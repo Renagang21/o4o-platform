@@ -1,10 +1,11 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Mail, BookOpen, Key, FileText, MessageSquare, Shield } from 'lucide-react'
+import { Settings as SettingsIcon, Mail, BookOpen, Key, FileText, MessageSquare, Shield, Link as LinkIcon } from 'lucide-react'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
 import EmailSettings from './EmailSettings'
+import PermalinkSettings from './PermalinkSettings'
 
 const UserSettings: FC = () => (
   <div className="wp-card">
@@ -40,6 +41,7 @@ const settingsTabs = [
   { id: 'general', label: '일반', icon: <SettingsIcon className="w-4 h-4" />, path: '/settings' },
   { id: 'writing', label: '쓰기', icon: <FileText className="w-4 h-4" />, path: '/settings/writing' },
   { id: 'reading', label: '읽기', icon: <BookOpen className="w-4 h-4" />, path: '/settings/reading' },
+  { id: 'permalink', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: '/settings/permalink' },
   { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: '/settings/discussion' },
   { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: '/settings/privacy' },
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
@@ -85,6 +87,7 @@ const Settings: FC = () => {
       <Routes>
         <Route index element={<GeneralSettings />} />
         <Route path="reading" element={<ReadingSettings />} />
+        <Route path="permalink" element={<PermalinkSettings />} />
         <Route path="privacy" element={<PrivacySettings />} />
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />

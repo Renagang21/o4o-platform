@@ -6,7 +6,7 @@ export class Settings {
   key!: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  value: GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | Record<string, unknown> | null;
+  value: GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | Record<string, unknown> | null;
 
   @Column({ type: 'varchar', length: 50 })
   type!: string; // 'general', 'reading', 'theme', 'email', etc.
@@ -65,4 +65,21 @@ export interface EmailSettings {
   smtpSecure: boolean;
   fromEmail: string;
   fromName: string;
+}
+
+export interface PermalinkSettings {
+  structure: string; // "/%postname%/" | "/%year%/%monthnum%/%postname%/" 등
+  categoryBase: string; // "category" (카테고리 URL 베이스)
+  tagBase: string; // "tag" (태그 URL 베이스)
+  customStructures?: {
+    post?: string;
+    page?: string;
+    category?: string;
+    tag?: string;
+  };
+  // SEO 및 성능 최적화 옵션
+  removeStopWords: boolean; // "the", "and" 등 불용어 제거
+  maxUrlLength: number; // URL 최대 길이 (기본값: 75)
+  autoFlushRules: boolean; // 설정 변경 시 자동으로 rewrite rules flush
+  enableSeoWarnings: boolean; // SEO 관련 경고 표시
 }
