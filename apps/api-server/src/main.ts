@@ -682,7 +682,6 @@ import tagRoutes from './routes/content/tagRoutes';
 app.use('/api', tagRoutes); // Tags at /api/tags (mounted at specific paths in the router)
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
-app.use('/api/v1/media', contentRoutes); // Media routes (v1 API compatibility)
 
 // Advanced menu features (Phase 2)
 import menuAdvancedRoutes from './routes/menu-advanced';
@@ -691,14 +690,14 @@ app.use('/api/v1/menus-advanced', menuAdvancedRoutes); // Advanced menu APIs
 // Menu Phase 3 features (Caching, Analytics, Widgets)
 import menuPhase3Routes from './routes/menu-phase3';
 app.use('/api/v1/menus-phase3', menuPhase3Routes); // Phase 3 menu APIs
+app.use('/api/media/gallery', galleryRoutes); // Gallery-specific routes (PUBLIC ACCESS)
+app.use('/api/media', galleryRoutes); // Standard media routes for gallery block (PUBLIC ACCESS)
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
-app.use('/api/v1/media', mediaV1Routes);
+app.use('/api/v1/media', mediaV1Routes); // V1 media routes (AUTHENTICATED ACCESS)
 app.use('/api/v1/pages', pagesV1Routes); // V1 pages API with full authentication
-app.use('/api/media/gallery', galleryRoutes); // Gallery-specific routes
-app.use('/api/media', galleryRoutes); // Standard media routes for gallery block
 app.use('/api/v1/apps', appsV1Routes);
 app.use('/api/v1/apps/plugins', pluginsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);
