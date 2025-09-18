@@ -135,6 +135,12 @@ const HomePage: FC = () => {
 
   const settings = settingsResponse?.data;
   
+  // Debug logging for production
+  if (typeof window !== 'undefined') {
+    console.log('Homepage settings response:', settingsResponse);
+    console.log('Settings data:', settings);
+  }
+  
   if (!settings) {
     return (
       <Layout>
