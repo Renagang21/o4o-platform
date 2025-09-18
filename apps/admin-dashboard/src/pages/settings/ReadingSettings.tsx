@@ -161,7 +161,7 @@ export default function ReadingSettings() {
 
   const handleSave = () => {
     // Validate settings
-    if (settings.homepageType !== 'latest_posts' && !settings.homepageId) {
+    if (settings.homepageType === 'static_page' && !settings.homepageId) {
       toast.error('홈페이지로 사용할 페이지를 선택해주세요');
       return;
     }
