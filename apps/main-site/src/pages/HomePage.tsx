@@ -38,8 +38,14 @@ const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  const response = await apiClient.get(`/posts/${pageId}`);
-  return response.data.data;
+  // Use base API URL for posts data since v1 doesn't have posts endpoint
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr/api';
+  const response = await fetch(`${baseUrl}/posts/${pageId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch page data');
+  }
+  const data = await response.json();
+  return data.data;
 };
 
 const HomePage: FC = () => {
