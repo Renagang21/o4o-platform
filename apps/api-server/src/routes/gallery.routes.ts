@@ -6,6 +6,7 @@ const router: Router = Router();
 const galleryController = new GalleryController();
 
 // Public routes (for viewing images)
+router.get('/', galleryController.getGalleryImages.bind(galleryController)); // Root media endpoint
 router.get('/images', galleryController.getGalleryImages.bind(galleryController));
 
 // Protected routes (require authentication)
