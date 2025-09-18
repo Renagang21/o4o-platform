@@ -4,7 +4,7 @@ import { checkPermission } from '../../middleware/permissions';
 import logger from '../../utils/logger';
 import { AppDataSource } from '../../database/connection';
 import { Settings, ReadingSettings } from '../../entities/Settings';
-import { Page } from '../../entities/Page';
+import { Post } from '../../entities/Post';
 
 const router: Router = Router();
 
@@ -286,9 +286,12 @@ router.get('/homepage', async (req: Request, res: Response) => {
       } else {
         // pageId가 있는 경우 검증
         try {
-          const pageRepository = AppDataSource.getRepository(Page);
-          const page = await pageRepository.findOne({
-            where: { id: readingSettings.homepageId }
+          const postRepository = AppDataSource.getRepository(Post);
+          const page = await postRepository.findOne({
+            where: { 
+              id: readingSettings.homepageId,
+              type: 'page'
+            }
           });
           
           if (!page) {
@@ -520,9 +523,12 @@ router.put('/reading',
       // pageId 유효성 검사 (static_page인 경우)
       if (newSettings.homepageType === 'static_page' && newSettings.homepageId) {
         try {
-          const pageRepository = AppDataSource.getRepository(Page);
-          const page = await pageRepository.findOne({
-            where: { id: newSettings.homepageId }
+          const postRepository = AppDataSource.getRepository(Post);
+          const page = await postRepository.findOne({
+            where: { 
+              id: newSettings.homepageId,
+              type: 'page'
+            }
           });
           
           if (!page) {
