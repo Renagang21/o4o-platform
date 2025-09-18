@@ -40,12 +40,29 @@ const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
 const fetchPageData = async (pageId: string): Promise<Page> => {
   // Use base API URL for posts data since v1 doesn't have posts endpoint
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr/api';
-  const response = await fetch(`${baseUrl}/posts/${pageId}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch page data');
+  try {
+    const response = await fetch(`${baseUrl}/posts/${pageId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data || !data.data) {
+      throw new Error('Invalid response format');
+    }
+    
+    return data.data;
+  } catch (error) {
+    console.error('Failed to fetch page data:', error);
+    throw error;
   }
-  const data = await response.json();
-  return data.data;
 };
 
 const HomePage: FC = () => {
