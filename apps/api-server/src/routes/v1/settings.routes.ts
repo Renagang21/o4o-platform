@@ -473,9 +473,43 @@ router.put('/reading',
         timestamp: new Date().toISOString()
       });
       
+      // 상세 디버깅 로그
+      logger.debug('Detailed request analysis:', {
+        traceId,
+        homepageType: newSettings.homepageType,
+        homepageId: newSettings.homepageId,
+        hasHomepageId: !!newSettings.homepageId,
+        homepageIdType: typeof newSettings.homepageId,
+        homepageIdValue: JSON.stringify(newSettings.homepageId),
+        fullPayload: JSON.stringify(newSettings, null, 2)
+      });
+      
       // 입력 검증
-      if (newSettings.homepageType === 'static_page' && !newSettings.homepageId) {
-        logger.warn('Validation failed: static_page requires pageId:', { traceId, actor });
+      if (!newSettings.homepageType) {
+        logger.warn('Validation failed: homepageType is required:', { traceId, actor, payload: newSettings });
+        return res.status(400).json({
+          success: false,
+          error: 'homepageType is required',
+          code: 'MISSING_HOMEPAGE_TYPE'
+        });
+      }
+      
+      if (!['latest_posts', 'static_page'].includes(newSettings.homepageType)) {
+        logger.warn('Validation failed: invalid homepageType:', { traceId, actor, homepageType: newSettings.homepageType });
+        return res.status(400).json({
+          success: false,
+          error: 'homepageType must be either "latest_posts" or "static_page"',
+          code: 'INVALID_HOMEPAGE_TYPE'
+        });
+      }
+      
+      if (newSettings.homepageType === 'static_page' && (!newSettings.homepageId || newSettings.homepageId.trim() === '')) {
+        logger.warn('Validation failed: static_page requires valid pageId:', { 
+          traceId, 
+          actor, 
+          homepageId: newSettings.homepageId,
+          homepageIdType: typeof newSettings.homepageId
+        });
         return res.status(400).json({
           success: false,
           error: 'homepageId is required when homepageType is static_page',
