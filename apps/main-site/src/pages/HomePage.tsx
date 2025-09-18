@@ -32,14 +32,19 @@ interface Page {
 
 // Fetch homepage settings
 const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
-  const response = await apiClient.get('/v1/settings/homepage');
+  const response = await apiClient.get('/settings/homepage');
   return response.data;
 };
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  const response = await apiClient.get(`/public/pages/${pageId}`);
-  return response.data.data;
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+  const response = await fetch(`${baseUrl}/api/pages/${pageId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch page: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.data;
 };
 
 const HomePage: FC = () => {
