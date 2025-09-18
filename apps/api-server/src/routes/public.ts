@@ -45,7 +45,7 @@ router.get('/templates/homepage', async (req, res) => {
         metadata: {
           version: homepageTemplate.version,
           layoutType: homepageTemplate.layoutType,
-          updatedAt: homepageTemplate.updated_at
+          updatedAt: homepageTemplate.updatedAt
         }
       }
     });
