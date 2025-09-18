@@ -5,8 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DropshippingController } from '../../controllers/DropshippingController';
-// import { authenticateToken } from '../../middleware/authMiddleware';
-// import { requireRole } from '../../middleware/requireRole';
+import { authMiddleware } from '../../middleware/authMiddleware';
 
 const router: Router = Router();
 const dropshippingController = new DropshippingController();
@@ -49,9 +48,13 @@ router.get('/connectors', (req: Request, res: Response) => {
  * @desc    Test supplier connector
  * @access  Admin
  */
-router.post('/connectors/:connectorId/test', (req: Request, res: Response) => {
-  dropshippingController.testConnector(req as any, res);
-});
+router.post('/connectors/:connectorId/test', 
+  authMiddleware.authenticateToken,
+  authMiddleware.requirePermission('dropshipping:test'),
+  (req: Request, res: Response) => {
+    dropshippingController.testConnector(req as any, res);
+  }
+);
 
 /**
  * @route   GET /api/v1/dropshipping/margin-policies
