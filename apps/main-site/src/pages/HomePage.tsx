@@ -135,12 +135,6 @@ const HomePage: FC = () => {
 
   const settings = settingsResponse?.data;
   
-  // Debug logging for production
-  if (typeof window !== 'undefined') {
-    console.log('Homepage settings response:', settingsResponse);
-    console.log('Settings data:', settings);
-  }
-  
   if (!settings) {
     return (
       <Layout>
@@ -255,17 +249,25 @@ const HomePage: FC = () => {
     );
   }
 
-  // Fallback for unknown state
+  // Fallback for unknown state - with enhanced debugging
   return (
     <Layout>
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            알 수 없는 상태
+            홈페이지 디버깅 모드
           </h2>
           <p className="text-gray-600 mb-4">
-            홈페이지 설정에 문제가 있습니다.
+            현재 설정 상태를 확인 중입니다.
           </p>
+          <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mb-4">
+            <p><strong>Settings Type:</strong> {settings?.type || 'undefined'}</p>
+            <p><strong>Page ID:</strong> {settings?.pageId || 'null'}</p>
+            <p><strong>Posts Per Page:</strong> {settings?.postsPerPage || 'undefined'}</p>
+            <p><strong>Settings Loading:</strong> {isSettingsLoading ? 'true' : 'false'}</p>
+            <p><strong>Settings Error:</strong> {settingsError ? 'true' : 'false'}</p>
+            <p><strong>Validation Failed:</strong> {settingsResponse?.meta?.validation_failed ? 'true' : 'false'}</p>
+          </div>
           <button 
             onClick={() => window.location.reload()}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -273,7 +275,7 @@ const HomePage: FC = () => {
             새로고침
           </button>
           <details className="mt-4 text-sm text-gray-500">
-            <summary className="cursor-pointer">디버그 정보</summary>
+            <summary className="cursor-pointer">전체 디버그 정보</summary>
             <pre className="mt-2 p-2 bg-gray-100 rounded text-left overflow-auto">
               {JSON.stringify(settingsResponse, null, 2)}
             </pre>
