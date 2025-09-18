@@ -276,6 +276,16 @@ export class GalleryController {
       const { id } = req.params;
       const { alt, caption, description } = req.body;
 
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid media ID format. Expected UUID.',
+          code: 'INVALID_UUID'
+        });
+      }
+
       const mediaFile = await this.mediaRepository.findOne({ where: { id } });
 
       if (!mediaFile) {
@@ -319,6 +329,16 @@ export class GalleryController {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
+
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid media ID format. Expected UUID.',
+          code: 'INVALID_UUID'
+        });
+      }
 
       const mediaFile = await this.mediaRepository.findOne({ where: { id } });
 
