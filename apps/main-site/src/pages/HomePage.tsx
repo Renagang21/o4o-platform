@@ -60,7 +60,7 @@ const fetchPageData = async (pageId: string): Promise<Page> => {
     
     return data.data;
   } catch (error) {
-    console.error('Failed to fetch page data:', error);
+    // console.error('Failed to fetch page data:', error);
     throw error;
   }
 };
