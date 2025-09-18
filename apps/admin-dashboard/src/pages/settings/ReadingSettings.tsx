@@ -80,41 +80,8 @@ export default function ReadingSettings() {
   // Save settings mutation
   const saveMutation = useMutation({
     mutationFn: async (data: ReadingSettingsData) => {
-      try {
-        // 토큰 상태 디버깅
-        const accessToken = localStorage.getItem('accessToken');
-        const token = localStorage.getItem('token');
-        const adminStorage = localStorage.getItem('admin-auth-storage');
-        
-        if (!accessToken && !token && !adminStorage) {
-          toast.error('인증 토큰이 없습니다. 다시 로그인해주세요.');
-          throw new Error('인증 토큰이 없습니다');
-        }
-        
-        // JWT 토큰 디코딩하여 role 확인 (디버깅용)
-        const actualToken = accessToken || token;
-        if (actualToken) {
-          try {
-            const payload = JSON.parse(atob(actualToken.split('.')[1]));
-            if (payload.role !== 'admin' && payload.role !== 'super_admin') {
-              toast.error(`권한 부족: 현재 역할은 '${payload.role}'입니다. 관리자 권한이 필요합니다.`);
-              throw new Error('관리자 권한이 필요합니다');
-            }
-          } catch (e) {
-            // 토큰 파싱 실패 - 계속 진행
-          }
-        }
-        
-        const response = await apiClient.put('/api/v1/settings/reading', data);
-        return response;
-      } catch (apiError: any) {
-        if (apiError.response?.status === 401) {
-          throw new Error('인증이 만료되었습니다. 다시 로그인해주세요.');
-        } else if (apiError.response?.status === 403) {
-          throw new Error('관리자 권한이 필요합니다. 현재 계정의 역할을 확인해주세요.');
-        }
-        throw new Error('서버에 설정을 저장할 수 없습니다. 네트워크 연결을 확인해주세요.');
-      }
+      const response = await apiClient.put('/api/v1/settings/reading', data);
+      return response;
     },
     onSuccess: async () => {
       // 즉시 서버에서 최신 데이터를 다시 가져와 동기화
