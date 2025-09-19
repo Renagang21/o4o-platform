@@ -71,7 +71,15 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
         );
 
         if (response.status === 200) {
-          setTemplateParts(response.data);
+          // Ensure response.data is an array
+          const data = response.data;
+          if (Array.isArray(data)) {
+            setTemplateParts(data);
+          } else if (data && data.error) {
+            throw new Error(data.error);
+          } else {
+            setTemplateParts([]);
+          }
         } else {
           throw new Error('Failed to fetch template parts');
         }

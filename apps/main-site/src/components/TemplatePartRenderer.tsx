@@ -124,7 +124,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
           <style dangerouslySetInnerHTML={{ __html: settings.customCss }} />
         )}
         <div className={containerClass}>
-          {content.map((block: TemplatePartBlock) => renderBlock(block))}
+          {Array.isArray(content) ? content.map((block: TemplatePartBlock) => renderBlock(block)) : null}
         </div>
       </div>
     );
@@ -161,7 +161,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   // Render all active template parts for the area
   return (
     <>
-      {templateParts.map(templatePart => renderTemplatePart(templatePart))}
+      {Array.isArray(templateParts) ? templateParts.map(templatePart => renderTemplatePart(templatePart)) : null}
     </>
   );
 };
