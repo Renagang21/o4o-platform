@@ -52,44 +52,92 @@ export default function TemplateParts() {
         params.append('area', activeTab);
       }
       const response = await authClient.api.get(`/template-parts?${params}`);
-      return response.data;
+      // Handle both old and new API response structures
+      const data = response.data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        // New structure: {success: true, data: [...], count: N}
+        if (data.success) {
+          return data.data || [];
+        } else {
+          throw new Error(data.error || 'Failed to fetch template parts');
+        }
+      } else if (Array.isArray(data)) {
+        // Old structure: direct array
+        return data;
+      } else {
+        // Fallback for other structures
+        return [];
+      }
     }
   });
 
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await authClient.api.delete(`/template-parts/${id}`);
+      const response = await authClient.api.delete(`/template-parts/${id}`);
+      // Handle both old and new API response structures
+      const data = response.data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        // New structure: {success: true/false, error?: string}
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to delete template part');
+        }
+      }
+      return response.data;
     },
     onSuccess: () => {
       toast.success('템플릿 파트가 삭제되었습니다');
       queryClient.invalidateQueries({ queryKey: ['template-parts'] });
       setDeleteId(null);
     },
-    onError: () => {
-      toast.error('템플릿 파트 삭제에 실패했습니다');
+    onError: (error: any) => {
+      toast.error(error.message || '템플릿 파트 삭제에 실패했습니다');
     }
   });
 
   // Toggle active status
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      await authClient.api.put(`/template-parts/${id}`, { isActive });
+      const response = await authClient.api.put(`/template-parts/${id}`, { isActive });
+      // Handle both old and new API response structures
+      const data = response.data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        // New structure: {success: true/false, error?: string}
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to update template part');
+        }
+      }
+      return response.data;
     },
     onSuccess: () => {
       toast.success('상태가 변경되었습니다');
       queryClient.invalidateQueries({ queryKey: ['template-parts'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || '상태 변경에 실패했습니다');
     }
   });
 
   // Duplicate template part
   const duplicateMutation = useMutation({
     mutationFn: async (id: string) => {
-      await authClient.api.post(`/template-parts/${id}/duplicate`);
+      const response = await authClient.api.post(`/template-parts/${id}/duplicate`);
+      // Handle both old and new API response structures
+      const data = response.data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        // New structure: {success: true/false, error?: string}
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to duplicate template part');
+        }
+      }
+      return response.data;
     },
     onSuccess: () => {
       toast.success('템플릿 파트가 복제되었습니다');
       queryClient.invalidateQueries({ queryKey: ['template-parts'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || '템플릿 파트 복제에 실패했습니다');
     }
   });
 

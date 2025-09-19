@@ -69,7 +69,22 @@ export default function TemplatePartEditor() {
     queryFn: async () => {
       if (!isEditMode) return null;
       const response = await authClient.api.get(`/template-parts/${id}`);
-      return response.data;
+      // Handle both old and new API response structures
+      const data = response.data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        // New structure: {success: true, data: {...}}
+        if (data.success) {
+          return data.data || null;
+        } else {
+          throw new Error(data.error || 'Failed to fetch template part');
+        }
+      } else if (data && typeof data === 'object') {
+        // Old structure: direct object
+        return data;
+      } else {
+        // Fallback
+        return null;
+      }
     },
     enabled: !!isEditMode
   });
@@ -103,7 +118,19 @@ export default function TemplatePartEditor() {
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await authClient.api.post('/template-parts', data);
-      return response.data;
+      // Handle both old and new API response structures
+      const responseData = response.data;
+      if (responseData && typeof responseData === 'object' && 'success' in responseData) {
+        // New structure: {success: true, data: {...}}
+        if (responseData.success) {
+          return responseData.data || null;
+        } else {
+          throw new Error(responseData.error || 'Failed to create template part');
+        }
+      } else {
+        // Old structure: direct object
+        return responseData;
+      }
     },
     onSuccess: () => {
       toast.success('템플릿 파트가 생성되었습니다');
@@ -119,7 +146,19 @@ export default function TemplatePartEditor() {
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await authClient.api.put(`/template-parts/${id}`, data);
-      return response.data;
+      // Handle both old and new API response structures
+      const responseData = response.data;
+      if (responseData && typeof responseData === 'object' && 'success' in responseData) {
+        // New structure: {success: true, data: {...}}
+        if (responseData.success) {
+          return responseData.data || null;
+        } else {
+          throw new Error(responseData.error || 'Failed to update template part');
+        }
+      } else {
+        // Old structure: direct object
+        return responseData;
+      }
     },
     onSuccess: () => {
       toast.success('템플릿 파트가 수정되었습니다');

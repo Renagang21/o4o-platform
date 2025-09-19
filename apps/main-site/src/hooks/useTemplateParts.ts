@@ -71,7 +71,22 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
         );
 
         if (response.status === 200) {
-          setTemplateParts(response.data);
+          // Handle both old and new API response structures
+          const data = response.data;
+          if (data && typeof data === 'object' && 'success' in data) {
+            // New structure: {success: true, data: [...], count: N}
+            if (data.success) {
+              setTemplateParts(data.data || []);
+            } else {
+              throw new Error(data.error || 'Failed to fetch template parts');
+            }
+          } else if (Array.isArray(data)) {
+            // Old structure: direct array
+            setTemplateParts(data);
+          } else {
+            // Fallback for other structures
+            setTemplateParts([]);
+          }
         } else {
           throw new Error('Failed to fetch template parts');
         }
@@ -108,7 +123,22 @@ export function useTemplatePart(identifier: string) {
         const response = await authClient.api.get(`/template-parts/${identifier}`);
 
         if (response.status === 200) {
-          setTemplatePart(response.data);
+          // Handle both old and new API response structures
+          const data = response.data;
+          if (data && typeof data === 'object' && 'success' in data) {
+            // New structure: {success: true, data: {...}}
+            if (data.success) {
+              setTemplatePart(data.data || null);
+            } else {
+              throw new Error(data.error || 'Failed to fetch template part');
+            }
+          } else if (data && typeof data === 'object') {
+            // Old structure: direct object
+            setTemplatePart(data);
+          } else {
+            // Fallback
+            setTemplatePart(null);
+          }
         } else {
           throw new Error('Failed to fetch template part');
         }
