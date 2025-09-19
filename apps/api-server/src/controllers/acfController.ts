@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 import { validate } from 'class-validator';
+import { metaDataService } from '../services/MetaDataService';
 
 export class ACFController {
   // Field Groups
@@ -214,18 +215,10 @@ export class ACFController {
   static async getFieldValues(req: Request, res: Response) {
     try {
       const { entityType, entityId } = req.params;
-      const fieldValueRepo = AppDataSource.getRepository(CustomFieldValue);
       
-      const values = await fieldValueRepo.find({
-        where: { entityType, entityId },
-        relations: ['field']
-      });
-
-      // Transform to key-value pairs
-      const result = values.reduce((acc: any, val: any) => {
-        acc[val.field.name] = val.value;
-        return acc;
-      }, {});
+      // 새로운 통합 데이터 접근 레이어 사용
+      const metaData = await metaDataService.getManyMeta(entityType, [entityId]);
+      const result = metaData[entityId] || {};
 
       res.json({
         success: true,
@@ -246,34 +239,20 @@ export class ACFController {
       const { entityType, entityId } = req.params;
       const values = req.body;
       
-      const fieldValueRepo = AppDataSource.getRepository(CustomFieldValue);
-      const fieldRepo = AppDataSource.getRepository(CustomField);
+      // 새로운 통합 데이터 접근 레이어 사용 (트랜잭션 포함)
+      const success = await metaDataService.setManyMeta(entityType, entityId, values);
 
-      // Delete existing values
-      await fieldValueRepo.delete({ entityType, entityId });
-
-      // Save new values
-      const valueEntities = [];
-      for (const [fieldName, value] of Object.entries(values)) {
-        const field = await fieldRepo.findOne({ where: { name: fieldName } });
-        
-        if (field) {
-          const fieldValue = fieldValueRepo.create({
-            fieldId: field.id,
-            entityType,
-            entityId,
-            value
-          });
-          valueEntities.push(fieldValue);
-        }
+      if (success) {
+        res.json({
+          success: true,
+          message: 'Field values saved successfully'
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to save field values'
+        });
       }
-
-      await fieldValueRepo.save(valueEntities);
-
-      res.json({
-        success: true,
-        message: 'Field values saved successfully'
-      });
     } catch (error: any) {
       // Error log removed
       res.status(500).json({

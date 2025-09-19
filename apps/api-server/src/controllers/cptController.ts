@@ -4,6 +4,7 @@ import { CustomPostType, FieldGroup, FieldSchema } from '../entities/CustomPostT
 import { CustomPost, PostStatus } from '../entities/CustomPost';
 import { AuthRequest } from '../types/auth';
 import { WordPressTransformer } from '../utils/wordpress-transformer';
+import { metaDataService } from '../services/MetaDataService';
 
 export class CPTController {
   // ============= Custom Post Type Management =============
@@ -269,10 +270,10 @@ export class CPTController {
         queryBuilder.andWhere('post.status = :status', { status });
       }
 
-      // Search in title and fields
+      // Search in title, content, and custom field values
       if (search) {
         queryBuilder.andWhere(
-          '(post.title ILIKE :search OR post.content ILIKE :search OR post.fields::text ILIKE :search)',
+          '(post.title ILIKE :search OR post.content ILIKE :search OR EXISTS (SELECT 1 FROM custom_field_values cfv WHERE cfv.entityId = post.id AND cfv.entityType = \'post\' AND cfv.value::text ILIKE :search))',
           { search: `%${search}%` }
         );
       }
@@ -289,6 +290,17 @@ export class CPTController {
       queryBuilder.skip(skip).take(Number(per_page));
 
       const [posts, total] = await queryBuilder.getManyAndCount();
+
+      // 커스텀 필드 데이터를 EAV에서 가져와서 포스트에 추가
+      if (posts.length > 0) {
+        const postIds = posts.map(post => post.id);
+        const metaData = await metaDataService.getManyMeta('post', postIds);
+        
+        // 각 포스트에 EAV 데이터 병합
+        posts.forEach(post => {
+          post.fields = { ...post.fields, ...metaData[post.id] };
+        });
+      }
 
       // Transform to WordPress format
       const wpPosts = WordPressTransformer.transformCustomPosts(posts, {
@@ -345,7 +357,7 @@ export class CPTController {
       post.title = title;
       post.slug = post.generateSlug();
       post.postTypeSlug = slug;
-      post.fields = fields || {};
+      post.fields = {}; // 레거시 필드는 빈 객체로 유지 (마이그레이션 후 제거 예정)
       post.content = content;
       post.status = status || PostStatus.DRAFT;
       post.meta = meta;
@@ -356,6 +368,11 @@ export class CPTController {
       }
 
       await postRepo.save(post);
+
+      // 새로운 EAV 시스템으로 필드 데이터 저장
+      if (fields && Object.keys(fields).length > 0) {
+        await metaDataService.setManyMeta('post', post.id, fields);
+      }
 
       res.status(201).json({
         success: true,
@@ -449,6 +466,10 @@ export class CPTController {
         });
       }
 
+      // 커스텀 필드 데이터를 EAV에서 가져와서 포스트에 추가
+      const metaData = await metaDataService.getManyMeta('post', [post.id]);
+      post.fields = { ...post.fields, ...metaData[post.id] };
+
       // Transform to WordPress format
       const wpPost = WordPressTransformer.transformCustomPost(post, {
         includeContent: true,
@@ -470,7 +491,7 @@ export class CPTController {
   static async updatePost(req: Request, res: Response) {
     try {
       const { slug, postId } = req.params;
-      const updates = req.body;
+      const { fields, ...otherUpdates } = req.body;
 
       const postRepo = AppDataSource.getRepository(CustomPost);
       const post = await postRepo.findOne({
@@ -484,8 +505,14 @@ export class CPTController {
         });
       }
 
-      Object.assign(post, updates);
+      // 기본 필드 업데이트 (fields 제외)
+      Object.assign(post, otherUpdates);
       await postRepo.save(post);
+
+      // 커스텀 필드 업데이트 (EAV 시스템 사용)
+      if (fields && typeof fields === 'object') {
+        await metaDataService.setManyMeta('post', post.id, fields);
+      }
 
       res.json({
         success: true,
@@ -507,17 +534,26 @@ export class CPTController {
       const { slug, postId } = req.params;
       const postRepo = AppDataSource.getRepository(CustomPost);
 
-      const result = await postRepo.delete({
-        id: postId,
-        postTypeSlug: slug
+      // 포스트 존재 여부 확인
+      const post = await postRepo.findOne({
+        where: { id: postId, postTypeSlug: slug }
       });
 
-      if (result.affected === 0) {
+      if (!post) {
         return res.status(404).json({
           success: false,
           message: '포스트를 찾을 수 없습니다.'
         });
       }
+
+      // 관련 메타 데이터 먼저 삭제
+      await metaDataService.deleteMeta('post', postId);
+
+      // 포스트 삭제
+      await postRepo.delete({
+        id: postId,
+        postTypeSlug: slug
+      });
 
       res.json({
         success: true,
@@ -575,6 +611,17 @@ export class CPTController {
       queryBuilder.skip(skip).take(Number(per_page));
 
       const [posts, total] = await queryBuilder.getManyAndCount();
+
+      // 커스텀 필드 데이터를 EAV에서 가져와서 포스트에 추가
+      if (posts.length > 0) {
+        const postIds = posts.map(post => post.id);
+        const metaData = await metaDataService.getManyMeta('post', postIds);
+        
+        // 각 포스트에 EAV 데이터 병합
+        posts.forEach(post => {
+          post.fields = { ...post.fields, ...metaData[post.id] };
+        });
+      }
 
       // Transform to WordPress format
       const wpPosts = WordPressTransformer.transformCustomPosts(posts, {
