@@ -30,14 +30,28 @@ const Navigation: FC<NavigationProps> = ({
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        // TODO: Implement menu API endpoint
-        const response = await authClient.api.get(`/menus/${menuRef}`);
+        const response = await authClient.api.get(`/v1/menus/${menuRef}`);
         if (response.status === 200 && response.data) {
-          setMenuItems(response.data.items || []);
+          // Handle new API response structure
+          const data = response.data;
+          if (data && typeof data === 'object' && 'success' in data) {
+            // New structure: {success: true, data: {...}}
+            if (data.success && data.data) {
+              setMenuItems(data.data.items || []);
+            } else {
+              throw new Error(data.error || 'Failed to fetch menu');
+            }
+          } else if (data && data.items) {
+            // Old structure: direct object with items
+            setMenuItems(data.items);
+          } else {
+            throw new Error('Invalid menu data structure');
+          }
+        } else {
+          throw new Error('Failed to fetch menu');
         }
       } catch (error) {
-    // Error logging - use proper error handler
-        // Fallback menu items
+        // Use fallback menu items for graceful degradation
         setMenuItems([
           { id: '1', title: '홈', url: '/' },
           { id: '2', title: '소개', url: '/about' },

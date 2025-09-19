@@ -60,6 +60,50 @@ class MenuService {
     return menu;
   }
 
+  async getMenuBySlug(slug: string): Promise<any | null> {
+    try {
+      // Check database connection first
+      if (!this.menuRepository.manager.connection.isInitialized) {
+        throw new Error('Database not initialized');
+      }
+
+      // Query database directly for menu with items
+      const result = await this.menuRepository.manager.query(`
+        SELECT m.id, m.name, m.slug, m.location, m.is_active,
+               json_agg(
+                 json_build_object(
+                   'id', mi.id,
+                   'title', mi.title,
+                   'url', mi.url,
+                   'type', mi.type,
+                   'target', mi.target,
+                   'order_num', mi.order_num
+                 ) ORDER BY mi.order_num
+               ) FILTER (WHERE mi.id IS NOT NULL) as items
+        FROM menus m
+        LEFT JOIN menu_items mi ON m.id = mi.menu_id
+        WHERE m.slug = $1
+        GROUP BY m.id, m.name, m.slug, m.location, m.is_active
+      `, [slug]);
+
+      if (result && result.length > 0) {
+        const menu = result[0];
+        return {
+          id: menu.id,
+          name: menu.name,
+          slug: menu.slug,
+          location: menu.location,
+          is_active: menu.is_active,
+          items: menu.items || []
+        };
+      }
+
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createMenu(data: {
     name: string;
     slug?: string;

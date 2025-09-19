@@ -10,8 +10,29 @@ const Customize: React.FC = () => {
   };
   
   const handleSave = async (settings: any) => {
-    // TODO: Implement API call to save settings
-    localStorage.setItem('astra-customizer-settings', JSON.stringify(settings));
+    try {
+      // Save customizer settings via API
+      const response = await fetch('/api/v1/settings/customizer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          settings: settings,
+          type: 'astra-customizer'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save customizer settings');
+      }
+
+      // Show success notification
+      console.log('Customizer settings saved successfully');
+    } catch (error) {
+      console.error('Failed to save customizer settings:', error);
+      throw error;
+    }
   };
   
   return (

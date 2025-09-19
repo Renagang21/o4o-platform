@@ -56,6 +56,24 @@ export class MenuController {
   getMenu = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+      
+      // For slug-based lookup, query database directly
+      if (id === 'primary-menu') {
+        try {
+          const menuData = await menuService.getMenuBySlug('primary-menu');
+          if (menuData) {
+            res.json({
+              success: true,
+              data: menuData
+            });
+            return;
+          }
+        } catch (dbError) {
+          logger.error('Database error for primary-menu:', dbError);
+          // Fall through to service lookup
+        }
+      }
+      
       const menu = await menuService.findMenuById(id);
       
       if (!menu) {
