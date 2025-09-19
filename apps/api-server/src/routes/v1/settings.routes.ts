@@ -356,6 +356,65 @@ router.get('/reading', async (req: Request, res: Response) => {
 });
 
 /**
+ * @route   GET /api/v1/settings/customizer
+ * @desc    Get customizer settings
+ * @access  Public (for frontend theme rendering)
+ */
+router.get('/customizer',
+  async (req: Request, res: Response) => {
+    try {
+      // Get customizer settings from database
+      const settingsRepository = AppDataSource.getRepository(Settings);
+      const dbSettings = await settingsRepository.findOne({ 
+        where: { key: 'customizer', type: 'customizer' } 
+      });
+      
+      if (dbSettings && dbSettings.value) {
+        return res.json({
+          success: true,
+          data: dbSettings.value
+        });
+      }
+      
+      // Fallback to default customizer settings
+      const defaultSettings = {
+        logo: null,
+        siteName: 'O4O Platform',
+        tagline: '통합 비즈니스 플랫폼',
+        colors: {
+          primary: '#3b82f6',
+          secondary: '#64748b',
+          accent: '#f59e0b'
+        },
+        typography: {
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontSize: {
+            base: '16px',
+            heading: '24px'
+          }
+        },
+        layout: {
+          headerStyle: 'default',
+          footerStyle: 'default',
+          containerWidth: 'wide'
+        }
+      };
+      
+      res.json({
+        success: true,
+        data: defaultSettings
+      });
+    } catch (error) {
+      logger.error('Failed to fetch customizer settings:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch customizer settings'
+      });
+    }
+  }
+);
+
+/**
  * @route   GET /api/v1/settings/:section
  * @desc    Get settings for a specific section
  * @access  Private
@@ -859,6 +918,103 @@ router.post('/permalink/validate',
       res.status(500).json({
         success: false,
         error: 'Failed to validate permalink settings'
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/v1/settings/customizer
+ * @desc    Update customizer settings
+ * @access  Private (Admin only)
+ */
+router.post('/customizer',
+  authenticateToken,
+  checkPermission('settings:write'),
+  async (req: Request, res: Response) => {
+    try {
+      const newSettings = req.body;
+      const actor = (req as any).user?.id || 'unknown';
+      
+      logger.info('Customizer settings update request:', {
+        actor,
+        settings: newSettings,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Validate settings structure
+      if (!newSettings.settings && !newSettings.type) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid customizer settings format'
+        });
+      }
+      
+      const customizerSettings = newSettings.settings || newSettings;
+      
+      // Save to database
+      const settingsRepository = AppDataSource.getRepository(Settings);
+      
+      try {
+        let dbSettings = await settingsRepository.findOne({ 
+          where: { key: 'customizer', type: 'customizer' } 
+        });
+        
+        if (dbSettings) {
+          // Merge with existing settings
+          const existingSettings = dbSettings.value || {};
+          dbSettings.value = { ...existingSettings, ...customizerSettings };
+          dbSettings.updatedAt = new Date();
+        } else {
+          dbSettings = settingsRepository.create({
+            key: 'customizer',
+            type: 'customizer',
+            value: customizerSettings,
+            description: 'Website customizer settings (logo, colors, typography, layout)'
+          });
+        }
+        
+        await settingsRepository.save(dbSettings);
+        
+        logger.info('Customizer settings saved to database:', {
+          actor,
+          settings: dbSettings.value,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Also update memory store for backward compatibility
+        settingsStore.set('customizer', customizerSettings);
+        
+        res.json({
+          success: true,
+          data: dbSettings.value,
+          message: 'Customizer settings updated successfully'
+        });
+        
+      } catch (dbError) {
+        logger.error('Database save failed for customizer settings:', {
+          actor,
+          error: dbError instanceof Error ? dbError.message : 'Unknown DB error'
+        });
+        
+        // Fallback to memory store
+        settingsStore.set('customizer', customizerSettings);
+        
+        res.status(500).json({
+          success: false,
+          error: 'Database save failed, settings saved temporarily'
+        });
+      }
+      
+    } catch (error) {
+      logger.error('Customizer settings update failed:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update customizer settings'
       });
     }
   }
