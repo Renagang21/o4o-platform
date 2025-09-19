@@ -18,6 +18,18 @@ const router: Router = Router()
 // Apply authentication to protected routes
 router.use('/ws', authenticateToken)
 
+// Handle preflight OPTIONS requests for CORS
+router.options('*', (req: Request, res: Response) => {
+  // Remove X-Frame-Options to allow iframe access
+  res.removeHeader('X-Frame-Options')
+  
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://admin.neture.co.kr https://neture.co.kr http://localhost:3000 http://localhost:3001 http://localhost:5173 http://localhost:5174")
+  res.status(200).end()
+})
+
 /**
  * GET /api/preview
  * Generate theme customization preview HTML
@@ -93,7 +105,17 @@ router.get('/',
       // Set appropriate headers
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-      res.setHeader('X-Frame-Options', 'SAMEORIGIN')
+      
+      // Remove X-Frame-Options to allow iframe access
+      res.removeHeader('X-Frame-Options')
+      
+      // Allow iframe access from specific domains
+      res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://admin.neture.co.kr https://neture.co.kr http://localhost:3000 http://localhost:3001 http://localhost:5173 http://localhost:5174")
+      
+      // Add CORS headers for iframe access
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
       
       res.send(previewHtml)
 
@@ -126,6 +148,11 @@ router.post('/generate',
       // For now, we'll generate a URL with parameters
       const previewUrl = `/api/preview?userId=${userId}&theme=twenty-four&device=${device}&token=${previewToken}`
 
+      // Add CORS headers for iframe access
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+      
       res.json({ previewUrl })
 
     } catch (error) {

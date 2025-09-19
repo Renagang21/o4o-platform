@@ -133,6 +133,7 @@ import settingsV1Routes from './routes/v1/settings.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
 import pagesV1Routes from './routes/v1/pages.routes';
+import previewRoutes from './routes/preview';
 import { affiliateRoutes, commissionRoutes, phase3Routes } from './modules/affiliate';
 import { AffiliateSocketManager } from './modules/affiliate/websocket/socket.manager';
 
@@ -251,6 +252,7 @@ const publicLimiter = rateLimit({
 // 미들웨어 설정
 app.use(helmet({
   contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
+  frameguard: { action: 'deny' }, // Default frame guard, will be overridden for specific routes
 }));
 
 // Enable compression for all responses
@@ -680,6 +682,7 @@ app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
 app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
+app.use('/api/preview', publicLimiter, previewRoutes); // Preview routes for theme customization
 app.use('/api/content', contentRoutes); // Content routes - moved to specific path to avoid conflicts
 app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full features)
 
