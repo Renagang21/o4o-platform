@@ -83,6 +83,9 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
           } else if (Array.isArray(data)) {
             // Old structure: direct array
             setTemplateParts(data);
+          } else if (data && data.error) {
+            // Error response
+            throw new Error(data.error);
           } else {
             // Fallback for other structures
             setTemplateParts([]);

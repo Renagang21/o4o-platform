@@ -16,18 +16,28 @@ export const WordPressBlockRenderer: FC<WordPressBlockRendererProps> = ({
   className = '' 
 }) => {
   // Parse and transform blocks
-  let parsedBlocks = [];
+  let parsedBlocks: any[] = [];
   
   if (typeof blocks === 'string') {
     try {
       const wpBlocks = JSON.parse(blocks);
-      parsedBlocks = transformWordPressBlocks(Array.isArray(wpBlocks) ? wpBlocks : [wpBlocks]);
+      if (Array.isArray(wpBlocks)) {
+        parsedBlocks = transformWordPressBlocks(wpBlocks);
+      } else if (wpBlocks && typeof wpBlocks === 'object') {
+        parsedBlocks = transformWordPressBlocks([wpBlocks]);
+      } else {
+        console.warn('WordPressBlockRenderer: Invalid blocks data:', wpBlocks);
+        parsedBlocks = [];
+      }
     } catch (error) {
-    // Error logging - use proper error handler
+      console.warn('WordPressBlockRenderer: Failed to parse blocks JSON:', error);
       return <div className="error">Failed to render content</div>;
     }
   } else if (Array.isArray(blocks)) {
     parsedBlocks = transformWordPressBlocks(blocks);
+  } else if (blocks && typeof blocks === 'object') {
+    console.warn('WordPressBlockRenderer: Expected array but got object:', blocks);
+    parsedBlocks = [];
   }
 
   if (parsedBlocks.length === 0) {
@@ -36,9 +46,9 @@ export const WordPressBlockRenderer: FC<WordPressBlockRendererProps> = ({
 
   return (
     <div className={`wp-block-content ${className}`}>
-      {parsedBlocks.map((block, index) => (
+      {Array.isArray(parsedBlocks) ? parsedBlocks.map((block, index) => (
         <BlockRenderer key={block.id || index} block={block} />
-      ))}
+      )) : null}
     </div>
   );
 };
