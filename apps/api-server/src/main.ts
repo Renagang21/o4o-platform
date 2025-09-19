@@ -62,7 +62,7 @@ import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
 import { authenticateToken } from './middleware/auth';
 import { startCrowdfundingSchedules } from './schedules/crowdfundingSchedule';
-import { startInventorySchedules } from './schedules/inventorySchedule';
+// import { startInventorySchedules } from './schedules/inventorySchedule'; // Disabled: unnecessary complex feature
 
 // Monitoring services
 import { backupService } from './services/BackupService';
@@ -973,7 +973,7 @@ const startServer = async () => {
   // Start scheduled jobs
   try {
     startCrowdfundingSchedules();
-    startInventorySchedules();
+    // startInventorySchedules(); // Disabled: unnecessary complex feature per CLAUDE.md
     logger.info('Scheduled jobs started');
   } catch (scheduleError) {
     logger.warn('Failed to start some scheduled jobs (non-critical):', scheduleError);

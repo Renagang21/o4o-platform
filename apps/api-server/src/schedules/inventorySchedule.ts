@@ -19,8 +19,20 @@ class InventoryScheduler {
     try {
       logger.info('Starting inventory level check...');
 
+      // Check if inventory table exists before querying
+      if (!this.inventoryRepository.manager.connection.isInitialized) {
+        logger.warn('Database not initialized, skipping inventory check');
+        return;
+      }
+
       const inventoryItems = await this.inventoryRepository.find({
         relations: ['vendor'],
+      }).catch((error) => {
+        if (error.message.includes('does not exist')) {
+          logger.warn('Inventory table does not exist, skipping inventory check');
+          return [];
+        }
+        throw error;
       });
 
       for (const item of inventoryItems) {
@@ -73,6 +85,12 @@ class InventoryScheduler {
   async checkReorderRules() {
     try {
       logger.info('Starting reorder rules check...');
+
+      // Check if tables exist before querying
+      if (!this.reorderRuleRepository.manager.connection.isInitialized) {
+        logger.warn('Database not initialized, skipping reorder rules check');
+        return;
+      }
 
       const activeRules = await this.reorderRuleRepository.find({
         where: { isActive: true },
@@ -470,27 +488,47 @@ export function startInventorySchedules() {
 
   // Check inventory levels every hour
   cron.schedule('0 * * * *', async () => {
-    await scheduler.checkInventoryLevels();
+    try {
+      await scheduler.checkInventoryLevels();
+    } catch (error) {
+      logger.error('Error in inventory levels check:', error);
+    }
   });
 
   // Check reorder rules every 2 hours
   cron.schedule('0 */2 * * *', async () => {
-    await scheduler.checkReorderRules();
+    try {
+      await scheduler.checkReorderRules();
+    } catch (error) {
+      logger.error('Error in reorder rules check:', error);
+    }
   });
 
   // Calculate analytics daily at 2 AM
   cron.schedule('0 2 * * *', async () => {
-    await scheduler.calculateInventoryAnalytics();
+    try {
+      await scheduler.calculateInventoryAnalytics();
+    } catch (error) {
+      logger.error('Error in inventory analytics calculation:', error);
+    }
   });
 
   // Identify dead stock weekly on Sundays at 3 AM
   cron.schedule('0 3 * * 0', async () => {
-    await scheduler.identifyDeadStock();
+    try {
+      await scheduler.identifyDeadStock();
+    } catch (error) {
+      logger.error('Error in dead stock identification:', error);
+    }
   });
 
   // Auto-resolve alerts every 6 hours
   cron.schedule('0 */6 * * *', async () => {
-    await scheduler.autoResolveAlerts();
+    try {
+      await scheduler.autoResolveAlerts();
+    } catch (error) {
+      logger.error('Error in auto-resolve alerts:', error);
+    }
   });
 
   logger.info('Inventory schedules started successfully');
