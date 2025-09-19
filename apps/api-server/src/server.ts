@@ -24,7 +24,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // 보안 헤더 설정
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: NODE_ENV === 'production' ? undefined : false
+  contentSecurityPolicy: NODE_ENV === 'production' ? undefined : false,
+  frameguard: false // Disable X-Frame-Options for iframe preview support
 }));
 
 // CORS 설정 (CLAUDE.md 정책 기반)

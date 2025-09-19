@@ -84,6 +84,7 @@ export const securityConfig: {
       },
     },
     crossOriginEmbedderPolicy: false, // Allow embedding for dashboard
+    frameguard: false, // Disable X-Frame-Options for iframe preview support
     hsts: {
       maxAge: 31536000, // 1 year
       includeSubDomains: true,

@@ -252,7 +252,7 @@ const publicLimiter = rateLimit({
 // 미들웨어 설정
 app.use(helmet({
   contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
-  frameguard: { action: 'deny' }, // Default frame guard, will be overridden for specific routes
+  frameguard: false, // Disable X-Frame-Options for iframe preview support
 }));
 
 // Enable compression for all responses
