@@ -24,7 +24,7 @@ export const AstraImageUploader: React.FC<AstraImageUploaderProps> = ({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = async (file: File) => {
     setError(null);
     
     // Validate file size
@@ -39,16 +39,54 @@ export const AstraImageUploader: React.FC<AstraImageUploaderProps> = ({
       return;
     }
     
-    // Read file as data URL
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      onChange(result);
-    };
-    reader.onerror = () => {
-      setError('Failed to read file');
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Upload image to server
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'logo');
+      
+      const response = await fetch('/api/v1/media/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const data = await response.json();
+      
+      // Use the uploaded image URL
+      if (data.url) {
+        onChange(data.url);
+      } else if (data.data?.url) {
+        onChange(data.data.url);
+      } else {
+        // Fallback to data URL if upload fails
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          onChange(result);
+        };
+        reader.onerror = () => {
+          setError('Failed to read file');
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (uploadError) {
+      console.warn('Upload failed, using data URL fallback:', uploadError);
+      // Fallback to data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        onChange(result);
+      };
+      reader.onerror = () => {
+        setError('Failed to read file');
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
