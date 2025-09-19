@@ -95,9 +95,9 @@ export interface Media {
 // API 요청 타입
 export interface CreatePostRequest {
   title: string;
-  content: Block[];
+  content: Block[] | string;
   excerpt?: string;
-  status?: PostStatus;
+  status?: PostStatus | 'publish' | 'pending';
   type?: string; // Content type: 'post' or 'page'
   featuredImageId?: string;
   categoryIds?: string[];

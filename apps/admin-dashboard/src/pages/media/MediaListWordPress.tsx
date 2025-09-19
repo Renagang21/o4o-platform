@@ -14,7 +14,6 @@ import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { formatDate, formatFileSize } from '@/lib/utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
-import type { Media } from '@o4o/types';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import toast from 'react-hot-toast';
 

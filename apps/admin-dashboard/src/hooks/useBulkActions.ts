@@ -13,27 +13,30 @@ interface UseBulkActionsProps {
   items: any[];
   idField?: string;
   actions: BulkAction[];
+  selectedIds?: string[]; // optional controlled selection
 }
 
 /**
  * Hook for managing bulk actions on list pages
  */
-export function useBulkActions({ items, idField = 'id', actions }: UseBulkActionsProps) {
+export function useBulkActions({ items, idField = 'id', actions, selectedIds: controlledSelected }: UseBulkActionsProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isProcessing, setIsProcessing] = useState(false);
   const { success, error } = useAdminNotices();
 
   // Check if all items are selected
+  const currentSelected = useMemo(() => new Set(controlledSelected ?? Array.from(selectedIds)), [controlledSelected, selectedIds]);
+
   const isAllSelected = useMemo(() => {
     if (items.length === 0) return false;
-    return items.every((item: any) => selectedIds.has(String(item[idField])));
-  }, [items, selectedIds, idField]);
+    return items.every((item: any) => currentSelected.has(String(item[idField])));
+  }, [items, currentSelected, idField]);
 
   // Check if some items are selected (for indeterminate state)
   const isSomeSelected = useMemo(() => {
     if (items.length === 0) return false;
-    return items.some((item: any) => selectedIds.has(String(item[idField]))) && !isAllSelected;
-  }, [items, selectedIds, idField, isAllSelected]);
+    return items.some((item: any) => currentSelected.has(String(item[idField]))) && !isAllSelected;
+  }, [items, currentSelected, idField, isAllSelected]);
 
   // Toggle all items selection
   const toggleAll = useCallback(() => {
@@ -71,7 +74,8 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
       return;
     }
 
-    if (selectedIds.size === 0) {
+    const selected = Array.from(currentSelected);
+    if (selected.length === 0) {
       error('No items selected');
       return;
     }
@@ -86,19 +90,19 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
 
     setIsProcessing(true);
     try {
-      await action.action(Array.from(selectedIds));
-      success(`${action.label} applied to ${selectedIds.size} item(s)`);
+      await action.action(selected);
+      success(`${action.label} applied to ${selected.length} item(s)`);
       clearSelection();
     } catch (err: any) {
       error(`Failed to apply ${action.label}: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
     }
-  }, [actions, selectedIds, success, error, clearSelection]);
+  }, [actions, currentSelected, success, error, clearSelection]);
 
   return {
-    selectedIds,
-    selectedCount: selectedIds.size,
+    selectedIds: Array.from(currentSelected),
+    selectedCount: currentSelected.size,
     isAllSelected,
     isSomeSelected,
     isProcessing,

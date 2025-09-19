@@ -420,8 +420,8 @@ const PostFormWYSIWYG = () => {
                 <span className="text-sm">공개 설정:</span>
                 <Select
                   value={formData.visibility}
-                  onValueChange={(value: PostVisibility) => {
-                    setFormData({ ...formData, visibility: value });
+                  onValueChange={(value: string) => {
+                    setFormData({ ...formData, visibility: value as PostVisibility });
                     setIsDirty(true);
                   }}
                 >

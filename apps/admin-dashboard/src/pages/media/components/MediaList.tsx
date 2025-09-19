@@ -106,7 +106,7 @@ const MediaList: FC<MediaListProps> = ({
       ),
       uploader: (
         <div className="text-sm">
-          {file.uploader?.name || 'Unknown'}
+          {file.uploadedBy || 'Unknown'}
         </div>
       )
     },

@@ -9,6 +9,8 @@ export interface WordPressTableColumn {
   width?: string;
   align?: 'left' | 'center' | 'right';
   sortable?: boolean;
+  // Optional cell renderer when using data-based API
+  render?: (item: any) => ReactNode;
 }
 
 export interface WordPressTableRow {
@@ -19,14 +21,27 @@ export interface WordPressTableRow {
 
 interface WordPressTableProps {
   columns: WordPressTableColumn[];
-  rows: WordPressTableRow[];
+  // Two usage modes:
+  // 1) row-based (existing)
+  rows?: WordPressTableRow[];
+  // 2) data-based with column.render
+  data?: any[];
   selectable?: boolean;
-  selectedRows?: string[];
+  selectedRows?: string[]; // for row-based API
   onSelectRow?: (rowId: string, selected: boolean) => void;
   onSelectAll?: (selected: boolean) => void;
+  // data-based selection (array of ids)
+  selectedItems?: string[];
+  onSelectionChange?: (ids: string[]) => void;
   className?: string;
   loading?: boolean;
   emptyMessage?: string;
+  // Sorting control (optional external control)
+  onSort?: (columnId: string) => void;
+  sortColumn?: string | null;
+  sortDirection?: 'asc' | 'desc';
+  // Optional empty state node
+  emptyState?: ReactNode;
 }
 
 /**
@@ -35,29 +50,59 @@ interface WordPressTableProps {
 export const WordPressTable: FC<WordPressTableProps> = ({
   columns,
   rows,
+  data,
   selectable = false,
   selectedRows = [],
   onSelectRow,
   onSelectAll,
+  selectedItems,
+  onSelectionChange,
   className,
   loading = false,
-  emptyMessage = 'No items found'
+  emptyMessage = 'No items found',
+  onSort,
+  sortColumn: controlledSortColumn,
+  sortDirection: controlledSortDirection,
+  emptyState,
 }) => {
   const { handleMouseEnter, handleMouseLeave, isRowHovered } = useRowActions();
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const isControlledSort = typeof onSort === 'function' && controlledSortColumn !== undefined && controlledSortDirection !== undefined;
+  const [uncontrolledSortColumn, setUncontrolledSortColumn] = useState<string | null>(null);
+  const [uncontrolledSortDirection, setUncontrolledSortDirection] = useState<'asc' | 'desc'>('asc');
+  const sortColumn = isControlledSort ? (controlledSortColumn as string | null) : uncontrolledSortColumn;
+  const sortDirection = isControlledSort ? (controlledSortDirection as 'asc'|'desc') : uncontrolledSortDirection;
 
   const handleSort = (columnId: string) => {
+    if (isControlledSort) return onSort?.(columnId);
     if (sortColumn === columnId) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setUncontrolledSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortColumn(columnId);
-      setSortDirection('asc');
+      setUncontrolledSortColumn(columnId);
+      setUncontrolledSortDirection('asc');
     }
   };
 
-  const allSelected = rows.length > 0 && selectedRows.length === rows.length;
-  const someSelected = selectedRows.length > 0 && selectedRows.length < rows.length;
+  // Normalize into row objects when using data + renderers
+  const normalizedRows: WordPressTableRow[] = ((): WordPressTableRow[] => {
+    if (rows && rows.length > 0) return rows;
+    if (!data) return [];
+    return data.map((item: any) => {
+      const cells: Record<string, ReactNode> = {};
+      columns.forEach((col) => {
+        if (col.render) {
+          cells[col.id] = col.render(item);
+        } else {
+          cells[col.id] = (item && item[col.id] !== undefined) ? String(item[col.id]) : null;
+        }
+      });
+      return { id: String(item.id ?? ''), data: cells };
+    });
+  })();
+
+  const isExternalSelection = Array.isArray(selectedItems) && typeof onSelectionChange === 'function';
+  const selectedIds = isExternalSelection ? (selectedItems as string[]) : selectedRows;
+  const allSelected = normalizedRows.length > 0 && selectedIds.length === normalizedRows.length;
+  const someSelected = selectedIds.length > 0 && selectedIds.length < normalizedRows.length;
 
   return (
     <div className={clsx('wp-list-table-wrapper overflow-x-auto', className)}>
@@ -122,19 +167,19 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                 <p className="mt-4 text-gray-500">Loading...</p>
               </td>
             </tr>
-          ) : rows.length === 0 ? (
+          ) : normalizedRows.length === 0 ? (
             <tr>
               <td colSpan={columns.length + (selectable ? 1 : 0)} className="text-center py-8 text-gray-500">
-                {emptyMessage}
+                {emptyState ?? emptyMessage}
               </td>
             </tr>
           ) : (
-            rows.map((row: any) => (
+            normalizedRows.map((row: any) => (
               <tr
                 key={row.id}
                 className={clsx(
                   'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors',
-                  selectedRows.includes(row.id) && 'selected bg-blue-100 dark:bg-blue-900/30'
+                  selectedIds.includes(row.id) && 'selected bg-blue-100 dark:bg-blue-900/30'
                 )}
                 onMouseEnter={() => handleMouseEnter(row.id)}
                 onMouseLeave={handleMouseLeave}
@@ -142,8 +187,16 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                 {selectable && (
                   <th scope="row" className="check-column">
                     <Checkbox
-                      checked={selectedRows.includes(row.id)}
-                      onCheckedChange={(checked) => onSelectRow?.(row.id, checked as boolean)}
+                      checked={selectedIds.includes(row.id)}
+                      onCheckedChange={(checked) => {
+                        if (isExternalSelection) {
+                          const next = new Set(selectedIds);
+                          if (checked) next.add(row.id); else next.delete(row.id);
+                          onSelectionChange?.(Array.from(next));
+                        } else {
+                          onSelectRow?.(row.id, checked as boolean);
+                        }
+                      }}
                       aria-label={`Select ${row.id}`}
                       className="wp-checkbox"
                     />

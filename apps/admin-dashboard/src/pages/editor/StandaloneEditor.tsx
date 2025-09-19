@@ -98,7 +98,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
-    status: 'draft' as 'draft' | 'publish' | 'pending' | 'private',
+    status: 'draft' as 'draft' | 'publish' | 'pending' | 'private' | 'scheduled',
     visibility: 'public' as 'public' | 'private' | 'password',
     publishDate: new Date().toISOString().slice(0, 16),
     author: 'Admin User',
@@ -211,8 +211,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           }
         } else if (Array.isArray(data.content)) {
           parsedBlocks = data.content;
-        } else if (data.content?.blocks) {
-          parsedBlocks = data.content.blocks;
+        } else if ((data as any).content?.blocks) {
+          parsedBlocks = (data as any).content.blocks;
         }
       }
       
@@ -221,13 +221,18 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Set post settings - ensure slug is preserved
       setPostSettings(prev => {
+        const mapStatus = (s: any) => (s === 'published' ? 'publish' : s);
+        const toIsoLocal = (input: any) => {
+          const d = input ? new Date(input) : new Date();
+          return d.toISOString().replace('Z', '').slice(0, 16);
+        };
         const newSettings = {
           ...prev,
-          status: (data.status || 'draft') as any,
+          status: mapStatus(data.status || 'draft') as any,
           visibility: 'public' as const,
-          publishDate: (data.publishedAt || data.createdAt || new Date().toISOString()).replace('Z', '').slice(0, 16),
+          publishDate: toIsoLocal(data.publishedAt || data.createdAt),
           author: data.author?.name || 'Admin User',
-          featuredImage: data.featuredImage,
+          featuredImage: data.featuredImage?.url,
           excerpt: data.excerpt || '',
           slug: data.slug || prev.slug || '', // Preserve existing slug if API doesn't return one
           categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
@@ -257,14 +262,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       postSettingsRef.current = {
         ...postSettingsRef.current,
         slug: data.slug || '',
-        status: data.status || 'draft',
+        status: (data.status === 'published' ? 'publish' : (data.status || 'draft')),
         excerpt: data.excerpt || '',
-        categories: data.categories || [],
-        tags: data.tags || [],
-        sticky: data.sticky || false,
-        featuredImage: data.featuredImage,
-        format: data.format || 'standard',
-        commentStatus: data.commentStatus !== false
+        categories: (data.categories || []).map((c: any) => typeof c === 'object' ? c.id : c),
+        tags: (data.tags || []).map((t: any) => typeof t === 'object' ? t.id : t),
+        sticky: (data as any).sticky || false,
+        featuredImage: data.featuredImage?.url,
+        format: (data as any).format || 'standard',
+        commentStatus: (data as any).commentStatus !== false
       };
       
       setIsDirty(false);
@@ -1083,13 +1088,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       {/* Media Library Modal */}
       <Dialog open={showMediaLibrary} onOpenChange={setShowMediaLibrary}>
         <DialogContent className="max-w-6xl h-[80vh] p-0">
-          <MediaLibrary
-            mode="picker"
-            multiple={false}
-            accept="image/*"
-            onSelect={handleMediaSelect}
-            onClose={() => setShowMediaLibrary(false)}
-          />
+          <MediaLibrary />
         </DialogContent>
       </Dialog>
       
