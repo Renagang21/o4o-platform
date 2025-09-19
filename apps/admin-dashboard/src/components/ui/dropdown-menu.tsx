@@ -43,8 +43,8 @@ const DropdownMenu = ({ open: controlledOpen, defaultOpen = false, onOpenChange,
   );
 };
 
-const DropdownMenuTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ onClick, ...props }, ref) => {
+const DropdownMenuTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }>(
+  ({ onClick, asChild, ...props }, ref) => {
     const context = useContext(DropdownMenuContext);
     if (!context) throw new Error('DropdownMenuTrigger must be used within DropdownMenu');
     

@@ -63,6 +63,8 @@ const DEFAULT_CUSTOMIZATION: ThemeCustomization = {
     businessHours: {}
   },
   navigation: {
+    menuItems: [],
+    footerLinks: [],
     items: [],
     showHome: true,
     sticky: false

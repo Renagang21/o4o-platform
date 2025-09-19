@@ -188,10 +188,10 @@ const ForumPostForm: FC = () => {
                   onValueChange={(value: string) => handleChange('categoryId', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue 
-                      placeholder="카테고리를 선택하세요"
+                      <SelectValue 
+                        placeholder="카테고리를 선택하세요"
                       getDisplayValue={(categoryId) => {
-                        const category = categories.find(c => c.id === categoryId);
+                        const category = categories.find((c: any) => c.id === categoryId);
                         return category?.name || categoryId;
                       }}
                     />

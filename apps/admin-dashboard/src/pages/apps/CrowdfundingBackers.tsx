@@ -288,7 +288,7 @@ const CrowdfundingBackers: FC = () => {
           <Button 
             onClick={() => {
               // Send bulk message
-              toast.info('일괄 메시지 기능 준비중');
+              toast('일괄 메시지 기능 준비중');
             }}
           >
             <Send className="h-4 w-4 mr-2" />

@@ -70,9 +70,9 @@ const customizerReducer = (state: CustomizerState, action: CustomizerAction): Cu
       } else {
         // Direct section update
         updatedSettings[action.section] = deepMerge(
-          updatedSettings[action.section],
-          action.value
-        );
+          updatedSettings[action.section] as any,
+          action.value as any
+        ) as any;
       }
       
       updatedSettings._meta = {

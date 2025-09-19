@@ -85,7 +85,6 @@ const CPTList: FC = () => {
     if (supports.revisions) features.push('Revisions');
     if (supports.author) features.push('Author');
     if (supports.excerpt) features.push('Excerpt');
-    if (supports.trackbacks) features.push('Trackbacks');
     if (supports.pageAttributes) features.push('Page Attributes');
     return features;
   };
@@ -152,7 +151,6 @@ const CPTList: FC = () => {
         revisions: true,
         author: true,
         excerpt: true,
-        trackbacks: true,
         pageAttributes: false
       },
       fieldGroups: [],
@@ -177,7 +175,6 @@ const CPTList: FC = () => {
         revisions: true,
         author: true,
         excerpt: false,
-        trackbacks: false,
         pageAttributes: true
       },
       fieldGroups: [],

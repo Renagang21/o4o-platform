@@ -44,6 +44,10 @@ interface EditorHeaderProps {
   onOpenDesignLibrary?: () => void;
   onToggleInspector?: () => void;
   isInspectorOpen?: boolean;
+  // Optional extras used by some editors
+  title?: string;
+  subtitle?: string;
+  actions?: React.ReactNode;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -62,6 +66,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onOpenDesignLibrary,
   onToggleInspector,
   isInspectorOpen = true,
+  title,
+  subtitle,
+  actions,
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -139,8 +146,16 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           </Button>
         </div>
 
-        {/* Center Section - Status Badge */}
-        <div className="flex items-center gap-2">
+        {/* Center Section - Title / Subtitle */}
+        <div className="flex items-center gap-3">
+          {title && (
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{title}</span>
+              {subtitle && (
+                <span className="text-xs text-muted-foreground">{subtitle}</span>
+              )}
+            </div>
+          )}
           {isDirty && (
             <span className="text-xs text-orange-500">• Unsaved changes</span>
           )}
@@ -148,6 +163,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
         {/* Right Section - Actions */}
         <div className="flex items-center gap-2">
+          {/* Custom Actions (optional) */}
+          {actions}
+
           {/* Preview */}
           <Button
             variant="ghost"

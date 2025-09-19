@@ -195,14 +195,17 @@ export function useResponsiveValue<T>(
   const { state } = useCustomizer();
   const currentDevice = state.previewDevice;
   
-  const [responsiveValue, setResponsiveValue] = useState(() => {
-    if (typeof initialValue === 'object' && 'desktop' in initialValue) {
-      return initialValue as { desktop: T; tablet: T; mobile: T };
+  const isResponsive = (v: any): v is { desktop: T; tablet: T; mobile: T } =>
+    !!v && typeof v === 'object' && 'desktop' in v && 'tablet' in v && 'mobile' in v;
+
+  const [responsiveValue, setResponsiveValue] = useState<{ desktop: T; tablet: T; mobile: T }>(() => {
+    if (isResponsive(initialValue)) {
+      return initialValue;
     }
     return {
-      desktop: initialValue,
-      tablet: initialValue,
-      mobile: initialValue,
+      desktop: initialValue as T,
+      tablet: initialValue as T,
+      mobile: initialValue as T,
     };
   });
   

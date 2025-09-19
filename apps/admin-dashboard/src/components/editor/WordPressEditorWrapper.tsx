@@ -11,7 +11,11 @@ const Spinner = ({ className }: { className?: string }) => (
 );
 
 interface WordPressEditorWrapperProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  // Optional props expected by callers; currently not used internally
+  initialContent?: string;
+  onChange?: (_content: string, _blocks: any[]) => void;
+  showReusableBlocks?: boolean;
 }
 
 export default function WordPressEditorWrapper({ children }: WordPressEditorWrapperProps) {
@@ -63,5 +67,5 @@ export default function WordPressEditorWrapper({ children }: WordPressEditorWrap
     );
   }
 
-  return <>{children}</>;
+  return <>{children ?? null}</>;
 }

@@ -258,7 +258,7 @@ const TagListWordPress: FC = () => {
       <ScreenOptionsReact
         columns={options.columns}
         itemsPerPage={itemsPerPage}
-        onColumnVisibilityChange={updateColumnVisibility}
+        onColumnToggle={updateColumnVisibility}
         onItemsPerPageChange={setItemsPerPage}
       />
     </div>

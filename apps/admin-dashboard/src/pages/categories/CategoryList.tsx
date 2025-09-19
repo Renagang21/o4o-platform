@@ -49,7 +49,7 @@ const CategoryList: FC = () => {
   });
 
   // Fetch categories
-  const { data: categories = [], isLoading } = useQuery<AdminCategory[]>({
+  const { data: categories = [] as AdminCategory[], isLoading } = useQuery<AdminCategory[]>({
     queryKey: ['categories', searchQuery],
     queryFn: async () => {
       try {
@@ -60,11 +60,11 @@ const CategoryList: FC = () => {
         return response as AdminCategory[];
       } catch (error) {
         // Return mock data if API fails
-        return [
+        return ([
           { id: '1', name: 'Announcements', slug: 'announcements', postCount: 5, createdAt: new Date() },
           { id: '2', name: 'Guides', slug: 'guides', postCount: 12, createdAt: new Date() },
           { id: '3', name: 'News', slug: 'news', postCount: 8, createdAt: new Date() },
-        ] as AdminCategory[];
+        ] as unknown) as AdminCategory[];
       }
     }
   });

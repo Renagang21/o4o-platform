@@ -386,7 +386,7 @@ export interface CustomizerPreset {
  * PostMessage 이벤트 타입
  */
 export interface CustomizerMessage {
-  type: 'setting-change' | 'device-change' | 'save' | 'reset' | 'preview-ready';
+  type: 'setting-change' | 'device-change' | 'save' | 'reset' | 'preview-ready' | 'selective-refresh' | 'navigate';
   payload?: any;
 }
 
