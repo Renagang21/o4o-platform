@@ -20,7 +20,6 @@ const Customize: React.FC = () => {
       });
 
       // Settings saved successfully
-      console.log('Customizer settings saved:', response.data);
     } catch (error) {
       console.error('Failed to save customizer settings:', error);
       throw error;
