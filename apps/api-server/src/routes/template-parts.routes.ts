@@ -103,10 +103,50 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
       }
     }
     
+    // Sanitize content field for each template part before sending to client
+    const sanitizedTemplateParts = templateParts.map(templatePart => {
+      try {
+        let sanitizedContent = templatePart.content
+        
+        // If content is a string, try to parse it as JSON
+        if (typeof templatePart.content === 'string') {
+          try {
+            sanitizedContent = JSON.parse(templatePart.content)
+          } catch (parseError) {
+            // If parsing fails, set to empty array for client safety
+            console.warn(`Template part ${templatePart.id} has invalid JSON content:`, parseError)
+            sanitizedContent = []
+          }
+        }
+        
+        // If content is null or undefined, set to empty array
+        if (sanitizedContent == null) {
+          sanitizedContent = []
+        }
+        
+        // Ensure content is always an array
+        if (!Array.isArray(sanitizedContent)) {
+          console.warn(`Template part ${templatePart.id} content is not an array, converting to empty array`)
+          sanitizedContent = []
+        }
+        
+        return {
+          ...templatePart,
+          content: sanitizedContent
+        }
+      } catch (error) {
+        console.error(`Error sanitizing template part ${templatePart.id}:`, error)
+        return {
+          ...templatePart,
+          content: []
+        }
+      }
+    })
+    
     res.json({
       success: true,
-      data: templateParts,
-      count: templateParts.length
+      data: sanitizedTemplateParts,
+      count: sanitizedTemplateParts.length
     })
   } catch (error) {
     console.error('Template Parts API Error:', error)
