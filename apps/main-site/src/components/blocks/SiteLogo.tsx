@@ -38,7 +38,7 @@ const SiteLogo: FC<SiteLogoProps> = ({
       } catch (error) {
         console.info('Using default logo settings:', error);
         // Fallback to local image if API fails
-        setLogoUrl('/images/logo.png');
+        setLogoUrl('/images/logo.svg');
       } finally {
         setLoading(false);
       }
@@ -74,13 +74,18 @@ const SiteLogo: FC<SiteLogoProps> = ({
           attempted_url: logoUrl,
           resolved_url: target.src,
           error_details: errorDetails,
-          fallback_action: 'Hiding logo element',
+          fallback_action: 'Trying SVG fallback',
           current_domain: window.location.origin
         });
         
-        // Remove the logo completely from DOM
-        if (target.parentElement) {
-          target.parentElement.style.display = 'none';
+        // Try SVG fallback if PNG fails
+        if (target.src.includes('logo.png')) {
+          target.src = '/images/logo.svg';
+        } else {
+          // If SVG also fails, hide the logo
+          if (target.parentElement) {
+            target.parentElement.style.display = 'none';
+          }
         }
       }}
     />

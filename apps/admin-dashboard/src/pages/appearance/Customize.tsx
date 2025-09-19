@@ -1,6 +1,8 @@
 import React from 'react';
 import { AstraCustomizer } from './astra-customizer/AstraCustomizer';
 import { useNavigate } from 'react-router-dom';
+import { getPublicOrigin } from '../../utils/publicUrls';
+import { authClient } from '@o4o/auth-client';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
@@ -11,23 +13,14 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
-      // Save customizer settings via API
-      const response = await fetch('/api/v1/settings/customizer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          settings: settings,
-          type: 'astra-customizer'
-        }),
+      // Save customizer settings via authenticated API
+      const response = await authClient.api.post('/v1/settings/customizer', {
+        settings: settings,
+        type: 'astra-customizer'
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save customizer settings');
-      }
-
       // Settings saved successfully
+      console.log('Customizer settings saved:', response.data);
     } catch (error) {
       console.error('Failed to save customizer settings:', error);
       throw error;
@@ -37,7 +30,7 @@ const Customize: React.FC = () => {
   return (
     <AstraCustomizer
       onClose={handleClose}
-      previewUrl={process.env.REACT_APP_MAIN_SITE_URL || "https://neture.co.kr"}
+      previewUrl={import.meta.env.VITE_PUBLIC_APP_ORIGIN || getPublicOrigin()}
       siteName="Neture Platform"
       onSave={handleSave}
     />
