@@ -188,6 +188,9 @@ const HomePage: FC = () => {
   if (settings.type === 'latest_posts') {
     return (
       <Layout>
+        <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded">
+          <p className="text-red-800 font-bold">⚠️ LATEST POSTS MODE DETECTED</p>
+        </div>
         <BlogList postsPerPage={settings.postsPerPage || 10} />
       </Layout>
     );
