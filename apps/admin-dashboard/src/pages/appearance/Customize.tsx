@@ -17,8 +17,8 @@ const Customize: React.FC = () => {
   return (
     <AstraCustomizer
       onClose={handleClose}
-      previewUrl="/"
-      siteName="O4O Platform"
+      previewUrl={process.env.REACT_APP_MAIN_SITE_URL || "https://neture.co.kr"}
+      siteName="Neture Platform"
       onSave={handleSave}
     />
   );

@@ -17,8 +17,8 @@ const SiteLogo: FC<SiteLogoProps> = ({
   className = ''
 }) => {
   // TODO: Get logo from settings
-  const logoUrl = '/logo.png'; // Placeholder
-  const siteName = 'O4O Platform';
+  const logoUrl = '/images/logo.png'; // Updated path
+  const siteName = 'Neture Platform';
 
   const logo = (
     <img
@@ -27,6 +27,40 @@ const SiteLogo: FC<SiteLogoProps> = ({
       width={width}
       height={height || 'auto'}
       className={`site-logo ${className}`}
+      onError={(e) => {
+        // Enhanced fallback with debugging for browser testing
+        const target = e.target as HTMLImageElement;
+        const errorDetails = {
+          src: target.src,
+          naturalWidth: target.naturalWidth,
+          naturalHeight: target.naturalHeight,
+          complete: target.complete,
+          timestamp: new Date().toISOString()
+        };
+        
+        console.warn('🖼️ Logo loading failed:', {
+          attempted_url: logoUrl,
+          resolved_url: target.src,
+          error_details: errorDetails,
+          fallback_action: 'Switching to text logo'
+        });
+        
+        target.style.display = 'none';
+        const parent = target.parentElement;
+        if (parent && !parent.querySelector('.text-logo')) {
+          const textLogo = document.createElement('div');
+          textLogo.className = 'text-logo font-bold text-xl text-blue-600';
+          textLogo.textContent = siteName;
+          textLogo.title = `Fallback logo (image failed: ${logoUrl})`;
+          parent.appendChild(textLogo);
+          
+          console.info('✅ Text logo fallback applied:', {
+            text: siteName,
+            parent_element: parent.tagName,
+            css_classes: textLogo.className
+          });
+        }
+      }}
     />
   );
 

@@ -12,14 +12,14 @@ interface MenuItem {
 }
 
 interface NavigationProps {
-  ref?: string; // Menu reference/slug
+  menuRef?: string; // Menu reference/slug (renamed from ref to avoid React conflict)
   orientation?: 'horizontal' | 'vertical';
   showSubmenuIcon?: boolean;
   className?: string;
 }
 
 const Navigation: FC<NavigationProps> = ({
-  ref: menuRef = 'primary-menu',
+  menuRef = 'primary-menu',
   orientation = 'horizontal',
   showSubmenuIcon = true,
   className = ''

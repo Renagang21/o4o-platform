@@ -16,7 +16,7 @@ const deviceSizes: Record<PreviewDevice, { width: string; height: string }> = {
 };
 
 export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
-  url = '/',
+  url = process.env.REACT_APP_MAIN_SITE_URL || 'https://neture.co.kr',
   onLoad,
 }) => {
   const { state, setPreviewDevice } = useCustomizer();
