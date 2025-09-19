@@ -86,7 +86,7 @@ export const AppDataSource = new DataSource({
   
   // 개발 환경 설정
   synchronize: false, // 자동 스키마 동기화 비활성화 (마이그레이션 사용)
-  logging: NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
+  logging: NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   
   // 연결 풀 설정 (CLAUDE.md 정책 기반)
   extra: {

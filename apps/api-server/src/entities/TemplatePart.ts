@@ -60,13 +60,13 @@ export class TemplatePart {
     customCss?: string
   }
 
-  @Column({ default: true })
+  @Column({ name: 'is_active', default: true })
   isActive!: boolean
 
-  @Column({ default: false })
+  @Column({ name: 'is_default', default: false })
   isDefault!: boolean // Default template part for the area
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'author_id', type: 'uuid', nullable: true })
   authorId!: string
 
   @ManyToOne(() => User, { nullable: true })
@@ -87,9 +87,9 @@ export class TemplatePart {
     userRoles?: string[] // Show only to specific user roles
   }
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date
 }

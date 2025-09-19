@@ -109,10 +109,12 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
       count: templateParts.length
     })
   } catch (error) {
+    console.error('Template Parts API Error:', error)
     res.status(500).json({ 
       success: false,
       error: 'Failed to fetch active template parts',
-      code: 'TEMPLATE_PARTS_ERROR'
+      code: 'TEMPLATE_PARTS_ERROR',
+      debug: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
     })
   }
 })
