@@ -1,5 +1,6 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { authClient } from '@o4o/auth-client';
 
 interface SiteLogoProps {
   width?: number;
@@ -16,10 +17,41 @@ const SiteLogo: FC<SiteLogoProps> = ({
   linkTarget = '_self',
   className = ''
 }) => {
-  // TODO: Get logo from settings
-  const logoUrl = '/images/logo.png'; // Updated path
-  const siteName = 'Neture Platform';
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [siteName, setSiteName] = useState<string>('Neture Platform');
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        // Try to get site identity settings from API
+        const response = await authClient.api.get('/v1/settings/customizer');
+        if (response.status === 200 && response.data) {
+          const settings = response.data.settings || response.data;
+          if (settings?.siteIdentity?.logo?.desktop) {
+            setLogoUrl(settings.siteIdentity.logo.desktop);
+          }
+          if (settings?.siteIdentity?.siteTitle?.text) {
+            setSiteName(settings.siteIdentity.siteTitle.text);
+          }
+        }
+      } catch (error) {
+        console.info('Using default logo settings:', error);
+        // Fallback to local image if API fails
+        setLogoUrl('/images/logo.png');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSiteSettings();
+  }, []);
 
+  // Don't render anything if loading or no logo URL
+  if (loading || !logoUrl) {
+    return null;
+  }
+  
   const logo = (
     <img
       src={logoUrl}
@@ -28,7 +60,7 @@ const SiteLogo: FC<SiteLogoProps> = ({
       height={height || 'auto'}
       className={`site-logo ${className}`}
       onError={(e) => {
-        // Enhanced fallback with debugging for browser testing
+        // Enhanced debugging for browser testing
         const target = e.target as HTMLImageElement;
         const errorDetails = {
           src: target.src,
@@ -42,23 +74,13 @@ const SiteLogo: FC<SiteLogoProps> = ({
           attempted_url: logoUrl,
           resolved_url: target.src,
           error_details: errorDetails,
-          fallback_action: 'Switching to text logo'
+          fallback_action: 'Hiding logo element',
+          current_domain: window.location.origin
         });
         
-        target.style.display = 'none';
-        const parent = target.parentElement;
-        if (parent && !parent.querySelector('.text-logo')) {
-          const textLogo = document.createElement('div');
-          textLogo.className = 'text-logo font-bold text-xl text-blue-600';
-          textLogo.textContent = siteName;
-          textLogo.title = `Fallback logo (image failed: ${logoUrl})`;
-          parent.appendChild(textLogo);
-          
-          console.info('✅ Text logo fallback applied:', {
-            text: siteName,
-            parent_element: parent.tagName,
-            css_classes: textLogo.className
-          });
+        // Remove the logo completely from DOM
+        if (target.parentElement) {
+          target.parentElement.style.display = 'none';
         }
       }}
     />
