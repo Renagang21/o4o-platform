@@ -29,7 +29,7 @@ const Customize: React.FC = () => {
   return (
     <AstraCustomizer
       onClose={handleClose}
-      previewUrl={import.meta.env.VITE_PUBLIC_APP_ORIGIN || getPublicOrigin()}
+      previewUrl="/api/preview"
       siteName="Neture Platform"
       onSave={handleSave}
     />
