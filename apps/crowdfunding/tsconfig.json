@@ -20,9 +20,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@o4o/crowdfunding-types": ["../../packages/crowdfunding-types/src"]
+      "@o4o/crowdfunding-types": ["../../packages/crowdfunding-types/dist"]
     }
   },
-  "include": ["src", "types/**/*.d.ts", "../../types/**/*.d.ts"],
+  "include": [
+    "src",
+    "types/**/*.d.ts",
+    "../../types/**/*.d.ts",
+    "../../packages/crowdfunding-types/src/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
