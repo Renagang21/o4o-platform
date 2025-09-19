@@ -55,7 +55,7 @@ export class SeedDefaultTemplateParts1738000000006 implements MigrationInterface
                   id: 'primary-menu',
                   type: 'core/navigation',
                   data: {
-                    ref: 'primary-menu', // References menu system
+                    menuRef: 'primary-menu', // References menu system
                     orientation: 'horizontal',
                     showSubmenuIcon: true
                   }
@@ -159,7 +159,7 @@ export class SeedDefaultTemplateParts1738000000006 implements MigrationInterface
                       id: 'footer-menu-1',
                       type: 'core/navigation',
                       data: {
-                        ref: 'footer-company-menu',
+                        menuRef: 'footer-company-menu',
                         orientation: 'vertical',
                         showSubmenuIcon: false
                       }
@@ -183,7 +183,7 @@ export class SeedDefaultTemplateParts1738000000006 implements MigrationInterface
                       id: 'footer-menu-2',
                       type: 'core/navigation',
                       data: {
-                        ref: 'footer-support-menu',
+                        menuRef: 'footer-support-menu',
                         orientation: 'vertical',
                         showSubmenuIcon: false
                       }
@@ -207,7 +207,7 @@ export class SeedDefaultTemplateParts1738000000006 implements MigrationInterface
                       id: 'footer-menu-3',
                       type: 'core/navigation',
                       data: {
-                        ref: 'footer-legal-menu',
+                        menuRef: 'footer-legal-menu',
                         orientation: 'vertical',
                         showSubmenuIcon: false
                       }
@@ -295,7 +295,7 @@ export class SeedDefaultTemplateParts1738000000006 implements MigrationInterface
               id: 'primary-menu',
               type: 'core/navigation',
               data: {
-                ref: 'primary-menu',
+                menuRef: 'primary-menu',
                 orientation: 'horizontal'
               }
             }
