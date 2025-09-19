@@ -377,7 +377,6 @@ if (redisEnabled) {
       password: process.env.REDIS_PASSWORD,
       lazyConnect: true, // 지연 연결로 에러 방지
       maxRetriesPerRequest: 3,
-      retryDelayOnFailover: 100,
       connectTimeout: 5000
     });
     
@@ -943,7 +942,6 @@ const startServer = async () => {
         password: process.env.REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 3,
-        retryDelayOnFailover: 100,
         connectTimeout: 5000
       });
 
@@ -960,7 +958,7 @@ const startServer = async () => {
       
       // Initialize WebSocket session sync if enabled
       if (process.env.SESSION_SYNC_ENABLED === 'true') {
-        webSocketSessionSync = new WebSocketSessionSync(io, redisClient);
+        webSocketSessionSync = new WebSocketSessionSync(io);
         logger.info('WebSocket session sync initialized');
       }
       
