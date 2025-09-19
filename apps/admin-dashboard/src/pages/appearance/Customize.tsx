@@ -27,8 +27,7 @@ const Customize: React.FC = () => {
         throw new Error('Failed to save customizer settings');
       }
 
-      // Show success notification
-      console.log('Customizer settings saved successfully');
+      // Settings saved successfully
     } catch (error) {
       console.error('Failed to save customizer settings:', error);
       throw error;
