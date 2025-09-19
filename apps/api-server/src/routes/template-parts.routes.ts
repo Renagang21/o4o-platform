@@ -1,4 +1,4 @@
-import { Router, Response } from 'express'
+import { Router, Response, Request } from 'express'
 import AppDataSource from '../database/data-source'
 import { TemplatePart } from '../entities/TemplatePart'
 import { AuthRequest, authenticateToken } from '../middleware/auth'
@@ -36,6 +36,85 @@ const templatePartSchema = z.object({
     categories: z.array(z.string()).optional(),
     userRoles: z.array(z.string()).optional()
   }).optional()
+})
+
+// Get active template parts for a specific area (PUBLIC ACCESS - 라우트 순서 최우선)
+router.get('/area/:area/active', async (req: Request, res: Response) => {
+  try {
+    // Check database connection first
+    if (!AppDataSource.isInitialized) {
+      return res.status(503).json({ 
+        success: false,
+        error: 'Database not available',
+        code: 'DB_NOT_READY' 
+      })
+    }
+
+    const { area } = req.params
+    const { context } = req.query // Optional context for conditional rendering
+    
+    const templatePartRepository = AppDataSource.getRepository(TemplatePart)
+    
+    // Get all active template parts for the area
+    let templateParts = await templatePartRepository.find({
+      where: {
+        area: area as any,
+        isActive: true
+      },
+      order: {
+        priority: 'ASC'
+      }
+    })
+    
+    // Filter by conditions if context is provided
+    if (context) {
+      try {
+        const contextData = JSON.parse(String(context))
+        templateParts = templateParts.filter(part => {
+          if (!part.conditions) return true
+          
+          // Check page conditions
+          if (part.conditions.pages && contextData.pageId) {
+            if (!part.conditions.pages.includes(contextData.pageId)) return false
+          }
+          
+          // Check post type conditions
+          if (part.conditions.postTypes && contextData.postType) {
+            if (!part.conditions.postTypes.includes(contextData.postType)) return false
+          }
+          
+          // Check category conditions
+          if (part.conditions.categories && contextData.categories) {
+            const hasCategory = part.conditions.categories.some(cat => 
+              contextData.categories.includes(cat)
+            )
+            if (!hasCategory) return false
+          }
+          
+          // Check user role conditions
+          if (part.conditions.userRoles && contextData.userRole) {
+            if (!part.conditions.userRoles.includes(contextData.userRole)) return false
+          }
+          
+          return true
+        })
+      } catch (parseError) {
+        // Invalid context JSON, ignore and return all active parts
+      }
+    }
+    
+    res.json({
+      success: true,
+      data: templateParts,
+      count: templateParts.length
+    })
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch active template parts',
+      code: 'TEMPLATE_PARTS_ERROR'
+    })
+  }
 })
 
 // Get all template parts with filtering
@@ -135,64 +214,6 @@ router.get('/:identifier', authenticateToken, async (req: AuthRequest, res: Resp
   }
 })
 
-// Get active template parts for a specific area
-router.get('/area/:area/active', async (req: AuthRequest, res: Response) => {
-  try {
-    const { area } = req.params
-    const { context } = req.query // Optional context for conditional rendering
-    
-    const templatePartRepository = AppDataSource.getRepository(TemplatePart)
-    
-    // Get all active template parts for the area
-    let templateParts = await templatePartRepository.find({
-      where: {
-        area: area as any,
-        isActive: true
-      },
-      order: {
-        priority: 'ASC'
-      }
-    })
-    
-    // Filter by conditions if context is provided
-    if (context) {
-      const contextData = JSON.parse(String(context))
-      templateParts = templateParts.filter(part => {
-        if (!part.conditions) return true
-        
-        // Check page conditions
-        if (part.conditions.pages && contextData.pageId) {
-          if (!part.conditions.pages.includes(contextData.pageId)) return false
-        }
-        
-        // Check post type conditions
-        if (part.conditions.postTypes && contextData.postType) {
-          if (!part.conditions.postTypes.includes(contextData.postType)) return false
-        }
-        
-        // Check category conditions
-        if (part.conditions.categories && contextData.categories) {
-          const hasCategory = part.conditions.categories.some(cat => 
-            contextData.categories.includes(cat)
-          )
-          if (!hasCategory) return false
-        }
-        
-        // Check user role conditions
-        if (part.conditions.userRoles && contextData.userRole) {
-          if (!part.conditions.userRoles.includes(contextData.userRole)) return false
-        }
-        
-        return true
-      })
-    }
-    
-    res.json(templateParts)
-  } catch (error) {
-    console.error('Error fetching active template parts:', error)
-    res.status(500).json({ error: 'Failed to fetch active template parts' })
-  }
-})
 
 // Create new template part
 router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {

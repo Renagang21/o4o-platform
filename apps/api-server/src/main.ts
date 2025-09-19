@@ -366,18 +366,32 @@ let sessionConfig: any = {
   }
 };
 
-// Use Redis store in production
-if (process.env.NODE_ENV === 'production') {
-  const sessionRedisClient = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    password: process.env.REDIS_PASSWORD
-  });
-  
-  sessionConfig.store = new RedisStore({
-    client: sessionRedisClient,
-    prefix: 'sess:'
-  });
+// Use Redis store conditionally (production + REDIS_ENABLED)
+const redisEnabled = process.env.REDIS_ENABLED !== 'false' && process.env.NODE_ENV === 'production';
+
+if (redisEnabled) {
+  try {
+    const sessionRedisClient = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+      lazyConnect: true, // 지연 연결로 에러 방지
+      maxRetriesPerRequest: 3,
+      retryDelayOnFailover: 100,
+      connectTimeout: 5000
+    });
+    
+    sessionConfig.store = new RedisStore({
+      client: sessionRedisClient,
+      prefix: 'sess:'
+    });
+    
+    logger.info('Redis session store configured');
+  } catch (redisError) {
+    logger.warn('Redis session store configuration failed, using memory store:', redisError);
+  }
+} else {
+  logger.info('Redis disabled, using memory session store');
 }
 
 // Session middleware for passport (required for OAuth)
@@ -808,34 +822,54 @@ const startServer = async () => {
       // 환경변수 재확인
       const dbConfig = {
         host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '6379'),
+        port: parseInt(process.env.DB_PORT || '5432'), // PostgreSQL 기본 포트로 수정
         username: process.env.DB_USERNAME || 'postgres',
         password: process.env.DB_PASSWORD || '',
         database: process.env.DB_NAME || 'o4o_platform'
       };
       
-      //   ...dbConfig,
-      //   password: dbConfig.password ? '***' : 'NOT SET'
-      // });
-      
-      // 데이터베이스 초기화 (타임아웃 적용)
-      logger.info('Attempting database connection...');
-      
-      // Add timeout for database connection in development
-      const dbConnectionPromise = AppDataSource.initialize();
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Database connection timeout')), 5000);
+      logger.info('Database configuration:', {
+        ...dbConfig,
+        password: dbConfig.password ? '***' : 'NOT SET'
       });
       
-      try {
-        await Promise.race([dbConnectionPromise, timeoutPromise]);
-        logger.info('Database connection successful');
-      } catch (connectionError) {
-        logger.warn('Database connection failed:', connectionError);
+      // 데이터베이스 초기화 (재시도 로직 포함)
+      logger.info('Attempting database connection...');
+      
+      let dbConnected = false;
+      const maxRetries = 3;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          logger.info(`Database connection attempt ${attempt}/${maxRetries}`);
+          
+          const dbConnectionPromise = AppDataSource.initialize();
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Database connection timeout')), 10000); // 타임아웃 연장
+          });
+          
+          await Promise.race([dbConnectionPromise, timeoutPromise]);
+          logger.info('Database connection successful');
+          dbConnected = true;
+          break;
+        } catch (connectionError) {
+          logger.warn(`Database connection attempt ${attempt} failed:`, connectionError);
+          
+          if (attempt < maxRetries) {
+            logger.info(`Retrying in 2 seconds...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+      }
+      
+      if (!dbConnected) {
+        const errorMessage = 'Failed to connect to database after multiple attempts';
+        logger.error(errorMessage);
+        
         if (process.env.NODE_ENV === 'development') {
           logger.warn('Continuing without database in development mode');
         } else {
-          throw connectionError;
+          throw new Error(errorMessage);
         }
       }
       
@@ -896,36 +930,55 @@ const startServer = async () => {
     }
   }
 
-  // Redis 초기화
+  // Redis 초기화 (조건부)
   let webSocketSessionSync: WebSocketSessionSync | null = null;
-  try {
-    const redisClient = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD
-    });
+  
+  if (redisEnabled) {
+    try {
+      logger.info('Initializing Redis connection...');
+      
+      const redisClient = new Redis({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 3,
+        retryDelayOnFailover: 100,
+        connectTimeout: 5000
+      });
 
-    redisClient.on('connect', () => {
-      logger.info('Redis connected');
-    });
+      redisClient.on('connect', () => {
+        logger.info('Redis connected successfully');
+      });
 
-    redisClient.on('error', (err) => {
-      logger.error('Redis error:', err);
-    });
+      redisClient.on('error', (err) => {
+        logger.warn('Redis connection error (non-critical):', err);
+      });
 
-    // Initialize SessionSyncService
-    SessionSyncService.initialize(redisClient);
-    
-    // Initialize WebSocket session sync if enabled
-    if (process.env.SESSION_SYNC_ENABLED === 'true') {
-      webSocketSessionSync = new WebSocketSessionSync(io);
+      // Initialize SessionSyncService
+      SessionSyncService.initialize(redisClient);
+      
+      // Initialize WebSocket session sync if enabled
+      if (process.env.SESSION_SYNC_ENABLED === 'true') {
+        webSocketSessionSync = new WebSocketSessionSync(io, redisClient);
+        logger.info('WebSocket session sync initialized');
+      }
+      
+      logger.info('Redis initialization completed');
+    } catch (redisError) {
+      logger.warn('Redis initialization failed (non-critical), continuing without Redis:', redisError);
     }
-    
-    // Start crowdfunding schedules
+  } else {
+    logger.info('Redis disabled, skipping Redis initialization');
+  }
+  
+  // Start scheduled jobs
+  try {
     startCrowdfundingSchedules();
     startInventorySchedules();
-  } catch (redisError) {
-    logger.warn('Redis connection failed (non-critical):', redisError);
+    logger.info('Scheduled jobs started');
+  } catch (scheduleError) {
+    logger.warn('Failed to start some scheduled jobs (non-critical):', scheduleError);
   }
   
   // Initialize image processing folders
