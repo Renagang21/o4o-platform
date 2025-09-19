@@ -89,6 +89,8 @@ type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  // Allow shadcn-style API seen in apps; ignored at runtime
+  asChild?: boolean;
 }
 
 const getVariantClasses = (variant: ButtonVariant = 'default'): string => {
@@ -250,3 +252,98 @@ export {
   Label,
   Badge
 };
+
+// ---------------------------------------------------------------------------
+// Minimal additional primitives to satisfy app imports
+// These are intentionally lightweight and can be replaced with full-featured
+// components later without changing import sites.
+
+// Textarea
+export const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(({ className, ...props }, ref) => (
+  <textarea
+    ref={ref}
+    className={cn(
+      "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+      className
+    )}
+    {...props}
+  />
+));
+Textarea.displayName = 'Textarea';
+
+// Select (native)
+export const Select = React.forwardRef<
+  HTMLSelectElement,
+  React.SelectHTMLAttributes<HTMLSelectElement>
+>(({ className, children, ...props }, ref) => (
+  <select
+    ref={ref}
+    className={cn(
+      "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </select>
+));
+Select.displayName = 'Select';
+
+// Skeleton
+export const Skeleton: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...props
+}) => (
+  <div
+    className={cn(
+      'animate-pulse rounded-md bg-gray-200 dark:bg-gray-800',
+      className
+    )}
+    {...props}
+  />
+);
+
+// Tabs (very light placeholder API)
+type TabsProps = React.HTMLAttributes<HTMLDivElement> & { defaultValue?: string };
+export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn(className)} {...props} />
+  )
+);
+Tabs.displayName = 'Tabs';
+
+export const TabsList = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('flex gap-2', className)} {...props} />
+));
+TabsList.displayName = 'TabsList';
+
+export const TabsTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { value?: string }
+>(({ className, ...props }, ref) => (
+  <button
+    ref={ref}
+    className={cn(
+      'inline-flex items-center justify-center whitespace-nowrap rounded-md border px-3 py-1 text-sm',
+      className
+    )}
+    {...props}
+  />
+));
+TabsTrigger.displayName = 'TabsTrigger';
+
+export const TabsContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { value?: string }
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn(className)} {...props} />
+));
+TabsContent.displayName = 'TabsContent';
+
+// (no additional exports section; components above are already exported)

@@ -86,9 +86,11 @@ export const ZoneCanvas: React.FC<ZoneCanvasProps> = ({
   })
 
   // Combine refs
-  const setRef = useCallback((node: HTMLDivElement) => {
-    canvasRef.current = node
-    drop(node)
+  const setRef = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      (canvasRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+      drop(node)
+    }
   }, [drop])
 
   // Handle block reordering

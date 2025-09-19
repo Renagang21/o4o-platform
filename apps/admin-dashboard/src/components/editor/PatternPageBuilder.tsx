@@ -220,7 +220,7 @@ const PatternPageBuilder: React.FC<PatternPageBuilderProps> = ({
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
         <GutenbergBlockEditor
-          initialBlocks={editorContent || []}
+          initialBlocks={editorBlocks}
           onChange={(blocks) => handleEditorChange(JSON.stringify(blocks), blocks)}
           documentTitle=""
           slug=""

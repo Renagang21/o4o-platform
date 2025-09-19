@@ -138,7 +138,76 @@ export interface EditorBlock {
   attributes?: Record<string, any>;
 }
 
+export interface Block {
+  id: string;
+  type: string;
+  content: any;
+  attributes?: Record<string, any>;
+  settings?: Record<string, any>;
+  children?: Block[];
+  order?: number;
+}
+
 export interface EditorState {
   blocks: EditorBlock[];
   version: string;
+}
+
+// Layout-specific block types
+export interface ColumnBlock extends Block {
+  type: 'column';
+  content: {
+    columns: number;
+    gap: string;
+    verticalAlignment: 'top' | 'center' | 'bottom';
+    stackOnMobile: boolean;
+    backgroundColor?: string;
+    padding?: string;
+    borderRadius?: string;
+    minHeight?: string;
+  };
+}
+
+export interface TableBlock extends Block {
+  type: 'table';
+  content: {
+    rows: any[][];
+    hasHeader: boolean;
+    hasFooter: boolean;
+    striped: boolean;
+    bordered: boolean;
+    compact: boolean;
+    responsive: boolean;
+    headerBackgroundColor?: string;
+    headerTextColor?: string;
+    borderColor?: string;
+    hoverColor?: string;
+    fontSize?: string;
+    cellPadding?: string;
+    caption?: string;
+  };
+}
+
+// Update Post interface to use Block[] instead of string for content
+export interface PostWithBlocks extends Omit<Post, 'content'> {
+  content: Block[];
+  settings?: {
+    layout?: string;
+    template?: string;
+    customCSS?: string;
+  };
+}
+
+// Create Post Request that includes slug
+export interface CreatePostRequest extends Omit<CreatePostDto, 'content'> {
+  slug: string;
+  content: Block[] | string;
+  settings?: {
+    layout?: string;
+    template?: string;
+    customCSS?: string;
+  };
+  visibility: PostVisibility;
+  categories?: PostCategory[];
+  tags?: Tag[];
 }

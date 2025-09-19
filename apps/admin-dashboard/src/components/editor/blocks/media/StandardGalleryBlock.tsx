@@ -342,7 +342,6 @@ const StandardGalleryBlock: React.FC<GalleryBlockProps> = (props) => {
           <div>
             <Label htmlFor="columns" className="text-xs text-gray-600">Columns ({columns})</Label>
             <Slider
-              id="columns"
               min={1}
               max={8}
               step={1}
@@ -355,7 +354,6 @@ const StandardGalleryBlock: React.FC<GalleryBlockProps> = (props) => {
           <div>
             <Label htmlFor="gap" className="text-xs text-gray-600">Gap ({gap}px)</Label>
             <Slider
-              id="gap"
               min={0}
               max={30}
               step={5}

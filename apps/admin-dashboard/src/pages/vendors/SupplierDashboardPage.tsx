@@ -12,7 +12,7 @@ const SupplierDashboardPage = () => {
   const { user } = useAuth();
   const [showProductForm, setShowProductForm] = useState(false);
   const [stats] = useState<SupplierStats>({
-    supplierId: user?.id || '',
+    supplierId: user?.id?.toString() || '',
     period: 'month' as const,
     totalProducts: 45,
     pendingProducts: 3,
@@ -60,7 +60,7 @@ const SupplierDashboardPage = () => {
     try {
       // 재고 부족 제품
       const lowStockResponse = await getSupplierProducts({
-        supplierId: user?.id,
+        supplierId: user?.id?.toString(),
         status: 'active',
         limit: 5
       });
@@ -70,7 +70,7 @@ const SupplierDashboardPage = () => {
 
       // 승인 대기 제품
       const pendingResponse = await getSupplierProducts({
-        supplierId: user?.id,
+        supplierId: user?.id?.toString(),
         approvalStatus: 'pending',
         limit: 5
       });

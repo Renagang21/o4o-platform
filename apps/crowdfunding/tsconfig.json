@@ -16,9 +16,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "typeRoots": ["./types", "../../types", "./node_modules/@types"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@o4o/crowdfunding-types": ["../../packages/crowdfunding-types/src"]
     }
   },
   "include": ["src", "types/**/*.d.ts", "../../types/**/*.d.ts"],

@@ -71,7 +71,7 @@ export const ProductApprovalManager: FC = () => {
     const request: ProductApprovalRequest = {
       productIds: Array.from(selectedProducts),
       action: 'approve',
-      approvedBy: user?.id || ''
+      approvedBy: user?.id?.toString() || ''
     };
 
     try {
@@ -110,7 +110,7 @@ export const ProductApprovalManager: FC = () => {
       productIds: Array.from(selectedProducts),
       action: 'reject',
       reason: rejectReason,
-      approvedBy: user?.id || ''
+      approvedBy: user?.id?.toString() || ''
     };
 
     try {

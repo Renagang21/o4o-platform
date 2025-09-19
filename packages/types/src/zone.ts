@@ -134,11 +134,14 @@ export interface Layout {
 
 // Theme Customization Interfaces
 export interface BrandingCustomization {
-  logo?: string
-  favicon?: string
+  logo?: string | null
+  favicon?: string | null
   siteName?: string
   tagline?: string
 }
+
+// Alias for backward compatibility
+export type BrandingConfig = BrandingCustomization
 
 export interface ColorCustomization {
   primary?: string
@@ -146,8 +149,17 @@ export interface ColorCustomization {
   accent?: string
   text?: string
   background?: string
+  muted?: string
+  mutedForeground?: string
+  border?: string
+  input?: string
+  ring?: string
+  foreground?: string
   customPalette?: ColorPreset[]
 }
+
+// Alias for backward compatibility
+export type ColorScheme = ColorCustomization
 
 export interface ColorPreset {
   name: string
@@ -164,11 +176,16 @@ export interface TypographyCustomization {
 }
 
 export interface BusinessInfo {
+  name?: string
   companyName?: string
+  description?: string
   phone?: string
   email?: string
   address?: string
+  website?: string
+  socialMedia?: Record<string, string>
   socialLinks?: Record<string, string>
+  businessHours?: Record<string, string>
 }
 
 export interface NavigationItem {
@@ -180,17 +197,29 @@ export interface NavigationItem {
   icon?: string
 }
 
+export interface NavigationConfig {
+  menuItems: NavigationItem[]
+  footerLinks: NavigationItem[]
+  items?: NavigationItem[]
+  showHome?: boolean
+  sticky?: boolean
+}
+
 export interface ThemeCustomization {
+  id?: string
+  userId?: string
+  name?: string
   branding: BrandingCustomization
   colors: ColorCustomization
-  typography: TypographyCustomization
+  typography?: TypographyCustomization
   businessInfo: BusinessInfo
-  navigation: {
-    menuItems: NavigationItem[]
-    footerLinks: NavigationItem[]
-  }
+  navigation: NavigationConfig
   customCSS?: string
   customJS?: string
+  isActive?: boolean
+  isApproved?: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 // Zone Configuration Schema

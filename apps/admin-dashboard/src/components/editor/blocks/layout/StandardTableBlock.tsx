@@ -88,8 +88,9 @@ const tableConfig: StandardBlockConfig = {
 
 const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
   const { onChange, attributes = {}, isSelected } = props;
-  const {
-    rows = [
+  
+  const defaultAttributes = {
+    rows: [
       {
         id: 'row-1',
         cells: [
@@ -105,20 +106,37 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
         ]
       }
     ],
-    hasHeader = true,
-    hasFooter = false,
-    striped = false,
-    bordered = true,
-    compact = false,
-    responsive = true,
-    headerBackgroundColor = '#f8fafc',
-    headerTextColor = '#1f2937',
-    borderColor = '#e5e7eb',
-    hoverColor = '#f1f5f9',
-    fontSize = 14,
-    cellPadding = 12,
-    caption = ''
-  } = attributes;
+    hasHeader: true,
+    hasFooter: false,
+    striped: false,
+    bordered: true,
+    compact: false,
+    responsive: true,
+    headerBackgroundColor: '#f8fafc',
+    headerTextColor: '#1f2937',
+    borderColor: '#e5e7eb',
+    hoverColor: '#f1f5f9',
+    fontSize: 14,
+    cellPadding: 12,
+    caption: ''
+  };
+  
+  const {
+    rows,
+    hasHeader,
+    hasFooter,
+    striped,
+    bordered,
+    compact,
+    responsive,
+    headerBackgroundColor,
+    headerTextColor,
+    borderColor,
+    hoverColor,
+    fontSize,
+    cellPadding,
+    caption
+  } = { ...defaultAttributes, ...attributes };
 
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -157,7 +175,7 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
 
   // Add column
   const addColumn = () => {
-    const updatedRows = rows.map(row => ({
+    const updatedRows = rows.map((row: TableRow) => ({
       ...row,
       cells: [
         ...row.cells,
@@ -174,7 +192,7 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
   // Remove column
   const removeColumn = (columnIndex: number) => {
     if (rows[0]?.cells.length > 1) {
-      const updatedRows = rows.map(row => ({
+      const updatedRows = rows.map((row: TableRow) => ({
         ...row,
         cells: row.cells.filter((_, index) => index !== columnIndex)
       }));
@@ -184,11 +202,11 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
 
   // Update cell content
   const updateCellContent = (rowId: string, cellId: string, content: string) => {
-    const updatedRows = rows.map(row =>
+    const updatedRows = rows.map((row: TableRow) =>
       row.id === rowId
         ? {
             ...row,
-            cells: row.cells.map(cell =>
+            cells: row.cells.map((cell: TableCell) =>
               cell.id === cellId ? { ...cell, content } : cell
             )
           }
@@ -199,11 +217,11 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
 
   // Update cell property
   const updateCellProperty = (rowId: string, cellId: string, property: string, value: any) => {
-    const updatedRows = rows.map(row =>
+    const updatedRows = rows.map((row: TableRow) =>
       row.id === rowId
         ? {
             ...row,
-            cells: row.cells.map(cell =>
+            cells: row.cells.map((cell: TableCell) =>
               cell.id === cellId ? { ...cell, [property]: value } : cell
             )
           }
@@ -214,8 +232,8 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
 
   // Export table as CSV
   const exportCSV = () => {
-    const csvContent = rows.map(row =>
-      row.cells.map(cell => `"${cell.content.replace(/"/g, '""')}"`).join(',')
+    const csvContent = rows.map((row: TableRow) =>
+      row.cells.map((cell: TableCell) => `"${cell.content.replace(/"/g, '""')}"`).join(',')
     ).join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -240,11 +258,11 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
         const text = e.target?.result as string;
         const csvRows = text.split('\n').filter(row => row.trim());
         
-        const newRows: TableRow[] = csvRows.map((csvRow, rowIndex) => {
-          const cells = csvRow.split(',').map(cell => cell.replace(/"/g, '').trim());
+        const newRows: TableRow[] = csvRows.map((csvRow: string, rowIndex: number) => {
+          const cells = csvRow.split(',').map((cell: string) => cell.replace(/"/g, '').trim());
           return {
             id: `row-${Date.now()}-${rowIndex}`,
-            cells: cells.map((content, cellIndex) => ({
+            cells: cells.map((content: string, cellIndex: number) => ({
               id: `cell-${Date.now()}-${rowIndex}-${cellIndex}`,
               content,
               isHeader: rowIndex === 0 && hasHeader
@@ -539,7 +557,7 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
         style={{ borderColor: borderColor }}
       >
         <tbody>
-          {rows.map((row, rowIndex) => {
+          {rows.map((row: TableRow, rowIndex: number) => {
             const isHeaderRow = hasHeader && rowIndex === 0;
             const isFooterRow = hasFooter && rowIndex === rows.length - 1;
             const Tag = (isHeaderRow || isFooterRow) ? 'th' : 'td';
@@ -549,7 +567,7 @@ const StandardTableBlock: React.FC<TableBlockProps> = (props) => {
                 key={row.id}
                 className={getRowClasses(rowIndex, isHeaderRow)}
               >
-                {row.cells.map((cell, cellIndex) => (
+                {row.cells.map((cell: TableCell, cellIndex: number) => (
                   <Tag
                     key={cell.id}
                     className={getCellClasses(cell, isHeaderRow)}

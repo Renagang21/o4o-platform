@@ -4,9 +4,9 @@
  */
 
 import { ComponentType } from 'react'
-import SimplifiedParagraphBlock from '../components/editor/blocks/SimplifiedParagraphBlock'
+import ParagraphBlock from '../components/editor/blocks/ParagraphBlock'
 import EnhancedHeadingBlock from '../components/editor/blocks/EnhancedHeadingBlock'
-import SimplifiedListBlock from '../components/editor/blocks/SimplifiedListBlock'
+import ListBlock from '../components/editor/blocks/ListBlock'
 import CodeBlock from '../components/editor/blocks/CodeBlock'
 import QuoteBlock from '../components/editor/blocks/QuoteBlock'
 import EnhancedImageBlock from '../components/editor/blocks/EnhancedImageBlock'

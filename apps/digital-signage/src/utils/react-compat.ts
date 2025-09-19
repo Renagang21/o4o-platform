@@ -8,6 +8,6 @@ import { useEffect, useLayoutEffect as useLayoutEffectReact } from 'react';
 export const useLayoutEffect = typeof window !== 'undefined' ? useLayoutEffectReact : useEffect;
 
 // React 19 호환성을 위한 전역 설정
-if (typeof window !== 'undefined' && typeof global === 'undefined') {
+if (typeof window !== 'undefined' && typeof (globalThis as any).global === 'undefined') {
   (window as any).global = window;
 }

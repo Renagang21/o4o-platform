@@ -33,7 +33,7 @@ export {
   formatFileSize,
   formatPercentage,
   // formatRelativeTime,  // Removed - may cause issues
-  // formatDateFromNow,  // Removed - may cause issues  
+  formatDateFromNow,  // Re-exported for consumers expecting it
   formatPhoneNumber
 } from './format';
 
@@ -47,4 +47,3 @@ export {
   toTitleCase,
   randomString
 } from './string';
-

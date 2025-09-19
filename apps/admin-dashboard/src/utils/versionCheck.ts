@@ -22,7 +22,7 @@ export const checkVersion = async () => {
       localStorage.setItem('app-version', data.version);
       
       // Force reload
-      window.location.reload(true);
+      window.location.reload();
     } else if (!storedVersion) {
       localStorage.setItem('app-version', data.version);
     }

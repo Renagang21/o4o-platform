@@ -71,7 +71,7 @@ export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({
   allowedBlocks = [],
   onBlockAdd
 }) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
   const [showActions, setShowActions] = React.useState(false)
 
   // Drag functionality
@@ -125,9 +125,12 @@ export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({
   })
 
   // Combine drag and drop refs
-  const setRef = useCallback((node: HTMLDivElement) => {
-    ref.current = node
-    drag(drop(node))
+  const setRef = useCallback((node: HTMLElement | null) => {
+    if (node) {
+      // Use a type assertion since we know node is not null here
+      (ref as React.MutableRefObject<HTMLElement | null>).current = node
+      drag(drop(node))
+    }
   }, [drag, drop])
 
   // Handle block selection
@@ -179,7 +182,7 @@ export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({
       onChange: (content: string, attributes?: any) => {
         handleUpdate({ content, attributes })
       },
-      onDelete: onRemove,
+      onDelete: onRemove || (() => {}),
       onDuplicate: () => {
         // TODO: Implement duplication
       },

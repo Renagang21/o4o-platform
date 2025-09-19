@@ -23,3 +23,42 @@ export interface Tag {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Theme types
+export type Theme = 'light' | 'dark' | 'system' | 'evening' | 'noon' | 'dusk' | 'afternoon' | 'twilight';
+
+// Bulk actions types
+export interface UseBulkActionsProps {
+  onDelete?: (ids: string[]) => void;
+  onStatusChange?: (ids: string[], status: string) => void;
+  onBulkEdit?: (ids: string[]) => void;
+}
+
+// Contact info types
+export interface ContactInfo {
+  name: string;
+  title: string;
+  phone?: string;
+  email?: string;
+}
+
+// API response types are now in api.ts to avoid duplicates
+
+// Permission types
+export interface Permission {
+  id: string;
+  name: string;
+  description?: string;
+  resource: string;
+  action: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description?: string;
+  permissions: Permission[];
+  isSystem?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}

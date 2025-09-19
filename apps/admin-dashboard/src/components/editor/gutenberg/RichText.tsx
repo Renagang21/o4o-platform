@@ -15,6 +15,7 @@ interface RichTextProps {
   onMerge?: () => void;
   onReplace?: (blocks: any[]) => void;
   onRemove?: () => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
   placeholder?: string;
   allowedFormats?: string[];
   identifier?: string;
@@ -30,6 +31,7 @@ export const RichText: FC<RichTextProps> = ({
   onSplit,
   onReplace,
   onRemove,
+  onKeyDown,
   placeholder = 'Start writing or type / to choose a block',
   allowedFormats = ['core/bold', 'core/italic', 'core/link'],
   className,
@@ -97,6 +99,14 @@ export const RichText: FC<RichTextProps> = ({
 
   // 키보드 이벤트 처리
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    // 외부 onKeyDown 핸들러가 있으면 먼저 호출
+    if (onKeyDown) {
+      onKeyDown(e);
+      // 외부 핸들러에서 이벤트가 preventDefault되었으면 내부 처리를 하지 않음
+      if (e.defaultPrevented) {
+        return;
+      }
+    }
     // Ctrl/Cmd + B (Bold)
     if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
       e.preventDefault();

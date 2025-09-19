@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { MediaItem } from '@/pages/media/MediaLibrary';
+import type { MediaItem } from '@o4o/types';
 
 interface MediaGridProps {
   items: MediaItem[];

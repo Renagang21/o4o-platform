@@ -82,16 +82,27 @@ const StandardColumnsBlock: React.FC<ColumnsBlockProps> = (props) => {
     { id: 'col-2', width: 50, content: [] }
   ];
   
+  const defaultAttributes = {
+    columns: defaultColumns,
+    gap: 20,
+    verticalAlignment: 'top',
+    stackOnMobile: true,
+    backgroundColor: '',
+    padding: 0,
+    borderRadius: 0,
+    minHeight: 0
+  };
+  
   const {
-    columns = defaultColumns,
-    gap = 20,
-    verticalAlignment = 'top',
-    stackOnMobile = true,
-    backgroundColor = '',
-    padding = 0,
-    borderRadius = 0,
-    minHeight = 0
-  } = attributes;
+    columns,
+    gap,
+    verticalAlignment,
+    stackOnMobile,
+    backgroundColor,
+    padding,
+    borderRadius,
+    minHeight
+  } = { ...defaultAttributes, ...attributes };
 
 
   // Update attribute helper
@@ -255,7 +266,7 @@ const StandardColumnsBlock: React.FC<ColumnsBlockProps> = (props) => {
       <div>
         <Label className="text-sm font-medium">Column Widths</Label>
         <div className="mt-2 space-y-2">
-          {columns.map((column, index) => (
+          {columns.map((column: ColumnData, index: number) => (
             <div key={column.id} className="flex items-center gap-2">
               <Label className="text-xs text-gray-600 w-12">Col {index + 1}</Label>
               <Input
@@ -343,7 +354,7 @@ const StandardColumnsBlock: React.FC<ColumnsBlockProps> = (props) => {
   const ColumnPlaceholder = ({ columnId, width }: { columnId: string; width: number }) => (
     <div 
       className="border-2 border-dashed border-gray-300 rounded p-4 min-h-[100px] flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors"
-      onClick={() => onAddBlock?.('inside', columnId)}
+      onClick={() => onAddBlock?.('after')}
     >
       <div className="text-center text-gray-500">
         <Plus className="h-6 w-6 mx-auto mb-2" />
@@ -372,7 +383,7 @@ const StandardColumnsBlock: React.FC<ColumnsBlockProps> = (props) => {
         )}
         style={{ gap: `${gap}px` }}
       >
-        {columns.map((column, index) => (
+        {columns.map((column: ColumnData, index: number) => (
           <div
             key={column.id}
             className={cn(

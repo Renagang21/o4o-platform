@@ -238,7 +238,7 @@ export const ZoneEditor: React.FC<ZoneEditorProps> = ({
         {/* Editor Header */}
         <EditorHeader
           onSave={handleSave}
-          onPublish={onPublish}
+          onPublish={onPublish || (() => {})}
           title="Zone Editor"
           subtitle={`Layout: ${content.layout}`}
           actions={

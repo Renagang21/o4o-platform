@@ -201,7 +201,7 @@ export default function RoleManagement() {
           <p className="text-gray-600">Manage user roles and permissions</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger>
             <Button onClick={resetForm}>
               <Plus className="mr-2 h-4 w-4" />
               Create Role

@@ -2,7 +2,7 @@
  * Zone API - API client for zone-based content management
  */
 
-import { apiClient } from './base'
+import { apiClient } from '../../utils/apiClient'
 import { 
   ZoneBasedContent, 
   ZoneApiResponse, 
@@ -169,7 +169,7 @@ class ZoneApiClient {
       
       const response = await apiClient.get<ThemeCustomizationApiResponse>(url)
       return response.data.customization
-    } catch (error) {
+    } catch (error: any) {
       if (error.response?.status === 404) {
         return null // No customization found
       }

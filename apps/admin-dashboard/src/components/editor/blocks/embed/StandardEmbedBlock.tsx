@@ -119,6 +119,7 @@ const StandardEmbedBlock: React.FC<EmbedBlockProps> = (props) => {
 
   const [urlInput, setUrlInput] = useState(url);
   const [codeInput, setCodeInput] = useState(embedCode);
+  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
   // Update attribute helper
   const updateAttribute = useCallback((key: string, value: any) => {

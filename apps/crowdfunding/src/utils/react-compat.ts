@@ -10,8 +10,8 @@ export const useLayoutEffect = typeof window !== 'undefined' ? useLayoutEffectRe
 
 // React 19 호환성을 위한 전역 설정
 if (typeof window !== 'undefined') {
-  // global 설정
-  if (typeof global === 'undefined') {
+  // global 설정 (Node의 global 참조를 사용하는 서드파티 호환)
+  if (typeof (globalThis as any).global === 'undefined') {
     (window as any).global = window;
   }
   

@@ -33,7 +33,7 @@ const AffiliatePerformanceDashboard = () => {
       // 실제로는 API 호출
       const mockAffiliate: AffiliateUser = {
         id: '1',
-        userId: user?.id || '',
+        userId: user?.id?.toString() || '',
         referralCode: 'KIM123ABC',
         status: 'active',
         joinedAt: new Date('2024-01-15'),

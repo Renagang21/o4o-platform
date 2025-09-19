@@ -175,7 +175,7 @@ export function formatPercentage(
 export function formatRelativeTime(
   date: Date | string | number,
   baseDate: Date = new Date(),
-  locale: string = 'ko-KR'
+  _locale: string = 'ko-KR'
 ): string {
   const dateObj = typeof date === 'string' || typeof date === 'number' 
     ? new Date(date) 

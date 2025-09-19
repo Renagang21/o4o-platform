@@ -21,6 +21,10 @@ export const mockPostApi = {
       slug: data.slug || data.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/^-|-$/g, ''),
       content: data.content,
       status: data.status || 'draft',
+      visibility: data.visibility || 'public',
+      categories: data.categories || [],
+      tags: data.tags || [],
+      settings: data.settings || {},
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       author: {

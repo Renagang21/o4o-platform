@@ -76,8 +76,7 @@ export default function MediaUploader({
       // ContentApi returns ApiResponse<MediaFile[]>
       const uploadedFile = response.data && response.data[0]; // Get first uploaded file
       updateFileStatus(variables.fileId, 'completed', {
-        uploadedUrl: uploadedFile?.url,
-        webpUrl: uploadedFile?.webpUrl
+        uploadedUrl: uploadedFile?.url
       });
       queryClient.invalidateQueries({ queryKey: ['media'] });
       toast.success('파일이 업로드되었습니다');

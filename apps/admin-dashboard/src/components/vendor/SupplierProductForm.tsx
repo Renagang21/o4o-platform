@@ -124,7 +124,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
       supplierStock: formData.supplierStock,
       lowStockThreshold: formData.lowStockThreshold,
       images: formData.images,
-      supplierId: user?.id || '',
+      supplierId: user?.id?.toString() || '',
       approvalStatus: 'pending' as const,
       status: 'draft' as const
     };

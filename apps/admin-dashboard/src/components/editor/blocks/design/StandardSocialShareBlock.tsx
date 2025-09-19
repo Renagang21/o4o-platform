@@ -13,7 +13,8 @@ import {
   Check,
   Mail,
   Linkedin,
-  Send
+  Send,
+  Layout
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

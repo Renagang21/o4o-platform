@@ -34,7 +34,7 @@ interface ChartDataPoint {
 
 interface AffiliateUserData {
   id: string;
-  affiliateCode: string;
+  referralCode: string;
 }
 
 const AffiliateDashboard = () => {
@@ -134,7 +134,7 @@ const AffiliateDashboard = () => {
     ];
   };
   
-  const mockReferralCode = affiliateUser?.affiliateCode || 'DEMO123';
+  const mockReferralCode = affiliateUser?.referralCode || 'DEMO123';
   const mockStats = stats || {
     monthlyClicks: 245,
     monthlySignups: 18,

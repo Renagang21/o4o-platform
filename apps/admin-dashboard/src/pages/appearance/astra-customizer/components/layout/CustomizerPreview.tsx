@@ -3,6 +3,7 @@ import { Smartphone, Tablet, Monitor, RefreshCw, ExternalLink } from 'lucide-rea
 import { useCustomizer } from '../../context/CustomizerContext';
 import { PreviewDevice } from '../../types/customizer-types';
 import { generateCSS } from '../../utils/css-generator';
+import { Button } from '@o4o/ui';
 
 interface CustomizerPreviewProps {
   url?: string;
@@ -16,20 +17,42 @@ const deviceSizes: Record<PreviewDevice, { width: string; height: string }> = {
 };
 
 export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
-  url = process.env.REACT_APP_MAIN_SITE_URL || 'https://neture.co.kr',
+  url,
   onLoad,
 }) => {
   const { state, setPreviewDevice } = useCustomizer();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUrl, setCurrentUrl] = useState(url);
+  
+  // Generate preview URL (server-side proxy recommended to avoid X-Frame-Options)
+  const generatePreviewUrl = () => {
+    // Fallback to provided URL or homepage
+    return url || 'https://neture.co.kr';
+  };
+  
+  const [currentUrl, setCurrentUrl] = useState(generatePreviewUrl());
   
   const { previewDevice } = state;
   
   // Handle device change
   const handleDeviceChange = (device: PreviewDevice) => {
     setPreviewDevice(device);
+    // Update URL with new device parameter
+    const newUrl = generatePreviewUrl();
+    setCurrentUrl(newUrl);
+    if (iframeRef.current) {
+      iframeRef.current.src = newUrl;
+    }
   };
+  
+  // Update URL when preview device changes
+  useEffect(() => {
+    const newUrl = generatePreviewUrl();
+    setCurrentUrl(newUrl);
+    if (iframeRef.current) {
+      iframeRef.current.src = newUrl;
+    }
+  }, [state.previewDevice]);
   
   // Inject CSS into iframe
   const injectCSS = () => {
@@ -122,49 +145,49 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
       {/* Preview Header */}
       <div className="wp-customizer-preview-header">
         <div className="wp-customizer-device-buttons">
-          <button
+          <Button
             onClick={() => handleDeviceChange('desktop')}
             variant={previewDevice === 'desktop' ? 'default' : 'ghost'}
             title="Desktop preview"
           >
             <Monitor size={16} />
             <span>Desktop</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleDeviceChange('tablet')}
             variant={previewDevice === 'tablet' ? 'default' : 'ghost'}
             title="Tablet preview"
           >
             <Tablet size={16} />
             <span>Tablet</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleDeviceChange('mobile')}
             variant={previewDevice === 'mobile' ? 'default' : 'ghost'}
             title="Mobile preview"
           >
             <Smartphone size={16} />
             <span>Mobile</span>
-          </button>
+          </Button>
         </div>
         
         <div className="wp-customizer-preview-actions">
           <span className="wp-customizer-preview-url">{currentUrl}</span>
-          <button
+          <Button
             onClick={handleRefresh}
             className="wp-button-icon"
             title="Refresh preview"
             disabled={isLoading}
           >
             <RefreshCw size={16} className={isLoading ? 'spin' : ''} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleExternalLink}
             className="wp-button-icon"
             title="Open in new tab"
           >
             <ExternalLink size={16} />
-          </button>
+          </Button>
         </div>
       </div>
       

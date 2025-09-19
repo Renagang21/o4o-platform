@@ -214,7 +214,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                     업로드
                   </span>
                   <span className="text-sm font-medium">
-                    {new Date(media.uploadedAt).toLocaleDateString()}
+                    {new Date(media.createdAt).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
@@ -222,7 +222,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                     <User className="w-4 h-4" />
                     업로더
                   </span>
-                  <span className="text-sm font-medium">{media.uploader.name}</span>
+                  <span className="text-sm font-medium">{media.uploadedBy.name}</span>
                 </div>
               </div>
             </div>

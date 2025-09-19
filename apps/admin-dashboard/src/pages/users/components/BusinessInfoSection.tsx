@@ -46,8 +46,8 @@ interface BusinessInfo {
   verificationStatus: 'pending' | 'verified' | 'rejected';
   verificationDocuments?: string[];
   contactPerson?: {
-    name: string;
-    title: string;
+    name?: string;
+    title?: string;
     phone?: string;
     email?: string;
   };
@@ -209,7 +209,7 @@ export default function BusinessInfoSection({ userId, userRole, onBusinessInfoCh
   return (
     <Collapsible open={expanded} onOpenChange={setExpanded}>
       <Card>
-        <CollapsibleTrigger asChild>
+        <CollapsibleTrigger>
           <CardHeader className="cursor-pointer hover:bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

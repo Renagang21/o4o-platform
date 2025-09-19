@@ -688,8 +688,7 @@ const StandardCodeBlock: React.FC<CodeBlockProps> = (props) => {
         className="w-full border rounded"
         style={{
           borderRadius: `${borderRadius}px`,
-          borderColor: getThemeColors().color,
-          borderOpacity: 0.1
+          borderColor: `${getThemeColors().color}1a` // Using hex alpha for 10% opacity (0.1)
         }}
       >
         <CodeContent />
