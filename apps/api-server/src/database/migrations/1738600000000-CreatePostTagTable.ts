@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from "typeorm";
 
-export class CreatePostTagTable1725170000000 implements MigrationInterface {
-    name = 'CreatePostTagTable1725170000000'
+export class CreatePostTagTable1738600000000 implements MigrationInterface {
+    name = 'CreatePostTagTable1738600000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Create post_tags table
