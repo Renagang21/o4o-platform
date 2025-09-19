@@ -42,7 +42,9 @@ const SiteLogo: FC<SiteLogoProps> = ({
           attempted_url: logoUrl,
           resolved_url: target.src,
           error_details: errorDetails,
-          fallback_action: 'Switching to text logo'
+          fallback_action: 'Switching to text logo',
+          current_domain: window.location.origin,
+          expected_logo_url: `${window.location.origin}${logoUrl}`
         });
         
         target.style.display = 'none';

@@ -89,11 +89,17 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
       return null;
     }
 
+    // Filter out React reserved props and rename ref to menuRef for Navigation
+    const { ref, ...safeData } = block.data || {};
+    const { ref: attrRef, ...safeAttributes } = block.attributes || {};
+    
     const blockProps = {
-      ...block.data,
-      ...block.attributes,
+      ...safeData,
+      ...safeAttributes,
       key: block.id,
-      id: block.id
+      id: block.id,
+      // Convert ref to menuRef for Navigation component
+      ...(block.type === 'core/navigation' && (ref || attrRef) ? { menuRef: ref || attrRef } : {})
     };
 
     // Handle blocks with inner blocks
