@@ -94,36 +94,16 @@ export const patchHistoryAPI = () => {
   const originalForward = window.history.forward.bind(window.history);
   const originalGo = window.history.go.bind(window.history);
 
-  // Override pushState
+  // Override pushState - completely silent in iframe
   window.history.pushState = function(data: any, title: string, url?: string | URL | null) {
-    try {
-      // In iframe, we can still try to update URL without navigation
-      if (url && typeof url === 'string') {
-        // Only update hash part to avoid security errors
-        const newUrl = new URL(url, window.location.origin);
-        if (newUrl.origin === window.location.origin) {
-          window.location.hash = newUrl.hash || '';
-        }
-      }
-    } catch (error) {
-      // Silently ignore errors in iframe context
-    }
+    // Completely ignore in iframe context - no errors, no actions
+    return;
   };
 
-  // Override replaceState
+  // Override replaceState - completely silent in iframe
   window.history.replaceState = function(data: any, title: string, url?: string | URL | null) {
-    try {
-      // In iframe, we can still try to update URL without navigation
-      if (url && typeof url === 'string') {
-        // Only update hash part to avoid security errors
-        const newUrl = new URL(url, window.location.origin);
-        if (newUrl.origin === window.location.origin) {
-          window.location.hash = newUrl.hash || '';
-        }
-      }
-    } catch (error) {
-      // Silently ignore errors in iframe context
-    }
+    // Completely ignore in iframe context - no errors, no actions
+    return;
   };
 
   // Override navigation methods to prevent errors
@@ -151,6 +131,24 @@ export const patchHistoryAPI = () => {
     } catch (error) {
       // Silently ignore
     }
+  };
+  
+  // Also override the prototype to catch any other calls
+  const HistoryProto = Object.getPrototypeOf(window.history);
+  
+  // Backup originals
+  const originalPushStateProto = HistoryProto.pushState;
+  const originalReplaceStateProto = HistoryProto.replaceState;
+  
+  // Override prototype methods
+  HistoryProto.pushState = function(data: any, title: string, url?: string | URL | null) {
+    // Silent in iframe
+    return;
+  };
+  
+  HistoryProto.replaceState = function(data: any, title: string, url?: string | URL | null) {
+    // Silent in iframe
+    return;
   };
 };
 

@@ -5,7 +5,6 @@ import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
 import { useAuthStore } from './stores/authStore';
 import { initializeAuthInterceptor } from './services/authInterceptor';
-import { initializeIframeContext } from './utils/iframe-context';
 
 // Auth Pages
 import AuthCallbackV2 from './pages/auth/AuthCallbackV2';
@@ -48,9 +47,6 @@ const App: FC = () => {
   const { checkAuth } = useAuthStore();
 
   useEffect(() => {
-    // Initialize iframe context detection
-    initializeIframeContext();
-    
     // Initialize auth interceptor
     initializeAuthInterceptor();
     
