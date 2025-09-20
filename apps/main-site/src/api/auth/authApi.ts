@@ -88,9 +88,10 @@ export const authApi = {
     // SSO 로그아웃
     if (USE_SSO && ssoAuthAPI.isAuthenticated()) {
       promises.push(
-        ssoAuthAPI.logout().catch(error => 
-    // Error logging - use proper error handler
-        )
+        ssoAuthAPI.logout().catch(error => {
+          // Error logging - use proper error handler
+          console.error('SSO logout error:', error);
+        })
       );
     }
 
@@ -98,9 +99,10 @@ export const authApi = {
     const legacyToken = localStorage.getItem('legacy_token');
     if (legacyToken) {
       promises.push(
-        axiosInstance.post(API_ENDPOINTS.AUTH.LEGACY_LOGOUT).catch(error =>
-    // Error logging - use proper error handler
-        )
+        axiosInstance.post(API_ENDPOINTS.AUTH.LEGACY_LOGOUT).catch(error => {
+          // Error logging - use proper error handler
+          console.error('Legacy logout error:', error);
+        })
       );
     }
 
