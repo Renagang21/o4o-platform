@@ -152,7 +152,7 @@ const WordPressMenuList: FC = () => {
             <p className="text-gray-600 mt-2">사이트의 내비게이션 메뉴를 관리합니다</p>
           </div>
           <Link
-            to="/menus/new"
+            to="/appearance/menus/new"
             className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 shadow-sm transition-all duration-200 transform hover:scale-105"
           >
             <Plus className="w-5 h-5" />
@@ -244,7 +244,7 @@ const WordPressMenuList: FC = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-2">메뉴가 없습니다</h3>
               <p className="text-gray-500 mb-6">첫 번째 메뉴를 만들어보세요</p>
               <Link
-                to="/menus/new"
+                to="/appearance/menus/new"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4" />
@@ -304,7 +304,7 @@ const WordPressMenuList: FC = () => {
                       <td className="px-6 py-5">
                         <div>
                           <Link
-                            to={`/menus/${menu.id}/edit`}
+                            to={`/appearance/menus/${menu.id}/edit`}
                             className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors"
                           >
                             {menu.name}
@@ -384,7 +384,7 @@ const WordPressMenuList: FC = () => {
                       <td className="px-6 py-5">
                         <div className="flex items-center justify-end gap-1">
                           <Link
-                            to={`/menus/${menu.id}/edit`}
+                            to={`/appearance/menus/${menu.id}/edit`}
                             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                             title="편집"
                           >

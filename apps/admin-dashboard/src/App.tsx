@@ -439,7 +439,7 @@ function App() {
                     } />
                     
                     <Route path="/appearance/menus/*" element={
-                      <AdminProtectedRoute requiredPermissions={['menus:read']}>
+                      <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <Menus />
                         </Suspense>

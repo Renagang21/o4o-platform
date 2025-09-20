@@ -227,7 +227,7 @@ const DashboardSimple: FC = () => {
             <Settings className="w-5 h-5 mr-2" />
             Customize Your Site
           </Link>
-          <Link to="/themes/menus" className="quick-link">
+          <Link to="/appearance/menus" className="quick-link">
             Manage Menus
           </Link>
           <Link to="/themes/widgets" className="quick-link">
