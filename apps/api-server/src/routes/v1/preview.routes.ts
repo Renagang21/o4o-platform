@@ -45,17 +45,6 @@ router.get('/assets/*', async (req: Request, res: Response) => {
  */
 router.get('/site/:domain?', async (req: Request, res: Response) => {
   try {
-    // 디버깅: 헤더 정보 로깅
-    console.log('🔍 Preview proxy debug info:', {
-      protocol: req.protocol,
-      'x-forwarded-proto': req.get('X-Forwarded-Proto'),
-      'x-forwarded-for': req.get('X-Forwarded-For'),
-      host: req.get('host'),
-      url: req.url,
-      secure: req.secure,
-      headers: req.headers
-    });
-    
     const { domain } = req.params;
     const targetUrl = domain ? `https://${domain}` : 'https://neture.co.kr';
     
@@ -120,11 +109,11 @@ router.get('/site/:domain?', async (req: Request, res: Response) => {
           const originalReplaceState = window.history.replaceState;
           
           window.history.pushState = function() {
-            console.log('History.pushState blocked in iframe context');
+            // History API blocked in iframe context
           };
           
           window.history.replaceState = function() {
-            console.log('History.replaceState blocked in iframe context');
+            // History API blocked in iframe context
           };
         }
         
