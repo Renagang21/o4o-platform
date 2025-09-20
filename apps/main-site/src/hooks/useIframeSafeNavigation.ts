@@ -16,7 +16,7 @@ export const useIframeSafeNavigation = () => {
         safeNavigate(to);
       } else {
         // Handle numeric navigation (back/forward)
-        console.log(`Navigation with numeric value ${to} skipped in iframe context`);
+        // Navigation with numeric value skipped in iframe context
       }
     } else {
       // In standalone context, use normal React Router navigation

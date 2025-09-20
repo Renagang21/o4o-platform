@@ -27,7 +27,7 @@ export const safeHistoryAPI = {
         console.warn('History.pushState failed:', error);
       }
     } else {
-      console.log('History.pushState skipped in iframe context');
+      // History.pushState skipped in iframe context
     }
   },
 
@@ -39,7 +39,7 @@ export const safeHistoryAPI = {
         console.warn('History.replaceState failed:', error);
       }
     } else {
-      console.log('History.replaceState skipped in iframe context');
+      // History.replaceState skipped in iframe context
     }
   },
 
@@ -51,7 +51,7 @@ export const safeHistoryAPI = {
         console.warn('History.back failed:', error);
       }
     } else {
-      console.log('History.back skipped in iframe context');
+      // History.back skipped in iframe context
     }
   },
 
@@ -63,7 +63,7 @@ export const safeHistoryAPI = {
         console.warn('History.forward failed:', error);
       }
     } else {
-      console.log('History.forward skipped in iframe context');
+      // History.forward skipped in iframe context
     }
   },
 
@@ -75,7 +75,7 @@ export const safeHistoryAPI = {
         console.warn('History.go failed:', error);
       }
     } else {
-      console.log('History.go skipped in iframe context');
+      // History.go skipped in iframe context
     }
   }
 };
@@ -88,7 +88,7 @@ export const initializeIframeContext = () => {
   const inIframe = isInIframe();
   
   if (inIframe) {
-    console.log('Running in iframe context - History API will be disabled');
+    // Running in iframe context - History API will be disabled
     
     // Add CSS class to body for iframe-specific styling
     document.body.classList.add('in-iframe');
