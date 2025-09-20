@@ -10,8 +10,13 @@ import * as fs from 'fs';
 import sharp from 'sharp';
 
 export class MediaController {
-  private mediaRepository = AppDataSource.getRepository(Media);
-  private userRepository = AppDataSource.getRepository(User);
+  private get mediaRepository() {
+    return AppDataSource.getRepository(Media);
+  }
+  
+  private get userRepository() {
+    return AppDataSource.getRepository(User);
+  }
 
   // POST /api/media/upload - 파일 업로드
   uploadMedia = async (req: Request, res: Response): Promise<void> => {
@@ -138,6 +143,17 @@ export class MediaController {
   // GET /api/media - 미디어 목록
   getMedia = async (req: Request, res: Response): Promise<void> => {
     try {
+      // Debug: Check if AppDataSource is initialized
+      if (!AppDataSource.isInitialized) {
+        logger.error('AppDataSource is not initialized');
+        res.status(500).json({
+          success: false,
+          error: 'Database not initialized'
+        });
+        return;
+      }
+      
+      logger.info('AppDataSource is initialized, proceeding with query');
       const {
         page = 1,
         limit = 20,

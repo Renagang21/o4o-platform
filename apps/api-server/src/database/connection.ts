@@ -6,6 +6,7 @@ import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { ApprovalLog } from '../entities/ApprovalLog';
 import { LinkedAccount } from '../entities/LinkedAccount';
 import { AccountActivity } from '../entities/AccountActivity';
+import { Media } from '../entities/Media';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
 import { Product } from '../entities/Product';
@@ -107,6 +108,7 @@ export const AppDataSource = new DataSource({
         ApprovalLog,
         LinkedAccount,
         AccountActivity,
+        Media,
         MediaFile,
         MediaFolder,
         Product,
