@@ -172,7 +172,7 @@ const MenuListWordPress: FC = () => {
       name: (
         <div>
           <strong>
-            <a href={`/themes/menus/${menu.id}/edit`} className="row-title">
+            <a href={`/appearance/menus/${menu.id}/edit`} className="row-title">
               {menu.name}
             </a>
           </strong>
@@ -210,7 +210,7 @@ const MenuListWordPress: FC = () => {
     actions: [
       {
         label: 'Edit',
-        href: `/themes/menus/${menu.id}/edit`,
+        href: `/appearance/menus/${menu.id}/edit`,
         primary: true
       },
       {
@@ -235,7 +235,7 @@ const MenuListWordPress: FC = () => {
       
       <Button 
         className="page-title-action ml-2"
-        onClick={() => window.location.href = '/themes/menus/new'}
+        onClick={() => window.location.href = '/appearance/menus/new'}
       >
         Add New
       </Button>

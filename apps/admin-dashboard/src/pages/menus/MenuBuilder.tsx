@@ -146,7 +146,7 @@ const MenuBuilder: FC = () => {
     onSuccess: () => {
       toast.success('메뉴가 생성되었습니다')
       queryClient.invalidateQueries({ queryKey: ['menus'] })
-      navigate('/themes/menus')
+      navigate('/appearance/menus')
     },
     onError: () => {
       toast.error('메뉴 생성에 실패했습니다')
@@ -507,7 +507,7 @@ const MenuBuilder: FC = () => {
         <Button
           variant={"ghost" as const}
           size={"sm" as const}
-          onClick={() => navigate('/themes/menus')}
+          onClick={() => navigate('/appearance/menus')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           메뉴 목록
