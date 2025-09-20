@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
 import { useTemplateParts, TemplatePartBlock } from '../hooks/useTemplateParts';
 import SiteHeader from './blocks/SiteHeader';
 import SiteFooter from './blocks/SiteFooter';
@@ -63,10 +63,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
 }) => {
   const { templateParts, loading, error } = useTemplateParts({ area, context });
 
-  // Component initialization tracking
-  useMemo(() => {
-    // Template part renderer initialized for area
-  }, [area, context, fallback, loading, error, templateParts]);
+  // Note: removed a no-op useMemo to satisfy lint rules
 
   // Render blocks recursively
   const renderBlock = (block: TemplatePartBlock): React.ReactNode => {
