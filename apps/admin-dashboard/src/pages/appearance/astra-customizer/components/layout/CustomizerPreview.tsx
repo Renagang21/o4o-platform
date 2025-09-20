@@ -181,27 +181,14 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     
     requestAnimationFrame(() => {
       if (previewDevice === 'desktop') {
-        // For desktop, make iframe fill the container
+        // For desktop, make iframe fill the container completely
         iframe.style.width = '100%';
         iframe.style.height = '100%';
       } else {
-        // For mobile/tablet, maintain aspect ratio
-        const containerRect = container.getBoundingClientRect();
-        const maxWidth = containerRect.width - 40; // Account for padding
-        const maxHeight = containerRect.height - 40;
-        
-        // Get device dimensions
+        // For mobile/tablet, use fixed sizes from deviceSizes
         const deviceDimensions = deviceSizes[previewDevice];
-        const deviceWidth = parseInt(deviceDimensions.width);
-        const deviceHeight = parseInt(deviceDimensions.height);
-        
-        // Calculate scale to fit in container
-        const scaleX = maxWidth / deviceWidth;
-        const scaleY = maxHeight / deviceHeight;
-        const scale = Math.min(scaleX, scaleY, 1); // Don't scale up
-        
-        iframe.style.width = `${deviceWidth * scale}px`;
-        iframe.style.height = `${deviceHeight * scale}px`;
+        iframe.style.width = deviceDimensions.width;
+        iframe.style.height = deviceDimensions.height;
       }
     });
   }, [previewDevice]);

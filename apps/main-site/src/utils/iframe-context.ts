@@ -81,6 +81,80 @@ export const safeHistoryAPI = {
 };
 
 /**
+ * Patch the global History API to prevent errors in iframe context
+ * This must be called before React Router initializes
+ */
+export const patchHistoryAPI = () => {
+  if (!isInIframe()) return; // Only patch in iframe context
+
+  // Store original methods
+  const originalPushState = window.history.pushState.bind(window.history);
+  const originalReplaceState = window.history.replaceState.bind(window.history);
+  const originalBack = window.history.back.bind(window.history);
+  const originalForward = window.history.forward.bind(window.history);
+  const originalGo = window.history.go.bind(window.history);
+
+  // Override pushState
+  window.history.pushState = function(data: any, title: string, url?: string | URL | null) {
+    try {
+      // In iframe, we can still try to update URL without navigation
+      if (url && typeof url === 'string') {
+        // Only update hash part to avoid security errors
+        const newUrl = new URL(url, window.location.origin);
+        if (newUrl.origin === window.location.origin) {
+          window.location.hash = newUrl.hash || '';
+        }
+      }
+    } catch (error) {
+      // Silently ignore errors in iframe context
+    }
+  };
+
+  // Override replaceState
+  window.history.replaceState = function(data: any, title: string, url?: string | URL | null) {
+    try {
+      // In iframe, we can still try to update URL without navigation
+      if (url && typeof url === 'string') {
+        // Only update hash part to avoid security errors
+        const newUrl = new URL(url, window.location.origin);
+        if (newUrl.origin === window.location.origin) {
+          window.location.hash = newUrl.hash || '';
+        }
+      }
+    } catch (error) {
+      // Silently ignore errors in iframe context
+    }
+  };
+
+  // Override navigation methods to prevent errors
+  window.history.back = function() {
+    // In iframe context, back navigation is usually blocked
+    // Send message to parent instead
+    try {
+      window.parent.postMessage({ type: 'navigate-back' }, '*');
+    } catch (error) {
+      // Silently ignore
+    }
+  };
+
+  window.history.forward = function() {
+    try {
+      window.parent.postMessage({ type: 'navigate-forward' }, '*');
+    } catch (error) {
+      // Silently ignore
+    }
+  };
+
+  window.history.go = function(delta: number) {
+    try {
+      window.parent.postMessage({ type: 'navigate-go', delta }, '*');
+    } catch (error) {
+      // Silently ignore
+    }
+  };
+};
+
+/**
  * Initialize iframe-aware behavior
  * Should be called early in the application lifecycle
  */
@@ -90,11 +164,11 @@ export const initializeIframeContext = () => {
   if (inIframe) {
     // Running in iframe context - History API will be disabled
     
+    // Patch the global History API BEFORE React Router starts
+    patchHistoryAPI();
+    
     // Add CSS class to body for iframe-specific styling
     document.body.classList.add('in-iframe');
-    
-    // Prevent certain behaviors that don't work well in iframes
-    // Like opening new windows, etc.
     
     // Send message to parent frame that we're ready
     try {
