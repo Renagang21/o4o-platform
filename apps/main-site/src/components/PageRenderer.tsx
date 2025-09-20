@@ -21,6 +21,13 @@ interface PageRendererProps {
 }
 
 const PageRenderer: FC<PageRendererProps> = ({ page }) => {
+  // Debug content format
+  console.debug('[PageRenderer] Page content:', { 
+    title: page.title,
+    contentType: typeof page.content,
+    content: page.content 
+  });
+  
   // Context for conditional template parts
   const context = {
     pageId: page.id,
