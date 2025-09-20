@@ -21,7 +21,7 @@ export const useProducts = (
       });
 
       const response = await axiosInstance.get<PaginatedResponse<Product>>(
-        `/api/v1/public/products?${params}`
+        `public/products?${params}`
       );
       return response.data;
     },
@@ -35,7 +35,7 @@ export const useProduct = (productId: string, enabled = true) => {
     queryKey: ['product', productId],
     queryFn: async () => {
       const response = await axiosInstance.get<ApiResponse<Product>>(
-        `/api/v1/public/products/${productId}`
+        `public/products/${productId}`
       );
       return response.data;
     },
@@ -50,7 +50,7 @@ export const useFeaturedProducts = (limit = 8) => {
     queryKey: ['featured-products', limit],
     queryFn: async () => {
       const response = await axiosInstance.get<PaginatedResponse<Product>>(
-        `/api/v1/public/products?featured=true&limit=${limit}`
+        `public/products?featured=true&limit=${limit}`
       );
       return response.data;
     },
@@ -68,7 +68,7 @@ export const useProductsByCategory = (
     queryKey: ['products-by-category', categorySlug, page, limit],
     queryFn: async () => {
       const response = await axiosInstance.get<PaginatedResponse<Product>>(
-        `/api/v1/public/products?category=${categorySlug}&page=${page}&limit=${limit}`
+        `public/products?category=${categorySlug}&page=${page}&limit=${limit}`
       );
       return response.data;
     },
@@ -87,7 +87,7 @@ export const useProductSearch = (
     queryKey: ['product-search', searchTerm, page, limit],
     queryFn: async () => {
       const response = await axiosInstance.get<PaginatedResponse<Product>>(
-        `/api/v1/public/products?search=${encodeURIComponent(searchTerm)}&page=${page}&limit=${limit}`
+        `public/products?search=${encodeURIComponent(searchTerm)}&page=${page}&limit=${limit}`
       );
       return response.data;
     },

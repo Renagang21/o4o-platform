@@ -178,6 +178,9 @@
   justify-content: center;
   padding: 20px;
   overflow: auto;
+  /* Performance optimizations */
+  contain: layout style;
+  will-change: transform;
 }
 
 .wp-customizer-preview-frame {
@@ -185,6 +188,9 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
+  /* Performance optimizations for iframe container */
+  contain: layout style;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 .wp-customizer-preview-desktop {
@@ -219,6 +225,11 @@
   width: 100%;
   height: 100%;
   border: none;
+  /* Performance optimizations for iframe */
+  contain: layout style;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .wp-customizer-preview-error {

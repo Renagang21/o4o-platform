@@ -530,6 +530,8 @@ app.use('/api/signage', limiter, signageRoutes);
 app.use('/api/crowdfunding', limiter, crowdfundingRoutes);
 app.use('/api/forum', limiter, forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
+// Compatibility: expose public routes under v1 prefix for frontend consistency
+app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management routes
 
 // Categories routes (public access)

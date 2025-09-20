@@ -38,27 +38,66 @@ const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  // Use base API URL for posts data since v1 doesn't have posts endpoint
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr/api';
-  
-  const response = await fetch(`${baseUrl}/posts/${pageId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  // Build robust public API base for pages: /api/pages/:id (unauthenticated)
+  // Accepts VITE_API_BASE_URL or VITE_API_URL; normalize to .../api
+  const rawBase =
+    (import.meta.env as any).VITE_API_BASE_URL ||
+    (import.meta.env as any).VITE_API_URL ||
+    'https://api.neture.co.kr/api';
+
+  let baseUrl = String(rawBase);
+  if (baseUrl.endsWith('/api/v1')) {
+    baseUrl = baseUrl.replace(/\/api\/v1$/, '/api');
+  } else if (/\/api\b/.test(baseUrl)) {
+    // keep as-is if contains /api path somewhere
+    // normalize to end at /api if it's a longer path like /api/v2 -> fallback to append
+    if (!/\/api(\/)?$/.test(baseUrl)) {
+      // try to cut at first /api segment
+      const idx = baseUrl.indexOf('/api');
+      baseUrl = baseUrl.slice(0, idx + 4);
+    }
+  } else {
+    // append /api if missing
+    baseUrl = baseUrl.replace(/\/$/, '') + '/api';
   }
-  
-  const data = await response.json();
-  
-  if (!data || !data.data) {
-    throw new Error('Invalid response format');
+
+  const tried: string[] = [];
+
+  // 1) Try public pages endpoint first
+  const tryUrls = [
+    `${baseUrl}/pages/${encodeURIComponent(pageId)}`,
+    // 2) Fallback: some environments might have stored a post id
+    `${baseUrl}/posts/${encodeURIComponent(pageId)}`,
+    // 3) Legacy public endpoint used elsewhere in the app
+    `${baseUrl}/public/posts/post/${encodeURIComponent(pageId)}`,
+  ];
+
+  for (const url of tryUrls) {
+    try {
+      console.debug('[HomePage] Fetching static page', { url });
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      tried.push(`${response.status} ${url}`);
+
+      if (!response.ok) {
+        // If 404, continue to next fallback
+        if (response.status === 404) continue;
+        throw new Error(`HTTP error! status: ${response.status} at ${url}`);
+      }
+
+      const json = await response.json();
+      const page = (json && (json.data || json)) as Page;
+      if (page && page.id) return page;
+    } catch (e) {
+      // Keep trying next URL
+      continue;
+    }
   }
-  
-  return data.data;
+
+  throw new Error(`HTTP error! status: 404 - Tried: ${tried.join(' | ')}`);
 };
 
 const HomePage: FC = () => {
