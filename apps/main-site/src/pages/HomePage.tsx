@@ -45,20 +45,20 @@ const fetchPageData = async (pageId: string): Promise<Page> => {
     (import.meta.env as any).VITE_API_URL ||
     'https://api.neture.co.kr/api';
 
-  let baseUrl = String(rawBase);
-  if (baseUrl.endsWith('/api/v1')) {
-    baseUrl = baseUrl.replace(/\/api\/v1$/, '/api');
-  } else if (/\/api\b/.test(baseUrl)) {
-    // keep as-is if contains /api path somewhere
-    // normalize to end at /api if it's a longer path like /api/v2 -> fallback to append
-    if (!/\/api(\/)?$/.test(baseUrl)) {
-      // try to cut at first /api segment
-      const idx = baseUrl.indexOf('/api');
-      baseUrl = baseUrl.slice(0, idx + 4);
+  // Robustly resolve a valid absolute base like https://api.neture.co.kr/api
+  let baseUrl: string;
+  try {
+    const u = new URL(String(rawBase));
+    // Guard against invalid host like just "api"
+    if (!u.hostname || u.hostname === 'api') {
+      baseUrl = 'https://api.neture.co.kr/api';
+    } else {
+      // Always normalize path to /api (not /api/v1) for public endpoints
+      baseUrl = `${u.protocol}//${u.host}/api`;
     }
-  } else {
-    // append /api if missing
-    baseUrl = baseUrl.replace(/\/$/, '') + '/api';
+  } catch {
+    // Fallback to canonical public API base
+    baseUrl = 'https://api.neture.co.kr/api';
   }
 
   const tried: string[] = [];
