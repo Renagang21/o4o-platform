@@ -1,7 +1,43 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 
-const router = Router();
+const router: Router = Router();
+
+/**
+ * 정적 파일 프록시 라우트 (JS, CSS, 이미지 등)
+ */
+router.get('/assets/*', async (req: Request, res: Response) => {
+  try {
+    const assetPath = req.params[0];
+    const targetUrl = `https://neture.co.kr/assets/${assetPath}`;
+    
+    const response = await axios.get(targetUrl, {
+      headers: {
+        'User-Agent': 'O4O-Preview-Proxy/1.0'
+      },
+      responseType: 'stream',
+      timeout: 10000
+    });
+    
+    // 원본 헤더 복사 (Content-Type 등)
+    const contentType = response.headers['content-type'];
+    if (contentType) {
+      res.set('Content-Type', contentType);
+    }
+    
+    // 캐시 헤더 설정
+    res.set({
+      'Cache-Control': 'public, max-age=31536000',
+      'Access-Control-Allow-Origin': '*'
+    });
+    
+    response.data.pipe(res);
+    
+  } catch (error: any) {
+    console.error('Asset proxy error:', error.message);
+    res.status(404).json({ error: 'Asset not found' });
+  }
+});
 
 /**
  * 프록시 라우트: X-Frame-Options 우회를 위한 사이트 미리보기
@@ -9,6 +45,17 @@ const router = Router();
  */
 router.get('/site/:domain?', async (req: Request, res: Response) => {
   try {
+    // 디버깅: 헤더 정보 로깅
+    console.log('🔍 Preview proxy debug info:', {
+      protocol: req.protocol,
+      'x-forwarded-proto': req.get('X-Forwarded-Proto'),
+      'x-forwarded-for': req.get('X-Forwarded-For'),
+      host: req.get('host'),
+      url: req.url,
+      secure: req.secure,
+      headers: req.headers
+    });
+    
     const { domain } = req.params;
     const targetUrl = domain ? `https://${domain}` : 'https://neture.co.kr';
     
@@ -36,12 +83,51 @@ router.get('/site/:domain?', async (req: Request, res: Response) => {
     
     let html = response.data;
     
-    // HTML 수정: X-Frame-Options 관련 meta 태그 제거
+    // 1. CSP meta 태그 제거 (frame-ancestors는 meta에서 지원 안됨)
+    html = html.replace(/<meta[^>]*http-equiv=['"]Content-Security-Policy['"][^>]*>/gi, '');
+    html = html.replace(/<meta[^>]*name=['"]content-security-policy['"][^>]*>/gi, '');
+    
+    // 2. X-Frame-Options meta 태그 제거
     html = html.replace(/<meta[^>]*http-equiv=['"]X-Frame-Options['"][^>]*>/gi, '');
     
-    // iframe-friendly 스크립트 추가
+    // 3. 정적 파일 경로를 API 프록시로 리다이렉트
+    // trust proxy 설정으로 req.protocol이 올바르게 감지됨
+    const apiBaseUrl = req.protocol + '://' + req.get('host');
+    
+    // CSS 파일 경로 변경
+    html = html.replace(/href="\/assets\//g, `href="${apiBaseUrl}/api/v1/preview/assets/`);
+    html = html.replace(/href="assets\//g, `href="${apiBaseUrl}/api/v1/preview/assets/`);
+    
+    // JS 파일 경로 변경
+    html = html.replace(/src="\/assets\//g, `src="${apiBaseUrl}/api/v1/preview/assets/`);
+    html = html.replace(/src="assets\//g, `src="${apiBaseUrl}/api/v1/preview/assets/`);
+    
+    // 이미지 경로 변경
+    html = html.replace(/src="\/uploads\//g, `src="${targetUrl}/uploads/`);
+    html = html.replace(/src="uploads\//g, `src="${targetUrl}/uploads/`);
+    
+    // base href 태그 추가 - 프록시 경로 사용으로 cross-origin 이슈 방지
+    const baseTag = `<base href="${apiBaseUrl}/api/v1/preview/site/${new URL(targetUrl).host}/">`;
+    html = html.replace('<head>', `<head>\n  ${baseTag}`);
+    
+    // 4. iframe-friendly 스크립트 추가
     const iframeScript = `
       <script>
+        // History API 보안 오류 방지 (Cross-Origin 제한)
+        if (window !== window.top) {
+          // iframe 컨텍스트에서 History API 비활성화
+          const originalPushState = window.history.pushState;
+          const originalReplaceState = window.history.replaceState;
+          
+          window.history.pushState = function() {
+            console.log('History.pushState blocked in iframe context');
+          };
+          
+          window.history.replaceState = function() {
+            console.log('History.replaceState blocked in iframe context');
+          };
+        }
+        
         // iframe 환경에서 동작하는 스크립트
         if (window !== window.top) {
           // 상위 프레임과 통신을 위한 PostMessage 설정
@@ -62,6 +148,21 @@ router.get('/site/:domain?', async (req: Request, res: Response) => {
           
           // 상위 프레임에 로드 완료 알림
           window.parent.postMessage({ type: 'preview-loaded' }, '*');
+        }
+        
+        // 외부 링크 클릭 방지 (iframe 내에서)
+        if (window !== window.top) {
+          document.addEventListener('click', function(e) {
+            const target = e.target.closest('a');
+            if (target && target.href) {
+              e.preventDefault();
+              // 상위 프레임에 링크 클릭 알림
+              window.parent.postMessage({ 
+                type: 'link-clicked', 
+                url: target.href 
+              }, '*');
+            }
+          });
         }
       </script>
     `;

@@ -143,9 +143,8 @@ const app: Application = express();
 
 // IMPORTANT: Set trust proxy IMMEDIATELY after creating the app
 // This must be done before any middleware that uses req.ip
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', true);
-}
+// Enable for both development and production since we're behind nginx proxy
+app.set('trust proxy', true);
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
