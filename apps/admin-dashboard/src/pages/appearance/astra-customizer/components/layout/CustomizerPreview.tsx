@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Smartphone, Tablet, Monitor, RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useCustomizer } from '../../context/CustomizerContext';
 import { PreviewDevice } from '../../types/customizer-types';
@@ -25,7 +25,6 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [iframeError, setIframeError] = useState(false);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   
   // Generate preview URL (using API proxy to avoid X-Frame-Options)
   const generatePreviewUrl = () => {
@@ -39,39 +38,8 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
   
   const { previewDevice } = state;
 
-  // Debounce function to prevent excessive reflows
-  const debounce = useCallback((func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func.apply(null, args), delay);
-    };
-  }, []);
-
-  // Memoize CSS generation to prevent unnecessary recalculations
-  const memoizedCSS = useMemo(() => {
-    return generateCSS(state.settings);
-  }, [state.settings]);
-
-  // Optimized container size calculation
-  const updateContainerSize = useCallback(() => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    setContainerSize(prev => {
-      // Only update if size actually changed to prevent unnecessary re-renders
-      if (prev.width !== rect.width || prev.height !== rect.height) {
-        return { width: rect.width, height: rect.height };
-      }
-      return prev;
-    });
-  }, []);
-
-  // Debounced version of container size update
-  const debouncedUpdateContainerSize = useMemo(
-    () => debounce(updateContainerSize, 100),
-    [updateContainerSize, debounce]
-  );
+  // Simple CSS generation
+  const css = generateCSS(state.settings);
   
   // Handle device change
   const handleDeviceChange = (device: PreviewDevice) => {
@@ -93,48 +61,38 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     }
   }, [state.previewDevice]);
   
-  // Optimized CSS injection with batching
+  // Simple CSS injection
   const injectCSS = useCallback(() => {
     if (!iframeRef.current?.contentWindow) return;
     
     try {
-      // Use memoized CSS instead of generating on each call
-      const css = memoizedCSS;
-      
-      // Batch DOM operations to prevent multiple reflows
       const doc = iframeRef.current.contentDocument;
       if (!doc) return;
       
-      // Use requestAnimationFrame to batch DOM updates
-      requestAnimationFrame(() => {
-        let styleEl = doc.getElementById('astra-customizer-css');
-        if (!styleEl) {
-          styleEl = doc.createElement('style');
-          styleEl.id = 'astra-customizer-css';
-          doc.head.appendChild(styleEl);
-        }
-        
-        // Only update if CSS actually changed
-        if (styleEl.textContent !== css) {
-          styleEl.textContent = css;
-        }
-        
-        // Send message to iframe
-        if (iframeRef.current?.contentWindow) {
-          iframeRef.current.contentWindow.postMessage(
-            {
-              type: 'customizer-update',
-              settings: state.settings,
-              css,
-            },
-            '*'
-          );
-        }
-      });
+      let styleEl = doc.getElementById('astra-customizer-css');
+      if (!styleEl) {
+        styleEl = doc.createElement('style');
+        styleEl.id = 'astra-customizer-css';
+        doc.head.appendChild(styleEl);
+      }
+      
+      styleEl.textContent = css;
+      
+      // Send message to iframe
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: 'customizer-update',
+            settings: state.settings,
+            css,
+          },
+          '*'
+        );
+      }
     } catch (error) {
       console.error('Failed to inject CSS:', error);
     }
-  }, [memoizedCSS, state.settings]);
+  }, [css, state.settings]);
   
   // Handle iframe load
   const handleIframeLoad = () => {
@@ -172,61 +130,10 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     window.open(currentUrl, '_blank');
   };
   
-  // Optimized iframe size adjustment
-  const adjustIframeSize = useCallback(() => {
-    if (!iframeRef.current || !containerRef.current) return;
-    
-    const iframe = iframeRef.current;
-    const container = containerRef.current;
-    
-    requestAnimationFrame(() => {
-      if (previewDevice === 'desktop') {
-        // For desktop, make iframe fill the container completely
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-      } else {
-        // For mobile/tablet, use fixed sizes from deviceSizes
-        const deviceDimensions = deviceSizes[previewDevice];
-        iframe.style.width = deviceDimensions.width;
-        iframe.style.height = deviceDimensions.height;
-      }
-    });
-  }, [previewDevice]);
-
-  // Use ResizeObserver for better performance than window resize events
+  // Update CSS when settings change
   useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        // Use debounced update to prevent excessive reflows
-        debouncedUpdateContainerSize();
-        adjustIframeSize();
-      }
-    });
-    
-    resizeObserver.observe(containerRef.current);
-    
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [debouncedUpdateContainerSize, adjustIframeSize]);
-
-  // Update iframe size when device changes
-  useEffect(() => {
-    adjustIframeSize();
-  }, [previewDevice, adjustIframeSize]);
-
-  // Debounced CSS injection to prevent excessive updates
-  const debouncedInjectCSS = useMemo(
-    () => debounce(injectCSS, 50),
-    [injectCSS, debounce]
-  );
-
-  // Update CSS when settings change (debounced)
-  useEffect(() => {
-    debouncedInjectCSS();
-  }, [debouncedInjectCSS]);
+    injectCSS();
+  }, [injectCSS]);
   
   // Handle navigation within iframe
   useEffect(() => {
@@ -300,15 +207,7 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
       
       {/* Preview Body */}
       <div className="wp-customizer-preview-body" ref={containerRef}>
-        <div 
-          className={getPreviewClasses()}
-          style={{
-            width: deviceSizes[previewDevice].width,
-            height: deviceSizes[previewDevice].height,
-            maxWidth: '100%',
-            maxHeight: '100%',
-          }}
-        >
+        <div className={getPreviewClasses()}>
           {isLoading && !iframeError && (
             <div className="wp-customizer-preview-loading">
               <RefreshCw size={32} className="spin" />
@@ -356,8 +255,10 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
             onError={handleIframeError}
             title="Site Preview"
             style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
               opacity: isLoading || iframeError ? 0 : 1,
-              transition: 'opacity 0.3s',
               display: iframeError ? 'none' : 'block',
             }}
           />
