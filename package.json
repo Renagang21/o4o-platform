@@ -58,6 +58,7 @@
     "deploy:webserver": "./scripts/deploy-to-server.sh webserver",
     "deploy:apiserver": "./scripts/deploy-to-server.sh apiserver",
     "deploy:all": "./scripts/deploy-to-server.sh both",
+    "deploy:main-site": "./scripts/deploy-main-site.sh",
     "pm2:start": "./scripts/deploy.sh start",
     "pm2:stop": "./scripts/deploy.sh stop",
     "pm2:restart": "./scripts/deploy.sh restart",
