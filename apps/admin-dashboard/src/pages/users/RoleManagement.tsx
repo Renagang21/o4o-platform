@@ -264,15 +264,7 @@ export default function RoleManagement() {
                     onValueChange={(color) => setFormData(prev => ({ ...prev, color }))}
                   >
                     <SelectTrigger>
-                      <SelectValue>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-4 h-4 rounded"
-                            style={{ backgroundColor: formData.color }}
-                          />
-                          {formData.color}
-                        </div>
-                      </SelectValue>
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {defaultRoleColors.map((color) => (

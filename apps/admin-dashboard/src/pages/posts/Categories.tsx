@@ -165,8 +165,8 @@ const Categories = () => {
         <div className="flex items-center justify-between">
           <AdminBreadcrumb 
             items={[
-              { label: 'Admin', href: '/admin' },
-              { label: '글', href: '/admin/posts' },
+              { label: 'Admin', path: '/admin' },
+              { label: '글', path: '/admin/posts' },
               { label: '카테고리' }
             ]}
           />

@@ -183,7 +183,7 @@ const MenuListWordPress: FC = () => {
       ),
       location: (
         <Badge variant="outline">
-          {locationLabels[menu.location as any]}
+          {locationLabels[menu.location as keyof typeof locationLabels]}
         </Badge>
       ),
       items: (

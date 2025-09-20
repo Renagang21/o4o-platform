@@ -103,9 +103,9 @@ const WordPressMenuEditor: FC = () => {
   const loadAvailableItems = async () => {
     try {
       // Load pages
-      const pagesResponse = await unifiedApi.content.pages.list({ limit: 100 });
-      if (pagesResponse.success && pagesResponse.data) {
-        setPages(pagesResponse.data.map((page: any) => ({
+      const pagesResponse = await (unifiedApi as any).raw.get('/api/pages?limit=100');
+      if (pagesResponse.data?.success && pagesResponse.data?.data) {
+        setPages(pagesResponse.data.data.map((page: any) => ({
           id: page.id,
           title: page.title,
           type: 'page' as const,
@@ -114,9 +114,9 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load posts
-      const postsResponse = await unifiedApi.content.posts.list({ limit: 100 });
-      if (postsResponse.success && postsResponse.data) {
-        setPosts(postsResponse.data.map((post: any) => ({
+      const postsResponse = await (unifiedApi as any).raw.get('/api/posts?limit=100');
+      if (postsResponse.data?.success && postsResponse.data?.data) {
+        setPosts(postsResponse.data.data.map((post: any) => ({
           id: post.id,
           title: post.title,
           type: 'post' as const,
@@ -125,9 +125,9 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load categories
-      const categoriesResponse = await unifiedApi.content.categories.list({ limit: 100 });
-      if (categoriesResponse.success && categoriesResponse.data) {
-        setCategories(categoriesResponse.data.map((cat: any) => ({
+      const categoriesResponse = await (unifiedApi as any).raw.get('/api/categories?limit=100');
+      if (categoriesResponse.data?.success && categoriesResponse.data?.data) {
+        setCategories(categoriesResponse.data.data.map((cat: any) => ({
           id: cat.id,
           title: cat.name,
           type: 'category' as const,
@@ -136,8 +136,8 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load tags
-      const tagsResponse = await unifiedApi.raw.get('/api/tags');
-      if (tagsResponse.data.success && tagsResponse.data.data) {
+      const tagsResponse = await (unifiedApi as any).raw.get('/api/tags?limit=100');
+      if (tagsResponse.data?.success && tagsResponse.data?.data) {
         setTags(tagsResponse.data.data.map((tag: any) => ({
           id: tag.id,
           title: tag.name,

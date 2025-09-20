@@ -221,6 +221,19 @@
   border: none;
 }
 
+.wp-customizer-preview-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db;
+}
+
 /* Panel Content Styles */
 .wp-customizer-section {
   padding: 15px 20px;

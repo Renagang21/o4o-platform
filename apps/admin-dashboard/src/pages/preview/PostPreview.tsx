@@ -43,7 +43,11 @@ const PostPreview: React.FC = () => {
             return;
           }
           
-          const post = response.data.data;
+          const post = response.data as any;
+          if (!post) {
+            setContent({ title: 'Not Found', blocks: [], postId: id });
+            return;
+          }
           let blocks: Block[] = [];
           
           if (post.content) {
@@ -118,7 +122,7 @@ const PostPreview: React.FC = () => {
 
       case 'core/heading':
       case 'heading':
-        const HeadingTag = `h${content?.level || 2}` as keyof JSX.IntrinsicElements;
+        const HeadingTag = `h${content?.level || 2}` as 'h1'|'h2'|'h3'|'h4'|'h5'|'h6';
         const headingClasses = {
           h1: 'text-4xl font-bold mb-6 text-gray-900',
           h2: 'text-3xl font-semibold mb-5 text-gray-800',

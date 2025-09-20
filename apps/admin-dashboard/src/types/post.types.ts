@@ -96,12 +96,16 @@ export interface Media {
 export interface CreatePostRequest {
   title: string;
   content: Block[] | string;
+  slug?: string;
   excerpt?: string;
   status?: PostStatus | 'publish' | 'pending';
+  visibility?: 'public' | 'private' | 'password';
   type?: string; // Content type: 'post' or 'page'
   featuredImageId?: string;
   categoryIds?: string[];
   tagIds?: string[];
+  categories?: string[];
+  tags?: string[];
   settings?: Partial<Post['settings']>;
 }
 

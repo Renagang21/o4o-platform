@@ -320,7 +320,7 @@ const Posts = () => {
   const handlePermanentDelete = async (id: string) => {
     if (confirm('이 글을 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
       try {
-        const response = await postApi.delete(id, true);
+        const response = await postApi.delete(id);
         
         if (response.success) {
           // Remove from local state
@@ -425,7 +425,7 @@ const Posts = () => {
     
     // Filter by tab
     if (activeTab === 'published') {
-      filtered = filtered.filter(p => p.status === 'published' || p.status === 'publish');
+      filtered = filtered.filter(p => (p.status as any) === 'published' || (p.status as any) === 'publish');
     } else if (activeTab === 'draft') {
       filtered = filtered.filter(p => p.status === 'draft');
     } else if (activeTab === 'trash') {
@@ -469,7 +469,7 @@ const Posts = () => {
   };
 
   const getStatusCounts = () => {
-    const published = posts.filter(p => p.status === 'published' || p.status === 'publish').length;
+    const published = posts.filter(p => (p.status as any) === 'published' || (p.status as any) === 'publish').length;
     const draft = posts.filter(p => p.status === 'draft').length;
     const trash = posts.filter(p => p.status === 'trash').length;
     const all = posts.length;  // 휴지통 포함한 전체 개수
@@ -502,8 +502,8 @@ const Posts = () => {
         <div className="flex items-center justify-between">
           <AdminBreadcrumb 
             items={[
-              { label: 'Admin', href: '/admin' },
-              { label: '글', href: '/admin/posts' },
+              { label: 'Admin', path: '/admin' },
+              { label: '글', path: '/admin/posts' },
               { label: '모든 글' }
             ]}
           />

@@ -85,22 +85,25 @@ const PermalinkSettings: FC = () => {
   ];
 
   // 설정 조회
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings, isLoading } = useQuery<PermalinkSettings>({
     queryKey: ['permalink-settings'],
     queryFn: async () => {
       const response = await apiClient.get('/api/v1/settings/permalink');
-      return response.data.data as PermalinkSettings;
-    },
-    onSuccess: (data) => {
-      setSelectedStructure(data.structure || '/%postname%/');
-      setCategoryBase(data.categoryBase || 'category');
-      setTagBase(data.tagBase || 'tag');
-      setRemoveStopWords(data.removeStopWords || false);
-      setMaxUrlLength(data.maxUrlLength || 75);
-      setAutoFlushRules(data.autoFlushRules !== undefined ? data.autoFlushRules : true);
-      setEnableSeoWarnings(data.enableSeoWarnings !== undefined ? data.enableSeoWarnings : true);
+      return response.data as PermalinkSettings;
     }
   });
+
+  useEffect(() => {
+    if (settings) {
+      setSelectedStructure(settings.structure || '/%postname%/');
+      setCategoryBase(settings.categoryBase || 'category');
+      setTagBase(settings.tagBase || 'tag');
+      setRemoveStopWords(!!settings.removeStopWords);
+      setMaxUrlLength(settings.maxUrlLength || 75);
+      setAutoFlushRules(settings.autoFlushRules !== undefined ? settings.autoFlushRules : true);
+      setEnableSeoWarnings(settings.enableSeoWarnings !== undefined ? settings.enableSeoWarnings : true);
+    }
+  }, [settings]);
 
   // 설정 저장
   const saveMutation = useMutation({
@@ -448,7 +451,7 @@ const PermalinkSettings: FC = () => {
             </button>
             <button 
               onClick={handleSave}
-              disabled={saveMutation.isPending || (validation && !validation.valid)}
+              disabled={saveMutation.isPending || !!(validation && !validation.valid)}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saveMutation.isPending ? '저장 중...' : '변경사항 저장'}

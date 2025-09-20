@@ -35,8 +35,8 @@ class ZoneApiClient {
    */
   async getZoneContent(pageId: string): Promise<ZoneContentResponse> {
     try {
-      const response = await apiClient.get<ZoneApiResponse>(`${this.baseUrl}/${pageId}`)
-      return response.data
+      const response = await apiClient.get(`${this.baseUrl}/${pageId}`)
+      return response.data as ZoneApiResponse
     } catch (error) {
       // console.error('Error fetching zone content:', error)
       throw new Error('Failed to load zone content')
@@ -88,8 +88,8 @@ class ZoneApiClient {
         ? `/api/themes/${themeId}/zones-config`
         : '/api/themes/default/zones-config'
       
-      const response = await apiClient.get<ZoneConfig>(url)
-      return response.data
+      const response = await apiClient.get(url)
+      return response.data as ZoneConfig
     } catch (error) {
       // console.error('Error fetching zone config:', error)
       throw new Error('Failed to load zone configuration')
@@ -105,8 +105,8 @@ class ZoneApiClient {
         ? `/api/themes/${themeId}/layout-config`
         : '/api/themes/default/layout-config'
       
-      const response = await apiClient.get<LayoutConfig>(url)
-      return response.data
+      const response = await apiClient.get(url)
+      return response.data as LayoutConfig
     } catch (error) {
       // console.error('Error fetching layout config:', error)
       throw new Error('Failed to load layout configuration')
@@ -122,8 +122,8 @@ class ZoneApiClient {
         ? `${this.baseUrl}/templates?zoneId=${zoneId}`
         : `${this.baseUrl}/templates`
       
-      const response = await apiClient.get<ZoneTemplate[]>(url)
-      return response.data
+      const response = await apiClient.get(url)
+      return response.data as ZoneTemplate[]
     } catch (error) {
       // console.error('Error fetching zone templates:', error)
       throw new Error('Failed to load zone templates')
@@ -135,8 +135,8 @@ class ZoneApiClient {
    */
   async saveZoneTemplate(template: Omit<ZoneTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<ZoneTemplate> {
     try {
-      const response = await apiClient.post<ZoneTemplate>(`${this.baseUrl}/templates`, template)
-      return response.data
+      const response = await apiClient.post(`${this.baseUrl}/templates`, template)
+      return response.data as ZoneTemplate
     } catch (error) {
       // console.error('Error saving zone template:', error)
       throw new Error('Failed to save zone template')
@@ -167,8 +167,8 @@ class ZoneApiClient {
         ? `/api/theme/customization?userId=${userId}`
         : '/api/theme/customization'
       
-      const response = await apiClient.get<ThemeCustomizationApiResponse>(url)
-      return response.data.customization
+      const response = await apiClient.get(url)
+      return (response.data as ThemeCustomizationApiResponse).customization
     } catch (error: any) {
       if (error.response?.status === 404) {
         return null // No customization found
@@ -195,8 +195,8 @@ class ZoneApiClient {
    */
   async generatePreview(customization: ThemeCustomization): Promise<{ previewUrl: string }> {
     try {
-      const response = await apiClient.post<{ previewUrl: string }>('/api/theme/preview', customization)
-      return response.data
+      const response = await apiClient.post('/api/theme/preview', customization)
+      return response.data as { previewUrl: string }
     } catch (error) {
       // console.error('Error generating preview:', error)
       throw new Error('Failed to generate preview')
@@ -225,7 +225,7 @@ class ZoneApiClient {
   }> {
     try {
       const response = await apiClient.post('/api/zones/validate', content)
-      return response.data
+      return response.data as { valid: boolean; errors?: any[]; warnings?: any[] }
     } catch (error) {
       // console.error('Error validating zone content:', error)
       throw new Error('Failed to validate zone content')
@@ -237,11 +237,11 @@ class ZoneApiClient {
    */
   async convertToZoneFormat(legacyContent: any, layoutType: string): Promise<ZoneBasedContent> {
     try {
-      const response = await apiClient.post<ZoneBasedContent>('/api/zones/convert', {
+      const response = await apiClient.post('/api/zones/convert', {
         content: legacyContent,
         layoutType
       })
-      return response.data
+      return response.data as ZoneBasedContent
     } catch (error) {
       // console.error('Error converting to zone format:', error)
       throw new Error('Failed to convert content to zone format')
@@ -253,10 +253,12 @@ class ZoneApiClient {
    */
   async exportZoneContent(pageId: string, format: 'json' | 'html' = 'json'): Promise<Blob> {
     try {
-      const response = await apiClient.get(`${this.baseUrl}/${pageId}/export?format=${format}`, {
-        responseType: 'blob'
+      // Fetch API 기반 클라이언트는 responseType 옵션을 받지 않으므로 별도 다운로드 엔드포인트 사용 필요
+      const res = await fetch(`${(window as any).API_BASE_URL || ''}${this.baseUrl}/${pageId}/export?format=${format}`, {
+        headers: (apiClient as any).getAuthHeaders?.() || undefined
       })
-      return response.data
+      if (!res.ok) throw new Error('Failed to export zone content')
+      return await res.blob()
     } catch (error) {
       // console.error('Error exporting zone content:', error)
       throw new Error('Failed to export zone content')

@@ -22,7 +22,8 @@ const ThemeSettings: FC = () => {
 
   const handleApplyTheme = () => {
     setIsApplying(true)
-    setTheme(selectedTheme)
+    // 현재 ThemeContext가 지원하는 테마만 적용(확장 테마는 라이트/다크 중 가장 가까운 것으로 매핑)
+    setTheme(selectedTheme === 'dark' ? 'dark' : 'light')
     
     // Simulate a brief loading state
     setTimeout(() => {

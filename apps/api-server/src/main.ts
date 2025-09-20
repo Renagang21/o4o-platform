@@ -714,6 +714,10 @@ app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes); // V1 media routes (AUTHENTICATED ACCESS)
 app.use('/api/v1/pages', pagesV1Routes); // V1 pages API with full authentication
+
+// Preview proxy routes (for X-Frame-Options bypass)
+import previewProxyRoutes from './routes/v1/preview.routes';
+app.use('/api/v1/preview', previewProxyRoutes); // Preview proxy routes
 app.use('/api/v1/apps', appsV1Routes);
 app.use('/api/v1/apps/plugins', pluginsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Smartphone, Tablet, Monitor, RefreshCw, ExternalLink } from 'lucide-react';
+import { Smartphone, Tablet, Monitor, RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useCustomizer } from '../../context/CustomizerContext';
 import { PreviewDevice } from '../../types/customizer-types';
 import { generateCSS } from '../../utils/css-generator';
@@ -23,11 +23,14 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
   const { state, setPreviewDevice } = useCustomizer();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [iframeError, setIframeError] = useState(false);
   
-  // Generate preview URL (server-side proxy recommended to avoid X-Frame-Options)
+  // Generate preview URL (using API proxy to avoid X-Frame-Options)
   const generatePreviewUrl = () => {
-    // Fallback to provided URL or homepage
-    return url || 'https://neture.co.kr';
+    // Use API proxy instead of direct URL to bypass X-Frame-Options
+    const baseUrl = process.env.REACT_APP_API_URL || 'https://api.neture.co.kr';
+    const targetDomain = url ? new URL(url).host : 'neture.co.kr';
+    return `${baseUrl}/api/v1/preview/site/${targetDomain}`;
   };
   
   const [currentUrl, setCurrentUrl] = useState(generatePreviewUrl());
@@ -91,6 +94,7 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
   // Handle iframe load
   const handleIframeLoad = () => {
     setIsLoading(false);
+    setIframeError(false);
     injectCSS();
     onLoad?.();
     
@@ -103,10 +107,17 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     }
   };
   
+  // Handle iframe error (X-Frame-Options blocked)
+  const handleIframeError = () => {
+    setIsLoading(false);
+    setIframeError(true);
+  };
+  
   // Refresh preview
   const handleRefresh = () => {
     if (iframeRef.current) {
       setIsLoading(true);
+      setIframeError(false);
       iframeRef.current.src = iframeRef.current.src;
     }
   };
@@ -202,10 +213,41 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
             maxHeight: '100%',
           }}
         >
-          {isLoading && (
+          {isLoading && !iframeError && (
             <div className="wp-customizer-preview-loading">
               <RefreshCw size={32} className="spin" />
               <p>Loading preview...</p>
+            </div>
+          )}
+          
+          {iframeError && (
+            <div className="wp-customizer-preview-error">
+              <AlertTriangle size={48} className="text-yellow-500 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Preview Unavailable</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                The site cannot be displayed in a frame due to X-Frame-Options security policy.
+              </p>
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleExternalLink}
+                  className="w-full"
+                  variant="default"
+                >
+                  <ExternalLink size={16} className="mr-2" />
+                  Open in New Tab
+                </Button>
+                <Button 
+                  onClick={handleRefresh}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <RefreshCw size={16} className="mr-2" />
+                  Retry Preview
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-4">
+                To enable iframe preview, contact your server administrator to configure X-Frame-Options.
+              </p>
             </div>
           )}
           
@@ -215,10 +257,12 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
             className="wp-customizer-iframe"
             src={currentUrl}
             onLoad={handleIframeLoad}
+            onError={handleIframeError}
             title="Site Preview"
             style={{
-              opacity: isLoading ? 0 : 1,
+              opacity: isLoading || iframeError ? 0 : 1,
               transition: 'opacity 0.3s',
+              display: iframeError ? 'none' : 'block',
             }}
           />
         </div>
