@@ -63,16 +63,9 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
 }) => {
   const { templateParts, loading, error } = useTemplateParts({ area, context });
 
-  // Debug logging for browser testing
+  // Component initialization tracking
   useMemo(() => {
-    console.info('🎨 TemplatePartRenderer initialized:', {
-      area,
-      context,
-      has_fallback: !!fallback,
-      loading,
-      error,
-      template_parts_count: Array.isArray(templateParts) ? templateParts.length : 0
-    });
+    // Template part renderer initialized for area
   }, [area, context, fallback, loading, error, templateParts]);
 
   // Render blocks recursively
@@ -80,12 +73,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     const BlockComponent = blockComponents[block.type];
     
     if (!BlockComponent) {
-      console.warn('🧩 Unknown block type:', {
-        type: block.type,
-        id: block.id,
-        available_types: Object.keys(blockComponents),
-        block_data: block.data
-      });
+      // Unknown block type - skip rendering
       return null;
     }
 
@@ -166,13 +154,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
 
   // Show error or fallback
   if (error || templateParts.length === 0) {
-    console.warn('🔄 Using fallback for template parts:', {
-      area,
-      error,
-      template_parts_count: templateParts.length,
-      fallback_type: fallback ? 'custom' : 'default',
-      will_render: area === 'header' ? 'SiteHeader' : area === 'footer' ? 'SiteFooter' : 'null'
-    });
+    // Using fallback for template parts
     
     if (fallback) {
       return <>{fallback}</>;
@@ -190,10 +172,6 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   }
 
   // Render all active template parts for the area
-  console.info('✨ Rendering template parts:', {
-    area,
-    parts_to_render: templateParts.map(p => ({ id: p.id, name: p.name, content_blocks: p.content?.length || 0 }))
-  });
   
   return (
     <>

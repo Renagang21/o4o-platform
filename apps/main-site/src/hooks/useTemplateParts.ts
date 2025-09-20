@@ -66,69 +66,40 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
           params.append('context', JSON.stringify(context));
         }
 
-        console.info('🔍 Fetching template parts:', {
-          area,
-          context,
-          url: `/template-parts/area/${area}/active?${params.toString()}`
-        });
+        // Fetching template parts for area
 
         const response = await authClient.api.get(
           `/template-parts/area/${area}/active?${params.toString()}`
         );
 
-        console.info('📡 Template parts API response:', {
-          status: response.status,
-          data_type: Array.isArray(response.data) ? 'array' : typeof response.data,
-          data_structure: response.data && typeof response.data === 'object' ? Object.keys(response.data) : null,
-          data_length: Array.isArray(response.data) ? response.data.length : null
-        });
+        // Template parts API response received
 
         if (response.status === 200) {
           // Handle both old and new API response structures
           const data = response.data;
           if (data && typeof data === 'object' && 'success' in data) {
             // New structure: {success: true, data: [...], count: N}
-            console.info('📋 Using new API structure');
             if (data.success) {
               const templatePartsData = Array.isArray(data.data) ? data.data : [];
-              console.info('✅ Template parts loaded:', {
-                count: templatePartsData.length,
-                parts: templatePartsData.map(p => ({ id: p.id, name: p.name, area: p.area }))
-              });
               setTemplateParts(templatePartsData);
             } else {
               throw new Error(data.error || 'Failed to fetch template parts');
             }
           } else if (Array.isArray(data)) {
             // Old structure: direct array
-            console.info('📋 Using legacy API structure');
-            console.info('✅ Template parts loaded:', {
-              count: data.length,
-              parts: data.map(p => ({ id: p.id, name: p.name, area: p.area }))
-            });
             setTemplateParts(data);
           } else if (data && data.error) {
             // Error response
-            console.error('❌ API returned error:', data.error);
             throw new Error(data.error);
           } else {
             // Fallback for other structures
-            console.warn('⚠️ Unknown API response structure, falling back to empty array:', data);
             setTemplateParts([]);
           }
         } else {
-          console.error('❌ HTTP error:', response.status);
           throw new Error('Failed to fetch template parts');
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        console.error('❌ Template parts fetch failed:', {
-          area,
-          context,
-          error: errorMessage,
-          error_type: err instanceof Error ? err.constructor.name : typeof err,
-          stack: err instanceof Error ? err.stack : null
-        });
         setError(errorMessage);
       } finally {
         setLoading(false);

@@ -26,17 +26,14 @@ export const WordPressBlockRenderer: FC<WordPressBlockRendererProps> = ({
       } else if (wpBlocks && typeof wpBlocks === 'object') {
         parsedBlocks = transformWordPressBlocks([wpBlocks]);
       } else {
-        console.warn('WordPressBlockRenderer: Invalid blocks data:', wpBlocks);
         parsedBlocks = [];
       }
     } catch (error) {
-      console.warn('WordPressBlockRenderer: Failed to parse blocks JSON:', error);
       return <div className="error">Failed to render content</div>;
     }
   } else if (Array.isArray(blocks)) {
     parsedBlocks = transformWordPressBlocks(blocks);
   } else if (blocks && typeof blocks === 'object') {
-    console.warn('WordPressBlockRenderer: Expected array but got object:', blocks);
     parsedBlocks = [];
   }
 

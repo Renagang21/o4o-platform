@@ -24,6 +24,11 @@ export interface MainSiteBlock {
  * Transform WordPress block to main site block format
  */
 export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock | null {
+  // Safety check for block name
+  if (!wpBlock || !wpBlock.name || typeof wpBlock.name !== 'string') {
+    return null;
+  }
+  
   // Remove 'core/' prefix from block name
   const blockType = wpBlock.name.replace('core/', '');
   
