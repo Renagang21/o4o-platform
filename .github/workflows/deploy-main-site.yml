@@ -41,8 +41,8 @@ jobs:
         cd apps/main-site
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
-        VITE_API_URL=https://api.neture.co.kr/api/v1 \
-        VITE_API_BASE_URL=https://api.neture.co.kr/api \
+        VITE_API_URL=https://api.neture.co.kr \
+        VITE_API_BASE_URL=https://api.neture.co.kr \
         pnpm run build
 
     - name: Deploy to web server

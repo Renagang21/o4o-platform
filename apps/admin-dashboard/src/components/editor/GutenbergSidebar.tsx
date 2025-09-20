@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/collapsible';
 
 interface PostSettings {
-  status: 'draft' | 'pending' | 'private' | 'publish';
+  status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
   visibility: 'public' | 'private' | 'password';
   publishDate: string;
   author: string;

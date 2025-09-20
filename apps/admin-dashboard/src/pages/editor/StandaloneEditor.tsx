@@ -221,7 +221,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Set post settings - ensure slug is preserved
       setPostSettings(prev => {
-        const mapStatus = (s: any) => (s === 'published' ? 'publish' : s);
+        const mapStatus = (s: any) => {
+          if (s === 'published') return 'publish';
+          if (s === 'trash') return 'draft';
+          return s;
+        };
         const toIsoLocal = (input: any) => {
           const d = input ? new Date(input) : new Date();
           return d.toISOString().replace('Z', '').slice(0, 16);
@@ -262,7 +266,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       postSettingsRef.current = {
         ...postSettingsRef.current,
         slug: data.slug || '',
-        status: (data.status === 'published' ? 'publish' : (data.status || 'draft')),
+        status: (data.status === 'published' ? 'publish' : (data.status === 'trash' ? 'draft' : (data.status || 'draft'))),
         excerpt: data.excerpt || '',
         categories: (data.categories || []).map((c: any) => typeof c === 'object' ? c.id : c),
         tags: (data.tags || []).map((t: any) => typeof t === 'object' ? t.id : t),
@@ -494,7 +498,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       if (lastSaveHashRef.current === saveHash && !isDirty) {
         setIsSaving(false);
         toast('No changes to save', { icon: 'ℹ️' });
-        return currentPostId;
+        return currentPostId != null ? String(currentPostId) : undefined;
       }
       
       // Add unique request ID to prevent duplicate processing
@@ -526,7 +530,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Update post settings with saved data
       // Only update slug if it's different from what we sent (server might have modified it)
       if (savedData?.slug && savedData.slug !== trimmedSlug) {
-        setPostSettings(prev => ({ ...prev, slug: savedData.slug }));
+        setPostSettings(prev => ({ ...prev, slug: String(savedData.slug) }));
         postSettingsRef.current = { ...postSettingsRef.current, slug: savedData.slug };
       }
       
@@ -541,8 +545,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         toast.success('Saved as draft');
       }
       
-      // Return the saved post ID for use in preview
-      return savedData?.id || currentPostId;
+          // Return the saved post ID for use in preview
+          const savedId = savedData?.id != null ? String(savedData.id) : undefined;
+          return savedId || (currentPostId != null ? String(currentPostId) : undefined);
     } catch (error: any) {
       // Show specific conflict/validation messages when possible
       const status = error?.response?.status;

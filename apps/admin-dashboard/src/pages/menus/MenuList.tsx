@@ -166,7 +166,7 @@ const MenuList: FC = () => {
   const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform menus to table rows
-  const rows: WordPressTableRow[] = menus.map((menu: Menu) => ({
+  const rows: WordPressTableRow[] = menus.map((menu: any) => ({
     id: menu.id,
     data: {
       name: (
@@ -183,7 +183,7 @@ const MenuList: FC = () => {
       ),
       location: (
         <Badge variant="outline">
-          {locationLabels[menu.location]}
+          {locationLabels[menu.location as any]}
         </Badge>
       ),
       items: (
@@ -304,7 +304,7 @@ const MenuList: FC = () => {
         }}
         onSelectAll={(selected) => {
           if (selected) {
-            setSelectedMenus(menus.map((menu: Menu) => menu.id));
+            setSelectedMenus(menus.map((menu: any) => menu.id));
           } else {
             setSelectedMenus([]);
           }

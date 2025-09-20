@@ -338,8 +338,8 @@ const MediaListWordPress: FC = () => {
         <div className="flex items-center justify-between">
           <AdminBreadcrumb 
             items={[
-              { label: 'Admin', href: '/admin' },
-              { label: '미디어', href: '/admin/media' },
+              { label: 'Admin', path: '/admin' },
+              { label: '미디어', path: '/admin/media' },
               { label: 'Library' }
             ]}
           />

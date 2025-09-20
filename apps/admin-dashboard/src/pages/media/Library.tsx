@@ -513,7 +513,7 @@ const Library: FC = () => {
                   
                   <div>
                     <Label>업로더</Label>
-                    <p className="text-sm text-gray-600">{selectedItem.uploader?.name || 'Unknown'}</p>
+                    <p className="text-sm text-gray-600">{selectedItem.uploadedBy || 'Unknown'}</p>
                   </div>
                 </div>
                 

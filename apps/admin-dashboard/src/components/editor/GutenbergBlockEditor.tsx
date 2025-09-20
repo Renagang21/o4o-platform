@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 // Block interface는 이제 @/types/post.types에서 import
 
 interface PostSettings {
-  status: 'draft' | 'pending' | 'private' | 'publish';
+  status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
   visibility: 'public' | 'private' | 'password';
   publishDate: string;
   author: string;

@@ -83,7 +83,7 @@ export function useBulkActions({ items, idField = 'id', actions, selectedIds: co
     // Show confirmation if needed
     if (action.confirmMessage) {
       const confirmed = window.confirm(
-        action.confirmMessage.replace('{count}', String(selectedIds.size))
+        action.confirmMessage.replace('{count}', String(selected.length))
       );
       if (!confirmed) return;
     }
@@ -110,6 +110,6 @@ export function useBulkActions({ items, idField = 'id', actions, selectedIds: co
     toggleItem,
     clearSelection,
     executeBulkAction,
-    isSelected: (itemId: string) => selectedIds.has(itemId)
+    isSelected: (itemId: string) => currentSelected.has(itemId)
   };
 }
