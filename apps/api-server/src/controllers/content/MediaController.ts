@@ -202,7 +202,7 @@ export class MediaController {
       const media = await this.mediaRepository.find({
         where,
         relations: ['user'],
-        order: { [orderByField]: orderDirection },
+        order: { [orderByField as string]: orderDirection as any },
         skip,
         take: Number(limit)
       });
