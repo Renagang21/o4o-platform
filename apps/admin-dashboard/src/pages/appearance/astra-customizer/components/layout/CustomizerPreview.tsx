@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Smartphone, Tablet, Monitor, RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Smartphone, Tablet, Monitor, RefreshCw, ExternalLink, AlertTriangle, Maximize2, Minimize2 } from 'lucide-react';
 import { useCustomizer } from '../../context/CustomizerContext';
 import { PreviewDevice } from '../../types/customizer-types';
 import { generateCSS } from '../../utils/css-generator';
@@ -10,10 +10,10 @@ interface CustomizerPreviewProps {
   onLoad?: () => void;
 }
 
-const deviceSizes: Record<PreviewDevice, { width: string; height: string }> = {
-  desktop: { width: '100%', height: '100%' },
-  tablet: { width: '768px', height: '1024px' },
-  mobile: { width: '375px', height: '667px' },
+const deviceSizes: Record<PreviewDevice, { width: number; height: number }> = {
+  desktop: { width: 0, height: 0 },
+  tablet: { width: 768, height: 1024 },
+  mobile: { width: 375, height: 667 },
 };
 
 export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
@@ -25,6 +25,9 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [iframeError, setIframeError] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [frameSize, setFrameSize] = useState<{width: number; height: number}>({ width: 0, height: 0 });
   
   // Generate preview URL (using API proxy to avoid X-Frame-Options)
   const generatePreviewUrl = () => {
@@ -130,6 +133,41 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     window.open(currentUrl, '_blank');
   };
   
+  // Fullscreen toggle
+  const toggleFullscreen = async () => {
+    const el = containerRef.current;
+    if (!el) return;
+    try {
+      if (!document.fullscreenElement) {
+        // @ts-ignore - WebKit fallback
+        if (el.requestFullscreen) await el.requestFullscreen();
+        // @ts-ignore - Safari/iOS fallback
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        // @ts-ignore - Safari/iOS fallback
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+    } catch (e) {
+      // no-op; some environments may block fullscreen
+    }
+  };
+  
+  useEffect(() => {
+    const onFsChange = () => {
+      const active = Boolean(document.fullscreenElement);
+      setIsFullscreen(active);
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    // @ts-ignore - Safari
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange);
+      // @ts-ignore - Safari
+      document.removeEventListener('webkitfullscreenchange', onFsChange);
+    };
+  }, []);
+  
   // Update CSS when settings change
   useEffect(() => {
     injectCSS();
@@ -153,6 +191,35 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     classes.push(`wp-customizer-preview-${previewDevice}`);
     return classes.join(' ');
   };
+
+  // Compute scale for tablet/mobile so the frame fits within container without overflow
+  const recomputeScale = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    if (previewDevice === 'desktop') {
+      setScale(1);
+      setFrameSize({ width: container.clientWidth, height: container.clientHeight });
+      return;
+    }
+    const { width: targetW, height: targetH } = deviceSizes[previewDevice];
+    const availW = container.clientWidth;
+    const availH = container.clientHeight;
+    const s = Math.min(availW / targetW, availH / targetH, 1);
+    setScale(s);
+    setFrameSize({ width: targetW, height: targetH });
+  }, [previewDevice]);
+
+  useEffect(() => {
+    recomputeScale();
+    const handleResize = () => recomputeScale();
+    window.addEventListener('resize', handleResize);
+    const ro = new (window as any).ResizeObserver?.(() => recomputeScale());
+    if (ro && containerRef.current) ro.observe(containerRef.current);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (ro && containerRef.current) ro.unobserve(containerRef.current);
+    };
+  }, [recomputeScale]);
   
   return (
     <div className="wp-customizer-preview">
@@ -188,6 +255,13 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
         <div className="wp-customizer-preview-actions">
           <span className="wp-customizer-preview-url">{currentUrl}</span>
           <Button
+            onClick={toggleFullscreen}
+            className="wp-button-icon"
+            title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </Button>
+          <Button
             onClick={handleRefresh}
             className="wp-button-icon"
             title="Refresh preview"
@@ -207,7 +281,20 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
       
       {/* Preview Body */}
       <div className="wp-customizer-preview-body" ref={containerRef}>
-        <div className={getPreviewClasses()}>
+        <div
+          className={getPreviewClasses()}
+          style={
+            previewDevice === 'desktop'
+              ? { width: '100%', height: '100%' }
+              : {
+                  width: `${frameSize.width}px`,
+                  height: `${frameSize.height}px`,
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'center center',
+                  margin: 'auto',
+                }
+          }
+        >
           {isLoading && !iframeError && (
             <div className="wp-customizer-preview-loading">
               <RefreshCw size={32} className="spin" />
@@ -254,6 +341,8 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
             onLoad={handleIframeLoad}
             onError={handleIframeError}
             title="Site Preview"
+            allowFullScreen
+            allow="fullscreen"
             style={{
               width: '100%',
               height: '100%',

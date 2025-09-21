@@ -7,6 +7,7 @@ import { SettingSection, AstraCustomizerSettings } from './types/customizer-type
 import '../../../styles/wordpress-customizer.css';
 import './styles/controls.css';
 import './styles/sections.css';
+import { useCustomizerState } from './hooks/useCustomizerState';
 
 // Import section components
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -36,18 +37,39 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const { isDirty } = useCustomizerState();
   
-  // Handle escape key to close customizer
+  // Handle escape key to close customizer (unless currently in fullscreen)
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        // If any element is in fullscreen, let ESC exit fullscreen first
+        if (typeof document !== 'undefined' && (document as any).fullscreenElement) {
+          return;
+        }
+        if (isDirty) {
+          const ok = window.confirm('변경사항이 저장되지 않았습니다. 종료하시겠습니까?');
+          if (!ok) return;
+        }
         onClose();
       }
     };
     
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+  }, [onClose, isDirty]);
+
+  // Warn on page unload if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      // Chrome requires returnValue to be set
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
   
   // Prevent body scroll when customizer is open
   useEffect(() => {

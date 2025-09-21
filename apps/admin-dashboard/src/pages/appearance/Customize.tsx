@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AstraCustomizer } from './astra-customizer/AstraCustomizer';
 import { useNavigate } from 'react-router-dom';
 import { getPublicOrigin } from '../../utils/publicUrls';
 import { authClient } from '@o4o/auth-client';
+import { useAdminFullscreen } from '@/hooks/useAdminFullscreen';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
+  const { enter, exit } = useAdminFullscreen();
+  
+  // Apply fullscreen CSS class while Customizer is mounted
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.classList.add('customizer-fullscreen');
+    }
+    // Manage fullscreen state
+    enter('customize');
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('customizer-fullscreen');
+      }
+      exit();
+    };
+  }, [enter, exit]);
   
   const handleClose = () => {
-    navigate('/appearance/themes');
+    navigate('/admin');
   };
   
   const handleSave = async (settings: any) => {
