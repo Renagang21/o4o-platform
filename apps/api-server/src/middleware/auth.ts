@@ -151,10 +151,26 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     } as any;
     next();
   } catch (error: any) {
-    return res.status(401).json({ 
-      error: 'Invalid token',
-      code: 'TOKEN_INVALID'
-    });
+    // Enhanced error handling for better debugging
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ 
+        error: 'Token expired',
+        code: 'TOKEN_EXPIRED',
+        message: 'Your session has expired. Please log in again.'
+      });
+    } else if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ 
+        error: 'Invalid token format',
+        code: 'TOKEN_MALFORMED',
+        message: 'Invalid authentication token format.'
+      });
+    } else {
+      return res.status(401).json({ 
+        error: 'Invalid token',
+        code: 'TOKEN_INVALID',
+        message: 'Authentication failed. Please log in again.'
+      });
+    }
   }
 };
 

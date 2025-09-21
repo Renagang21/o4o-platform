@@ -112,13 +112,18 @@ export class AuthClient {
             }
           } catch (refreshError) {
             // Refresh failed, clear tokens and redirect to login
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('admin-auth-storage');
+            this.clearAllTokens();
             
-            // Redirect to login page
+            // Show user-friendly message before redirect
             if (typeof window !== 'undefined') {
+              const errorData = (refreshError as any)?.response?.data;
+              if (errorData?.code === 'TOKEN_EXPIRED') {
+                console.warn('Session expired, redirecting to login');
+              } else {
+                console.warn('Authentication failed, redirecting to login');
+              }
+              
+              // Redirect to login page
               window.location.href = '/login';
             }
             
@@ -145,6 +150,21 @@ export class AuthClient {
     }
     const response = await axios.post(authUrl, credentials);
     return response.data as AuthResponse;
+  }
+
+  // Clear all authentication tokens from all storage locations
+  private clearAllTokens(): void {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('admin-auth-storage');
+    
+    // Also clear any cookies if present
+    if (typeof document !== 'undefined') {
+      document.cookie = 'accessToken=; Max-Age=0; path=/';
+      document.cookie = 'refreshToken=; Max-Age=0; path=/';
+    }
   }
 
   async logout(): Promise<void> {
