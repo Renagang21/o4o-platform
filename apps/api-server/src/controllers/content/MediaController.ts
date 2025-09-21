@@ -56,7 +56,7 @@ export class MediaController {
 
           // Determine file category and upload path
           const fileCategory = this.getFileCategory(file.mimetype);
-          const uploadDir = path.join(process.cwd(), 'uploads', fileCategory);
+          const uploadDir = path.join(process.cwd(), 'public', 'uploads', fileCategory);
           
           // Ensure upload directory exists
           if (!fs.existsSync(uploadDir)) {
@@ -385,7 +385,7 @@ export class MediaController {
       // Delete physical files if requested
       if (deleteFiles === 'true') {
         try {
-          const filePath = path.join(process.cwd(), 'uploads', media.folderPath?.substring(1) || '', media.filename);
+          const filePath = path.join(process.cwd(), 'public', 'uploads', media.folderPath?.substring(1) || '', media.filename);
           if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
           }
@@ -393,7 +393,7 @@ export class MediaController {
           // Delete variants
           if (media.variants) {
             for (const [size, url] of Object.entries(media.variants)) {
-              const variantPath = path.join(process.cwd(), 'uploads', url.replace('/uploads/', ''));
+              const variantPath = path.join(process.cwd(), 'public', 'uploads', url.replace('/uploads/', ''));
               if (fs.existsSync(variantPath)) {
                 fs.unlinkSync(variantPath);
               }
@@ -451,7 +451,7 @@ export class MediaController {
     try {
       for (const [sizeName, dimensions] of Object.entries(sizes)) {
         const variantFileName = `${baseName}-${sizeName}${extension}`;
-        const variantPath = path.join(process.cwd(), 'uploads', category, variantFileName);
+        const variantPath = path.join(process.cwd(), 'public', 'uploads', category, variantFileName);
 
         await sharp(originalPath)
           .resize(dimensions.width, dimensions.height, {
@@ -471,28 +471,41 @@ export class MediaController {
 
   private async getStorageStats() {
     try {
-      // Get all media files
-      const allMedia = await this.mediaRepository.find();
+      // Use aggregation queries instead of loading all records
+      const totalFiles = await this.mediaRepository.count();
       
-      // Calculate stats manually
-      const stats = {
-        totalFiles: allMedia.length,
-        totalSize: allMedia.reduce((sum, media) => sum + (media.size || 0), 0),
-        breakdown: {
-          images: allMedia.filter(m => m.mimeType?.startsWith('image/')).length,
-          videos: allMedia.filter(m => m.mimeType?.startsWith('video/')).length,
-          audio: allMedia.filter(m => m.mimeType?.startsWith('audio/')).length,
-          documents: allMedia.filter(m => 
-            m.mimeType === 'application/pdf' || m.mimeType?.startsWith('text/')
-          ).length
-        }
-      };
+      // Get total size using query builder for better performance
+      const sizeResult = await this.mediaRepository
+        .createQueryBuilder('media')
+        .select('SUM(media.size)', 'totalSize')
+        .getRawOne();
+      
+      const totalSize = parseInt(sizeResult?.totalSize || '0', 10);
+      
+      // Get breakdown counts efficiently
+      const [images, videos, audio] = await Promise.all([
+        this.mediaRepository.count({ where: { mimeType: Like('image/%') } }),
+        this.mediaRepository.count({ where: { mimeType: Like('video/%') } }),
+        this.mediaRepository.count({ where: { mimeType: Like('audio/%') } })
+      ]);
+      
+      // Documents count using raw query for OR condition
+      const documentsResult = await this.mediaRepository
+        .createQueryBuilder('media')
+        .where('media.mimeType = :pdf', { pdf: 'application/pdf' })
+        .orWhere('media.mimeType LIKE :text', { text: 'text/%' })
+        .getCount();
 
       return {
-        totalFiles: stats.totalFiles,
-        totalSize: stats.totalSize,
-        totalSizeMB: Math.round(stats.totalSize / 1024 / 1024 * 100) / 100,
-        breakdown: stats.breakdown
+        totalFiles,
+        totalSize,
+        totalSizeMB: Math.round(totalSize / 1024 / 1024 * 100) / 100,
+        breakdown: {
+          images,
+          videos,
+          audio,
+          documents: documentsResult
+        }
       };
     } catch (error) {
       logger.error('Error getting storage stats:', error);
