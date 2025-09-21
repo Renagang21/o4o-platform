@@ -17,24 +17,32 @@ interface PageRendererProps {
 const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   // Simple rendering logic - prioritize displaying content
   const renderContent = () => {
-    // Debug: Log what we receive
-    console.log('[PageRenderer] Received page:', {
-      title: page.title,
-      contentType: typeof page.content,
-      contentIsString: typeof page.content === 'string',
-      contentIsArray: Array.isArray(page.content),
-      blocksExists: 'blocks' in page,
-      blocksType: typeof page.blocks,
-      blocksIsArray: Array.isArray(page.blocks)
-    });
-
     // Check blocks field first (from API response)
     // If blocks is empty array, use content instead
-    const contentToRender = (page.blocks && page.blocks.length > 0) ? page.blocks : page.content;
+    let contentToRender = (page.blocks && page.blocks.length > 0) ? page.blocks : page.content;
     
-    console.log('[PageRenderer] contentToRender:', contentToRender);
-    console.log('[PageRenderer] contentToRender type:', typeof contentToRender);
-    console.log('[PageRenderer] Is array?', Array.isArray(contentToRender));
+    // Parse JSON string if needed (content might be stored as JSON string in DB)
+    if (typeof contentToRender === 'string') {
+      // Check if it's a JSON array string
+      const trimmed = contentToRender.trim();
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        try {
+          contentToRender = JSON.parse(contentToRender);
+        } catch (e) {
+          // If parsing fails, keep as string
+          console.error('[PageRenderer] Failed to parse JSON:', e);
+        }
+      }
+      // Check if it's a JSON object string
+      else if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          contentToRender = JSON.parse(contentToRender);
+        } catch (e) {
+          // If parsing fails, keep as string
+          console.error('[PageRenderer] Failed to parse JSON:', e);
+        }
+      }
+    }
 
     // If content is a string, render as HTML
     if (contentToRender && typeof contentToRender === 'string') {

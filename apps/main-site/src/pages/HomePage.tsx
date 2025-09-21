@@ -59,18 +59,6 @@ const fetchPageData = async (pageId: string): Promise<Page> => {
     throw new Error(`Invalid page data received from ${url}`);
   }
 
-  // Debug: Check what's in the page object
-  console.log('[HomePage] Page data from API:', {
-    id: page.id,
-    title: page.title,
-    content: page.content,
-    contentType: typeof page.content,
-    blocks: page.blocks,
-    blocksType: typeof page.blocks,
-    hasBlocks: 'blocks' in page,
-    blocksLength: Array.isArray(page.blocks) ? page.blocks.length : 'not array'
-  });
-
   return page;
 };
 
