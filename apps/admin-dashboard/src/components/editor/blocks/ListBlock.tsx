@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { 
+import {
   List,
   ListOrdered,
   Plus,
@@ -18,7 +18,10 @@ import {
   Circle,
   Square,
   CheckSquare,
-  ArrowRight
+  ArrowRight,
+  GripVertical,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +38,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import './list/list-styles.css';
 
 interface ListItem {
   id: string;
@@ -56,9 +60,11 @@ interface ListBlockProps {
   attributes?: {
     items?: ListItem[];
     type?: 'ordered' | 'unordered' | 'checklist';
-    style?: 'default' | 'circle' | 'square' | 'arrow';
+    style?: 'disc' | 'circle' | 'square' | 'arrow' | 'dash' | 'plus' | 'star' | 'diamond' | 'triangle' | 'heart' | 'custom-emoji';
+    numbering?: 'decimal' | 'decimal-zero' | 'lower-roman' | 'upper-roman' | 'lower-alpha' | 'upper-alpha' | 'lower-greek' | 'parentheses' | 'brackets';
     startNumber?: number;
     align?: 'left' | 'center' | 'right';
+    color?: 'default' | 'blue' | 'green' | 'purple' | 'red' | 'orange';
   };
 }
 
@@ -77,14 +83,18 @@ const ListBlock: React.FC<ListBlockProps> = ({
   const {
     items = [{ id: '1', content: '', level: 0 }],
     type = 'unordered',
-    style = 'default',
+    style = 'disc',
+    numbering = 'decimal',
     startNumber = 1,
-    align = 'left'
+    align = 'left',
+    color = 'default'
   } = attributes;
 
   const [localItems, setLocalItems] = useState<ListItem[]>(items);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
+  const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
+  const [dragOverItemId, setDragOverItemId] = useState<string | null>(null);
   const itemRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   // Sync items
@@ -193,6 +203,68 @@ const ListBlock: React.FC<ListBlockProps> = ({
     updateItems(newItems);
   };
 
+  // Move item up
+  const moveItemUp = (itemId: string) => {
+    const index = localItems.findIndex(item => item.id === itemId);
+    if (index > 0) {
+      const newItems = [...localItems];
+      [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+      updateItems(newItems);
+    }
+  };
+
+  // Move item down
+  const moveItemDown = (itemId: string) => {
+    const index = localItems.findIndex(item => item.id === itemId);
+    if (index < localItems.length - 1) {
+      const newItems = [...localItems];
+      [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+      updateItems(newItems);
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, itemId: string) => {
+    setDraggingItemId(itemId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', itemId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, itemId: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverItemId(itemId);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverItemId(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetItemId: string) => {
+    e.preventDefault();
+    const sourceItemId = e.dataTransfer.getData('text/plain');
+
+    if (sourceItemId && sourceItemId !== targetItemId) {
+      const sourceIndex = localItems.findIndex(item => item.id === sourceItemId);
+      const targetIndex = localItems.findIndex(item => item.id === targetItemId);
+
+      if (sourceIndex !== -1 && targetIndex !== -1) {
+        const newItems = [...localItems];
+        const [movedItem] = newItems.splice(sourceIndex, 1);
+        newItems.splice(targetIndex, 0, movedItem);
+        updateItems(newItems);
+      }
+    }
+
+    setDraggingItemId(null);
+    setDragOverItemId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingItemId(null);
+    setDragOverItemId(null);
+  };
+
   // Handle key down for item
   const handleItemKeyDown = (e: React.KeyboardEvent, itemId: string, index: number) => {
     const item = localItems.find(i => i.id === itemId);
@@ -252,43 +324,16 @@ const ListBlock: React.FC<ListBlockProps> = ({
     }
   };
 
-  // Get list marker
-  const getListMarker = (item: ListItem, index: number) => {
-    if (type === 'ordered') {
-      const actualIndex = localItems
-        .slice(0, index)
-        .filter(i => i.level === item.level)
-        .length;
-      return `${startNumber + actualIndex}.`;
-    }
+  // Get enhanced list styles class
+  const getListStyleClass = () => {
+    const baseClass = 'enhanced-list-block';
+    const styleClass = type === 'ordered' ? `list-style-${numbering}` :
+                      type === 'checklist' ? 'list-checklist' :
+                      `list-style-${style}`;
+    const alignClass = `align-${align}`;
+    const colorClass = `list-color-${color}`;
 
-    if (type === 'checklist') {
-      return (
-        <button
-          className="mr-2"
-          onClick={() => toggleCheckbox(item.id)}
-          contentEditable={false}
-        >
-          {item.checked ? (
-            <CheckSquare className="h-4 w-4 text-blue-600" />
-          ) : (
-            <Square className="h-4 w-4 text-gray-400" />
-          )}
-        </button>
-      );
-    }
-
-    // Unordered list markers
-    switch (style) {
-      case 'circle':
-        return <Circle className="h-2 w-2 fill-current mr-2" />;
-      case 'square':
-        return <Square className="h-2 w-2 fill-current mr-2" />;
-      case 'arrow':
-        return <ArrowRight className="h-3 w-3 mr-2" />;
-      default:
-        return '•';
-    }
+    return cn(baseClass, styleClass, alignClass, colorClass);
   };
 
   // Get list type icon
@@ -352,17 +397,59 @@ const ListBlock: React.FC<ListBlockProps> = ({
           {/* Style selector for unordered lists */}
           {type === 'unordered' && (
             <Select value={style} onValueChange={(v) => updateAttribute('style', v)}>
-              <SelectTrigger className="w-28 h-8">
+              <SelectTrigger className="w-32 h-8">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="default">• Default</SelectItem>
+                <SelectItem value="disc">• Disc</SelectItem>
                 <SelectItem value="circle">○ Circle</SelectItem>
                 <SelectItem value="square">■ Square</SelectItem>
                 <SelectItem value="arrow">→ Arrow</SelectItem>
+                <SelectItem value="dash">– Dash</SelectItem>
+                <SelectItem value="plus">+ Plus</SelectItem>
+                <SelectItem value="star">★ Star</SelectItem>
+                <SelectItem value="diamond">◆ Diamond</SelectItem>
+                <SelectItem value="triangle">▸ Triangle</SelectItem>
+                <SelectItem value="heart">♥ Heart</SelectItem>
+                <SelectItem value="custom-emoji">🔸 Emoji</SelectItem>
               </SelectContent>
             </Select>
           )}
+
+          {/* Numbering style selector for ordered lists */}
+          {type === 'ordered' && (
+            <Select value={numbering} onValueChange={(v) => updateAttribute('numbering', v)}>
+              <SelectTrigger className="w-32 h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="decimal">1. Decimal</SelectItem>
+                <SelectItem value="decimal-zero">01. Zero-padded</SelectItem>
+                <SelectItem value="lower-roman">i. Lower Roman</SelectItem>
+                <SelectItem value="upper-roman">I. Upper Roman</SelectItem>
+                <SelectItem value="lower-alpha">a. Lower Alpha</SelectItem>
+                <SelectItem value="upper-alpha">A. Upper Alpha</SelectItem>
+                <SelectItem value="lower-greek">α. Lower Greek</SelectItem>
+                <SelectItem value="parentheses">(1) Parentheses</SelectItem>
+                <SelectItem value="brackets">[1] Brackets</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Color theme selector */}
+          <Select value={color} onValueChange={(v) => updateAttribute('color', v)}>
+            <SelectTrigger className="w-24 h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default</SelectItem>
+              <SelectItem value="blue">Blue</SelectItem>
+              <SelectItem value="green">Green</SelectItem>
+              <SelectItem value="purple">Purple</SelectItem>
+              <SelectItem value="red">Red</SelectItem>
+              <SelectItem value="orange">Orange</SelectItem>
+            </SelectContent>
+          </Select>
 
           <div className="w-px h-6 bg-gray-300" />
 
@@ -409,85 +496,145 @@ const ListBlock: React.FC<ListBlockProps> = ({
         </div>
       )}
 
-      {/* List items */}
-      <div className={cn('list-block', getAlignmentClasses())}>
-        {localItems.map((item, index) => (
-          <div
-            key={item.id}
-            className={cn(
-              'list-item flex items-start group',
-              'hover:bg-gray-50 rounded px-2 py-1',
-              editingItemId === item.id && 'bg-blue-50'
-            )}
-            style={{ paddingLeft: `${item.level * 24}px` }}
-          >
-            {/* Item controls - show on hover */}
-            {isSelected && focusedItemId === item.id && (
-              <div className="flex gap-1 mr-2 opacity-0 group-hover:opacity-100">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => outdentItem(item.id)}
-                  disabled={item.level === 0}
-                >
-                  <ChevronLeft className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => indentItem(item.id)}
-                  disabled={item.level >= 3}
-                >
-                  <ChevronRight className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => removeItem(item.id)}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-
-            {/* List marker */}
-            <span className="list-marker mr-2 mt-0.5 select-none">
-              {getListMarker(item, index)}
-            </span>
-
-            {/* Item content */}
-            <div
-              ref={(el) => { itemRefs.current[item.id] = el; }}
-              contentEditable
-              suppressContentEditableWarning
+      {/* List items - Enhanced styling */}
+      <div className={getListStyleClass()}>
+        <ul>
+          {localItems.map((item, index) => (
+            <li
+              key={item.id}
               className={cn(
-                'flex-1 outline-none min-h-[1.5em]',
-                editingItemId === item.id && 'ring-2 ring-blue-500 ring-offset-1 rounded px-1',
-                !item.content && 'text-gray-400',
-                type === 'checklist' && item.checked && 'line-through text-gray-500'
+                'list-item-wrapper group',
+                'hover:bg-gray-50 rounded px-2 py-1 transition-all duration-200',
+                editingItemId === item.id && 'bg-blue-50',
+                type === 'checklist' && item.checked && 'checked',
+                draggingItemId === item.id && 'list-item-dragging',
+                dragOverItemId === item.id && 'list-item-drop-target'
               )}
-              onFocus={() => {
-                setEditingItemId(item.id);
-                setFocusedItemId(item.id);
-              }}
-              onBlur={() => {
-                setEditingItemId(null);
-                setFocusedItemId(null);
-              }}
-              onInput={(e) => {
-                const target = e.target as HTMLDivElement;
-                updateItemContent(item.id, target.innerText);
-              }}
-              onKeyDown={(e) => handleItemKeyDown(e, item.id, index)}
-              data-placeholder="리스트 항목 입력..."
+              style={{
+                marginLeft: `${item.level * 24}px`,
+                '--start-number': startNumber - 1
+              } as React.CSSProperties}
+              onDragOver={(e) => handleDragOver(e, item.id)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, item.id)}
             >
-              {item.content || '리스트 항목 입력...'}
-            </div>
-          </div>
-        ))}
+              {/* Item controls - show on hover */}
+              {isSelected && focusedItemId === item.id && (
+                <div className="flex gap-1 mr-2 opacity-0 group-hover:opacity-100">
+                  {/* Drag handle */}
+                  <div
+                    className="cursor-move flex items-center justify-center h-6 w-6 text-gray-400 hover:text-gray-600"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, item.id)}
+                    onDragEnd={handleDragEnd}
+                    title="Drag to reorder"
+                  >
+                    <GripVertical className="h-3 w-3" />
+                  </div>
+
+                  {/* Move up/down buttons */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => moveItemUp(item.id)}
+                    disabled={index === 0}
+                    title="Move up"
+                  >
+                    <ChevronUp className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => moveItemDown(item.id)}
+                    disabled={index === localItems.length - 1}
+                    title="Move down"
+                  >
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+
+                  {/* Indent/outdent buttons */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => outdentItem(item.id)}
+                    disabled={item.level === 0}
+                    title="Decrease indent"
+                  >
+                    <ChevronLeft className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => indentItem(item.id)}
+                    disabled={item.level >= 3}
+                    title="Increase indent"
+                  >
+                    <ChevronRight className="h-3 w-3" />
+                  </Button>
+
+                  {/* Remove button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => removeItem(item.id)}
+                    title="Remove item"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Checkbox for checklist */}
+              {type === 'checklist' && (
+                <button
+                  className="mr-2 flex-shrink-0"
+                  onClick={() => toggleCheckbox(item.id)}
+                  contentEditable={false}
+                >
+                  {item.checked ? (
+                    <CheckSquare className="h-4 w-4 text-blue-600" />
+                  ) : (
+                    <Square className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              )}
+
+              {/* Item content with enhanced CSS marker */}
+              <div
+                ref={(el) => { itemRefs.current[item.id] = el; }}
+                contentEditable
+                suppressContentEditableWarning
+                className={cn(
+                  'list-item-content flex-1 outline-none min-h-[1.5em]',
+                  editingItemId === item.id && 'ring-2 ring-blue-500 ring-offset-1 rounded px-1',
+                  !item.content && 'text-gray-400',
+                  type === 'checklist' && item.checked && 'line-through text-gray-500'
+                )}
+                onFocus={() => {
+                  setEditingItemId(item.id);
+                  setFocusedItemId(item.id);
+                }}
+                onBlur={() => {
+                  setEditingItemId(null);
+                  setFocusedItemId(null);
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLDivElement;
+                  updateItemContent(item.id, target.innerText);
+                }}
+                onKeyDown={(e) => handleItemKeyDown(e, item.id, index)}
+                data-placeholder="리스트 항목 입력..."
+              >
+                {item.content || '리스트 항목 입력...'}
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </EnhancedBlockWrapper>
   );

@@ -1,0 +1,361 @@
+/**
+ * Code Block Themes
+ * CSS Variable-based theme system for syntax highlighting
+ * 5 professional themes inspired by popular editors
+ */
+
+/* Base syntax highlighter styles */
+.syntax-highlighter {
+  font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: var(--syntax-font-size, 14px);
+  line-height: var(--syntax-line-height, 1.5);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.syntax-pre {
+  margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  background: var(--syntax-bg);
+  color: var(--syntax-text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.syntax-code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Line numbers */
+.syntax-line-numbers {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  background: var(--syntax-gutter-bg);
+  color: var(--syntax-gutter-text);
+  text-align: right;
+  padding: 1rem 0.5rem;
+  font-size: 0.875em;
+  line-height: inherit;
+  user-select: none;
+  border-right: 1px solid var(--syntax-border);
+}
+
+.syntax-content {
+  margin-left: 40px;
+}
+
+.syntax-line-number {
+  display: block;
+  line-height: inherit;
+  counter-increment: line;
+}
+
+.syntax-line-number::before {
+  content: counter(line);
+}
+
+/* Individual line styling */
+.syntax-line {
+  display: flex;
+  align-items: flex-start;
+  line-height: inherit;
+}
+
+.syntax-line-number {
+  width: 40px;
+  text-align: right;
+  padding-right: 0.5rem;
+  color: var(--syntax-gutter-text);
+  background: var(--syntax-gutter-bg);
+  user-select: none;
+  flex-shrink: 0;
+  border-right: 1px solid var(--syntax-border);
+}
+
+.syntax-line-content {
+  flex: 1;
+  padding-left: 1rem;
+  min-height: 1.5em;
+}
+
+/* Syntax token styles */
+.syntax-comment {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+
+.syntax-keyword {
+  color: var(--syntax-keyword);
+  font-weight: 600;
+}
+
+.syntax-string {
+  color: var(--syntax-string);
+}
+
+.syntax-number {
+  color: var(--syntax-number);
+}
+
+.syntax-operator {
+  color: var(--syntax-operator);
+}
+
+.syntax-function {
+  color: var(--syntax-function);
+  font-weight: 500;
+}
+
+.syntax-variable {
+  color: var(--syntax-variable);
+}
+
+.syntax-type {
+  color: var(--syntax-type);
+  font-weight: 500;
+}
+
+.syntax-tag {
+  color: var(--syntax-tag);
+  font-weight: 600;
+}
+
+.syntax-attribute {
+  color: var(--syntax-attribute);
+}
+
+.syntax-value {
+  color: var(--syntax-value);
+}
+
+.syntax-selector {
+  color: var(--syntax-selector);
+  font-weight: 600;
+}
+
+.syntax-property {
+  color: var(--syntax-property);
+}
+
+.syntax-color {
+  color: var(--syntax-color);
+  font-weight: 600;
+}
+
+.syntax-cdata {
+  color: var(--syntax-cdata);
+  background: var(--syntax-cdata-bg);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.syntax-text {
+  color: var(--syntax-text);
+}
+
+/* Theme 1: VS Code Dark (Default) */
+.syntax-theme-default,
+.syntax-theme-vscode {
+  --syntax-bg: #1e1e1e;
+  --syntax-text: #d4d4d4;
+  --syntax-gutter-bg: #1e1e1e;
+  --syntax-gutter-text: #858585;
+  --syntax-border: #3e3e3e;
+
+  --syntax-comment: #6a9955;
+  --syntax-keyword: #569cd6;
+  --syntax-string: #ce9178;
+  --syntax-number: #b5cea8;
+  --syntax-operator: #d4d4d4;
+  --syntax-function: #dcdcaa;
+  --syntax-variable: #9cdcfe;
+  --syntax-type: #4ec9b0;
+  --syntax-tag: #569cd6;
+  --syntax-attribute: #9cdcfe;
+  --syntax-value: #ce9178;
+  --syntax-selector: #d7ba7d;
+  --syntax-property: #9cdcfe;
+  --syntax-color: #ce9178;
+  --syntax-cdata: #608b4e;
+  --syntax-cdata-bg: rgba(96, 139, 78, 0.1);
+}
+
+/* Theme 2: GitHub Light */
+.syntax-theme-github {
+  --syntax-bg: #ffffff;
+  --syntax-text: #24292e;
+  --syntax-gutter-bg: #fafbfc;
+  --syntax-gutter-text: #6a737d;
+  --syntax-border: #e1e4e8;
+
+  --syntax-comment: #6a737d;
+  --syntax-keyword: #d73a49;
+  --syntax-string: #032f62;
+  --syntax-number: #005cc5;
+  --syntax-operator: #d73a49;
+  --syntax-function: #6f42c1;
+  --syntax-variable: #e36209;
+  --syntax-type: #6f42c1;
+  --syntax-tag: #22863a;
+  --syntax-attribute: #6f42c1;
+  --syntax-value: #032f62;
+  --syntax-selector: #6f42c1;
+  --syntax-property: #005cc5;
+  --syntax-color: #005cc5;
+  --syntax-cdata: #6a737d;
+  --syntax-cdata-bg: rgba(106, 115, 125, 0.1);
+}
+
+/* Theme 3: Monokai */
+.syntax-theme-monokai {
+  --syntax-bg: #272822;
+  --syntax-text: #f8f8f2;
+  --syntax-gutter-bg: #272822;
+  --syntax-gutter-text: #75715e;
+  --syntax-border: #3c3d37;
+
+  --syntax-comment: #75715e;
+  --syntax-keyword: #f92672;
+  --syntax-string: #e6db74;
+  --syntax-number: #ae81ff;
+  --syntax-operator: #f92672;
+  --syntax-function: #a6e22e;
+  --syntax-variable: #66d9ef;
+  --syntax-type: #66d9ef;
+  --syntax-tag: #f92672;
+  --syntax-attribute: #a6e22e;
+  --syntax-value: #e6db74;
+  --syntax-selector: #a6e22e;
+  --syntax-property: #66d9ef;
+  --syntax-color: #ae81ff;
+  --syntax-cdata: #75715e;
+  --syntax-cdata-bg: rgba(117, 113, 94, 0.1);
+}
+
+/* Theme 4: Dracula */
+.syntax-theme-dracula {
+  --syntax-bg: #282a36;
+  --syntax-text: #f8f8f2;
+  --syntax-gutter-bg: #282a36;
+  --syntax-gutter-text: #6272a4;
+  --syntax-border: #44475a;
+
+  --syntax-comment: #6272a4;
+  --syntax-keyword: #ff79c6;
+  --syntax-string: #f1fa8c;
+  --syntax-number: #bd93f9;
+  --syntax-operator: #ff79c6;
+  --syntax-function: #50fa7b;
+  --syntax-variable: #8be9fd;
+  --syntax-type: #8be9fd;
+  --syntax-tag: #ff79c6;
+  --syntax-attribute: #50fa7b;
+  --syntax-value: #f1fa8c;
+  --syntax-selector: #50fa7b;
+  --syntax-property: #8be9fd;
+  --syntax-color: #bd93f9;
+  --syntax-cdata: #6272a4;
+  --syntax-cdata-bg: rgba(98, 114, 164, 0.1);
+}
+
+/* Theme 5: Solarized Light */
+.syntax-theme-solarized {
+  --syntax-bg: #fdf6e3;
+  --syntax-text: #657b83;
+  --syntax-gutter-bg: #eee8d5;
+  --syntax-gutter-text: #93a1a1;
+  --syntax-border: #eee8d5;
+
+  --syntax-comment: #93a1a1;
+  --syntax-keyword: #859900;
+  --syntax-string: #2aa198;
+  --syntax-number: #d33682;
+  --syntax-operator: #859900;
+  --syntax-function: #268bd2;
+  --syntax-variable: #b58900;
+  --syntax-type: #268bd2;
+  --syntax-tag: #859900;
+  --syntax-attribute: #268bd2;
+  --syntax-value: #2aa198;
+  --syntax-selector: #268bd2;
+  --syntax-property: #268bd2;
+  --syntax-color: #d33682;
+  --syntax-cdata: #93a1a1;
+  --syntax-cdata-bg: rgba(147, 161, 161, 0.1);
+}
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+  .syntax-highlighter {
+    --syntax-font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .syntax-highlighter {
+    --syntax-font-size: 11px;
+  }
+
+  .syntax-line-numbers,
+  .syntax-line-number {
+    width: 30px;
+    font-size: 0.75em;
+  }
+
+  .syntax-content {
+    margin-left: 30px;
+  }
+
+  .syntax-line-content {
+    padding-left: 0.5rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .syntax-theme-default,
+  .syntax-theme-vscode {
+    --syntax-bg: #000000;
+    --syntax-text: #ffffff;
+    --syntax-gutter-bg: #000000;
+    --syntax-gutter-text: #ffffff;
+    --syntax-border: #ffffff;
+  }
+
+  .syntax-theme-github {
+    --syntax-bg: #ffffff;
+    --syntax-text: #000000;
+    --syntax-gutter-bg: #ffffff;
+    --syntax-gutter-text: #000000;
+    --syntax-border: #000000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .syntax-highlighter {
+    --syntax-bg: #ffffff;
+    --syntax-text: #000000;
+    --syntax-gutter-bg: #ffffff;
+    --syntax-gutter-text: #666666;
+    --syntax-border: #cccccc;
+
+    border: 1px solid #cccccc;
+    page-break-inside: avoid;
+  }
+
+  .syntax-highlighter * {
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  .syntax-comment {
+    color: #666666 !important;
+  }
+}

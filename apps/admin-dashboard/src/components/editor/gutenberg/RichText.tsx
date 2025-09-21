@@ -1,7 +1,7 @@
 /**
  * RichText Component
  * 구텐베르그 스타일 리치 텍스트 에디터
- * WordPress Gutenberg RichText 완전 모방
+ * WordPress Gutenberg RichText 완전 모방 - 텍스트 역순 문제 해결
  */
 
 import React, { FC, useRef, useState, useEffect, KeyboardEvent } from 'react';
@@ -40,31 +40,65 @@ export const RichText: FC<RichTextProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isEmpty, setIsEmpty] = useState(!value || value === '');
+  const isUpdatingRef = useRef(false);
 
-  // 초기값 설정 및 변경 감지
+  // 초기값 및 외부 value 변경 처리 - 텍스트 역순 문제 해결
   useEffect(() => {
-    if (editorRef.current && value !== editorRef.current.innerHTML) {
-      // 커서 위치 저장
-      const selection = window.getSelection();
-      const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
-      const startOffset = range?.startOffset || 0;
-      
-      // 내용 업데이트
-      editorRef.current.innerHTML = value || '';
-      
-      // 커서 위치 복원
-      if (range && editorRef.current.firstChild) {
-        try {
-          const newRange = document.createRange();
-          newRange.setStart(editorRef.current.firstChild, Math.min(startOffset, editorRef.current.textContent?.length || 0));
-          newRange.collapse(true);
-          selection?.removeAllRanges();
-          selection?.addRange(newRange);
-        } catch (e) {
-          // 커서 복원 실패 시 무시
+    if (editorRef.current && !isUpdatingRef.current) {
+      const currentContent = editorRef.current.innerHTML;
+      const normalizedCurrent = currentContent.replace(/<br\s*\/?>/gi, '').trim();
+      const normalizedValue = (value || '').replace(/<br\s*\/?>/gi, '').trim();
+
+      if (normalizedCurrent !== normalizedValue) {
+        // 현재 포커스 상태 저장
+        const wasActive = document.activeElement === editorRef.current;
+        let cursorPosition = 0;
+
+        if (wasActive) {
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            cursorPosition = range.startOffset;
+          }
+        }
+
+        // 내용 업데이트
+        editorRef.current.innerHTML = value || '';
+
+        // 포커스 상태였다면 커서 위치 복원
+        if (wasActive) {
+          editorRef.current.focus();
+
+          // 커서 위치 복원
+          setTimeout(() => {
+            try {
+              const selection = window.getSelection();
+              if (selection && editorRef.current) {
+                const textNode = editorRef.current.firstChild;
+                if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                  const range = document.createRange();
+                  const maxOffset = textNode.textContent?.length || 0;
+                  range.setStart(textNode, Math.min(cursorPosition, maxOffset));
+                  range.collapse(true);
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                } else {
+                  // 텍스트 노드가 없으면 끝으로 이동
+                  const range = document.createRange();
+                  range.selectNodeContents(editorRef.current);
+                  range.collapse(false);
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                }
+              }
+            } catch (e) {
+              // 커서 복원 실패 시 무시
+            }
+          }, 0);
         }
       }
     }
+
     setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
   }, [value]);
 
@@ -90,9 +124,13 @@ export const RichText: FC<RichTextProps> = ({
       } else {
         document.execCommand(command, false);
       }
-      
+
       if (editorRef.current) {
+        isUpdatingRef.current = true;
         onChange?.(editorRef.current.innerHTML);
+        setTimeout(() => {
+          isUpdatingRef.current = false;
+        }, 0);
       }
     }
   };
@@ -107,18 +145,19 @@ export const RichText: FC<RichTextProps> = ({
         return;
       }
     }
+
     // Ctrl/Cmd + B (Bold)
     if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
       e.preventDefault();
       applyFormat('core/bold');
     }
-    
+
     // Ctrl/Cmd + I (Italic)
     if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
       e.preventDefault();
       applyFormat('core/italic');
     }
-    
+
     // Ctrl/Cmd + K (Link)
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
       e.preventDefault();
@@ -133,7 +172,11 @@ export const RichText: FC<RichTextProps> = ({
           e.preventDefault();
           document.execCommand('insertParagraph', false);
           if (editorRef.current) {
+            isUpdatingRef.current = true;
             onChange?.(editorRef.current.innerHTML);
+            setTimeout(() => {
+              isUpdatingRef.current = false;
+            }, 0);
           }
         }
       } else {
@@ -165,12 +208,19 @@ export const RichText: FC<RichTextProps> = ({
     }
   };
 
-  // 입력 처리
+  // 입력 처리 - 텍스트 역순 문제 방지
   const handleInput = () => {
-    if (editorRef.current) {
+    if (editorRef.current && !isUpdatingRef.current) {
+      isUpdatingRef.current = true;
       const newValue = editorRef.current.innerHTML;
-      onChange?.(newValue);
-      setIsEmpty(!newValue || newValue === '' || newValue === '<br>');
+      // 빈 콘텐츠를 정리
+      const cleanValue = newValue === '<br>' || newValue === '<div><br></div>' ? '' : newValue;
+      onChange?.(cleanValue);
+      setIsEmpty(!cleanValue || cleanValue === '' || cleanValue === '<br>');
+
+      setTimeout(() => {
+        isUpdatingRef.current = false;
+      }, 0);
     }
   };
 
@@ -190,63 +240,40 @@ export const RichText: FC<RichTextProps> = ({
     const text = e.clipboardData.getData('text/plain');
     document.execCommand('insertText', false, text);
     if (editorRef.current) {
+      isUpdatingRef.current = true;
       onChange?.(editorRef.current.innerHTML);
+      setTimeout(() => {
+        isUpdatingRef.current = false;
+      }, 0);
     }
   };
 
   // Create the appropriate element based on tagName
-  
+  const commonProps = {
+    ref: editorRef,
+    contentEditable: true,
+    suppressContentEditableWarning: true,
+    className: cn('rich-text', 'outline-none', 'min-h-[1.8em]', isEmpty && 'empty', className),
+    style,
+    onInput: handleInput,
+    onKeyDown: handleKeyDown,
+    onFocus: handleFocus,
+    onBlur: handleBlur,
+    onPaste: handlePaste,
+    'data-placeholder': isEmpty ? placeholder : undefined,
+    role: 'textbox',
+    'aria-label': placeholder,
+    'aria-multiline': multiline ? 'true' : 'false',
+  };
+
   // For specific tags that need special handling
-  if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || 
+  if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' ||
       tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
-    return React.createElement(
-      tagName,
-      {
-        ref: editorRef,
-        contentEditable: true,
-        suppressContentEditableWarning: true,
-        className: cn('rich-text', 'outline-none', 'min-h-[1.8em]', isEmpty && 'empty', className),
-        style,
-        onInput: handleInput,
-        onKeyDown: handleKeyDown,
-        onFocus: handleFocus,
-        onBlur: handleBlur,
-        onPaste: handlePaste,
-        'data-placeholder': isEmpty ? placeholder : undefined,
-        role: 'textbox',
-        'aria-label': placeholder,
-        'aria-multiline': multiline ? 'true' : 'false',
-        dangerouslySetInnerHTML: { __html: value }
-      }
-    );
+    return React.createElement(tagName, commonProps);
   }
-  
+
   // For p, div, figcaption, and other simple elements
-  return (
-    <div
-      ref={editorRef}
-      contentEditable
-      suppressContentEditableWarning
-      className={cn(
-        'rich-text',
-        'outline-none',
-        'min-h-[1.8em]',
-        isEmpty && 'empty',
-        className
-      )}
-      style={style}
-      onInput={handleInput}
-      onKeyDown={handleKeyDown}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      onPaste={handlePaste}
-      data-placeholder={isEmpty ? placeholder : undefined}
-      role="textbox"
-      aria-label={placeholder}
-      aria-multiline={multiline ? 'true' : 'false'}
-      dangerouslySetInnerHTML={{ __html: value }}
-    />
-  );
+  return <div {...commonProps} />;
 };
 
 // 플레인 텍스트 컴포넌트 (제목 등에 사용)

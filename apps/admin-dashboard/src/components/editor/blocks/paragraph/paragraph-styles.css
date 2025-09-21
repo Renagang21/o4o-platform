@@ -1,0 +1,233 @@
+/**
+ * Enhanced Paragraph Block Styles
+ * Drop Cap 및 고급 타이포그래피 지원
+ */
+
+/* Drop Cap Styles */
+.drop-cap-enabled::first-letter {
+  float: left;
+  font-size: var(--drop-cap-font-size, 64px);
+  color: var(--drop-cap-color, #000000);
+  font-weight: var(--drop-cap-font-weight, 700);
+  line-height: var(--drop-cap-line-height, 2.4rem);
+  margin-right: 8px;
+  margin-top: 4px;
+  margin-bottom: -4px;
+  text-transform: uppercase;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* Drop Cap variations for different line heights */
+.drop-cap-enabled.lines-2::first-letter {
+  line-height: 1.6rem;
+}
+
+.drop-cap-enabled.lines-3::first-letter {
+  line-height: 2.4rem;
+}
+
+.drop-cap-enabled.lines-4::first-letter {
+  line-height: 3.2rem;
+}
+
+.drop-cap-enabled.lines-5::first-letter {
+  line-height: 4.0rem;
+}
+
+.drop-cap-enabled.lines-6::first-letter {
+  line-height: 4.8rem;
+}
+
+/* Enhanced Typography */
+.paragraph-content {
+  /* Enhanced text rendering */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Improved line breaking */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Text Transform Styles */
+.paragraph-content[style*="text-transform: uppercase"] {
+  letter-spacing: 0.05em;
+}
+
+.paragraph-content[style*="text-transform: lowercase"] {
+  font-variant: small-caps;
+}
+
+/* Typography Presets */
+.typography-elegant {
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+.typography-modern {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+.typography-condensed {
+  font-family: 'Arial Narrow', Arial, sans-serif;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.typography-expanded {
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+}
+
+/* Inline Image Styles */
+.paragraph-content .inline-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.paragraph-content .inline-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.paragraph-content .inline-image.size-small {
+  max-width: 32px;
+  max-height: 32px;
+}
+
+.paragraph-content .inline-image.size-medium {
+  max-width: 64px;
+  max-height: 64px;
+}
+
+.paragraph-content .inline-image.size-large {
+  max-width: 96px;
+  max-height: 96px;
+}
+
+/* Highlight Styles */
+.paragraph-content mark,
+.paragraph-content .highlight {
+  padding: 2px 4px;
+  border-radius: 3px;
+  background-color: var(--highlight-color, #fef08a);
+  background-clip: padding-box;
+}
+
+/* Selection Styles */
+.paragraph-content::selection {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.paragraph-content::-moz-selection {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Focus States */
+.paragraph-content:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  border-radius: 4px;
+}
+
+/* Placeholder Styles */
+.paragraph-content:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Print Styles */
+@media print {
+  .drop-cap-enabled::first-letter {
+    color: #000000 !important;
+    font-weight: bold !important;
+  }
+
+  .paragraph-content {
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  .paragraph-content mark,
+  .paragraph-content .highlight {
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .drop-cap-enabled::first-letter {
+    font-size: calc(var(--drop-cap-font-size, 64px) * 0.8);
+    margin-right: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .drop-cap-enabled::first-letter {
+    font-size: calc(var(--drop-cap-font-size, 64px) * 0.6);
+    margin-right: 4px;
+    line-height: calc(var(--drop-cap-line-height, 2.4rem) * 0.8);
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .drop-cap-enabled::first-letter {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+
+  .paragraph-content {
+    color: #000000 !important;
+  }
+
+  .paragraph-content mark,
+  .paragraph-content .highlight {
+    background: #ffff00 !important;
+    color: #000000 !important;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .paragraph-content,
+  .drop-cap-enabled::first-letter {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .paragraph-content {
+    color: #e5e7eb;
+  }
+
+  .paragraph-content::selection {
+    background-color: #60a5fa;
+    color: #1f2937;
+  }
+
+  .paragraph-content::-moz-selection {
+    background-color: #60a5fa;
+    color: #1f2937;
+  }
+
+  .drop-cap-enabled::first-letter {
+    color: var(--drop-cap-color, #e5e7eb);
+  }
+}

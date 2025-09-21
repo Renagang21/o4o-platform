@@ -1,0 +1,402 @@
+/**
+ * Enhanced List Block Styles
+ * CSS counter-style and list-style-type for 20+ marker styles
+ */
+
+/* Base list styles */
+.enhanced-list-block {
+  --list-indent-size: 24px;
+  --list-marker-color: #6b7280;
+  --list-marker-size: 16px;
+  --list-text-color: #374151;
+  --list-hover-bg: #f3f4f6;
+  --list-focus-ring: #3b82f6;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Dark mode support */
+.dark .enhanced-list-block {
+  --list-marker-color: #9ca3af;
+  --list-text-color: #e5e7eb;
+  --list-hover-bg: #374151;
+  --list-focus-ring: #60a5fa;
+}
+
+/* Basic list structure */
+.enhanced-list-block ul,
+.enhanced-list-block ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: list-counter;
+}
+
+.enhanced-list-block li {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+  color: var(--list-text-color);
+  counter-increment: list-counter;
+}
+
+.enhanced-list-block li::before {
+  content: counter(list-counter);
+  color: var(--list-marker-color);
+  font-weight: 500;
+  margin-right: 8px;
+  min-width: var(--list-marker-size);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Unordered list markers */
+.enhanced-list-block .list-style-disc li::before {
+  content: '•';
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.enhanced-list-block .list-style-circle li::before {
+  content: '○';
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.enhanced-list-block .list-style-square li::before {
+  content: '■';
+  font-size: 0.8em;
+  line-height: 1.4;
+}
+
+.enhanced-list-block .list-style-arrow li::before {
+  content: '→';
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+.enhanced-list-block .list-style-dash li::before {
+  content: '–';
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.enhanced-list-block .list-style-plus li::before {
+  content: '+';
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.enhanced-list-block .list-style-star li::before {
+  content: '★';
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+.enhanced-list-block .list-style-diamond li::before {
+  content: '◆';
+  font-size: 0.9em;
+  line-height: 1.3;
+}
+
+.enhanced-list-block .list-style-triangle li::before {
+  content: '▸';
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+.enhanced-list-block .list-style-heart li::before {
+  content: '♥';
+  font-size: 1em;
+  line-height: 1.2;
+  color: #ef4444;
+}
+
+/* Ordered list number styles */
+.enhanced-list-block .list-style-decimal li::before {
+  content: counter(list-counter) '.';
+}
+
+.enhanced-list-block .list-style-decimal-zero li::before {
+  content: counter(list-counter, decimal-leading-zero) '.';
+}
+
+.enhanced-list-block .list-style-lower-roman li::before {
+  content: counter(list-counter, lower-roman) '.';
+}
+
+.enhanced-list-block .list-style-upper-roman li::before {
+  content: counter(list-counter, upper-roman) '.';
+}
+
+.enhanced-list-block .list-style-lower-alpha li::before {
+  content: counter(list-counter, lower-alpha) '.';
+}
+
+.enhanced-list-block .list-style-upper-alpha li::before {
+  content: counter(list-counter, upper-alpha) '.';
+}
+
+.enhanced-list-block .list-style-lower-greek li::before {
+  content: counter(list-counter, lower-greek) '.';
+}
+
+.enhanced-list-block .list-style-parentheses li::before {
+  content: '(' counter(list-counter) ')';
+}
+
+.enhanced-list-block .list-style-brackets li::before {
+  content: '[' counter(list-counter) ']';
+}
+
+.enhanced-list-block .list-style-custom-emoji li::before {
+  content: '🔸';
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+/* Nested list styles */
+.enhanced-list-block li li {
+  margin-left: var(--list-indent-size);
+}
+
+.enhanced-list-block li li::before {
+  counter-increment: list-counter-2;
+}
+
+.enhanced-list-block li li li {
+  margin-left: calc(var(--list-indent-size) * 2);
+}
+
+.enhanced-list-block li li li::before {
+  counter-increment: list-counter-3;
+}
+
+/* Different markers for nested levels */
+.enhanced-list-block .list-style-disc li li::before {
+  content: '○';
+}
+
+.enhanced-list-block .list-style-disc li li li::before {
+  content: '■';
+}
+
+.enhanced-list-block .list-style-circle li li::before {
+  content: '■';
+}
+
+.enhanced-list-block .list-style-circle li li li::before {
+  content: '•';
+}
+
+/* Checklist styles */
+.enhanced-list-block .list-checklist li::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--list-marker-color);
+  border-radius: 3px;
+  background: transparent;
+  margin-right: 8px;
+  margin-top: 2px;
+}
+
+.enhanced-list-block .list-checklist li.checked::before {
+  background: var(--list-focus-ring);
+  border-color: var(--list-focus-ring);
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6 10.293l7.146-7.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
+  background-size: 10px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.enhanced-list-block .list-checklist li.checked {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Interactive states */
+.enhanced-list-block li:hover {
+  background-color: var(--list-hover-bg);
+  border-radius: 4px;
+  margin: 0 -8px;
+  padding: 4px 8px;
+}
+
+.enhanced-list-block li:focus-within {
+  background-color: var(--list-hover-bg);
+  border-radius: 4px;
+  margin: 0 -8px;
+  padding: 4px 8px;
+  outline: 2px solid var(--list-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Drag and drop states */
+.enhanced-list-block .list-item-dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+}
+
+.enhanced-list-block .list-item-drop-target {
+  border-top: 2px solid var(--list-focus-ring);
+  margin-top: 4px;
+}
+
+.enhanced-list-block .list-item-drop-target::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: -6px;
+  width: 8px;
+  height: 8px;
+  background: var(--list-focus-ring);
+  border-radius: 50%;
+}
+
+/* Custom start numbers */
+.enhanced-list-block .custom-start {
+  counter-reset: list-counter var(--start-number);
+}
+
+/* Alignment styles */
+.enhanced-list-block.align-left {
+  text-align: left;
+}
+
+.enhanced-list-block.align-center {
+  text-align: center;
+}
+
+.enhanced-list-block.align-center li {
+  justify-content: center;
+}
+
+.enhanced-list-block.align-right {
+  text-align: right;
+}
+
+.enhanced-list-block.align-right li {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+
+.enhanced-list-block.align-right li::before {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* List item content */
+.enhanced-list-block .list-item-content {
+  flex: 1;
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  transition: all 0.15s ease;
+}
+
+.enhanced-list-block .list-item-content:focus {
+  background: white;
+  box-shadow: 0 0 0 2px var(--list-focus-ring);
+}
+
+.enhanced-list-block .list-item-content:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .enhanced-list-block {
+    --list-indent-size: 20px;
+    --list-marker-size: 14px;
+  }
+
+  .enhanced-list-block li {
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-list-block {
+    --list-indent-size: 16px;
+    --list-marker-size: 12px;
+  }
+
+  .enhanced-list-block li::before {
+    font-size: 0.9em;
+  }
+}
+
+/* Print styles */
+@media print {
+  .enhanced-list-block {
+    --list-marker-color: #000000;
+    --list-text-color: #000000;
+  }
+
+  .enhanced-list-block li:hover,
+  .enhanced-list-block li:focus-within {
+    background: transparent !important;
+    outline: none !important;
+  }
+
+  .enhanced-list-block .list-item-controls {
+    display: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .enhanced-list-block {
+    --list-marker-color: #000000;
+    --list-text-color: #000000;
+    --list-hover-bg: #f0f0f0;
+    --list-focus-ring: #0000ff;
+  }
+}
+
+/* Animation for new items */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.enhanced-list-block .list-item-new {
+  animation: slideInFromLeft 0.2s ease-out;
+}
+
+/* Color variations */
+.enhanced-list-block.list-color-blue {
+  --list-marker-color: #3b82f6;
+  --list-focus-ring: #3b82f6;
+}
+
+.enhanced-list-block.list-color-green {
+  --list-marker-color: #10b981;
+  --list-focus-ring: #10b981;
+}
+
+.enhanced-list-block.list-color-purple {
+  --list-marker-color: #8b5cf6;
+  --list-focus-ring: #8b5cf6;
+}
+
+.enhanced-list-block.list-color-red {
+  --list-marker-color: #ef4444;
+  --list-focus-ring: #ef4444;
+}
+
+.enhanced-list-block.list-color-orange {
+  --list-marker-color: #f97316;
+  --list-focus-ring: #f97316;
+}

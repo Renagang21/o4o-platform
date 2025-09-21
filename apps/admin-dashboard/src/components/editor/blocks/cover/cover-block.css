@@ -1,0 +1,420 @@
+/**
+ * Enhanced Cover Block Styles
+ * WordPress Gutenberg-compatible CSS for Cover Block
+ */
+
+/* Base Cover Block Styles */
+.wp-block-cover,
+.cover-block {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background-color: #000;
+  color: #fff;
+}
+
+/* Background Attachment for Parallax */
+.wp-block-cover.has-parallax {
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Background Type Classes */
+.wp-block-cover.has-background-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.wp-block-cover.has-background-video {
+  background-color: transparent;
+}
+
+.wp-block-cover.has-background-color {
+  background-image: none !important;
+}
+
+.wp-block-cover.has-background-gradient {
+  background-image: none !important;
+}
+
+/* Overlay Styles */
+.wp-block-cover.has-overlay::before,
+.cover-block.has-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Content Positioning */
+.cover-content {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+}
+
+/* Inner Block Styles */
+.cover-content .wp-block {
+  margin: 0 0 1rem 0;
+}
+
+.cover-content .wp-block:last-child {
+  margin-bottom: 0;
+}
+
+/* Heading Styles in Cover */
+.cover-content h1,
+.cover-content h2,
+.cover-content h3,
+.cover-content h4,
+.cover-content h5,
+.cover-content h6 {
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+.cover-content h1 { font-size: 2.5rem; }
+.cover-content h2 { font-size: 2rem; }
+.cover-content h3 { font-size: 1.75rem; }
+.cover-content h4 { font-size: 1.5rem; }
+.cover-content h5 { font-size: 1.25rem; }
+.cover-content h6 { font-size: 1rem; }
+
+/* Paragraph Styles in Cover */
+.cover-content p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+/* Button Styles in Cover */
+.cover-content .wp-block-button {
+  margin: 1rem 0;
+}
+
+.cover-content .wp-block-button__link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.cover-content .wp-block-button__link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Focal Point Styles */
+.cover-background-focal-point {
+  position: relative;
+  overflow: hidden;
+}
+
+.cover-background-focal-point img,
+.cover-background-focal-point video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Video Background Styles */
+.cover-background video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+/* Duotone Filter Styles */
+.cover-overlay[data-duotone] {
+  filter: url(#duotone);
+}
+
+/* Blend Mode Support */
+.cover-overlay[data-blend-mode="multiply"] { mix-blend-mode: multiply; }
+.cover-overlay[data-blend-mode="screen"] { mix-blend-mode: screen; }
+.cover-overlay[data-blend-mode="overlay"] { mix-blend-mode: overlay; }
+.cover-overlay[data-blend-mode="darken"] { mix-blend-mode: darken; }
+.cover-overlay[data-blend-mode="lighten"] { mix-blend-mode: lighten; }
+.cover-overlay[data-blend-mode="color-dodge"] { mix-blend-mode: color-dodge; }
+.cover-overlay[data-blend-mode="color-burn"] { mix-blend-mode: color-burn; }
+.cover-overlay[data-blend-mode="hard-light"] { mix-blend-mode: hard-light; }
+.cover-overlay[data-blend-mode="soft-light"] { mix-blend-mode: soft-light; }
+.cover-overlay[data-blend-mode="difference"] { mix-blend-mode: difference; }
+.cover-overlay[data-blend-mode="exclusion"] { mix-blend-mode: exclusion; }
+
+/* Resize Handle Styles */
+.cover-block .resize-handle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 8px;
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 4px 4px 0 0;
+  cursor: ns-resize;
+  transition: background-color 0.2s;
+  z-index: 30;
+}
+
+.cover-block .resize-handle:hover {
+  background: rgba(59, 130, 246, 0.75);
+}
+
+.cover-block .resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 2px;
+  background: white;
+  border-radius: 1px;
+}
+
+/* Resizing State */
+.cover-block.is-resizing {
+  transition: none !important;
+}
+
+.cover-block.is-resizing .resize-handle {
+  background: rgba(59, 130, 246, 1);
+}
+
+/* Position Classes */
+.position-top-left { justify-content: flex-start; align-items: flex-start; }
+.position-top-center { justify-content: center; align-items: flex-start; }
+.position-top-right { justify-content: flex-end; align-items: flex-start; }
+.position-center-left { justify-content: flex-start; align-items: center; }
+.position-center-center { justify-content: center; align-items: center; }
+.position-center-right { justify-content: flex-end; align-items: center; }
+.position-bottom-left { justify-content: flex-start; align-items: flex-end; }
+.position-bottom-center { justify-content: center; align-items: flex-end; }
+.position-bottom-right { justify-content: flex-end; align-items: flex-end; }
+
+/* Aspect Ratio Support */
+.cover-block[data-aspect-ratio] {
+  height: 0;
+  padding-bottom: var(--aspect-ratio);
+}
+
+.cover-block[data-aspect-ratio="16:9"] { aspect-ratio: 16 / 9; }
+.cover-block[data-aspect-ratio="4:3"] { aspect-ratio: 4 / 3; }
+.cover-block[data-aspect-ratio="3:2"] { aspect-ratio: 3 / 2; }
+.cover-block[data-aspect-ratio="1:1"] { aspect-ratio: 1 / 1; }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .wp-block-cover,
+  .cover-block {
+    min-height: 300px;
+  }
+
+  .cover-content h1 { font-size: 2rem; }
+  .cover-content h2 { font-size: 1.75rem; }
+  .cover-content h3 { font-size: 1.5rem; }
+  .cover-content h4 { font-size: 1.25rem; }
+  .cover-content h5 { font-size: 1.125rem; }
+  .cover-content h6 { font-size: 1rem; }
+
+  .cover-content .wp-block-button__link {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Disable parallax on mobile for performance */
+  .wp-block-cover.has-parallax {
+    background-attachment: scroll !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .wp-block-cover,
+  .cover-block {
+    min-height: 250px;
+  }
+
+  .cover-content h1 { font-size: 1.75rem; }
+  .cover-content h2 { font-size: 1.5rem; }
+}
+
+/* High DPI / Retina Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .cover-background img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Accessibility Styles */
+.cover-block:focus-within {
+  outline: 2px solid #005cee;
+  outline-offset: 2px;
+}
+
+.cover-content [contenteditable]:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* Print Styles */
+@media print {
+  .wp-block-cover,
+  .cover-block {
+    background-attachment: scroll !important;
+    color: #000 !important;
+    background-color: #fff !important;
+  }
+
+  .cover-overlay {
+    display: none !important;
+  }
+
+  .cover-content {
+    color: #000 !important;
+  }
+}
+
+/* Animation Support */
+@keyframes coverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cover-content.animate-in {
+  animation: coverFadeIn 0.6s ease-out;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .cover-block {
+    background-color: #1a1a1a;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .cover-block,
+  .cover-content,
+  .wp-block-button__link {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .wp-block-cover.has-parallax {
+    background-attachment: scroll !important;
+  }
+}
+
+/* Content Editable Enhancements */
+[contenteditable] {
+  outline: none;
+}
+
+[contenteditable]:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+/* Selection Styles */
+.cover-block.is-selected {
+  box-shadow: 0 0 0 2px #005cee;
+}
+
+.cover-block.is-selected .resize-handle {
+  opacity: 1;
+}
+
+.cover-block:not(.is-selected) .resize-handle {
+  opacity: 0;
+}
+
+/* Loading States */
+.cover-background.is-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Error States */
+.cover-background.has-error {
+  background: #fee;
+  border: 2px dashed #f56565;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-background.has-error::before {
+  content: "⚠ Background failed to load";
+  color: #f56565;
+  font-size: 14px;
+}
+
+/* WordPress Compatibility */
+.wp-block-cover__inner-container {
+  width: 100%;
+  z-index: 1;
+  color: inherit;
+}
+
+.wp-block-cover .wp-block-cover__inner-container {
+  padding: 0;
+  margin: 0;
+}
+
+/* Legacy Support */
+.wp-block-cover.has-dim::before {
+  background-color: #000;
+  opacity: 0.5;
+}
+
+.wp-block-cover.has-dim.has-dim-0::before { opacity: 0; }
+.wp-block-cover.has-dim.has-dim-10::before { opacity: 0.1; }
+.wp-block-cover.has-dim.has-dim-20::before { opacity: 0.2; }
+.wp-block-cover.has-dim.has-dim-30::before { opacity: 0.3; }
+.wp-block-cover.has-dim.has-dim-40::before { opacity: 0.4; }
+.wp-block-cover.has-dim.has-dim-50::before { opacity: 0.5; }
+.wp-block-cover.has-dim.has-dim-60::before { opacity: 0.6; }
+.wp-block-cover.has-dim.has-dim-70::before { opacity: 0.7; }
+.wp-block-cover.has-dim.has-dim-80::before { opacity: 0.8; }
+.wp-block-cover.has-dim.has-dim-90::before { opacity: 0.9; }
+.wp-block-cover.has-dim.has-dim-100::before { opacity: 1; }

@@ -36,6 +36,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { RichText } from '../gutenberg/RichText';
 import { BlockControls, ToolbarGroup, ToolbarButton, AlignmentToolbar } from '../gutenberg/BlockControls';
+import { DropCapController } from './paragraph/DropCapController';
+import { TypographyPanel } from './paragraph/TypographyPanel';
+import { HighlightSelector } from './paragraph/HighlightSelector';
+import { InlineImageInserter, InlineImageData } from './paragraph/InlineImageInserter';
+import './paragraph/paragraph-styles.css';
 
 interface ParagraphBlockProps {
   id: string;
@@ -51,12 +56,18 @@ interface ParagraphBlockProps {
   attributes?: {
     align?: 'left' | 'center' | 'right' | 'justify';
     dropCap?: boolean;
+    dropCapLines?: number;
+    dropCapColor?: string;
+    dropCapFontSize?: number;
+    dropCapFontWeight?: number;
     fontSize?: number;
     lineHeight?: number;
     letterSpacing?: number;
+    wordSpacing?: number;
     textColor?: string;
     backgroundColor?: string;
     highlightColor?: string;
+    highlightOpacity?: number;
     padding?: number;
     margin?: number;
     borderRadius?: number;
@@ -86,6 +97,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [selectedText, setSelectedText] = useState('');
+  const [showDropCapSettings, setShowDropCapSettings] = useState(false);
+  const [showTypographySettings, setShowTypographySettings] = useState(false);
   const blockRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   
@@ -93,12 +106,18 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const {
     align = 'left',
     dropCap = false,
+    dropCapLines = 3,
+    dropCapColor = '#000000',
+    dropCapFontSize = 64,
+    dropCapFontWeight = 700,
     fontSize = 16,
     lineHeight = 1.6,
     letterSpacing = 0,
+    wordSpacing = 0,
     textColor = '#1e293b',
     backgroundColor = '',
     highlightColor = '',
+    highlightOpacity = 0.3,
     padding = 0,
     margin = 0,
     borderRadius = 0,
@@ -146,6 +165,73 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       handleContentChange(editorRef.current.innerHTML);
     }
   }, [handleContentChange]);
+
+  // Apply highlight to selected text
+  const applyHighlight = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection && selection.toString() && highlightColor) {
+      const rgba = `rgba(${highlightColor.slice(1).match(/.{2}/g)?.map(hex => parseInt(hex, 16)).join(', ')}, ${highlightOpacity})`;
+      applyFormat('hiliteColor', rgba);
+    }
+  }, [highlightColor, highlightOpacity, applyFormat]);
+
+  // Insert inline image
+  const insertInlineImage = useCallback((imageData: InlineImageData) => {
+    const selection = window.getSelection();
+    if (selection && editorRef.current) {
+      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+      if (range) {
+        // Create image element
+        const img = document.createElement('img');
+        img.src = imageData.src;
+        img.alt = imageData.alt;
+        img.style.width = `${imageData.width}px`;
+        img.style.height = `${imageData.height}px`;
+        img.style.verticalAlign = imageData.align;
+        img.style.display = imageData.textWrap ? 'inline' : 'inline-block';
+        img.style.margin = '0 4px';
+        img.className = 'inline-image';
+
+        // Insert at cursor position
+        range.insertNode(img);
+
+        // Move cursor after image
+        range.setStartAfter(img);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // Update content
+        handleContentChange(editorRef.current.innerHTML);
+      }
+    }
+  }, [handleContentChange]);
+
+  // Reset drop cap to defaults
+  const resetDropCap = useCallback(() => {
+    onChange(localContent, {
+      ...attributes,
+      dropCapLines: 3,
+      dropCapColor: '#000000',
+      dropCapFontSize: 64,
+      dropCapFontWeight: 700,
+    });
+  }, [localContent, attributes, onChange]);
+
+  // Reset typography to defaults
+  const resetTypography = useCallback(() => {
+    onChange(localContent, {
+      ...attributes,
+      fontSize: 16,
+      lineHeight: 1.6,
+      letterSpacing: 0,
+      wordSpacing: 0,
+      fontWeight: 400,
+      fontStyle: 'normal',
+      textTransform: 'none',
+    });
+  }, [localContent, attributes, onChange]);
 
   // Insert link with better UX
   const insertLink = useCallback(() => {
@@ -235,22 +321,30 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     isSelected && 'before:shadow-sm'
   );
 
-  // Content area classes
+  // Content area classes with enhanced drop cap
   const contentClasses = cn(
     'paragraph-content relative',
     'min-h-[1.8em] outline-none',
     align === 'center' && 'text-center',
     align === 'right' && 'text-right',
     align === 'justify' && 'text-justify',
-    dropCap && 'first-letter:float-left first-letter:text-5xl first-letter:font-bold first-letter:mr-2 first-letter:mt-1',
     isFocused && 'ring-2 ring-blue-500 ring-opacity-20 rounded'
   );
 
-  // Content styles
+  // Drop cap styles
+  const dropCapStyles = dropCap ? {
+    '--drop-cap-font-size': `${dropCapFontSize}px`,
+    '--drop-cap-color': dropCapColor,
+    '--drop-cap-font-weight': dropCapFontWeight,
+    '--drop-cap-line-height': `${dropCapLines * 0.8}rem`,
+  } as React.CSSProperties : {};
+
+  // Content styles with enhanced typography
   const contentStyles: React.CSSProperties = {
     fontSize: `${fontSize}px`,
     lineHeight,
     letterSpacing: letterSpacing ? `${letterSpacing}em` : undefined,
+    wordSpacing: wordSpacing ? `${wordSpacing}em` : undefined,
     color: textColor || undefined,
     backgroundColor: backgroundColor || undefined,
     padding: padding ? `${padding}px` : undefined,
@@ -259,10 +353,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     fontWeight,
     fontStyle,
     textTransform,
-    // Add highlight effect if specified
-    ...(highlightColor && {
-      background: `linear-gradient(180deg, transparent 60%, ${highlightColor} 60%)`,
-    })
+    ...dropCapStyles,
   };
 
   return (
@@ -298,7 +389,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             />
           </ToolbarGroup>
 
-          {/* Link and Code */}
+          {/* Link, Image and Code */}
           <ToolbarGroup>
             <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
               <PopoverTrigger>
@@ -336,6 +427,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
               </PopoverContent>
             </Popover>
 
+            <InlineImageInserter onInsert={insertInlineImage} />
+
             <ToolbarButton
               icon={<Code className="h-4 w-4" />}
               label="Inline Code"
@@ -350,6 +443,15 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
           {/* Advanced Formatting */}
           <ToolbarGroup>
+            <HighlightSelector
+              selectedColor={highlightColor}
+              opacity={highlightOpacity}
+              onColorChange={(color) => updateAttribute('highlightColor', color)}
+              onOpacityChange={(opacity) => updateAttribute('highlightOpacity', opacity)}
+              onClear={() => updateAttribute('highlightColor', '')}
+              onApply={applyHighlight}
+            />
+
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant="ghost" size="sm" className="h-9 px-2">
@@ -365,9 +467,14 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
                   <Superscript className="h-4 w-4 mr-2" />
                   Superscript
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => updateAttribute('highlightColor', '#fef08a')}>
-                  <Highlighter className="h-4 w-4 mr-2" />
-                  Highlight
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowDropCapSettings(!showDropCapSettings)}>
+                  <Type className="h-4 w-4 mr-2" />
+                  Drop Cap Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowTypographySettings(!showTypographySettings)}>
+                  <Type className="h-4 w-4 mr-2" />
+                  Typography Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => applyFormat('removeFormat')}>
@@ -399,7 +506,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       >
         <div
           ref={editorRef}
-          className={contentClasses}
+          className={cn(
+            contentClasses,
+            dropCap && 'drop-cap-enabled',
+            dropCap && `lines-${dropCapLines}`
+          )}
           style={contentStyles}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -435,6 +546,48 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           </div>
         )}
       </div>
+
+      {/* Drop Cap Settings Panel */}
+      {isSelected && showDropCapSettings && (
+        <div className="mt-4">
+          <DropCapController
+            isEnabled={dropCap}
+            lines={dropCapLines}
+            color={dropCapColor}
+            fontSize={dropCapFontSize}
+            fontWeight={dropCapFontWeight}
+            onToggle={(enabled) => updateAttribute('dropCap', enabled)}
+            onLinesChange={(lines) => updateAttribute('dropCapLines', lines)}
+            onColorChange={(color) => updateAttribute('dropCapColor', color)}
+            onFontSizeChange={(size) => updateAttribute('dropCapFontSize', size)}
+            onFontWeightChange={(weight) => updateAttribute('dropCapFontWeight', weight)}
+            onReset={resetDropCap}
+          />
+        </div>
+      )}
+
+      {/* Typography Settings Panel */}
+      {isSelected && showTypographySettings && (
+        <div className="mt-4">
+          <TypographyPanel
+            fontSize={fontSize}
+            lineHeight={lineHeight}
+            letterSpacing={letterSpacing}
+            wordSpacing={wordSpacing}
+            textTransform={textTransform}
+            fontWeight={fontWeight}
+            fontStyle={fontStyle}
+            onFontSizeChange={(size) => updateAttribute('fontSize', size)}
+            onLineHeightChange={(height) => updateAttribute('lineHeight', height)}
+            onLetterSpacingChange={(spacing) => updateAttribute('letterSpacing', spacing)}
+            onWordSpacingChange={(spacing) => updateAttribute('wordSpacing', spacing)}
+            onTextTransformChange={(transform) => updateAttribute('textTransform', transform)}
+            onFontWeightChange={(weight) => updateAttribute('fontWeight', weight)}
+            onFontStyleChange={(style) => updateAttribute('fontStyle', style)}
+            onReset={resetTypography}
+          />
+        </div>
+      )}
     </>
   );
 };

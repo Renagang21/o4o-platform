@@ -1,0 +1,333 @@
+/**
+ * Enhanced Quote Block Styles
+ * Quote, Large Quote, Pullquote 스타일 지원
+ */
+
+/* Base Quote Styles */
+.enhanced-quote-block {
+  --quote-border-color: #e5e7eb;
+  --quote-bg-color: transparent;
+  --quote-text-color: #374151;
+  --quote-accent-color: #3b82f6;
+  --quote-citation-color: #6b7280;
+  --quote-icon-opacity: 0.2;
+
+  position: relative;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.6;
+}
+
+/* Dark mode support */
+.dark .enhanced-quote-block {
+  --quote-border-color: #374151;
+  --quote-bg-color: #1f2937;
+  --quote-text-color: #e5e7eb;
+  --quote-accent-color: #60a5fa;
+  --quote-citation-color: #9ca3af;
+}
+
+/* Default Quote Style */
+.enhanced-quote-block.quote-style-default {
+  border-left: 4px solid var(--quote-border-color);
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.enhanced-quote-block.quote-style-default .quote-content {
+  font-size: 1.125rem;
+  font-style: italic;
+  color: var(--quote-text-color);
+  margin: 0;
+}
+
+.enhanced-quote-block.quote-style-default .quote-citation {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--quote-citation-color);
+  font-style: normal;
+}
+
+/* Large Quote Style */
+.enhanced-quote-block.quote-style-large {
+  border-left: 6px solid var(--quote-accent-color);
+  padding: 2rem;
+  margin: 2rem 0;
+  background: var(--quote-bg-color);
+  border-radius: 8px;
+}
+
+.enhanced-quote-block.quote-style-large .quote-content {
+  font-size: 1.5rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--quote-text-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.enhanced-quote-block.quote-style-large .quote-citation {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--quote-citation-color);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Pullquote Style */
+.enhanced-quote-block.quote-style-pullquote {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, var(--quote-bg-color) 0%, #f8fafc 100%);
+  border-top: 1px solid var(--quote-border-color);
+  border-bottom: 1px solid var(--quote-border-color);
+  text-align: center;
+  position: relative;
+}
+
+.enhanced-quote-block.quote-style-pullquote::before,
+.enhanced-quote-block.quote-style-pullquote::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--quote-accent-color);
+}
+
+.enhanced-quote-block.quote-style-pullquote::before {
+  left: 0;
+}
+
+.enhanced-quote-block.quote-style-pullquote::after {
+  right: 0;
+}
+
+.enhanced-quote-block.quote-style-pullquote .quote-content {
+  font-size: 2rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--quote-text-color);
+  margin: 0 auto;
+  max-width: 800px;
+  line-height: 1.3;
+}
+
+.enhanced-quote-block.quote-style-pullquote .quote-citation {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  color: var(--quote-citation-color);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Quote Icons */
+.enhanced-quote-block .quote-icon {
+  position: absolute;
+  font-family: Georgia, serif;
+  font-weight: bold;
+  opacity: var(--quote-icon-opacity);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.enhanced-quote-block .quote-icon.position-left {
+  left: -0.5rem;
+  top: -0.5rem;
+}
+
+.enhanced-quote-block .quote-icon.position-right {
+  right: -0.5rem;
+  bottom: -0.5rem;
+}
+
+.enhanced-quote-block.quote-style-pullquote .quote-icon.position-left {
+  left: 2rem;
+  top: 1rem;
+}
+
+.enhanced-quote-block.quote-style-pullquote .quote-icon.position-right {
+  right: 2rem;
+  bottom: 1rem;
+}
+
+/* Citation Styles */
+.quote-citation.style-normal {
+  font-style: normal;
+  font-weight: normal;
+}
+
+.quote-citation.style-italic {
+  font-style: italic;
+  font-weight: normal;
+}
+
+.quote-citation.style-bold {
+  font-style: normal;
+  font-weight: bold;
+}
+
+.quote-citation.position-left {
+  text-align: left;
+}
+
+.quote-citation.position-center {
+  text-align: center;
+}
+
+.quote-citation.position-right {
+  text-align: right;
+}
+
+.quote-citation.prefix-dash::before {
+  content: '— ';
+}
+
+.quote-citation.prefix-quote::before {
+  content: '" ';
+}
+
+/* Citation Links */
+.quote-citation a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+  transition: border-bottom-color 0.2s ease;
+}
+
+.quote-citation a:hover {
+  border-bottom-color: var(--quote-accent-color);
+  color: var(--quote-accent-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .enhanced-quote-block.quote-style-pullquote {
+    padding: 2rem 1rem;
+    margin-left: -1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .enhanced-quote-block.quote-style-pullquote .quote-content {
+    font-size: 1.5rem;
+  }
+
+  .enhanced-quote-block.quote-style-large .quote-content {
+    font-size: 1.25rem;
+  }
+
+  .enhanced-quote-block .quote-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-quote-block.quote-style-pullquote .quote-content {
+    font-size: 1.25rem;
+  }
+
+  .enhanced-quote-block.quote-style-pullquote .quote-citation {
+    font-size: 1rem;
+  }
+
+  .enhanced-quote-block.quote-style-large {
+    padding: 1.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .enhanced-quote-block {
+    --quote-border-color: #000000;
+    --quote-bg-color: transparent;
+    --quote-text-color: #000000;
+    --quote-accent-color: #000000;
+    --quote-citation-color: #666666;
+  }
+
+  .enhanced-quote-block.quote-style-pullquote {
+    width: 100%;
+    margin-left: 0;
+    background: transparent;
+    border: 2px solid #000000;
+  }
+
+  .enhanced-quote-block .quote-icon {
+    display: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .enhanced-quote-block {
+    --quote-border-color: #000000;
+    --quote-text-color: #000000;
+    --quote-accent-color: #0000ff;
+    --quote-citation-color: #333333;
+  }
+}
+
+/* Animation for quote reveal */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.enhanced-quote-block.quote-animate {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Focus states for editing */
+.enhanced-quote-block .quote-content:focus,
+.enhanced-quote-block .quote-citation:focus {
+  outline: 2px solid var(--quote-accent-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Empty state placeholders */
+.enhanced-quote-block .quote-content:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.enhanced-quote-block .quote-citation:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Color Theme Variations */
+.enhanced-quote-block.theme-blue {
+  --quote-accent-color: #3b82f6;
+  --quote-border-color: #3b82f6;
+}
+
+.enhanced-quote-block.theme-green {
+  --quote-accent-color: #10b981;
+  --quote-border-color: #10b981;
+}
+
+.enhanced-quote-block.theme-purple {
+  --quote-accent-color: #8b5cf6;
+  --quote-border-color: #8b5cf6;
+}
+
+.enhanced-quote-block.theme-red {
+  --quote-accent-color: #ef4444;
+  --quote-border-color: #ef4444;
+}
+
+.enhanced-quote-block.theme-orange {
+  --quote-accent-color: #f59e0b;
+  --quote-border-color: #f59e0b;
+}
