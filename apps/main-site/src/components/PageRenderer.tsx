@@ -18,7 +18,8 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   // Simple rendering logic - prioritize displaying content
   const renderContent = () => {
     // Check blocks field first (from API response)
-    const contentToRender = page.blocks || page.content;
+    // If blocks is empty array, use content instead
+    const contentToRender = (page.blocks && page.blocks.length > 0) ? page.blocks : page.content;
 
     // If content is a string, render as HTML
     if (contentToRender && typeof contentToRender === 'string') {
