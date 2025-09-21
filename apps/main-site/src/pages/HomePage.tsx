@@ -41,8 +41,6 @@ const fetchPageData = async (pageId: string): Promise<Page> => {
   const baseUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
   const url = `${baseUrl}/pages/${pageId}`;
 
-  console.debug('[HomePage] Fetching static page', { url });
-
   const response = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -254,11 +252,6 @@ const HomePage: FC = () => {
   if (settings.type === 'static_page' && pageData) {
     return (
       <Layout>
-        <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded">
-          <p className="text-sm text-green-700">디버그: Static page render mode - Page loaded successfully</p>
-          <p className="text-sm text-green-700">Page Title: {pageData.title}</p>
-          <p className="text-sm text-green-700">Page ID: {pageData.id}</p>
-        </div>
         <PageRenderer page={pageData} />
       </Layout>
     );
