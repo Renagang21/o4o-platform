@@ -227,7 +227,7 @@ export const uploadSingleMiddleware = (fieldName: string = 'file') => {
 
 // Utility function to ensure upload directories exist
 export const ensureUploadDirectories = () => {
-  const baseUploadDir = path.join(process.cwd(), 'uploads');
+  const baseUploadDir = path.join(process.cwd(), 'public', 'uploads');
   const categories = ['images', 'videos', 'audio', 'documents', 'others'];
   
   try {
@@ -285,7 +285,7 @@ export const cleanupTempFiles = (files: Express.Multer.File[]) => {
 // Get upload statistics
 export const getUploadStats = () => {
   try {
-    const uploadDir = path.join(process.cwd(), 'uploads');
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     const categories = ['images', 'videos', 'audio', 'documents', 'others'];
     
     const stats = {

@@ -347,7 +347,13 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // Serve static files for uploads (EARLY in middleware chain)
-app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
+// Static file serving - single configuration
+const staticUploadsPath = path.join(process.cwd(), 'public', 'uploads');
+app.use('/uploads', express.static(staticUploadsPath, {
+  maxAge: '7d',
+  etag: true,
+  lastModified: true
+}));
 
 // Add performance monitoring middleware early in the chain
 app.use(performanceMonitor as any);
@@ -407,9 +413,7 @@ app.use(session(sessionConfig) as any);
 // Initialize passport
 app.use(passport.initialize() as any);
 
-// Static file serving for uploads
-const uploadsPath = process.env.UPLOAD_DIR || './uploads';
-app.use('/uploads', express.static(uploadsPath));
+// Remove duplicate static file serving - already configured above
 
 // Settings API rate limiter - very lenient for admin operations
 const settingsLimiter = rateLimit({
@@ -913,6 +917,17 @@ const startServer = async () => {
         logger.info('Tracking updater job started');
       } catch (jobError) {
         // Error log removed
+      }
+
+      // Initialize upload directories
+      logger.info('Initializing upload directories...');
+      try {
+        const { ensureUploadDirectories } = await import('./middleware/upload.middleware');
+        ensureUploadDirectories();
+        logger.info('Upload directories initialized successfully');
+      } catch (uploadError: any) {
+        logger.error('Failed to initialize upload directories:', uploadError);
+        // Don't throw - directories might already exist
       }
 
       // Initialize email service (graceful, non-blocking)
