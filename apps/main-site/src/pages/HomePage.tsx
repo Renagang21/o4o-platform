@@ -61,43 +61,27 @@ const fetchPageData = async (pageId: string): Promise<Page> => {
     baseUrl = 'https://api.neture.co.kr/api';
   }
 
-  const tried: string[] = [];
+  // Only use the proper pages endpoint without fallbacks
+  const url = `${baseUrl}/pages/${encodeURIComponent(pageId)}`;
 
-  // 1) Try public pages endpoint first
-  const tryUrls = [
-    `${baseUrl}/pages/${encodeURIComponent(pageId)}`,
-    // 2) Fallback: some environments might have stored a post id
-    `${baseUrl}/posts/${encodeURIComponent(pageId)}`,
-    // 3) Legacy public endpoint used elsewhere in the app
-    `${baseUrl}/public/posts/post/${encodeURIComponent(pageId)}`,
-  ];
+  console.debug('[HomePage] Fetching static page', { url });
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
 
-  for (const url of tryUrls) {
-    try {
-      console.debug('[HomePage] Fetching static page', { url });
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      tried.push(`${response.status} ${url}`);
-
-      if (!response.ok) {
-        // If 404, continue to next fallback
-        if (response.status === 404) continue;
-        throw new Error(`HTTP error! status: ${response.status} at ${url}`);
-      }
-
-      const json = await response.json();
-      const page = (json && (json.data || json)) as Page;
-      if (page && page.id) return page;
-    } catch (e) {
-      // Keep trying next URL
-      continue;
-    }
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status} at ${url}`);
   }
 
-  throw new Error(`HTTP error! status: 404 - Tried: ${tried.join(' | ')}`);
+  const json = await response.json();
+  const page = (json && (json.data || json)) as Page;
+
+  if (!page || !page.id) {
+    throw new Error(`Invalid page data received from ${url}`);
+  }
+
+  return page;
 };
 
 const HomePage: FC = () => {

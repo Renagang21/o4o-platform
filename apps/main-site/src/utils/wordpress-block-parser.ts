@@ -24,50 +24,55 @@ export interface MainSiteBlock {
  * Transform WordPress block to main site block format
  */
 export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock | null {
+  // Support both 'name' and 'type' properties for compatibility
+  const blockName = (wpBlock as any).type || wpBlock.name;
+
   // Safety check for block name
-  if (!wpBlock || !wpBlock.name || typeof wpBlock.name !== 'string') {
+  if (!wpBlock || !blockName || typeof blockName !== 'string') {
     return null;
   }
-  
+
   // Remove 'core/' prefix from block name
-  const blockType = wpBlock.name.replace('core/', '');
-  
+  const blockType = blockName.replace('core/', '');
+
   // Base block structure
   const block: MainSiteBlock = {
-    id: wpBlock.clientId,
+    id: (wpBlock as any).id || wpBlock.clientId,
     type: blockType,
     data: {},
   };
 
   // Transform based on block type
-  switch (wpBlock.name) {
+  switch (blockName) {
     // Text blocks
     case 'core/paragraph':
+      const paragraphData = (wpBlock as any).data || wpBlock.attributes;
       return {
         ...block,
         type: 'paragraph',
         data: {
           text: extractTextContent(wpBlock),
-          alignment: wpBlock.attributes.align || 'left',
-          dropCap: wpBlock.attributes.dropCap || false,
-          fontSize: wpBlock.attributes.fontSize,
-          textColor: wpBlock.attributes.textColor,
-          backgroundColor: wpBlock.attributes.backgroundColor,
-          customTextColor: wpBlock.attributes.style?.color?.text,
-          customBackgroundColor: wpBlock.attributes.style?.color?.background,
+          alignment: paragraphData?.align || 'left',
+          dropCap: paragraphData?.dropCap || false,
+          fontSize: paragraphData?.fontSize,
+          textColor: paragraphData?.textColor,
+          backgroundColor: paragraphData?.backgroundColor,
+          customTextColor: paragraphData?.style?.color?.text,
+          customBackgroundColor: paragraphData?.style?.color?.background,
         }
       };
 
     case 'core/heading':
+      const headingData = (wpBlock as any).data || wpBlock.attributes;
       return {
         ...block,
         type: 'heading',
         data: {
           text: extractTextContent(wpBlock),
-          level: wpBlock.attributes.level || 2,
-          alignment: wpBlock.attributes.align || 'left',
-          textColor: wpBlock.attributes.textColor,
-          customTextColor: wpBlock.attributes.style?.color?.text,
+          level: headingData?.level || 2,
+          alignment: headingData?.align || 'left',
+          textColor: headingData?.textColor,
+          customTextColor: headingData?.style?.color?.text,
         }
       };
 
@@ -361,10 +366,21 @@ function transformInnerBlocks(innerBlocks?: WordPressBlock[]): MainSiteBlock[] {
  * Extract text content from WordPress block
  */
 function extractTextContent(block: WordPressBlock): string {
-  if (block.attributes.content) {
+  // Support both attributes and data properties
+  const blockData = (block as any).data || block.attributes;
+
+  if (blockData && blockData.text) {
+    return blockData.text;
+  }
+
+  if (blockData && blockData.content) {
+    return blockData.content;
+  }
+
+  if (block.attributes && block.attributes.content) {
     return block.attributes.content;
   }
-  
+
   if (block.innerHTML) {
     // Strip HTML tags for plain text
     const div = document.createElement('div');
