@@ -17,18 +17,30 @@ interface PageRendererProps {
 const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   // Simple rendering logic - prioritize displaying content
   const renderContent = () => {
+    // Debug logging to understand data structure
+    console.log('[PageRenderer] Full page object:', page);
+    console.log('[PageRenderer] page.blocks:', page.blocks);
+    console.log('[PageRenderer] page.content:', page.content);
+    console.log('[PageRenderer] page.blocks type:', typeof page.blocks);
+    console.log('[PageRenderer] page.content type:', typeof page.content);
+    
     // Check blocks field first (from API response)
     const contentToRender = page.blocks || page.content;
+    console.log('[PageRenderer] contentToRender:', contentToRender);
+    console.log('[PageRenderer] contentToRender type:', typeof contentToRender);
 
     // If content is a string, render as HTML
     if (contentToRender && typeof contentToRender === 'string') {
+      console.log('[PageRenderer] Rendering as string HTML');
       return <div dangerouslySetInnerHTML={{ __html: contentToRender }} />;
     }
 
     // If content is JSON (TipTap or other format), convert to string
     if (contentToRender && typeof contentToRender === 'object') {
+      console.log('[PageRenderer] Content is object, checking format...');
       // Try to extract text content from TipTap format
       if (contentToRender.type === 'doc' && contentToRender.content) {
+        console.log('[PageRenderer] TipTap format detected');
         // Simple extraction of text from TipTap nodes
         const extractText = (nodes: any[]): string => {
           return nodes.map(node => {
@@ -53,6 +65,8 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
 
       // If it's WordPress blocks format, render each block
       if (Array.isArray(contentToRender)) {
+        console.log('[PageRenderer] WordPress blocks array detected, length:', contentToRender.length);
+        console.log('[PageRenderer] First block:', contentToRender[0]);
         const htmlContent = contentToRender
           .map(block => {
             // Handle different block types
@@ -98,11 +112,13 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
           .filter(html => html !== '')
           .join('');
 
+        console.log('[PageRenderer] Final HTML content:', htmlContent);
         // Always render the container, even if empty
         return <div dangerouslySetInnerHTML={{ __html: htmlContent || '' }} />;
       }
     }
 
+    console.log('[PageRenderer] No content to render, showing fallback');
     return <p className="text-gray-500">콘텐츠가 없습니다.</p>;
   };
 
