@@ -5,6 +5,10 @@
 
 set -euo pipefail
 
+# Volta 환경 활성화 (Node.js 및 pnpm 버전 설정)
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
+
 echo "🚀 메인 사이트 배포 시작..."
 
 # 0) 루트 확인
