@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { CPTController } from '../controllers/cptController';
+import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
 const router: Router = Router();

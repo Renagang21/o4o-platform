@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom'
-import { 
-  Plus, 
-  Settings2, 
-  Trash2, 
+import {
+  Plus,
+  Settings2,
+  Trash2,
   Edit2,
   Copy,
   MoreVertical,
@@ -22,37 +22,21 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useACFGroups, useDeleteACFGroup } from '@/features/cpt-acf/hooks'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
-import type { ACFFieldGroup } from '@o4o/types'
+import type { FieldGroup } from '@/features/cpt-acf/types/acf.types'
 import toast from 'react-hot-toast'
 
 const ACFManager: FC = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  // Fetch field groups
-  const { data: fieldGroups = [], isLoading } = useQuery({
-    queryKey: ['acf-field-groups'],
-    queryFn: async () => {
-      const response = await authClient.api.get('/acf/field-groups')
-      return response.data
-    }
-  })
+  // Fetch field groups using new hook
+  const { data: fieldGroups = [], isLoading } = useACFGroups()
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return authClient.api.delete(`/acf/field-groups/${id}`)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['acf-field-groups'] })
-      toast.success('필드 그룹이 삭제되었습니다')
-    },
-    onError: () => {
-      toast.error('삭제에 실패했습니다')
-    }
-  })
+  // Use the delete ACF group hook
+  const deleteMutation = useDeleteACFGroup()
 
   // Duplicate mutation
   const duplicateMutation = useMutation({
@@ -68,13 +52,13 @@ const ACFManager: FC = () => {
     }
   })
 
-  const handleDelete = (fieldGroup: ACFFieldGroup) => {
+  const handleDelete = (fieldGroup: FieldGroup) => {
     if (confirm(`정말 "${fieldGroup.name}" 필드 그룹을 삭제하시겠습니까?`)) {
       deleteMutation.mutate(fieldGroup.id)
     }
   }
 
-  const getLocationDescription = (fieldGroup: ACFFieldGroup) => {
+  const getLocationDescription = (fieldGroup: FieldGroup) => {
     if (!fieldGroup.location || fieldGroup.location.length === 0) {
       return '위치 설정 없음'
     }

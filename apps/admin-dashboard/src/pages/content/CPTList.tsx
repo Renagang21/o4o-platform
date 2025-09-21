@@ -1,19 +1,17 @@
-import { FC, useState } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authClient } from '@o4o/auth-client';
-import type { CustomPostType } from '@o4o/types';
-import toast from 'react-hot-toast';
+import { useCPTTypes, useDeleteCPTType } from '@/features/cpt-acf/hooks';
+import type { CustomPostType } from '@/features/cpt-acf/types/cpt.types';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
 import { Eye, EyeOff, Database, Settings2 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
@@ -28,64 +26,52 @@ const CPTList: FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPublic, setFilterPublic] = useState<'all' | 'public' | 'private'>('all');
 
-  // Fetch custom post types
-  const { data: postTypes = [], isLoading, error } = useQuery({
-    queryKey: ['custom-post-types', filterPublic, searchQuery],
-    queryFn: async () => {
-      const response = await authClient.api.get('/platform/custom-post-types');
-      let types = response.data || [];
-      
-      // Apply filters
-      if (filterPublic !== 'all') {
-        types = types.filter((t: CustomPostType) => 
-          filterPublic === 'public' ? t.isPublic : !t.isPublic
-        );
-      }
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        types = types.filter((t: CustomPostType) => 
-          t.name.toLowerCase().includes(query) || 
-          t.pluralName.toLowerCase().includes(query) ||
-          t.slug.toLowerCase().includes(query)
-        );
-      }
-      
-      return types;
-    }
-  });
+  // Fetch custom post types using new hook
+  const { data: allPostTypes = [], isLoading, error } = useCPTTypes();
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return authClient.api.delete(`/platform/custom-post-types/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['custom-post-types'] });
-      toast.success('Custom post type deleted successfully');
-    },
-    onError: () => {
-      toast.error('Failed to delete custom post type');
+  // Apply client-side filtering
+  const postTypes = useMemo(() => {
+    let types = [...allPostTypes];
+
+    // Apply public/private filter
+    if (filterPublic !== 'all') {
+      types = types.filter((t: CustomPostType) =>
+        filterPublic === 'public' ? t.showInRest : !t.showInRest
+      );
     }
-  });
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      types = types.filter((t: CustomPostType) =>
+        t.name.toLowerCase().includes(query) ||
+        t.labels?.plural?.toLowerCase().includes(query) ||
+        t.slug.toLowerCase().includes(query)
+      );
+    }
+
+    return types;
+  }, [allPostTypes, filterPublic, searchQuery]);
+
+  // Use the delete CPT hook
+  const deleteMutation = useDeleteCPTType();
 
   const handleDelete = (postType: CustomPostType) => {
     if (confirm(`Are you sure you want to delete "${postType.name}"?\nAll posts of this type will also be deleted.`)) {
-      deleteMutation.mutate(postType.id);
+      deleteMutation.mutate(postType.slug);
     }
   };
 
   // Get support features as text
   const getSupportFeatures = (supports: CustomPostType['supports']) => {
+    if (!supports) return [];
     const features = [];
     if (supports.title) features.push('Title');
     if (supports.editor) features.push('Editor');
     if (supports.thumbnail) features.push('Thumbnail');
     if (supports.customFields) features.push('Custom Fields');
     if (supports.comments) features.push('Comments');
-    if (supports.revisions) features.push('Revisions');
-    if (supports.author) features.push('Author');
     if (supports.excerpt) features.push('Excerpt');
-    if (supports.pageAttributes) features.push('Page Attributes');
     return features;
   };
 
