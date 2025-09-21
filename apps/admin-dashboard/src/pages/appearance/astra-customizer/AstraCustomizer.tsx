@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { CustomizerProvider } from './context/CustomizerContext';
 import { CustomizerHeader } from './components/layout/CustomizerHeader';
 import { CustomizerSidebar } from './components/layout/CustomizerSidebar';
-import { CustomizerPreview } from './components/layout/CustomizerPreview';
+import { EnhancedPreview } from './components/layout/EnhancedPreview';
 import { SettingSection, AstraCustomizerSettings } from './types/customizer-types';
 import '../../../styles/wordpress-customizer.css';
 import './styles/controls.css';
 import './styles/sections.css';
+import './styles/enhanced-preview.css';
 import { useCustomizerState } from './hooks/useCustomizerState';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 // Import section components
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -37,8 +39,23 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { isDirty } = useCustomizerState();
-  
+  const { isDirty, undo, redo } = useCustomizerState();
+
+  // Initialize keyboard shortcuts
+  useKeyboardShortcuts({
+    onSave: async () => {
+      const { settings } = useCustomizerState();
+      await handleSave(settings);
+    },
+    onUndo: undo,
+    onRedo: redo,
+    onClose,
+    onReset: () => {
+      const { resetSettings } = useCustomizerState();
+      resetSettings();
+    },
+  });
+
   // Handle escape key to close customizer (unless currently in fullscreen)
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -169,7 +186,7 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
             </div>
           )}
           
-          <CustomizerPreview
+          <EnhancedPreview
             url={previewUrl}
             onLoad={() => setIsReady(true)}
           />

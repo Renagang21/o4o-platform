@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, Search } from 'lucide-react';
 import { useCustomizer } from '../../context/CustomizerContext';
 import { SettingSection } from '../../types/customizer-types';
+import { EnhancedSearch } from '../EnhancedSearch';
+import '../../styles/enhanced-search.css';
 
 interface SidebarPanel {
   id: SettingSection;
@@ -197,18 +199,15 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
   
   return (
     <div className="wp-customizer-sidebar">
-      {/* Search */}
-      <div className="wp-customizer-search">
-        <div className="wp-customizer-search-input">
-          <Search size={16} />
-          <input
-            type="text"
-            placeholder="Search options..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
+      {/* Enhanced Search */}
+      <EnhancedSearch
+        onSelect={(sectionId) => {
+          setCurrentSection(sectionId);
+          setCurrentView('section');
+          setActiveSection(sectionId);
+          onPanelSelect(sectionId);
+        }}
+      />
       
       {/* Panels */}
       <div className="wp-customizer-panels">
