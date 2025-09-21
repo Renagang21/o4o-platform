@@ -201,7 +201,7 @@ export class MediaController {
       const skip = (Number(page) - 1) * Number(limit);
       const media = await this.mediaRepository.find({
         where,
-        relations: ['user'],
+        // relations: ['user'], // Temporarily disabled due to DB schema issue
         order: { [orderByField as string]: orderDirection as any },
         skip,
         take: Number(limit)
@@ -250,8 +250,8 @@ export class MediaController {
       const { id } = req.params;
 
       const media = await this.mediaRepository.findOne({
-        where: { id },
-        relations: ['user']
+        where: { id }
+        // relations: ['user'] // Temporarily disabled due to DB schema issue
       });
 
       if (!media) {
@@ -325,8 +325,8 @@ export class MediaController {
 
       // Load complete media with relations
       const completeMedia = await this.mediaRepository.findOne({
-        where: { id: savedMedia.id },
-        relations: ['user']
+        where: { id: savedMedia.id }
+        // relations: ['user'] // Temporarily disabled due to DB schema issue
       });
 
       res.json({
