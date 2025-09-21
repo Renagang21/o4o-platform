@@ -96,7 +96,7 @@ export const EnhancedPreview: React.FC<EnhancedPreviewProps> = ({
           }
         } catch (error) {
           // Fallback to postMessage for cross-origin
-          console.log('Using postMessage for CSS injection');
+          // Using postMessage for CSS injection when cross-origin
         }
 
         // Always send postMessage for compatibility
@@ -133,7 +133,7 @@ export const EnhancedPreview: React.FC<EnhancedPreviewProps> = ({
       }
     } catch (error) {
       // Cross-origin or blocked
-      console.log('Preview loaded (cross-origin)');
+      // Preview loaded (cross-origin)
       setLoadingState('loaded');
       injectCSS();
       onLoad?.();
