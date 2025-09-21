@@ -16,7 +16,7 @@ import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
 import CodeBlock from './blocks/CodeBlock';
-import QuoteBlock from './blocks/QuoteBlock';
+import EnhancedQuoteBlock from './blocks/EnhancedQuoteBlock';
 import EnhancedImageBlock from './blocks/EnhancedImageBlock';
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
@@ -657,7 +657,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return <CodeBlock key={block.id} {...enhancedProps} />;
       case 'core/quote':
       case 'quote': // Support both formats
-        return <QuoteBlock key={block.id} {...enhancedProps} />;
+        return <EnhancedQuoteBlock key={block.id} {...enhancedProps} />;
       case 'core/image':
       case 'image': // Support both formats
         return <EnhancedImageBlock key={block.id} {...enhancedProps} />;
