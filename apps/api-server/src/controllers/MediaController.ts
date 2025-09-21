@@ -240,6 +240,7 @@ export class MediaController {
       const {
         page = 1,
         limit = 24,
+        per_page = 24,  // Support WordPress-style per_page parameter
         type,
         folderId,
         search,
@@ -247,8 +248,10 @@ export class MediaController {
         sortOrder = 'DESC'
       } = req.query;
 
-      const pageNum = parseInt(page as string);
-      const limitNum = parseInt(limit as string);
+      const pageNum = Math.max(1, parseInt(page as string) || 1);
+      // Use per_page if provided (WordPress compatibility), otherwise use limit
+      const perPageValue = per_page || limit;
+      const limitNum = Math.min(1000, Math.max(1, parseInt(perPageValue as string) || 24));
       const skip = (pageNum - 1) * limitNum;
 
       const queryBuilder = this.mediaRepository.createQueryBuilder('media')
@@ -294,11 +297,11 @@ export class MediaController {
         }
       });
     } catch (error: any) {
-      // Error log removed
+      console.error('MediaController.getMedia error:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch media',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   };
