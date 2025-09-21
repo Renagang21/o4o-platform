@@ -38,33 +38,11 @@ const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  // Build robust public API base for pages: /api/pages/:id (unauthenticated)
-  // Accepts VITE_API_BASE_URL or VITE_API_URL; normalize to .../api
-  const rawBase =
-    (import.meta.env as any).VITE_API_BASE_URL ||
-    (import.meta.env as any).VITE_API_URL ||
-    'https://api.neture.co.kr/api';
-
-  // Robustly resolve a valid absolute base like https://api.neture.co.kr/api
-  let baseUrl: string;
-  try {
-    const u = new URL(String(rawBase));
-    // Guard against invalid host like just "api"
-    if (!u.hostname || u.hostname === 'api') {
-      baseUrl = 'https://api.neture.co.kr/api';
-    } else {
-      // Always normalize path to /api (not /api/v1) for public endpoints
-      baseUrl = `${u.protocol}//${u.host}/api`;
-    }
-  } catch {
-    // Fallback to canonical public API base
-    baseUrl = 'https://api.neture.co.kr/api';
-  }
-
-  // Only use the proper pages endpoint without fallbacks
-  const url = `${baseUrl}/pages/${encodeURIComponent(pageId)}`;
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
+  const url = `${baseUrl}/pages/${pageId}`;
 
   console.debug('[HomePage] Fetching static page', { url });
+
   const response = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { PagesController } from '../../controllers/pagesController'
 import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
 import { AppDataSource } from '../../database/connection'
-import { Page } from '../../entities/Page'
+import { Post } from '../../entities/Post'
 import { Request, Response } from 'express'
 import logger from '../../utils/logger'
 
@@ -10,7 +10,7 @@ const router: Router = Router()
 const pagesController = new PagesController()
 
 // Helper function to build page hierarchy
-const buildPageHierarchy = (pages: Page[]): any[] => {
+const buildPageHierarchy = (pages: Post[]): any[] => {
   const pageMap = new Map()
   const roots: any[] = []
 
@@ -22,8 +22,9 @@ const buildPageHierarchy = (pages: Page[]): any[] => {
   // Second pass: build hierarchy
   pages.forEach(page => {
     const pageNode = pageMap.get(page.id)
-    if (page.parentId) {
-      const parent = pageMap.get(page.parentId)
+    const parentId = page.meta?.parentId
+    if (parentId) {
+      const parent = pageMap.get(parentId)
       if (parent) {
         parent.children.push(pageNode)
       }
@@ -38,7 +39,7 @@ const buildPageHierarchy = (pages: Page[]): any[] => {
 // Public routes
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const {
       page = 1,
       per_page = 10,
@@ -46,7 +47,7 @@ router.get('/', async (req: Request, res: Response) => {
       status,
       parent,
       author,
-      orderby = 'menuOrder',
+      orderby = 'created_at',
       order = 'ASC',
       menu_order
     } = req.query
@@ -55,37 +56,36 @@ router.get('/', async (req: Request, res: Response) => {
     const limitNum = parseInt(per_page as string)
     const skip = (pageNum - 1) * limitNum
 
-    const queryBuilder = pageRepository.createQueryBuilder('page')
-      .leftJoinAndSelect('page.author', 'author')
-      .leftJoinAndSelect('page.parent', 'parent')
-      .leftJoinAndSelect('page.children', 'children')
+    const queryBuilder = postRepository.createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .where('post.type = :type', { type: 'page' })
 
     if (status) {
-      queryBuilder.andWhere('page.status = :status', { status })
-    }
-    
-    if (parent !== undefined) {
-      if (parent === '0' || parent === null) {
-        queryBuilder.andWhere('page.parentId IS NULL')
-      } else {
-        queryBuilder.andWhere('page.parentId = :parentId', { parentId: parent })
-      }
-    }
-    
-    if (author) {
-      queryBuilder.andWhere('page.authorId = :authorId', { authorId: author })
-    }
-    
-    if (search) {
-      queryBuilder.andWhere('(page.title ILIKE :search OR page.excerpt ILIKE :search)', 
-        { search: `%${search}%` })
-    }
-    
-    if (menu_order !== undefined) {
-      queryBuilder.andWhere('page.menuOrder = :menuOrder', { menuOrder: menu_order })
+      queryBuilder.andWhere('post.status = :status', { status })
     }
 
-    queryBuilder.orderBy(`page.${orderby as string}`, order as 'ASC' | 'DESC')
+    if (parent !== undefined) {
+      if (parent === '0' || parent === null) {
+        queryBuilder.andWhere('(post.meta->>\'parentId\') IS NULL')
+      } else {
+        queryBuilder.andWhere('post.meta->>\'parentId\' = :parentId', { parentId: parent })
+      }
+    }
+
+    if (author) {
+      queryBuilder.andWhere('post.author_id = :authorId', { authorId: author })
+    }
+
+    if (search) {
+      queryBuilder.andWhere('(post.title ILIKE :search OR post.excerpt ILIKE :search)',
+        { search: `%${search}%` })
+    }
+
+    if (menu_order !== undefined) {
+      queryBuilder.andWhere('post.meta->>\'menuOrder\' = :menuOrder', { menuOrder: menu_order })
+    }
+
+    queryBuilder.orderBy(`post.${orderby as string}`, order as 'ASC' | 'DESC')
       .skip(skip)
       .take(limitNum)
 
@@ -112,11 +112,14 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/hierarchy', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
-    const pages = await pageRepository.find({
-      where: { status: 'publish' },
+    const postRepository = AppDataSource.getRepository(Post)
+    const pages = await postRepository.find({
+      where: {
+        type: 'page',
+        status: 'publish'
+      },
       relations: ['author'],
-      order: { menuOrder: 'ASC' }
+      order: { created_at: 'ASC' }
     })
 
     const hierarchy = buildPageHierarchy(pages)
@@ -132,21 +135,22 @@ router.get('/hierarchy', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { id } = req.params
-    
+
     // 공개 엔드포인트이므로 publish 상태의 페이지만 허용
-    const page = await pageRepository.findOne({
-      where: { id, status: 'publish' },
-      relations: ['author', 'parent', 'children', 'lastModifier']
+    const page = await postRepository.findOne({
+      where: {
+        id,
+        type: 'page',
+        status: 'publish'
+      },
+      relations: ['author']
     })
 
     if (!page) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found or not published' } })
     }
-
-    // Increment view count
-    await pageRepository.update(id, { views: page.views + 1 })
 
     res.json(page)
   } catch (error) {
@@ -161,14 +165,17 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.get('/:id/preview', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { id } = req.params
-    
-    const page = await pageRepository.findOne({
-      where: { id },
-      relations: ['author', 'parent', 'children']
+
+    const page = await postRepository.findOne({
+      where: {
+        id,
+        type: 'page'
+      },
+      relations: ['author']
     })
-    
+
     if (!page) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found' } })
     }
@@ -193,7 +200,7 @@ router.use(authenticateToken)
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const userId = (req as any).user?.id
     
     if (!userId) {
@@ -220,40 +227,45 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Check if slug is unique
     if (slug) {
-      const existingPage = await pageRepository.findOne({ where: { slug } })
+      const existingPage = await postRepository.findOne({ where: { slug, type: 'page' } })
       if (existingPage) {
         return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
       }
     }
 
-    const page = pageRepository.create({
+    const page = postRepository.create({
       title,
       content,
       excerpt,
       slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       status,
       type: 'page',
-      parentId,
-      menuOrder,
       template,
       seo,
-      customFields,
-      allowComments,
-      password,
-      passwordProtected: !!password,
-      scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
-      publishedAt: status === 'publish' ? new Date() : undefined,
-      authorId: userId,
-      showInMenu,
-      isHomepage
+      meta: {
+        parentId,
+        menuOrder,
+        customFields,
+        allowComments,
+        password,
+        passwordProtected: !!password,
+        showInMenu,
+        isHomepage
+      },
+      published_at: status === 'publish' ? new Date() : undefined,
+      author_id: userId
     })
 
     // If setting as homepage, unset other homepages
     if (isHomepage) {
-      await pageRepository.update({ isHomepage: true }, { isHomepage: false })
+      await postRepository.createQueryBuilder()
+        .update(Post)
+        .set({ meta: () => "meta || '{\"isHomepage\": false}'" })
+        .where("type = :type AND meta->>'isHomepage' = 'true'", { type: 'page' })
+        .execute()
     }
 
-    const savedPage = await pageRepository.save(page)
+    const savedPage = await postRepository.save(page)
     res.status(201).json(savedPage)
   } catch (error) {
     logger.error('Error creating page:', {
@@ -268,15 +280,15 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { id } = req.params
     const userId = (req as any).user?.id
-    
+
     if (!userId) {
       return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not authenticated' } })
     }
 
-    const page = await pageRepository.findOne({ where: { id } })
+    const page = await postRepository.findOne({ where: { id, type: 'page' } })
     
     if (!page) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found' } })
@@ -302,7 +314,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     // Check slug uniqueness if changed
     if (slug && slug !== page.slug) {
-      const existingPage = await pageRepository.findOne({ where: { slug } })
+      const existingPage = await postRepository.findOne({ where: { slug, type: 'page' } })
       if (existingPage) {
         return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
       }
@@ -315,34 +327,40 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (slug !== undefined) page.slug = slug
     if (status !== undefined) {
       page.status = status
-      if (status === 'publish' && !page.publishedAt) {
-        page.publishedAt = new Date()
+      if (status === 'publish' && !page.published_at) {
+        page.published_at = new Date()
       }
     }
-    if (parentId !== undefined) page.parentId = parentId
-    if (menuOrder !== undefined) page.menuOrder = menuOrder
     if (template !== undefined) page.template = template
     if (seo !== undefined) page.seo = seo
-    if (customFields !== undefined) page.customFields = customFields
-    if (allowComments !== undefined) page.allowComments = allowComments
+
+    // Update meta fields
+    const currentMeta = page.meta || {}
+    if (parentId !== undefined) currentMeta.parentId = parentId
+    if (menuOrder !== undefined) currentMeta.menuOrder = menuOrder
+    if (customFields !== undefined) currentMeta.customFields = customFields
+    if (allowComments !== undefined) currentMeta.allowComments = allowComments
     if (password !== undefined) {
-      page.password = password
-      page.passwordProtected = !!password
+      currentMeta.password = password
+      currentMeta.passwordProtected = !!password
     }
-    if (scheduledAt !== undefined) page.scheduledAt = scheduledAt ? new Date(scheduledAt) : null
-    if (showInMenu !== undefined) page.showInMenu = showInMenu
-    
+    if (showInMenu !== undefined) currentMeta.showInMenu = showInMenu
+
     // Handle homepage setting
     if (isHomepage !== undefined) {
-      page.isHomepage = isHomepage
+      currentMeta.isHomepage = isHomepage
       if (isHomepage) {
-        await pageRepository.update({ isHomepage: true, id: Not(id) }, { isHomepage: false })
+        await postRepository.createQueryBuilder()
+          .update(Post)
+          .set({ meta: () => "meta || '{\"isHomepage\": false}'" })
+          .where("type = :type AND meta->>'isHomepage' = 'true' AND id != :id", { type: 'page', id })
+          .execute()
       }
     }
 
-    page.lastModifiedBy = userId
+    page.meta = currentMeta
 
-    const updatedPage = await pageRepository.save(page)
+    const updatedPage = await postRepository.save(page)
     res.json(updatedPage)
   } catch (error) {
     logger.error('Error updating page:', {
@@ -358,10 +376,10 @@ router.put('/:id', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { id } = req.params
-    
-    const page = await pageRepository.findOne({ where: { id } })
+
+    const page = await postRepository.findOne({ where: { id, type: 'page' } })
     
     if (!page) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found' } })
@@ -369,7 +387,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     // Soft delete by changing status to trash
     page.status = 'trash'
-    await pageRepository.save(page)
+    await postRepository.save(page)
 
     res.json({ message: 'Page moved to trash' })
   } catch (error) {
@@ -384,7 +402,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
 router.post('/:id/autosave', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { id } = req.params
     const { content, title, excerpt } = req.body
     const userId = (req as any).user?.id
@@ -393,14 +411,15 @@ router.post('/:id/autosave', async (req: Request, res: Response) => {
       return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not authenticated' } })
     }
 
-    const page = await pageRepository.findOne({ where: { id } })
+    const page = await postRepository.findOne({ where: { id, type: 'page' } })
     
     if (!page) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found' } })
     }
 
-    // Store current version as revision
-    const revisions = page.revisions || []
+    // Store current version as revision in meta
+    const currentMeta = page.meta || {}
+    const revisions = currentMeta.revisions || []
     revisions.push({
       id: `rev_${Date.now()}`,
       timestamp: new Date().toISOString(),
@@ -418,13 +437,13 @@ router.post('/:id/autosave', async (req: Request, res: Response) => {
     }
 
     // Update page with auto-saved content
-    page.revisions = revisions
+    currentMeta.revisions = revisions
+    page.meta = currentMeta
     if (content !== undefined) page.content = content
     if (title !== undefined) page.title = title
     if (excerpt !== undefined) page.excerpt = excerpt
-    page.lastModifiedBy = userId
 
-    await pageRepository.save(page)
+    await postRepository.save(page)
 
     res.json({ message: 'Auto-save successful', revisionId: revisions[revisions.length - 1].id })
   } catch (error) {
@@ -441,19 +460,19 @@ router.post('/:id/autosave', async (req: Request, res: Response) => {
 
 router.get('/:id/revisions', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { id } = req.params
-    
-    const page = await pageRepository.findOne({ 
-      where: { id },
-      select: ['id', 'revisions']
+
+    const page = await postRepository.findOne({
+      where: { id, type: 'page' },
+      select: ['id', 'meta']
     })
     
     if (!page) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found' } })
     }
 
-    res.json(page.revisions || [])
+    res.json(page.meta?.revisions || [])
   } catch (error) {
     logger.error('Error fetching revisions:', {
       pageId: req.params.id,
@@ -466,7 +485,7 @@ router.get('/:id/revisions', async (req: Request, res: Response) => {
 
 router.post('/bulk', async (req: Request, res: Response) => {
   try {
-    const pageRepository = AppDataSource.getRepository(Page)
+    const postRepository = AppDataSource.getRepository(Post)
     const { action, ids } = req.body
     
     if (!action || !ids || !Array.isArray(ids) || ids.length === 0) {
@@ -478,7 +497,7 @@ router.post('/bulk', async (req: Request, res: Response) => {
       })
     }
 
-    const pages = await pageRepository.findBy({ id: In(ids) })
+    const pages = await postRepository.findBy({ id: In(ids), type: 'page' })
     
     if (pages.length === 0) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'No pages found' } })
@@ -486,22 +505,22 @@ router.post('/bulk', async (req: Request, res: Response) => {
 
     switch (action) {
       case 'trash':
-        await pageRepository.update({ id: In(ids) }, { status: 'trash' })
+        await postRepository.update({ id: In(ids), type: 'page' }, { status: 'trash' })
         break
       case 'restore':
-        await pageRepository.update({ id: In(ids) }, { status: 'draft' })
+        await postRepository.update({ id: In(ids), type: 'page' }, { status: 'draft' })
         break
       case 'delete':
-        await pageRepository.delete({ id: In(ids) })
+        await postRepository.delete({ id: In(ids), type: 'page' })
         break
       case 'publish':
-        await pageRepository.update(
-          { id: In(ids) }, 
-          { status: 'publish', publishedAt: new Date() }
+        await postRepository.update(
+          { id: In(ids), type: 'page' },
+          { status: 'publish', published_at: new Date() }
         )
         break
       case 'draft':
-        await pageRepository.update({ id: In(ids) }, { status: 'draft' })
+        await postRepository.update({ id: In(ids), type: 'page' }, { status: 'draft' })
         break
       default:
         return res.status(400).json({ 
