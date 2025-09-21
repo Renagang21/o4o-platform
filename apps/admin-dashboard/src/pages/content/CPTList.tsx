@@ -118,7 +118,7 @@ const CPTList: FC = () => {
   ];
 
   // Add default post types to the list
-  const allPostTypes = [
+  const defaultPostTypes = [
     // Default Post Type
     {
       id: 'default-post',
@@ -171,7 +171,7 @@ const CPTList: FC = () => {
   ];
 
   // Transform post types to table rows
-  const rows: WordPressTableRow[] = allPostTypes.map((postType: any) => ({
+  const rows: WordPressTableRow[] = defaultPostTypes.map((postType: any) => ({
     id: postType.id,
     data: {
       name: (
