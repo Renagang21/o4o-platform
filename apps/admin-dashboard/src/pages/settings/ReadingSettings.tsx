@@ -99,7 +99,15 @@ export default function ReadingSettings() {
         const response = await apiClient.get('/api/v1/settings/reading');
         const data = response.data.data;
         if (data) {
-          setSettings(data);
+          // Preserve homepageId even if it comes as undefined from API
+          // Don't override with default settings when data exists
+          setSettings({
+            homepageType: data.homepageType || 'latest_posts',
+            homepageId: data.homepageId, // Keep undefined or actual value
+            postsPerPage: data.postsPerPage || 10,
+            showSummary: data.showSummary || 'excerpt',
+            excerptLength: data.excerptLength || 200
+          });
         }
         return data;
       } catch (apiError) {
@@ -119,7 +127,12 @@ export default function ReadingSettings() {
   const saveMutation = useMutation({
     mutationFn: async (data: ReadingSettingsData) => {
       try {
-        const response = await apiClient.put('/api/v1/settings/reading', data);
+        // Ensure homepageId is included in the request
+        const payload = {
+          ...data,
+          homepageId: data.homepageType === 'static_page' ? data.homepageId : undefined
+        };
+        const response = await apiClient.put('/api/v1/settings/reading', payload);
         return response;
       } catch (apiError: any) {
         // 구체적인 에러 상황별 메시지 처리

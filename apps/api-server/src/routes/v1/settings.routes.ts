@@ -337,6 +337,7 @@ router.get('/reading', async (req: Request, res: Response) => {
     // Fallback to default settings
     const defaultSettings = {
       homepageType: 'latest_posts',
+      homepageId: undefined,  // Include homepageId to prevent initialization issues
       postsPerPage: 10,
       showSummary: 'excerpt',
       excerptLength: 150
