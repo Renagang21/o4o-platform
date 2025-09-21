@@ -11,9 +11,9 @@ import {
 import { User } from './User';
 
 @Entity('media')
-@Index(['userId'])
-@Index(['folderPath'])
-@Index(['createdAt'])
+@Index(['userId'], { synchronize: false })
+@Index(['folderPath'], { synchronize: false })
+@Index(['createdAt'], { synchronize: false })
 export class Media {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -21,16 +21,16 @@ export class Media {
   @Column({ type: 'varchar', length: 255 })
   filename!: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'original_filename', type: 'varchar', length: 255, nullable: true })
   originalFilename?: string;
 
   @Column({ type: 'text' })
   url!: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: 'thumbnail_url', type: 'text', nullable: true })
   thumbnailUrl?: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ name: 'mime_type', type: 'varchar', length: 100, nullable: true })
   mimeType?: string;
 
   @Column({ type: 'bigint', nullable: true })
@@ -42,7 +42,7 @@ export class Media {
   @Column({ type: 'int', nullable: true })
   height?: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: 'alt_text', type: 'text', nullable: true })
   altText?: string;
 
   @Column({ type: 'text', nullable: true })
@@ -51,14 +51,14 @@ export class Media {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'folder_path', type: 'varchar', length: 255, nullable: true })
   folderPath?: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'user_id', type: 'uuid', nullable: true })
   userId?: string;
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user?: User;
 
   // Image variants for responsive images
@@ -70,9 +70,9 @@ export class Media {
     large?: string;      // 1024x1024
   };
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 }
