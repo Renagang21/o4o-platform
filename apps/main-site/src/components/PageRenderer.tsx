@@ -57,14 +57,16 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
           .map(block => {
             // Handle different block types
             if (block.type === 'core/paragraph') {
-              const text = block.content?.text || block.innerHTML || '';
-              return text ? `<p>${text}</p>` : '';
+              const text = block.content?.text ?? block.innerHTML ?? '';
+              // Render even empty paragraphs for proper spacing
+              return `<p>${text}</p>`;
             }
 
             if (block.type === 'core/heading') {
               const level = block.attributes?.level || 2;
-              const text = block.content?.text || block.innerHTML || '';
-              return text ? `<h${level}>${text}</h${level}>` : '';
+              const text = block.content?.text ?? block.innerHTML ?? '';
+              // Render heading even if text is empty (for spacing/structure)
+              return `<h${level}>${text}</h${level}>`;
             }
 
             if (block.type === 'core/list') {
@@ -81,24 +83,23 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
             }
 
             if (block.type === 'core/quote') {
-              const text = block.content?.text || block.innerHTML || '';
+              const text = block.content?.text ?? block.innerHTML ?? '';
               const citation = block.attributes?.citation || '';
-              return text ? `<blockquote>${text}${citation ? `<cite>${citation}</cite>` : ''}</blockquote>` : '';
+              return text !== undefined ? `<blockquote>${text}${citation ? `<cite>${citation}</cite>` : ''}</blockquote>` : '';
             }
 
             // Fallback for other block types
-            if (block.innerHTML) return block.innerHTML;
-            if (block.attributes?.content) return block.attributes.content;
-            if (block.content?.text) return `<div>${block.content.text}</div>`;
+            if (block.innerHTML !== undefined) return block.innerHTML;
+            if (block.attributes?.content !== undefined) return block.attributes.content;
+            if (block.content?.text !== undefined) return `<div>${block.content.text}</div>`;
 
             return '';
           })
-          .filter(Boolean)
+          .filter(html => html !== '')
           .join('');
 
-        if (htmlContent) {
-          return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
-        }
+        // Always render the container, even if empty
+        return <div dangerouslySetInnerHTML={{ __html: htmlContent || '' }} />;
       }
     }
 
