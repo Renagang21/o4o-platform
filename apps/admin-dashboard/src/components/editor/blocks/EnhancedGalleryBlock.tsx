@@ -216,8 +216,7 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
       // Handle file upload
-      console.log('Files dropped:', files);
-      // TODO: Implement file upload
+      // Files dropped - TODO: Implement file upload
     }
   }, []);
 
@@ -514,8 +513,7 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
         onChange={(e) => {
           const files = Array.from(e.target.files || []);
           if (files.length > 0) {
-            // TODO: Handle file upload
-            console.log('Files selected:', files);
+            // Files selected - TODO: Handle file upload
           }
         }}
         className="hidden"

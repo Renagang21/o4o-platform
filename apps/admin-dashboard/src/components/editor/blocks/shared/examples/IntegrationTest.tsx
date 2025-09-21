@@ -427,7 +427,7 @@ const IntegrationTest: React.FC = () => {
               <h4 className="font-medium mb-2">Compact MediaSelector</h4>
               <CompactMediaSelector
                 onSelect={(media) => {
-                  console.log('Compact selector:', media);
+                  // Compact selector: media selected
                 }}
                 multiple={false}
                 acceptedTypes={['image']}
