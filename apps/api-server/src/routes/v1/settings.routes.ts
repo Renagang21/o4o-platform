@@ -457,8 +457,19 @@ router.put('/reading',
     
     try {
       const newSettings = req.body;
-      const actor = (req as any).user?.id || 'unknown';
-      
+      const user = (req as any).user;
+      const actor = user?.id || user?.userId || 'unknown';
+
+      // Log user authentication details for debugging
+      logger.debug('Authenticated user details:', {
+        traceId,
+        userId: user?.id,
+        userEmail: user?.email,
+        userRole: user?.role,
+        hasUser: !!user,
+        timestamp: new Date().toISOString()
+      });
+
       logger.info('Reading settings update request:', {
         traceId,
         actor,

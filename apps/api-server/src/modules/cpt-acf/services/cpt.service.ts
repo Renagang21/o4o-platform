@@ -141,7 +141,7 @@ export class CPTService {
       }
 
       // Delete all posts of this type
-      await this.postRepository.delete({ postType: slug });
+      await this.postRepository.delete({ postTypeSlug: slug });
 
       // Delete the CPT
       await this.cptRepository.remove(cpt);
@@ -233,7 +233,7 @@ export class CPTService {
 
       const post = this.postRepository.create({
         ...data,
-        postType: slug,
+        postTypeSlug: slug,
         authorId: userId
       });
 

@@ -156,7 +156,9 @@ export const checkPermission = (requiredPermission: Permission) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        error: 'Unauthorized: No user found'
+        error: 'Unauthorized: No user found',
+        code: 'USER_NOT_AUTHENTICATED',
+        message: 'Authentication required. Please log in to access this resource.'
       });
     }
 
@@ -195,7 +197,9 @@ export const checkAnyPermission = (permissions: Permission[]) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        error: 'Unauthorized: No user found'
+        error: 'Unauthorized: No user found',
+        code: 'USER_NOT_AUTHENTICATED',
+        message: 'Authentication required. Please log in to access this resource.'
       });
     }
 

@@ -350,11 +350,11 @@ app.options('*', cors(corsOptions));
 app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
 // Add performance monitoring middleware early in the chain
-app.use(performanceMonitor);
+app.use(performanceMonitor as any);
 
 // Security middleware
-app.use(securityMiddleware);
-app.use(sqlInjectionDetection);
+app.use(securityMiddleware as any);
+app.use(sqlInjectionDetection as any);
 
 app.use(cookieParser() as any);
 app.use(express.json({ limit: '50mb' }));
@@ -568,16 +568,16 @@ app.use('/api/v1/media/folders', (req: Request, res: Response, next: NextFunctio
 
 // Dashboard endpoints with real data
 import { DashboardController } from './controllers/dashboardController';
-app.get('/ecommerce/dashboard/stats', DashboardController.getEcommerceStats);
-app.get('/api/users/stats', DashboardController.getUserStats);
-app.get('/api/admin/notifications', DashboardController.getNotifications);
-app.get('/api/admin/activities', DashboardController.getActivities);
-app.get('/api/system/health', DashboardController.getSystemHealth);
-app.get('/api/admin/stats', DashboardController.getContentStats);
-app.get('/api/dashboard/overview', DashboardController.getDashboardOverview);
+app.get('/ecommerce/dashboard/stats', DashboardController.getEcommerceStats as any);
+app.get('/api/users/stats', DashboardController.getUserStats as any);
+app.get('/api/admin/notifications', DashboardController.getNotifications as any);
+app.get('/api/admin/activities', DashboardController.getActivities as any);
+app.get('/api/system/health', DashboardController.getSystemHealth as any);
+app.get('/api/admin/stats', DashboardController.getContentStats as any);
+app.get('/api/dashboard/overview', DashboardController.getDashboardOverview as any);
 
 // Add publish endpoint directly at /api/posts level
-app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: Response) => {
+app.post('/api/posts/:id/publish', authenticateToken as any, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -613,7 +613,7 @@ app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: 
   } catch (error) {
     logger.error('Error publishing post:', error);
     return res.status(500).json({
-      error: { code: 'INTERNAL_ERROR', message: 'Failed to publish post', details: error.message }
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to publish post', details: (error as Error).message }
     });
   }
 });
@@ -800,7 +800,7 @@ io.on('connection', (socket) => {
 });
 
 // 중앙화된 에러 핸들러 (모든 라우트 뒤에 위치해야 함)
-app.use(errorHandler);
+app.use(errorHandler as any);
 
 // 404 핸들러 (API 전용)
 app.use('*', (req, res) => {

@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { ACFController } from '../controllers/acf.controller';
 import { authenticate as authenticateToken } from '../../../middleware/auth.middleware';
 import { requireAdmin } from '../../../middleware/admin.middleware';
 
-const router = Router();
+const router: IRouter = Router();
 
 // Field Group Management Routes
 router.get('/custom-field-groups', ACFController.getFieldGroups);

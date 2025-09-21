@@ -30,30 +30,26 @@ interface AstraCustomizerProps {
   onSave?: (settings: AstraCustomizerSettings) => Promise<void>;
 }
 
-export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
-  onClose,
-  initialSettings,
-  previewUrl = '/',
-  siteName = 'O4O Platform',
-  onSave,
-}) => {
+// Inner component that uses the context
+const AstraCustomizerContent: React.FC<{
+  onClose: () => void;
+  siteName: string;
+  previewUrl: string;
+  onSaveHandler: (settings: AstraCustomizerSettings) => Promise<void>;
+}> = ({ onClose, siteName, previewUrl, onSaveHandler }) => {
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const { isDirty, undo, redo } = useCustomizerState();
+  const { isDirty, undo, redo, settings, resetAll } = useCustomizerState();
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts({
     onSave: async () => {
-      const { settings } = useCustomizerState();
-      await handleSave(settings);
+      await onSaveHandler(settings);
     },
     onUndo: undo,
     onRedo: redo,
     onClose,
-    onReset: () => {
-      const { resetSettings } = useCustomizerState();
-      resetSettings();
-    },
+    onReset: resetAll,
   });
 
   // Handle escape key to close customizer (unless currently in fullscreen)
@@ -71,7 +67,7 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
         onClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose, isDirty]);
@@ -87,7 +83,7 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
-  
+
   // Prevent body scroll when customizer is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -95,21 +91,7 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
       document.body.style.overflow = '';
     };
   }, []);
-  
-  const handleSave = async (settings: AstraCustomizerSettings) => {
-    if (onSave) {
-      await onSave(settings);
-    } else {
-      // Default save implementation
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In real implementation, this would save to backend
-      localStorage.setItem('astra-customizer-settings', JSON.stringify(settings));
-    }
-  };
-  
+
   const renderSectionContent = () => {
     if (!activeSection) {
       return (
@@ -127,7 +109,7 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
         </div>
       );
     }
-    
+
     // Render appropriate section component based on activeSection
     switch (activeSection) {
       case 'siteIdentity':
@@ -152,7 +134,55 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
         return <div>Section not found</div>;
     }
   };
-  
+
+  return (
+    <div className="wp-customizer">
+      <CustomizerHeader onClose={onClose} siteName={siteName} />
+
+      <div className="wp-customizer-body">
+        <CustomizerSidebar
+          activePanel={activeSection}
+          onPanelSelect={setActiveSection}
+        />
+
+        {/* Section Content Area - Hidden for now, will show when section is selected */}
+        {activeSection && (
+          <div className="wp-customizer-section-panel">
+            {renderSectionContent()}
+          </div>
+        )}
+
+        <EnhancedPreview
+          url={previewUrl}
+          onLoad={() => setIsReady(true)}
+        />
+      </div>
+    </div>
+  );
+};
+
+// Main component that provides the context
+export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
+  onClose,
+  initialSettings,
+  previewUrl = '/',
+  siteName = 'O4O Platform',
+  onSave,
+}) => {
+  const handleSave = async (settings: AstraCustomizerSettings) => {
+    if (onSave) {
+      await onSave(settings);
+    } else {
+      // Default save implementation
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // In real implementation, this would save to backend
+      localStorage.setItem('astra-customizer-settings', JSON.stringify(settings));
+    }
+  };
+
   return (
     <CustomizerProvider
       initialSettings={initialSettings}
@@ -170,28 +200,12 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
         },
       }}
     >
-      <div className="wp-customizer">
-        <CustomizerHeader onClose={onClose} siteName={siteName} />
-        
-        <div className="wp-customizer-body">
-          <CustomizerSidebar
-            activePanel={activeSection}
-            onPanelSelect={setActiveSection}
-          />
-          
-          {/* Section Content Area - Hidden for now, will show when section is selected */}
-          {activeSection && (
-            <div className="wp-customizer-section-panel">
-              {renderSectionContent()}
-            </div>
-          )}
-          
-          <EnhancedPreview
-            url={previewUrl}
-            onLoad={() => setIsReady(true)}
-          />
-        </div>
-      </div>
+      <AstraCustomizerContent
+        onClose={onClose}
+        siteName={siteName}
+        previewUrl={previewUrl}
+        onSaveHandler={handleSave}
+      />
     </CustomizerProvider>
   );
 };

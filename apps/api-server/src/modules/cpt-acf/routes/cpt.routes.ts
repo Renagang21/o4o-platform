@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { CPTController } from '../controllers/cpt.controller';
 import { authenticate as authenticateToken } from '../../../middleware/auth.middleware';
 import { requireAdmin } from '../../../middleware/admin.middleware';
 
-const router = Router();
+const router: IRouter = Router();
 
 // CPT Management Routes
 router.get('/types', authenticateToken, CPTController.getAllCPTs);

@@ -1,5 +1,4 @@
-import { Router } from 'express';
-import { Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import { blockDataService } from '../services/block-data.service';
 import logger from '../../../utils/logger';
 
@@ -7,7 +6,7 @@ import logger from '../../../utils/logger';
  * Block API Routes - Optimized endpoints for block editor
  * Provides fast, cached access to CPT and ACF data for blocks
  */
-const router = Router();
+const router: IRouter = Router();
 
 /**
  * Get all block data for a post

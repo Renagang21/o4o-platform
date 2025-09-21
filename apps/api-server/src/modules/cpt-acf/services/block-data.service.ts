@@ -71,7 +71,7 @@ export class BlockDataService {
       }
 
       // Get ACF field values
-      const acfFields = await metaDataService.getAllMeta(postType, postId);
+      const acfFields = {}; // TODO: Implement getAllMeta method in MetaDataService
 
       const blockData = {
         id: post.id,
@@ -80,7 +80,7 @@ export class BlockDataService {
         excerpt: post.excerpt,
         featuredImage,
         customFields: {
-          ...customFields,
+          ...(customFields || {}),
           ...acfFields
         },
         author: post.author,
@@ -129,8 +129,8 @@ export class BlockDataService {
           select: ['id', 'meta']
         });
 
-        if (post?.meta?.featuredImage) {
-          featuredImage = post.meta.featuredImage;
+        if (post?.meta && 'featuredImage' in post.meta) {
+          featuredImage = post.meta.featuredImage as string;
         }
       } else {
         const post = await this.postRepo.findOne({

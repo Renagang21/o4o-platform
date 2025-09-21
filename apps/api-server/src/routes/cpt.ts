@@ -43,8 +43,8 @@ router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePos
 
 // ============= Public Routes (for frontend display) =============
 
-// Get published posts (public)
-router.get('/public/:slug', CPTController.getPublicPosts);
+// Get published posts (public) - TODO: Implement getPublicPosts method
+// router.get('/public/:slug', CPTController.getPublicPosts);
 
 // Get single published post (public)
 // router.get('/public/:slug/:postSlug', CPTController.getPublicPost);

@@ -104,9 +104,10 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Access token required',
-        code: 'TOKEN_REQUIRED'
+        code: 'TOKEN_REQUIRED',
+        message: 'No valid authentication token found. Please log in again.'
       });
     }
 
@@ -136,8 +137,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       });
     }
 
-    if (user.status !== UserStatus.APPROVED) {
-      return res.status(403).json({ 
+    if (user.status !== UserStatus.APPROVED && user.status !== UserStatus.ACTIVE) {
+      return res.status(403).json({
         error: 'Account not active',
         code: 'ACCOUNT_NOT_ACTIVE',
         status: user.status
