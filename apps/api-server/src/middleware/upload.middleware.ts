@@ -89,10 +89,13 @@ const upload = multer({
   }
 });
 
-// Upload middleware wrapper
+// Upload middleware wrapper that accepts both 'file' and 'files'
 export const uploadMiddleware = (fieldName: string = 'files', maxFiles: number = 10) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const uploadHandler = upload.array(fieldName, maxFiles);
+    // Support both single 'file' and multiple 'files'
+    const uploadHandler = fieldName === 'file' 
+      ? upload.array('file', maxFiles)  // Try 'file' field for array
+      : upload.array(fieldName, maxFiles);
     
     uploadHandler(req as any, res as any, (err) => {
       if (err instanceof multer.MulterError) {
@@ -145,7 +148,12 @@ export const uploadMiddleware = (fieldName: string = 'files', maxFiles: number =
       }
       
       // Additional file size validation after upload
-      const files = req.files as Express.Multer.File[];
+      // Ensure req.files is always an array
+      let files = req.files as Express.Multer.File[];
+      if (!files && req.file) {
+        files = [req.file as Express.Multer.File];
+        req.files = files; // Normalize to array
+      }
       if (files && files.length > 0) {
         for (const file of files) {
           const fileType = getFileType(file.mimetype);
