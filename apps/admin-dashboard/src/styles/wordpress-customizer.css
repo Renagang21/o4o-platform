@@ -12,6 +12,36 @@
   flex-direction: column;
 }
 
+/* Global fullscreen mode when Customizer is active */
+body.customizer-fullscreen .wordpress-admin-bar {
+  display: none !important;
+}
+body.customizer-fullscreen .admin-sidebar,
+body.customizer-fullscreen .admin-sidebar-backdrop {
+  display: none !important;
+}
+body.customizer-fullscreen .wordpress-admin-content {
+  margin: 0 !important;
+  width: 100% !important;
+}
+body.customizer-fullscreen .wordpress-admin-content main {
+  padding: 0 !important;
+}
+
+/* Ensure the customizer overlay uses full viewport in fullscreen mode */
+body.customizer-fullscreen {
+  overflow: hidden !important;
+}
+body.customizer-fullscreen .wp-customizer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background: #fff;
+}
+
 /* Header */
 .wp-customizer-header {
   height: 45px;
@@ -87,6 +117,13 @@
   background: #f1f1f1;
   border-right: 1px solid #ddd;
   overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .wp-customizer-sidebar { width: 280px; }
+}
+@media (max-width: 640px) {
+  .wp-customizer-sidebar { width: 260px; }
 }
 
 .wp-customizer-panels {
@@ -174,17 +211,40 @@
 .wp-customizer-preview-body {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
   overflow: hidden;
+}
+
+/* Fullscreen adjustments for preview */
+.wp-customizer-preview-body:fullscreen {
+  padding: 0;
+  background: #000;
+}
+
+.wp-customizer-preview-body:fullscreen .wp-customizer-preview-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  box-shadow: none;
+}
+
+.wp-customizer-preview-body:fullscreen .wp-customizer-iframe {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .wp-customizer-preview-frame {
   background: #fff;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   transition: all 0.3s ease;
   position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
 }
 
 .wp-customizer-preview-desktop {

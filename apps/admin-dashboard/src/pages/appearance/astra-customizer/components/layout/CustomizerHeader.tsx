@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Save, Undo, Redo, Eye, RefreshCw } from 'lucide-react';
+import { X, Save, Undo, Redo, Eye, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useCustomizer } from '../../context/CustomizerContext';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 
@@ -15,12 +15,22 @@ export const CustomizerHeader: React.FC<CustomizerHeaderProps> = ({
   const { state, saveSettings, publishSettings } = useCustomizer();
   const { isDirty, isSaving, undo, redo, canUndo, canRedo } = useCustomizerState();
   
+  const requestClose = () => {
+    if (isDirty) {
+      const ok = window.confirm('변경사항이 저장되지 않았습니다. 종료하시겠습니까?');
+      if (!ok) return;
+    }
+    onClose();
+  };
+
   const handleSave = async () => {
     await saveSettings();
   };
   
   const handlePublish = async () => {
     await publishSettings();
+    // After successful publish, return to admin via onClose
+    onClose();
   };
   
   return (
@@ -40,6 +50,16 @@ export const CustomizerHeader: React.FC<CustomizerHeaderProps> = ({
       </div>
       
       <div className="wp-customizer-actions">
+        {/* Back to Admin */}
+        <button
+          onClick={requestClose}
+          className="wp-button wp-button-secondary"
+          title="관리자로 돌아가기"
+        >
+          <ArrowLeft size={16} style={{ marginRight: 4 }} />
+          관리자로 돌아가기
+        </button>
+        
         {/* Undo/Redo */}
         <div className="wp-customizer-history">
           <button
