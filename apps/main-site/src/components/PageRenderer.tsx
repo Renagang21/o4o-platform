@@ -51,13 +51,46 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
         }
       }
 
-      // If it's WordPress blocks format, try to render as text
+      // If it's WordPress blocks format, render each block
       if (Array.isArray(contentToRender)) {
         const htmlContent = contentToRender
           .map(block => {
-            // Extract innerHTML or content from WordPress blocks
+            // Handle different block types
+            if (block.type === 'core/paragraph') {
+              const text = block.content?.text || block.innerHTML || '';
+              return text ? `<p>${text}</p>` : '';
+            }
+
+            if (block.type === 'core/heading') {
+              const level = block.attributes?.level || 2;
+              const text = block.content?.text || block.innerHTML || '';
+              return text ? `<h${level}>${text}</h${level}>` : '';
+            }
+
+            if (block.type === 'core/list') {
+              const items = block.content?.items || [];
+              const tag = block.attributes?.ordered ? 'ol' : 'ul';
+              const listItems = items.map((item: string) => `<li>${item}</li>`).join('');
+              return listItems ? `<${tag}>${listItems}</${tag}>` : '';
+            }
+
+            if (block.type === 'core/image') {
+              const src = block.attributes?.url || block.content?.url || '';
+              const alt = block.attributes?.alt || block.content?.alt || '';
+              return src ? `<img src="${src}" alt="${alt}" class="w-full h-auto rounded-lg" />` : '';
+            }
+
+            if (block.type === 'core/quote') {
+              const text = block.content?.text || block.innerHTML || '';
+              const citation = block.attributes?.citation || '';
+              return text ? `<blockquote>${text}${citation ? `<cite>${citation}</cite>` : ''}</blockquote>` : '';
+            }
+
+            // Fallback for other block types
             if (block.innerHTML) return block.innerHTML;
             if (block.attributes?.content) return block.attributes.content;
+            if (block.content?.text) return `<div>${block.content.text}</div>`;
+
             return '';
           })
           .filter(Boolean)
