@@ -11,9 +11,9 @@ import {
 import { User } from './User';
 
 @Entity('media')
-@Index(['userId'], { synchronize: false })
-@Index(['folderPath'], { synchronize: false })
-@Index(['createdAt'], { synchronize: false })
+@Index('idx_media_userId', ['userId'])
+@Index('idx_media_folderPath', ['folderPath'])
+@Index('idx_media_createdAt', ['createdAt'])
 export class Media {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
