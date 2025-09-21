@@ -320,8 +320,15 @@ const corsOptions: CorsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      logger.warn(`[CORS] Blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      // In production, allow any *.neture.co.kr subdomain
+      if (process.env.NODE_ENV === 'production' && origin && origin.endsWith('.neture.co.kr')) {
+        logger.info(`[CORS] Allowing subdomain: ${origin}`);
+        callback(null, true);
+      } else {
+        logger.warn(`[CORS] Blocked origin: ${origin}`);
+        logger.warn(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   credentials: true,
@@ -336,8 +343,8 @@ const corsOptions: CorsOptions = {
 // Apply CORS before any other middleware
 app.use(cors(corsOptions));
 
-// OPTIONS requests are already handled by the CORS middleware above
-// No need for additional app.options() handler
+// Explicit OPTIONS request handler for better preflight support
+app.options('*', cors(corsOptions));
 
 // Serve static files for uploads (EARLY in middleware chain)
 app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
