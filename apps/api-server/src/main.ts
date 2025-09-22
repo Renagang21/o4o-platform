@@ -777,10 +777,8 @@ app.use('/api/v1/pages', pagesV1Routes); // V1 pages API with full authenticatio
 import previewProxyRoutes from './routes/v1/preview.routes';
 app.use('/api/v1/preview', previewProxyRoutes); // Preview proxy routes
 app.use('/api/v1/apps', appsV1Routes);
-app.use('/api/apps', appsV1Routes); // Legacy route for backward compatibility
 app.use('/api/v1/apps/plugins', pluginsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);
-app.use('/api/coupons', couponV1Routes); // Legacy route for backward compatibility
 app.use('/api/v1/themes', themeRoutes);
 app.use('/api/v1/export', exportV1Routes);
 app.use('/api/v1/shipping', shippingV1Routes);
