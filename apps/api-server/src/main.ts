@@ -253,6 +253,8 @@ app.use(helmet({
   contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
   frameguard: false, // Disable X-Frame-Options for iframe preview support
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin access to resources
+  crossOriginEmbedderPolicy: false, // Disable COEP to allow loading cross-origin resources
+  crossOriginOpenerPolicy: false, // Disable COOP for better compatibility
 }));
 
 // Enable compression for all responses
