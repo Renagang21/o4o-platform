@@ -205,9 +205,27 @@ export class AuthClient {
 }
 
 // Singleton instance
-// Always use production API server
+// Use environment-specific API URL
 const getApiUrl = () => {
-  // Always use production API server to avoid confusion
+  // Check if we're in a browser environment
+  if (typeof window !== 'undefined') {
+    // Try to get from environment variables first
+    const envApiUrl = (window as any).__ENV__?.VITE_API_URL ||
+                      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL);
+
+    if (envApiUrl) {
+      return envApiUrl.endsWith('/api') ? envApiUrl : `${envApiUrl}/api`;
+    }
+
+    // Auto-detect based on current location for development
+    if (window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.includes('.local')) {
+      return 'http://localhost:3002/api';
+    }
+  }
+
+  // Default to production API server
   return 'https://api.neture.co.kr/api';
 };
 
