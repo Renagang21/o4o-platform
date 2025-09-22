@@ -77,7 +77,6 @@ const MediaListWordPress: React.FC = () => {
 
       setMedia(transformed);
     } catch (err) {
-      console.error('Failed to fetch media:', err);
       toast.error('Failed to load media');
     } finally {
       setLoading(false);
@@ -101,7 +100,6 @@ const MediaListWordPress: React.FC = () => {
     
     try {
       const token = authClient.getAccessToken();
-      console.log('Deleting media with token:', token ? 'Token exists' : 'No token');
       
       await axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
         headers: {
@@ -113,7 +111,6 @@ const MediaListWordPress: React.FC = () => {
       setMedia(prev => prev.filter(m => m.id !== id));
       toast.success('Media deleted');
     } catch (error: any) {
-      console.error('Delete error:', error.response || error);
       toast.error(`Failed to delete: ${error.response?.data?.message || error.message}`);
     }
   };
@@ -140,7 +137,6 @@ const MediaListWordPress: React.FC = () => {
       setSelectedMedia(new Set());
       toast.success('Selected media deleted');
     } catch (error: any) {
-      console.error('Bulk delete error:', error.response || error);
       toast.error(`Failed to delete: ${error.response?.data?.message || error.message}`);
     }
   };
