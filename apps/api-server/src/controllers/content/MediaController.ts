@@ -22,7 +22,7 @@ export class MediaController {
   uploadMedia = async (req: Request, res: Response): Promise<void> => {
     try {
       // Temporarily allow upload without authentication for admin dashboard
-      const userId = req.user?.id || 'anonymous';
+      const userId = req.user?.id || null;
 
       const files = req.files as Express.Multer.File[];
 
