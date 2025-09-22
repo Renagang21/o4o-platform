@@ -355,8 +355,8 @@ importers:
         specifier: 13.9.0
         version: 13.9.0(react@18.2.0)
       '@wordpress/components':
-        specifier: 28.9.0
-        version: 28.9.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 30.4.0
+        version: 30.4.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@wordpress/element':
         specifier: 6.9.0
         version: 6.9.0
@@ -1376,8 +1376,8 @@ importers:
         specifier: 13.9.0
         version: 13.9.0(react@18.2.0)
       '@wordpress/components':
-        specifier: 28.9.0
-        version: 28.9.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 30.4.0
+        version: 30.4.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@wordpress/element':
         specifier: 6.9.0
         version: 6.9.0
@@ -8215,8 +8215,8 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  react-day-picker@9.10.0:
-    resolution: {integrity: sha512-tedecLSd+fpSN+J08601MaMsf122nxtqZXxB6lwX37qFoLtuPNuRJN8ylxFjLhyJS1kaLfAqL1GUkSLd2BMrpQ==}
+  react-day-picker@9.11.0:
+    resolution: {integrity: sha512-L4FYOaPrr3+AEROeP6IG2mCORZZfxJDkJI2df8mv1jyPrNYeccgmFPZDaHyAuPCBCddQFozkxbikj2NhMEYfDQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=16.8.0'
@@ -11249,7 +11249,7 @@ snapshots:
 
   '@mui/system@7.3.2(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/private-theming': 7.3.2(@types/react@18.2.79)(react@18.2.0)
       '@mui/styled-engine': 7.3.2(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)
       '@mui/types': 7.4.6(@types/react@18.2.79)
@@ -11265,13 +11265,13 @@ snapshots:
 
   '@mui/types@7.4.6(@types/react@18.2.79)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
     optionalDependencies:
       '@types/react': 18.2.79
 
   '@mui/utils@7.3.2(@types/react@18.2.79)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/types': 7.4.6(@types/react@18.2.79)
       '@types/prop-types': 15.7.15
       clsx: 2.1.1
@@ -13443,7 +13443,7 @@ snapshots:
 
   '@wordpress/a11y@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/dom-ready': 3.58.0
       '@wordpress/i18n': 4.58.0
 
@@ -13639,7 +13639,7 @@ snapshots:
   '@wordpress/components@28.9.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@ariakit/react': 0.4.18(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/cache': 11.14.0
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.2.79)(react@18.2.0)
@@ -13736,7 +13736,7 @@ snapshots:
       re-resizable: 6.11.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
       react-colorful: 5.6.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      react-day-picker: 9.10.0(react@18.2.0)
+      react-day-picker: 9.11.0(react@18.2.0)
       react-dom: 18.2.0(react@18.2.0)
       remove-accents: 0.5.0
       uuid: 9.0.1
@@ -13747,7 +13747,7 @@ snapshots:
 
   '@wordpress/compose@6.35.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@types/mousetrap': 1.6.15
       '@wordpress/deprecated': 3.58.0
       '@wordpress/dom': 3.58.0
@@ -13819,7 +13819,7 @@ snapshots:
 
   '@wordpress/date@4.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/deprecated': 3.58.0
       moment: 2.30.1
       moment-timezone: 0.5.48
@@ -13833,7 +13833,7 @@ snapshots:
 
   '@wordpress/deprecated@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/hooks': 3.58.0
 
   '@wordpress/deprecated@4.31.0':
@@ -13843,7 +13843,7 @@ snapshots:
 
   '@wordpress/dom-ready@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   '@wordpress/dom-ready@4.31.0':
     dependencies:
@@ -13851,7 +13851,7 @@ snapshots:
 
   '@wordpress/dom@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/deprecated': 3.58.0
 
   '@wordpress/dom@4.31.0':
@@ -13894,7 +13894,7 @@ snapshots:
 
   '@wordpress/escape-html@2.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   '@wordpress/escape-html@3.31.0':
     dependencies:
@@ -13902,7 +13902,7 @@ snapshots:
 
   '@wordpress/hooks@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   '@wordpress/hooks@4.31.0':
     dependencies:
@@ -13910,7 +13910,7 @@ snapshots:
 
   '@wordpress/html-entities@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   '@wordpress/html-entities@4.31.0':
     dependencies:
@@ -13918,7 +13918,7 @@ snapshots:
 
   '@wordpress/i18n@4.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/hooks': 3.58.0
       gettext-parser: 1.4.0
       memize: 2.1.1
@@ -13953,13 +13953,13 @@ snapshots:
 
   '@wordpress/icons@9.49.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/element': 5.35.0
       '@wordpress/primitives': 3.56.0
 
   '@wordpress/is-shallow-equal@4.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   '@wordpress/is-shallow-equal@5.31.0':
     dependencies:
@@ -14012,7 +14012,7 @@ snapshots:
 
   '@wordpress/primitives@3.56.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/element': 5.35.0
       clsx: 2.1.1
 
@@ -14025,7 +14025,7 @@ snapshots:
 
   '@wordpress/priority-queue@2.58.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       requestidlecallback: 0.3.0
 
   '@wordpress/priority-queue@3.31.0':
@@ -14035,7 +14035,7 @@ snapshots:
 
   '@wordpress/private-apis@0.40.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   '@wordpress/private-apis@1.31.0':
     dependencies:
@@ -14043,7 +14043,7 @@ snapshots:
 
   '@wordpress/redux-routine@4.58.0(redux@4.2.1)':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       is-plain-object: 5.0.0
       is-promise: 4.0.0
       redux: 4.2.1
@@ -14059,7 +14059,7 @@ snapshots:
 
   '@wordpress/rich-text@6.35.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/a11y': 3.58.0
       '@wordpress/compose': 6.35.0(react@18.2.0)
       '@wordpress/data': 9.28.0(react@18.2.0)
@@ -14102,7 +14102,7 @@ snapshots:
 
   '@wordpress/undo-manager@0.18.0':
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       '@wordpress/is-shallow-equal': 4.58.0
 
   '@wordpress/undo-manager@1.31.0':
@@ -14374,7 +14374,7 @@ snapshots:
 
   babel-plugin-macros@3.1.0:
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
       cosmiconfig: 7.1.0
       resolve: 1.22.10
 
@@ -17792,7 +17792,7 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  react-day-picker@9.10.0(react@18.2.0):
+  react-day-picker@9.11.0(react@18.2.0):
     dependencies:
       '@date-fns/tz': 1.4.1
       date-fns: 4.1.0
@@ -17915,7 +17915,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -17999,7 +17999,7 @@ snapshots:
 
   redux@4.2.1:
     dependencies:
-      '@babel/runtime': 7.28.3
+      '@babel/runtime': 7.28.4
 
   redux@5.0.1: {}
 
