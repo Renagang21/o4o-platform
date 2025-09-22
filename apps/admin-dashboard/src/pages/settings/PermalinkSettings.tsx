@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Link, Eye, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
-import apiClient from '../../api/client';
+import { authClient } from '@o4o/auth-client';
 
 interface PermalinkSettings {
   structure: string;
@@ -88,7 +88,7 @@ const PermalinkSettings: FC = () => {
   const { data: settings, isLoading } = useQuery<PermalinkSettings>({
     queryKey: ['permalink-settings'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/settings/permalink');
+      const response = await authClient.api.get('/v1/settings/permalink');
       return response.data as PermalinkSettings;
     }
   });
@@ -108,7 +108,7 @@ const PermalinkSettings: FC = () => {
   // 설정 저장
   const saveMutation = useMutation({
     mutationFn: async (newSettings: PermalinkSettings) => {
-      const response = await apiClient.put('/api/v1/settings/permalink', newSettings);
+      const response = await authClient.api.put('/v1/settings/permalink', newSettings);
       return response.data;
     },
     onSuccess: () => {
@@ -119,7 +119,7 @@ const PermalinkSettings: FC = () => {
   // 미리보기 생성
   const previewMutation = useMutation({
     mutationFn: async (structure: string) => {
-      const response = await apiClient.post('/api/v1/settings/permalink/preview', { structure });
+      const response = await authClient.api.post('/v1/settings/permalink/preview', { structure });
       return response.data.data as UrlPreview[];
     },
     onSuccess: (data) => {
@@ -130,7 +130,7 @@ const PermalinkSettings: FC = () => {
   // 검증
   const validateMutation = useMutation({
     mutationFn: async (settings: PermalinkSettings) => {
-      const response = await apiClient.post('/api/v1/settings/permalink/validate', settings);
+      const response = await authClient.api.post('/v1/settings/permalink/validate', settings);
       return response.data.data as ValidationResult;
     },
     onSuccess: (data) => {
