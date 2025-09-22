@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { formatDate, formatFileSize } from '@/lib/utils';
 import { authClient } from '@o4o/auth-client';
+import axios from 'axios';
 import toast from 'react-hot-toast';
 
 interface MediaItem {
@@ -100,16 +101,20 @@ const MediaListWordPress: React.FC = () => {
     
     try {
       const token = authClient.getAccessToken();
-      await authClient.api.delete(`/v1/content/media/${id}`, {
+      console.log('Deleting media with token:', token ? 'Token exists' : 'No token');
+      
+      await axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+      
       setMedia(prev => prev.filter(m => m.id !== id));
       toast.success('Media deleted');
-    } catch (error) {
-      console.error('Delete error:', error);
-      toast.error('Failed to delete media');
+    } catch (error: any) {
+      console.error('Delete error:', error.response || error);
+      toast.error(`Failed to delete: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -119,21 +124,24 @@ const MediaListWordPress: React.FC = () => {
 
     try {
       const token = authClient.getAccessToken();
+      
       await Promise.all(
         Array.from(selectedMedia).map(id => 
-          authClient.api.delete(`/v1/content/media/${id}`, {
+          axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
             headers: {
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
             }
           })
         )
       );
+      
       setMedia(prev => prev.filter(m => !selectedMedia.has(m.id)));
       setSelectedMedia(new Set());
       toast.success('Selected media deleted');
-    } catch (error) {
-      console.error('Bulk delete error:', error);
-      toast.error('Failed to delete media');
+    } catch (error: any) {
+      console.error('Bulk delete error:', error.response || error);
+      toast.error(`Failed to delete: ${error.response?.data?.message || error.message}`);
     }
   };
 
