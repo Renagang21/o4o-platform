@@ -180,11 +180,6 @@ const OAuthSettings = () => {
     return `${baseUrl}/api/auth/callback/${provider}`;
   }, []);
 
-  // Mask sensitive data
-  const maskSecret = useCallback((secret: string): string => {
-    if (!secret || secret.length < 8) return secret;
-    return secret.substring(0, 4) + '****' + secret.substring(secret.length - 4);
-  }, []);
 
   if (isLoading) {
     return (
@@ -293,7 +288,7 @@ const OAuthSettings = () => {
                   <Input
                     id={`${provider}-client-secret`}
                     type={showSecrets[provider] ? 'text' : 'password'}
-                    value={showSecrets[provider] ? config.clientSecret : maskSecret(config.clientSecret)}
+                    value={config.clientSecret || ''}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
                       handleInputChange(provider, 'clientSecret', e.target.value)
                     }
@@ -305,7 +300,7 @@ const OAuthSettings = () => {
                     variant="outline"
                     size="icon"
                     onClick={() => toggleSecretVisibility(provider)}
-                    disabled={!config.enabled || updateMutation.isPending}
+                    disabled={updateMutation.isPending}
                   >
                     {showSecrets[provider] ? 
                       <EyeOff className="h-4 w-4" /> : 
