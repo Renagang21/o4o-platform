@@ -232,6 +232,22 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
       }
     }, 500);
     
+    // Special handling for logo updates - force preview refresh
+    if (section === 'siteIdentity' && path && path[0] === 'logo') {
+      setTimeout(() => {
+        const iframe = document.getElementById('customizer-preview-iframe') as HTMLIFrameElement;
+        if (iframe?.contentWindow) {
+          iframe.contentWindow.postMessage(
+            {
+              type: 'update-logo',
+              settings: state.settings
+            },
+            '*'
+          );
+        }
+      }, 100);
+    }
+    
     // Call event handler if provided
     eventHandlers?.onSettingChange?.(section, value);
   }, [state.settings, eventHandlers]);

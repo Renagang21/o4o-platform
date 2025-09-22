@@ -53,17 +53,40 @@ export const AstraImageUploader: React.FC<AstraImageUploaderProps> = ({
       });
 
       // Extract URL from response
+      let imageUrl = '';
       if (response.data?.data?.media?.[0]?.url) {
-        onChange(response.data.data.media[0].url);
+        imageUrl = response.data.data.media[0].url;
       } else if (response.data?.url) {
-        onChange(response.data.url);
+        imageUrl = response.data.url;
       } else {
         throw new Error('Invalid response format');
       }
+      
+      // Add timestamp for cache busting
+      const urlWithTimestamp = `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      onChange(urlWithTimestamp);
 
       toast.success('Image uploaded successfully');
+      
+      // Force preview refresh
+      const iframe = document.getElementById('customizer-preview-iframe') as HTMLIFrameElement;
+      if (iframe) {
+        // Send message to iframe to update logo
+        iframe.contentWindow?.postMessage(
+          { 
+            type: 'update-logo', 
+            url: urlWithTimestamp 
+          },
+          '*'
+        );
+        
+        // Also trigger a refresh after a short delay
+        setTimeout(() => {
+          iframe.src = iframe.src;
+        }, 500);
+      }
     } catch (uploadError: any) {
-      console.error('Failed to upload image:', uploadError);
+      // Upload failed, use data URL as fallback
 
       // For customizer, use data URL as fallback for immediate preview
       const reader = new FileReader();

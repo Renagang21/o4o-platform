@@ -29,14 +29,16 @@ const SiteLogo: FC<SiteLogoProps> = ({
         if (response.status === 200 && response.data) {
           const settings = response.data.settings || response.data;
           if (settings?.siteIdentity?.logo?.desktop) {
-            setLogoUrl(settings.siteIdentity.logo.desktop);
+            // Remove any existing timestamp for clean comparison
+            const cleanUrl = settings.siteIdentity.logo.desktop.split('?')[0];
+            // Add fresh timestamp for cache busting
+            setLogoUrl(`${cleanUrl}?t=${Date.now()}`);
           }
           if (settings?.siteIdentity?.siteTitle?.text) {
             setSiteName(settings.siteIdentity.siteTitle.text);
           }
         }
       } catch (error) {
-        console.info('Using default logo settings:', error);
         // Fallback to local image if API fails
         setLogoUrl('/images/logo.svg');
       } finally {
@@ -45,6 +47,24 @@ const SiteLogo: FC<SiteLogoProps> = ({
     };
     
     fetchSiteSettings();
+    
+    // Listen for logo update messages from customizer
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'update-logo' && event.data.url) {
+        setLogoUrl(event.data.url);
+      } else if (event.data.type === 'customizer-update' && event.data.settings) {
+        const settings = event.data.settings;
+        if (settings?.siteIdentity?.logo?.desktop) {
+          setLogoUrl(settings.siteIdentity.logo.desktop);
+        }
+        if (settings?.siteIdentity?.siteTitle?.text) {
+          setSiteName(settings.siteIdentity.siteTitle.text);
+        }
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   // Don't render anything if loading or no logo URL
@@ -60,23 +80,7 @@ const SiteLogo: FC<SiteLogoProps> = ({
       height={height || 'auto'}
       className={`site-logo ${className}`}
       onError={(e) => {
-        // Enhanced debugging for browser testing
         const target = e.target as HTMLImageElement;
-        const errorDetails = {
-          src: target.src,
-          naturalWidth: target.naturalWidth,
-          naturalHeight: target.naturalHeight,
-          complete: target.complete,
-          timestamp: new Date().toISOString()
-        };
-        
-        console.warn('🖼️ Logo loading failed:', {
-          attempted_url: logoUrl,
-          resolved_url: target.src,
-          error_details: errorDetails,
-          fallback_action: 'Trying SVG fallback',
-          current_domain: window.location.origin
-        });
         
         // Try SVG fallback if PNG fails
         if (target.src.includes('logo.png')) {
