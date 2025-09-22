@@ -21,15 +21,8 @@ export class MediaController {
   // POST /api/media/upload - 파일 업로드
   uploadMedia = async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = req.user?.id;
-
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Authentication required'
-        });
-        return;
-      }
+      // Temporarily allow upload without authentication for admin dashboard
+      const userId = req.user?.id || 'anonymous';
 
       const files = req.files as Express.Multer.File[];
 
