@@ -12,8 +12,8 @@ import crypto from 'crypto';
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads', new Date().getFullYear().toString(), (new Date().getMonth() + 1).toString().padStart(2, '0'));
-    
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'images');
+
     try {
       await fs.mkdir(uploadDir, { recursive: true });
       cb(null, uploadDir);
@@ -90,9 +90,8 @@ export class MediaController {
         const { folderId, altText, caption, description } = req.body;
         const userId = (req as any).user?.id;
 
-        // Generate URL path
-        const uploadPath = req.file.path.replace(process.cwd(), '').replace(/\\/g, '/');
-        const fileUrl = `/uploads${uploadPath.split('/uploads')[1]}`;
+        // Generate URL path - just use filename since we're saving to public/uploads/images
+        const fileUrl = `/uploads/images/${req.file.filename}`;
 
         // Get file metadata
         let metadata: any = {
@@ -112,7 +111,7 @@ export class MediaController {
         const mediaFile = this.mediaRepository.create({
           filename: req.file.filename,
           originalName: req.file.originalname,
-          path: uploadPath,
+          path: req.file.path,
           url: fileUrl,
           mimeType: req.file.mimetype,
           size: req.file.size,

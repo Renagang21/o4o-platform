@@ -252,6 +252,7 @@ const publicLimiter = rateLimit({
 app.use(helmet({
   contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
   frameguard: false, // Disable X-Frame-Options for iframe preview support
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin access to resources
 }));
 
 // Enable compression for all responses
@@ -348,7 +349,9 @@ app.options('*', cors(corsOptions));
 
 // Serve static files for uploads (EARLY in middleware chain)
 // Static file serving with CORS headers for images
-const staticUploadsPath = path.join(process.cwd(), 'public', 'uploads');
+// Use project root instead of process.cwd() to ensure correct path
+const projectRoot = path.resolve(__dirname, '../../../');
+const staticUploadsPath = path.join(projectRoot, 'public', 'uploads');
 
 // Add CORS headers for static files
 app.use('/uploads', (req, res, next) => {
