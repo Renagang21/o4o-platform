@@ -112,45 +112,54 @@ const MediaListWordPress: FC = () => {
       try {
         setLoading(true);
         const params = new URLSearchParams();
-        params.append('per_page', '1000');
+        params.append('limit', '1000');  // API expects 'limit' not 'per_page'
         
         const response = await authClient.api.get(`/v1/content/media?${params}`);
-        const mediaData = response.data.data || [];
+        console.log('Media API Response:', response.data); // Debug log
         
-        const transformedMedia = mediaData.map((item: any) => ({
-          id: item.id,
-          title: item.originalName || item.filename || 'Untitled',
-          filename: item.filename,
-          author: { name: item.uploader?.name || 'Unknown' },
-          attachedTo: item.attachedTo || null,
-          createdAt: item.uploadedAt,
-          mimeType: item.mimeType,
-          size: item.size,
-          width: item.width,
-          height: item.height,
-          thumbnailUrl: item.thumbnailUrl,
-          url: item.url
-        }));
+        // Handle different response structures
+        let mediaData = [];
+        if (Array.isArray(response.data)) {
+          mediaData = response.data;
+        } else if (response.data.data?.media) {
+          // API returns data.media array
+          mediaData = response.data.data.media;
+        } else if (response.data.data) {
+          mediaData = response.data.data;
+        } else if (response.data.items) {
+          mediaData = response.data.items;
+        }
         
+        const transformedMedia = mediaData.map((item: any) => {
+          // Use thumbnailUrl from API or fall back to main URL for images
+          let thumbnailUrl = item.thumbnailUrl || (item.isImage ? item.url : null);
+          
+          // Ensure URLs are already absolute from the API
+          // The API already provides absolute URLs
+          
+          return {
+            id: item.id || item._id,
+            title: item.originalFilename || item.filename || item.name || 'Untitled',
+            filename: item.filename || item.name,
+            author: { name: item.uploadedBy?.name || item.uploader?.name || 'Unknown' },
+            attachedTo: item.attachedTo || null,
+            createdAt: item.createdAt || item.uploadedAt || item.created_at,
+            mimeType: item.mimeType || item.mime_type || 'application/octet-stream',
+            size: item.size || 0,
+            width: item.width,
+            height: item.height,
+            thumbnailUrl: thumbnailUrl,
+            url: item.url
+          };
+        });
+        
+        console.log('Transformed media:', transformedMedia); // Debug log
         setMedia(transformedMedia);
       } catch (err) {
-        // Fallback to mock data if API fails
-        setMedia([
-          {
-            id: '1',
-            title: 'My Awesome Picture',
-            filename: 'my-awesome-pic.jpg',
-            author: { name: 'John Doe' },
-            attachedTo: { title: 'My Awesome Post' },
-            createdAt: new Date().toISOString(),
-            mimeType: 'image/jpeg',
-            size: 123456,
-            width: 1920,
-            height: 1080,
-            thumbnailUrl: '/placeholder-150x150.png',
-            url: '/placeholder-1920x1080.png'
-          }
-        ]);
+        console.error('Failed to fetch media:', err);
+        // Fallback to empty array instead of mock data
+        setMedia([]);
+        error('Failed to load media library');
       } finally {
         setLoading(false);
       }
