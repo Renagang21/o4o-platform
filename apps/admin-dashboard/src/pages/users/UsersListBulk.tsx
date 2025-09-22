@@ -135,8 +135,8 @@ const UsersListBulk: FC = () => {
   // Bulk role update mutation
   const bulkRoleMutation = useMutation({
     mutationFn: async ({ ids, role }: { ids: string[], role: string }) => {
-      await Promise.all(ids.map((id: any) => 
-        authClient.api.patch(`/users/${id}`, { role })
+      await Promise.all(ids.map((id: any) =>
+        authClient.api.put(`/users/${id}`, { roles: [role] })
       ));
     },
     onSuccess: () => {
@@ -167,10 +167,11 @@ const UsersListBulk: FC = () => {
   // Quick Edit mutation
   const quickEditMutation = useMutation({
     mutationFn: async (data: { id: string, name: string, email: string, role: string, status: User['status'] }) => {
-      const response = await authClient.api.patch(`/users/${data.id}`, {
-        name: data.name,
+      const response = await authClient.api.put(`/users/${data.id}`, {
+        firstName: data.name.split(' ')[0],
+        lastName: data.name.split(' ').slice(1).join(' ') || '',
         email: data.email,
-        role: data.role,
+        roles: [data.role],
         status: data.status
       });
       return response.data;
