@@ -25,6 +25,7 @@ const MediaListWordPress: React.FC = () => {
   const [selectedMedia, setSelectedMedia] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'image' | 'unattached'>('all');
+  const currentUser = authClient.getUser(); // Get current logged in user
 
   // Fetch media from API
   useEffect(() => {
@@ -63,7 +64,7 @@ const MediaListWordPress: React.FC = () => {
           id: item.id,
           title: item.originalFilename || item.filename || 'Untitled',
           filename: item.filename,
-          author: item.uploadedBy?.name || item.uploadedBy?.username || item.author || 'Admin',
+          author: item.uploadedBy?.name || item.uploadedBy?.username || item.author || currentUser?.name || currentUser?.email || 'Current User',
           createdAt: item.createdAt,
           mimeType: item.mimeType || 'application/octet-stream',
           size: parseInt(item.size) || 0,
