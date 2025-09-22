@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth, UserRole } from '../context/AuthContext';
+import { useAuth, UserRole } from '../contexts/AuthContext';
 
 interface SSOProtectedRouteProps {
   children: ReactNode;

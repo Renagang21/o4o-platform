@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useAuth, UserRole } from '../context/AuthContext';
+import { useAuth, UserRole } from '../contexts/AuthContext';
 
 
 const Profile: FC = () => {

@@ -1,4 +1,4 @@
-import { UserRole } from '../context/AuthContext';
+import { UserRole } from '../contexts/AuthContext';
 
 export async function logRoleChange(adminId: string, targetUserId: string, newRoles: UserRole[]) {
   try {

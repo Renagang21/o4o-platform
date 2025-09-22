@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import { X } from 'lucide-react';
-import { useAuth, UserRole } from '../context/AuthContext';
+import { useAuth, UserRole } from '../contexts/AuthContext';
 
 const getBannerContent = (role: string | undefined) => {
   switch (role) {
