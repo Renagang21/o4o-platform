@@ -530,12 +530,28 @@ export class MediaController {
   }
 
   private formatMediaResponse(media: any): any {
+    const baseUrl = process.env.API_BASE_URL || 'https://api.neture.co.kr';
+
+    // Convert relative URLs to absolute URLs
+    const makeAbsolute = (url: string | null) => {
+      if (!url) return url;
+      if (url.startsWith('http')) return url;
+      return `${baseUrl}${url}`;
+    };
+
+    // Process variants to have absolute URLs
+    const processedVariants = media.variants ?
+      Object.entries(media.variants).reduce((acc, [key, value]) => {
+        acc[key] = makeAbsolute(value as string);
+        return acc;
+      }, {} as any) : null;
+
     return {
       id: media.id,
       filename: media.filename,
       originalFilename: media.originalFilename,
-      url: media.url,
-      thumbnailUrl: media.thumbnailUrl,
+      url: makeAbsolute(media.url),
+      thumbnailUrl: makeAbsolute(media.thumbnailUrl),
       mimeType: media.mimeType,
       size: media.size,
       sizeFormatted: this.formatFileSize(media.size),
@@ -545,7 +561,7 @@ export class MediaController {
       caption: media.caption,
       description: media.description,
       folderPath: media.folderPath,
-      variants: media.variants,
+      variants: processedVariants,
       uploadedBy: media.user ? {
         id: media.user.id,
         name: media.user.name,
