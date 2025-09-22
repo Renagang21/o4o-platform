@@ -26,7 +26,21 @@ const MediaListWordPress: React.FC = () => {
   const [selectedMedia, setSelectedMedia] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'image' | 'unattached'>('all');
-  const currentUser = authClient.getUser(); // Get current logged in user
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  // Get current logged in user
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await authClient.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        // User not logged in or error fetching
+        setCurrentUser(null);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Fetch media from API
   useEffect(() => {
