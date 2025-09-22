@@ -27,24 +27,10 @@ const Content: FC = () => {
   
   return (
     <Routes>
-      <Route path="/" element={<Posts />} />
-      <Route path="new" element={<PostForm />} />
-      <Route path="posts/new" element={<PostForm />} />
-      <Route path="posts/:id/edit" element={<PostForm />} />
-      <Route path=":id/edit" element={<PostForm />} />
-      <Route path="pages" element={<PageList />} />
-      <Route path="pages/new" element={<PostForm />} />
-      <Route path="pages/:id/edit" element={<PostForm />} />
-      <Route path="cpt" element={<CPTList />} />
-      <Route path="cpt/new" element={<CPTForm />} />
-      <Route path="cpt/:id/edit" element={<CPTForm />} />
-      <Route path="cpt/:cptId/fields" element={<CustomFieldBuilder />} />
-      <Route path="acf" element={<ACFManager />} />
-      <Route path="acf/new" element={<ACFFieldGroupForm />} />
-      <Route path="acf/:id/edit" element={<ACFFieldGroupForm />} />
-      {/* Media route moved to /media */}
-      <Route path="templates" element={<TemplateManager />} />
-      <Route path="widgets" element={<WidgetManager />} />
+      <Route path="/" element={<CPTList />} />
+      <Route path="new" element={<CPTForm />} />
+      <Route path=":id/edit" element={<CPTForm />} />
+      <Route path=":cptId/fields" element={<CustomFieldBuilder />} />
       {/* Dynamic routes for custom post types */}
       <Route path=":slug" element={<DynamicContentList />} />
       <Route path=":slug/new" element={<PostForm />} />
