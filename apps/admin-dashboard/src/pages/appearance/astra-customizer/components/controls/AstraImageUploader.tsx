@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { authClient } from '@o4o/auth-client';
+import toast from 'react-hot-toast';
 
 interface AstraImageUploaderProps {
   label: string;
@@ -26,64 +28,53 @@ export const AstraImageUploader: React.FC<AstraImageUploaderProps> = ({
   
   const handleFileSelect = async (file: File) => {
     setError(null);
-    
+
     // Validate file size
     if (file.size > maxSize * 1024 * 1024) {
       setError(`File size must be less than ${maxSize}MB`);
       return;
     }
-    
+
     // Validate file type
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file');
       return;
     }
-    
+
     try {
-      // Upload image to server
+      // Upload image using authenticated API client
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('type', 'logo');
-      
-      const response = await fetch('/api/v1/media/upload', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
+
+      const response = await authClient.api.post('/v1/content/media/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-      
-      const data = await response.json();
-      
-      // Use the uploaded image URL
-      if (data.url) {
-        onChange(data.url);
-      } else if (data.data?.url) {
-        onChange(data.data.url);
+
+      // Extract URL from response
+      if (response.data?.data?.media?.[0]?.url) {
+        onChange(response.data.data.media[0].url);
+      } else if (response.data?.url) {
+        onChange(response.data.url);
       } else {
-        // Fallback to data URL if upload fails
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const result = e.target?.result as string;
-          onChange(result);
-        };
-        reader.onerror = () => {
-          setError('Failed to read file');
-        };
-        reader.readAsDataURL(file);
+        throw new Error('Invalid response format');
       }
-    } catch (uploadError) {
-      console.warn('Upload failed, using data URL fallback:', uploadError);
-      // Fallback to data URL
+
+      toast.success('Image uploaded successfully');
+    } catch (uploadError: any) {
+      console.error('Failed to upload image:', uploadError);
+
+      // For customizer, use data URL as fallback for immediate preview
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
         onChange(result);
+        toast.info('Using local preview - save to persist changes');
       };
       reader.onerror = () => {
         setError('Failed to read file');
+        toast.error('Failed to read image file');
       };
       reader.readAsDataURL(file);
     }
