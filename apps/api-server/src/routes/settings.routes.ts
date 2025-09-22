@@ -14,6 +14,7 @@ import logger from '../utils/logger';
 import { encrypt, decrypt } from '../utils/crypto';
 import { AppDataSource } from '../database/connection';
 import { Settings as Setting } from '../entities/Settings';
+import { reloadPassportStrategies } from '../config/passportDynamic';
 
 const router: Router = Router();
 
@@ -231,6 +232,15 @@ router.put('/oauth',
           type: 'json'
         });
         await settingRepository.save(oauthSetting);
+      }
+
+      // Reload Passport strategies with new configuration
+      try {
+        await reloadPassportStrategies();
+        logger.info('Passport strategies reloaded successfully');
+      } catch (passportError) {
+        logger.error('Failed to reload Passport strategies:', passportError);
+        // Don't fail the request, just log the error
       }
 
       res.json({

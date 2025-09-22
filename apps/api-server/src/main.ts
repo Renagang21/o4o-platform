@@ -45,7 +45,7 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
-import passport from './config/passport';
+import passport, { initializePassport } from './config/passportDynamic';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
@@ -857,6 +857,14 @@ try {
 // 서버 시작
 const startServer = async () => {
   logger.info('Starting server...');
+  
+  // Initialize dynamic Passport strategies
+  try {
+    await initializePassport();
+    logger.info('✅ Dynamic Passport strategies initialized');
+  } catch (passportError) {
+    logger.error('Failed to initialize Passport strategies:', passportError);
+  }
   try {
     logger.info('Checking database initialization status...');
     // 데이터베이스 초기화 전 상태 확인

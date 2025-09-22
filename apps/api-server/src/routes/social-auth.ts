@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import passport from '../config/passport';
+import passport from '../config/passportDynamic';
 import { SocialAuthService } from '../services/socialAuthService';
 import { authenticateCookie, AuthRequest } from '../middleware/auth-v2';
 
