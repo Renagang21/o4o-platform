@@ -41,8 +41,26 @@ const Customize: React.FC = () => {
         toast.success('Customizer settings saved successfully');
       }
     } catch (error: any) {
-      const message = error?.response?.data?.message || 'Failed to save customizer settings';
-      toast.error(message);
+      const statusCode = error?.response?.status;
+      const errorCode = error?.response?.data?.code;
+
+      // Handle authentication errors
+      if (statusCode === 401 || statusCode === 403) {
+        if (errorCode === 'USER_NOT_AUTHENTICATED') {
+          toast.error('Session expired. Please log in again.');
+          // Optionally redirect to login
+          setTimeout(() => {
+            window.location.href = '/admin/login';
+          }, 2000);
+        } else if (errorCode === 'INSUFFICIENT_PERMISSIONS') {
+          toast.error('You do not have permission to save customizer settings.');
+        } else {
+          toast.error('Authentication error. Please try logging in again.');
+        }
+      } else {
+        const message = error?.response?.data?.message || 'Failed to save customizer settings';
+        toast.error(message);
+      }
       throw error;
     }
   };
