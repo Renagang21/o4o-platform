@@ -280,7 +280,7 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy shortcode:', error);
+      // Copy failed, ignore silently
     }
   };
 

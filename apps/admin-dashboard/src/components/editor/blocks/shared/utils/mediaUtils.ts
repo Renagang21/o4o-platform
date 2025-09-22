@@ -241,7 +241,6 @@ export const downloadMediaItem = async (item: MediaItem): Promise<void> => {
 
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Download failed:', error);
     throw new Error('파일 다운로드에 실패했습니다.');
   }
 };

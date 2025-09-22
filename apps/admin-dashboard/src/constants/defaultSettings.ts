@@ -155,7 +155,7 @@ export const saveSettingsToStorage = <T>(key: string, settings: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(settings));
   } catch (error) {
-    console.warn('Settings localStorage 저장 실패:', error);
+    // localStorage save failed, ignore silently
   }
 };
 
@@ -165,7 +165,7 @@ export const loadSettingsFromStorage = <T>(key: string, defaultValue: T): T => {
     const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : defaultValue;
   } catch (error) {
-    console.warn('Settings localStorage 로드 실패:', error);
+    // localStorage load failed, return default value
     return defaultValue;
   }
 };

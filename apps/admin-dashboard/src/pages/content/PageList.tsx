@@ -80,7 +80,7 @@ const PageList = () => {
               date = new Date(page.createdAt).toISOString().split('T')[0];
             }
           } catch (err) {
-            console.warn('Failed to parse date for page:', page.id, err);
+            // Failed to parse date, use default
           }
           
           return {
@@ -100,7 +100,6 @@ const PageList = () => {
         sessionStorage.setItem('pages-data', JSON.stringify(transformedPages));
         setError(null);
       } catch (error) {
-        console.error('Failed to fetch pages:', error);
         setError('Failed to load pages. Please try again.');
         setPages([]);
       } finally {
@@ -216,7 +215,6 @@ const PageList = () => {
           toast.error('Failed to update page');
         }
       } catch (error) {
-        console.error('Quick edit error:', error);
         toast.error('Failed to update page');
       }
     }

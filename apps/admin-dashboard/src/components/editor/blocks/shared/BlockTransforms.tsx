@@ -345,7 +345,6 @@ export const BlockTransforms: React.FC<BlockTransformProps> = ({
 
       onTransform(targetType, newAttributes, newContent);
     } catch (error) {
-      console.error('Block transformation failed:', error);
       alert(`Transformation failed: ${error.message}`);
     }
   };

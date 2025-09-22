@@ -131,7 +131,6 @@ const EnhancedGalleryBlock: React.FC<EnhancedGalleryBlockProps> = ({
       toast.success(`${newImages.length} image${newImages.length > 1 ? 's' : ''} added to gallery`);
     } catch (error) {
       toast.error('Failed to add images to gallery');
-      console.error('Error adding images:', error);
     } finally {
       setIsProcessing(false);
       setShowMediaSelector(false);

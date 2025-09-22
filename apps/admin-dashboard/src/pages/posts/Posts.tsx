@@ -96,8 +96,7 @@ const Posts = () => {
               date = new Date(post.created_at).toISOString().split('T')[0];
             }
           } catch (err) {
-            console.warn('Failed to parse date for post:', post.id, err);
-            // Keep default date
+            // Failed to parse date, keep default date
           }
           
           return {
@@ -281,7 +280,6 @@ const Posts = () => {
           toast.error('Failed to update post');
         }
       } catch (error) {
-        console.error('Quick edit error:', error);
         toast.error('Failed to update post');
       }
     }

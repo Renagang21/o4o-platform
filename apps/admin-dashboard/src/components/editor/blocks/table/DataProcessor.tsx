@@ -190,7 +190,6 @@ export function downloadTableAsCSV(data: TableData, filename = 'table.csv'): voi
 
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Failed to download CSV:', error);
     throw new Error('Failed to download CSV file');
   }
 }
@@ -342,7 +341,6 @@ export const DataProcessor: React.FC<DataProcessorProps> = ({
     try {
       downloadTableAsCSV(data, 'table-export.csv');
     } catch (error) {
-      console.error('Export failed:', error);
       alert('Failed to export table as CSV');
     }
   };
@@ -362,7 +360,6 @@ export const DataProcessor: React.FC<DataProcessorProps> = ({
 
       onImport(importedData);
     } catch (error) {
-      console.error('Import failed:', error);
       alert(`Import failed: ${error.message}`);
     } finally {
       // Reset file input
