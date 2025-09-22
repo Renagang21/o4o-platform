@@ -32,7 +32,7 @@ const MediaListWordPress: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const user = await authClient.getCurrentUser();
+        const user = await authClient.getUser();
         setCurrentUser(user);
       } catch (error) {
         // User not logged in or error fetching

@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Loader2 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { authProviderService } from '../services/authProviderService';
 import { OAuthProviders, SocialLoginConfig } from '../types/auth';
 import toast from 'react-hot-toast';

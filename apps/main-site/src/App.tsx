@@ -7,7 +7,6 @@ import { useAuthStore } from './stores/authStore';
 import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
-import AuthCallbackV2 from './pages/auth/AuthCallbackV2';
 import { OAuthCallback } from './pages/auth/OAuthCallback';
 import { EmailVerificationPending } from './pages/auth/EmailVerificationPending';
 import { EmailVerificationSuccess } from './pages/auth/EmailVerificationSuccess';
@@ -75,7 +74,7 @@ const App: FC = () => {
               </div>
             </Layout>
           } />
-          <Route path="/auth/callback" element={<AuthCallbackV2 />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           <Route path="/auth/verify-email/pending" element={
             <Layout>
