@@ -127,36 +127,43 @@
   outline: 1px dotted var(--wp-admin-link-focus);
 }
 
-/* WordPress Buttons */
+/* Modern Buttons (WordPress Layout with Modern Style) */
 .wp-button-primary {
-  background-color: var(--wp-admin-button-bg);
-  color: var(--wp-admin-button-text);
-  border: 1px solid var(--wp-admin-button-bg);
-  padding: 6px 12px;
-  font-size: 13px;
+  background-color: #2563eb; /* Modern blue */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
   line-height: normal;
-  border-radius: 3px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .wp-button-primary:hover {
-  background-color: var(--wp-admin-button-bg-hover);
-  border-color: var(--wp-admin-button-bg-hover);
+  background-color: #1d4ed8; /* Darker blue on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .wp-button-secondary {
-  background-color: var(--wp-admin-button-secondary-bg);
-  color: var(--wp-admin-button-secondary-text);
-  border: 1px solid var(--wp-admin-button-secondary-border);
-  padding: 6px 12px;
-  font-size: 13px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  font-size: 14px;
   line-height: normal;
-  border-radius: 3px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .wp-button-secondary:hover {
-  background-color: #f1f1f1;
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
 }
 
 /* WordPress Tables */

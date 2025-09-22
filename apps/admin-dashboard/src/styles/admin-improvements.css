@@ -124,15 +124,20 @@ button {
 
 .btn-primary,
 .button-primary {
-  background: linear-gradient(135deg, #2693ff 0%, #a548ff 100%) !important;
+  background: #2563eb !important;
   color: white !important;
   border: none !important;
+  border-radius: 6px !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
 }
 
 .btn-primary:hover,
 .button-primary:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(38, 147, 255, 0.3) !important;
+  background: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* 4. Table Improvements */
