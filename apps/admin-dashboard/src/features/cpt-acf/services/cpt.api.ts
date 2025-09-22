@@ -16,7 +16,7 @@ import {
   PostStatus
 } from '../types/cpt.types';
 
-const API_BASE = '/api/cpt';
+const API_BASE = '/cpt';
 
 /**
  * CPT Type Management

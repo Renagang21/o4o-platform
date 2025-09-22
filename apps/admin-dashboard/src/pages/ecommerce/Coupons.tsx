@@ -65,7 +65,7 @@ const Coupons: FC = () => {
         ...(statusFilter !== 'all' && { status: statusFilter })
       });
 
-      const response = await api.get(`/coupons?${params}`);
+      const response = await api.get(`/v1/coupons?${params}`);
       setCoupons(response.data.data || []);
       setTotalPages(response.data.pagination?.totalPages || 1);
     } catch (error) {
@@ -141,7 +141,7 @@ const Coupons: FC = () => {
     }
 
     try {
-      await api.delete(`/coupons/${id}`);
+      await api.delete(`/v1/coupons/${id}`);
       toast.success('Coupon deleted successfully');
       fetchCoupons();
     } catch (error) {
@@ -154,7 +154,7 @@ const Coupons: FC = () => {
   const handleDuplicate = async (coupon: Coupon) => {
     try {
       const newCode = `${coupon.code}_COPY_${Date.now()}`;
-      await api.post('/coupons', {
+      await api.post('/v1/coupons', {
         ...coupon,
         id: undefined,
         code: newCode,
@@ -214,7 +214,7 @@ const Coupons: FC = () => {
     try {
       await Promise.all(
         selectedItems.map(id => 
-          api.patch(`/coupons/${id}`, { status: 'active' })
+          api.patch(`/v1/coupons/${id}`, { status: 'active' })
         )
       );
       toast.success(`${selectedItems.length}개 쿠폰이 활성화되었습니다`);
@@ -229,7 +229,7 @@ const Coupons: FC = () => {
     try {
       await Promise.all(
         selectedItems.map(id => 
-          api.patch(`/coupons/${id}`, { status: 'inactive' })
+          api.patch(`/v1/coupons/${id}`, { status: 'inactive' })
         )
       );
       toast.success(`${selectedItems.length}개 쿠폰이 비활성화되었습니다`);
@@ -247,7 +247,7 @@ const Coupons: FC = () => {
 
     try {
       await Promise.all(
-        selectedItems.map(id => api.delete(`/coupons/${id}`))
+        selectedItems.map(id => api.delete(`/v1/coupons/${id}`))
       );
       toast.success(`${selectedItems.length}개 쿠폰이 삭제되었습니다`);
       setSelectedItems([]);
@@ -268,7 +268,7 @@ const Coupons: FC = () => {
           if (coupon?.validUntil) {
             const newDate = new Date(coupon.validUntil);
             newDate.setDate(newDate.getDate() + Number(days));
-            return api.patch(`/coupons/${id}`, { 
+            return api.patch(`/v1/coupons/${id}`, { 
               validUntil: newDate.toISOString() 
             });
           }
