@@ -119,14 +119,8 @@ const AtAGlanceWidget: FC<AtAGlanceProps> = ({
             >
               Customize Your Site
             </Link>
-            <Link 
-              to="/appearance/widgets" 
-              className="inline-flex items-center px-3 py-1 text-sm border border-modern-border-primary text-modern-text-primary rounded hover:bg-modern-bg-hover transition-colors"
-            >
-              Manage Widgets
-            </Link>
-            <Link 
-              to="/menus" 
+            <Link
+              to="/appearance/menus"
               className="inline-flex items-center px-3 py-1 text-sm border border-modern-border-primary text-modern-text-primary rounded hover:bg-modern-bg-hover transition-colors"
             >
               Manage Menus
