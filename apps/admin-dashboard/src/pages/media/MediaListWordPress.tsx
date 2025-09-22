@@ -112,50 +112,42 @@ const MediaListWordPress: FC = () => {
       try {
         setLoading(true);
         const params = new URLSearchParams();
-        params.append('per_page', '1000');
-        
+        params.append('limit', '100');
+        params.append('page', '1');
+
         const response = await authClient.api.get(`/v1/content/media?${params}`);
-        const mediaData = response.data.data || [];
-        
-        const transformedMedia = mediaData.map((item: any) => ({
-          id: item.id,
-          title: item.originalName || item.filename || 'Untitled',
-          filename: item.filename,
-          author: { name: item.uploader?.name || 'Unknown' },
-          attachedTo: item.attachedTo || null,
-          createdAt: item.uploadedAt,
-          mimeType: item.mimeType,
-          size: item.size,
-          width: item.width,
-          height: item.height,
-          thumbnailUrl: item.thumbnailUrl,
-          url: item.url
-        }));
-        
-        setMedia(transformedMedia);
+        const mediaResponse = response.data.data;
+
+        if (mediaResponse && mediaResponse.media) {
+          const transformedMedia = mediaResponse.media.map((item: any) => ({
+            id: item.id,
+            title: item.originalFilename || item.filename || 'Untitled',
+            filename: item.filename,
+            author: { name: item.uploadedBy?.name || 'Unknown' },
+            attachedTo: null, // Not yet implemented in API
+            createdAt: item.createdAt,
+            mimeType: item.mimeType,
+            size: parseInt(item.size) || 0,
+            width: item.width,
+            height: item.height,
+            thumbnailUrl: item.thumbnailUrl,
+            url: item.url
+          }));
+
+          setMedia(transformedMedia);
+        } else {
+          console.error('Invalid API response structure:', response.data);
+          setMedia([]);
+        }
       } catch (err) {
-        // Fallback to mock data if API fails
-        setMedia([
-          {
-            id: '1',
-            title: 'My Awesome Picture',
-            filename: 'my-awesome-pic.jpg',
-            author: { name: 'John Doe' },
-            attachedTo: { title: 'My Awesome Post' },
-            createdAt: new Date().toISOString(),
-            mimeType: 'image/jpeg',
-            size: 123456,
-            width: 1920,
-            height: 1080,
-            thumbnailUrl: '/placeholder-150x150.png',
-            url: '/placeholder-1920x1080.png'
-          }
-        ]);
+        console.error('Failed to fetch media:', err);
+        setMedia([]);
+        toast.error('Failed to load media');
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchMedia();
   }, []);
   
