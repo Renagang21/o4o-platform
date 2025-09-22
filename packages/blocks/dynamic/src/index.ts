@@ -2,6 +2,7 @@ import { BlockPlugin } from '@o4o/block-core';
 import CPTACFLoopBlock from './blocks/cpt-acf-loop';
 import ReusableBlock from './blocks/reusable';
 import SpectraFormBlock from './blocks/spectra-forms';
+import MarkdownReaderBlock from './blocks/markdown-reader';
 
 /**
  * Dynamic Blocks Plugin
@@ -20,7 +21,8 @@ class DynamicBlocksPlugin implements BlockPlugin {
   blocks = [
     CPTACFLoopBlock,
     ReusableBlock,
-    SpectraFormBlock
+    SpectraFormBlock,
+    MarkdownReaderBlock
   ];
   
   settings = {
