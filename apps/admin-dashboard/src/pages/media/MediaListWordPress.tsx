@@ -115,7 +115,6 @@ const MediaListWordPress: FC = () => {
         params.append('limit', '1000');  // API expects 'limit' not 'per_page'
         
         const response = await authClient.api.get(`/v1/content/media?${params}`);
-        console.log('Media API Response:', response.data); // Debug log
         
         // Handle different response structures
         let mediaData = [];
@@ -153,7 +152,6 @@ const MediaListWordPress: FC = () => {
           };
         });
         
-        console.log('Transformed media:', transformedMedia); // Debug log
         setMedia(transformedMedia);
       } catch (err) {
         console.error('Failed to fetch media:', err);
