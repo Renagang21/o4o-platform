@@ -5,6 +5,7 @@ import { formatDate, formatFileSize } from '@/lib/utils';
 import { authClient } from '@o4o/auth-client';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { getFileTypeFromMime, getFileIcon, getFileColorClass } from '@/utils/fileIcons';
 
 interface MediaItem {
   id: string;
@@ -25,7 +26,7 @@ const MediaListWordPress: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'image' | 'unattached'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'image' | 'document' | 'unattached'>('all');
   const [currentUser, setCurrentUser] = useState<any>(null);
   
   // Get current logged in user
@@ -260,6 +261,11 @@ const MediaListWordPress: React.FC = () => {
     // Tab filter
     if (activeTab === 'image') {
       filtered = filtered.filter(m => m.mimeType.startsWith('image/'));
+    } else if (activeTab === 'document') {
+      filtered = filtered.filter(m => {
+        const fileType = getFileTypeFromMime(m.mimeType, m.filename);
+        return ['document', 'markdown', 'json', 'pdf', 'text', 'spreadsheet'].includes(fileType);
+      });
     } else if (activeTab === 'unattached') {
       // For now, show all as we don't track attachments
       filtered = filtered;
@@ -286,6 +292,10 @@ const MediaListWordPress: React.FC = () => {
   const counts = {
     all: media.length,
     image: media.filter(m => m.mimeType.startsWith('image/')).length,
+    document: media.filter(m => {
+      const fileType = getFileTypeFromMime(m.mimeType, m.filename);
+      return ['document', 'markdown', 'json', 'pdf', 'text', 'spreadsheet'].includes(fileType);
+    }).length,
     unattached: media.length // Simplified - all are unattached for now
   };
 
@@ -336,6 +346,13 @@ const MediaListWordPress: React.FC = () => {
             className={activeTab === 'image' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
           >
             Images ({counts.image})
+          </button>
+          <span className="text-gray-400">|</span>
+          <button
+            onClick={() => setActiveTab('document')}
+            className={activeTab === 'document' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+          >
+            Documents ({counts.document})
           </button>
           <span className="text-gray-400">|</span>
           <button
@@ -428,8 +445,8 @@ const MediaListWordPress: React.FC = () => {
                     <div className="flex items-start gap-3">
                       {/* Thumbnail */}
                       {item.thumbnailUrl || item.isImage ? (
-                        <img 
-                          src={item.thumbnailUrl || item.url} 
+                        <img
+                          src={item.thumbnailUrl || item.url}
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded border"
                           onError={(e) => {
@@ -438,8 +455,8 @@ const MediaListWordPress: React.FC = () => {
                           }}
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center text-2xl">
-                          {item.mimeType.startsWith('image') ? '🖼️' : '📄'}
+                        <div className={`w-16 h-16 rounded border flex items-center justify-center ${getFileColorClass(getFileTypeFromMime(item.mimeType, item.filename))}`}>
+                          {getFileIcon(getFileTypeFromMime(item.mimeType, item.filename), 'w-8 h-8')}
                         </div>
                       )}
                       

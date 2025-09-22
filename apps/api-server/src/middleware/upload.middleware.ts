@@ -27,6 +27,9 @@ const ALLOWED_MIME_TYPES = [
   'application/pdf',
   'text/plain',
   'text/csv',
+  'text/markdown',
+  'text/x-markdown',
+  'application/json',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.ms-excel',
@@ -54,7 +57,12 @@ const getFileType = (mimeType: string): string => {
   if (mimeType.startsWith('image/')) return 'image';
   if (mimeType.startsWith('video/')) return 'video';
   if (mimeType.startsWith('audio/')) return 'audio';
-  if (mimeType === 'application/pdf' || mimeType.startsWith('text/') || mimeType.includes('document') || mimeType.includes('sheet') || mimeType.includes('presentation')) {
+  if (mimeType === 'application/pdf' ||
+      mimeType.startsWith('text/') ||
+      mimeType === 'application/json' ||
+      mimeType.includes('document') ||
+      mimeType.includes('sheet') ||
+      mimeType.includes('presentation')) {
     return 'document';
   }
   return 'other';

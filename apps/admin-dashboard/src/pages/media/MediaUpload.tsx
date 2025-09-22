@@ -103,7 +103,7 @@ const MediaUpload: React.FC = () => {
           multiple
           className="hidden"
           onChange={handleFileSelect}
-          accept="image/*,video/*,audio/*,application/pdf"
+          accept="image/*,video/*,audio/*,application/pdf,.txt,.md,.json,.doc,.docx,.csv"
         />
       </div>
     </div>
