@@ -51,18 +51,51 @@ const OAuthSettings = () => {
       const response = await apiClient.put('/api/v1/settings/oauth', data);
       return response.data;
     },
+    onMutate: async (newData) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['oauth-settings'] });
+      
+      // Snapshot the previous value
+      const previousSettings = queryClient.getQueryData(['oauth-settings']);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(['oauth-settings'], (old: any) => {
+        if (!old?.data) return old;
+        
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            [newData.provider]: {
+              ...old.data[newData.provider],
+              ...newData.config
+            }
+          }
+        };
+      });
+      
+      // Return a context object with the snapshotted value
+      return { previousSettings };
+    },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['oauth-settings'] });
       addNotice({
         type: 'success',
         message: `${OAUTH_PROVIDERS[variables.provider].displayName} 설정이 저장되었습니다.`
       });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context: { previousSettings?: any } | undefined) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousSettings) {
+        queryClient.setQueryData(['oauth-settings'], context.previousSettings);
+      }
       addNotice({
         type: 'error',
         message: `설정 저장 실패: ${error.message}`
       });
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: ['oauth-settings'] });
     }
   });
 
@@ -88,10 +121,17 @@ const OAuthSettings = () => {
 
   // Handle input change
   const handleInputChange = useCallback((provider: OAuthProvider, field: keyof OAuthConfig, value: string | boolean | string[]) => {
-    if (!settings?.data) return;
+    if (!settings?.data) {
+      addNotice({
+        type: 'error',
+        message: '설정 데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.'
+      });
+      return;
+    }
 
+    const currentConfig = settings.data[provider];
     const updatedConfig: Partial<OAuthConfig> = {
-      ...settings.data[provider],
+      ...currentConfig,
       [field]: value
     };
 
@@ -99,7 +139,7 @@ const OAuthSettings = () => {
       provider,
       config: updatedConfig
     });
-  }, [settings, updateMutation]);
+  }, [settings, updateMutation, addNotice]);
 
   // Toggle secret visibility
   const toggleSecretVisibility = useCallback((provider: OAuthProvider) => {
@@ -214,13 +254,19 @@ const OAuthSettings = () => {
               {/* Enable/Disable Switch */}
               <div className="flex items-center justify-between">
                 <Label htmlFor={`${provider}-enabled`}>활성화</Label>
-                <Switch
-                  id={`${provider}-enabled`}
-                  checked={config.enabled}
-                  onCheckedChange={(checked: boolean) => 
-                    handleInputChange(provider, 'enabled', checked)
-                  }
-                />
+                <div className="flex items-center space-x-2">
+                  {updateMutation.isPending && (
+                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  )}
+                  <Switch
+                    id={`${provider}-enabled`}
+                    checked={config.enabled}
+                    disabled={updateMutation.isPending}
+                    onCheckedChange={(checked: boolean) => 
+                      handleInputChange(provider, 'enabled', checked)
+                    }
+                  />
+                </div>
               </div>
 
               <Separator />
@@ -236,7 +282,7 @@ const OAuthSettings = () => {
                     handleInputChange(provider, 'clientId', e.target.value)
                   }
                   placeholder="OAuth 애플리케이션의 Client ID"
-                  disabled={!config.enabled}
+                  disabled={!config.enabled || updateMutation.isPending}
                 />
               </div>
 
@@ -252,14 +298,14 @@ const OAuthSettings = () => {
                       handleInputChange(provider, 'clientSecret', e.target.value)
                     }
                     placeholder="OAuth 애플리케이션의 Client Secret"
-                    disabled={!config.enabled}
+                    disabled={!config.enabled || updateMutation.isPending}
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => toggleSecretVisibility(provider)}
-                    disabled={!config.enabled}
+                    disabled={!config.enabled || updateMutation.isPending}
                   >
                     {showSecrets[provider] ? 
                       <EyeOff className="h-4 w-4" /> : 
@@ -306,7 +352,7 @@ const OAuthSettings = () => {
                   <Button
                     variant="secondary"
                     onClick={() => testConnection(provider)}
-                    disabled={testMutation.isPending}
+                    disabled={testMutation.isPending || updateMutation.isPending}
                   >
                     <TestTube className="h-4 w-4 mr-2" />
                     연결 테스트

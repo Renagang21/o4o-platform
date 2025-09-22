@@ -289,7 +289,7 @@ const CoverSettings: React.FC<CoverSettingsProps> = ({
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Smartphone className="h-4 w-4" />
-          <Label className="text-sm font-medium">Mobile (< 768px)</Label>
+          <Label className="text-sm font-medium">Mobile (&lt; 768px)</Label>
         </div>
 
         <div>

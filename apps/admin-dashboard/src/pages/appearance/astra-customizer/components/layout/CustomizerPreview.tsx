@@ -213,7 +213,8 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
     recomputeScale();
     const handleResize = () => recomputeScale();
     window.addEventListener('resize', handleResize);
-    const ro = new (window as any).ResizeObserver?.(() => recomputeScale());
+    const ResizeObserverClass = (window as any).ResizeObserver;
+    const ro = ResizeObserverClass ? new ResizeObserverClass(() => recomputeScale()) : null;
     if (ro && containerRef.current) ro.observe(containerRef.current);
     return () => {
       window.removeEventListener('resize', handleResize);
