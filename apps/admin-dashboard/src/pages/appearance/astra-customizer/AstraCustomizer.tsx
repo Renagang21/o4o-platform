@@ -10,6 +10,8 @@ import './styles/sections.css';
 import './styles/enhanced-preview.css';
 import { useCustomizerState } from './hooks/useCustomizerState';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { authClient } from '@o4o/auth-client';
+import toast from 'react-hot-toast';
 
 // Import section components
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -19,8 +21,6 @@ import { ContainerSection } from './sections/layout/ContainerSection';
 import { HeaderLayoutSection } from './sections/header/HeaderLayoutSection';
 import { FooterSection } from './sections/footer/FooterSection';
 import { ImportExport } from './components/ImportExport';
-// import { SidebarSection } from './sections/layout/SidebarSection';
-// import { BlogSection } from './sections/content/BlogSection';
 
 interface AstraCustomizerProps {
   onClose: () => void;
@@ -38,7 +38,6 @@ const AstraCustomizerContent: React.FC<{
   onSaveHandler: (settings: AstraCustomizerSettings) => Promise<void>;
 }> = ({ onClose, siteName, previewUrl, onSaveHandler }) => {
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
-  const [isReady, setIsReady] = useState(false);
   const { isDirty, undo, redo, settings, resetAll } = useCustomizerState();
 
   // Initialize keyboard shortcuts
@@ -127,7 +126,7 @@ const AstraCustomizerContent: React.FC<{
       case 'sidebar':
         return <ContainerSection />;
       case 'blog':
-        return <div>Blog Settings (To be implemented)</div>;
+        return <ContainerSection />;
       case 'customCSS':
         return <ImportExport />;
       default:
@@ -154,7 +153,6 @@ const AstraCustomizerContent: React.FC<{
 
         <EnhancedPreview
           url={previewUrl}
-          onLoad={() => setIsReady(true)}
         />
       </div>
     </div>
@@ -173,13 +171,20 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
     if (onSave) {
       await onSave(settings);
     } else {
-      // Default save implementation
+      // Default save implementation using API
+      try {
+        const response = await authClient.api.post('/api/v1/themes/customizer/settings', {
+          themeId: 'default',
+          settings: settings
+        });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // In real implementation, this would save to backend
-      localStorage.setItem('astra-customizer-settings', JSON.stringify(settings));
+        if (response.data?.success) {
+          toast.success('Settings saved successfully');
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || 'Failed to save settings');
+        throw error;
+      }
     }
   };
 

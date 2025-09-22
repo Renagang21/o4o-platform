@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPublicOrigin } from '../../utils/publicUrls';
 import { authClient } from '@o4o/auth-client';
 import { useAdminFullscreen } from '@/hooks/useAdminFullscreen';
+import toast from 'react-hot-toast';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
@@ -36,9 +37,12 @@ const Customize: React.FC = () => {
         type: 'astra-customizer'
       });
 
-      // Settings saved successfully
-    } catch (error) {
-      console.error('Failed to save customizer settings:', error);
+      if (response.data?.success) {
+        toast.success('Customizer settings saved successfully');
+      }
+    } catch (error: any) {
+      const message = error?.response?.data?.message || 'Failed to save customizer settings';
+      toast.error(message);
       throw error;
     }
   };

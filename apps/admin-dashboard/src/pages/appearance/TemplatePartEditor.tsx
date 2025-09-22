@@ -434,7 +434,6 @@ export default function TemplatePartEditor() {
                   <p className="text-sm text-gray-600">
                     특정 페이지나 조건에서만 이 템플릿 파트가 표시되도록 설정할 수 있습니다.
                   </p>
-                  {/* TODO: Implement condition settings */}
                   <div className="text-center py-8 text-gray-500">
                     조건부 표시 설정은 추후 업데이트될 예정입니다.
                   </div>

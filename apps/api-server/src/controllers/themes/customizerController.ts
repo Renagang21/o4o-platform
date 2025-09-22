@@ -9,6 +9,7 @@ import { asyncHandler, createValidationError, createNotFoundError } from '../../
 import { cacheService } from '../../services/cache.service';
 import logger from '../../utils/logger';
 import dayjs from 'dayjs';
+import { Settings } from '../../entities/Settings';
 
 // Entity for customizer settings
 interface CustomizerSettings {
@@ -76,52 +77,64 @@ export class CustomizerController {
       return;
     }
 
-    // Fetch from database (mock for now)
-    const settings: CustomizerSettings = {
-      userId: userId!,
-      themeId: themeId as string,
-      settings: {
-        siteIdentity: {
-          siteTitle: 'My Website',
-          tagline: 'Just another website',
-          logo: undefined,
-          favicon: undefined
+    // Fetch from database
+    const settingsRepo = AppDataSource.getRepository(Settings);
+    const dbSettings = await settingsRepo.findOne({
+      where: { key: `customizer_${themeId}`, type: 'customizer' }
+    });
+
+    let settings: CustomizerSettings;
+
+    if (dbSettings && dbSettings.value) {
+      // Return existing settings
+      settings = dbSettings.value as unknown as CustomizerSettings;
+    } else {
+      // Return default settings if none exist
+      settings = {
+        userId: userId!,
+        themeId: themeId as string,
+        settings: {
+          siteIdentity: {
+            siteTitle: 'My Website',
+            tagline: 'Just another website',
+            logo: undefined,
+            favicon: undefined
+          },
+          colors: {
+            backgroundColor: '#ffffff',
+            textColor: '#333333',
+            linkColor: '#0073aa',
+            accentColor: '#0073aa',
+            headerBackgroundColor: '#23282d',
+            headerTextColor: '#ffffff',
+            darkMode: false
+          },
+          menus: {
+            primaryMenu: undefined,
+            footerMenu: undefined,
+            socialMenu: undefined
+          },
+          backgroundImage: {
+            url: undefined,
+            preset: 'default',
+            position: 'center center',
+            size: 'auto',
+            repeat: 'repeat',
+            attachment: 'scroll'
+          },
+          additionalCss: '',
+          homepage: {
+            showOnFront: 'posts',
+            pageOnFront: undefined,
+            pageForPosts: undefined
+          }
         },
-        colors: {
-          backgroundColor: '#ffffff',
-          textColor: '#333333',
-          linkColor: '#0073aa',
-          accentColor: '#0073aa',
-          headerBackgroundColor: '#23282d',
-          headerTextColor: '#ffffff',
-          darkMode: false
-        },
-        menus: {
-          primaryMenu: undefined,
-          footerMenu: undefined,
-          socialMenu: undefined
-        },
-        backgroundImage: {
-          url: undefined,
-          preset: 'default',
-          position: 'center center',
-          size: 'auto',
-          repeat: 'repeat',
-          attachment: 'scroll'
-        },
-        additionalCss: '',
-        homepage: {
-          showOnFront: 'posts',
-          pageOnFront: undefined,
-          pageForPosts: undefined
-        }
-      },
-      isDraft: false,
-      isPublished: true,
-      publishedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+        isDraft: false,
+        isPublished: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+    }
 
     // Cache for 5 minutes
     await cacheService.set(cacheKey, settings, { ttl: 300 });
@@ -143,17 +156,28 @@ export class CustomizerController {
       throw createValidationError('Site title is required');
     }
 
-    // Save to database (mock for now)
+    // Save to database
+    const settingsRepo = AppDataSource.getRepository(Settings);
     const saved: CustomizerSettings = {
       id: `cs_${Date.now()}`,
       userId: userId!,
       themeId,
-      settings: settings,
+      settings: settings.settings || settings,
       isDraft: false,
       isPublished: false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    await settingsRepo.upsert(
+      {
+        key: `customizer_${themeId}`,
+        value: saved as any,
+        type: 'customizer',
+        description: `Customizer settings for theme: ${themeId}`
+      },
+      ['key']
+    );
 
     // Clear cache
     const cacheKey = `customizer:${userId}:${themeId}`;
@@ -189,18 +213,29 @@ export class CustomizerController {
       }
     }
 
-    // Publish settings (mock for now)
+    // Publish settings to database
+    const settingsRepo = AppDataSource.getRepository(Settings);
     const published: CustomizerSettings = {
       id: `cs_${Date.now()}`,
       userId: userId!,
       themeId,
-      settings: settings,
+      settings: settings.settings || settings,
       isDraft: false,
       isPublished: true,
       publishedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    await settingsRepo.upsert(
+      {
+        key: `customizer_${themeId}`,
+        value: published as any,
+        type: 'customizer',
+        description: `Published customizer settings for theme: ${themeId}`
+      },
+      ['key']
+    );
 
     // Clear all related caches
     const cacheKeys = [
@@ -235,17 +270,28 @@ export class CustomizerController {
     const { themeId = 'default' } = req.body;
     const settings = req.body;
 
-    // Save draft (mock for now)
+    // Save draft to database
+    const settingsRepo = AppDataSource.getRepository(Settings);
     const draft: CustomizerSettings = {
       id: `draft_${Date.now()}`,
       userId: userId!,
       themeId,
-      settings: settings,
+      settings: settings.settings || settings,
       isDraft: true,
       isPublished: false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    await settingsRepo.upsert(
+      {
+        key: `customizer_draft_${userId}_${themeId}`,
+        value: draft as any,
+        type: 'customizer_draft',
+        description: `Draft customizer settings for user ${userId}, theme: ${themeId}`
+      },
+      ['key']
+    );
 
     // Cache draft for 1 hour
     const cacheKey = `customizer:draft:${userId}:${themeId}`;
@@ -267,12 +313,24 @@ export class CustomizerController {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.query;
 
-    // Get draft from cache
+    // Try cache first
     const cacheKey = `customizer:draft:${userId}:${themeId}`;
-    const draft = await cacheService.get(cacheKey);
+    let draft = await cacheService.get(cacheKey);
 
+    // If not in cache, fetch from database
     if (!draft) {
-      throw createNotFoundError('No draft found');
+      const settingsRepo = AppDataSource.getRepository(Settings);
+      const dbDraft = await settingsRepo.findOne({
+        where: { key: `customizer_draft_${userId}_${themeId}`, type: 'customizer_draft' }
+      });
+
+      if (!dbDraft || !dbDraft.value) {
+        throw createNotFoundError('No draft found');
+      }
+
+      draft = dbDraft.value;
+      // Cache for 1 hour
+      await cacheService.set(cacheKey, draft, { ttl: 3600 });
     }
 
     logger.info('Customizer draft retrieved', { userId, themeId });
@@ -356,12 +414,22 @@ export class CustomizerController {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.query;
 
-    // Get current settings
+    // Get current settings from cache or database
     const cacheKey = `customizer:${userId}:${themeId}`;
-    const settings = await cacheService.get(cacheKey);
+    let settings = await cacheService.get(cacheKey);
 
     if (!settings) {
-      throw createNotFoundError('No settings found to export');
+      // Try database
+      const settingsRepo = AppDataSource.getRepository(Settings);
+      const dbSettings = await settingsRepo.findOne({
+        where: { key: `customizer_${themeId}`, type: 'customizer' }
+      });
+
+      if (!dbSettings || !dbSettings.value) {
+        throw createNotFoundError('No settings found to export');
+      }
+
+      settings = dbSettings.value;
     }
 
     // Prepare export data

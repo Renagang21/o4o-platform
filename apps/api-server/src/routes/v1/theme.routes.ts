@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ThemeController } from '../../controllers/ThemeController';
 import { authenticateToken } from '../../middleware/auth';
 import { requireAdmin } from '../../middleware/auth';
+import customizerRoutes from '../customizerRoutes';
 
 const router: Router = Router();
 const themeController = new ThemeController();
@@ -32,5 +33,8 @@ router.put('/:id/customize', themeController.saveCustomizations);
 
 // Hook system (for testing)
 router.post('/hooks/execute', themeController.executeHook);
+
+// Customizer routes
+router.use('/customizer', customizerRoutes);
 
 export default router;

@@ -278,14 +278,10 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     
     try {
       await eventHandlers?.onSave?.(state.settings);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       dispatch({ type: 'SET_SAVE_STATUS', status: 'saved' });
       dispatch({ type: 'MARK_DIRTY', isDirty: false });
     } catch (error) {
-      console.error('Failed to save settings:', error);
       dispatch({ type: 'SET_SAVE_STATUS', status: 'error' });
     }
   }, [state.settings, eventHandlers]);
@@ -297,15 +293,13 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     try {
       // Save as draft first
       await saveSettings();
-      
-      // Then publish
-      // This would typically call a different API endpoint
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+
+      // Then publish - eventHandlers can handle the actual API call
+      await eventHandlers?.onPublish?.(state.settings);
+
       dispatch({ type: 'SET_SAVE_STATUS', status: 'saved' });
       dispatch({ type: 'MARK_DIRTY', isDirty: false });
     } catch (error) {
-      console.error('Failed to publish settings:', error);
       dispatch({ type: 'SET_SAVE_STATUS', status: 'error' });
     }
   }, [saveSettings]);
