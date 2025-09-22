@@ -113,7 +113,30 @@ const MediaListWordPress: React.FC = () => {
     if (!confirm('Delete this media permanently?')) return;
     
     try {
-      const token = authClient.getAccessToken();
+      // Get token from localStorage directly
+      let token = localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token') || 
+                  localStorage.getItem('authToken');
+      
+      // Also check admin-auth-storage
+      if (!token) {
+        const authStorage = localStorage.getItem('admin-auth-storage');
+        if (authStorage) {
+          try {
+            const parsed = JSON.parse(authStorage);
+            if (parsed.state?.accessToken || parsed.state?.token) {
+              token = parsed.state.accessToken || parsed.state.token;
+            }
+          } catch (e) {
+            // Invalid JSON, ignore
+          }
+        }
+      }
+      
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        return;
+      }
       
       await axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
         headers: {
@@ -134,7 +157,30 @@ const MediaListWordPress: React.FC = () => {
     if (!confirm(`Delete ${selectedMedia.size} items permanently?`)) return;
 
     try {
-      const token = authClient.getAccessToken();
+      // Get token from localStorage directly
+      let token = localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token') || 
+                  localStorage.getItem('authToken');
+      
+      // Also check admin-auth-storage
+      if (!token) {
+        const authStorage = localStorage.getItem('admin-auth-storage');
+        if (authStorage) {
+          try {
+            const parsed = JSON.parse(authStorage);
+            if (parsed.state?.accessToken || parsed.state?.token) {
+              token = parsed.state.accessToken || parsed.state.token;
+            }
+          } catch (e) {
+            // Invalid JSON, ignore
+          }
+        }
+      }
+      
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        return;
+      }
       
       await Promise.all(
         Array.from(selectedMedia).map(id => 
