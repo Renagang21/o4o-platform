@@ -14,6 +14,7 @@ interface MediaItem {
   size: number;
   thumbnailUrl?: string;
   url: string;
+  isImage?: boolean;
 }
 
 const MediaListWordPress: React.FC = () => {
@@ -40,17 +41,35 @@ const MediaListWordPress: React.FC = () => {
         mediaData = response.data;
       }
 
-      const transformed = mediaData.map((item: any) => ({
-        id: item.id,
-        title: item.originalFilename || item.filename || 'Untitled',
-        filename: item.filename,
-        author: item.uploadedBy?.name || 'Unknown',
-        createdAt: item.createdAt,
-        mimeType: item.mimeType || 'application/octet-stream',
-        size: parseInt(item.size) || 0,
-        thumbnailUrl: item.thumbnailUrl || (item.isImage ? item.url : null),
-        url: item.url
-      }));
+      const transformed = mediaData.map((item: any) => {
+        // Ensure thumbnailUrl has proper format
+        let thumbnailUrl = item.thumbnailUrl;
+        if (!thumbnailUrl && item.isImage && item.url) {
+          thumbnailUrl = item.url;
+        }
+        // Add API base URL if needed
+        if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
+          thumbnailUrl = `https://api.neture.co.kr${thumbnailUrl}`;
+        }
+        
+        let url = item.url;
+        if (url && !url.startsWith('http')) {
+          url = `https://api.neture.co.kr${url}`;
+        }
+
+        return {
+          id: item.id,
+          title: item.originalFilename || item.filename || 'Untitled',
+          filename: item.filename,
+          author: item.uploadedBy?.name || 'Unknown',
+          createdAt: item.createdAt,
+          mimeType: item.mimeType || 'application/octet-stream',
+          size: parseInt(item.size) || 0,
+          thumbnailUrl,
+          url,
+          isImage: item.isImage || (item.mimeType && item.mimeType.startsWith('image/'))
+        };
+      });
 
       setMedia(transformed);
     } catch (err) {
@@ -58,6 +77,18 @@ const MediaListWordPress: React.FC = () => {
       toast.error('Failed to load media');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = async (id: string, newTitle: string) => {
+    try {
+      await authClient.api.put(`/v1/content/media/${id}`, { title: newTitle });
+      setMedia(prev => prev.map(m => 
+        m.id === id ? { ...m, title: newTitle } : m
+      ));
+      toast.success('Media updated');
+    } catch (error) {
+      toast.error('Failed to update media');
     }
   };
 
@@ -265,11 +296,15 @@ const MediaListWordPress: React.FC = () => {
                   <td className="px-3 py-3">
                     <div className="flex items-start gap-3">
                       {/* Thumbnail */}
-                      {item.thumbnailUrl ? (
+                      {item.thumbnailUrl || item.isImage ? (
                         <img 
-                          src={item.thumbnailUrl} 
+                          src={item.thumbnailUrl || item.url} 
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded border"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }}
                         />
                       ) : (
                         <div className="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center text-2xl">
@@ -286,6 +321,19 @@ const MediaListWordPress: React.FC = () => {
                         
                         {/* Actions */}
                         <div className="flex items-center gap-2 mt-2 text-xs">
+                          <button
+                            onClick={() => {
+                              // Simple edit - change title
+                              const newTitle = prompt('Edit title:', item.title);
+                              if (newTitle && newTitle !== item.title) {
+                                handleEdit(item.id, newTitle);
+                              }
+                            }}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Edit
+                          </button>
+                          <span className="text-gray-400">|</span>
                           <button
                             onClick={() => handleDelete(item.id)}
                             className="text-red-600 hover:text-red-800"
