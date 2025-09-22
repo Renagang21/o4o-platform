@@ -110,7 +110,16 @@ const MediaListWordPress: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this media permanently?')) return;
+    // Use non-blocking confirmation
+    const shouldDelete = window.confirm('Delete this media permanently?');
+    if (!shouldDelete) return;
+    
+    // Find the item to delete for potential restoration
+    const itemToDelete = media.find(m => m.id === id);
+    if (!itemToDelete) return;
+    
+    // Optimistically remove from UI immediately for better perceived performance
+    setMedia(prev => prev.filter(m => m.id !== id));
     
     try {
       // Get token from localStorage directly
@@ -134,10 +143,15 @@ const MediaListWordPress: React.FC = () => {
       }
       
       if (!token) {
+        // Restore the item if auth fails
+        setMedia(prev => [...prev, itemToDelete].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ));
         toast.error('Authentication required. Please login again.');
         return;
       }
       
+      // Perform delete request
       await axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -145,16 +159,30 @@ const MediaListWordPress: React.FC = () => {
         }
       });
       
-      setMedia(prev => prev.filter(m => m.id !== id));
-      toast.success('Media deleted');
+      toast.success('Media deleted successfully');
     } catch (error: any) {
+      // Restore the item on error
+      setMedia(prev => [...prev, itemToDelete].sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ));
       toast.error(`Failed to delete: ${error.response?.data?.message || error.message}`);
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedMedia.size === 0) return;
-    if (!confirm(`Delete ${selectedMedia.size} items permanently?`)) return;
+    
+    const shouldDelete = window.confirm(`Delete ${selectedMedia.size} items permanently?`);
+    if (!shouldDelete) return;
+
+    // Store items to potentially restore
+    const itemsToDelete = media.filter(m => selectedMedia.has(m.id));
+    const selectedIds = new Set(selectedMedia);
+    
+    // Optimistically update UI immediately
+    setMedia(prev => prev.filter(m => !selectedIds.has(m.id)));
+    setSelectedMedia(new Set());
+    toast.info(`Deleting ${selectedIds.size} items...`);
 
     try {
       // Get token from localStorage directly
@@ -178,25 +206,49 @@ const MediaListWordPress: React.FC = () => {
       }
       
       if (!token) {
+        // Restore items if auth fails
+        setMedia(prev => [...prev, ...itemsToDelete].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ));
+        setSelectedMedia(selectedIds);
         toast.error('Authentication required. Please login again.');
         return;
       }
       
-      await Promise.all(
-        Array.from(selectedMedia).map(id => 
-          axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          })
-        )
+      // Delete items in parallel but don't block UI
+      const deletePromises = Array.from(selectedIds).map(id => 
+        axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }).catch(error => {
+          console.error(`Failed to delete media ${id}:`, error);
+          return { error, id };
+        })
       );
       
-      setMedia(prev => prev.filter(m => !selectedMedia.has(m.id)));
-      setSelectedMedia(new Set());
-      toast.success('Selected media deleted');
+      // Process results in background
+      Promise.all(deletePromises).then(results => {
+        const failedDeletions = results.filter(r => r && 'error' in r);
+        if (failedDeletions.length > 0) {
+          // Restore only the failed items
+          const failedIds = failedDeletions.map((f: any) => f.id);
+          const failedItems = itemsToDelete.filter(item => failedIds.includes(item.id));
+          setMedia(prev => [...prev, ...failedItems].sort((a, b) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ));
+          toast.error(`Failed to delete ${failedDeletions.length} item(s)`);
+        } else {
+          toast.success('Selected media deleted successfully');
+        }
+      });
     } catch (error: any) {
+      // Restore all items on complete failure
+      setMedia(prev => [...prev, ...itemsToDelete].sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ));
+      setSelectedMedia(selectedIds);
       toast.error(`Failed to delete: ${error.response?.data?.message || error.message}`);
     }
   };
