@@ -79,3 +79,44 @@ export enum AuthErrorCode {
   TOO_MANY_ATTEMPTS = 'TOO_MANY_ATTEMPTS',
   OAUTH_LINK_FAILED = 'OAUTH_LINK_FAILED'
 }
+
+export interface OAuthProvider {
+  enabled: boolean;
+}
+
+export interface OAuthProviders {
+  google: OAuthProvider;
+  kakao: OAuthProvider;
+  naver: OAuthProvider;
+}
+
+export interface OAuthProvidersResponse {
+  providers: OAuthProviders;
+}
+
+export interface SocialLoginConfig {
+  google: {
+    enabled: boolean;
+    name: string;
+    icon: string;
+    color: string;
+    hoverColor: string;
+    textColor: string;
+  };
+  kakao: {
+    enabled: boolean;
+    name: string;
+    icon: string;
+    color: string;
+    hoverColor: string;
+    textColor: string;
+  };
+  naver: {
+    enabled: boolean;
+    name: string;
+    icon: string;
+    color: string;
+    hoverColor: string;
+    textColor: string;
+  };
+}
