@@ -180,6 +180,11 @@ const OAuthSettings = () => {
     return `${baseUrl}/api/auth/callback/${provider}`;
   }, []);
 
+  // Mask sensitive data
+  const maskSecret = useCallback((secret: string): string => {
+    if (!secret || secret.length < 8) return secret;
+    return secret.substring(0, 4) + '****' + secret.substring(secret.length - 4);
+  }, []);
 
   if (isLoading) {
     return (
