@@ -116,29 +116,36 @@ const MediaListWordPress: FC = () => {
         params.append('page', '1');
 
         const response = await authClient.api.get(`/v1/content/media?${params}`);
-        const mediaResponse = response.data.data;
 
-        if (mediaResponse && mediaResponse.media) {
-          const transformedMedia = mediaResponse.media.map((item: any) => ({
-            id: item.id,
-            title: item.originalFilename || item.filename || 'Untitled',
-            filename: item.filename,
-            author: { name: item.uploadedBy?.name || 'Unknown' },
-            attachedTo: null, // Not yet implemented in API
-            createdAt: item.createdAt,
-            mimeType: item.mimeType,
-            size: parseInt(item.size) || 0,
-            width: item.width,
-            height: item.height,
-            thumbnailUrl: item.thumbnailUrl,
-            url: item.url
-          }));
-
-          setMedia(transformedMedia);
-        } else {
-          console.error('Invalid API response structure:', response.data);
-          setMedia([]);
+        // Handle different response structures
+        let mediaData = [];
+        if (Array.isArray(response.data)) {
+          mediaData = response.data;
+        } else if (response.data.data?.media) {
+          // API returns data.media array
+          mediaData = response.data.data.media;
+        } else if (response.data.data) {
+          mediaData = response.data.data;
+        } else if (response.data.items) {
+          mediaData = response.data.items;
         }
+
+        const transformedMedia = mediaData.map((item: any) => ({
+          id: item.id || item._id,
+          title: item.originalFilename || item.filename || item.name || 'Untitled',
+          filename: item.filename || item.name,
+          author: { name: item.uploadedBy?.name || item.uploader?.name || 'Unknown' },
+          attachedTo: item.attachedTo || null,
+          createdAt: item.createdAt || item.uploadedAt || item.created_at,
+          mimeType: item.mimeType || item.mime_type || 'application/octet-stream',
+          size: parseInt(item.size) || 0,
+          width: item.width,
+          height: item.height,
+          thumbnailUrl: item.thumbnailUrl || (item.isImage ? item.url : null),
+          url: item.url
+        }));
+
+        setMedia(transformedMedia);
       } catch (err) {
         console.error('Failed to fetch media:', err);
         setMedia([]);
