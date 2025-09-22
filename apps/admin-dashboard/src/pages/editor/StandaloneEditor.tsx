@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
-import MediaLibrary from '@/pages/media/MediaLibrary';
+import MediaListWordPress from '@/pages/media/MediaListWordPress';
 import ContentTemplates from '@/components/editor/ContentTemplates';
 import {
   Dialog,
@@ -1093,7 +1093,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       {/* Media Library Modal */}
       <Dialog open={showMediaLibrary} onOpenChange={setShowMediaLibrary}>
         <DialogContent className="max-w-6xl h-[80vh] p-0">
-          <MediaLibrary />
+          <MediaListWordPress />
         </DialogContent>
       </Dialog>
       
