@@ -195,26 +195,52 @@ const MediaListWordPress: FC = () => {
   };
 
   const handleEdit = (id: string) => {
-    // Handle edit functionality
-    // TODO: Implement edit functionality
+    // Open media editor modal or redirect to edit page
+    const mediaItem = media.find(m => m.id === id);
+    if (mediaItem) {
+      // For now, show media details in alert
+      alert(`Edit functionality coming soon!\n\nFile: ${mediaItem.filename}\nTitle: ${mediaItem.title}\nSize: ${formatFileSize(mediaItem.size)}`);
+      // TODO: Implement proper edit modal/page
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('정말 이 미디어를 삭제하시겠습니까?')) {
       try {
-        await authClient.api.delete(`/v1/content/media/${id}`);
+        // Ensure we have authentication token
+        const token = authClient.getToken();
+        if (!token) {
+          toast.error('Please log in to delete media');
+          return;
+        }
+        
+        await authClient.api.delete(`/v1/content/media/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
         setMedia(prevMedia => prevMedia.filter(m => m.id !== id));
         toast.success('Media deleted successfully');
-      } catch (error) {
-        toast.error('Failed to delete media');
+      } catch (error: any) {
+        console.error('Delete error:', error);
+        if (error.response?.status === 401) {
+          toast.error('Authentication required. Please log in again.');
+        } else {
+          toast.error('Failed to delete media');
+        }
       }
     }
   };
 
   const handleView = (id: string) => {
     const mediaItem = media.find(m => m.id === id);
-    if (mediaItem) {
-      window.open(mediaItem.url, '_blank');
+    if (mediaItem && mediaItem.url) {
+      // Ensure URL is absolute
+      const url = mediaItem.url.startsWith('http') 
+        ? mediaItem.url 
+        : `${import.meta.env.VITE_API_URL || 'https://api.neture.co.kr'}${mediaItem.url}`;
+      window.open(url, '_blank');
     }
   };
 

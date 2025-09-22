@@ -347,12 +347,33 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // Serve static files for uploads (EARLY in middleware chain)
-// Static file serving - single configuration
+// Static file serving with CORS headers for images
 const staticUploadsPath = path.join(process.cwd(), 'public', 'uploads');
+
+// Add CORS headers for static files
+app.use('/uploads', (req, res, next) => {
+  // Set CORS headers for all upload requests
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  
+  // Cache control for images
+  res.header('Cache-Control', 'public, max-age=604800, immutable');
+  
+  next();
+});
+
 app.use('/uploads', express.static(staticUploadsPath, {
   maxAge: '7d',
   etag: true,
-  lastModified: true
+  lastModified: true,
+  setHeaders: (res, path) => {
+    // Additional headers for specific file types
+    if (path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png') || path.endsWith('.gif') || path.endsWith('.webp')) {
+      res.setHeader('Content-Type', 'image/' + path.split('.').pop());
+    }
+  }
 }));
 
 // Add performance monitoring middleware early in the chain
