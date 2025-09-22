@@ -50,7 +50,7 @@ const MediaUpload: React.FC = () => {
     
     if (successCount > 0) {
       toast.success(`${successCount} file${successCount > 1 ? 's' : ''} uploaded`);
-      setTimeout(() => navigate('/admin/media'), 1000);
+      setTimeout(() => navigate('/media'), 1000);
     }
   };
 
@@ -60,8 +60,8 @@ const MediaUpload: React.FC = () => {
       <div className="bg-white border-b px-8 py-3">
         <AdminBreadcrumb 
           items={[
-            { label: 'Dashboard', path: '/admin' },
-            { label: 'Media', path: '/admin/media' },
+            { label: 'Dashboard', path: '/' },
+            { label: 'Media', path: '/media' },
             { label: 'Add New' }
           ]}
         />

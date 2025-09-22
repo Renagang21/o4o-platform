@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { formatDate, formatFileSize } from '@/lib/utils';
 import { authClient } from '@o4o/auth-client';
@@ -18,6 +19,7 @@ interface MediaItem {
 }
 
 const MediaListWordPress: React.FC = () => {
+  const navigate = useNavigate();
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState<Set<string>>(new Set());
@@ -61,7 +63,7 @@ const MediaListWordPress: React.FC = () => {
           id: item.id,
           title: item.originalFilename || item.filename || 'Untitled',
           filename: item.filename,
-          author: item.uploadedBy?.name || 'Unknown',
+          author: item.uploadedBy?.name || item.uploadedBy?.username || item.author || 'Admin',
           createdAt: item.createdAt,
           mimeType: item.mimeType || 'application/octet-stream',
           size: parseInt(item.size) || 0,
@@ -96,10 +98,16 @@ const MediaListWordPress: React.FC = () => {
     if (!confirm('Delete this media permanently?')) return;
     
     try {
-      await authClient.api.delete(`/v1/content/media/${id}`);
+      const token = authClient.getAccessToken();
+      await authClient.api.delete(`/v1/content/media/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setMedia(prev => prev.filter(m => m.id !== id));
       toast.success('Media deleted');
     } catch (error) {
+      console.error('Delete error:', error);
       toast.error('Failed to delete media');
     }
   };
@@ -109,15 +117,21 @@ const MediaListWordPress: React.FC = () => {
     if (!confirm(`Delete ${selectedMedia.size} items permanently?`)) return;
 
     try {
+      const token = authClient.getAccessToken();
       await Promise.all(
         Array.from(selectedMedia).map(id => 
-          authClient.api.delete(`/v1/content/media/${id}`)
+          authClient.api.delete(`/v1/content/media/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
         )
       );
       setMedia(prev => prev.filter(m => !selectedMedia.has(m.id)));
       setSelectedMedia(new Set());
       toast.success('Selected media deleted');
     } catch (error) {
+      console.error('Bulk delete error:', error);
       toast.error('Failed to delete media');
     }
   };
@@ -172,8 +186,8 @@ const MediaListWordPress: React.FC = () => {
       <div className="bg-white border-b px-8 py-3">
         <AdminBreadcrumb 
           items={[
-            { label: 'Dashboard', path: '/admin' },
-            { label: 'Media', path: '/admin/media' },
+            { label: 'Dashboard', path: '/' },
+            { label: 'Media', path: '/media' },
             { label: 'Library' }
           ]}
         />
@@ -184,7 +198,7 @@ const MediaListWordPress: React.FC = () => {
         <div className="flex items-center gap-3 mb-4">
           <h1 className="text-2xl font-normal">Media Library</h1>
           <button
-            onClick={() => window.location.href = '/admin/media/new'}
+            onClick={() => navigate('/media/new')}
             className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
           >
             Add New
