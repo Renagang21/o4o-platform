@@ -352,8 +352,11 @@ app.options('*', cors(corsOptions));
 // Serve static files for uploads (EARLY in middleware chain)
 // Static file serving with CORS headers for images
 // Use project root instead of process.cwd() to ensure correct path
+// Static file paths - handle both production and development
 const projectRoot = path.resolve(__dirname, '../../../');
-const staticUploadsPath = path.join(projectRoot, 'public', 'uploads');
+const staticUploadsPath = process.env.NODE_ENV === 'production'
+  ? path.join(__dirname, '../public', 'uploads')  // apps/api-server/public/uploads in production
+  : path.join(projectRoot, 'public', 'uploads');   // project root public/uploads in development
 
 // Add CORS headers for static files
 app.use('/uploads', (req, res, next) => {
@@ -369,6 +372,7 @@ app.use('/uploads', (req, res, next) => {
   next();
 });
 
+// Primary static path
 app.use('/uploads', express.static(staticUploadsPath, {
   maxAge: '7d',
   etag: true,
@@ -380,6 +384,21 @@ app.use('/uploads', express.static(staticUploadsPath, {
     }
   }
 }));
+
+// Fallback static path for apps/api-server/public/uploads (for compatibility)
+const fallbackUploadsPath = path.join(__dirname, '../public', 'uploads');
+if (fallbackUploadsPath !== staticUploadsPath) {
+  app.use('/uploads', express.static(fallbackUploadsPath, {
+    maxAge: '7d',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      if (path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png') || path.endsWith('.gif') || path.endsWith('.webp')) {
+        res.setHeader('Content-Type', 'image/' + path.split('.').pop());
+      }
+    }
+  }));
+}
 
 // Add performance monitoring middleware early in the chain
 app.use(performanceMonitor as any);

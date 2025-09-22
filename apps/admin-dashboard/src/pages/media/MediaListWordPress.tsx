@@ -79,7 +79,7 @@ const MediaListWordPress: React.FC = () => {
           id: item.id,
           title: item.originalFilename || item.filename || 'Untitled',
           filename: item.filename,
-          author: item.uploadedBy?.name || item.uploadedBy?.username || item.author || currentUser?.name || currentUser?.email || 'Current User',
+          author: item.uploadedBy?.name || item.uploadedBy?.email?.split('@')[0] || currentUser?.name || currentUser?.email?.split('@')[0] || 'Unknown',
           createdAt: item.createdAt,
           mimeType: item.mimeType || 'application/octet-stream',
           size: parseInt(item.size) || 0,
