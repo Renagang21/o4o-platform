@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Save, Copy, Check, AlertCircle, ExternalLink, TestTube, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +35,20 @@ const OAuthSettings = () => {
     kakao: false,
     naver: false
   });
+  
+  // Local state for form data - prevents immediate saving
+  const [localSettings, setLocalSettings] = useState<Record<OAuthProvider, OAuthConfig>>({
+    google: { provider: 'google', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] },
+    kakao: { provider: 'kakao', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] },
+    naver: { provider: 'naver', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] }
+  });
+  
+  // Track which providers have unsaved changes
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<Record<OAuthProvider, boolean>>({
+    google: false,
+    kakao: false,
+    naver: false
+  });
 
   // Fetch OAuth settings
   const { data: settings, isLoading } = useQuery<OAuthSettingsResponse>({
@@ -44,6 +58,19 @@ const OAuthSettings = () => {
       return response.data;
     }
   });
+
+  // Sync server settings to local state when data loads
+  useEffect(() => {
+    if (settings?.data) {
+      setLocalSettings(settings.data);
+      // Reset unsaved changes when fresh data loads
+      setHasUnsavedChanges({
+        google: false,
+        kakao: false,
+        naver: false
+      });
+    }
+  }, [settings]);
 
   // Update OAuth settings mutation
   const updateMutation = useMutation<OAuthUpdateResponse, Error, OAuthUpdateRequest>({
@@ -83,7 +110,7 @@ const OAuthSettings = () => {
         message: `${OAUTH_PROVIDERS[variables.provider].displayName} 설정이 저장되었습니다.`
       });
     },
-    onError: (error: Error, _variables, context: { previousSettings?: any } | undefined) => {
+    onError: (error: Error, _variables, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousSettings) {
         queryClient.setQueryData(['oauth-settings'], context.previousSettings);
@@ -119,27 +146,52 @@ const OAuthSettings = () => {
     }
   });
 
-  // Handle input change
+  // Handle local input changes (no immediate save)
   const handleInputChange = useCallback((provider: OAuthProvider, field: keyof OAuthConfig, value: string | boolean | string[]) => {
-    if (!settings?.data) {
+    setLocalSettings(prev => ({
+      ...prev,
+      [provider]: {
+        ...prev[provider],
+        [field]: value
+      }
+    }));
+    
+    // Mark as having unsaved changes
+    setHasUnsavedChanges(prev => ({
+      ...prev,
+      [provider]: true
+    }));
+  }, []);
+
+  // Save specific provider settings to server
+  const handleSaveProvider = useCallback(async (provider: OAuthProvider) => {
+    const config = localSettings[provider];
+    
+    // Validate required fields
+    if (config.enabled && (!config.clientId || !config.clientSecret)) {
       addNotice({
         type: 'error',
-        message: '설정 데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.'
+        message: `${OAUTH_PROVIDERS[provider].displayName} 설정을 저장하려면 Client ID와 Client Secret을 모두 입력해주세요.`
       });
       return;
     }
 
-    const currentConfig = settings.data[provider];
-    const updatedConfig: Partial<OAuthConfig> = {
-      ...currentConfig,
-      [field]: value
-    };
-
-    updateMutation.mutate({
-      provider,
-      config: updatedConfig
-    });
-  }, [settings, updateMutation, addNotice]);
+    updateMutation.mutate(
+      {
+        provider,
+        config
+      },
+      {
+        onSuccess: () => {
+          // Mark as saved
+          setHasUnsavedChanges(prev => ({
+            ...prev,
+            [provider]: false
+          }));
+        }
+      }
+    );
+  }, [localSettings, updateMutation, addNotice]);
 
   // Toggle secret visibility
   const toggleSecretVisibility = useCallback((provider: OAuthProvider) => {
@@ -194,11 +246,8 @@ const OAuthSettings = () => {
     );
   }
 
-  const oauthData = settings?.data || {
-    google: { provider: 'google', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] },
-    kakao: { provider: 'kakao', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] },
-    naver: { provider: 'naver', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] }
-  };
+  // Use local settings for UI display
+  const oauthData = localSettings;
 
   return (
     <div className="space-y-6">
@@ -346,9 +395,21 @@ const OAuthSettings = () => {
                 </p>
               </div>
 
-              {/* Test Connection */}
-              {config.enabled && config.clientId && config.clientSecret && (
-                <div className="pt-4">
+              {/* Action Buttons */}
+              <div className="pt-4 flex gap-2">
+                {/* Save Button */}
+                <Button
+                  variant={hasUnsavedChanges[provider] ? "default" : "outline"}
+                  onClick={() => handleSaveProvider(provider)}
+                  disabled={updateMutation.isPending}
+                  className={hasUnsavedChanges[provider] ? "bg-blue-600 hover:bg-blue-700" : ""}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {hasUnsavedChanges[provider] ? '저장' : '저장됨'}
+                </Button>
+
+                {/* Test Connection - only show when saved and enabled */}
+                {config.enabled && config.clientId && config.clientSecret && !hasUnsavedChanges[provider] && (
                   <Button
                     variant="secondary"
                     onClick={() => testConnection(provider)}
@@ -357,27 +418,20 @@ const OAuthSettings = () => {
                     <TestTube className="h-4 w-4 mr-2" />
                     연결 테스트
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </CardContent>
           </Card>
         );
       })}
 
-      {/* Save All Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={() => {
-            addNotice({
-              type: 'success',
-              message: '모든 OAuth 설정이 저장되었습니다.'
-            });
-          }}
-          disabled={updateMutation.isPending}
-        >
-          <Save className="h-4 w-4 mr-2" />
-          모든 설정 저장
-        </Button>
+      {/* Info about individual saving */}
+      <div className="text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="font-medium text-blue-800 mb-1">💡 개별 저장 방식</p>
+        <p className="text-blue-700">
+          각 소셜 로그인 제공자의 설정을 완료한 후, 해당 카드의 <strong>"저장"</strong> 버튼을 눌러주세요. 
+          모든 정보를 입력한 후에만 저장이 가능하며, 저장되지 않은 변경사항은 파란색 "저장" 버튼으로 표시됩니다.
+        </p>
       </div>
     </div>
   );
