@@ -8,6 +8,23 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Check if running in CI environment
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+
+if (isCI) {
+  console.log('🔍 CI environment detected, using CI build script...');
+  try {
+    execSync('node build-ci.js', {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ CI build failed');
+    process.exit(1);
+  }
+}
+
 console.log('🔨 Building @o4o/auth-context...');
 
 // Clean previous build
