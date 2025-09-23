@@ -263,7 +263,7 @@ export const RichText: FC<RichTextProps> = ({
     'data-placeholder': isEmpty ? placeholder : undefined,
     role: 'textbox',
     'aria-label': placeholder,
-    'aria-multiline': multiline ? 'true' : 'false',
+    'aria-multiline': !!multiline,
   };
 
   // For specific tags that need special handling

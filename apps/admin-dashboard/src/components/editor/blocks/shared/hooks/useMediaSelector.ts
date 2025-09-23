@@ -280,14 +280,6 @@ export const useMediaSelector = (options: UseMediaSelectorOptions = {}): UseMedi
     isFetchingNextPage,
     loadMoreRef,
     refetch
-  } as UseMediaSelectorReturn & {
-    allFiles: MediaItem[];
-    isLoading: boolean;
-    error: any;
-    hasNextPage: boolean;
-    isFetchingNextPage: boolean;
-    loadMoreRef: any;
-    refetch: () => void;
   };
 };
 

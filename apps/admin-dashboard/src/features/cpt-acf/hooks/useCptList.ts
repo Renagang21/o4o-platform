@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { listCpt, deleteCpt } from '../services/cpt.api';
 import * as KEYS from './keys.cpt';
 
@@ -41,7 +41,7 @@ export function useCptList(initial: CptListFilters = {}) {
   const { data = [], isLoading, isFetching, error, refetch } = useQuery({
     queryKey: [ ...KEYS.LIST, queryParams ],
     queryFn: () => listCpt(queryParams),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 60_000,
   });
 

@@ -91,6 +91,14 @@ export interface UseMediaSelectorReturn {
     canSelectMore: boolean;
     isAllSelected: boolean;
   };
+  // Additional data properties
+  allFiles: MediaItem[];
+  isLoading: boolean;
+  error: any;
+  hasNextPage?: boolean;
+  isFetchingNextPage: boolean;
+  loadMoreRef: (node?: Element | null) => void;
+  refetch: () => void;
 }
 
 // Component variant props

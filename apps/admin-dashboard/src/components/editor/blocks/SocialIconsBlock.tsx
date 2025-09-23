@@ -377,7 +377,7 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
                       color={style === 'outlined' ?
                         getIconColor(link.platform, isHovered) :
                         (link.platform === 'kakao' && colorMode === 'brand' ?
-                          platformInfo.textColor :
+                          (platformInfo as any).textColor || '#3C1E1E' :
                           '#ffffff')
                       }
                     />

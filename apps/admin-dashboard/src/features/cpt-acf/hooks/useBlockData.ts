@@ -57,8 +57,6 @@ export function useBlockData(
     refetchOnMount,
     refetchOnWindowFocus,
     select: (response) => response.data,
-    onSuccess,
-    onError,
   });
 }
 

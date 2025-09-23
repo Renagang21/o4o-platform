@@ -12,7 +12,7 @@ interface GalleryMasonryProps {
   images: GalleryImage[];
   attributes: Partial<GalleryAttributes>;
   isEditing?: boolean;
-  selectedImageId?: string;
+  selectedImageId?: string | null;
   onImageSelect?: (imageId: string) => void;
   onImageEdit?: (imageId: string) => void;
   onImageRemove?: (imageId: string) => void;

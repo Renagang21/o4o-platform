@@ -124,19 +124,19 @@ const Edit: React.FC<MarkdownReaderBlockProps> = ({
       mediaId: media.id,
       mediaUrl: media.url,
       mediaTitle: media.title || media.filename,
-      markdownContent: null,
-      lastFetched: null
+      markdownContent: undefined,
+      lastFetched: undefined
     });
   };
 
   // Handle media removal
   const onRemoveMedia = () => {
     setAttributes({
-      mediaId: null,
-      mediaUrl: null,
-      mediaTitle: null,
-      markdownContent: null,
-      lastFetched: null
+      mediaId: undefined,
+      mediaUrl: undefined,
+      mediaTitle: undefined,
+      markdownContent: undefined,
+      lastFetched: undefined
     });
     setParsedHtml('');
     setError(null);
@@ -174,7 +174,7 @@ const Edit: React.FC<MarkdownReaderBlockProps> = ({
               value={mediaId}
               render={({ open }) => (
                 <ToolbarButton
-                  icon={FileCode}
+                  icon={() => <FileCode size={24} />}
                   label={__('Select Markdown File')}
                   onClick={open}
                 />
@@ -219,7 +219,7 @@ const Edit: React.FC<MarkdownReaderBlockProps> = ({
               { label: 'Medium (5xl)', value: 'medium' },
               { label: 'Narrow (3xl)', value: 'narrow' }
             ]}
-            onChange={(value) => setAttributes({ containerWidth: value })}
+            onChange={(value) => setAttributes({ containerWidth: value as 'wide' | 'full' | 'narrow' | 'medium' })}
           />
           <SelectControl
             label={__('Theme')}
@@ -351,8 +351,7 @@ const MarkdownReaderBlock: BlockDefinition = {
   supports: {
     align: ['wide', 'full'],
     html: false,
-    className: true,
-    customClassName: true
+    className: true
   },
   edit: Edit,
   save: Save

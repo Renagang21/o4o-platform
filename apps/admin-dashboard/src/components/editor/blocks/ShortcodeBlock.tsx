@@ -61,10 +61,27 @@ interface ShortcodeMatch {
   selfClosing: boolean;
 }
 
+interface ShortcodeParameter {
+  name: string;
+  required: boolean;
+  description: string;
+  type: 'text' | 'number' | 'url' | 'select';
+  default?: string;
+  options?: string[];
+}
+
+interface ShortcodeTemplate {
+  name: string;
+  description: string;
+  template: string;
+  parameters: ShortcodeParameter[];
+  hasContent?: boolean;
+}
+
 /**
  * Common shortcodes with their parameter definitions
  */
-const SHORTCODE_TEMPLATES = [
+const SHORTCODE_TEMPLATES: ShortcodeTemplate[] = [
   {
     name: 'gallery',
     description: 'Display image gallery',
@@ -184,7 +201,7 @@ function validateShortcode(shortcodeString: string): { valid: boolean; error?: s
 /**
  * Generate shortcode from template and parameters
  */
-function generateShortcode(template: typeof SHORTCODE_TEMPLATES[0], parameters: Record<string, string>, content?: string): string {
+function generateShortcode(template: ShortcodeTemplate, parameters: Record<string, string>, content?: string): string {
   let shortcode = `[${template.name}`;
 
   // Add parameters
@@ -236,7 +253,7 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
 
   const [localShortcode, setLocalShortcode] = useState(initialShortcode || content || '');
   const [showBuilder, setShowBuilder] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<typeof SHORTCODE_TEMPLATES[0] | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<ShortcodeTemplate | null>(null);
   const [builderParams, setBuilderParams] = useState<Record<string, string>>({});
   const [builderContent, setBuilderContent] = useState('');
   const [copied, setCopied] = useState(false);
@@ -285,7 +302,7 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
   };
 
   // Handle template selection
-  const handleTemplateSelect = (template: typeof SHORTCODE_TEMPLATES[0]) => {
+  const handleTemplateSelect = (template: ShortcodeTemplate) => {
     setSelectedTemplate(template);
 
     // Initialize parameters with defaults

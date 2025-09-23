@@ -110,7 +110,7 @@ const OAuthSettings = () => {
         message: `${OAUTH_PROVIDERS[variables.provider].displayName} 설정이 저장되었습니다.`
       });
     },
-    onError: (error: Error, _variables, context) => {
+    onError: (error: Error, _variables, context: { previousSettings?: any } | undefined) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousSettings) {
         queryClient.setQueryData(['oauth-settings'], context.previousSettings);

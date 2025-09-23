@@ -18,7 +18,8 @@ import {
   Subscript,
   Superscript,
   RemoveFormatting,
-  MoreHorizontal
+  MoreHorizontal,
+  Type
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

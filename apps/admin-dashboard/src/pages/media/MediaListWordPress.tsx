@@ -4,7 +4,7 @@ import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { formatDate, formatFileSize } from '@/lib/utils';
 import { authClient } from '@o4o/auth-client';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { getFileTypeFromMime, getFileIcon, getFileColorClass } from '@/utils/fileIcons';
 
 interface MediaItem {
@@ -183,7 +183,7 @@ const MediaListWordPress: React.FC = () => {
     // Optimistically update UI immediately
     setMedia(prev => prev.filter(m => !selectedIds.has(m.id)));
     setSelectedMedia(new Set());
-    toast.info(`Deleting ${selectedIds.size} items...`);
+    toast.loading(`Deleting ${selectedIds.size} items...`);
 
     try {
       // Get token from localStorage directly

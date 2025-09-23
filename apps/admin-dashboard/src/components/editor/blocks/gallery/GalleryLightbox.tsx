@@ -199,11 +199,15 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      lightboxRef.current?.requestFullscreen?.();
-      setIsFullscreen(true);
+      if (lightboxRef.current && typeof lightboxRef.current.requestFullscreen === 'function') {
+        lightboxRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      }
     } else {
-      document.exitFullscreen?.();
-      setIsFullscreen(false);
+      if (typeof document.exitFullscreen === 'function') {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
     }
   };
 
@@ -227,7 +231,9 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
       });
     } catch (error) {
       // Fallback to copy URL
-      navigator.clipboard?.writeText(currentImage.url);
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(currentImage.url);
+      }
     }
   };
 

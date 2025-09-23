@@ -235,7 +235,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
           <RichText
             value={localCaption}
             onChange={setLocalCaption}
-            onBlur={() => handleCaptionSave(localCaption)}
+            onFocusOut={() => handleCaptionSave(localCaption)}
             placeholder="Add a caption..."
             className="w-full bg-transparent border-none outline-none"
             multiline={false}

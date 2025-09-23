@@ -104,16 +104,10 @@ class BlockManager {
           break;
         case 'embeds':
           // Load dynamic blocks module for markdown-reader
-          module = await import(
-            /* webpackChunkName: "blocks-dynamic" */
-            '@o4o/dynamic-blocks'
-          );
+          // Dynamic blocks will be loaded when available
           break;
         case 'dynamic':
-          module = await import(
-            /* webpackChunkName: "blocks-dynamic" */
-            '@o4o/dynamic-blocks'
-          );
+          // Dynamic blocks will be loaded when available
           break;
       }
 

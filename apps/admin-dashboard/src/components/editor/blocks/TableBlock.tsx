@@ -154,11 +154,11 @@ const TableBlock: React.FC<TableBlockProps> = ({
 
   // Handle style change
   const handleStyleChange = (newStyle: string) => {
-    const newData = { ...tableData, style: newStyle as any };
+    const newData = { ...tableData, style: newStyle as 'default' | 'striped' | 'bordered' | 'minimal' };
     setTableData(newData);
     updateAttributes({
       tableData: newData,
-      style: newStyle as any
+      style: newStyle as 'default' | 'striped' | 'bordered' | 'minimal'
     });
   };
 
@@ -337,7 +337,7 @@ const TableBlock: React.FC<TableBlockProps> = ({
             {/* Color Theme */}
             <div>
               <Label className="text-sm font-medium">Color Theme</Label>
-              <Select value={theme} onValueChange={(value) => updateAttributes({ theme: value })}>
+              <Select value={theme} onValueChange={(value) => updateAttributes({ theme: value as 'default' | 'blue' | 'green' | 'purple' | 'red' })}>
                 <SelectTrigger className="w-full mt-1 text-xs">
                   <SelectValue />
                 </SelectTrigger>
@@ -360,7 +360,7 @@ const TableBlock: React.FC<TableBlockProps> = ({
             {/* Font Size */}
             <div>
               <Label className="text-sm font-medium">Font Size</Label>
-              <Select value={fontSize} onValueChange={(value) => updateAttributes({ fontSize: value })}>
+              <Select value={fontSize} onValueChange={(value) => updateAttributes({ fontSize: value as 'small' | 'medium' | 'large' })}>
                 <SelectTrigger className="w-full mt-1 text-xs">
                   <SelectValue />
                 </SelectTrigger>
@@ -390,7 +390,7 @@ const TableBlock: React.FC<TableBlockProps> = ({
                     key={value}
                     variant={alignment === value ? "default" : "outline"}
                     size="sm"
-                    onClick={() => updateAttributes({ alignment: value })}
+                    onClick={() => updateAttributes({ alignment: value as 'left' | 'center' | 'right' })}
                     className="flex-1 text-xs h-8"
                     title={label}
                   >
