@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -58,16 +58,40 @@ interface BlockInserterProps {
   isOpen: boolean;
 }
 
-const blockCategories: BlockCategory[] = [
-  { slug: 'text', title: 'Text', icon: <Type className="h-4 w-4" />, count: 8 },
-  { slug: 'media', title: 'Media', icon: <Image className="h-4 w-4" />, count: 6 },
-  { slug: 'design', title: 'Design', icon: <Palette className="h-4 w-4" />, count: 12 },
-  { slug: 'widgets', title: 'Widgets', icon: <Package className="h-4 w-4" />, count: 10 },
-  { slug: 'theme', title: 'Theme', icon: <Layout className="h-4 w-4" />, count: 5 },
-  { slug: 'embed', title: 'Embeds', icon: <Code className="h-4 w-4" />, count: 15 },
-];
+// Category icons mapping
+const categoryIcons: Record<string, React.ReactNode> = {
+  text: <Type className="h-4 w-4" />,
+  media: <Image className="h-4 w-4" />,
+  design: <Palette className="h-4 w-4" />,
+  widgets: <Package className="h-4 w-4" />,
+  theme: <Layout className="h-4 w-4" />,
+  embed: <Code className="h-4 w-4" />,
+  dynamic: <Grid className="h-4 w-4" />,
+};
 
-const availableBlocks: BlockType[] = [
+// Block icons mapping
+const blockIcons: Record<string, React.ReactNode> = {
+  'paragraph': <FileText className="h-5 w-5" />,
+  'heading': <Type className="h-5 w-5" />,
+  'list': <List className="h-5 w-5" />,
+  'quote': <Quote className="h-5 w-5" />,
+  'code': <Code className="h-5 w-5" />,
+  'image': <Image className="h-5 w-5" />,
+  'gallery': <Grid className="h-5 w-5" />,
+  'video': <Film className="h-5 w-5" />,
+  'audio': <Music className="h-5 w-5" />,
+  'columns': <Columns className="h-5 w-5" />,
+  'group': <Square className="h-5 w-5" />,
+  'button': <Play className="h-5 w-5" />,
+  'layout': <Layout className="h-5 w-5" />,
+  'block-default': <Square className="h-5 w-5" />,
+  'forms': <FileText className="h-5 w-5" />,
+  'media-document': <FileText className="h-5 w-5" />,
+  'default': <Square className="h-5 w-5" />,
+};
+
+// Fallback hardcoded blocks (used if WordPress API is not available)
+const fallbackBlocks: BlockType[] = [
   // Text blocks
   {
     name: 'core/paragraph',
@@ -183,6 +207,82 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['text', 'media'])
   );
+  const [availableBlocks, setAvailableBlocks] = useState<BlockType[]>(fallbackBlocks);
+  const [blockCategories, setBlockCategories] = useState<BlockCategory[]>([]);
+
+  // Load blocks and categories from WordPress API
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Get categories from WordPress
+    let categories: BlockCategory[] = [];
+    if (window.wp?.blocks?.getCategories) {
+      const wpCategories = window.wp.blocks.getCategories();
+      categories = wpCategories.map((cat: any) => ({
+        slug: cat.slug,
+        title: cat.title,
+        icon: categoryIcons[cat.slug] || categoryIcons['default'],
+        count: 0, // Will be updated when counting blocks
+      }));
+    } else {
+      // Fallback categories if WordPress API is not available
+      categories = [
+        { slug: 'text', title: 'Text', icon: categoryIcons.text, count: 0 },
+        { slug: 'media', title: 'Media', icon: categoryIcons.media, count: 0 },
+        { slug: 'design', title: 'Design', icon: categoryIcons.design, count: 0 },
+        { slug: 'widgets', title: 'Widgets', icon: categoryIcons.widgets, count: 0 },
+        { slug: 'theme', title: 'Theme', icon: categoryIcons.theme, count: 0 },
+        { slug: 'embed', title: 'Embeds', icon: categoryIcons.embed, count: 0 },
+      ];
+    }
+
+    // Get blocks from WordPress
+    let mergedBlocks = fallbackBlocks;
+    if (window.wp?.blocks?.getBlockTypes) {
+      const wpBlocks = window.wp.blocks.getBlockTypes();
+      
+      if (wpBlocks && wpBlocks.length > 0) {
+        const blocks: BlockType[] = wpBlocks.map((block: any) => {
+          // Extract icon name from block.icon if it's a string
+          const iconName = typeof block.icon === 'string' ? block.icon : 'default';
+          const icon = blockIcons[iconName] || blockIcons['default'];
+          
+          return {
+            name: block.name,
+            title: block.title || block.name.split('/')[1] || block.name,
+            description: block.description || '',
+            category: block.category || 'common',
+            icon: icon,
+            keywords: block.keywords || [],
+          };
+        });
+
+        // Merge with fallback blocks to ensure we have all core blocks
+        const blockMap = new Map<string, BlockType>();
+        
+        // Add fallback blocks first
+        fallbackBlocks.forEach(block => {
+          blockMap.set(block.name, block);
+        });
+        
+        // Override with WordPress blocks (this adds dynamic blocks)
+        blocks.forEach(block => {
+          blockMap.set(block.name, block);
+        });
+        
+        mergedBlocks = Array.from(blockMap.values());
+      }
+    }
+
+    setAvailableBlocks(mergedBlocks);
+
+    // Update category counts
+    const updatedCategories = categories.map(cat => {
+      const count = mergedBlocks.filter(b => b.category === cat.slug).length;
+      return { ...cat, count };
+    });
+    setBlockCategories(updatedCategories);
+  }, [isOpen]);
 
   const filteredBlocks = useMemo(() => {
     if (!searchQuery) return availableBlocks;

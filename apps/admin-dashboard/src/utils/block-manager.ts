@@ -56,7 +56,7 @@ class BlockManager {
     this.categories.set('embeds', {
       name: 'Embed Blocks',
       priority: 'low',
-      blocks: ['embed', 'youtube', 'twitter', 'facebook', 'instagram', 'o4o/markdown-reader'],
+      blocks: ['o4o/markdown-reader', 'o4o/youtube', 'o4o/twitter', 'o4o/instagram'],
       loaded: false
     });
 
@@ -103,7 +103,7 @@ class BlockManager {
           // Widgets blocks will be implemented later
           break;
         case 'embeds':
-          // Register markdown-reader block directly
+          // Register embed blocks directly
           this.registerBlock('o4o/markdown-reader', {
             title: 'Markdown Reader',
             category: 'embed',
@@ -122,6 +122,52 @@ class BlockManager {
             edit: () => null,
             save: () => null
           });
+          
+          this.registerBlock('o4o/youtube', {
+            title: 'YouTube',
+            category: 'embed',
+            icon: 'video',
+            description: 'Embed a YouTube video',
+            attributes: {
+              url: {
+                type: 'string',
+                default: ''
+              }
+            },
+            edit: () => null,
+            save: () => null
+          });
+          
+          this.registerBlock('o4o/twitter', {
+            title: 'Twitter',
+            category: 'embed',
+            icon: 'twitter',
+            description: 'Embed a tweet',
+            attributes: {
+              url: {
+                type: 'string',
+                default: ''
+              }
+            },
+            edit: () => null,
+            save: () => null
+          });
+          
+          this.registerBlock('o4o/instagram', {
+            title: 'Instagram',
+            category: 'embed',
+            icon: 'instagram',
+            description: 'Embed an Instagram post',
+            attributes: {
+              url: {
+                type: 'string',
+                default: ''
+              }
+            },
+            edit: () => null,
+            save: () => null
+          });
+          
           category.loaded = true;
           break;
         case 'dynamic':
