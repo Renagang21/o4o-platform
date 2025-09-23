@@ -56,7 +56,7 @@ class BlockManager {
     this.categories.set('embeds', {
       name: 'Embed Blocks',
       priority: 'low',
-      blocks: ['embed', 'youtube', 'twitter', 'facebook', 'instagram', 'markdown-reader'],
+      blocks: ['embed', 'youtube', 'twitter', 'facebook', 'instagram', 'o4o/markdown-reader'],
       loaded: false
     });
 
@@ -64,7 +64,7 @@ class BlockManager {
     this.categories.set('dynamic', {
       name: 'Dynamic Blocks',
       priority: 'low',
-      blocks: ['cpt-acf-loop', 'reusable', 'spectra-forms'],
+      blocks: ['o4o/cpt-acf-loop', 'o4o/reusable', 'o4o/spectra-forms'],
       loaded: false
     });
   }
@@ -104,8 +104,7 @@ class BlockManager {
           break;
         case 'embeds':
           // Register markdown-reader block directly
-          this.registerBlock('markdown-reader', {
-            name: 'markdown-reader',
+          this.registerBlock('o4o/markdown-reader', {
             title: 'Markdown Reader',
             category: 'embed',
             icon: 'media-document',
@@ -113,32 +112,65 @@ class BlockManager {
             supports: {
               align: ['wide', 'full'],
               html: false
-            }
+            },
+            attributes: {
+              url: {
+                type: 'string',
+                default: ''
+              }
+            },
+            edit: () => null,
+            save: () => null
           });
+          category.loaded = true;
           break;
         case 'dynamic':
-          // Register dynamic blocks directly
-          this.registerBlock('cpt-acf-loop', {
-            name: 'cpt-acf-loop',
+          // Register dynamic blocks directly with proper namespace
+          this.registerBlock('o4o/cpt-acf-loop', {
             title: 'CPT ACF Loop',
             category: 'dynamic',
             icon: 'layout',
-            description: 'Display custom post type loops'
+            description: 'Display custom post type loops',
+            attributes: {
+              postType: {
+                type: 'string',
+                default: 'post'
+              },
+              postsPerPage: {
+                type: 'number',
+                default: 10
+              }
+            },
+            edit: () => null,
+            save: () => null
           });
-          this.registerBlock('reusable', {
-            name: 'reusable',
+          this.registerBlock('o4o/reusable', {
             title: 'Reusable Block',
             category: 'dynamic',
             icon: 'block-default',
-            description: 'Insert a reusable block'
+            description: 'Insert a reusable block',
+            attributes: {
+              ref: {
+                type: 'number'
+              }
+            },
+            edit: () => null,
+            save: () => null
           });
-          this.registerBlock('spectra-forms', {
-            name: 'spectra-forms',
+          this.registerBlock('o4o/spectra-forms', {
             title: 'Spectra Forms',
             category: 'dynamic',
             icon: 'forms',
-            description: 'Add a form'
+            description: 'Add a form',
+            attributes: {
+              formId: {
+                type: 'string'
+              }
+            },
+            edit: () => null,
+            save: () => null
           });
+          category.loaded = true;
           break;
       }
 
@@ -234,7 +266,17 @@ class BlockManager {
     
     // Register with WordPress if available
     if (window.wp?.blocks?.registerBlockType) {
-      window.wp.blocks.registerBlockType(name, definition);
+      const result = window.wp.blocks.registerBlockType(name, definition);
+      console.log(`Block registered: ${name}`, result);
+      
+      // Log current block count
+      if (window.wp?.blocks?.getBlockTypes) {
+        const allBlocks = window.wp.blocks.getBlockTypes();
+        console.log(`Total registered blocks: ${allBlocks.length}`);
+        console.log('Dynamic blocks:', allBlocks.filter((b: any) => b.category === 'dynamic'));
+      }
+    } else {
+      console.warn('WordPress blocks API not available');
     }
   }
 

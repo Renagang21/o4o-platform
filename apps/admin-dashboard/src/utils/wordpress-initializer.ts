@@ -140,11 +140,25 @@ export async function initializeWordPress() {
       { slug: 'embed', title: 'Embeds', icon: null }
     ];
     
+    // Store registered blocks
+    const registeredBlocks = new Map();
+    
     window.wp.blocks = {
-      registerBlockType: () => {},
-      unregisterBlockType: () => {},
-      getBlockType: () => null,
-      getBlockTypes: () => [],
+      registerBlockType: (name, settings) => {
+        // Store the block definition
+        const block = { name, ...settings };
+        registeredBlocks.set(name, block);
+        return block;
+      },
+      unregisterBlockType: (name) => {
+        return registeredBlocks.delete(name);
+      },
+      getBlockType: (name) => {
+        return registeredBlocks.get(name) || null;
+      },
+      getBlockTypes: () => {
+        return Array.from(registeredBlocks.values());
+      },
       getCategories: () => blockCategories,
       setCategories: (categories) => {
         blockCategories.length = 0;
@@ -458,12 +472,15 @@ export async function initializeWordPress() {
   }
 
   // Load block manager for optimized block loading
+  console.log('Loading block manager...');
   const { getBlockManager } = await import('@/utils/block-manager');
   const blockManager = getBlockManager();
   
   // Register Dynamic category if WordPress blocks is available
   if (window.wp?.blocks?.setCategories) {
     const currentCategories = window.wp.blocks.getCategories() || [];
+    console.log('Current categories:', currentCategories);
+    
     if (!currentCategories.find((cat: any) => cat.slug === 'dynamic')) {
       window.wp.blocks.setCategories([
         ...currentCategories,
@@ -473,17 +490,31 @@ export async function initializeWordPress() {
           icon: null
         }
       ]);
+      console.log('Dynamic category added');
     }
+    console.log('Updated categories:', window.wp.blocks.getCategories());
   }
 
   // Load only essential blocks initially
   await blockManager.loadEssentialBlocks();
   
   // Load embeds category for markdown support
+  console.log('Loading embeds category...');
   await blockManager.loadCategory('embeds');
   
   // Load dynamic blocks category
+  console.log('Loading dynamic category...');
   await blockManager.loadCategory('dynamic');
+  
+  // Log final state
+  if (window.wp?.blocks?.getBlockTypes) {
+    const allBlocks = window.wp.blocks.getBlockTypes();
+    console.log('All registered blocks after initialization:', allBlocks);
+    console.log('Blocks by category:', {
+      dynamic: allBlocks.filter((b: any) => b.category === 'dynamic'),
+      embed: allBlocks.filter((b: any) => b.category === 'embed')
+    });
+  }
   
   // Start progressive loading of other blocks
   blockManager.loadBlocksProgressive();
