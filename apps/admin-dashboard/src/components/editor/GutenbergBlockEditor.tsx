@@ -11,6 +11,7 @@ import { postApi } from '@/services/api/postApi';
 import { debugTokenStatus } from '@/utils/token-debug';
 import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
+import { initializeWordPress } from '@/utils/wordpress-initializer';
 import DesignLibraryModalImproved from './DesignLibraryModalImproved';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
@@ -145,6 +146,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   });
   
   const navigate = useNavigate();
+  
+  // Initialize WordPress on mount
+  useEffect(() => {
+    initializeWordPress().catch(error => {
+      console.error('Failed to initialize WordPress:', error);
+    });
+  }, []);
   
   // Update slug when propPostSettings or slug prop changes
   useEffect(() => {

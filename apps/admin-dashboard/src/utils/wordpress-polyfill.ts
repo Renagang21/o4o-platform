@@ -135,11 +135,17 @@ export function initWordPress() {
   };
   
   // blocks API 추가 (블록 에디터 지원)
-  window.wp.blocks = window.wp.blocks || {
-    registerBlockType: (_name: string, _config: any) => {},
-    getCategories: () => [],
-    setCategories: (_categories: any[]) => {},
-  };
+  // 기존 객체가 있으면 유지하고, 없는 함수만 추가
+  if (!window.wp.blocks) {
+    window.wp.blocks = {
+      registerBlockType: (_name: string, _config: any) => {},
+      getCategories: () => [],
+      setCategories: (_categories: any[]) => {},
+      getBlockTypes: () => [],
+      getBlockType: (_name: string) => null,
+      unregisterBlockType: (_name: string) => false,
+    };
+  }
   
 }
 
