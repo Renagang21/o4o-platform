@@ -13,6 +13,7 @@ import {
   Clock,
   ChevronDown
 } from 'lucide-react';
+import { getBlockManager } from '@/utils/block-manager';
 
 interface Block {
   name: string;
@@ -48,35 +49,44 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
 
   // Load blocks and categories from WordPress
   useEffect(() => {
-    if (!isOpen || !window.wp?.blocks) return;
+    if (!isOpen) return;
 
-    const loadData = () => {
-      // Get categories from WordPress
-      const wpCategories = window.wp.blocks.getCategories() || [];
-      setCategories(wpCategories);
+    const loadData = async () => {
+      // Initialize block manager and load blocks
+      const blockManager = getBlockManager();
+      
+      // Load all block categories progressively
+      await blockManager.loadBlocksProgressive();
+      
+      // Wait a bit for blocks to be registered
+      setTimeout(() => {
+        // Get categories from WordPress
+        const wpCategories = window.wp?.blocks?.getCategories?.() || [];
+        setCategories(wpCategories);
 
-      // Get blocks from WordPress
-      const wpBlocks = window.wp.blocks.getBlockTypes() || [];
-      setBlocks(wpBlocks.map((block: any) => ({
-        name: block.name,
-        title: block.title || block.name,
-        description: block.description,
-        category: block.category || 'common',
-        icon: block.icon,
-        keywords: block.keywords || []
-      })));
+        // Get blocks from WordPress
+        const wpBlocks = window.wp?.blocks?.getBlockTypes?.() || [];
+        setBlocks(wpBlocks.map((block: any) => ({
+          name: block.name,
+          title: block.title || block.name,
+          description: block.description,
+          category: block.category || 'common',
+          icon: block.icon,
+          keywords: block.keywords || []
+        })));
 
-      // Get most used blocks (from localStorage or default)
-      const stored = localStorage.getItem('gutenberg_most_used_blocks');
-      if (stored) {
-        try {
-          setMostUsedBlocks(JSON.parse(stored));
-        } catch {
+        // Get most used blocks (from localStorage or default)
+        const stored = localStorage.getItem('gutenberg_most_used_blocks');
+        if (stored) {
+          try {
+            setMostUsedBlocks(JSON.parse(stored));
+          } catch {
+            setMostUsedBlocks(['core/paragraph', 'core/heading', 'core/image']);
+          }
+        } else {
           setMostUsedBlocks(['core/paragraph', 'core/heading', 'core/image']);
         }
-      } else {
-        setMostUsedBlocks(['core/paragraph', 'core/heading', 'core/image']);
-      }
+      }, 100);
     };
 
     loadData();

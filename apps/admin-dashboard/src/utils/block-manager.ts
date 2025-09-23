@@ -86,18 +86,27 @@ class BlockManager {
             /* webpackChunkName: "blocks-core" */
             '@/blocks/core'
           );
+          if (module.registerCoreBlocks) {
+            module.registerCoreBlocks();
+          }
           break;
         case 'layout':
           module = await import(
             /* webpackChunkName: "blocks-layout" */
             '@/blocks/layout'
           );
+          if (module.registerLayoutBlocks) {
+            module.registerLayoutBlocks();
+          }
           break;
         case 'media':
           module = await import(
             /* webpackChunkName: "blocks-media" */
             '@/blocks/media'
           );
+          if (module.registerMediaBlocks) {
+            module.registerMediaBlocks();
+          }
           break;
         case 'widgets':
           // Widgets blocks will be implemented later
@@ -220,8 +229,13 @@ class BlockManager {
           break;
       }
 
-      if (module) {
-        // Register blocks from module
+      // Mark category as loaded after registration
+      if (categoryName === 'core' || categoryName === 'layout' || categoryName === 'media') {
+        category.loaded = true;
+      }
+      
+      if (module && categoryName !== 'core' && categoryName !== 'layout' && categoryName !== 'media') {
+        // Register blocks from module for other categories
         Object.entries(module).forEach(([blockName, blockDefinition]) => {
           this.registerBlock(blockName, blockDefinition);
         });
