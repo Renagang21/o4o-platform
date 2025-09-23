@@ -141,14 +141,15 @@ export async function initializeWordPress() {
       }
     };
 
-    // Initialize blocks with actual category management
+    // Initialize standard Gutenberg block categories
     let blockCategories = [
-      { slug: 'text', title: 'Text', icon: null },
-      { slug: 'media', title: 'Media', icon: null },
-      { slug: 'design', title: 'Design', icon: null },
-      { slug: 'widgets', title: 'Widgets', icon: null },
-      { slug: 'theme', title: 'Theme', icon: null },
-      { slug: 'embed', title: 'Embeds', icon: null }
+      { slug: 'text', title: 'Text' },
+      { slug: 'media', title: 'Media' },
+      { slug: 'design', title: 'Design' },
+      { slug: 'widgets', title: 'Widgets' },
+      { slug: 'theme', title: 'Theme' },
+      { slug: 'embed', title: 'Embeds' },
+      { slug: 'dynamic', title: 'Dynamic' }
     ];
     
     // Store registered blocks
@@ -494,22 +495,6 @@ export async function initializeWordPress() {
   // Load block manager for optimized block loading
   const { getBlockManager } = await import('@/utils/block-manager');
   const blockManager = getBlockManager();
-  
-  // Register Dynamic category if WordPress blocks is available
-  if (window.wp?.blocks?.setCategories) {
-    const currentCategories = window.wp.blocks.getCategories() || [];
-    
-    if (!currentCategories.find((cat: any) => cat.slug === 'dynamic')) {
-      window.wp.blocks.setCategories([
-        ...currentCategories,
-        {
-          slug: 'dynamic',
-          title: 'Dynamic',
-          icon: null
-        }
-      ]);
-    }
-  }
 
   // Load only essential blocks initially
   await blockManager.loadEssentialBlocks();

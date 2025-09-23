@@ -10,7 +10,7 @@ import '../../styles/editor.css';
 import { postApi } from '@/services/api/postApi';
 import { debugTokenStatus } from '@/utils/token-debug';
 import { Block } from '@/types/post.types';
-import BlockInserter from './BlockInserter';
+import GutenbergBlockInserter from './GutenbergBlockInserter';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
 import DesignLibraryModalImproved from './DesignLibraryModalImproved';
 import ParagraphBlock from './blocks/ParagraphBlock';
@@ -710,10 +710,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       {/* Main Layout */}
       <div className="flex-1 flex relative">
         {/* Block Inserter */}
-        <BlockInserter
+        <GutenbergBlockInserter
           isOpen={isBlockInserterOpen}
           onClose={() => setIsBlockInserterOpen(false)}
-          onInsertBlock={handleInsertBlock}
+          onSelect={handleInsertBlock}
         />
 
         {/* Editor Canvas */}

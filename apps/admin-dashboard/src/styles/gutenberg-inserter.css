@@ -1,0 +1,119 @@
+/**
+ * Gutenberg Block Inserter Styles
+ * Matches WordPress Gutenberg UI patterns
+ */
+
+.gutenberg-block-inserter {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Dashicons support */
+.dashicons {
+  font-family: dashicons;
+  display: inline-block;
+  line-height: 1;
+  font-weight: 400;
+  font-style: normal;
+  speak: none;
+  text-decoration: inherit;
+  text-transform: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  vertical-align: top;
+  text-align: center;
+}
+
+/* Block hover effects */
+.gutenberg-block-inserter button:hover {
+  transition: all 0.1s ease;
+}
+
+/* Search input focus */
+.gutenberg-block-inserter input:focus {
+  outline: 2px solid #007cba;
+  outline-offset: -2px;
+}
+
+/* Category pills */
+.gutenberg-block-inserter button[class*="rounded-full"] {
+  transition: all 0.2s ease;
+}
+
+/* Scrollbar styling */
+.gutenberg-block-inserter ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.gutenberg-block-inserter ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.gutenberg-block-inserter ::-webkit-scrollbar-thumb {
+  background: #949494;
+  border-radius: 6px;
+  border: 3px solid #f1f1f1;
+}
+
+.gutenberg-block-inserter ::-webkit-scrollbar-thumb:hover {
+  background: #7e7e7e;
+}
+
+/* Block icons */
+.gutenberg-block-inserter svg {
+  fill: currentColor;
+}
+
+/* Most used section */
+.gutenberg-block-inserter .most-used-blocks {
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  padding: 12px;
+}
+
+/* Block item animation */
+@keyframes blockInsert {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.gutenberg-block-inserter .block-item-inserted {
+  animation: blockInsert 0.2s ease-out;
+}
+
+/* Line clamp fallback for older browsers */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive adjustments */
+@media (max-width: 782px) {
+  .gutenberg-block-inserter {
+    width: 100%;
+  }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .gutenberg-block-inserter {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+  }
+  
+  .gutenberg-block-inserter button:hover {
+    background-color: #2d2d2d;
+  }
+}
