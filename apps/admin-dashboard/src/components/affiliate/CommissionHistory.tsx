@@ -26,62 +26,8 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
   const loadCommissions = async () => {
     try {
       setLoading(true);
-      // 실제로는 API 호출
-      const mockCommissions: AffiliateCommission[] = [
-        {
-          id: '1',
-          affiliateUserId,
-          orderId: 'ORD-2024-001',
-          orderAmount: 89000,
-          commissionRate: 5,
-          commissionAmount: 4450,
-          status: 'paid',
-          approvedAt: new Date('2024-03-10'),
-          paidAt: new Date('2024-03-25'),
-          paymentMethod: 'bank',
-          paymentReference: 'REF-2024-03-25-001',
-          createdAt: new Date('2024-03-05'),
-          updatedAt: new Date('2024-03-25')
-        },
-        {
-          id: '2',
-          affiliateUserId,
-          orderId: 'ORD-2024-002',
-          orderAmount: 156000,
-          commissionRate: 5,
-          commissionAmount: 7800,
-          status: 'approved',
-          approvedAt: new Date('2024-03-15'),
-          createdAt: new Date('2024-03-12'),
-          updatedAt: new Date('2024-03-15')
-        },
-        {
-          id: '3',
-          affiliateUserId,
-          orderId: 'ORD-2024-003',
-          orderAmount: 45000,
-          commissionRate: 5,
-          commissionAmount: 2250,
-          status: 'pending',
-          createdAt: new Date('2024-03-18'),
-          updatedAt: new Date('2024-03-18')
-        },
-        {
-          id: '4',
-          affiliateUserId,
-          orderId: 'ORD-2024-004',
-          orderAmount: 78000,
-          commissionRate: 5,
-          commissionAmount: 3900,
-          status: 'cancelled',
-          cancelledAt: new Date('2024-03-08'),
-          cancelledReason: '주문 취소로 인한 커미션 취소',
-          createdAt: new Date('2024-03-01'),
-          updatedAt: new Date('2024-03-08')
-        }
-      ];
-
-      setCommissions(mockCommissions);
+      // API call will be implemented here
+      setCommissions([]);
     } catch (error: any) {
     // Error logging - use proper error handler
     } finally {

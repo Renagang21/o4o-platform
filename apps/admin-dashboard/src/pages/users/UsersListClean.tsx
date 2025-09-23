@@ -106,44 +106,7 @@ const UsersListClean = () => {
         }
       } catch (err) {
         console.error('Failed to fetch users:', err);
-        // Use mock data for development
-        setUsers([
-          {
-            id: '1',
-            name: 'John Doe',
-            username: 'johndoe',
-            email: 'john@example.com',
-            role: 'administrator',
-            posts: 42,
-            registeredDate: '2024-01-15',
-            lastLogin: '2024-03-20',
-            status: 'active',
-            avatar: 'https://ui-avatars.com/api/?name=John+Doe'
-          },
-          {
-            id: '2',
-            name: 'Jane Smith',
-            username: 'janesmith',
-            email: 'jane@example.com',
-            role: 'editor',
-            posts: 18,
-            registeredDate: '2024-02-20',
-            lastLogin: '2024-03-19',
-            status: 'active',
-            avatar: 'https://ui-avatars.com/api/?name=Jane+Smith'
-          },
-          {
-            id: '3',
-            name: 'Bob Wilson',
-            username: 'bobwilson',
-            email: 'bob@example.com',
-            role: 'subscriber',
-            posts: 0,
-            registeredDate: '2024-03-01',
-            status: 'pending',
-            avatar: 'https://ui-avatars.com/api/?name=Bob+Wilson'
-          }
-        ]);
+        setUsers([]);
       } finally {
         setLoading(false);
       }
