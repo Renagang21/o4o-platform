@@ -242,36 +242,38 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
       const wpBlocks = window.wp.blocks.getBlockTypes();
       
       if (wpBlocks && wpBlocks.length > 0) {
-        const blocks: BlockType[] = wpBlocks.map((block: any) => {
-          // Extract icon name from block.icon if it's a string
-          const iconName = typeof block.icon === 'string' ? block.icon : 'default';
-          const icon = blockIcons[iconName] || blockIcons['default'];
-          
-          return {
-            name: block.name,
-            title: block.title || block.name.split('/')[1] || block.name,
-            description: block.description || '',
-            category: block.category || 'common',
-            icon: icon,
-            keywords: block.keywords || [],
-          };
-        });
-
-        // Merge with fallback blocks to ensure we have all core blocks
+        // Create a map to preserve fallback blocks
         const blockMap = new Map<string, BlockType>();
         
-        // Add fallback blocks first
+        // Add fallback blocks first (these have correct UI data)
         fallbackBlocks.forEach(block => {
           blockMap.set(block.name, block);
         });
         
-        // Override with WordPress blocks (this adds dynamic blocks)
-        blocks.forEach(block => {
-          blockMap.set(block.name, block);
+        // Process WordPress blocks
+        wpBlocks.forEach((block: any) => {
+          // Only add new blocks from WordPress, don't override existing ones
+          if (!blockMap.has(block.name)) {
+            // Extract icon name from block.icon if it's a string
+            const iconName = typeof block.icon === 'string' ? block.icon : 'default';
+            const icon = blockIcons[iconName] || blockIcons['default'];
+            
+            blockMap.set(block.name, {
+              name: block.name,
+              title: block.title || block.name.split('/')[1] || block.name,
+              description: block.description || '',
+              category: block.category || 'common',
+              icon: icon,
+              keywords: block.keywords || [],
+            });
+          }
         });
         
         mergedBlocks = Array.from(blockMap.values());
       }
+    } else {
+      // If WordPress API is not available, just use fallback blocks
+      mergedBlocks = fallbackBlocks;
     }
 
     setAvailableBlocks(mergedBlocks);
