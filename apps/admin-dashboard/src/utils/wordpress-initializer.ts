@@ -452,6 +452,12 @@ export async function initializeWordPress() {
   // Load only essential blocks initially
   await blockManager.loadEssentialBlocks();
   
+  // Load embeds category for markdown support
+  await blockManager.loadCategory('embeds');
+  
+  // Load dynamic blocks category
+  await blockManager.loadCategory('dynamic');
+  
   // Start progressive loading of other blocks
   blockManager.loadBlocksProgressive();
 

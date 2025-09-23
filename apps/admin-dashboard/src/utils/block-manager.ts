@@ -52,11 +52,19 @@ class BlockManager {
       loaded: false
     });
 
-    // Embed blocks - lazy loaded
+    // Embed blocks - lazy loaded (including markdown reader)
     this.categories.set('embeds', {
       name: 'Embed Blocks',
       priority: 'low',
-      blocks: ['embed', 'youtube', 'twitter', 'facebook', 'instagram'],
+      blocks: ['embed', 'youtube', 'twitter', 'facebook', 'instagram', 'markdown-reader'],
+      loaded: false
+    });
+
+    // Dynamic blocks - lazy loaded (without markdown-reader)
+    this.categories.set('dynamic', {
+      name: 'Dynamic Blocks',
+      priority: 'low',
+      blocks: ['cpt-acf-loop', 'reusable', 'spectra-forms'],
       loaded: false
     });
   }
@@ -95,7 +103,17 @@ class BlockManager {
           // Widgets blocks will be implemented later
           break;
         case 'embeds':
-          // Embed blocks will be implemented later
+          // Load dynamic blocks module for markdown-reader
+          module = await import(
+            /* webpackChunkName: "blocks-dynamic" */
+            '@o4o/dynamic-blocks'
+          );
+          break;
+        case 'dynamic':
+          module = await import(
+            /* webpackChunkName: "blocks-dynamic" */
+            '@o4o/dynamic-blocks'
+          );
           break;
       }
 

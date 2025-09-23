@@ -18,7 +18,9 @@ import {
   Share2,
   MessageCircle,
   MapPin,
-  HelpCircle
+  HelpCircle,
+  FileText,
+  RefreshCw
 } from 'lucide-react'
 import type { TemplateBlockType } from '@o4o/types'
 
@@ -213,10 +215,42 @@ const blockDefinitions: BlockDefinition[] = [
     icon: <BarChart className="w-5 h-5" />,
     category: 'Advanced',
     description: '진행률 바'
+  },
+
+  // Embed Blocks
+  {
+    type: 'markdown-reader',
+    name: 'Markdown Reader',
+    icon: <FileText className="w-5 h-5" />,
+    category: 'Embeds',
+    description: '마크다운 파일 렌더러'
+  },
+
+  // Dynamic Blocks
+  {
+    type: 'cpt-acf-loop',
+    name: 'CPT ACF Loop',
+    icon: <List className="w-5 h-5" />,
+    category: 'Dynamic',
+    description: '커스텀 포스트 타입 루프'
+  },
+  {
+    type: 'reusable',
+    name: 'Reusable Block',
+    icon: <RefreshCw className="w-5 h-5" />,
+    category: 'Dynamic',
+    description: '재사용 가능한 블록'
+  },
+  {
+    type: 'spectra-forms',
+    name: 'Spectra Forms',
+    icon: <FileText className="w-5 h-5" />,
+    category: 'Dynamic',
+    description: 'Spectra 폼 블록'
   }
 ]
 
-const categories = ['Basic', 'Media', 'Layout', 'Content', 'Interactive', 'Advanced']
+const categories = ['Basic', 'Media', 'Layout', 'Content', 'Interactive', 'Advanced', 'Embeds', 'Dynamic']
 
 const BlockPalette: FC<BlockPaletteProps> = ({ onAddBlock }) => {
   const [selectedCategory, setSelectedCategory] = useState('Basic')
