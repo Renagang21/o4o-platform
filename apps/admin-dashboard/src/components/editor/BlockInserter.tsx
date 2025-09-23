@@ -213,82 +213,104 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
   // Load blocks and categories from WordPress API
   useEffect(() => {
     if (!isOpen) return;
-
-    // Get categories from WordPress
-    let categories: BlockCategory[] = [];
-    if (window.wp?.blocks?.getCategories) {
-      const wpCategories = window.wp.blocks.getCategories();
-      if (wpCategories && wpCategories.length > 0) {
-        categories = wpCategories.map((cat: any) => ({
-          slug: cat.slug,
-          title: cat.title,
-          icon: categoryIcons[cat.slug] || categoryIcons['default'],
-          count: 0, // Will be updated when counting blocks
-        }));
+    
+    // Function to load categories and blocks
+    const loadBlocksAndCategories = () => {
+      // Get categories from WordPress
+      let categories: BlockCategory[] = [];
+      if (window.wp?.blocks?.getCategories) {
+        const wpCategories = window.wp.blocks.getCategories();
+        if (wpCategories && wpCategories.length > 0) {
+          categories = wpCategories.map((cat: any) => ({
+            slug: cat.slug,
+            title: cat.title,
+            icon: categoryIcons[cat.slug] || categoryIcons['default'],
+            count: 0, // Will be updated when counting blocks
+          }));
+        }
       }
+      
+      // Use fallback categories if none were loaded
+      if (categories.length === 0) {
+        categories = [
+          { slug: 'text', title: 'Text', icon: categoryIcons.text, count: 0 },
+          { slug: 'media', title: 'Media', icon: categoryIcons.media, count: 0 },
+          { slug: 'design', title: 'Design', icon: categoryIcons.design, count: 0 },
+          { slug: 'widgets', title: 'Widgets', icon: categoryIcons.widgets, count: 0 },
+          { slug: 'theme', title: 'Theme', icon: categoryIcons.theme, count: 0 },
+          { slug: 'embed', title: 'Embeds', icon: categoryIcons.embed, count: 0 },
+          { slug: 'dynamic', title: 'Dynamic', icon: categoryIcons.dynamic, count: 0 },
+        ];
+      }
+
+      // Get blocks from WordPress
+      let mergedBlocks = fallbackBlocks;
+      if (window.wp?.blocks?.getBlockTypes) {
+        const wpBlocks = window.wp.blocks.getBlockTypes();
+        
+        if (wpBlocks && wpBlocks.length > 0) {
+          // Create a map to preserve fallback blocks
+          const blockMap = new Map<string, BlockType>();
+          
+          // Add fallback blocks first (these have correct UI data)
+          fallbackBlocks.forEach(block => {
+            blockMap.set(block.name, block);
+          });
+          
+          // Process WordPress blocks
+          wpBlocks.forEach((block: any) => {
+            // Only add new blocks from WordPress, don't override existing ones
+            if (!blockMap.has(block.name)) {
+              // Extract icon name from block.icon if it's a string
+              const iconName = typeof block.icon === 'string' ? block.icon : 'default';
+              const icon = blockIcons[iconName] || blockIcons['default'];
+              
+              blockMap.set(block.name, {
+                name: block.name,
+                title: block.title || block.name.split('/')[1] || block.name,
+                description: block.description || '',
+                category: block.category || 'common',
+                icon: icon,
+                keywords: block.keywords || [],
+              });
+            }
+          });
+          
+          mergedBlocks = Array.from(blockMap.values());
+        }
+      } else {
+        // If WordPress API is not available, just use fallback blocks
+        mergedBlocks = fallbackBlocks;
+      }
+
+      setAvailableBlocks(mergedBlocks);
+
+      // Update category counts
+      const updatedCategories = categories.map(cat => {
+        const count = mergedBlocks.filter(b => b.category === cat.slug).length;
+        return { ...cat, count };
+      });
+      setBlockCategories(updatedCategories);
+    };
+    
+    // Load blocks and categories immediately
+    loadBlocksAndCategories();
+    
+    // Subscribe to block changes if WordPress data API is available
+    let unsubscribe: (() => void) | undefined;
+    if (window.wp?.data?.subscribe) {
+      unsubscribe = window.wp.data.subscribe(() => {
+        // Reload blocks and categories when changes occur
+        loadBlocksAndCategories();
+      });
     }
     
-    // Use fallback categories if none were loaded
-    if (categories.length === 0) {
-      categories = [
-        { slug: 'text', title: 'Text', icon: categoryIcons.text, count: 0 },
-        { slug: 'media', title: 'Media', icon: categoryIcons.media, count: 0 },
-        { slug: 'design', title: 'Design', icon: categoryIcons.design, count: 0 },
-        { slug: 'widgets', title: 'Widgets', icon: categoryIcons.widgets, count: 0 },
-        { slug: 'theme', title: 'Theme', icon: categoryIcons.theme, count: 0 },
-        { slug: 'embed', title: 'Embeds', icon: categoryIcons.embed, count: 0 },
-        { slug: 'dynamic', title: 'Dynamic', icon: categoryIcons.dynamic, count: 0 },
-      ];
-    }
-
-    // Get blocks from WordPress
-    let mergedBlocks = fallbackBlocks;
-    if (window.wp?.blocks?.getBlockTypes) {
-      const wpBlocks = window.wp.blocks.getBlockTypes();
-      
-      if (wpBlocks && wpBlocks.length > 0) {
-        // Create a map to preserve fallback blocks
-        const blockMap = new Map<string, BlockType>();
-        
-        // Add fallback blocks first (these have correct UI data)
-        fallbackBlocks.forEach(block => {
-          blockMap.set(block.name, block);
-        });
-        
-        // Process WordPress blocks
-        wpBlocks.forEach((block: any) => {
-          // Only add new blocks from WordPress, don't override existing ones
-          if (!blockMap.has(block.name)) {
-            // Extract icon name from block.icon if it's a string
-            const iconName = typeof block.icon === 'string' ? block.icon : 'default';
-            const icon = blockIcons[iconName] || blockIcons['default'];
-            
-            blockMap.set(block.name, {
-              name: block.name,
-              title: block.title || block.name.split('/')[1] || block.name,
-              description: block.description || '',
-              category: block.category || 'common',
-              icon: icon,
-              keywords: block.keywords || [],
-            });
-          }
-        });
-        
-        mergedBlocks = Array.from(blockMap.values());
+    // Clean up subscription on unmount or when dialog closes
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
       }
-    } else {
-      // If WordPress API is not available, just use fallback blocks
-      mergedBlocks = fallbackBlocks;
-    }
-
-    setAvailableBlocks(mergedBlocks);
-
-    // Update category counts
-    const updatedCategories = categories.map(cat => {
-      const count = mergedBlocks.filter(b => b.category === cat.slug).length;
-      return { ...cat, count };
-    });
-    setBlockCategories(updatedCategories);
+    };
   }, [isOpen]);
 
   const filteredBlocks = useMemo(() => {

@@ -101,11 +101,19 @@ export async function initializeWordPress() {
       didAction: () => 0
     };
 
-    // Initialize data
+    // Initialize data with working subscribe mechanism
     window.wp.data = {
       select: () => ({}),
       dispatch: () => ({}),
-      subscribe: () => () => {},
+      subscribe: (callback: Function) => {
+        // Add callback to block subscribers
+        blockSubscribers.add(callback);
+        
+        // Return unsubscribe function
+        return () => {
+          blockSubscribers.delete(callback);
+        };
+      },
       registerStore: () => {},
       combineReducers: () => () => ({}),
       createRegistry: () => ({}),
@@ -143,11 +151,24 @@ export async function initializeWordPress() {
     // Store registered blocks
     const registeredBlocks = new Map();
     
+    // Simple publish-subscribe mechanism for block changes
+    const blockSubscribers = new Set<Function>();
+    
     window.wp.blocks = {
       registerBlockType: (name, settings) => {
         // Store the block definition
         const block = { name, ...settings };
         registeredBlocks.set(name, block);
+        
+        // Notify all subscribers about the change
+        blockSubscribers.forEach(callback => {
+          try {
+            callback();
+          } catch (error) {
+            // Prevent one subscriber's error from affecting others
+          }
+        });
+        
         return block;
       },
       unregisterBlockType: (name) => {
