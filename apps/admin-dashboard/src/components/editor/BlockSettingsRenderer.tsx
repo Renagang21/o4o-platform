@@ -404,7 +404,7 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       {renderBlockSpecificSettings()}
       {renderCommonSettings()}
     </div>
