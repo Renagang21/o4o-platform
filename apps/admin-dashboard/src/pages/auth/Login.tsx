@@ -126,7 +126,7 @@ const Login: FC = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-gray-500" />
                 </div>
                 <input
                   id="email"
@@ -136,7 +136,7 @@ const Login: FC = () => {
                   required
                   value={email}
                   onChange={(e: any) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 bg-white/10 border border-white/20 rounded-lg focus:bg-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 focus:outline-none transition-all duration-200 text-white placeholder-gray-400"
+                  className="block w-full pl-10 pr-3 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="admin@neture.co.kr"
                   disabled={isLoading}
                 />
@@ -150,7 +150,7 @@ const Login: FC = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-gray-500" />
                 </div>
                 <input
                   id="password"
@@ -160,7 +160,7 @@ const Login: FC = () => {
                   required
                   value={password}
                   onChange={(e: any) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 bg-white/10 border border-white/20 rounded-lg focus:bg-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 focus:outline-none transition-all duration-200 text-white placeholder-gray-400"
+                  className="block w-full pl-10 pr-10 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="비밀번호를 입력하세요"
                   disabled={isLoading}
                 />
@@ -171,9 +171,9 @@ const Login: FC = () => {
                   disabled={isLoading}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-white transition-colors" />
+                    <EyeOff className="h-5 w-5 text-gray-600 hover:text-gray-900 transition-colors" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-white transition-colors" />
+                    <Eye className="h-5 w-5 text-gray-600 hover:text-gray-900 transition-colors" />
                   )}
                 </button>
               </div>
@@ -189,7 +189,7 @@ const Login: FC = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e: any) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-blue-500 bg-white/10 border-white/20 rounded focus:ring-blue-400 focus:ring-offset-0"
+                className="h-4 w-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-offset-0"
                 disabled={isLoading}
               />
               <label htmlFor="remember-me" className="ml-2 text-sm text-blue-200">
