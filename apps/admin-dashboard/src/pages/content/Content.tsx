@@ -10,7 +10,6 @@ import DynamicContentList from './DynamicContentList'
 import ACFManager from './ACFManager'
 import ACFFieldGroupForm from './ACFFieldGroupForm'
 // MediaLibrary moved to /media route
-import TemplateManager from './TemplateManager'
 import WidgetManager from './WidgetManager'
 import ShortcodeList from './ShortcodeList'
 // import NewPost from '../posts/NewPost' // No longer needed, redirecting to editor

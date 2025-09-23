@@ -130,14 +130,26 @@ export async function initializeWordPress() {
       }
     };
 
-    // Initialize blocks
+    // Initialize blocks with actual category management
+    const blockCategories = [
+      { slug: 'text', title: 'Text', icon: null },
+      { slug: 'media', title: 'Media', icon: null },
+      { slug: 'design', title: 'Design', icon: null },
+      { slug: 'widgets', title: 'Widgets', icon: null },
+      { slug: 'theme', title: 'Theme', icon: null },
+      { slug: 'embed', title: 'Embeds', icon: null }
+    ];
+    
     window.wp.blocks = {
       registerBlockType: () => {},
       unregisterBlockType: () => {},
       getBlockType: () => null,
       getBlockTypes: () => [],
-      getCategories: () => [],
-      setCategories: () => {},
+      getCategories: () => blockCategories,
+      setCategories: (categories) => {
+        blockCategories.length = 0;
+        blockCategories.push(...categories);
+      },
       updateCategory: () => {},
       registerBlockCollection: () => {},
       unregisterBlockCollection: () => {},
