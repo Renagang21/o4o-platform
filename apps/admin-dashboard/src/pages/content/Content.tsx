@@ -12,6 +12,7 @@ import ACFFieldGroupForm from './ACFFieldGroupForm'
 // MediaLibrary moved to /media route
 import TemplateManager from './TemplateManager'
 import WidgetManager from './WidgetManager'
+import ShortcodeList from './ShortcodeList'
 // import NewPost from '../posts/NewPost' // No longer needed, redirecting to editor
 
 const Content: FC = () => {
@@ -31,6 +32,7 @@ const Content: FC = () => {
       <Route path="new" element={<CPTForm />} />
       <Route path=":id/edit" element={<CPTForm />} />
       <Route path=":cptId/fields" element={<CustomFieldBuilder />} />
+      <Route path="shortcodes" element={<ShortcodeList />} />
       {/* Dynamic routes for custom post types */}
       <Route path=":slug" element={<DynamicContentList />} />
       <Route path=":slug/new" element={<PostForm />} />

@@ -37,3 +37,7 @@ export { ShortcodeProvider, useShortcodeContext, ShortcodeContent } from './prov
 // Dropshipping shortcodes
 export { registerDropshippingShortcodes } from './dropshipping';
 export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropshipping';
+
+// Auth shortcodes
+export { registerAuthShortcodes } from './auth';
+export { SocialLogin } from './auth';

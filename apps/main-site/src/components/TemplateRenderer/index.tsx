@@ -14,6 +14,7 @@ import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 import { formShortcodes } from '@/components/shortcodes/formShortcodes';
+import { authShortcodes } from '@/components/shortcodes/authShortcodes';
 
 // Block component mapping
 const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
@@ -39,6 +40,7 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
 // Register shortcodes on initialization
 shortcodeParser.registerMany(productShortcodes);
 shortcodeParser.registerMany(formShortcodes);
+shortcodeParser.registerMany(authShortcodes);
 
 interface TemplateRendererProps {
   blocks: TemplateBlock[];
