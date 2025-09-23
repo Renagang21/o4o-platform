@@ -228,7 +228,7 @@ class BlockManager {
         category.loaded = true;
       }
     } catch (error) {
-      // Failed to load block category
+      console.error(`Failed to load block category ${categoryName}:`, error);
     }
   }
 
@@ -310,9 +310,14 @@ class BlockManager {
     this.blockRegistry.set(name, definition);
     this.loadedBlocks.add(name);
     
+    console.log(`Registering block: ${name}`, definition);
+    
     // Register with WordPress if available
     if (window.wp?.blocks?.registerBlockType) {
-      window.wp.blocks.registerBlockType(name, definition);
+      const result = window.wp.blocks.registerBlockType(name, definition);
+      console.log(`Block registered with WordPress: ${name}`, result);
+    } else {
+      console.warn('WordPress blocks API not available for registration');
     }
   }
 

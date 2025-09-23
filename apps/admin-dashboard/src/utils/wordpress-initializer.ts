@@ -515,10 +515,19 @@ export async function initializeWordPress() {
   await blockManager.loadEssentialBlocks();
   
   // Load embeds category for markdown support
+  console.log('Loading embeds category...');
   await blockManager.loadCategory('embeds');
   
   // Load dynamic blocks category
+  console.log('Loading dynamic category...');
   await blockManager.loadCategory('dynamic');
+  
+  // Debug: Check what blocks are registered
+  if (window.wp?.blocks?.getBlockTypes) {
+    const registeredBlocks = window.wp.blocks.getBlockTypes();
+    console.log('Total blocks registered:', registeredBlocks.length);
+    console.log('Registered blocks:', registeredBlocks);
+  }
   
   // Start progressive loading of other blocks
   blockManager.loadBlocksProgressive();

@@ -245,8 +245,18 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
 
       // Get blocks from WordPress
       let mergedBlocks = fallbackBlocks;
+      
+      // Debug: Check WordPress API status
+      console.log('WordPress blocks API check:', {
+        hasWp: !!window.wp,
+        hasBlocks: !!window.wp?.blocks,
+        hasGetBlockTypes: !!window.wp?.blocks?.getBlockTypes,
+        hasGetCategories: !!window.wp?.blocks?.getCategories,
+      });
+      
       if (window.wp?.blocks?.getBlockTypes) {
         const wpBlocks = window.wp.blocks.getBlockTypes();
+        console.log('WordPress blocks found:', wpBlocks);
         
         if (wpBlocks && wpBlocks.length > 0) {
           // Create a map to preserve fallback blocks
