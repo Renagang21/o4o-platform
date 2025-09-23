@@ -1,93 +1,180 @@
 /**
  * Gutenberg Block Inserter Styles
- * Matches WordPress Gutenberg UI patterns
+ * WordPress-style grid layout with enhanced visual effects
  */
 
 .gutenberg-block-inserter {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
-/* Dashicons support */
-.dashicons {
-  font-family: dashicons;
-  display: inline-block;
-  line-height: 1;
-  font-weight: 400;
-  font-style: normal;
-  speak: none;
-  text-decoration: inherit;
-  text-transform: none;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  width: 20px;
-  height: 20px;
-  font-size: 20px;
-  vertical-align: top;
-  text-align: center;
+/* Enhanced Block Grid Cards */
+.gutenberg-block-inserter .block-card {
+  position: relative;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
 }
 
-/* Block hover effects */
-.gutenberg-block-inserter button:hover {
-  transition: all 0.1s ease;
+.gutenberg-block-inserter .block-card:hover {
+  background: #f0f8ff;
+  border-color: #2271b1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 
+              0 0 0 1px rgba(34, 113, 177, 0.1);
+  transform: translateY(-1px);
 }
 
-/* Search input focus */
+.gutenberg-block-inserter .block-card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Block Icon Styling */
+.gutenberg-block-inserter .block-icon {
+  transition: transform 0.2s ease;
+}
+
+.gutenberg-block-inserter .block-card:hover .block-icon {
+  transform: scale(1.1);
+}
+
+/* Icon Color System */
+.block-icon-text { color: #0073aa; }
+.block-icon-media { color: #8e44ad; }
+.block-icon-design { color: #e91e63; }
+.block-icon-widgets { color: #4caf50; }
+.block-icon-theme { color: #ff9800; }
+.block-icon-embed { color: #3f51b5; }
+.block-icon-layout { color: #00bcd4; }
+
+/* Search input enhanced focus */
 .gutenberg-block-inserter input:focus {
-  outline: 2px solid #007cba;
-  outline-offset: -2px;
+  outline: none;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  background-color: white;
 }
 
-/* Category pills */
-.gutenberg-block-inserter button[class*="rounded-full"] {
-  transition: all 0.2s ease;
+/* Category tabs styling */
+.gutenberg-block-inserter .category-tab {
+  position: relative;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: all 0.15s ease;
 }
 
-/* Scrollbar styling */
+.gutenberg-block-inserter .category-tab:hover {
+  background-color: #f0f0f0;
+}
+
+.gutenberg-block-inserter .category-tab.active {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-color: #ddd;
+}
+
+/* Scrollbar styling - WordPress style */
 .gutenberg-block-inserter ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 .gutenberg-block-inserter ::-webkit-scrollbar-track {
   background: #f1f1f1;
+  border-radius: 4px;
 }
 
 .gutenberg-block-inserter ::-webkit-scrollbar-thumb {
-  background: #949494;
-  border-radius: 6px;
-  border: 3px solid #f1f1f1;
+  background: #c1c1c1;
+  border-radius: 4px;
+  border: 2px solid #f1f1f1;
 }
 
 .gutenberg-block-inserter ::-webkit-scrollbar-thumb:hover {
-  background: #7e7e7e;
+  background: #a8a8a8;
 }
 
-/* Block icons */
+/* Block icons animation */
 .gutenberg-block-inserter svg {
   fill: currentColor;
 }
 
-/* Most used section */
-.gutenberg-block-inserter .most-used-blocks {
-  background-color: #f0f0f0;
-  border-radius: 2px;
-  padding: 12px;
+/* Most used section highlight */
+.gutenberg-block-inserter .most-used-section {
+  position: relative;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
-/* Block item animation */
+.gutenberg-block-inserter .most-used-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e0e0e0 20%, #e0e0e0 80%, transparent);
+}
+
+/* Block insertion animation */
 @keyframes blockInsert {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95) translateY(4px);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
-.gutenberg-block-inserter .block-item-inserted {
-  animation: blockInsert 0.2s ease-out;
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.gutenberg-block-inserter .block-inserted {
+  animation: blockInsert 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ripple effect on click */
+.gutenberg-block-inserter .block-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(34, 113, 177, 0.3);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gutenberg-block-inserter .block-card:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Empty state styling */
+.gutenberg-block-inserter .empty-state {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+/* Focus visible for accessibility */
+.gutenberg-block-inserter button:focus-visible {
+  outline: 2px solid #2271b1;
+  outline-offset: 2px;
 }
 
 /* Line clamp fallback for older browsers */

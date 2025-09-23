@@ -1,16 +1,17 @@
 /**
  * ImageBlock Component
- * Standardized image block using EnhancedBlockWrapper
+ * Standardized image block using EnhancedBlockWrapper with media library support
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { 
   Image as ImageIcon,
   Upload,
   Link2,
   Replace,
-  Edit2
+  Edit2,
+  FolderOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/popover';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
+import { MediaSelector, MediaItem } from './shared/MediaSelector';
 
 interface ImageBlockProps {
   id: string;
@@ -97,10 +99,29 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [tempLinkUrl, setTempLinkUrl] = useState(linkUrl);
+  const [showMediaSelector, setShowMediaSelector] = useState(false);
+
+  // Handle media selection from library
+  const handleMediaSelect = useCallback((media: MediaItem | MediaItem[]) => {
+    const selectedMedia = Array.isArray(media) ? media[0] : media;
+    if (selectedMedia) {
+      const updatedAttributes = {
+        ...attributes,
+        url: selectedMedia.url,
+        alt: selectedMedia.alt || selectedMedia.title || '',
+        width: selectedMedia.width,
+        height: selectedMedia.height,
+        id: selectedMedia.id
+      };
+      onChange('', updatedAttributes);
+      setShowMediaSelector(false);
+    }
+  }, [attributes, onChange]);
 
   // Update attribute helper
   const updateAttribute = (key: string, value: any) => {
-    onChange(url, { ...attributes, [key]: value });
+    const updatedAttributes = { ...attributes, [key]: value };
+    onChange('', updatedAttributes);
   };
 
   // Handle alignment change
@@ -116,11 +137,12 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
       setIsUploading(true);
       // Create object URL for immediate preview
       const objectUrl = URL.createObjectURL(file);
-      onChange(objectUrl, { 
+      const updatedAttributes = { 
         ...attributes, 
         url: objectUrl,
         alt: file.name.replace(/\.[^/.]+$/, "")
-      });
+      };
+      onChange('', updatedAttributes);
       setIsUploading(false);
       
       // Here you would typically upload to your server
@@ -143,7 +165,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setShowMediaSelector(true)}
             className="h-9 px-2"
           >
             <Replace className="h-4 w-4 mr-1" />
@@ -196,11 +218,17 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
       <ImageIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">Add an image</h3>
-        <p className="text-sm text-gray-600">Upload an image or drag and drop</p>
-        <Button onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-          <Upload className="mr-2 h-4 w-4" />
-          {isUploading ? 'Uploading...' : 'Upload Image'}
-        </Button>
+        <p className="text-sm text-gray-600">Choose from media library or upload</p>
+        <div className="flex gap-2 justify-center">
+          <Button onClick={() => setShowMediaSelector(true)} variant="default">
+            <FolderOpen className="mr-2 h-4 w-4" />
+            Media Library
+          </Button>
+          <Button onClick={() => fileInputRef.current?.click()} variant="outline" disabled={isUploading}>
+            <Upload className="mr-2 h-4 w-4" />
+            {isUploading ? 'Uploading...' : 'Upload'}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -228,7 +256,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
           if (!width || !height) {
             const img = new Image();
             img.onload = () => {
-              onChange(url, {
+              onChange('', {
                 ...attributes,
                 width: img.naturalWidth,
                 height: img.naturalHeight
@@ -338,6 +366,19 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
           </div>
         )}
       </div>
+
+      {/* Media Selector Modal */}
+      {showMediaSelector && (
+        <MediaSelector
+          isOpen={showMediaSelector}
+          onClose={() => setShowMediaSelector(false)}
+          onSelect={handleMediaSelect}
+          multiple={false}
+          acceptedTypes={['image']}
+          selectedItems={url ? [{ id: attributes.id || '', url, type: 'image', title: alt || '', alt }] : []}
+          title="Select Image"
+        />
+      )}
     </EnhancedBlockWrapper>
   );
 };
