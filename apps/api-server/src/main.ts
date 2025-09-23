@@ -542,9 +542,34 @@ app.get('/api/ecommerce/health', (req, res) => {
   });
 });
 
-// Apply rate limiting to specific endpoints  
+// Apply rate limiting to specific endpoints
 app.use('/api/v1/accounts/sso/check', ssoCheckLimiter);
 app.use('/accounts/sso/check', ssoCheckLimiter); // Direct route for frontend
+
+// Public permalink endpoint - must be before general public route handlers
+app.get('/api/public/permalink-settings', async (req, res) => {
+  try {
+    // Return default permalink settings
+    res.json({
+      success: true,
+      data: {
+        structure: '/%postname%/',
+        categoryBase: 'category',
+        tagBase: 'tag',
+        removeStopWords: false,
+        maxUrlLength: 75,
+        autoFlushRules: true,
+        enableSeoWarnings: true
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get permalink settings'
+    });
+  }
+});
+
 app.use('/api/public', publicLimiter);
 
 // Direct frontend routes (without /api prefix)

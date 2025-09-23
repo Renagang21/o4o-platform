@@ -88,8 +88,21 @@ const PermalinkSettings: FC = () => {
   const { data: settings, isLoading } = useQuery<PermalinkSettings>({
     queryKey: ['permalink-settings'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/settings/permalink');
-      return response.data as PermalinkSettings;
+      try {
+        const response = await authClient.api.get('/public/permalink-settings');
+        return response.data?.data || response.data as PermalinkSettings;
+      } catch (error) {
+        // Return default settings if API fails
+        return {
+          structure: '/%postname%/',
+          categoryBase: 'category',
+          tagBase: 'tag',
+          removeStopWords: false,
+          maxUrlLength: 75,
+          autoFlushRules: true,
+          enableSeoWarnings: true
+        };
+      }
     }
   });
 

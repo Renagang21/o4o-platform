@@ -8,6 +8,29 @@ import logger from '../utils/logger';
 
 const router: Router = Router();
 
+// Get permalink settings (public endpoint)
+router.get('/permalink-settings', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: {
+        structure: '/%postname%/',
+        categoryBase: 'category',
+        tagBase: 'tag',
+        removeStopWords: false,
+        maxUrlLength: 75,
+        autoFlushRules: true,
+        enableSeoWarnings: true
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get permalink settings'
+    });
+  }
+});
+
 // Get homepage template
 router.get('/templates/homepage', async (req, res) => {
   try {
