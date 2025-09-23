@@ -30,52 +30,11 @@ const getRepositories = () => {
 };
 
 // Mock data for when database is not available
-const mockPosts: any[] = [
-  {
-    id: '1',
-    title: 'Welcome to Neture Platform',
-    slug: 'welcome-to-neture',
-    content: '<p>Welcome to the Neture O4O platform.</p>',
-    excerpt: 'Welcome to the Neture O4O platform.',
-    status: 'publish',
-    type: 'post',
-    author: {
-      id: '1',
-      name: 'Admin',
-      email: 'admin@neture.co.kr'
-    },
-    categories: [{ id: '1', name: '공지사항', slug: 'notice' }],
-    tags: [],
-    featuredImage: null,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+// Mock data removed - database should be used instead
+const mockPosts: any[] = [];
 
-// Mock data for pages
-const mockPages: any[] = [
-  {
-    id: '1',
-    title: 'About Us',
-    slug: 'about',
-    content: '<p>About Neture Platform</p>',
-    excerpt: 'Learn more about Neture',
-    status: 'publish',
-    type: 'page',
-    author: {
-      id: '1',
-      name: 'Admin',
-      email: 'admin@neture.co.kr'
-    },
-    template: 'default',
-    parent: null,
-    menuOrder: 0,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+// Mock data for pages - removed
+const mockPages: any[] = [];
 
 // Helper to extract content from Gutenberg format
 const extractContent = (content: any): string => {

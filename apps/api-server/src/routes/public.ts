@@ -387,31 +387,11 @@ router.get('/posts', async (req, res) => {
     const order = req.query.order as string || 'DESC';
     const offset = (page - 1) * limit;
 
-    // For now, return mock data until we have proper posts entity
-    const mockPosts = [
-      {
-        id: '1',
-        title: 'Neture 플랫폼 출시',
-        slug: 'neture-platform-launch',
-        excerpt: 'O4O 비즈니스를 위한 통합 플랫폼이 출시되었습니다.',
-        content: '<p>Neture 플랫폼이 공식 출시되었습니다...</p>',
-        status: 'publish',
-        author: {
-          id: '1',
-          name: 'Admin',
-          avatar: null
-        },
-        featuredImage: null,
-        categories: ['공지사항'],
-        tags: ['플랫폼', '출시'],
-        publishedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    ];
+    // Mock data removed - use database instead
+    const posts: any[] = [];
 
     res.json({
-      data: mockPosts,
+      data: posts,
       pagination: {
         current: page,
         total: 1,

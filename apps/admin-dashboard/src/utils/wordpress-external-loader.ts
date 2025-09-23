@@ -151,7 +151,7 @@ function initializeWordPressPolyfill() {
     };
   }
 
-  // blocks polyfill
+  // blocks polyfill - preserve existing implementation if present
   if (!window.wp.blocks) {
     window.wp.blocks = {
       registerBlockType: () => {},
@@ -162,6 +162,14 @@ function initializeWordPressPolyfill() {
       hasBlockSupport: () => false,
       isReusableBlock: () => false,
     };
+  } else {
+    // Only add missing functions, don't overwrite existing ones
+    if (!window.wp.blocks.hasBlockSupport) {
+      window.wp.blocks.hasBlockSupport = () => false;
+    }
+    if (!window.wp.blocks.isReusableBlock) {
+      window.wp.blocks.isReusableBlock = () => false;
+    }
   }
 
   // blockEditor polyfill

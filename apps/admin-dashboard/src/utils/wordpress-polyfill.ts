@@ -145,6 +145,27 @@ export function initWordPress() {
       getBlockType: (_name: string) => null,
       unregisterBlockType: (_name: string) => false,
     };
+  } else {
+    // Preserve existing blocks API if it already exists with real implementations
+    // Only add missing functions
+    if (!window.wp.blocks.registerBlockType) {
+      window.wp.blocks.registerBlockType = (_name: string, _config: any) => {};
+    }
+    if (!window.wp.blocks.getCategories) {
+      window.wp.blocks.getCategories = () => [];
+    }
+    if (!window.wp.blocks.setCategories) {
+      window.wp.blocks.setCategories = (_categories: any[]) => {};
+    }
+    if (!window.wp.blocks.getBlockTypes) {
+      window.wp.blocks.getBlockTypes = () => [];
+    }
+    if (!window.wp.blocks.getBlockType) {
+      window.wp.blocks.getBlockType = (_name: string) => null;
+    }
+    if (!window.wp.blocks.unregisterBlockType) {
+      window.wp.blocks.unregisterBlockType = (_name: string) => false;
+    }
   }
   
 }

@@ -27,49 +27,8 @@ const getRepositories = () => {
   }
 };
 
-// Mock data for when database is not available
-const mockPosts = [
-  {
-    id: '1',
-    title: 'Welcome to Neture Platform',
-    slug: 'welcome-to-neture',
-    content: '<p>Welcome to the Neture O4O platform.</p>',
-    excerpt: 'Welcome to the Neture O4O platform.',
-    status: 'publish',
-    type: 'post',
-    author: {
-      id: '1',
-      name: 'Admin',
-      email: 'admin@neture.co.kr'
-    },
-    categories: [{ id: '1', name: '공지사항', slug: 'notice' }],
-    tags: [],
-    featuredImage: null,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    title: 'Getting Started Guide',
-    slug: 'getting-started',
-    content: '<p>Learn how to use the platform effectively.</p>',
-    excerpt: 'Learn how to use the platform effectively.',
-    status: 'publish',
-    type: 'post',
-    author: {
-      id: '1',
-      name: 'Admin',
-      email: 'admin@neture.co.kr'
-    },
-    categories: [{ id: '2', name: '가이드', slug: 'guide' }],
-    tags: [],
-    featuredImage: null,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+// Mock data removed - database should be used instead
+const mockPosts: any[] = [];
 
 // WordPress-compatible query parameters interface
 interface PostQueryParams {
