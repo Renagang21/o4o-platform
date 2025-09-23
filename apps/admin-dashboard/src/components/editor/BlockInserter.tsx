@@ -218,14 +218,18 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
     let categories: BlockCategory[] = [];
     if (window.wp?.blocks?.getCategories) {
       const wpCategories = window.wp.blocks.getCategories();
-      categories = wpCategories.map((cat: any) => ({
-        slug: cat.slug,
-        title: cat.title,
-        icon: categoryIcons[cat.slug] || categoryIcons['default'],
-        count: 0, // Will be updated when counting blocks
-      }));
-    } else {
-      // Fallback categories if WordPress API is not available
+      if (wpCategories && wpCategories.length > 0) {
+        categories = wpCategories.map((cat: any) => ({
+          slug: cat.slug,
+          title: cat.title,
+          icon: categoryIcons[cat.slug] || categoryIcons['default'],
+          count: 0, // Will be updated when counting blocks
+        }));
+      }
+    }
+    
+    // Use fallback categories if none were loaded
+    if (categories.length === 0) {
       categories = [
         { slug: 'text', title: 'Text', icon: categoryIcons.text, count: 0 },
         { slug: 'media', title: 'Media', icon: categoryIcons.media, count: 0 },
@@ -233,6 +237,7 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
         { slug: 'widgets', title: 'Widgets', icon: categoryIcons.widgets, count: 0 },
         { slug: 'theme', title: 'Theme', icon: categoryIcons.theme, count: 0 },
         { slug: 'embed', title: 'Embeds', icon: categoryIcons.embed, count: 0 },
+        { slug: 'dynamic', title: 'Dynamic', icon: categoryIcons.dynamic, count: 0 },
       ];
     }
 

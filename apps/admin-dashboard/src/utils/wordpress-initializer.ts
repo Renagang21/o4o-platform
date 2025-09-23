@@ -131,7 +131,7 @@ export async function initializeWordPress() {
     };
 
     // Initialize blocks with actual category management
-    const blockCategories = [
+    let blockCategories = [
       { slug: 'text', title: 'Text', icon: null },
       { slug: 'media', title: 'Media', icon: null },
       { slug: 'design', title: 'Design', icon: null },
@@ -161,8 +161,7 @@ export async function initializeWordPress() {
       },
       getCategories: () => blockCategories,
       setCategories: (categories) => {
-        blockCategories.length = 0;
-        blockCategories.push(...categories);
+        blockCategories = [...categories];
       },
       updateCategory: () => {},
       registerBlockCollection: () => {},
