@@ -27,71 +27,10 @@ interface Vendor {
   avatar?: string;
 }
 
-const mockVendors: Vendor[] = [
-  {
-    id: '1',
-    name: '김판매',
-    email: 'seller1@example.com',
-    businessName: '프리미엄 건강식품',
-    status: 'active',
-    products: 45,
-    revenue: 15000000,
-    commission: 1500000,
-    joinedAt: '2024-01-15',
-    lastActivity: '2024-03-15T10:30:00',
-    rating: 4.8,
-    reviewCount: 234,
-    tier: 'gold'
-  },
-  {
-    id: '2',
-    name: '이공급',
-    email: 'supplier2@example.com',
-    businessName: '오가닉 라이프',
-    status: 'active',
-    products: 32,
-    revenue: 8500000,
-    commission: 850000,
-    joinedAt: '2024-02-20',
-    lastActivity: '2024-03-14T15:20:00',
-    rating: 4.5,
-    reviewCount: 128,
-    tier: 'silver'
-  },
-  {
-    id: '3',
-    name: '박판매',
-    email: 'seller3@example.com',
-    businessName: '헬스케어 프로',
-    status: 'pending',
-    products: 0,
-    revenue: 0,
-    commission: 0,
-    joinedAt: '2024-03-10',
-    lastActivity: '2024-03-10T09:15:00',
-    rating: 0,
-    reviewCount: 0,
-    tier: 'bronze'
-  },
-  {
-    id: '4',
-    name: '최공급',
-    email: 'supplier4@example.com',
-    businessName: '웰빙 마켓',
-    status: 'suspended',
-    products: 28,
-    revenue: 5200000,
-    commission: 520000,
-    joinedAt: '2024-01-05',
-    lastActivity: '2024-03-01T12:45:00',
-    rating: 3.2,
-    reviewCount: 89,
-    tier: 'bronze'
-  }
-];
+// Vendor data will be fetched from API
 
 const VendorsList = () => {
-  const [vendors] = useState(mockVendors);
+  const [vendors] = useState<Vendor[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [tierFilter, setTierFilter] = useState('all');

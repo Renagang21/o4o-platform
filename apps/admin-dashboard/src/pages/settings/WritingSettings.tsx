@@ -85,12 +85,9 @@ const WritingSettings: React.FC = () => {
     emailNotifyModeration: true
   });
 
-  // Mock categories for demo
+  // Categories will be fetched from API
   const categories = [
-    { id: '1', name: 'Uncategorized' },
-    { id: '2', name: 'News' },
-    { id: '3', name: 'Tutorials' },
-    { id: '4', name: 'Updates' }
+    { id: '1', name: 'Uncategorized' }
   ];
 
   // Post formats

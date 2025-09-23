@@ -137,12 +137,9 @@ const PrivacySettings: React.FC = () => {
     }
   });
 
-  // Mock pages for privacy policy selection
+  // Pages for privacy policy selection (will be fetched from API)
   const pages = [
-    { id: '0', title: '-- Select --' },
-    { id: '1', title: 'Privacy Policy' },
-    { id: '2', title: 'Terms of Service' },
-    { id: '3', title: 'Cookie Policy' }
+    { id: '0', title: '-- Select --' }
   ];
 
   const exportFormats = [

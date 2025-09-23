@@ -21,50 +21,7 @@ interface CommissionData {
   paidDate?: string;
 }
 
-const mockCommissionData: CommissionData[] = [
-  {
-    vendorId: '1',
-    vendorName: '김판매',
-    businessName: '프리미엄 건강식품',
-    period: '2024-03',
-    sales: 15000000,
-    commissionRate: 10,
-    commissionAmount: 1500000,
-    status: 'paid',
-    paidDate: '2024-03-10'
-  },
-  {
-    vendorId: '2',
-    vendorName: '이공급',
-    businessName: '오가닉 라이프',
-    period: '2024-03',
-    sales: 8500000,
-    commissionRate: 10,
-    commissionAmount: 850000,
-    status: 'pending'
-  },
-  {
-    vendorId: '3',
-    vendorName: '박판매',
-    businessName: '헬스케어 프로',
-    period: '2024-03',
-    sales: 12000000,
-    commissionRate: 8,
-    commissionAmount: 960000,
-    status: 'processing'
-  },
-  {
-    vendorId: '4',
-    vendorName: '최공급',
-    businessName: '웰빙 마켓',
-    period: '2024-02',
-    sales: 5200000,
-    commissionRate: 10,
-    commissionAmount: 520000,
-    status: 'paid',
-    paidDate: '2024-02-10'
-  }
-];
+// Commission data will be fetched from API
 
 interface CommissionRate {
   category: string;
@@ -80,7 +37,7 @@ const commissionRates: CommissionRate[] = [
 ];
 
 const VendorsCommission = () => {
-  const [commissions] = useState(mockCommissionData);
+  const [commissions] = useState<CommissionData[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
