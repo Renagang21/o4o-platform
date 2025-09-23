@@ -310,14 +310,9 @@ class BlockManager {
     this.blockRegistry.set(name, definition);
     this.loadedBlocks.add(name);
     
-    console.log(`Registering block: ${name}`, definition);
-    
     // Register with WordPress if available
     if (window.wp?.blocks?.registerBlockType) {
-      const result = window.wp.blocks.registerBlockType(name, definition);
-      console.log(`Block registered with WordPress: ${name}`, result);
-    } else {
-      console.warn('WordPress blocks API not available for registration');
+      window.wp.blocks.registerBlockType(name, definition);
     }
   }
 

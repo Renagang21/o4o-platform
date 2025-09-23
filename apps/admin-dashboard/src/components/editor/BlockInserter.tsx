@@ -90,9 +90,6 @@ const blockIcons: Record<string, React.ReactNode> = {
   'default': <Square className="h-5 w-5" />,
 };
 
-// No fallback blocks - use WordPress API only
-const fallbackBlocks: BlockType[] = [];
-
 const BlockInserter: React.FC<BlockInserterProps> = ({
   onClose,
   onInsertBlock,
@@ -102,120 +99,61 @@ const BlockInserter: React.FC<BlockInserterProps> = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['text', 'media'])
   );
-  const [availableBlocks, setAvailableBlocks] = useState<BlockType[]>(fallbackBlocks);
+  const [availableBlocks, setAvailableBlocks] = useState<BlockType[]>([]);
   const [blockCategories, setBlockCategories] = useState<BlockCategory[]>([]);
 
   // Load blocks and categories from WordPress API
   useEffect(() => {
     if (!isOpen) return;
     
-    // Function to load categories and blocks
-    const loadBlocksAndCategories = () => {
-      // Get categories from WordPress
-      let categories: BlockCategory[] = [];
-      if (window.wp?.blocks?.getCategories) {
-        const wpCategories = window.wp.blocks.getCategories();
-        if (wpCategories && wpCategories.length > 0) {
-          categories = wpCategories.map((cat: any) => ({
+    // Function to load blocks from WordPress
+    const loadBlocks = () => {
+      // Get categories
+      const wpCategories = window.wp?.blocks?.getCategories?.() || [];
+      const categories = wpCategories.length > 0 
+        ? wpCategories.map((cat: any) => ({
             slug: cat.slug,
             title: cat.title,
             icon: categoryIcons[cat.slug] || categoryIcons['default'],
-            count: 0, // Will be updated when counting blocks
-          }));
-        }
-      }
-      
-      // Use fallback categories if none were loaded
-      if (categories.length === 0) {
-        categories = [
-          { slug: 'text', title: 'Text', icon: categoryIcons.text, count: 0 },
-          { slug: 'media', title: 'Media', icon: categoryIcons.media, count: 0 },
-          { slug: 'design', title: 'Design', icon: categoryIcons.design, count: 0 },
-          { slug: 'widgets', title: 'Widgets', icon: categoryIcons.widgets, count: 0 },
-          { slug: 'theme', title: 'Theme', icon: categoryIcons.theme, count: 0 },
-          { slug: 'embed', title: 'Embeds', icon: categoryIcons.embed, count: 0 },
-          { slug: 'dynamic', title: 'Dynamic', icon: categoryIcons.dynamic, count: 0 },
-        ];
-      }
+            count: 0,
+          }))
+        : [
+            { slug: 'text', title: 'Text', icon: categoryIcons.text, count: 0 },
+            { slug: 'media', title: 'Media', icon: categoryIcons.media, count: 0 },
+            { slug: 'design', title: 'Design', icon: categoryIcons.design, count: 0 },
+            { slug: 'widgets', title: 'Widgets', icon: categoryIcons.widgets, count: 0 },
+            { slug: 'theme', title: 'Theme', icon: categoryIcons.theme, count: 0 },
+            { slug: 'embed', title: 'Embeds', icon: categoryIcons.embed, count: 0 },
+            { slug: 'dynamic', title: 'Dynamic', icon: categoryIcons.dynamic, count: 0 },
+          ];
 
-      // Get blocks from WordPress
-      let mergedBlocks = fallbackBlocks;
-      
-      // Debug: Check WordPress API status
-      console.log('WordPress blocks API check:', {
-        hasWp: !!window.wp,
-        hasBlocks: !!window.wp?.blocks,
-        hasGetBlockTypes: !!window.wp?.blocks?.getBlockTypes,
-        hasGetCategories: !!window.wp?.blocks?.getCategories,
-      });
-      
-      if (window.wp?.blocks?.getBlockTypes) {
-        const wpBlocks = window.wp.blocks.getBlockTypes();
-        console.log('WordPress blocks found:', wpBlocks);
-        
-        if (wpBlocks && wpBlocks.length > 0) {
-          // Create a map to preserve fallback blocks
-          const blockMap = new Map<string, BlockType>();
-          
-          // Add fallback blocks first (these have correct UI data)
-          fallbackBlocks.forEach(block => {
-            blockMap.set(block.name, block);
-          });
-          
-          // Process WordPress blocks
-          wpBlocks.forEach((block: any) => {
-            // Only add new blocks from WordPress, don't override existing ones
-            if (!blockMap.has(block.name)) {
-              // Extract icon name from block.icon if it's a string
-              const iconName = typeof block.icon === 'string' ? block.icon : 'default';
-              const icon = blockIcons[iconName] || blockIcons['default'];
-              
-              blockMap.set(block.name, {
-                name: block.name,
-                title: block.title || block.name.split('/')[1] || block.name,
-                description: block.description || '',
-                category: block.category || 'common',
-                icon: icon,
-                keywords: block.keywords || [],
-              });
-            }
-          });
-          
-          mergedBlocks = Array.from(blockMap.values());
-        }
-      } else {
-        // If WordPress API is not available, just use fallback blocks
-        mergedBlocks = fallbackBlocks;
-      }
+      // Get blocks
+      const wpBlocks = window.wp?.blocks?.getBlockTypes?.() || [];
+      const blocks = wpBlocks.map((block: any) => ({
+        name: block.name,
+        title: block.title || block.name.split('/')[1] || block.name,
+        description: block.description || '',
+        category: block.category || 'common',
+        icon: blockIcons[typeof block.icon === 'string' ? block.icon : 'default'] || blockIcons['default'],
+        keywords: block.keywords || [],
+      }));
 
-      setAvailableBlocks(mergedBlocks);
-
+      setAvailableBlocks(blocks);
+      
       // Update category counts
-      const updatedCategories = categories.map(cat => {
-        const count = mergedBlocks.filter(b => b.category === cat.slug).length;
-        return { ...cat, count };
-      });
-      setBlockCategories(updatedCategories);
+      setBlockCategories(categories.map(cat => ({
+        ...cat,
+        count: blocks.filter(b => b.category === cat.slug).length
+      })));
     };
     
-    // Load blocks and categories immediately
-    loadBlocksAndCategories();
+    // Load immediately
+    loadBlocks();
     
-    // Subscribe to block changes if WordPress data API is available
-    let unsubscribe: (() => void) | undefined;
-    if (window.wp?.data?.subscribe) {
-      unsubscribe = window.wp.data.subscribe(() => {
-        // Reload blocks and categories when changes occur
-        loadBlocksAndCategories();
-      });
-    }
+    // Subscribe to changes
+    const unsubscribe = window.wp?.data?.subscribe?.(() => loadBlocks());
     
-    // Clean up subscription on unmount or when dialog closes
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
+    return () => unsubscribe?.();
   }, [isOpen]);
 
   const filteredBlocks = useMemo(() => {

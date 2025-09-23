@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
+import { initializeWordPress } from '@/utils/wordpress-initializer';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaListWordPress from '@/pages/media/MediaListWordPress';
@@ -301,7 +301,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     const initializeEditor = async () => {
       try {
         // Initialize WordPress editor
-        await ensureWordPressLoaded();
+        await initializeWordPress();
         setIsWordPressReady(true);
         
         // Load post data if editing existing post

@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
-import { setupWordPressEnvironment } from '@/utils/wordpress-runtime-setup'
 import { initVersionCheck } from '@/utils/versionCheck'
 import App from './App'
 import './styles/globals.css'
@@ -39,12 +38,6 @@ const queryClient = new QueryClient({
     },
   },
 })
-
-// WordPress 런타임 환경 초기화
-// Deploy trigger: ParagraphTestBlock and StandaloneEditor updates - v2
-setupWordPressEnvironment().catch((error) => {
-  // Error log removed
-});
 
 // Initialize version checking
 initVersionCheck();

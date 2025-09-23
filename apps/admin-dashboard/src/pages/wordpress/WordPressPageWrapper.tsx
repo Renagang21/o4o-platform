@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, ReactNode } from 'react';
-import { loadWordPressModules } from '@/utils/wordpress-dynamic-loader';
+import { initializeWordPress } from '@/utils/wordpress-initializer';
 // Using inline spinner as ui/spinner doesn't exist
 
 interface WordPressPageWrapperProps {
@@ -22,7 +22,7 @@ export default function WordPressPageWrapper({
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    loadWordPressModules()
+    initializeWordPress()
       .then(() => setIsLoaded(true))
       .catch(err => setError(err));
   }, []);
