@@ -9,7 +9,18 @@ import { Plus, Settings, Download, Upload } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import ReusableBlocksBrowser from '../../components/editor/ReusableBlocksBrowser';
+// ReusableBlocksBrowser component removed - using placeholder
+const ReusableBlocksBrowser = ({ onEditBlock, onCreateNew }: any) => (
+  <div className="text-center py-8">
+    <p className="text-gray-500 mb-4">Reusable blocks will be displayed here</p>
+    <button 
+      onClick={onCreateNew}
+      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    >
+      Create New Block
+    </button>
+  </div>
+);
 const ReusableBlocksPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
