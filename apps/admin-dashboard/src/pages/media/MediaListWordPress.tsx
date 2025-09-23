@@ -224,7 +224,7 @@ const MediaListWordPress: React.FC = () => {
             'Content-Type': 'application/json'
           }
         }).catch(error => {
-          console.error(`Failed to delete media ${id}:`, error);
+          // Failed to delete media item
           return { error, id };
         })
       );

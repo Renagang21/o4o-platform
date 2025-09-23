@@ -6,7 +6,7 @@
 // Register media WordPress blocks
 export function registerMediaBlocks() {
   if (!window.wp?.blocks?.registerBlockType) {
-    console.warn('WordPress blocks API not available');
+    // WordPress blocks API not available
     return;
   }
 

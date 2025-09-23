@@ -6,7 +6,7 @@
 // Register layout WordPress blocks
 export function registerLayoutBlocks() {
   if (!window.wp?.blocks?.registerBlockType) {
-    console.warn('WordPress blocks API not available');
+    // WordPress blocks API not available
     return;
   }
 

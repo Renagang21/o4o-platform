@@ -67,7 +67,7 @@ export const EnhancedPreview: React.FC<EnhancedPreviewProps> = ({
       const origin = window.location.origin;
       return `${origin}${url.startsWith('/') ? url : '/' + url}`;
     } catch (error) {
-      console.error('Error generating preview URL:', error);
+      // Error generating preview URL
       return '/';
     }
   }, [url]);

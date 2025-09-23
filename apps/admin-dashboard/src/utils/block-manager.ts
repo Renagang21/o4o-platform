@@ -242,7 +242,7 @@ class BlockManager {
         category.loaded = true;
       }
     } catch (error) {
-      console.error(`Failed to load block category ${categoryName}:`, error);
+      // Failed to load block category
     }
   }
 

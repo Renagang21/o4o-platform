@@ -39,7 +39,7 @@ export class PostMessageAPI {
    */
   send(type: CustomizerMessage['type'], payload?: any) {
     if (!this.targetWindow) {
-      console.warn('No target window set for PostMessage');
+      // No target window set for PostMessage
       return;
     }
     
@@ -51,7 +51,7 @@ export class PostMessageAPI {
     try {
       this.targetWindow.postMessage(message, this.targetOrigin);
     } catch (error) {
-      console.error('Failed to send PostMessage:', error);
+      // Failed to send PostMessage
     }
   }
   
@@ -104,7 +104,7 @@ export class PostMessageAPI {
           try {
             callback(event.data.payload);
           } catch (error) {
-            console.error('Error in PostMessage callback:', error);
+            // Error in PostMessage callback
           }
         });
       }

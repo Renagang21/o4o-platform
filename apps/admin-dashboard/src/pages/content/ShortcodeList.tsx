@@ -130,7 +130,7 @@ const ShortcodeList: React.FC = () => {
       setCopiedCode(text);
       setTimeout(() => setCopiedCode(null), 2000);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      // Failed to copy to clipboard
     }
   };
 

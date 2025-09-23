@@ -71,7 +71,7 @@ const SelectValue = ({
       try {
         return getDisplayValue(value);
       } catch (error) {
-        console.warn('SelectValue getDisplayValue error:', error);
+        // SelectValue getDisplayValue error
         return value;
       }
     }

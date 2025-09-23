@@ -190,7 +190,7 @@ export class AuthClient {
       }
     } catch (error) {
       // Even if logout fails (e.g., token expired), continue with local cleanup
-      console.log('Logout API call failed (this is normal if token expired):', error);
+      // This is normal if token expired
     }
   }
 

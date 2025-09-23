@@ -93,7 +93,7 @@ export const CustomizerPreview: React.FC<CustomizerPreviewProps> = ({
         );
       }
     } catch (error) {
-      console.error('Failed to inject CSS:', error);
+      // Failed to inject CSS
     }
   }, [css, state.settings]);
   

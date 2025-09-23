@@ -59,7 +59,7 @@ export function usePreviewInjection({
       injectedRef.current = true;
       return true;
     } catch (error) {
-      console.error('Failed to inject preview script:', error);
+      // Failed to inject preview script
       return false;
     }
   }, [getIframe]);
@@ -86,7 +86,7 @@ export function usePreviewInjection({
       styleEl.textContent = generatedCSS;
       return true;
     } catch (error) {
-      console.error('Failed to inject CSS:', error);
+      // Failed to inject CSS
       return false;
     }
   }, [getIframe, settings]);

@@ -150,7 +150,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Initialize WordPress on mount
   useEffect(() => {
     initializeWordPress().catch(error => {
-      console.error('Failed to initialize WordPress:', error);
+      // Failed to initialize WordPress
     });
   }, []);
   

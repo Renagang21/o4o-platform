@@ -105,7 +105,7 @@ const UsersListClean = () => {
           setUsers(transformedUsers);
         }
       } catch (err) {
-        console.error('Failed to fetch users:', err);
+        // Failed to fetch users
         setUsers([]);
       } finally {
         setLoading(false);
