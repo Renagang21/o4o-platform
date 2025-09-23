@@ -266,17 +266,7 @@ class BlockManager {
     
     // Register with WordPress if available
     if (window.wp?.blocks?.registerBlockType) {
-      const result = window.wp.blocks.registerBlockType(name, definition);
-      console.log(`Block registered: ${name}`, result);
-      
-      // Log current block count
-      if (window.wp?.blocks?.getBlockTypes) {
-        const allBlocks = window.wp.blocks.getBlockTypes();
-        console.log(`Total registered blocks: ${allBlocks.length}`);
-        console.log('Dynamic blocks:', allBlocks.filter((b: any) => b.category === 'dynamic'));
-      }
-    } else {
-      console.warn('WordPress blocks API not available');
+      window.wp.blocks.registerBlockType(name, definition);
     }
   }
 
