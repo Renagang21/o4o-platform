@@ -449,6 +449,21 @@ export async function initializeWordPress() {
   const { getBlockManager } = await import('@/utils/block-manager');
   const blockManager = getBlockManager();
   
+  // Register Dynamic category if WordPress blocks is available
+  if (window.wp?.blocks?.setCategories) {
+    const currentCategories = window.wp.blocks.getCategories() || [];
+    if (!currentCategories.find((cat: any) => cat.slug === 'dynamic')) {
+      window.wp.blocks.setCategories([
+        ...currentCategories,
+        {
+          slug: 'dynamic',
+          title: 'Dynamic',
+          icon: null
+        }
+      ]);
+    }
+  }
+
   // Load only essential blocks initially
   await blockManager.loadEssentialBlocks();
   

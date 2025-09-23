@@ -21,7 +21,8 @@ export enum BlockCategory {
   COMMERCE = 'commerce',
   SITE = 'site',
   DATA = 'data',
-  EMBED = 'embed'
+  EMBED = 'embed',
+  DYNAMIC = 'dynamic'
 }
 
 // 블록 상태 정의

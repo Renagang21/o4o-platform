@@ -103,11 +103,42 @@ class BlockManager {
           // Widgets blocks will be implemented later
           break;
         case 'embeds':
-          // Load dynamic blocks module for markdown-reader
-          // Dynamic blocks will be loaded when available
+          // Register markdown-reader block directly
+          this.registerBlock('markdown-reader', {
+            name: 'markdown-reader',
+            title: 'Markdown Reader',
+            category: 'embed',
+            icon: 'media-document',
+            description: 'Display markdown files',
+            supports: {
+              align: ['wide', 'full'],
+              html: false
+            }
+          });
           break;
         case 'dynamic':
-          // Dynamic blocks will be loaded when available
+          // Register dynamic blocks directly
+          this.registerBlock('cpt-acf-loop', {
+            name: 'cpt-acf-loop',
+            title: 'CPT ACF Loop',
+            category: 'dynamic',
+            icon: 'layout',
+            description: 'Display custom post type loops'
+          });
+          this.registerBlock('reusable', {
+            name: 'reusable',
+            title: 'Reusable Block',
+            category: 'dynamic',
+            icon: 'block-default',
+            description: 'Insert a reusable block'
+          });
+          this.registerBlock('spectra-forms', {
+            name: 'spectra-forms',
+            title: 'Spectra Forms',
+            category: 'dynamic',
+            icon: 'forms',
+            description: 'Add a form'
+          });
           break;
       }
 
