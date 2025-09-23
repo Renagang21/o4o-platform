@@ -101,6 +101,9 @@ export async function initializeWordPress() {
       didAction: () => 0
     };
 
+    // Simple publish-subscribe mechanism for block changes
+    const blockSubscribers = new Set<Function>();
+    
     // Initialize data with working subscribe mechanism
     window.wp.data = {
       select: () => ({}),
@@ -150,9 +153,6 @@ export async function initializeWordPress() {
     
     // Store registered blocks
     const registeredBlocks = new Map();
-    
-    // Simple publish-subscribe mechanism for block changes
-    const blockSubscribers = new Set<Function>();
     
     window.wp.blocks = {
       registerBlockType: (name, settings) => {
