@@ -116,7 +116,7 @@ const WritingSettings: React.FC = () => {
         setSettings(response.data.data);
       }
     } catch (error: any) {
-      console.log('Using default settings');
+      // Using default settings on error
     } finally {
       setLoading(false);
     }
