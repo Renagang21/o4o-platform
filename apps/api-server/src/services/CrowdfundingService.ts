@@ -694,9 +694,9 @@ export class CrowdfundingService extends EventEmitter {
       .createQueryBuilder()
       .update(FundingProject)
       .set({ status: 'ongoing' as FundingStatus })
-      .where('status = :status', { status: 'pending' })
-      .andWhere('startDate <= :now', { now })
-      .andWhere('endDate > :now', { now })
+      .where('"status" = :status', { status: 'pending' })
+      .andWhere('"startDate" <= :now', { now })
+      .andWhere('"endDate" > :now', { now })
       .execute();
 
     // 종료일이 지난 프로젝트 종료 처리
