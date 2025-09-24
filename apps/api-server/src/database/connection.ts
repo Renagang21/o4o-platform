@@ -87,8 +87,8 @@ export const AppDataSource = new DataSource({
   password: DB_PASSWORD,
   database: DB_NAME,
   
-  // NamingStrategy 설정 - camelCase to snake_case 자동 변환
-  namingStrategy: new SnakeNamingStrategy(),
+  // NamingStrategy 설정 - 주석 처리 (데이터베이스가 이미 camelCase 사용)
+  // namingStrategy: new SnakeNamingStrategy(),
   
   // 개발 환경 설정
   synchronize: false, // 자동 스키마 동기화 비활성화 (마이그레이션 사용)
