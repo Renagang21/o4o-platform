@@ -2,7 +2,7 @@
 
 ## 🚀 Recent Updates
 
-### Date: 2024-01-24
+### Date: 2025-01-24
 
 ## ✅ Completed Features
 
@@ -39,6 +39,62 @@
 ### 4. Public Endpoints
 - `/api/public/permalink-settings` - WordPress-compatible permalink configuration
 - `/api/public/cpt/types` - Custom post types (no auth required)
+
+### 5. Commission System
+- **Email Notifications**: 
+  - Commission calculation notifications for vendors
+  - Settlement request emails with payment details
+- **Auto-approval Logic**:
+  - Vendor commissions auto-approved if < 1M KRW and vendor is active after 7 days
+  - Supplier settlements auto-approved if < 5M KRW, supplier is active, rating >= 4.5 after 14 days
+- **Payment Reminders**: Automated reminders for pending commissions and settlements
+- **Interim Reports**: Weekly commission statistics generation
+
+### 6. Shipping Tracking System
+- **Entity**: `ShippingTracking` with comprehensive tracking fields
+- **Carriers Supported**: CJ Logistics, Korea Post, Hanjin, Lotte, Logen, DHL, FedEx, UPS
+- **Features**:
+  - Real-time tracking status updates
+  - Tracking history with location and timestamps
+  - Return shipment processing
+  - Delivery statistics and analytics
+  - Carrier-specific tracking URLs
+  - Batch updates from carrier APIs
+- **API Endpoints**:
+  - `/api/shipping/track/:trackingNumber` - Public tracking lookup
+  - `/api/shipping/tracking` - Create/update tracking (protected)
+  - `/api/shipping/statistics` - Delivery analytics
+
+### 7. Tax & Discount Calculation System
+- **Pricing Service**: Comprehensive pricing engine with:
+  - Role-based pricing (retail, wholesale, affiliate)
+  - Quantity-based bulk discounts
+  - Coupon system integration
+  - Seasonal discount campaigns (Korean shopping seasons)
+  - International tax rates (KR VAT 10%, US Sales Tax, JP GST, CN VAT)
+  - Shipping cost calculation (domestic and international)
+- **Features**:
+  - Cart total calculation with multiple products
+  - Combined shipping optimization
+  - Tax-inclusive pricing
+  - Discount stacking rules
+  - Korean Won (KRW) currency formatting
+- **API Endpoints**:
+  - `/api/pricing/calculate` - Single product pricing
+  - `/api/pricing/cart-total` - Multi-item cart calculation
+  - `/api/pricing/tax-rate` - Get tax rates by country
+  - `/api/pricing/shipping` - Calculate shipping costs
+  - `/api/pricing/breakdown` - Detailed pricing breakdown
+
+### 8. Product Enhancements
+- **Price Fields**: 
+  - Multiple pricing tiers (retail, wholesale, affiliate, sale)
+  - Cost tracking and compare-at pricing
+- **Inventory Management**:
+  - Stock quantity tracking
+  - Low stock threshold alerts
+  - Manage stock toggle
+  - Automatic out-of-stock status
 
 ## 📦 Database Schema Updates
 
@@ -77,6 +133,28 @@
 - metadata (JSONB)
 - created_at
 - updated_at
+
+-- shipping_trackings
+- id (UUID)
+- orderId (FK → orders)
+- carrier (enum)
+- trackingNumber
+- status (enum)
+- estimatedDeliveryDate
+- actualDeliveryDate
+- recipientName
+- recipientSignature
+- deliveryNotes
+- trackingHistory (JSONB)
+- shippingAddress (JSONB)
+- shippingCost
+- weight
+- dimensions (JSONB)
+- returnTrackingNumber
+- failureReason
+- metadata (JSONB)
+- createdAt
+- updatedAt
 ```
 
 ## 🔧 Local Development Setup
@@ -151,14 +229,14 @@ Allowed origins:
 ## 📝 TODO
 
 ### High Priority
-- [ ] Commission notification emails
-- [ ] Auto-approval business logic
-- [ ] OAuth flow implementation
+- [x] Commission notification emails ✅
+- [x] Auto-approval business logic ✅
+- [x] OAuth flow implementation ✅
 
 ### Medium Priority
-- [ ] Product price/inventory fields
-- [ ] Shipping tracking system
-- [ ] Tax/discount calculations
+- [x] Product price/inventory fields ✅
+- [x] Shipping tracking system ✅
+- [x] Tax/discount calculations ✅
 
 ### Low Priority
 - [ ] HTML export functionality

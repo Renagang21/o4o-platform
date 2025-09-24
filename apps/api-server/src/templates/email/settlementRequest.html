@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>정산 요청 알림</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #536dfe 0%, #3d5afe 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">📊 정산 요청</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">정산 가능한 금액이 있습니다</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                {{recipientName}}님께
+              </h2>
+              
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                정산 요청이 접수되었습니다. 아래 내역을 확인해 주세요.
+              </p>
+              
+              <div style="background-color: #e8eaf6; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #3d5afe; font-size: 20px;">정산 요청 상세</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666; width: 150px;">요청 번호:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{requestId}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666;">요청일:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{requestDate}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666;">정산 기간:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{settlementPeriod}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666;">건수:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{transactionCount}}건</td>
+                  </tr>
+                  <tr style="border-top: 2px solid #c5cae9;">
+                    <td style="padding: 12px 0 8px 0; color: #3d5afe; font-size: 18px;">정산 금액:</td>
+                    <td style="padding: 12px 0 8px 0; color: #3d5afe; font-size: 18px; font-weight: bold;">₩{{settlementAmount}}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style="background-color: #fff8e1; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #333333; font-size: 16px;">💳 입금 정보</h4>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666; width: 100px;">은행:</td>
+                    <td style="padding: 5px 0; color: #333333;">{{bankName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">계좌번호:</td>
+                    <td style="padding: 5px 0; color: #333333;">{{accountNumber}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">예금주:</td>
+                    <td style="padding: 5px 0; color: #333333;">{{accountHolder}}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #333333; font-size: 16px;">처리 일정</h4>
+                <p style="margin: 5px 0; color: #666666; font-size: 14px; line-height: 1.6;">
+                  • 검토 기한: {{reviewDeadline}}<br>
+                  • 예상 입금일: {{expectedPaymentDate}}<br>
+                  • 처리 상태: <span style="color: #ff9800; font-weight: 600;">검토 중</span>
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{settlementUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #536dfe 0%, #3d5afe 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  정산 내역 확인
+                </a>
+              </div>
+              
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                정산 관련 문의: settlement@neture.co.kr
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © 2024 Neture. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

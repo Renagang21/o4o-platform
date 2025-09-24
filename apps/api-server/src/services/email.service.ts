@@ -540,6 +540,94 @@ export class EmailService {
     }
   }
 
+  // Send commission calculated email
+  async sendCommissionCalculatedEmail(to: string, data: {
+    vendorName: string;
+    orderDate: string;
+    orderId: string;
+    orderAmount: string;
+    commissionRate: number;
+    commissionAmount: string;
+    settlementDate: string;
+    pendingAmount: string;
+    settlementStatus: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/commissionCalculated.html');
+    
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+      
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{vendorName}}/g, data.vendorName)
+        .replace(/{{orderDate}}/g, data.orderDate)
+        .replace(/{{orderId}}/g, data.orderId)
+        .replace(/{{orderAmount}}/g, data.orderAmount)
+        .replace(/{{commissionRate}}/g, data.commissionRate.toString())
+        .replace(/{{commissionAmount}}/g, data.commissionAmount)
+        .replace(/{{settlementDate}}/g, data.settlementDate)
+        .replace(/{{pendingAmount}}/g, data.pendingAmount)
+        .replace(/{{settlementStatus}}/g, data.settlementStatus)
+        .replace(/{{dashboardUrl}}/g, `${process.env.FRONTEND_URL || 'https://admin.neture.co.kr'}/dashboard/commissions`);
+      
+      await this.sendEmail({
+        to,
+        subject: '💰 커미션 계산 완료 - Neture Platform',
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send commission calculated email:', error);
+      throw error;
+    }
+  }
+
+  // Send settlement request email
+  async sendSettlementRequestEmail(to: string, data: {
+    recipientName: string;
+    requestId: string;
+    requestDate: string;
+    settlementPeriod: string;
+    transactionCount: number;
+    settlementAmount: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
+    reviewDeadline: string;
+    expectedPaymentDate: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/settlementRequest.html');
+    
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+      
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{recipientName}}/g, data.recipientName)
+        .replace(/{{requestId}}/g, data.requestId)
+        .replace(/{{requestDate}}/g, data.requestDate)
+        .replace(/{{settlementPeriod}}/g, data.settlementPeriod)
+        .replace(/{{transactionCount}}/g, data.transactionCount.toString())
+        .replace(/{{settlementAmount}}/g, data.settlementAmount)
+        .replace(/{{bankName}}/g, data.bankName)
+        .replace(/{{accountNumber}}/g, data.accountNumber)
+        .replace(/{{accountHolder}}/g, data.accountHolder)
+        .replace(/{{reviewDeadline}}/g, data.reviewDeadline)
+        .replace(/{{expectedPaymentDate}}/g, data.expectedPaymentDate)
+        .replace(/{{settlementUrl}}/g, `${process.env.FRONTEND_URL || 'https://admin.neture.co.kr'}/settlements/${data.requestId}`);
+      
+      await this.sendEmail({
+        to,
+        subject: '📊 정산 요청 접수 - Neture Platform',
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send settlement request email:', error);
+      throw error;
+    }
+  }
+
   // Public method to check if email service is available
   isServiceAvailable(): boolean {
     return this.isEnabled && this.isInitialized && this.transporter !== null;

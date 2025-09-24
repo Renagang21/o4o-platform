@@ -759,6 +759,10 @@ app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api/suppliers', supplierRoutes); // Supplier management routes
 app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
+import shippingRoutes from './routes/shipping.routes';
+app.use('/api/shipping', shippingRoutes); // Shipping tracking routes
+import pricingRoutes from './routes/pricing.routes';
+app.use('/api/pricing', pricingRoutes); // Pricing calculation routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
 // Removed duplicate mount to ensure a single canonical router for /api/posts
 // app.use('/api/posts', postsRoutes);

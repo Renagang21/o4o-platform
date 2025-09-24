@@ -72,8 +72,8 @@ export class VendorProductController {
           name: product.name,
           sku: product.sku,
           category: product.categoryId || 'Uncategorized',
-          price: 0, // TODO: Add pricing to Product entity
-          stock: 0, // TODO: Add inventory to Product entity
+          price: product.retailPrice || 0,
+          stock: product.stockQuantity || 0,
           status: product.status,
           image: product.images?.[0] || '/api/placeholder/100/100',
           sales: stats?.totalSales || 0
@@ -152,11 +152,24 @@ export class VendorProductController {
         slug: slugify(productData.name, { lower: true, strict: true }),
         status: productData.status || 'draft',
         categoryId: category?.id,
+        // Price fields
+        retailPrice: productData.price || productData.retailPrice || 0,
+        wholesalePrice: productData.wholesalePrice,
+        affiliatePrice: productData.affiliatePrice,
+        salePrice: productData.salePrice,
+        cost: productData.cost,
+        compareAtPrice: productData.compareAtPrice,
+        // Inventory fields
+        stockQuantity: productData.stock || productData.stockQuantity || 0,
+        manageStock: productData.manageStock !== undefined ? productData.manageStock : true,
+        lowStockThreshold: productData.lowStockThreshold,
+        // Shipping fields
         weight: productData.shipping?.weight,
         dimensions: productData.shipping?.dimensions,
         requiresShipping: productData.shipping?.requiresShipping || true,
         images: productData.images?.map((img: any) => img.url || img),
-        featuredImage: productData.images?.[0]?.url || productData.images?.[0]
+        featuredImage: productData.images?.[0]?.url || productData.images?.[0],
+        createdBy: vendorId
       });
 
       const savedProduct = await productRepository.save(product);
@@ -200,14 +213,27 @@ export class VendorProductController {
       if (updateData.name) product.name = updateData.name;
       if (updateData.description) product.description = updateData.description;
       if (updateData.sku) product.sku = updateData.sku;
-      // TODO: Add price fields to Product entity
-      // if (updateData.price !== undefined) product.price = updateData.price;
-      // if (updateData.compareAtPrice !== undefined) product.compareAtPrice = updateData.compareAtPrice;
-      // if (updateData.cost !== undefined) product.cost = updateData.cost;
       if (updateData.status) product.status = updateData.status;
 
-      // TODO: Add inventory management to Product entity
-      // if (updateData.inventory) { ... }
+      // Price fields
+      if (updateData.price !== undefined) product.retailPrice = updateData.price;
+      if (updateData.retailPrice !== undefined) product.retailPrice = updateData.retailPrice;
+      if (updateData.wholesalePrice !== undefined) product.wholesalePrice = updateData.wholesalePrice;
+      if (updateData.affiliatePrice !== undefined) product.affiliatePrice = updateData.affiliatePrice;
+      if (updateData.salePrice !== undefined) product.salePrice = updateData.salePrice;
+      if (updateData.compareAtPrice !== undefined) product.compareAtPrice = updateData.compareAtPrice;
+      if (updateData.cost !== undefined) product.cost = updateData.cost;
+
+      // Inventory management
+      if (updateData.inventory) {
+        if (updateData.inventory.stock !== undefined) product.stockQuantity = updateData.inventory.stock;
+        if (updateData.inventory.manageStock !== undefined) product.manageStock = updateData.inventory.manageStock;
+        if (updateData.inventory.lowStockThreshold !== undefined) product.lowStockThreshold = updateData.inventory.lowStockThreshold;
+      }
+      if (updateData.stock !== undefined) product.stockQuantity = updateData.stock;
+      if (updateData.stockQuantity !== undefined) product.stockQuantity = updateData.stockQuantity;
+      if (updateData.manageStock !== undefined) product.manageStock = updateData.manageStock;
+      if (updateData.lowStockThreshold !== undefined) product.lowStockThreshold = updateData.lowStockThreshold;
 
       // SEO fields
       if (updateData.seo) {
