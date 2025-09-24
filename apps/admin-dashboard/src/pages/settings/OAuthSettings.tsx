@@ -299,9 +299,10 @@ const OAuthSettings = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Enable/Disable Switch */}
-              <div className="flex items-center justify-between">
+            <CardContent>
+              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                {/* Enable/Disable Switch */}
+                <div className="flex items-center justify-between">
                 <Label htmlFor={`${provider}-enabled`}>활성화</Label>
                 <div className="flex items-center space-x-2">
                   {updateMutation.isPending && (
@@ -348,6 +349,7 @@ const OAuthSettings = () => {
                     }
                     placeholder="OAuth 애플리케이션의 Client Secret"
                     disabled={!config.enabled || updateMutation.isPending}
+                    autoComplete="new-password"
                   />
                   <Button
                     type="button"
@@ -420,6 +422,7 @@ const OAuthSettings = () => {
                   </Button>
                 )}
               </div>
+              </form>
             </CardContent>
           </Card>
         );
