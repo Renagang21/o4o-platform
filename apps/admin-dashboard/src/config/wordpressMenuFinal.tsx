@@ -206,6 +206,12 @@ export const wordpressMenuItems: MenuItem[] = [
     separator: true
   },
   {
+    id: 'cpt-engine',
+    label: 'CPT 콘텐츠 엔진',
+    icon: <FileCode className="w-5 h-5" />,
+    path: '/cpt-engine'
+  },
+  {
     id: 'cpt-acf',
     label: 'CPT & ACF',
     icon: <FileCode className="w-5 h-5" />,

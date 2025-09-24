@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { wordpressMenuItems, MenuItem } from '@/config/wordpressMenuFinal';
+import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 
 interface ActiveApp {
   id: string;
@@ -106,8 +107,14 @@ export const useDynamicMenu = () => {
     });
   };
 
-  // 동적 메뉴 생성
-  const dynamicMenu = filterMenuItems([...wordpressMenuItems]);
+  // CPT 메뉴 아이템 가져오기
+  const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
+
+  // 기본 메뉴 필터링
+  const filteredBaseMenu = filterMenuItems([...wordpressMenuItems]);
+  
+  // CPT 메뉴 아이템 삽입
+  const dynamicMenu = injectCPTMenuItems(filteredBaseMenu, cptMenuItems);
 
   // 앱 상태 변경 시 메뉴 다시 로드
   const refreshMenu = () => {
@@ -118,7 +125,7 @@ export const useDynamicMenu = () => {
   return {
     menuItems: dynamicMenu,
     activeApps,
-    isLoading,
+    isLoading: isLoading || cptLoading,
     isAppActive,
     refreshMenu
   };

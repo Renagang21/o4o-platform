@@ -93,14 +93,23 @@ export interface CPTApiResponse<T = any> {
 
 export interface CreateCPTDto {
   slug: string;
-  name: string;
+  label: string;
+  singularLabel: string;
   description?: string;
   icon?: string;
-  active?: boolean;
-  supports?: Partial<CustomPostType['supports']>;
-  labels?: Partial<CustomPostType['labels']>;
-  taxonomies?: string[];
+  isActive?: boolean;
+  public?: boolean;
   showInMenu?: boolean;
+  menuPosition?: number;
+  hasArchive?: boolean;
+  supports?: string[];
+  rewrite?: {
+    slug: string;
+    withFront: boolean;
+  };
+  capabilities?: Record<string, string>;
+  taxonomies?: string[];
+  labels?: Partial<CustomPostType['labels']>;
   showInRest?: boolean;
 }
 

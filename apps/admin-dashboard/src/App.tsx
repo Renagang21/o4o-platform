@@ -98,6 +98,9 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
+
+// CPT Engine
+const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 // const GutenbergPage = lazy(() => 
 //   import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPageWrapped')
 // );
@@ -751,7 +754,16 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* CPT & ACF */}
+                    {/* CPT Engine - New Unified Dashboard */}
+                    <Route path="/cpt-engine/*" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CPTEngine />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* CPT & ACF - Legacy Routes */}
                     <Route path="/cpt/*" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
