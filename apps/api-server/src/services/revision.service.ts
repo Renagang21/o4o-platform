@@ -286,7 +286,7 @@ export class RevisionService {
         seo: revision.seo,
         customFields: revision.customFields,
         lastModifiedBy: restoredBy,
-        updatedAt: new Date()
+        updated_at: new Date()
       });
 
       logger.info('Page restored from revision', {
@@ -374,7 +374,7 @@ export class RevisionService {
 
       // Update entity with new content
       await (entityType === 'post' ? this.postRepository : this.pageRepository)
-        .update(entityId, { content, updatedAt: new Date() });
+        .update(entityId, { content, updated_at: new Date() });
 
       // Create autosave revision
       const updatedEntity = entityType === 'post'

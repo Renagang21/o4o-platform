@@ -126,11 +126,11 @@ export const getArchiveData = async (req: Request, res: Response) => {
 
     // 필터 조건 추가
     if (filters.author_id) {
-      queryBuilder.andWhere('post.author_id = :authorId', { authorId: filters.author_id });
+      queryBuilder.andWhere('post.authorId = :authorId', { authorId: filters.author_id });
     }
 
     if (filters.dateRange) {
-      queryBuilder.andWhere('post.created_at BETWEEN :startDate AND :endDate', {
+      queryBuilder.andWhere('post.createdAt BETWEEN :startDate AND :endDate', {
         startDate: filters.dateRange.start,
         endDate: filters.dateRange.end
       });
@@ -146,10 +146,10 @@ export const getArchiveData = async (req: Request, res: Response) => {
         queryBuilder.orderBy('post.viewCount', orderDirection);
         break;
       case 'published_at':
-        queryBuilder.orderBy('post.published_at', orderDirection);
+        queryBuilder.orderBy('post.publishedAt', orderDirection);
         break;
       default:
-        queryBuilder.orderBy('post.created_at', orderDirection);
+        queryBuilder.orderBy('post.createdAt', orderDirection);
     }
 
     // 페이지네이션
@@ -175,8 +175,8 @@ export const getArchiveData = async (req: Request, res: Response) => {
           slug: post.slug,
           excerpt: post.content ? post.content.substring(0, 200) + '...' : '',
           content: post.content,
-          date: post.published_at || post.created_at,
-          author: post.author_id, // TODO: User 엔티티와 조인 필요
+          date: post.publishedAt || post.createdAt,
+          author: post.authorId, // TODO: User 엔티티와 조인 필요
           categories: post.meta?.tags || [],
           tags: post.meta?.tags || [],
           featured_image: post.meta?.thumbnail,
@@ -454,18 +454,18 @@ export const getUserStats = async (req: Request, res: Response) => {
     // 사용자별 포스트 통계
     const totalPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.author_id = :userId', { userId })
+      .where('post.authorId = :userId', { userId })
       .getCount();
     
     const publishedPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.author_id = :userId', { userId })
+      .where('post.authorId = :userId', { userId })
       .andWhere('post.status = :status', { status: 'publish' })
       .getCount();
     
     const draftPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.author_id = :userId', { userId })
+      .where('post.authorId = :userId', { userId })
       .andWhere('post.status = :status', { status: 'draft' })
       .getCount();
     
@@ -473,7 +473,7 @@ export const getUserStats = async (req: Request, res: Response) => {
     const viewsResult = await postRepository
       .createQueryBuilder('post')
       .select('SUM(post.viewCount)', 'totalViews')
-      .where('post.author_id = :userId', { userId })
+      .where('post.authorId = :userId', { userId })
       .getRawOne();
     
     const totalViews = parseInt(viewsResult?.totalViews || '0');
@@ -481,7 +481,7 @@ export const getUserStats = async (req: Request, res: Response) => {
     // 상위 포스트 조회
     const topPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.author_id = :userId', { userId })
+      .where('post.authorId = :userId', { userId })
       .andWhere('post.status = :status', { status: 'publish' })
       .orderBy('post.viewCount', 'DESC')
       .limit(5)
@@ -502,7 +502,7 @@ export const getUserStats = async (req: Request, res: Response) => {
         id: post.id,
         title: post.title,
         views: post.viewCount,
-        date: post.created_at.toISOString().split('T')[0]
+        date: post.createdAt.toISOString().split('T')[0]
       }))
     };
 

@@ -526,7 +526,7 @@ export class TossPaymentsAdvancedService {
       const failedPayments = await paymentRepository
         .createQueryBuilder('payment')
         .where('payment.status = :status', { status: 'failed' })
-        .andWhere('payment.created_at > :since', { 
+        .andWhere('payment.createdAt > :since', { 
           since: new Date(Date.now() - 24 * 60 * 60 * 1000) 
         })
         .andWhere('payment.retryCount < :maxRetries', { maxRetries: 3 })

@@ -172,13 +172,13 @@ router.get('/',
       }
 
       // Ordering
-      let orderByField = 'post.created_at';
+      let orderByField = 'post.createdAt';
       switch (orderby) {
         case 'date':
           orderByField = 'post.published_at';
           break;
         case 'modified':
-          orderByField = 'post.updated_at';
+          orderByField = 'post.updatedAt';
           break;
         case 'title':
           orderByField = 'post.title';

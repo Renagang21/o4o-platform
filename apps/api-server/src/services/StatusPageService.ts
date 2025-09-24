@@ -657,7 +657,7 @@ export class StatusPageService {
       );
       
       const dayIncidents = incidents.filter((i: any) => 
-        i.created_at >= dayStart && i.created_at <= dayEnd
+        i.createdAt >= dayStart && i.createdAt <= dayEnd
       );
       
       const uptime = dayUptimeMetrics.length > 0 

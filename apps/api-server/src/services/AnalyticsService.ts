@@ -269,13 +269,13 @@ export class AnalyticsService {
         .where('user.createdAt >= :startDate', { startDate })
         .getCount(),
       this.userSessionRepo.createQueryBuilder('session')
-        .where('session.created_at >= :startDate', { startDate })
+        .where('session.createdAt >= :startDate', { startDate })
         .getCount(),
       this.getAverageSessionDuration(startDate),
       this.getTotalPageViews(startDate),
       this.getTotalActions(startDate),
       this.betaFeedbackRepo.createQueryBuilder('feedback')
-        .where('feedback.created_at >= :startDate', { startDate })
+        .where('feedback.createdAt >= :startDate', { startDate })
         .getCount(),
       this.getTotalErrors(startDate),
       this.getAverageResponseTime(startDate),
@@ -326,7 +326,7 @@ export class AnalyticsService {
     const sessions = await this.userSessionRepo
       .createQueryBuilder('session')
       .leftJoinAndSelect('session.betaUser', 'betaUser')
-      .where('session.created_at >= :startDate', { startDate })
+      .where('session.createdAt >= :startDate', { startDate })
       .getMany();
 
     const engagementData = sessions.map((session: any) => ({
@@ -370,7 +370,7 @@ export class AnalyticsService {
       .createQueryBuilder('log')
       .leftJoinAndSelect('log.content', 'content')
       .leftJoinAndSelect('log.store', 'store')
-      .where('log.created_at >= :startDate', { startDate })
+      .where('log.createdAt >= :startDate', { startDate })
       .getMany();
 
     const contentUsage = contentLogs.reduce((acc, log) => {
@@ -620,7 +620,7 @@ export class AnalyticsService {
     const result = await this.userSessionRepo
       .createQueryBuilder('session')
       .select('AVG(session.durationMinutes)', 'avgDuration')
-      .where('session.created_at >= :startDate', { startDate })
+      .where('session.createdAt >= :startDate', { startDate })
       .getRawOne();
     
     return parseFloat(result.avgDuration) || 0;
@@ -630,7 +630,7 @@ export class AnalyticsService {
     const result = await this.userSessionRepo
       .createQueryBuilder('session')
       .select('SUM(session.pageViews)', 'totalPageViews')
-      .where('session.created_at >= :startDate', { startDate })
+      .where('session.createdAt >= :startDate', { startDate })
       .getRawOne();
     
     return parseInt(result.totalPageViews) || 0;
@@ -639,14 +639,14 @@ export class AnalyticsService {
   private async getTotalActions(startDate: Date): Promise<number> {
     return await this.userActionRepo
       .createQueryBuilder('action')
-      .where('action.created_at >= :startDate', { startDate })
+      .where('action.createdAt >= :startDate', { startDate })
       .getCount();
   }
 
   private async getTotalErrors(startDate: Date): Promise<number> {
     return await this.userActionRepo
       .createQueryBuilder('action')
-      .where('action.created_at >= :startDate', { startDate })
+      .where('action.createdAt >= :startDate', { startDate })
       .andWhere('action.isError = :isError', { isError: true })
       .getCount();
   }
@@ -655,7 +655,7 @@ export class AnalyticsService {
     const result = await this.systemMetricsRepo
       .createQueryBuilder('metric')
       .select('AVG(metric.value)', 'avgResponseTime')
-      .where('metric.created_at >= :startDate', { startDate })
+      .where('metric.createdAt >= :startDate', { startDate })
       .andWhere('metric.metricCategory = :category', { category: MetricCategory.RESPONSE_TIME })
       .getRawOne();
     
@@ -666,11 +666,11 @@ export class AnalyticsService {
     const [totalRequests, errorRequests] = await Promise.all([
       this.userActionRepo
         .createQueryBuilder('action')
-        .where('action.created_at >= :startDate', { startDate })
+        .where('action.createdAt >= :startDate', { startDate })
         .getCount(),
       this.userActionRepo
         .createQueryBuilder('action')
-        .where('action.created_at >= :startDate', { startDate })
+        .where('action.createdAt >= :startDate', { startDate })
         .andWhere('action.isError = :isError', { isError: true })
         .getCount()
     ]);

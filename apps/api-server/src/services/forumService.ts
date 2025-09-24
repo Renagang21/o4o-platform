@@ -270,10 +270,10 @@ export class ForumService {
 
     // 날짜 범위 필터
     if (options.dateRange?.start) {
-      queryBuilder.andWhere('post.created_at >= :startDate', { startDate: options.dateRange.start });
+      queryBuilder.andWhere('post.createdAt >= :startDate', { startDate: options.dateRange.start });
     }
     if (options.dateRange?.end) {
-      queryBuilder.andWhere('post.created_at <= :endDate', { endDate: options.dateRange.end });
+      queryBuilder.andWhere('post.createdAt <= :endDate', { endDate: options.dateRange.end });
     }
 
     // 정렬
@@ -282,25 +282,25 @@ export class ForumService {
         queryBuilder
           .addSelect('(post.viewCount * 0.1 + post.commentCount * 2 + post.likeCount * 1.5)', 'popularity')
           .orderBy('popularity', 'DESC')
-          .addOrderBy('post.created_at', 'DESC');
+          .addOrderBy('post.createdAt', 'DESC');
         break;
       case 'trending':
         queryBuilder
           .addSelect(
-            '(post.viewCount * 0.1 + post.commentCount * 2 + post.likeCount * 1.5) / EXTRACT(epoch FROM (NOW() - post.created_at)) * 86400',
+            '(post.viewCount * 0.1 + post.commentCount * 2 + post.likeCount * 1.5) / EXTRACT(epoch FROM (NOW() - post.createdAt)) * 86400',
             'trending'
           )
-          .where('post.created_at >= :weekAgo', { weekAgo: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) })
+          .where('post.createdAt >= :weekAgo', { weekAgo: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) })
           .orderBy('trending', 'DESC');
         break;
       case 'oldest':
-        queryBuilder.orderBy('post.created_at', 'ASC');
+        queryBuilder.orderBy('post.createdAt', 'ASC');
         break;
       case 'latest':
       default:
         queryBuilder
           .orderBy('post.isPinned', 'DESC')
-          .addOrderBy('post.created_at', 'DESC');
+          .addOrderBy('post.createdAt', 'DESC');
         break;
     }
 

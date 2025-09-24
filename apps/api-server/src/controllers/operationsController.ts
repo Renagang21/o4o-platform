@@ -220,7 +220,7 @@ export class OperationsController {
             currentValue: alert.currentValue,
             thresholdValue: alert.thresholdValue,
             unit: alert.unit,
-            createdAt: alert.created_at,
+            createdAt: alert.createdAt,
             acknowledgedAt: alert.acknowledgedAt,
             resolvedAt: alert.resolvedAt,
             isEscalated: alert.isEscalated,
@@ -522,7 +522,7 @@ export class OperationsController {
     unit: string;
   }> {
     return metrics.map((metric: any) => ({
-      timestamp: metric.created_at,
+      timestamp: metric.createdAt,
       value: parseFloat(metric.value),
       unit: metric.unit
     }));
@@ -657,7 +657,7 @@ export class OperationsController {
         id: alert.id,
         title: alert.title,
         status: alert.status,
-        startTime: alert.created_at,
+        startTime: alert.createdAt,
         resolvedTime: alert.resolvedAt,
         impact: 'Service disruption'
       }));

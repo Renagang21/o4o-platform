@@ -932,7 +932,7 @@ export class AutoScalingService {
         currentLoad: i.currentLoad,
         port: i.port,
         processId: i.processId,
-        createdAt: i.created_at.toISOString()
+        createdAt: i.createdAt.toISOString()
       })),
       scalingRules: Array.from(this.scalingRules.entries()).reduce((acc, [key, value]) => {
         acc[key] = value;

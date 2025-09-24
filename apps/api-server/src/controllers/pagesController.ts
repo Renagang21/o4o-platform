@@ -64,11 +64,11 @@ export class PagesController {
       }
 
       if (dateFrom) {
-        queryBuilder.andWhere('page.created_at >= :dateFrom', { dateFrom });
+        queryBuilder.andWhere('page.createdAt >= :dateFrom', { dateFrom });
       }
 
       if (dateTo) {
-        queryBuilder.andWhere('page.created_at <= :dateTo', { dateTo });
+        queryBuilder.andWhere('page.createdAt <= :dateTo', { dateTo });
       }
 
       if (parentId) {

@@ -697,10 +697,10 @@ export class ForecastingService {
       // Get historical inventory levels from stock movements
       let query = stockMovementRepository.createQueryBuilder('movement')
         .leftJoinAndSelect('movement.inventory', 'inventory')
-        .where('movement.created_at >= :startDate', { 
+        .where('movement.createdAt >= :startDate', { 
           startDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) // Last 12 months
         })
-        .orderBy('movement.created_at', 'ASC');
+        .orderBy('movement.createdAt', 'ASC');
         
       // Apply filters
       if (filters?.supplierIds) {
@@ -744,7 +744,7 @@ export class ForecastingService {
       const monthlyData = new Map();
       
       movements.forEach(movement => {
-        const monthKey = movement.created_at.toISOString().substring(0, 7); // YYYY-MM
+        const monthKey = movement.createdAt.toISOString().substring(0, 7); // YYYY-MM
         if (!monthlyData.has(monthKey)) {
           monthlyData.set(monthKey, { totalValue: 0, count: 0 });
         }

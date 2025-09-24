@@ -293,16 +293,16 @@ export class PerformanceOptimizationService {
 
       // 레벨별 필드 제거
       if (level === 'low') {
-        delete cleaned.created_at;
-        delete cleaned.updated_at;
+        delete cleaned.createdAt;
+        delete cleaned.updatedAt;
       } else if (level === 'medium') {
-        delete cleaned.created_at;
-        delete cleaned.updated_at;
+        delete cleaned.createdAt;
+        delete cleaned.updatedAt;
         delete cleaned.deletedAt;
         delete cleaned.version;
       } else if (level === 'high') {
-        delete cleaned.created_at;
-        delete cleaned.updated_at;
+        delete cleaned.createdAt;
+        delete cleaned.updatedAt;
         delete cleaned.deletedAt;
         delete cleaned.version;
         delete cleaned.metadata;

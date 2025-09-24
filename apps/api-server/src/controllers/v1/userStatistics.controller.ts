@@ -70,7 +70,7 @@ export class UserStatisticsController {
       const activeUserIds = await UserStatisticsController.activityRepository
         .createQueryBuilder('activity')
         .select('DISTINCT activity.userId')
-        .where('activity.created_at BETWEEN :startDate AND :endDate', {
+        .where('activity.createdAt BETWEEN :startDate AND :endDate', {
           startDate,
           endDate: new Date()
         })
@@ -163,9 +163,9 @@ export class UserStatisticsController {
     // Daily activity counts
     const dailyActivity = await UserStatisticsController.activityRepository
       .createQueryBuilder('activity')
-      .select('DATE(activity.created_at) as date, COUNT(*) as count')
-      .where('activity.created_at >= :startDate', { startDate })
-      .groupBy('DATE(activity.created_at)')
+      .select('DATE(activity.createdAt) as date, COUNT(*) as count')
+      .where('activity.createdAt >= :startDate', { startDate })
+      .groupBy('DATE(activity.createdAt)')
       .orderBy('date', 'ASC')
       .getRawMany();
 
@@ -173,7 +173,7 @@ export class UserStatisticsController {
     const topActivityTypes = await UserStatisticsController.activityRepository
       .createQueryBuilder('activity')
       .select('activity.activityType as type, COUNT(*) as count')
-      .where('activity.created_at >= :startDate', { startDate })
+      .where('activity.createdAt >= :startDate', { startDate })
       .groupBy('activity.activityType')
       .orderBy('count', 'DESC')
       .limit(10)
@@ -202,7 +202,7 @@ export class UserStatisticsController {
     const locations = await UserStatisticsController.activityRepository
       .createQueryBuilder('activity')
       .select('activity.metadata->>"$.location.country" as country, COUNT(*) as count')
-      .where('activity.created_at >= :startDate', { startDate })
+      .where('activity.createdAt >= :startDate', { startDate })
       .andWhere('activity.metadata->>"$.location.country" IS NOT NULL')
       .groupBy('country')
       .orderBy('count', 'DESC')
@@ -212,7 +212,7 @@ export class UserStatisticsController {
     const cities = await UserStatisticsController.activityRepository
       .createQueryBuilder('activity')
       .select('activity.metadata->>"$.location.city" as city, activity.metadata->>"$.location.country" as country, COUNT(*) as count')
-      .where('activity.created_at >= :startDate', { startDate })
+      .where('activity.createdAt >= :startDate', { startDate })
       .andWhere('activity.metadata->>"$.location.city" IS NOT NULL')
       .groupBy('city, country')
       .orderBy('count', 'DESC')
@@ -247,7 +247,7 @@ export class UserStatisticsController {
         'user.role as role',
         'COUNT(*) as activityCount'
       ])
-      .where('activity.created_at >= :startDate', { startDate })
+      .where('activity.createdAt >= :startDate', { startDate })
       .groupBy('user.id, user.email, user.firstName, user.lastName, user.role')
       .orderBy('activityCount', 'DESC')
       .limit(limit)
@@ -289,14 +289,14 @@ export class UserStatisticsController {
     const failedLogins = await UserStatisticsController.activityRepository
       .createQueryBuilder('activity')
       .where('activity.activityType = :type', { type: ActivityType.LOGIN })
-      .andWhere('activity.created_at >= :startDate', { startDate })
+      .andWhere('activity.createdAt >= :startDate', { startDate })
       .andWhere('activity.isError = true OR activity.metadata->>"$.success" = "false"')
       .getCount();
 
     const suspiciousIPs = await UserStatisticsController.activityRepository
       .createQueryBuilder('activity')
       .select('activity.ipAddress as ip, COUNT(DISTINCT activity.userId) as userCount, COUNT(*) as activityCount')
-      .where('activity.created_at >= :startDate', { startDate })
+      .where('activity.createdAt >= :startDate', { startDate })
       .andWhere('activity.ipAddress IS NOT NULL')
       .groupBy('activity.ipAddress')
       .having('COUNT(DISTINCT activity.userId) > :threshold', { threshold: 5 })
@@ -384,7 +384,7 @@ export class UserStatisticsController {
           .createQueryBuilder('activity')
           .leftJoin('activity.user', 'user')
           .where('user.createdAt BETWEEN :cohortStart AND :cohortEnd', { cohortStart, cohortEnd })
-          .andWhere('activity.created_at >= :periodStart', { 
+          .andWhere('activity.createdAt >= :periodStart', { 
             periodStart: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
           })
           .select('COUNT(DISTINCT activity.userId)')

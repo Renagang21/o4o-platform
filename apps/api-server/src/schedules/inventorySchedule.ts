@@ -169,7 +169,7 @@ class InventoryScheduler {
           .createQueryBuilder('movement')
           .where('movement.inventoryId = :id', { id: item.id })
           .andWhere('movement.movementType = :type', { type: 'sale' })
-          .andWhere('movement.created_at >= :date', { date: oneDayAgo })
+          .andWhere('movement.createdAt >= :date', { date: oneDayAgo })
           .select('SUM(ABS(movement.quantity))', 'total')
           .getRawOne();
 
@@ -180,7 +180,7 @@ class InventoryScheduler {
           .createQueryBuilder('movement')
           .where('movement.inventoryId = :id', { id: item.id })
           .andWhere('movement.movementType = :type', { type: 'sale' })
-          .andWhere('movement.created_at >= :date', { date: oneWeekAgo })
+          .andWhere('movement.createdAt >= :date', { date: oneWeekAgo })
           .select('SUM(ABS(movement.quantity))', 'total')
           .getRawOne();
 
@@ -191,7 +191,7 @@ class InventoryScheduler {
           .createQueryBuilder('movement')
           .where('movement.inventoryId = :id', { id: item.id })
           .andWhere('movement.movementType = :type', { type: 'sale' })
-          .andWhere('movement.created_at >= :date', { date: oneMonthAgo })
+          .andWhere('movement.createdAt >= :date', { date: oneMonthAgo })
           .select('SUM(ABS(movement.quantity))', 'total')
           .getRawOne();
 

@@ -61,7 +61,7 @@ export class PricePolicyController {
 
       queryBuilder
         .orderBy('policy.priority', 'DESC')
-        .addOrderBy('policy.created_at', 'DESC')
+        .addOrderBy('policy.createdAt', 'DESC')
         .skip(skip)
         .take(Number(limit));
 

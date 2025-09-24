@@ -287,7 +287,7 @@ export class InventoryController {
       const total = await query.getCount();
 
       query
-        .orderBy('alert.created_at', 'DESC')
+        .orderBy('alert.createdAt', 'DESC')
         .skip((pageNum - 1) * limitNum)
         .take(limitNum);
 
@@ -415,7 +415,7 @@ export class InventoryController {
       }
 
       if (startDate && endDate) {
-        query.andWhere('movement.created_at BETWEEN :startDate AND :endDate', {
+        query.andWhere('movement.createdAt BETWEEN :startDate AND :endDate', {
           startDate: new Date(startDate as string),
           endDate: new Date(endDate as string),
         });
@@ -424,7 +424,7 @@ export class InventoryController {
       const total = await query.getCount();
 
       query
-        .orderBy('movement.created_at', 'DESC')
+        .orderBy('movement.createdAt', 'DESC')
         .skip((pageNum - 1) * limitNum)
         .take(limitNum);
 
@@ -686,7 +686,7 @@ export class InventoryController {
       const total = await query.getCount();
 
       query
-        .orderBy('rule.created_at', 'DESC')
+        .orderBy('rule.createdAt', 'DESC')
         .skip((pageNum - 1) * limitNum)
         .take(limitNum);
 

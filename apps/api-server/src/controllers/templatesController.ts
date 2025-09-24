@@ -44,7 +44,7 @@ export class TemplatesController {
       // Order by featured first, then by usage count
       queryBuilder.orderBy('template.featured', 'DESC')
                   .addOrderBy('template.usageCount', 'DESC')
-                  .addOrderBy('template.created_at', 'DESC');
+                  .addOrderBy('template.createdAt', 'DESC');
 
       const userTemplates = await queryBuilder.getMany();
 

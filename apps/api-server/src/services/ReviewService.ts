@@ -214,7 +214,7 @@ export class ReviewService extends EventEmitter {
     // 정렬
     switch (filter.sortBy) {
       case 'oldest':
-        query.orderBy('review.created_at', 'ASC');
+        query.orderBy('review.createdAt', 'ASC');
         break;
       case 'helpful':
         query.orderBy('review.helpfulCount', 'DESC');
@@ -227,7 +227,7 @@ export class ReviewService extends EventEmitter {
         break;
       case 'newest':
       default:
-        query.orderBy('review.created_at', 'DESC');
+        query.orderBy('review.createdAt', 'DESC');
     }
 
     // 페이징

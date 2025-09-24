@@ -63,9 +63,9 @@ export class UserActivityController {
       }
 
       if (startDate && endDate) {
-        whereConditions.created_at = Between(new Date(startDate as string), new Date(endDate as string));
+        whereConditions.createdAt = Between(new Date(startDate as string), new Date(endDate as string));
       } else if (startDate) {
-        whereConditions.created_at = Between(new Date(startDate as string), new Date());
+        whereConditions.createdAt = Between(new Date(startDate as string), new Date());
       }
 
       const findOptions: FindManyOptions<UserActivityLog> = {

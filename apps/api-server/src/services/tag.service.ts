@@ -38,7 +38,7 @@ export class TagService {
     }
 
     // Add sorting
-    const allowedSortFields = ['name', 'slug', 'created_at', 'updated_at'];
+    const allowedSortFields = ['name', 'slug', 'createdAt', 'updatedAt'];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'name';
     queryBuilder.orderBy(`tag.${sortField}`, sortOrder);
 
@@ -101,7 +101,7 @@ export class TagService {
     };
     
     // Timestamps are handled automatically by TypeORM
-    // tag.created_at and tag.updated_at are set by @CreateDateColumn and @UpdateDateColumn
+    // tag.createdAt and tag.updatedAt are set by @CreateDateColumn and @UpdateDateColumn
 
     return await this.tagRepository.save(tag);
   }

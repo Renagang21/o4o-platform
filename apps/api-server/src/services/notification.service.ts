@@ -759,14 +759,14 @@ export class NotificationService extends EventEmitter {
       }
 
       if (filters.startDate) {
-        queryBuilder.andWhere('notification.created_at >= :startDate', { startDate: filters.startDate });
+        queryBuilder.andWhere('notification.createdAt >= :startDate', { startDate: filters.startDate });
       }
 
       if (filters.endDate) {
-        queryBuilder.andWhere('notification.created_at <= :endDate', { endDate: filters.endDate });
+        queryBuilder.andWhere('notification.createdAt <= :endDate', { endDate: filters.endDate });
       }
 
-      queryBuilder.orderBy('notification.created_at', 'DESC');
+      queryBuilder.orderBy('notification.createdAt', 'DESC');
 
       if (filters.limit) {
         queryBuilder.limit(filters.limit);

@@ -84,7 +84,7 @@ router.get('/',
 
       // Apply pagination
       queryBuilder.skip(parseInt(String(offset))).take(parseInt(String(limit)))
-      queryBuilder.orderBy('customization.updated_at', 'DESC')
+      queryBuilder.orderBy('customization.updatedAt', 'DESC')
 
       const users = await queryBuilder.getMany()
 
@@ -119,7 +119,7 @@ router.get('/',
               customizationId: customization.id,
               customization,
               status: requestStatus,
-              submittedAt: customization.created_at,
+              submittedAt: customization.createdAt,
               reviewedAt: customization.reviewedAt,
               reviewedBy: customization.reviewedBy,
               reviewNote: customization.reviewNote,
@@ -194,7 +194,7 @@ router.get('/:requestId',
         customizationId: customization.id,
         customization,
         status,
-        submittedAt: customization.created_at,
+        submittedAt: customization.createdAt,
         reviewedAt: customization.reviewedAt,
         reviewedBy: customization.reviewedBy,
         reviewNote: customization.reviewNote,
@@ -474,7 +474,7 @@ router.get('/my-requests',
           id: customization.id,
           name: customization.name,
           status,
-          submittedAt: customization.created_at,
+          submittedAt: customization.createdAt,
           reviewedAt: customization.reviewedAt,
           reviewedBy: customization.reviewedBy,
           reviewNote: customization.reviewNote,

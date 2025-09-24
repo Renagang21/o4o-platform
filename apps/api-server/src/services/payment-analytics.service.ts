@@ -124,7 +124,7 @@ export class PaymentAnalyticsService {
       
       // 현재 기간 데이터
       let query = paymentRepository.createQueryBuilder('payment')
-        .where('payment.created_at BETWEEN :startDate AND :endDate', { startDate, endDate });
+        .where('payment.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
       
       // 필터 적용
       if (filters.paymentMethods?.length) {
@@ -155,7 +155,7 @@ export class PaymentAnalyticsService {
       const previousEnd = startDate;
       
       const previousQuery = paymentRepository.createQueryBuilder('payment')
-        .where('payment.created_at BETWEEN :startDate AND :endDate', { 
+        .where('payment.createdAt BETWEEN :startDate AND :endDate', { 
           startDate: previousStart, 
           endDate: previousEnd 
         });
@@ -273,7 +273,7 @@ export class PaymentAnalyticsService {
           'AVG(payment.amount) as averageAmount',
           'SUM(COALESCE(payment.fee, 0)) as totalFees'
         ])
-        .where('payment.created_at BETWEEN :startDate AND :endDate', { startDate, endDate })
+        .where('payment.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
         .groupBy('payment.method')
         .orderBy('totalAmount', 'DESC')
         .getRawMany();
@@ -354,7 +354,7 @@ export class PaymentAnalyticsService {
       const trends = await paymentRepository
         .createQueryBuilder('payment')
         .select([
-          `DATE_TRUNC('${dateTrunc}', payment.created_at) as date`,
+          `DATE_TRUNC('${dateTrunc}', payment.createdAt) as date`,
           'COUNT(*) as totalPayments',
           'SUM(CASE WHEN payment.status = \'completed\' THEN payment.amount ELSE 0 END) as totalAmount',
           'COUNT(CASE WHEN payment.status = \'completed\' THEN 1 END) as successfulPayments',
@@ -362,8 +362,8 @@ export class PaymentAnalyticsService {
           'SUM(CASE WHEN payment.status = \'cancelled\' THEN COALESCE(payment.cancelledAmount, 0) ELSE 0 END) as refundAmount',
           'SUM(CASE WHEN payment.status = \'completed\' THEN COALESCE(payment.fee, 0) ELSE 0 END) as totalFees'
         ])
-        .where('payment.created_at BETWEEN :startDate AND :endDate', { startDate, endDate })
-        .groupBy(`DATE_TRUNC('${dateTrunc}', payment.created_at)`)
+        .where('payment.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
+        .groupBy(`DATE_TRUNC('${dateTrunc}', payment.createdAt)`)
         .orderBy('date', 'ASC')
         .getRawMany();
 
@@ -492,14 +492,14 @@ export class PaymentAnalyticsService {
       const trends = await paymentRepository
         .createQueryBuilder('payment')
         .select([
-          `DATE_TRUNC('day', payment.created_at) as date`,
+          `DATE_TRUNC('day', payment.createdAt) as date`,
           'COUNT(*) as count',
           'SUM(CASE WHEN payment.status = \'completed\' THEN payment.amount ELSE 0 END) as amount',
           'COUNT(CASE WHEN payment.status = \'completed\' THEN 1 END) as successCount'
         ])
-        .where('payment.created_at BETWEEN :startDate AND :endDate', { startDate, endDate })
+        .where('payment.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
         .andWhere('payment.method = :method', { method })
-        .groupBy(`DATE_TRUNC('day', payment.created_at)`)
+        .groupBy(`DATE_TRUNC('day', payment.createdAt)`)
         .orderBy('date', 'ASC')
         .getRawMany();
 
@@ -561,7 +561,7 @@ export class PaymentAnalyticsService {
             'SUM(CASE WHEN plan.interval = \'monthly\' THEN plan.amount ELSE plan.amount / 12 END) as mrr'
           ])
           .where('subscription.status = :status', { status: 'active' })
-          .andWhere('subscription.created_at <= :date', { date: monthEnd.toDate() })
+          .andWhere('subscription.createdAt <= :date', { date: monthEnd.toDate() })
           .getRawOne();
         
         growth.push({
@@ -644,7 +644,7 @@ export class PaymentAnalyticsService {
           'SUM(CASE WHEN payment.status = \'completed\' THEN payment.amount ELSE 0 END) as todayRevenue',
           'COUNT(CASE WHEN payment.status = \'processing\' THEN 1 END) as activePayments'
         ])
-        .where('payment.created_at >= :today', { today })
+        .where('payment.createdAt >= :today', { today })
         .getRawOne();
 
       // 실패 사유 집계 (오늘)
@@ -655,7 +655,7 @@ export class PaymentAnalyticsService {
           'COUNT(*) as count'
         ])
         .where('payment.status = :status', { status: 'failed' })
-        .andWhere('payment.created_at >= :today', { today })
+        .andWhere('payment.createdAt >= :today', { today })
         .groupBy('payment.failureReason')
         .orderBy('count', 'DESC')
         .limit(5)

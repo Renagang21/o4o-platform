@@ -93,7 +93,7 @@ export class OrderAutomationService {
         queryBuilder.andWhere('rule.triggerEvent = :triggerEvent', { triggerEvent: filters.triggerEvent });
       }
 
-      queryBuilder.orderBy('rule.priority', 'DESC').addOrderBy('rule.created_at', 'DESC');
+      queryBuilder.orderBy('rule.priority', 'DESC').addOrderBy('rule.createdAt', 'DESC');
 
       if (filters.limit) {
         queryBuilder.limit(filters.limit);
