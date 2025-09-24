@@ -247,7 +247,7 @@ export class AuthServiceV2 {
 
       return {
         accessToken,
-        refreshToken: rotationResult.token,
+        refreshToken: rotationResult.refreshToken,
         expiresIn: 15 * 60
       };
     } catch (error) {

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계정 승인 완료</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Neture Platform</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">계정 승인 완료</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                안녕하세요, {{userName}}님!
+              </h2>
+              
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                축하합니다! 귀하의 Neture Platform 계정이 승인되었습니다.
+              </p>
+              
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">계정 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">이메일:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{userEmail}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">역할:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{userRole}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">승인일:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{approvalDate}}</td>
+                  </tr>
+                  {{#if notes}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666; vertical-align: top;">메모:</td>
+                    <td style="padding: 5px 0; color: #333333;">{{notes}}</td>
+                  </tr>
+                  {{/if}}
+                </table>
+              </div>
+              
+              <p style="margin: 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                이제 다음 서비스를 이용하실 수 있습니다:
+              </p>
+              
+              <ul style="margin: 20px 0; padding-left: 20px; color: #666666; font-size: 16px; line-height: 1.8;">
+                <li>관리자 대시보드 접속</li>
+                <li>상품 및 서비스 관리</li>
+                <li>주문 및 결제 처리</li>
+                <li>고객 관리 및 분석</li>
+              </ul>
+              
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{loginUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  로그인하기
+                </a>
+              </div>
+              
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                문의사항이 있으시면 언제든지 지원팀에 연락해 주세요.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 Neture Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © 2024 Neture. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

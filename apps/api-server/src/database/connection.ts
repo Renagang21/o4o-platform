@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
 import { RefreshToken } from '../entities/RefreshToken';
+import { LoginAttempt } from '../entities/LoginAttempt';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { ApprovalLog } from '../entities/ApprovalLog';
@@ -103,6 +104,7 @@ export const AppDataSource = new DataSource({
     : [
         User,
         RefreshToken,
+        LoginAttempt,
         PasswordResetToken,
         EmailVerificationToken,
         ApprovalLog,

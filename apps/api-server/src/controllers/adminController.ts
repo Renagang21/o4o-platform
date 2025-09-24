@@ -4,6 +4,8 @@ import { AppDataSource } from '../database/connection';
 import { User, UserStatus } from '../entities/User';
 import { AuthRequest } from '../types/auth';
 import { Like, SelectQueryBuilder } from 'typeorm';
+import { emailService } from '../services/email.service';
+import logger from '../utils/logger';
 
 export const getPendingUsers = async (req: Request, res: Response) => {
   try {
@@ -190,7 +192,21 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
       approvedBy: (req.user as any)?.id || (req.user as any)?.userId || 'system'
     });
 
-    // TODO: 승인 이메일 발송
+    // Send approval email
+    if (emailService.isServiceAvailable()) {
+      try {
+        await emailService.sendUserApprovalEmail(user.email, {
+          userName: user.name || user.email,
+          userEmail: user.email,
+          userRole: user.role,
+          approvalDate: new Date().toLocaleString('ko-KR'),
+          notes
+        });
+      } catch (emailError) {
+        logger.error('Failed to send approval email:', emailError);
+        // Continue even if email fails
+      }
+    }
 
     // Get updated user
     const updatedUser = await userRepository.findOne({
@@ -252,7 +268,18 @@ export const rejectUser = async (req: Request, res: Response) => {
       status: UserStatus.REJECTED
     });
 
-    // TODO: 거부 이메일 발송 (이유 포함)
+    // Send rejection email
+    if (emailService.isServiceAvailable()) {
+      try {
+        await emailService.sendUserRejectionEmail(user.email, {
+          userName: user.name || user.email,
+          rejectReason: reason
+        });
+      } catch (emailError) {
+        logger.error('Failed to send rejection email:', emailError);
+        // Continue even if email fails
+      }
+    }
 
     // Get updated user
     const updatedUser = await userRepository.findOne({
@@ -306,7 +333,20 @@ export const suspendUser = async (req: Request, res: Response) => {
       status: UserStatus.SUSPENDED
     });
 
-    // TODO: 정지 이메일 발송
+    // Send suspension email
+    if (emailService.isServiceAvailable()) {
+      try {
+        await emailService.sendAccountSuspensionEmail(user.email, {
+          userName: user.name || user.email,
+          suspendReason: reason,
+          suspendedDate: new Date().toLocaleString('ko-KR'),
+          suspendDuration: undefined
+        });
+      } catch (emailError) {
+        logger.error('Failed to send suspension email:', emailError);
+        // Continue even if email fails
+      }
+    }
 
     // Get updated user
     const updatedUser = await userRepository.findOne({
@@ -360,7 +400,19 @@ export const reactivateUser = async (req: Request, res: Response) => {
       status: UserStatus.APPROVED
     });
 
-    // TODO: 재활성화 이메일 발송
+    // Send reactivation email
+    if (emailService.isServiceAvailable()) {
+      try {
+        await emailService.sendAccountReactivationEmail(user.email, {
+          userName: user.name || user.email,
+          reactivatedDate: new Date().toLocaleString('ko-KR'),
+          notes: undefined
+        });
+      } catch (emailError) {
+        logger.error('Failed to send reactivation email:', emailError);
+        // Continue even if email fails
+      }
+    }
 
     // Get updated user
     const updatedUser = await userRepository.findOne({

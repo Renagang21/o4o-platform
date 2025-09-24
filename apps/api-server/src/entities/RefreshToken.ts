@@ -1,40 +1,54 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from './User';
 
 @Entity('refresh_tokens')
-@Index(['token'], { unique: true })
-@Index(['userId', 'family'])
 export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   token: string;
+
+  @ManyToOne(() => User, user => user.id, { onDelete: 'CASCADE' })
+  user: User;
 
   @Column()
   userId: string;
 
-  @ManyToOne(() => User, user => user.refreshTokens, { onDelete: 'CASCADE' })
-  user: User;
-
-  @Column()
-  family: string; // Token family for rotation
-
   @Column({ type: 'timestamp' })
   expiresAt: Date;
 
-  @Column({ default: false })
-  isRevoked: boolean;
+  @Column({ type: 'varchar', nullable: true })
+  deviceId?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userAgent?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   ipAddress?: string;
+
+  @Column({ default: false })
+  revoked: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  revokedAt?: Date;
+
+  @Column({ type: 'varchar', nullable: true })
+  revokedReason?: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // Check if token is expired
+  isExpired(): boolean {
+    return new Date() > this.expiresAt;
+  }
+
+  // Check if token is valid (not expired and not revoked)
+  isValid(): boolean {
+    return !this.isExpired() && !this.revoked;
+  }
 }

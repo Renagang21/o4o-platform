@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계정 재활성화 완료</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Neture Platform</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">계정 재활성화 완료</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                반갑습니다, {{userName}}님!
+              </h2>
+              
+              <div style="background-color: #e8f5e9; border-left: 4px solid #43e97b; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #2e7d32; font-size: 16px; line-height: 1.6; font-weight: 600;">
+                  ✓ 귀하의 계정이 성공적으로 재활성화되었습니다!
+                </p>
+              </div>
+              
+              <p style="margin: 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                계정 정지가 해제되어 이제 Neture Platform의 모든 서비스를 다시 이용하실 수 있습니다.
+              </p>
+              
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">재활성화 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666; width: 140px;">재활성화 일시:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{reactivatedDate}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666;">계정 상태:</td>
+                    <td style="padding: 8px 0; color: #43e97b; font-weight: 600;">활성</td>
+                  </tr>
+                  {{#if notes}}
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666; vertical-align: top;">안내사항:</td>
+                    <td style="padding: 8px 0; color: #333333;">{{notes}}</td>
+                  </tr>
+                  {{/if}}
+                </table>
+              </div>
+              
+              <h3 style="margin: 30px 0 15px 0; color: #333333; font-size: 18px;">이용 가능 서비스</h3>
+              <ul style="margin: 10px 0 20px 0; padding-left: 20px; color: #666666; font-size: 16px; line-height: 1.8;">
+                <li>✓ 플랫폼 로그인 및 대시보드 접속</li>
+                <li>✓ 상품 및 서비스 관리</li>
+                <li>✓ 거래 및 결제 처리</li>
+                <li>✓ API 전체 기능 사용</li>
+                <li>✓ 고객 지원 서비스</li>
+              </ul>
+              
+              <div style="background-color: #fff8e1; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #333333; font-size: 16px;">재발 방지를 위한 안내</h4>
+                <p style="margin: 0; color: #666666; font-size: 14px; line-height: 1.6;">
+                  향후 유사한 문제가 발생하지 않도록 <a href="{{termsUrl}}" style="color: #667eea;">이용약관</a> 및 
+                  <a href="{{policyUrl}}" style="color: #667eea;">운영정책</a>을 다시 한 번 확인해 주시기 바랍니다.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{loginUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  대시보드로 이동
+                </a>
+              </div>
+              
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                앞으로도 Neture Platform을 안전하고 즐겁게 이용해 주시기 바랍니다.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 Neture Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © 2024 Neture. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

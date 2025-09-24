@@ -408,6 +408,138 @@ export class EmailService {
       .trim();
   }
 
+  // Send user approval email
+  async sendUserApprovalEmail(to: string, data: { userName: string; userEmail: string; userRole: string; approvalDate: string; notes?: string }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/userApproved.html');
+    
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+      
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{userEmail}}/g, data.userEmail)
+        .replace(/{{userRole}}/g, data.userRole)
+        .replace(/{{approvalDate}}/g, data.approvalDate)
+        .replace(/{{notes}}/g, data.notes || '')
+        .replace(/{{loginUrl}}/g, process.env.FRONTEND_URL || 'https://admin.neture.co.kr');
+      
+      // Remove notes section if no notes provided
+      if (!data.notes) {
+        htmlTemplate = htmlTemplate.replace(/{{#if notes}}[\s\S]*?{{\/if}}/g, '');
+      }
+      
+      await this.sendEmail({
+        to,
+        subject: '계정 승인 완료 - Neture Platform',
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send approval email:', error);
+      throw error;
+    }
+  }
+
+  // Send user rejection email
+  async sendUserRejectionEmail(to: string, data: { userName: string; rejectReason: string }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/userRejected.html');
+    
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+      
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{rejectReason}}/g, data.rejectReason)
+        .replace(/{{supportUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`);
+      
+      await this.sendEmail({
+        to,
+        subject: '계정 승인 거부 - Neture Platform',
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send rejection email:', error);
+      throw error;
+    }
+  }
+
+  // Send account suspension email
+  async sendAccountSuspensionEmail(to: string, data: { 
+    userName: string; 
+    suspendReason: string; 
+    suspendedDate: string;
+    suspendDuration?: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/accountSuspended.html');
+    
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+      
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{suspendReason}}/g, data.suspendReason)
+        .replace(/{{suspendedDate}}/g, data.suspendedDate)
+        .replace(/{{suspendDuration}}/g, data.suspendDuration || '')
+        .replace(/{{appealUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support/appeal`);
+      
+      // Remove duration section if not provided
+      if (!data.suspendDuration) {
+        htmlTemplate = htmlTemplate.replace(/{{#if suspendDuration}}[\s\S]*?{{\/if}}/g, '');
+      }
+      
+      await this.sendEmail({
+        to,
+        subject: '계정 정지 알림 - Neture Platform',
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send suspension email:', error);
+      throw error;
+    }
+  }
+
+  // Send account reactivation email
+  async sendAccountReactivationEmail(to: string, data: { 
+    userName: string; 
+    reactivatedDate: string;
+    notes?: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/accountReactivated.html');
+    
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+      
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{reactivatedDate}}/g, data.reactivatedDate)
+        .replace(/{{notes}}/g, data.notes || '')
+        .replace(/{{loginUrl}}/g, process.env.FRONTEND_URL || 'https://admin.neture.co.kr')
+        .replace(/{{termsUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/terms`)
+        .replace(/{{policyUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/policy`);
+      
+      // Remove notes section if no notes provided
+      if (!data.notes) {
+        htmlTemplate = htmlTemplate.replace(/{{#if notes}}[\s\S]*?{{\/if}}/g, '');
+      }
+      
+      await this.sendEmail({
+        to,
+        subject: '계정 재활성화 완료 - Neture Platform',
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send reactivation email:', error);
+      throw error;
+    }
+  }
+
   // Public method to check if email service is available
   isServiceAvailable(): boolean {
     return this.isEnabled && this.isInitialized && this.transporter !== null;

@@ -4,6 +4,7 @@ import { body, query, validationResult } from 'express-validator';
 import { UnifiedAuthService } from '../services/unified-auth.service';
 import { authenticate } from '../middleware/auth.middleware';
 import { AuthProvider, OAuthProfile } from '../types/account-linking';
+import { refreshTokenService } from '../services/refreshToken.service';
 import logger from '../utils/logger';
 
 const router: ExpressRouter = Router();
@@ -271,7 +272,15 @@ router.post('/logout', authenticate, async (req, res) => {
       });
     }
 
-    // TODO: Invalidate refresh token in database
+    // Invalidate refresh token
+    const userId = (req as any).user?.userId || (req as any).user?.id;
+    const refreshToken = req.body.refreshToken || req.headers['x-refresh-token'];
+    
+    if (refreshToken) {
+      await refreshTokenService.revokeToken(refreshToken, 'Unified auth logout');
+    } else if (userId) {
+      await refreshTokenService.revokeAllUserTokens(userId, 'Unified auth logout');
+    }
 
     res.json({
       success: true,

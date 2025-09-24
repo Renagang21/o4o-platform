@@ -17,6 +17,7 @@ import { User } from '../entities/User';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { emailService } from '../services/email.service';
+import { refreshTokenService } from '../services/refreshToken.service';
 import {
   hashPassword,
   comparePassword,
@@ -169,10 +170,45 @@ router.post('/login',
         });
       }
 
+      // Get client info
+      const ipAddress = req.ip || req.connection.remoteAddress || '';
+      const userAgent = req.headers['user-agent'] || '';
+      const deviceId = req.body.deviceId || req.headers['x-device-id'] as string;
+
+      // Check account lock status
+      const lockStatus = await refreshTokenService.checkAccountLock(email);
+      if (lockStatus.locked) {
+        await refreshTokenService.trackLoginAttempt(
+          email,
+          false,
+          ipAddress,
+          userAgent,
+          deviceId,
+          'Account locked'
+        );
+        return res.status(429).json({
+          success: false,
+          message: `계정이 잠겼습니다. ${Math.ceil((lockStatus.lockDuration || 0) / 60000)}분 후에 다시 시도해주세요.`,
+          error: {
+            code: AuthErrorCode.ACCOUNT_LOCKED,
+            lockDuration: lockStatus.lockDuration,
+            attempts: lockStatus.attempts
+          }
+        });
+      }
+
       // Check password
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) {
-        // TODO: Implement login attempt tracking
+        // Track failed login attempt
+        await refreshTokenService.trackLoginAttempt(
+          email,
+          false,
+          ipAddress,
+          userAgent,
+          deviceId,
+          'Invalid password'
+        );
         return res.status(401).json({
           success: false,
           message: '이메일 또는 비밀번호가 올바르지 않습니다',
@@ -204,6 +240,15 @@ router.post('/login',
         });
       }
 
+      // Track successful login
+      await refreshTokenService.trackLoginAttempt(
+        email,
+        true,
+        ipAddress,
+        userAgent,
+        deviceId
+      );
+
       // Generate tokens
       const jwtPayload: JwtPayload = {
         userId: user.id,
@@ -213,7 +258,9 @@ router.post('/login',
       };
 
       const accessToken = generateAccessToken(jwtPayload);
-      const refreshToken = rememberMe ? generateRefreshToken(user.id) : undefined;
+      const refreshToken = rememberMe ? 
+        await refreshTokenService.generateRefreshToken(user, deviceId, userAgent, ipAddress) : 
+        undefined;
 
       // Update last login
       user.lastLoginAt = new Date();
@@ -513,11 +560,25 @@ router.post('/refresh',
     try {
       const { refreshToken } = req.body;
       
-      // TODO: Implement refresh token verification with database
-      // For now, returning error
-      return res.status(501).json({
-        success: false,
-        message: 'Refresh token functionality not yet implemented'
+      // Refresh the access token
+      const result = await refreshTokenService.refreshAccessToken(refreshToken);
+      
+      if (result.error) {
+        return res.status(401).json({
+          success: false,
+          message: result.error,
+          error: {
+            code: AuthErrorCode.INVALID_TOKEN
+          }
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          accessToken: result.accessToken,
+          tokenType: 'Bearer'
+        }
       });
     } catch (error) {
       logger.error('Token refresh error:', error);
@@ -531,7 +592,17 @@ router.post('/logout',
   authenticateToken,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // TODO: Implement token blacklisting or session management
+      const userId = (req as any).user?.userId || (req as any).user?.id;
+      const refreshToken = req.body.refreshToken || req.headers['x-refresh-token'];
+      
+      if (refreshToken) {
+        // Revoke specific refresh token
+        await refreshTokenService.revokeToken(refreshToken, 'User logout');
+      } else if (userId) {
+        // Revoke all user tokens if no specific token provided
+        await refreshTokenService.revokeAllUserTokens(userId, 'User logout');
+      }
+      
       res.json({
         success: true,
         message: '로그아웃되었습니다'
