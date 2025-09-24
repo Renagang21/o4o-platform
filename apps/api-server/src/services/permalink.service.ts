@@ -431,12 +431,13 @@ export class PermalinkService {
       
       for (const cpt of customPostTypes) {
         // rewrite slug 충돌 검사
-        if (cpt.rewrite_slug) {
-          if (settings.categoryBase === cpt.rewrite_slug) {
-            conflicts.push(`Category base conflicts with custom post type: ${cpt.rewrite_slug}`);
+        const rewriteSlug = cpt.rewrite?.slug || cpt.slug;
+        if (rewriteSlug) {
+          if (settings.categoryBase === rewriteSlug) {
+            conflicts.push(`Category base conflicts with custom post type: ${rewriteSlug}`);
           }
-          if (settings.tagBase === cpt.rewrite_slug) {
-            conflicts.push(`Tag base conflicts with custom post type: ${cpt.rewrite_slug}`);
+          if (settings.tagBase === rewriteSlug) {
+            conflicts.push(`Tag base conflicts with custom post type: ${rewriteSlug}`);
           }
         }
       }

@@ -11,8 +11,12 @@ import logger from '../../../utils/logger';
  * Follows the pattern from affiliate module
  */
 export class CPTService {
-  private cptRepository = AppDataSource.getRepository(CustomPostType);
-  private postRepository = AppDataSource.getRepository(CustomPost);
+  private get cptRepository() {
+    return AppDataSource.getRepository(CustomPostType);
+  }
+  private get postRepository() {
+    return AppDataSource.getRepository(CustomPost);
+  }
 
   /**
    * Get all Custom Post Types
@@ -179,7 +183,7 @@ export class CPTService {
 
       const queryBuilder = this.postRepository.createQueryBuilder('post');
 
-      queryBuilder.where('post.postType = :postType', { postType: slug });
+      queryBuilder.where('post.postTypeSlug = :postTypeSlug', { postTypeSlug: slug });
 
       if (status) {
         queryBuilder.andWhere('post.status = :status', { status });

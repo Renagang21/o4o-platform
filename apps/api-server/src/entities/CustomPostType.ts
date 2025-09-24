@@ -57,8 +57,33 @@ export class CustomPostType {
   @Column({ type: 'boolean', default: true })
   active!: boolean;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  rewrite_slug?: string;
+  // WordPress-like settings
+  @Column({ type: 'boolean', default: true, name: 'public' })
+  public!: boolean;
+
+  @Column({ type: 'boolean', default: true, name: 'has_archive' })
+  hasArchive!: boolean;
+
+  @Column({ type: 'boolean', default: true, name: 'show_in_menu' })
+  showInMenu!: boolean;
+
+  @Column({ type: 'json', default: '["title", "editor"]' })
+  supports!: string[];
+
+  @Column({ type: 'json', default: '[]' })
+  taxonomies!: string[];
+
+  @Column({ type: 'json', nullable: true })
+  labels?: any;
+
+  @Column({ type: 'int', nullable: true, name: 'menu_position' })
+  menuPosition?: number;
+
+  @Column({ type: 'varchar', length: 50, default: 'post', name: 'capability_type' })
+  capabilityType!: string;
+
+  @Column({ type: 'json', nullable: true })
+  rewrite?: any;
 
   // Relations
   @OneToMany('CustomPost', 'postType')
