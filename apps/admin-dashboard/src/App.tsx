@@ -763,14 +763,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* CPT & ACF - Legacy Routes */}
-                    <Route path="/cpt/*" element={
-                      <AdminProtectedRoute requiredPermissions={['content:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Content />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
+                    {/* CPT & ACF - Legacy Routes - Removed (replaced by CPT Engine) */}
                     
                     <Route path="/acf/*" element={
                       <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
