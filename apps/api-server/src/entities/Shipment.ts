@@ -32,69 +32,48 @@ export class Shipment {
   @Column({ name: 'shipped_at', type: 'timestamp', nullable: true })
   shippedAt?: Date;
 
-  @Column({ name: 'delivered_at', type: 'timestamp', nullable: true })
+  @Column({ name: 'actual_delivery', type: 'timestamp', nullable: true })
   deliveredAt?: Date;
 
-  @Column({ name: 'expected_delivery_date', type: 'date', nullable: true })
+  @Column({ name: 'estimated_delivery', type: 'date', nullable: true })
   expectedDeliveryDate?: Date;
 
-  @Column({ name: 'sender_name' })
-  senderName!: string;
-
-  @Column({ name: 'sender_phone' })
-  senderPhone!: string;
-
-  @Column({ name: 'sender_address', type: 'text' })
-  senderAddress!: string;
-
-  @Column({ name: 'sender_postal_code', nullable: true })
-  senderPostalCode?: string;
-
-  @Column({ name: 'recipient_name' })
-  recipientName!: string;
-
-  @Column({ name: 'recipient_phone' })
-  recipientPhone!: string;
-
-  @Column({ name: 'recipient_address', type: 'text' })
-  recipientAddress!: string;
-
-  @Column({ name: 'recipient_postal_code', nullable: true })
-  recipientPostalCode?: string;
+  @Column({ name: 'shipping_address', type: 'json', nullable: true })
+  shippingAddress?: {
+    senderName?: string;
+    senderPhone?: string;
+    senderAddress?: string;
+    senderPostalCode?: string;
+    recipientName?: string;
+    recipientPhone?: string;
+    recipientAddress?: string;
+    recipientPostalCode?: string;
+  };
 
   @Column({ name: 'shipping_cost', type: 'decimal', precision: 10, scale: 2, default: 0 })
   shippingCost!: number;
 
-  @Column({ name: 'insurance_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
-  insuranceAmount?: number;
-
-  @Column({ type: 'decimal', precision: 8, scale: 2, nullable: true })
-  weight?: number;
 
   @Column({ type: 'json', nullable: true })
-  dimensions?: {
-    length: number;
-    width: number;
-    height: number;
-  };
+  items?: any[];
 
-  @Column({ type: 'text', nullable: true })
-  notes?: string;
+  @Column({ name: 'current_location', type: 'text', nullable: true })
+  currentLocation?: string;
 
-  @Column({ name: 'delivery_message', nullable: true })
-  deliveryMessage?: string;
+  @Column({ name: 'label_url', type: 'text', nullable: true })
+  labelUrl?: string;
 
-  @Column({ name: 'signature_required', type: 'boolean', default: false })
-  signatureRequired!: boolean;
+  @Column({ name: 'tracking_events', type: 'json', nullable: true })
+  trackingEvents?: any[];
 
-  @Column({ name: 'signature_image', type: 'text', nullable: true })
-  signatureImage?: string;
+  @Column({ name: 'last_updated', type: 'timestamp', nullable: true })
+  lastUpdated?: Date;
 
-  @Column({ name: 'failed_reason', type: 'text', nullable: true })
-  failedReason?: string;
+  @Column({ name: 'cancelled_at', type: 'timestamp', nullable: true })
+  cancelledAt?: Date;
 
-  @Column({ name: 'return_reason', type: 'text', nullable: true })
-  returnReason?: string;
+  @Column({ name: 'cancel_reason', type: 'text', nullable: true })
+  cancelReason?: string;
 
   @Column({ type: 'json', nullable: true })
   metadata?: Record<string, any>;

@@ -132,18 +132,18 @@ export class ShippingService {
     shipment.carrierCode = carrierCode;
     shipment.status = 'pending';
     
-    // Set sender info (default for now)
+    // Set sender and recipient info in shippingAddress JSON field
     const senderAddress = await this.getDefaultSenderAddress();
-    shipment.senderName = senderAddress.name;
-    shipment.senderPhone = senderAddress.phone;
-    shipment.senderAddress = `${senderAddress.address1} ${senderAddress.address2 || ''}`;
-    shipment.senderPostalCode = senderAddress.postalCode;
-    
-    // Set recipient info
-    shipment.recipientName = order.shippingAddress.name;
-    shipment.recipientPhone = order.shippingAddress.phone;
-    shipment.recipientAddress = `${order.shippingAddress.address} ${order.shippingAddress.addressDetail || ''}`;
-    shipment.recipientPostalCode = order.shippingAddress.zipCode;
+    shipment.shippingAddress = {
+      senderName: senderAddress.name,
+      senderPhone: senderAddress.phone,
+      senderAddress: `${senderAddress.address1} ${senderAddress.address2 || ''}`,
+      senderPostalCode: senderAddress.postalCode,
+      recipientName: order.shippingAddress.name,
+      recipientPhone: order.shippingAddress.phone,
+      recipientAddress: `${order.shippingAddress.address} ${order.shippingAddress.addressDetail || ''}`,
+      recipientPostalCode: order.shippingAddress.zipCode
+    };
     
     // Set metadata for items and address details
     shipment.metadata = {
