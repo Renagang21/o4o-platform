@@ -557,7 +557,7 @@ export class CrowdfundingService extends EventEmitter {
       .createQueryBuilder('backing')
       .innerJoin('backing.project', 'project')
       .where('project.creatorId = :creatorId', { creatorId })
-      .orderBy('backing.created_at', 'DESC')
+      .orderBy('backing.createdAt', 'DESC')
       .limit(10)
       .getMany();
 
@@ -628,7 +628,7 @@ export class CrowdfundingService extends EventEmitter {
     }
 
     // 정렬
-    query.orderBy('project.created_at', 'DESC');
+    query.orderBy('project.createdAt', 'DESC');
 
     // 페이징
     const page = filter.page || 1;
