@@ -57,7 +57,7 @@ export const useDynamicMenu = () => {
         'dashboard', 'users', 'posts', 'pages', 'media', 
         'appearance', // 외모 메뉴 추가
         'theme', 'themes', 'settings', 'tools', 'apps', 
-        'monitoring', 'cpt-acf', 'collapse',
+        'monitoring', 'cpt-engine', 'cpt-acf', 'collapse',
         'shortcodes', // Shortcode 메뉴 추가
         'plugins' // 플러그인 메뉴 추가 (apps 관리 포함)
       ];
