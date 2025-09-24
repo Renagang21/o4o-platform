@@ -7,6 +7,7 @@ const couponController = new CouponController();
 
 // Public routes - validate coupon (requires authentication)
 router.post('/validate', authenticateToken, couponController.validateCoupon);
+router.post('/apply', authenticateToken, couponController.applyCoupon);
 router.get('/my-coupons', authenticateToken, couponController.getCustomerCoupons);
 
 // Admin routes
@@ -22,6 +23,7 @@ router.delete('/:id', couponController.deleteCoupon);
 
 // Additional admin routes
 router.get('/:id/usage', couponController.getCouponUsageHistory);
+router.get('/:id/statistics', couponController.getCouponStatistics);
 router.post('/bulk-generate', couponController.bulkGenerateCoupons);
 
 export default router;
