@@ -29,7 +29,7 @@ import { cptApi, cptPostApi } from '@/features/cpt-acf/services/cpt.api';
 import { acfGroupApi } from '@/features/cpt-acf/services/acf.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { CustomPost, CreatePostDto, UpdatePostDto, PostStatus } from '@/features/cpt-acf/types/cpt.types';
-import { FormBuilder } from '@/pages/forms/FormBuilder';
+// import FormBuilder from '@/pages/forms/FormBuilder';
 
 interface CPTContentEditorProps {
   cptSlug: string;
@@ -334,11 +334,55 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
                           )}
                         </CardHeader>
                         <CardContent>
-                          <FormBuilder
-                            fields={group.fields}
-                            values={formData.acfFields || {}}
-                            onChange={handleACFChange}
-                          />
+                          <div className="space-y-4">
+                            {group.fields.map((field: any) => (
+                              <div key={field.id} className="grid gap-2">
+                                <Label htmlFor={field.name}>{field.label}</Label>
+                                {field.type === 'text' ? (
+                                  <Input
+                                    id={field.name}
+                                    value={formData.acfFields?.[field.name] || ''}
+                                    onChange={(e) => handleACFChange(field.name, e.target.value)}
+                                    placeholder={field.placeholder}
+                                  />
+                                ) : field.type === 'textarea' ? (
+                                  <Textarea
+                                    id={field.name}
+                                    value={formData.acfFields?.[field.name] || ''}
+                                    onChange={(e) => handleACFChange(field.name, e.target.value)}
+                                    placeholder={field.placeholder}
+                                    rows={4}
+                                  />
+                                ) : field.type === 'select' ? (
+                                  <Select
+                                    value={formData.acfFields?.[field.name] || ''}
+                                    onValueChange={(value) => handleACFChange(field.name, value)}
+                                  >
+                                    <SelectTrigger id={field.name}>
+                                      <SelectValue placeholder={field.placeholder || '선택...'} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {field.options?.choices?.map((choice: string) => (
+                                        <SelectItem key={choice} value={choice}>
+                                          {choice}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Input
+                                    id={field.name}
+                                    value={formData.acfFields?.[field.name] || ''}
+                                    onChange={(e) => handleACFChange(field.name, e.target.value)}
+                                    placeholder={field.placeholder}
+                                  />
+                                )}
+                                {field.description && (
+                                  <p className="text-xs text-muted-foreground">{field.description}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </CardContent>
                       </Card>
                     ))
