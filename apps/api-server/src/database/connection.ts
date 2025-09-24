@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import { SnakeNamingStrategy } from './SnakeNamingStrategy';
 import { User } from '../entities/User';
 import { RefreshToken } from '../entities/RefreshToken';
 import { LoginAttempt } from '../entities/LoginAttempt';
@@ -85,6 +86,9 @@ export const AppDataSource = new DataSource({
   username: DB_USERNAME,
   password: DB_PASSWORD,
   database: DB_NAME,
+  
+  // NamingStrategy 설정 - camelCase to snake_case 자동 변환
+  namingStrategy: new SnakeNamingStrategy(),
   
   // 개발 환경 설정
   synchronize: false, // 자동 스키마 동기화 비활성화 (마이그레이션 사용)
