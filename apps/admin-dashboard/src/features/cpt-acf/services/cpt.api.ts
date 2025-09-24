@@ -25,7 +25,8 @@ export const cptApi = {
   // Get all CPT types
   async getAllTypes(active?: boolean): Promise<CPTApiResponse<CustomPostType[]>> {
     const params = active !== undefined ? `?active=${active}` : '';
-    const response = await authClient.api.get(`${API_BASE}/types${params}`);
+    // Use public endpoint for getting CPT types (no auth required)
+    const response = await authClient.api.get(`/public${API_BASE}/types${params}`);
     return response.data;
   },
 
