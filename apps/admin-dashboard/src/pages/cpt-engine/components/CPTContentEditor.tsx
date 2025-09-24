@@ -1,6 +1,6 @@
 /**
  * CPT Content Editor Component
- * Leverages PostForm.tsx pattern with FormBuilder.tsx integration
+ * Unified content editor for CPT posts
  */
 
 import { useState, useEffect, useMemo } from 'react';

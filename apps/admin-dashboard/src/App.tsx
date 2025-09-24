@@ -31,7 +31,7 @@ const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
 const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
-const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content'));
+// const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
 const OrderDetail = lazy(() => import('@/pages/ecommerce/OrderDetail'));
@@ -52,9 +52,9 @@ const MailManagement = lazy(() => import('@/pages/mail/MailManagement'));
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
 const Media = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
-const ReusableBlocksPage = lazy(() => 
-  import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
-);
+// const ReusableBlocksPage = lazy(() => 
+//   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
+// ); // Removed - content directory deleted
 const Posts = lazy(() => import('@/pages/posts/Posts'));
 const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
@@ -427,7 +427,7 @@ function App() {
                     <Route path="/reusable-blocks" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <ReusableBlocksPage />
+                          <div>Reusable Blocks - Coming Soon</div>
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

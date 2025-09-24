@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import PageList from '../content/PageList';
+import PageList from './PageList';
 
 const PagesRouter: FC = () => {
   return (
