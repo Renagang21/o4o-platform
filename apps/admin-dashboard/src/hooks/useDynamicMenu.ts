@@ -115,6 +115,17 @@ export const useDynamicMenu = () => {
   
   // CPT 메뉴 아이템 삽입
   const dynamicMenu = injectCPTMenuItems(filteredBaseMenu, cptMenuItems);
+  
+  // 디버깅용 로그 - CPT Engine 메뉴 확인
+  if (typeof window !== 'undefined') {
+    const cptEngineMenu = dynamicMenu.find(item => item.id === 'cpt-engine');
+    if (cptEngineMenu) {
+      console.log('CPT Engine menu found:', cptEngineMenu);
+    } else {
+      console.log('CPT Engine menu NOT found in dynamicMenu');
+      console.log('All menu IDs:', dynamicMenu.map(item => item.id));
+    }
+  }
 
   // 앱 상태 변경 시 메뉴 다시 로드
   const refreshMenu = () => {
