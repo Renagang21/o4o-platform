@@ -487,4 +487,27 @@ router.get('/featured-products', async (req, res) => {
   }
 });
 
+// Get CPT types (public) - for admin dashboard
+router.get('/cpt/types', async (req, res) => {
+  try {
+    // Import CPT service
+    const { cptService } = await import('../modules/cpt-acf/services/cpt.service');
+    
+    const result = await cptService.getAllCPTs(true);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    res.json(result);
+  } catch (error: any) {
+    logger.error('Public CPT types error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch CPT types',
+      message: error.message
+    });
+  }
+});
+
 export default router;
