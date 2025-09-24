@@ -151,7 +151,7 @@ export class PerformanceOptimizationService {
       // Preload recent conversions
       const recentConversions = await AppDataSource.getRepository(AffiliateConversion)
         .createQueryBuilder('conversion')
-        .where('conversion.created_at > :date', {
+        .where('conversion.createdAt > :date', {
           date: new Date(Date.now() - 24 * 60 * 60 * 1000)
         })
         .getMany();
@@ -479,10 +479,10 @@ export class PerformanceOptimizationService {
     return await AppDataSource.getRepository(AffiliateClick)
       .createQueryBuilder('click')
       .select('COUNT(*)', 'total')
-      .addSelect('DATE(click.created_at)', 'date')
+      .addSelect('DATE(click.createdAt)', 'date')
       .where('click.affiliateUserId = :affiliateUserId', { affiliateUserId })
-      .andWhere('click.created_at >= :startDate', { startDate })
-      .groupBy('DATE(click.created_at)')
+      .andWhere('click.createdAt >= :startDate', { startDate })
+      .groupBy('DATE(click.createdAt)')
       .getRawMany();
   }
 
@@ -494,10 +494,10 @@ export class PerformanceOptimizationService {
       .createQueryBuilder('conversion')
       .select('COUNT(*)', 'total')
       .addSelect('SUM(conversion.orderAmount)', 'revenue')
-      .addSelect('DATE(conversion.created_at)', 'date')
+      .addSelect('DATE(conversion.createdAt)', 'date')
       .where('conversion.affiliateUserId = :affiliateUserId', { affiliateUserId })
-      .andWhere('conversion.created_at >= :startDate', { startDate })
-      .groupBy('DATE(conversion.created_at)')
+      .andWhere('conversion.createdAt >= :startDate', { startDate })
+      .groupBy('DATE(conversion.createdAt)')
       .getRawMany();
   }
 
@@ -509,7 +509,7 @@ export class PerformanceOptimizationService {
       .createQueryBuilder('conversion')
       .select('SUM(conversion.commissionAmount)', 'total')
       .where('conversion.affiliateUserId = :affiliateUserId', { affiliateUserId })
-      .andWhere('conversion.created_at >= :startDate', { startDate })
+      .andWhere('conversion.createdAt >= :startDate', { startDate })
       .getRawOne();
   }
 

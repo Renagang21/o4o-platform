@@ -108,11 +108,11 @@ export class AffiliateRepository {
     const whereConditions: any = { affiliateUserId };
 
     if (startDate && endDate) {
-      whereConditions.created_at = Between(startDate, endDate);
+      whereConditions.createdAt = Between(startDate, endDate);
     } else if (startDate) {
-      whereConditions.created_at = MoreThanOrEqual(startDate);
+      whereConditions.createdAt = MoreThanOrEqual(startDate);
     } else if (endDate) {
-      whereConditions.created_at = LessThanOrEqual(endDate);
+      whereConditions.createdAt = LessThanOrEqual(endDate);
     }
 
     return await this.clickRepo.find({
@@ -136,11 +136,11 @@ export class AffiliateRepository {
     }
 
     if (startDate) {
-      query.andWhere('click.created_at >= :startDate', { startDate });
+      query.andWhere('click.createdAt >= :startDate', { startDate });
     }
 
     if (endDate) {
-      query.andWhere('click.created_at <= :endDate', { endDate });
+      query.andWhere('click.createdAt <= :endDate', { endDate });
     }
 
     const result = await query
@@ -191,11 +191,11 @@ export class AffiliateRepository {
     }
 
     if (startDate && endDate) {
-      whereConditions.created_at = Between(startDate, endDate);
+      whereConditions.createdAt = Between(startDate, endDate);
     } else if (startDate) {
-      whereConditions.created_at = MoreThanOrEqual(startDate);
+      whereConditions.createdAt = MoreThanOrEqual(startDate);
     } else if (endDate) {
-      whereConditions.created_at = LessThanOrEqual(endDate);
+      whereConditions.createdAt = LessThanOrEqual(endDate);
     }
 
     return await this.conversionRepo.find({
@@ -229,11 +229,11 @@ export class AffiliateRepository {
     }
 
     if (startDate) {
-      query.andWhere('conversion.created_at >= :startDate', { startDate });
+      query.andWhere('conversion.createdAt >= :startDate', { startDate });
     }
 
     if (endDate) {
-      query.andWhere('conversion.created_at <= :endDate', { endDate });
+      query.andWhere('conversion.createdAt <= :endDate', { endDate });
     }
 
     const result = await query
@@ -257,16 +257,16 @@ export class AffiliateRepository {
 
   async getDailyStats(affiliateUserId?: string, startDate?: Date, endDate?: Date): Promise<any[]> {
     const clickQuery = this.clickRepo.createQueryBuilder('click')
-      .select('DATE(click.created_at)', 'date')
+      .select('DATE(click.createdAt)', 'date')
       .addSelect('COUNT(*)', 'clicks')
-      .groupBy('DATE(click.created_at)');
+      .groupBy('DATE(click.createdAt)');
 
     const conversionQuery = this.conversionRepo.createQueryBuilder('conversion')
-      .select('DATE(conversion.created_at)', 'date')
+      .select('DATE(conversion.createdAt)', 'date')
       .addSelect('COUNT(*)', 'conversions')
       .addSelect('SUM(conversion.orderAmount)', 'revenue')
       .addSelect('SUM(conversion.commissionAmount)', 'commission')
-      .groupBy('DATE(conversion.created_at)');
+      .groupBy('DATE(conversion.createdAt)');
 
     if (affiliateUserId) {
       clickQuery.andWhere('click.affiliateUserId = :affiliateUserId', { affiliateUserId });
@@ -274,13 +274,13 @@ export class AffiliateRepository {
     }
 
     if (startDate) {
-      clickQuery.andWhere('click.created_at >= :startDate', { startDate });
-      conversionQuery.andWhere('conversion.created_at >= :startDate', { startDate });
+      clickQuery.andWhere('click.createdAt >= :startDate', { startDate });
+      conversionQuery.andWhere('conversion.createdAt >= :startDate', { startDate });
     }
 
     if (endDate) {
-      clickQuery.andWhere('click.created_at <= :endDate', { endDate });
-      conversionQuery.andWhere('conversion.created_at <= :endDate', { endDate });
+      clickQuery.andWhere('click.createdAt <= :endDate', { endDate });
+      conversionQuery.andWhere('conversion.createdAt <= :endDate', { endDate });
     }
 
     const [clicks, conversions] = await Promise.all([

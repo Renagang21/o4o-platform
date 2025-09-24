@@ -370,7 +370,7 @@ export class CommissionService {
       this.commissionRepo.getCommissions({
         page: 1,
         limit: 10,
-        orderBy: 'created_at',
+        orderBy: 'createdAt',
         orderDirection: 'DESC'
       })
     ]);

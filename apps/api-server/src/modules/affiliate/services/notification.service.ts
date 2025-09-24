@@ -83,7 +83,7 @@ export class NotificationService {
       query.andWhere('notification.type = :type', { type });
     }
 
-    query.orderBy('notification.created_at', 'DESC');
+    query.orderBy('notification.createdAt', 'DESC');
 
     const skip = (page - 1) * limit;
     query.skip(skip).take(limit);
