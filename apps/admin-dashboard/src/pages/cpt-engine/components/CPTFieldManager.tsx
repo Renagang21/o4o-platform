@@ -34,7 +34,7 @@ import {
   Database
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { acfApi } from '@/features/cpt-acf/services/acf.api';
+import { acfGroupApi } from '@/features/cpt-acf/services/acf.api';
 import { cptApi } from '@/features/cpt-acf/services/cpt.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { 
@@ -124,10 +124,10 @@ const CPTFieldManager: React.FC<CPTFieldManagerProps> = ({
     queryKey: ['field-groups', selectedType],
     queryFn: async () => {
       if (selectedType) {
-        const response = await acfApi.getFieldGroupsByPostType(selectedType);
+        const response = await acfGroupApi.getByPostType(selectedType);
         return response.data;
       } else {
-        const response = await acfApi.getAllFieldGroups(true);
+        const response = await acfGroupApi.getAll(true);
         return response.data;
       }
     }
@@ -136,7 +136,7 @@ const CPTFieldManager: React.FC<CPTFieldManagerProps> = ({
   // Create field group mutation
   const createGroupMutation = useMutation({
     mutationFn: async (data: CreateFieldGroupDto) => {
-      return await acfApi.createFieldGroup(data);
+      return await acfGroupApi.create(data);
     },
     onSuccess: () => {
       addNotice({
@@ -166,7 +166,7 @@ const CPTFieldManager: React.FC<CPTFieldManagerProps> = ({
   // Update field group mutation
   const updateGroupMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateFieldGroupDto }) => {
-      return await acfApi.updateFieldGroup(id, data);
+      return await acfGroupApi.update(id, data);
     },
     onSuccess: () => {
       addNotice({
@@ -186,7 +186,7 @@ const CPTFieldManager: React.FC<CPTFieldManagerProps> = ({
   // Delete field group mutation
   const deleteGroupMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await acfApi.deleteFieldGroup(id);
+      return await acfGroupApi.delete(id);
     },
     onSuccess: () => {
       addNotice({

@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cptApi, cptPostApi } from '@/features/cpt-acf/services/cpt.api';
-import { acfApi } from '@/features/cpt-acf/services/acf.api';
+import { acfGroupApi } from '@/features/cpt-acf/services/acf.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { CustomPost, CreatePostDto, UpdatePostDto, PostStatus } from '@/features/cpt-acf/types/cpt.types';
 import { FormBuilder } from '@/pages/forms/FormBuilder';
@@ -75,7 +75,7 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
   const { data: fieldGroups } = useQuery({
     queryKey: ['acf-groups', cptSlug],
     queryFn: async () => {
-      const response = await acfApi.getFieldGroupsByPostType(cptSlug);
+      const response = await acfGroupApi.getByPostType(cptSlug);
       return response.data;
     }
   });
