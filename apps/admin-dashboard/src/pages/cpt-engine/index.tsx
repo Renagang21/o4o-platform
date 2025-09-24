@@ -4,21 +4,34 @@
  */
 
 import { Routes, Route } from 'react-router-dom';
-import CPTDashboard from './CPTDashboard';
+import CPTDashboardToolset from './CPTDashboardToolset';
 import CPTContentEditorWrapper from './CPTContentEditorWrapper';
 
 const CPTEngine = () => {
   return (
     <Routes>
-      {/* Main Dashboard */}
-      <Route index element={<CPTDashboard />} />
+      {/* Main Dashboard - Toolset UI Style */}
+      <Route index element={<CPTDashboardToolset />} />
       
       {/* Content Editor Routes */}
       <Route path="content/:cptSlug/new" element={<CPTContentEditorWrapper />} />
       <Route path="content/:cptSlug/:postId/edit" element={<CPTContentEditorWrapper />} />
+      <Route path="content/:cptSlug" element={<CPTDashboardToolset />} />
       
-      {/* Other routes handled by dashboard tabs for now */}
-      <Route path="*" element={<CPTDashboard />} />
+      {/* Type Management Routes */}
+      <Route path="types/new" element={<CPTDashboardToolset />} />
+      <Route path="types/:slug/edit" element={<CPTDashboardToolset />} />
+      
+      {/* Field Management Routes */}
+      <Route path="fields/new" element={<CPTDashboardToolset />} />
+      <Route path="fields/:id/edit" element={<CPTDashboardToolset />} />
+      
+      {/* Taxonomy Routes */}
+      <Route path="taxonomies/new" element={<CPTDashboardToolset />} />
+      <Route path="taxonomies/:slug/edit" element={<CPTDashboardToolset />} />
+      
+      {/* Other routes handled by dashboard */}
+      <Route path="*" element={<CPTDashboardToolset />} />
     </Routes>
   );
 };

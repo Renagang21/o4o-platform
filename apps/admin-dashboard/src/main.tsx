@@ -16,6 +16,8 @@ import './styles/help-tab.css'
 import './styles/media-upload.css'
 // import './styles/ui-improvements.css' // Temporarily disabled to fix sidebar conflict
 import './styles/wordpress-table-fix.css'
+// Toolset UI styles for CPT Engine
+import './styles/toolset-ui.css'
 
 
 const queryClient = new QueryClient({
