@@ -29,8 +29,7 @@ import { cptApi, cptPostApi } from '@/features/cpt-acf/services/cpt.api';
 import { acfApi } from '@/features/cpt-acf/services/acf.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { CustomPost, CreatePostDto, UpdatePostDto, PostStatus } from '@/features/cpt-acf/types/cpt.types';
-import { FormBuilder } from '@/features/cpt-acf/components/FormBuilder';
-import RichTextEditor from '@/components/RichTextEditor';
+import { FormBuilder } from '@/pages/forms/FormBuilder';
 
 interface CPTContentEditorProps {
   cptSlug: string;
@@ -298,10 +297,12 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
                   {cptType?.supports?.includes('editor') && (
                     <div className="grid gap-2">
                       <Label htmlFor="content">내용</Label>
-                      <RichTextEditor
+                      <Textarea
+                        id="content"
                         value={formData.content || ''}
-                        onChange={(value) => handleInputChange('content', value)}
+                        onChange={(e) => handleInputChange('content', e.target.value)}
                         placeholder="콘텐츠 내용을 입력하세요..."
+                        rows={10}
                       />
                     </div>
                   )}
