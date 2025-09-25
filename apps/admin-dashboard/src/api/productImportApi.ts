@@ -192,9 +192,19 @@ class ProductImportApi {
     }));
   }
 
-  // Simplified import for testing - creates products directly
+  // Simplified import - uses the server's import endpoint
   async quickImport(csvData: any[]): Promise<ImportResult> {
-    return this.importProductsBatch(csvData);
+    try {
+      const response = await api.post('/v1/products/import', {
+        products: csvData
+      });
+
+      return response.data.data || response.data;
+    } catch (error: any) {
+      // Fallback to batch import if server import fails
+      console.warn('Server import failed, falling back to batch import:', error.message);
+      return this.importProductsBatch(csvData);
+    }
   }
 }
 
