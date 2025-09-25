@@ -44,50 +44,73 @@ export const useVendorsPendingData = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Generate mock data for demonstration
+  // Fetch pending vendors from database
   useEffect(() => {
     const fetchVendors = async () => {
       try {
         setLoading(true);
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        // Mock data generation
-        const mockVendors: PendingVendor[] = Array.from({ length: 25 }, (_, i) => {
-          const daysAgo = Math.floor(Math.random() * 30);
-          const appliedDate = new Date();
-          appliedDate.setDate(appliedDate.getDate() - daysAgo);
+        const response = await fetch(`${apiUrl}/api/vendors/pending`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          }
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            setError('Authentication required. Please login.');
+            window.location.href = '/login';
+          } else if (response.status === 500 || response.status === 503) {
+            setError('Server error. Please try again later.');
+          } else {
+            setError(`Failed to fetch pending vendors: ${response.status}`);
+          }
+          setVendors([]);
+          return;
+        }
+        
+        const data = await response.json();
+        const vendorsArray = data.data || data.vendors || [];
+        
+        // Transform API data to match PendingVendor interface
+        const transformedVendors = vendorsArray.map((vendor: any) => {
+          // Calculate waiting days
+          const appliedDate = new Date(vendor.appliedAt || vendor.createdAt || vendor.created_at);
+          const now = new Date();
+          const diffTime = Math.abs(now.getTime() - appliedDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           
-          const hasAllDocs = Math.random() > 0.3;
-          const hasPartialDocs = !hasAllDocs && Math.random() > 0.5;
-          
+          // Determine urgency level based on waiting days
           let urgencyLevel: 'normal' | 'urgent' | 'critical' = 'normal';
-          if (daysAgo > 14) urgencyLevel = 'critical';
-          else if (daysAgo > 7) urgencyLevel = 'urgent';
+          if (diffDays > 14) urgencyLevel = 'critical';
+          else if (diffDays > 7) urgencyLevel = 'urgent';
           
           return {
-            id: `vendor-${i + 1}`,
-            name: `담당자 ${i + 1}`,
-            email: `vendor${i + 1}@example.com`,
-            businessName: `${['주식회사', '유한회사', ''][Math.floor(Math.random() * 3)]} ${
-              ['테크솔루션', '글로벌무역', '온라인마켓', '디지털커머스', '스마트스토어'][Math.floor(Math.random() * 5)]
-            } ${i + 1}`,
-            businessType: Math.random() > 0.5 ? 'seller' : 'supplier',
-            businessNumber: `${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 90) + 10}-${Math.floor(Math.random() * 90000) + 10000}`,
-            phoneNumber: `010-${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
-            address: `서울시 ${['강남구', '서초구', '송파구', '강동구', '마포구'][Math.floor(Math.random() * 5)]} 테헤란로 ${Math.floor(Math.random() * 500) + 1}`,
+            id: vendor.id,
+            name: vendor.contactName || vendor.contact_name || vendor.name || 'Unknown',
+            email: vendor.email || '',
+            businessName: vendor.businessName || vendor.business_name || vendor.company_name || 'Unknown Business',
+            businessType: vendor.businessType || vendor.business_type || vendor.type || 'seller',
+            businessNumber: vendor.businessNumber || vendor.business_number || vendor.registration_number || '',
+            phoneNumber: vendor.phoneNumber || vendor.phone_number || vendor.phone || '',
+            address: vendor.address || vendor.business_address || '',
             documents: {
-              businessLicense: hasAllDocs || (hasPartialDocs && Math.random() > 0.5),
-              taxCertificate: hasAllDocs || (hasPartialDocs && Math.random() > 0.5),
-              bankAccount: hasAllDocs || (hasPartialDocs && Math.random() > 0.5)
+              businessLicense: vendor.documents?.businessLicense || vendor.has_business_license || false,
+              taxCertificate: vendor.documents?.taxCertificate || vendor.has_tax_certificate || false,
+              bankAccount: vendor.documents?.bankAccount || vendor.has_bank_account || false
             },
-            appliedAt: appliedDate.toISOString(),
-            message: Math.random() > 0.7 ? '빠른 승인 부탁드립니다.' : undefined,
+            appliedAt: vendor.appliedAt || vendor.createdAt || vendor.created_at || new Date().toISOString(),
+            message: vendor.message || vendor.notes || undefined,
             urgencyLevel
           };
         });
         
-        setVendors(mockVendors);
+        setVendors(transformedVendors);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load vendors');
+        setVendors([]);
       } finally {
         setLoading(false);
       }

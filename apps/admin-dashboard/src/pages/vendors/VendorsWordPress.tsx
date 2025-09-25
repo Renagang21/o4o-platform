@@ -87,77 +87,62 @@ const VendorsWordPress = () => {
     return saved ? parseInt(saved) : 20;
   });
 
-  // Fetch vendors (mock data for now)
+  // Fetch vendors from database
   useEffect(() => {
     const fetchVendors = async () => {
       try {
         setLoading(true);
-        // Mock data - replace with actual API call
-        const mockVendors: Vendor[] = [
-          {
-            id: '1',
-            name: '김철수',
-            email: 'kim@example.com',
-            businessName: '김철수 스토어',
-            status: 'active',
-            products: 45,
-            revenue: 15000000,
-            commission: 10,
-            joinedAt: '2024-01-15',
-            lastActivity: '2024-03-20',
-            rating: 4.5,
-            reviewCount: 128,
-            tier: 'gold'
-          },
-          {
-            id: '2',
-            name: '이영희',
-            email: 'lee@example.com',
-            businessName: '영희네 패션',
-            status: 'pending',
-            products: 0,
-            revenue: 0,
-            commission: 15,
-            joinedAt: '2024-03-18',
-            lastActivity: '2024-03-18',
-            rating: 0,
-            reviewCount: 0,
-            tier: 'bronze'
-          },
-          {
-            id: '3',
-            name: '박민수',
-            email: 'park@example.com',
-            businessName: '민수 전자',
-            status: 'active',
-            products: 120,
-            revenue: 45000000,
-            commission: 8,
-            joinedAt: '2023-06-10',
-            lastActivity: '2024-03-19',
-            rating: 4.8,
-            reviewCount: 452,
-            tier: 'platinum'
-          },
-          {
-            id: '4',
-            name: '최지은',
-            email: 'choi@example.com',
-            businessName: '지은이네 화장품',
-            status: 'suspended',
-            products: 32,
-            revenue: 8500000,
-            commission: 12,
-            joinedAt: '2023-11-20',
-            lastActivity: '2024-02-15',
-            rating: 3.2,
-            reviewCount: 67,
-            tier: 'silver'
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/vendors`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
           }
-        ];
-        setVendors(mockVendors);
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            toast.error('인증이 필요합니다. 다시 로그인해주세요.');
+            window.location.href = '/login';
+            return;
+          }
+          throw new Error(`Failed to fetch vendors: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const vendorsArray = data.data || data.vendors || [];
+        
+        // Transform API data to match Vendor interface
+        const transformedVendors = vendorsArray.map((vendor: any) => {
+          // Determine tier based on revenue or other metrics
+          let tier: 'bronze' | 'silver' | 'gold' | 'platinum' = 'bronze';
+          const revenue = vendor.revenue || vendor.total_revenue || 0;
+          if (revenue > 50000000) tier = 'platinum';
+          else if (revenue > 20000000) tier = 'gold';
+          else if (revenue > 5000000) tier = 'silver';
+          
+          return {
+            id: vendor.id,
+            name: vendor.contactName || vendor.contact_name || vendor.name || 'Unknown',
+            email: vendor.email || '',
+            businessName: vendor.businessName || vendor.business_name || vendor.company_name || 'Unknown Business',
+            status: vendor.status || 'pending',
+            products: vendor.productCount || vendor.product_count || vendor.products || 0,
+            revenue: revenue,
+            commission: vendor.commissionRate || vendor.commission_rate || vendor.commission || 10,
+            joinedAt: vendor.joinedAt || vendor.createdAt || vendor.created_at || new Date().toISOString(),
+            lastActivity: vendor.lastActivity || vendor.last_activity || vendor.updatedAt || new Date().toISOString(),
+            rating: vendor.rating || vendor.average_rating || 0,
+            reviewCount: vendor.reviewCount || vendor.review_count || vendor.reviews || 0,
+            tier: vendor.tier || tier
+          };
+        });
+        
+        setVendors(transformedVendors);
       } catch (error) {
         toast.error('판매자 목록을 불러오는데 실패했습니다.');
+        setVendors([]);
       } finally {
         setLoading(false);
       }
