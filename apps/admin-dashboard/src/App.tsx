@@ -828,7 +828,7 @@ function App() {
                     <Route path="/apps" element={
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <AppsManager />
+                          <AppsManagerV2 />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -836,14 +836,6 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <AppSettings />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/apps/marketplace" element={
-                      <AdminProtectedRoute requiredPermissions={['apps:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AppsManager />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
