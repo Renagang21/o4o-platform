@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { User, UserRole, UserStatus } from '../entities/User';
 import * as bcrypt from 'bcryptjs';
+import logger from '../utils/logger';
 
 async function createTestUser() {
   try {
@@ -21,7 +22,7 @@ async function createTestUser() {
     });
     
     await dataSource.initialize();
-    console.log('Database connected');
+    logger.info('Database connected');
 
     const userRepository = dataSource.getRepository(User);
 
@@ -31,8 +32,8 @@ async function createTestUser() {
     });
 
     if (existingUser) {
-      console.log('Test user already exists');
-      console.log('User ID:', existingUser.id);
+      logger.info('Test user already exists');
+      logger.info(`User ID: ${existingUser.id}`);
       process.exit(0);
     }
 
@@ -50,16 +51,16 @@ async function createTestUser() {
 
     const savedUser = await userRepository.save(testUser);
     
-    console.log('Test user created successfully');
-    console.log('Email:', savedUser.email);
-    console.log('Password:', 'Test123!@#');
-    console.log('User ID:', savedUser.id);
-    console.log('Role:', savedUser.role);
+    logger.info('Test user created successfully');
+    logger.info(`Email: ${savedUser.email}`);
+    logger.info('Password: Test123!@#');
+    logger.info(`User ID: ${savedUser.id}`);
+    logger.info(`Role: ${savedUser.role}`);
 
     await dataSource.destroy();
     process.exit(0);
   } catch (error) {
-    console.error('Error creating test user:', error);
+    logger.error('Error creating test user:', error);
     process.exit(1);
   }
 }

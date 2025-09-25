@@ -3,6 +3,8 @@
  * 필수 환경 변수를 체크하고 기본값을 설정합니다.
  */
 
+import logger from './logger';
+
 class EnvironmentValidator {
   private env: { [key: string]: string | undefined };
   private requiredVars: string[] = [
@@ -79,22 +81,22 @@ class EnvironmentValidator {
   }
   
   private logConfiguration(): void {
-    console.log('🔧 Environment Configuration:');
-    console.log(`  - Environment: ${this.env.NODE_ENV || 'development'}`);
-    console.log(`  - Database: ${this.env.DB_NAME}@${this.env.DB_HOST}:${this.env.DB_PORT}`);
-    console.log(`  - Server Port: ${this.env.PORT || '3001'}`);
+    logger.info('🔧 Environment Configuration:');
+    logger.info(`  - Environment: ${this.env.NODE_ENV || 'development'}`);
+    logger.info(`  - Database: ${this.env.DB_NAME}@${this.env.DB_HOST}:${this.env.DB_PORT}`);
+    logger.info(`  - Server Port: ${this.env.PORT || '3001'}`);
     
     // Optional services
     if (this.env.REDIS_HOST) {
-      console.log(`  - Redis: ${this.env.REDIS_HOST}:${this.env.REDIS_PORT || '6379'}`);
+      logger.info(`  - Redis: ${this.env.REDIS_HOST}:${this.env.REDIS_PORT || '6379'}`);
     } else {
-      console.log('  - Redis: Not configured');
+      logger.info('  - Redis: Not configured');
     }
     
     if (this.env.EMAIL_SERVICE_ENABLED === 'true') {
-      console.log('  - Email Service: Enabled');
+      logger.info('  - Email Service: Enabled');
     } else {
-      console.log('  - Email Service: Disabled');
+      logger.info('  - Email Service: Disabled');
     }
   }
   

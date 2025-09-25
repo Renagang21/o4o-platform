@@ -5,11 +5,17 @@ import { authenticateToken, requireAdmin } from '../../middleware/auth';
 const router: Router = Router();
 
 // Field Groups API - v1 endpoints
+// Support both 'field-groups' and 'custom-field-groups' paths for compatibility
 router.get('/field-groups', ACFController.getFieldGroups);
+router.get('/custom-field-groups', ACFController.getFieldGroups);
 router.get('/field-groups/:id', ACFController.getFieldGroup);
+router.get('/custom-field-groups/:id', ACFController.getFieldGroup);
 router.post('/field-groups', authenticateToken, requireAdmin, ACFController.createFieldGroup);
+router.post('/custom-field-groups', authenticateToken, requireAdmin, ACFController.createFieldGroup);
 router.put('/field-groups/:id', authenticateToken, requireAdmin, ACFController.updateFieldGroup);
+router.put('/custom-field-groups/:id', authenticateToken, requireAdmin, ACFController.updateFieldGroup);
 router.delete('/field-groups/:id', authenticateToken, requireAdmin, ACFController.deleteFieldGroup);
+router.delete('/custom-field-groups/:id', authenticateToken, requireAdmin, ACFController.deleteFieldGroup);
 
 // Field Values API
 router.get('/fields/:entityType/:entityId', ACFController.getFieldValues);

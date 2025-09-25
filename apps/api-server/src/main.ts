@@ -603,6 +603,7 @@ app.use('/settings', settingsLimiter, settingsRoutes);
 // Protected API routes (with individual rate limiting)
 app.use('/api/users', limiter, userRoutes);
 app.use('/api/v1/users', limiter, usersV1Routes); // V1 user management routes with comprehensive functionality
+app.use('/v1/users', limiter, usersV1Routes); // V1 user management routes (backward compatibility)
 app.use('/api/admin', limiter, adminRoutes);
 app.use('/api/ecommerce', limiter, ecommerceRoutes);
 app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
@@ -766,6 +767,7 @@ app.use('/api/shipping', shippingRoutes); // Shipping tracking routes
 import pricingRoutes from './routes/pricing.routes';
 app.use('/api/pricing', pricingRoutes); // Pricing calculation routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
+app.use('/monitoring', monitoringRoutes); // Monitoring routes (backward compatibility)
 // Removed duplicate mount to ensure a single canonical router for /api/posts
 // app.use('/api/posts', postsRoutes);
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
@@ -821,6 +823,7 @@ app.use('/api/v1/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 �
 app.use('/api/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트 (backward compatibility)
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
+app.use('/api/acf', acfV1Routes); // ACF 라우트 (backward compatibility)
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
