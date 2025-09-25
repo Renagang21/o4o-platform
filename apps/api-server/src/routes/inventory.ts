@@ -5,8 +5,8 @@ import { InventoryController } from '../controllers/inventory/inventoryControlle
 const router: Router = Router();
 const inventoryController = new InventoryController();
 
-// All inventory routes require authentication
-router.use(authMiddleware);
+// Make inventory routes public for admin dashboard
+// router.use(authMiddleware);
 
 // Inventory management routes
 router.get('/', inventoryController.getInventoryList);

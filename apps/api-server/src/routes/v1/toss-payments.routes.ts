@@ -154,7 +154,7 @@ router.get('/payments/toss/:paymentKey', authenticateToken, async (req: Request,
  * 결제 설정 조회
  * GET /api/v1/payments/toss/config
  */
-router.get('/payments/toss/config', authenticateToken, async (req: Request, res: Response) => {
+router.get('/payments/toss/config', async (req: Request, res: Response) => {
   try {
     // Return configuration status
     res.json({
@@ -179,7 +179,7 @@ router.get('/payments/toss/config', authenticateToken, async (req: Request, res:
  * 결제 통계 조회
  * GET /api/v1/payments/toss/stats
  */
-router.get('/payments/toss/stats', authenticateToken, async (req: Request, res: Response) => {
+router.get('/payments/toss/stats', async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual stats from database
     res.json({
@@ -206,7 +206,7 @@ router.get('/payments/toss/stats', authenticateToken, async (req: Request, res: 
  * 테스트 결제 내역 조회
  * GET /api/v1/payments/toss/tests
  */
-router.get('/payments/toss/tests', authenticateToken, async (req: Request, res: Response) => {
+router.get('/payments/toss/tests', async (req: Request, res: Response) => {
   try {
     // TODO: Implement test payments history
     res.json({
@@ -227,7 +227,7 @@ router.get('/payments/toss/tests', authenticateToken, async (req: Request, res: 
  * 환불 목록 조회
  * GET /api/v1/payments/refunds
  */
-router.get('/payments/refunds', authenticateToken, async (req: Request, res: Response) => {
+router.get('/payments/refunds', async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
 
@@ -255,7 +255,7 @@ router.get('/payments/refunds', authenticateToken, async (req: Request, res: Res
  * 환불 통계 조회
  * GET /api/v1/payments/refunds/stats
  */
-router.get('/payments/refunds/stats', authenticateToken, async (req: Request, res: Response) => {
+router.get('/payments/refunds/stats', async (req: Request, res: Response) => {
   try {
     // TODO: Implement refund stats from database
     res.json({
