@@ -71,14 +71,15 @@ import { Menu } from '../entities/Menu';
 import { MenuItem } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
 
-// 환경변수 기본값 설정
-const DB_HOST = process.env.DB_HOST || 'localhost';
-const DB_PORT = parseInt(process.env.DB_PORT || '5432');
-const DB_USERNAME = process.env.DB_USERNAME || 'postgres';
-// DB_PASSWORD는 반드시 문자열로 처리
-const DB_PASSWORD = String(process.env.DB_PASSWORD || '');
-const DB_NAME = process.env.DB_NAME || 'o4o_platform';
-const NODE_ENV = process.env.NODE_ENV || 'development';
+import { env } from '../utils/env-validator';
+
+// 환경변수는 env-validator를 통해 가져옴
+const DB_HOST = env.getString('DB_HOST');
+const DB_PORT = env.getNumber('DB_PORT');
+const DB_USERNAME = env.getString('DB_USERNAME');
+const DB_PASSWORD = env.getString('DB_PASSWORD');
+const DB_NAME = env.getString('DB_NAME');
+const NODE_ENV = env.getString('NODE_ENV', 'development');
 
 // TypeORM 데이터소스 설정
 export const AppDataSource = new DataSource({
@@ -94,7 +95,7 @@ export const AppDataSource = new DataSource({
   
   // 개발 환경 설정
   synchronize: false, // 자동 스키마 동기화 비활성화 (마이그레이션 사용)
-  logging: NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  logging: env.isDevelopment() ? ['query', 'error', 'warn'] : ['error'],
   
   // 연결 풀 설정 (CLAUDE.md 정책 기반)
   extra: {

@@ -1,13 +1,16 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken as authMiddleware, requireRole } from '../middleware/auth';
+import { asyncHandler } from '../middleware/error-handler';
+import { ServiceUnavailableError } from '../utils/api-error';
 // import { InventoryController } from '../controllers/inventory/inventoryController';
 
 const router: Router = Router();
 // const inventoryController = new InventoryController();
 
 // Temporary mock responses until inventory table is created
-const mockInventoryList = (req: Request, res: Response) => {
-  res.json({
+const mockInventoryList = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Implement once inventory table is created
+  return res.json({
     success: true,
     data: [],
     pagination: {
@@ -16,10 +19,11 @@ const mockInventoryList = (req: Request, res: Response) => {
       limit: 10
     }
   });
-};
+});
 
-const mockInventoryStats = (req: Request, res: Response) => {
-  res.json({
+const mockInventoryStats = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Implement once inventory table is created
+  return res.json({
     success: true,
     data: {
       totalItems: 0,
@@ -28,7 +32,7 @@ const mockInventoryStats = (req: Request, res: Response) => {
       totalValue: 0
     }
   });
-};
+});
 
 // Make inventory routes public for admin dashboard
 // router.use(authMiddleware);
@@ -36,24 +40,46 @@ const mockInventoryStats = (req: Request, res: Response) => {
 // Inventory management routes
 router.get('/', mockInventoryList);
 router.get('/stats', mockInventoryStats);
-router.post('/adjust', (req: Request, res: Response) => res.json({ success: true, message: 'Mock response' }));
+router.post('/adjust', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, message: 'Mock response' });
+}));
 
 // Alerts management
-router.get('/alerts', (req: Request, res: Response) => res.json({ success: true, data: [] }));
-router.post('/alerts/:id/acknowledge', (req: Request, res: Response) => res.json({ success: true }));
+router.get('/alerts', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: [] });
+}));
+router.post('/alerts/:id/acknowledge', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true });
+}));
 
 // Analytics and reporting
-router.get('/dead-stock', (req: Request, res: Response) => res.json({ success: true, data: [] }));
-router.get('/value', (req: Request, res: Response) => res.json({ success: true, data: { totalValue: 0 } }));
+router.get('/dead-stock', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: [] });
+}));
+router.get('/value', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: { totalValue: 0 } });
+}));
 
 // Reorder management
-router.get('/reorder/settings', (req: Request, res: Response) => res.json({ success: true, data: {} }));
-router.put('/reorder/settings', requireRole(['admin', 'manager']), (req: Request, res: Response) => res.json({ success: true }));
-router.get('/reorder/rules', (req: Request, res: Response) => res.json({ success: true, data: [] }));
-router.put('/reorder/rules/:id', (req: Request, res: Response) => res.json({ success: true }));
+router.get('/reorder/settings', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: {} });
+}));
+router.put('/reorder/settings', requireRole(['admin', 'manager']), asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true });
+}));
+router.get('/reorder/rules', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: [] });
+}));
+router.put('/reorder/rules/:id', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true });
+}));
 
 // Individual inventory item routes
-router.get('/:id/movements', (req: Request, res: Response) => res.json({ success: true, data: [] }));
-router.get('/:id/forecast', (req: Request, res: Response) => res.json({ success: true, data: {} }));
+router.get('/:id/movements', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: [] });
+}));
+router.get('/:id/forecast', asyncHandler(async (req: Request, res: Response) => {
+  return res.json({ success: true, data: {} });
+}));
 
 export default router;

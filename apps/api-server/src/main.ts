@@ -39,7 +39,8 @@ if (!envLoaded) {
   // Warning: No .env file found, using system environment variables
 }
 
-// 환경변수 검증
+// 환경변수 검증 - 새로운 검증기 사용
+import { env } from './utils/env-validator';
 
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
@@ -52,12 +53,13 @@ import Redis from 'ioredis';
 import logger from './utils/logger';
 
 // Database connection
-import { AppDataSource } from './database/connection';
+import { AppDataSource, checkDatabaseHealth } from './database/connection';
+import { DatabaseChecker } from './utils/database-checker';
 import { Post } from './entities/Post';
 import { Page } from './entities/Page';
 import { SessionSyncService } from './services/sessionSyncService';
 import { WebSocketSessionSync } from './websocket/sessionSync';
-import { errorHandler } from './middleware/errorHandler';
+import { errorHandler, asyncHandler, notFoundHandler } from './middleware/error-handler';
 import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
 import { authenticateToken } from './middleware/auth';
@@ -191,7 +193,7 @@ const io = new Server(httpServer, {
   }
 });
 
-const port = process.env.PORT || 4000;
+const port = env.getNumber('PORT', 4000);
 
 // Rate limiting for authenticated endpoints
 const limiter = rateLimit({
@@ -413,27 +415,27 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Configure session store
 let sessionConfig: any = {
-  secret: process.env.SESSION_SECRET || 'o4o-platform-session-secret',
+  secret: env.getString('SESSION_SECRET', 'o4o-platform-session-secret'),
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.isProduction(),
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    domain: process.env.COOKIE_DOMAIN || undefined, // Enable cross-subdomain cookies
+    domain: env.getString('COOKIE_DOMAIN', undefined), // Enable cross-subdomain cookies
     sameSite: 'lax'
   }
 };
 
 // Use Redis store conditionally (production + REDIS_ENABLED)
-const redisEnabled = process.env.REDIS_ENABLED !== 'false' && process.env.NODE_ENV === 'production';
+const redisEnabled = env.getString('REDIS_ENABLED', 'false') !== 'false' && env.isProduction();
 
 if (redisEnabled) {
   try {
     const sessionRedisClient = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+      host: env.getString('REDIS_HOST', 'localhost'),
+      port: env.getNumber('REDIS_PORT', 6379),
+      password: env.getString('REDIS_PASSWORD', undefined),
       lazyConnect: true, // 지연 연결로 에러 방지
       maxRetriesPerRequest: 3,
       connectTimeout: 5000
@@ -883,14 +885,8 @@ io.on('connection', (socket) => {
 // 중앙화된 에러 핸들러 (모든 라우트 뒤에 위치해야 함)
 app.use(errorHandler as any);
 
-// 404 핸들러 (API 전용)
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'API endpoint not found',
-    code: 'ENDPOINT_NOT_FOUND',
-    requestedPath: req.originalUrl
-  });
-});
+// 404 핸들러 (API 전용) - 새로운 핸들러 사용
+app.use('*', notFoundHandler as any);
 
 // Swagger documentation
 import { setupSwagger } from './config/swagger-enhanced';
@@ -922,13 +918,13 @@ const startServer = async () => {
       logger.info('Database already initialized');
     } else {
       
-      // 환경변수 재확인
+      // 환경변수 재확인 - 검증기 사용
       const dbConfig = {
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432'), // PostgreSQL 기본 포트로 수정
-        username: process.env.DB_USERNAME || 'postgres',
-        password: process.env.DB_PASSWORD || '',
-        database: process.env.DB_NAME || 'o4o_platform'
+        host: env.getString('DB_HOST'),
+        port: env.getNumber('DB_PORT'),
+        username: env.getString('DB_USERNAME'),
+        password: env.getString('DB_PASSWORD'),
+        database: env.getString('DB_NAME')
       };
       
       logger.info('Database configuration:', {
@@ -976,8 +972,20 @@ const startServer = async () => {
         }
       }
       
+      // 데이터베이스 헬스 체크
+      if (AppDataSource.isInitialized) {
+        const dbChecker = new DatabaseChecker(AppDataSource);
+        const healthCheck = await dbChecker.performHealthCheck();
+        if (!healthCheck.healthy) {
+          logger.error('Database health check failed', healthCheck.details);
+          if (env.isProduction()) {
+            throw new Error('Database health check failed');
+          }
+        }
+      }
+
       // 마이그레이션 실행 (프로덕션 환경, DB 연결된 경우만)
-      if (process.env.NODE_ENV === 'production' && AppDataSource.isInitialized) {
+      if (env.isProduction() && AppDataSource.isInitialized) {
         try {
           await AppDataSource.runMigrations();
         } catch (migrationError) {
@@ -986,7 +994,7 @@ const startServer = async () => {
       }
 
       // Initialize monitoring services - skip in development
-      if (process.env.NODE_ENV === 'production') {
+      if (env.isProduction()) {
         try {
           await backupService.initialize();
           await errorAlertService.initialize();
@@ -1052,9 +1060,9 @@ const startServer = async () => {
       logger.info('Initializing Redis connection...');
       
       const redisClient = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        password: process.env.REDIS_PASSWORD,
+        host: env.getString('REDIS_HOST', 'localhost'),
+        port: env.getNumber('REDIS_PORT', 6379),
+        password: env.getString('REDIS_PASSWORD', undefined),
         lazyConnect: true,
         maxRetriesPerRequest: 3,
         connectTimeout: 5000
@@ -1072,7 +1080,7 @@ const startServer = async () => {
       SessionSyncService.initialize(redisClient);
       
       // Initialize WebSocket session sync if enabled
-      if (process.env.SESSION_SYNC_ENABLED === 'true') {
+      if (env.getString('SESSION_SYNC_ENABLED', 'false') === 'true') {
         webSocketSessionSync = new WebSocketSessionSync(io);
         logger.info('WebSocket session sync initialized');
       }
@@ -1104,7 +1112,7 @@ const startServer = async () => {
   }
 
   // Bind to IPv4 explicitly (0.0.0.0) to avoid IPv6 issues
-  const host = process.env.HOST || '0.0.0.0';
+  const host = env.getString('HOST', '0.0.0.0');
   httpServer.listen(port as number, host as string, () => {
     logger.info(`🚀 API Server running on ${host}:${port}`);
   });

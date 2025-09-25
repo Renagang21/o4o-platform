@@ -1,0 +1,181 @@
+/**
+ * Environment Variable Validator
+ * 필수 환경 변수를 체크하고 기본값을 설정합니다.
+ */
+
+class EnvironmentValidator {
+  private env: { [key: string]: string | undefined };
+  private requiredVars: string[] = [
+    'DB_HOST',
+    'DB_PORT',
+    'DB_USERNAME',
+    'DB_PASSWORD',
+    'DB_NAME',
+    'JWT_SECRET',
+  ];
+  
+  private optionalVars: string[] = [
+    'NODE_ENV',
+    'PORT',
+    'HOST',
+    'SESSION_SECRET',
+    'COOKIE_DOMAIN',
+    'REDIS_HOST',
+    'REDIS_PORT',
+    'REDIS_PASSWORD',
+    'REDIS_ENABLED',
+    'SESSION_SYNC_ENABLED',
+    'EMAIL_SERVICE_ENABLED',
+    'BCRYPT_ROUNDS',
+    'JWT_REFRESH_SECRET',
+  ];
+  
+  constructor() {
+    this.env = process.env;
+    this.validate();
+  }
+  
+  private validate(): void {
+    const missingVars: string[] = [];
+    
+    // Check required variables
+    for (const varName of this.requiredVars) {
+      if (!this.env[varName]) {
+        // Use defaults in development
+        if (this.env.NODE_ENV !== 'production') {
+          this.setDefaults(varName);
+        } else {
+          missingVars.push(varName);
+        }
+      }
+    }
+    
+    // In production, fail if required vars are missing
+    if (missingVars.length > 0 && this.env.NODE_ENV === 'production') {
+      throw new Error(
+        `Missing required environment variables: ${missingVars.join(', ')}\n` +
+        'Please set these in your .env file or environment.'
+      );
+    }
+    
+    // Log configuration
+    this.logConfiguration();
+  }
+  
+  private setDefaults(varName: string): void {
+    const defaults: { [key: string]: string } = {
+      DB_HOST: 'localhost',
+      DB_PORT: '5432',
+      DB_USERNAME: 'postgres',
+      DB_PASSWORD: '',
+      DB_NAME: 'o4o_platform',
+      JWT_SECRET: 'dev-jwt-secret-change-in-production',
+      JWT_REFRESH_SECRET: 'dev-refresh-secret-change-in-production',
+    };
+    
+    if (defaults[varName] !== undefined) {
+      this.env[varName] = defaults[varName];
+    }
+  }
+  
+  private logConfiguration(): void {
+    console.log('🔧 Environment Configuration:');
+    console.log(`  - Environment: ${this.env.NODE_ENV || 'development'}`);
+    console.log(`  - Database: ${this.env.DB_NAME}@${this.env.DB_HOST}:${this.env.DB_PORT}`);
+    console.log(`  - Server Port: ${this.env.PORT || '3001'}`);
+    
+    // Optional services
+    if (this.env.REDIS_HOST) {
+      console.log(`  - Redis: ${this.env.REDIS_HOST}:${this.env.REDIS_PORT || '6379'}`);
+    } else {
+      console.log('  - Redis: Not configured');
+    }
+    
+    if (this.env.EMAIL_SERVICE_ENABLED === 'true') {
+      console.log('  - Email Service: Enabled');
+    } else {
+      console.log('  - Email Service: Disabled');
+    }
+  }
+  
+  /**
+   * Get environment variable with type safety
+   */
+  get<T = string>(key: string): T;
+  get<T = string>(key: string, defaultValue: T): T;
+  get<T = any>(key: string, defaultValue?: T): T {
+    const value = this.env[key];
+    
+    if (value === undefined || value === '') {
+      if (defaultValue !== undefined) {
+        return defaultValue;
+      }
+      if (this.requiredVars.includes(key)) {
+        throw new Error(`Required environment variable ${key} is not set`);
+      }
+      return '' as T;
+    }
+    
+    // Type conversion for common types
+    if (typeof defaultValue === 'boolean' || (defaultValue === undefined && (value === 'true' || value === 'false'))) {
+      return (value === 'true') as T;
+    }
+    
+    if (typeof defaultValue === 'number' || (defaultValue === undefined && !isNaN(Number(value)))) {
+      const num = Number(value);
+      if (!isNaN(num)) {
+        return num as T;
+      }
+    }
+    
+    return value as T;
+  }
+  
+  /**
+   * Get string value
+   */
+  getString(key: string, defaultValue?: string): string {
+    return this.get<string>(key, defaultValue as any);
+  }
+  
+  /**
+   * Get number value
+   */
+  getNumber(key: string, defaultValue?: number): number {
+    const value = this.get(key, defaultValue?.toString());
+    const num = Number(value);
+    return isNaN(num) ? (defaultValue || 0) : num;
+  }
+  
+  /**
+   * Get boolean value
+   */
+  getBoolean(key: string, defaultValue = false): boolean {
+    const value = this.get(key, defaultValue.toString());
+    return value === 'true' || value === '1';
+  }
+  
+  /**
+   * Check if environment is development
+   */
+  isDevelopment(): boolean {
+    return this.env.NODE_ENV !== 'production';
+  }
+  
+  /**
+   * Check if environment is production
+   */
+  isProduction(): boolean {
+    return this.env.NODE_ENV === 'production';
+  }
+  
+  /**
+   * Check if environment is test
+   */
+  isTest(): boolean {
+    return this.env.NODE_ENV === 'test';
+  }
+}
+
+// Singleton instance
+export const env = new EnvironmentValidator();
