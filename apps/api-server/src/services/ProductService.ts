@@ -46,55 +46,50 @@ export class ProductService {
   }
 
   async createProduct(productData: CreateProductDto, userId: string): Promise<Product> {
-    try {
-      // Generate unique SKU if not provided
-      if (!productData.sku) {
-        productData.sku = `PRD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      }
-
-      // Check if SKU already exists
-      const existingProduct = await this.productRepository.findOne({
-        where: { sku: productData.sku }
-      });
-
-      if (existingProduct) {
-        throw new Error(`Product with SKU ${productData.sku} already exists`);
-      }
-
-      // Generate slug from name/title
-      const productName = productData.title || productData.name || 'Untitled Product';
-      const slug = productData.handle || this.generateSlug(productName);
-
-      // Map fields to entity structure
-      const product = this.productRepository.create({
-        name: productName,
-        slug,
-        description: productData.description || '',
-        shortDescription: productData.subtitle || '',
-        sku: productData.sku,
-        retailPrice: productData.retailPrice || productData.price || 0,
-        salePrice: productData.salePrice,
-        cost: productData.cost,
-        stockQuantity: productData.inventory_quantity || productData.stockQuantity || 0,
-        manageStock: true,
-        weight: productData.weight,
-        status: this.mapStatus(productData.status || 'draft'),
-        type: ProductType.PHYSICAL,
-        featured: false,
-        requiresShipping: true,
-        images: productData.images || [],
-        featuredImage: productData.thumbnail,
-        tags: this.extractTags(productData.tags),
-        createdBy: userId,
-        metadata: productData.metadata || {}
-      });
-
-      const savedProduct = await this.productRepository.save(product);
-      return savedProduct;
-
-    } catch (error) {
-      throw error;
+    // Generate unique SKU if not provided
+    if (!productData.sku) {
+      productData.sku = `PRD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
+
+    // Check if SKU already exists
+    const existingProduct = await this.productRepository.findOne({
+      where: { sku: productData.sku }
+    });
+
+    if (existingProduct) {
+      throw new Error(`Product with SKU ${productData.sku} already exists`);
+    }
+
+    // Generate slug from name/title
+    const productName = productData.title || productData.name || 'Untitled Product';
+    const slug = productData.handle || this.generateSlug(productName);
+
+    // Map fields to entity structure
+    const product = this.productRepository.create({
+      name: productName,
+      slug,
+      description: productData.description || '',
+      shortDescription: productData.subtitle || '',
+      sku: productData.sku,
+      retailPrice: productData.retailPrice || productData.price || 0,
+      salePrice: productData.salePrice,
+      cost: productData.cost,
+      stockQuantity: productData.inventory_quantity || productData.stockQuantity || 0,
+      manageStock: true,
+      weight: productData.weight,
+      status: this.mapStatus(productData.status || 'draft'),
+      type: ProductType.PHYSICAL,
+      featured: false,
+      requiresShipping: true,
+      images: productData.images || [],
+      featuredImage: productData.thumbnail,
+      tags: this.extractTags(productData.tags),
+      createdBy: userId,
+      metadata: productData.metadata || {}
+    });
+
+    const savedProduct = await this.productRepository.save(product);
+    return savedProduct;
   }
 
   async importProducts(products: CreateProductDto[], userId: string): Promise<ImportResult> {
