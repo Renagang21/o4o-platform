@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { useQueryClient } from '@tanstack/react-query';
+import { productImportApi } from '@/api/productImportApi';
+import toast from 'react-hot-toast';
 import {
   Upload,
   FileText,
@@ -53,6 +56,7 @@ interface ImportLog {
 
 const ProductImport = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<'upload' | 'mapping' | 'options' | 'import' | 'complete'>('upload');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
@@ -176,36 +180,77 @@ const ProductImport = () => {
   };
 
   const startImport = async () => {
+    if (!uploadedFile) {
+      toast.error('파일을 업로드해주세요');
+      return;
+    }
+
     setCurrentStep('import');
+    addLog('info', 'Import 시작...');
     
-    // Simulate import process
-    const total = importStats.total;
-    let processed = 0;
-    
-    const interval = setInterval(() => {
-      processed += Math.floor(Math.random() * 5) + 1;
-      if (processed >= total) {
-        processed = total;
-        clearInterval(interval);
-        setCurrentStep('complete');
-      }
+    try {
+      // Parse CSV file
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target?.result as string;
+        const lines = text.split('\n').filter(line => line.trim());
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        
+        // Parse all data rows
+        const allData = lines.slice(1).map(line => {
+          const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+          return headers.reduce((obj, header, index) => {
+            obj[header] = values[index] || '';
+            return obj;
+          }, {} as any);
+        });
+
+        // Update total count
+        setImportStats(prev => ({ ...prev, total: allData.length }));
+        addLog('info', `총 ${allData.length}개 상품 처리 시작`);
+
+        // Process import using API
+        try {
+          const result = await productImportApi.quickImport(allData);
+          
+          setImportStats({
+            total: result.total,
+            processed: result.total,
+            success: result.created + result.updated,
+            failed: result.failed,
+            skipped: 0
+          });
+
+          setImportProgress(100);
+
+          if (result.errors.length > 0) {
+            result.errors.forEach(error => {
+              addLog('error', `Row ${error.row}: ${error.message}`);
+            });
+          }
+
+          addLog('success', `Import 완료: 성공 ${result.created + result.updated}개, 실패 ${result.failed}개`);
+          
+          // Invalidate products cache to refresh the list
+          queryClient.invalidateQueries({ queryKey: ['products'] });
+          
+          toast.success(`${result.created}개 상품이 성공적으로 등록되었습니다!`);
+          
+          setCurrentStep('complete');
+        } catch (error: any) {
+          console.error('Import error:', error);
+          addLog('error', `Import 실패: ${error.message}`);
+          toast.error('Import 중 오류가 발생했습니다');
+          setCurrentStep('complete');
+        }
+      };
       
-      const progress = (processed / total) * 100;
-      setImportProgress(progress);
-      
-      setImportStats(prev => ({
-        ...prev,
-        processed,
-        success: processed - Math.floor(processed * 0.05),
-        failed: Math.floor(processed * 0.02),
-        skipped: Math.floor(processed * 0.03)
-      }));
-      
-      // Add log entries
-      if (processed % 10 === 0) {
-        addLog('info', `${processed}/${total} 상품 처리 완료`);
-      }
-    }, 200);
+      reader.readAsText(uploadedFile);
+    } catch (error: any) {
+      console.error('File read error:', error);
+      addLog('error', `파일 읽기 실패: ${error.message}`);
+      toast.error('파일을 읽는 중 오류가 발생했습니다');
+    }
   };
 
   const addLog = (type: ImportLog['type'], message: string) => {
