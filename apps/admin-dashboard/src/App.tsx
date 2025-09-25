@@ -4,7 +4,6 @@ import { AuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { useEffect, Suspense, lazy } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import AppGuard from '@/components/AppGuard';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/stores/authStore';
 import '@/styles/wordpress-theme.css';
@@ -700,56 +699,44 @@ function App() {
                     {/* 제휴 마케팅 - App Guard 적용 */}
                     <Route path="/affiliate/partners" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <AppGuard appName="affiliate">
-                          <Suspense fallback={<PageLoader />}>
-                            <AffiliatePartners />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliatePartners />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/partners/new" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <AppGuard appName="affiliate">
-                          <Suspense fallback={<PageLoader />}>
-                            <AffiliatePartnerForm />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliatePartnerForm />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/partners/:id/edit" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <AppGuard appName="affiliate">
-                          <Suspense fallback={<PageLoader />}>
-                            <AffiliatePartnerForm />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliatePartnerForm />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/links" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <AppGuard appName="affiliate">
-                          <Suspense fallback={<PageLoader />}>
-                            <AffiliateLinks />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliateLinks />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/commission" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <AppGuard appName="affiliate">
-                          <Suspense fallback={<PageLoader />}>
-                            <AffiliateCommission />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliateCommission />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/analytics" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <AppGuard appName="affiliate">
-                          <Suspense fallback={<PageLoader />}>
-                            <AffiliateAnalytics />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliateAnalytics />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
@@ -792,33 +779,27 @@ function App() {
                     {/* Forum - App Guard 적용 */}
                     <Route path="/forum/*" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <AppGuard appName="forum">
-                          <Suspense fallback={<PageLoader />}>
-                            <ForumRouter />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <ForumRouter />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
                     {/* Digital Signage - App Guard 적용 */}
                     <Route path="/signage/*" element={
                       <AdminProtectedRoute requiredPermissions={['signage:read']}>
-                        <AppGuard appName="signage">
-                          <Suspense fallback={<PageLoader />}>
-                            <SignageRouter />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <SignageRouter />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
                     {/* Crowdfunding - App Guard 적용 */}
                     <Route path="/crowdfunding/*" element={
                       <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
-                        <AppGuard appName="crowdfunding">
-                          <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingRouter />
-                          </Suspense>
-                        </AppGuard>
+                        <Suspense fallback={<PageLoader />}>
+                          <CrowdfundingRouter />
+                        </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
