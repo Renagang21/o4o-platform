@@ -113,14 +113,11 @@ const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 // const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
 
 // Apps Manager
-const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
+const AppsManagerV2 = lazy(() => import('@/pages/apps/AppsManagerV2'));
 const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
 
 // Appearance Pages (WordPress Style)
 const Customize = lazy(() => import('@/pages/appearance/Customize'));
-
-// Plugin Management
-const WordPressPluginManager = lazy(() => import('@/pages/apps/WordPressPluginManager'));
 
 // Shortcode Management - REMOVED
 
@@ -452,19 +449,11 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 플러그인 관리 */}
-                    <Route path="/plugins" element={
+                    {/* 앱 관리 */}
+                    <Route path="/apps" element={
                       <AdminProtectedRoute requiredPermissions={['apps:manage']}>
                         <Suspense fallback={<PageLoader />}>
-                          <WordPressPluginManager />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/plugins/add" element={
-                      <AdminProtectedRoute requiredPermissions={['apps:manage']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <WordPressPluginManager />
+                          <AppsManagerV2 />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

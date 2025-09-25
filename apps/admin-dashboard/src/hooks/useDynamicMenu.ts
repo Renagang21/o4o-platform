@@ -56,10 +56,9 @@ export const useDynamicMenu = () => {
       const coreMenus = [
         'dashboard', 'users', 'posts', 'pages', 'media', 
         'appearance', // 외모 메뉴 추가
-        'theme', 'themes', 'settings', 'tools', 'apps', 
+        'theme', 'themes', 'settings', 'tools', 'apps', 'apps-installed',
         'monitoring', 'cpt-engine', 'cpt-acf', 'collapse',
-        'shortcodes', // Shortcode 메뉴 추가
-        'plugins' // 플러그인 메뉴 추가 (apps 관리 포함)
+        'shortcodes' // Shortcode 메뉴 추가
       ];
       if (coreMenus.includes(item.id)) {
         return true;
@@ -93,6 +92,13 @@ export const useDynamicMenu = () => {
       // 하위 메뉴가 있는 경우 재귀적으로 필터링
       if (item.children) {
         const filteredChildren = filterMenuItems(item.children);
+        
+        // 앱 메뉴들은 하위 메뉴가 없어도 표시
+        const appMenus = ['ecommerce', 'forum', 'signage', 'crowdfunding', 'affiliate', 'vendors'];
+        if (appMenus.includes(item.id)) {
+          item.children = filteredChildren;
+          return true;
+        }
         
         // 하위 메뉴가 모두 필터링되면 상위 메뉴도 숨김
         if (filteredChildren.length === 0) {

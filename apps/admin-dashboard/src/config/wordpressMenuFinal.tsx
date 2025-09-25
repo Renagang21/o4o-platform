@@ -103,15 +103,13 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 플러그인
+  // 앱 관리
   {
-    id: 'plugins',
-    label: '플러그인',
+    id: 'apps',
+    label: '앱 관리',
     icon: <Puzzle className="w-5 h-5" />,
     children: [
-      { id: 'plugins-installed', label: '설치된 플러그인', icon: <Puzzle className="w-4 h-4" />, path: '/plugins' },
-      { id: 'plugins-add', label: '새로 추가', icon: <Plus className="w-4 h-4" />, path: '/plugins/add' },
-      { id: 'plugins-editor', label: '플러그인 편집기', icon: <Code className="w-4 h-4" />, path: '/plugins/editor' }
+      { id: 'apps-installed', label: '앱 목록', icon: <Puzzle className="w-4 h-4" />, path: '/apps' }
     ]
   },
   {
