@@ -77,7 +77,7 @@ const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDa
 
 // Vendor Management Pages
 const VendorsList = lazy(() => import('@/pages/vendors/VendorsWordPress'));
-const VendorsPending = lazy(() => import('@/pages/vendors/VendorsPending'));
+const VendorsPending = lazy(() => import('@/pages/vendors/VendorsPendingWordPress'));
 const VendorsCommission = lazy(() => import('@/pages/vendors/VendorsCommission'));
 const VendorsReports = lazy(() => import('@/pages/vendors/VendorsReports'));
 
