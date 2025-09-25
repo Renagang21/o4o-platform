@@ -90,20 +90,30 @@ router.post('/login',
         }
       });
     } catch (error: any) {
-      // Error log removed
+      console.error('Login error:', error);
       
       // PostgreSQL 권한 에러 체크
       if (error instanceof Error && error.message.includes('aclcheck_error')) {
-        // Error log removed
+        console.error('Database permission error:', error.message);
         return res.status(500).json({
           error: 'Database access error',
           code: 'DATABASE_PERMISSION_ERROR'
         });
       }
       
+      // TypeORM 관련 에러 체크
+      if (error instanceof Error && error.message.includes('metadata')) {
+        console.error('Entity metadata error:', error.message);
+        return res.status(500).json({
+          error: 'Database configuration error',
+          code: 'DATABASE_CONFIG_ERROR'
+        });
+      }
+      
       res.status(500).json({
         error: 'Internal server error',
-        code: 'INTERNAL_SERVER_ERROR'
+        code: 'INTERNAL_SERVER_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   }
