@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
+import HamburgerMenu from '../HamburgerMenu';
 
 interface MenuItem {
   id: string;
@@ -112,10 +113,14 @@ const Navigation: FC<NavigationProps> = ({
   ].filter(Boolean).join(' ');
 
   return (
-    <nav className={navClasses}>
-      <ul className={`menu menu-${orientation}`}>
-        {menuItems.map(item => renderMenuItem(item))}
-      </ul>
+    <>
+      <nav className={`${navClasses} hidden md:block`}>
+        <ul className={`menu menu-${orientation}`}>
+          {menuItems.map(item => renderMenuItem(item))}
+        </ul>
+      </nav>
+      
+      <HamburgerMenu menuRef={menuRef} />
       
       <style>{`
         .navigation-horizontal .menu {
@@ -179,7 +184,7 @@ const Navigation: FC<NavigationProps> = ({
           background-color: #f3f4f6;
         }
       `}</style>
-    </nav>
+    </>
   );
 };
 

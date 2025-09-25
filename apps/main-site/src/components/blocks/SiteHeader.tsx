@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
+import HamburgerMenu from '../HamburgerMenu';
 
 // Fallback header component
 const SiteHeader: FC = () => {
@@ -17,6 +18,8 @@ const SiteHeader: FC = () => {
             <Link to="/services" className="text-gray-700 hover:text-gray-900">서비스</Link>
             <Link to="/contact" className="text-gray-700 hover:text-gray-900">문의</Link>
           </nav>
+          
+          <HamburgerMenu />
         </div>
       </div>
     </header>
