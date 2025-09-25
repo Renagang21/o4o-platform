@@ -29,6 +29,10 @@ router.post('/:id/approve', authMiddleware, requireRole(['admin', 'manager']), v
 router.post('/:id/reject', authMiddleware, requireRole(['admin', 'manager']), vendorController.rejectVendor);
 router.post('/:id/suspend', authMiddleware, requireRole(['admin']), vendorController.suspendVendor);
 
+// Commission endpoints (admin/manager only)
+router.get('/commissions', authMiddleware, requireRole(['admin', 'manager']), vendorController.getCommissions);
+router.get('/commissions/stats', authMiddleware, requireRole(['admin', 'manager']), vendorController.getCommissionStats);
+
 // Vendor reports and data
 router.get('/:id/commission', authMiddleware, vendorController.getCommissionHistory);
 router.get('/:id/products', authMiddleware, vendorController.getVendorProducts);

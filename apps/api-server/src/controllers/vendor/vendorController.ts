@@ -701,6 +701,101 @@ export class VendorController {
     }
   };
 
+  // GET /api/vendors/commissions - Get all vendor commissions with filtering
+  getCommissions = async (req: Request, res: Response) => {
+    try {
+      const {
+        period,
+        vendorId,
+        status,
+        page = 1,
+        limit = 10
+      } = req.query;
+
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+
+      // Mock commission data based on period parameter
+      const mockCommissions = [];
+      const periodDate = period ? new Date(period as string) : new Date();
+      const year = periodDate.getFullYear();
+      const month = periodDate.getMonth();
+
+      // Generate sample data for the specified month
+      for (let i = 1; i <= 30; i++) {
+        const vendors = ['vendor-1', 'vendor-2', 'vendor-3', 'vendor-4', 'vendor-5'];
+        const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
+
+        if (vendorId && randomVendor !== vendorId) continue;
+
+        mockCommissions.push({
+          id: `commission-${year}-${month}-${i}`,
+          vendorId: randomVendor,
+          vendorName: `Vendor ${randomVendor.split('-')[1]}`,
+          period: `${year}-${String(month + 1).padStart(2, '0')}`,
+          totalSales: Math.floor(Math.random() * 1000000) + 100000,
+          commissionRate: 0.1 + Math.random() * 0.1, // 10-20%
+          commissionAmount: Math.floor(Math.random() * 100000) + 10000,
+          status: i % 4 === 0 ? 'pending' : 'paid',
+          paidAt: i % 4 === 0 ? null : new Date(year, month, i),
+          createdAt: new Date(year, month, i)
+        });
+      }
+
+      const filteredCommissions = status
+        ? mockCommissions.filter(c => c.status === status)
+        : mockCommissions;
+
+      const start = (pageNum - 1) * limitNum;
+      const paginatedCommissions = filteredCommissions.slice(start, start + limitNum);
+
+      res.json({
+        success: true,
+        data: paginatedCommissions,
+        total: filteredCommissions.length,
+        page: pageNum,
+        pageSize: limitNum,
+        totalPages: Math.ceil(filteredCommissions.length / limitNum)
+      });
+    } catch (error) {
+      logger.error('Error fetching commissions:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch commissions'
+      });
+    }
+  };
+
+  // GET /api/vendors/commissions/stats - Get commission statistics
+  getCommissionStats = async (req: Request, res: Response) => {
+    try {
+      const { period } = req.query;
+      const periodDate = period ? new Date(period as string) : new Date();
+
+      // Mock statistics data
+      const stats = {
+        totalCommissions: Math.floor(Math.random() * 5000000) + 1000000, // 1-6M
+        paidCommissions: Math.floor(Math.random() * 4000000) + 800000,   // 0.8-4.8M
+        pendingCommissions: Math.floor(Math.random() * 1000000) + 200000, // 0.2-1.2M
+        totalVendors: Math.floor(Math.random() * 50) + 20, // 20-70 vendors
+        activeVendors: Math.floor(Math.random() * 40) + 15, // 15-55 active
+        averageCommissionRate: 0.12 + Math.random() * 0.08, // 12-20%
+        period: period || `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`
+      };
+
+      res.json({
+        success: true,
+        data: stats
+      });
+    } catch (error) {
+      logger.error('Error fetching commission stats:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch commission statistics'
+      });
+    }
+  };
+
   // Helper method to generate unique affiliate code
   private async generateAffiliateCode(): Promise<string> {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
