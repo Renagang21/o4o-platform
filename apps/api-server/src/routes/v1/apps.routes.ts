@@ -3,168 +3,29 @@ import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
 const router: Router = Router();
 
-// In-memory storage for app states (replace with database in production)
-const appStates = new Map<string, boolean>([
-  ['ecommerce', true],
-  ['affiliate', false],
-  ['crowdfunding', true],
-  ['forum', true],
-  ['signage', false],
-  ['cpt-acf', true],
-  ['vendor', false],
-  ['security', true]
-]);
-
-// Get all app states
-router.get('/states', authenticateToken, requireAdmin, (req, res) => {
+// Get app information
+router.get('/info', authenticateToken, requireAdmin, (req, res) => {
   try {
-    const states = Object.fromEntries(appStates);
-    res.json({
-      success: true,
-      data: states
-    });
-  } catch (error) {
-    // Error log removed
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch app states'
-    });
-  }
-});
-
-// Get single app state
-router.get('/states/:appId', authenticateToken, requireAdmin, (req, res) => {
-  try {
-    const { appId } = req.params;
-    const isActive = appStates.get(appId);
-    
-    if (isActive === undefined) {
-      return res.status(404).json({
-        success: false,
-        message: 'App not found'
-      });
-    }
+    // Return static app information
+    const apps = [
+      { id: 'ecommerce', name: '전자상거래', version: '2.0.0', category: 'Sales' },
+      { id: 'affiliate', name: '제휴 마케팅', version: '1.5.0', category: 'Marketing' },
+      { id: 'crowdfunding', name: '크라우드펀딩', version: '1.2.0', category: 'Finance' },
+      { id: 'forum', name: '포럼/커뮤니티', version: '1.8.0', category: 'Community' },
+      { id: 'signage', name: '디지털 사이니지', version: '1.0.0', category: 'Media' },
+      { id: 'cpt-acf', name: 'CPT & ACF', version: '1.3.0', category: 'Content' },
+      { id: 'vendor', name: '벤더 관리', version: '1.1.0', category: 'Sales' },
+      { id: 'security', name: '보안 관리', version: '2.1.0', category: 'System' }
+    ];
     
     res.json({
       success: true,
-      data: {
-        appId,
-        isActive
-      }
+      data: apps
     });
   } catch (error) {
-    // Error log removed
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch app state'
-    });
-  }
-});
-
-// Update app state
-router.put('/states/:appId', authenticateToken, requireAdmin, (req, res) => {
-  try {
-    const { appId } = req.params;
-    const { isActive } = req.body;
-    
-    if (!appStates.has(appId)) {
-      return res.status(404).json({
-        success: false,
-        message: 'App not found'
-      });
-    }
-    
-    if (typeof isActive !== 'boolean') {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid isActive value'
-      });
-    }
-    
-    // Check dependencies
-    const dependencies: Record<string, string[]> = {
-      'crowdfunding': ['ecommerce'],
-      'vendor': ['ecommerce']
-    };
-    
-    // When activating, check if dependencies are active
-    if (isActive && dependencies[appId]) {
-      const inactiveDeps = dependencies[appId].filter(dep => !appStates.get(dep));
-      if (inactiveDeps.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot activate. Required apps are inactive: ${inactiveDeps.join(', ')}`
-        });
-      }
-    }
-    
-    // When deactivating, check if other apps depend on this
-    if (!isActive) {
-      const dependentApps = Object.entries(dependencies)
-        .filter(([app, deps]) => deps.includes(appId) && appStates.get(app))
-        .map(([app]) => app);
-      
-      if (dependentApps.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot deactivate. Other apps depend on this: ${dependentApps.join(', ')}`
-        });
-      }
-    }
-    
-    // Update state
-    appStates.set(appId, isActive);
-    
-    res.json({
-      success: true,
-      data: {
-        appId,
-        isActive
-      }
-    });
-  } catch (error) {
-    // Error log removed
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update app state'
-    });
-  }
-});
-
-// Batch update app states
-router.post('/states/batch', authenticateToken, requireAdmin, (req, res) => {
-  try {
-    const { updates } = req.body;
-    
-    if (!Array.isArray(updates)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid updates format'
-      });
-    }
-    
-    const results = [];
-    
-    for (const update of updates) {
-      const { appId, isActive } = update;
-      
-      if (appStates.has(appId) && typeof isActive === 'boolean') {
-        appStates.set(appId, isActive);
-        results.push({ appId, isActive, success: true });
-      } else {
-        results.push({ appId, success: false, reason: 'Invalid app or state' });
-      }
-    }
-    
-    res.json({
-      success: true,
-      data: results
-    });
-  } catch (error) {
-    // Error log removed
-    res.status(500).json({
-      success: false,
-      message: 'Failed to batch update app states'
+      message: 'Failed to fetch app information'
     });
   }
 });

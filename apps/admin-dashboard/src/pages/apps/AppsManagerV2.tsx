@@ -2,8 +2,6 @@ import { FC, useState, useEffect } from 'react';
 import { 
   Package, 
   Settings, 
-  ToggleLeft, 
-  ToggleRight, 
   Info,
   Shield,
   ShoppingCart,
@@ -17,8 +15,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import toast from 'react-hot-toast';
 import { appsApi } from '@/api/apps';
 
 // 앱 타입 정의
@@ -27,7 +23,6 @@ interface App {
   name: string;
   description: string;
   icon: React.ReactNode;
-  status: 'active' | 'inactive' | 'error';
   version: string;
   author: string;
   category: string;
@@ -44,7 +39,6 @@ const availableApps: App[] = [
     name: '전자상거래',
     description: '온라인 쇼핑몰 기능 - 상품 관리, 주문 처리, 결제 시스템',
     icon: <ShoppingCart className="w-6 h-6" />,
-    status: 'active',
     version: '2.0.0',
     author: 'O4O Platform',
     category: 'Sales',
@@ -57,7 +51,6 @@ const availableApps: App[] = [
     name: '제휴 마케팅',
     description: '파트너 추천 프로그램 및 수수료 관리 시스템',
     icon: <TrendingUp className="w-6 h-6" />,
-    status: 'inactive',
     version: '1.5.0',
     author: 'O4O Platform',
     category: 'Marketing',
@@ -70,7 +63,6 @@ const availableApps: App[] = [
     name: '크라우드펀딩',
     description: '프로젝트 펀딩 및 후원 관리 플랫폼',
     icon: <DollarSign className="w-6 h-6" />,
-    status: 'active',
     version: '1.2.0',
     author: 'O4O Platform',
     category: 'Finance',
@@ -84,7 +76,6 @@ const availableApps: App[] = [
     name: '포럼/커뮤니티',
     description: '사용자 커뮤니티 및 토론 게시판',
     icon: <Users className="w-6 h-6" />,
-    status: 'active',
     version: '1.8.0',
     author: 'O4O Platform',
     category: 'Community',
@@ -97,7 +88,6 @@ const availableApps: App[] = [
     name: '디지털 사이니지',
     description: '디지털 디스플레이 콘텐츠 관리 시스템',
     icon: <Monitor className="w-6 h-6" />,
-    status: 'inactive',
     version: '1.0.0',
     author: 'O4O Platform',
     category: 'Media',
@@ -110,7 +100,6 @@ const availableApps: App[] = [
     name: 'CPT & ACF',
     description: '사용자 정의 게시물 타입 및 필드 관리',
     icon: <FileText className="w-6 h-6" />,
-    status: 'active',
     version: '1.3.0',
     author: 'O4O Platform',
     category: 'Content',
@@ -123,7 +112,6 @@ const availableApps: App[] = [
     name: '벤더 관리',
     description: '다중 판매자 마켓플레이스 시스템',
     icon: <Box className="w-6 h-6" />,
-    status: 'inactive',
     version: '1.1.0',
     author: 'O4O Platform',
     category: 'Sales',
@@ -137,7 +125,6 @@ const availableApps: App[] = [
     name: '보안 관리',
     description: '시스템 보안 및 사용자 접근 제어',
     icon: <Shield className="w-6 h-6" />,
-    status: 'active',
     version: '2.1.0',
     author: 'O4O Platform',
     category: 'System',
@@ -148,91 +135,29 @@ const availableApps: App[] = [
 ];
 
 const AppsManagerV2: FC = () => {
-  const [apps, setApps] = useState<App[]>(availableApps);
+  const [apps] = useState<App[]>(availableApps);
   const [filter, setFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Load app states from API on mount
+  // Load app info from API on mount (for version info)
   useEffect(() => {
-    loadAppStates();
+    loadAppInfo();
   }, []);
 
-  const loadAppStates = async () => {
+  const loadAppInfo = async () => {
     try {
-      const states = await appsApi.getStates();
-      setApps(currentApps => 
-        currentApps.map(app => ({
-          ...app,
-          status: states[app.id] ? 'active' : 'inactive'
-        }))
-      );
+      await appsApi.getAppInfo();
+      // Version info could be updated here if needed
     } catch (error) {
-      // Error log removed
-    }
-  };
-
-  // 앱 활성화/비활성화 토글
-  const toggleApp = async (appId: string) => {
-    try {
-      setIsLoading(true);
-      const app = apps.find(a => a.id === appId);
-      if (!app) return;
-
-      const newStatus = app.status === 'active' ? 'inactive' : 'active';
-      const isActive = newStatus === 'active';
-      
-      // 의존성 체크 (로컬)
-      if (isActive) {
-        const dependencies = app.dependencies || [];
-        const inactiveDeps = dependencies.filter(
-          depId => apps.find(a => a.id === depId)?.status !== 'active'
-        );
-        
-        if (inactiveDeps.length > 0) {
-          toast.error(`먼저 다음 앱을 활성화해주세요: ${inactiveDeps.join(', ')}`);
-          setIsLoading(false);
-          return;
-        }
-      }
-      
-      // 의존하는 앱들 체크 (비활성화 시)
-      if (!isActive) {
-        const dependentApps = apps.filter(
-          a => a.dependencies?.includes(appId) && a.status === 'active'
-        );
-        
-        if (dependentApps.length > 0) {
-          toast.error(`다음 앱이 이 앱에 의존합니다: ${dependentApps.map(a => a.name).join(', ')}`);
-          setIsLoading(false);
-          return;
-        }
-      }
-      
-      // API 호출로 상태 저장
-      await appsApi.updateState(appId, isActive);
-      
-      // 로컬 상태 업데이트
-      setApps(apps.map(a => 
-        a.id === appId ? { ...a, status: newStatus } : a
-      ));
-      
-      toast.success(`${app.name} 앱이 ${newStatus === 'active' ? '활성화' : '비활성화'}되었습니다.`);
-      
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || '앱 상태 변경에 실패했습니다.';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      // Error silently handled
     }
   };
 
   // 필터링된 앱 목록
   const filteredApps = apps.filter(app => {
     const matchesFilter = filter === 'all' || 
-      (filter === 'active' && app.status === 'active') ||
-      (filter === 'inactive' && app.status === 'inactive') ||
-      (filter === 'core' && app.isCore);
+      (filter === 'core' && app.isCore) ||
+      (filter === app.category.toLowerCase());
     
     const matchesSearch = app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -249,13 +174,16 @@ const AppsManagerV2: FC = () => {
     return acc;
   }, {} as Record<string, App[]>);
 
+  // Get unique categories for filter
+  const categories = [...new Set(apps.map(app => app.category))];
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">앱 관리</h1>
         <p className="text-gray-600 mt-2">
-          O4O 플랫폼의 기능을 확장하는 앱들을 관리하세요
+          O4O 플랫폼에서 사용 가능한 앱들을 확인하세요
         </p>
       </div>
 
@@ -277,34 +205,6 @@ const AppsManagerV2: FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">활성화된 앱</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {apps.filter(a => a.status === 'active').length}
-                </p>
-              </div>
-              <ToggleRight className="w-8 h-8 text-green-400" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">비활성화된 앱</p>
-                <p className="text-2xl font-bold text-gray-500">
-                  {apps.filter(a => a.status === 'inactive').length}
-                </p>
-              </div>
-              <ToggleLeft className="w-8 h-8 text-gray-400" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
                 <p className="text-sm text-gray-600">코어 앱</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {apps.filter(a => a.isCore).length}
@@ -314,11 +214,39 @@ const AppsManagerV2: FC = () => {
             </div>
           </CardContent>
         </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">추가 앱</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {apps.filter(a => !a.isCore).length}
+                </p>
+              </div>
+              <Package className="w-8 h-8 text-green-400" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">카테고리</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {categories.length}
+                </p>
+              </div>
+              <Box className="w-8 h-8 text-purple-400" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
             onClick={() => setFilter('all')}
@@ -326,23 +254,20 @@ const AppsManagerV2: FC = () => {
             전체
           </Button>
           <Button
-            variant={filter === 'active' ? 'default' : 'outline'}
-            onClick={() => setFilter('active')}
-          >
-            활성화
-          </Button>
-          <Button
-            variant={filter === 'inactive' ? 'default' : 'outline'}
-            onClick={() => setFilter('inactive')}
-          >
-            비활성화
-          </Button>
-          <Button
             variant={filter === 'core' ? 'default' : 'outline'}
             onClick={() => setFilter('core')}
           >
             코어 앱
           </Button>
+          {categories.map(category => (
+            <Button
+              key={category}
+              variant={filter === category.toLowerCase() ? 'default' : 'outline'}
+              onClick={() => setFilter(category.toLowerCase())}
+            >
+              {category}
+            </Button>
+          ))}
         </div>
         
         <input
@@ -361,13 +286,11 @@ const AppsManagerV2: FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categoryApps.map((app) => (
-              <Card key={app.id} className={`${app.status === 'inactive' ? 'opacity-60' : ''}`}>
+              <Card key={app.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        app.status === 'active' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
-                      }`}>
+                      <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
                         {app.icon}
                       </div>
                       <div>
@@ -382,12 +305,6 @@ const AppsManagerV2: FC = () => {
                         <p className="text-sm text-gray-500">v{app.version}</p>
                       </div>
                     </div>
-                    
-                    <Switch
-                      checked={app.status === 'active'}
-                      onCheckedChange={() => toggleApp(app.id)}
-                      disabled={(app.isCore && app.status === 'active') || isLoading}
-                    />
                   </div>
                 </CardHeader>
                 
@@ -422,7 +339,7 @@ const AppsManagerV2: FC = () => {
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className="text-xs text-gray-500">by {app.author}</span>
                     
-                    {app.status === 'active' && app.settings && (
+                    {app.settings && (
                       <Button
                         size="sm"
                         variant="ghost"

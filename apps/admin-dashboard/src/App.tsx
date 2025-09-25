@@ -86,13 +86,16 @@ const AffiliateLinks = lazy(() => import('@/pages/affiliate/AffiliateLinks'));
 const AffiliateCommission = lazy(() => import('@/pages/affiliate/AffiliateCommission'));
 const AffiliateAnalytics = lazy(() => import('@/pages/affiliate/AffiliateAnalytics'));
 
+// Forum Pages
+const ForumRouter = lazy(() => import('@/pages/forum/ForumRouter'));
+
+// Digital Signage Pages
+const SignageRouter = lazy(() => import('@/pages/signage/SignageRouter'));
+
+// Crowdfunding Pages
+const CrowdfundingRouter = lazy(() => import('@/pages/crowdfunding/CrowdfundingRouter'));
+
 // App Pages
-const ForumApp = lazy(() => import('@/pages/apps/ForumApp'));
-const SignageApp = lazy(() => import('@/pages/apps/SignageApp'));
-const CrowdfundingApp = lazy(() => import('@/pages/apps/CrowdfundingApp'));
-const CrowdfundingProjects = lazy(() => import('@/pages/apps/CrowdfundingProjects'));
-const CrowdfundingProjectDetail = lazy(() => import('@/pages/apps/CrowdfundingProjectDetail'));
-const CrowdfundingProjectForm = lazy(() => import('@/pages/apps/CrowdfundingProjectForm'));
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 
 
@@ -790,68 +793,34 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* Forum, Signage, Crowdfunding - App Guard 적용 */}
+                    {/* Forum - App Guard 적용 */}
                     <Route path="/forum/*" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
                         <AppGuard appName="forum">
                           <Suspense fallback={<PageLoader />}>
-                            <ForumApp />
+                            <ForumRouter />
                           </Suspense>
                         </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     
+                    {/* Digital Signage - App Guard 적용 */}
                     <Route path="/signage/*" element={
                       <AdminProtectedRoute requiredPermissions={['signage:read']}>
                         <AppGuard appName="signage">
                           <Suspense fallback={<PageLoader />}>
-                            <SignageApp />
+                            <SignageRouter />
                           </Suspense>
                         </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     
+                    {/* Crowdfunding - App Guard 적용 */}
                     <Route path="/crowdfunding/*" element={
                       <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
                         <AppGuard appName="crowdfunding">
                           <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingApp />
-                          </Suspense>
-                        </AppGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/crowdfunding/projects" element={
-                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
-                        <AppGuard appName="crowdfunding">
-                          <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingProjects />
-                          </Suspense>
-                        </AppGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/crowdfunding/projects/new" element={
-                      <AdminProtectedRoute requiredPermissions={['crowdfunding:write']}>
-                        <AppGuard appName="crowdfunding">
-                          <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingProjectForm />
-                          </Suspense>
-                        </AppGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/crowdfunding/projects/:id" element={
-                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
-                        <AppGuard appName="crowdfunding">
-                          <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingProjectDetail />
-                          </Suspense>
-                        </AppGuard>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/crowdfunding/projects/:id/edit" element={
-                      <AdminProtectedRoute requiredPermissions={['crowdfunding:write']}>
-                        <AppGuard appName="crowdfunding">
-                          <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingProjectForm />
+                            <CrowdfundingRouter />
                           </Suspense>
                         </AppGuard>
                       </AdminProtectedRoute>
