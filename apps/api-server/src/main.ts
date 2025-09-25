@@ -814,6 +814,7 @@ app.use('/api/v1/shipping', shippingV1Routes);
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
 app.use('/api/v1/products', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
+app.use('/api/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트 (backward compatibility)
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 

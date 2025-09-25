@@ -510,4 +510,38 @@ router.get('/cpt/types', async (req, res) => {
   }
 });
 
+// Get template parts (public) - for admin dashboard
+router.get('/template-parts', async (req, res) => {
+  try {
+    const { AppDataSource } = await import('../database/connection');
+    const { TemplatePart } = await import('../entities/TemplatePart');
+
+    const repository = AppDataSource.getRepository(TemplatePart);
+    const queryBuilder = repository.createQueryBuilder('templatePart');
+
+    // Filter by area if provided
+    const { area } = req.query;
+    if (area && area !== 'all') {
+      queryBuilder.where('templatePart.area = :area', { area });
+    }
+
+    queryBuilder.orderBy('templatePart.createdAt', 'DESC');
+
+    const [templateParts, count] = await queryBuilder.getManyAndCount();
+
+    res.json({
+      success: true,
+      data: templateParts,
+      count
+    });
+  } catch (error: any) {
+    logger.error('Public template parts error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch template parts',
+      message: error.message
+    });
+  }
+});
+
 export default router;

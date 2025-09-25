@@ -51,7 +51,7 @@ export default function TemplateParts() {
       if (activeTab !== 'all') {
         params.append('area', activeTab);
       }
-      const response = await authClient.api.get(`/template-parts?${params}`);
+      const response = await authClient.api.get(`/public/template-parts?${params}`);
       // Handle both old and new API response structures
       const data = response.data;
       if (data && typeof data === 'object' && 'success' in data) {

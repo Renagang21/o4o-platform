@@ -16,6 +16,56 @@ export class InventoryController {
   private alertRepository = AppDataSource.getRepository(InventoryAlert);
   private vendorRepository = AppDataSource.getRepository(VendorInfo);
 
+  // GET /api/inventory/stats - Get inventory statistics
+  getInventoryStats = async (req: AuthRequest, res: Response) => {
+    try {
+      const currentUser = req.user;
+
+      const query = this.inventoryRepository.createQueryBuilder('inventory')
+        .leftJoinAndSelect('inventory.vendor', 'vendor');
+
+      // Apply vendor filter based on role
+      if (currentUser?.role === 'vendor') {
+        const vendor = await this.vendorRepository.findOne({
+          where: { userId: currentUser.id }
+        });
+        if (vendor) {
+          query.andWhere('inventory.vendorId = :vendorId', { vendorId: vendor.id });
+        }
+      }
+
+      const inventory = await query.getMany();
+
+      // Calculate statistics
+      const totalItems = inventory.length;
+      const lowStockItems = inventory.filter(item =>
+        item.quantity > 0 && item.quantity <= item.minQuantity
+      ).length;
+      const outOfStockItems = inventory.filter(item =>
+        item.quantity === 0
+      ).length;
+      const totalValue = inventory.reduce((sum, item) =>
+        sum + (item.quantity * item.unitCost), 0
+      );
+
+      res.json({
+        success: true,
+        data: {
+          totalItems,
+          lowStockItems,
+          outOfStockItems,
+          totalValue
+        }
+      });
+    } catch (error) {
+      logger.error('Error fetching inventory stats:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch inventory statistics'
+      });
+    }
+  };
+
   // GET /api/inventory - Get inventory list with filtering
   getInventoryList = async (req: AuthRequest, res: Response) => {
     try {

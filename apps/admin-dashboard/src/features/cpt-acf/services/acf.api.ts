@@ -15,7 +15,7 @@ import {
   ImportFieldGroupsDto
 } from '../types/acf.types';
 
-const API_BASE = '/api/acf';
+const API_BASE = '/acf';
 
 /**
  * ACF Field Group Management

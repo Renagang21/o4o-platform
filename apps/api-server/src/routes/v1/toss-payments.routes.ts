@@ -151,6 +151,133 @@ router.get('/payments/toss/:paymentKey', authenticateToken, async (req: Request,
 });
 
 /**
+ * 결제 설정 조회
+ * GET /api/v1/payments/toss/config
+ */
+router.get('/payments/toss/config', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    // Return configuration status
+    res.json({
+      success: true,
+      data: {
+        isConfigured: !!process.env.TOSS_CLIENT_KEY,
+        clientKey: process.env.TOSS_CLIENT_KEY || null,
+        mode: process.env.TOSS_MODE || 'test',
+        webhookUrl: process.env.TOSS_WEBHOOK_URL || null
+      }
+    });
+  } catch (error: any) {
+    logger.error('Failed to get payment config:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get payment configuration'
+    });
+  }
+});
+
+/**
+ * 결제 통계 조회
+ * GET /api/v1/payments/toss/stats
+ */
+router.get('/payments/toss/stats', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    // TODO: Implement actual stats from database
+    res.json({
+      success: true,
+      data: {
+        totalPayments: 0,
+        totalAmount: 0,
+        todayPayments: 0,
+        todayAmount: 0,
+        pendingPayments: 0,
+        failedPayments: 0
+      }
+    });
+  } catch (error: any) {
+    logger.error('Failed to get payment stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get payment statistics'
+    });
+  }
+});
+
+/**
+ * 테스트 결제 내역 조회
+ * GET /api/v1/payments/toss/tests
+ */
+router.get('/payments/toss/tests', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    // TODO: Implement test payments history
+    res.json({
+      success: true,
+      data: [],
+      total: 0
+    });
+  } catch (error: any) {
+    logger.error('Failed to get test payments:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get test payments'
+    });
+  }
+});
+
+/**
+ * 환불 목록 조회
+ * GET /api/v1/payments/refunds
+ */
+router.get('/payments/refunds', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const { page = 1, limit = 10, status } = req.query;
+
+    // TODO: Implement refunds list from database
+    res.json({
+      success: true,
+      data: [],
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total: 0,
+        totalPages: 0
+      }
+    });
+  } catch (error: any) {
+    logger.error('Failed to get refunds:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get refunds list'
+    });
+  }
+});
+
+/**
+ * 환불 통계 조회
+ * GET /api/v1/payments/refunds/stats
+ */
+router.get('/payments/refunds/stats', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    // TODO: Implement refund stats from database
+    res.json({
+      success: true,
+      data: {
+        totalRefunds: 0,
+        totalRefundAmount: 0,
+        pendingRefunds: 0,
+        completedRefunds: 0,
+        rejectedRefunds: 0
+      }
+    });
+  } catch (error: any) {
+    logger.error('Failed to get refund stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get refund statistics'
+    });
+  }
+});
+
+/**
  * 토스페이먼츠 웹훅
  * POST /api/v1/payments/toss/webhook
  */

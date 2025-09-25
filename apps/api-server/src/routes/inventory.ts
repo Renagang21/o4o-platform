@@ -10,6 +10,7 @@ router.use(authMiddleware);
 
 // Inventory management routes
 router.get('/', inventoryController.getInventoryList);
+router.get('/stats', inventoryController.getInventoryStats);
 router.post('/adjust', inventoryController.adjustInventory);
 
 // Alerts management
