@@ -185,10 +185,70 @@ export const menuPermissions: MenuPermission[] = [
     roles: ['admin', 'manager', 'business', 'affiliate', 'seller', 'supplier', 'retailer'],
     permissions: ['forum:read']
   },
+  {
+    menuId: 'forum-boards',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['forum:read']
+  },
+  {
+    menuId: 'forum-categories',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['forum:read']
+  },
+  {
+    menuId: 'forum-posts',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['forum:read']
+  },
+  {
+    menuId: 'forum-comments',
+    roles: ['admin', 'manager'],
+    permissions: ['forum:read']
+  },
+  {
+    menuId: 'forum-reports',
+    roles: ['admin', 'manager'],
+    permissions: ['forum:read']
+  },
+  {
+    menuId: 'forum-settings',
+    roles: ['admin'],
+    permissions: ['forum:write']
+  },
 
   // Digital Signage - Admin, Manager, Business
   {
     menuId: 'signage',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['signage:read']
+  },
+  {
+    menuId: 'signage-screens',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['signage:read']
+  },
+  {
+    menuId: 'signage-content',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['signage:read']
+  },
+  {
+    menuId: 'signage-playlists',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['signage:read']
+  },
+  {
+    menuId: 'signage-schedule',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['signage:write']
+  },
+  {
+    menuId: 'signage-devices',
+    roles: ['admin', 'manager'],
+    permissions: ['signage:write']
+  },
+  {
+    menuId: 'signage-analytics',
     roles: ['admin', 'manager', 'business'],
     permissions: ['signage:read']
   },
@@ -198,6 +258,36 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'crowdfunding',
     roles: ['admin', 'manager', 'business'],
     permissions: ['crowdfunding:read']
+  },
+  {
+    menuId: 'crowdfunding-projects',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['crowdfunding:read']
+  },
+  {
+    menuId: 'crowdfunding-backers',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['crowdfunding:read']
+  },
+  {
+    menuId: 'crowdfunding-rewards',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['crowdfunding:read']
+  },
+  {
+    menuId: 'crowdfunding-payments',
+    roles: ['admin', 'manager'],
+    permissions: ['crowdfunding:write']
+  },
+  {
+    menuId: 'crowdfunding-reports',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['crowdfunding:read']
+  },
+  {
+    menuId: 'crowdfunding-settings',
+    roles: ['admin'],
+    permissions: ['crowdfunding:write']
   },
 
   // Mail Management - Admin, Manager
@@ -337,26 +427,26 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['tools:read']
   },
 
-  // Apps Management - Admin, Manager
+  // System Monitoring - Admin, Manager
   {
-    menuId: 'apps',
+    menuId: 'monitoring',
     roles: ['admin', 'manager'],
-    permissions: ['apps:read']
+    permissions: ['monitoring:read']
   },
   {
-    menuId: 'apps-installed',
+    menuId: 'monitoring-dashboard',
     roles: ['admin', 'manager'],
-    permissions: ['apps:read']
+    permissions: ['monitoring:read']
   },
   {
-    menuId: 'apps-settings',
+    menuId: 'performance',
+    roles: ['admin', 'manager'],
+    permissions: ['monitoring:read']
+  },
+  {
+    menuId: 'security-logs',
     roles: ['admin'],
-    permissions: ['apps:write']
-  },
-  {
-    menuId: 'apps-marketplace',
-    roles: ['admin', 'manager'],
-    permissions: ['apps:read']
+    permissions: ['monitoring:read']
   },
 
   // Shortcode Management - Admin, Manager, Business
