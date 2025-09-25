@@ -113,7 +113,7 @@ const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 // const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
 
 // Apps Manager
-const AppsManagerV2 = lazy(() => import('@/pages/apps/AppsManagerV2'));
+const AppsSimple = lazy(() => import('@/pages/apps/AppsSimple'));
 const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
 
 // Appearance Pages (WordPress Style)
@@ -453,7 +453,7 @@ function App() {
                     <Route path="/apps" element={
                       <AdminProtectedRoute requiredPermissions={['apps:manage']}>
                         <Suspense fallback={<PageLoader />}>
-                          <AppsManagerV2 />
+                          <AppsSimple />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -825,13 +825,6 @@ function App() {
                     } />
                     
                     {/* Apps Manager */}
-                    <Route path="/apps" element={
-                      <AdminProtectedRoute requiredPermissions={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AppsManagerV2 />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     <Route path="/apps/settings" element={
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>

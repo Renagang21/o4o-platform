@@ -10,7 +10,7 @@ import { clsx } from 'clsx'
 import { MenuItem } from '@/config/wordpressMenuFinal'
 import { filterMenuByRole, UserRole } from '@/config/rolePermissions'
 import { useAuth } from '@o4o/auth-context'
-import { useDynamicMenu } from '@/hooks/useDynamicMenu'
+import { useSimpleMenu } from '@/hooks/useSimpleMenu'
 
 interface AdminSidebarProps {
   isOpen: boolean
@@ -23,8 +23,8 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const [expandedItems, setExpandedItems] = useState<any[]>([])
   const [isCollapsed, setIsCollapsed] = useState(false)
   
-  // 동적 메뉴 가져오기 (활성화된 앱 기반)
-  const { menuItems: dynamicMenuItems, isLoading: menuLoading } = useDynamicMenu()
+  // 메뉴 가져오기
+  const { menuItems: dynamicMenuItems, isLoading: menuLoading } = useSimpleMenu()
   
   // 역할 기반 메뉴 필터링
   const userRole = (user?.role || 'customer') as UserRole
