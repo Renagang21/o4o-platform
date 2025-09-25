@@ -103,15 +103,6 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 앱 관리
-  {
-    id: 'apps',
-    label: '앱 관리',
-    icon: <Puzzle className="w-5 h-5" />,
-    children: [
-      { id: 'apps-installed', label: '앱 목록', icon: <Puzzle className="w-4 h-4" />, path: '/apps' }
-    ]
-  },
   {
     id: 'ecommerce',
     label: '전자상거래',

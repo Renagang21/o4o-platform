@@ -112,9 +112,7 @@ const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 // const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
 // const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
 
-// Apps Manager
-const AppsSimple = lazy(() => import('@/pages/apps/AppsSimple'));
-const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
+// Removed Apps Manager - using WordPress style menu
 
 // Appearance Pages (WordPress Style)
 const Customize = lazy(() => import('@/pages/appearance/Customize'));
@@ -445,15 +443,6 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <Menus />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* 앱 관리 */}
-                    <Route path="/apps" element={
-                      <AdminProtectedRoute requiredPermissions={['apps:manage']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AppsSimple />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -820,15 +809,6 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <ToolsPage />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* Apps Manager */}
-                    <Route path="/apps/settings" element={
-                      <AdminProtectedRoute requiredPermissions={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AppSettings />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
