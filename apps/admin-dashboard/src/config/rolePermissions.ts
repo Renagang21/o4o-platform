@@ -410,10 +410,7 @@ export function hasMenuAccess(menuId: string, userRole: UserRole, userPermission
   const menuPermission = menuPermissions.find((mp: any) => mp.menuId === menuId);
   
   if (!menuPermission) {
-    // 디버깅: CPT Engine 관련 메뉴 확인
-    if (menuId === 'cpt-engine') {
-      console.log('CPT Engine menu permission not found in menuPermissions');
-    }
+    // CPT Engine 관련 메뉴 확인
     return false; // Menu item not found
   }
 
