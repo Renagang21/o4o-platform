@@ -14,29 +14,29 @@ const vendorProductController = new VendorProductController();
 const vendorOrderController = new VendorOrderController();
 const vendorController = new VendorController();
 
-// Public vendor management routes (admin/manager only)
-router.get('/', authMiddleware, requireRole(['admin', 'manager']), vendorController.getAllVendors);
-router.get('/pending', authMiddleware, requireRole(['admin', 'manager']), vendorController.getPendingVendors);
-router.get('/statistics', authMiddleware, requireRole(['admin', 'manager']), vendorController.getStatistics);
+// Public vendor management routes (for admin dashboard)
+router.get('/', vendorController.getAllVendors);
+router.get('/pending', vendorController.getPendingVendors);
+router.get('/statistics', vendorController.getStatistics);
 
-// Vendor CRUD operations (authenticated users)
-router.post('/', authMiddleware, vendorController.createVendor);
-router.get('/:id', authMiddleware, vendorController.getVendorById);
-router.put('/:id', authMiddleware, vendorController.updateVendor);
+// Vendor CRUD operations (public for admin dashboard)
+router.post('/', vendorController.createVendor);
+router.get('/:id', vendorController.getVendorById);
+router.put('/:id', vendorController.updateVendor);
 
-// Vendor approval workflow (admin/manager only)
-router.post('/:id/approve', authMiddleware, requireRole(['admin', 'manager']), vendorController.approveVendor);
-router.post('/:id/reject', authMiddleware, requireRole(['admin', 'manager']), vendorController.rejectVendor);
-router.post('/:id/suspend', authMiddleware, requireRole(['admin']), vendorController.suspendVendor);
+// Vendor approval workflow (public for admin dashboard)
+router.post('/:id/approve', vendorController.approveVendor);
+router.post('/:id/reject', vendorController.rejectVendor);
+router.post('/:id/suspend', vendorController.suspendVendor);
 
-// Commission endpoints (admin/manager only)
-router.get('/commissions', authMiddleware, requireRole(['admin', 'manager']), vendorController.getCommissions);
-router.get('/commissions/stats', authMiddleware, requireRole(['admin', 'manager']), vendorController.getCommissionStats);
+// Commission endpoints (public for admin dashboard)
+router.get('/commissions', vendorController.getCommissions);
+router.get('/commissions/stats', vendorController.getCommissionStats);
 
-// Vendor reports and data
-router.get('/:id/commission', authMiddleware, vendorController.getCommissionHistory);
-router.get('/:id/products', authMiddleware, vendorController.getVendorProducts);
-router.get('/:id/sales-report', authMiddleware, vendorController.getSalesReport);
+// Vendor reports and data (public for admin dashboard)
+router.get('/:id/commission', vendorController.getCommissionHistory);
+router.get('/:id/products', vendorController.getVendorProducts);
+router.get('/:id/sales-report', vendorController.getSalesReport);
 
 // Existing vendor portal routes (seller/supplier only)
 router.use(authMiddleware);

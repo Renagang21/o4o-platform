@@ -180,7 +180,30 @@ const EcommerceSettings: FC = () => {
       setLoading(true);
       const response = await EcommerceApi.getSettings();
       if (response.data) {
-        setSettings(response.data as any);
+        // Merge API response with default settings to ensure all fields exist
+        const mergedSettings = {
+          ...settings, // Default values
+          ...response.data,
+          // Ensure nested objects have all required fields
+          paymentMethods: {
+            creditCard: true,
+            paypal: false,
+            stripe: false,
+            toss: true,
+            bankTransfer: false,
+            ...(response.data as any).paymentMethods
+          },
+          emailNotifications: {
+            newOrder: true,
+            orderShipped: true,
+            orderCancelled: true,
+            lowStock: true,
+            newCustomer: false,
+            paymentFailed: true,
+            ...(response.data as any).emailNotifications
+          }
+        };
+        setSettings(mergedSettings);
       }
     } catch (error) {
       // Error log removed

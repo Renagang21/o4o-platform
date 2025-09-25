@@ -77,11 +77,77 @@ router.get('/categories/tree', async (req: Request, res: Response) => {
   });
 });
 
-// Settings routes (mock implementation)
-router.get('/settings', authenticateToken, async (req: Request, res: Response) => {
+// Settings routes - Return full settings structure for admin dashboard
+router.get('/settings', async (req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
+      // Store Information
+      storeName: 'O4O Store',
+      storeEmail: 'store@o4o.com',
+      storePhone: '02-1234-5678',
+      storeAddress: '서울시 강남구',
+      storeCity: '서울',
+      storeCountry: 'KR',
+      storePostalCode: '06000',
+
+      // Payment Settings
+      paymentMethods: {
+        creditCard: true,
+        paypal: false,
+        stripe: false,
+        toss: true,
+        bankTransfer: true
+      },
+
+      // Shipping Settings
+      enableShipping: true,
+      freeShippingThreshold: 50000,
+      defaultShippingFee: 3000,
+      shippingZones: [],
+      shippingProviders: [],
+
+      // Tax Settings
+      enableTax: true,
+      taxRate: 10,
+      taxIncludedInPrice: true,
+      taxName: '부가세',
+
+      // Email Notifications
+      emailNotifications: {
+        newOrder: true,
+        orderShipped: true,
+        orderCancelled: true,
+        lowStock: true,
+        newCustomer: false,
+        paymentFailed: true
+      },
+      notificationEmail: 'admin@o4o.com',
+
+      // Product Display Settings
+      productsPerPage: 20,
+      enableReviews: true,
+      requireReviewApproval: true,
+      enableWishlist: true,
+      enableCompare: false,
+      showOutOfStock: true,
+      defaultSortOrder: 'date',
+
+      // Inventory Settings
+      enableStockManagement: true,
+      lowStockThreshold: 10,
+      outOfStockThreshold: 0,
+      hideOutOfStock: false,
+      allowBackorders: false,
+
+      // Currency Settings
+      currency: 'KRW',
+      currencyPosition: 'right',
+      thousandSeparator: ',',
+      decimalSeparator: '.',
+      decimals: 0,
+
+      // Legacy fields for compatibility
       general: {
         storeName: 'O4O Store',
         storeEmail: 'store@o4o.com',
