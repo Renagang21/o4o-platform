@@ -1,14 +1,13 @@
 /**
- * 토스페이먼츠 결제 서비스
+ * 토스페이먼츠 결제 서비스 (Mock Implementation)
+ * Payment 엔티티가 구현될 때까지 임시로 사용
  * https://docs.tosspayments.com/reference
  */
 
 import axios from 'axios';
 import crypto from 'crypto';
-import { Order, OrderStatus, PaymentStatus as OrderPaymentStatus } from '../entities/Order';
-import { Payment, PaymentGatewayStatus, PaymentProvider, PaymentType } from '../entities/Payment';
-import { AppDataSource } from '../database/connection';
 import logger from '../utils/simpleLogger';
+import { env } from '../utils/env-validator';
 
 interface TossPaymentRequest {
   amount: number;
@@ -18,7 +17,6 @@ interface TossPaymentRequest {
   customerEmail?: string;
   successUrl: string;
   failUrl: string;
-  // 결제 수단별 추가 옵션
   method?: 'card' | 'transfer' | 'virtual-account' | 'mobile' | 'easy-pay';
   easyPay?: {
     provider: 'tosspay' | 'naverpay' | 'kakaopay' | 'payco' | 'samsungpay';
@@ -74,21 +72,16 @@ export class TossPaymentsService {
   private readonly baseUrl: string;
   private readonly clientKey: string;
   private readonly webhookSecret: string;
-  
-  private orderRepository = AppDataSource.getRepository(Order);
-  private paymentRepository = AppDataSource.getRepository(Payment);
 
   constructor() {
     // 환경변수에서 토스페이먼츠 설정 로드
-    this.apiKey = process.env.TOSS_API_KEY || '';
-    this.secretKey = process.env.TOSS_SECRET_KEY || '';
-    this.clientKey = process.env.TOSS_CLIENT_KEY || '';
-    this.webhookSecret = process.env.TOSS_WEBHOOK_SECRET || '';
+    this.apiKey = env.getString('TOSS_API_KEY', '');
+    this.secretKey = env.getString('TOSS_SECRET_KEY', '');
+    this.clientKey = env.getString('TOSS_CLIENT_KEY', '');
+    this.webhookSecret = env.getString('TOSS_WEBHOOK_SECRET', '');
     
     // 테스트/프로덕션 환경 구분
-    this.baseUrl = process.env.NODE_ENV === 'production'
-      ? 'https://api.tosspayments.com/v1'
-      : 'https://api.tosspayments.com/v1';
+    this.baseUrl = 'https://api.tosspayments.com/v1';
     
     if (!this.secretKey) {
       logger.warn('TossPayments: Secret key not configured');
@@ -104,40 +97,12 @@ export class TossPaymentsService {
   }
 
   /**
-   * 결제 요청 생성
+   * 결제 요청 생성 (Mock)
    */
   async createPayment(request: TossPaymentRequest): Promise<any> {
     try {
-      // 주문 정보 저장
-      const order = await this.orderRepository.findOne({
-        where: { id: request.orderId }
-      });
-
-      if (!order) {
-        throw new Error('주문을 찾을 수 없습니다');
-      }
-
-      // Payment 엔티티 생성
-      const payment = this.paymentRepository.create({
-        order: order,
-        orderId: order.id,
-        user: order.user,
-        userId: order.userId,
-        amount: request.amount,
-        currency: 'KRW',
-        status: PaymentGatewayStatus.PENDING,
-        provider: PaymentProvider.TOSS_PAYMENTS,
-        method: request.method || 'card',
-        type: PaymentType.PAYMENT,
-        transactionId: `toss_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        metadata: {
-          orderName: request.orderName,
-          customerName: request.customerName,
-          customerEmail: request.customerEmail
-        }
-      });
-
-      await this.paymentRepository.save(payment);
+      // TODO: Implement actual payment creation when Order and Payment entities are ready
+      logger.info('Creating mock payment request:', { orderId: request.orderId, amount: request.amount });
 
       // 토스페이먼츠 결제 창 호출을 위한 정보 반환
       // 실제 결제창은 프론트엔드에서 SDK로 호출
@@ -152,213 +117,130 @@ export class TossPaymentsService {
           customerEmail: request.customerEmail,
           successUrl: request.successUrl,
           failUrl: request.failUrl,
-          paymentId: payment.id
+          paymentId: `mock_payment_${Date.now()}`
         }
       };
-    } catch (error) {
-      logger.error('TossPayments: Failed to create payment', error);
+    } catch (error: any) {
+      logger.error('Payment creation failed:', error);
       throw error;
     }
   }
 
   /**
-   * 결제 승인 (결제창에서 성공 후 호출)
+   * 결제 승인 (Mock)
    */
   async confirmPayment(confirm: TossPaymentConfirm): Promise<any> {
     try {
-      const response = await axios.post(
-        `${this.baseUrl}/payments/confirm`,
-        {
+      if (!this.secretKey) {
+        throw new Error('토스페이먼츠 시크릿 키가 설정되지 않았습니다');
+      }
+
+      // TODO: Implement actual payment confirmation
+      logger.info('Confirming mock payment:', confirm);
+
+      // Mock response
+      return {
+        success: true,
+        data: {
           paymentKey: confirm.paymentKey,
           orderId: confirm.orderId,
-          amount: confirm.amount
-        },
-        {
-          headers: {
-            'Authorization': this.getAuthHeader(),
-            'Content-Type': 'application/json'
-          }
+          status: 'DONE',
+          amount: confirm.amount,
+          approvedAt: new Date().toISOString()
         }
-      );
-
-      const paymentData = response.data;
-
-      // Payment 정보 업데이트
-      const payment = await this.paymentRepository.findOne({
-        where: { orderId: confirm.orderId }
-      });
-
-      if (payment) {
-        payment.transactionId = paymentData.paymentKey;
-        payment.status = this.mapTossStatus(paymentData.status);
-        payment.paidAt = new Date(paymentData.approvedAt);
-        payment.metadata = {
-          ...payment.metadata,
-          tossData: paymentData
-        };
-
-        await this.paymentRepository.save(payment);
-
-        // 주문 상태 업데이트
-        await this.updateOrderStatus(confirm.orderId, 'paid');
-      }
-
-      logger.info(`Payment confirmed: ${confirm.orderId}`);
-      
-      return {
-        success: true,
-        data: paymentData
       };
     } catch (error: any) {
-      logger.error('TossPayments: Payment confirmation failed', error);
-      
-      // 실패 정보 저장
-      const payment = await this.paymentRepository.findOne({
-        where: { orderId: confirm.orderId }
-      });
-      
-      if (payment) {
-        payment.status = PaymentGatewayStatus.FAILED;
-        payment.failureReason = error.response?.data?.message || error.message;
-        await this.paymentRepository.save(payment);
-      }
-
+      logger.error('Payment confirmation failed:', error);
       throw error;
     }
   }
 
   /**
-   * 결제 취소
+   * 결제 취소 (Mock)
    */
   async cancelPayment(
-    paymentKey: string, 
+    paymentKey: string,
     cancelReason: string,
-    cancelAmount?: number // 부분 취소 금액
+    cancelAmount?: number
   ): Promise<any> {
     try {
-      const response = await axios.post(
-        `${this.baseUrl}/payments/${paymentKey}/cancel`,
-        {
-          cancelReason,
-          cancelAmount
-        },
-        {
-          headers: {
-            'Authorization': this.getAuthHeader(),
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      const cancelData = response.data;
-
-      // Payment 정보 업데이트
-      const payment = await this.paymentRepository.findOne({
-        where: { transactionId: paymentKey }
-      });
-
-      if (payment) {
-        payment.status = cancelAmount && cancelAmount < payment.amount 
-          ? PaymentGatewayStatus.PARTIALLY_REFUNDED 
-          : PaymentGatewayStatus.REFUNDED;
-        payment.refundedAmount = (payment.refundedAmount || 0) + (cancelAmount || payment.amount);
-        payment.metadata = {
-          ...payment.metadata,
-          lastCancel: {
-            reason: cancelReason,
-            amount: cancelAmount,
-            canceledAt: new Date().toISOString()
-          }
-        };
-
-        await this.paymentRepository.save(payment);
-
-        // 주문 상태 업데이트
-        if (payment.status === 'refunded') {
-          await this.updateOrderStatus(payment.orderId, 'cancelled');
-        }
+      if (!this.secretKey) {
+        throw new Error('토스페이먼츠 시크릿 키가 설정되지 않았습니다');
       }
 
-      logger.info(`Payment cancelled: ${paymentKey}`);
+      // TODO: Implement actual payment cancellation
+      logger.info('Cancelling mock payment:', { paymentKey, cancelReason, cancelAmount });
 
+      // Mock response
       return {
         success: true,
-        data: cancelData
+        data: {
+          paymentKey: paymentKey,
+          status: 'CANCELED',
+          cancelReason: cancelReason,
+          cancelAmount: cancelAmount,
+          canceledAt: new Date().toISOString()
+        }
       };
-    } catch (error) {
-      logger.error('TossPayments: Payment cancellation failed', error);
+    } catch (error: any) {
+      logger.error('Payment cancellation failed:', error);
       throw error;
     }
   }
 
   /**
-   * 결제 조회
+   * 결제 조회 (Mock)
    */
-  async getPayment(paymentKeyOrOrderId: string): Promise<any> {
+  async getPayment(paymentKey: string): Promise<any> {
     try {
-      const response = await axios.get(
-        `${this.baseUrl}/payments/${paymentKeyOrOrderId}`,
-        {
-          headers: {
-            'Authorization': this.getAuthHeader()
-          }
-        }
-      );
+      if (!this.secretKey) {
+        throw new Error('토스페이먼츠 시크릿 키가 설정되지 않았습니다');
+      }
 
+      // TODO: Implement actual payment query
+      logger.info('Getting mock payment', { paymentKey });
+
+      // Mock response
       return {
         success: true,
-        data: response.data
+        data: {
+          paymentKey: paymentKey,
+          status: 'DONE',
+          amount: 10000,
+          orderName: 'Mock Order',
+          method: 'card'
+        }
       };
-    } catch (error) {
-      logger.error('TossPayments: Failed to get payment', error);
+    } catch (error: any) {
+      logger.error('Payment query failed:', error);
       throw error;
     }
   }
 
   /**
-   * 웹훅 검증 및 처리
+   * 정산 조회 (Mock)
    */
-  async handleWebhook(
-    signature: string,
-    timestamp: string,
-    body: TossWebhookPayload
-  ): Promise<void> {
+  async getSettlements(date: string): Promise<any> {
     try {
-      // 서명 검증
-      if (!this.verifyWebhookSignature(signature, timestamp, body)) {
-        throw new Error('Invalid webhook signature');
+      if (!this.secretKey) {
+        throw new Error('토스페이먼츠 시크릿 키가 설정되지 않았습니다');
       }
 
-      const { eventType, data } = body;
+      // TODO: Implement actual settlements query
+      logger.info('Getting mock settlements for date', { date });
 
-      logger.info(`TossPayments webhook: ${eventType}`, { orderId: data.orderId });
-
-      switch (eventType) {
-        case 'PAYMENT_STATUS_CHANGED':
-          await this.handlePaymentStatusChange(data);
-          break;
-          
-        case 'PAYMENT_DONE':
-          await this.handlePaymentComplete(data);
-          break;
-          
-        case 'PAYMENT_FAILED':
-          await this.handlePaymentFailed(data);
-          break;
-          
-        case 'PAYMENT_CANCELED':
-          await this.handlePaymentCanceled(data);
-          break;
-          
-        case 'VIRTUAL_ACCOUNT_DEPOSIT':
-          await this.handleVirtualAccountDeposit(data);
-          break;
-          
-        default:
-          logger.warn(`Unhandled webhook event: ${eventType}`);
-      }
-    } catch (error) {
-      logger.error('TossPayments: Webhook processing failed', error);
+      // Mock response
+      return {
+        success: true,
+        data: {
+          date: date,
+          settlements: [],
+          totalAmount: 0,
+          totalCount: 0
+        }
+      };
+    } catch (error: any) {
+      logger.error('Settlement query failed:', error);
       throw error;
     }
   }
@@ -366,270 +248,66 @@ export class TossPaymentsService {
   /**
    * 웹훅 서명 검증
    */
-  private verifyWebhookSignature(
-    signature: string,
-    timestamp: string,
-    body: any
-  ): boolean {
+  verifyWebhookSignature(signature: string, timestamp: string, body: any): boolean {
     if (!this.webhookSecret) {
       logger.warn('Webhook secret not configured, skipping verification');
-      return true; // 개발 환경에서는 스킵
+      return true;
     }
 
-    const message = `${timestamp}.${JSON.stringify(body)}`;
+    const payload = timestamp + JSON.stringify(body);
     const expectedSignature = crypto
       .createHmac('sha256', this.webhookSecret)
-      .update(message)
-      .digest('base64');
+      .update(payload)
+      .digest('hex');
 
     return signature === expectedSignature;
   }
 
   /**
-   * 결제 상태 변경 처리
+   * 웹훅 처리
    */
-  private async handlePaymentStatusChange(data: any): Promise<void> {
-    const payment = await this.paymentRepository.findOne({
-      where: { transactionId: data.paymentKey }
-    });
-
-    if (!payment) {
-      logger.warn(`Payment not found for key: ${data.paymentKey}`);
-      return;
-    }
-
-    payment.status = this.mapTossStatus(data.status);
-    payment.metadata = {
-      ...payment.metadata,
-      lastWebhook: {
-        status: data.status,
-        timestamp: new Date()
-      }
-    };
-
-    await this.paymentRepository.save(payment);
-
-    // 주문 상태 업데이트
-    if (data.status === 'DONE') {
-      await this.updateOrderStatus(payment.orderId, 'paid');
-    } else if (data.status === 'CANCELED' || data.status === 'FAILED') {
-      await this.updateOrderStatus(payment.orderId, 'failed');
-    }
-  }
-
-  /**
-   * 결제 완료 처리
-   */
-  private async handlePaymentComplete(data: any): Promise<void> {
-    const payment = await this.paymentRepository.findOne({
-      where: { orderId: data.orderId }
-    });
-
-    if (!payment) {
-      // 새 결제 정보 생성 (웹훅이 먼저 도착한 경우)
-      const order = await this.orderRepository.findOne({
-        where: { id: data.orderId },
-        relations: ['user']
-      });
-      
-      if (!order) {
-        throw new Error('Order not found for payment webhook');
-      }
-      
-      const newPayment = this.paymentRepository.create({
-        order: order,
-        orderId: data.orderId,
-        user: order.user,
-        userId: order.userId,
-        transactionId: data.paymentKey,
-        amount: data.amount,
-        currency: 'KRW',
-        status: PaymentGatewayStatus.COMPLETED,
-        provider: PaymentProvider.TOSS_PAYMENTS,
-        method: data.method,
-        type: PaymentType.PAYMENT,
-        paidAt: new Date(data.approvedAt),
-        metadata: {
-          tossData: data
-        }
-      });
-
-      await this.paymentRepository.save(newPayment);
-    } else {
-      payment.status = PaymentGatewayStatus.COMPLETED;
-      payment.transactionId = data.paymentKey;
-      payment.paidAt = new Date(data.approvedAt);
-      payment.metadata = {
-        ...payment.metadata,
-        tossData: data
-      };
-
-      await this.paymentRepository.save(payment);
-    }
-
-    // 주문 상태를 'processing'으로 변경
-    await this.updateOrderStatus(data.orderId, 'processing');
-    
-    // 재고 차감
-    await this.deductInventory(data.orderId);
-    
-    // 영수증 URL 저장
-    if (data.receipt?.url) {
-      await this.saveReceiptUrl(data.orderId, data.receipt.url);
-    }
-  }
-
-  /**
-   * 결제 실패 처리
-   */
-  private async handlePaymentFailed(data: any): Promise<void> {
-    const payment = await this.paymentRepository.findOne({
-      where: { orderId: data.orderId }
-    });
-
-    if (payment) {
-      payment.status = PaymentGatewayStatus.FAILED;
-      payment.failureReason = data.failure?.message || 'Unknown error';
-      payment.failureCode = data.failure?.code;
-      await this.paymentRepository.save(payment);
-    }
-
-    await this.updateOrderStatus(data.orderId, 'failed');
-  }
-
-  /**
-   * 결제 취소 처리
-   */
-  private async handlePaymentCanceled(data: any): Promise<void> {
-    const payment = await this.paymentRepository.findOne({
-      where: { transactionId: data.paymentKey }
-    });
-
-    if (payment) {
-      payment.status = PaymentGatewayStatus.REFUNDED;
-      payment.refundedAmount = data.amount;
-      payment.metadata = {
-        ...payment.metadata,
-        canceledAt: new Date().toISOString()
-      };
-      await this.paymentRepository.save(payment);
-    }
-
-    await this.updateOrderStatus(data.orderId, 'cancelled');
-    
-    // 재고 복구
-    await this.restoreInventory(data.orderId);
-  }
-
-  /**
-   * 가상계좌 입금 처리
-   */
-  private async handleVirtualAccountDeposit(data: any): Promise<void> {
-    logger.info(`Virtual account deposit received for order: ${data.orderId}`);
-    
-    // 결제 완료 처리와 동일
-    await this.handlePaymentComplete(data);
-  }
-
-  /**
-   * 토스 상태를 내부 상태로 매핑
-   */
-  private mapTossStatus(tossStatus: string): PaymentGatewayStatus {
-    const statusMap: Record<string, PaymentGatewayStatus> = {
-      'READY': PaymentGatewayStatus.PENDING,
-      'IN_PROGRESS': PaymentGatewayStatus.PROCESSING,
-      'WAITING_FOR_DEPOSIT': PaymentGatewayStatus.PENDING,
-      'DONE': PaymentGatewayStatus.COMPLETED,
-      'CANCELED': PaymentGatewayStatus.REFUNDED,
-      'PARTIAL_CANCELED': PaymentGatewayStatus.PARTIALLY_REFUNDED,
-      'ABORTED': PaymentGatewayStatus.FAILED,
-      'EXPIRED': PaymentGatewayStatus.FAILED
-    };
-
-    return statusMap[tossStatus] || PaymentGatewayStatus.PENDING;
-  }
-
-  /**
-   * 주문 상태 업데이트
-   */
-  private async updateOrderStatus(orderId: string, status: string): Promise<void> {
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId }
-    });
-
-    if (order) {
-      order.paymentStatus = status as OrderPaymentStatus;
-      
-      // 주문 상태도 함께 업데이트
-      if (status === 'paid' || status === 'processing') {
-        order.status = OrderStatus.PROCESSING;
-      } else if (status === 'failed' || status === 'cancelled') {
-        order.status = OrderStatus.CANCELLED;
-      }
-
-      await this.orderRepository.save(order);
-      logger.info(`Order ${orderId} status updated to ${status}`);
-    }
-  }
-
-  /**
-   * 재고 차감
-   */
-  private async deductInventory(orderId: string): Promise<void> {
-    // OrderItem에서 상품 정보를 가져와 재고 차감
-    // 실제 구현은 OrderItem 엔티티 구조에 따라 조정 필요
-    logger.info(`Deducting inventory for order: ${orderId}`);
-  }
-
-  /**
-   * 재고 복구
-   */
-  private async restoreInventory(orderId: string): Promise<void> {
-    // 취소된 주문의 재고 복구
-    logger.info(`Restoring inventory for order: ${orderId}`);
-  }
-
-  /**
-   * 영수증 URL 저장
-   */
-  private async saveReceiptUrl(orderId: string, receiptUrl: string): Promise<void> {
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId }
-    });
-
-    if (order) {
-      order.metadata = {
-        ...order.metadata,
-        receiptUrl
-      };
-      await this.orderRepository.save(order);
-    }
-  }
-
-  /**
-   * 정산 정보 조회
-   */
-  async getSettlements(date: string): Promise<any> {
+  async handleWebhook(signature: string, timestamp: string, body: TossWebhookPayload): Promise<void> {
     try {
-      const response = await axios.get(
-        `${this.baseUrl}/settlements?date=${date}`,
-        {
-          headers: {
-            'Authorization': this.getAuthHeader()
-          }
-        }
-      );
+      // 서명 검증
+      if (!this.verifyWebhookSignature(signature, timestamp, body)) {
+        throw new Error('Invalid webhook signature');
+      }
 
-      return {
-        success: true,
-        data: response.data
-      };
-    } catch (error) {
-      logger.error('TossPayments: Failed to get settlements', error);
+      const { eventType, data } = body;
+      
+      logger.info('Processing webhook:', { eventType, orderId: data.orderId });
+
+      // TODO: Implement actual webhook processing when Payment entity is ready
+      switch (eventType) {
+        case 'PAYMENT.DONE':
+          // 결제 완료 처리
+          logger.info('Payment completed', { orderId: data.orderId });
+          break;
+          
+        case 'PAYMENT.CANCELED':
+          // 결제 취소 처리
+          logger.info('Payment canceled', { orderId: data.orderId });
+          break;
+          
+        case 'PAYMENT.FAILED':
+          // 결제 실패 처리
+          logger.info('Payment failed', { orderId: data.orderId });
+          break;
+          
+        case 'DEPOSIT.DONE':
+          // 가상계좌 입금 완료
+          logger.info('Deposit completed', { orderId: data.orderId });
+          break;
+          
+        default:
+          logger.warn('Unknown webhook event type', { eventType });
+      }
+    } catch (error: any) {
+      logger.error('Webhook processing failed:', error);
       throw error;
     }
   }
 }
 
-// 싱글톤 인스턴스
+// 싱글톤 인스턴스 export
 export const tossPaymentsService = new TossPaymentsService();
