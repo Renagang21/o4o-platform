@@ -13,7 +13,7 @@ const orderRepository = AppDataSource.getRepository(Order);
  * 결제 요청 생성
  * POST /api/v1/payments/toss/create
  */
-router.post('/payments/toss/create', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/toss/create', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { orderId, successUrl, failUrl } = req.body;
     const userId = (req.user as any)?.id;
@@ -63,7 +63,7 @@ router.post('/payments/toss/create', authenticateToken, async (req: AuthRequest,
  * 결제 승인
  * POST /api/v1/payments/toss/confirm
  */
-router.post('/payments/toss/confirm', async (req: Request, res: Response) => {
+router.post('/toss/confirm', async (req: Request, res: Response) => {
   try {
     const { paymentKey, orderId, amount } = req.body;
 
@@ -99,7 +99,7 @@ router.post('/payments/toss/confirm', async (req: Request, res: Response) => {
  * 결제 취소
  * POST /api/v1/payments/toss/cancel
  */
-router.post('/payments/toss/cancel', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/toss/cancel', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { paymentKey, cancelReason, cancelAmount } = req.body;
     const userId = (req.user as any)?.id;
@@ -134,7 +134,7 @@ router.post('/payments/toss/cancel', authenticateToken, async (req: AuthRequest,
  * 결제 조회
  * GET /api/v1/payments/toss/:paymentKey
  */
-router.get('/payments/toss/:paymentKey', authenticateToken, async (req: Request, res: Response) => {
+router.get('/toss/:paymentKey', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { paymentKey } = req.params;
 
@@ -154,7 +154,7 @@ router.get('/payments/toss/:paymentKey', authenticateToken, async (req: Request,
  * 결제 설정 조회
  * GET /api/v1/payments/toss/config
  */
-router.get('/payments/toss/config', async (req: Request, res: Response) => {
+router.get('/toss/config', async (req: Request, res: Response) => {
   try {
     // Return configuration status
     res.json({
@@ -179,7 +179,7 @@ router.get('/payments/toss/config', async (req: Request, res: Response) => {
  * 결제 통계 조회
  * GET /api/v1/payments/toss/stats
  */
-router.get('/payments/toss/stats', async (req: Request, res: Response) => {
+router.get('/toss/stats', async (req: Request, res: Response) => {
   try {
     // TODO: Implement actual stats from database
     res.json({
@@ -206,7 +206,7 @@ router.get('/payments/toss/stats', async (req: Request, res: Response) => {
  * 테스트 결제 내역 조회
  * GET /api/v1/payments/toss/tests
  */
-router.get('/payments/toss/tests', async (req: Request, res: Response) => {
+router.get('/toss/tests', async (req: Request, res: Response) => {
   try {
     // TODO: Implement test payments history
     res.json({
@@ -227,7 +227,7 @@ router.get('/payments/toss/tests', async (req: Request, res: Response) => {
  * 환불 목록 조회
  * GET /api/v1/payments/refunds
  */
-router.get('/payments/refunds', async (req: Request, res: Response) => {
+router.get('/refunds', async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
 
@@ -255,7 +255,7 @@ router.get('/payments/refunds', async (req: Request, res: Response) => {
  * 환불 통계 조회
  * GET /api/v1/payments/refunds/stats
  */
-router.get('/payments/refunds/stats', async (req: Request, res: Response) => {
+router.get('/refunds/stats', async (req: Request, res: Response) => {
   try {
     // TODO: Implement refund stats from database
     res.json({
@@ -281,7 +281,7 @@ router.get('/payments/refunds/stats', async (req: Request, res: Response) => {
  * 토스페이먼츠 웹훅
  * POST /api/v1/payments/toss/webhook
  */
-router.post('/payments/toss/webhook', async (req: Request, res: Response) => {
+router.post('/toss/webhook', async (req: Request, res: Response) => {
   try {
     const signature = req.headers['toss-signature'] as string;
     const timestamp = req.headers['toss-timestamp'] as string;
@@ -313,7 +313,7 @@ router.post('/payments/toss/webhook', async (req: Request, res: Response) => {
  * 결제 성공 콜백 페이지
  * GET /api/v1/payments/toss/success
  */
-router.get('/payments/toss/success', async (req: Request, res: Response) => {
+router.get('/toss/success', async (req: Request, res: Response) => {
   try {
     const { paymentKey, orderId, amount } = req.query;
 
@@ -338,7 +338,7 @@ router.get('/payments/toss/success', async (req: Request, res: Response) => {
  * 결제 실패 콜백 페이지
  * GET /api/v1/payments/toss/fail
  */
-router.get('/payments/toss/fail', async (req: Request, res: Response) => {
+router.get('/toss/fail', async (req: Request, res: Response) => {
   const { code, message, orderId } = req.query;
   
   logger.info('Payment failed callback:', { code, message, orderId });
@@ -351,7 +351,7 @@ router.get('/payments/toss/fail', async (req: Request, res: Response) => {
  * 정산 조회 (관리자용)
  * GET /api/v1/payments/toss/settlements
  */
-router.get('/payments/toss/settlements', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/toss/settlements', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userRole = (req.user as any)?.role;
     
