@@ -11,13 +11,13 @@ export class DatabaseChecker {
   private dataSource: DataSource;
   private requiredTables = [
     'users',
-    'products',
-    'orders',
-    'categories',
     'settings',
   ];
   
   private optionalTables = [
+    'products',
+    'orders',
+    'categories',
     'inventory',
     'coupons',
     'themes',
