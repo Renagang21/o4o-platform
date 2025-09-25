@@ -120,6 +120,11 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['analytics:read']
   },
   {
+    menuId: 'ecommerce-tools',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['products:read']
+  },
+  {
     menuId: 'ecommerce-settings',
     roles: ['admin', 'manager'],
     permissions: ['settings:write']

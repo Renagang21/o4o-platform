@@ -118,6 +118,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'toss-payments', label: '결제 설정', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/payments/toss' },
       { id: 'settlement-dashboard', label: '정산 관리', icon: <DollarSign className="w-4 h-4" />, path: '/ecommerce/settlements' },
       { id: 'reports', label: '매출 보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
+      { id: 'ecommerce-tools', label: '도구', icon: <Wrench className="w-4 h-4" />, path: '/ecommerce/tools' },
       { id: 'ecommerce-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/ecommerce/settings' }
     ]
   },

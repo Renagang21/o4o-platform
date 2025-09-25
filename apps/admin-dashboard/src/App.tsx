@@ -62,6 +62,8 @@ const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
+const EcommerceTools = lazy(() => import('@/pages/ecommerce/tools/EcommerceTools'));
+const ProductImport = lazy(() => import('@/pages/ecommerce/tools/ProductImport'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
 // const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
@@ -628,6 +630,22 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['analytics:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Analytics />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/tools" element={
+                      <AdminProtectedRoute requiredPermissions={['products:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EcommerceTools />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/tools/import" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ProductImport />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
