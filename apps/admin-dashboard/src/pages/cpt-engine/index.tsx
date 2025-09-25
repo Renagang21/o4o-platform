@@ -6,6 +6,7 @@
 import { Routes, Route } from 'react-router-dom';
 import CPTDashboardToolset from './CPTDashboardToolset';
 import CPTContentEditorWrapper from './CPTContentEditorWrapper';
+import FormsManager from './forms/FormsManager';
 
 const CPTEngine = () => {
   return (
@@ -29,6 +30,11 @@ const CPTEngine = () => {
       {/* Taxonomy Routes */}
       <Route path="taxonomies/new" element={<CPTDashboardToolset />} />
       <Route path="taxonomies/:slug/edit" element={<CPTDashboardToolset />} />
+      
+      {/* Forms Routes */}
+      <Route path="forms" element={<FormsManager />} />
+      <Route path="forms/new" element={<FormsManager />} />
+      <Route path="forms/:id/edit" element={<FormsManager />} />
       
       {/* Other routes handled by dashboard */}
       <Route path="*" element={<CPTDashboardToolset />} />

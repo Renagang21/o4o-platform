@@ -208,6 +208,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-types', label: 'Custom Post Types', icon: <FileCode className="w-4 h-4" />, path: '/cpt' },
       { id: 'acf-fields', label: 'Custom Fields', icon: <FileCode className="w-4 h-4" />, path: '/acf' },
       { id: 'acf-groups', label: 'Field Groups', icon: <FileCode className="w-4 h-4" />, path: '/acf/groups' },
+      { id: 'forms', label: 'Forms', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/forms' },
       { id: 'shortcodes', label: 'Shortcodes', icon: <Code className="w-4 h-4" />, path: '/content/shortcodes' }
     ]
   },

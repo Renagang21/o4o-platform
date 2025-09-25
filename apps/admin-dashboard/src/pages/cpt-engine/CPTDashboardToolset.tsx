@@ -31,7 +31,8 @@ import {
   LayoutGrid,
   Code,
   Layers,
-  Package
+  Package,
+  Users
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cptApi } from '@/features/cpt-acf/services/cpt.api';
@@ -48,7 +49,7 @@ export const CPTDashboardToolset = () => {
   const { addNotice } = useAdminNotices();
   
   // State management
-  const [activeView, setActiveView] = useState<'dashboard' | 'types' | 'fields' | 'taxonomies'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'types' | 'fields' | 'taxonomies' | 'forms'>('dashboard');
   const [selectedType, setSelectedType] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -155,6 +156,16 @@ export const CPTDashboardToolset = () => {
                     <span className="toolset-badge toolset-badge--primary">{stats.totalTaxonomies}</span>
                   </button>
                 </li>
+                <li className={`toolset-nav__item ${activeView === 'forms' ? 'toolset-nav__item--active' : ''}`}>
+                  <button 
+                    onClick={() => setActiveView('forms')}
+                    className="toolset-nav__link"
+                  >
+                    <FileText className="toolset-nav__icon" />
+                    <span className="toolset-nav__label">Forms</span>
+                    <span className="toolset-badge toolset-badge--primary">0</span>
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -193,6 +204,7 @@ export const CPTDashboardToolset = () => {
                 activeView === 'dashboard' ? 'Dashboard' :
                 activeView === 'types' ? 'Post Types' :
                 activeView === 'fields' ? 'Custom Fields' :
+                activeView === 'forms' ? 'Forms' :
                 'Taxonomies'
               }</h1>
             </div>
@@ -262,6 +274,16 @@ export const CPTDashboardToolset = () => {
                 >
                   <Plus size={16} />
                   Add Taxonomy
+                </button>
+              )}
+
+              {activeView === 'forms' && (
+                <button 
+                  className="toolset-btn toolset-btn--primary"
+                  onClick={() => navigate('/cpt-engine/forms/new')}
+                >
+                  <Plus size={16} />
+                  Add New Form
                 </button>
               )}
             </div>
@@ -341,8 +363,8 @@ export const CPTDashboardToolset = () => {
                     </div>
                     <div className="toolset-stat-card__content">
                       <div className="toolset-stat-card__value">0</div>
-                      <div className="toolset-stat-card__label">Total Posts</div>
-                      <div className="toolset-stat-card__meta">All types</div>
+                      <div className="toolset-stat-card__label">Forms</div>
+                      <div className="toolset-stat-card__meta">All forms</div>
                     </div>
                   </div>
                 </div>
@@ -381,6 +403,20 @@ export const CPTDashboardToolset = () => {
                       >
                         <Eye className="toolset-quick-action__icon" />
                         <span className="toolset-quick-action__label">View All Types</span>
+                      </button>
+                      <button 
+                        className="toolset-quick-action"
+                        onClick={() => navigate('/cpt-engine/forms/new')}
+                      >
+                        <FileText className="toolset-quick-action__icon" />
+                        <span className="toolset-quick-action__label">Create Form</span>
+                      </button>
+                      <button 
+                        className="toolset-quick-action"
+                        onClick={() => setActiveView('forms')}
+                      >
+                        <Eye className="toolset-quick-action__icon" />
+                        <span className="toolset-quick-action__label">View All Forms</span>
                       </button>
                     </div>
                   </div>
@@ -824,6 +860,128 @@ export const CPTDashboardToolset = () => {
                       <p className="toolset-empty__text">No custom taxonomies created yet.</p>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Forms View */}
+            {activeView === 'forms' && (
+              <div className="toolset-forms">
+                <div className="toolset-section">
+                  <div className="toolset-section__header">
+                    <h2 className="toolset-section__title">Form Types</h2>
+                  </div>
+                  
+                  <div className="toolset-grid">
+                    {/* Contact Forms */}
+                    <div className="toolset-card toolset-card--interactive">
+                      <div className="toolset-card__header">
+                        <div className="toolset-card__title-group">
+                          <FileText className="toolset-card__icon" />
+                          <h3 className="toolset-card__title">Contact Forms</h3>
+                        </div>
+                        <span className="toolset-badge toolset-badge--default">0 Forms</span>
+                      </div>
+                      <div className="toolset-card__body">
+                        <p>Create contact forms with email notifications and validation.</p>
+                      </div>
+                      <div className="toolset-card__footer">
+                        <button 
+                          className="toolset-btn toolset-btn--secondary toolset-btn--sm"
+                          onClick={() => navigate('/cpt-engine/forms/new?type=contact')}
+                        >
+                          Create Contact Form
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Post Forms */}
+                    <div className="toolset-card toolset-card--interactive">
+                      <div className="toolset-card__header">
+                        <div className="toolset-card__title-group">
+                          <Database className="toolset-card__icon" />
+                          <h3 className="toolset-card__title">Post Forms</h3>
+                        </div>
+                        <span className="toolset-badge toolset-badge--default">0 Forms</span>
+                      </div>
+                      <div className="toolset-card__body">
+                        <p>Frontend forms for creating and editing posts.</p>
+                      </div>
+                      <div className="toolset-card__footer">
+                        <button 
+                          className="toolset-btn toolset-btn--secondary toolset-btn--sm"
+                          onClick={() => navigate('/cpt-engine/forms/new?type=post')}
+                        >
+                          Create Post Form
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* User Forms */}
+                    <div className="toolset-card toolset-card--interactive">
+                      <div className="toolset-card__header">
+                        <div className="toolset-card__title-group">
+                          <Users className="toolset-card__icon" />
+                          <h3 className="toolset-card__title">User Forms</h3>
+                        </div>
+                        <span className="toolset-badge toolset-badge--default">0 Forms</span>
+                      </div>
+                      <div className="toolset-card__body">
+                        <p>Registration and profile editing forms.</p>
+                      </div>
+                      <div className="toolset-card__footer">
+                        <button 
+                          className="toolset-btn toolset-btn--secondary toolset-btn--sm"
+                          onClick={() => navigate('/cpt-engine/forms/new?type=user')}
+                        >
+                          Create User Form
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Search Forms */}
+                    <div className="toolset-card toolset-card--interactive">
+                      <div className="toolset-card__header">
+                        <div className="toolset-card__title-group">
+                          <Search className="toolset-card__icon" />
+                          <h3 className="toolset-card__title">Search Forms</h3>
+                        </div>
+                        <span className="toolset-badge toolset-badge--default">0 Forms</span>
+                      </div>
+                      <div className="toolset-card__body">
+                        <p>Advanced search forms with custom filters.</p>
+                      </div>
+                      <div className="toolset-card__footer">
+                        <button 
+                          className="toolset-btn toolset-btn--secondary toolset-btn--sm"
+                          onClick={() => navigate('/cpt-engine/forms/new?type=search')}
+                        >
+                          Create Search Form
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recent Forms Table */}
+                  <div className="toolset-section">
+                    <div className="toolset-section__header">
+                      <h2 className="toolset-section__title">All Forms</h2>
+                    </div>
+                    
+                    <div className="toolset-empty">
+                      <FileText className="toolset-empty__icon" />
+                      <h3 className="toolset-empty__title">No Forms Created Yet</h3>
+                      <p className="toolset-empty__text">
+                        Forms allow you to create custom data entry interfaces for your site.
+                      </p>
+                      <button 
+                        className="toolset-btn toolset-btn--primary"
+                        onClick={() => navigate('/cpt-engine/forms/new')}
+                      >
+                        Create Your First Form
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

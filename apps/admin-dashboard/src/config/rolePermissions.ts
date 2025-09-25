@@ -340,6 +340,11 @@ export const menuPermissions: MenuPermission[] = [
     roles: ['admin'],
     permissions: ['custom_fields:write']
   },
+  {
+    menuId: 'forms',
+    roles: ['admin', 'manager'],
+    permissions: ['forms:write']
+  },
 
   // Appearance/Theme - Admin, Manager
   {
