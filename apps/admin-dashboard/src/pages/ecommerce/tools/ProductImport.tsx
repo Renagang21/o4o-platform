@@ -76,7 +76,8 @@ const ProductImport = () => {
     processed: 0,
     success: 0,
     failed: 0,
-    skipped: 0
+    skipped: 0,
+    errors: [] as Array<{ row: number; message: string }>
   });
 
   const medusaFields = [
@@ -218,7 +219,8 @@ const ProductImport = () => {
             processed: result.total,
             success: result.created + result.updated,
             failed: result.failed,
-            skipped: 0
+            skipped: 0,
+            errors: result.errors || []
           });
 
           setImportProgress(100);
@@ -254,7 +256,53 @@ const ProductImport = () => {
   };
 
   const addLog = (type: ImportLog['type'], message: string) => {
-    setImportLogs(prev => [...prev, { type, message, timestamp: new Date() }]);
+    const log = { type, message, timestamp: new Date() };
+    setImportLogs(prev => [...prev, log]);
+    
+    // Store error logs for later download
+    if (type === 'error') {
+      setImportStats(prev => ({
+        ...prev,
+        errors: [...(prev.errors || []), { row: 0, message }]
+      }));
+    }
+  };
+
+  const handleDownloadLog = () => {
+    if (!importStats.errors || importStats.errors.length === 0) {
+      toast.error('다운로드할 로그가 없습니다');
+      return;
+    }
+
+    // Create log content
+    const logContent = {
+      importDate: new Date().toISOString(),
+      summary: {
+        total: importStats.total,
+        success: importStats.success,
+        failed: importStats.failed,
+        skipped: importStats.skipped
+      },
+      errors: importStats.errors,
+      logs: importLogs.map(log => ({
+        type: log.type,
+        message: log.message,
+        timestamp: log.timestamp.toISOString()
+      }))
+    };
+
+    // Create blob and download
+    const blob = new Blob([JSON.stringify(logContent, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `import-log-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast.success('로그 파일이 다운로드되었습니다');
   };
 
   const renderStep = () => {
@@ -663,7 +711,11 @@ const ProductImport = () => {
                 <Button onClick={() => window.location.reload()}>
                   새 Import 시작
                 </Button>
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={handleDownloadLog}
+                  disabled={!importStats.errors || importStats.errors.length === 0}
+                >
                   <Download className="w-4 h-4 mr-2" />
                   로그 다운로드
                 </Button>
