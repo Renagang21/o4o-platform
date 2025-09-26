@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { VendorInfo } from '../../entities/VendorInfo';
+import { VendorCommission } from '../../entities/VendorCommission';
 import { User } from '../../entities/User';
 import { AuthRequest } from '../../types/auth';
 import { Like, IsNull, Not } from 'typeorm';
@@ -10,6 +11,7 @@ import logger from '../../utils/logger';
 export class VendorController {
   private vendorRepository = AppDataSource.getRepository(VendorInfo);
   private userRepository = AppDataSource.getRepository(User);
+  private commissionRepository = AppDataSource.getRepository(VendorCommission);
 
   // GET /api/vendors - Get all vendors with filtering and pagination
   getAllVendors = async (req: Request, res: Response) => {
@@ -527,31 +529,35 @@ export class VendorController {
         });
       }
 
-      // Mock commission data - replace with actual commission entity query
-      const mockCommissions = [];
-      for (let i = 0; i < 20; i++) {
-        mockCommissions.push({
-          id: `comm-${i}`,
-          vendorId: id,
-          orderId: `order-${i}`,
-          amount: Math.random() * 100000,
-          rate: vendor.affiliateRate || 10,
-          commission: Math.random() * 10000,
-          status: i % 3 === 0 ? 'pending' : 'paid',
-          createdAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
-        });
-      }
+      // Fetch actual commission data from database
+      const skip = (pageNum - 1) * limitNum;
+      
+      const [commissions, total] = await this.commissionRepository.findAndCount({
+        where: { vendorId: id },
+        skip,
+        take: limitNum,
+        order: { createdAt: 'DESC' },
+        relations: ['vendor']
+      });
 
-      const start = (pageNum - 1) * limitNum;
-      const paginatedCommissions = mockCommissions.slice(start, start + limitNum);
+      const formattedCommissions = commissions.map(comm => ({
+        id: comm.id,
+        vendorId: comm.vendorId,
+        orderId: comm.orderId,
+        amount: comm.totalSales,
+        rate: comm.commissionRate,
+        commission: comm.commissionAmount,
+        status: comm.status,
+        createdAt: comm.createdAt,
+      }));
 
       res.json({
         success: true,
-        data: paginatedCommissions,
-        total: mockCommissions.length,
+        data: formattedCommissions,
+        total,
         page: pageNum,
         pageSize: limitNum,
-        totalPages: Math.ceil(mockCommissions.length / limitNum),
+        totalPages: Math.ceil(total / limitNum),
       });
     } catch (error) {
       logger.error('Error fetching commission history:', error);
@@ -592,34 +598,39 @@ export class VendorController {
         });
       }
 
-      // Mock product data - replace with actual product entity query
-      const mockProducts = [];
-      for (let i = 0; i < 35; i++) {
-        mockProducts.push({
-          id: `prod-${i}`,
-          vendorId: id,
-          name: `Product ${i}`,
-          price: Math.random() * 100000,
-          stock: Math.floor(Math.random() * 100),
-          status: i % 4 === 0 ? 'inactive' : 'active',
-          createdAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
-        });
+      // Fetch actual product data from database
+      const skip = (pageNum - 1) * limitNum;
+      const where: any = { vendorId: id };
+      
+      if (status) {
+        where.status = status;
       }
 
-      const filteredProducts = status
-        ? mockProducts.filter(p => p.status === status)
-        : mockProducts;
+      const productRepository = AppDataSource.getRepository('Product');
+      const [products, total] = await productRepository.findAndCount({
+        where,
+        skip,
+        take: limitNum,
+        order: { createdAt: 'DESC' }
+      });
 
-      const start = (pageNum - 1) * limitNum;
-      const paginatedProducts = filteredProducts.slice(start, start + limitNum);
+      const formattedProducts = products.map((product: any) => ({
+        id: product.id,
+        vendorId: product.vendorId,
+        name: product.name,
+        price: product.price,
+        stock: product.stock || 0,
+        status: product.status,
+        createdAt: product.createdAt,
+      }));
 
       res.json({
         success: true,
-        data: paginatedProducts,
-        total: filteredProducts.length,
+        data: formattedProducts,
+        total,
         page: pageNum,
         pageSize: limitNum,
-        totalPages: Math.ceil(filteredProducts.length / limitNum),
+        totalPages: Math.ceil(total / limitNum),
       });
     } catch (error) {
       logger.error('Error fetching vendor products:', error);
@@ -657,37 +668,58 @@ export class VendorController {
         });
       }
 
-      // Mock sales report data - replace with actual sales data aggregation
-      const reportData = [];
-      const days = groupBy === 'month' ? 30 : groupBy === 'week' ? 7 : 1;
-      const periods = 10;
-
-      for (let i = 0; i < periods; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i * days);
-        
-        reportData.push({
-          period: date.toISOString().split('T')[0],
-          totalSales: Math.floor(Math.random() * 50),
-          totalRevenue: Math.random() * 1000000,
-          totalCommission: Math.random() * 100000,
-          avgOrderValue: Math.random() * 50000,
-        });
+      // Fetch actual sales data from database
+      const orderRepository = AppDataSource.getRepository('Order');
+      
+      const queryBuilder = orderRepository.createQueryBuilder('order')
+        .where('order.vendorId = :vendorId', { vendorId: id });
+      
+      if (startDate) {
+        queryBuilder.andWhere('order.createdAt >= :startDate', { startDate });
       }
+      if (endDate) {
+        queryBuilder.andWhere('order.createdAt <= :endDate', { endDate });
+      }
+
+      // Group by period
+      let groupByClause = "DATE_TRUNC('day', order.createdAt)";
+      if (groupBy === 'week') {
+        groupByClause = "DATE_TRUNC('week', order.createdAt)";
+      } else if (groupBy === 'month') {
+        groupByClause = "DATE_TRUNC('month', order.createdAt)";
+      }
+
+      const reportData = await queryBuilder
+        .select(groupByClause, 'period')
+        .addSelect('COUNT(order.id)', 'totalSales')
+        .addSelect('SUM(order.totalAmount)', 'totalRevenue')
+        .addSelect('SUM(order.commissionAmount)', 'totalCommission')
+        .groupBy('period')
+        .orderBy('period', 'DESC')
+        .limit(10)
+        .getRawMany();
+
+      const formattedData = reportData.map(row => ({
+        period: row.period,
+        totalSales: parseInt(row.totalSales) || 0,
+        totalRevenue: parseFloat(row.totalRevenue) || 0,
+        totalCommission: parseFloat(row.totalCommission) || 0,
+        avgOrderValue: row.totalSales > 0 ? (parseFloat(row.totalRevenue) / parseInt(row.totalSales)) : 0
+      }));
 
       res.json({
         success: true,
         data: {
           vendorId: id,
-          startDate: startDate || reportData[reportData.length - 1].period,
-          endDate: endDate || reportData[0].period,
+          startDate: startDate || (formattedData.length > 0 ? formattedData[formattedData.length - 1].period : null),
+          endDate: endDate || (formattedData.length > 0 ? formattedData[0].period : null),
           groupBy,
-          data: reportData,
+          data: formattedData,
           summary: {
-            totalSales: reportData.reduce((sum, r) => sum + r.totalSales, 0),
-            totalRevenue: reportData.reduce((sum, r) => sum + r.totalRevenue, 0),
-            totalCommission: reportData.reduce((sum, r) => sum + r.totalCommission, 0),
-            avgOrderValue: reportData.reduce((sum, r) => sum + r.avgOrderValue, 0) / reportData.length,
+            totalSales: formattedData.reduce((sum, r) => sum + r.totalSales, 0),
+            totalRevenue: formattedData.reduce((sum, r) => sum + r.totalRevenue, 0),
+            totalCommission: formattedData.reduce((sum, r) => sum + r.totalCommission, 0),
+            avgOrderValue: formattedData.length > 0 ? formattedData.reduce((sum, r) => sum + r.avgOrderValue, 0) / formattedData.length : 0,
           },
         },
       });
@@ -713,48 +745,55 @@ export class VendorController {
 
       const pageNum = parseInt(page as string);
       const limitNum = parseInt(limit as string);
+      const skip = (pageNum - 1) * limitNum;
 
-      // Mock commission data based on period parameter
-      const mockCommissions = [];
-      const periodDate = period ? new Date(period as string) : new Date();
-      const year = periodDate.getFullYear();
-      const month = periodDate.getMonth();
-
-      // Generate sample data for the specified month
-      for (let i = 1; i <= 30; i++) {
-        const vendors = ['vendor-1', 'vendor-2', 'vendor-3', 'vendor-4', 'vendor-5'];
-        const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
-
-        if (vendorId && randomVendor !== vendorId) continue;
-
-        mockCommissions.push({
-          id: `commission-${year}-${month}-${i}`,
-          vendorId: randomVendor,
-          vendorName: `Vendor ${randomVendor.split('-')[1]}`,
-          period: `${year}-${String(month + 1).padStart(2, '0')}`,
-          totalSales: Math.floor(Math.random() * 1000000) + 100000,
-          commissionRate: 0.1 + Math.random() * 0.1, // 10-20%
-          commissionAmount: Math.floor(Math.random() * 100000) + 10000,
-          status: i % 4 === 0 ? 'pending' : 'paid',
-          paidAt: i % 4 === 0 ? null : new Date(year, month, i),
-          createdAt: new Date(year, month, i)
-        });
+      // Build query conditions
+      const where: any = {};
+      
+      if (vendorId) {
+        where.vendorId = vendorId;
+      }
+      
+      if (status) {
+        where.status = status;
+      }
+      
+      if (period) {
+        where.period = period;
       }
 
-      const filteredCommissions = status
-        ? mockCommissions.filter(c => c.status === status)
-        : mockCommissions;
+      // Fetch commissions from database
+      const [commissions, total] = await this.commissionRepository.findAndCount({
+        where,
+        relations: ['vendor', 'vendor.user'],
+        skip,
+        take: limitNum,
+        order: {
+          createdAt: 'DESC'
+        }
+      });
 
-      const start = (pageNum - 1) * limitNum;
-      const paginatedCommissions = filteredCommissions.slice(start, start + limitNum);
+      // Format response
+      const formattedCommissions = commissions.map(commission => ({
+        id: commission.id,
+        vendorId: commission.vendorId,
+        vendorName: commission.vendor?.vendorName || 'Unknown Vendor',
+        period: commission.period,
+        totalSales: commission.totalSales,
+        commissionRate: commission.commissionRate,
+        commissionAmount: commission.commissionAmount,
+        status: commission.status,
+        paidAt: commission.paidAt,
+        createdAt: commission.createdAt
+      }));
 
       res.json({
         success: true,
-        data: paginatedCommissions,
-        total: filteredCommissions.length,
+        data: formattedCommissions,
+        total,
         page: pageNum,
         pageSize: limitNum,
-        totalPages: Math.ceil(filteredCommissions.length / limitNum)
+        totalPages: Math.ceil(total / limitNum)
       });
     } catch (error) {
       logger.error('Error fetching commissions:', error);
@@ -769,17 +808,53 @@ export class VendorController {
   getCommissionStats = async (req: Request, res: Response) => {
     try {
       const { period } = req.query;
-      const periodDate = period ? new Date(period as string) : new Date();
+      
+      // Build query conditions for period
+      const where: any = {};
+      if (period) {
+        where.period = period;
+      }
 
-      // Mock statistics data
+      // Get total commissions
+      const totalResult = await this.commissionRepository
+        .createQueryBuilder('commission')
+        .select('SUM(commission.commissionAmount)', 'total')
+        .where(where)
+        .getRawOne();
+
+      // Get paid commissions
+      const paidResult = await this.commissionRepository
+        .createQueryBuilder('commission')
+        .select('SUM(commission.commissionAmount)', 'total')
+        .where({ ...where, status: 'paid' })
+        .getRawOne();
+
+      // Get pending commissions
+      const pendingResult = await this.commissionRepository
+        .createQueryBuilder('commission')
+        .select('SUM(commission.commissionAmount)', 'total')
+        .where({ ...where, status: 'pending' })
+        .getRawOne();
+
+      // Get vendor counts
+      const totalVendors = await this.vendorRepository.count();
+      const activeVendors = await this.vendorRepository.count({ where: { status: 'active' } });
+
+      // Calculate average commission rate
+      const avgRateResult = await this.commissionRepository
+        .createQueryBuilder('commission')
+        .select('AVG(commission.commissionRate)', 'average')
+        .where(where)
+        .getRawOne();
+
       const stats = {
-        totalCommissions: Math.floor(Math.random() * 5000000) + 1000000, // 1-6M
-        paidCommissions: Math.floor(Math.random() * 4000000) + 800000,   // 0.8-4.8M
-        pendingCommissions: Math.floor(Math.random() * 1000000) + 200000, // 0.2-1.2M
-        totalVendors: Math.floor(Math.random() * 50) + 20, // 20-70 vendors
-        activeVendors: Math.floor(Math.random() * 40) + 15, // 15-55 active
-        averageCommissionRate: 0.12 + Math.random() * 0.08, // 12-20%
-        period: period || `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`
+        totalCommissions: totalResult?.total || 0,
+        paidCommissions: paidResult?.total || 0,
+        pendingCommissions: pendingResult?.total || 0,
+        totalVendors,
+        activeVendors,
+        averageCommissionRate: avgRateResult?.average || 0,
+        period: period || new Date().toISOString().slice(0, 7)
       };
 
       res.json({

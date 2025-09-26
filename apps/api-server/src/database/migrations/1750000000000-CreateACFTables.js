@@ -55,7 +55,7 @@ class CreateACFTables1750000000000 {
                 },
                 {
                     name: 'hideOnScreen',
-                    type: 'simple-array',
+                    type: 'text',
                     isNullable: true
                 },
                 {
