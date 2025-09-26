@@ -44,7 +44,36 @@ export class EcommerceApi {
     })
 
     const response = await unifiedApi.ecommerce.products.list(Object.fromEntries(params))
-    return response.data
+    
+    // API returns data array directly, but we need to wrap it in the expected format
+    if (Array.isArray(response.data?.data)) {
+      // Map API response to match the expected Product interface
+      const products = response.data.data.map((product: any) => ({
+        ...product,
+        title: product.name || product.title, // Map 'name' to 'title'
+        handle: product.slug || product.handle, // Map 'slug' to 'handle'
+        thumbnail: product.featuredImage || product.thumbnail,
+        variants: product.variations || product.variants || [],
+        categories: product.categories || [],
+        created_at: product.createdAt || product.created_at,
+        updated_at: product.updatedAt || product.updated_at,
+      }))
+      
+      return {
+        products: products,
+        total: response.data.total || response.data.data.length,
+        page: page,
+        limit: limit
+      }
+    }
+    
+    // Fallback for unexpected response structure
+    return {
+      products: [],
+      total: 0,
+      page: page,
+      limit: limit
+    }
   }
 
   static async getProduct(productId: string): Promise<ApiResponse<Product>> {
