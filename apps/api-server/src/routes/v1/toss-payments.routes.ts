@@ -115,9 +115,9 @@ router.get('/toss/config', asyncHandler(async (req: Request, res: Response) => {
     success: true,
     data: {
       isConfigured: !!env.getString('TOSS_CLIENT_KEY', ''),
-      clientKey: env.getString('TOSS_CLIENT_KEY', null),
+      clientKey: env.getString('TOSS_CLIENT_KEY', ''),
       mode: env.getString('TOSS_MODE', 'test'),
-      webhookUrl: env.getString('TOSS_WEBHOOK_URL', null)
+      webhookUrl: env.getString('TOSS_WEBHOOK_URL', '')
     }
   });
 }));
