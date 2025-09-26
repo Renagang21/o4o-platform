@@ -12,7 +12,8 @@ import {
   Redo2,
   Plus,
   List,
-  Info
+  Info,
+  Sparkles
 } from 'lucide-react';
 import type { Post } from '@/types/post.types';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaListWordPress from '@/pages/media/MediaListWordPress';
 import ContentTemplates from '@/components/editor/ContentTemplates';
+import AIPageGeneratorModal from '@/components/ai/AIPageGeneratorModal';
 import {
   Dialog,
   DialogContent,
@@ -91,6 +93,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [showListView, setShowListView] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Add refs to track latest state values for save operations
@@ -806,6 +809,27 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </div>
           )}
 
+          {/* AI Generator Button */}
+          {!isMobile && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 text-purple-600 hover:text-purple-700"
+                    onClick={() => setShowAIGenerator(true)}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>AI 페이지 생성</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           {/* View Options - 모바일에서 숨김 */}
           {!isMobile && (
             <TooltipProvider>
@@ -1106,6 +1130,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           />
         </DialogContent>
       </Dialog>
+
+      {/* AI Generator Modal */}
+      <AIPageGeneratorModal
+        isOpen={showAIGenerator}
+        onClose={() => setShowAIGenerator(false)}
+        onGenerate={(generatedBlocks) => {
+          // Merge AI generated blocks with existing blocks
+          const newBlocks = [...blocks, ...generatedBlocks];
+          setBlocks(newBlocks);
+          blocksRef.current = newBlocks;
+          setIsDirty(true);
+          toast.success('AI 페이지가 성공적으로 생성되었습니다!');
+        }}
+      />
     </div>
   );
 };

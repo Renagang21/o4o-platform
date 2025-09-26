@@ -66,7 +66,7 @@
     "@tiptap/starter-kit": "^2.22.0",
     "@types/react-dropzone": "^5.1.0",
     "@types/socket.io-client": "^1.4.36",
-    "@types/uuid": "10.0.0",
+    "@types/uuid": "^10.0.0",
     "@wordpress/block-editor": "14.4.0",
     "@wordpress/blocks": "13.9.0",
     "@wordpress/components": "28.9.0",
