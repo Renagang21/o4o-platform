@@ -1,6 +1,6 @@
-module.exports = {
+module.exports = (ctx) => ({
   plugins: [
     require('tailwindcss'),
     require('autoprefixer'),
   ],
-}
+})

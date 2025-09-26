@@ -102,10 +102,11 @@ export function useCustomizerState(
   
   // Reset section to default
   const resetSection = useCallback(
-    async (section: SettingSection) => {
-      const { getDefaultSettings } = await import('../utils/default-settings');
-      const defaultSettings = getDefaultSettings();
-      contextUpdateSetting(section, defaultSettings[section]);
+    (section: SettingSection) => {
+      import('../utils/default-settings').then(({ getDefaultSettings }) => {
+        const defaultSettings = getDefaultSettings();
+        contextUpdateSetting(section, defaultSettings[section]);
+      });
     },
     [contextUpdateSetting]
   );
