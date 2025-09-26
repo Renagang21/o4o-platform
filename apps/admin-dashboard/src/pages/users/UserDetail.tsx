@@ -47,13 +47,13 @@ export default function UserDetail() {
       setLoading(true);
       
       // Fetch user details
-      const userResponse = await api.get(`/v1/users/${id}`);
+      const userResponse = await api.get(`/api/v1/users/${id}`);
       if (userResponse.data.success) {
         setUser(userResponse.data.data);
       }
 
       // Fetch approval history
-      const historyResponse = await api.get(`/v1/users/${id}/approval-history`);
+      const historyResponse = await api.get(`/api/v1/users/${id}/approval-history`);
       if (historyResponse.data.success) {
         setApprovalHistory(historyResponse.data.data);
       }
@@ -68,7 +68,7 @@ export default function UserDetail() {
 
   const handleApprove = async () => {
     try {
-      await api.post(`/v1/users/${id}/approve`, {
+      await api.post(`/api/v1/users/${id}/approve`, {
         notes: 'Approved via admin dashboard',
       });
       
@@ -83,7 +83,7 @@ export default function UserDetail() {
 
   const handleReject = async () => {
     try {
-      await api.post(`/v1/users/${id}/reject`, {
+      await api.post(`/api/v1/users/${id}/reject`, {
         notes: 'Rejected via admin dashboard',
       });
       

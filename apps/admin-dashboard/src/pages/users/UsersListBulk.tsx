@@ -107,7 +107,7 @@ const UsersListBulk: FC = () => {
       if (statusFilter !== 'all') params.set('status', statusFilter);
       if (searchQuery) params.set('search', searchQuery);
 
-      const response = await authClient.api.get(`/v1/users?${params}`);
+      const response = await authClient.api.get(`/api/v1/users?${params}`);
       // Extract users array from the response
       if (response.data?.data?.users) {
         return response.data.data.users;
@@ -120,7 +120,7 @@ const UsersListBulk: FC = () => {
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map((id: any) => authClient.api.delete(`/v1/users/${id}`)));
+      await Promise.all(ids.map((id: any) => authClient.api.delete(`/api/v1/users/${id}`)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -136,7 +136,7 @@ const UsersListBulk: FC = () => {
   const bulkRoleMutation = useMutation({
     mutationFn: async ({ ids, role }: { ids: string[], role: string }) => {
       await Promise.all(ids.map((id: any) =>
-        authClient.api.put(`/v1/users/${id}`, { roles: [role] })
+        authClient.api.put(`/api/v1/users/${id}`, { roles: [role] })
       ));
     },
     onSuccess: () => {
@@ -153,7 +153,7 @@ const UsersListBulk: FC = () => {
   const sendPasswordResetMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       await Promise.all(ids.map((id: any) =>
-        authClient.api.post(`/v1/users/${id}/send-password-reset`)
+        authClient.api.post(`/api/v1/users/${id}/send-password-reset`)
       ));
     },
     onSuccess: () => {
@@ -167,7 +167,7 @@ const UsersListBulk: FC = () => {
   // Quick Edit mutation
   const quickEditMutation = useMutation({
     mutationFn: async (data: { id: string, name: string, email: string, role: string, status: User['status'] }) => {
-      const response = await authClient.api.put(`/v1/users/${data.id}`, {
+      const response = await authClient.api.put(`/api/v1/users/${data.id}`, {
         firstName: data.name.split(' ')[0],
         lastName: data.name.split(' ').slice(1).join(' ') || '',
         email: data.email,

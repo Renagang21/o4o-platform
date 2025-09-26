@@ -24,7 +24,7 @@ export default function UserStatistics() {
   const fetchStatistics = async () => {
     try {
       setLoading(true);
-      const response = await api.get<{ success: boolean; data: UserStatistics }>('/v1/users/statistics');
+      const response = await api.get<{ success: boolean; data: UserStatistics }>('/api/v1/users/statistics');
       
       if (response.data.success) {
         // Save previous stats for comparison

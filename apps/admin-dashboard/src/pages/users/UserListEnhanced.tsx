@@ -87,7 +87,7 @@ export default function UserListEnhanced() {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/v1/users?${params}`);
+      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/api/v1/users?${params}`);
       
       if (response.data.success) {
         setUsers(response.data.data.users);
@@ -116,14 +116,14 @@ export default function UserListEnhanced() {
     try {
       switch (action) {
         case 'approve':
-          await api.post('/v1/users/bulk-approve', {
+          await api.post('/api/v1/users/bulk-approve', {
             userIds: selectedUsers,
             notes: 'Bulk approved via admin dashboard',
           });
           success(`${selectedUsers.length} users approved successfully.`);
           break;
         case 'delete':
-          await api.post('/v1/users/bulk-delete', { userIds: selectedUsers });
+          await api.post('/api/v1/users/bulk-delete', { userIds: selectedUsers });
           success(`${selectedUsers.length} users deleted.`);
           break;
       }
@@ -137,7 +137,7 @@ export default function UserListEnhanced() {
   // Individual user actions
   const handleApprove = async (userId: string) => {
     try {
-      await api.post(`/v1/users/${userId}/approve`);
+      await api.post(`/api/v1/users/${userId}/approve`);
       success('User approved successfully.');
       fetchUsers();
     } catch (err: any) {
@@ -148,7 +148,7 @@ export default function UserListEnhanced() {
   const handleDelete = async (userId: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
       try {
-        await api.delete(`/v1/users/${userId}`);
+        await api.delete(`/api/v1/users/${userId}`);
         success('User deleted.');
         fetchUsers();
       } catch (err: any) {

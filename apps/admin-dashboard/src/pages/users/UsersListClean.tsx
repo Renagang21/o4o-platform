@@ -86,7 +86,7 @@ const UsersListClean = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await authClient.api.get('/v1/users');
+        const response = await authClient.api.get('/api/v1/users');
 
         // Check for both direct data and nested data structure
         const userData = response.data?.data?.users || response.data?.data || response.data || [];
@@ -230,7 +230,7 @@ const UsersListClean = () => {
         // API call to delete users
         await Promise.all(
           Array.from(selectedUsers).map(id => 
-            authClient.api.delete(`/v1/users/${id}`)
+            authClient.api.delete(`/api/v1/users/${id}`)
           )
         );
         
@@ -248,7 +248,7 @@ const UsersListClean = () => {
       try {
         await Promise.all(
           Array.from(selectedUsers).map(id => 
-            authClient.api.patch(`/v1/users/${id}`, { role: newRole })
+            authClient.api.patch(`/api/v1/users/${id}`, { role: newRole })
           )
         );
         
@@ -278,7 +278,7 @@ const UsersListClean = () => {
 
   const handleQuickEditSave = async () => {
     try {
-      await authClient.api.patch(`/v1/users/${quickEditId}`, quickEditData);
+      await authClient.api.patch(`/api/v1/users/${quickEditId}`, quickEditData);
       
       setUsers(prev => prev.map(u => 
         u.id === quickEditId 
@@ -319,7 +319,7 @@ const UsersListClean = () => {
     }
 
     try {
-      await authClient.api.delete(`/v1/users/${userId}`);
+      await authClient.api.delete(`/api/v1/users/${userId}`);
       setUsers(prev => prev.filter(u => u.id !== userId));
       toast.success('User deleted successfully');
     } catch (error) {

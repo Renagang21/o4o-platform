@@ -76,8 +76,8 @@ export default function RoleManagement() {
     try {
       setLoading(true);
       const [rolesResponse, permissionsResponse] = await Promise.all([
-        api.get('/v1/users/roles'),
-        api.get('/v1/users/permissions'),
+        api.get('/api/v1/users/roles'),
+        api.get('/api/v1/users/permissions'),
       ]);
 
       if (rolesResponse.data.success) {
@@ -99,10 +99,10 @@ export default function RoleManagement() {
     
     try {
       if (editingRole) {
-        await api.put(`/v1/users/roles/${editingRole.id}`, formData);
+        await api.put(`/api/v1/users/roles/${editingRole.id}`, formData);
         toast.success('Role updated successfully');
       } else {
-        await api.post('/v1/users/roles', formData);
+        await api.post('/api/v1/users/roles', formData);
         toast.success('Role created successfully');
       }
       
@@ -140,7 +140,7 @@ export default function RoleManagement() {
 
     if (confirm(`Are you sure you want to delete the role "${role.displayName}"?`)) {
       try {
-        await api.delete(`/v1/users/roles/${role.id}`);
+        await api.delete(`/api/v1/users/roles/${role.id}`);
         toast.success('Role deleted successfully');
         fetchData();
       } catch (error) {

@@ -103,7 +103,7 @@ export default function UserStatistics() {
   const fetchStatistics = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/v1/users/statistics?range=${timeRange}`);
+      const response = await api.get(`/api/v1/users/statistics?range=${timeRange}`);
       
       if (response.data.success) {
         setStats(response.data.data);

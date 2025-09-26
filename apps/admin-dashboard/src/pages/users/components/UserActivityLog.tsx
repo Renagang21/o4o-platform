@@ -79,7 +79,7 @@ export default function UserActivityLog({ userId }: UserActivityLogProps) {
   const fetchActivities = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/v1/users/${userId}/activity-log?page=${page}&limit=20`);
+      const response = await api.get(`/api/v1/users/${userId}/activity-log?page=${page}&limit=20`);
       
       if (response.data.success) {
         if (page === 1) {

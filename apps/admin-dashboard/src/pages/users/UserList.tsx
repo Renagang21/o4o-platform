@@ -76,7 +76,7 @@ const UserList: FC = () => {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/v1/users?${params}`);
+      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/api/v1/users?${params}`);
       
       if (response.data.success) {
         setUsers(response.data.data.users);
@@ -97,7 +97,7 @@ const UserList: FC = () => {
   // Bulk approve mutation
   const handleBulkApprove = async (userIds: string[]) => {
     try {
-      await api.post('/v1/users/bulk-approve', {
+      await api.post('/api/v1/users/bulk-approve', {
         userIds,
         notes: 'Bulk approved via admin dashboard',
       });
@@ -112,7 +112,7 @@ const UserList: FC = () => {
   // Bulk reject mutation
   const handleBulkReject = async (userIds: string[]) => {
     try {
-      await api.post('/v1/users/bulk-reject', {
+      await api.post('/api/v1/users/bulk-reject', {
         userIds,
         notes: 'Bulk rejected via admin dashboard',
       });
@@ -127,7 +127,7 @@ const UserList: FC = () => {
   // Bulk role change mutation
   const handleBulkRoleChange = async (userIds: string[], role: UserRole) => {
     try {
-      await api.post('/v1/users/bulk-role', {
+      await api.post('/api/v1/users/bulk-role', {
         userIds,
         role,
       });
@@ -142,7 +142,7 @@ const UserList: FC = () => {
   // Individual user actions
   const handleApprove = async (userId: string) => {
     try {
-      await api.post(`/v1/users/${userId}/approve`);
+      await api.post(`/api/v1/users/${userId}/approve`);
       toast.success('User approved successfully');
       fetchUsers();
     } catch (error) {
@@ -152,7 +152,7 @@ const UserList: FC = () => {
 
   const handleReject = async (userId: string) => {
     try {
-      await api.post(`/v1/users/${userId}/reject`);
+      await api.post(`/api/v1/users/${userId}/reject`);
       toast.success('User rejected successfully');
       fetchUsers();
     } catch (error) {
@@ -163,7 +163,7 @@ const UserList: FC = () => {
   const handleDelete = async (userId: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
       try {
-        await api.delete(`/v1/users/${userId}`);
+        await api.delete(`/api/v1/users/${userId}`);
         toast.success('User deleted successfully');
         fetchUsers();
       } catch (error) {
@@ -180,7 +180,7 @@ const UserList: FC = () => {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get(`/v1/users/export/csv?${params}`, {
+      const response = await api.get(`/api/v1/users/export/csv?${params}`, {
         responseType: 'blob',
       });
 

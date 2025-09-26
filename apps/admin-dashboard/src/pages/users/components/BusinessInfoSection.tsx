@@ -110,7 +110,7 @@ export default function BusinessInfoSection({ userId, userRole, onBusinessInfoCh
   const fetchBusinessInfo = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/v1/users/${userId}/business-info`);
+      const response = await api.get(`/api/v1/users/${userId}/business-info`);
       
       if (response.data.success) {
         setBusinessInfo(response.data.data);
@@ -145,10 +145,10 @@ export default function BusinessInfoSection({ userId, userRole, onBusinessInfoCh
       setSaving(true);
       
       if (businessInfo.id) {
-        await api.put(`/v1/users/${userId}/business-info`, businessInfo);
+        await api.put(`/api/v1/users/${userId}/business-info`, businessInfo);
         toast.success('Business information updated successfully');
       } else {
-        const response = await api.post(`/v1/users/${userId}/business-info`, businessInfo);
+        const response = await api.post(`/api/v1/users/${userId}/business-info`, businessInfo);
         setBusinessInfo(response.data.data);
         toast.success('Business information created successfully');
       }
