@@ -14,6 +14,7 @@ import {
 import { useProduct, useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
 import { Product } from '@/types/ecommerce';
 import ProductVariantManager from '@/components/ecommerce/ProductVariantManager';
+import ProductImageGallery from '@/components/ecommerce/ProductImageGallery';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { RichText } from '@/components/editor/gutenberg/RichText';
@@ -72,6 +73,7 @@ const ProductForm: FC = () => {
     featured: false,
     tags: [],
     images: [],
+    thumbnail: '',
     metaTitle: '',
     metaDescription: '',
     categories: [],
@@ -1187,42 +1189,32 @@ const ProductForm: FC = () => {
 
           {/* Images */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <ImageIcon className="w-5 h-5 mr-2" />
-              상품 이미지
-            </h2>
-            
-            <div className="space-y-3">
-              {formData.images && formData.images.length > 0 ? (
-                formData.images.map((image, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={image.url}
-                      alt={image.alt || ''}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const newImages = [...(formData.images || [])];
-                        newImages.splice(index, 1);
-                        handleInputChange('images', newImages);
-                      }}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">
-                    클릭하여 이미지를 업로드하세요
-                  </p>
-                </div>
-              )}
-            </div>
+            <ProductImageGallery
+              images={formData.images?.map((img: any) => ({
+                id: img.id || img.url,
+                url: img.url,
+                alt: img.alt,
+                title: img.title,
+                isFeatured: img.isFeatured || false,
+                position: img.position
+              })) || []}
+              onImagesChange={(newImages) => {
+                // Update formData with new images
+                const images = newImages.map((img, index) => ({
+                  ...img,
+                  position: index
+                }));
+                handleInputChange('images', images);
+                
+                // Set first image as thumbnail
+                if (images.length > 0) {
+                  handleInputChange('thumbnail', images[0].url);
+                } else {
+                  handleInputChange('thumbnail', '');
+                }
+              }}
+              maxImages={10}
+            />
           </div>
 
           {/* SEO */}
