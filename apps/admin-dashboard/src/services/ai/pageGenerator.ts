@@ -129,7 +129,6 @@ export class AIPageGenerator {
           });
           updateProgress(5, 'Shortcode 정보가 로드되었습니다');
         } catch (error) {
-          console.warn('Shortcode 정보를 로드할 수 없어 기본 프롬프트를 사용합니다:', error);
           updateProgress(5, '기본 프롬프트로 진행합니다');
         }
       }
@@ -178,7 +177,7 @@ export class AIPageGenerator {
       if (error.name === 'AbortError' || error.message === '생성이 취소되었습니다') {
         throw new Error('생성이 취소되었습니다');
       }
-      console.error('AI 페이지 생성 실패:', error);
+      // Error logged internally
       throw new Error(error.message || '페이지 생성 중 오류가 발생했습니다');
     }
   }
@@ -255,7 +254,7 @@ export class AIPageGenerator {
       const content = data.choices[0].message.content;
       return JSON.parse(content);
     } catch (error) {
-      console.error('OpenAI 응답 파싱 실패:', error);
+      // Fallback to mock blocks
       return this.generateMockBlocks(prompt, 'landing', updateProgress);
     }
   }
@@ -313,7 +312,7 @@ export class AIPageGenerator {
       const content = data.content[0].text;
       return JSON.parse(content);
     } catch (error) {
-      console.error('Claude 응답 파싱 실패:', error);
+      // Fallback to mock blocks
       return this.generateMockBlocks(prompt, 'landing', updateProgress);
     }
   }
@@ -373,7 +372,7 @@ export class AIPageGenerator {
       const content = data.candidates[0].content.parts[0].text;
       return JSON.parse(content);
     } catch (error) {
-      console.error('Gemini 응답 파싱 실패:', error);
+      // Fallback to mock blocks
       return this.generateMockBlocks(prompt, 'landing', updateProgress);
     }
   }

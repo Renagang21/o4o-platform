@@ -59,8 +59,6 @@ class ShortcodeIntegratorService {
     }
 
     try {
-      console.log('🔄 Loading shortcodes from API...');
-      
       const response = await authClient.api.get<{
         success: boolean;
         data: ShortcodeRegistryResponse;
@@ -71,17 +69,13 @@ class ShortcodeIntegratorService {
         this.categories = response.data.data.categories;
         this.cacheExpiry = new Date(Date.now() + this.CACHE_DURATION);
         
-        console.log(`✅ Loaded ${this.shortcodeCache.length} shortcodes`);
         return this.shortcodeCache;
       } else {
         throw new Error('Failed to load shortcodes');
       }
     } catch (error) {
-      console.error('❌ Failed to load shortcodes:', error);
-      
       // 캐시된 데이터가 있으면 사용
       if (this.shortcodeCache.length > 0) {
-        console.log('📦 Using cached shortcodes');
         return this.shortcodeCache;
       }
       
@@ -245,7 +239,6 @@ Provide a complete HTML page structure with embedded shortcodes that fulfills th
     this.shortcodeCache = [];
     this.categories = [];
     this.cacheExpiry = null;
-    console.log('🗑️ Shortcode cache invalidated');
   }
 
   /**
