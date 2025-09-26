@@ -1136,10 +1136,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         isOpen={showAIGenerator}
         onClose={() => setShowAIGenerator(false)}
         onGenerate={(generatedBlocks) => {
-          // Merge AI generated blocks with existing blocks
-          const newBlocks = [...blocks, ...generatedBlocks];
-          setBlocks(newBlocks);
-          blocksRef.current = newBlocks;
+          // Replace existing blocks with AI generated blocks (or merge if preferred)
+          setBlocks(generatedBlocks);
+          blocksRef.current = generatedBlocks;
           setIsDirty(true);
           toast.success('AI 페이지가 성공적으로 생성되었습니다!');
         }}

@@ -21,6 +21,19 @@ export interface PageTemplate {
   exampleBlocks?: Block[];
 }
 
+// 진행률 콜백 타입
+export interface ProgressCallback {
+  (progress: number, message: string): void;
+}
+
+// 생성 옵션 타입
+export interface GenerateOptions {
+  prompt: string;
+  template: keyof typeof PAGE_TEMPLATES;
+  onProgress?: ProgressCallback;
+  signal?: AbortSignal;
+}
+
 // 페이지 템플릿 정의
 const PAGE_TEMPLATES: Record<string, PageTemplate> = {
   landing: {
@@ -71,44 +84,84 @@ const PAGE_TEMPLATES: Record<string, PageTemplate> = {
 
 export class AIPageGenerator {
   private provider: AIProvider;
+  private abortController?: AbortController;
 
   constructor(provider: AIProvider) {
     this.provider = provider;
   }
 
   /**
-   * 프롬프트를 기반으로 페이지 블록을 생성합니다
+   * 프롬프트를 기반으로 페이지 블록을 생성합니다 (개선된 버전)
    */
-  async generateBlocks(
+  async generateBlocks(options: GenerateOptions): Promise<Block[]> {
+    const { prompt, template = 'landing', onProgress, signal } = options;
+    const pageTemplate = PAGE_TEMPLATES[template];
+    
+    // 진행률 업데이트 헬퍼
+    const updateProgress = (progress: number, message: string) => {
+      if (onProgress) {
+        onProgress(progress, message);
+      }
+    };
+
+    try {
+      // 1단계: AI 모델 연결 (20%)
+      updateProgress(10, 'AI 모델에 연결 중...');
+      
+      // AbortSignal 체크
+      if (signal?.aborted) {
+        throw new Error('생성이 취소되었습니다');
+      }
+
+      let blocks: Block[] = [];
+
+      // 2단계: 프롬프트 처리 (40%)
+      updateProgress(20, '프롬프트를 처리하고 있습니다...');
+      
+      switch (this.provider.name) {
+        case 'openai':
+          blocks = await this.generateWithOpenAI(prompt, pageTemplate, updateProgress, signal);
+          break;
+        case 'claude':
+          blocks = await this.generateWithClaude(prompt, pageTemplate, updateProgress, signal);
+          break;
+        case 'gemini':
+          blocks = await this.generateWithGemini(prompt, pageTemplate, updateProgress, signal);
+          break;
+        default:
+          // 테스트/개발용 모의 생성
+          updateProgress(30, '테스트 데이터를 생성 중...');
+          blocks = await this.generateMockBlocks(prompt, template, updateProgress);
+      }
+
+      // 3단계: 블록 검증 및 정규화 (30%)
+      updateProgress(70, '생성된 블록을 검증하고 있습니다...');
+      blocks = this.validateAndNormalizeBlocks(blocks);
+
+      // 4단계: 완료 (10%)
+      updateProgress(90, '페이지 생성을 완료하고 있습니다...');
+      
+      // 완료
+      updateProgress(100, '페이지가 성공적으로 생성되었습니다!');
+      
+      return blocks;
+    } catch (error: any) {
+      if (error.name === 'AbortError' || error.message === '생성이 취소되었습니다') {
+        throw new Error('생성이 취소되었습니다');
+      }
+      console.error('AI 페이지 생성 실패:', error);
+      throw new Error(error.message || '페이지 생성 중 오류가 발생했습니다');
+    }
+  }
+
+  /**
+   * 이전 버전과의 호환성을 위한 래퍼 메서드
+   */
+  async generateBlocksLegacy(
     prompt: string,
     template: keyof typeof PAGE_TEMPLATES = 'landing'
   ): Promise<Block[]> {
-    const pageTemplate = PAGE_TEMPLATES[template];
-    
-    try {
-      let blocks: Block[] = [];
-
-      switch (this.provider.name) {
-        case 'openai':
-          blocks = await this.generateWithOpenAI(prompt, pageTemplate);
-          break;
-        case 'claude':
-          blocks = await this.generateWithClaude(prompt, pageTemplate);
-          break;
-        case 'gemini':
-          blocks = await this.generateWithGemini(prompt, pageTemplate);
-          break;
-        default:
-          // 개발/테스트용 모의 생성
-          blocks = this.generateMockBlocks(prompt, template);
-      }
-
-      // 블록 ID 생성 및 검증
-      return this.validateAndNormalizeBlocks(blocks);
-    } catch (error) {
-      console.error('AI 페이지 생성 실패:', error);
-      throw new Error('페이지 생성 중 오류가 발생했습니다');
-    }
+    return this.generateBlocks({ prompt, template });
   }
 
   /**
@@ -116,11 +169,15 @@ export class AIPageGenerator {
    */
   private async generateWithOpenAI(
     prompt: string,
-    template: PageTemplate
+    template: PageTemplate,
+    updateProgress: (progress: number, message: string) => void,
+    signal?: AbortSignal
   ): Promise<Block[]> {
     if (!this.provider.apiKey) {
       throw new Error('OpenAI API 키가 설정되지 않았습니다');
     }
+
+    updateProgress(30, 'OpenAI GPT-4에 요청을 전송 중...');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -152,7 +209,10 @@ export class AIPageGenerator {
         ],
         temperature: 0.7,
       }),
+      signal,
     });
+
+    updateProgress(50, 'AI 응답을 처리하고 있습니다...');
 
     const data = await response.json();
     
@@ -160,12 +220,14 @@ export class AIPageGenerator {
       throw new Error(data.error?.message || 'OpenAI API 오류');
     }
 
+    updateProgress(60, '블록 데이터를 파싱하고 있습니다...');
+
     try {
       const content = data.choices[0].message.content;
       return JSON.parse(content);
     } catch (error) {
       console.error('OpenAI 응답 파싱 실패:', error);
-      return this.generateMockBlocks(prompt, 'landing');
+      return this.generateMockBlocks(prompt, 'landing', updateProgress);
     }
   }
 
@@ -174,11 +236,15 @@ export class AIPageGenerator {
    */
   private async generateWithClaude(
     prompt: string,
-    template: PageTemplate
+    template: PageTemplate,
+    updateProgress: (progress: number, message: string) => void,
+    signal?: AbortSignal
   ): Promise<Block[]> {
     if (!this.provider.apiKey) {
       throw new Error('Claude API 키가 설정되지 않았습니다');
     }
+
+    updateProgress(30, 'Claude AI에 요청을 전송 중...');
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -201,7 +267,10 @@ export class AIPageGenerator {
           },
         ],
       }),
+      signal,
     });
+
+    updateProgress(50, 'Claude 응답을 처리하고 있습니다...');
 
     const data = await response.json();
     
@@ -209,12 +278,14 @@ export class AIPageGenerator {
       throw new Error(data.error?.message || 'Claude API 오류');
     }
 
+    updateProgress(60, '블록 데이터를 파싱하고 있습니다...');
+
     try {
       const content = data.content[0].text;
       return JSON.parse(content);
     } catch (error) {
       console.error('Claude 응답 파싱 실패:', error);
-      return this.generateMockBlocks(prompt, 'landing');
+      return this.generateMockBlocks(prompt, 'landing', updateProgress);
     }
   }
 
@@ -223,11 +294,15 @@ export class AIPageGenerator {
    */
   private async generateWithGemini(
     prompt: string,
-    template: PageTemplate
+    template: PageTemplate,
+    updateProgress: (progress: number, message: string) => void,
+    signal?: AbortSignal
   ): Promise<Block[]> {
     if (!this.provider.apiKey) {
       throw new Error('Gemini API 키가 설정되지 않았습니다');
     }
+
+    updateProgress(30, 'Google Gemini에 요청을 전송 중...');
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.provider.apiKey}`,
@@ -251,8 +326,11 @@ export class AIPageGenerator {
             },
           ],
         }),
+        signal,
       }
     );
+
+    updateProgress(50, 'Gemini 응답을 처리하고 있습니다...');
 
     const data = await response.json();
     
@@ -260,19 +338,38 @@ export class AIPageGenerator {
       throw new Error(data.error?.message || 'Gemini API 오류');
     }
 
+    updateProgress(60, '블록 데이터를 파싱하고 있습니다...');
+
     try {
       const content = data.candidates[0].content.parts[0].text;
       return JSON.parse(content);
     } catch (error) {
       console.error('Gemini 응답 파싱 실패:', error);
-      return this.generateMockBlocks(prompt, 'landing');
+      return this.generateMockBlocks(prompt, 'landing', updateProgress);
     }
   }
 
   /**
    * 개발/테스트용 모의 블록 생성
    */
-  private generateMockBlocks(prompt: string, template: string): Block[] {
+  private async generateMockBlocks(
+    prompt: string,
+    template: string,
+    updateProgress?: (progress: number, message: string) => void
+  ): Promise<Block[]> {
+    // 모의 지연을 추가하여 실제 API 호출처럼 보이게 함
+    if (updateProgress) {
+      updateProgress(40, '템플릿을 준비하고 있습니다...');
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    if (updateProgress) {
+      updateProgress(50, '콘텐츠를 생성하고 있습니다...');
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     const blocks: Block[] = [];
 
     // 제목 추가
@@ -282,6 +379,10 @@ export class AIPageGenerator {
       content: { text: prompt },
       attributes: { level: 1, textAlign: 'center' },
     });
+
+    if (updateProgress) {
+      updateProgress(60, '블록을 구성하고 있습니다...');
+    }
 
     // 템플릿별 기본 구조
     switch (template) {
@@ -566,6 +667,15 @@ export class AIPageGenerator {
       name: template.name,
       description: template.description,
     }));
+  }
+
+  /**
+   * 생성 취소
+   */
+  cancel() {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
   }
 }
 

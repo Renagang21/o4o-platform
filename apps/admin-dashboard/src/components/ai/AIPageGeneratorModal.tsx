@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,8 +12,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
-import { AIPageGenerator, AIProvider, Block } from '@/services/ai/pageGenerator';
+import { Progress } from '@/components/ui/progress';
+import { Loader2, Sparkles, AlertCircle, X } from 'lucide-react';
+import { AIPageGenerator, AIProvider, Block, GenerateOptions } from '@/services/ai/pageGenerator';
 
 interface AIPageGeneratorModalProps {
   isOpen: boolean;
@@ -32,6 +33,14 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
   const [apiKey, setApiKey] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 진행률 관련 상태
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
+  
+  // AbortController를 위한 ref
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const generatorRef = useRef<AIPageGenerator | null>(null);
 
   const templates = [
     { key: 'landing', name: '랜딩 페이지', description: '제품이나 서비스를 소개하는 페이지' },
@@ -61,16 +70,36 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
 
     setIsGenerating(true);
     setError(null);
+    setProgress(0);
+    setProgressMessage('준비 중...');
+
+    // AbortController 생성
+    abortControllerRef.current = new AbortController();
 
     try {
       const generator = new AIPageGenerator({
         name: provider === 'mock' ? 'openai' : provider as AIProvider['name'],
         apiKey: provider === 'mock' ? undefined : apiKey,
       });
+      
+      generatorRef.current = generator;
+
+      // 진행률 콜백
+      const onProgress = (progress: number, message: string) => {
+        setProgress(progress);
+        setProgressMessage(message);
+      };
+
+      const options: GenerateOptions = {
+        prompt,
+        template: template as any,
+        onProgress,
+        signal: abortControllerRef.current.signal,
+      };
 
       const blocks = provider === 'mock' 
-        ? generator['generateMockBlocks'](prompt, template)
-        : await generator.generateBlocks(prompt, template as any);
+        ? await generator.generateBlocks(options)
+        : await generator.generateBlocks(options);
 
       onGenerate(blocks);
       onClose();
@@ -78,11 +107,38 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
       // 성공 후 초기화
       setPrompt('');
       setApiKey('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'AI 생성 중 오류가 발생했습니다.');
+      setProgress(0);
+      setProgressMessage('');
+    } catch (err: any) {
+      if (err.message === '생성이 취소되었습니다') {
+        setError('생성이 취소되었습니다.');
+      } else {
+        setError(err instanceof Error ? err.message : 'AI 생성 중 오류가 발생했습니다.');
+      }
     } finally {
       setIsGenerating(false);
+      abortControllerRef.current = null;
+      generatorRef.current = null;
     }
+  };
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    if (generatorRef.current) {
+      generatorRef.current.cancel();
+    }
+    setIsGenerating(false);
+    setProgress(0);
+    setProgressMessage('');
+  };
+
+  const handleClose = () => {
+    if (isGenerating) {
+      handleCancel();
+    }
+    onClose();
   };
 
   const examplePrompts = {
@@ -93,133 +149,168 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-500" />
-            AI 페이지 생성
+          <DialogTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-500" />
+              AI 페이지 생성
+            </div>
+            {isGenerating && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancel}
+                className="text-red-500 hover:text-red-700"
+              >
+                <X className="h-4 w-4 mr-1" />
+                취소
+              </Button>
+            )}
           </DialogTitle>
           <DialogDescription>
             AI가 자동으로 페이지 콘텐츠를 생성합니다.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          {/* 템플릿 선택 */}
-          <div className="space-y-2">
-            <Label htmlFor="template">템플릿</Label>
-            <Select value={template} onValueChange={setTemplate}>
-              <SelectTrigger id="template">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {templates.map((t) => (
-                  <SelectItem key={t.key} value={t.key}>
-                    <div>
-                      <div className="font-medium">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.description}</div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* AI 프로바이더 선택 */}
-          <div className="space-y-2">
-            <Label htmlFor="provider">AI 모델</Label>
-            <Select value={provider} onValueChange={(v) => setProvider(v as AIProvider['name'])}>
-              <SelectTrigger id="provider">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {providers.map((p) => (
-                  <SelectItem key={p.key} value={p.key}>
-                    <div className="flex items-center gap-2">
-                      <span>{p.name}</span>
-                      {!p.requiresKey && (
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">
-                          무료
-                        </span>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* API 키 입력 (필요한 경우) */}
-          {providers.find(p => p.key === provider)?.requiresKey && (
-            <div className="space-y-2">
-              <Label htmlFor="apiKey">API 키</Label>
-              <input
-                id="apiKey"
-                type="password"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder={`${provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'AIza...'}`}
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                API 키는 브라우저에만 저장되며 서버로 전송되지 않습니다.
-              </p>
+        {isGenerating ? (
+          // 진행 중 화면
+          <div className="space-y-4 py-8">
+            <div className="text-center space-y-2">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-500" />
+              <p className="text-sm font-medium">{progressMessage}</p>
+              <p className="text-xs text-muted-foreground">잠시만 기다려주세요...</p>
             </div>
-          )}
+            
+            <div className="space-y-2">
+              <Progress value={progress} className="h-2" />
+              <p className="text-center text-sm text-muted-foreground">{progress}%</p>
+            </div>
 
-          {/* 프롬프트 입력 */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="prompt">페이지 내용 설명</Label>
+            <div className="text-center">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                onClick={() => setPrompt(examplePrompts[template as keyof typeof examplePrompts])}
+                onClick={handleCancel}
+                className="text-red-600 border-red-200 hover:bg-red-50"
               >
-                예시 사용
+                <X className="h-4 w-4 mr-1" />
+                생성 취소
               </Button>
             </div>
-            <Textarea
-              id="prompt"
-              placeholder="어떤 페이지를 만들까요? 자세히 설명해주세요..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              rows={5}
-              className="resize-none"
-            />
-            <p className="text-xs text-muted-foreground">
-              페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.
-            </p>
           </div>
+        ) : (
+          // 입력 화면
+          <div className="space-y-4 py-4">
+            {/* 템플릿 선택 */}
+            <div className="space-y-2">
+              <Label htmlFor="template">템플릿</Label>
+              <Select value={template} onValueChange={setTemplate}>
+                <SelectTrigger id="template">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((t) => (
+                    <SelectItem key={t.key} value={t.key}>
+                      <div>
+                        <div className="font-medium">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.description}</div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* 에러 메시지 */}
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </div>
+            {/* AI 프로바이더 선택 */}
+            <div className="space-y-2">
+              <Label htmlFor="provider">AI 모델</Label>
+              <Select value={provider} onValueChange={(v) => setProvider(v as AIProvider['name'])}>
+                <SelectTrigger id="provider">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {providers.map((p) => (
+                    <SelectItem key={p.key} value={p.key}>
+                      <div className="flex items-center gap-2">
+                        <span>{p.name}</span>
+                        {!p.requiresKey && (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">
+                            무료
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isGenerating}>
-            취소
-          </Button>
-          <Button onClick={handleGenerate} disabled={isGenerating}>
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                생성 중...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                페이지 생성
-              </>
+            {/* API 키 입력 (필요한 경우) */}
+            {providers.find(p => p.key === provider)?.requiresKey && (
+              <div className="space-y-2">
+                <Label htmlFor="apiKey">API 키</Label>
+                <input
+                  id="apiKey"
+                  type="password"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder={`${provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'AIza...'}`}
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  API 키는 브라우저에만 저장되며 서버로 전송되지 않습니다.
+                </p>
+              </div>
             )}
-          </Button>
-        </DialogFooter>
+
+            {/* 프롬프트 입력 */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="prompt">페이지 내용 설명</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPrompt(examplePrompts[template as keyof typeof examplePrompts])}
+                >
+                  예시 사용
+                </Button>
+              </div>
+              <Textarea
+                id="prompt"
+                placeholder="어떤 페이지를 만들까요? 자세히 설명해주세요..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                rows={5}
+                className="resize-none"
+              />
+              <p className="text-xs text-muted-foreground">
+                페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.
+              </p>
+            </div>
+
+            {/* 에러 메시지 */}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+        )}
+
+        {!isGenerating && (
+          <DialogFooter>
+            <Button variant="outline" onClick={handleClose}>
+              취소
+            </Button>
+            <Button onClick={handleGenerate}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              페이지 생성
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
