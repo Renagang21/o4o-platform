@@ -16,7 +16,7 @@ export class UserApi {
       )
     })
 
-    const response = await unifiedApi.raw.get(`/api/api/v1/users?${params}`)
+    const response = await unifiedApi.raw.get(`/api/v1/users?${params}`)
     return response.data
   }
 
@@ -35,17 +35,17 @@ export class UserApi {
       params.append('businessType', businessType)
     }
 
-    const response = await unifiedApi.raw.get(`/api/api/v1/users?${params}`)
+    const response = await unifiedApi.raw.get(`/api/v1/users?${params}`)
     return response.data
   }
 
   static async getUser(userId: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.get(`/api/api/v1/users/${userId}`)
+    const response = await unifiedApi.raw.get(`/api/v1/users/${userId}`)
     return response.data
   }
 
   static async createUser(userData: UserFormData): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post('/api/api/v1/users', userData)
+    const response = await unifiedApi.raw.post('/api/v1/users', userData)
     return response.data
   }
 
