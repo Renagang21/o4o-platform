@@ -809,36 +809,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </div>
           )}
 
-          {/* AI Generator Button */}
-          {isMobile ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-purple-600 hover:text-purple-700"
-              onClick={() => setShowAIGenerator(true)}
-              aria-label="AI 페이지 생성"
-            >
-              <Sparkles className="h-4 w-4" />
-            </Button>
-          ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 text-purple-600 hover:text-purple-700"
-                    onClick={() => setShowAIGenerator(true)}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>AI 페이지 생성</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
 
           {/* View Options - 모바일에서 숨김 */}
           {!isMobile && (
@@ -927,6 +897,28 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             {postSettings.status === 'publish' ? 'Update' : 'Publish'}
           </Button>
           
+          {/* AI Generator */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    isMobile ? "h-8 w-8" : "h-9 w-9",
+                    "text-purple-600 hover:text-purple-700"
+                  )}
+                  onClick={() => setShowAIGenerator(true)}
+                >
+                  <Sparkles className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>AI 페이지 생성</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {/* Settings */}
           <TooltipProvider>
             <Tooltip>
@@ -967,10 +959,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem onClick={() => setShowAIGenerator(true)}>
-                <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
-                AI 페이지 생성
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setShowTemplates(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add template
