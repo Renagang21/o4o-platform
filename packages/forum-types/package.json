@@ -24,7 +24,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "24.2.1",
-    "eslint": "9.33.0",
+    "eslint": "9.36.0",
     "typescript": "5.4.5"
   },
   "dependencies": {
