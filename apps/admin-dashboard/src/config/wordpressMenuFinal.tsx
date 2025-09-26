@@ -197,20 +197,14 @@ export const wordpressMenuItems: MenuItem[] = [
   },
   {
     id: 'cpt-engine',
-    label: 'CPT 콘텐츠 엔진',
-    icon: <FileCode className="w-5 h-5" />,
-    path: '/cpt-engine'
-  },
-  {
-    id: 'cpt-acf',
-    label: 'CPT & ACF',
-    icon: <FileCode className="w-5 h-5" />,
+    label: 'CPT 엔진',
+    icon: <Package className="w-5 h-5" />,
     children: [
-      { id: 'cpt-types', label: 'Custom Post Types', icon: <FileCode className="w-4 h-4" />, path: '/cpt' },
-      { id: 'acf-fields', label: 'Custom Fields', icon: <FileCode className="w-4 h-4" />, path: '/acf' },
-      { id: 'acf-groups', label: 'Field Groups', icon: <FileCode className="w-4 h-4" />, path: '/acf/groups' },
-      { id: 'forms', label: 'Forms', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/forms' },
-      { id: 'shortcodes', label: 'Shortcodes', icon: <Code className="w-4 h-4" />, path: '/content/shortcodes' }
+      { id: 'cpt-dashboard', label: '대시보드', icon: <LayoutDashboard className="w-4 h-4" />, path: '/cpt-engine' },
+      { id: 'cpt-types', label: 'Post Types', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine?view=types' },
+      { id: 'cpt-fields', label: 'Custom Fields', icon: <Layout className="w-4 h-4" />, path: '/cpt-engine?view=fields' },
+      { id: 'cpt-taxonomies', label: 'Taxonomies', icon: <Tag className="w-4 h-4" />, path: '/cpt-engine?view=taxonomies' },
+      { id: 'cpt-forms', label: 'Forms', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/forms' }
     ]
   },
   {

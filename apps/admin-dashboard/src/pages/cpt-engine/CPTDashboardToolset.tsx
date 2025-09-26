@@ -48,12 +48,27 @@ export const CPTDashboardToolset = () => {
   const queryClient = useQueryClient();
   const { addNotice } = useAdminNotices();
   
+  // Get view from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewFromUrl = urlParams.get('view') as 'dashboard' | 'types' | 'fields' | 'taxonomies' | 'forms' | null;
+  
   // State management
-  const [activeView, setActiveView] = useState<'dashboard' | 'types' | 'fields' | 'taxonomies' | 'forms'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'types' | 'fields' | 'taxonomies' | 'forms'>(
+    viewFromUrl || 'dashboard'
+  );
   const [selectedType, setSelectedType] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Update view when URL changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view') as 'dashboard' | 'types' | 'fields' | 'taxonomies' | 'forms' | null;
+    if (view && view !== activeView) {
+      setActiveView(view);
+    }
+  }, [window.location.search]);
   
   // Fetch CPT Types
   const { data: cptTypes = [], isLoading: typesLoading } = useQuery({
@@ -119,7 +134,10 @@ export const CPTDashboardToolset = () => {
               <ul className="toolset-nav__list">
                 <li className={`toolset-nav__item ${activeView === 'dashboard' ? 'toolset-nav__item--active' : ''}`}>
                   <button 
-                    onClick={() => setActiveView('dashboard')}
+                    onClick={() => {
+                      setActiveView('dashboard');
+                      navigate('/cpt-engine');
+                    }}
                     className="toolset-nav__link"
                   >
                     <Grid3X3 className="toolset-nav__icon" />
@@ -128,7 +146,10 @@ export const CPTDashboardToolset = () => {
                 </li>
                 <li className={`toolset-nav__item ${activeView === 'types' ? 'toolset-nav__item--active' : ''}`}>
                   <button 
-                    onClick={() => setActiveView('types')}
+                    onClick={() => {
+                      setActiveView('types');
+                      navigate('/cpt-engine?view=types');
+                    }}
                     className="toolset-nav__link"
                   >
                     <Database className="toolset-nav__icon" />
@@ -138,7 +159,10 @@ export const CPTDashboardToolset = () => {
                 </li>
                 <li className={`toolset-nav__item ${activeView === 'fields' ? 'toolset-nav__item--active' : ''}`}>
                   <button 
-                    onClick={() => setActiveView('fields')}
+                    onClick={() => {
+                      setActiveView('fields');
+                      navigate('/cpt-engine?view=fields');
+                    }}
                     className="toolset-nav__link"
                   >
                     <Layers className="toolset-nav__icon" />
@@ -148,7 +172,10 @@ export const CPTDashboardToolset = () => {
                 </li>
                 <li className={`toolset-nav__item ${activeView === 'taxonomies' ? 'toolset-nav__item--active' : ''}`}>
                   <button 
-                    onClick={() => setActiveView('taxonomies')}
+                    onClick={() => {
+                      setActiveView('taxonomies');
+                      navigate('/cpt-engine?view=taxonomies');
+                    }}
                     className="toolset-nav__link"
                   >
                     <Tag className="toolset-nav__icon" />
@@ -158,7 +185,10 @@ export const CPTDashboardToolset = () => {
                 </li>
                 <li className={`toolset-nav__item ${activeView === 'forms' ? 'toolset-nav__item--active' : ''}`}>
                   <button 
-                    onClick={() => setActiveView('forms')}
+                    onClick={() => {
+                      setActiveView('forms');
+                      navigate('/cpt-engine?view=forms');
+                    }}
                     className="toolset-nav__link"
                   >
                     <FileText className="toolset-nav__icon" />
