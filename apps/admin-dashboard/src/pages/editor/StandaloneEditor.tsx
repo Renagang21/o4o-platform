@@ -12,8 +12,7 @@ import {
   Redo2,
   Plus,
   List,
-  Info,
-  Sparkles
+  Info
 } from 'lucide-react';
 import type { Post } from '@/types/post.types';
 import { Button } from '@/components/ui/button';
@@ -175,22 +174,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       if (!data) {
         throw new Error('Invalid post data received');
       }
-      
-      // Store normalized data for debugging (works in production too)
-      if (typeof window !== 'undefined') {
-        (window as any).__DEBUG_NORMALIZED_POST = {
-          id: data.id,
-          title: data.title,
-          slug: data.slug,
-          hasSlug: !!data.slug,
-          slugValue: data.slug || '(empty)',
-          allKeys: Object.keys(data)
-        };
-        
-        // Debug data stored in window for production debugging
-        // Access via browser console: window.__DEBUG_NORMALIZED_POST
-      }
-      
       
       // Extract and set title
       const title = data.title || '';
@@ -395,16 +378,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     const trimmedTitle = postTitle?.trim() || '';
     let trimmedSlug = currentSettings.slug?.trim() || '';
-    
-    // For debugging in production
-    if (typeof window !== 'undefined') {
-      (window as any).__DEBUG_SAVE_SLUG = {
-        original: currentSettings.slug,
-        trimmed: trimmedSlug,
-        postId: currentPostId,
-        title: trimmedTitle
-      };
-    }
     
     // Auto-generate slug from title if empty (for non-Korean titles)
     // Only for new posts, not updates
@@ -1027,37 +1000,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 </Button>
               </div>
             )}
-            {/* Debug only in development */}
-            {import.meta.env.DEV && (
-              <div style={{ display: 'none' }}>
-                {(() => {
-                  if (typeof window !== 'undefined') {
-                    (window as any).__DEBUG_POST_SETTINGS = postSettings;
-                    (window as any).__DEBUG_SLUG = postSettings.slug;
-                    (window as any).__DEBUG_SLUG_INFO = {
-                      slug: postSettings.slug,
-                      type: typeof postSettings.slug,
-                      length: postSettings.slug?.length || 0,
-                      isEmpty: !postSettings.slug,
-                      trimmed: postSettings.slug?.trim(),
-                      trimmedLength: postSettings.slug?.trim()?.length || 0
-                    };
-                    (window as any).__DEBUG_VALIDATE_SLUG = () => {
-                      const trimmed = postSettings.slug?.trim() || '';
-                      return !!trimmed;
-                    };
-                  }
-                  return null;
-                })()}
-              </div>
-            )}
             <GutenbergSidebar
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlock}
               onPostSettingsChange={(settings: any) => {
-                // DEBUG: Log settings change from sidebar
-                // Logging removed for CI/CD
                 
                 // Clear slug error when slug is changed
                 if (settings.slug !== undefined && postSettings.slugError) {
@@ -1066,8 +1013,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 setPostSettings(prev => {
                   const newSettings = { ...prev, ...settings };
                   
-                  // DEBUG: Log state update
-                  // Logging removed for CI/CD
                   
                   // Update ref
                   postSettingsRef.current = newSettings;
