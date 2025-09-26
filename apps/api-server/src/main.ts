@@ -759,6 +759,7 @@ app.use('/api/auth', emailAuthRoutes);
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
+app.use('/api/vendors', vendorRoutes); // Vendor management routes (alias for compatibility)
 app.use('/api/suppliers', supplierRoutes); // Supplier management routes
 app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
