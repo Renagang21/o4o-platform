@@ -20,7 +20,7 @@ export class VendorController {
         status,
         vendorType,
         search,
-        sortBy = 'created_at',
+        sortBy = 'createdAt',
         sortOrder = 'DESC',
       } = req.query;
 
@@ -34,7 +34,6 @@ export class VendorController {
           'user.id',
           'user.name',
           'user.email',
-          'user.phone',
         ]);
 
       if (status) {
