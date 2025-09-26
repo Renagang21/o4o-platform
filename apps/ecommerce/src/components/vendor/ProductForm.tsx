@@ -5,7 +5,11 @@ import {
   Plus, 
   Trash2, 
   Save,
-  AlertCircle
+  AlertCircle,
+  Bold,
+  Italic,
+  Link2,
+  Type
 } from 'lucide-react';
 import { 
   Button, 
