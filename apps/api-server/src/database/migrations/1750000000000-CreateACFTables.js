@@ -319,7 +319,7 @@ class CreateACFTables1750000000000 {
                 },
                 {
                     name: 'mimeTypes',
-                    type: 'simple-array',
+                    type: 'text',
                     isNullable: true
                 },
                 {
@@ -360,12 +360,12 @@ class CreateACFTables1750000000000 {
                 },
                 {
                     name: 'postTypes',
-                    type: 'simple-array',
+                    type: 'text',
                     isNullable: true
                 },
                 {
                     name: 'taxonomies',
-                    type: 'simple-array',
+                    type: 'text',
                     isNullable: true
                 },
                 {
@@ -418,7 +418,7 @@ class CreateACFTables1750000000000 {
                 },
                 {
                     name: 'cloneFields',
-                    type: 'simple-array',
+                    type: 'text',
                     isNullable: true
                 },
                 {

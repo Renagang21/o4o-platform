@@ -45,6 +45,12 @@ class PassportManager {
 
   static async loadOAuthSettings(): Promise<OAuthSettingsData> {
     try {
+      // Check if AppDataSource is initialized
+      if (!AppDataSource.isInitialized) {
+        console.log('DataSource not initialized, using default settings');
+        return this.getDefaultSettings();
+      }
+
       const settingsRepo = AppDataSource.getRepository(Setting);
       const oauthSetting = await settingsRepo.findOne({
         where: { key: 'oauth_settings' }

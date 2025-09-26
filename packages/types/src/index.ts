@@ -30,8 +30,27 @@ export * from './crowdfunding';
 // Export affiliate types
 export * from './affiliate';
 
-// Export partner types
-export * from './partner';
+// Export partner types (with renamed conflicting types)
+export type {
+  // Unique partner types
+  PartnerUser,
+  PartnerCommission,
+  PartnerStats,
+  CreatePartnerRequest,
+  CreatePartnerResponse,
+  GetPartnerStatsRequest,
+  AdminPartnerOverview,
+  UserPartnerDashboard,
+  
+  // Renamed to avoid conflicts with affiliate module
+  BankAccount as PartnerBankAccount,
+  ReferralRelationship as PartnerReferralRelationship,
+  ReferralClick as PartnerReferralClick,
+  CommissionPolicy as PartnerCommissionPolicy,
+  GenerateReferralLinkRequest as GeneratePartnerLinkRequest,
+  GenerateReferralLinkResponse as GeneratePartnerLinkResponse,
+  ProcessCommissionRequest as ProcessPartnerCommissionRequest
+} from './partner';
 
 // Export vendor management types (excluding duplicates)
 export type {
