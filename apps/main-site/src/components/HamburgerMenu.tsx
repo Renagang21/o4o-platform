@@ -50,10 +50,11 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
   }, [menuRef]);
 
   useEffect(() => {
+    if (!isOpen) return;
+    
     const handleClickOutside = (event: MouseEvent) => {
       // Check if click is outside both menu and button
       if (
-        isOpen &&
         menuPanelRef.current &&
         buttonRef.current &&
         !menuPanelRef.current.contains(event.target as Node) &&
@@ -63,11 +64,20 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    // Use mousedown instead of click to prevent conflict with button click
+    // Add a small delay to avoid immediate closing
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 0);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isOpen]);
 
   const toggleMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsOpen(prev => !prev);
   };
