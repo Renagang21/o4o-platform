@@ -1,0 +1,148 @@
+/* Hamburger Menu Button */
+.hamburger-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: block;
+  }
+}
+
+.hamburger-btn {
+  width: 30px;
+  height: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  z-index: 1002;
+}
+
+.hamburger-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Hamburger Lines */
+.hamburger-line {
+  width: 100%;
+  height: 3px;
+  background-color: #333;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animation for open state */
+.hamburger-btn.is-open .hamburger-line:nth-child(1) {
+  transform: translateY(10.5px) rotate(45deg);
+}
+
+.hamburger-btn.is-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.is-open .hamburger-line:nth-child(3) {
+  transform: translateY(-10.5px) rotate(-45deg);
+}
+
+/* Menu Backdrop */
+.menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Menu Panel */
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 280px;
+  height: 100vh;
+  background-color: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1001;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.menu-panel.is-open {
+  right: 0;
+}
+
+/* Navigation */
+.menu-nav {
+  padding-top: 60px;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Menu Items */
+.menu-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.menu-link {
+  display: block;
+  padding: 16px 24px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  font-size: 16px;
+}
+
+.menu-link:hover {
+  background-color: #f3f4f6;
+}
+
+.menu-link:active {
+  background-color: #e5e7eb;
+}
+
+/* Submenu */
+.submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #f9fafb;
+}
+
+.submenu .menu-link {
+  padding-left: 40px;
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Desktop - hide everything */
+@media (min-width: 769px) {
+  .hamburger-menu,
+  .menu-backdrop,
+  .menu-panel {
+    display: none !important;
+  }
+}
