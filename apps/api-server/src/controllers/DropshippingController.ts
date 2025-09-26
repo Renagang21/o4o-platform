@@ -45,37 +45,20 @@ export class DropshippingController {
    */
   async getSettings(req: Request, res: Response) {
     try {
-      // Mock settings - in production, these would come from a settings table
+      // TODO: fetch settings from database settings table
       const settings: DropshippingSettings = {
-        autoOrderRouting: true,
+        autoOrderRouting: false,
         defaultMarginPolicy: {
-          platformCommission: 3, // 3%
-          affiliateCommission: 5, // 5%
-          minimumMargin: 10 // 10%
+          platformCommission: 0,
+          affiliateCommission: 0,
+          minimumMargin: 0
         },
-        supplierConnectors: {
-          'domestic-api': {
-            type: 'api',
-            enabled: true,
-            config: {
-              endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT || '',
-              apiKey: '***' // Hide sensitive data
-            }
-          },
-          'csv-catalog': {
-            type: 'csv',
-            enabled: true,
-            config: {
-              filePath: './catalogs/supplier-products.csv',
-              syncInterval: 3600 // 1 hour
-            }
-          }
-        },
+        supplierConnectors: {},
         automationRules: {
           autoApproveOrders: false,
-          autoForwardToSupplier: true,
-          stockSyncInterval: 1800, // 30 minutes
-          priceUpdateInterval: 3600 // 1 hour
+          autoForwardToSupplier: false,
+          stockSyncInterval: 0,
+          priceUpdateInterval: 0
         }
       };
 
@@ -121,49 +104,8 @@ export class DropshippingController {
    */
   async getConnectors(req: Request, res: Response) {
     try {
-      const connectors = [
-        {
-          id: 'domestic-api',
-          name: 'Domestic API Supplier',
-          type: 'api',
-          status: 'active',
-          lastSync: new Date(),
-          productsCount: 150,
-          ordersCount: 25,
-          config: {
-            endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT || '',
-            timeout: 30000,
-            retryAttempts: 3
-          }
-        },
-        {
-          id: 'csv-catalog',
-          name: 'CSV Catalog Import',
-          type: 'csv',
-          status: 'active',
-          lastSync: new Date(Date.now() - 3600000), // 1 hour ago
-          productsCount: 89,
-          ordersCount: 12,
-          config: {
-            filePath: './catalogs/supplier-products.csv',
-            syncInterval: 3600
-          }
-        },
-        {
-          id: 'ftp-supplier',
-          name: 'FTP Supplier Integration',
-          type: 'ftp',
-          status: 'inactive',
-          lastSync: null,
-          productsCount: 0,
-          ordersCount: 0,
-          config: {
-            host: '',
-            username: '',
-            password: '***'
-          }
-        }
-      ];
+      // TODO: fetch connectors from database
+      const connectors: any[] = [];
 
       res.json({
         success: true,
@@ -185,17 +127,13 @@ export class DropshippingController {
     try {
       const { connectorId } = req.params;
 
-      // Mock connector test
+      // TODO: implement actual connector testing
       const testResult = {
         connectorId,
-        status: 'success',
-        responseTime: Math.random() * 1000 + 500, // 500-1500ms
-        message: 'Connection successful',
-        details: {
-          apiVersion: '1.0',
-          supportedFeatures: ['products', 'inventory', 'orders'],
-          rateLimit: '100 requests/minute'
-        }
+        status: 'error',
+        responseTime: 0,
+        message: 'Testing not implemented',
+        details: {}
       };
 
       res.json({
@@ -216,35 +154,8 @@ export class DropshippingController {
    */
   async getMarginPolicies(req: Request, res: Response) {
     try {
-      const policies = [
-        {
-          id: 'default',
-          name: 'Default Policy',
-          platformCommission: 3,
-          affiliateCommission: 5,
-          minimumMargin: 10,
-          applyTo: 'all',
-          active: true
-        },
-        {
-          id: 'premium',
-          name: 'Premium Products',
-          platformCommission: 2,
-          affiliateCommission: 7,
-          minimumMargin: 15,
-          applyTo: 'category:premium',
-          active: true
-        },
-        {
-          id: 'bulk',
-          name: 'Bulk Orders',
-          platformCommission: 2.5,
-          affiliateCommission: 4,
-          minimumMargin: 8,
-          applyTo: 'quantity:>100',
-          active: false
-        }
-      ];
+      // TODO: fetch margin policies from database
+      const policies: any[] = [];
 
       res.json({
         success: true,
@@ -264,7 +175,7 @@ export class DropshippingController {
    */
   async getStatistics(req: Request, res: Response) {
     try {
-      // Mock statistics - in production, calculate from actual data
+      // TODO: calculate actual dropshipping statistics
       const stats = {
         overview: {
           totalSuppliers: await this.supplierInfoRepository.count(),
@@ -273,29 +184,14 @@ export class DropshippingController {
           dropshippingProducts: await this.productRepository.count({ where: { type: ProductType.PHYSICAL } })
         },
         performance: {
-          totalOrders: 1247,
-          dropshippingOrders: 856,
-          averageOrderValue: 125000,
-          totalRevenue: 156750000,
-          platformCommission: 4702500, // 3%
-          affiliateCommission: 7837500 // 5%
+          totalOrders: 0,
+          dropshippingOrders: 0,
+          averageOrderValue: 0,
+          totalRevenue: 0,
+          platformCommission: 0,
+          affiliateCommission: 0
         },
-        suppliers: [
-          {
-            id: 'domestic-api',
-            name: 'Domestic API Supplier',
-            orders: 425,
-            revenue: 68500000,
-            fulfillmentRate: 98.2
-          },
-          {
-            id: 'csv-catalog',
-            name: 'CSV Catalog Import',
-            orders: 321,
-            revenue: 52100000,
-            fulfillmentRate: 96.8
-          }
-        ]
+        suppliers: []
       };
 
       res.json({

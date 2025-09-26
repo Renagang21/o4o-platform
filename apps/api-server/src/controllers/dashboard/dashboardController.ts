@@ -174,15 +174,8 @@ export class DashboardController {
           .reduce((sum, c) => sum + Number(c.totalPayable), 0),
       },
 
-      // Recent activities (mocked for now - would come from activity logs)
-      recentActivities: [
-        {
-          type: 'commission_calculated',
-          description: `Commission calculated for ${dayjs().format('MMMM YYYY')}`,
-          timestamp: now,
-          amount: currentMonthCommission?.totalCommission || 0,
-        }
-      ],
+      // Recent activities (TODO: implement activity logs)
+      recentActivities: [],
 
       // Notifications and alerts
       alerts: await this.getVendorAlerts(vendorId),
@@ -242,19 +235,15 @@ export class DashboardController {
 
   private async getVendorPerformanceMetrics(vendorId: string, startDate: Date, endDate: Date) {
     try {
-      // Get orders in date range (mocked structure)
+      // TODO: Replace with actual performance metrics calculation
       const metrics = {
-        conversionRate: 85.5,
-        averageOrderValue: 156.78,
-        totalCustomers: 1234,
-        repeatCustomerRate: 45.2,
-        topCategories: [
-          { name: 'Electronics', orders: 145, revenue: 12450 },
-          { name: 'Fashion', orders: 123, revenue: 9876 },
-          { name: 'Home & Garden', orders: 98, revenue: 7532 },
-        ],
-        monthlyGrowth: 12.5,
-        customerSatisfaction: 4.6,
+        conversionRate: 0,
+        averageOrderValue: 0,
+        totalCustomers: 0,
+        repeatCustomerRate: 0,
+        topCategories: [],
+        monthlyGrowth: 0,
+        customerSatisfaction: 0,
       };
 
       return metrics;

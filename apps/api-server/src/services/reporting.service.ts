@@ -479,22 +479,8 @@ export class ReportingService {
   }
 
   private async getSalesReportData(options: ReportOptions & { period: string }): Promise<SalesReportData[]> {
-    // Mock implementation - would query actual orders and calculate sales data
-    return [
-      {
-        period: options.period,
-        orderId: 'ORD-001',
-        vendorName: 'Tech Vendor A',
-        productName: 'Laptop Pro',
-        quantity: 2,
-        unitPrice: 1299.99,
-        totalAmount: 2599.98,
-        commission: 325.00,
-        status: 'completed',
-        orderDate: new Date(),
-      },
-      // ... more sales data
-    ];
+    // TODO: implement actual sales data query from orders and calculate data
+    return [];
   }
 
   private async getCommissionReportData(options: ReportOptions): Promise<CommissionReportData[]> {

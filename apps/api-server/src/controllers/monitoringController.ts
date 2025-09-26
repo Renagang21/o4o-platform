@@ -16,10 +16,10 @@ export class MonitoringController {
       const freeMemory = os.freemem();
       const usedMemory = totalMemory - freeMemory;
       
-      // Get disk usage (mock data for now - diskusage module not installed)
+      // Get disk usage (TODO: implement actual disk monitoring)
       const disk = {
-        total: 100 * 1024 * 1024 * 1024, // 100GB
-        free: 40 * 1024 * 1024 * 1024,   // 40GB free
+        total: 0,
+        free: 0,
       };
       
       // Get database metrics
@@ -31,12 +31,12 @@ export class MonitoringController {
         slowQueries: 0
       };
 
-      // API metrics (simplified)
+      // API metrics (TODO: implement actual API monitoring)
       const apiMetrics = {
-        requestsPerMinute: Math.floor(Math.random() * 100) + 50,
-        averageResponseTime: Math.floor(Math.random() * 50) + 20,
-        errorRate: Math.random() * 2,
-        activeConnections: Math.floor(Math.random() * 20) + 10
+        requestsPerMinute: 0,
+        averageResponseTime: 0,
+        errorRate: 0,
+        activeConnections: 0
       };
 
       const metrics = {
@@ -73,23 +73,10 @@ export class MonitoringController {
   // Get performance history
   static async getMetricsHistory(req: Request, res: Response) {
     try {
-      // In production, this would fetch from a time-series database
-      // For now, return mock data
-      const history = [];
-      const now = Date.now();
-      
-      for (let i = 0; i < 60; i++) {
-        history.push({
-          timestamp: new Date(now - (i * 60000)), // Every minute for last hour
-          cpu: Math.random() * 100,
-          memory: 50 + Math.random() * 30,
-          responseTime: 20 + Math.random() * 50,
-          requests: Math.floor(50 + Math.random() * 100),
-          errors: Math.floor(Math.random() * 5)
-        });
-      }
+      // TODO: fetch from a time-series database
+      const history: any[] = [];
 
-      res.json(history.reverse());
+      res.json(history);
     } catch (error) {
       logger.error('Error fetching metrics history:', error);
       res.status(500).json({ error: 'Failed to fetch metrics history' });

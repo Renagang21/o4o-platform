@@ -656,26 +656,8 @@ export class SupplierController {
         });
       }
 
-      // Mock settlement data - replace with actual settlement calculation
-      const settlements = [];
-      const currentDate = new Date();
-      
-      for (let i = 0; i < 12; i++) {
-        const settlementDate = new Date(currentDate);
-        settlementDate.setMonth(settlementDate.getMonth() - i);
-        
-        settlements.push({
-          id: `SETTLE-${i}`,
-          period: settlementDate.toISOString().slice(0, 7), // YYYY-MM
-          totalOrders: Math.floor(Math.random() * 50),
-          totalAmount: Math.random() * 1000000,
-          commission: Math.random() * 50000,
-          netAmount: Math.random() * 950000,
-          status: i === 0 ? 'pending' : 'paid',
-          paidAt: i === 0 ? null : new Date(settlementDate.getTime() + 7 * 24 * 60 * 60 * 1000),
-          bankTransferRef: i === 0 ? null : `TRF${Date.now() - i * 1000000}`,
-        });
-      }
+      // TODO: replace with actual settlement calculation from database
+      const settlements: any[] = [];
 
       const paginatedSettlements = settlements.slice(
         (pageNum - 1) * limitNum,
@@ -911,24 +893,11 @@ export class SupplierController {
 
   // Helper: Sync products via API
   private async syncViaAPI(supplier: Supplier): Promise<SupplierProduct[]> {
-    // Mock API sync - in production, make actual API call
+    // TODO: implement actual API sync - make real API call to supplier
     logger.info(`Syncing products via API for supplier ${supplier.companyName}`);
     
-    // Simulate API response
-    const apiProducts = [
-      {
-        sku: `API-${Date.now()}-1`,
-        name: 'API Product 1',
-        price: 100,
-        quantity: 50,
-      },
-      {
-        sku: `API-${Date.now()}-2`,
-        name: 'API Product 2',
-        price: 200,
-        quantity: 30,
-      },
-    ];
+    // No mock data - return empty for now
+    const apiProducts: any[] = [];
 
     const syncedProducts = [];
     for (const apiProduct of apiProducts) {

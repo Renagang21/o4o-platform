@@ -367,12 +367,12 @@ export class AdminCommissionController {
   }
 
   private async getSettlementStatistics(ranges: any) {
-    // Mock implementation - would calculate actual settlement stats
+    // TODO: implement actual settlement statistics calculation
     return {
-      current: 125000,
-      previous: 118000,
-      change: 5.9,
-      pending: 15000,
+      current: 0,
+      previous: 0,
+      change: 0,
+      pending: 0,
     };
   }
 
@@ -393,27 +393,18 @@ export class AdminCommissionController {
   }
 
   private async getTopVendorsByCommission(startDate: Date, endDate: Date) {
-    // Mock implementation - would query actual top vendors
-    return [
-      { vendorId: '1', vendorName: 'Tech Vendor A', totalCommission: 15000, orderCount: 125, averageOrderValue: 200, commissionRate: 12 },
-      { vendorId: '2', vendorName: 'Fashion Vendor B', totalCommission: 12500, orderCount: 98, averageOrderValue: 180, commissionRate: 10 },
-    ];
+    // TODO: implement actual top vendors query
+    return [];
   }
 
   private async getTopSuppliersByRevenue(startDate: Date, endDate: Date) {
-    // Mock implementation - would query actual top suppliers
-    return [
-      { supplierId: '1', supplierName: 'Supplier A', totalRevenue: 85000, orderCount: 245, productCount: 150, marginRate: 15 },
-      { supplierId: '2', supplierName: 'Supplier B', totalRevenue: 72000, orderCount: 198, productCount: 120, marginRate: 18 },
-    ];
+    // TODO: implement actual top suppliers query
+    return [];
   }
 
   private async getRecentCommissionActivities() {
-    // Mock implementation - would query actual activities
-    return [
-      { type: 'commission_approved', description: 'Commission approved for Tech Vendor A', timestamp: new Date(), amount: 1500 },
-      { type: 'settlement_paid', description: 'Settlement paid to Supplier B', timestamp: new Date(), amount: 8500 },
-    ];
+    // TODO: implement actual activities query
+    return [];
   }
 
   private async getFinancialSummary(ranges: any) {
@@ -448,12 +439,8 @@ export class AdminCommissionController {
   }
 
   private async getCommissionTrendData(ranges: any) {
-    // Mock implementation - would return actual trend data
-    return [
-      { period: '2024-01', commissions: 95000, settlements: 65000 },
-      { period: '2024-02', commissions: 105000, settlements: 72000 },
-      { period: '2024-03', commissions: 125000, settlements: 85000 },
-    ];
+    // TODO: implement actual trend data calculation
+    return [];
   }
 
   private async getSettlementTrendData(ranges: any) {

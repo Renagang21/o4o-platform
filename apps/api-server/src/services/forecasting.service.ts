@@ -642,22 +642,8 @@ export class ForecastingService {
 
   private async getSalesHistoricalData(filters?: any): Promise<any[]> {
     try {
-      // Mock data for demonstration - replace with actual database queries
-      const mockData = [];
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 12);
-
-      for (let i = 0; i < 12; i++) {
-        const date = new Date(startDate);
-        date.setMonth(date.getMonth() + i);
-        
-        mockData.push({
-          date: date.toISOString().split('T')[0],
-          value: Math.random() * 10000 + 5000 + Math.sin(i * Math.PI / 6) * 2000
-        });
-      }
-      
-      return mockData;
+      // TODO: replace with actual database queries for sales historical data
+      return [];
     } catch (error) {
       logger.error('Error fetching sales historical data:', error);
       return [];
@@ -666,22 +652,8 @@ export class ForecastingService {
 
   private async getDemandHistoricalData(filters?: any): Promise<any[]> {
     try {
-      // Mock data - replace with actual order/demand data
-      const mockData = [];
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 12);
-
-      for (let i = 0; i < 12; i++) {
-        const date = new Date(startDate);
-        date.setMonth(date.getMonth() + i);
-        
-        mockData.push({
-          date: date.toISOString().split('T')[0],
-          value: Math.random() * 500 + 200 + Math.cos(i * Math.PI / 6) * 100
-        });
-      }
-      
-      return mockData;
+      // TODO: replace with actual order/demand data from database
+      return [];
     } catch (error) {
       logger.error('Error fetching demand historical data:', error);
       return [];
@@ -720,24 +692,8 @@ export class ForecastingService {
           take: 100
         });
         
-        // Generate mock historical data based on current levels
-        const mockData = [];
-        const startDate = new Date();
-        startDate.setMonth(startDate.getMonth() - 12);
-        
-        const avgInventoryValue = inventoryItems.reduce((sum, item) => sum + (item.totalValue || 0), 0);
-        
-        for (let i = 0; i < 12; i++) {
-          const date = new Date(startDate);
-          date.setMonth(date.getMonth() + i);
-          
-          mockData.push({
-            date: date.toISOString().split('T')[0],
-            value: avgInventoryValue * (0.8 + Math.random() * 0.4) // Vary by ±20%
-          });
-        }
-        
-        return mockData;
+        // Return empty data if no inventory movements available
+        return [];
       }
       
       // Group movements by month and calculate average inventory levels
@@ -765,43 +721,15 @@ export class ForecastingService {
     } catch (error) {
       logger.error('Error fetching inventory historical data:', error);
       
-      // Return fallback mock data
-      const mockData = [];
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 12);
-
-      for (let i = 0; i < 12; i++) {
-        const date = new Date(startDate);
-        date.setMonth(date.getMonth() + i);
-        
-        mockData.push({
-          date: date.toISOString().split('T')[0],
-          value: Math.random() * 1000 + 500
-        });
-      }
-      
-      return mockData;
+      // Return empty data on error
+      return [];
     }
   }
 
   private async getRevenueHistoricalData(filters?: any): Promise<any[]> {
     try {
-      // Mock data - replace with actual revenue data
-      const mockData = [];
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 12);
-
-      for (let i = 0; i < 12; i++) {
-        const date = new Date(startDate);
-        date.setMonth(date.getMonth() + i);
-        
-        mockData.push({
-          date: date.toISOString().split('T')[0],
-          value: Math.random() * 50000 + 25000 + Math.sin(i * Math.PI / 6) * 10000
-        });
-      }
-      
-      return mockData;
+      // TODO: replace with actual revenue data from database
+      return [];
     } catch (error) {
       logger.error('Error fetching revenue historical data:', error);
       return [];

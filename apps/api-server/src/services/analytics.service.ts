@@ -534,8 +534,8 @@ export class AnalyticsService {
           },
         }),
         
-        // Mock active users count - would need session tracking
-        Promise.resolve(Math.floor(Math.random() * 50) + 10),
+        // TODO: implement session tracking for active users
+        Promise.resolve(0),
         
         this.getSystemHealthMetrics(),
       ]);
@@ -576,18 +576,18 @@ export class AnalyticsService {
       endDate = new Date(),
     } = filters;
 
-    // Mock implementation - would calculate real KPIs
+    // TODO: implement real KPI calculations from database
     return {
-      totalRevenue: 1250000,
-      totalOrders: 3450,
-      averageOrderValue: 362.32,
-      conversionRate: 3.2,
-      inventoryTurnover: 8.5,
-      stockoutRate: 2.1,
-      fulfillmentRate: 98.7,
-      returnRate: 1.8,
-      grossMargin: 32.5,
-      netProfit: 187500,
+      totalRevenue: 0,
+      totalOrders: 0,
+      averageOrderValue: 0,
+      conversionRate: 0,
+      inventoryTurnover: 0,
+      stockoutRate: 0,
+      fulfillmentRate: 0,
+      returnRate: 0,
+      grossMargin: 0,
+      netProfit: 0,
     };
   }
 
@@ -620,12 +620,8 @@ export class AnalyticsService {
   }
 
   private async getInventoryTrends(startDate: Date, endDate: Date) {
-    // Get inventory level trends over time
-    return [
-      { period: '2024-01', totalValue: 2500000, itemCount: 15000 },
-      { period: '2024-02', totalValue: 2650000, itemCount: 15500 },
-      { period: '2024-03', totalValue: 2800000, itemCount: 16000 },
-    ];
+    // TODO: implement real inventory trends calculation
+    return [];
   }
 
   private async getCommissionTrends(startDate: Date, endDate: Date) {
@@ -670,19 +666,10 @@ export class AnalyticsService {
   }
 
   private async getRevenueBreakdown(filters: AnalyticsFilter) {
-    // Mock revenue breakdown by category/channel
+    // TODO: implement real revenue breakdown calculation
     return {
-      byCategory: [
-        { category: 'Electronics', revenue: 450000, percentage: 36 },
-        { category: 'Fashion', revenue: 320000, percentage: 25.6 },
-        { category: 'Home & Garden', revenue: 280000, percentage: 22.4 },
-        { category: 'Sports', revenue: 200000, percentage: 16 },
-      ],
-      byChannel: [
-        { channel: 'Online', revenue: 875000, percentage: 70 },
-        { channel: 'Retail', revenue: 250000, percentage: 20 },
-        { channel: 'B2B', revenue: 125000, percentage: 10 },
-      ],
+      byCategory: [],
+      byChannel: [],
     };
   }
 
@@ -751,12 +738,12 @@ export class AnalyticsService {
   }
 
   private async getSystemHealthMetrics() {
-    // Mock system health metrics
+    // TODO: implement real system health monitoring
     return {
-      apiResponseTime: Math.floor(Math.random() * 200) + 50, // 50-250ms
-      databaseConnections: Math.floor(Math.random() * 10) + 5, // 5-15 connections
-      cacheHitRate: Math.floor(Math.random() * 20) + 80, // 80-100%
-      errorRate: Math.random() * 0.5, // 0-0.5%
+      apiResponseTime: 0,
+      databaseConnections: 0,
+      cacheHitRate: 0,
+      errorRate: 0,
     };
   }
 

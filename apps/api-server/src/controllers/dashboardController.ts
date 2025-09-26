@@ -134,18 +134,8 @@ export class DashboardController {
   // Get admin notifications
   static async getNotifications(req: Request, res: Response) {
     try {
-      // For now, return sample notifications
-      // In production, fetch from a notifications table
-      const notifications = [
-        {
-          id: '1',
-          type: 'info',
-          title: 'System Update',
-          message: 'Platform has been updated to latest version',
-          timestamp: new Date().toISOString(),
-          read: false
-        }
-      ];
+      // TODO: Replace with actual notifications from database
+      const notifications: any[] = [];
 
       res.json({
         success: true,
@@ -167,17 +157,8 @@ export class DashboardController {
   // Get admin activities
   static async getActivities(req: Request, res: Response) {
     try {
-      // Sample activities - in production, fetch from activity log table
-      const activities = [
-        {
-          id: '1',
-          user: 'Admin',
-          action: 'logged_in',
-          description: 'Admin logged in',
-          timestamp: new Date().toISOString(),
-          ip: req.ip
-        }
-      ];
+      // TODO: Replace with actual activities from activity log table
+      const activities: any[] = [];
 
       res.json({
         success: true,
