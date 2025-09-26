@@ -109,7 +109,7 @@ router.get('/toss/:paymentKey', authenticateToken, asyncHandler(async (req: Requ
  * 결제 설정 조회
  * GET /api/v1/payments/toss/config
  */
-router.get('/toss/config', asyncHandler(async (req: Request, res: Response) => {
+router.get('/toss/config', authenticateToken, asyncHandler(async (req: Request, res: Response) => {
   // Return configuration status
   return res.json({
     success: true,
@@ -126,7 +126,7 @@ router.get('/toss/config', asyncHandler(async (req: Request, res: Response) => {
  * 결제 통계 조회
  * GET /api/v1/payments/toss/stats
  */
-router.get('/toss/stats', asyncHandler(async (req: Request, res: Response) => {
+router.get('/toss/stats', authenticateToken, asyncHandler(async (req: Request, res: Response) => {
   // TODO: Implement actual stats from database
   return res.json({
     success: true,
@@ -145,7 +145,7 @@ router.get('/toss/stats', asyncHandler(async (req: Request, res: Response) => {
  * 테스트 결제 내역 조회
  * GET /api/v1/payments/toss/tests
  */
-router.get('/toss/tests', asyncHandler(async (req: Request, res: Response) => {
+router.get('/toss/tests', authenticateToken, asyncHandler(async (req: Request, res: Response) => {
   // TODO: Implement test payments history
   return res.json({
     success: true,
