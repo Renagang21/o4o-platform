@@ -771,7 +771,8 @@ import shippingRoutes from './routes/shipping.routes';
 app.use('/api/shipping', shippingRoutes); // Shipping tracking routes
 import pricingRoutes from './routes/pricing.routes';
 app.use('/api/pricing', pricingRoutes); // Pricing calculation routes
-app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
+app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes v1
+app.use('/api/monitoring', monitoringRoutes); // Monitoring routes (primary API path)
 app.use('/monitoring', monitoringRoutes); // Monitoring routes (backward compatibility)
 // Removed duplicate mount to ensure a single canonical router for /api/posts
 // app.use('/api/posts', postsRoutes);
