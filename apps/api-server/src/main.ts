@@ -1020,7 +1020,7 @@ const startServer = async () => {
         // Error log removed
       }
 
-      // Initialize upload directories
+      // Initialize upload directories  
       logger.info('Initializing upload directories...');
       try {
         const { ensureUploadDirectories } = await import('./middleware/upload.middleware');
