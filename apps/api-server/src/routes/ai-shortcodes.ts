@@ -1,0 +1,270 @@
+/**
+ * AI Shortcodes API Routes
+ * AI 페이지 생성을 위한 shortcode 정보 제공
+ */
+
+import { Router, Request, Response } from 'express';
+import { shortcodeRegistry } from '../services/shortcode-registry.service';
+import logger from '../utils/logger';
+
+const router: Router = Router();
+
+/**
+ * AI를 위한 shortcode 참조 데이터
+ * GET /api/ai/shortcodes/reference
+ */
+router.get('/reference', async (req: Request, res: Response) => {
+  try {
+    const reference = shortcodeRegistry.getAIReference();
+    
+    // 응답 헤더 설정 (캐싱)
+    res.set({
+      'Cache-Control': 'public, max-age=300', // 5분 캐싱
+      'ETag': `"${Buffer.from(reference.lastUpdated).toString('base64')}"`
+    });
+
+    res.json({
+      success: true,
+      data: reference,
+      meta: {
+        version: '1.0.0',
+        generatedAt: new Date().toISOString()
+      }
+    });
+
+  } catch (error: any) {
+    logger.error('AI shortcode reference error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch shortcode reference',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * AI용 간소화된 shortcode 목록
+ * GET /api/ai/shortcodes/simple
+ */
+router.get('/simple', async (req: Request, res: Response) => {
+  try {
+    const { category, limit } = req.query;
+    let shortcodes = shortcodeRegistry.getAll();
+
+    // 카테고리 필터
+    if (category) {
+      shortcodes = shortcodeRegistry.getByCategory(category as string);
+    }
+
+    // 개수 제한
+    if (limit) {
+      const limitNum = parseInt(limit as string);
+      shortcodes = shortcodes.slice(0, limitNum);
+    }
+
+    // AI용 간소화된 형태로 변환
+    const simpleShortcodes = shortcodes.map(sc => ({
+      name: sc.name,
+      description: sc.description,
+      usage: `[${sc.name}]`,
+      category: sc.category,
+      mainExample: sc.examples[0] || `[${sc.name}]`,
+      commonUse: sc.aiPrompts?.[0] || sc.description
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        shortcodes: simpleShortcodes,
+        total: simpleShortcodes.length,
+        filtered: !!category || !!limit
+      }
+    });
+
+  } catch (error: any) {
+    logger.error('AI simple shortcodes error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch simple shortcodes',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * AI 프롬프트 생성 도우미
+ * POST /api/ai/shortcodes/prompt
+ */
+router.post('/prompt', async (req: Request, res: Response) => {
+  try {
+    const { userRequest, includeCategories, maxShortcodes = 20 } = req.body;
+
+    if (!userRequest) {
+      return res.status(400).json({
+        success: false,
+        error: 'User request is required'
+      });
+    }
+
+    let shortcodes = shortcodeRegistry.getAll();
+
+    // 카테고리 필터링
+    if (includeCategories && Array.isArray(includeCategories)) {
+      shortcodes = shortcodes.filter(sc => 
+        includeCategories.includes(sc.category)
+      );
+    }
+
+    // 개수 제한
+    shortcodes = shortcodes.slice(0, maxShortcodes);
+
+    // AI 프롬프트 생성
+    const shortcodeList = shortcodes.map(sc => {
+      const params = Object.keys(sc.parameters).length > 0 
+        ? ` (parameters: ${Object.keys(sc.parameters).join(', ')})`
+        : '';
+      
+      return `- [${sc.name}]${params}: ${sc.description}
+  Example: ${sc.examples[0] || `[${sc.name}]`}
+  Use when: ${sc.aiPrompts?.[0] || sc.description}`;
+    }).join('\n\n');
+
+    const fullPrompt = `Available Shortcodes (${shortcodes.length} total):
+
+${shortcodeList}
+
+User Request: "${userRequest}"
+
+Instructions:
+1. Analyze the user request and determine which shortcodes would be most appropriate
+2. Generate a complete page layout using HTML structure and appropriate shortcodes
+3. Use shortcode parameters when needed to customize the output
+4. Consider the user's intent and create a cohesive page design
+5. Only use shortcodes from the list above
+
+Please generate a page that fulfills the user's request using the available shortcodes.`;
+
+    res.json({
+      success: true,
+      data: {
+        prompt: fullPrompt,
+        availableShortcodes: shortcodes.length,
+        categories: [...new Set(shortcodes.map(sc => sc.category))],
+        userRequest
+      }
+    });
+
+  } catch (error: any) {
+    logger.error('AI prompt generation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate AI prompt',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Shortcode 검색
+ * GET /api/ai/shortcodes/search?q=query
+ */
+router.get('/search', async (req: Request, res: Response) => {
+  try {
+    const { q: query } = req.query;
+
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Search query is required'
+      });
+    }
+
+    const results = shortcodeRegistry.search(query);
+    
+    res.json({
+      success: true,
+      data: {
+        query,
+        results: results.map(sc => ({
+          name: sc.name,
+          description: sc.description,
+          category: sc.category,
+          usage: `[${sc.name}]`,
+          examples: sc.examples,
+          relevantPrompts: sc.aiPrompts || []
+        })),
+        total: results.length
+      }
+    });
+
+  } catch (error: any) {
+    logger.error('Shortcode search error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to search shortcodes',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Shortcode 상세 정보
+ * GET /api/ai/shortcodes/:name
+ */
+router.get('/:name', async (req: Request, res: Response) => {
+  try {
+    const { name } = req.params;
+    const shortcode = shortcodeRegistry.get(name);
+
+    if (!shortcode) {
+      return res.status(404).json({
+        success: false,
+        error: 'Shortcode not found',
+        message: `Shortcode [${name}] does not exist`
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        ...shortcode,
+        usage: `[${shortcode.name}]`,
+        parameterCount: Object.keys(shortcode.parameters).length,
+        exampleCount: shortcode.examples.length
+      }
+    });
+
+  } catch (error: any) {
+    logger.error('Shortcode detail error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch shortcode details',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Registry 통계
+ * GET /api/ai/shortcodes/stats
+ */
+router.get('/stats', async (req: Request, res: Response) => {
+  try {
+    const stats = shortcodeRegistry.getStats();
+    
+    res.json({
+      success: true,
+      data: stats
+    });
+
+  } catch (error: any) {
+    logger.error('Shortcode stats error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch shortcode statistics',
+      message: error.message
+    });
+  }
+});
+
+export default router;

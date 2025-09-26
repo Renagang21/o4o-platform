@@ -70,6 +70,9 @@ import { AffiliateAuditLog } from '../entities/affiliate/AffiliateAuditLog';
 import { Menu } from '../entities/Menu';
 import { MenuItem } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
+// Vendor entities
+import { VendorInfo } from '../entities/VendorInfo';
+import { VendorCommission } from '../entities/VendorCommission';
 
 import { env } from '../utils/env-validator';
 
@@ -183,7 +186,10 @@ export const AppDataSource = new DataSource({
     // Menu System entities
     Menu,
     MenuItem,
-    MenuLocation
+    MenuLocation,
+    // Vendor entities
+    VendorInfo,
+    VendorCommission
   ],
   
   // 마이그레이션 설정

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { shortcodeIntegrator } from './shortcodeIntegrator';
 
 export interface Block {
   id: string;
@@ -32,6 +33,8 @@ export interface GenerateOptions {
   template: keyof typeof PAGE_TEMPLATES;
   onProgress?: ProgressCallback;
   signal?: AbortSignal;
+  useShortcodes?: boolean; // shortcode 사용 여부
+  shortcodeCategories?: string[]; // 포함할 shortcode 카테고리
 }
 
 // 페이지 템플릿 정의
@@ -94,7 +97,14 @@ export class AIPageGenerator {
    * 프롬프트를 기반으로 페이지 블록을 생성합니다 (개선된 버전)
    */
   async generateBlocks(options: GenerateOptions): Promise<Block[]> {
-    const { prompt, template = 'landing', onProgress, signal } = options;
+    const { 
+      prompt, 
+      template = 'landing', 
+      onProgress, 
+      signal, 
+      useShortcodes = true, 
+      shortcodeCategories 
+    } = options;
     const pageTemplate = PAGE_TEMPLATES[template];
     
     // 진행률 업데이트 헬퍼
@@ -105,7 +115,26 @@ export class AIPageGenerator {
     };
 
     try {
-      // 1단계: AI 모델 연결 (20%)
+      // 0단계: Shortcode 정보 로드 (5%)
+      updateProgress(0, 'Shortcode 정보를 로드 중...');
+      let enhancedPrompt = prompt;
+      
+      if (useShortcodes) {
+        try {
+          enhancedPrompt = await shortcodeIntegrator.buildEnhancedAIPrompt(prompt, {
+            includeCategories: shortcodeCategories,
+            maxShortcodes: 20,
+            includeExamples: true,
+            includeUsageHints: true
+          });
+          updateProgress(5, 'Shortcode 정보가 로드되었습니다');
+        } catch (error) {
+          console.warn('Shortcode 정보를 로드할 수 없어 기본 프롬프트를 사용합니다:', error);
+          updateProgress(5, '기본 프롬프트로 진행합니다');
+        }
+      }
+
+      // 1단계: AI 모델 연결 (15%)
       updateProgress(10, 'AI 모델에 연결 중...');
       
       // AbortSignal 체크
@@ -120,18 +149,18 @@ export class AIPageGenerator {
       
       switch (this.provider.name) {
         case 'openai':
-          blocks = await this.generateWithOpenAI(prompt, pageTemplate, updateProgress, signal);
+          blocks = await this.generateWithOpenAI(enhancedPrompt, pageTemplate, updateProgress, signal);
           break;
         case 'claude':
-          blocks = await this.generateWithClaude(prompt, pageTemplate, updateProgress, signal);
+          blocks = await this.generateWithClaude(enhancedPrompt, pageTemplate, updateProgress, signal);
           break;
         case 'gemini':
-          blocks = await this.generateWithGemini(prompt, pageTemplate, updateProgress, signal);
+          blocks = await this.generateWithGemini(enhancedPrompt, pageTemplate, updateProgress, signal);
           break;
         default:
           // 테스트/개발용 모의 생성
           updateProgress(30, '테스트 데이터를 생성 중...');
-          blocks = await this.generateMockBlocks(prompt, template, updateProgress);
+          blocks = await this.generateMockBlocks(enhancedPrompt, template, updateProgress);
       }
 
       // 3단계: 블록 검증 및 정규화 (30%)

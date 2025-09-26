@@ -107,6 +107,7 @@ import sessionsRoutes from './routes/sessions';
 import postsRoutes from './routes/posts';
 import reusableBlocksRoutes from './routes/reusable-blocks.routes';
 import blockPatternsRoutes from './routes/block-patterns.routes';
+import aiShortcodesRoutes from './routes/ai-shortcodes';
 import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
 import customPostTypesRoutes from './routes/custom-post-types';
@@ -617,6 +618,9 @@ app.use('/api/public', publicRoutes); // Public routes (no auth required)
 // Compatibility: expose public routes under v1 prefix for frontend consistency
 app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management routes
+
+// AI Shortcodes API (public access for AI page generation)
+app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
 
 // Categories routes (public access)
 app.use('/api/categories', categoriesRoutes);
