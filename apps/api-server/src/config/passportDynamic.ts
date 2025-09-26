@@ -47,7 +47,7 @@ class PassportManager {
     try {
       // Check if AppDataSource is initialized
       if (!AppDataSource.isInitialized) {
-        console.log('DataSource not initialized, using default settings');
+        // DataSource not initialized, using default settings
         return this.getDefaultSettings();
       }
 
