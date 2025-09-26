@@ -897,28 +897,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             {postSettings.status === 'publish' ? 'Update' : 'Publish'}
           </Button>
           
-          {/* AI Generator */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    isMobile ? "h-8 w-8" : "h-9 w-9",
-                    "text-purple-600 hover:text-purple-700"
-                  )}
-                  onClick={() => setShowAIGenerator(true)}
-                >
-                  <Sparkles className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>AI 페이지 생성</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
           {/* Settings */}
           <TooltipProvider>
             <Tooltip>

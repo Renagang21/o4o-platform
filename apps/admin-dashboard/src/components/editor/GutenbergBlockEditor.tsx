@@ -13,6 +13,7 @@ import { Block } from '@/types/post.types';
 import GutenbergBlockInserter from './GutenbergBlockInserter';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
 import DesignLibraryModalImproved from './DesignLibraryModalImproved';
+import AIPageGeneratorModal from '../ai/AIPageGeneratorModal';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
@@ -119,6 +120,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -703,6 +705,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         isCodeView={isCodeView}
         onPreview={handlePreview}
         onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
+        onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
         onToggleInspector={() => setSidebarOpen(!sidebarOpen)}
         isInspectorOpen={sidebarOpen}
       />
@@ -882,6 +885,19 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         isOpen={isDesignLibraryOpen}
         onClose={() => setIsDesignLibraryOpen(false)}
         onApplyTemplate={handleApplyTemplate}
+      />
+
+      {/* AI Generator Modal */}
+      <AIPageGeneratorModal
+        isOpen={isAIGeneratorOpen}
+        onClose={() => setIsAIGeneratorOpen(false)}
+        onGenerate={(generatedBlocks) => {
+          // Replace existing blocks with AI generated blocks
+          setBlocks(generatedBlocks);
+          setIsDirty(true);
+          addToHistory(generatedBlocks);
+          showToast('AI 페이지가 생성되었습니다!', 'success');
+        }}
       />
     </div>
   );

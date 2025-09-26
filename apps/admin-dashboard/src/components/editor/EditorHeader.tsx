@@ -22,6 +22,7 @@ import {
   Trash2,
   Library,
   Settings2,
+  Sparkles,
 } from 'lucide-react';
 
 interface EditorHeaderProps {
@@ -42,6 +43,7 @@ interface EditorHeaderProps {
   postStatus?: string;
   onPreview?: () => void;
   onOpenDesignLibrary?: () => void;
+  onOpenAIGenerator?: () => void;
   onToggleInspector?: () => void;
   isInspectorOpen?: boolean;
   // Optional extras used by some editors
@@ -64,6 +66,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   isPublished = false,
   onPreview,
   onOpenDesignLibrary,
+  onOpenAIGenerator,
   onToggleInspector,
   isInspectorOpen = true,
   title,
@@ -128,6 +131,18 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           >
             <Library className="h-4 w-4 mr-1" />
             디자인 라이브러리
+          </Button>
+
+          {/* AI Generator */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOpenAIGenerator}
+            className="h-8 px-3 hover:bg-gray-100 border border-gray-300 text-purple-600 hover:text-purple-700"
+            title="AI Page Generator - Generate content with AI"
+          >
+            <Sparkles className="h-4 w-4 mr-1" />
+            AI 페이지 생성
           </Button>
 
           {/* Inspector Toggle */}
