@@ -543,10 +543,9 @@ export class VendorController {
       const formattedCommissions = commissions.map(comm => ({
         id: comm.id,
         vendorId: comm.vendorId,
-        orderId: comm.orderId,
-        amount: comm.totalSales,
+        amount: comm.netSales,
         rate: comm.commissionRate,
-        commission: comm.commissionAmount,
+        commission: comm.totalCommission,
         status: comm.status,
         createdAt: comm.createdAt,
       }));
@@ -779,9 +778,9 @@ export class VendorController {
         vendorId: commission.vendorId,
         vendorName: commission.vendor?.vendorName || 'Unknown Vendor',
         period: commission.period,
-        totalSales: commission.totalSales,
+        netSales: commission.netSales,
         commissionRate: commission.commissionRate,
-        commissionAmount: commission.commissionAmount,
+        totalCommission: commission.totalCommission,
         status: commission.status,
         paidAt: commission.paidAt,
         createdAt: commission.createdAt

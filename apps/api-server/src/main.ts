@@ -825,6 +825,10 @@ app.use('/api/v1/shipping', shippingV1Routes);
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
 app.use('/api/v1/products', productsV1Routes); // 상품 기본 라우트
 app.use('/api/v1/products/variations', productVariationRoutes); // 상품 변형 라우트
+
+// Product import routes with detailed logging
+import productImportRoutes from './routes/product-import';
+app.use('/api/products', productImportRoutes); // Product import endpoints
 app.use('/api/v1/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 app.use('/api/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트 (backward compatibility)
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
