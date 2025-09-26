@@ -639,7 +639,7 @@ app.use('/api/tags', publicLimiter, tagsApiRoutes);
 
 // ACF routes
 import acfRoutes from './routes/acf';
-app.use('/admin', acfRoutes);
+app.use('/api/acf', acfRoutes); // Mount ACF routes at /api/acf for proper API access
 
 // API v1 compatibility for media routes
 app.use('/api/v1/media/folders', (req: Request, res: Response, next: NextFunction) => {
@@ -828,7 +828,6 @@ app.use('/api/v1/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 �
 app.use('/api/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트 (backward compatibility)
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
-app.use('/api/acf', acfV1Routes); // ACF 라우트 (backward compatibility)
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
