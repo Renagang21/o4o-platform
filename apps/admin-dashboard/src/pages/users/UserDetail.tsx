@@ -9,9 +9,9 @@ import BusinessInfoSection from './components/BusinessInfoSection';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
-import { api } from '@/api/base';
+import { UserApi } from '@/api/userApi';
 // import { formatDistanceToNow, format } from 'date-fns';
-import type { User } from '@o4o/types';
+import type { User } from '@/types/user';
 
 // interface ApprovalLogItem {
 //   id: string;
@@ -47,13 +47,13 @@ export default function UserDetail() {
       setLoading(true);
       
       // Fetch user details
-      const userResponse = await api.get(`/api/v1/users/${id}`);
-      if (userResponse.data.success) {
-        setUser(userResponse.data.data);
+      const userResponse = await UserApi.getUser(id!);
+      if (userResponse) {
+        setUser(userResponse.data || userResponse);
       }
 
       // Fetch approval history
-      const historyResponse = await api.get(`/api/v1/users/${id}/approval-history`);
+      const historyResponse = await UserApi.getUserActivity(id!);
       if (historyResponse.data.success) {
         setApprovalHistory(historyResponse.data.data);
       }
@@ -68,9 +68,7 @@ export default function UserDetail() {
 
   const handleApprove = async () => {
     try {
-      await api.post(`/api/v1/users/${id}/approve`, {
-        notes: 'Approved via admin dashboard',
-      });
+      await UserApi.approveUser(id!, 'Approved via admin dashboard');
       
       toast.success('User approved successfully');
 
@@ -83,9 +81,7 @@ export default function UserDetail() {
 
   const handleReject = async () => {
     try {
-      await api.post(`/api/v1/users/${id}/reject`, {
-        notes: 'Rejected via admin dashboard',
-      });
+      await UserApi.rejectUser(id!, 'Rejected via admin dashboard');
       
       toast.success('User rejected successfully');
 

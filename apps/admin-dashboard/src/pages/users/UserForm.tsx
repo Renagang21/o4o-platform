@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import BusinessInfoSection from './components/BusinessInfoSection';
 import toast from 'react-hot-toast';
-import { api } from '@/api/base';
+import { UserApi } from '@/api/userApi';
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -61,7 +61,7 @@ export default function UserForm() {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/v1/users/${id}`);
+      const response = await UserApi.getUser(id);
       
       if (response.data.success) {
         const userData = response.data.data;
@@ -97,11 +97,11 @@ export default function UserForm() {
           delete payload.password;
         }
         
-        await api.put(`/api/v1/users/${id}`, payload);
+        await UserApi.updateUser(id, payload);
         
         toast.success('User updated successfully');
       } else {
-        await api.post('/api/v1/users', payload);
+        await UserApi.createUser(payload);
         
         toast.success('User created successfully');
       }

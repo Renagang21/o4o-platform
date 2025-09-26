@@ -12,20 +12,36 @@ export interface BusinessInfo {
 }
 
 export interface User extends BaseUser {
+  // Unified fields
+  fullName?: string;
+  firstName?: string;
+  lastName?: string;
+  lastLoginAt?: string | Date;
   lastLogin?: Date;
   last_login?: Date;
   phone?: string;
   businessInfo?: BusinessInfo;
-  createdAt?: Date;
+  createdAt: string | Date;
   created_at?: Date;
+  updatedAt?: string | Date;
+  updated_at?: Date;
+  isEmailVerified?: boolean;
+  isActive?: boolean;
+  avatar?: string;
+  role: UserRole;
+  roles?: UserRole[];
+  status: UserStatus;
 }
 
-export type UserRole = 'admin' | 'business' | 'affiliate' | 'partner' | 'customer' | 'seller' | 'supplier' | 'vendor' | 'manager' | 'retailer';
+export type UserRole = 'admin' | 'moderator' | 'user' | 'guest' | 'vendor' | 'customer' | 'affiliate' | 'partner' | 'business' | 'seller' | 'supplier' | 'manager' | 'retailer';
 
-export type UserStatus = 'pending' | 'active' | 'inactive' | 'approved' | 'rejected' | 'suspended';
+export type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended' | 'deleted' | 'approved' | 'rejected';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: '관리자',
+  moderator: '운영자',
+  user: '일반 사용자',
+  guest: '게스트',
   business: '사업자', 
   affiliate: '제휴사',
   partner: '파트너',
@@ -37,18 +53,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   retailer: '소매업체'
 };
 
-export const roleDisplayNames: Record<UserRole, string> = {
-  admin: '관리자',
-  business: '사업자',
-  affiliate: '제휴사',
-  partner: '파트너',
-  customer: '고객',
-  seller: '판매자',
-  supplier: '공급업체',
-  vendor: '벤더',
-  manager: '매니저',
-  retailer: '소매업체'
-};
+export const roleDisplayNames: Record<UserRole, string> = ROLE_LABELS;
 
 // Additional exports for UserApi
 export interface UserFilters {

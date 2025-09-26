@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, User, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { api } from '@/api/base';
+import { UserApi } from '@/api/userApi';
 import toast from 'react-hot-toast';
 
 interface ActivityLog {

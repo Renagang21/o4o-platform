@@ -15,7 +15,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { api } from '@/api/base';
+import { UserApi } from '@/api/userApi';
 import toast from 'react-hot-toast';
 
 interface UserStats {
@@ -103,7 +103,7 @@ export default function UserStatistics() {
   const fetchStatistics = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/v1/users/statistics?range=${timeRange}`);
+      const response = await UserApi.getUserStats();
       
       if (response.data.success) {
         setStats(response.data.data);
