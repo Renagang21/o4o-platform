@@ -39,16 +39,11 @@ export class ProductController {
         }
       });
     } catch (error: any) {
-      // Return empty data for database issues (graceful degradation)
-      res.json({
-        success: true,
-        data: [],
-        pagination: {
-          page: Number(page),
-          limit: Number(limit),
-          total: 0,
-          totalPages: 0
-        }
+      console.error('ProductController.getProducts error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch products',
+        message: error.message
       });
     }
   }
@@ -118,7 +113,13 @@ export class ProductController {
         return;
       }
 
-      const product = await this.productService.createProduct(req.body, userId);
+      // Ensure tags is properly handled
+      const productData = {
+        ...req.body,
+        tags: req.body.tags || null  // Use null instead of empty array for PostgreSQL
+      };
+
+      const product = await this.productService.createProduct(productData, userId);
 
       res.status(201).json({
         success: true,
@@ -126,6 +127,7 @@ export class ProductController {
         message: 'Product created successfully'
       });
     } catch (error: any) {
+      console.error('ProductController.createProduct error:', error);
       res.status(400).json({
         success: false,
         error: 'Failed to create product',

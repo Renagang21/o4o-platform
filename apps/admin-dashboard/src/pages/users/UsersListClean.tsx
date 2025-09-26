@@ -87,9 +87,12 @@ const UsersListClean = () => {
       try {
         setLoading(true);
         const response = await authClient.api.get('/v1/users');
-        
-        if (response.data) {
-          const transformedUsers = response.data.map((user: any) => ({
+
+        // Check for both direct data and nested data structure
+        const userData = response.data?.data?.users || response.data?.data || response.data || [];
+
+        if (Array.isArray(userData) && userData.length > 0) {
+          const transformedUsers = userData.map((user: any) => ({
             id: user.id || user._id,
             name: user.name || 'Unknown',
             username: user.username || user.email?.split('@')[0] || 'unknown',
@@ -97,21 +100,23 @@ const UsersListClean = () => {
             role: user.role || 'subscriber',
             posts: user.postsCount || 0,
             registeredDate: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : '',
-            lastLogin: user.lastLogin ? new Date(user.lastLogin).toISOString().split('T')[0] : undefined,
+            lastLogin: user.lastLogin || user.lastLoginAt ? new Date(user.lastLogin || user.lastLoginAt).toISOString().split('T')[0] : undefined,
             status: user.status || 'active',
             avatar: user.avatar
           }));
-          
+
           setUsers(transformedUsers);
+        } else {
+          setUsers([]);
         }
-      } catch (err) {
-        // Failed to fetch users
+      } catch (err: any) {
+        setError('Failed to load users');
         setUsers([]);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchUsers();
   }, []);
 

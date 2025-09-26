@@ -607,6 +607,7 @@ app.use('/api/v1/users', limiter, usersV1Routes); // V1 user management routes w
 app.use('/v1/users', limiter, usersV1Routes); // V1 user management routes (backward compatibility)
 app.use('/api/admin', limiter, adminRoutes);
 app.use('/api/ecommerce', limiter, ecommerceRoutes);
+app.use('/api/v1/ecommerce', limiter, ecommerceRoutes); // V1 compatibility for ecommerce routes
 app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
 app.use('/api/cpt', limiter, cptRoutes);
 app.use('/api/post-creation', limiter, postCreationRoutes);

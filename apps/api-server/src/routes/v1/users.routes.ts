@@ -137,12 +137,102 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req: Request, res:
   }
 });
 
-// Update user
+// Create new user
+router.post('/', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+
+    // Check if user already exists
+    const existingUser = await userRepository.findOne({
+      where: { email: req.body.email }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+
+    // Create new user
+    const newUser = userRepository.create({
+      email: req.body.email,
+      password: req.body.password, // Should be hashed in the entity
+      name: req.body.firstName && req.body.lastName
+        ? `${req.body.firstName} ${req.body.lastName}`
+        : req.body.firstName || req.body.lastName || req.body.email.split('@')[0],
+      role: req.body.role || 'customer',
+      status: req.body.status || 'active',
+      provider: 'local'
+    });
+
+    const savedUser = await userRepository.save(newUser);
+
+    // Remove password from response
+    const { password, ...userWithoutPassword } = savedUser;
+
+    res.status(201).json({
+      success: true,
+      data: userWithoutPassword
+    });
+  } catch (error) {
+    logger.error('Error creating user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create user',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Update user (PUT for full update)
+router.put('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({ where: { id: req.params.id } });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    // Update allowed fields
+    if (req.body.email) user.email = req.body.email;
+    if (req.body.password) user.password = req.body.password; // Will be hashed in entity
+    if (req.body.firstName || req.body.lastName) {
+      user.name = req.body.firstName && req.body.lastName
+        ? `${req.body.firstName} ${req.body.lastName}`
+        : req.body.firstName || req.body.lastName || user.name;
+    }
+    if (req.body.role) user.role = req.body.role;
+    if (req.body.status) user.status = req.body.status;
+
+    const updatedUser = await userRepository.save(user);
+
+    // Remove password from response
+    const { password, ...userWithoutPassword } = updatedUser;
+
+    res.json({
+      success: true,
+      data: userWithoutPassword
+    });
+  } catch (error) {
+    logger.error('Error updating user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update user'
+    });
+  }
+});
+
+// Update user (PATCH for partial update)
 router.patch('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { id: req.params.id } });
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,

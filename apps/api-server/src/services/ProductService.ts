@@ -81,9 +81,9 @@ export class ProductService {
       type: ProductType.PHYSICAL,
       featured: false,
       requiresShipping: true,
-      images: productData.images || [],
+      images: productData.images && productData.images.length > 0 ? productData.images : null,
       featuredImage: productData.thumbnail,
-      tags: this.extractTags(productData.tags),
+      tags: productData.tags === null ? null : (this.extractTags(productData.tags) || null),
       createdBy: userId,
       metadata: productData.metadata || {}
     });

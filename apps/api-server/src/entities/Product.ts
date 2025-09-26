@@ -52,7 +52,7 @@ export class Product {
   cost?: number;
 
   // 재고 관리
-  @Column({ default: 0 })
+  @Column({ name: 'stock', default: 0 })
   stockQuantity!: number;
 
   @Column({ default: false })
@@ -87,10 +87,10 @@ export class Product {
   })
   type!: ProductType;
 
-  @Column({ default: true })
+  @Column({ default: false })
   featured!: boolean;
 
-  @Column({ default: false })
+  @Column({ default: true })
   requiresShipping!: boolean;
 
   // 이미지 및 미디어
@@ -134,7 +134,7 @@ export class Product {
 
   // 변형 관련 필드
   @Column({ default: false })
-  hasVariations: boolean;
+  hasVariations!: boolean;
 
   @OneToMany(() => ProductAttribute, attr => attr.product)
   attributes!: ProductAttribute[];
