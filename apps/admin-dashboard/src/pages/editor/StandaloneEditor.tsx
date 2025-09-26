@@ -810,7 +810,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           )}
 
           {/* AI Generator Button */}
-          {!isMobile && (
+          {isMobile ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-purple-600 hover:text-purple-700"
+              onClick={() => setShowAIGenerator(true)}
+              aria-label="AI 페이지 생성"
+            >
+              <Sparkles className="h-4 w-4" />
+            </Button>
+          ) : (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -957,6 +967,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   <DropdownMenuSeparator />
                 </>
               )}
+              <DropdownMenuItem onClick={() => setShowAIGenerator(true)}>
+                <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                AI 페이지 생성
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setShowTemplates(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add template
