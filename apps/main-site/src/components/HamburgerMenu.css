@@ -1,15 +1,18 @@
-/* Hamburger Menu Button */
-.hamburger-menu {
+/* Hamburger Menu - 모든 클래스에 hm- prefix 사용하여 충돌 방지 */
+
+/* Container */
+.hm-container {
   display: none;
 }
 
 @media (max-width: 768px) {
-  .hamburger-menu {
+  .hm-container {
     display: block;
   }
 }
 
-.hamburger-btn {
+/* Button */
+.hm-btn {
   width: 30px;
   height: 24px;
   display: flex;
@@ -23,36 +26,36 @@
   z-index: 1002;
 }
 
-.hamburger-btn:disabled {
+.hm-btn:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-/* Hamburger Lines */
-.hamburger-line {
+/* Lines */
+.hm-line {
   width: 100%;
   height: 3px;
   background-color: #333;
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 
-/* Animation for open state */
-.hamburger-btn.is-open .hamburger-line:nth-child(1) {
+/* Animation */
+.hm-btn.is-open .hm-line:nth-child(1) {
   transform: translateY(10.5px) rotate(45deg);
 }
 
-.hamburger-btn.is-open .hamburger-line:nth-child(2) {
+.hm-btn.is-open .hm-line:nth-child(2) {
   opacity: 0;
 }
 
-.hamburger-btn.is-open .hamburger-line:nth-child(3) {
+.hm-btn.is-open .hm-line:nth-child(3) {
   transform: translateY(-10.5px) rotate(-45deg);
 }
 
-/* Menu Backdrop */
-.menu-backdrop {
+/* Backdrop */
+.hm-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -63,8 +66,8 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* Menu Panel */
-.menu-panel {
+/* Panel */
+.hm-panel {
   position: fixed;
   top: 0;
   right: -100%;
@@ -78,27 +81,27 @@
   overflow-x: hidden;
 }
 
-.menu-panel.is-open {
+.hm-panel.is-open {
   right: 0;
 }
 
 /* Navigation */
-.menu-nav {
+.hm-nav {
   padding-top: 60px;
 }
 
-.menu-list {
+.hm-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* Menu Items */
-.menu-item {
+/* Items */
+.hm-item {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.menu-link {
+.hm-link {
   display: block;
   padding: 16px 24px;
   color: #333;
@@ -107,23 +110,23 @@
   font-size: 16px;
 }
 
-.menu-link:hover {
+.hm-link:hover {
   background-color: #f3f4f6;
 }
 
-.menu-link:active {
+.hm-link:active {
   background-color: #e5e7eb;
 }
 
 /* Submenu */
-.submenu {
+.hm-submenu {
   list-style: none;
   padding: 0;
   margin: 0;
   background-color: #f9fafb;
 }
 
-.submenu .menu-link {
+.hm-submenu .hm-link {
   padding-left: 40px;
   font-size: 14px;
 }
@@ -138,11 +141,11 @@
   }
 }
 
-/* Desktop - hide everything */
+/* Desktop - hide */
 @media (min-width: 769px) {
-  .hamburger-menu,
-  .menu-backdrop,
-  .menu-panel {
+  .hm-container,
+  .hm-backdrop,
+  .hm-panel {
     display: none !important;
   }
 }

@@ -80,13 +80,13 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
     const hasChildren = item.children && item.children.length > 0;
     
     return (
-      <li key={item.id} className="menu-item">
+      <li key={item.id} className="hm-item">
         {item.target === '_blank' ? (
           <a
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="menu-link"
+            className="hm-link"
             onClick={handleMenuItemClick}
           >
             {item.title}
@@ -94,7 +94,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
         ) : (
           <Link 
             to={item.url} 
-            className="menu-link"
+            className="hm-link"
             onClick={handleMenuItemClick}
           >
             {item.title}
@@ -102,7 +102,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
         )}
         
         {hasChildren && (
-          <ul className="submenu">
+          <ul className="hm-submenu">
             {item.children!.map(child => renderMenuItem(child))}
           </ul>
         )}
@@ -112,11 +112,11 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
 
   if (loading) {
     return (
-      <div className="hamburger-menu">
-        <button className="hamburger-btn" disabled>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
+      <div className="hm-container">
+        <button className="hm-btn" disabled>
+          <span className="hm-line"></span>
+          <span className="hm-line"></span>
+          <span className="hm-line"></span>
         </button>
       </div>
     );
@@ -124,30 +124,30 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
 
   return (
     <>
-      <div className="hamburger-menu">
+      <div className="hm-container">
         <button 
           ref={buttonRef}
-          className={`hamburger-btn ${isOpen ? 'is-open' : ''}`}
+          className={`hm-btn ${isOpen ? 'is-open' : ''}`}
           onClick={toggleMenu}
           aria-label="Toggle menu"
           aria-expanded={isOpen}
         >
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
+          <span className="hm-line"></span>
+          <span className="hm-line"></span>
+          <span className="hm-line"></span>
         </button>
       </div>
 
       {/* Backdrop */}
-      {isOpen && <div className="menu-backdrop" onClick={() => setIsOpen(false)} />}
+      {isOpen && <div className="hm-backdrop" onClick={() => setIsOpen(false)} />}
 
       {/* Menu Panel */}
       <div 
         ref={menuPanelRef}
-        className={`menu-panel ${isOpen ? 'is-open' : ''}`}
+        className={`hm-panel ${isOpen ? 'is-open' : ''}`}
       >
-        <nav className="menu-nav">
-          <ul className="menu-list">
+        <nav className="hm-nav">
+          <ul className="hm-list">
             {menuItems.map(item => renderMenuItem(item))}
           </ul>
         </nav>
