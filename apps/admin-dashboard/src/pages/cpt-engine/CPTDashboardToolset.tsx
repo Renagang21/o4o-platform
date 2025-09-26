@@ -323,16 +323,16 @@ export const CPTDashboardToolset = () => {
           {showFilters && activeView !== 'dashboard' && (
             <div className="toolset-filters">
               <div className="toolset-filters__group">
-                <label className="toolset-label">Status</label>
-                <select className="toolset-select">
+                <label className="toolset-label" htmlFor="status-filter">Status</label>
+                <select id="status-filter" name="status-filter" className="toolset-select">
                   <option>All</option>
                   <option>Active</option>
                   <option>Inactive</option>
                 </select>
               </div>
               <div className="toolset-filters__group">
-                <label className="toolset-label">Type</label>
-                <select className="toolset-select">
+                <label className="toolset-label" htmlFor="type-filter">Type</label>
+                <select id="type-filter" name="type-filter" className="toolset-select">
                   <option>All</option>
                   <option>Built-in</option>
                   <option>Custom</option>
@@ -598,7 +598,7 @@ export const CPTDashboardToolset = () => {
                         <thead>
                           <tr>
                             <th className="toolset-table__checkbox">
-                              <input type="checkbox" className="toolset-checkbox" />
+                              <input type="checkbox" id="select-all-items" name="select-all-items" className="toolset-checkbox" />
                             </th>
                             <th className="toolset-table__sortable">
                               Name
@@ -616,7 +616,7 @@ export const CPTDashboardToolset = () => {
                           {filteredTypes.map(type => (
                             <tr key={type.slug}>
                               <td className="toolset-table__checkbox">
-                                <input type="checkbox" className="toolset-checkbox" />
+                                <input type="checkbox" id={`select-item-${type.slug}`} name={`select-item-${type.slug}`} className="toolset-checkbox" />
                               </td>
                               <td>
                                 <div className="toolset-table__primary">
@@ -680,7 +680,7 @@ export const CPTDashboardToolset = () => {
                       
                       {/* Bulk Actions */}
                       <div className="toolset-bulk-actions">
-                        <select className="toolset-select">
+                        <select id="bulk-actions" name="bulk-actions" className="toolset-select">
                           <option>Bulk Actions</option>
                           <option>Activate</option>
                           <option>Deactivate</option>
