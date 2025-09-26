@@ -30,6 +30,9 @@ export * from './crowdfunding';
 // Export affiliate types
 export * from './affiliate';
 
+// Export partner types
+export * from './partner';
+
 // Export vendor management types (excluding duplicates)
 export type {
   // Types

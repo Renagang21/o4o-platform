@@ -45,7 +45,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   name: string;
-  role?: 'customer' | 'business' | 'affiliate';
+  role?: 'customer' | 'business' | 'affiliate' | 'partner';
 }
 
 export interface UpdateProfilePayload {
