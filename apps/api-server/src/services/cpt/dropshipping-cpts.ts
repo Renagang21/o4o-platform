@@ -1,5 +1,6 @@
 import { CustomPostType } from '../../entities/CustomPostType';
 import { AppDataSource } from '../../database/connection';
+import { logger } from '../../utils/logger';
 
 export const DROPSHIPPING_CPT_DEFINITIONS = [
   {
@@ -166,9 +167,9 @@ export async function registerDropshippingCPTs() {
       });
       
       await cptRepository.save(cpt);
-      console.log(`Registered CPT: ${cptDef.name}`);
+      logger.info(`Registered CPT: ${cptDef.name}`);
     } else {
-      console.log(`CPT already exists: ${cptDef.name}`);
+      logger.info(`CPT already exists: ${cptDef.name}`);
     }
   }
 }

@@ -1,6 +1,7 @@
 import { FieldGroup, CustomField } from '../../entities/CustomField';
 import { AppDataSource } from '../../database/connection';
 import { LocationRule } from '../../entities/CustomField';
+import { logger } from '../../utils/logger';
 
 export const DROPSHIPPING_ACF_GROUPS = [
   {
@@ -601,7 +602,7 @@ export async function registerDropshippingACFFields() {
       });
       
       await fieldGroupRepo.save(fieldGroup);
-      console.log(`Created ACF field group: ${groupDef.title}`);
+      logger.info(`Created ACF field group: ${groupDef.title}`);
     }
     
     // Create fields for the group
@@ -641,7 +642,7 @@ export async function registerDropshippingACFFields() {
         });
         
         await customFieldRepo.save(field);
-        console.log(`Created ACF field: ${fieldDef.name}`);
+        logger.info(`Created ACF field: ${fieldDef.name}`);
       }
     }
   }

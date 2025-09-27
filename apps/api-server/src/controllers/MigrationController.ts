@@ -5,6 +5,7 @@ import { CustomPost, PostStatus } from '../entities/CustomPost';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 import { User } from '../entities/User';
 import { UserRole } from '../types/auth';
+import { logger } from '../utils/logger';
 
 export class MigrationController {
   // Initialize CPTs and ACF fields for dropshipping
@@ -87,7 +88,7 @@ export class MigrationController {
           });
           
           await postTypeRepo.save(postType);
-          console.log(`Created CPT: ${cptDef.slug}`);
+          logger.info(`Created CPT: ${cptDef.slug}`);
         }
       }
 
@@ -143,7 +144,7 @@ export class MigrationController {
           });
           
           await fieldGroupRepo.save(fieldGroup);
-          console.log(`Created field group: ${groupDef.title}`);
+          logger.info(`Created field group: ${groupDef.title}`);
 
           // Create fields
           for (let i = 0; i < groupDef.fields.length; i++) {
@@ -158,7 +159,7 @@ export class MigrationController {
             });
             
             await customFieldRepo.save(field);
-            console.log(`Created field: ${fieldDef.name}`);
+            logger.info(`Created field: ${fieldDef.name}`);
           }
         }
       }

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PartnerController } from '../controllers/partner/partnerController';
 import { authenticate } from '../middleware/auth.middleware';
 import { validateRole } from '../middleware/roleValidation';
+import { logger } from '../utils/logger';
 
 const router: Router = Router();
 
@@ -49,7 +50,7 @@ router.get('/track/click/:linkId', async (req, res) => {
     
     // Track click event
     // This would typically update click counts in database
-    console.log(`Click tracked for link: ${linkId}, ref: ${ref}`);
+    logger.info(`Click tracked for link: ${linkId}, ref: ${ref}`);
     
     res.json({ 
       success: true, 
@@ -69,7 +70,7 @@ router.post('/track/conversion', async (req, res) => {
     
     // Track conversion event
     // This would typically update conversion counts and calculate commission
-    console.log(`Conversion tracked - Order: ${orderId}, Link: ${linkId}, Ref: ${ref}`);
+    logger.info(`Conversion tracked - Order: ${orderId}, Link: ${linkId}, Ref: ${ref}`);
     
     res.json({ 
       success: true, 

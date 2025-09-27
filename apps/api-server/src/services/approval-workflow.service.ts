@@ -1,6 +1,7 @@
 import { AppDataSource } from '../database/connection';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
+import { logger } from '../utils/logger';
 
 export interface ApprovalRequest {
   id: string;
@@ -58,7 +59,7 @@ export class ApprovalWorkflowService {
     // Store in pending approvals table (would need to create this entity)
     await this.storePendingRequest(request);
     
-    console.log(`🚨 Approval request created: ${request.id} for entity ${entityId}`);
+    logger.info(`🚨 Approval request created: ${request.id} for entity ${entityId}`);
     return request;
   }
 
@@ -84,7 +85,7 @@ export class ApprovalWorkflowService {
 
     await this.logAutonomousPricing(logEntry);
     
-    console.log(`✅ Autonomous pricing set by seller ${sellerId} for product ${entityId}: ₩${sellerPrice.toLocaleString()}`);
+    logger.info(`✅ Autonomous pricing set by seller ${sellerId} for product ${entityId}: ₩${sellerPrice.toLocaleString()}`);
   }
 
   /**
@@ -140,7 +141,7 @@ export class ApprovalWorkflowService {
       // Update the stored request
       await this.updatePendingRequest(request);
 
-      console.log(`✅ Pricing request ${requestId} approved by ${approvedBy}`);
+      logger.info(`✅ Pricing request ${requestId} approved by ${approvedBy}`);
       return { success: true, message: 'Request approved successfully' };
 
     } catch (error) {
@@ -188,7 +189,7 @@ export class ApprovalWorkflowService {
       // Update the stored request
       await this.updatePendingRequest(request);
 
-      console.log(`❌ Pricing request ${requestId} rejected by ${rejectedBy}: ${rejectionReason}`);
+      logger.info(`❌ Pricing request ${requestId} rejected by ${rejectedBy}: ${rejectionReason}`);
       return { success: true, message: 'Request rejected' };
 
     } catch (error) {
@@ -294,35 +295,35 @@ export class ApprovalWorkflowService {
   private async storePendingRequest(request: ApprovalRequest): Promise<void> {
     // Implementation would store in database
     // For now, store in memory or file system
-    console.log('Storing pending request:', request.id);
+    logger.debug('Storing pending request:', request.id);
   }
 
   private async updatePendingRequest(request: ApprovalRequest): Promise<void> {
     // Implementation would update in database
-    console.log('Updating pending request:', request.id);
+    logger.debug('Updating pending request:', request.id);
   }
 
   private async getPendingRequest(requestId: string): Promise<ApprovalRequest | null> {
     // Implementation would query from database
-    console.log('Getting pending request:', requestId);
+    logger.debug('Getting pending request:', requestId);
     return null; // Placeholder
   }
 
   private async queryPendingRequests(filters?: any): Promise<ApprovalRequest[]> {
     // Implementation would query from database
-    console.log('Querying pending requests with filters:', filters);
+    logger.debug('Querying pending requests with filters:', filters);
     return []; // Placeholder
   }
 
   private async queryRequestHistory(entityId: string): Promise<ApprovalRequest[]> {
     // Implementation would query from database
-    console.log('Querying request history for:', entityId);
+    logger.debug('Querying request history for:', entityId);
     return []; // Placeholder
   }
 
   private async applyApprovedChanges(request: ApprovalRequest): Promise<void> {
     // Implementation would apply changes to the actual entity
-    console.log('Applying approved changes for request:', request.id);
+    logger.debug('Applying approved changes for request:', request.id);
     
     // Update the product/supplier/partner entity with approved values
     // This would use TypeORM to update the actual entity
@@ -330,7 +331,7 @@ export class ApprovalWorkflowService {
 
   private async logAutonomousPricing(logEntry: any): Promise<void> {
     // Implementation would log autonomous pricing changes
-    console.log('Logging autonomous pricing:', logEntry);
+    logger.debug('Logging autonomous pricing:', logEntry);
   }
 
   /**

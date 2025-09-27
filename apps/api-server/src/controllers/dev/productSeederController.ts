@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
+import { logger } from '../../utils/logger';
 
 /**
  * Development Controller for Seeding Test Data
@@ -224,7 +225,7 @@ export class ProductSeederController {
       // 요청된 수만큼 상품 생성
       for (let i = 0; i < Math.min(count, products.length); i++) {
         try {
-          console.log(`Creating product ${i + 1}/${count}: ${products[i].title}`);
+          logger.info(`Creating product ${i + 1}/${count}: ${products[i].title}`);
           
           const response = await this.createWordPressProduct(products[i]);
           results.push({

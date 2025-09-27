@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import { User } from '../../entities/User';
 import { ApprovalLog } from '../../entities/ApprovalLog';
 import { AuthRequest } from '../../types/auth';
+import { logger } from '../../utils/logger';
 
 export class AdminApprovalController {
   // Get approval queue with filters
@@ -206,7 +207,7 @@ export class AdminApprovalController {
       await approvalLogRepository.save(log);
 
       // Send notification to requester (mock)
-      console.log(`Approval notification sent for request ${id}`);
+      logger.info(`Approval notification sent for request ${id}`);
 
       res.json({
         success: true,
@@ -271,7 +272,7 @@ export class AdminApprovalController {
       await approvalLogRepository.save(log);
 
       // Send notification to requester (mock)
-      console.log(`Rejection notification sent for request ${id}`);
+      logger.info(`Rejection notification sent for request ${id}`);
 
       res.json({
         success: true,

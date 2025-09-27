@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
+import { logger } from '../../utils/logger';
 
 export class AdminStatsController {
   /**
@@ -228,7 +229,7 @@ export class AdminStatsController {
       }
 
       // Process the settlement (mock implementation)
-      console.log(`Processing settlement ${id} with action: ${action}`);
+      logger.info(`Processing settlement ${id} with action: ${action}`);
 
       res.json({
         success: true,
