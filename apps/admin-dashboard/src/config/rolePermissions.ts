@@ -329,6 +329,11 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['products:read']
   },
   {
+    menuId: 'ds-sellers',
+    roles: ['admin', 'manager'],
+    permissions: ['users:read']
+  },
+  {
     menuId: 'ds-partners',
     roles: ['admin', 'manager'],
     permissions: ['vendors:read']

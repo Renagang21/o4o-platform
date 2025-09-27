@@ -167,6 +167,7 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       { id: 'ds-products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/dropshipping/products' },
       { id: 'ds-suppliers', label: '공급자', icon: <Store className="w-4 h-4" />, path: '/dropshipping/suppliers' },
+      { id: 'ds-sellers', label: '판매자', icon: <UserCheck className="w-4 h-4" />, path: '/dropshipping/sellers' },
       { id: 'ds-partners', label: '파트너', icon: <Users className="w-4 h-4" />, path: '/dropshipping/partners' },
       { id: 'ds-approvals', label: '승인 관리', icon: <FileCheck className="w-4 h-4" />, path: '/dropshipping/approvals' },
       { id: 'ds-commissions', label: '수수료 정책', icon: <DollarSign className="w-4 h-4" />, path: '/dropshipping/commissions' },
