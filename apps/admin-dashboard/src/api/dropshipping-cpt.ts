@@ -4,7 +4,7 @@ import api from './client';
 export const dropshippingAPI = {
   // Get all products
   getProducts: async () => {
-    const response = await api.get('/dropshipping/products');
+    const response = await api.get('/api/v1/dropshipping/products');
     return response.data;
   },
 
@@ -24,7 +24,7 @@ export const dropshippingAPI = {
       shipping_fee?: number;
     };
   }) => {
-    const response = await api.post('/dropshipping/products', data);
+    const response = await api.post('/api/v1/dropshipping/products', data);
     return response.data;
   },
 
@@ -56,7 +56,7 @@ export const dropshippingAPI = {
 
   // Calculate margin
   calculateMargin: async (cost_price: number, selling_price: number) => {
-    const response = await api.post('/dropshipping/calculate-margin', {
+    const response = await api.post('/api/v1/dropshipping/calculate-margin', {
       cost_price,
       selling_price
     });
@@ -65,13 +65,13 @@ export const dropshippingAPI = {
 
   // Initialize CPTs and ACF
   initializeCPTs: async () => {
-    const response = await api.post('/dropshipping/initialize');
+    const response = await api.post('/api/v1/dropshipping/initialize');
     return response.data;
   },
 
   // Partner API
   getPartners: async () => {
-    const response = await api.get('/dropshipping/partners');
+    const response = await api.get('/api/v1/dropshipping/partners');
     return response.data;
   },
 
@@ -84,7 +84,7 @@ export const dropshippingAPI = {
       partner_commission_rate?: number;
     };
   }) => {
-    const response = await api.post('/dropshipping/partners', data);
+    const response = await api.post('/api/v1/dropshipping/partners', data);
     return response.data;
   },
 
@@ -108,7 +108,7 @@ export const dropshippingAPI = {
 
   // Supplier API
   getSuppliers: async () => {
-    const response = await api.get('/dropshipping/suppliers');
+    const response = await api.get('/api/v1/dropshipping/suppliers');
     return response.data;
   },
 
@@ -123,7 +123,7 @@ export const dropshippingAPI = {
       supplier_api_endpoint?: string;
     };
   }) => {
-    const response = await api.post('/dropshipping/suppliers', data);
+    const response = await api.post('/api/v1/dropshipping/suppliers', data);
     return response.data;
   },
 
