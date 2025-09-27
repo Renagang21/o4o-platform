@@ -46,18 +46,10 @@ const SuppliersList: React.FC = () => {
 
       const response = await UserApi.getUsers(page, 20, filters);
       
-      // Debug: Check response structure
-      if (import.meta.env.DEV) {
-        console.log('Supplier API response structure:', {
-          isArray: Array.isArray(response),
-          hasData: !!response?.data,
-          dataIsArray: Array.isArray(response?.data),
-          response
-        });
-      }
-      
       // Handle PaginatedResponse structure and ensure data is an array
-      const supplierData = Array.isArray(response?.data) ? response.data : [];
+      const supplierData = Array.isArray(response?.data) ? response.data : 
+                          Array.isArray(response?.users) ? response.users : 
+                          Array.isArray(response) ? response : [];
       
       setSuppliers(supplierData);
       setTotalPages(Math.ceil((response?.total || 0) / 20));
