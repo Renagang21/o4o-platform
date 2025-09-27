@@ -189,13 +189,16 @@ export class AdminApprovalController {
       // For now, we'll just log it
       const approvalLogRepository = getRepository(ApprovalLog);
       const log = approvalLogRepository.create({
-        requestId: id,
-        action: 'approved',
-        performedBy: adminId?.toString() || 'system',
-        performedAt: new Date(),
+        user_id: 'pending_user',  // In production, get from actual request
+        admin_id: adminId?.toString() || 'system',
+        action: 'approved' as const,
+        previous_status: 'pending',
+        new_status: 'approved',
         notes: adminNotes,
         metadata: {
           adminName,
+          requestId: id,
+          requestType: 'approval',
           timestamp: new Date().toISOString()
         }
       });
@@ -252,13 +255,15 @@ export class AdminApprovalController {
       // In production, this would update the actual approval request
       const approvalLogRepository = getRepository(ApprovalLog);
       const log = approvalLogRepository.create({
-        requestId: id,
-        action: 'rejected',
-        performedBy: adminId?.toString() || 'system',
-        performedAt: new Date(),
+        user_id: 'pending_user',  // In production, get from actual request
+        admin_id: adminId?.toString() || 'system',
+        action: 'rejected' as const,
+        previous_status: 'pending',
+        new_status: 'rejected',
         notes: reason,
         metadata: {
           adminName,
+          requestId: id,
           timestamp: new Date().toISOString()
         }
       });

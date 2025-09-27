@@ -776,8 +776,8 @@ import partnerRoutes from './routes/partner.routes';
 app.use('/api/v1/dropshipping/partner', partnerRoutes); // Partner/Affiliate API routes
 
 // Admin Management Routes
-import adminRoutes from './routes/admin.routes';
-app.use('/api/v1/approval', adminRoutes); // Admin approval management routes
+import adminManagementRoutes from './routes/admin.routes';
+app.use('/api/v1/approval', adminManagementRoutes); // Admin approval management routes
 
 // Approval Workflow Routes (법률 준수)
 app.use('/api/v1/approval', approvalV1Routes); // Approval workflow for pricing changes
@@ -816,6 +816,13 @@ app.use('/api/v1/themes', themeRoutes);
 // import dropshippingV1Routes from './routes/v1/dropshipping.routes'; // Already imported above
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
+
+// 개발 환경 전용 라우트 (프로덕션에서는 자동 비활성화)
+if (process.env.NODE_ENV !== 'production') {
+  const devRoutes = require('./routes/dev.routes').default;
+  app.use('/api/v1/dev', devRoutes);
+  logger.info('Development routes enabled at /api/v1/dev');
+}
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
