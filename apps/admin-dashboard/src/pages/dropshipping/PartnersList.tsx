@@ -44,9 +44,7 @@ const PartnersList: React.FC = () => {
         filters.q = searchQuery;
       }
 
-      console.log('Fetching partners with filters:', filters);
       const response = await UserApi.getUsers(page, 20, filters);
-      console.log('Partners response:', response);
       
       // Handle PaginatedResponse structure
       const partnerData = response?.data || [];

@@ -44,9 +44,7 @@ const SuppliersList: React.FC = () => {
         filters.q = searchQuery;
       }
 
-      console.log('Fetching suppliers with filters:', filters);
       const response = await UserApi.getUsers(page, 20, filters);
-      console.log('Suppliers response:', response);
       
       // Handle PaginatedResponse structure
       const supplierData = response?.data || [];
