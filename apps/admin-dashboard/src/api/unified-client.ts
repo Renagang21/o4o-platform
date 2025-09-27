@@ -19,6 +19,11 @@ class UnifiedApiClient {
       this.baseURL = this.baseURL.slice(0, -3); // Remove '/v1'
     }
     
+    // Add /api prefix to baseURL if not present
+    if (!this.baseURL.endsWith('/api')) {
+      this.baseURL = `${this.baseURL}/api`;
+    }
+    
     this.client = axios.create({
       baseURL: this.baseURL,
       timeout: 30000,
@@ -146,7 +151,7 @@ class UnifiedApiClient {
 
   // Versioned API methods
   private v1(path: string): string {
-    return `/api/${this.version}${path}`;
+    return `/${this.version}${path}`;
   }
 
   // Content API

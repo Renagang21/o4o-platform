@@ -86,7 +86,7 @@ const UsersListClean = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await authClient.api.get('/api/v1/users');
+        const response = await authClient.api.get('/v1/users');
 
         // Check for both direct data and nested data structure
         const userData = response.data?.data?.users || response.data?.data || response.data || [];
