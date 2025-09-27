@@ -33,13 +33,25 @@ const SystemSetup: React.FC = () => {
   const checkSystemStatus = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/migration/status');
+      const response = await api.get('/api/v1/dropshipping/status');
       if (response.data.success) {
         setStatus(response.data.status);
       }
     } catch (error) {
       console.error('Failed to check system status:', error);
-      toast.error('시스템 상태 확인에 실패했습니다');
+      // 404 에러는 정상적인 상황일 수 있음 (초기 설정 전)
+      if (error.response?.status === 404) {
+        setStatus({
+          initialized: false,
+          cpts: [],
+          acf_fields: [],
+          data_count: {
+            products: 0,
+            suppliers: 0,
+            partners: 0
+          }
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -50,7 +62,7 @@ const SystemSetup: React.FC = () => {
 
     setInitializing(true);
     try {
-      const response = await api.post('/migration/initialize');
+      const response = await api.post('/api/v1/dropshipping/initialize');
       if (response.data.success) {
         toast.success('시스템이 성공적으로 초기화되었습니다');
         await checkSystemStatus();
@@ -68,7 +80,7 @@ const SystemSetup: React.FC = () => {
 
     setSeeding(true);
     try {
-      const response = await api.post('/migration/seed');
+      const response = await api.post('/api/v1/dropshipping/seed');
       if (response.data.success) {
         toast.success(`샘플 데이터가 생성되었습니다: 
           공급자 ${response.data.data.suppliers}개, 
