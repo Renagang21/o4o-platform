@@ -29,6 +29,13 @@ interface Order {
     total: number;
     status: 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
     payment_method: string;
+    payment_status?: 'paid' | 'unpaid';
+    payment_date?: string;
+    payment_amount?: number;
+    transaction_id?: string;
+    card_last_four?: string;
+    card_type?: string;
+    cash_receipt_number?: string;
     shipping_address?: {
       street: string;
       city: string;
@@ -82,6 +89,39 @@ const Orders: React.FC = () => {
       style: 'currency',
       currency: 'KRW'
     }).format(amount);
+  };
+
+  const getPaymentBadge = (status: string) => {
+    if (status === 'paid') {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <CheckCircle className="w-3 h-3 mr-1" />
+          결제완료
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+        <Clock className="w-3 h-3 mr-1" />
+        미결제
+      </span>
+    );
+  };
+
+  const getPaymentMethodBadge = (method: string) => {
+    const methodConfig = {
+      card: { color: 'bg-blue-100 text-blue-800', text: '카드' },
+      cash: { color: 'bg-gray-100 text-gray-800', text: '현금' },
+      bank_transfer: { color: 'bg-purple-100 text-purple-800', text: '계좌이체' },
+      mobile_payment: { color: 'bg-yellow-100 text-yellow-800', text: '간편결제' },
+      credit_card: { color: 'bg-indigo-100 text-indigo-800', text: '신용카드' }
+    };
+    const config = methodConfig[method as keyof typeof methodConfig] || { color: 'bg-gray-100 text-gray-800', text: method };
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        {config.text}
+      </span>
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -204,13 +244,48 @@ const Orders: React.FC = () => {
                   <dd className="mt-1">{getStatusBadge(selectedOrder.meta_data.status)}</dd>
                 </div>
                 <div>
+                  <dt className="text-gray-600">결제 상태</dt>
+                  <dd className="mt-1">{getPaymentBadge(selectedOrder.meta_data.payment_status || 'unpaid')}</dd>
+                </div>
+                <div>
                   <dt className="text-gray-600">주문일</dt>
                   <dd>{new Date(selectedOrder.createdAt).toLocaleString('ko-KR')}</dd>
                 </div>
+                {selectedOrder.meta_data.payment_date && (
+                  <div>
+                    <dt className="text-gray-600">결제일</dt>
+                    <dd>{new Date(selectedOrder.meta_data.payment_date).toLocaleString('ko-KR')}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+
+            {/* Payment Info */}
+            <div className="bg-white border border-gray-300 rounded-lg p-6 mb-6">
+              <h2 className="text-lg font-medium mb-4">결제 정보</h2>
+              <dl className="space-y-3 text-sm">
                 <div>
                   <dt className="text-gray-600">결제 방법</dt>
-                  <dd>{selectedOrder.meta_data.payment_method}</dd>
+                  <dd className="mt-1">{getPaymentMethodBadge(selectedOrder.meta_data.payment_method)}</dd>
                 </div>
+                {selectedOrder.meta_data.transaction_id && (
+                  <div>
+                    <dt className="text-gray-600">거래번호</dt>
+                    <dd className="font-mono text-xs">{selectedOrder.meta_data.transaction_id}</dd>
+                  </div>
+                )}
+                {selectedOrder.meta_data.card_last_four && (
+                  <div>
+                    <dt className="text-gray-600">카드정보</dt>
+                    <dd>{selectedOrder.meta_data.card_type} ****{selectedOrder.meta_data.card_last_four}</dd>
+                  </div>
+                )}
+                {selectedOrder.meta_data.cash_receipt_number && (
+                  <div>
+                    <dt className="text-gray-600">현금영수증</dt>
+                    <dd className="font-mono text-xs">{selectedOrder.meta_data.cash_receipt_number}</dd>
+                  </div>
+                )}
               </dl>
             </div>
 
@@ -264,7 +339,7 @@ const Orders: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg border border-gray-300">
           <div className="flex items-center justify-between">
             <div>
@@ -278,12 +353,24 @@ const Orders: React.FC = () => {
         <div className="bg-white p-4 rounded-lg border border-gray-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm">처리중</p>
-              <p className="text-2xl font-bold">
-                {orders.filter(o => o.meta_data.status === 'processing').length}
+              <p className="text-gray-600 text-sm">결제완료</p>
+              <p className="text-2xl font-bold text-green-600">
+                {orders.filter(o => o.meta_data.payment_status === 'paid').length}
               </p>
             </div>
-            <Package className="h-8 w-8 text-blue-400" />
+            <DollarSign className="h-8 w-8 text-green-400" />
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg border border-gray-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">미결제</p>
+              <p className="text-2xl font-bold text-red-600">
+                {orders.filter(o => o.meta_data.payment_status !== 'paid').length}
+              </p>
+            </div>
+            <Clock className="h-8 w-8 text-red-400" />
           </div>
         </div>
 
@@ -343,9 +430,9 @@ const Orders: React.FC = () => {
               <th className="manage-column">고객</th>
               <th className="manage-column">상품수</th>
               <th className="manage-column">금액</th>
-              <th className="manage-column">배송비</th>
-              <th className="manage-column">상태</th>
+              <th className="manage-column">결제상태</th>
               <th className="manage-column">결제방법</th>
+              <th className="manage-column">배송상태</th>
               <th className="manage-column">주문일</th>
             </tr>
           </thead>
@@ -385,10 +472,10 @@ const Orders: React.FC = () => {
                   </td>
                   <td>{order.meta_data.customer_name}</td>
                   <td className="text-center">{order.meta_data.items.length}</td>
-                  <td>{formatCurrency(order.meta_data.subtotal)}</td>
-                  <td>{formatCurrency(order.meta_data.shipping_fee)}</td>
+                  <td>{formatCurrency(order.meta_data.total)}</td>
+                  <td>{getPaymentBadge(order.meta_data.payment_status || 'unpaid')}</td>
+                  <td>{getPaymentMethodBadge(order.meta_data.payment_method)}</td>
                   <td>{getStatusBadge(order.meta_data.status)}</td>
-                  <td>{order.meta_data.payment_method}</td>
                   <td className="date column-date">
                     <abbr title={new Date(order.createdAt).toLocaleString('ko-KR')}>
                       {new Date(order.createdAt).toLocaleDateString('ko-KR')}
