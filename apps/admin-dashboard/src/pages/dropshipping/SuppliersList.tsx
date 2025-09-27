@@ -46,17 +46,27 @@ const SuppliersList: React.FC = () => {
 
       const response = await UserApi.getUsers(page, 20, filters);
       
-      // Handle PaginatedResponse structure
-      const supplierData = response?.data || [];
+      // Debug: Check response structure
+      if (import.meta.env.DEV) {
+        console.log('Supplier API response structure:', {
+          isArray: Array.isArray(response),
+          hasData: !!response?.data,
+          dataIsArray: Array.isArray(response?.data),
+          response
+        });
+      }
+      
+      // Handle PaginatedResponse structure and ensure data is an array
+      const supplierData = Array.isArray(response?.data) ? response.data : [];
       
       setSuppliers(supplierData);
       setTotalPages(Math.ceil((response?.total || 0) / 20));
       
-      // Calculate stats
+      // Calculate stats with safe array operations
       setStats({
         total: response?.total || 0,
-        active: supplierData.filter((s: User) => s.status === 'active').length,
-        pending: supplierData.filter((s: User) => s.status === 'pending').length,
+        active: Array.isArray(supplierData) ? supplierData.filter((s: User) => s.status === 'active').length : 0,
+        pending: Array.isArray(supplierData) ? supplierData.filter((s: User) => s.status === 'pending').length : 0,
         totalProducts: 0 // This would come from a separate API
       });
     } catch (error) {

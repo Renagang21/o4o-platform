@@ -46,17 +46,17 @@ const PartnersList: React.FC = () => {
 
       const response = await UserApi.getUsers(page, 20, filters);
       
-      // Handle PaginatedResponse structure
-      const partnerData = response?.data || [];
+      // Handle PaginatedResponse structure and ensure data is an array
+      const partnerData = Array.isArray(response?.data) ? response.data : [];
       
       setPartners(partnerData);
       setTotalPages(Math.ceil((response?.total || 0) / 20));
       
-      // Calculate stats
+      // Calculate stats with safe array operations
       setStats({
         total: response?.total || 0,
-        active: partnerData.filter((p: User) => p.status === 'active').length,
-        pending: partnerData.filter((p: User) => p.status === 'pending').length,
+        active: Array.isArray(partnerData) ? partnerData.filter((p: User) => p.status === 'active').length : 0,
+        pending: Array.isArray(partnerData) ? partnerData.filter((p: User) => p.status === 'pending').length : 0,
         totalCommission: 0 // This would come from a separate API
       });
     } catch (error) {
