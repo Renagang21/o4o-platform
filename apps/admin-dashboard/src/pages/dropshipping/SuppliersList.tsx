@@ -46,21 +46,31 @@ const SuppliersList: React.FC = () => {
 
       const response = await UserApi.getUsers(page, 20, filters);
       
-      if (response.data) {
-        setSuppliers(response.data);
-        setTotalPages(response.totalPages || 1);
-        
-        // Calculate stats
-        setStats({
-          total: response.total || 0,
-          active: response.data.filter(s => s.status === 'active').length,
-          pending: response.data.filter(s => s.status === 'pending').length,
-          totalProducts: 0 // This would come from a separate API
-        });
-      }
+      // Ensure response.data is an array
+      const supplierData = Array.isArray(response?.data) ? response.data : 
+                          Array.isArray(response) ? response : [];
+      
+      setSuppliers(supplierData);
+      setTotalPages(response?.totalPages || 1);
+      
+      // Calculate stats
+      setStats({
+        total: response?.total || supplierData.length,
+        active: supplierData.filter(s => s.status === 'active').length,
+        pending: supplierData.filter(s => s.status === 'pending').length,
+        totalProducts: 0 // This would come from a separate API
+      });
     } catch (error) {
       console.error('Failed to fetch suppliers:', error);
       toast.error('공급자 목록을 불러오는데 실패했습니다');
+      // Set empty data on error
+      setSuppliers([]);
+      setStats({
+        total: 0,
+        active: 0,
+        pending: 0,
+        totalProducts: 0
+      });
     } finally {
       setLoading(false);
     }

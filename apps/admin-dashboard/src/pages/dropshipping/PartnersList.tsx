@@ -46,21 +46,31 @@ const PartnersList: React.FC = () => {
 
       const response = await UserApi.getUsers(page, 20, filters);
       
-      if (response.data) {
-        setPartners(response.data);
-        setTotalPages(response.totalPages || 1);
-        
-        // Calculate stats
-        setStats({
-          total: response.total || 0,
-          active: response.data.filter(p => p.status === 'active').length,
-          pending: response.data.filter(p => p.status === 'pending').length,
-          totalCommission: 0 // This would come from a separate API
-        });
-      }
+      // Ensure response.data is an array
+      const partnerData = Array.isArray(response?.data) ? response.data : 
+                          Array.isArray(response) ? response : [];
+      
+      setPartners(partnerData);
+      setTotalPages(response?.totalPages || 1);
+      
+      // Calculate stats
+      setStats({
+        total: response?.total || partnerData.length,
+        active: partnerData.filter(p => p.status === 'active').length,
+        pending: partnerData.filter(p => p.status === 'pending').length,
+        totalCommission: 0 // This would come from a separate API
+      });
     } catch (error) {
       console.error('Failed to fetch partners:', error);
       toast.error('파트너 목록을 불러오는데 실패했습니다');
+      // Set empty data on error
+      setPartners([]);
+      setStats({
+        total: 0,
+        active: 0,
+        pending: 0,
+        totalCommission: 0
+      });
     } finally {
       setLoading(false);
     }
