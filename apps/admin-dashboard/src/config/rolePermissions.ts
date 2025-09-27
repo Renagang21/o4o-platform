@@ -2,7 +2,7 @@
 // Role-based menu permissions configuration
 // Defines which roles have access to which menu items and features
 
-export type UserRole = 'admin' | 'business' | 'affiliate' | 'customer' | 'seller' | 'supplier' | 'manager' | 'retailer';
+export type UserRole = 'admin' | 'business' | 'affiliate' | 'customer' | 'seller' | 'supplier' | 'partner' | 'manager' | 'retailer';
 
 export interface MenuPermission {
   menuId: string;
@@ -320,7 +320,7 @@ export const menuPermissions: MenuPermission[] = [
   // Dropshipping - Admin, Manager, Business, Seller, Supplier, Partner
   {
     menuId: 'dropshipping',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
+    roles: ['admin', 'manager', 'business', 'seller', 'supplier', 'partner'],
     permissions: ['ecommerce:read']
   },
   {
@@ -330,17 +330,17 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'ds-sellers',
-    roles: ['admin', 'manager'],
+    roles: ['admin', 'manager', 'seller'],
     permissions: ['users:read']
   },
   {
     menuId: 'ds-partners',
-    roles: ['admin', 'manager'],
+    roles: ['admin', 'manager', 'partner'],
     permissions: ['vendors:read']
   },
   {
     menuId: 'ds-suppliers',
-    roles: ['admin', 'manager'],
+    roles: ['admin', 'manager', 'supplier'],
     permissions: ['vendors:read']
   },
   {
