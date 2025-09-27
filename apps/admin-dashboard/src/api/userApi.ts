@@ -66,12 +66,12 @@ export class UserApi {
   }
 
   static async approveUser(userId: string, notes?: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post(`/v1/users/${userId}/approve`, { notes })
+    const response = await unifiedApi.raw.post(`/admin/users/${userId}/approve`, { notes })
     return response.data
   }
 
   static async rejectUser(userId: string, reason: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post(`/v1/users/${userId}/reject`, { notes: reason })
+    const response = await unifiedApi.raw.post(`/admin/users/${userId}/reject`, { notes: reason })
     return response.data
   }
 
