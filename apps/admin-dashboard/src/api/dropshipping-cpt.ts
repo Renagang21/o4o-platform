@@ -44,13 +44,13 @@ export const dropshippingAPI = {
       shipping_fee?: number;
     };
   }) => {
-    const response = await api.put(`/dropshipping/products/${id}`, data);
+    const response = await api.put(`/api/v1/dropshipping/products/${id}`, data);
     return response.data;
   },
 
   // Delete product
   deleteProduct: async (id: string) => {
-    const response = await api.delete(`/dropshipping/products/${id}`);
+    const response = await api.delete(`/api/v1/dropshipping/products/${id}`);
     return response.data;
   },
 
@@ -97,12 +97,12 @@ export const dropshippingAPI = {
       partner_commission_rate?: number;
     };
   }) => {
-    const response = await api.put(`/dropshipping/partners/${id}`, data);
+    const response = await api.put(`/api/v1/dropshipping/partners/${id}`, data);
     return response.data;
   },
 
   deletePartner: async (id: string) => {
-    const response = await api.delete(`/dropshipping/partners/${id}`);
+    const response = await api.delete(`/api/v1/dropshipping/partners/${id}`);
     return response.data;
   },
 
@@ -138,12 +138,12 @@ export const dropshippingAPI = {
       supplier_api_endpoint?: string;
     };
   }) => {
-    const response = await api.put(`/dropshipping/suppliers/${id}`, data);
+    const response = await api.put(`/api/v1/dropshipping/suppliers/${id}`, data);
     return response.data;
   },
 
   deleteSupplier: async (id: string) => {
-    const response = await api.delete(`/dropshipping/suppliers/${id}`);
+    const response = await api.delete(`/api/v1/dropshipping/suppliers/${id}`);
     return response.data;
   }
 };
