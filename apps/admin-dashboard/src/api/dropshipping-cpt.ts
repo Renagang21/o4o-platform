@@ -145,5 +145,53 @@ export const dropshippingAPI = {
   deleteSupplier: async (id: string) => {
     const response = await api.delete(`/api/v1/dropshipping/suppliers/${id}`);
     return response.data;
+  },
+
+  // Order API
+  getOrders: async (status?: string) => {
+    const params = status ? `?status=${status}` : '';
+    const response = await api.get(`/api/v1/dropshipping/orders${params}`);
+    return response.data;
+  },
+
+  getOrder: async (id: string) => {
+    const response = await api.get(`/api/v1/dropshipping/orders/${id}`);
+    return response.data;
+  },
+
+  createOrder: async (data: {
+    customer_id: string;
+    customer_name: string;
+    customer_email: string;
+    items: Array<{
+      product_id: string;
+      product_name: string;
+      quantity: number;
+      price: number;
+      seller_id: string;
+      seller_name: string;
+    }>;
+    shipping_fee: number;
+    payment_method: string;
+    shipping_address?: {
+      street: string;
+      city: string;
+      state: string;
+      zip: string;
+      country: string;
+    };
+  }) => {
+    const response = await api.post('/api/v1/dropshipping/orders', data);
+    return response.data;
+  },
+
+  updateOrderStatus: async (id: string, status: string) => {
+    const response = await api.patch(`/api/v1/dropshipping/orders/${id}/status`, { status });
+    return response.data;
+  },
+
+  deleteOrder: async (id: string) => {
+    const response = await api.delete(`/api/v1/dropshipping/orders/${id}`);
+    return response.data;
   }
 };
