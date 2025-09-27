@@ -44,20 +44,21 @@ const PartnersList: React.FC = () => {
         filters.q = searchQuery;
       }
 
+      console.log('Fetching partners with filters:', filters);
       const response = await UserApi.getUsers(page, 20, filters);
+      console.log('Partners response:', response);
       
-      // Ensure response.data is an array
-      const partnerData = Array.isArray(response?.data) ? response.data : 
-                          Array.isArray(response) ? response : [];
+      // Handle PaginatedResponse structure
+      const partnerData = response?.data || [];
       
       setPartners(partnerData);
-      setTotalPages(response?.totalPages || 1);
+      setTotalPages(Math.ceil((response?.total || 0) / 20));
       
       // Calculate stats
       setStats({
-        total: response?.total || partnerData.length,
-        active: partnerData.filter(p => p.status === 'active').length,
-        pending: partnerData.filter(p => p.status === 'pending').length,
+        total: response?.total || 0,
+        active: partnerData.filter((p: User) => p.status === 'active').length,
+        pending: partnerData.filter((p: User) => p.status === 'pending').length,
         totalCommission: 0 // This would come from a separate API
       });
     } catch (error) {

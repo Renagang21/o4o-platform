@@ -44,20 +44,21 @@ const SuppliersList: React.FC = () => {
         filters.q = searchQuery;
       }
 
+      console.log('Fetching suppliers with filters:', filters);
       const response = await UserApi.getUsers(page, 20, filters);
+      console.log('Suppliers response:', response);
       
-      // Ensure response.data is an array
-      const supplierData = Array.isArray(response?.data) ? response.data : 
-                          Array.isArray(response) ? response : [];
+      // Handle PaginatedResponse structure
+      const supplierData = response?.data || [];
       
       setSuppliers(supplierData);
-      setTotalPages(response?.totalPages || 1);
+      setTotalPages(Math.ceil((response?.total || 0) / 20));
       
       // Calculate stats
       setStats({
-        total: response?.total || supplierData.length,
-        active: supplierData.filter(s => s.status === 'active').length,
-        pending: supplierData.filter(s => s.status === 'pending').length,
+        total: response?.total || 0,
+        active: supplierData.filter((s: User) => s.status === 'active').length,
+        pending: supplierData.filter((s: User) => s.status === 'pending').length,
         totalProducts: 0 // This would come from a separate API
       });
     } catch (error) {

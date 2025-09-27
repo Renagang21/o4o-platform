@@ -44,20 +44,21 @@ const SellersList: React.FC = () => {
         filters.q = searchQuery;
       }
 
+      console.log('Fetching sellers with filters:', filters);
       const response = await UserApi.getUsers(page, 20, filters);
+      console.log('Sellers response:', response);
       
-      // Ensure response.data is an array
-      const sellerData = Array.isArray(response?.data) ? response.data : 
-                          Array.isArray(response) ? response : [];
+      // Handle PaginatedResponse structure
+      const sellerData = response?.data || [];
       
       setSellers(sellerData);
-      setTotalPages(response?.totalPages || 1);
+      setTotalPages(Math.ceil((response?.total || 0) / 20));
       
       // Calculate stats
       setStats({
-        total: response?.total || sellerData.length,
-        active: sellerData.filter(s => s.status === 'active').length,
-        pending: sellerData.filter(s => s.status === 'pending').length,
+        total: response?.total || 0,
+        active: sellerData.filter((s: User) => s.status === 'active').length,
+        pending: sellerData.filter((s: User) => s.status === 'pending').length,
         totalSales: 0 // This would come from a separate API
       });
     } catch (error) {
