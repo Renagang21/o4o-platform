@@ -317,6 +317,43 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['mail:read']
   },
 
+  // Dropshipping - Admin, Manager, Business, Seller, Supplier, Partner
+  {
+    menuId: 'dropshipping',
+    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
+    permissions: ['ecommerce:read']
+  },
+  {
+    menuId: 'ds-products',
+    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
+    permissions: ['products:read']
+  },
+  {
+    menuId: 'ds-partners',
+    roles: ['admin', 'manager'],
+    permissions: ['vendors:read']
+  },
+  {
+    menuId: 'ds-suppliers',
+    roles: ['admin', 'manager'],
+    permissions: ['vendors:read']
+  },
+  {
+    menuId: 'ds-approvals',
+    roles: ['admin', 'manager'],
+    permissions: ['vendors:write']
+  },
+  {
+    menuId: 'ds-commissions',
+    roles: ['admin', 'manager'],
+    permissions: ['vendors:write']
+  },
+  {
+    menuId: 'ds-setup',
+    roles: ['admin'],
+    permissions: ['settings:write']
+  },
+
   // CPT Engine - Admin only
   {
     menuId: 'cpt-engine',
