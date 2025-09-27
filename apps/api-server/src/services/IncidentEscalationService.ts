@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { Alert, AlertSeverity, AlertStatus } from '../entities/Alert';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-import { WebhookService } from './webhookService';
+// import { WebhookService } from './webhookService';
 import * as crypto from 'crypto';
 import { 
   EscalationActionParameters, 
@@ -128,7 +128,7 @@ export interface OnCallSchedule {
 export class IncidentEscalationService {
   private alertRepo: Repository<Alert>;
   private systemMetricsRepo: Repository<SystemMetrics>;
-  private webhookService: WebhookService;
+  // private webhookService: WebhookService;
 
   private escalationRules: Map<string, EscalationRule> = new Map();
   private activeEscalations: Map<string, IncidentEscalation> = new Map();
@@ -142,7 +142,7 @@ export class IncidentEscalationService {
   constructor() {
     this.alertRepo = AppDataSource.getRepository(Alert);
     this.systemMetricsRepo = AppDataSource.getRepository(SystemMetrics);
-    this.webhookService = new WebhookService();
+    // this.webhookService = new WebhookService();
   }
 
   async initialize(): Promise<void> {

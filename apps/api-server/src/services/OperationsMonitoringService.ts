@@ -7,7 +7,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import * as fs from 'fs';
-import { WebhookService } from './webhookService';
+// import { WebhookService } from './webhookService';
 
 const execAsync = promisify(exec);
 
@@ -140,7 +140,7 @@ export class OperationsMonitoringService {
   private systemMetricsRepo: Repository<SystemMetrics>;
   private alertRepo: Repository<Alert>;
   private analyticsService: AnalyticsService;
-  private webhookService: WebhookService;
+  // private webhookService: WebhookService;
   private config: MonitoringConfig;
   private monitoringIntervals: Map<string, NodeJS.Timeout> = new Map();
   private healthCheckHistory: Map<string, HealthCheckResult[]> = new Map();
@@ -150,7 +150,7 @@ export class OperationsMonitoringService {
     this.systemMetricsRepo = AppDataSource.getRepository(SystemMetrics);
     this.alertRepo = AppDataSource.getRepository(Alert);
     this.analyticsService = new AnalyticsService();
-    this.webhookService = new WebhookService();
+    // this.webhookService = new WebhookService();
     this.config = this.loadConfig();
     this.initializeAlertRules();
   }
@@ -918,11 +918,11 @@ export class OperationsMonitoringService {
       metadata: alert.metadata
     };
 
-    await Promise.all(
-      this.config.notifications.webhook.urls.map((url: any) =>
-        this.webhookService.sendWebhook(url, payload)
-      )
-    );
+    // await Promise.all(
+    //   this.config.notifications.webhook.urls.map((url: any) =>
+    //     this.webhookService.sendWebhook(url, payload)
+    //   )
+    // );
   }
 
   private async sendEscalationNotifications(alert: Alert): Promise<void> {

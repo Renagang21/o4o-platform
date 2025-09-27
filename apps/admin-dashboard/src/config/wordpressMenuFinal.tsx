@@ -104,53 +104,6 @@ export const wordpressMenuItems: MenuItem[] = [
     separator: true
   },
   {
-    id: 'ecommerce',
-    label: '전자상거래',
-    icon: <ShoppingCart className="w-5 h-5" />,
-    children: [
-      { id: 'ecommerce-dashboard', label: '대시보드', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce' },
-      { id: 'products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
-      { id: 'categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/ecommerce/categories' },
-      { id: 'orders', label: '주문 관리', icon: <ClipboardList className="w-4 h-4" />, path: '/ecommerce/orders' },
-      { id: 'inventory', label: '재고 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/inventory' },
-      { id: 'coupons', label: '쿠폰 관리', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/coupons' },
-      { id: 'refunds', label: '환불/교환', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/refunds' },
-      { id: 'toss-payments', label: '결제 설정', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/payments/toss' },
-      { id: 'settlement-dashboard', label: '정산 관리', icon: <DollarSign className="w-4 h-4" />, path: '/ecommerce/settlements' },
-      { id: 'reports', label: '매출 보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
-      { id: 'ecommerce-tools', label: '도구', icon: <Wrench className="w-4 h-4" />, path: '/ecommerce/tools' },
-      { id: 'ecommerce-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/ecommerce/settings' }
-    ]
-  },
-  {
-    id: 'vendors',
-    label: '판매자/공급자',
-    icon: <Store className="w-5 h-5" />,
-    children: [
-      { id: 'vendors-all', label: '모든 판매자', icon: <Store className="w-4 h-4" />, path: '/vendors' },
-      { id: 'vendors-pending', label: '승인 대기', icon: <UserCheck className="w-4 h-4" />, path: '/vendors/pending' },
-      { id: 'vendors-commission', label: '수수료 관리', icon: <DollarSign className="w-4 h-4" />, path: '/vendors/commission' },
-      { id: 'vendors-reports', label: '판매자 보고서', icon: <FileCheck className="w-4 h-4" />, path: '/vendors/reports' }
-    ]
-  },
-  {
-    id: 'affiliate',
-    label: '제휴 마케팅',
-    icon: <Share2 className="w-5 h-5" />,
-    children: [
-      { id: 'affiliates-manage', label: '제휴사 관리', icon: <UserPlus className="w-4 h-4" />, path: '/affiliate/partners' },
-      { id: 'affiliate-links', label: '추천 링크', icon: <Link className="w-4 h-4" />, path: '/affiliate/links' },
-      { id: 'affiliate-commission', label: '수수료 현황', icon: <DollarSign className="w-4 h-4" />, path: '/affiliate/commission' },
-      { id: 'affiliate-analytics', label: '성과 분석', icon: <TrendingUp className="w-4 h-4" />, path: '/affiliate/analytics' }
-    ]
-  },
-  {
-    id: 'separator-3',
-    label: '',
-    icon: <></>,
-    separator: true
-  },
-  {
     id: 'forum',
     label: '포럼',
     icon: <MessageSquare className="w-5 h-5" />,
@@ -205,6 +158,18 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-fields', label: 'Custom Fields', icon: <Layout className="w-4 h-4" />, path: '/cpt-engine?view=fields' },
       { id: 'cpt-taxonomies', label: 'Taxonomies', icon: <Tag className="w-4 h-4" />, path: '/cpt-engine?view=taxonomies' },
       { id: 'cpt-forms', label: 'Forms', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/forms' }
+    ]
+  },
+  {
+    id: 'dropshipping',
+    label: '드롭쉬핑',
+    icon: <ShoppingCart className="w-5 h-5" />,
+    children: [
+      { id: 'ds-products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/dropshipping/products' },
+      { id: 'ds-suppliers', label: '공급자', icon: <Store className="w-4 h-4" />, path: '/dropshipping/suppliers' },
+      { id: 'ds-partners', label: '파트너', icon: <Users className="w-4 h-4" />, path: '/dropshipping/partners' },
+      { id: 'ds-commissions', label: '수수료 정책', icon: <DollarSign className="w-4 h-4" />, path: '/dropshipping/commissions' },
+      { id: 'ds-setup', label: '시스템 설정', icon: <Settings className="w-4 h-4" />, path: '/dropshipping/setup' }
     ]
   },
   {

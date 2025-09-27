@@ -31,19 +31,7 @@ const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
 const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
-const Products = lazy(() => import('@/pages/ecommerce/Products'));
-const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
-const OrderDetail = lazy(() => import('@/pages/ecommerce/OrderDetail'));
-const OrderStatusManagement = lazy(() => import('@/pages/ecommerce/OrderStatusManagement'));
-const InventoryManagement = lazy(() => import('@/pages/ecommerce/InventoryManagement'));
-const TossPaymentsSettings = lazy(() => import('@/pages/ecommerce/TossPaymentsSettings'));
-const RefundManagement = lazy(() => import('@/pages/ecommerce/RefundManagement'));
-const Coupons = lazy(() => import('@/pages/ecommerce/Coupons'));
-const CouponForm = lazy(() => import('@/pages/ecommerce/CouponForm'));
-const EcommerceSettings = lazy(() => import('@/pages/ecommerce/EcommerceSettings'));
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
-const VendorSettlements = lazy(() => import('@/pages/ecommerce/VendorSettlements'));
-const FeeManagement = lazy(() => import('@/pages/ecommerce/FeeManagement'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
@@ -59,10 +47,6 @@ const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
-const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
-const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
-const EcommerceTools = lazy(() => import('@/pages/ecommerce/tools/EcommerceTools'));
-const ProductImport = lazy(() => import('@/pages/ecommerce/tools/ProductImport'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
 // const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
@@ -74,18 +58,8 @@ const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMon
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
 
-// Vendor Management Pages
-const VendorsList = lazy(() => import('@/pages/vendors/VendorsWordPress'));
-const VendorsPending = lazy(() => import('@/pages/vendors/VendorsPendingWordPress'));
-const VendorsCommission = lazy(() => import('@/pages/vendors/VendorsCommissionWordPress'));
-const VendorsReports = lazy(() => import('@/pages/vendors/VendorsReports'));
 
 // Affiliate Management Pages
-const AffiliatePartners = lazy(() => import('@/pages/affiliate/AffiliatePartners'));
-const AffiliatePartnerForm = lazy(() => import('@/pages/affiliate/AffiliatePartnerForm'));
-const AffiliateLinks = lazy(() => import('@/pages/affiliate/AffiliateLinks'));
-const AffiliateCommission = lazy(() => import('@/pages/affiliate/AffiliateCommission'));
-const AffiliateAnalytics = lazy(() => import('@/pages/affiliate/AffiliateAnalytics'));
 
 // Forum Pages
 const ForumRouter = lazy(() => import('@/pages/forum/ForumRouter'));
@@ -105,6 +79,9 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
+
+// Dropshipping Pages
+const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 // const GutenbergPage = lazy(() => 
 //   import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPageWrapped')
 // );
@@ -482,180 +459,8 @@ function App() {
                     } />
                     
                     {/* E-commerce 관리 */}
-                    <Route path="/ecommerce" element={
-                      <AdminProtectedRoute requiredPermissions={['products:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <DashboardSimple />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     
-                    <Route path="/ecommerce/products" element={
-                      <AdminProtectedRoute requiredPermissions={['products:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Products />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     
-                    <Route path="/ecommerce/categories" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ProductCategories />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/products/new" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ProductForm />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/products/:id/edit" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ProductForm />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/orders" element={
-                      <AdminProtectedRoute requiredPermissions={['orders:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Orders />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/ecommerce/orders/:id" element={
-                      <AdminProtectedRoute requiredPermissions={['orders:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <OrderDetail />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/order-status" element={
-                      <AdminProtectedRoute requiredPermissions={['orders:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <OrderStatusManagement />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/inventory" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <InventoryManagement />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/coupons" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Coupons />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/ecommerce/coupons/new" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <CouponForm />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/ecommerce/coupons/:id/edit" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <CouponForm />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/payments/toss" element={
-                      <AdminProtectedRoute requiredPermissions={['settings:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <TossPaymentsSettings />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/refunds" element={
-                      <AdminProtectedRoute requiredPermissions={['orders:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <RefundManagement />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/settlements" element={
-                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          {/* <SettlementDashboard /> */}
-                          <div>정산 대시보드는 준비 중입니다.</div>
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/vendor-settlements" element={
-                      <AdminProtectedRoute requiredPermissions={['vendors:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <VendorSettlements />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/fee-management" element={
-                      <AdminProtectedRoute requiredPermissions={['settings:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <FeeManagement />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/settlement-reports" element={
-                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          {/* <SettlementReports /> */}
-                          <div>정산 리포트는 준비 중입니다.</div>
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/reports" element={
-                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Analytics />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/tools" element={
-                      <AdminProtectedRoute requiredPermissions={['products:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <EcommerceTools />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/tools/import" element={
-                      <AdminProtectedRoute requiredPermissions={['products:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ProductImport />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/ecommerce/settings" element={
-                      <AdminProtectedRoute requiredPermissions={['settings:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <EcommerceSettings />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     
                     {/* 분석 */}
                     <Route path="/analytics/*" element={
@@ -666,85 +471,21 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 판매자/공급자 관리 */}
-                    <Route path="/vendors" element={
-                      <AdminProtectedRoute requiredPermissions={['vendors:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <VendorsList />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/vendors/pending" element={
-                      <AdminProtectedRoute requiredPermissions={['vendors:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <VendorsPending />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/vendors/commission" element={
-                      <AdminProtectedRoute requiredPermissions={['vendors:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <VendorsCommission />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/vendors/reports" element={
-                      <AdminProtectedRoute requiredPermissions={['vendors:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <VendorsReports />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* 제휴 마케팅 - App Guard 적용 */}
-                    <Route path="/affiliate/partners" element={
-                      <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliatePartners />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/affiliate/partners/new" element={
-                      <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliatePartnerForm />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/affiliate/partners/:id/edit" element={
-                      <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliatePartnerForm />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/affiliate/links" element={
-                      <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliateLinks />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/affiliate/commission" element={
-                      <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliateCommission />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    <Route path="/affiliate/analytics" element={
-                      <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliateAnalytics />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     
                     {/* CPT Engine - New Unified Dashboard */}
                     <Route path="/cpt-engine/*" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <CPTEngine />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Dropshipping Routes */}
+                    <Route path="/dropshipping/*" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DropshippingRouter />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

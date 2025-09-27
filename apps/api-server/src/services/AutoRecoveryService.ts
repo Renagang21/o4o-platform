@@ -8,7 +8,7 @@ import { GracefulDegradationService } from './GracefulDegradationService';
 import { IncidentEscalationService } from './IncidentEscalationService';
 import { SelfHealingService } from './SelfHealingService';
 import { DeploymentMonitoringService } from './DeploymentMonitoringService';
-import { WebhookService } from './webhookService';
+// import { WebhookService } from './webhookService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
@@ -99,7 +99,7 @@ export class AutoRecoveryService {
   private incidentEscalation: IncidentEscalationService;
   private selfHealing: SelfHealingService;
   private deploymentMonitoring: DeploymentMonitoringService;
-  private webhookService: WebhookService;
+  // private webhookService: WebhookService;
 
   private recoveryActions: Map<string, RecoveryAction> = new Map();
   private recoveryAttempts: Map<string, RecoveryAttempt> = new Map();
@@ -121,7 +121,7 @@ export class AutoRecoveryService {
     this.incidentEscalation = new IncidentEscalationService();
     this.selfHealing = new SelfHealingService();
     this.deploymentMonitoring = new DeploymentMonitoringService();
-    this.webhookService = new WebhookService();
+    // this.webhookService = new WebhookService();
 
     this.initializeRecoveryActions();
   }

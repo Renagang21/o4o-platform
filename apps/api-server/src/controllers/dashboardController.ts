@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { Post } from '../entities/Post';
-import { Product } from '../entities/Product';
-import { Order } from '../entities/Order';
 import { Category } from '../entities/Category';
 import { MediaFile } from '../entities/MediaFile';
 
@@ -51,84 +49,28 @@ export class DashboardController {
     }
   }
 
-  // Get ecommerce dashboard stats
+  // Get ecommerce dashboard stats (placeholder for future implementation)
   static async getEcommerceStats(req: Request, res: Response) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const productRepo = AppDataSource.getRepository(Product);
-      const userRepo = AppDataSource.getRepository(User);
-      
-      // Get date ranges
-      const today = new Date();
-      const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-      
-      const [orders, revenue, products, customers] = await Promise.all([
-        orderRepo.count(),
-        orderRepo
-          .createQueryBuilder('order')
-          .select('SUM(order.totalAmount)', 'total')
-          .where('order.status != :status', { status: 'cancelled' })
-          .getRawOne(),
-        productRepo.count({ where: { isActive: true } }),
-        userRepo.count({ where: { role: 'customer' as any } })
-      ]);
-
-      // Calculate monthly orders and revenue
-      const [monthlyOrders, monthlyRevenue] = await Promise.all([
-        orderRepo
-          .createQueryBuilder('order')
-          .where('order.createdAt >= :date', { date: thisMonth })
-          .getCount(),
-        orderRepo
-          .createQueryBuilder('order')
-          .select('SUM(order.totalAmount)', 'total')
-          .where('order.createdAt >= :date', { date: thisMonth })
-          .andWhere('order.status != :status', { status: 'cancelled' })
-          .getRawOne()
-      ]);
-
-      res.json({
-        success: true,
-        data: {
-          orders,
-          revenue: revenue?.total || 0,
-          products,
-          customers,
-          monthly: {
-            orders: monthlyOrders,
-            revenue: monthlyRevenue?.total || 0
-          },
-          trends: {
-            orders: '+0%', // Calculate actual trends
-            revenue: '+0%',
-            products: '+0%',
-            customers: '+0%'
-          }
-        }
-      });
-    } catch (error: any) {
-      // Return success with fallback data to avoid CORS-like errors
-      res.status(200).json({
-        success: true,
-        data: {
+    // Return placeholder data for now
+    res.status(200).json({
+      success: true,
+      data: {
+        orders: 0,
+        revenue: 0,
+        products: 0,
+        customers: 0,
+        monthly: {
           orders: 0,
-          revenue: 0,
-          products: 0,
-          customers: 0,
-          monthly: {
-            orders: 0,
-            revenue: 0
-          },
-          trends: {
-            orders: '+0%',
-            revenue: '+0%',
-            products: '+0%',
-            customers: '+0%'
-          }
+          revenue: 0
+        },
+        trends: {
+          orders: '+0%',
+          revenue: '+0%',
+          products: '+0%',
+          customers: '+0%'
         }
-      });
-    }
+      }
+    });
   }
 
   // Get admin notifications
@@ -320,19 +262,8 @@ export class DashboardController {
   }
 
   private static async getEcommerceStatsData() {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const productRepo = AppDataSource.getRepository(Product);
-      
-      const [orders, products] = await Promise.all([
-        orderRepo.count(),
-        productRepo.count({ where: { isActive: true } })
-      ]);
-      
-      return { orders, products };
-    } catch {
-      return { orders: 0, products: 0 };
-    }
+    // Placeholder for future implementation
+    return { orders: 0, products: 0 };
   }
 
   private static async getContentStatsData() {

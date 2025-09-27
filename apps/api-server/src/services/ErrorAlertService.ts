@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import logger from '../utils/logger';
 import { emailService } from './emailService';
-import { webhookService } from './webhookService';
+// import { webhookService } from './webhookService';
 
 export interface ErrorAlert {
   id: string;
@@ -327,10 +327,10 @@ class ErrorAlertService extends EventEmitter {
 
   private async sendWebhookNotification(alert: ErrorAlert): Promise<void> {
     try {
-      await webhookService.sendWebhook(this.config.webhookNotifications.url, {
-        type: 'error_alert',
-        alert
-      });
+      // await webhookService.sendWebhook(this.config.webhookNotifications.url, {
+      //   type: 'error_alert',
+      //   alert
+      // });
 
       alert.notificationsSent?.push('webhook');
     } catch (error) {

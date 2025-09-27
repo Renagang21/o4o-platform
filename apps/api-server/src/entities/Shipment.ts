@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Order } from './Order';
+// import { Order } from './Order'; // Order entity removed during ecommerce cleanup
 
 @Entity('shipments')
 export class Shipment {
@@ -9,9 +9,9 @@ export class Shipment {
   @Column({ name: 'order_id' })
   orderId!: number;
 
-  @ManyToOne(() => Order)
-  @JoinColumn({ name: 'order_id' })
-  order?: Order;
+  // @ManyToOne(() => Order)
+  // @JoinColumn({ name: 'order_id' })
+  // order?: Order; // Removed - Order entity deleted
 
   @Column({ name: 'tracking_number', nullable: true })
   trackingNumber?: string;

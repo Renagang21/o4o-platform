@@ -2,7 +2,7 @@ import { Repository, Between } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertSeverity, AlertType } from '../entities/Alert';
-import { WebhookService } from './webhookService';
+// import { WebhookService } from './webhookService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';
@@ -143,7 +143,7 @@ export interface DeploymentValidationRules {
 export class DeploymentMonitoringService {
   private systemMetricsRepo: Repository<SystemMetrics>;
   private alertRepo: Repository<Alert>;
-  private webhookService: WebhookService;
+  // private webhookService: WebhookService;
 
   private activeDeployments: Map<string, DeploymentInfo> = new Map();
   private deploymentHistory: DeploymentInfo[] = [];
@@ -157,7 +157,7 @@ export class DeploymentMonitoringService {
   constructor() {
     this.systemMetricsRepo = AppDataSource.getRepository(SystemMetrics);
     this.alertRepo = AppDataSource.getRepository(Alert);
-    this.webhookService = new WebhookService();
+    // this.webhookService = new WebhookService();
 
     this.validationRules = {
       healthCheckFailures: {

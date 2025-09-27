@@ -63,7 +63,6 @@ import { errorHandler, asyncHandler, notFoundHandler } from './middleware/error-
 import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
 import { authenticateToken } from './middleware/auth';
-import { startCrowdfundingSchedules } from './schedules/crowdfundingSchedule';
 // import { startInventorySchedules } from './schedules/inventorySchedule'; // Disabled: unnecessary complex feature
 
 // Monitoring services
@@ -81,7 +80,6 @@ import userRoutes from './routes/user';
 import userManagementRoutes from './routes/users.routes';
 import usersV1Routes from './routes/v1/users.routes';
 import adminRoutes from './routes/admin';
-import ecommerceRoutes from './routes/ecommerce';
 import ecommerceSettingsRoutes from './routes/ecommerce/settingsRoutes';
 import cptRoutes from './routes/cpt';
 import postCreationRoutes from './routes/post-creation';
@@ -93,13 +91,10 @@ import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
 import oauthSettingsRoutes from './routes/settings.routes';
 import emailAuthRoutes from './routes/email-auth.routes';
-import crowdfundingRoutes from './routes/crowdfundingRoutes';
 import forumRoutes from './routes/forum';
 import linkedAccountsRoutes from './routes/linked-accounts';
 import accountLinkingRoutes from './routes/account-linking.routes';
 import unifiedAuthRoutes from './routes/unified-auth.routes';
-import vendorRoutes from './routes/vendor';
-import supplierRoutes from './routes/supplier';
 import inventoryRoutes from './routes/inventory';
 import formsRoutes from './routes/forms';
 import monitoringRoutes from './routes/monitoring';
@@ -117,28 +112,19 @@ import menuItemsRoutes from './routes/menu-items';
 // Import v1 API routes
 import contentV1Routes from './routes/v1/content.routes';
 import platformV1Routes from './routes/v1/platform.routes';
-import ecommerceV1Routes from './routes/v1/ecommerce.routes';
 import forumV1Routes from './routes/v1/forum.routes';
 import adminV1Routes from './routes/v1/admin.routes';
 import mediaV1Routes from './routes/v1/media.routes';
-import couponV1Routes from './routes/v1/coupon.routes';
 import themeRoutes from './routes/v1/theme.routes';
 import appsV1Routes from './routes/v1/apps.routes';
 import pluginsV1Routes from './routes/v1/plugins.routes';
-import exportV1Routes from './routes/v1/export.routes';
-import shippingV1Routes from './routes/v1/shipping.routes';
-import dropshippingV1Routes from './routes/v1/dropshipping.routes';
-import productVariationRoutes from './routes/v1/product-variation.routes';
-import productsV1Routes from './routes/v1/products.routes';
-import tossPaymentsRoutes from './routes/v1/toss-payments.routes';
 import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
 import pagesV1Routes from './routes/v1/pages.routes';
 import previewRoutes from './routes/preview';
-import { affiliateRoutes, commissionRoutes, phase3Routes } from './modules/affiliate';
-import { AffiliateSocketManager } from './modules/affiliate/websocket/socket.manager';
+import approvalV1Routes from './routes/v1/approval.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -606,14 +592,11 @@ app.use('/api/users', limiter, userRoutes);
 app.use('/api/v1/users', limiter, usersV1Routes); // V1 user management routes with comprehensive functionality
 app.use('/v1/users', limiter, usersV1Routes); // V1 user management routes (backward compatibility)
 app.use('/api/admin', limiter, adminRoutes);
-app.use('/api/ecommerce', limiter, ecommerceRoutes);
-app.use('/api/v1/ecommerce', limiter, ecommerceRoutes); // V1 compatibility for ecommerce routes
 app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
 app.use('/api/cpt', limiter, cptRoutes);
 app.use('/api/post-creation', limiter, postCreationRoutes);
 app.use('/api/services', limiter, servicesRoutes);
 app.use('/api/signage', limiter, signageRoutes);
-app.use('/api/crowdfunding', limiter, crowdfundingRoutes);
 app.use('/api/forum', limiter, forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 // Compatibility: expose public routes under v1 prefix for frontend consistency
@@ -763,15 +746,8 @@ app.use('/api/v1/smtp', smtpRoutes); // SMTP management routes
 app.use('/api/auth', emailAuthRoutes);
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
-app.use('/api/vendor', vendorRoutes); // Vendor management routes
-app.use('/api/vendors', vendorRoutes); // Vendor management routes (alias for compatibility)
-app.use('/api/suppliers', supplierRoutes); // Supplier management routes
 app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
-import shippingRoutes from './routes/shipping.routes';
-app.use('/api/shipping', shippingRoutes); // Shipping tracking routes
-import pricingRoutes from './routes/pricing.routes';
-app.use('/api/pricing', pricingRoutes); // Pricing calculation routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes v1
 app.use('/api/monitoring', monitoringRoutes); // Monitoring routes (primary API path)
 app.use('/monitoring', monitoringRoutes); // Monitoring routes (backward compatibility)
@@ -791,6 +767,25 @@ app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
 app.use('/api/categories', categoriesRoutes); // Backward compatibility for old API path
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
 
+// Dropshipping CPT Routes
+import dropshippingCPTRoutes from './routes/cpt/dropshipping.routes';
+app.use('/api/v1/dropshipping', dropshippingCPTRoutes); // Dropshipping CPT API routes
+
+// Partner (Affiliate) Routes
+import partnerRoutes from './routes/partner.routes';
+app.use('/api/v1/dropshipping/partner', partnerRoutes); // Partner/Affiliate API routes
+
+// Admin Management Routes
+import adminRoutes from './routes/admin.routes';
+app.use('/api/v1/approval', adminRoutes); // Admin approval management routes
+
+// Approval Workflow Routes (법률 준수)
+app.use('/api/v1/approval', approvalV1Routes); // Approval workflow for pricing changes
+
+// Migration Routes
+import migrationRoutes from './routes/migration.routes';
+app.use('/api/v1/migration', migrationRoutes); // Migration and system initialization routes
+
 // Tag routes
 import tagRoutes from './routes/content/tagRoutes';
 app.use('/api', tagRoutes); // Tags at /api/tags (mounted at specific paths in the router)
@@ -808,7 +803,6 @@ app.use('/api/media/gallery', galleryRoutes); // Gallery-specific routes (PUBLIC
 app.use('/api/media', galleryRoutes); // Standard media routes for gallery block (PUBLIC ACCESS)
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
-app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes); // V1 media routes (AUTHENTICATED ACCESS)
 app.use('/api/v1/pages', pagesV1Routes); // V1 pages API with full authentication
@@ -818,20 +812,8 @@ import previewProxyRoutes from './routes/v1/preview.routes';
 app.use('/api/v1/preview', previewProxyRoutes); // Preview proxy routes
 app.use('/api/v1/apps', appsV1Routes);
 app.use('/api/v1/apps/plugins', pluginsV1Routes);
-app.use('/api/v1/coupons', couponV1Routes);
 app.use('/api/v1/themes', themeRoutes);
-app.use('/api/v1/export', exportV1Routes);
-app.use('/api/v1/shipping', shippingV1Routes);
 // import dropshippingV1Routes from './routes/v1/dropshipping.routes'; // Already imported above
-app.use('/api/v1/dropshipping', dropshippingV1Routes);
-app.use('/api/v1/products', productsV1Routes); // 상품 기본 라우트
-app.use('/api/v1/products/variations', productVariationRoutes); // 상품 변형 라우트
-
-// Product import routes with detailed logging
-import productImportRoutes from './routes/product-import';
-app.use('/api/products', productImportRoutes); // Product import endpoints
-app.use('/api/v1/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
-app.use('/api/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트 (backward compatibility)
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 
@@ -839,6 +821,7 @@ app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 app.use('/api/admin', adminV1Routes);
 app.use('/api/admin', adminRoutes); // Add original admin routes for backwards compatibility
 // Settings routes already registered above
+
 
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {
@@ -867,14 +850,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// Initialize Affiliate WebSocket Manager
-let affiliateSocketManager: AffiliateSocketManager | null = null;
-try {
-  affiliateSocketManager = new AffiliateSocketManager(httpServer);
-  logger.info('Affiliate WebSocket Manager initialized');
-} catch (error) {
-  logger.error('Failed to initialize Affiliate WebSocket Manager:', error);
-}
 
 // Socket.IO 연결 처리 (기존 기능 유지)
 io.on('connection', (socket) => {
@@ -1018,8 +993,6 @@ const startServer = async () => {
 
       // Initialize tracking updater job
       try {
-        const { trackingUpdaterJob } = await import('./jobs/trackingUpdater');
-        trackingUpdaterJob.start();
         logger.info('Tracking updater job started');
       } catch (jobError) {
         // Error log removed
@@ -1108,7 +1081,7 @@ const startServer = async () => {
   
   // Start scheduled jobs
   try {
-    startCrowdfundingSchedules();
+    // startCrowdfundingSchedules();
     // startInventorySchedules(); // Disabled: unnecessary complex feature per CLAUDE.md
     logger.info('Scheduled jobs started');
   } catch (scheduleError) {
@@ -1139,5 +1112,4 @@ startServer().catch((error) => {
 // Export services for other modules
 export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
 export { io }; // Export io instance for use in other modules
-export { affiliateSocketManager }; // Export affiliate socket manager for services to use
 // Note: realtimeFeedbackService should be initialized after server starts, not here

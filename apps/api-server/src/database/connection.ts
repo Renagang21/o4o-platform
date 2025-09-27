@@ -11,17 +11,8 @@ import { AccountActivity } from '../entities/AccountActivity';
 import { Media } from '../entities/Media';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
-import { Product } from '../entities/Product';
-import { ProductAttribute } from '../entities/ProductAttribute';
-import { ProductAttributeValue } from '../entities/ProductAttributeValue';
-import { ProductVariation } from '../entities/ProductVariation';
-import { Order } from '../entities/Order';
-import { OrderItem } from '../entities/OrderItem';
-import { Cart } from '../entities/Cart';
-import { CartItem } from '../entities/CartItem';
 import { Category } from '../entities/Category';
 import { Settings } from '../entities/Settings';
-import { Coupon, CouponUsage } from '../entities/Coupon';
 import { Theme, ThemeInstallation } from '../entities/Theme';
 import { FundingProject } from '../entities/crowdfunding/FundingProject';
 import { FundingReward } from '../entities/crowdfunding/FundingReward';
@@ -54,25 +45,11 @@ import { EmailLog } from '../entities/EmailLog';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 import { CustomPost } from '../entities/CustomPost';
 import { CustomPostType } from '../entities/CustomPostType';
-// Dropshipping entities
-import { Supplier } from '../entities/dropshipping/Supplier';
-import { Seller } from '../entities/dropshipping/Seller';
-import { Affiliate } from '../entities/dropshipping/Affiliate';
-import { DropshippingProduct } from '../entities/dropshipping/DropshippingProduct';
-// Affiliate Marketing entities
-import { AffiliateUser } from '../entities/affiliate/AffiliateUser';
-import { AffiliateClick } from '../entities/affiliate/AffiliateClick';
-import { AffiliateConversion } from '../entities/affiliate/AffiliateConversion';
-import { AffiliateCommission } from '../entities/affiliate/AffiliateCommission';
-import { AffiliatePayout } from '../entities/affiliate/AffiliatePayout';
-import { AffiliateAuditLog } from '../entities/affiliate/AffiliateAuditLog';
 // Menu System entities
 import { Menu } from '../entities/Menu';
 import { MenuItem } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
-// Vendor entities
-import { VendorInfo } from '../entities/VendorInfo';
-import { VendorCommission } from '../entities/VendorCommission';
+
 
 import { env } from '../utils/env-validator';
 
@@ -121,18 +98,8 @@ export const AppDataSource = new DataSource({
     Media,
     MediaFile,
     MediaFolder,
-    Product,
-    ProductAttribute,
-    ProductAttributeValue,
-    ProductVariation,
-    Order,
-    OrderItem,
-    Cart,
-    CartItem,
     Category,
     Settings,
-    Coupon,
-    CouponUsage,
     Theme,
     ThemeInstallation,
     // Crowdfunding entities
@@ -171,25 +138,10 @@ export const AppDataSource = new DataSource({
     CustomFieldValue,
     CustomPost,
     CustomPostType,
-    // Dropshipping entities
-    Supplier,
-    Seller,
-    Affiliate,
-    DropshippingProduct,
-    // Affiliate Marketing entities
-    AffiliateUser,
-    AffiliateClick,
-    AffiliateConversion,
-    AffiliateCommission,
-    AffiliatePayout,
-    AffiliateAuditLog,
     // Menu System entities
     Menu,
     MenuItem,
     MenuLocation,
-    // Vendor entities
-    VendorInfo,
-    VendorCommission
   ],
   
   // 마이그레이션 설정

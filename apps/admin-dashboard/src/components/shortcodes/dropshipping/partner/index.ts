@@ -2,9 +2,81 @@
 export { default as PartnerLinkGenerator } from './PartnerLinkGenerator';
 export { default as CommissionDashboard } from './CommissionDashboard';
 export { default as PayoutRequests } from './PayoutRequests';
+export { default as PartnerMainDashboard } from './PartnerMainDashboard';
+export { default as PartnerProducts } from './PartnerProducts';
+export { default as PartnerCommissions } from './PartnerCommissions';
 
 // Shortcode Registration Map for Partner Components
 export const partnerShortcodes = {
+  // Main shortcodes for WordPress integration
+  'partner_dashboard': {
+    component: 'PartnerMainDashboard',
+    description: '파트너 메인 대시보드 - 총 수익, 전환율, 개인 추천 링크를 보여주는 통합 UI',
+    attributes: {
+      tab: {
+        type: 'select',
+        options: ['overview', 'commissions', 'links'],
+        default: 'overview',
+        description: 'Default tab to display'
+      }
+    }
+  },
+  'partner_products': {
+    component: 'PartnerProducts',
+    description: '홍보 상품 목록 - 파트너 개인의 추천 코드가 적용된 링크 생성 기능',
+    attributes: {
+      category: {
+        type: 'string',
+        required: false,
+        description: 'Filter products by category'
+      },
+      featured: {
+        type: 'boolean',
+        default: false,
+        description: 'Show only featured products'
+      },
+      limit: {
+        type: 'number',
+        default: 12,
+        description: 'Number of products to display'
+      },
+      sortBy: {
+        type: 'select',
+        options: ['commission', 'performance', 'price', 'newest'],
+        default: 'commission',
+        description: 'Default sorting option'
+      }
+    }
+  },
+  'partner_commissions': {
+    component: 'PartnerCommissions',
+    description: '정산 내역 확인 - 수수료 정산 내역과 지급 상태를 보여주는 투명한 UI',
+    attributes: {
+      period: {
+        type: 'select',
+        options: ['7d', '30d', '90d', '1y'],
+        default: '30d',
+        description: 'Default time period'
+      },
+      status: {
+        type: 'select',
+        options: ['all', 'pending', 'approved', 'paid', 'cancelled'],
+        default: 'all',
+        description: 'Filter by commission status'
+      },
+      compact: {
+        type: 'boolean',
+        default: false,
+        description: 'Use compact layout'
+      },
+      showSummary: {
+        type: 'boolean',
+        default: true,
+        description: 'Show summary cards'
+      }
+    }
+  },
+  // Additional detailed shortcodes
   'partner_link_generator': {
     component: 'PartnerLinkGenerator',
     description: 'Generate and manage partner links with PARTNER app integration',

@@ -4,7 +4,7 @@
  */
 
 import { unifiedApi } from './unified-client';
-import { EcommerceApi } from './ecommerceApi';
+// import { EcommerceApi } from './ecommerceApi'; // Removed - ecommerce system deleted
 import { SalesDataItem, Notification, Activity, OrderStatusData, UserChartData, SystemHealthStatus } from '../types/dashboard';
 // Note: App services would be imported if available
 // import { forumService, signageService, crowdfundingService } from './apps';
@@ -86,9 +86,8 @@ export const dashboardApi = {
     let crowdfundingStats: any = null;
     
     try {
-      // Use EcommerceApi for dashboard stats
-      const [dashboardStatsResponse, usersResponse] = await Promise.all([
-        EcommerceApi.getDashboardStats(),
+      // Ecommerce removed - using default values
+      const [usersResponse] = await Promise.all([
         unifiedApi.raw.get('/api/users/stats').catch(() => {
           // API 오류 시 기본값 반환하고 토스트 메시지 표시
           import('react-hot-toast').then(({ default: toast }) => {
@@ -107,7 +106,7 @@ export const dashboardApi = {
       signageStats = null;
       crowdfundingStats = null;
 
-      const ecommerceStats = dashboardStatsResponse.data;
+      const ecommerceStats = { totalCustomers: 0, todaySales: 0 }; // Default values after ecommerce removal
 
       // 응답 데이터 정규화
       return {
@@ -235,34 +234,15 @@ export const dashboardApi = {
   // 차트 데이터 조회
   async getChartData() {
     try {
-      // Use EcommerceApi for sales report
-      const [salesReportResponse, ordersResponse] = await Promise.all([
-        EcommerceApi.getSalesReport('month'),
-        EcommerceApi.getOrders(1, 100) // Get recent orders for status distribution
-      ]);
-
-      // Process sales data for chart
-      const salesData = salesReportResponse.data?.salesByDay || [];
-      const chartSalesData = salesData.map((item: SalesDataItem) => ({
-        date: item.date,
-        amount: item.sales || 0,
-        orders: item.orders || 0
-      }));
-
-      // Calculate order status distribution
-      const orders = ordersResponse.data || [];
-      const statusCounts: Record<string, number> = {};
-      orders.forEach((order) => {
-        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
-      });
-
+      // Ecommerce removed - returning default chart data
+      const chartSalesData: any[] = [];
       const orderStatusData: OrderStatusData[] = [
-        { status: '대기중', count: statusCounts['pending'] || 0, color: '#f59e0b' },
-        { status: '처리중', count: statusCounts['processing'] || 0, color: '#3b82f6' },
-        { status: '배송중', count: statusCounts['shipped'] || 0, color: '#8b5cf6' },
-        { status: '완료', count: statusCounts['completed'] || 0, color: '#10b981' },
-        { status: '취소', count: statusCounts['cancelled'] || 0, color: '#ef4444' },
-        { status: '환불', count: statusCounts['refunded'] || 0, color: '#f97316' }
+        { status: '대기중', count: 0, color: '#f59e0b' },
+        { status: '처리중', count: 0, color: '#3b82f6' },
+        { status: '배송중', count: 0, color: '#8b5cf6' },
+        { status: '완료', count: 0, color: '#10b981' },
+        { status: '취소', count: 0, color: '#ef4444' },
+        { status: '환불', count: 0, color: '#f97316' }
       ].filter((item: any) => item.count > 0);
 
       return {

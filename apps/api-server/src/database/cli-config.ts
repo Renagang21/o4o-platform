@@ -8,17 +8,8 @@ import { LinkedAccount } from '../entities/LinkedAccount';
 import { AccountActivity } from '../entities/AccountActivity';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
-import { Product } from '../entities/Product';
-import { ProductAttribute } from '../entities/ProductAttribute';
-import { ProductAttributeValue } from '../entities/ProductAttributeValue';
-import { ProductVariation } from '../entities/ProductVariation';
-import { Order } from '../entities/Order';
-import { OrderItem } from '../entities/OrderItem';
-import { Cart } from '../entities/Cart';
-import { CartItem } from '../entities/CartItem';
 import { Category } from '../entities/Category';
 import { Settings } from '../entities/Settings';
-import { Coupon, CouponUsage } from '../entities/Coupon';
 import { Theme, ThemeInstallation } from '../entities/Theme';
 import { FundingProject } from '../entities/crowdfunding/FundingProject';
 import { FundingReward } from '../entities/crowdfunding/FundingReward';
@@ -47,19 +38,10 @@ import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
 import { SmtpSettings } from '../entities/SmtpSettings';
 import { EmailLog } from '../entities/EmailLog';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
-import { Supplier } from '../entities/dropshipping/Supplier';
-import { Seller } from '../entities/dropshipping/Seller';
-import { Affiliate } from '../entities/dropshipping/Affiliate';
-import { DropshippingProduct } from '../entities/dropshipping/DropshippingProduct';
-import { AffiliateUser } from '../entities/affiliate/AffiliateUser';
-import { AffiliateClick } from '../entities/affiliate/AffiliateClick';
-import { AffiliateConversion } from '../entities/affiliate/AffiliateConversion';
-import { AffiliateCommission } from '../entities/affiliate/AffiliateCommission';
-import { AffiliatePayout } from '../entities/affiliate/AffiliatePayout';
-import { AffiliateAuditLog } from '../entities/affiliate/AffiliateAuditLog';
 import { Menu } from '../entities/Menu';
 import { MenuItem } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
+import { CustomPostType } from '../entities/CustomPostType';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -91,18 +73,8 @@ const CLIDataSource = new DataSource({
     AccountActivity,
     MediaFile,
     MediaFolder,
-    Product,
-    ProductAttribute,
-    ProductAttributeValue,
-    ProductVariation,
-    Order,
-    OrderItem,
-    Cart,
-    CartItem,
     Category,
     Settings,
-    Coupon,
-    CouponUsage,
     Theme,
     ThemeInstallation,
     // Crowdfunding entities
@@ -138,22 +110,12 @@ const CLIDataSource = new DataSource({
     FieldGroup,
     CustomField,
     CustomFieldValue,
-    // Dropshipping entities
-    Supplier,
-    Seller,
-    Affiliate,
-    DropshippingProduct,
-    // Affiliate Marketing entities
-    AffiliateUser,
-    AffiliateClick,
-    AffiliateConversion,
-    AffiliateCommission,
-    AffiliatePayout,
-    AffiliateAuditLog,
     // Menu System entities
     Menu,
     MenuItem,
-    MenuLocation
+    MenuLocation,
+    // CPT entity
+    CustomPostType,
   ],
   
   migrations: ['src/database/migrations/*.ts'],

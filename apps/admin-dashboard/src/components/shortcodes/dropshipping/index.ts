@@ -2,8 +2,39 @@
 export { default as UserDashboard } from './UserDashboard';
 export { default as RoleVerification } from './RoleVerification';
 
+// Partner Shortcodes
+export { 
+  PartnerMainDashboard,
+  PartnerProducts,
+  PartnerCommissions,
+  PartnerLinkGenerator,
+  CommissionDashboard,
+  PayoutRequests
+} from './partner';
+
+// Supplier Shortcodes
+export {
+  SupplierProducts,
+  SupplierProductEditor
+} from './supplier';
+
+// Seller Shortcodes
+export {
+  SellerDashboard,
+  SellerProducts,
+  SellerSettlement
+} from './seller';
+
+// Import partner shortcodes
+import { partnerShortcodes } from './partner';
+// Import supplier shortcodes
+import { supplierShortcodes } from './supplier';
+// Import seller shortcodes  
+import { sellerShortcodes } from './seller';
+
 // Shortcode Registration Map
 export const dropshippingShortcodes = {
+  // Core dropshipping shortcodes
   'user_dashboard': {
     component: 'UserDashboard',
     description: 'User role-based dashboard for dropshipping platform',
@@ -43,5 +74,11 @@ export const dropshippingShortcodes = {
     component: 'RoleSwitcher',
     description: 'Switch between multiple user roles',
     attributes: {}
-  }
+  },
+  // Partner shortcodes integration
+  ...partnerShortcodes,
+  // Supplier shortcodes integration
+  ...supplierShortcodes,
+  // Seller shortcodes integration
+  ...sellerShortcodes
 };
