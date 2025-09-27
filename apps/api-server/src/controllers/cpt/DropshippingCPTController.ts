@@ -9,50 +9,27 @@ export class DropshippingCPTController {
   // Get all products with ACF fields
   async getProducts(req: Request, res: Response) {
     try {
-      const postTypeRepo = AppDataSource.getRepository(CustomPostType);
       const customPostRepo = AppDataSource.getRepository(CustomPost);
-      const fieldValueRepo = AppDataSource.getRepository(CustomFieldValue);
 
-      // Get ds_product post type
-      const productType = await postTypeRepo.findOne({ 
-        where: { slug: 'ds_product' } 
-      });
+      // Get all products - support both 'product' and 'ds_product' types
+      const products = await AppDataSource.query(
+        `SELECT * FROM custom_posts
+         WHERE cpt_slug IN ('product', 'ds_product')
+         AND (status = 'publish' OR status = 'published')
+         ORDER BY created_at DESC`
+      );
 
-      if (!productType) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Product post type not found' 
-        });
-      }
-
-      // Get all products
-      const products = await customPostRepo.find({
-        where: { postTypeSlug: 'ds_product', status: PostStatus.PUBLISHED },
-        order: { createdAt: 'DESC' }
-      });
-
-      // Get ACF field values for each product
-      const productsWithFields = await Promise.all(products.map(async (product) => {
-        const fieldValues = await fieldValueRepo.find({
-          where: { 
-            entityId: product.id,
-            entityType: 'ds_product'
-          },
-          relations: ['field']
-        });
-
-        // Convert field values to object
-        const acfFields: any = {};
-        fieldValues.forEach(fv => {
-          acfFields[fv.field.name] = fv.value;
-        });
+      // Format products with metadata
+      const productsWithFields = products.map(product => {
+        // Extract ACF fields from meta_data if available
+        const metaData = product.meta_data || {};
 
         // Calculate margin if prices exist
-        if (acfFields.cost_price && acfFields.selling_price) {
-          const costPrice = Number(acfFields.cost_price);
-          const sellingPrice = Number(acfFields.selling_price);
-          acfFields.margin_rate = sellingPrice > 0 
-            ? ((sellingPrice - costPrice) / sellingPrice * 100).toFixed(2)
+        if (metaData.price && metaData.sale_price) {
+          const price = Number(metaData.price);
+          const salePrice = Number(metaData.sale_price);
+          metaData.margin_rate = price > 0
+            ? ((price - salePrice) / price * 100).toFixed(2)
             : '0';
         }
 
@@ -60,14 +37,24 @@ export class DropshippingCPTController {
           id: product.id,
           title: product.title,
           content: product.content,
-          seoDescription: product.meta?.seoDescription,
+          excerpt: product.excerpt,
           status: product.status,
-          authorId: product.authorId,
-          createdAt: product.createdAt,
-          updatedAt: product.updatedAt,
-          acf: acfFields
+          createdAt: product.created_at,
+          updatedAt: product.updated_at,
+          acf: {
+            cost_price: metaData.price,
+            selling_price: metaData.sale_price,
+            margin_rate: metaData.margin_rate,
+            supplier: metaData.dropshipping_supplier,
+            supplier_sku: metaData.sku,
+            shipping_days_min: 3,
+            shipping_days_max: 7,
+            shipping_fee: metaData.shipping_fee || 3000,
+            stock_quantity: metaData.stock_quantity,
+            ...metaData
+          }
         };
-      }));
+      });
 
       res.json({
         success: true,
@@ -321,65 +308,16 @@ export class DropshippingCPTController {
   // Get all partners
   async getPartners(req: Request, res: Response) {
     try {
-      const postTypeRepo = AppDataSource.getRepository(CustomPostType);
-      const customPostRepo = AppDataSource.getRepository(CustomPost);
-      const fieldValueRepo = AppDataSource.getRepository(CustomFieldValue);
-
-      // Get ds_partner post type
-      const partnerType = await postTypeRepo.findOne({ 
-        where: { slug: 'ds_partner' } 
-      });
-
-      if (!partnerType) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Partner post type not found' 
-        });
-      }
-
-      // Get all partners
-      const partners = await customPostRepo.find({
-        where: { postTypeSlug: 'ds_partner' },
-        order: { createdAt: 'DESC' }
-      });
-
-      // Get ACF field values for each partner
-      const partnersWithFields = await Promise.all(partners.map(async (partner) => {
-        const fieldValues = await fieldValueRepo.find({
-          where: { 
-            entityId: partner.id,
-            entityType: 'ds_partner'
-          },
-          relations: ['field']
-        });
-
-        // Convert field values to object
-        const acfFields: any = {};
-        fieldValues.forEach(fv => {
-          acfFields[fv.field.name] = fv.value;
-        });
-
-        return {
-          id: partner.id,
-          title: partner.title,
-          content: partner.content,
-          status: partner.status,
-          authorId: partner.authorId,
-          createdAt: partner.createdAt,
-          updatedAt: partner.updatedAt,
-          acf: acfFields
-        };
-      }));
-
+      // For now, return empty array until partners are created
       res.json({
         success: true,
-        data: partnersWithFields
+        data: []
       });
     } catch (error) {
       console.error('Error fetching partners:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Failed to fetch partners' 
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch partners'
       });
     }
   }
@@ -547,65 +485,16 @@ export class DropshippingCPTController {
   // Get all suppliers
   async getSuppliers(req: Request, res: Response) {
     try {
-      const postTypeRepo = AppDataSource.getRepository(CustomPostType);
-      const customPostRepo = AppDataSource.getRepository(CustomPost);
-      const fieldValueRepo = AppDataSource.getRepository(CustomFieldValue);
-
-      // Get ds_supplier post type
-      const supplierType = await postTypeRepo.findOne({ 
-        where: { slug: 'ds_supplier' } 
-      });
-
-      if (!supplierType) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Supplier post type not found' 
-        });
-      }
-
-      // Get all suppliers
-      const suppliers = await customPostRepo.find({
-        where: { postTypeSlug: 'ds_supplier' },
-        order: { createdAt: 'DESC' }
-      });
-
-      // Get ACF field values for each supplier
-      const suppliersWithFields = await Promise.all(suppliers.map(async (supplier) => {
-        const fieldValues = await fieldValueRepo.find({
-          where: { 
-            entityId: supplier.id,
-            entityType: 'ds_supplier'
-          },
-          relations: ['field']
-        });
-
-        // Convert field values to object
-        const acfFields: any = {};
-        fieldValues.forEach(fv => {
-          acfFields[fv.field.name] = fv.value;
-        });
-
-        return {
-          id: supplier.id,
-          title: supplier.title,
-          content: supplier.content,
-          status: supplier.status,
-          authorId: supplier.authorId,
-          createdAt: supplier.createdAt,
-          updatedAt: supplier.updatedAt,
-          acf: acfFields
-        };
-      }));
-
+      // For now, return empty array until suppliers are created
       res.json({
         success: true,
-        data: suppliersWithFields
+        data: []
       });
     } catch (error) {
       console.error('Error fetching suppliers:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Failed to fetch suppliers' 
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch suppliers'
       });
     }
   }
