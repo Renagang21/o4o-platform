@@ -25,8 +25,8 @@ export const cptApi = {
   // Get all CPT types
   async getAllTypes(active?: boolean): Promise<CPTApiResponse<CustomPostType[]>> {
     // CPT 대시보드에서는 모든 CPT를 보여줘야 하므로
-    // active가 true일 때만 'true'를, 그렇지 않으면 'false'를 전달
-    const params = active === true ? '?active=true' : '?active=false';
+    // active 파라미터를 전달하지 않으면 백엔드에서 모든 CPT 반환
+    const params = active === true ? '?active=true' : '';
     // Fix: Remove /public prefix to match backend routing
     const response = await authClient.api.get(`${API_BASE}/types${params}`);
     return response.data;
