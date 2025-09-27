@@ -193,5 +193,44 @@ export const dropshippingAPI = {
   deleteOrder: async (id: string) => {
     const response = await api.delete(`/api/v1/dropshipping/orders/${id}`);
     return response.data;
+  },
+
+  // Settlement API
+  getSettlements: async (status?: string, type?: string) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (type) params.append('type', type);
+    const queryString = params.toString();
+    const response = await api.get(`/api/v1/dropshipping/settlements${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+
+  getSettlement: async (id: string) => {
+    const response = await api.get(`/api/v1/dropshipping/settlements/${id}`);
+    return response.data;
+  },
+
+  updateSettlementStatus: async (id: string, status: string) => {
+    const response = await api.patch(`/api/v1/dropshipping/settlements/${id}/status`, { status });
+    return response.data;
+  },
+
+  processSettlement: async (id: string) => {
+    const response = await api.post(`/api/v1/dropshipping/settlements/${id}/process`);
+    return response.data;
+  },
+
+  createSettlement: async (data: {
+    order_id?: string;
+    seller_id?: string;
+    partner_id?: string;
+    amount: number;
+    commission_rate: number;
+    bank_name: string;
+    account_number: string;
+    account_holder: string;
+  }) => {
+    const response = await api.post('/api/v1/dropshipping/settlements', data);
+    return response.data;
   }
 };
