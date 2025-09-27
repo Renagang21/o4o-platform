@@ -17,6 +17,17 @@ export class UserApi {
     })
 
     const response = await unifiedApi.raw.get(`/v1/users?${params}`)
+    
+    // Backend returns data in response.data.data structure
+    if (response.data?.data?.users) {
+      return {
+        data: response.data.data.users,
+        total: response.data.data.pagination?.totalItems || 0,
+        totalPages: response.data.data.pagination?.total || 0,
+        pagination: response.data.data.pagination
+      }
+    }
+    
     return response.data
   }
 
