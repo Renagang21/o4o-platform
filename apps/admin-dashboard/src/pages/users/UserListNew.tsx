@@ -51,7 +51,12 @@ const roleDisplayNames: Record<UserRole, string> = {
   vendor: '판매자',
   customer: '구매자',
   affiliate: '제휴사',
-  partner: '파트너'
+  partner: '파트너',
+  supplier: '공급자',
+  seller: '판매자',
+  business: '사업자',
+  manager: '매니저',
+  retailer: '소매업체'
 };
 
 const statusDisplayNames: Record<UserStatus, { label: string; color: string }> = {

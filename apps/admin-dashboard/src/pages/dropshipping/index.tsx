@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Products from './Products';
-import Partners from './Partners';
-import Suppliers from './Suppliers';
+import PartnersList from './PartnersList';
+import SuppliersList from './SuppliersList';
 import Approvals from './Approvals';
 import Commissions from './Commissions';
 import SystemSetup from './SystemSetup';
@@ -11,8 +11,8 @@ const DropshippingRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="products" element={<Products />} />
-      <Route path="partners" element={<Partners />} />
-      <Route path="suppliers" element={<Suppliers />} />
+      <Route path="partners" element={<PartnersList />} />
+      <Route path="suppliers" element={<SuppliersList />} />
       <Route path="approvals" element={<Approvals />} />
       <Route path="commissions" element={<Commissions />} />
       <Route path="setup" element={<SystemSetup />} />
