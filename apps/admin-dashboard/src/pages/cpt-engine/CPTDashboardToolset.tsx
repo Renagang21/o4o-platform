@@ -433,7 +433,7 @@ const CPTDashboardToolset = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCPTs.map((cpt) => {
+                {filteredCPTs?.map((cpt) => {
                   const fieldCount = getFieldCount(cpt.slug);
                   const isDropshipping = cpt.slug.startsWith('ds_');
                   
@@ -474,7 +474,7 @@ const CPTDashboardToolset = () => {
                         <div className="action-buttons">
                           {cpt.taxonomies && cpt.taxonomies.length > 0 ? (
                             <div className="taxonomy-list">
-                              {cpt.taxonomies.map((tax: string) => (
+                              {cpt.taxonomies?.map((tax: string) => (
                                 <span key={tax} className="taxonomy-tag">{tax}</span>
                               ))}
                             </div>
@@ -563,7 +563,7 @@ const CPTDashboardToolset = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCPTs.map((cpt) => {
+                {filteredCPTs?.map((cpt) => {
                   const fieldCount = getFieldCount(cpt.slug);
                   const isDropshipping = cpt.slug.startsWith('ds_');
                   
@@ -604,7 +604,7 @@ const CPTDashboardToolset = () => {
                         <div className="action-buttons">
                           {cpt.taxonomies && cpt.taxonomies.length > 0 ? (
                             <div className="taxonomy-list">
-                              {cpt.taxonomies.map((tax: string) => (
+                              {cpt.taxonomies?.map((tax: string) => (
                                 <span key={tax} className="taxonomy-tag">{tax}</span>
                               ))}
                             </div>
