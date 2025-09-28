@@ -3,6 +3,8 @@
  * Lazy loaded when needed
  */
 
+import { registerSlideBlock } from './slide-block';
+
 // Register media WordPress blocks
 export function registerMediaBlocks() {
   if (!window.wp?.blocks?.registerBlockType) {
@@ -300,6 +302,9 @@ export function registerMediaBlocks() {
     edit: () => null,
     save: () => null,
   });
+
+  // Register slide presentation block
+  registerSlideBlock();
 }
 
 export default registerMediaBlocks;

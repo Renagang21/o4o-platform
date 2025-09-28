@@ -25,6 +25,7 @@ import ListBlock from '../blocks/ListBlock'
 import ImageBlock from '../blocks/ImageBlock'
 import ButtonBlock from '../blocks/ButtonBlock'
 import ColumnsBlock from '../blocks/ColumnsBlock'
+import { SlideBlock } from '../blocks/slide'
 
 interface ZoneBlockRendererProps {
   block: ZoneBlock
@@ -55,6 +56,7 @@ const BLOCK_COMPONENTS = {
   'core/group': 'div', // Simple wrapper
   'core/spacer': 'div', // Simple spacer
   'core/separator': 'hr', // Horizontal rule
+  'o4o/slide': SlideBlock, // Slide presentation block
 }
 
 export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({

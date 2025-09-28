@@ -40,7 +40,7 @@ class BlockManager {
     this.categories.set('media', {
       name: 'Media Blocks',
       priority: 'low',
-      blocks: ['gallery', 'audio', 'video', 'file', 'media-text'],
+      blocks: ['gallery', 'audio', 'video', 'file', 'media-text', 'o4o/slide'],
       loaded: false
     });
 
