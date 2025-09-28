@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/popover';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
-import { MediaSelector, MediaItem } from './shared/MediaSelector';
+import MediaSelector, { MediaItem } from './shared/MediaSelector';
 
 interface ImageBlockProps {
   id: string;
@@ -375,7 +375,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
           onSelect={handleMediaSelect}
           multiple={false}
           acceptedTypes={['image']}
-          selectedItems={url ? [{ id: attributes.id || '', url, type: 'image', title: alt || '', alt }] : []}
+          selectedItems={url ? [{ id: id || '', url, type: 'image', title: alt || '', alt }] : []}
           title="Select Image"
         />
       )}

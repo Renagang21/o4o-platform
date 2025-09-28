@@ -483,7 +483,7 @@ const AdminPlatformStats: React.FC<AdminPlatformStatsProps> = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {stats.settlements.pending.map(settlement => (
+                {stats.settlements?.pending?.map(settlement => (
                   <div key={settlement.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">

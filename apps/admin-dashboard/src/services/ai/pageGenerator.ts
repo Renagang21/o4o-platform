@@ -10,7 +10,7 @@ export interface Block {
 }
 
 export interface AIProvider {
-  name: 'openai' | 'claude' | 'gemini';
+  name: 'openai' | 'claude' | 'gemini' | 'mock';
   apiKey?: string;
   model?: string;
 }

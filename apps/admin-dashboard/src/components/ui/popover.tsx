@@ -1,4 +1,5 @@
 import { forwardRef, HTMLAttributes, ButtonHTMLAttributes, createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from '@/lib/utils';
 
 interface PopoverContextValue {
@@ -35,13 +36,19 @@ const Popover = ({ open: controlledOpen, defaultOpen = false, onOpenChange, chil
   );
 };
 
-const PopoverTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ onClick, ...props }, ref) => {
+interface PopoverTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+}
+
+const PopoverTrigger = forwardRef<HTMLButtonElement, PopoverTriggerProps>(
+  ({ onClick, asChild = false, ...props }, ref) => {
     const context = useContext(PopoverContext);
     if (!context) throw new Error('PopoverTrigger must be used within Popover');
     
+    const Comp = asChild ? Slot : "button";
+    
     return (
-      <button
+      <Comp
         ref={ref}
         onClick={(e: any) => {
           onClick?.(e);

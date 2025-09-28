@@ -126,8 +126,8 @@ export const dashboardApi = {
           trend: 'up' as const
         },
         products: {
-          active: ecommerceStats?.totalProducts || 0,
-          lowStock: ecommerceStats?.lowStockProducts || 0,
+          active: (ecommerceStats as any)?.totalProducts || 0,
+          lowStock: (ecommerceStats as any)?.lowStockProducts || 0,
           newThisWeek: 5,
           bestsellers: [],
           change: 8.2,

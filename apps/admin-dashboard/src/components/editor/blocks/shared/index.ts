@@ -25,9 +25,7 @@ export {
   transformGalleryToCover
 } from './BlockTransforms';
 
-// Example Components
-export { default as EnhancedCoverBlock } from './examples/EnhancedCoverBlock';
-export { default as EnhancedGalleryBlock } from './examples/EnhancedGalleryBlock';
+// Example Components (removed missing files)
 
 // Hooks
 export { useMediaSelector } from './hooks/useMediaSelector';

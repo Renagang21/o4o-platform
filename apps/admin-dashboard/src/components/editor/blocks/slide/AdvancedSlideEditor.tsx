@@ -338,7 +338,7 @@ const AdvancedSlideEditor: React.FC<AdvancedSlideEditorProps> = ({
                     key={size}
                     className={`size-btn ${fontSize === size ? 'active' : ''}`}
                     onClick={() => {
-                      setFontSize(size);
+                      setFontSize(size as 'small' | 'medium' | 'large' | 'x-large');
                       updateTextStyles({ fontSize: size });
                     }}
                   >
@@ -408,7 +408,7 @@ const AdvancedSlideEditor: React.FC<AdvancedSlideEditorProps> = ({
               <select
                 value={textShadow}
                 onChange={(e) => {
-                  setTextShadow(e.target.value);
+                  setTextShadow(e.target.value as 'none' | 'subtle' | 'medium' | 'strong' | 'glow');
                   updateTextStyles({ textShadow: e.target.value });
                 }}
               >

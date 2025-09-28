@@ -80,21 +80,21 @@ const BulkEditPanel: React.FC<BulkEditPanelProps> = ({
     if (fontSize) {
       changes.textStyles = {
         ...changes.textStyles,
-        fontSize
+        fontSize: fontSize as 'small' | 'medium' | 'large' | 'x-large'
       };
     }
     
     if (fontWeight) {
       changes.textStyles = {
         ...changes.textStyles,
-        fontWeight
+        fontWeight: fontWeight as 'normal' | 'bold' | 'light'
       };
     }
     
     if (textShadow) {
       changes.textStyles = {
         ...changes.textStyles,
-        textShadow
+        textShadow: textShadow as 'none' | 'subtle' | 'medium' | 'strong' | 'glow'
       };
     }
     
