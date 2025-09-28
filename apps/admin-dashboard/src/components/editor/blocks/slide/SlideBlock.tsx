@@ -23,13 +23,19 @@ import {
 import SlideEditor from './SlideEditor';
 import AdvancedSlideEditor from './AdvancedSlideEditor';
 import SlideViewer from './SlideViewer';
+import EnhancedSlideViewer from './EnhancedSlideViewer';
 import BasicNavigation from './BasicNavigation';
 import SlideSortableList from './SlideSortableList';
 import BulkEditPanel from './BulkEditPanel';
 import useKeyboardNavigation from './useKeyboardNavigation';
+import useTouchGestures from './useTouchGestures';
+import useMouseInteractions from './useMouseInteractions';
+import { SlideProgress } from './SlideProgress';
+import { SlideAnnouncer, FocusTrap, SkipLinks } from './SlideAccessibility';
 import { Slide, SlideBlockAttributes } from './types';
 import './SlideBlock.css';
 import './AdvancedTransitions.css';
+import './InteractionStyles.css';
 
 // Re-export types for backward compatibility
 export type { Slide, SlideBlockAttributes } from './types';
@@ -55,7 +61,10 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
   const [selectedSlides, setSelectedSlides] = useState<Set<number>>(new Set());
   const [useAdvancedEditor, setUseAdvancedEditor] = useState(true);
   const [showThumbnails, setShowThumbnails] = useState(attributes.showThumbnails ?? true);
+  const [pausedForHover, setPausedForHover] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const {
     slides = [],
@@ -78,15 +87,20 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
     }
   }, []);
 
-  // Auto-play functionality
+  // Auto-play functionality with hover pause
   useEffect(() => {
-    if (isPlaying && slides.length > 1) {
+    if (isPlaying && !pausedForHover && slides.length > 1) {
       const interval = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
       }, autoPlayInterval);
       return () => clearInterval(interval);
     }
-  }, [isPlaying, slides.length, autoPlayInterval]);
+  }, [isPlaying, pausedForHover, slides.length, autoPlayInterval]);
+
+  // Detect touch device
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   // Generate unique ID
   const generateId = () => `slide-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -309,6 +323,32 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
     };
   }, []);
 
+  // Touch gestures
+  const { attachToElement: attachTouchElement } = useTouchGestures({
+    onSwipeLeft: goToNextSlide,
+    onSwipeRight: goToPrevSlide,
+    onDoubleTap: () => setIsPlaying(!isPlaying),
+    enabled: isTouchDevice && !isEditing
+  });
+
+  // Mouse interactions
+  const { attachToElement: attachMouseElement } = useMouseInteractions({
+    onWheelNext: goToNextSlide,
+    onWheelPrev: goToPrevSlide,
+    onHoverStart: () => setPausedForHover(true),
+    onHoverEnd: () => setPausedForHover(false),
+    enabled: !isEditing && !presentationMode,
+    pauseOnHover: autoPlay
+  });
+
+  // Attach interactions to viewport
+  useEffect(() => {
+    if (viewportRef.current) {
+      attachTouchElement(viewportRef.current);
+      attachMouseElement(viewportRef.current);
+    }
+  }, [viewportRef.current, isEditing, presentationMode]);
+
   // Get aspect ratio styles
   const getAspectRatioStyle = () => {
     const ratios = {
@@ -322,7 +362,9 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
   return (
     <div 
       ref={containerRef}
-      className={`slide-block ${className} ${isSelected ? 'selected' : ''} ${presentationMode ? 'presentation-mode' : ''}`}
+      className={`slide-block ${className} ${isSelected ? 'selected' : ''} ${presentationMode ? 'presentation-mode' : ''} ${isTouchDevice ? 'slide-block--touch-enabled' : ''}`}
+      role="region"
+      aria-label="Slide presentation"
     >
       {/* Toolbar */}
       {isSelected && (
@@ -559,36 +601,64 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
           </div>
         ) : (
           /* Preview Mode */
-          <div 
-            className="slide-block__viewer"
-            style={{ backgroundColor }}
-          >
+          <FocusTrap active={presentationMode} onEscape={() => setPresentationMode(false)}>
             <div 
-              className="slide-viewport"
-              style={getAspectRatioStyle()}
+              className="slide-block__viewer"
+              style={{ backgroundColor }}
+              ref={viewportRef}
             >
-              <div className="slide-viewport__inner">
-                {slides[currentSlide] && (
-                  <SlideViewer
-                    slide={slides[currentSlide]}
-                    transition={transition}
-                    isActive={true}
-                  />
-                )}
+              <SkipLinks
+                onSkipToContent={() => viewportRef.current?.focus()}
+                onSkipToNavigation={() => document.querySelector('.slide-navigation')?.focus()}
+              />
+              
+              <SlideAnnouncer
+                currentSlide={currentSlide}
+                totalSlides={slides.length}
+                slideTitle={slides[currentSlide]?.title}
+                isPlaying={isPlaying && !pausedForHover}
+              />
+              
+              <div 
+                className="slide-viewport"
+                style={getAspectRatioStyle()}
+                role="application"
+                aria-roledescription="slide viewer"
+              >
+                <div className="slide-viewport__inner">
+                  {slides[currentSlide] && (
+                    <EnhancedSlideViewer
+                      slide={slides[currentSlide]}
+                      transition={transition}
+                      isActive={true}
+                      lazyLoad={true}
+                      reducedMotion={false}
+                    />
+                  )}
 
-                {showNavigation && slides.length > 1 && (
-                  <BasicNavigation
-                    currentSlide={currentSlide}
-                    totalSlides={slides.length}
-                    onPrev={goToPrevSlide}
-                    onNext={goToNextSlide}
-                    onGoToSlide={goToSlide}
-                    showPagination={showPagination}
+                  {showNavigation && slides.length > 1 && (
+                    <BasicNavigation
+                      currentSlide={currentSlide}
+                      totalSlides={slides.length}
+                      onPrev={goToPrevSlide}
+                      onNext={goToNextSlide}
+                      onGoToSlide={goToSlide}
+                      showPagination={showPagination}
+                    />
+                  )}
+                  
+                  <SlideProgress
+                    current={currentSlide}
+                    total={slides.length}
+                    autoPlayInterval={autoPlayInterval}
+                    isPlaying={isPlaying && !pausedForHover}
+                    showProgressBar={true}
+                    position="bottom"
                   />
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          </FocusTrap>
         )}
       </div>
     </div>
