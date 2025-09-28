@@ -13,8 +13,16 @@ export class CPTController {
    */
   static async getAllCPTs(req: Request, res: Response) {
     try {
-      const { active } = req.query;
-      const result = await cptService.getAllCPTs(active === 'true');
+      const { active, includeInactive } = req.query;
+      
+      // If includeInactive is true, get all CPTs regardless of active status
+      // Otherwise, use the active parameter (default to true for backward compatibility)
+      let filterActive = active === 'true' || active === undefined;
+      if (includeInactive === 'true') {
+        filterActive = undefined; // Don't filter by active status
+      }
+      
+      const result = await cptService.getAllCPTs(filterActive);
 
       if (!result.success) {
         return res.status(400).json(result);
