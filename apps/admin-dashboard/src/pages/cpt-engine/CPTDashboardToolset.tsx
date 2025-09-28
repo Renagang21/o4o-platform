@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Plus,
   Settings,
@@ -72,6 +72,10 @@ const CPTDashboardToolset = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addNotice } = useAdminNotices();
+  const [searchParams] = useSearchParams();
+  
+  // Get current view from search params
+  const currentView = searchParams.get('view') || 'types';
   
   // State management
   const [activeTab, setActiveTab] = useState<'wordpress-admin' | 'frontend'>('wordpress-admin');
@@ -176,7 +180,9 @@ const CPTDashboardToolset = () => {
 
   // Filter CPTs based on search and filter
   const filteredCPTs = useMemo(() => {
-    let filtered = cptTypes;
+    // Ensure cptTypes is an array
+    const safeCPTs = Array.isArray(cptTypes) ? cptTypes : [];
+    let filtered = safeCPTs;
     
     // Apply search filter
     if (searchQuery) {
@@ -250,7 +256,87 @@ const CPTDashboardToolset = () => {
     return null;
   };
 
-  return (
+  // Render content based on current view
+  const renderViewContent = () => {
+    switch (currentView) {
+      case 'archives':
+        return (
+          <div className="toolset-card">
+            <div className="toolset-card-body">
+              <h2>Archive Pages</h2>
+              <p>Archive pages for Custom Post Types. These pages show lists of posts for each CPT.</p>
+              <div style={{ marginTop: '20px' }}>
+                <button
+                  className="toolset-btn-small"
+                  onClick={() => navigate('/cpt-engine/archives/new')}
+                >
+                  <Plus size={14} />
+                  Create Archive
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      case 'templates':
+        return (
+          <div className="toolset-card">
+            <div className="toolset-card-body">
+              <h2>Content Templates</h2>
+              <p>Templates for displaying individual CPT posts and their custom fields.</p>
+              <div style={{ marginTop: '20px' }}>
+                <button
+                  className="toolset-btn-small"
+                  onClick={() => navigate('/cpt-engine/templates/new')}
+                >
+                  <Plus size={14} />
+                  Create Template
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      case 'fields':
+        return (
+          <div className="toolset-card">
+            <div className="toolset-card-body">
+              <h2>Custom Fields</h2>
+              <p>Manage custom fields for your post types.</p>
+              <div style={{ marginTop: '20px' }}>
+                <button
+                  className="toolset-btn-small"
+                  onClick={() => navigate('/cpt-engine/fields/new')}
+                >
+                  <Plus size={14} />
+                  Create Field Group
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      case 'taxonomies':
+        return (
+          <div className="toolset-card">
+            <div className="toolset-card-body">
+              <h2>Taxonomies</h2>
+              <p>Manage custom taxonomies for organizing your content.</p>
+              <div style={{ marginTop: '20px' }}>
+                <button
+                  className="toolset-btn-small"
+                  onClick={() => navigate('/cpt-engine/taxonomies/new')}
+                >
+                  <Plus size={14} />
+                  Create Taxonomy
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return renderPostTypesView();
+    }
+  };
+
+  const renderPostTypesView = () => (
     <div className="toolset-tables-container">
       {/* Page Header */}
       <div style={{ marginBottom: '20px' }}>
@@ -613,6 +699,30 @@ const CPTDashboardToolset = () => {
           })}
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="toolset-tables-container">
+      {/* Page Header */}
+      <div style={{ marginBottom: '20px' }}>
+        <h1 style={{ fontSize: '24px', color: '#23282d', marginBottom: '10px' }}>
+          CPT Engine - {currentView === 'archives' ? 'Archives' : 
+                      currentView === 'templates' ? 'Content Templates' :
+                      currentView === 'fields' ? 'Custom Fields' :
+                      currentView === 'taxonomies' ? 'Taxonomies' : 'Post Types'}
+        </h1>
+        <p style={{ color: '#666' }}>
+          {currentView === 'archives' ? 'Manage archive pages for your custom post types' :
+           currentView === 'templates' ? 'Create templates for displaying CPT content' :
+           currentView === 'fields' ? 'Create and manage custom fields' :
+           currentView === 'taxonomies' ? 'Organize content with custom taxonomies' :
+           'Manage your custom post types with this WordPress Toolset-style interface'}
+        </p>
+      </div>
+
+      {/* Render current view content */}
+      {renderViewContent()}
     </div>
   );
 };
