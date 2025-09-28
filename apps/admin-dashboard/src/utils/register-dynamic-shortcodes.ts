@@ -1,13 +1,13 @@
 /**
  * Register Dynamic Shortcodes in Admin Dashboard
  */
-import { globalRegistry } from '../../../../packages/shortcodes/src';
+import { globalRegistry } from '@o4o/shortcodes';
 import { 
   CPTListShortcode,
   CPTFieldShortcode,
   ACFFieldShortcode,
   MetaFieldShortcode
-} from '../../../../packages/shortcodes/src/dynamic';
+} from '@o4o/shortcodes/dynamic';
 
 export function registerDynamicShortcodes() {
   // Register CPT List Shortcode

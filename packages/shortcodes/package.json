@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./dynamic": {
+      "types": "./dist/dynamic/index.d.ts",
+      "default": "./dist/dynamic/index.js"
     }
   },
   "scripts": {
