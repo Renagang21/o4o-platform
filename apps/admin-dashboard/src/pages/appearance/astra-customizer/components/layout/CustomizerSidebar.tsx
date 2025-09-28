@@ -162,7 +162,7 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
         
         {hasChildren && isExpanded && (
           <div className="wp-customizer-subpanels">
-            {panel.children!.map(child => renderPanel(child, level + 1))}
+            {panel.children?.map(child => renderPanel(child, level + 1))}
           </div>
         )}
       </div>
