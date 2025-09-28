@@ -82,6 +82,56 @@ interface ShortcodeTemplate {
  * Common shortcodes with their parameter definitions
  */
 const SHORTCODE_TEMPLATES: ShortcodeTemplate[] = [
+  // Dynamic Data Shortcodes
+  {
+    name: 'cpt_list',
+    description: 'CPT 게시물 목록 표시',
+    template: '[cpt_list type="ds_product" count="6" template="grid" columns="3"]',
+    parameters: [
+      { name: 'type', required: true, description: 'CPT slug (예: ds_product, ds_supplier)', type: 'text' },
+      { name: 'count', required: false, description: '표시할 개수', type: 'number', default: '10' },
+      { name: 'template', required: false, description: '템플릿 스타일', type: 'select', options: ['default', 'grid', 'list', 'card'], default: 'default' },
+      { name: 'columns', required: false, description: '그리드 컬럼 수', type: 'number', default: '3' },
+      { name: 'orderby', required: false, description: '정렬 기준', type: 'select', options: ['date', 'title', 'menu_order', 'rand'], default: 'date' },
+      { name: 'order', required: false, description: '정렬 순서', type: 'select', options: ['ASC', 'DESC'], default: 'DESC' }
+    ]
+  },
+  {
+    name: 'cpt_field',
+    description: 'CPT 필드 값 표시',
+    template: '[cpt_field field="title"]',
+    parameters: [
+      { name: 'field', required: true, description: '필드명 (title, content, price 등)', type: 'text' },
+      { name: 'post_type', required: false, description: 'CPT slug', type: 'text' },
+      { name: 'post_id', required: false, description: '특정 포스트 ID', type: 'text' },
+      { name: 'format', required: false, description: '출력 포맷', type: 'select', options: ['default', 'currency', 'date', 'excerpt'], default: 'default' },
+      { name: 'default', required: false, description: '기본값', type: 'text' }
+    ]
+  },
+  {
+    name: 'acf_field',
+    description: 'ACF 커스텀 필드 표시',
+    template: '[acf_field name="custom_price" format="currency"]',
+    parameters: [
+      { name: 'name', required: true, description: 'ACF 필드명', type: 'text' },
+      { name: 'post_id', required: false, description: '포스트 ID', type: 'text' },
+      { name: 'format', required: false, description: '출력 포맷', type: 'select', options: ['raw', 'formatted', 'html'], default: 'formatted' },
+      { name: 'type', required: false, description: '필드 타입', type: 'text' },
+      { name: 'default', required: false, description: '기본값', type: 'text' }
+    ]
+  },
+  {
+    name: 'meta_field',
+    description: '메타 필드 값 표시',
+    template: '[meta_field key="_stock_status" default="재고 확인 중"]',
+    parameters: [
+      { name: 'key', required: true, description: '메타 키', type: 'text' },
+      { name: 'post_id', required: false, description: '포스트 ID', type: 'text' },
+      { name: 'format', required: false, description: '출력 포맷', type: 'text' },
+      { name: 'default', required: false, description: '기본값', type: 'text' }
+    ]
+  },
+  // Original shortcodes
   {
     name: 'gallery',
     description: 'Display image gallery',

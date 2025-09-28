@@ -28,6 +28,10 @@ import { TestDashboard } from './features/test-dashboard';
 // Demo Pages
 import SpectraBlocksDemo from './pages/SpectraBlocksDemo';
 
+// Archive Pages
+import CPTArchive from './pages/archive/CPTArchive';
+import TemplateArchive from './pages/archive/TemplateArchive';
+
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -99,6 +103,22 @@ const App: FC = () => {
           <Route path="/auth/reset-password" element={
             <Layout>
               <ResetPassword />
+            </Layout>
+          } />
+          
+          {/* CPT Archive Routes */}
+          <Route path="/archive/:cptSlug" element={<TemplateArchive />} />
+          <Route path="/cpt/:cptSlug" element={<CPTArchive />} />
+          
+          {/* Dropshipping CPT Archive Routes with friendly URLs */}
+          <Route path="/ds-products" element={<TemplateArchive />} />
+          <Route path="/ds-suppliers" element={<CPTArchive />} />
+          <Route path="/ds-partners" element={<CPTArchive />} />
+          
+          {/* Single CPT Post Routes */}
+          <Route path="/cpt/:cptSlug/:postSlug" element={
+            <Layout>
+              <PostDetail />
             </Layout>
           } />
           

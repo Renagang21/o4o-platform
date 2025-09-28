@@ -1,0 +1,30 @@
+{
+  "name": "드롭쉬핑 상품 Archive",
+  "description": "드롭쉬핑 상품 목록 표시 템플릿",
+  "type": "archive",
+  "postType": "ds_product",
+  "content": {
+    "blocks": [
+      {
+        "id": "header-1",
+        "type": "heading",
+        "level": 1,
+        "content": "드롭쉬핑 상품",
+        "order": 0
+      },
+      {
+        "id": "shortcode-1",
+        "type": "shortcode",
+        "content": "[cpt_list type=\"ds_product\" limit=\"12\" template=\"grid\" show_image=\"true\" show_excerpt=\"true\" show_meta=\"true\"]",
+        "order": 1
+      }
+    ]
+  },
+  "settings": {
+    "layout": "full-width",
+    "sidebar": false,
+    "pagination": true
+  },
+  "featured": false,
+  "tags": ["archive", "dropshipping", "products"]
+}

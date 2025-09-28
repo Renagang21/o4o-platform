@@ -10,6 +10,9 @@ import '@/styles/wordpress-theme.css';
 import '@/styles/wordpress-sidebar.css';
 import '@/styles/admin-layout-fixed.css';
 
+// Register Dynamic Shortcodes
+import '@/utils/register-dynamic-shortcodes';
+
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
 import EditorLayout from '@/layouts/EditorLayout';

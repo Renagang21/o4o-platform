@@ -41,3 +41,18 @@ export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropsh
 // Auth shortcodes
 export { registerAuthShortcodes } from './auth';
 export { SocialLogin } from './auth';
+
+// Dynamic shortcodes
+export { 
+  CPTListShortcode,
+  cptListShortcodeDefinition,
+  CPTFieldShortcode,
+  cptFieldShortcodeDefinition,
+  ACFFieldShortcode,
+  acfFieldShortcodeDefinition,
+  MetaFieldShortcode,
+  metaFieldShortcodeDefinition,
+  registerDynamicShortcodes,
+  getDynamicShortcodeDefinitions,
+  dynamicShortcodeTemplates
+} from './dynamic';
