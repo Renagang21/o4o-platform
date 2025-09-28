@@ -5,6 +5,7 @@
 
 import { AppDataSource } from '../database/connection';
 import { CustomPostType } from '../entities/CustomPostType';
+import logger from '../utils/logger';
 
 const DROPSHIPPING_CPTS = [
   {
@@ -111,39 +112,37 @@ const DROPSHIPPING_CPTS = [
 
 async function initializeDropshippingCPTs() {
   try {
-    console.log('🔌 Initializing database connection...');
+    logger.info('🔌 Initializing database connection...');
     await AppDataSource.initialize();
-    console.log('✅ Database connected!\n');
+    logger.info('✅ Database connected!');
 
     const cptRepository = AppDataSource.getRepository(CustomPostType);
 
     // Check existing CPTs
-    console.log('📊 Checking existing Dropshipping CPTs...\n');
+    logger.info('📊 Checking existing Dropshipping CPTs...');
     const existingCPTs = await cptRepository
       .createQueryBuilder('cpt')
       .where('cpt.slug LIKE :pattern', { pattern: 'ds_%' })
       .getMany();
 
-    console.log(`Found ${existingCPTs.length} existing dropshipping CPTs\n`);
+    logger.info(`Found ${existingCPTs.length} existing dropshipping CPTs`);
 
     if (existingCPTs.length > 0) {
-      console.log('Existing CPTs:');
+      logger.info('Existing CPTs:');
       existingCPTs.forEach(cpt => {
-        console.log(`  - ${cpt.name} (${cpt.slug}) - Active: ${cpt.active}`);
+        logger.info(`  - ${cpt.name} (${cpt.slug}) - Active: ${cpt.active}`);
       });
-      console.log('');
 
       // Update inactive CPTs
       const inactiveCPTs = existingCPTs.filter(cpt => !cpt.active);
       if (inactiveCPTs.length > 0) {
-        console.log(`⚠️  Found ${inactiveCPTs.length} inactive CPTs. Activating them...`);
+        logger.info(`⚠️  Found ${inactiveCPTs.length} inactive CPTs. Activating them...`);
         for (const cpt of inactiveCPTs) {
           cpt.active = true;
           await cptRepository.save(cpt);
-          console.log(`  ✅ Activated: ${cpt.name}`);
+          logger.info(`  ✅ Activated: ${cpt.name}`);
         }
-        console.log('');
-      }
+        }
     }
 
     // Create missing CPTs
@@ -156,37 +155,37 @@ async function initializeDropshippingCPTs() {
       if (!existing) {
         const cpt = cptRepository.create(cptData);
         await cptRepository.save(cpt);
-        console.log(`✅ Created CPT: ${cptData.name} (${cptData.slug})`);
+        logger.info(`✅ Created CPT: ${cptData.name} (${cptData.slug})`);
         createdCount++;
       } else if (!existing.active) {
         // Make sure it's active
         existing.active = true;
         await cptRepository.save(existing);
-        console.log(`✅ Activated existing CPT: ${cptData.name} (${cptData.slug})`);
+        logger.info(`✅ Activated existing CPT: ${cptData.name} (${cptData.slug})`);
       } else {
-        console.log(`ℹ️  CPT already exists and is active: ${cptData.name} (${cptData.slug})`);
+        logger.info(`ℹ️  CPT already exists and is active: ${cptData.name} (${cptData.slug})`);
       }
     }
 
     if (createdCount > 0) {
-      console.log(`\n✅ Created ${createdCount} new CPTs`);
+      logger.info(`✅ Created ${createdCount} new CPTs`);
     }
 
     // Final status check
-    console.log('\n📊 Final status of all CPTs:\n');
+    logger.info('📊 Final status of all CPTs:');
     const allCPTs = await cptRepository.find({
       order: { createdAt: 'DESC' }
     });
 
-    console.log(`Total CPTs: ${allCPTs.length}`);
-    console.log(`Active CPTs: ${allCPTs.filter(c => c.active).length}`);
-    console.log(`Dropshipping CPTs: ${allCPTs.filter(c => c.slug.startsWith('ds_')).length}`);
-    console.log(`Active Dropshipping CPTs: ${allCPTs.filter(c => c.slug.startsWith('ds_') && c.active).length}`);
+    logger.info(`Total CPTs: ${allCPTs.length}`);
+    logger.info(`Active CPTs: ${allCPTs.filter(c => c.active).length}`);
+    logger.info(`Dropshipping CPTs: ${allCPTs.filter(c => c.slug.startsWith('ds_')).length}`);
+    logger.info(`Active Dropshipping CPTs: ${allCPTs.filter(c => c.slug.startsWith('ds_') && c.active).length}`);
 
-    console.log('\n✨ Dropshipping CPTs initialization completed!');
+    logger.info('✨ Dropshipping CPTs initialization completed!');
 
   } catch (error) {
-    console.error('❌ Error:', error);
+    logger.error('❌ Error:', error);
   } finally {
     if (AppDataSource.isInitialized) {
       await AppDataSource.destroy();
