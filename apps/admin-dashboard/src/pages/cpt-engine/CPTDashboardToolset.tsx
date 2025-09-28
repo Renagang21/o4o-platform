@@ -154,7 +154,7 @@ const CPTDashboardToolset = () => {
   const cptTypes = useMemo(() => {
     // Ensure allCPTTypes is an array
     const safeCPTTypes = Array.isArray(allCPTTypes) ? allCPTTypes : [];
-    const existingSlugs = new Set(safeCPTTypes.map(cpt => cpt.slug));
+    const existingSlugs = new Set(safeCPTTypes?.map(cpt => cpt?.slug) || []);
     const combinedCPTs = [...safeCPTTypes];
     
     // Add missing dropshipping CPTs
@@ -408,7 +408,7 @@ const CPTDashboardToolset = () => {
             <div className="toolset-loading">
               <div className="toolset-spinner"></div>
             </div>
-          ) : filteredCPTs.length === 0 ? (
+          ) : !filteredCPTs || filteredCPTs.length === 0 ? (
             <div className="toolset-empty-state">
               <Package />
               <h3>No Post Types Found</h3>
@@ -545,7 +545,7 @@ const CPTDashboardToolset = () => {
             <div className="toolset-loading">
               <div className="toolset-spinner"></div>
             </div>
-          ) : filteredCPTs.length === 0 ? (
+          ) : !filteredCPTs || filteredCPTs.length === 0 ? (
             <div className="toolset-empty-state">
               <Package />
               <h3>No Post Types Found</h3>
