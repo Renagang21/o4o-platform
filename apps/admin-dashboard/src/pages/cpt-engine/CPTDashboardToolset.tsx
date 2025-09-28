@@ -136,17 +136,19 @@ const CPTDashboardToolset = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cpt-types'] });
-      addNotice('success', 'Post Type deleted successfully');
+      addNotice({ type: 'success', message: 'Post Type deleted successfully' });
     },
     onError: () => {
-      addNotice('error', 'Failed to delete Post Type');
+      addNotice({ type: 'error', message: 'Failed to delete Post Type' });
     }
   });
 
   // Ensure dropshipping CPTs are included
   const cptTypes = useMemo(() => {
-    const existingSlugs = new Set(allCPTTypes.map(cpt => cpt.slug));
-    const combinedCPTs = [...allCPTTypes];
+    // Ensure allCPTTypes is an array
+    const safeCPTTypes = Array.isArray(allCPTTypes) ? allCPTTypes : [];
+    const existingSlugs = new Set(safeCPTTypes.map(cpt => cpt.slug));
+    const combinedCPTs = [...safeCPTTypes];
     
     // Add missing dropshipping CPTs
     DROPSHIPPING_CPTS.forEach(dsCPT => {
@@ -193,11 +195,13 @@ const CPTDashboardToolset = () => {
 
   // Get field count for a CPT
   const getFieldCount = (cptSlug: string): number => {
+    if (!Array.isArray(fieldGroups)) return 0;
+    
     return fieldGroups.filter((group: ACFFieldGroup) => {
-      if (!group.location) return false;
+      if (!group.location || !Array.isArray(group.location)) return false;
       return group.location.some((rule: any) => 
-        rule.some((condition: any) => 
-          condition.param === 'post_type' && condition.value === cptSlug
+        Array.isArray(rule) && rule.some((condition: any) => 
+          condition && condition.param === 'post_type' && condition.value === cptSlug
         )
       );
     }).length;
