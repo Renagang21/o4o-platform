@@ -674,7 +674,7 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                   cta={currentVisibleSlide?.cta}
                   onLinkClick={(link) => {
                     // Handle link click tracking
-                    console.log('Link clicked:', link);
+                    // Link clicked: link
                   }}
                   isEditing={false}
                 >

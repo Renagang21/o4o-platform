@@ -157,6 +157,8 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-types', label: 'Post Types', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine?view=types' },
       { id: 'cpt-fields', label: 'Custom Fields', icon: <Layout className="w-4 h-4" />, path: '/cpt-engine?view=fields' },
       { id: 'cpt-taxonomies', label: 'Taxonomies', icon: <Tag className="w-4 h-4" />, path: '/cpt-engine?view=taxonomies' },
+      { id: 'cpt-archives', label: 'Archives', icon: <FolderTree className="w-4 h-4" />, path: '/cpt-engine?view=archives' },
+      { id: 'cpt-templates', label: 'Content Templates', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine?view=templates' },
       { id: 'cpt-forms', label: 'Forms', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/forms' }
     ]
   },

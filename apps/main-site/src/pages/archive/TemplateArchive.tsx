@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { api } from '../../services/api';
-import { renderShortcodes } from '@o4o/shortcodes';
+import { renderShortcodes } from '../../../../packages/shortcodes/src';
 
 interface Template {
   id: string;
