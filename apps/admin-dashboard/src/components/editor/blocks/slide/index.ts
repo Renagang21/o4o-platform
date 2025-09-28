@@ -1,10 +1,11 @@
 /**
  * Slide Block Component Exports
- * Phase 3: Complete Slide System with Interactions
+ * Complete Phase 1-4 Implementation
  */
 
 // Core Components
 export { default as SlideBlock } from './SlideBlock';
+export { default as SlideBlockComplete } from './SlideBlockComplete';
 export { default as SlideEditor } from './SlideEditor';
 export { default as AdvancedSlideEditor } from './AdvancedSlideEditor';
 export { default as SlideViewer } from './SlideViewer';
@@ -32,13 +33,21 @@ export {
   SlideErrorBoundary
 } from './SlideAccessibility';
 
+// Phase 4 Components
+export { default as VideoSlide } from './VideoSlide';
+export { default as SlideLink, LinkEditor } from './SlideLink';
+export { default as SlideTemplates } from './SlideTemplates';
+export { SlideTiming, SlideTimingManager } from './SlideTiming';
+export { default as SlideConditional, evaluateSlideConditions } from './SlideConditional';
+export { default as SlideGroups } from './SlideGroups';
+
 // Hooks
 export { default as useKeyboardNavigation } from './useKeyboardNavigation';
 export { default as useTouchGestures } from './useTouchGestures';
 export { default as useMouseInteractions } from './useMouseInteractions';
 
 // Types
-export type { 
-  Slide, 
-  SlideBlockAttributes 
-} from './types';
+export * from './types';
+
+// Convenience export for the complete implementation
+export const SlidePresentation = SlideBlockComplete;
