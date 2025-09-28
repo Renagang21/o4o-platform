@@ -8,7 +8,7 @@ export const useVendorsPendingActions = () => {
     setLoading(true);
     try {
       // Mock action - replace with actual API call
-      console.log('Approving vendor:', vendorId);
+      // Approving vendor: vendorId
       setError(null);
       return { success: true };
     } catch (err) {
@@ -23,7 +23,7 @@ export const useVendorsPendingActions = () => {
     setLoading(true);
     try {
       // Mock action - replace with actual API call
-      console.log('Rejecting vendor:', vendorId, 'Reason:', reason);
+      // Rejecting vendor: vendorId, Reason: reason
       setError(null);
       return { success: true };
     } catch (err) {
@@ -38,7 +38,7 @@ export const useVendorsPendingActions = () => {
     setLoading(true);
     try {
       // Mock action - replace with actual API call
-      console.log('Updating vendor status:', vendorId, 'to', status);
+      // Updating vendor status: vendorId to status
       setError(null);
       return { success: true };
     } catch (err) {
