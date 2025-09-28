@@ -35,13 +35,17 @@ export const checkVersion = async () => {
 export const initVersionCheck = () => {
   checkVersion();
   
-  // Check periodically (every 5 minutes)
-  setInterval(checkVersion, 5 * 60 * 1000);
+  // Check periodically (every 30 minutes instead of 5)
+  setInterval(checkVersion, 30 * 60 * 1000);
   
-  // Check on visibility change (when tab becomes active)
+  // Check on visibility change but with debouncing
+  let visibilityTimeout: NodeJS.Timeout;
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
-      checkVersion();
+      clearTimeout(visibilityTimeout);
+      visibilityTimeout = setTimeout(() => {
+        checkVersion();
+      }, 5000); // Wait 5 seconds before checking
     }
   });
 };

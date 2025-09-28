@@ -32,8 +32,8 @@ export const useDynamicCPTMenu = () => {
     const menuItems: MenuItem[] = [];
 
     // showInMenu가 true인 CPT만 필터링
-    const menuCPTs = cptTypes
-      .filter(cpt => cpt.showInMenu && cpt.isActive)
+    const menuCPTs = (cptTypes || [])
+      .filter(cpt => cpt?.showInMenu && cpt?.isActive)
       .sort((a, b) => (a.menuPosition || 50) - (b.menuPosition || 50));
 
     if (menuCPTs.length > 0) {
