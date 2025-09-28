@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { logger } from '../../utils/logger';
+import logger from '../../utils/logger';
 
 /**
  * Development Controller for Seeding Test Data

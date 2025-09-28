@@ -1,7 +1,7 @@
 import { FieldGroup, CustomField } from '../../entities/CustomField';
 import { AppDataSource } from '../../database/connection';
 import { LocationRule } from '../../entities/CustomField';
-import { logger } from '../../utils/logger';
+import logger from '../../utils/logger';
 
 export const DROPSHIPPING_ACF_GROUPS = [
   {

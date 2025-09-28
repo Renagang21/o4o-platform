@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { PartnerController } from '../controllers/partner/partnerController';
 import { authenticate } from '../middleware/auth.middleware';
 import { validateRole } from '../middleware/roleValidation';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 const router: Router = Router();
 

@@ -5,7 +5,7 @@ import { CustomPost, PostStatus } from '../entities/CustomPost';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 import { User } from '../entities/User';
 import { UserRole } from '../types/auth';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 export class MigrationController {
   // Initialize CPTs and ACF fields for dropshipping

@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 import { User } from '../../entities/User';
 import { ApprovalLog } from '../../entities/ApprovalLog';
 import { AuthRequest } from '../../types/auth';
-import { logger } from '../../utils/logger';
+import logger from '../../utils/logger';
 
 export class AdminApprovalController {
   // Get approval queue with filters

@@ -1,7 +1,7 @@
 import { AppDataSource } from '../database/connection';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 export interface ApprovalRequest {
   id: string;
