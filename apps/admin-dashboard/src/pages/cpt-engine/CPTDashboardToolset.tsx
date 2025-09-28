@@ -68,7 +68,7 @@ const DROPSHIPPING_CPTS = [
   { slug: 'ds_commission_policy', name: '수수료 정책' }
 ];
 
-export const CPTDashboardToolset = () => {
+const CPTDashboardToolset = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addNotice } = useAdminNotices();
@@ -609,3 +609,5 @@ export const CPTDashboardToolset = () => {
     </div>
   );
 };
+
+export default CPTDashboardToolset;
