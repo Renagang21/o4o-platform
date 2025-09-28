@@ -387,7 +387,7 @@ const Settlements: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              settlements.map((settlement) => (
+              settlements?.map((settlement) => (
                 <tr key={settlement.id}>
                   <td className="title column-title column-primary page-title">
                     <strong>

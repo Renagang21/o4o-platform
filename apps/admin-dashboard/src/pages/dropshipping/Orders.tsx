@@ -181,7 +181,7 @@ const Orders: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedOrder.meta_data.items.map((item, index) => (
+                  {selectedOrder.meta_data.items?.map((item, index) => (
                     <tr key={index} className="border-b">
                       <td className="py-3">{item.product_name}</td>
                       <td className="text-center py-3 text-sm text-gray-600">{item.seller_name}</td>
@@ -450,7 +450,7 @@ const Orders: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              orders.map((order) => (
+              orders?.map((order) => (
                 <tr key={order.id}>
                   <td className="title column-title column-primary page-title">
                     <strong>
