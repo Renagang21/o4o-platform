@@ -103,16 +103,13 @@ const CPTDashboardToolset = () => {
                        (responseData.data ? responseData.data : 
                        (responseData.success && responseData.data ? responseData.data : []));
         
-        console.log('Fetched CPT data:', cptData);
         return Array.isArray(cptData) ? cptData : [];
       } catch (error) {
-        console.error('Error fetching CPTs:', error);
         // Fallback to get only active CPTs
         try {
           const response = await cptApi.getAllTypes();
           return response.data || [];
         } catch (fallbackError) {
-          console.error('Fallback error:', fallbackError);
           return [];
         }
       }
