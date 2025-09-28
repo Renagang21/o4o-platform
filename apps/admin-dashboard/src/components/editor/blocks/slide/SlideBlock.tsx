@@ -1,9 +1,9 @@
 /**
- * SlideBlock - Phase 1: Basic Slide System
- * Main component for slide presentation block
+ * SlideBlock - Phase 2: Advanced Slide System
+ * Main component for slide presentation block with advanced features
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plus, 
   Trash2, 
@@ -13,36 +13,26 @@ import {
   Type,
   Play,
   Pause,
-  Settings
+  Settings,
+  Maximize2,
+  Grid,
+  Layers,
+  Copy,
+  Eye
 } from 'lucide-react';
 import SlideEditor from './SlideEditor';
+import AdvancedSlideEditor from './AdvancedSlideEditor';
 import SlideViewer from './SlideViewer';
 import BasicNavigation from './BasicNavigation';
+import SlideSortableList from './SlideSortableList';
+import BulkEditPanel from './BulkEditPanel';
+import useKeyboardNavigation from './useKeyboardNavigation';
+import { Slide, SlideBlockAttributes } from './types';
 import './SlideBlock.css';
+import './AdvancedTransitions.css';
 
-export interface Slide {
-  id: string;
-  type: 'text' | 'image' | 'mixed';
-  title?: string;
-  subtitle?: string;
-  content?: string;
-  imageUrl?: string;
-  imageAlt?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  order: number;
-}
-
-export interface SlideBlockAttributes {
-  slides: Slide[];
-  aspectRatio: '16:9' | '4:3' | '1:1';
-  transition: 'fade' | 'slide' | 'none';
-  autoPlay: boolean;
-  autoPlayInterval: number;
-  showNavigation: boolean;
-  showPagination: boolean;
-  backgroundColor?: string;
-}
+// Re-export types for backward compatibility
+export type { Slide, SlideBlockAttributes } from './types';
 
 interface SlideBlockProps {
   attributes: SlideBlockAttributes;
@@ -60,6 +50,12 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(attributes.autoPlay);
   const [isEditing, setIsEditing] = useState(true);
+  const [presentationMode, setPresentationMode] = useState(false);
+  const [showBulkEdit, setShowBulkEdit] = useState(false);
+  const [selectedSlides, setSelectedSlides] = useState<Set<number>>(new Set());
+  const [useAdvancedEditor, setUseAdvancedEditor] = useState(true);
+  const [showThumbnails, setShowThumbnails] = useState(attributes.showThumbnails ?? true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const {
     slides = [],
@@ -69,7 +65,10 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
     autoPlayInterval = 5000,
     showNavigation = true,
     showPagination = true,
-    backgroundColor = '#f0f0f0'
+    backgroundColor = '#f0f0f0',
+    enableKeyboardNavigation = true,
+    fullscreenEnabled = true,
+    loop = true
   } = attributes;
 
   // Initialize with one slide if empty
@@ -126,6 +125,89 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
     }
   };
 
+  // Duplicate slide
+  const duplicateSlide = (index: number) => {
+    const slideToDuplicate = slides[index];
+    const newSlide: Slide = {
+      ...slideToDuplicate,
+      id: generateId(),
+      order: index + 1,
+      title: slideToDuplicate.title ? `${slideToDuplicate.title} (Copy)` : undefined
+    };
+    
+    const newSlides = [
+      ...slides.slice(0, index + 1),
+      newSlide,
+      ...slides.slice(index + 1)
+    ];
+    
+    // Update order numbers
+    newSlides.forEach((slide, i) => {
+      slide.order = i;
+    });
+    
+    setAttributes({ slides: newSlides });
+    setCurrentSlide(index + 1);
+  };
+
+  // Bulk edit functions
+  const applyBulkChanges = (indices: number[], changes: Partial<Slide>) => {
+    const newSlides = [...slides];
+    indices.forEach(index => {
+      newSlides[index] = { ...newSlides[index], ...changes };
+    });
+    setAttributes({ slides: newSlides });
+  };
+
+  const duplicateSelectedSlides = () => {
+    const indicesToDuplicate = Array.from(selectedSlides).sort((a, b) => b - a);
+    let newSlides = [...slides];
+    
+    indicesToDuplicate.forEach(index => {
+      const slideToDuplicate = slides[index];
+      const newSlide: Slide = {
+        ...slideToDuplicate,
+        id: generateId(),
+        title: slideToDuplicate.title ? `${slideToDuplicate.title} (Copy)` : undefined
+      };
+      newSlides.splice(index + 1, 0, newSlide);
+    });
+    
+    // Update order numbers
+    newSlides.forEach((slide, i) => {
+      slide.order = i;
+    });
+    
+    setAttributes({ slides: newSlides });
+    setSelectedSlides(new Set());
+  };
+
+  const deleteSelectedSlides = () => {
+    if (selectedSlides.size === slides.length) {
+      alert('You must keep at least one slide');
+      return;
+    }
+    
+    const newSlides = slides.filter((_, index) => !selectedSlides.has(index));
+    setAttributes({ slides: newSlides });
+    setSelectedSlides(new Set());
+    
+    if (currentSlide >= newSlides.length) {
+      setCurrentSlide(Math.max(0, newSlides.length - 1));
+    }
+  };
+
+  const toggleVisibilitySelected = () => {
+    const newSlides = [...slides];
+    selectedSlides.forEach(index => {
+      newSlides[index] = {
+        ...newSlides[index],
+        visible: newSlides[index].visible === false ? true : false
+      };
+    });
+    setAttributes({ slides: newSlides });
+  };
+
   // Update slide
   const updateSlide = (index: number, updatedSlide: Partial<Slide>) => {
     const newSlides = [...slides];
@@ -155,16 +237,77 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
 
   // Navigation handlers
   const goToPrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    if (loop) {
+      setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    } else {
+      setCurrentSlide((prev) => Math.max(0, prev - 1));
+    }
   };
 
   const goToNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    if (loop) {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    } else {
+      setCurrentSlide((prev) => Math.min(slides.length - 1, prev + 1));
+    }
   };
 
   const goToSlide = (index: number) => {
-    setCurrentSlide(index);
+    if (index >= 0 && index < slides.length) {
+      setCurrentSlide(index);
+    }
   };
+
+  // Fullscreen handler
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement && containerRef.current) {
+      containerRef.current.requestFullscreen();
+      setPresentationMode(true);
+    } else if (document.fullscreenElement) {
+      document.exitFullscreen();
+      setPresentationMode(false);
+    }
+  };
+
+  // Keyboard navigation
+  const { shortcuts } = useKeyboardNavigation({
+    onNext: goToNextSlide,
+    onPrev: goToPrevSlide,
+    onTogglePlay: () => setIsPlaying(!isPlaying),
+    onEscape: () => {
+      if (presentationMode) {
+        toggleFullscreen();
+      }
+    },
+    onFullscreen: toggleFullscreen,
+    onDelete: () => {
+      if (selectedSlides.size > 0) {
+        deleteSelectedSlides();
+      } else {
+        deleteSlide(currentSlide);
+      }
+    },
+    onDuplicate: () => {
+      if (selectedSlides.size > 0) {
+        duplicateSelectedSlides();
+      } else {
+        duplicateSlide(currentSlide);
+      }
+    },
+    enabled: enableKeyboardNavigation && !presentationMode,
+    isEditing
+  });
+
+  // Handle slide go to event
+  useEffect(() => {
+    const handleGoTo = (e: CustomEvent) => {
+      goToSlide(e.detail);
+    };
+    window.addEventListener('slideGoTo', handleGoTo as any);
+    return () => {
+      window.removeEventListener('slideGoTo', handleGoTo as any);
+    };
+  }, []);
 
   // Get aspect ratio styles
   const getAspectRatioStyle = () => {
@@ -177,7 +320,10 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
   };
 
   return (
-    <div className={`slide-block ${className} ${isSelected ? 'selected' : ''}`}>
+    <div 
+      ref={containerRef}
+      className={`slide-block ${className} ${isSelected ? 'selected' : ''} ${presentationMode ? 'presentation-mode' : ''}`}
+    >
       {/* Toolbar */}
       {isSelected && (
         <div className="slide-block__toolbar">
@@ -199,6 +345,37 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
               {isPlaying ? <Pause size={16} /> : <Play size={16} />}
               {isPlaying ? 'Pause' : 'Auto-play'}
             </button>
+            
+            {fullscreenEnabled && (
+              <button
+                className="toolbar-btn"
+                onClick={toggleFullscreen}
+                title="Fullscreen"
+              >
+                <Maximize2 size={16} />
+                Fullscreen
+              </button>
+            )}
+            
+            <button
+              className="toolbar-btn"
+              onClick={() => setShowThumbnails(!showThumbnails)}
+              title={showThumbnails ? 'Hide Thumbnails' : 'Show Thumbnails'}
+            >
+              <Grid size={16} />
+              Thumbnails
+            </button>
+            
+            {selectedSlides.size > 0 && (
+              <button
+                className="toolbar-btn"
+                onClick={() => setShowBulkEdit(!showBulkEdit)}
+                title="Bulk Edit"
+              >
+                <Layers size={16} />
+                Bulk Edit ({selectedSlides.size})
+              </button>
+            )}
           </div>
 
           <div className="toolbar-group">
@@ -227,6 +404,9 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
             >
               <option value="fade">Fade</option>
               <option value="slide">Slide</option>
+              <option value="zoom">Zoom</option>
+              <option value="flip">Flip</option>
+              <option value="cube">Cube</option>
               <option value="none">None</option>
             </select>
           </div>
@@ -238,11 +418,18 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
         {isEditing && isSelected ? (
           /* Edit Mode */
           <div className="slide-block__editor">
-            {/* Slide List */}
+            {/* Slide List or Sortable List */}
             <div className="slide-list">
               <div className="slide-list__header">
                 <h3>Slides ({slides.length})</h3>
                 <div className="slide-list__actions">
+                  <button
+                    className="btn-add"
+                    onClick={() => setUseAdvancedEditor(!useAdvancedEditor)}
+                    title="Toggle Advanced Editor"
+                  >
+                    <Settings size={16} />
+                  </button>
                   <button
                     className="btn-add"
                     onClick={() => addSlide('text')}
@@ -267,73 +454,106 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
                 </div>
               </div>
 
-              <div className="slide-list__items">
-                {slides.map((slide, index) => (
-                  <div
-                    key={slide.id}
-                    className={`slide-item ${currentSlide === index ? 'active' : ''}`}
-                    onClick={() => setCurrentSlide(index)}
-                  >
-                    <div className="slide-item__header">
-                      <span className="slide-number">#{index + 1}</span>
-                      <span className="slide-type">{slide.type}</span>
-                    </div>
-                    
-                    <div className="slide-item__preview">
-                      {slide.title && <div className="preview-title">{slide.title}</div>}
-                      {slide.imageUrl && <div className="preview-image">🖼️ Image</div>}
-                    </div>
+              {showThumbnails ? (
+                <SlideSortableList
+                  slides={slides}
+                  currentSlide={currentSlide}
+                  onReorder={(newSlides) => setAttributes({ slides: newSlides })}
+                  onSelect={setCurrentSlide}
+                  onDuplicate={duplicateSlide}
+                  onDelete={deleteSlide}
+                  onToggleVisibility={(index) => {
+                    const newSlides = [...slides];
+                    newSlides[index] = {
+                      ...newSlides[index],
+                      visible: newSlides[index].visible === false ? true : false
+                    };
+                    setAttributes({ slides: newSlides });
+                  }}
+                  selectedSlides={selectedSlides}
+                  onSelectionChange={setSelectedSlides}
+                />
+              ) : (
+                <div className="slide-list__items">
+                  {slides.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      className={`slide-item ${currentSlide === index ? 'active' : ''}`}
+                      onClick={() => setCurrentSlide(index)}
+                    >
+                      <div className="slide-item__header">
+                        <span className="slide-number">#{index + 1}</span>
+                        <span className="slide-type">{slide.type}</span>
+                      </div>
+                      
+                      <div className="slide-item__preview">
+                        {slide.title && <div className="preview-title">{slide.title}</div>}
+                        {slide.imageUrl && <div className="preview-image">🖼️ Image</div>}
+                      </div>
 
-                    <div className="slide-item__actions">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          moveSlide(index, 'up');
-                        }}
-                        disabled={index === 0}
-                        title="Move Up"
-                      >
-                        <ChevronUp size={14} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          moveSlide(index, 'down');
-                        }}
-                        disabled={index === slides.length - 1}
-                        title="Move Down"
-                      >
-                        <ChevronDown size={14} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteSlide(index);
-                        }}
-                        className="btn-delete"
-                        title="Delete Slide"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <div className="slide-item__actions">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            duplicateSlide(index);
+                          }}
+                          title="Duplicate Slide"
+                        >
+                          <Copy size={14} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteSlide(index);
+                          }}
+                          className="btn-delete"
+                          title="Delete Slide"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Slide Editor */}
             <div className="slide-editor-container">
-              {slides[currentSlide] && (
-                <SlideEditor
-                  slide={slides[currentSlide]}
-                  onChange={(updatedSlide) => updateSlide(currentSlide, updatedSlide)}
-                  onMediaSelect={(media) => {
-                    updateSlide(currentSlide, {
-                      imageUrl: media.url,
-                      imageAlt: media.alt
-                    });
-                  }}
+              {showBulkEdit && selectedSlides.size > 0 ? (
+                <BulkEditPanel
+                  slides={slides}
+                  selectedIndices={selectedSlides}
+                  onApplyChanges={applyBulkChanges}
+                  onDuplicateSelected={duplicateSelectedSlides}
+                  onDeleteSelected={deleteSelectedSlides}
+                  onToggleVisibilitySelected={toggleVisibilitySelected}
+                  onClose={() => setShowBulkEdit(false)}
                 />
+              ) : slides[currentSlide] && (
+                useAdvancedEditor ? (
+                  <AdvancedSlideEditor
+                    slide={slides[currentSlide]}
+                    onChange={(updatedSlide) => updateSlide(currentSlide, updatedSlide)}
+                    onMediaSelect={(media) => {
+                      updateSlide(currentSlide, {
+                        imageUrl: media.url,
+                        imageAlt: media.alt
+                      });
+                    }}
+                  />
+                ) : (
+                  <SlideEditor
+                    slide={slides[currentSlide]}
+                    onChange={(updatedSlide) => updateSlide(currentSlide, updatedSlide)}
+                    onMediaSelect={(media) => {
+                      updateSlide(currentSlide, {
+                        imageUrl: media.url,
+                        imageAlt: media.alt
+                      });
+                    }}
+                  />
+                )
               )}
             </div>
           </div>

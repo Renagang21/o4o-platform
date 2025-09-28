@@ -7,7 +7,7 @@ import { Slide } from './SlideBlock';
 
 interface SlideViewerProps {
   slide: Slide;
-  transition: 'fade' | 'slide' | 'none';
+  transition: 'fade' | 'slide' | 'zoom' | 'flip' | 'cube' | 'none';
   isActive: boolean;
 }
 
