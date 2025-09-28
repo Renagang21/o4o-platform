@@ -97,8 +97,14 @@ const CPTDashboardToolset = () => {
           return activeResponse.data || [];
         }
         
-        const data = await response.json();
-        return data || [];
+        const responseData = await response.json();
+        // Handle both direct array and object with data property
+        const cptData = Array.isArray(responseData) ? responseData : 
+                       (responseData.data ? responseData.data : 
+                       (responseData.success && responseData.data ? responseData.data : []));
+        
+        console.log('Fetched CPT data:', cptData);
+        return Array.isArray(cptData) ? cptData : [];
       } catch (error) {
         console.error('Error fetching CPTs:', error);
         // Fallback to get only active CPTs
