@@ -313,6 +313,8 @@ export const GUTENBERG_DEFAULTS = {
   enableLightbox: true
 };
 
+import type { GalleryImage } from './types';
+
 /**
  * WordPress Media API compatibility functions
  */

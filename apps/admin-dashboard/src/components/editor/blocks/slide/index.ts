@@ -49,5 +49,8 @@ export { default as useMouseInteractions } from './useMouseInteractions';
 // Types
 export * from './types';
 
+// Import the complete implementation
+import SlideBlockComplete from './SlideBlockComplete';
+
 // Convenience export for the complete implementation
 export const SlidePresentation = SlideBlockComplete;

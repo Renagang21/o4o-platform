@@ -29,6 +29,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cptApi } from '@/features/cpt-acf/services/cpt.api';
 import { acfGroupApi } from '@/features/cpt-acf/services/acf.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
+import { extractArrayFromResponse, ensureArray, SafeArray } from '@/utils/api-helpers';
 
 // Import Toolset table styles
 import '@/styles/toolset-tables.css';
@@ -102,17 +103,12 @@ const CPTDashboardToolset = () => {
         }
         
         const responseData = await response.json();
-        // Handle both direct array and object with data property
-        const cptData = Array.isArray(responseData) ? responseData : 
-                       (responseData.data ? responseData.data : 
-                       (responseData.success && responseData.data ? responseData.data : []));
-        
-        return Array.isArray(cptData) ? cptData : [];
+        return extractArrayFromResponse(responseData);
       } catch (error) {
         // Fallback to get only active CPTs
         try {
           const response = await cptApi.getAllTypes();
-          return response.data || [];
+          return extractArrayFromResponse(response);
         } catch (fallbackError) {
           return [];
         }
@@ -128,7 +124,7 @@ const CPTDashboardToolset = () => {
     queryFn: async () => {
       try {
         const response = await acfGroupApi.getAllGroups();
-        return response.data || [];
+        return extractArrayFromResponse(response);
       } catch (error) {
         console.error('Error fetching field groups:', error);
         return [];
@@ -152,10 +148,10 @@ const CPTDashboardToolset = () => {
 
   // Ensure dropshipping CPTs are included
   const cptTypes = useMemo(() => {
-    // Ensure allCPTTypes is an array
-    const safeCPTTypes = Array.isArray(allCPTTypes) ? allCPTTypes : [];
-    const existingSlugs = new Set(safeCPTTypes?.map(cpt => cpt?.slug) || []);
-    const combinedCPTs = [...safeCPTTypes];
+    const safeCPTs = ensureArray<CPTType>(allCPTTypes);
+    const validCPTs = safeCPTs.filter(cpt => cpt?.slug);
+    const existingSlugs = new Set(validCPTs.map(cpt => cpt.slug));
+    const combinedCPTs = [...validCPTs];
     
     // Add missing dropshipping CPTs
     DROPSHIPPING_CPTS.forEach(dsCPT => {
@@ -180,9 +176,7 @@ const CPTDashboardToolset = () => {
 
   // Filter CPTs based on search and filter
   const filteredCPTs = useMemo(() => {
-    // Ensure cptTypes is an array
-    const safeCPTs = Array.isArray(cptTypes) ? cptTypes : [];
-    let filtered = safeCPTs;
+    let filtered = ensureArray<CPTType>(cptTypes);
     
     // Apply search filter
     if (searchQuery) {
@@ -204,9 +198,7 @@ const CPTDashboardToolset = () => {
 
   // Get field count for a CPT
   const getFieldCount = (cptSlug: string): number => {
-    if (!Array.isArray(fieldGroups)) return 0;
-    
-    return fieldGroups.filter((group: ACFFieldGroup) => {
+    return SafeArray.filter(fieldGroups, (group: ACFFieldGroup) => {
       if (!group.location || !Array.isArray(group.location)) return false;
       return group.location.some((rule: any) => 
         Array.isArray(rule) && rule.some((condition: any) => 
@@ -408,7 +400,7 @@ const CPTDashboardToolset = () => {
             <div className="toolset-loading">
               <div className="toolset-spinner"></div>
             </div>
-          ) : !filteredCPTs || filteredCPTs.length === 0 ? (
+          ) : !Array.isArray(filteredCPTs) || filteredCPTs.length === 0 ? (
             <div className="toolset-empty-state">
               <Package />
               <h3>No Post Types Found</h3>
@@ -433,7 +425,7 @@ const CPTDashboardToolset = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCPTs?.map((cpt) => {
+                {filteredCPTs.map((cpt) => {
                   const fieldCount = getFieldCount(cpt.slug);
                   const isDropshipping = cpt.slug.startsWith('ds_');
                   
@@ -474,7 +466,7 @@ const CPTDashboardToolset = () => {
                         <div className="action-buttons">
                           {cpt.taxonomies && cpt.taxonomies.length > 0 ? (
                             <div className="taxonomy-list">
-                              {cpt.taxonomies?.map((tax: string) => (
+                              {ensureArray(cpt.taxonomies).map((tax: string) => (
                                 <span key={tax} className="taxonomy-tag">{tax}</span>
                               ))}
                             </div>
@@ -545,7 +537,7 @@ const CPTDashboardToolset = () => {
             <div className="toolset-loading">
               <div className="toolset-spinner"></div>
             </div>
-          ) : !filteredCPTs || filteredCPTs.length === 0 ? (
+          ) : !Array.isArray(filteredCPTs) || filteredCPTs.length === 0 ? (
             <div className="toolset-empty-state">
               <Package />
               <h3>No Post Types Found</h3>
@@ -563,7 +555,7 @@ const CPTDashboardToolset = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCPTs?.map((cpt) => {
+                {filteredCPTs.map((cpt) => {
                   const fieldCount = getFieldCount(cpt.slug);
                   const isDropshipping = cpt.slug.startsWith('ds_');
                   
@@ -604,7 +596,7 @@ const CPTDashboardToolset = () => {
                         <div className="action-buttons">
                           {cpt.taxonomies && cpt.taxonomies.length > 0 ? (
                             <div className="taxonomy-list">
-                              {cpt.taxonomies?.map((tax: string) => (
+                              {ensureArray(cpt.taxonomies).map((tax: string) => (
                                 <span key={tax} className="taxonomy-tag">{tax}</span>
                               ))}
                             </div>
@@ -672,8 +664,8 @@ const CPTDashboardToolset = () => {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
           {DROPSHIPPING_CPTS.map(dsCPT => {
-            const exists = cptTypes.some(cpt => cpt.slug === dsCPT.slug);
-            const isActive = cptTypes.find(cpt => cpt.slug === dsCPT.slug)?.active;
+            const exists = SafeArray.some(cptTypes, (cpt: CPTType) => cpt.slug === dsCPT.slug);
+            const isActive = SafeArray.find(cptTypes, (cpt: CPTType) => cpt.slug === dsCPT.slug)?.active;
             
             return (
               <div key={dsCPT.slug} style={{ padding: '10px', background: '#f9f9f9', borderRadius: '4px' }}>

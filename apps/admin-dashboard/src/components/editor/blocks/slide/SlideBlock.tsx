@@ -609,7 +609,7 @@ const SlideBlock: React.FC<SlideBlockProps> = ({
             >
               <SkipLinks
                 onSkipToContent={() => viewportRef.current?.focus()}
-                onSkipToNavigation={() => document.querySelector('.slide-navigation')?.focus()}
+                onSkipToNavigation={() => (document.querySelector('.slide-navigation') as HTMLElement)?.focus()}
               />
               
               <SlideAnnouncer

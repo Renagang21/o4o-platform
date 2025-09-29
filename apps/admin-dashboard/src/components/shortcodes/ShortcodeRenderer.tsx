@@ -117,7 +117,7 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
 
   const renderComponent = () => {
     // Check if shortcode exists
-    const shortcodeConfig = dropshippingShortcodes[name];
+    const shortcodeConfig = dropshippingShortcodes[name as keyof typeof dropshippingShortcodes];
     if (!shortcodeConfig) {
       setError({
         type: 'component_not_found',
@@ -128,7 +128,7 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
     }
 
     // Get component from map
-    const Component = COMPONENT_MAP[shortcodeConfig.component];
+    const Component = COMPONENT_MAP[shortcodeConfig.component as keyof typeof COMPONENT_MAP];
     if (!Component) {
       setError({
         type: 'component_not_found',
@@ -221,11 +221,11 @@ export const getShortcodeInfo = () => {
   return Object.keys(dropshippingShortcodes).map(name => ({
     name,
     tag: `[${name}]`,
-    description: dropshippingShortcodes[name].description,
-    attributes: dropshippingShortcodes[name].attributes || {},
-    example: `[${name}${Object.keys(dropshippingShortcodes[name].attributes || {}).length > 0 
-      ? ` ${Object.keys(dropshippingShortcodes[name].attributes || {}).slice(0, 2).map(attr => 
-          `${attr}="${dropshippingShortcodes[name].attributes![attr].default || 'value'}"`
+    description: dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.description,
+    attributes: dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {},
+    example: `[${name}${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).length > 0 
+      ? ` ${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).slice(0, 2).map(attr => 
+          `${attr}="${dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes![attr].default || 'value'}"`
         ).join(' ')}`
       : ''}]`,
     category: name.startsWith('partner_') ? 'Partner Portal' : 'General'

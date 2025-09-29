@@ -208,7 +208,7 @@ export const TypographyPanel: React.FC<TypographyPanelProps> = ({
       {/* Text Transform */}
       <div className="space-y-2">
         <Label className="text-xs font-medium text-gray-700">Text Transform</Label>
-        <Select value={textTransform} onValueChange={onTextTransformChange}>
+        <Select value={textTransform} onValueChange={(value: string) => onTextTransformChange(value as 'none' | 'uppercase' | 'lowercase' | 'capitalize')}>
           <SelectTrigger className="w-full h-8 text-xs">
             <SelectValue />
           </SelectTrigger>

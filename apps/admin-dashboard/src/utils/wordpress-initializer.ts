@@ -156,7 +156,7 @@ export async function initializeWordPress() {
     const registeredBlocks = new Map();
     
     window.wp.blocks = {
-      registerBlockType: (name, settings) => {
+      registerBlockType: (name: string, settings: any) => {
         // Store the block definition
         const block = { name, ...settings };
         registeredBlocks.set(name, block);
@@ -172,17 +172,17 @@ export async function initializeWordPress() {
         
         return block;
       },
-      unregisterBlockType: (name) => {
+      unregisterBlockType: (name: string) => {
         return registeredBlocks.delete(name);
       },
-      getBlockType: (name) => {
+      getBlockType: (name: string) => {
         return registeredBlocks.get(name) || null;
       },
       getBlockTypes: () => {
         return Array.from(registeredBlocks.values());
       },
       getCategories: () => blockCategories,
-      setCategories: (categories) => {
+      setCategories: (categories: any) => {
         blockCategories = [...categories];
       },
       updateCategory: () => {},

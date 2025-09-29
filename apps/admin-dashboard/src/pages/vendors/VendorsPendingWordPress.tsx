@@ -80,7 +80,7 @@ const VendorsPendingWordPress = () => {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(new Set(filteredVendors.map(v => v.id)));
+      setSelectedIds(new Set(filteredVendors.map((v: any) => v.id)));
     } else {
       setSelectedIds(new Set());
     }
@@ -142,7 +142,7 @@ const VendorsPendingWordPress = () => {
     <div className="wordpress-admin-container">
       <AdminBreadcrumb 
         items={[
-          { label: '판매자/공급자', href: '/admin/vendors' },
+          { label: '판매자/공급자', path: '/admin/vendors' },
           { label: '승인 대기' }
         ]} 
       />
@@ -267,7 +267,7 @@ const VendorsPendingWordPress = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredVendors.map(vendor => (
+            {filteredVendors.map((vendor: any) => (
               <VendorsPendingRow
                 key={vendor.id}
                 vendor={vendor}

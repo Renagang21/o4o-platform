@@ -16,6 +16,7 @@ interface RichTextProps {
   onReplace?: (blocks: any[]) => void;
   onRemove?: () => void;
   onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
+  onFocusOut?: () => void;
   placeholder?: string;
   allowedFormats?: string[];
   identifier?: string;
@@ -32,6 +33,7 @@ export const RichText: FC<RichTextProps> = ({
   onReplace,
   onRemove,
   onKeyDown,
+  onFocusOut,
   placeholder = 'Start writing or type / to choose a block',
   allowedFormats = ['core/bold', 'core/italic', 'core/link'],
   className,
@@ -232,6 +234,7 @@ export const RichText: FC<RichTextProps> = ({
   // 블러 처리
   const handleBlur = () => {
     // Handle blur
+    onFocusOut?.();
   };
 
   // 붙여넣기 처리

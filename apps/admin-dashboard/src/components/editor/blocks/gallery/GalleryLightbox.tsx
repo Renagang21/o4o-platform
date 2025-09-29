@@ -418,7 +418,7 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
               </Button>
 
               {/* Share */}
-              {navigator.share && (
+              {!!navigator.share && (
                 <Button
                   variant="ghost"
                   size="sm"

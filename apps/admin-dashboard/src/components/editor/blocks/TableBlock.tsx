@@ -121,7 +121,7 @@ const TableBlock: React.FC<TableBlockProps> = ({
   const [tableData, setTableData] = useState<TableData>(
     initialTableData || initializeTableData(3, 3)
   );
-  const [selection, setSelection] = useState<CellSelection | null>(null);
+  const [selection, setSelection] = useState<CellSelection | undefined>(undefined);
   const [showSettings, setShowSettings] = useState(false);
 
   // Sync with external changes

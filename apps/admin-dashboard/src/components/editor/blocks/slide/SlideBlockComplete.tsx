@@ -336,11 +336,9 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
   useKeyboardNavigation({
     enabled: enableKeyboardNavigation && !isEditing,
     onNext: goToNextSlide,
-    onPrevious: goToPrevSlide,
-    onFirst: () => setCurrentSlide(0),
-    onLast: () => setCurrentSlide(getVisibleSlides().length - 1),
+    onPrev: goToPrevSlide,
     onTogglePlay: () => setIsPlaying(!isPlaying),
-    onToggleFullscreen: () => setPresentationMode(!presentationMode),
+    onFullscreen: () => setPresentationMode(!presentationMode),
     onEscape: () => setPresentationMode(false)
   });
 
@@ -568,14 +566,14 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                     slide={currentVisibleSlide}
                     onChange={(updatedSlide) => {
                       const newSlides = slides.map((s) =>
-                        s.id === updatedSlide.id ? updatedSlide : s
+                        s.id === currentVisibleSlide.id ? { ...s, ...updatedSlide } : s
                       );
                       setAttributes({ slides: newSlides });
                     }}
-                    onImageSelect={(url) => {
+                    onMediaSelect={(media) => {
                       const newSlides = slides.map((s) =>
                         s.id === currentVisibleSlide.id 
-                          ? { ...s, imageUrl: url } 
+                          ? { ...s, imageUrl: media.url } 
                           : s
                       );
                       setAttributes({ slides: newSlides });
@@ -586,14 +584,14 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                     slide={currentVisibleSlide}
                     onChange={(updatedSlide) => {
                       const newSlides = slides.map((s) =>
-                        s.id === updatedSlide.id ? updatedSlide : s
+                        s.id === currentVisibleSlide.id ? { ...s, ...updatedSlide } : s
                       );
                       setAttributes({ slides: newSlides });
                     }}
-                    onImageSelect={(url) => {
+                    onMediaSelect={(media) => {
                       const newSlides = slides.map((s) =>
                         s.id === currentVisibleSlide.id 
-                          ? { ...s, imageUrl: url } 
+                          ? { ...s, imageUrl: media.url } 
                           : s
                       );
                       setAttributes({ slides: newSlides });
@@ -664,7 +662,6 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                   <SlideProgress
                     current={currentSlideTimer}
                     total={(currentVisibleSlide.timing.duration === 'auto' ? 5 : currentVisibleSlide.timing.duration as number) * 1000}
-                    showPercentage={false}
                   />
                 )}
 
@@ -686,11 +683,10 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                     />
                   ) : (
                     <EnhancedSlideViewer
-                      slides={visibleSlides}
-                      currentSlide={currentSlide}
-                      aspectRatio={aspectRatio}
+                      slide={visibleSlides[currentSlide]}
                       transition={transition}
-                      backgroundColor={backgroundColor}
+                      isActive={true}
+                      prefetchNext={currentSlide < visibleSlides.length - 1}
                     />
                   )}
                 </SlideLink>
@@ -700,12 +696,9 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                   <BasicNavigation
                     currentSlide={currentSlide}
                     totalSlides={visibleSlides.length}
-                    onPrevious={goToPrevSlide}
+                    onPrev={goToPrevSlide}
                     onNext={goToNextSlide}
                     onGoToSlide={setCurrentSlide}
-                    isPlaying={isPlaying}
-                    onPlayPause={() => setIsPlaying(!isPlaying)}
-                    showDots={showPagination}
                   />
                 )}
               </div>
@@ -716,12 +709,42 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
         {/* Bulk Edit Panel */}
         {showBulkEdit && selectedSlides.size > 0 && (
           <BulkEditPanel
-            selectedSlides={Array.from(selectedSlides)}
+            selectedIndices={selectedSlides}
             slides={slides}
             onApplyChanges={(indices, changes) => {
               const newSlides = [...slides];
               indices.forEach(index => {
                 newSlides[index] = { ...newSlides[index], ...changes };
+              });
+              setAttributes({ slides: newSlides });
+            }}
+            onDuplicateSelected={() => {
+              // Duplicate selected slides
+              const newSlides = [...slides];
+              const indicesToDuplicate = Array.from(selectedSlides).sort((a, b) => b - a);
+              indicesToDuplicate.forEach(index => {
+                newSlides.splice(index + 1, 0, { ...slides[index], id: Date.now().toString() });
+              });
+              setAttributes({ slides: newSlides });
+              setSelectedSlides(new Set());
+            }}
+            onDeleteSelected={() => {
+              // Delete selected slides
+              const newSlides = slides.filter((_, index) => !selectedSlides.has(index));
+              setAttributes({ slides: newSlides });
+              setSelectedSlides(new Set());
+              setShowBulkEdit(false);
+            }}
+            onToggleVisibilitySelected={() => {
+              // Toggle visibility of selected slides
+              const newSlides = [...slides];
+              selectedSlides.forEach(index => {
+                if (newSlides[index]) {
+                  newSlides[index] = {
+                    ...newSlides[index],
+                    isHidden: !newSlides[index].isHidden
+                  };
+                }
               });
               setAttributes({ slides: newSlides });
             }}

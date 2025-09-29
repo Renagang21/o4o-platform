@@ -212,7 +212,8 @@ export function readCSVFile(file: File): Promise<TableData> {
         const tableData = csvToTable(csvContent);
         resolve(tableData);
       } catch (error) {
-        reject(new Error(`Failed to parse CSV: ${error.message}`));
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        reject(new Error(`Failed to parse CSV: ${errorMessage}`));
       }
     };
 
@@ -360,7 +361,8 @@ export const DataProcessor: React.FC<DataProcessorProps> = ({
 
       onImport(importedData);
     } catch (error) {
-      alert(`Import failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Import failed: ${errorMessage}`);
     } finally {
       // Reset file input
       if (fileInputRef.current) {

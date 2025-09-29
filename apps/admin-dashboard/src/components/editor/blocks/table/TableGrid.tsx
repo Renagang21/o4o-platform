@@ -53,7 +53,7 @@ export interface TableGridProps {
   data: TableData;
   onChange: (data: TableData) => void;
   selection?: CellSelection;
-  onSelectionChange?: (selection: CellSelection | null) => void;
+  onSelectionChange?: (selection: CellSelection | undefined) => void;
   isSelected?: boolean;
   className?: string;
 }
@@ -270,7 +270,7 @@ export const TableGrid: React.FC<TableGridProps> = ({
     }
 
     onChange(newData);
-    onSelectionChange?.(null);
+    onSelectionChange?.(undefined);
   }, [data, selection, onChange, onSelectionChange]);
 
   // Split cell

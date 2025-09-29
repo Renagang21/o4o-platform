@@ -1,6 +1,12 @@
 import { useState } from 'react';
+import type { VendorsPendingData } from './useVendorsPendingData';
 
-export const useVendorsPendingActions = () => {
+interface UseVendorsPendingActionsParams {
+  vendors: VendorsPendingData[];
+  setVendors: (vendors: VendorsPendingData[]) => void;
+}
+
+export const useVendorsPendingActions = (params: UseVendorsPendingActionsParams) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,12 +55,78 @@ export const useVendorsPendingActions = () => {
     }
   };
 
+  // Handler functions expected by the component
+  const handleApprove = async (vendorId: string) => {
+    const result = await approveVendor(vendorId);
+    if (result.success) {
+      // Update the vendors list
+      params.setVendors(params.vendors.map(v => 
+        v.id === vendorId ? { ...v, status: 'approved' as const } : v
+      ));
+    }
+    return result;
+  };
+
+  const handleReject = async (vendorId: string, reason?: string) => {
+    const result = await rejectVendor(vendorId, reason);
+    if (result.success) {
+      // Update the vendors list
+      params.setVendors(params.vendors.map(v => 
+        v.id === vendorId ? { ...v, status: 'rejected' as const } : v
+      ));
+    }
+    return result;
+  };
+
+  const handleRequestDocuments = async (vendorId: string) => {
+    // Mock implementation
+    setLoading(true);
+    try {
+      // Request documents logic here
+      setError(null);
+      return { success: true };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      return { success: false };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkAction = async (vendorIds: string[], action: 'approve' | 'reject' | 'request_documents') => {
+    // Mock implementation
+    setLoading(true);
+    try {
+      // Bulk action logic here
+      if (action === 'approve') {
+        params.setVendors(params.vendors.map(v => 
+          vendorIds.includes(v.id) ? { ...v, status: 'approved' as const } : v
+        ));
+      } else if (action === 'reject') {
+        params.setVendors(params.vendors.map(v => 
+          vendorIds.includes(v.id) ? { ...v, status: 'rejected' as const } : v
+        ));
+      }
+      setError(null);
+      return { success: true };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      return { success: false };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     error,
     approveVendor,
     rejectVendor,
-    updateVendorStatus
+    updateVendorStatus,
+    handleApprove,
+    handleReject,
+    handleRequestDocuments,
+    handleBulkAction
   };
 };
 
