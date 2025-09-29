@@ -66,42 +66,8 @@ export default function IntegratedMonitoring() {
   const { data: summary, isLoading, refetch } = useQuery({
     queryKey: ['monitoring-summary'],
     queryFn: async () => {
-      try {
-        const response = await authClient.api.get<MonitoringSummary>('/monitoring/summary');
-        return response.data;
-      } catch (error) {
-        console.error('Error fetching monitoring summary:', error);
-        // Return default summary
-        return {
-          backup: {
-            lastBackup: null,
-            nextBackup: null,
-            backupSize: '0 MB',
-            status: 'success' as const,
-            totalBackups: 0,
-            failedBackups: 0
-          },
-          errors: {
-            critical: 0,
-            error: 0,
-            warning: 0,
-            recent: []
-          },
-          security: {
-            blockedIPs: 0,
-            failedLogins: 0,
-            suspiciousActivities: 0,
-            recentEvents: []
-          },
-          system: {
-            health: 'healthy' as const,
-            uptime: 0,
-            cpu: 0,
-            memory: 0,
-            disk: 0
-          }
-        } as MonitoringSummary;
-      }
+      const response = await authClient.api.get<MonitoringSummary>('/monitoring/summary');
+      return response.data;
     },
     refetchInterval: 30000 // 30 seconds
   });

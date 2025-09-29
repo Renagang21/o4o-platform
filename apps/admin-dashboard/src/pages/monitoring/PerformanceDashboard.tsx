@@ -69,48 +69,9 @@ export default function PerformanceDashboard() {
   const { data: metrics, isLoading, refetch } = useQuery({
     queryKey: ['performance-metrics'],
     queryFn: async () => {
-      try {
-        const response = await authClient.api.get<SystemMetrics>('/monitoring/metrics');
-        return response.data;
-      } catch (error) {
-        console.error('Error fetching performance metrics:', error);
-        // Return default metrics to prevent map errors
-        return {
-          cpu: {
-            usage: 0,
-            cores: 1,
-            loadAverage: [0, 0, 0]
-          },
-          memory: {
-            total: 1024 * 1024 * 1024, // 1GB default
-            used: 0,
-            free: 1024 * 1024 * 1024,
-            percentage: 0
-          },
-          disk: {
-            total: 100 * 1024 * 1024 * 1024, // 100GB default
-            used: 0,
-            free: 100 * 1024 * 1024 * 1024,
-            percentage: 0
-          },
-          database: {
-            connections: 0,
-            maxConnections: 100,
-            queryTime: 0,
-            slowQueries: 0
-          },
-          api: {
-            requestsPerMinute: 0,
-            averageResponseTime: 0,
-            errorRate: 0,
-            activeConnections: 0
-          },
-          uptime: 0,
-          timestamp: new Date()
-        } as SystemMetrics;
-      }
+      const response = await authClient.api.get<SystemMetrics>('/monitoring/metrics');
+      return response.data;
     },
-    retry: 1,
     refetchInterval: autoRefresh ? refreshInterval : false
   });
 
@@ -118,13 +79,8 @@ export default function PerformanceDashboard() {
   const { data: history } = useQuery({
     queryKey: ['performance-history'],
     queryFn: async () => {
-      try {
-        const response = await authClient.api.get<PerformanceHistory[]>('/monitoring/metrics/history');
-        return response.data;
-      } catch (error) {
-        console.error('Error fetching performance history:', error);
-        return []; // Return empty array on error
-      }
+      const response = await authClient.api.get<PerformanceHistory[]>('/monitoring/metrics/history');
+      return response.data;
     },
     refetchInterval: autoRefresh ? refreshInterval : false
   });
@@ -232,9 +188,11 @@ export default function PerformanceDashboard() {
               value={metrics.cpu.usage} 
               className={`mt-2 h-2 ${getProgressColor(metrics.cpu.usage)}`}
             />
-            <p className="text-xs text-gray-500 mt-2">
-              Load: {metrics.cpu.loadAverage.map((l: any) => l.toFixed(2)).join(', ')}
-            </p>
+            {metrics.cpu.loadAverage && Array.isArray(metrics.cpu.loadAverage) && (
+              <p className="text-xs text-gray-500 mt-2">
+                Load: {metrics.cpu.loadAverage.map((l: any) => l.toFixed(2)).join(', ')}
+              </p>
+            )}
           </CardContent>
         </Card>
 
