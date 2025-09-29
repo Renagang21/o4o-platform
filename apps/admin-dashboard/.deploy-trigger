@@ -1,0 +1,13 @@
+# Deploy trigger file
+# Last updated: 2025-09-29 10:55:00 KST
+# Purpose: Ensure deployment of monitoring dashboard fixes
+
+This file is used to trigger GitHub Actions deployment when needed.
+
+Recent fixes deployed:
+- API routing duplicates removed
+- Monitoring dashboard authentication fixed  
+- Error handling for undefined map operations added
+- Performance Dashboard now uses authClient
+
+Deployment status: TRIGGERED
