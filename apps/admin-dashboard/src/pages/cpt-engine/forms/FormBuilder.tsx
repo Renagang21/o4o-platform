@@ -57,7 +57,7 @@ import {
 } from '@dnd-kit/sortable';
 import { authClient } from '@o4o/auth-client';
 import { SortableFormField } from './components/SortableFormField';
-import { FieldEditor } from '../field-groups/components/FieldEditor';
+import FieldEditor from '../field-groups/components/FieldEditor';
 
 interface FormField {
   id: string;
