@@ -64,10 +64,10 @@ export class MonitoringController {
         timestamp: new Date()
       };
 
-      res.json(createSuccessResponse(metrics));
+      res.json(metrics);
     } catch (error) {
       logger.error('Error fetching metrics:', error);
-      res.status(500).json(createErrorResponse('Failed to fetch metrics', 'METRICS_ERROR'));
+      res.status(500).json({ error: 'Failed to fetch metrics' });
     }
   }
 

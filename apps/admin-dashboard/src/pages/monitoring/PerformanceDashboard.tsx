@@ -69,8 +69,8 @@ export default function PerformanceDashboard() {
   const { data: metrics, isLoading, refetch } = useQuery({
     queryKey: ['performance-metrics'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ success: boolean; data: SystemMetrics }>('/monitoring/metrics');
-      return response.data?.data;
+      const response = await authClient.api.get<SystemMetrics>('/monitoring/metrics');
+      return response.data;
     },
     refetchInterval: autoRefresh ? refreshInterval : false
   });
