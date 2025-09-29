@@ -10,6 +10,8 @@ import CPTBuilderWrapper from './components/CPTBuilderWrapper';
 import CPTFieldManagerWrapper from './components/CPTFieldManagerWrapper';
 import CPTContentList from './components/CPTContentList';
 import FormsManager from './forms/FormsManager';
+import FieldGroupsList from './field-groups/FieldGroupsList';
+import FieldGroupEditor from './field-groups/FieldGroupEditor';
 
 const CPTEngine = () => {
   return (
@@ -26,7 +28,12 @@ const CPTEngine = () => {
       <Route path="types/new" element={<CPTBuilderWrapper />} />
       <Route path="types/:slug/edit" element={<CPTBuilderWrapper />} />
       
-      {/* Field Management Routes */}
+      {/* Field Groups Routes */}
+      <Route path="field-groups" element={<FieldGroupsList />} />
+      <Route path="field-groups/new" element={<FieldGroupEditor />} />
+      <Route path="field-groups/:id/edit" element={<FieldGroupEditor />} />
+      
+      {/* Field Management Routes - Legacy */}
       <Route path="fields/new" element={<CPTFieldManagerWrapper />} />
       <Route path="fields/:id/edit" element={<CPTFieldManagerWrapper />} />
       

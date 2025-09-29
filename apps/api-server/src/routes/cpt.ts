@@ -49,6 +49,85 @@ router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePos
 // Get single published post (public)
 // router.get('/public/:slug/:postSlug', CPTController.getPublicPost);
 
+// ============= Field Groups Routes (Mock Implementation) =============
+
+// Get all field groups
+router.get('/field-groups', async (req, res) => {
+  try {
+    const postType = req.query.postType as string;
+    // Mock data for now until service is properly implemented
+    const mockGroups = [];
+    res.json({ data: mockGroups });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch field groups' });
+  }
+});
+
+// Get single field group
+router.get('/field-groups/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Mock for now
+    res.json({ data: null });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch field group' });
+  }
+});
+
+// Create field group
+router.post('/field-groups', authenticateToken, async (req, res) => {
+  try {
+    const fieldGroup = req.body;
+    // For now, just return the submitted data with an ID
+    const created = {
+      id: `fg_${Date.now()}`,
+      ...fieldGroup,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    res.json({ data: created });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create field group' });
+  }
+});
+
+// Update field group
+router.put('/field-groups/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const fieldGroup = req.body;
+    const updated = {
+      id,
+      ...fieldGroup,
+      updatedAt: new Date().toISOString()
+    };
+    res.json({ data: updated });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update field group' });
+  }
+});
+
+// Patch field group
+router.patch('/field-groups/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    res.json({ data: { id, ...updates } });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update field group' });
+  }
+});
+
+// Delete field group
+router.delete('/field-groups/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete field group' });
+  }
+});
+
 // ============= Utility Routes =============
 
 // Get CPT schema for form building

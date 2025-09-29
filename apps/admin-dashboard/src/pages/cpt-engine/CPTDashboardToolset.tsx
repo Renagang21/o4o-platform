@@ -192,7 +192,7 @@ const CPTDashboardToolset = () => {
 
   // Handle adding custom fields
   const handleAddFields = (cptSlug: string) => {
-    navigate(`/cpt-engine/fields/new?postType=${cptSlug}`);
+    navigate(`/cpt-engine/field-groups/new?postType=${cptSlug}`);
   };
 
   // Handle adding taxonomy
@@ -261,15 +261,15 @@ const CPTDashboardToolset = () => {
         return (
           <div className="toolset-card">
             <div className="toolset-card-body">
-              <h2>Custom Fields</h2>
-              <p>Manage custom fields for your post types.</p>
+              <h2>Field Groups</h2>
+              <p>Manage field groups and custom fields for your post types.</p>
               <div style={{ marginTop: '20px' }}>
                 <button
                   className="toolset-btn-small"
-                  onClick={() => navigate('/cpt-engine/fields/new')}
+                  onClick={() => navigate('/cpt-engine/field-groups')}
                 >
                   <Plus size={14} />
-                  Create Field Group
+                  View Field Groups
                 </button>
               </div>
             </div>
@@ -675,13 +675,13 @@ const CPTDashboardToolset = () => {
         <h1 style={{ fontSize: '24px', color: '#23282d', marginBottom: '10px' }}>
           CPT Engine - {currentView === 'archives' ? 'Archives' : 
                       currentView === 'templates' ? 'Content Templates' :
-                      currentView === 'fields' ? 'Custom Fields' :
+                      currentView === 'fields' ? 'Field Groups' :
                       currentView === 'taxonomies' ? 'Taxonomies' : 'Post Types'}
         </h1>
         <p style={{ color: '#666' }}>
           {currentView === 'archives' ? 'Manage archive pages for your custom post types' :
            currentView === 'templates' ? 'Create templates for displaying CPT content' :
-           currentView === 'fields' ? 'Create and manage custom fields' :
+           currentView === 'fields' ? 'Create and manage field groups for custom fields' :
            currentView === 'taxonomies' ? 'Organize content with custom taxonomies' :
            'Manage your custom post types with this professional interface'}
         </p>
