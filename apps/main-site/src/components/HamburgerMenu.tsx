@@ -52,33 +52,45 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
   useEffect(() => {
     if (!isOpen) return;
     
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      // Get the target element
+      const target = event.target as Node;
+      
       // Check if click is outside both menu and button
       if (
         menuPanelRef.current &&
         buttonRef.current &&
-        !menuPanelRef.current.contains(event.target as Node) &&
-        !buttonRef.current.contains(event.target as Node)
+        !menuPanelRef.current.contains(target) &&
+        !buttonRef.current.contains(target)
       ) {
         setIsOpen(false);
       }
     };
 
-    // Use mousedown instead of click to prevent conflict with button click
-    // Add a small delay to avoid immediate closing
+    // Use a proper delay to ensure the menu is fully opened
+    // This prevents the opening click from immediately closing the menu
     const timeoutId = setTimeout(() => {
+      // Listen for both mouse and touch events
       document.addEventListener('mousedown', handleClickOutside);
-    }, 0);
+      document.addEventListener('touchstart', handleClickOutside);
+    }, 100); // 100ms delay ensures the menu opening is complete
     
     return () => {
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [isOpen]);
 
-  const toggleMenu = (e: React.MouseEvent) => {
+  const toggleMenu = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Prevent ghost clicks on mobile
+    if ('touches' in e) {
+      e.nativeEvent.stopImmediatePropagation();
+    }
+    
     setIsOpen(prev => !prev);
   };
 
@@ -139,6 +151,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
           ref={buttonRef}
           className={`hm-btn ${isOpen ? 'is-open' : ''}`}
           onClick={toggleMenu}
+          onTouchEnd={toggleMenu}
           aria-label="Toggle menu"
           aria-expanded={isOpen}
         >

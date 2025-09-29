@@ -24,6 +24,10 @@
   padding: 0;
   position: relative;
   z-index: 1002;
+  /* Prevent text selection and tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .hm-btn:disabled {
@@ -79,6 +83,11 @@
   z-index: 1001;
   overflow-y: auto;
   overflow-x: hidden;
+  /* Prevent mobile browser bounce */
+  overscroll-behavior: contain;
+  /* Hardware acceleration for smooth animation */
+  transform: translateZ(0);
+  will-change: right;
 }
 
 .hm-panel.is-open {
