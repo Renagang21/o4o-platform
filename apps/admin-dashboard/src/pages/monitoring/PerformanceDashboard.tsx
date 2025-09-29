@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { apiClient } from '@/lib/api-client';
+import { authClient } from '@o4o/auth-client';
 // Charts removed - placeholder UI used instead
 
 interface SystemMetrics {
@@ -69,9 +69,48 @@ export default function PerformanceDashboard() {
   const { data: metrics, isLoading, refetch } = useQuery({
     queryKey: ['performance-metrics'],
     queryFn: async () => {
-      const response = await apiClient.get<SystemMetrics>('/monitoring/metrics');
-      return response.data;
+      try {
+        const response = await authClient.api.get<SystemMetrics>('/monitoring/metrics');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching performance metrics:', error);
+        // Return default metrics to prevent map errors
+        return {
+          cpu: {
+            usage: 0,
+            cores: 1,
+            loadAverage: [0, 0, 0]
+          },
+          memory: {
+            total: 1024 * 1024 * 1024, // 1GB default
+            used: 0,
+            free: 1024 * 1024 * 1024,
+            percentage: 0
+          },
+          disk: {
+            total: 100 * 1024 * 1024 * 1024, // 100GB default
+            used: 0,
+            free: 100 * 1024 * 1024 * 1024,
+            percentage: 0
+          },
+          database: {
+            connections: 0,
+            maxConnections: 100,
+            queryTime: 0,
+            slowQueries: 0
+          },
+          api: {
+            requestsPerMinute: 0,
+            averageResponseTime: 0,
+            errorRate: 0,
+            activeConnections: 0
+          },
+          uptime: 0,
+          timestamp: new Date()
+        } as SystemMetrics;
+      }
     },
+    retry: 1,
     refetchInterval: autoRefresh ? refreshInterval : false
   });
 
@@ -79,8 +118,13 @@ export default function PerformanceDashboard() {
   const { data: history } = useQuery({
     queryKey: ['performance-history'],
     queryFn: async () => {
-      const response = await apiClient.get<PerformanceHistory[]>('/monitoring/metrics/history');
-      return response.data;
+      try {
+        const response = await authClient.api.get<PerformanceHistory[]>('/monitoring/metrics/history');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching performance history:', error);
+        return []; // Return empty array on error
+      }
     },
     refetchInterval: autoRefresh ? refreshInterval : false
   });

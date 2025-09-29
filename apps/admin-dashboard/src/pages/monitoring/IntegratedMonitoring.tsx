@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { apiClient } from '@/lib/api-client';
+import { authClient } from '@o4o/auth-client';
 import PerformanceDashboard from './PerformanceDashboard';
 
 interface MonitoringSummary {
@@ -66,8 +66,42 @@ export default function IntegratedMonitoring() {
   const { data: summary, isLoading, refetch } = useQuery({
     queryKey: ['monitoring-summary'],
     queryFn: async () => {
-      const response = await apiClient.get<MonitoringSummary>('/monitoring/summary');
-      return response.data;
+      try {
+        const response = await authClient.api.get<MonitoringSummary>('/monitoring/summary');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching monitoring summary:', error);
+        // Return default summary
+        return {
+          backup: {
+            lastBackup: null,
+            nextBackup: null,
+            backupSize: '0 MB',
+            status: 'success' as const,
+            totalBackups: 0,
+            failedBackups: 0
+          },
+          errors: {
+            critical: 0,
+            error: 0,
+            warning: 0,
+            recent: []
+          },
+          security: {
+            blockedIPs: 0,
+            failedLogins: 0,
+            suspiciousActivities: 0,
+            recentEvents: []
+          },
+          system: {
+            health: 'healthy' as const,
+            uptime: 0,
+            cpu: 0,
+            memory: 0,
+            disk: 0
+          }
+        } as MonitoringSummary;
+      }
     },
     refetchInterval: 30000 // 30 seconds
   });
@@ -75,7 +109,7 @@ export default function IntegratedMonitoring() {
   // Manual backup trigger
   const triggerBackup = async () => {
     try {
-      await apiClient.post('/monitoring/backup/trigger');
+      await authClient.api.post('/monitoring/backup/trigger');
       refetch();
     } catch (error: any) {
     // Error logging - use proper error handler

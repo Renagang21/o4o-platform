@@ -577,11 +577,11 @@ app.use('/api/v1/accounts', linkedAccountsRoutes); // Linked accounts routes (mo
 app.use('/api/v1/social', socialAuthRoutes); // Social auth routes (moved to avoid conflict)
 
 // Settings routes with lenient rate limiting (BEFORE general rate limiter)
+// Consolidated settings routes - removed duplicates
 app.use('/api/v1/settings', settingsLimiter, settingsV1Routes);
-app.use('/v1/settings', settingsLimiter, settingsV1Routes);
-app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
-app.use('/api/settings', settingsLimiter, settingsRoutes);
-app.use('/settings', settingsLimiter, settingsRoutes);
+app.use('/api/settings', settingsLimiter, settingsRoutes); // Primary settings route
+// Removed duplicate: app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
+app.use('/settings', settingsLimiter, settingsRoutes); // Backward compatibility
 
 // Apply standard rate limiting to authenticated endpoints (exclude public routes)
 // Note: Public routes (/api/public) should not have rate limiting
@@ -606,8 +606,8 @@ app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management rout
 // AI Shortcodes API (public access for AI page generation)
 app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
 
-// Categories routes (public access)
-app.use('/api/categories', categoriesRoutes);
+// Categories routes (public access) - moved to avoid duplication
+// app.use('/api/categories', categoriesRoutes); // Commented - duplicate with line 621
 
 // Gutenberg Content Management Routes
 import postsApiRoutes from './routes/api/posts';
@@ -618,7 +618,7 @@ import tagsApiRoutes from './routes/api/tags';
 // Canonical posts API - Apply publicLimiter for read operations
 app.use('/api/posts', publicLimiter, postsApiRoutes);
 app.use('/api/pages', publicLimiter, pagesApiRoutes);
-app.use('/api/categories', publicLimiter, categoriesApiRoutes);
+app.use('/api/categories', publicLimiter, categoriesApiRoutes); // Primary categories API
 app.use('/api/tags', publicLimiter, tagsApiRoutes);
 
 // ACF routes
@@ -743,14 +743,15 @@ import emailSettingsRoutes from './routes/email-settings.routes';
 import smtpRoutes from './routes/v1/smtp.routes';
 app.use('/api/v1/email', emailSettingsRoutes);
 app.use('/api/v1/smtp', smtpRoutes); // SMTP management routes
-app.use('/api/auth', emailAuthRoutes);
+// app.use('/api/auth', emailAuthRoutes); // Commented - duplicate with line 571 (main auth routes)
+app.use('/api/auth/email', emailAuthRoutes); // Email-specific auth routes (moved to sub-path)
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
 app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes v1
 app.use('/api/monitoring', monitoringRoutes); // Monitoring routes (primary API path)
-app.use('/monitoring', monitoringRoutes); // Monitoring routes (backward compatibility)
+// app.use('/monitoring', monitoringRoutes); // Removed - non-standard path without /api prefix
 // Removed duplicate mount to ensure a single canonical router for /api/posts
 // app.use('/api/posts', postsRoutes);
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
@@ -763,8 +764,8 @@ app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full
 // V1 API routes (new standardized endpoints)
 // Removed v1 posts duplicate mounting to avoid policy conflicts
 // app.use('/api/v1/posts', postsRoutes);
-app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
-app.use('/api/categories', categoriesRoutes); // Backward compatibility for old API path
+app.use('/api/v1/categories', categoriesRoutes); // Categories routes v1
+// app.use('/api/categories', categoriesRoutes); // Commented - duplicate with line 621 (categoriesApiRoutes)
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
 
 // Dropshipping CPT Routes
@@ -777,10 +778,10 @@ app.use('/api/v1/dropshipping/partner', partnerRoutes); // Partner/Affiliate API
 
 // Admin Management Routes
 import adminManagementRoutes from './routes/admin.routes';
-app.use('/api/v1/approval', adminManagementRoutes); // Admin approval management routes
+app.use('/api/v1/approval/admin', adminManagementRoutes); // Admin approval management routes (moved to sub-path)
 
 // Approval Workflow Routes (법률 준수)
-app.use('/api/v1/approval', approvalV1Routes); // Approval workflow for pricing changes
+app.use('/api/v1/approval', approvalV1Routes); // Approval workflow for pricing changes (primary approval route)
 
 // Migration Routes
 import migrationRoutes from './routes/migration.routes';
@@ -825,8 +826,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Admin routes with correct paths
-app.use('/api/admin', adminV1Routes);
-app.use('/api/admin', adminRoutes); // Add original admin routes for backwards compatibility
+app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versioning
+// app.use('/api/admin', adminRoutes); // Already registered at line 594 - commented to avoid duplicate
 // Settings routes already registered above
 
 

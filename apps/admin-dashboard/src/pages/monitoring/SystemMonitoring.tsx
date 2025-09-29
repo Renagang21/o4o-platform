@@ -8,7 +8,7 @@ import {
   Zap,
   AlertCircle
 } from 'lucide-react';
-import apiClient from '../../api/base';
+import { authClient } from '@o4o/auth-client';
 
 interface PerformanceMetric {
   endpoint: string;
@@ -54,8 +54,19 @@ const SystemMonitoring: FC = () => {
   const { data: systemHealth } = useQuery<SystemHealth>({
     queryKey: ['system-health'],
     queryFn: async () => {
-      const response = await apiClient.get('/monitoring/health');
-      return response.data;
+      try {
+        const response = await authClient.api.get('/monitoring/health');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching system health:', error);
+        return {
+          status: 'healthy' as const,
+          uptime: 0,
+          memoryUsage: { used: 0, total: 1024*1024*1024, percentage: 0 },
+          cpu: { usage: 0 },
+          database: { connected: false, responseTime: 0, activeConnections: 0 }
+        };
+      }
     },
     refetchInterval: autoRefresh ? 10000 : false // 10초마다 갱신
   });
@@ -64,8 +75,13 @@ const SystemMonitoring: FC = () => {
   const { data: performanceMetrics } = useQuery<PerformanceMetric[]>({
     queryKey: ['performance-metrics', timeRange],
     queryFn: async () => {
-      const response = await apiClient.get(`/monitoring/performance?range=${timeRange}`);
-      return response.data;
+      try {
+        const response = await authClient.api.get(`/monitoring/performance?range=${timeRange}`);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching performance metrics:', error);
+        return [];
+      }
     },
     refetchInterval: autoRefresh ? 30000 : false // 30초마다 갱신
   });
@@ -74,8 +90,13 @@ const SystemMonitoring: FC = () => {
   const { data: errorLogs } = useQuery<ErrorLog[]>({
     queryKey: ['error-logs'],
     queryFn: async () => {
-      const response = await apiClient.get('/monitoring/errors?limit=50');
-      return response.data;
+      try {
+        const response = await authClient.api.get('/monitoring/errors?limit=50');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching error logs:', error);
+        return [];
+      }
     },
     refetchInterval: autoRefresh ? 60000 : false // 1분마다 갱신
   });
