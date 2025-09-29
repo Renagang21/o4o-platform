@@ -33,7 +33,8 @@ import {
   Shield,
   Puzzle,
   Plus,
-  Code
+  Code,
+  ChevronLeft
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -52,12 +53,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <LayoutDashboard className="w-5 h-5" />,
     path: '/admin'
   },
-  {
-    id: 'separator-1',
-    label: '',
-    icon: <></>,
-    separator: true
-  },
+  // 1. 글
   {
     id: 'posts',
     label: '글',
@@ -69,6 +65,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'posts-tags', label: '태그', icon: <Tag className="w-4 h-4" />, path: '/posts/tags' }
     ]
   },
+  // 2. 미디어
   {
     id: 'media',
     label: '미디어',
@@ -78,6 +75,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'media-new', label: '새로 추가', icon: <Image className="w-4 h-4" />, path: '/media/new' }
     ]
   },
+  // 3. 페이지
   {
     id: 'pages',
     label: '페이지',
@@ -87,6 +85,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'pages-new', label: '새 페이지 추가', icon: <FileTextIcon className="w-4 h-4" />, path: '/editor/pages/new' }
     ]
   },
+  // 4. 외모
   {
     id: 'appearance',
     label: '외모',
@@ -97,71 +96,27 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' }
     ]
   },
+  // 5. 사용자
   {
-    id: 'separator-2',
+    id: 'users',
+    label: '사용자',
+    icon: <Users className="w-5 h-5" />,
+    children: [
+      { id: 'users-all', label: '모든 사용자', icon: <Users className="w-4 h-4" />, path: '/users' },
+      { id: 'users-new', label: '새로 추가', icon: <UserPlus className="w-4 h-4" />, path: '/users/new' },
+      { id: 'users-profile', label: '프로필', icon: <Users className="w-4 h-4" />, path: '/users/profile' },
+      { id: 'users-roles', label: '역할 관리', icon: <UserCheck className="w-4 h-4" />, path: '/users/roles' },
+      { id: 'users-statistics', label: '사용자 통계', icon: <BarChart3 className="w-4 h-4" />, path: '/users/statistics' }
+    ]
+  },
+  // 구분선 1
+  {
+    id: 'separator-1',
     label: '',
     icon: <></>,
     separator: true
   },
-  {
-    id: 'forum',
-    label: '포럼',
-    icon: <MessageSquare className="w-5 h-5" />,
-    children: [
-      { id: 'forum-boards', label: '게시판 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/boards' },
-      { id: 'forum-categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/forum/categories' },
-      { id: 'forum-posts', label: '게시글 관리', icon: <FileText className="w-4 h-4" />, path: '/forum/posts' },
-      { id: 'forum-comments', label: '댓글 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/comments' },
-      { id: 'forum-reports', label: '신고 관리', icon: <Shield className="w-4 h-4" />, path: '/forum/reports' },
-      { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
-    ]
-  },
-  {
-    id: 'signage',
-    label: '디지털 사이니지',
-    icon: <Monitor className="w-5 h-5" />,
-    children: [
-      { id: 'signage-screens', label: '화면 관리', icon: <Monitor className="w-4 h-4" />, path: '/signage/screens' },
-      { id: 'signage-content', label: '콘텐츠 관리', icon: <FileText className="w-4 h-4" />, path: '/signage/content' },
-      { id: 'signage-playlists', label: '재생목록', icon: <ClipboardList className="w-4 h-4" />, path: '/signage/playlists' },
-      { id: 'signage-schedule', label: '스케줄 관리', icon: <Activity className="w-4 h-4" />, path: '/signage/schedule' },
-      { id: 'signage-devices', label: '디바이스 관리', icon: <Monitor className="w-4 h-4" />, path: '/signage/devices' },
-      { id: 'signage-analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" />, path: '/signage/analytics' }
-    ]
-  },
-  {
-    id: 'crowdfunding',
-    label: '크라우드펀딩',
-    icon: <DollarSign className="w-5 h-5" />,
-    children: [
-      { id: 'crowdfunding-projects', label: '프로젝트 관리', icon: <FileText className="w-4 h-4" />, path: '/crowdfunding/projects' },
-      { id: 'crowdfunding-backers', label: '후원자 관리', icon: <Users className="w-4 h-4" />, path: '/crowdfunding/backers' },
-      { id: 'crowdfunding-rewards', label: '리워드 관리', icon: <Package className="w-4 h-4" />, path: '/crowdfunding/rewards' },
-      { id: 'crowdfunding-payments', label: '결제 관리', icon: <CreditCard className="w-4 h-4" />, path: '/crowdfunding/payments' },
-      { id: 'crowdfunding-reports', label: '보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/crowdfunding/reports' },
-      { id: 'crowdfunding-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/crowdfunding/settings' }
-    ]
-  },
-  {
-    id: 'separator-4',
-    label: '',
-    icon: <></>,
-    separator: true
-  },
-  {
-    id: 'cpt-engine',
-    label: 'CPT 엔진',
-    icon: <Package className="w-5 h-5" />,
-    children: [
-      { id: 'cpt-dashboard', label: '대시보드', icon: <LayoutDashboard className="w-4 h-4" />, path: '/cpt-engine' },
-      { id: 'cpt-types', label: 'Post Types', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine?view=types' },
-      { id: 'cpt-fields', label: 'Custom Fields', icon: <Layout className="w-4 h-4" />, path: '/cpt-engine?view=fields' },
-      { id: 'cpt-taxonomies', label: 'Taxonomies', icon: <Tag className="w-4 h-4" />, path: '/cpt-engine?view=taxonomies' },
-      { id: 'cpt-archives', label: 'Archives', icon: <FolderTree className="w-4 h-4" />, path: '/cpt-engine?view=archives' },
-      { id: 'cpt-templates', label: 'Content Templates', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine?view=templates' },
-      { id: 'cpt-forms', label: 'Forms', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/forms' }
-    ]
-  },
+  // 6. 드롭쉬핑
   {
     id: 'dropshipping',
     label: '드롭쉬핑',
@@ -176,24 +131,56 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'ds-setup', label: '시스템 설정', icon: <Settings className="w-4 h-4" />, path: '/dropshipping/setup' }
     ]
   },
+  // 7. 크라우드펀딩
   {
-    id: 'separator-5',
+    id: 'crowdfunding',
+    label: '크라우드펀딩',
+    icon: <DollarSign className="w-5 h-5" />,
+    children: [
+      { id: 'crowdfunding-projects', label: '프로젝트 관리', icon: <FileText className="w-4 h-4" />, path: '/crowdfunding/projects' },
+      { id: 'crowdfunding-backers', label: '후원자 관리', icon: <Users className="w-4 h-4" />, path: '/crowdfunding/backers' },
+      { id: 'crowdfunding-rewards', label: '리워드 관리', icon: <Package className="w-4 h-4" />, path: '/crowdfunding/rewards' },
+      { id: 'crowdfunding-payments', label: '결제 관리', icon: <CreditCard className="w-4 h-4" />, path: '/crowdfunding/payments' },
+      { id: 'crowdfunding-reports', label: '보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/crowdfunding/reports' },
+      { id: 'crowdfunding-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/crowdfunding/settings' }
+    ]
+  },
+  // 8. 이커머스
+  {
+    id: 'ecommerce',
+    label: '이커머스',
+    icon: <Store className="w-5 h-5" />,
+    children: [
+      { id: 'ecommerce-products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
+      { id: 'ecommerce-orders', label: '주문 관리', icon: <ShoppingCart className="w-4 h-4" />, path: '/ecommerce/orders' },
+      { id: 'ecommerce-customers', label: '고객 관리', icon: <Users className="w-4 h-4" />, path: '/ecommerce/customers' },
+      { id: 'ecommerce-coupons', label: '쿠폰 관리', icon: <Tag className="w-4 h-4" />, path: '/ecommerce/coupons' },
+      { id: 'ecommerce-reports', label: '매출 보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
+      { id: 'ecommerce-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/ecommerce/settings' }
+    ]
+  },
+  // 9. 포럼
+  {
+    id: 'forum',
+    label: '포럼',
+    icon: <MessageSquare className="w-5 h-5" />,
+    children: [
+      { id: 'forum-boards', label: '게시판 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/boards' },
+      { id: 'forum-categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/forum/categories' },
+      { id: 'forum-posts', label: '게시글 관리', icon: <FileText className="w-4 h-4" />, path: '/forum/posts' },
+      { id: 'forum-comments', label: '댓글 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/comments' },
+      { id: 'forum-reports', label: '신고 관리', icon: <Shield className="w-4 h-4" />, path: '/forum/reports' },
+      { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
+    ]
+  },
+  // 구분선 2
+  {
+    id: 'separator-2',
     label: '',
     icon: <></>,
     separator: true
   },
-  {
-    id: 'users',
-    label: '사용자',
-    icon: <Users className="w-5 h-5" />,
-    children: [
-      { id: 'users-all', label: '모든 사용자', icon: <Users className="w-4 h-4" />, path: '/users' },
-      { id: 'users-new', label: '새로 추가', icon: <UserPlus className="w-4 h-4" />, path: '/users/new' },
-      { id: 'users-profile', label: '프로필', icon: <Users className="w-4 h-4" />, path: '/users/profile' },
-      { id: 'users-roles', label: '역할 관리', icon: <UserCheck className="w-4 h-4" />, path: '/users/roles' },
-      { id: 'users-statistics', label: '사용자 통계', icon: <BarChart3 className="w-4 h-4" />, path: '/users/statistics' }
-    ]
-  },
+  // 10. 도구
   {
     id: 'tools',
     label: '도구',
@@ -201,9 +188,18 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       { id: 'tools-available', label: '사용 가능한 도구', icon: <Wrench className="w-4 h-4" />, path: '/tools' },
       { id: 'tools-import', label: '가져오기', icon: <FileText className="w-4 h-4" />, path: '/tools/import' },
-      { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
+      { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' },
+      { id: 'cpt-engine', label: 'CPT 엔진', icon: <Package className="w-4 h-4" />, path: '/cpt-engine' }
     ]
   },
+  // 11. 설정
+  {
+    id: 'settings',
+    label: '설정',
+    icon: <Settings className="w-5 h-5" />,
+    path: '/settings'
+  },
+  // 12. 시스템 모니터링
   {
     id: 'monitoring',
     label: '시스템 모니터링',
@@ -214,22 +210,11 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'security-logs', label: '보안 로그', icon: <Shield className="w-4 h-4" />, path: '/monitoring/security' }
     ]
   },
-  {
-    id: 'settings',
-    label: '설정',
-    icon: <Settings className="w-5 h-5" />,
-    path: '/settings'
-  },
-  {
-    id: 'separator-6',
-    label: '',
-    icon: <></>,
-    separator: true
-  },
+  // 메뉴 접기
   {
     id: 'collapse',
     label: '메뉴 접기',
-    icon: <Layout className="w-5 h-5" />,
+    icon: <ChevronLeft className="w-5 h-5" />,
     path: '#collapse'
   }
 ];
