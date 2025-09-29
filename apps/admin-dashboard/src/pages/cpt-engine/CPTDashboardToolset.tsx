@@ -1,6 +1,6 @@
 /**
  * CPT Engine Dashboard - Toolset Style Table Layout
- * Following WordPress Toolset Types interface patterns
+ * Professional CPT management interface inspired by Toolset design
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -78,7 +78,7 @@ const CPTDashboardToolset = () => {
   const currentView = searchParams.get('view') || 'types';
   
   // State management
-  const [activeTab, setActiveTab] = useState<'wordpress-admin' | 'frontend'>('wordpress-admin');
+  const [activeTab, setActiveTab] = useState<'admin-dashboard' | 'frontend'>('admin-dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'public' | 'private'>('all');
   const [selectedCPTs, setSelectedCPTs] = useState<string[]>([]);
@@ -244,7 +244,7 @@ const CPTDashboardToolset = () => {
           <div className="toolset-card">
             <div className="toolset-card-body">
               <h2>Content Templates</h2>
-              <p>Templates for displaying individual CPT posts and their custom fields.</p>
+              <p>React-based templates for rendering CPT content. Built with Gutenberg blocks and dynamic shortcodes.</p>
               <div style={{ marginTop: '20px' }}>
                 <button
                   className="toolset-btn-small"
@@ -313,11 +313,11 @@ const CPTDashboardToolset = () => {
       {/* Tab Navigation */}
       <div className="toolset-tabs">
         <button
-          className={`toolset-tab ${activeTab === 'wordpress-admin' ? 'active' : ''}`}
-          onClick={() => setActiveTab('wordpress-admin')}
+          className={`toolset-tab ${activeTab === 'admin-dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('admin-dashboard')}
         >
           <Database size={16} style={{ marginRight: '6px' }} />
-          WordPress Admin
+          Admin Dashboard
         </button>
         <button
           className={`toolset-tab ${activeTab === 'frontend' ? 'active' : ''}`}
@@ -328,11 +328,11 @@ const CPTDashboardToolset = () => {
         </button>
       </div>
 
-      {/* WordPress Admin Section */}
-      {activeTab === 'wordpress-admin' && (
+      {/* Admin Dashboard Section */}
+      {activeTab === 'admin-dashboard' && (
         <div className="toolset-table-section">
           <div className="toolset-table-header">
-            WordPress Admin - Post Types Management
+            Admin Dashboard - Post Types Management
           </div>
 
           {/* Filters Bar */}
@@ -390,7 +390,7 @@ const CPTDashboardToolset = () => {
                   <th style={{ width: '25%' }}>Post Type</th>
                   <th style={{ width: '20%' }}>Custom Fields</th>
                   <th style={{ width: '20%' }}>Taxonomies</th>
-                  <th style={{ width: '15%' }}>Template</th>
+                  <th style={{ width: '15%' }}>React Template</th>
                   <th style={{ width: '20%' }}>Forms</th>
                 </tr>
               </thead>
@@ -452,7 +452,9 @@ const CPTDashboardToolset = () => {
                       </td>
                       <td>
                         <div className="template-info">
-                          {cpt.hasArchive ? 'archive.php' : 'single.php'}
+                          <span title="React component template">
+                            {cpt.hasArchive ? 'Archive Template' : 'Single Template'}
+                          </span>
                         </div>
                       </td>
                       <td>
@@ -583,7 +585,9 @@ const CPTDashboardToolset = () => {
                       <td>
                         {cpt.hasArchive ? (
                           <div>
-                            <span className="archive-enabled">archive.php</span>
+                            <span className="archive-enabled" title="React-based archive template">
+                              Archive Template
+                            </span>
                             <button
                               className="toolset-btn-small"
                               onClick={() => handleCreateArchive(cpt.slug)}
@@ -679,7 +683,7 @@ const CPTDashboardToolset = () => {
            currentView === 'templates' ? 'Create templates for displaying CPT content' :
            currentView === 'fields' ? 'Create and manage custom fields' :
            currentView === 'taxonomies' ? 'Organize content with custom taxonomies' :
-           'Manage your custom post types with this WordPress Toolset-style interface'}
+           'Manage your custom post types with this professional interface'}
         </p>
       </div>
 
