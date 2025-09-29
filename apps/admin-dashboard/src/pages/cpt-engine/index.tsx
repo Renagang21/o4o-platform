@@ -6,8 +6,8 @@
 import { Routes, Route } from 'react-router-dom';
 import CPTDashboardToolset from './CPTDashboardToolset';
 import CPTContentEditorWrapper from './CPTContentEditorWrapper';
-import CPTBuilder from './components/CPTBuilder';
-import CPTFieldManager from './components/CPTFieldManager';
+import CPTBuilderWrapper from './components/CPTBuilderWrapper';
+import CPTFieldManagerWrapper from './components/CPTFieldManagerWrapper';
 import CPTContentList from './components/CPTContentList';
 import FormsManager from './forms/FormsManager';
 
@@ -23,20 +23,20 @@ const CPTEngine = () => {
       <Route path="content/:cptSlug/:postId/edit" element={<CPTContentEditorWrapper />} />
       
       {/* Type Management Routes */}
-      <Route path="types/new" element={<CPTBuilder />} />
-      <Route path="types/:slug/edit" element={<CPTBuilder />} />
+      <Route path="types/new" element={<CPTBuilderWrapper />} />
+      <Route path="types/:slug/edit" element={<CPTBuilderWrapper />} />
       
       {/* Field Management Routes */}
-      <Route path="fields/new" element={<CPTFieldManager />} />
-      <Route path="fields/:id/edit" element={<CPTFieldManager />} />
+      <Route path="fields/new" element={<CPTFieldManagerWrapper />} />
+      <Route path="fields/:id/edit" element={<CPTFieldManagerWrapper />} />
       
-      {/* Taxonomy Routes - Using CPTBuilder for now */}
-      <Route path="taxonomies/new" element={<CPTBuilder />} />
-      <Route path="taxonomies/:slug/edit" element={<CPTBuilder />} />
+      {/* Taxonomy Routes - Using CPTBuilderWrapper for now */}
+      <Route path="taxonomies/new" element={<CPTBuilderWrapper />} />
+      <Route path="taxonomies/:slug/edit" element={<CPTBuilderWrapper />} />
       
-      {/* Archive Routes - Using CPTBuilder for now */}
-      <Route path="archives/new" element={<CPTBuilder />} />
-      <Route path="archives/:slug/edit" element={<CPTBuilder />} />
+      {/* Archive Routes - Using CPTBuilderWrapper for now */}
+      <Route path="archives/new" element={<CPTBuilderWrapper />} />
+      <Route path="archives/:slug/edit" element={<CPTBuilderWrapper />} />
       
       {/* Forms Routes */}
       <Route path="forms" element={<FormsManager />} />
