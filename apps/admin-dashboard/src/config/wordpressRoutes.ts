@@ -1,6 +1,7 @@
 /**
- * WordPress Admin URL Routing Configuration
- * Maps WordPress-style URLs to React Router paths
+ * Admin URL Routing Configuration
+ * Maps admin URLs to React Router paths
+ * Maintains URL structure for compatibility
  */
 
 export interface WordPressRoute {

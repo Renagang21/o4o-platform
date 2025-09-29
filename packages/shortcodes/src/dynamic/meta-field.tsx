@@ -16,7 +16,7 @@ const formatMetaValue = (value: any, key: string, format?: string): string => {
 
   // Handle objects
   if (typeof value === 'object' && value !== null) {
-    // If it's a serialized PHP object, try to parse
+    // If it's a nested object, try to extract data
     if (value.data) {
       return formatMetaValue(value.data, key, format);
     }

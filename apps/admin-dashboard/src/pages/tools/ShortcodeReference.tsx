@@ -628,7 +628,7 @@ const ShortcodeReferencePage: FC = () => {
                 <li>• 페이지나 게시물 편집기에서 직접 입력</li>
                 <li>• 블록 에디터의 "Shortcode 블록" 사용</li>
                 <li>• 위젯 영역에서도 사용 가능</li>
-                <li>• PHP 코드에서: <code className="bg-blue-100 px-1">do_shortcode('[...]')</code></li>
+                <li>• React 컴포넌트에서 Dynamic Shortcode 시스템 활용</li>
               </ul>
             </div>
             <div>
