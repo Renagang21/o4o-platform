@@ -106,7 +106,7 @@ const SystemMonitoring: FC = () => {
             <input
               type="checkbox"
               checked={autoRefresh}
-              onChange={(e: any) => setAutoRefresh(e.target.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAutoRefresh(e.target.checked)}
               className="sr-only"
             />
             <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -122,7 +122,7 @@ const SystemMonitoring: FC = () => {
           {/* 시간 범위 선택 */}
           <select
             value={timeRange}
-            onChange={(e: any) => setTimeRange(e.target.value as '1h' | '24h' | '7d')}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTimeRange(e.target.value as '1h' | '24h' | '7d')}
             className="px-3 py-1 border border-gray-300 rounded-md text-sm"
           >
             <option value="1h">1시간</option>
@@ -248,7 +248,7 @@ const SystemMonitoring: FC = () => {
           <div className="wp-card-body">
             {performanceMetrics && performanceMetrics.length > 0 ? (
               <div className="space-y-4">
-                {performanceMetrics?.slice(0, 10).map((metric: any) => (
+                {performanceMetrics?.slice(0, 10).map((metric: PerformanceMetric) => (
                   <div key={metric.endpoint} className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900">
@@ -277,7 +277,7 @@ const SystemMonitoring: FC = () => {
           </div>
           <div className="wp-card-body">
             <div className="space-y-4">
-              {performanceMetrics?.slice(0, 5).map((metric: any) => (
+              {performanceMetrics?.slice(0, 5).map((metric: PerformanceMetric) => (
                 <div key={metric.endpoint} className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{metric.endpoint}</p>
@@ -324,7 +324,7 @@ const SystemMonitoring: FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {errorLogs?.map((log: any) => (
+                {errorLogs?.map((log: ErrorLog) => (
                   <tr key={log.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(log.timestamp).toLocaleString('ko-KR')}

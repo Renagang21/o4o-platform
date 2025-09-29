@@ -5,6 +5,7 @@ import { backupService } from '../services/BackupService';
 import { errorAlertService } from '../services/ErrorAlertService';
 import { securityAuditService } from '../services/SecurityAuditService';
 import logger from '../utils/simpleLogger';
+import { createSuccessResponse, createErrorResponse } from '../types/api-response';
 
 export class MonitoringController {
   // Get system metrics
@@ -63,10 +64,10 @@ export class MonitoringController {
         timestamp: new Date()
       };
 
-      res.json(metrics);
+      res.json(createSuccessResponse(metrics));
     } catch (error) {
       logger.error('Error fetching metrics:', error);
-      res.status(500).json({ error: 'Failed to fetch metrics' });
+      res.status(500).json(createErrorResponse('Failed to fetch metrics', 'METRICS_ERROR'));
     }
   }
 

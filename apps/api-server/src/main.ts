@@ -105,7 +105,6 @@ import blockPatternsRoutes from './routes/block-patterns.routes';
 import aiShortcodesRoutes from './routes/ai-shortcodes';
 import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
-import customPostTypesRoutes from './routes/custom-post-types';
 import menusRoutes from './routes/menus';
 import menuItemsRoutes from './routes/menu-items';
 
@@ -607,7 +606,6 @@ app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management rout
 app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
 
 // Categories routes (public access) - moved to avoid duplication
-// app.use('/api/categories', categoriesRoutes); // Commented - duplicate with line 621
 
 // Gutenberg Content Management Routes
 import postsApiRoutes from './routes/api/posts';
@@ -743,7 +741,6 @@ import emailSettingsRoutes from './routes/email-settings.routes';
 import smtpRoutes from './routes/v1/smtp.routes';
 app.use('/api/v1/email', emailSettingsRoutes);
 app.use('/api/v1/smtp', smtpRoutes); // SMTP management routes
-// app.use('/api/auth', emailAuthRoutes); // Commented - duplicate with line 571 (main auth routes)
 app.use('/api/auth/email', emailAuthRoutes); // Email-specific auth routes (moved to sub-path)
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
@@ -751,9 +748,7 @@ app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes v1
 app.use('/api/monitoring', monitoringRoutes); // Monitoring routes (primary API path)
-// app.use('/monitoring', monitoringRoutes); // Removed - non-standard path without /api prefix
 // Removed duplicate mount to ensure a single canonical router for /api/posts
-// app.use('/api/posts', postsRoutes);
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
 app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
@@ -763,10 +758,7 @@ app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full
 
 // V1 API routes (new standardized endpoints)
 // Removed v1 posts duplicate mounting to avoid policy conflicts
-// app.use('/api/v1/posts', postsRoutes);
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes v1
-// app.use('/api/categories', categoriesRoutes); // Commented - duplicate with line 621 (categoriesApiRoutes)
-app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
 
 // Dropshipping CPT Routes
 import dropshippingCPTRoutes from './routes/cpt/dropshipping.routes';
@@ -827,7 +819,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Admin routes with correct paths
 app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versioning
-// app.use('/api/admin', adminRoutes); // Already registered at line 594 - commented to avoid duplicate
 // Settings routes already registered above
 
 

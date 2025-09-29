@@ -69,8 +69,8 @@ export default function PerformanceDashboard() {
   const { data: metrics, isLoading, refetch } = useQuery({
     queryKey: ['performance-metrics'],
     queryFn: async () => {
-      const response = await authClient.api.get<SystemMetrics>('/monitoring/metrics');
-      return response.data;
+      const response = await authClient.api.get<{ success: boolean; data: SystemMetrics }>('/monitoring/metrics');
+      return response.data?.data;
     },
     refetchInterval: autoRefresh ? refreshInterval : false
   });
@@ -157,7 +157,7 @@ export default function PerformanceDashboard() {
             <input
               type="checkbox"
               checked={autoRefresh}
-              onChange={(e: any) => setAutoRefresh(e.target.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAutoRefresh(e.target.checked)}
               className="rounded"
             />
           </div>
@@ -190,7 +190,7 @@ export default function PerformanceDashboard() {
             />
             {metrics.cpu.loadAverage && Array.isArray(metrics.cpu.loadAverage) && (
               <p className="text-xs text-gray-500 mt-2">
-                Load: {metrics.cpu.loadAverage.map((l: any) => l.toFixed(2)).join(', ')}
+                Load: {metrics.cpu.loadAverage.map((l: number) => l.toFixed(2)).join(', ')}
               </p>
             )}
           </CardContent>

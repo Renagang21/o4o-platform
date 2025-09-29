@@ -77,7 +77,7 @@ export default function IntegratedMonitoring() {
     try {
       await authClient.api.post('/monitoring/backup/trigger');
       refetch();
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
     }
   };
@@ -252,7 +252,7 @@ export default function IntegratedMonitoring() {
                   {summary.errors.recent.length === 0 ? (
                     <p className="text-sm text-gray-500">No recent errors</p>
                   ) : (
-                    summary.errors.recent.slice(0, 5).map((error: any) => (
+                    summary.errors.recent.slice(0, 5).map((error) => (
                       <div key={error.id} className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <p className="text-sm font-medium line-clamp-1">{error.message}</p>
@@ -279,7 +279,7 @@ export default function IntegratedMonitoring() {
                   {summary.security.recentEvents.length === 0 ? (
                     <p className="text-sm text-gray-500">No recent security events</p>
                   ) : (
-                    summary.security.recentEvents.slice(0, 5).map((event: any) => (
+                    summary.security.recentEvents.slice(0, 5).map((event) => (
                       <div key={event.id} className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <p className="text-sm font-medium">{event.type}</p>
