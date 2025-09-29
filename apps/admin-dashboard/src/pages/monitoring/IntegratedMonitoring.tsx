@@ -251,7 +251,7 @@ export default function IntegratedMonitoring() {
                 <div className="space-y-3">
                   {summary.errors.recent.length === 0 ? (
                     <p className="text-sm text-gray-500">No recent errors</p>
-                  ) : (
+                  ) : summary.errors.recent && Array.isArray(summary.errors.recent) ? (
                     summary.errors.recent.slice(0, 5).map((error) => (
                       <div key={error.id} className="flex items-start justify-between gap-2">
                         <div className="flex-1">
@@ -263,6 +263,8 @@ export default function IntegratedMonitoring() {
                         {getSeverityBadge(error.level)}
                       </div>
                     ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No recent errors</p>
                   )}
                 </div>
               </CardContent>
@@ -276,9 +278,7 @@ export default function IntegratedMonitoring() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {summary.security.recentEvents.length === 0 ? (
-                    <p className="text-sm text-gray-500">No recent security events</p>
-                  ) : (
+                  {summary.security.recentEvents && Array.isArray(summary.security.recentEvents) && summary.security.recentEvents.length > 0 ? (
                     summary.security.recentEvents.slice(0, 5).map((event) => (
                       <div key={event.id} className="flex items-start justify-between gap-2">
                         <div className="flex-1">
@@ -290,6 +290,8 @@ export default function IntegratedMonitoring() {
                         {getSeverityBadge(event.severity)}
                       </div>
                     ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No recent security events</p>
                   )}
                 </div>
               </CardContent>
