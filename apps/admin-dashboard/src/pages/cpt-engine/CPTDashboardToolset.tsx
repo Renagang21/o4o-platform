@@ -283,8 +283,16 @@ const CPTDashboardToolset = () => {
               <p>Manage custom taxonomies for organizing your content.</p>
               <div style={{ marginTop: '20px' }}>
                 <button
+                  className="toolset-btn-primary"
+                  onClick={() => navigate('/cpt-engine/taxonomies')}
+                >
+                  <Tag size={14} />
+                  View Taxonomies
+                </button>
+                <button
                   className="toolset-btn-small"
                   onClick={() => navigate('/cpt-engine/taxonomies/new')}
+                  style={{ marginLeft: '10px' }}
                 >
                   <Plus size={14} />
                   Create Taxonomy

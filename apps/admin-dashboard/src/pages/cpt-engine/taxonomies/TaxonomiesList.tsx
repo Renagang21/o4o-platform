@@ -1,6 +1,6 @@
 /**
- * Field Groups List Page
- * Displays all field groups with filtering and management capabilities
+ * Taxonomies List Page
+ * Displays all taxonomies with filtering and management capabilities
  */
 
 import { useState, useMemo } from 'react';
@@ -12,11 +12,13 @@ import {
   Edit2,
   Trash2,
   Copy,
-  Eye,
-  EyeOff,
-  Layout,
-  Filter,
-  ChevronDown
+  Tag,
+  Folder,
+  List,
+  ChevronDown,
+  ArrowRight,
+  GitBranch,
+  Hash
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,17 +46,23 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { fieldGroupApi, cptApi } from '@/features/cpt-acf/services/cpt.api';
+import { taxonomyApi, cptApi } from '@/features/cpt-acf/services/cpt.api';
 
-interface FieldGroup {
+interface Taxonomy {
   id: string;
-  title: string;
+  name: string;
+  slug: string;
   description?: string;
+  hierarchical: boolean;
   postTypes: string[];
-  fields: any[];
-  position: string;
-  style: string;
-  isActive: boolean;
+  labels?: {
+    singular_name?: string;
+    plural_name?: string;
+    menu_name?: string;
+  };
+  showInRest?: boolean;
+  showInMenu?: boolean;
+  termsCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -65,17 +73,17 @@ interface CPTType {
   name: string;
 }
 
-export default function FieldGroupsList() {
+export default function TaxonomiesList() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCPT, setSelectedCPT] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  // Fetch field groups
-  const { data: fieldGroups = [], isLoading: groupsLoading, refetch } = useQuery({
-    queryKey: ['field-groups'],
+  // Fetch taxonomies
+  const { data: taxonomies = [], isLoading: taxonomiesLoading, refetch } = useQuery({
+    queryKey: ['taxonomies'],
     queryFn: async () => {
-      const response = await fieldGroupApi.getAll();
+      const response = await taxonomyApi.getAll();
       return response.data || [];
     }
   });
@@ -89,76 +97,67 @@ export default function FieldGroupsList() {
     }
   });
 
-  // Filter field groups
-  const filteredGroups = useMemo(() => {
-    return fieldGroups.filter(group => {
-      const matchesSearch = group.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           group.description?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter taxonomies
+  const filteredTaxonomies = useMemo(() => {
+    return taxonomies.filter(taxonomy => {
+      const matchesSearch = taxonomy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           taxonomy.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           taxonomy.description?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesCPT = selectedCPT === 'all' || 
-                         group.postTypes.includes(selectedCPT);
+                         taxonomy.postTypes.includes(selectedCPT);
       
-      const matchesStatus = statusFilter === 'all' ||
-                           (statusFilter === 'active' && group.isActive) ||
-                           (statusFilter === 'inactive' && !group.isActive);
+      const matchesType = typeFilter === 'all' ||
+                          (typeFilter === 'hierarchical' && taxonomy.hierarchical) ||
+                          (typeFilter === 'tag' && !taxonomy.hierarchical);
       
-      return matchesSearch && matchesCPT && matchesStatus;
+      return matchesSearch && matchesCPT && matchesType;
     });
-  }, [fieldGroups, searchTerm, selectedCPT, statusFilter]);
+  }, [taxonomies, searchTerm, selectedCPT, typeFilter]);
 
-  // Delete field group
+  // Delete taxonomy
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this field group?')) {
+    if (window.confirm('Are you sure you want to delete this taxonomy? This will also delete all associated terms.')) {
       try {
-        await authClient.api.delete(`/api/cpt/field-groups/${id}`);
+        await authClient.api.delete(`/api/cpt/taxonomies/${id}`);
         refetch();
       } catch (error) {
-        console.error('Failed to delete field group:', error);
+        console.error('Failed to delete taxonomy:', error);
       }
     }
   };
 
-  // Duplicate field group
-  const handleDuplicate = async (group: FieldGroup) => {
+  // Duplicate taxonomy
+  const handleDuplicate = async (taxonomy: Taxonomy) => {
     try {
-      await authClient.api.post('/api/cpt/field-groups', {
-        ...group,
-        title: `${group.title} (Copy)`,
+      await authClient.api.post('/api/cpt/taxonomies', {
+        ...taxonomy,
+        name: `${taxonomy.name} (Copy)`,
+        slug: `${taxonomy.slug}_copy`,
         id: undefined
       });
       refetch();
     } catch (error) {
-      console.error('Failed to duplicate field group:', error);
+      console.error('Failed to duplicate taxonomy:', error);
     }
   };
 
-  // Toggle active status
-  const handleToggleActive = async (id: string, currentStatus: boolean) => {
-    try {
-      await authClient.api.patch(`/api/cpt/field-groups/${id}`, {
-        isActive: !currentStatus
-      });
-      refetch();
-    } catch (error) {
-      console.error('Failed to toggle status:', error);
-    }
+  const getTypeIcon = (hierarchical: boolean) => {
+    return hierarchical ? <GitBranch className="w-4 h-4" /> : <Hash className="w-4 h-4" />;
   };
 
-  const getPositionLabel = (position: string) => {
-    const labels: Record<string, string> = {
-      'normal': 'Normal',
-      'side': 'Side',
-      'advanced': 'Advanced'
-    };
-    return labels[position] || position;
-  };
-
-  const getStyleLabel = (style: string) => {
-    const labels: Record<string, string> = {
-      'default': 'Default',
-      'seamless': 'Seamless'
-    };
-    return labels[style] || style;
+  const getTypeBadge = (hierarchical: boolean) => {
+    return hierarchical ? (
+      <Badge variant="default">
+        <Folder className="w-3 h-3 mr-1" />
+        Hierarchical
+      </Badge>
+    ) : (
+      <Badge variant="secondary">
+        <Tag className="w-3 h-3 mr-1" />
+        Tags
+      </Badge>
+    );
   };
 
   return (
@@ -166,12 +165,12 @@ export default function FieldGroupsList() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Field Groups</h1>
-          <p className="text-gray-600 mt-1">Manage custom field groups for your post types</p>
+          <h1 className="text-3xl font-bold">Taxonomies</h1>
+          <p className="text-gray-600 mt-1">Manage taxonomies for organizing your content</p>
         </div>
-        <Button onClick={() => navigate('/cpt-engine/field-groups/new')}>
+        <Button onClick={() => navigate('/cpt-engine/taxonomies/new')}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Field Group
+          Add Taxonomy
         </Button>
       </div>
 
@@ -179,39 +178,39 @@ export default function FieldGroupsList() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Groups</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Taxonomies</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{fieldGroups.length}</div>
+            <div className="text-2xl font-bold">{taxonomies.length}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Active Groups</CardTitle>
+            <CardTitle className="text-sm font-medium">Hierarchical</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {fieldGroups.filter(g => g.isActive).length}
+              {taxonomies.filter(t => t.hierarchical).length}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Fields</CardTitle>
+            <CardTitle className="text-sm font-medium">Tag-based</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {fieldGroups.reduce((acc, g) => acc + (g.fields?.length || 0), 0)}
+              {taxonomies.filter(t => !t.hierarchical).length}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">CPTs Covered</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Terms</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Set(fieldGroups.flatMap(g => g.postTypes)).size}
+              {taxonomies.reduce((acc, t) => acc + (t.termsCount || 0), 0)}
             </div>
           </CardContent>
         </Card>
@@ -225,7 +224,7 @@ export default function FieldGroupsList() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Search field groups..."
+                  placeholder="Search taxonomies..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -245,69 +244,76 @@ export default function FieldGroupsList() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="hierarchical">Hierarchical</SelectItem>
+                <SelectItem value="tag">Tags</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Field Groups Table */}
+      {/* Taxonomies Table */}
       <Card>
         <CardContent className="pt-6">
-          {groupsLoading ? (
+          {taxonomiesLoading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
-          ) : filteredGroups.length === 0 ? (
+          ) : filteredTaxonomies.length === 0 ? (
             <div className="text-center py-8">
-              <Layout className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No field groups found</p>
+              <Tag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">No taxonomies found</p>
               <Button 
                 variant="outline" 
                 className="mt-4"
-                onClick={() => navigate('/cpt-engine/field-groups/new')}
+                onClick={() => navigate('/cpt-engine/taxonomies/new')}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Create First Field Group
+                Create First Taxonomy
               </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Field Group</TableHead>
+                  <TableHead>Taxonomy</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Post Types</TableHead>
-                  <TableHead className="text-center">Fields</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="text-center">Terms</TableHead>
+                  <TableHead>Visibility</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredGroups.map((group) => (
-                  <TableRow key={group.id}>
+                {filteredTaxonomies.map((taxonomy) => (
+                  <TableRow key={taxonomy.id}>
                     <TableCell>
-                      <div>
-                        <p className="font-medium">{group.title}</p>
-                        {group.description && (
-                          <p className="text-sm text-gray-500">{group.description}</p>
-                        )}
+                      <div className="flex items-center gap-2">
+                        {getTypeIcon(taxonomy.hierarchical)}
+                        <div>
+                          <p className="font-medium">{taxonomy.name}</p>
+                          <p className="text-sm text-gray-500">{taxonomy.slug}</p>
+                          {taxonomy.description && (
+                            <p className="text-sm text-gray-500 mt-1">{taxonomy.description}</p>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
+                      {getTypeBadge(taxonomy.hierarchical)}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {group.postTypes.map(postType => {
+                        {taxonomy.postTypes.map(postType => {
                           const cpt = cptTypes.find(t => t.slug === postType);
                           return (
-                            <Badge key={postType} variant="secondary">
+                            <Badge key={postType} variant="outline">
                               {cpt?.name || postType}
                             </Badge>
                           );
@@ -315,24 +321,27 @@ export default function FieldGroupsList() {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="outline">
-                        {group.fields?.length || 0} fields
-                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(`/cpt-engine/taxonomies/${taxonomy.id}/terms`)}
+                        className="gap-1"
+                      >
+                        <Badge variant="outline">
+                          {taxonomy.termsCount || 0}
+                        </Badge>
+                        <ArrowRight className="w-3 h-3" />
+                      </Button>
                     </TableCell>
                     <TableCell>
-                      <div className="space-y-1">
-                        <Badge variant="outline">{getPositionLabel(group.position)}</Badge>
-                        <Badge variant="outline">{getStyleLabel(group.style)}</Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={group.isActive ? 'default' : 'secondary'}>
-                        {group.isActive ? (
-                          <><Eye className="w-3 h-3 mr-1" /> Active</>
-                        ) : (
-                          <><EyeOff className="w-3 h-3 mr-1" /> Inactive</>
+                      <div className="flex flex-col gap-1">
+                        {taxonomy.showInRest && (
+                          <Badge variant="outline" className="text-xs">REST API</Badge>
                         )}
-                      </Badge>
+                        {taxonomy.showInMenu && (
+                          <Badge variant="outline" className="text-xs">Admin Menu</Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -344,29 +353,26 @@ export default function FieldGroupsList() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => navigate(`/cpt-engine/field-groups/${group.id}/edit`)}
+                            onClick={() => navigate(`/cpt-engine/taxonomies/${taxonomy.id}/edit`)}
                           >
                             <Edit2 className="w-4 h-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleDuplicate(group)}
+                            onClick={() => navigate(`/cpt-engine/taxonomies/${taxonomy.id}/terms`)}
+                          >
+                            <List className="w-4 h-4 mr-2" />
+                            Manage Terms
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDuplicate(taxonomy)}
                           >
                             <Copy className="w-4 h-4 mr-2" />
                             Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleToggleActive(group.id, group.isActive)}
-                          >
-                            {group.isActive ? (
-                              <><EyeOff className="w-4 h-4 mr-2" /> Deactivate</>
-                            ) : (
-                              <><Eye className="w-4 h-4 mr-2" /> Activate</>
-                            )}
-                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            onClick={() => handleDelete(group.id)}
+                            onClick={() => handleDelete(taxonomy.id)}
                             className="text-red-600"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />

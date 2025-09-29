@@ -7,11 +7,14 @@ import { Routes, Route } from 'react-router-dom';
 import CPTDashboardToolset from './CPTDashboardToolset';
 import CPTContentEditorWrapper from './CPTContentEditorWrapper';
 import CPTBuilderWrapper from './components/CPTBuilderWrapper';
-import CPTFieldManagerWrapper from './components/CPTFieldManagerWrapper';
 import CPTContentList from './components/CPTContentList';
 import FormsManager from './forms/FormsManager';
+import FormBuilder from './forms/FormBuilder';
 import FieldGroupsList from './field-groups/FieldGroupsList';
 import FieldGroupEditor from './field-groups/FieldGroupEditor';
+import TaxonomiesList from './taxonomies/TaxonomiesList';
+import TaxonomyEditor from './taxonomies/TaxonomyEditor';
+import TermsManager from './taxonomies/TermsManager';
 
 const CPTEngine = () => {
   return (
@@ -33,13 +36,13 @@ const CPTEngine = () => {
       <Route path="field-groups/new" element={<FieldGroupEditor />} />
       <Route path="field-groups/:id/edit" element={<FieldGroupEditor />} />
       
-      {/* Field Management Routes - Legacy */}
-      <Route path="fields/new" element={<CPTFieldManagerWrapper />} />
-      <Route path="fields/:id/edit" element={<CPTFieldManagerWrapper />} />
+      {/* Field Management Routes - Now handled by Field Groups */}
       
-      {/* Taxonomy Routes - Using CPTBuilderWrapper for now */}
-      <Route path="taxonomies/new" element={<CPTBuilderWrapper />} />
-      <Route path="taxonomies/:slug/edit" element={<CPTBuilderWrapper />} />
+      {/* Taxonomy Routes */}
+      <Route path="taxonomies" element={<TaxonomiesList />} />
+      <Route path="taxonomies/new" element={<TaxonomyEditor />} />
+      <Route path="taxonomies/:id/edit" element={<TaxonomyEditor />} />
+      <Route path="taxonomies/:taxonomyId/terms" element={<TermsManager />} />
       
       {/* Archive Routes - Using CPTBuilderWrapper for now */}
       <Route path="archives/new" element={<CPTBuilderWrapper />} />
@@ -47,8 +50,8 @@ const CPTEngine = () => {
       
       {/* Forms Routes */}
       <Route path="forms" element={<FormsManager />} />
-      <Route path="forms/new" element={<FormsManager />} />
-      <Route path="forms/:id/edit" element={<FormsManager />} />
+      <Route path="forms/new" element={<FormBuilder />} />
+      <Route path="forms/:id/edit" element={<FormBuilder />} />
       
       {/* Other routes handled by dashboard */}
       <Route path="*" element={<CPTDashboardToolset />} />

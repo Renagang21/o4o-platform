@@ -42,10 +42,11 @@ interface Field {
 }
 
 interface FieldEditorProps {
-  field: Field;
-  cptTypes: any[];
+  field: Field | null;
+  cptTypes?: any[];
   onSave: (field: Field) => void;
-  onCancel: () => void;
+  onCancel?: () => void;
+  onClose?: () => void;
 }
 
 const FIELD_TYPES = [
@@ -68,13 +69,21 @@ const FIELD_TYPES = [
   { value: 'repeater', label: 'Repeater' },
 ];
 
-export default function FieldEditor({ field, cptTypes, onSave, onCancel }: FieldEditorProps) {
-  const [formData, setFormData] = useState<Field>(field);
+export default function FieldEditor({ field, cptTypes = [], onSave, onCancel, onClose }: FieldEditorProps) {
+  const initialField: Field = field || {
+    id: `field_${Date.now()}`,
+    name: '',
+    label: '',
+    type: 'text',
+    required: false,
+    order: 0
+  };
+  const [formData, setFormData] = useState<Field>(initialField);
   const [selectOptions, setSelectOptions] = useState<string[]>([]);
   const [newOption, setNewOption] = useState('');
 
   useEffect(() => {
-    if (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') {
+    if (field && (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox')) {
       setSelectOptions(field.options?.choices || []);
     }
   }, [field]);
@@ -114,12 +123,17 @@ export default function FieldEditor({ field, cptTypes, onSave, onCancel }: Field
   const needsOptions = ['select', 'radio', 'checkbox'].includes(formData.type);
   const needsRelationship = ['relationship', 'post_object'].includes(formData.type);
 
+  const handleClose = () => {
+    if (onClose) onClose();
+    if (onCancel) onCancel();
+  };
+
   return (
-    <Dialog open={true} onOpenChange={onCancel}>
+    <Dialog open={true} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {field.id.startsWith('field_') && !field.name ? 'Add New Field' : 'Edit Field'}
+            {!field || (field.id.startsWith('field_') && !field.name) ? 'Add New Field' : 'Edit Field'}
           </DialogTitle>
           <DialogDescription>
             Configure the field settings and options

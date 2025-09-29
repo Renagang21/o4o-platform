@@ -29,12 +29,7 @@ const getRepositories = () => {
   }
 };
 
-// Mock data for when database is not available
-// Mock data removed - database should be used instead
-const mockPosts: any[] = [];
-
-// Mock data for pages - removed
-const mockPages: any[] = [];
+// Database should be used instead of mock data
 
 // Helper to extract content from Gutenberg format
 const extractContent = (content: any): string => {
@@ -114,44 +109,9 @@ router.get('/',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        // Return mock data when database is not available
-        const postType = post_type || type || 'post';
-        
-        // Handle custom post types
-        let filteredPosts;
-        if (postType === 'page') {
-          filteredPosts = mockPages;
-        } else if (postType === 'post') {
-          filteredPosts = mockPosts;
-        } else {
-          // For custom post types, return empty array or mock data
-          filteredPosts = [];
-        }
-        
-        filteredPosts = filteredPosts.filter(p => p.type === postType);
-        
-        if (status && status !== 'all') {
-          filteredPosts = filteredPosts.filter(p => p.status === status);
-        }
-        
-        if (search) {
-          const searchLower = search.toString().toLowerCase();
-          filteredPosts = filteredPosts.filter(p => 
-            p.title.toLowerCase().includes(searchLower) ||
-            p.content.toLowerCase().includes(searchLower)
-          );
-        }
-
-        const startIndex = ((page as number) - 1) * (per_page as number);
-        const endIndex = startIndex + (per_page as number);
-        const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
-
-        return res.json({
-          data: paginatedPosts,
-          total: filteredPosts.length,
-          page: page as number,
-          per_page: per_page as number,
-          total_pages: Math.ceil(filteredPosts.length / (per_page as number))
+        return res.status(503).json({ 
+          error: 'Database connection not available',
+          message: 'Please ensure database is properly configured'
         });
       }
 

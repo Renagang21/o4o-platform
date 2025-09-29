@@ -64,6 +64,148 @@ export const cptApi = {
 };
 
 /**
+ * Field Groups Management  
+ */
+export const fieldGroupApi = {
+  // Get all field groups
+  async getAll(postType?: string): Promise<CPTApiResponse<any[]>> {
+    const params = postType ? `?postType=${postType}` : '';
+    const response = await authClient.api.get(`${API_BASE}/field-groups${params}`);
+    return response.data;
+  },
+
+  // Get single field group
+  async getById(id: string): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.get(`${API_BASE}/field-groups/${id}`);
+    return response.data;
+  },
+
+  // Create field group
+  async create(data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.post(`${API_BASE}/field-groups`, data);
+    return response.data;
+  },
+
+  // Update field group
+  async update(id: string, data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.put(`${API_BASE}/field-groups/${id}`, data);
+    return response.data;
+  },
+
+  // Delete field group
+  async delete(id: string): Promise<CPTApiResponse<void>> {
+    const response = await authClient.api.delete(`${API_BASE}/field-groups/${id}`);
+    return response.data;
+  }
+};
+
+/**
+ * Taxonomies Management
+ */
+export const taxonomyApi = {
+  // Get all taxonomies
+  async getAll(): Promise<CPTApiResponse<any[]>> {
+    const response = await authClient.api.get(`${API_BASE}/taxonomies`);
+    return response.data;
+  },
+
+  // Get single taxonomy
+  async getById(id: string): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.get(`${API_BASE}/taxonomies/${id}`);
+    return response.data;
+  },
+
+  // Create taxonomy
+  async create(data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.post(`${API_BASE}/taxonomies`, data);
+    return response.data;
+  },
+
+  // Update taxonomy
+  async update(id: string, data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.put(`${API_BASE}/taxonomies/${id}`, data);
+    return response.data;
+  },
+
+  // Delete taxonomy
+  async delete(id: string): Promise<CPTApiResponse<void>> {
+    const response = await authClient.api.delete(`${API_BASE}/taxonomies/${id}`);
+    return response.data;
+  },
+
+  // Get terms for taxonomy
+  async getTerms(taxonomyId: string): Promise<CPTApiResponse<any[]>> {
+    const response = await authClient.api.get(`${API_BASE}/taxonomies/${taxonomyId}/terms`);
+    return response.data;
+  },
+
+  // Create term
+  async createTerm(taxonomyId: string, data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.post(`${API_BASE}/taxonomies/${taxonomyId}/terms`, data);
+    return response.data;
+  },
+
+  // Update term
+  async updateTerm(taxonomyId: string, termId: string, data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.put(`${API_BASE}/taxonomies/${taxonomyId}/terms/${termId}`, data);
+    return response.data;
+  },
+
+  // Delete term
+  async deleteTerm(taxonomyId: string, termId: string): Promise<CPTApiResponse<void>> {
+    const response = await authClient.api.delete(`${API_BASE}/taxonomies/${taxonomyId}/terms/${termId}`);
+    return response.data;
+  }
+};
+
+/**
+ * Forms Management
+ */
+export const formApi = {
+  // Get all forms
+  async getAll(): Promise<CPTApiResponse<any[]>> {
+    const response = await authClient.api.get(`${API_BASE}/forms`);
+    return response.data;
+  },
+
+  // Get single form
+  async getById(id: string): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.get(`${API_BASE}/forms/${id}`);
+    return response.data;
+  },
+
+  // Create form
+  async create(data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.post(`${API_BASE}/forms`, data);
+    return response.data;
+  },
+
+  // Update form
+  async update(id: string, data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.put(`${API_BASE}/forms/${id}`, data);
+    return response.data;
+  },
+
+  // Delete form
+  async delete(id: string): Promise<CPTApiResponse<void>> {
+    const response = await authClient.api.delete(`${API_BASE}/forms/${id}`);
+    return response.data;
+  },
+
+  // Submit form
+  async submit(id: string, data: any): Promise<CPTApiResponse<any>> {
+    const response = await authClient.api.post(`${API_BASE}/forms/${id}/submit`, data);
+    return response.data;
+  },
+
+  // Get form submissions
+  async getSubmissions(id: string): Promise<CPTApiResponse<any[]>> {
+    const response = await authClient.api.get(`${API_BASE}/forms/${id}/submissions`);
+    return response.data;
+  }
+};
+
+/**
  * CPT Post Management
  */
 export const cptPostApi = {

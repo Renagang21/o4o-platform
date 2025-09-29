@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Plus, 
   FileText, 
@@ -14,6 +15,7 @@ import {
   UserPlus,
   Filter
 } from 'lucide-react';
+import { authClient } from '@o4o/auth-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,28 +39,37 @@ import {
 interface Form {
   id: string;
   name: string;
-  type: 'contact' | 'post' | 'user' | 'search';
+  type: 'contact' | 'post' | 'user' | 'search' | 'cpt';
+  cptSlug?: string;
   status: 'active' | 'inactive';
   submissions: number;
   created: string;
   modified: string;
   fields: number;
+  submitAction?: 'create_post' | 'create_user' | 'send_email' | 'both';
+  userRole?: string;
 }
-
-// Mock data - replace with API call
-const mockForms: Form[] = [];
 
 const FormsManager = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
-  const [forms] = useState<Form[]>(mockForms);
+
+  // Fetch forms from API
+  const { data: forms = [], isLoading, refetch } = useQuery({
+    queryKey: ['forms'],
+    queryFn: async () => {
+      const response = await authClient.api.get<{ data: Form[] }>('/api/cpt/forms');
+      return response.data?.data || [];
+    }
+  });
 
   const formTypes = {
     contact: { icon: Mail, label: 'Contact Form', color: 'blue' },
     post: { icon: FileText, label: 'Post Form', color: 'green' },
     user: { icon: UserPlus, label: 'User Form', color: 'purple' },
-    search: { icon: SearchIcon, label: 'Search Form', color: 'orange' }
+    search: { icon: SearchIcon, label: 'Search Form', color: 'orange' },
+    cpt: { icon: Database, label: 'CPT Form', color: 'indigo' }
   };
 
   const filteredForms = forms.filter(form => {
@@ -232,7 +243,11 @@ const FormsManager = () => {
           </div>
         </CardHeader>
         <CardContent>
-          {filteredForms.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            </div>
+          ) : filteredForms.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -250,7 +265,14 @@ const FormsManager = () => {
                   const TypeIcon = formTypes[form.type].icon;
                   return (
                     <TableRow key={form.id}>
-                      <TableCell className="font-medium">{form.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <div>
+                          <div>{form.name}</div>
+                          {form.cptSlug && (
+                            <div className="text-xs text-gray-500 mt-1">CPT: {form.cptSlug}</div>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <TypeIcon className="w-4 h-4" />
@@ -267,16 +289,35 @@ const FormsManager = () => {
                       <TableCell>{form.modified}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button size="sm" variant="ghost">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => navigate(`/cpt-engine/forms/${form.id}/submissions`)}
+                            title="View Submissions"
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="ghost">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => navigate(`/cpt-engine/forms/${form.id}/edit`)}
+                            title="Edit Form"
+                          >
                             <Edit3 className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="ghost">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            title="Duplicate Form"
+                          >
                             <Copy className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="ghost" className="text-red-600">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="text-red-600"
+                            title="Delete Form"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>

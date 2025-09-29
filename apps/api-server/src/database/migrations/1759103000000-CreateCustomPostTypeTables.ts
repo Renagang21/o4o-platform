@@ -218,15 +218,8 @@ export class CreateCustomPostTypeTables1759103000000 implements MigrationInterfa
       await queryRunner.query(`CREATE INDEX "IDX_CUSTOM_POST_STATUS" ON "custom_posts" ("status")`);
     }
 
-    // Insert default CPT types for dropshipping
-    await queryRunner.query(`
-      INSERT INTO custom_post_types (slug, name, description, icon, active, public, has_archive, supports, taxonomies)
-      VALUES 
-        ('ds_products', 'Dropshipping Products', 'Manage dropshipping products', 'package', true, true, true, '["title", "editor", "thumbnail", "excerpt"]', '["product_cat", "product_tag"]'),
-        ('ds_suppliers', 'Suppliers', 'Manage dropshipping suppliers', 'truck', true, false, false, '["title", "editor"]', '[]'),
-        ('ds_orders', 'DS Orders', 'Manage dropshipping orders', 'shopping-cart', true, false, false, '["title"]', '[]')
-      ON CONFLICT (slug) DO NOTHING;
-    `);
+    // Note: Dropshipping CPTs are handled by 1758897000000-InitializeDropshippingCPTs migration
+    // This section is left empty to avoid duplication
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
