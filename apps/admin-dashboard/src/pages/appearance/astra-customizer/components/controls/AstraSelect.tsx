@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface SelectOption {
@@ -60,7 +60,7 @@ export const AstraSelect: React.FC<AstraSelectProps> = ({
   const currentLabel = currentOption?.label || placeholder;
   
   // Close dropdown when clicking outside
-  useEffect(() => {
+  React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
         setIsOpen(false);

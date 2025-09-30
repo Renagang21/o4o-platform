@@ -3,7 +3,7 @@
  * Manages WebSocket connection for live theme customization updates
  */
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { ThemeCustomization } from '@o4o/types'
 
 export interface PreviewUpdate {
@@ -324,11 +324,11 @@ class PreviewWebSocketService {
 
 // React hook for using preview WebSocket
 export const usePreviewWebSocket = (userId: string, pageId?: string) => {
-  const [service] = useState(() => new PreviewWebSocketService(userId, pageId))
-  const [isConnected, setIsConnected] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
+  const [service] = React.useState(() => new PreviewWebSocketService(userId, pageId))
+  const [isConnected, setIsConnected] = React.useState(false)
+  const [error, setError] = React.useState<Error | null>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const unsubscribeConnection = service.onConnection(setIsConnected)
     const unsubscribeError = service.onError(setError)
 
