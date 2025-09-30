@@ -77,6 +77,7 @@ export class AISettingsController {
         aiSetting.apiKey = apiKey || null;
         aiSetting.defaultModel = defaultModel || null;
         aiSetting.settings = settings || {};
+        aiSetting.isActive = true; // Reactivate when updating
       } else {
         // Create new
         aiSetting = aiSettingRepository.create({
