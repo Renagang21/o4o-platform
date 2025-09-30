@@ -115,8 +115,9 @@ export class AISettingsController {
       }
 
       const { provider } = req.params;
+      const aiSettingRepository = this.getRepository();
 
-      const aiSetting = await this.aiSettingRepository.findOne({
+      const aiSetting = await aiSettingRepository.findOne({
         where: { provider }
       });
 
@@ -130,7 +131,7 @@ export class AISettingsController {
       // Soft delete by setting apiKey to null
       aiSetting.apiKey = null;
       aiSetting.isActive = false;
-      await this.aiSettingRepository.save(aiSetting);
+      await aiSettingRepository.save(aiSetting);
 
       return res.json({
         status: 'success',
