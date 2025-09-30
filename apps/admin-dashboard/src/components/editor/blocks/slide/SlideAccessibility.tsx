@@ -3,7 +3,7 @@
  * Phase 3: Interaction features
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, Volume2, VolumeX } from 'lucide-react';
 
 interface SlideAccessibilityProps {
@@ -197,7 +197,7 @@ export const ReducedMotion: React.FC<ReducedMotionProps> = ({
   children,
   fallback
 }) => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -236,8 +236,8 @@ export const AudioDescription: React.FC<AudioDescriptionProps> = ({
   autoPlay = false,
   volume = 0.8
 }) => {
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [isMuted, setIsMuted] = React.useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {

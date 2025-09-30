@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -81,7 +81,7 @@ const Toast: React.FC<ToastProps> = ({
 
 // Toast container hook
 export const useToast = () => {
-  const [toasts, setToasts] = React.useState<Array<{
+  const [toasts, setToasts] = useState<Array<{
     id: string;
     message: string;
     type: ToastType;

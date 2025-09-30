@@ -1,5 +1,5 @@
 import * as React from "react"
-const { useEffect } = React
+import { useEffect, useState } from "react"
 
 import type {
   ToastActionElement,
@@ -171,7 +171,7 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
+  const [state, setState] = useState<State>(memoryState)
 
   useEffect(() => {
     listeners.push(setState)
