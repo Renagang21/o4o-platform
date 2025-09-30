@@ -13,6 +13,9 @@ import '@/styles/admin-layout-fixed.css';
 // Register Dynamic Shortcodes
 import '@/utils/register-dynamic-shortcodes';
 
+// AI Config Migration - Fix old gemini-pro references
+import '@/utils/aiMigration';
+
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
 import EditorLayout from '@/layouts/EditorLayout';

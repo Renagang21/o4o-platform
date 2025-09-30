@@ -15,6 +15,29 @@ export interface AIProvider {
   model?: string;
 }
 
+// 2025년 최신 Gemini 모델 목록
+export const GEMINI_MODELS = {
+  'gemini-1.5-flash': 'Gemini 1.5 Flash (2025년 9월 종료 예정)',
+  'gemini-1.5-pro': 'Gemini 1.5 Pro (2025년 9월 종료 예정)', 
+  'gemini-2.0-flash': 'Gemini 2.0 Flash (최신 멀티모달)',
+  'gemini-2.5-flash': 'Gemini 2.5 Flash (안정 버전)',
+  'gemini-2.5-pro': 'Gemini 2.5 Pro (최강력 모델)',
+} as const;
+
+// OpenAI 모델 목록
+export const OPENAI_MODELS = {
+  'gpt-4': 'GPT-4',
+  'gpt-4-turbo': 'GPT-4 Turbo',
+  'gpt-3.5-turbo': 'GPT-3.5 Turbo',
+} as const;
+
+// Claude 모델 목록  
+export const CLAUDE_MODELS = {
+  'claude-3-opus-20240229': 'Claude 3 Opus',
+  'claude-3-sonnet-20240229': 'Claude 3 Sonnet',
+  'claude-3-haiku-20240307': 'Claude 3 Haiku',
+} as const;
+
 export interface PageTemplate {
   name: string;
   description: string;
@@ -318,7 +341,7 @@ export class AIPageGenerator {
   }
 
   /**
-   * Gemini API를 사용한 블록 생성
+   * Gemini API를 사용한 블록 생성 (2025년 최신 버전)
    */
   private async generateWithGemini(
     prompt: string,
@@ -327,53 +350,130 @@ export class AIPageGenerator {
     signal?: AbortSignal
   ): Promise<Block[]> {
     if (!this.provider.apiKey) {
-      throw new Error('Gemini API 키가 설정되지 않았습니다');
+      throw new Error('Gemini API 키가 설정되지 않았습니다. Google AI Studio에서 API 키를 발급받으세요.');
     }
 
-    updateProgress(30, 'Google Gemini에 요청을 전송 중...');
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.provider.apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${template.systemPrompt}
-                  
-                  다음 요구사항으로 페이지를 생성하세요: ${prompt}
-                  
-                  WordPress Gutenberg 블록 JSON 배열만 반환하세요.`,
-                },
-              ],
-            },
-          ],
-        }),
-        signal,
-      }
-    );
-
-    updateProgress(50, 'Gemini 응답을 처리하고 있습니다...');
-
-    const data = await response.json();
+    // 기본 모델 설정 - 2025년 권장 모델 사용
+    let modelName = this.provider.model || 'gemini-2.5-flash';
     
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Gemini API 오류');
+    // 구 모델명을 신 모델명으로 자동 변환
+    if (modelName === 'gemini-pro') {
+      console.warn('gemini-pro 모델은 더 이상 지원되지 않습니다. gemini-2.5-flash로 변경합니다.');
+      modelName = 'gemini-2.5-flash';
+    }
+    
+    // 1.5 모델 경고 (2025년 9월 종료 예정)
+    if (modelName.includes('1.5')) {
+      console.warn(`${modelName}는 2025년 9월에 종료됩니다. gemini-2.5 모델로 마이그레이션을 권장합니다.`);
     }
 
-    updateProgress(60, '블록 데이터를 파싱하고 있습니다...');
+    updateProgress(30, `Google Gemini ${modelName}에 요청을 전송 중...`);
+
+    // API 버전 결정 - 2.5 모델은 v1 사용, 나머지는 v1beta
+    const apiVersion = modelName.includes('2.5') ? 'v1' : 'v1beta';
+    
+    const systemInstruction = `${template.systemPrompt}
+    
+중요: 반드시 유효한 JSON 배열 형식으로만 응답하세요.
+각 블록은 다음 구조를 가져야 합니다:
+{
+  "type": "블록 타입 (예: core/heading)",
+  "content": { "text": "내용" },
+  "attributes": { "level": 1 }
+}`;
+
+    const userPrompt = `다음 요구사항으로 WordPress Gutenberg 페이지를 생성하세요: ${prompt}
+
+JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 포함하지 마세요.`;
 
     try {
-      const content = data.candidates[0].content.parts[0].text;
-      return JSON.parse(content);
-    } catch (error) {
-      // Fallback to mock blocks
-      return this.generateMockBlocks(prompt, 'landing', updateProgress);
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/${apiVersion}/models/${modelName}:generateContent?key=${this.provider.apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  {
+                    text: systemInstruction + '\n\n' + userPrompt
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 8192,
+              responseMimeType: 'application/json',
+            },
+          }),
+          signal,
+        }
+      );
+
+      updateProgress(50, 'Gemini 응답을 처리하고 있습니다...');
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error('Gemini API Error:', data);
+        
+        // 모델이 없는 경우 대체 모델 사용
+        if (data.error?.message?.includes('is not found')) {
+          console.warn(`${modelName} 모델을 찾을 수 없습니다. 기본 모델로 재시도합니다.`);
+          this.provider.model = 'gemini-2.5-flash';
+          return this.generateWithGemini(prompt, template, updateProgress, signal);
+        }
+        
+        throw new Error(data.error?.message || `Gemini API 오류: ${response.status}`);
+      }
+
+      updateProgress(60, '블록 데이터를 파싱하고 있습니다...');
+
+      try {
+        // 응답 구조 확인 및 파싱
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!content) {
+          throw new Error('Gemini 응답에 콘텐츠가 없습니다');
+        }
+        
+        // JSON 파싱 시도
+        let blocks;
+        try {
+          blocks = JSON.parse(content);
+        } catch (parseError) {
+          // JSON이 아닌 경우 코드 블록 제거 후 재시도
+          const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+          if (jsonMatch) {
+            blocks = JSON.parse(jsonMatch[1]);
+          } else {
+            blocks = JSON.parse(content);
+          }
+        }
+        
+        if (!Array.isArray(blocks)) {
+          throw new Error('응답이 배열 형식이 아닙니다');
+        }
+        
+        return blocks;
+      } catch (error) {
+        console.error('Gemini 응답 파싱 실패:', error);
+        // Fallback to mock blocks
+        updateProgress(60, '기본 템플릿을 사용합니다...');
+        return this.generateMockBlocks(prompt, 'landing', updateProgress);
+      }
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw error;
+      }
+      console.error('Gemini API 호출 실패:', error);
+      throw new Error(`Gemini API 오류: ${error.message}`);
     }
   }
 

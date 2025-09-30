@@ -33,52 +33,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-/* Sidebar - Base styles */
-.admin-sidebar {
-  position: fixed;
-  top: 46px;
-  left: 0;
-  bottom: 0;
-  width: 240px;
-  background-color: #23282d;
-  color: #eee;
-  z-index: 9998;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* Desktop (>= 1024px) - Sidebar always visible */
-@media (min-width: 1024px) {
-  .admin-sidebar {
-    transform: translateX(0) !important;
-    transition: none !important;
-  }
-  
-  .wordpress-admin-content {
-    margin-left: 240px;
-    width: calc(100% - 240px);
-  }
-}
-
-/* Mobile (< 1024px) - Sidebar with slide animation */
-@media (max-width: 1023px) {
-  .admin-sidebar {
-    width: 280px;
-    transform: translateX(-100%) !important;
-    transition: transform 0.3s ease-in-out !important;
-    z-index: 10000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-  }
-  
-  .admin-sidebar.open {
-    transform: translateX(0) !important;
-  }
-  
-  .wordpress-admin-content {
-    margin-left: 0;
-    width: 100%;
-  }
-}
+/* Sidebar styles moved to mobile-menu.css to avoid conflicts */
 
 /* Main Content Area */
 .wordpress-admin-content {
@@ -98,24 +53,7 @@
   z-index: 1;
 }
 
-/* Mobile backdrop */
-@media (max-width: 1023px) {
-  .admin-sidebar-backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    transition: opacity 0.3s ease-in-out;
-  }
-  
-  .admin-sidebar-backdrop.show {
-    display: block;
-  }
-}
+/* Backdrop styles moved to mobile-menu.css to avoid conflicts */
 
 /* Emergency Layout Fixes */
 .wordpress-admin-content {

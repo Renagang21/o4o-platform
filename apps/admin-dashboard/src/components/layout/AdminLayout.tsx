@@ -15,37 +15,20 @@ interface AdminLayoutProps {
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => {
-    // Safe window access for SSR
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 1024;
-    }
-    return false; // Default to desktop on server
-  })
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
-      const isCurrentlyMobile = window.innerWidth < 1024
-      setIsMobile(isCurrentlyMobile)
-      // Auto-close sidebar when switching to mobile
-      if (isCurrentlyMobile && sidebarOpen) {
-        setSidebarOpen(false)
-      }
+      const mobile = window.innerWidth < 1024
+      setIsMobile(mobile)
     }
     
-    // Initial check on mount
+    // Initial check
     checkMobile()
     
-    // Listen for resize events
+    // Listen for resize
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [sidebarOpen])
-  
-  // Additional effect to ensure mobile detection on first render
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsMobile(window.innerWidth < 1024);
-    }
   }, [])
   
   const { logout } = useAuth()
@@ -91,12 +74,9 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       {!isFullscreenMode && <AdminBar onLogout={handleLogout} />}
       
       
-      {/* Sidebar - CSS handles all styling, no inline styles needed */}
-      {/* Sidebar (hidden in fullscreen customizer) */}
+      {/* Sidebar */}
       {!isFullscreenMode && (
-        <div 
-          className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`}
-        >
+        <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
           <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         </div>
       )}
@@ -117,10 +97,9 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       </div>
       
       {/* Mobile sidebar backdrop */}
-      {/* Mobile sidebar backdrop (hidden in fullscreen customizer) */}
       {!isFullscreenMode && (
         <div 
-          className={`admin-sidebar-backdrop ${sidebarOpen && isMobile ? 'show' : ''}`}
+          className={`admin-sidebar-backdrop ${sidebarOpen ? 'show' : ''}`}
           onClick={() => setSidebarOpen(false)}
         />
       )}
