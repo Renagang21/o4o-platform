@@ -106,18 +106,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
-    // 최적화 설정 추가 (esbuild 우선, terser는 fallback)
+    // 최적화 설정 - esbuild 사용 (더 빠름)
     minify: process.env.VITE_BUILD_MINIFY || (process.env.NODE_ENV === 'production' ? 'esbuild' : false),
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        // Remove console methods in production
-        pure_funcs: ['console' + '.log', 'console' + '.info'],
-      },
-      mangle: {
-        safari10: true,
-      },
+    // esbuild minify 옵션
+    esbuildOptions: {
+      drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+      pure: process.env.NODE_ENV === 'production' ? ['console.log', 'console.info'] : [],
     },
     // modulepreload 설정 추가 - WordPress 청크 제외
     modulePreload: {

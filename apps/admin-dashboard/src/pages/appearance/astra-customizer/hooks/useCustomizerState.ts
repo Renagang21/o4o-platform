@@ -7,6 +7,7 @@ import {
   DeepPartial,
 } from '../types/customizer-types';
 import { deepMerge, deepEqual, getNestedValue, setNestedValue } from '../utils/deep-merge';
+import { getDefaultSettings } from '../utils/default-settings';
 
 interface UseCustomizerStateOptions {
   debounceMs?: number;
@@ -103,10 +104,8 @@ export function useCustomizerState(
   // Reset section to default
   const resetSection = useCallback(
     (section: SettingSection) => {
-      import('../utils/default-settings').then(({ getDefaultSettings }) => {
-        const defaultSettings = getDefaultSettings();
-        contextUpdateSetting(section, defaultSettings[section]);
-      });
+      const defaultSettings = getDefaultSettings();
+      contextUpdateSetting(section, defaultSettings[section]);
     },
     [contextUpdateSetting]
   );
