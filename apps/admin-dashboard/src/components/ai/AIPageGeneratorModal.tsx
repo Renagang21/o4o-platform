@@ -52,7 +52,7 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
     const loadProviderSettings = async () => {
       try {
         const savedKey = await AIApiKeyService.getKey(provider);
-        const savedModel = AIApiKeyService.getDefaultModel(provider);
+        const savedModel = await AIApiKeyService.getDefaultModel(provider);
         
         if (savedKey) {
           setApiKey(savedKey);

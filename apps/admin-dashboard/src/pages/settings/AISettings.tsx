@@ -7,25 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import toast from 'react-hot-toast';
 import { aiSettingsApi } from '@/api/ai-settings.api';
 
-// API 키 서비스 - 데이터베이스와 로컬 스토리지를 동시에 사용
+// API 키 서비스 - 데이터베이스만 사용
 export class AIApiKeyService {
-  private static STORAGE_KEY = 'ai_api_keys';
-  private static cachedKeys: Record<string, string> = {};
-
-  private static getStorage() {
-    try {
-      const test = '__storage_test__';
-      localStorage.setItem(test, test);
-      localStorage.removeItem(test);
-      return localStorage;
-    } catch {
-      return sessionStorage;
-    }
-  }
+  private static cachedSettings: Record<string, any> = {};
 
   static async getKeys(): Promise<Record<string, string>> {
     try {
-      // First try to get from database
       const dbSettings = await aiSettingsApi.getSettings();
       const keys: Record<string, string> = {};
       
@@ -35,43 +22,30 @@ export class AIApiKeyService {
         }
       });
       
-      // Cache in memory
-      this.cachedKeys = keys;
-      
-      // Also save to localStorage for offline access
-      const storage = this.getStorage();
-      storage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+      // Cache in memory for current session
+      this.cachedSettings = dbSettings;
       
       return keys;
     } catch (error) {
-      // Fallback to localStorage if database is unavailable
-      try {
-        const storage = this.getStorage();
-        const stored = storage.getItem(this.STORAGE_KEY);
-        return stored ? JSON.parse(stored) : {};
-      } catch {
-        return this.cachedKeys || {};
-      }
+      console.error('Failed to get API keys from database:', error);
+      return {};
     }
   }
 
   static async setKey(provider: string, key: string): Promise<void> {
     try {
-      // Save to database
+      const defaultModel = await this.getDefaultModel(provider);
       await aiSettingsApi.saveSetting({
         provider,
         apiKey: key,
-        defaultModel: this.getDefaultModel(provider) || null
+        defaultModel: defaultModel || null
       });
       
       // Update cache
-      this.cachedKeys[provider] = key;
-      
-      // Also save to localStorage
-      const storage = this.getStorage();
-      const keys = await this.getKeys();
-      keys[provider] = key;
-      storage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+      if (!this.cachedSettings[provider]) {
+        this.cachedSettings[provider] = {};
+      }
+      this.cachedSettings[provider].apiKey = key;
     } catch (error) {
       console.error('Failed to save API key:', error);
       throw error;
@@ -80,17 +54,10 @@ export class AIApiKeyService {
 
   static async removeKey(provider: string): Promise<void> {
     try {
-      // Delete from database
       await aiSettingsApi.deleteSetting(provider);
       
       // Update cache
-      delete this.cachedKeys[provider];
-      
-      // Also remove from localStorage
-      const storage = this.getStorage();
-      const keys = await this.getKeys();
-      delete keys[provider];
-      storage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+      delete this.cachedSettings[provider];
     } catch (error) {
       console.error('Failed to remove API key:', error);
       throw error;
@@ -102,11 +69,16 @@ export class AIApiKeyService {
     return keys[provider];
   }
 
-  static getDefaultModel(provider: string): string | undefined {
+  static async getDefaultModel(provider: string): Promise<string | undefined> {
     try {
-      const storage = this.getStorage();
-      const stored = storage.getItem(`ai_default_model_${provider}`);
-      return stored || undefined;
+      // Get from cached settings first
+      if (this.cachedSettings[provider]?.defaultModel) {
+        return this.cachedSettings[provider].defaultModel;
+      }
+      
+      // Otherwise fetch from database
+      const dbSettings = await aiSettingsApi.getSettings();
+      return dbSettings[provider]?.defaultModel;
     } catch {
       return undefined;
     }
@@ -114,21 +86,21 @@ export class AIApiKeyService {
 
   static async setDefaultModel(provider: string, model: string): Promise<void> {
     try {
-      // Save to database along with the key
       const key = await this.getKey(provider);
-      if (key) {
-        await aiSettingsApi.saveSetting({
-          provider,
-          apiKey: key,
-          defaultModel: model
-        });
-      }
+      await aiSettingsApi.saveSetting({
+        provider,
+        apiKey: key || null,
+        defaultModel: model
+      });
       
-      // Also save to localStorage
-      const storage = this.getStorage();
-      storage.setItem(`ai_default_model_${provider}`, model);
+      // Update cache
+      if (!this.cachedSettings[provider]) {
+        this.cachedSettings[provider] = {};
+      }
+      this.cachedSettings[provider].defaultModel = model;
     } catch (error) {
       console.error('Failed to save default model:', error);
+      throw error;
     }
   }
 }
@@ -205,12 +177,13 @@ const AISettings: FC = () => {
         const savedKeys = await AIApiKeyService.getKeys();
         const savedModels: Record<string, string> = {};
         
-        providers.forEach(provider => {
-          const savedModel = AIApiKeyService.getDefaultModel(provider.id);
+        // Load default models from database
+        for (const provider of providers) {
+          const savedModel = await AIApiKeyService.getDefaultModel(provider.id);
           if (savedModel) {
             savedModels[provider.id] = savedModel;
           }
-        });
+        }
 
         setApiKeys(prev => ({
           ...prev,
@@ -225,6 +198,7 @@ const AISettings: FC = () => {
         }
       } catch (error) {
         console.error('Failed to load AI settings:', error);
+        toast.error('AI 설정을 불러오는데 실패했습니다.');
       }
     };
     
