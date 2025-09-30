@@ -98,19 +98,19 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Transform MediaFile to MediaItem
-  const transformMediaFile = (file: MediaFile): MediaItem => ({
+  const transformMediaFile = (file: any): MediaItem => ({
     id: file.id,
     url: file.url,
-    type: file.type === 'image' ? 'image' : file.type === 'video' ? 'video' : 'image',
-    title: file.name,
-    alt: file.altText || file.name,
-    width: file.dimensions?.width,
-    height: file.dimensions?.height,
+    type: file.isImage ? 'image' : file.isVideo ? 'video' : 'image',
+    title: file.originalFilename || file.filename || file.name || 'Untitled',
+    alt: file.altText || file.originalFilename || file.filename,
+    width: file.width || file.dimensions?.width,
+    height: file.height || file.dimensions?.height,
     fileSize: file.size,
     mimeType: file.mimeType,
     thumbnailUrl: file.thumbnailUrl,
     caption: file.caption,
-    uploadedAt: file.uploadedAt
+    uploadedAt: file.createdAt || file.uploadedAt
   });
 
   // Fetch media files with infinite scroll
@@ -188,9 +188,11 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, selectedFiles, onClose]);
 
-  const allFiles = data?.pages?.flatMap(page =>
-    Array.isArray(page?.data) ? page.data.map(transformMediaFile) : []
-  ) || [];
+  const allFiles = data?.pages?.flatMap(page => {
+    // API response structure: { media: [...], pagination: {...} }
+    const mediaArray = page?.media || page?.data?.media || page?.data || [];
+    return Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
+  }) || [];
 
   const selectedFileObjects = allFiles.filter(file => selectedFiles.includes(file.id));
 
