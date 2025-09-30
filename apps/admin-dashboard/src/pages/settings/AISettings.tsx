@@ -209,22 +209,37 @@ const AISettings: FC = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // 각 프로바이더의 키 저장
-      for (const [provider, key] of Object.entries(apiKeys)) {
+      // 각 프로바이더의 키와 모델을 함께 저장
+      const savePromises = [];
+      
+      for (const provider of providers) {
+        const key = apiKeys[provider.id];
+        const model = defaultModels[provider.id];
+        
         if (key) {
-          await AIApiKeyService.setKey(provider, key);
-        } else {
-          await AIApiKeyService.removeKey(provider);
+          // API 키가 있으면 저장
+          savePromises.push(
+            aiSettingsApi.saveSetting({
+              provider: provider.id,
+              apiKey: key,
+              defaultModel: model,
+              settings: {}
+            })
+          );
         }
       }
-
-      // 기본 모델 저장
-      for (const [provider, model] of Object.entries(defaultModels)) {
-        await AIApiKeyService.setDefaultModel(provider, model);
+      
+      // 모든 저장 작업을 병렬로 처리
+      const results = await Promise.all(savePromises);
+      
+      // 모든 저장이 성공했는지 확인
+      if (results.every(result => result)) {
+        toast.success('AI API 설정이 저장되었습니다.');
+      } else {
+        toast.error('일부 설정 저장에 실패했습니다.');
       }
-
-      toast.success('AI API 설정이 저장되었습니다.');
     } catch (error) {
+      console.error('Error saving settings:', error);
       toast.error('설정 저장 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -344,7 +359,7 @@ const AISettings: FC = () => {
                         ...prev,
                         [provider.id]: e.target.value
                       }))}
-                      autoComplete="off"
+                      autoComplete="new-password"
                     />
                     <button
                       type="button"
