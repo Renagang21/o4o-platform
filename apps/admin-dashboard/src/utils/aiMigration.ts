@@ -20,7 +20,7 @@ export class AIConfigMigration {
       const defaultModel = localStorage.getItem('ai_default_model_gemini');
       if (defaultModel === 'gemini-pro') {
         localStorage.setItem('ai_default_model_gemini', 'gemini-2.5-flash');
-        console.log('[AI Migration] Updated gemini-pro to gemini-2.5-flash');
+        // Migration: Updated gemini-pro to gemini-2.5-flash
       }
       
       // 저장된 API 키 확인
@@ -33,7 +33,7 @@ export class AIConfigMigration {
             localStorage.setItem('ai_default_model_gemini', 'gemini-2.5-flash');
           }
         } catch (e) {
-          console.error('[AI Migration] Failed to parse API keys:', e);
+          // Migration: Failed to parse API keys
         }
       }
       
@@ -46,35 +46,37 @@ export class AIConfigMigration {
             // gemini-pro를 gemini-2.5-flash로 치환
             const newValue = value.replace(/gemini-pro/g, 'gemini-2.5-flash');
             localStorage.setItem(key, newValue);
-            console.log(`[AI Migration] Updated ${key} from gemini-pro to gemini-2.5-flash`);
+            // Migration: Updated model from gemini-pro to gemini-2.5-flash
           }
         }
       }
       
       // 마이그레이션 완료 표시
       localStorage.setItem(this.MIGRATED_KEY, new Date().toISOString());
-      console.log('[AI Migration] Migration completed successfully');
+      // Migration completed successfully
       
     } catch (error) {
-      console.error('[AI Migration] Migration failed:', error);
+      // Migration failed - silently continue
     }
   }
   
   /**
-   * 디버깅용: 모든 AI 관련 로컬 스토리지 항목 표시
+   * 디버깅용: 모든 AI 관련 로컬 스토리지 항목 가져오기
    */
-  static debugAIConfigs(): void {
-    console.group('[AI Debug] Current AI Configurations');
+  static debugAIConfigs(): Record<string, string> {
+    const configs: Record<string, string> = {};
     
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && (key.includes('ai') || key.includes('gemini') || key.includes('model'))) {
         const value = localStorage.getItem(key);
-        console.log(`${key}:`, value);
+        if (value) {
+          configs[key] = value;
+        }
       }
     }
     
-    console.groupEnd();
+    return configs;
   }
   
   /**
@@ -93,23 +95,23 @@ export class AIConfigMigration {
             const newValue = value.replace(/gemini-pro/g, 'gemini-2.5-flash');
             localStorage.setItem(key, newValue);
             updated++;
-            console.log(`[AI Reset] Updated ${key} to use gemini-2.5-flash`);
+            // Reset: Updated model to use gemini-2.5-flash
           } else {
             // 다른 항목은 삭제
             localStorage.removeItem(key);
             updated++;
-            console.log(`[AI Reset] Removed ${key} containing gemini-pro`);
+            // Reset: Removed item containing gemini-pro
           }
         }
       }
     }
     
     if (updated > 0) {
-      console.log(`[AI Reset] Updated/Removed ${updated} items containing gemini-pro`);
+      // Reset: Updated/Removed items containing gemini-pro
       // 마이그레이션 플래그 재설정
       localStorage.setItem(this.MIGRATED_KEY, new Date().toISOString());
     } else {
-      console.log('[AI Reset] No gemini-pro references found');
+      // Reset: No gemini-pro references found
     }
   }
 }
