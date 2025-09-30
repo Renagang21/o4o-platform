@@ -318,123 +318,126 @@ const AISettings: FC = () => {
           </AlertDescription>
         </Alert>
 
-        {providers.map((provider) => (
-          <div key={provider.id} className="border rounded-lg p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{provider.icon}</span>
-                <div>
-                  <h3 className="font-semibold">{provider.name}</h3>
-                  <p className="text-sm text-gray-500">{provider.description}</p>
-                </div>
-              </div>
-              <a
-                href={provider.apiUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-blue-500 hover:underline"
-              >
-                API 키 발급 →
-              </a>
-            </div>
-
-            <div className="space-y-3">
-              {/* API 키 입력 */}
-              <div>
-                <Label htmlFor={`${provider.id}-key`}>API 키</Label>
-                <div className="flex gap-2 mt-1">
-                  <div className="relative flex-1">
-                    <input
-                      id={`${provider.id}-key`}
-                      name={`${provider.id}-api-key`}
-                      type={showKeys[provider.id] ? 'text' : 'password'}
-                      className="w-full px-3 py-2 border rounded-md pr-10"
-                      placeholder={
-                        provider.id === 'gemini' ? 'AIza...' :
-                        provider.id === 'openai' ? 'sk-...' :
-                        'sk-ant-...'
-                      }
-                      value={apiKeys[provider.id] || ''}
-                      onChange={(e) => setApiKeys(prev => ({
-                        ...prev,
-                        [provider.id]: e.target.value
-                      }))}
-                      autoComplete="new-password"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
-                      onClick={() => setShowKeys(prev => ({
-                        ...prev,
-                        [provider.id]: !prev[provider.id]
-                      }))}
-                    >
-                      {showKeys[provider.id] ? 
-                        <EyeOff className="w-4 h-4 text-gray-400" /> : 
-                        <Eye className="w-4 h-4 text-gray-400" />
-                      }
-                    </button>
+        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+          {providers.map((provider) => (
+            <div key={provider.id} className="border rounded-lg p-4 space-y-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{provider.icon}</span>
+                  <div>
+                    <h3 className="font-semibold">{provider.name}</h3>
+                    <p className="text-sm text-gray-500">{provider.description}</p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTestKey(provider.id)}
-                    disabled={testingProvider === provider.id}
+                </div>
+                <a
+                  href={provider.apiUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  API 키 발급 →
+                </a>
+              </div>
+
+              <div className="space-y-3">
+                {/* API 키 입력 */}
+                <div>
+                  <Label htmlFor={`${provider.id}-key`}>API 키</Label>
+                  <div className="flex gap-2 mt-1">
+                    <div className="relative flex-1">
+                      <input
+                        id={`${provider.id}-key`}
+                        name={`${provider.id}-api-key`}
+                        type={showKeys[provider.id] ? 'text' : 'password'}
+                        className="w-full px-3 py-2 border rounded-md pr-10"
+                        placeholder={
+                          provider.id === 'gemini' ? 'AIza...' :
+                          provider.id === 'openai' ? 'sk-...' :
+                          'sk-ant-...'
+                        }
+                        value={apiKeys[provider.id] || ''}
+                        onChange={(e) => setApiKeys(prev => ({
+                          ...prev,
+                          [provider.id]: e.target.value
+                        }))}
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        onClick={() => setShowKeys(prev => ({
+                          ...prev,
+                          [provider.id]: !prev[provider.id]
+                        }))}
+                      >
+                        {showKeys[provider.id] ? 
+                          <EyeOff className="w-4 h-4 text-gray-400" /> : 
+                          <Eye className="w-4 h-4 text-gray-400" />
+                        }
+                      </button>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTestKey(provider.id)}
+                      disabled={testingProvider === provider.id}
+                    >
+                      {testingProvider === provider.id ? (
+                        <span className="animate-spin">⏳</span>
+                      ) : testResults[provider.id] === true ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : testResults[provider.id] === false ? (
+                        <X className="w-4 h-4 text-red-500" />
+                      ) : (
+                        '테스트'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 기본 모델 선택 */}
+                <div>
+                  <Label htmlFor={`${provider.id}-model`}>기본 모델</Label>
+                  <Select 
+                    value={defaultModels[provider.id]} 
+                    onValueChange={(value) => setDefaultModels(prev => ({
+                      ...prev,
+                      [provider.id]: value
+                    }))}
                   >
-                    {testingProvider === provider.id ? (
-                      <span className="animate-spin">⏳</span>
-                    ) : testResults[provider.id] === true ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : testResults[provider.id] === false ? (
-                      <X className="w-4 h-4 text-red-500" />
-                    ) : (
-                      '테스트'
-                    )}
-                  </Button>
+                    <SelectTrigger id={`${provider.id}-model`} className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {provider.models.map(model => (
+                        <SelectItem key={model.id} value={model.id}>
+                          {model.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-
-              {/* 기본 모델 선택 */}
-              <div>
-                <Label htmlFor={`${provider.id}-model`}>기본 모델</Label>
-                <Select 
-                  value={defaultModels[provider.id]} 
-                  onValueChange={(value) => setDefaultModels(prev => ({
-                    ...prev,
-                    [provider.id]: value
-                  }))}
-                >
-                  <SelectTrigger id={`${provider.id}-model`} className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {provider.models.map(model => (
-                      <SelectItem key={model.id} value={model.id}>
-                        {model.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? (
-              <>
-                <span className="animate-spin mr-2">⏳</span>
-                저장 중...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                설정 저장
-              </>
-            )}
-          </Button>
-        </div>
+          <div className="flex justify-end">
+            <Button type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  저장 중...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  설정 저장
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );
