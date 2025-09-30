@@ -1,27 +1,57 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middleware/auth';
+import AppDataSource from '../database/data-source';
+import { AiSettings } from '../entities/AiSettings';
 
 const router: Router = Router();
 
 /**
  * AI Settings Routes
- * Stub implementation to prevent 404 errors
+ * Full implementation with database support
  */
 
 // GET AI settings
 router.get('/ai-settings', authenticateToken, async (req: Request, res: Response) => {
   try {
-    // Return empty settings for now
-    // This prevents 404 errors in the frontend
+    const aiSettingsRepo = AppDataSource.getRepository(AiSettings);
+    
+    // Get all AI provider settings
+    const settings = await aiSettingsRepo.find({
+      order: { provider: 'ASC' }
+    });
+    
+    // Transform to frontend format
+    const providers: any = {};
+    let defaultProvider: string | null = null;
+    
+    // Initialize with default providers if they don't exist
+    const defaultProviders = ['openai', 'claude', 'gemini'];
+    
+    for (const providerName of defaultProviders) {
+      const setting = settings.find(s => s.provider === providerName);
+      if (setting) {
+        providers[providerName] = {
+          enabled: setting.isActive,
+          apiKey: setting.apiKey ? '***' : null, // Mask API key for security
+          model: setting.defaultModel
+        };
+        if (setting.isActive && setting.apiKey && !defaultProvider) {
+          defaultProvider = providerName;
+        }
+      } else {
+        providers[providerName] = {
+          enabled: false,
+          apiKey: null,
+          model: null
+        };
+      }
+    }
+    
     res.json({
       success: true,
       data: {
-        providers: {
-          openai: { enabled: false, apiKey: null },
-          claude: { enabled: false, apiKey: null },
-          gemini: { enabled: false, apiKey: null }
-        },
-        defaultProvider: null,
+        providers,
+        defaultProvider,
         settings: {
           maxTokens: 4096,
           temperature: 0.7
@@ -40,12 +70,46 @@ router.get('/ai-settings', authenticateToken, async (req: Request, res: Response
 // POST AI settings (update)
 router.post('/ai-settings', authenticateToken, async (req: Request, res: Response) => {
   try {
-    // For now, just acknowledge the request
-    // In the future, this would save the settings to database
+    const aiSettingsRepo = AppDataSource.getRepository(AiSettings);
+    const { provider, apiKey, model, enabled } = req.body;
+    
+    if (!provider) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provider is required'
+      });
+    }
+    
+    // Find or create provider settings
+    let settings = await aiSettingsRepo.findOne({ where: { provider } });
+    
+    if (!settings) {
+      settings = new AiSettings();
+      settings.provider = provider;
+    }
+    
+    // Update settings
+    if (apiKey !== undefined && apiKey !== '***') {
+      settings.apiKey = apiKey || null;
+    }
+    if (model !== undefined) {
+      settings.defaultModel = model;
+    }
+    if (enabled !== undefined) {
+      settings.isActive = enabled;
+    }
+    
+    await aiSettingsRepo.save(settings);
+    
     res.json({
       success: true,
       message: 'AI settings updated successfully',
-      data: req.body
+      data: {
+        provider,
+        enabled: settings.isActive,
+        model: settings.defaultModel,
+        apiKey: settings.apiKey ? '***' : null
+      }
     });
   } catch (error) {
     console.error('Error updating AI settings:', error);

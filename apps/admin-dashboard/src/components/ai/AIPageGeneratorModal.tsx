@@ -383,7 +383,7 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
                     </div>
                     
                     {!useSavedKey && (
-                      <div>
+                      <form onSubmit={(e) => e.preventDefault()}>
                         <input
                           id="apiKey"
                           type="password"
@@ -391,11 +391,12 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
                           placeholder={`${provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'AIza...'}`}
                           value={apiKey}
                           onChange={(e) => setApiKey(e.target.value)}
+                          autoComplete="off"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                           임시 키는 이번 생성에만 사용됩니다.
                         </p>
-                      </div>
+                      </form>
                     )}
                   </div>
                 )}

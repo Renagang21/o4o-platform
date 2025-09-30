@@ -348,11 +348,7 @@ router.post('/',
           tags: tags || []
         };
         
-<<<<<<< HEAD
-        return res.status(503).json({ error: 'Database not available' });
-=======
         return res.status(503).json({ error: 'Database connection not available' });
->>>>>>> c13311ec51cd43e3ec0fd0e4e8349a4aaf92f31f
       }
 
       const { postRepository, categoryRepository } = repos;
