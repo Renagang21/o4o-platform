@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { GoogleFontSelector } from '../../components/controls/GoogleFontSelector';
 import { AstraSlider } from '../../components/controls/AstraSlider';
@@ -10,8 +10,8 @@ export const TypographySection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const typography = settings.typography;
   
-  const [activeTab, setActiveTab] = React.useState<'body' | 'headings' | 'buttons'>('body');
-  const [expandedHeading, setExpandedHeading] = React.useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'body' | 'headings' | 'buttons'>('body');
+  const [expandedHeading, setExpandedHeading] = useState<string | null>(null);
   
   const fontWeightOptions = [
     { value: '100', label: 'Thin (100)' },
