@@ -256,44 +256,19 @@ const AISettings: FC = () => {
 
     setTestingProvider(providerId);
     try {
-      // 간단한 API 테스트 요청
-      let testUrl = '';
-      let headers: HeadersInit = {};
-      let body = {};
-
-      if (providerId === 'gemini') {
-        testUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
-        const response = await fetch(testUrl);
-        if (response.ok) {
-          setTestResults(prev => ({ ...prev, [providerId]: true }));
-          toast.success('Gemini API 키가 유효합니다.');
-        } else {
-          throw new Error('Invalid API key');
-        }
-      } else if (providerId === 'openai') {
-        testUrl = 'https://api.openai.com/v1/models';
-        headers = {
-          'Authorization': `Bearer ${key}`
-        };
-        const response = await fetch(testUrl, { headers });
-        if (response.ok) {
-          setTestResults(prev => ({ ...prev, [providerId]: true }));
-          toast.success('OpenAI API 키가 유효합니다.');
-        } else {
-          throw new Error('Invalid API key');
-        }
-      } else if (providerId === 'claude') {
-        // Claude API는 실제 요청이 필요하므로 간단한 체크만
-        if (key.startsWith('sk-ant-')) {
-          setTestResults(prev => ({ ...prev, [providerId]: true }));
-          toast.success('Claude API 키 형식이 유효합니다.');
-        } else {
-          throw new Error('Invalid API key format');
-        }
+      // Backend API를 통해 테스트
+      const result = await aiSettingsApi.testApiKey(providerId, key);
+      
+      if (result.valid) {
+        setTestResults(prev => ({ ...prev, [providerId]: true }));
+        toast.success(result.message || `${providerId} API 키가 유효합니다.`);
+      } else {
+        setTestResults(prev => ({ ...prev, [providerId]: false }));
+        toast.error(result.message || `${providerId} API 키가 유효하지 않습니다.`);
       }
     } catch (error) {
       setTestResults(prev => ({ ...prev, [providerId]: false }));
-      toast.error(`${providerId} API 키가 유효하지 않습니다.`);
+      toast.error(`API 키 테스트 중 오류가 발생했습니다.`);
     } finally {
       setTestingProvider(null);
     }
