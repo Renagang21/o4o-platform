@@ -188,8 +188,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, selectedFiles, onClose]);
 
-  const allFiles = data?.pages.flatMap(page =>
-    page.data?.map(transformMediaFile) || []
+  const allFiles = data?.pages?.flatMap(page =>
+    Array.isArray(page?.data) ? page.data.map(transformMediaFile) : []
   ) || [];
 
   const selectedFileObjects = allFiles.filter(file => selectedFiles.includes(file.id));

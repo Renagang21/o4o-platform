@@ -107,8 +107,8 @@ export const useMediaSelector = (options: UseMediaSelectorOptions = {}): UseMedi
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Get all files from pages
-  const allFiles = data?.pages.flatMap(page =>
-    page.data?.map(transformMediaFile) || []
+  const allFiles = data?.pages?.flatMap(page =>
+    Array.isArray(page?.data) ? page.data.map(transformMediaFile) : []
   ) || [];
 
   // Actions
