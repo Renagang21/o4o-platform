@@ -7,10 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import toast from 'react-hot-toast';
 import { aiSettingsApi } from '@/api/ai-settings.api';
 
-// API 키 서비스 - 데이터베이스만 사용
+// API 키 서비스 - 데이터베이스만 사용 (캐시 제거)
 export class AIApiKeyService {
-  private static cachedSettings: Record<string, any> = {};
-
   static async getKeys(): Promise<Record<string, string>> {
     try {
       const dbSettings = await aiSettingsApi.getSettings();
@@ -21,9 +19,6 @@ export class AIApiKeyService {
           keys[provider] = settings.apiKey;
         }
       });
-      
-      // Cache in memory for current session
-      this.cachedSettings = dbSettings;
       
       return keys;
     } catch (error) {
@@ -40,12 +35,6 @@ export class AIApiKeyService {
         apiKey: key,
         defaultModel: defaultModel || null
       });
-      
-      // Update cache
-      if (!this.cachedSettings[provider]) {
-        this.cachedSettings[provider] = {};
-      }
-      this.cachedSettings[provider].apiKey = key;
     } catch (error) {
       // Failed to save API key
       throw error;
@@ -55,9 +44,6 @@ export class AIApiKeyService {
   static async removeKey(provider: string): Promise<void> {
     try {
       await aiSettingsApi.deleteSetting(provider);
-      
-      // Update cache
-      delete this.cachedSettings[provider];
     } catch (error) {
       // Failed to remove API key
       throw error;
@@ -71,12 +57,6 @@ export class AIApiKeyService {
 
   static async getDefaultModel(provider: string): Promise<string | undefined> {
     try {
-      // Get from cached settings first
-      if (this.cachedSettings[provider]?.defaultModel) {
-        return this.cachedSettings[provider].defaultModel;
-      }
-      
-      // Otherwise fetch from database
       const dbSettings = await aiSettingsApi.getSettings();
       return dbSettings[provider]?.defaultModel;
     } catch {
@@ -92,12 +72,6 @@ export class AIApiKeyService {
         apiKey: key || null,
         defaultModel: model
       });
-      
-      // Update cache
-      if (!this.cachedSettings[provider]) {
-        this.cachedSettings[provider] = {};
-      }
-      this.cachedSettings[provider].defaultModel = model;
     } catch (error) {
       // Failed to save default model
       throw error;
@@ -185,10 +159,10 @@ const AISettings: FC = () => {
           }
         }
 
-        setApiKeys(prev => ({
-          ...prev,
-          ...savedKeys
-        }));
+        // 실제로 값이 있는 경우에만 설정
+        if (Object.keys(savedKeys).length > 0) {
+          setApiKeys(savedKeys);
+        }
 
         if (Object.keys(savedModels).length > 0) {
           setDefaultModels(prev => ({
@@ -198,7 +172,7 @@ const AISettings: FC = () => {
         }
       } catch (error) {
         // Failed to load AI settings
-        toast.error('AI 설정을 불러오는데 실패했습니다.');
+        // 에러가 발생해도 기본값 유지
       }
     };
     
