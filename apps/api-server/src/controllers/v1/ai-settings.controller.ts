@@ -1,15 +1,11 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
-import { AISetting } from '../../entities/AISetting';
+import { AiSettings } from '../../entities/AiSettings';
 import { Repository } from 'typeorm';
 
 export class AISettingsController {
-  private aiSettingRepository: Repository<AISetting>;
-
-  constructor() {
-    if (AppDataSource.isInitialized) {
-      this.aiSettingRepository = AppDataSource.getRepository(AISetting);
-    }
+  private getRepository(): Repository<AiSettings> {
+    return AppDataSource.getRepository(AiSettings);
   }
 
   // Get all AI settings
@@ -22,7 +18,8 @@ export class AISettingsController {
         });
       }
 
-      const settings = await this.aiSettingRepository.find({
+      const aiSettingRepository = this.getRepository();
+      const settings = await aiSettingRepository.find({
         where: { isActive: true }
       });
 
@@ -68,8 +65,10 @@ export class AISettingsController {
         });
       }
 
+      const aiSettingRepository = this.getRepository();
+      
       // Find existing setting or create new one
-      let aiSetting = await this.aiSettingRepository.findOne({
+      let aiSetting = await aiSettingRepository.findOne({
         where: { provider }
       });
 
@@ -80,7 +79,7 @@ export class AISettingsController {
         aiSetting.settings = settings || {};
       } else {
         // Create new
-        aiSetting = this.aiSettingRepository.create({
+        aiSetting = aiSettingRepository.create({
           provider,
           apiKey: apiKey || null,
           defaultModel: defaultModel || null,
@@ -89,7 +88,7 @@ export class AISettingsController {
         });
       }
 
-      await this.aiSettingRepository.save(aiSetting);
+      await aiSettingRepository.save(aiSetting);
 
       return res.json({
         status: 'success',
