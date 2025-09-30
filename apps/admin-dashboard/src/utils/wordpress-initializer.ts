@@ -4,28 +4,8 @@
  * Prevents WordPress from being included in the initial bundle
  */
 
-import React, { 
-  createElement, 
-  createContext, 
-  useContext, 
-  useState, 
-  useEffect, 
-  useCallback, 
-  useMemo, 
-  useRef,
-  Component,
-  Fragment,
-  Children,
-  forwardRef,
-  memo,
-  lazy,
-  Suspense,
-  StrictMode,
-  PureComponent,
-  cloneElement,
-  isValidElement
-} from 'react';
-import ReactDOM, { createPortal, render, unmountComponentAtNode } from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import '../styles/wordpress-dashboard.css';
 
 // Initialize WordPress polyfills only when needed
@@ -44,28 +24,28 @@ export async function initializeWordPress() {
     
     // Initialize WordPress element with React
     window.wp.element = {
-      createElement,
-      createContext,
-      useContext,
-      useState,
-      useEffect,
-      useCallback,
-      useMemo,
-      useRef,
-      Component,
-      Fragment,
-      Children,
-      forwardRef,
-      memo,
-      lazy,
-      Suspense,
-      StrictMode,
-      PureComponent,
-      cloneElement,
-      isValidElement,
-      createPortal,
-      render,
-      unmountComponentAtNode,
+      createElement: React.createElement,
+      createContext: React.createContext,
+      useContext: React.useContext,
+      useState: React.useState,
+      useEffect: React.useEffect,
+      useCallback: React.useCallback,
+      useMemo: React.useMemo,
+      useRef: React.useRef,
+      Component: React.Component,
+      Fragment: React.Fragment,
+      Children: React.Children,
+      forwardRef: React.forwardRef,
+      memo: React.memo,
+      lazy: React.lazy,
+      Suspense: React.Suspense,
+      StrictMode: React.StrictMode,
+      PureComponent: React.PureComponent,
+      cloneElement: React.cloneElement,
+      isValidElement: React.isValidElement,
+      createPortal: ReactDOM.createPortal,
+      render: ReactDOM.render,
+      unmountComponentAtNode: ReactDOM.unmountComponentAtNode,
     };
 
     // Initialize i18n
