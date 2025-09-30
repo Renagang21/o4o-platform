@@ -66,12 +66,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({
             // SSO 체크는 비동기로 수행하되, 실패해도 로컬 세션 유지
             authClient.checkSession().then(sessionData => {
               if (!sessionData.isAuthenticated) {
-                console.warn('SSO session invalid, but keeping local session');
                 // SSO 세션이 없어도 로컬 세션은 유지 (토큰이 유효한 경우)
+                // 콘솔 로그 제거 - 정상적인 동작임
               }
-            }).catch(error => {
-              console.warn('SSO session check failed, keeping local session:', error);
+            }).catch(() => {
               // SSO 체크 실패 시에도 기존 세션 유지
+              // 콘솔 로그 제거 - 정상적인 동작임
             });
           }
           

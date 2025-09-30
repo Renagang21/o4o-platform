@@ -91,7 +91,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
           
           {isExpanded && item.children && !isCollapsed && (
             <div className="ml-6 mt-1 space-y-1">
-              {item.children.map((child: any) => (
+              {item.children?.map((child: any) => (
                 <Link
                   key={child.id}
                   to={child.path!}
@@ -162,12 +162,12 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
             <div className="flex justify-center items-center h-20">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
             </div>
-          ) : menuItems.length === 0 ? (
+          ) : !menuItems || menuItems.length === 0 ? (
             <div className="text-center p-4 text-sidebar-text text-xs">
               메뉴를 불러오는 중...
             </div>
           ) : (
-            menuItems.map(renderMenuItem)
+            menuItems?.map(renderMenuItem)
           )}
         </nav>
 

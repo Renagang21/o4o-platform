@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
-  const { enter, exit } = useAdminFullscreen();
+  const adminFullscreen = useAdminFullscreen();
   
   // Apply fullscreen CSS class while Customizer is mounted
   useEffect(() => {
@@ -16,14 +16,14 @@ const Customize: React.FC = () => {
       document.body.classList.add('customizer-fullscreen');
     }
     // Manage fullscreen state
-    enter('customize');
+    adminFullscreen.enter('customize');
     return () => {
       if (typeof document !== 'undefined') {
         document.body.classList.remove('customizer-fullscreen');
       }
-      exit();
+      adminFullscreen.exit();
     };
-  }, [enter, exit]);
+  }, [adminFullscreen]);
   
   const handleClose = () => {
     navigate('/admin');
