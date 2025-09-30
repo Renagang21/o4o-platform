@@ -3,7 +3,7 @@
  * [meta_field key="_stock_status" default="재고 확인 중"]
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createElement } from 'react';
 import { MetaFieldShortcodeAttributes, DynamicShortcodeContext } from './types';
 import { ShortcodeProps } from '../types';
 
@@ -186,11 +186,13 @@ export const MetaFieldShortcode: React.FC<ShortcodeProps> = ({ attributes, conte
 
   // Wrap in specified HTML element
   if (attrs.wrapper) {
-    const Wrapper = attrs.wrapper as keyof JSX.IntrinsicElements;
-    return (
-      <Wrapper className={`meta-field meta-field--${metaKey.replace(/^_/, '')} ${attrs.class || ''}`}>
-        {formattedValue}
-      </Wrapper>
+    const wrapperTag = attrs.wrapper as keyof React.JSX.IntrinsicElements;
+    return createElement(
+      wrapperTag,
+      {
+        className: `meta-field meta-field--${metaKey.replace(/^_/, '')} ${attrs.class || ''}`
+      },
+      formattedValue
     );
   }
 
