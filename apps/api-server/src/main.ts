@@ -789,9 +789,7 @@ app.use('/api/v1/migration', migrationRoutes); // Migration and system initializ
 import tagRoutes from './routes/content/tagRoutes';
 app.use('/api', tagRoutes); // Tags at /api/tags (mounted at specific paths in the router)
 
-// AI routes
-import aiRoutes from './routes/aiRoutes';
-app.use('/api/v1', aiRoutes); // AI settings routes
+// AI routes - Removed duplicate (using v1/ai-settings.routes.ts instead)
 
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
