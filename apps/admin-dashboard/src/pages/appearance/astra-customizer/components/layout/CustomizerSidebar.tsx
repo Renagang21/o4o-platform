@@ -162,7 +162,7 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
         
         {hasChildren && isExpanded && (
           <div className="wp-customizer-subpanels">
-            {panel.children?.map(child => renderPanel(child, level + 1))}
+            {Array.isArray(panel.children) && panel.children.map(child => renderPanel(child, level + 1))}
           </div>
         )}
       </div>
@@ -171,8 +171,10 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
   
   if (currentView === 'section' && currentSection) {
     // Render section content
-    const section = panels.find(p => p.id === currentSection) || 
-                   panels.flatMap(p => p.children || []).find(c => c.id === currentSection);
+    const section = Array.isArray(panels) ? 
+                   (panels.find(p => p.id === currentSection) || 
+                    panels.flatMap(p => p.children || []).find(c => c.id === currentSection)) : 
+                   undefined;
     
     return (
       <div className="wp-customizer-sidebar">
@@ -211,7 +213,7 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
       
       {/* Panels */}
       <div className="wp-customizer-panels">
-        {filteredPanels.length > 0 ? (
+        {Array.isArray(filteredPanels) && filteredPanels.length > 0 ? (
           filteredPanels.map(panel => renderPanel(panel))
         ) : (
           <div className="wp-customizer-no-results">

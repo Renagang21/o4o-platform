@@ -211,7 +211,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({
     const parts = text.split(regex);
     return (
       <>
-        {parts.map((part, i) =>
+        {Array.isArray(parts) && parts.map((part, i) =>
           regex.test(part) ? (
             <mark key={i} className="wp-customizer-search-highlight">
               {part}
@@ -262,7 +262,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({
                 Recent Searches
               </h4>
               <ul>
-                {recentSearches.map((search, i) => (
+                {Array.isArray(recentSearches) && recentSearches.map((search, i) => (
                   <li
                     key={i}
                     onClick={() => {
@@ -286,7 +286,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({
             </div>
           )}
 
-          {searchResults.length > 0 ? (
+          {Array.isArray(searchResults) && searchResults.length > 0 ? (
             <ul className="wp-customizer-search-results">
               {searchResults.map((item, index) => (
                 <li
@@ -304,7 +304,7 @@ export const EnhancedSearch: React.FC<EnhancedSearchProps> = ({
                       <span className="wp-customizer-search-path">
                         {item.path.join(' › ')}
                       </span>
-                      {item.keywords.slice(0, 3).map(keyword => (
+                      {Array.isArray(item.keywords) && item.keywords.slice(0, 3).map(keyword => (
                         <span key={keyword} className="wp-customizer-search-tag">
                           <Tag size={10} />
                           {keyword}
