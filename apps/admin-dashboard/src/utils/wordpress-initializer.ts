@@ -2,6 +2,7 @@
  * WordPress Initializer
  * This module is only loaded when WordPress functionality is needed
  * Prevents WordPress from being included in the initial bundle
+ * Updated: 2025-09-30 - Fixed React 18.2.0 compatibility
  */
 
 import React, { 
