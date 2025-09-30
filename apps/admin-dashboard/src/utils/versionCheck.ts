@@ -1,4 +1,5 @@
 // Version checking utility for cache invalidation
+// Last updated: 2025-09-30
 let lastCheckTime = 0;
 const MIN_CHECK_INTERVAL = 60000; // Minimum 1 minute between checks
 
