@@ -81,9 +81,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   title = '미디어 선택',
   className
 }) => {
-  const [selectedFiles, setSelectedFiles] = useState<string[]>(
-    selectedItems.map(item => item.id)
-  );
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filters, setFilters] = useState({
     searchTerm: '',
@@ -152,12 +150,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Reset selections when modal opens
+  // Only initialize selections when selectedItems are explicitly provided
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && selectedItems && selectedItems.length > 0) {
       setSelectedFiles(selectedItems.map(item => item.id));
     }
-  }, [isOpen, selectedItems]);
+    // Don't clear selection automatically - let user manually select/deselect
+  }, [isOpen]); // Removed selectedItems from dependencies to prevent unwanted resets
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -167,7 +166,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       switch (e.key) {
         case 'Escape':
           e.preventDefault();
-          onClose();
+          handleCancel();
           break;
         case 'Enter':
           e.preventDefault();
@@ -186,7 +185,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedFiles, onClose]);
+  }, [isOpen, selectedFiles, handleCancel, handleConfirmSelection]);
 
   const allFiles = data?.pages?.flatMap(page => {
     // API response structure: { media: [...], pagination: {...} }
@@ -234,8 +233,16 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     } else if (selectedFileObjects.length > 0) {
       onSelect(selectedFileObjects[0]);
     }
+    // Clear selection after confirming for next time
+    setSelectedFiles([]);
     onClose();
   }, [multiple, selectedFileObjects, onSelect, onClose]);
+
+  // Handle cancel - don't clear selection to maintain state
+  const handleCancel = useCallback(() => {
+    // Keep selection state for better UX
+    onClose();
+  }, [onClose]);
 
   // Update filter
   const updateFilter = useCallback((key: string, value: string) => {
@@ -598,7 +605,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
               {title}
             </h2>
             <button
-              onClick={onClose}
+              onClick={handleCancel}
               className="text-gray-400 hover:text-gray-600 p-1 rounded"
               aria-label="닫기"
             >
@@ -763,7 +770,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={onClose}
+                onClick={handleCancel}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 취소
