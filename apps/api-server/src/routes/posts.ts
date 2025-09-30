@@ -208,12 +208,7 @@ router.get('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        // Check both posts and pages
-        const mockPost = mockPosts.find(p => p.id === id) || mockPages.find(p => p.id === id);
-        if (!mockPost) {
-          return res.status(404).json({ error: 'Post not found' });
-        }
-        return res.json(mockPost);
+        return res.status(503).json({ error: 'Database not available' });
       }
 
       const { postRepository } = repos;
@@ -353,8 +348,7 @@ router.post('/',
           tags: tags || []
         };
         
-        mockPosts.push(newPost);
-        return res.status(201).json(newPost);
+        return res.status(503).json({ error: 'Database not available' });
       }
 
       const { postRepository, categoryRepository } = repos;
@@ -469,26 +463,7 @@ router.put('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        const postIndex = mockPosts.findIndex(p => p.id === id);
-        if (postIndex === -1) {
-          return res.status(404).json({ 
-            code: 'rest_post_invalid_id',
-            message: 'Invalid post ID',
-            data: { status: 404 }
-          });
-        }
-        
-        const updatedPost = {
-          ...mockPosts[postIndex],
-          title: { raw: title || mockPosts[postIndex].title, rendered: title || mockPosts[postIndex].title },
-          content: { raw: content || mockPosts[postIndex].content, rendered: content || mockPosts[postIndex].content, protected: false },
-          status: status || mockPosts[postIndex].status,
-          modified: new Date().toISOString(),
-          modified_gmt: new Date().toISOString()
-        };
-        
-        mockPosts[postIndex] = updatedPost;
-        return res.json(updatedPost);
+        return res.status(503).json({ error: 'Database not available' });
       }
 
       const { postRepository, categoryRepository } = repos;
@@ -588,12 +563,7 @@ router.delete('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        const postIndex = mockPosts.findIndex(p => p.id === id);
-        if (postIndex === -1) {
-          return res.status(404).json({ error: 'Post not found' });
-        }
-        const deletedPost = mockPosts.splice(postIndex, 1)[0];
-        return res.json({ message: 'Post deleted successfully', post: deletedPost });
+        return res.status(503).json({ error: 'Database not available' });
       }
 
       const { postRepository } = repos;

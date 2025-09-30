@@ -782,6 +782,11 @@ app.use('/api/v1/migration', migrationRoutes); // Migration and system initializ
 // Tag routes
 import tagRoutes from './routes/content/tagRoutes';
 app.use('/api', tagRoutes); // Tags at /api/tags (mounted at specific paths in the router)
+
+// AI routes
+import aiRoutes from './routes/aiRoutes';
+app.use('/api/v1', aiRoutes); // AI settings routes
+
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
 
@@ -810,12 +815,7 @@ app.use('/api/v1/themes', themeRoutes);
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 
-// 개발 환경 전용 라우트 (프로덕션에서는 자동 비활성화)
-if (process.env.NODE_ENV !== 'production') {
-  const devRoutes = require('./routes/dev.routes').default;
-  app.use('/api/v1/dev', devRoutes);
-  logger.info('Development routes enabled at /api/v1/dev');
-}
+// Development routes removed for production deployment
 
 // Admin routes with correct paths
 app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versioning
