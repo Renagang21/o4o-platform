@@ -3,7 +3,7 @@
  * 갤러리 블록의 접근성 기능을 제공하는 컴포넌트
  */
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { GalleryImage, GalleryAttributes } from './types';
 
 interface GalleryAccessibilityProps {
@@ -200,7 +200,7 @@ export const useGalleryKeyboardNavigation = (
   layout: string,
   columns: number
 ) => {
-  const [currentFocus, setCurrentFocus] = React.useState(0);
+  const [currentFocus, setCurrentFocus] = useState(0);
 
   const moveFocus = useCallback((direction: 'up' | 'down' | 'left' | 'right' | 'home' | 'end') => {
     let newFocus = currentFocus;
@@ -285,7 +285,7 @@ export const useScreenReaderSupport = () => {
  * 고대비 모드 감지 훅
  */
 export const useHighContrastMode = () => {
-  const [isHighContrast, setIsHighContrast] = React.useState(false);
+  const [isHighContrast, setIsHighContrast] = useState(false);
 
   useEffect(() => {
     const checkHighContrast = () => {
@@ -313,7 +313,7 @@ export const useHighContrastMode = () => {
  * 모션 감소 설정 감지 훅
  */
 export const useReducedMotion = () => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia) {
