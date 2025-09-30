@@ -49,20 +49,30 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
   
   // 컴포넌트 마운트 시 저장된 API 키와 모델 로드
   useEffect(() => {
-    const savedKey = AIApiKeyService.getKey(provider);
-    const savedModel = AIApiKeyService.getDefaultModel(provider);
+    const loadProviderSettings = async () => {
+      try {
+        const savedKey = await AIApiKeyService.getKey(provider);
+        const savedModel = AIApiKeyService.getDefaultModel(provider);
+        
+        if (savedKey) {
+          setApiKey(savedKey);
+          setUseSavedKey(true);
+        } else {
+          setApiKey('');
+          setUseSavedKey(false);
+        }
+        
+        if (savedModel) {
+          setSelectedModel(savedModel);
+        }
+      } catch (error) {
+        console.error('Failed to load provider settings:', error);
+        setApiKey('');
+        setUseSavedKey(false);
+      }
+    };
     
-    if (savedKey) {
-      setApiKey(savedKey);
-      setUseSavedKey(true);
-    } else {
-      setApiKey('');
-      setUseSavedKey(false);
-    }
-    
-    if (savedModel) {
-      setSelectedModel(savedModel);
-    }
+    loadProviderSettings();
   }, [provider]);
 
   const templates = [
