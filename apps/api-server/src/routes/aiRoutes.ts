@@ -13,6 +13,15 @@ const router: Router = Router();
 // GET AI settings
 router.get('/ai-settings', authenticateToken, async (req: Request, res: Response) => {
   try {
+    // Check if data source is initialized
+    if (!AppDataSource.isInitialized) {
+      console.error('Database not initialized for AI settings');
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection not available'
+      });
+    }
+    
     const aiSettingsRepo = AppDataSource.getRepository(AiSettings);
     
     // Get all AI provider settings
@@ -70,6 +79,15 @@ router.get('/ai-settings', authenticateToken, async (req: Request, res: Response
 // POST AI settings (update)
 router.post('/ai-settings', authenticateToken, async (req: Request, res: Response) => {
   try {
+    // Check if data source is initialized
+    if (!AppDataSource.isInitialized) {
+      console.error('Database not initialized for AI settings');
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection not available'
+      });
+    }
+    
     const aiSettingsRepo = AppDataSource.getRepository(AiSettings);
     const { provider, apiKey, model, enabled } = req.body;
     
