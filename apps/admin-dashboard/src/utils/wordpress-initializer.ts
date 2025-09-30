@@ -4,8 +4,6 @@
  * Prevents WordPress from being included in the initial bundle
  */
 
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import '../styles/wordpress-dashboard.css';
 
 // Initialize WordPress polyfills only when needed
@@ -16,8 +14,9 @@ export async function initializeWordPress() {
   }
 
   // Create React bridge for WordPress
-  if (typeof window !== 'undefined') {
-    // No longer dependent on window.React - use directly imported React
+  if (typeof window !== 'undefined' && window.React) {
+    const React = window.React;
+    const ReactDOM = window.ReactDOM;
     
     // Initialize WordPress global object
     window.wp = window.wp || {};
