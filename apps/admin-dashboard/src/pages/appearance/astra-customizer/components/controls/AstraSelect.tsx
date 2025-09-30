@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface SelectOption {
@@ -29,9 +29,9 @@ export const AstraSelect: React.FC<AstraSelectProps> = ({
   disabled = false,
   searchable = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const selectRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const selectRef = React.useRef<HTMLDivElement>(null);
   
   // Normalize options to SelectOption format
   const normalizedOptions: SelectOption[] = options.map((opt) =>

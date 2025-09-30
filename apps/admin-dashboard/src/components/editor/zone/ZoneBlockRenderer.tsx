@@ -3,7 +3,7 @@
  * Handles block interactions, selection, and drag operations
  */
 
-import React, { useRef, useCallback, useState } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { ZoneBlock } from '@o4o/types'
 import { BlockInserter } from './BlockInserter'
@@ -74,7 +74,7 @@ export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({
   onBlockAdd
 }) => {
   const ref = useRef<HTMLElement>(null)
-  const [showActions, setShowActions] = useState(false)
+  const [showActions, setShowActions] = React.useState(false)
 
   // Drag functionality
   const [{ isDragging }, drag, dragPreview] = useDrag({

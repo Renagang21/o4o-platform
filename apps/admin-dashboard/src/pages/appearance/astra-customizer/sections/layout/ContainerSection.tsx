@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraSelect } from '../../components/controls/AstraSelect';
@@ -9,7 +9,7 @@ export const ContainerSection: React.FC = () => {
   const container = settings.container;
   const sidebar = settings.sidebar;
   
-  const [activeTab, setActiveTab] = useState<'container' | 'sidebar'>('container');
+  const [activeTab, setActiveTab] = React.useState<'container' | 'sidebar'>('container');
   
   const layoutOptions = [
     { value: 'boxed', label: 'Boxed' },

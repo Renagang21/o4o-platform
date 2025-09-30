@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraImageUploader } from '../../components/controls/AstraImageUploader';
 import { AstraSlider } from '../../components/controls/AstraSlider';
@@ -10,7 +10,7 @@ export const SiteIdentitySection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const siteIdentity = settings.siteIdentity;
   
-  const [logoTab, setLogoTab] = useState<'desktop' | 'mobile'>('desktop');
+  const [logoTab, setLogoTab] = React.useState<'desktop' | 'mobile'>('desktop');
   
   return (
     <div className="astra-section site-identity-section">
