@@ -173,7 +173,8 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
     // Render section content
     const section = Array.isArray(panels) ? 
                    (panels.find(p => p.id === currentSection) || 
-                    panels.flatMap(p => p.children || []).find(c => c.id === currentSection)) : 
+                    panels.flatMap(p => Array.isArray(p.children) ? p.children : [])
+                          .find(c => c.id === currentSection)) : 
                    undefined;
     
     return (

@@ -104,7 +104,7 @@ const WordPressMenuEditor: FC = () => {
     try {
       // Load pages
       const pagesResponse = await (unifiedApi as any).raw.get('/api/pages?limit=100');
-      if (pagesResponse.data?.success && pagesResponse.data?.data) {
+      if (pagesResponse.data?.success && Array.isArray(pagesResponse.data?.data)) {
         setPages(pagesResponse.data.data.map((page: any) => ({
           id: page.id,
           title: page.title,
@@ -115,7 +115,7 @@ const WordPressMenuEditor: FC = () => {
 
       // Load posts
       const postsResponse = await (unifiedApi as any).raw.get('/api/posts?limit=100');
-      if (postsResponse.data?.success && postsResponse.data?.data) {
+      if (postsResponse.data?.success && Array.isArray(postsResponse.data?.data)) {
         setPosts(postsResponse.data.data.map((post: any) => ({
           id: post.id,
           title: post.title,
@@ -126,7 +126,7 @@ const WordPressMenuEditor: FC = () => {
 
       // Load categories
       const categoriesResponse = await (unifiedApi as any).raw.get('/api/categories?limit=100');
-      if (categoriesResponse.data?.success && categoriesResponse.data?.data) {
+      if (categoriesResponse.data?.success && Array.isArray(categoriesResponse.data?.data)) {
         setCategories(categoriesResponse.data.data.map((cat: any) => ({
           id: cat.id,
           title: cat.name,
@@ -137,7 +137,7 @@ const WordPressMenuEditor: FC = () => {
 
       // Load tags
       const tagsResponse = await (unifiedApi as any).raw.get('/api/tags?limit=100');
-      if (tagsResponse.data?.success && tagsResponse.data?.data) {
+      if (tagsResponse.data?.success && Array.isArray(tagsResponse.data?.data)) {
         setTags(tagsResponse.data.data.map((tag: any) => ({
           id: tag.id,
           title: tag.name,
@@ -153,7 +153,7 @@ const WordPressMenuEditor: FC = () => {
   const loadMenuLocations = async () => {
     try {
       const response = await MenuApi.getMenuLocations();
-      if (response.success && response.data) {
+      if (response.success && Array.isArray(response.data)) {
         setMenuLocations(response.data.map((loc: MenuLocationType) => ({
           id: loc.key || loc.id,
           key: loc.key,
