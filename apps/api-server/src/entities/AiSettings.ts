@@ -9,21 +9,21 @@ export class AiSettings {
   @Index()
   provider: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: 'apikey', type: 'text', nullable: true })
   apiKey: string | null;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'default_model', type: 'varchar', length: 255, nullable: true })
   defaultModel: string | null;
 
   @Column({ type: 'json', nullable: true })
   settings: Record<string, any> | null;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
