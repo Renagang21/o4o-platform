@@ -1071,6 +1071,7 @@ export class ContentController {
   // Media Management
   getMediaFiles = async (req: Request, res: Response) => {
     try {
+      // 데이터베이스가 초기화되지 않은 경우 빈 배열 반환
       if (!AppDataSource.isInitialized) {
         return res.json({
           status: 'success',
@@ -1078,6 +1079,7 @@ export class ContentController {
         });
       }
 
+      // 데이터베이스에서 미디어 파일 가져오기
       const media = await this.mediaRepository.find();
 
       return res.json({
