@@ -12,18 +12,18 @@ export class AiSettings {
   @Column({ name: 'apikey', type: 'text', nullable: true })
   apiKey: string | null;
 
-  @Column({ name: 'default_model', type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'defaultmodel', type: 'varchar', length: 255, nullable: true })
   defaultModel: string | null;
 
   @Column({ type: 'json', nullable: true })
   settings: Record<string, any> | null;
 
-  @Column({ name: 'is_active', type: 'boolean', default: true })
+  @Column({ name: 'isactive', type: 'boolean', default: true })
   isActive: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 }
