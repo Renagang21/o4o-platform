@@ -345,6 +345,16 @@ const AISettings: FC = () => {
                   <Label htmlFor={`${provider.id}-key`}>API 키</Label>
                   <div className="flex gap-2 mt-1">
                     <div className="relative flex-1">
+                      {/* Hidden username field for accessibility */}
+                      <input
+                        type="text"
+                        name={`${provider.id}-username`}
+                        autoComplete="username"
+                        style={{ display: 'none' }}
+                        aria-hidden="true"
+                        value={provider.id}
+                        readOnly
+                      />
                       <input
                         id={`${provider.id}-key`}
                         name={`${provider.id}-api-key`}
@@ -360,7 +370,7 @@ const AISettings: FC = () => {
                           ...prev,
                           [provider.id]: e.target.value
                         }))}
-                        autoComplete="new-password"
+                        autoComplete="current-password"
                       />
                       <button
                         type="button"
