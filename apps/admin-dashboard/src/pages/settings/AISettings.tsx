@@ -27,7 +27,7 @@ export class AIApiKeyService {
       
       return keys;
     } catch (error) {
-      console.error('Failed to get API keys from database:', error);
+      // Failed to get API keys from database
       return {};
     }
   }
@@ -47,7 +47,7 @@ export class AIApiKeyService {
       }
       this.cachedSettings[provider].apiKey = key;
     } catch (error) {
-      console.error('Failed to save API key:', error);
+      // Failed to save API key
       throw error;
     }
   }
@@ -59,7 +59,7 @@ export class AIApiKeyService {
       // Update cache
       delete this.cachedSettings[provider];
     } catch (error) {
-      console.error('Failed to remove API key:', error);
+      // Failed to remove API key
       throw error;
     }
   }
@@ -99,7 +99,7 @@ export class AIApiKeyService {
       }
       this.cachedSettings[provider].defaultModel = model;
     } catch (error) {
-      console.error('Failed to save default model:', error);
+      // Failed to save default model
       throw error;
     }
   }
@@ -197,7 +197,7 @@ const AISettings: FC = () => {
           }));
         }
       } catch (error) {
-        console.error('Failed to load AI settings:', error);
+        // Failed to load AI settings
         toast.error('AI 설정을 불러오는데 실패했습니다.');
       }
     };
@@ -239,7 +239,7 @@ const AISettings: FC = () => {
         toast.error('일부 설정 저장에 실패했습니다.');
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
+      // Error saving settings
       toast.error('설정 저장 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);

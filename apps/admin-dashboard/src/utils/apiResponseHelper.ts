@@ -158,7 +158,7 @@ export function safeMap<T, R>(
   try {
     return array.map(mapFn);
   } catch (error) {
-    console.error('Error in safeMap:', error);
+    // Error in safeMap
     return defaultValue;
   }
 }
@@ -179,7 +179,7 @@ export function safeFilter<T>(
   try {
     return array.filter(filterFn);
   } catch (error) {
-    console.error('Error in safeFilter:', error);
+    // Error in safeFilter
     return defaultValue;
   }
 }
@@ -200,7 +200,7 @@ export function safeFind<T>(
   try {
     return array.find(findFn) || defaultValue;
   } catch (error) {
-    console.error('Error in safeFind:', error);
+    // Error in safeFind
     return defaultValue;
   }
 }

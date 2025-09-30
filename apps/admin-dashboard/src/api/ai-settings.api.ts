@@ -42,7 +42,7 @@ class AISettingsApi {
       const result = await response.json();
       return result.data || {};
     } catch (error) {
-      console.error('Error fetching AI settings:', error);
+      // Error fetching AI settings
       return {};
     }
   }
@@ -63,7 +63,7 @@ class AISettingsApi {
 
       return true;
     } catch (error) {
-      console.error('Error saving AI setting:', error);
+      // Error saving AI setting
       return false;
     }
   }
@@ -88,7 +88,7 @@ class AISettingsApi {
         message: result.message || 'Unknown error'
       };
     } catch (error) {
-      console.error('Error testing API key:', error);
+      // Error testing API key
       return {
         valid: false,
         message: 'Failed to test API key'
@@ -111,7 +111,7 @@ class AISettingsApi {
 
       return true;
     } catch (error) {
-      console.error('Error deleting AI setting:', error);
+      // Error deleting AI setting
       return false;
     }
   }

@@ -66,7 +66,7 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
           setSelectedModel(savedModel);
         }
       } catch (error) {
-        console.error('Failed to load provider settings:', error);
+        // Failed to load provider settings
         setApiKey('');
         setUseSavedKey(false);
       }

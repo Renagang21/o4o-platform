@@ -358,13 +358,13 @@ export class AIPageGenerator {
     
     // 구 모델명을 신 모델명으로 자동 변환
     if (modelName === 'gemini-pro') {
-      console.warn('gemini-pro 모델은 더 이상 지원되지 않습니다. gemini-2.5-flash로 변경합니다.');
+      // gemini-pro 모델은 더 이상 지원되지 않습니다. gemini-2.5-flash로 변경합니다.
       modelName = 'gemini-2.5-flash';
     }
     
     // 1.5 모델 경고 (2025년 9월 종료 예정)
     if (modelName.includes('1.5')) {
-      console.warn(`${modelName}는 2025년 9월에 종료됩니다. gemini-2.5 모델로 마이그레이션을 권장합니다.`);
+      // ${modelName}는 2025년 9월에 종료됩니다. gemini-2.5 모델로 마이그레이션을 권장합니다.
     }
 
     updateProgress(30, `Google Gemini ${modelName}에 요청을 전송 중...`);
@@ -422,11 +422,11 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
       const data = await response.json();
       
       if (!response.ok) {
-        console.error('Gemini API Error:', data);
+        // Gemini API Error
         
         // 모델이 없는 경우 대체 모델 사용
         if (data.error?.message?.includes('is not found')) {
-          console.warn(`${modelName} 모델을 찾을 수 없습니다. 기본 모델로 재시도합니다.`);
+          // ${modelName} 모델을 찾을 수 없습니다. 기본 모델로 재시도합니다.
           this.provider.model = 'gemini-2.5-flash';
           return this.generateWithGemini(prompt, template, updateProgress, signal);
         }
@@ -463,7 +463,7 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
         
         return blocks;
       } catch (error) {
-        console.error('Gemini 응답 파싱 실패:', error);
+        // Gemini 응답 파싱 실패
         // Fallback to mock blocks
         updateProgress(60, '기본 템플릿을 사용합니다...');
         return this.generateMockBlocks(prompt, 'landing', updateProgress);
@@ -472,7 +472,7 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
       if (error.name === 'AbortError') {
         throw error;
       }
-      console.error('Gemini API 호출 실패:', error);
+      // Gemini API 호출 실패
       throw new Error(`Gemini API 오류: ${error.message}`);
     }
   }
