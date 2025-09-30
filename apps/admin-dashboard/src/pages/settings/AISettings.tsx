@@ -10,25 +10,50 @@ import toast from 'react-hot-toast';
 export class AIApiKeyService {
   private static STORAGE_KEY = 'ai_api_keys';
 
+  private static getStorage() {
+    // localStorage가 사용 가능한지 체크
+    try {
+      const test = '__storage_test__';
+      localStorage.setItem(test, test);
+      localStorage.removeItem(test);
+      return localStorage;
+    } catch {
+      // localStorage 사용 불가 시 sessionStorage 사용
+      return sessionStorage;
+    }
+  }
+
   static getKeys(): Record<string, string> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const storage = this.getStorage();
+      const stored = storage.getItem(this.STORAGE_KEY);
       return stored ? JSON.parse(stored) : {};
-    } catch {
+    } catch (error) {
+      console.error('Failed to get API keys:', error);
       return {};
     }
   }
 
   static setKey(provider: string, key: string): void {
-    const keys = this.getKeys();
-    keys[provider] = key;
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+    try {
+      const storage = this.getStorage();
+      const keys = this.getKeys();
+      keys[provider] = key;
+      storage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+    } catch (error) {
+      console.error('Failed to save API key:', error);
+    }
   }
 
   static removeKey(provider: string): void {
-    const keys = this.getKeys();
-    delete keys[provider];
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+    try {
+      const storage = this.getStorage();
+      const keys = this.getKeys();
+      delete keys[provider];
+      storage.setItem(this.STORAGE_KEY, JSON.stringify(keys));
+    } catch (error) {
+      console.error('Failed to remove API key:', error);
+    }
   }
 
   static getKey(provider: string): string | undefined {
@@ -38,7 +63,8 @@ export class AIApiKeyService {
   // 기본 모델 설정
   static getDefaultModel(provider: string): string | undefined {
     try {
-      const stored = localStorage.getItem(`ai_default_model_${provider}`);
+      const storage = this.getStorage();
+      const stored = storage.getItem(`ai_default_model_${provider}`);
       return stored || undefined;
     } catch {
       return undefined;
@@ -46,7 +72,12 @@ export class AIApiKeyService {
   }
 
   static setDefaultModel(provider: string, model: string): void {
-    localStorage.setItem(`ai_default_model_${provider}`, model);
+    try {
+      const storage = this.getStorage();
+      storage.setItem(`ai_default_model_${provider}`, model);
+    } catch (error) {
+      console.error('Failed to save default model:', error);
+    }
   }
 }
 
@@ -266,6 +297,7 @@ const AISettings: FC = () => {
                   <div className="relative flex-1">
                     <input
                       id={`${provider.id}-key`}
+                      name={`${provider.id}-api-key`}
                       type={showKeys[provider.id] ? 'text' : 'password'}
                       className="w-full px-3 py-2 border rounded-md pr-10"
                       placeholder={
@@ -273,11 +305,12 @@ const AISettings: FC = () => {
                         provider.id === 'openai' ? 'sk-...' :
                         'sk-ant-...'
                       }
-                      value={apiKeys[provider.id]}
+                      value={apiKeys[provider.id] || ''}
                       onChange={(e) => setApiKeys(prev => ({
                         ...prev,
                         [provider.id]: e.target.value
                       }))}
+                      autoComplete="off"
                     />
                     <button
                       type="button"
