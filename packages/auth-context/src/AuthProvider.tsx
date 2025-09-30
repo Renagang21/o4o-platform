@@ -50,7 +50,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       'https://api.neture.co.kr'
   );
 
-  // 초기 인증 상태 확인
+  // 초기 인증 상태 확인 - 마운트 시 한 번만 실행
   useEffect(() => {
     const checkInitialAuth = async () => {
       try {
@@ -75,10 +75,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
             });
           }
           
-          // 이미 로딩이 false로 설정되어 있으므로 추가 작업 불필요
-          if (isLoading) {
-            setIsLoading(false);
-          }
+          setIsLoading(false);
         } else {
           // 저장된 인증 정보가 없으면 null 설정
           setUser(null);
@@ -91,11 +88,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       }
     };
 
-    // 로딩 중일 때만 초기 인증 체크 수행
-    if (isLoading) {
-      checkInitialAuth();
-    }
-  }, [authClient, ssoClient, isLoading]);
+    checkInitialAuth();
+  }, [authClient, ssoClient]);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
