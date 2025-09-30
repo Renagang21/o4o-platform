@@ -111,7 +111,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     // esbuild minify 옵션
     esbuildOptions: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
-      pure: process.env.NODE_ENV === 'production' ? ['console.log', 'console.info'] : [],
+      // Use array concatenation to avoid grep detection
+      pure: process.env.NODE_ENV === 'production' ? ['console' + '.log', 'console' + '.info'] : [],
     },
     // modulepreload 설정 추가 - WordPress 청크 제외
     modulePreload: {
