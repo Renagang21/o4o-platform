@@ -209,7 +209,12 @@ export default function FieldEditor({ field, cptTypes = [], onSave, onCancel, on
                 <div className="space-y-2 mt-2">
                   {selectOptions.map((option, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Input value={option} readOnly />
+                      <Input 
+                        id={`option-${index}`}
+                        name={`option-${index}`}
+                        value={option} 
+                        readOnly 
+                      />
                       <Button
                         type="button"
                         variant="ghost"
@@ -222,6 +227,8 @@ export default function FieldEditor({ field, cptTypes = [], onSave, onCancel, on
                   ))}
                   <div className="flex items-center gap-2">
                     <Input
+                      id="new-option"
+                      name="new-option"
                       value={newOption}
                       onChange={(e) => setNewOption(e.target.value)}
                       placeholder="Add new option..."

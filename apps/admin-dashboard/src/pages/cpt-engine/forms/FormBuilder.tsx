@@ -351,6 +351,7 @@ export default function FormBuilder() {
                 <Label htmlFor="name">Form Name *</Label>
                 <Input
                   id="name"
+                  name="name"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Contact Form, Registration Form"
@@ -361,6 +362,7 @@ export default function FormBuilder() {
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
+                  name="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe what this form is for"
@@ -563,6 +565,7 @@ export default function FormBuilder() {
                 <Label htmlFor="redirectUrl">Redirect URL (after submit)</Label>
                 <Input
                   id="redirectUrl"
+                  name="redirectUrl"
                   value={formData.settings.redirectUrl}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
@@ -576,6 +579,7 @@ export default function FormBuilder() {
                 <Label htmlFor="successMessage">Success Message</Label>
                 <Textarea
                   id="successMessage"
+                  name="successMessage"
                   value={formData.settings.successMessage}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
@@ -589,6 +593,7 @@ export default function FormBuilder() {
                 <Label htmlFor="errorMessage">Error Message</Label>
                 <Textarea
                   id="errorMessage"
+                  name="errorMessage"
                   value={formData.settings.errorMessage}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
@@ -633,6 +638,7 @@ export default function FormBuilder() {
                   <Label htmlFor="notificationEmail">Notification Email</Label>
                   <Input
                     id="notificationEmail"
+                    name="notificationEmail"
                     type="email"
                     value={formData.settings.notification?.email}
                     onChange={(e) => setFormData(prev => ({
