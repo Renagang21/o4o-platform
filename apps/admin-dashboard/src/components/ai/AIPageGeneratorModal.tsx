@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Sparkles, AlertCircle, X } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, X, Check } from 'lucide-react';
 import { AIPageGenerator, AIProvider, Block, GenerateOptions, GEMINI_MODELS, OPENAI_MODELS, CLAUDE_MODELS } from '@/services/ai/pageGenerator';
 import { AIApiKeyService } from '@/pages/settings/AISettings';
 import { useNavigate } from 'react-router-dom';
