@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { Palette, Droplet, Link, Type, Square } from 'lucide-react';
@@ -7,7 +7,7 @@ export const ColorsSection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const colors = settings.colors;
   
-  const [activeTab, setActiveTab] = React.useState<'theme' | 'palette'>('theme');
+  const [activeTab, setActiveTab] = useState<'theme' | 'palette'>('theme');
   
   return (
     <div className="astra-section colors-section">

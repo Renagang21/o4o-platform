@@ -3,7 +3,7 @@
  * Manages WebSocket connection for live theme customization updates
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ThemeCustomization } from '@o4o/types'
 
 export interface PreviewUpdate {
@@ -349,19 +349,19 @@ export const usePreviewWebSocket = (userId: string, pageId?: string) => {
     service,
     isConnected,
     error,
-    sendCustomizationUpdate: React.useCallback((customization: ThemeCustomization) => {
+    sendCustomizationUpdate: useCallback((customization: ThemeCustomization) => {
       service.sendCustomizationUpdate(customization)
     }, [service]),
-    sendLayoutUpdate: React.useCallback((layout: string) => {
+    sendLayoutUpdate: useCallback((layout: string) => {
       service.sendLayoutUpdate(layout)
     }, [service]),
-    sendContentUpdate: React.useCallback((content: any) => {
+    sendContentUpdate: useCallback((content: any) => {
       service.sendContentUpdate(content)
     }, [service]),
-    requestFullRefresh: React.useCallback(() => {
+    requestFullRefresh: useCallback(() => {
       service.requestFullRefresh()
     }, [service]),
-    onUpdate: React.useCallback((callback: (update: PreviewUpdate) => void) => {
+    onUpdate: useCallback((callback: (update: PreviewUpdate) => void) => {
       return service.onUpdate(callback)
     }, [service])
   }

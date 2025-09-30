@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { AstraToggle } from '../../components/controls/AstraToggle';
@@ -10,7 +10,7 @@ export const FooterSection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const footer = settings.footer;
   
-  const [activeTab, setActiveTab] = React.useState<'widgets' | 'bottom'>('widgets');
+  const [activeTab, setActiveTab] = useState<'widgets' | 'bottom'>('widgets');
   
   const footerLayoutOptions = [
     { value: 'footer-layout-1', label: 'Layout 1 - Equal Columns' },
