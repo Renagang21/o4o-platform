@@ -145,15 +145,9 @@ export function useCustomizerState(
     }
   }, [autoSave, autoSaveInterval, state.isDirty, saveSettings]);
   
-  // Track changes for debugging
+  // Track previous settings
   useEffect(() => {
     if (!deepEqual(previousSettingsRef.current, state.settings)) {
-      if (process.env.NODE_ENV === 'development') {
-        console.debug('Settings changed:', {
-          previous: previousSettingsRef.current,
-          current: state.settings,
-        });
-      }
       previousSettingsRef.current = state.settings;
     }
   }, [state.settings]);

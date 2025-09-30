@@ -1,4 +1,3 @@
-import './react-shim'; // React 19 compatibility - MUST be first
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'

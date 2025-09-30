@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface SelectOption {
@@ -29,9 +29,9 @@ export const AstraSelect: React.FC<AstraSelectProps> = ({
   disabled = false,
   searchable = false,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const selectRef = React.useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const selectRef = useRef<HTMLDivElement>(null);
   
   // Normalize options to SelectOption format
   const normalizedOptions: SelectOption[] = options.map((opt) =>
@@ -60,7 +60,7 @@ export const AstraSelect: React.FC<AstraSelectProps> = ({
   const currentLabel = currentOption?.label || placeholder;
   
   // Close dropdown when clicking outside
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
         setIsOpen(false);

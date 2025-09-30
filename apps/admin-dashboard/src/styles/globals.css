@@ -4,6 +4,9 @@
 /* Import admin UI improvements */
 @import './admin-improvements.css';
 
+/* Import mobile menu styles */
+@import './mobile-menu.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -368,6 +368,7 @@ const WritingSettings: React.FC = () => {
                 <Label htmlFor="autoSaveInterval">Auto-save Interval (seconds)</Label>
                 <Input
                   id="autoSaveInterval"
+                  name="autoSaveInterval"
                   type="number"
                   min="30"
                   max="300"
@@ -381,6 +382,7 @@ const WritingSettings: React.FC = () => {
                 <Label htmlFor="revisionsToKeep">Revisions to Keep</Label>
                 <Input
                   id="revisionsToKeep"
+                  name="revisionsToKeep"
                   type="number"
                   min="0"
                   max="100"
@@ -456,6 +458,7 @@ const WritingSettings: React.FC = () => {
               <Label htmlFor="updateServices">Ping Services</Label>
               <Textarea
                 id="updateServices"
+                name="updateServices"
                 placeholder="Enter ping service URLs, one per line..."
                 value={settings.updateServices}
                 onChange={(e) => updateSetting('updateServices', e.target.value)}

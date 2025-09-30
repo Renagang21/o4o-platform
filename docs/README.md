@@ -1,101 +1,219 @@
 # O4O Platform Documentation
 
-Welcome to the O4O Platform documentation. This directory contains comprehensive documentation for developers, operators, and maintainers of the platform.
+> Comprehensive documentation for the O4O (Optimize for Online) e-commerce platform
 
 ## 📚 Documentation Structure
 
-### 🚀 [Deployment](./deployment/)
-- [Deployment Overview](./deployment/deployment-overview.md) - General deployment guide
-- [Server Prerequisites](./deployment/server-prerequisites.md) - Server setup requirements
-- [Database Password Handling](./deployment/database-password-handling.md) - Guide for handling DB passwords
-- [Nginx Setup](./deployment/nginx-setup.md) - Nginx configuration guide
-- [SSH Infrastructure](./deployment/SSH_INFRASTRUCTURE.md) - SSH setup and management
-- [SSH Key Setup Guide](./deployment/SSH_KEY_SETUP_GUIDE.md) - Detailed SSH key configuration
-- [Deployment Fix](./deployment/DEPLOYMENT_FIX.md) - Common deployment issues and fixes
+### 🏗️ [Architecture](./architecture/)
+System design, components, and technical architecture documentation.
+
+- **Core Architecture**
+  - [API Server Requirements](./architecture/API_SERVER_REQUIREMENTS.md)
+  - [API Server Status](./API_SERVER_STATUS.md)
+  - [Page Management Implementation](./architecture/PAGE_MANAGEMENT_IMPLEMENTATION_GUIDE.md)
+  - [Shortcode Reference](./architecture/SHORTCODE_REFERENCE.md)
+  - [Shortcode Usage Guide](./architecture/SHORTCODE_USAGE_GUIDE.md)
+
+- **Block System**
+  - [Block Plugin Architecture](./architecture/BLOCK_PLUGIN_ARCHITECTURE.md)
+  - [Block Implementation Guide](./architecture/BLOCK_PLUGIN_IMPLEMENTATION_GUIDE.md)
+  - [Block System Audit Report](./architecture/BLOCK_SYSTEM_AUDIT_REPORT.md)
+  - [Editor Data Storage Analysis](./architecture/EDITOR_DATA_STORAGE_ANALYSIS.md)
+  - [Zone System Investigation](./architecture/ZONE_SYSTEM_INVESTIGATION_REPORT.md)
 
 ### 💻 [Development](./development/)
-- [Code Quality Analysis](./development/CODE_QUALITY_ANALYSIS.md) - Code quality standards and analysis
-- [TypeScript Guidelines](./development/TYPESCRIPT_GUIDELINES.md) - TypeScript best practices
-- [NPM Scripts Guide](./development/NPM_SCRIPTS_GUIDE.md) - Available npm scripts and usage
-- [Dependency Resolution Analysis](./development/dependency-resolution-analysis.md) - Dependency management guide
+Development guidelines, setup instructions, and coding standards.
 
-### 🔄 [CI/CD](./ci-cd/)
-- [CI/CD Audit Report](./ci-cd/CI_CD_AUDIT_REPORT.md) - CI/CD pipeline analysis
-- [CI Fix Summary](./ci-cd/CI_FIX_SUMMARY.md) - CI/CD fixes and improvements
-- [Secrets Required](./ci-cd/SECRETS_REQUIRED.md) - GitHub secrets configuration
-- [CI/CD Failure Investigation Report](./ci-cd/CI_CD_FAILURE_INVESTIGATION_REPORT.md) - package-lock.json desynchronization analysis and fixes
+- [Development Guidelines](./development/DEVELOPMENT_GUIDELINES.md)
+- [Local Development Commands](./development/LOCAL_DEV_COMMANDS.md)
+- [Local Setup Guide](./development/LOCAL_SETUP_GUIDE.md)
+- [TypeScript Guidelines](./development/TYPESCRIPT_GUIDELINES.md)
+- [NPM Scripts Guide](./development/NPM_SCRIPTS_GUIDE.md)
+- [Code Quality Analysis](./development/CODE_QUALITY_ANALYSIS.md)
+- [Admin Dashboard TypeScript Status](./admin-dashboard-ts-status.md)
+
+### 🚀 [Deployment](./deployment/)
+Production deployment, CI/CD, and infrastructure documentation.
+
+- **Main Guides**
+  - [Deployment Guide](./deployment/DEPLOYMENT_GUIDE.md)
+  - [Deployment Checklist](./deployment/DEPLOYMENT_CHECKLIST.md)
+  - [Deployment Scripts Guide](./DEPLOYMENT_SCRIPTS_GUIDE.md)
+  - [Unified Deployment Guide](./DEPLOYMENT_GUIDE_UNIFIED.md)
+  - [Direct Deployment Plan](./deployment/DIRECT_DEPLOYMENT_PLAN.md)
+
+- **CI/CD & Automation**
+  - [GitHub Actions Setup](./deployment/GITHUB_ACTIONS_SETUP.md)
+  - [Auto Deploy Setup](./deployment/SETUP_AUTO_DEPLOY.md)
+
+- **Infrastructure**
+  - [Server Setup Guide](./deployment/SERVER_SETUP_GUIDE.md)
+  - [Database Setup](./deployment/DATABASE_SETUP_GUIDE.md)
+  - [Database Password Handling](./deployment/database-password-handling.md)
+  - [Nginx Configuration](./deployment/nginx-setup.md)
+  - [DNS Configuration](./deployment/DNS_CONFIGURATION_GUIDE.md)
+  - [SSH Infrastructure](./deployment/SSH_INFRASTRUCTURE.md)
+  - [SSH Key Setup](./deployment/SSH_KEY_SETUP_GUIDE.md)
+  - [Environment Setup](./deployment/ENV_SETUP.md)
+
+- **Legacy (Reference Only)**
+  - [Legacy deployment docs](./deployment/legacy/)
+
+### 📱 [Applications](./apps/)
+App-specific documentation for each platform component.
+
+- [Admin Dashboard Guide](./apps/ADMIN_MENU_GUIDE.md)
+- [Admin Dashboard Routing](./apps/ROUTING_GUIDE.md)
+- [API Safety Guide](./apps/API_SAFETY_GUIDE.md)
+- [User Manual (Korean)](./apps/USER_MANUAL_KO.md)
+- [Screen Options Guide](./apps/SCREEN_OPTIONS_GUIDE.md)
+- [Gallery Block API Requirements](./apps/GALLERY_BLOCK_API_REQUIREMENTS.md)
+
+### 🔧 [Operations](./operations/)
+Operational guides for running and maintaining the platform.
+
+- [Claude Webserver Guide](./operations/CLAUDE_WEBSERVER.md)
+- [Server Access Guide](./operations/SERVER_ACCESS.md)
+- [Product Import Guide](./operations/PRODUCT_IMPORT_GUIDE.md)
+- [Webserver No-Build Guide](./operations/WEBSERVER_NO_BUILD_GUIDE.md)
+
+### 🛠️ [Setup](./setup/)
+Environment configuration and initial setup documentation.
+
+- [API Server Setup](./setup/API_SERVER_SETUP.md)
+- [API Server Environment](./setup/API_SERVER_ENV_REQUIREMENTS.md)
+- [Webserver Environment](./setup/WEBSERVER_ENV_REQUIREMENTS.md)
+- [PM2 Autostart Setup](./setup/PM2_AUTOSTART_SETUP-webserver.md)
+- [Environment Variables Design](./setup/ENV_VARIABLES_DESIGN.md)
+
+### 🔍 [Troubleshooting](./troubleshooting/)
+Common issues, solutions, and recovery procedures.
+
+- [Main Troubleshooting Guide](./troubleshooting/README.md)
+- [502 Bad Gateway Solutions](./troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md)
+- [React 19 Fix Summary](./troubleshooting/REACT19_FIX_SUMMARY.md)
+- [Admin Dashboard React 19 Fix](./troubleshooting/ADMIN_DASHBOARD_REACT19_FIX.md)
+- [Server PM2 Fix Guide](./troubleshooting/SERVER_PM2_FIX_GUIDE.md)
+- [Server Git Merge Guide](./troubleshooting/SERVER_GIT_MERGE_GUIDE.md)
+- [Disaster Recovery Runbook](./troubleshooting/DISASTER_RECOVERY_RUNBOOK.md)
+- [Recovery Procedures](./troubleshooting/RECOVERY_PROCEDURES.md)
+- [Backup Recovery](./troubleshooting/BACKUP_RECOVERY.md)
 
 ### 🧪 [Testing](./testing/)
-- [Test Guide](./testing/TEST_GUIDE.md) - Comprehensive testing guide
+Testing guidelines and test documentation.
+
+- [Test Guide](./testing/TEST_GUIDE.md)
+- [Dropshipping Test Checklist](./testing/DROPSHIPPING_TEST_CHECKLIST.md)
 
 ### 🔒 [Security](./security/)
-- [Security Audit Report](./security/SECURITY_AUDIT_REPORT.md) - Security analysis and recommendations
+Security guidelines and audit reports.
 
-### 📊 [Reports](./reports/)
-- [Phase 1 Verification Report](./reports/PHASE1_VERIFICATION_REPORT.md) - Initial phase completion report
-- [System Diagnostic Report](./reports/SYSTEM_DIAGNOSTIC_REPORT.md) - System health analysis
-- [Error Analysis Report](./reports/O4O_PLATFORM_ERROR_ANALYSIS_REPORT.md) - Common errors and solutions
-- [Admin Dashboard Status](./reports/ADMIN_DASHBOARD_STATUS.md) - Admin dashboard implementation status
-- [Admin Dashboard Comprehensive Analysis](./reports/O4O_ADMIN_DASHBOARD_COMPREHENSIVE_ANALYSIS.md) - Detailed admin dashboard analysis and roadmap
+- [Security Audit Report](./security/SECURITY_AUDIT_REPORT.md)
 
-### 🏗️ [Architecture](./architecture/)
-*(Architecture documentation to be added)*
+### 📚 [Guides](./guides/)
+Comprehensive guides for various platform features.
 
-### 🔌 [API](./api/)
-*(API documentation to be added)*
+- **Authentication & Security**
+  - [Authentication Integration](./guides/authentication-integration.md)
+  - [OAuth Integration Guide](./guides/oauth-integration-guide.md)
+  - [Password Reset Implementation](./guides/password-reset-implementation.md)
+  - [Refresh Token Implementation](./guides/refresh-token-implementation.md)
+  - [Session Management](./guides/session-management-implementation.md)
+  - [Login Security](./guides/login-security-implementation.md)
+  - [Cross-App Session Sync](./guides/cross-app-session-sync.md)
 
-### 📖 [Guides](./guides/)
-- [AI Collaboration Guide](./guides/AI_COLLABORATION_GUIDE.md) - Guidelines for working with AI assistants
-- [AI Development Lecture Material](./guides/AI_DEVELOPMENT_LECTURE_MATERIAL.md) - Educational material for AI-assisted development
+- **API & Development**
+  - [API Documentation](./guides/API_DOCUMENTATION.md)
+  - [API CORS Fix Guide](./guides/API_CORS_FIX_GUIDE.md)
+  - [API Server Setup Guide](./guides/API_SERVER_SETUP_GUIDE.md)
+  - [AI Collaboration Guide](./guides/AI_COLLABORATION_GUIDE.md)
+  - [AI Development Lecture Material](./guides/AI_DEVELOPMENT_LECTURE_MATERIAL.md)
 
-### 🛠️ [Troubleshooting](./troubleshooting/)
-- [502 Bad Gateway Solutions](./troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md) - 502 error troubleshooting guide
-- [Server Git Merge Guide](./troubleshooting/SERVER_GIT_MERGE_GUIDE.md) - Resolving git merge conflicts on servers
-- [Server PM2 Fix Guide](./troubleshooting/SERVER_PM2_FIX_GUIDE.md) - PM2 path issues and solutions
+- **Quick Start**
+  - [Quick Start Guide](./guides/QUICK_START.md)
+  - [Unified Deployment Guide](./guides/UNIFIED_DEPLOYMENT_GUIDE.md)
 
-## 🔍 Quick Links
+### 📂 [API Analysis](./api-analysis/)
+API-related analysis and fixes.
 
-### For Developers
-- [Getting Started](../CLAUDE.md#getting-started)
-- [TypeScript Guidelines](./development/TYPESCRIPT_GUIDELINES.md)
-- [Testing Guide](./testing/TEST_GUIDE.md)
-- [AI Collaboration Guide](./guides/AI_COLLABORATION_GUIDE.md)
+- [API Error Analysis Report](./api-analysis/API_ERROR_ANALYSIS_REPORT.md)
+- [API Server Fix Instructions](./api-analysis/API_SERVER_FIX_INSTRUCTIONS.md)
 
-### For DevOps
-- [Server Setup](./deployment/server-prerequisites.md)
-- [CI/CD Configuration](./ci-cd/SECRETS_REQUIRED.md)
-- [Deployment Guide](./deployment/deployment-overview.md)
+### 📦 [Archive](./archive/)
+Historical documentation and investigation reports.
 
-### For Troubleshooting
-- [Error Analysis](./reports/O4O_PLATFORM_ERROR_ANALYSIS_REPORT.md)
-- [Deployment Fixes](./deployment/DEPLOYMENT_FIX.md)
-- [System Diagnostics](./reports/SYSTEM_DIAGNOSTIC_REPORT.md)
-- [502 Bad Gateway Solutions](./troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md)
-- [Git Merge Issues](./troubleshooting/SERVER_GIT_MERGE_GUIDE.md)
-- [PM2 Path Issues](./troubleshooting/SERVER_PM2_FIX_GUIDE.md)
+- [Post Editor Investigation](./archive/POST_EDITOR_INVESTIGATION_REPORT.md)
+- [React Router Navigation Investigation](./archive/REACT_ROUTER_NAVIGATION_INVESTIGATION.md)
+- [Deploy Now (Legacy)](./archive/DEPLOY_NOW.md)
 
-## 📝 Documentation Standards
+## 🚀 Quick Links
 
-1. All documentation should be written in Markdown
-2. Use clear headings and subheadings
-3. Include code examples where applicable
-4. Keep documentation up-to-date with code changes
-5. Add creation and last modified dates to documents
+- **Getting Started**: [Quick Start Guide](./guides/QUICK_START.md)
+- **Local Development**: [Local Setup Guide](./development/LOCAL_SETUP_GUIDE.md)
+- **Deploy to Production**: [Deployment Guide](./deployment/DEPLOYMENT_GUIDE.md)
+- **Troubleshooting**: [Troubleshooting README](./troubleshooting/README.md)
 
-## 🤝 Contributing to Documentation
+## 📖 Document Status
 
-When adding new documentation:
-1. Place it in the appropriate subdirectory
-2. Update this README with a link to your document
-3. Follow the existing formatting conventions
-4. Include practical examples and use cases
+| Category | Status | Last Updated |
+|----------|--------|--------------|
+| Architecture | ✅ Complete | 2025-01-30 |
+| Development | ✅ Complete | 2025-01-30 |
+| Deployment | ✅ Complete | 2025-01-30 |
+| Operations | ✅ Complete | 2025-01-30 |
+| Testing | 🔄 In Progress | 2025-01-30 |
+| Security | 📝 Needs Update | 2024-08-05 |
+| Troubleshooting | ✅ Complete | 2025-01-30 |
+| Guides | ✅ Complete | 2025-01-30 |
 
-## 📅 Last Updated
+## 🔄 Documentation Maintenance
 
-This documentation structure was last updated on: July 19, 2025
+### Adding New Documentation
+1. Place documents in the appropriate category folder
+2. Update this README with the new document link
+3. Follow the naming convention: `TOPIC_NAME.md` or `topic-name.md`
+4. Use clear section headers with emoji indicators
 
-### Recent Updates
-- Added CI/CD Failure Investigation Report to ci-cd section
-- Added Admin Dashboard Comprehensive Analysis to reports section
-- Added Server Git Merge Guide and PM2 Fix Guide to new troubleshooting section
-- Reorganized documentation from root directory to proper subdirectories
+### Document Templates
+- Use clear headings with emoji indicators
+- Include a table of contents for long documents
+- Add code examples where applicable
+- Include troubleshooting sections
+- Add "Last Updated" timestamp
+
+### Documentation Standards
+- **Language**: Technical docs in English, user guides can be in Korean
+- **Format**: Markdown with GitHub Flavored Markdown extensions
+- **Code Blocks**: Include language hints for syntax highlighting
+- **Links**: Use relative links for internal docs, absolute for external
+
+## 📞 Support
+
+For questions or issues with the documentation:
+- Check the [Troubleshooting Guide](./troubleshooting/README.md)
+- Review the [FAQ](./guides/QUICK_START.md#faq)
+- Open an issue on GitHub
+- Contact the development team
+
+## 🗂️ Project Structure Overview
+
+```
+docs/
+├── architecture/       # System design and architecture
+├── development/       # Development guides and standards
+├── deployment/        # Deployment and CI/CD
+├── apps/             # App-specific documentation
+├── operations/       # Operational guides
+├── setup/           # Environment setup
+├── troubleshooting/ # Problem solving guides
+├── testing/         # Test documentation
+├── security/        # Security guidelines
+├── guides/          # Comprehensive feature guides
+├── api-analysis/    # API analysis and fixes
+└── archive/         # Historical documentation
+```
+
+---
+
+*Last Updated: 2025-01-30*
+*Version: 2.0.0*

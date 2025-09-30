@@ -13,6 +13,9 @@ import '@/styles/admin-layout-fixed.css';
 // Register Dynamic Shortcodes
 import '@/utils/register-dynamic-shortcodes';
 
+// AI Config Migration - Fix old gemini-pro references
+import '@/utils/aiMigration';
+
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
 import EditorLayout from '@/layouts/EditorLayout';
@@ -117,41 +120,11 @@ const ssoClient = new AuthClient(
  * SSO 인증 시스템 통합
  */
 function App() {
-  const checkSSOSession = useAuthStore(state => state.checkSSOSession);
-  
-  // Initialize SSO on app start
+  // Initialize auth on app start
   useEffect(() => {
-    // 앱 시작 시 즉시 토큰 복원 시도
-    const initializeAuth = async () => {
-      try {
-        // 먼저 저장된 인증 정보로 상태 복원
-        await checkSSOSession();
-      } catch (error) {
-        // SSO session check failed - clear local storage only if it's a 401 error
-        if ((error as any)?.response?.status === 401) {
-          localStorage.removeItem('admin-auth-storage');
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('accessToken');
-        }
-      }
-    };
-
-    // 즉시 초기화 실행
-    initializeAuth();
-    
-    // SSO 세션 모니터링 비활성화 (SSO 엔드포인트가 구현되지 않음)
-    // TODO: SSO 엔드포인트 구현 후 활성화
-    // ssoService.startSessionCheck((isAuthenticated) => {
-    //   if (!isAuthenticated) {
-    //     toast.error('Session expired. Please log in again.');
-    //     checkSSOSession();
-    //   }
-    // });
-    
-    return () => {
-      // ssoService.stopSessionCheck();
-    };
-  }, [checkSSOSession]);
+    // SSO 체크 비활성화 - 로컬 인증만 사용
+    // SSO는 백엔드 구현 완료 후 활성화
+  }, []);
   
   // 인증 오류 처리
   const handleAuthError = (error: string) => {

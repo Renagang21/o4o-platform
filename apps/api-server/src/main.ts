@@ -124,6 +124,7 @@ import acfV1Routes from './routes/v1/acf.routes';
 import pagesV1Routes from './routes/v1/pages.routes';
 import previewRoutes from './routes/preview';
 import approvalV1Routes from './routes/v1/approval.routes';
+import aiSettingsRoutes from './routes/v1/ai-settings.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -605,6 +606,9 @@ app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management rout
 // AI Shortcodes API (public access for AI page generation)
 app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
 
+// AI Settings API (admin only)
+app.use('/api/v1/ai-settings', limiter, aiSettingsRoutes);
+
 // Categories routes (public access) - moved to avoid duplication
 
 // Gutenberg Content Management Routes
@@ -631,16 +635,18 @@ app.use('/api/v1/media/folders', (req: Request, res: Response, next: NextFunctio
 
 // Dashboard endpoints with real data
 import { DashboardController } from './controllers/dashboardController';
-app.get('/ecommerce/dashboard/stats', DashboardController.getEcommerceStats as any);
-app.get('/api/users/stats', DashboardController.getUserStats as any);
-app.get('/api/admin/notifications', DashboardController.getNotifications as any);
-app.get('/api/admin/activities', DashboardController.getActivities as any);
-app.get('/api/system/health', DashboardController.getSystemHealth as any);
-app.get('/api/admin/stats', DashboardController.getContentStats as any);
-app.get('/api/dashboard/overview', DashboardController.getDashboardOverview as any);
+import { RequestHandler } from 'express';
+
+app.get('/ecommerce/dashboard/stats', DashboardController.getEcommerceStats as RequestHandler);
+app.get('/api/users/stats', DashboardController.getUserStats as RequestHandler);
+app.get('/api/admin/notifications', DashboardController.getNotifications as RequestHandler);
+app.get('/api/admin/activities', DashboardController.getActivities as RequestHandler);
+app.get('/api/system/health', DashboardController.getSystemHealth as RequestHandler);
+app.get('/api/admin/stats', DashboardController.getContentStats as RequestHandler);
+app.get('/api/dashboard/overview', DashboardController.getDashboardOverview as RequestHandler);
 
 // Add publish endpoint directly at /api/posts level
-app.post('/api/posts/:id/publish', authenticateToken as any, async (req: Request, res: Response) => {
+app.post('/api/posts/:id/publish', authenticateToken as RequestHandler, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     

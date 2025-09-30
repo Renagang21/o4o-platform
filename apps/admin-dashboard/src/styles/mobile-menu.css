@@ -1,0 +1,122 @@
+/**
+ * Mobile Menu Styles
+ * Simplified and consolidated mobile menu handling
+ */
+
+/* Base sidebar styles for all screen sizes */
+.admin-sidebar {
+  position: fixed;
+  top: 46px;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background-color: #23282d;
+  color: #eee;
+  z-index: 9998;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Desktop: sidebar always visible */
+@media (min-width: 1024px) {
+  .admin-sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile: sidebar hidden by default, slides in when open */
+@media (max-width: 1023px) {
+  .admin-sidebar {
+    width: 280px;
+    transform: translateX(-280px) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 10000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0) !important;
+  }
+}
+
+/* Backdrop for mobile */
+.admin-sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 9999;
+  visibility: hidden;
+  transition: background-color 0.3s ease, visibility 0.3s ease;
+}
+
+.admin-sidebar-backdrop.show {
+  visibility: visible;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Desktop: never show backdrop */
+@media (min-width: 1024px) {
+  .admin-sidebar-backdrop {
+    display: none !important;
+  }
+}
+
+/* Content area adjustments */
+.wordpress-admin-content {
+  position: relative;
+  margin-top: 46px;
+  min-height: calc(100vh - 46px);
+  background-color: #f1f1f1;
+}
+
+/* Desktop: content area with sidebar margin */
+@media (min-width: 1024px) {
+  .wordpress-admin-content.with-sidebar {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+}
+
+/* Mobile: content area full width */
+@media (max-width: 1023px) {
+  .wordpress-admin-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Hamburger menu button styling */
+@media (max-width: 1023px) {
+  .admin-header-mobile-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  
+  .admin-header-mobile-menu:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #111827;
+  }
+  
+  .admin-header-mobile-menu:active {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-header-mobile-menu {
+    display: none;
+  }
+}

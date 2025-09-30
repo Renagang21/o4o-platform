@@ -3,7 +3,7 @@
  * [cpt_field field="title"] or [cpt_field post_type="ds_product" post_id="123" field="price"]
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createElement } from 'react';
 import { CPTFieldShortcodeAttributes, DynamicShortcodeContext } from './types';
 import { ShortcodeProps } from '../types';
 
@@ -245,11 +245,13 @@ export const CPTFieldShortcode: React.FC<ShortcodeProps> = ({ attributes, contex
 
   // Wrap in specified HTML element
   if (attrs.wrapper) {
-    const Wrapper = attrs.wrapper as keyof JSX.IntrinsicElements;
-    return (
-      <Wrapper className={`cpt-field cpt-field--${field} ${attrs.class || ''}`}>
-        {formattedValue}
-      </Wrapper>
+    const wrapperTag = attrs.wrapper as keyof React.JSX.IntrinsicElements;
+    return createElement(
+      wrapperTag,
+      {
+        className: `cpt-field cpt-field--${field} ${attrs.class || ''}`
+      },
+      formattedValue
     );
   }
 

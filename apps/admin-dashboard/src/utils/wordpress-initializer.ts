@@ -2,8 +2,16 @@
  * WordPress Initializer
  * This module is only loaded when WordPress functionality is needed
  * Prevents WordPress from being included in the initial bundle
+ * Updated: 2025-09-30 - Fixed React 18.2.0 compatibility
  */
 
+import React, { 
+  createElement, createContext, useContext, useState, useEffect,
+  useCallback, useMemo, useRef, Component, Fragment, Children,
+  forwardRef, memo, lazy, Suspense, StrictMode, PureComponent,
+  cloneElement, isValidElement
+} from 'react';
+import ReactDOM, { createPortal, render, unmountComponentAtNode } from 'react-dom';
 import '../styles/wordpress-dashboard.css';
 
 // Initialize WordPress polyfills only when needed
@@ -14,37 +22,36 @@ export async function initializeWordPress() {
   }
 
   // Create React bridge for WordPress
-  if (typeof window !== 'undefined' && window.React) {
-    const React = window.React;
-    const ReactDOM = window.ReactDOM;
+  if (typeof window !== 'undefined') {
+    // No longer dependent on window.React - use directly imported React
     
     // Initialize WordPress global object
     window.wp = window.wp || {};
     
     // Initialize WordPress element with React
     window.wp.element = {
-      createElement: React.createElement,
-      createContext: React.createContext,
-      useContext: React.useContext,
-      useState: React.useState,
-      useEffect: React.useEffect,
-      useCallback: React.useCallback,
-      useMemo: React.useMemo,
-      useRef: React.useRef,
-      Component: React.Component,
-      Fragment: React.Fragment,
-      Children: React.Children,
-      forwardRef: React.forwardRef,
-      memo: React.memo,
-      lazy: React.lazy,
-      Suspense: React.Suspense,
-      StrictMode: React.StrictMode,
-      PureComponent: React.PureComponent,
-      cloneElement: React.cloneElement,
-      isValidElement: React.isValidElement,
-      createPortal: ReactDOM.createPortal,
-      render: ReactDOM.render,
-      unmountComponentAtNode: ReactDOM.unmountComponentAtNode,
+      createElement,
+      createContext,
+      useContext,
+      useState,
+      useEffect,
+      useCallback,
+      useMemo,
+      useRef,
+      Component,
+      Fragment,
+      Children,
+      forwardRef,
+      memo,
+      lazy,
+      Suspense,
+      StrictMode,
+      PureComponent,
+      cloneElement,
+      isValidElement,
+      createPortal,
+      render,
+      unmountComponentAtNode,
     };
 
     // Initialize i18n

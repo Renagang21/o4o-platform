@@ -135,6 +135,7 @@ export default function GeneralSettings() {
               <Label htmlFor="siteName">사이트 이름</Label>
               <Input
                 id="siteName"
+                name="siteName"
                 value={settings.siteName}
                 onChange={(e: any) => handleChange('siteName', e.target.value)}
                 placeholder="O4O Platform"
@@ -144,6 +145,7 @@ export default function GeneralSettings() {
               <Label htmlFor="siteUrl">사이트 URL</Label>
               <Input
                 id="siteUrl"
+                name="siteUrl"
                 value={settings.siteUrl}
                 onChange={(e: any) => handleChange('siteUrl', e.target.value)}
                 placeholder="https://admin.neture.co.kr"
@@ -154,6 +156,7 @@ export default function GeneralSettings() {
             <Label htmlFor="siteDescription">사이트 설명</Label>
             <Textarea
               id="siteDescription"
+              name="siteDescription"
               value={settings.siteDescription}
               onChange={(e: any) => handleChange('siteDescription', e.target.value)}
               placeholder="사이트에 대한 간단한 설명을 입력하세요"
@@ -164,6 +167,7 @@ export default function GeneralSettings() {
             <Label htmlFor="adminEmail">관리자 이메일</Label>
             <Input
               id="adminEmail"
+              name="adminEmail"
               type="email"
               value={settings.adminEmail}
               onChange={(e: any) => handleChange('adminEmail', e.target.value)}
@@ -350,6 +354,7 @@ export default function GeneralSettings() {
                 <Label htmlFor="maintenanceMessage">유지보수 메시지</Label>
                 <Textarea
                   id="maintenanceMessage"
+                  name="maintenanceMessage"
                   value={settings.maintenanceMessage}
                   onChange={(e: any) => handleChange('maintenanceMessage', e.target.value)}
                   placeholder="잠시 시스템 점검 중입니다. 곧 정상 서비스하겠습니다."

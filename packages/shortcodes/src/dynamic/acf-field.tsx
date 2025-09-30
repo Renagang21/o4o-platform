@@ -3,7 +3,7 @@
  * [acf_field name="custom_price" format="currency"]
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createElement } from 'react';
 import { ACFFieldShortcodeAttributes, ACFFieldValue, DynamicShortcodeContext } from './types';
 import { ShortcodeProps } from '../types';
 
@@ -287,11 +287,13 @@ export const ACFFieldShortcode: React.FC<ShortcodeProps> = ({ attributes, contex
 
   // Wrap in specified HTML element
   if (attrs.wrapper) {
-    const Wrapper = attrs.wrapper as keyof JSX.IntrinsicElements;
-    return (
-      <Wrapper className={`acf-field acf-field--${fieldName} acf-type--${fieldData.type} ${attrs.class || ''}`}>
-        {formattedContent}
-      </Wrapper>
+    const wrapperTag = attrs.wrapper as keyof React.JSX.IntrinsicElements;
+    return createElement(
+      wrapperTag,
+      {
+        className: `acf-field acf-field--${fieldName} acf-type--${fieldData.type} ${attrs.class || ''}`
+      },
+      formattedContent
     );
   }
 

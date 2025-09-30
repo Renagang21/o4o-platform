@@ -3,7 +3,7 @@
  * 소셜 아이콘 스타일 선택기
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
@@ -52,7 +52,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({
   onOpenInNewTabChange,
 }) => {
   // Animation preview state
-  const [previewAnimation, setPreviewAnimation] = React.useState(false);
+  const [previewAnimation, setPreviewAnimation] = useState(false);
 
   // Trigger animation preview
   const triggerPreview = () => {

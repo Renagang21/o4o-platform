@@ -81,9 +81,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   title = '미디어 선택',
   className
 }) => {
-  const [selectedFiles, setSelectedFiles] = useState<string[]>(
-    selectedItems.map(item => item.id)
-  );
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filters, setFilters] = useState({
     searchTerm: '',
@@ -98,19 +96,19 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Transform MediaFile to MediaItem
-  const transformMediaFile = (file: MediaFile): MediaItem => ({
+  const transformMediaFile = (file: any): MediaItem => ({
     id: file.id,
     url: file.url,
-    type: file.type === 'image' ? 'image' : file.type === 'video' ? 'video' : 'image',
-    title: file.name,
-    alt: file.altText || file.name,
-    width: file.dimensions?.width,
-    height: file.dimensions?.height,
+    type: file.isImage ? 'image' : file.isVideo ? 'video' : 'image',
+    title: file.originalFilename || file.filename || file.name || 'Untitled',
+    alt: file.altText || file.originalFilename || file.filename,
+    width: file.width || file.dimensions?.width,
+    height: file.height || file.dimensions?.height,
     fileSize: file.size,
     mimeType: file.mimeType,
     thumbnailUrl: file.thumbnailUrl,
     caption: file.caption,
-    uploadedAt: file.uploadedAt
+    uploadedAt: file.createdAt || file.uploadedAt
   });
 
   // Fetch media files with infinite scroll
@@ -127,7 +125,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     queryFn: async ({ pageParam = 1 }) => {
       const response = await ContentApi.getMediaFiles(
         pageParam,
-        50,
+        10,
         undefined,
         filters.fileType === 'all' ? undefined : filters.fileType,
         filters.searchTerm
@@ -152,12 +150,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Reset selections when modal opens
+  // Only initialize selections when selectedItems are explicitly provided
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && selectedItems && selectedItems.length > 0) {
       setSelectedFiles(selectedItems.map(item => item.id));
     }
-  }, [isOpen, selectedItems]);
+    // Don't clear selection automatically - let user manually select/deselect
+  }, [isOpen]); // Removed selectedItems from dependencies to prevent unwanted resets
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -167,7 +166,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       switch (e.key) {
         case 'Escape':
           e.preventDefault();
-          onClose();
+          handleCancel();
           break;
         case 'Enter':
           e.preventDefault();
@@ -186,11 +185,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedFiles, onClose]);
+  }, [isOpen, selectedFiles, handleCancel, handleConfirmSelection]);
 
-  const allFiles = data?.pages.flatMap(page =>
-    page.data?.map(transformMediaFile) || []
-  ) || [];
+  const allFiles = data?.pages?.flatMap(page => {
+    // API response structure: { media: [...], pagination: {...} }
+    const mediaArray = page?.media || page?.data?.media || page?.data || [];
+    return Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
+  }) || [];
 
   const selectedFileObjects = allFiles.filter(file => selectedFiles.includes(file.id));
 
@@ -232,8 +233,16 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     } else if (selectedFileObjects.length > 0) {
       onSelect(selectedFileObjects[0]);
     }
+    // Clear selection after confirming for next time
+    setSelectedFiles([]);
     onClose();
   }, [multiple, selectedFileObjects, onSelect, onClose]);
+
+  // Handle cancel - don't clear selection to maintain state
+  const handleCancel = useCallback(() => {
+    // Keep selection state for better UX
+    onClose();
+  }, [onClose]);
 
   // Update filter
   const updateFilter = useCallback((key: string, value: string) => {
@@ -408,9 +417,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
         key={item.id}
         className={cn(
           "relative aspect-square rounded-lg overflow-hidden cursor-pointer transition-all group",
+          "border-2",
           isSelected
-            ? "ring-2 ring-blue-500 ring-offset-2"
-            : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-1"
+            ? "border-blue-500 shadow-lg shadow-blue-500/30"
+            : "border-gray-300 hover:border-blue-400 hover:shadow-md"
         )}
         onClick={() => handleFileSelect(item.id)}
         role="button"
@@ -436,8 +446,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
           </div>
         )}
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity" />
+        {/* Overlay - 선택된 경우 파란색 오버레이 추가 */}
+        <div className={cn(
+          "absolute inset-0 transition-all",
+          isSelected 
+            ? "bg-blue-500 bg-opacity-10" 
+            : "bg-black bg-opacity-0 group-hover:bg-opacity-10"
+        )} />
 
         {/* Selection indicator */}
         <div className="absolute top-2 right-2">
@@ -590,7 +605,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
               {title}
             </h2>
             <button
-              onClick={onClose}
+              onClick={handleCancel}
               className="text-gray-400 hover:text-gray-600 p-1 rounded"
               aria-label="닫기"
             >
@@ -722,7 +737,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             <>
               <div className={cn(
                 viewMode === 'grid'
-                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 gap-4"
                   : "space-y-2"
               )}>
                 {allFiles.map((item, index) => renderMediaItem(item, index))}
@@ -755,7 +770,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={onClose}
+                onClick={handleCancel}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 취소

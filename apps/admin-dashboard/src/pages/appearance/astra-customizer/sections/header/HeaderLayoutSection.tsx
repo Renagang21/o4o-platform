@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraToggle } from '../../components/controls/AstraToggle';
@@ -10,7 +10,7 @@ export const HeaderLayoutSection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const header = settings.header;
   
-  const [activeTab, setActiveTab] = React.useState<'general' | 'primary' | 'above' | 'below'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'primary' | 'above' | 'below'>('general');
   
   const layoutOptions = [
     { value: 'header-main-layout-1', label: 'Layout 1 - Logo Left, Menu Right' },

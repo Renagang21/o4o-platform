@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useState, useCallback, useContext, createContext } from "react"
 
 export interface Toast {
   id: string
@@ -14,10 +15,10 @@ interface ToastContextType {
   dismiss: (toastId?: string) => void
 }
 
-const ToastContext = React.createContext<ToastContextType | undefined>(undefined)
+const ToastContext = createContext<ToastContextType | undefined>(undefined)
 
 export function useToast() {
-  const context = React.useContext(ToastContext)
+  const context = useContext(ToastContext)
   if (!context) {
     return {
       toast: (_toast: Omit<Toast, "id">) => {
@@ -33,9 +34,9 @@ export function useToast() {
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = React.useState<Toast[]>([])
+  const [toasts, setToasts] = useState<Toast[]>([])
 
-  const toast = React.useCallback((toast: Omit<Toast, "id">) => {
+  const toast = useCallback((toast: Omit<Toast, "id">) => {
     const id = Math.random().toString(36).substring(2, 9)
     setToasts((prev) => [...prev, { ...toast, id }])
     
@@ -44,7 +45,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     }, 5000)
   }, [])
 
-  const dismiss = React.useCallback((toastId?: string) => {
+  const dismiss = useCallback((toastId?: string) => {
     if (toastId) {
       setToasts((prev) => prev.filter((t) => t.id !== toastId))
     } else {

@@ -145,6 +145,8 @@ const EmailSettings: FC = () => {
             </label>
             <input
               type="text"
+              id="smtpHost"
+              name="smtpHost"
               value={settings.smtpHost || ''}
               onChange={(e) => handleInputChange('smtpHost', e.target.value)}
               className="wp-input"
@@ -164,6 +166,8 @@ const EmailSettings: FC = () => {
               </label>
               <input
                 type="number"
+                id="smtpPort"
+                name="smtpPort"
                 value={settings.smtpPort || 587}
                 onChange={(e) => handleInputChange('smtpPort', parseInt(e.target.value))}
                 className="wp-input"
@@ -177,6 +181,8 @@ const EmailSettings: FC = () => {
             <div>
               <label className="wp-label">암호화</label>
               <select
+                id="smtpSecure"
+                name="smtpSecure"
                 value={settings.smtpSecure ? 'ssl' : 'tls'}
                 onChange={(e) => handleInputChange('smtpSecure', e.target.value === 'ssl')}
                 className="wp-input"
@@ -197,6 +203,8 @@ const EmailSettings: FC = () => {
             </label>
             <input
               type="text"
+              id="smtpUser"
+              name="smtpUser"
               value={settings.smtpUser || ''}
               onChange={(e) => handleInputChange('smtpUser', e.target.value)}
               className="wp-input"
@@ -215,6 +223,8 @@ const EmailSettings: FC = () => {
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
+                id="smtpPass"
+                name="smtpPass"
                 value={settings.smtpPass || ''}
                 onChange={(e) => handleInputChange('smtpPass', e.target.value)}
                 className="wp-input pr-10"
@@ -245,6 +255,8 @@ const EmailSettings: FC = () => {
                 </label>
                 <input
                   type="email"
+                  id="fromEmail"
+                  name="fromEmail"
                   value={settings.fromEmail || ''}
                   onChange={(e) => handleInputChange('fromEmail', e.target.value)}
                   className="wp-input"
@@ -260,6 +272,8 @@ const EmailSettings: FC = () => {
                 <label className="wp-label">발신자 이름</label>
                 <input
                   type="text"
+                  id="fromName"
+                  name="fromName"
                   value={settings.fromName || ''}
                   onChange={(e) => handleInputChange('fromName', e.target.value)}
                   className="wp-input"
@@ -308,6 +322,8 @@ const EmailSettings: FC = () => {
           <div className="flex gap-3">
             <input
               type="email"
+              id="testEmail"
+              name="testEmail"
               value={testEmail}
               onChange={(e) => setTestEmail(e.target.value)}
               className="wp-input flex-1"

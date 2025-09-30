@@ -137,3 +137,4 @@ LOCAL_ENVIRONMENT_REPORT.md
 # Vite cache
 .vite-cache/
 **/vite-cache/
+apps/admin-dashboard/dist/

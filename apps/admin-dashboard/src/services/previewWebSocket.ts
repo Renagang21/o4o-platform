@@ -3,7 +3,7 @@
  * Manages WebSocket connection for live theme customization updates
  */
 
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ThemeCustomization } from '@o4o/types'
 
 export interface PreviewUpdate {
@@ -324,11 +324,11 @@ class PreviewWebSocketService {
 
 // React hook for using preview WebSocket
 export const usePreviewWebSocket = (userId: string, pageId?: string) => {
-  const [service] = React.useState(() => new PreviewWebSocketService(userId, pageId))
-  const [isConnected, setIsConnected] = React.useState(false)
-  const [error, setError] = React.useState<Error | null>(null)
+  const [service] = useState(() => new PreviewWebSocketService(userId, pageId))
+  const [isConnected, setIsConnected] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribeConnection = service.onConnection(setIsConnected)
     const unsubscribeError = service.onError(setError)
 
@@ -349,19 +349,19 @@ export const usePreviewWebSocket = (userId: string, pageId?: string) => {
     service,
     isConnected,
     error,
-    sendCustomizationUpdate: React.useCallback((customization: ThemeCustomization) => {
+    sendCustomizationUpdate: useCallback((customization: ThemeCustomization) => {
       service.sendCustomizationUpdate(customization)
     }, [service]),
-    sendLayoutUpdate: React.useCallback((layout: string) => {
+    sendLayoutUpdate: useCallback((layout: string) => {
       service.sendLayoutUpdate(layout)
     }, [service]),
-    sendContentUpdate: React.useCallback((content: any) => {
+    sendContentUpdate: useCallback((content: any) => {
       service.sendContentUpdate(content)
     }, [service]),
-    requestFullRefresh: React.useCallback(() => {
+    requestFullRefresh: useCallback(() => {
       service.requestFullRefresh()
     }, [service]),
-    onUpdate: React.useCallback((callback: (update: PreviewUpdate) => void) => {
+    onUpdate: useCallback((callback: (update: PreviewUpdate) => void) => {
       return service.onUpdate(callback)
     }, [service])
   }

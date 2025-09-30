@@ -49,6 +49,8 @@ import { CustomPostType } from '../entities/CustomPostType';
 import { Menu } from '../entities/Menu';
 import { MenuItem } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
+// AI Settings entity
+import { AISetting } from '../entities/AISetting';
 
 
 import { env } from '../utils/env-validator';
@@ -142,6 +144,8 @@ export const AppDataSource = new DataSource({
     Menu,
     MenuItem,
     MenuLocation,
+    // AI Settings
+    AISetting,
   ],
   
   // 마이그레이션 설정

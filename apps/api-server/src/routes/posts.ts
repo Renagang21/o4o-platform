@@ -208,7 +208,7 @@ router.get('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: 'Database connection not available' });
       }
 
       const { postRepository } = repos;
@@ -348,7 +348,11 @@ router.post('/',
           tags: tags || []
         };
         
+<<<<<<< HEAD
         return res.status(503).json({ error: 'Database not available' });
+=======
+        return res.status(503).json({ error: 'Database connection not available' });
+>>>>>>> c13311ec51cd43e3ec0fd0e4e8349a4aaf92f31f
       }
 
       const { postRepository, categoryRepository } = repos;
@@ -463,7 +467,7 @@ router.put('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: 'Database connection not available' });
       }
 
       const { postRepository, categoryRepository } = repos;
@@ -563,7 +567,7 @@ router.delete('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: 'Database connection not available' });
       }
 
       const { postRepository } = repos;

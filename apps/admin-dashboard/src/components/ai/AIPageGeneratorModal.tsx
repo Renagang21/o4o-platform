@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Sparkles, AlertCircle, X } from 'lucide-react';
-import { AIPageGenerator, AIProvider, Block, GenerateOptions } from '@/services/ai/pageGenerator';
+import { Loader2, Sparkles, AlertCircle, X, Check } from 'lucide-react';
+import { AIPageGenerator, AIProvider, Block, GenerateOptions, GEMINI_MODELS, OPENAI_MODELS, CLAUDE_MODELS } from '@/services/ai/pageGenerator';
+import { AIApiKeyService } from '@/pages/settings/AISettings';
+import { useNavigate } from 'react-router-dom';
 
 interface AIPageGeneratorModalProps {
   isOpen: boolean;
@@ -29,10 +31,13 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
 }) => {
   const [prompt, setPrompt] = useState('');
   const [template, setTemplate] = useState('landing');
-  const [provider, setProvider] = useState<AIProvider['name']>('openai');
+  const [provider, setProvider] = useState<AIProvider['name']>('gemini');
   const [apiKey, setApiKey] = useState('');
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useSavedKey, setUseSavedKey] = useState(true);
+  const navigate = useNavigate();
   
   // 진행률 관련 상태
   const [progress, setProgress] = useState(0);
@@ -41,6 +46,34 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
   // AbortController를 위한 ref
   const abortControllerRef = useRef<AbortController | null>(null);
   const generatorRef = useRef<AIPageGenerator | null>(null);
+  
+  // 컴포넌트 마운트 시 저장된 API 키와 모델 로드
+  useEffect(() => {
+    const loadProviderSettings = async () => {
+      try {
+        const savedKey = await AIApiKeyService.getKey(provider);
+        const savedModel = await AIApiKeyService.getDefaultModel(provider);
+        
+        if (savedKey) {
+          setApiKey(savedKey);
+          setUseSavedKey(true);
+        } else {
+          setApiKey('');
+          setUseSavedKey(false);
+        }
+        
+        if (savedModel) {
+          setSelectedModel(savedModel);
+        }
+      } catch (error) {
+        console.error('Failed to load provider settings:', error);
+        setApiKey('');
+        setUseSavedKey(false);
+      }
+    };
+    
+    loadProviderSettings();
+  }, [provider]);
 
   const templates = [
     { key: 'landing', name: '랜딩 페이지', description: '제품이나 서비스를 소개하는 페이지' },
@@ -50,11 +83,25 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
   ];
 
   const providers = [
+    { key: 'gemini', name: 'Google Gemini (추천)', requiresKey: true },
     { key: 'openai', name: 'OpenAI (GPT-4)', requiresKey: true },
     { key: 'claude', name: 'Claude', requiresKey: true },
-    { key: 'gemini', name: 'Google Gemini', requiresKey: true },
     { key: 'mock', name: '테스트 모드', requiresKey: false },
   ];
+  
+  // 프로바이더에 따른 모델 목록
+  const getModelsForProvider = (providerName: string) => {
+    switch (providerName) {
+      case 'gemini':
+        return Object.entries(GEMINI_MODELS);
+      case 'openai':
+        return Object.entries(OPENAI_MODELS);
+      case 'claude':
+        return Object.entries(CLAUDE_MODELS);
+      default:
+        return [];
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -63,8 +110,18 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
     }
 
     const selectedProvider = providers.find(p => p.key === provider);
-    if (selectedProvider?.requiresKey && !apiKey) {
-      setError('API 키를 입력해주세요.');
+    
+    // API 키 확인 - 저장된 키 또는 입력된 키 사용
+    let finalApiKey = apiKey;
+    if (useSavedKey && selectedProvider?.requiresKey) {
+      const savedKey = AIApiKeyService.getKey(provider);
+      if (savedKey) {
+        finalApiKey = savedKey;
+      }
+    }
+    
+    if (selectedProvider?.requiresKey && !finalApiKey) {
+      setError('API 키가 필요합니다. 설정에서 API 키를 등록하거나 직접 입력해주세요.');
       return;
     }
 
@@ -79,7 +136,8 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
     try {
       const generator = new AIPageGenerator({
         name: provider === 'mock' ? 'openai' : provider as AIProvider['name'],
-        apiKey: provider === 'mock' ? undefined : apiKey,
+        apiKey: provider === 'mock' ? undefined : finalApiKey,
+        model: provider === 'mock' ? undefined : selectedModel,
       });
       
       generatorRef.current = generator;
@@ -225,8 +283,14 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
 
             {/* AI 프로바이더 선택 */}
             <div className="space-y-2">
-              <Label htmlFor="provider">AI 모델</Label>
-              <Select value={provider} onValueChange={(v) => setProvider(v as AIProvider['name'])}>
+              <Label htmlFor="provider">AI 서비스</Label>
+              <Select value={provider} onValueChange={(v) => {
+                setProvider(v as AIProvider['name']);
+                // 프로바이더 변경 시 기본 모델 설정
+                if (v === 'gemini') setSelectedModel('gemini-2.5-flash');
+                else if (v === 'openai') setSelectedModel('gpt-4-turbo');
+                else if (v === 'claude') setSelectedModel('claude-3-sonnet-20240229');
+              }}>
                 <SelectTrigger id="provider">
                   <SelectValue />
                 </SelectTrigger>
@@ -246,22 +310,95 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* 모델 선택 (프로바이더별) */}
+            {provider !== 'mock' && (
+              <div className="space-y-2">
+                <Label htmlFor="model">모델 선택</Label>
+                <Select value={selectedModel} onValueChange={setSelectedModel}>
+                  <SelectTrigger id="model">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getModelsForProvider(provider).map(([key, name]) => (
+                      <SelectItem key={key} value={key}>
+                        <div className="text-sm">
+                          <div>{key}</div>
+                          <div className="text-xs text-muted-foreground">{name}</div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-            {/* API 키 입력 (필요한 경우) */}
+            {/* API 키 설정 */}
             {providers.find(p => p.key === provider)?.requiresKey && (
               <div className="space-y-2">
-                <Label htmlFor="apiKey">API 키</Label>
-                <input
-                  id="apiKey"
-                  type="password"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder={`${provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'AIza...'}`}
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  API 키는 브라우저에만 저장되며 서버로 전송되지 않습니다.
-                </p>
+                <Label>API 키 설정</Label>
+                {AIApiKeyService.getKey(provider) ? (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span className="text-sm text-green-800">저장된 API 키 사용 중</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/settings/ai')}
+                      >
+                        설정 변경
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        API 키가 설정되지 않았습니다.
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="ml-2 p-0 h-auto"
+                          onClick={() => navigate('/settings/ai')}
+                        >
+                          설정으로 이동
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="use-temp-key"
+                        checked={!useSavedKey}
+                        onChange={(e) => setUseSavedKey(!e.target.checked)}
+                      />
+                      <Label htmlFor="use-temp-key" className="text-sm cursor-pointer">
+                        임시 API 키 사용
+                      </Label>
+                    </div>
+                    
+                    {!useSavedKey && (
+                      <div>
+                        <input
+                          id="apiKey"
+                          type="password"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          placeholder={`${provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'AIza...'}`}
+                          value={apiKey}
+                          onChange={(e) => setApiKey(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          임시 키는 이번 생성에만 사용됩니다.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
