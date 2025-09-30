@@ -51,6 +51,7 @@ import { MenuItem } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
 // AI Settings entity
 import { AISetting } from '../entities/AISetting';
+import { AiSettings } from '../entities/AiSettings';
 
 
 import { env } from '../utils/env-validator';
@@ -146,6 +147,7 @@ export const AppDataSource = new DataSource({
     MenuLocation,
     // AI Settings
     AISetting,
+    AiSettings,
   ],
   
   // 마이그레이션 설정
