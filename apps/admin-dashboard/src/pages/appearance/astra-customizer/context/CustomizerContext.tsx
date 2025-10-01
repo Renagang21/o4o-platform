@@ -267,7 +267,7 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
   const settingsRef = useRef(state.settings);
   useEffect(() => {
     settingsRef.current = state.settings;
-  });
+  }, [state.settings]); // 의존성 배열 추가하여 settings 변경 시에만 실행
   
   // Save settings to backend - use ref to get latest settings
   const saveSettings = useCallback(async () => {

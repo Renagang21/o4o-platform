@@ -22,7 +22,7 @@ export const sharedViteConfig: UserConfig = {
   ],
   resolve: {
     alias: {
-      // React 19 호환성을 위한 alias - 모든 React imports가 동일한 인스턴스를 사용하도록
+      // React 18.2.0 호환성을 위한 alias - 모든 React imports가 동일한 인스턴스를 사용하도록
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
       'react/jsx-runtime': path.resolve(__dirname, 'node_modules/react/jsx-runtime'),
@@ -36,7 +36,7 @@ export const sharedViteConfig: UserConfig = {
   build: {
     sourcemap: process.env.NODE_ENV === 'development',
     minify: 'esbuild',
-    target: 'esnext', // React 19 호환성을 위해 최신 타겟 사용
+    target: 'esnext', // React 18.2.0 호환성을 위해 최신 타겟 사용
     commonjsOptions: {
       transformMixedEsModules: true,
       include: [/node_modules/],
