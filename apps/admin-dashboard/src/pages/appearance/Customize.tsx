@@ -22,7 +22,7 @@ const Customize: React.FC = () => {
       }
       adminFullscreen.exit();
     };
-  }, [adminFullscreen]);
+  }, []); // 빈 의존성 배열로 변경하여 마운트/언마운트 시에만 실행
   
   const handleClose = () => {
     navigate('/admin');
