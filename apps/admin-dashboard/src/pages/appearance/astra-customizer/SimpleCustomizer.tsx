@@ -151,13 +151,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     { key: 'footer', label: '푸터', icon: '🔻' },
   ] as const;
 
-  // Context for sections to use
-  const customizerContext = {
-    settings,
-    updateSetting,
-    previewDevice,
-  };
-
   // Render section content
   const renderSectionContent = () => {
     if (!activeSection) {
@@ -183,24 +176,19 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       );
     }
 
-    // Render appropriate section component with context
-    const SectionComponent = (() => {
+    // Render appropriate section component without complex context dependencies
+    const renderSection = () => {
       switch (activeSection) {
-        case 'siteIdentity': return SiteIdentitySection;
-        case 'colors': return ColorsSection;
-        case 'typography': return TypographySection;
-        case 'container': return ContainerSection;
-        case 'header': return HeaderLayoutSection;
-        case 'footer': return FooterSection;
-        default: return null;
+        case 'siteIdentity': return <SiteIdentitySection />;
+        case 'colors': return <ColorsSection />;
+        case 'typography': return <TypographySection />;
+        case 'container': return <ContainerSection />;
+        case 'header': return <HeaderLayoutSection />;
+        case 'footer': return <FooterSection />;
+        default: return <div className="p-6">섹션을 찾을 수 없습니다.</div>;
       }
-    })();
+    };
 
-    if (!SectionComponent) {
-      return <div className="p-6">섹션을 찾을 수 없습니다.</div>;
-    }
-
-    // Create a simple context provider for the section
     return (
       <div className="h-full overflow-y-auto">
         <div className="p-4 border-b border-gray-200 flex items-center gap-3">
@@ -215,7 +203,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           </h2>
         </div>
         <div className="p-4">
-          <SectionComponent />
+          {renderSection()}
         </div>
       </div>
     );
