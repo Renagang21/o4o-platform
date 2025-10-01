@@ -285,7 +285,7 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
     // Meta
     _meta: {
       version: '1.0.0',
-      lastModified: new Date().toISOString(),
+      lastModified: '2025-01-01T00:00:00.000Z',
       isDirty: false,
     },
   };

@@ -254,42 +254,20 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
   useEffect(() => {
     const handleMessage = (event: MessageEvent<CustomizerMessage>) => {
       if (event.data.type === 'preview-ready') {
-        // Send initial settings to preview
-        if (previewIframeRef.current?.contentWindow) {
-          const css = generateCSS(state.settings);
-          previewIframeRef.current.contentWindow.postMessage(
-            {
-              type: 'setting-change',
-              payload: { settings: state.settings, css },
-            },
-            '*'
-          );
-        }
+        // Initial settings will be sent by EnhancedPreview component
+        // No need to send duplicate messages here
       }
     };
     
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []); // Remove state.settings dependency - handleMessage captures it via closure
+  }, []);
   
-  // Update preview when settings change - use ref to avoid dependency
+  // Settings ref for external access
   const settingsRef = useRef(state.settings);
   useEffect(() => {
     settingsRef.current = state.settings;
   });
-  
-  useEffect(() => {
-    if (previewIframeRef.current?.contentWindow) {
-      const css = generateCSS(settingsRef.current);
-      previewIframeRef.current.contentWindow.postMessage(
-        {
-          type: 'setting-change',
-          payload: { settings: settingsRef.current, css },
-        },
-        '*'
-      );
-    }
-  }, [state.settings]);
   
   // Save settings to backend - use ref to get latest settings
   const saveSettings = useCallback(async () => {

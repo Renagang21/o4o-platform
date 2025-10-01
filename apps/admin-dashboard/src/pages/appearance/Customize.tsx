@@ -67,7 +67,7 @@ const Customize: React.FC = () => {
   return (
     <AstraCustomizer
       onClose={handleClose}
-      previewUrl={import.meta.env.VITE_PUBLIC_APP_ORIGIN || window.location.origin}
+      previewUrl="/"
       siteName="Neture Platform"
       onSave={handleSave}
     />

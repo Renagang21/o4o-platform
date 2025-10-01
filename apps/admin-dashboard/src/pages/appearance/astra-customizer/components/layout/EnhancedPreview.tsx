@@ -75,42 +75,41 @@ export const EnhancedPreview: React.FC<EnhancedPreviewProps> = ({
   const currentUrl = getPreviewUrl();
 
   // Debounced CSS injection for performance
-  const injectCSS = useMemo(
-    () =>
-      debounce(() => {
-        if (!iframeRef.current?.contentWindow) return;
+  const injectCSS = useCallback(
+    debounce(() => {
+      if (!iframeRef.current?.contentWindow) return;
 
-        try {
-          // Try direct DOM access first
-          const doc = iframeRef.current.contentDocument;
-          if (doc) {
-            let styleEl = doc.getElementById('astra-customizer-css');
-            if (!styleEl) {
-              styleEl = doc.createElement('style');
-              styleEl.id = 'astra-customizer-css';
-              doc.head?.appendChild(styleEl);
-            }
-            if (styleEl) {
-              styleEl.textContent = css;
-            }
+      try {
+        // Try direct DOM access first
+        const doc = iframeRef.current.contentDocument;
+        if (doc) {
+          let styleEl = doc.getElementById('astra-customizer-css');
+          if (!styleEl) {
+            styleEl = doc.createElement('style');
+            styleEl.id = 'astra-customizer-css';
+            doc.head?.appendChild(styleEl);
           }
-        } catch (error) {
-          // Fallback to postMessage for cross-origin
-          // Using postMessage for CSS injection when cross-origin
+          if (styleEl) {
+            styleEl.textContent = css;
+          }
         }
+      } catch (error) {
+        // Fallback to postMessage for cross-origin
+        // Using postMessage for CSS injection when cross-origin
+      }
 
-        // Always send postMessage for compatibility
-        if (iframeRef.current?.contentWindow) {
-          iframeRef.current.contentWindow.postMessage(
-            {
-              type: 'customizer-update',
-              settings: state.settings,
-              css,
-            },
-            '*'
-          );
-        }
-      }, 100),
+      // Send unified postMessage for compatibility
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: 'customizer-update',
+            settings: state.settings,
+            css,
+          },
+          '*'
+        );
+      }
+    }, 100),
     [css, state.settings]
   );
 
