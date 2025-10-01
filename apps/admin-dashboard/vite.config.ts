@@ -70,7 +70,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react-dom',
       'react/jsx-runtime',
       '@tanstack/react-query',
-      '@o4o/types', 
       '@o4o/utils', 
       '@o4o/ui', 
       '@o4o/auth-client', 
@@ -82,6 +81,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@wordpress/element',
       '@wordpress/data',
       '@wordpress/i18n'
+    ],
+    exclude: [
+      '@o4o/types' // ES Module import 순서 문제 방지
     ],
     esbuildOptions: {
       define: {
@@ -144,6 +146,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         format: 'es',
         // Allow hoisting for better module initialization
         hoistTransitiveImports: true,
+        // Fix ES Module initialization order
+        exports: 'named',
+        interop: 'auto',
         manualChunks: (id) => {
           // 공통 설정 먼저 적용
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
