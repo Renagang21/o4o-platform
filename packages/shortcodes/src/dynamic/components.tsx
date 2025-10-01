@@ -210,7 +210,7 @@ export function useLoadingState(
 } {
   const [loading, setLoading] = React.useState(initialLoading);
   const [timedOut, setTimedOut] = React.useState(false);
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>();
+  const timeoutRef = React.useRef<number | undefined>();
 
   React.useEffect(() => {
     if (loading) {
