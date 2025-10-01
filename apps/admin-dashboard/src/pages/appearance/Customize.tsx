@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAdminFullscreen } from '@/hooks/useAdminFullscreen';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { AstraCustomizer } from './astra-customizer/AstraCustomizer';
+import { SimpleCustomizer } from './astra-customizer/SimpleCustomizer';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ const Customize: React.FC = () => {
   };
   
   return (
-    <AstraCustomizer
+    <SimpleCustomizer
       onClose={handleClose}
       previewUrl="/"
       siteName="Neture Platform"
