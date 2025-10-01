@@ -407,10 +407,29 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
             ],
             generationConfig: {
               temperature: 0.7,
-              top_k: 40,
-              top_p: 0.95,
-              max_output_tokens: 8192,
-              response_mime_type: 'application/json',
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 8192,
+              responseMimeType: 'application/json',
+              responseSchema: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    type: { type: 'STRING' },
+                    content: { 
+                      type: 'OBJECT',
+                      properties: {
+                        text: { type: 'STRING' }
+                      }
+                    },
+                    attributes: { 
+                      type: 'OBJECT',
+                      properties: {}
+                    }
+                  }
+                }
+              }
             },
           }),
           signal,
