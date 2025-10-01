@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { Palette, Droplet, Link, Type, Square } from 'lucide-react';
+import { AstraCustomizerSettings, SettingSection, PreviewDevice } from '../../types/customizer-types';
 
-export const ColorsSection: React.FC = () => {
-  const { settings, updateSetting } = useCustomizerState();
+interface ColorsSectionProps {
+  settings: AstraCustomizerSettings;
+  updateSetting: (section: keyof AstraCustomizerSettings, value: any, path?: string[]) => void;
+  previewDevice: PreviewDevice;
+}
+
+export const ColorsSection: React.FC<ColorsSectionProps> = ({ settings, updateSetting }) => {
   const colors = settings.colors;
   
   const [activeTab, setActiveTab] = useState<'theme' | 'palette'>('theme');

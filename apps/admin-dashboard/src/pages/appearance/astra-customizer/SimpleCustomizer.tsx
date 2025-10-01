@@ -1,9 +1,18 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { X, Save, RotateCcw, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
-import { AstraCustomizerSettings, PreviewDevice } from './types/customizer-types';
+import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
+
+// Import Astra sections
+import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
+import { ColorsSection } from './sections/global/ColorsSection';
+import { TypographySection } from './sections/global/TypographySection';
+import { ContainerSection } from './sections/layout/ContainerSection';
+import { HeaderLayoutSection } from './sections/header/HeaderLayoutSection';
+import { FooterSection } from './sections/footer/FooterSection';
+
 import './styles/controls.css';
 import './styles/sections.css';
 
@@ -20,11 +29,13 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   previewUrl = '/',
   siteName = 'Site Preview',
 }) => {
-  // Simple state management
+  // Enhanced state management for full Astra functionality
   const [settings, setSettings] = useState<AstraCustomizerSettings>(() => getDefaultSettings());
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const cssUpdateTimeoutRef = useRef<NodeJS.Timeout>();
@@ -129,6 +140,86 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }, 100);
   };
 
+  // Define sections with icons and labels
+  const sections = [
+    { key: 'siteIdentity', label: '사이트 정보', icon: '🏠' },
+    { key: 'colors', label: '색상', icon: '🎨' },
+    { key: 'typography', label: '글꼴', icon: '📝' },
+    { key: 'container', label: '레이아웃', icon: '📐' },
+    { key: 'header', label: '헤더', icon: '🔝' },
+    { key: 'footer', label: '푸터', icon: '🔻' },
+  ] as const;
+
+  // Context for sections to use
+  const customizerContext = {
+    settings,
+    updateSetting,
+    previewDevice,
+  };
+
+  // Render section content
+  const renderSectionContent = () => {
+    if (!activeSection) {
+      return (
+        <div className="p-6 text-center">
+          <h2 className="text-xl font-medium mb-4">Astra 사용자 정의하기</h2>
+          <p className="text-gray-600 mb-6">
+            왼쪽 메뉴에서 섹션을 선택하여 사이트를 사용자 정의하세요.
+          </p>
+          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+            {sections.map((section) => (
+              <button
+                key={section.key}
+                onClick={() => setActiveSection(section.key as SettingSection)}
+                className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
+              >
+                <div className="text-2xl mb-2">{section.icon}</div>
+                <div className="text-sm font-medium">{section.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Render appropriate section component with context
+    const SectionComponent = (() => {
+      switch (activeSection) {
+        case 'siteIdentity': return SiteIdentitySection;
+        case 'colors': return ColorsSection;
+        case 'typography': return TypographySection;
+        case 'container': return ContainerSection;
+        case 'header': return HeaderLayoutSection;
+        case 'footer': return FooterSection;
+        default: return null;
+      }
+    })();
+
+    if (!SectionComponent) {
+      return <div className="p-6">섹션을 찾을 수 없습니다.</div>;
+    }
+
+    // Create a simple context provider for the section
+    return (
+      <div className="h-full overflow-y-auto">
+        <div className="p-4 border-b border-gray-200 flex items-center gap-3">
+          <button
+            onClick={() => setActiveSection(null)}
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <h2 className="font-medium">
+            {sections.find(s => s.key === activeSection)?.label}
+          </h2>
+        </div>
+        <div className="p-4">
+          <SectionComponent {...customizerContext} />
+        </div>
+      </div>
+    );
+  };
+
   // Device sizes for responsive preview
   const deviceSizes = {
     desktop: { width: '100%', height: '100%' },
@@ -148,9 +239,20 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             <X size={20} />
           </button>
           <h1 className="text-lg font-medium">사용자 정의하기</h1>
+          {activeSection && (
+            <span className="text-sm text-gray-500">
+              › {sections.find(s => s.key === activeSection)?.label}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="p-2 hover:bg-gray-100 rounded-md md:hidden"
+          >
+            {showSidebar ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+          </button>
           <Button
             variant="outline"
             size="sm"
@@ -172,88 +274,31 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       </div>
 
       <div className="flex h-[calc(100vh-80px)]">
-        {/* Settings Panel */}
-        <div className="w-80 border-r border-gray-200 overflow-y-auto p-4">
-          <div className="space-y-6">
-            {/* Site Title */}
-            <div className="space-y-3">
-              <h3 className="font-medium">사이트 제목</h3>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">제목</label>
-                <input
-                  type="text"
-                  value={settings.siteIdentity.siteTitle.text}
-                  onChange={(e) => updateSetting('siteIdentity', e.target.value, ['siteTitle', 'text'])}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
+        {/* Sidebar */}
+        {showSidebar && (
+          <div className="w-80 border-r border-gray-200 bg-gray-50">
+            {activeSection ? (
+              renderSectionContent()
+            ) : (
+              <div className="p-4">
+                <h3 className="font-medium mb-4">사용자 정의 옵션</h3>
+                <div className="space-y-1">
+                  {sections.map((section) => (
+                    <button
+                      key={section.key}
+                      onClick={() => setActiveSection(section.key as SettingSection)}
+                      className="w-full flex items-center gap-3 p-3 text-left hover:bg-white rounded-lg transition-colors"
+                    >
+                      <span className="text-lg">{section.icon}</span>
+                      <span className="font-medium">{section.label}</span>
+                      <ChevronRight size={16} className="ml-auto text-gray-400" />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">색상</label>
-                <input
-                  type="color"
-                  value={settings.siteIdentity.siteTitle.color.normal}
-                  onChange={(e) => updateSetting('siteIdentity', { normal: e.target.value }, ['siteTitle', 'color'])}
-                  className="w-full h-10 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-
-            {/* Colors */}
-            <div className="space-y-3">
-              <h3 className="font-medium">색상</h3>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">기본 색상</label>
-                <input
-                  type="color"
-                  value={settings.colors.primaryColor}
-                  onChange={(e) => updateSetting('colors', { primaryColor: e.target.value })}
-                  className="w-full h-10 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">보조 색상</label>
-                <input
-                  type="color"
-                  value={settings.colors.secondaryColor}
-                  onChange={(e) => updateSetting('colors', { secondaryColor: e.target.value })}
-                  className="w-full h-10 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">텍스트 색상</label>
-                <input
-                  type="color"
-                  value={settings.colors.textColor}
-                  onChange={(e) => updateSetting('colors', { textColor: e.target.value })}
-                  className="w-full h-10 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-
-            {/* Container Width */}
-            <div className="space-y-3">
-              <h3 className="font-medium">레이아웃</h3>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  컨테이너 너비: {settings.container.width.desktop}px
-                </label>
-                <input
-                  type="range"
-                  min="800"
-                  max="1400"
-                  step="50"
-                  value={settings.container.width.desktop}
-                  onChange={(e) => updateSetting('container', { 
-                    desktop: parseInt(e.target.value),
-                    tablet: Math.min(992, parseInt(e.target.value)),
-                    mobile: 544
-                  }, ['width'])}
-                  className="w-full"
-                />
-              </div>
-            </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Preview Panel */}
         <div className="flex-1 flex flex-col">

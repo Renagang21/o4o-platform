@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { GoogleFontSelector } from '../../components/controls/GoogleFontSelector';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraSelect } from '../../components/controls/AstraSelect';
 import { Type, Heading, MousePointer } from 'lucide-react';
-import { TextTransform, FontWeight } from '../../types/customizer-types';
+import { TextTransform, FontWeight, AstraCustomizerSettings, PreviewDevice } from '../../types/customizer-types';
 
-export const TypographySection: React.FC = () => {
-  const { settings, updateSetting } = useCustomizerState();
+interface TypographySectionProps {
+  settings: AstraCustomizerSettings;
+  updateSetting: (section: keyof AstraCustomizerSettings, value: any, path?: string[]) => void;
+  previewDevice: PreviewDevice;
+}
+
+export const TypographySection: React.FC<TypographySectionProps> = ({ settings, updateSetting }) => {
   const typography = settings.typography;
   
   const [activeTab, setActiveTab] = useState<'body' | 'headings' | 'buttons'>('body');

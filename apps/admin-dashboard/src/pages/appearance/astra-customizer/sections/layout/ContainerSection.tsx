@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraSelect } from '../../components/controls/AstraSelect';
 import { Layout, Maximize, Square, Sidebar as SidebarIcon } from 'lucide-react';
+import { AstraCustomizerSettings, PreviewDevice } from '../../types/customizer-types';
 
-export const ContainerSection: React.FC = () => {
-  const { settings, updateSetting } = useCustomizerState();
+interface ContainerSectionProps {
+  settings: AstraCustomizerSettings;
+  updateSetting: (section: keyof AstraCustomizerSettings, value: any, path?: string[]) => void;
+  previewDevice: PreviewDevice;
+}
+
+export const ContainerSection: React.FC<ContainerSectionProps> = ({ settings, updateSetting }) => {
   const container = settings.container;
   const sidebar = settings.sidebar;
   
