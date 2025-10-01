@@ -9,6 +9,20 @@ const Customize: React.FC = () => {
   const navigate = useNavigate();
   const adminFullscreen = useAdminFullscreen();
   
+  // 실제 사이트 URL 동적 설정 (관리자 도메인에서 admin 제거)
+  const getSitePreviewUrl = () => {
+    const currentHost = window.location.host;
+    const protocol = window.location.protocol;
+    
+    // admin.neture.co.kr -> neture.co.kr 같은 변환
+    if (currentHost.startsWith('admin.')) {
+      return `${protocol}//${currentHost.replace('admin.', '')}`;
+    }
+    
+    // 기타 경우는 환경변수에서 가져오기
+    return import.meta.env.VITE_SITE_URL || `${protocol}//${currentHost}`;
+  };
+  
   // 풀스크린 모드 관리
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -67,7 +81,7 @@ const Customize: React.FC = () => {
   return (
     <SimpleCustomizer
       onClose={handleClose}
-      previewUrl="/"
+      previewUrl={getSitePreviewUrl()}
       siteName="Neture Platform"
       onSave={handleSave}
     />
