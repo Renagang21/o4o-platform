@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { simpleAIGenerator, AI_MODELS, type AIModel, type Block } from '@/services/ai/SimpleAIGenerator';
+import { AIApiKeyService } from '@/pages/settings/AISettings';
 
 interface SimpleAIModalProps {
   isOpen: boolean;
@@ -36,6 +37,32 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   const [progressMessage, setProgressMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // 모달이 열릴 때 저장된 API 키 자동 로드
+  useEffect(() => {
+    const loadSavedSettings = async () => {
+      if (isOpen) {
+        try {
+          // 현재 선택된 프로바이더의 API 키와 모델 로드
+          const savedApiKey = await AIApiKeyService.getKey(provider);
+          const savedModel = await AIApiKeyService.getDefaultModel(provider);
+          
+          if (savedApiKey) {
+            setApiKey(savedApiKey);
+          }
+          
+          if (savedModel) {
+            setModel(savedModel as AIModel);
+          }
+        } catch (error) {
+          // API 키 로드 실패 시 무시 (사용자가 직접 입력 가능)
+          console.log('Failed to load saved API key:', error);
+        }
+      }
+    };
+
+    loadSavedSettings();
+  }, [isOpen, provider]);
+
   // 프로바이더별 모델 필터링
   const getModelsForProvider = (selectedProvider: string) => {
     return Object.entries(AI_MODELS).filter(([key]) => {
@@ -52,12 +79,31 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     });
   };
 
-  // 프로바이더 변경 시 첫 번째 모델로 자동 선택
-  const handleProviderChange = (newProvider: 'openai' | 'gemini' | 'claude') => {
+  // 프로바이더 변경 시 첫 번째 모델로 자동 선택 및 API 키 로드
+  const handleProviderChange = async (newProvider: 'openai' | 'gemini' | 'claude') => {
     setProvider(newProvider);
     const models = getModelsForProvider(newProvider);
     if (models.length > 0) {
       setModel(models[0][0] as AIModel);
+    }
+    
+    // 선택된 프로바이더의 저장된 API 키 로드
+    try {
+      const savedApiKey = await AIApiKeyService.getKey(newProvider);
+      const savedModel = await AIApiKeyService.getDefaultModel(newProvider);
+      
+      if (savedApiKey) {
+        setApiKey(savedApiKey);
+      } else {
+        setApiKey(''); // 저장된 키가 없으면 초기화
+      }
+      
+      if (savedModel) {
+        setModel(savedModel as AIModel);
+      }
+    } catch (error) {
+      // API 키 로드 실패 시 초기화
+      setApiKey('');
     }
   };
 
@@ -230,11 +276,20 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
               />
-              <p className="text-xs text-gray-500">
-                {provider === 'openai' && 'OpenAI API 키를 입력하세요'}
-                {provider === 'gemini' && 'Google AI Studio에서 발급받은 API 키를 입력하세요'}
-                {provider === 'claude' && 'Anthropic Console에서 발급받은 API 키를 입력하세요'}
-              </p>
+              <div className="text-xs text-gray-500 space-y-1">
+                <p>
+                  {provider === 'openai' && 'OpenAI API 키를 입력하세요'}
+                  {provider === 'gemini' && 'Google AI Studio에서 발급받은 API 키를 입력하세요'}
+                  {provider === 'claude' && 'Anthropic Console에서 발급받은 API 키를 입력하세요'}
+                </p>
+                {!apiKey && (
+                  <p className="text-blue-600">
+                    💡 <a href="/admin/settings" target="_blank" className="underline hover:no-underline">
+                      설정 페이지에서 API 키를 미리 저장
+                    </a>하면 자동으로 입력됩니다.
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* 프롬프트 입력 */}
