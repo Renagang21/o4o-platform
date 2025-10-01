@@ -62,7 +62,7 @@ class ShortcodeIntegratorService {
       const response = await authClient.api.get<{
         success: boolean;
         data: ShortcodeRegistryResponse;
-      }>('/api/ai/shortcodes/reference');
+      }>('/ai/shortcodes/reference');
 
       if (response.data.success) {
         this.shortcodeCache = response.data.data.shortcodes;

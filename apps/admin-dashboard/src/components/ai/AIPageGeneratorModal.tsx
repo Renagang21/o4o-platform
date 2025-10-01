@@ -114,7 +114,7 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
     // API 키 확인 - 저장된 키 또는 입력된 키 사용
     let finalApiKey = apiKey;
     if (useSavedKey && selectedProvider?.requiresKey) {
-      const savedKey = AIApiKeyService.getKey(provider);
+      const savedKey = await AIApiKeyService.getKey(provider);
       if (savedKey) {
         finalApiKey = savedKey;
       }
