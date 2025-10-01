@@ -55,7 +55,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
           }
         } catch (error) {
           // API 키 로드 실패 시 무시 (사용자가 직접 입력 가능)
-          console.log('Failed to load saved API key:', error);
+          // Error is logged for debugging but not shown to user
         }
       }
     };
