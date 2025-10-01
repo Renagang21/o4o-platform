@@ -270,35 +270,40 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [state.settings]);
+  }, []); // Remove state.settings dependency - handleMessage captures it via closure
   
-  // Update preview when settings change
+  // Update preview when settings change - use ref to avoid dependency
+  const settingsRef = useRef(state.settings);
+  useEffect(() => {
+    settingsRef.current = state.settings;
+  });
+  
   useEffect(() => {
     if (previewIframeRef.current?.contentWindow) {
-      const css = generateCSS(state.settings);
+      const css = generateCSS(settingsRef.current);
       previewIframeRef.current.contentWindow.postMessage(
         {
           type: 'setting-change',
-          payload: { settings: state.settings, css },
+          payload: { settings: settingsRef.current, css },
         },
         '*'
       );
     }
   }, [state.settings]);
   
-  // Save settings to backend
+  // Save settings to backend - use ref to get latest settings
   const saveSettings = useCallback(async () => {
     dispatch({ type: 'SET_SAVE_STATUS', status: 'saving' });
     
     try {
-      await eventHandlers?.onSave?.(state.settings);
+      await eventHandlers?.onSave?.(settingsRef.current);
 
       dispatch({ type: 'SET_SAVE_STATUS', status: 'saved' });
       dispatch({ type: 'MARK_DIRTY', isDirty: false });
     } catch (error) {
       dispatch({ type: 'SET_SAVE_STATUS', status: 'error' });
     }
-  }, [state.settings, eventHandlers]);
+  }, [eventHandlers]);
   
   // Publish settings (save and apply to live site)
   const publishSettings = useCallback(async () => {
@@ -309,14 +314,14 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
       await saveSettings();
 
       // Then publish - eventHandlers can handle the actual API call
-      await eventHandlers?.onPublish?.(state.settings);
+      await eventHandlers?.onPublish?.(settingsRef.current);
 
       dispatch({ type: 'SET_SAVE_STATUS', status: 'saved' });
       dispatch({ type: 'MARK_DIRTY', isDirty: false });
     } catch (error) {
       dispatch({ type: 'SET_SAVE_STATUS', status: 'error' });
     }
-  }, [saveSettings]);
+  }, [saveSettings, eventHandlers]);
   
   const value: CustomizerContextValue = {
     state,
