@@ -181,7 +181,7 @@ export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({
       id: block.id,
       content: block.content || '',
       attributes: block.attributes || {},
-      onChange: (content: string, attributes?: any) => {
+      onChange: (content: string, attributes?: Record<string, unknown>) => {
         handleUpdate({ content, attributes })
       },
       onDelete: onRemove || (() => {}),
@@ -194,10 +194,14 @@ export const ZoneBlockRenderer: React.FC<ZoneBlockRendererProps> = ({
       onSelect: () => onSelect?.(block.id),
       canMoveUp: index > 0,
       canMoveDown: true, // Will be determined by parent
-      viewMode
+      viewMode,
+      setAttributes: (newAttributes: Record<string, unknown>) => {
+        // Update the block's attributes
+        onUpdate?.({ attributes: { ...block.attributes, ...newAttributes } });
+      }
     }
 
-    return <BlockComponent {...blockProps} />
+    return <BlockComponent {...blockProps} {...(block.attributes || {})} />
   }
 
   // Handle inner blocks for nested structures

@@ -59,7 +59,7 @@ const FormsManager = () => {
   const { data: forms = [], isLoading, refetch } = useQuery({
     queryKey: ['forms'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ data: Form[] }>('/api/cpt/forms');
+      const response = await authClient.api.get<{ data: Form[] }>('/cpt/forms');
       return response.data?.data || [];
     }
   });

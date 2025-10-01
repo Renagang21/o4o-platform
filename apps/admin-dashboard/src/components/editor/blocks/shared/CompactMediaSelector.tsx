@@ -237,11 +237,9 @@ const CompactMediaSelector: React.FC<CompactMediaSelectorProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className={className}>
-          <Upload className="w-4 h-4 mr-2" />
-          {title}
-        </Button>
+      <DialogTrigger className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 h-8 px-3 ${className}`}>
+        <Upload className="w-4 h-4 mr-2" />
+        {title}
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>

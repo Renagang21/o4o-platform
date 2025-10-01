@@ -16,8 +16,8 @@ const CPTBuilderWrapper = () => {
   const { data: cptTypes = [], isLoading } = useQuery({
     queryKey: ['cpt-types'],
     queryFn: async () => {
-      const response = await cptApi.getTypes();
-      return response || [];
+      const response = await cptApi.getAllTypes();
+      return response.data || [];
     }
   });
 

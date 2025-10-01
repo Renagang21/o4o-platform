@@ -9,8 +9,8 @@
  * Safely extract array data from API response
  * Handles various response structures and ensures array return
  */
-export function ensureArray<T = any>(
-  data: any,
+export function ensureArray<T = unknown>(
+  data: unknown,
   defaultValue: T[] = []
 ): T[] {
   // If already an array, return it
@@ -20,40 +20,42 @@ export function ensureArray<T = any>(
 
   // Handle nested data structures
   if (data && typeof data === 'object') {
+    const dataObj = data as Record<string, unknown>;
+    
     // Check for data.data pattern
-    if (Array.isArray(data.data)) {
-      return data.data;
+    if (Array.isArray(dataObj.data)) {
+      return dataObj.data;
     }
 
     // Check for data.data.items pattern
-    if (data.data && Array.isArray(data.data.items)) {
-      return data.data.items;
-    }
+    if (dataObj.data && typeof dataObj.data === 'object' && !Array.isArray(dataObj.data)) {
+      const nestedData = dataObj.data as Record<string, unknown>;
+      if (Array.isArray(nestedData.items)) {
+        return nestedData.items;
+      }
 
-    // Check for data.data.{resource} pattern (like users, posts, etc.)
-    if (data.data && typeof data.data === 'object') {
-      // Find first array value in data.data
-      const firstArrayKey = Object.keys(data.data).find(
-        key => Array.isArray(data.data[key])
+      // Check for data.data.{resource} pattern (like users, posts, etc.)
+      const firstArrayKey = Object.keys(nestedData).find(
+        key => Array.isArray(nestedData[key])
       );
       if (firstArrayKey) {
-        return data.data[firstArrayKey];
+        return nestedData[firstArrayKey] as T[];
       }
     }
 
     // Check for data.items pattern
-    if (Array.isArray(data.items)) {
-      return data.items;
+    if (Array.isArray(dataObj.items)) {
+      return dataObj.items;
     }
 
     // Check for data.results pattern
-    if (Array.isArray(data.results)) {
-      return data.results;
+    if (Array.isArray(dataObj.results)) {
+      return dataObj.results;
     }
 
     // Check for data.content pattern
-    if (Array.isArray(data.content)) {
-      return data.content;
+    if (Array.isArray(dataObj.content)) {
+      return dataObj.content;
     }
   }
 
@@ -65,8 +67,8 @@ export function ensureArray<T = any>(
  * Safely extract object data from API response
  * Handles nested response structures
  */
-export function ensureObject<T extends Record<string, any> = Record<string, any>>(
-  data: any,
+export function ensureObject<T extends Record<string, unknown> = Record<string, unknown>>(
+  data: unknown,
   defaultValue: T = {} as T
 ): T {
   // If data is null or undefined, return default
@@ -76,18 +78,20 @@ export function ensureObject<T extends Record<string, any> = Record<string, any>
 
   // If already an object (not array), process it
   if (typeof data === 'object' && !Array.isArray(data)) {
+    const dataObj = data as Record<string, unknown>;
+    
     // Check for data.data pattern
-    if (data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
-      return data.data;
+    if (dataObj.data && typeof dataObj.data === 'object' && !Array.isArray(dataObj.data)) {
+      return dataObj.data as T;
     }
 
     // Check for data.result pattern
-    if (data.result && typeof data.result === 'object' && !Array.isArray(data.result)) {
-      return data.result;
+    if (dataObj.result && typeof dataObj.result === 'object' && !Array.isArray(dataObj.result)) {
+      return dataObj.result as T;
     }
 
     // Return the object itself
-    return data;
+    return dataObj as T;
   }
 
   // Return default value if not an object
@@ -97,7 +101,7 @@ export function ensureObject<T extends Record<string, any> = Record<string, any>
 /**
  * Extract pagination info from various API response formats
  */
-export function extractPagination(response: any): {
+export function extractPagination(response: unknown): {
   total: number;
   totalPages: number;
   currentPage: number;
@@ -113,11 +117,16 @@ export function extractPagination(response: any): {
   if (!response) return defaultPagination;
 
   // Check for pagination at different levels
+  const responseObj = response as Record<string, unknown>;
+  const dataObj = responseObj.data as Record<string, unknown> | undefined;
+  const nestedDataObj = dataObj?.data as Record<string, unknown> | undefined;
+  const metaObj = responseObj.meta as Record<string, unknown> | undefined;
+  
   const pagination = 
-    response.pagination ||
-    response.data?.pagination ||
-    response.data?.data?.pagination ||
-    response.meta?.pagination;
+    responseObj.pagination ||
+    dataObj?.pagination ||
+    nestedDataObj?.pagination ||
+    metaObj?.pagination;
 
   if (pagination) {
     return {
@@ -129,11 +138,14 @@ export function extractPagination(response: any): {
   }
 
   // Check for total in response
+  const responseObj = response as Record<string, unknown>;
+  const dataObj = responseObj.data as Record<string, unknown> | undefined;
+  
   const total = 
-    response.total ||
-    response.data?.total ||
-    response.totalCount ||
-    response.data?.totalCount ||
+    (responseObj.total as number) ||
+    (dataObj?.total as number) ||
+    (responseObj.totalCount as number) ||
+    (dataObj?.totalCount as number) ||
     0;
 
   return {
@@ -146,7 +158,7 @@ export function extractPagination(response: any): {
  * Safely map over data that might not be an array
  */
 export function safeMap<T, R>(
-  data: any,
+  data: unknown,
   mapFn: (item: T, index: number, array: T[]) => R,
   defaultValue: R[] = []
 ): R[] {
@@ -167,7 +179,7 @@ export function safeMap<T, R>(
  * Safely filter data that might not be an array
  */
 export function safeFilter<T>(
-  data: any,
+  data: unknown,
   filterFn: (item: T, index: number, array: T[]) => boolean,
   defaultValue: T[] = []
 ): T[] {
@@ -188,7 +200,7 @@ export function safeFilter<T>(
  * Safely find item in data that might not be an array
  */
 export function safeFind<T>(
-  data: any,
+  data: unknown,
   findFn: (item: T, index: number, array: T[]) => boolean,
   defaultValue?: T
 ): T | undefined {
@@ -208,52 +220,61 @@ export function safeFind<T>(
 /**
  * Check if response indicates success
  */
-export function isSuccessResponse(response: any): boolean {
+export function isSuccessResponse(response: unknown): boolean {
   if (!response) return false;
   
+  const responseObj = response as Record<string, unknown>;
+  const dataObj = responseObj.data as Record<string, unknown> | undefined;
+  
   // Check for explicit success flag
-  if (typeof response.success === 'boolean') {
-    return response.success;
+  if (typeof responseObj.success === 'boolean') {
+    return responseObj.success;
   }
   
-  if (response.data && typeof response.data.success === 'boolean') {
-    return response.data.success;
+  if (dataObj && typeof dataObj.success === 'boolean') {
+    return dataObj.success;
   }
   
   // Check for status codes
-  if (response.status >= 200 && response.status < 300) {
+  if (typeof responseObj.status === 'number' && responseObj.status >= 200 && responseObj.status < 300) {
     return true;
   }
   
   // Check for error indicators
-  if (response.error || response.errors || response.data?.error) {
+  if (responseObj.error || responseObj.errors || dataObj?.error) {
     return false;
   }
   
   // Assume success if we have data
-  return !!(response.data || response.result || response.items);
+  return !!(responseObj.data || responseObj.result || responseObj.items);
 }
 
 /**
  * Extract error message from various response formats
  */
-export function extractErrorMessage(error: any): string {
-  // Check for axios error response
-  if (error?.response?.data?.message) {
-    return error.response.data.message;
-  }
-  
-  if (error?.response?.data?.error) {
-    return error.response.data.error;
-  }
-  
-  // Check for direct error message
-  if (error?.message) {
-    return error.message;
-  }
-  
+export function extractErrorMessage(error: unknown): string {
   if (typeof error === 'string') {
     return error;
+  }
+  
+  if (error && typeof error === 'object') {
+    const errorObj = error as Record<string, unknown>;
+    const responseObj = errorObj.response as Record<string, unknown> | undefined;
+    const responseDataObj = responseObj?.data as Record<string, unknown> | undefined;
+    
+    // Check for axios error response
+    if (typeof responseDataObj?.message === 'string') {
+      return responseDataObj.message;
+    }
+    
+    if (typeof responseDataObj?.error === 'string') {
+      return responseDataObj.error;
+    }
+    
+    // Check for direct error message
+    if (typeof errorObj.message === 'string') {
+      return errorObj.message;
+    }
   }
   
   return '알 수 없는 오류가 발생했습니다.';
@@ -262,32 +283,46 @@ export function extractErrorMessage(error: any): string {
 /**
  * Normalize API response to consistent format
  */
-export function normalizeResponse<T = any>(response: any): {
+export function normalizeResponse<T = unknown>(response: unknown): {
   data: T;
   success: boolean;
   message?: string;
-  pagination?: any;
+  pagination?: unknown;
 } {
+  if (!response) {
+    return {
+      data: null as T,
+      success: false,
+      pagination: extractPagination(response)
+    };
+  }
+  
+  const responseObj = response as Record<string, unknown>;
+  
   // Handle axios response
-  const rawData = response?.data || response;
+  const rawData = responseObj.data || response;
+  const rawDataObj = rawData as Record<string, unknown>;
   
   // Extract data based on common patterns
   let data: T;
   
-  if (rawData?.data?.data) {
-    data = rawData.data.data;
-  } else if (rawData?.data) {
-    data = rawData.data;
-  } else if (rawData?.result) {
-    data = rawData.result;
+  if (rawDataObj?.data && typeof rawDataObj.data === 'object') {
+    const nestedDataObj = rawDataObj.data as Record<string, unknown>;
+    if (nestedDataObj.data) {
+      data = nestedDataObj.data as T;
+    } else {
+      data = rawDataObj.data as T;
+    }
+  } else if (rawDataObj?.result) {
+    data = rawDataObj.result as T;
   } else {
-    data = rawData;
+    data = rawData as T;
   }
   
   return {
     data,
     success: isSuccessResponse(response),
-    message: rawData?.message || response?.statusText,
+    message: (rawDataObj?.message as string) || (responseObj?.statusText as string),
     pagination: extractPagination(response)
   };
 }

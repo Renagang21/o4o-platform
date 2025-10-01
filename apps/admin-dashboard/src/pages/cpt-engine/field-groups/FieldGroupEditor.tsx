@@ -138,7 +138,7 @@ export default function FieldGroupEditor() {
   const { data: cptTypes = [] } = useQuery({
     queryKey: ['cpt-types'],
     queryFn: async () => {
-      const response = await authClient.api.get('/api/public/cpt/types');
+      const response = await authClient.api.get('/cpt/types');
       return response.data?.data || [];
     }
   });
@@ -148,7 +148,7 @@ export default function FieldGroupEditor() {
     queryKey: ['field-group', id],
     queryFn: async () => {
       if (!id || id === 'new') return null;
-      const response = await authClient.api.get(`/api/cpt/field-groups/${id}`);
+      const response = await authClient.api.get(`/cpt/field-groups/${id}`);
       return response.data?.data;
     },
     enabled: !!id && id !== 'new'
@@ -164,9 +164,9 @@ export default function FieldGroupEditor() {
   const saveMutation = useMutation({
     mutationFn: async (data: FieldGroup) => {
       if (id && id !== 'new') {
-        return await authClient.api.put(`/api/cpt/field-groups/${id}`, data);
+        return await authClient.api.put(`/cpt/field-groups/${id}`, data);
       } else {
-        return await authClient.api.post('/api/cpt/field-groups', data);
+        return await authClient.api.post('/cpt/field-groups', data);
       }
     },
     onSuccess: () => {

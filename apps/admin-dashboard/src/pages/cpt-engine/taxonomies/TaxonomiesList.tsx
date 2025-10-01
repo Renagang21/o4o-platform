@@ -119,7 +119,7 @@ export default function TaxonomiesList() {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this taxonomy? This will also delete all associated terms.')) {
       try {
-        await authClient.api.delete(`/api/cpt/taxonomies/${id}`);
+        await authClient.api.delete(`/cpt/taxonomies/${id}`);
         refetch();
       } catch (error) {
         console.error('Failed to delete taxonomy:', error);
@@ -130,7 +130,7 @@ export default function TaxonomiesList() {
   // Duplicate taxonomy
   const handleDuplicate = async (taxonomy: Taxonomy) => {
     try {
-      await authClient.api.post('/api/cpt/taxonomies', {
+      await authClient.api.post('/cpt/taxonomies', {
         ...taxonomy,
         name: `${taxonomy.name} (Copy)`,
         slug: `${taxonomy.slug}_copy`,

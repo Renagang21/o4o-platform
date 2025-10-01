@@ -8,8 +8,8 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { ensureArray, ensureObject, normalizeResponse } from '@/utils/apiResponseHelper';
 
-interface SafeQueryOptions<T> extends Omit<UseQueryOptions<any, Error, T>, 'queryFn'> {
-  queryFn: () => Promise<any>;
+interface SafeQueryOptions<T> extends Omit<UseQueryOptions<unknown, Error, T>, 'queryFn'> {
+  queryFn: () => Promise<unknown>;
   dataType?: 'array' | 'object' | 'auto';
   defaultData?: T;
 }
@@ -17,7 +17,7 @@ interface SafeQueryOptions<T> extends Omit<UseQueryOptions<any, Error, T>, 'quer
 /**
  * Safe version of useQuery that handles various API response formats
  */
-export function useSafeQuery<T = any>(
+export function useSafeQuery<T = unknown>(
   options: SafeQueryOptions<T>
 ): UseQueryResult<T, Error> {
   const { queryFn, dataType = 'auto', defaultData, ...queryOptions } = options;
@@ -31,15 +31,15 @@ export function useSafeQuery<T = any>(
         
         // Handle data based on expected type
         if (dataType === 'array') {
-          return ensureArray(normalized.data, defaultData as any || []) as T;
+          return ensureArray(normalized.data, (defaultData as unknown[]) || []) as T;
         } else if (dataType === 'object') {
-          return ensureObject(normalized.data, defaultData as any || {}) as T;
+          return ensureObject(normalized.data, (defaultData as Record<string, unknown>) || {}) as T;
         } else {
           // Auto-detect based on default data or response
           if (Array.isArray(defaultData)) {
-            return ensureArray(normalized.data, defaultData as any) as T;
+            return ensureArray(normalized.data, defaultData as unknown[]) as T;
           } else if (defaultData && typeof defaultData === 'object') {
-            return ensureObject(normalized.data, defaultData as any) as T;
+            return ensureObject(normalized.data, defaultData as Record<string, unknown>) as T;
           }
           
           // Return normalized data as-is
@@ -59,9 +59,9 @@ export function useSafeQuery<T = any>(
 /**
  * Safe version of useQuery specifically for array data
  */
-export function useSafeArrayQuery<T = any>(
-  queryKey: any[],
-  queryFn: () => Promise<any>,
+export function useSafeArrayQuery<T = unknown>(
+  queryKey: unknown[],
+  queryFn: () => Promise<unknown>,
   options?: Omit<UseQueryOptions<T[], Error, T[]>, 'queryKey' | 'queryFn'>,
   defaultData: T[] = []
 ): UseQueryResult<T[], Error> {
@@ -77,9 +77,9 @@ export function useSafeArrayQuery<T = any>(
 /**
  * Safe version of useQuery specifically for object data
  */
-export function useSafeObjectQuery<T extends Record<string, any> = Record<string, any>>(
-  queryKey: any[],
-  queryFn: () => Promise<any>,
+export function useSafeObjectQuery<T extends Record<string, unknown> = Record<string, unknown>>(
+  queryKey: unknown[],
+  queryFn: () => Promise<unknown>,
   options?: Omit<UseQueryOptions<T, Error, T>, 'queryKey' | 'queryFn'>,
   defaultData: T = {} as T
 ): UseQueryResult<T, Error> {
@@ -95,10 +95,10 @@ export function useSafeObjectQuery<T extends Record<string, any> = Record<string
 /**
  * Hook for paginated data that ensures proper structure
  */
-export function useSafePaginatedQuery<T = any>(
-  queryKey: any[],
-  queryFn: () => Promise<any>,
-  options?: Omit<UseQueryOptions<any, Error, any>, 'queryKey' | 'queryFn'>
+export function useSafePaginatedQuery<T = unknown>(
+  queryKey: unknown[],
+  queryFn: () => Promise<unknown>,
+  options?: Omit<UseQueryOptions<unknown, Error, unknown>, 'queryKey' | 'queryFn'>
 ): UseQueryResult<{
   data: T[];
   pagination: {

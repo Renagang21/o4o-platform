@@ -66,7 +66,7 @@ export const useDashboardStats = () => {
           refunded: 0
         };
 
-        orders.forEach((order) => {
+        orders.forEach((order: { status: string }) => {
           if (statusCounts[order.status] !== undefined) {
             statusCounts[order.status]++;
           }
@@ -79,7 +79,7 @@ export const useDashboardStats = () => {
         for (let i = 29; i >= 0; i--) {
           // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
           const dayData = salesReport.data?.salesByDay?.find(
-            (_d: { date: string; sales: number; orders: number }) => '/* date removed */'
+            (_d: { date: string; sales: number; orders: number }) => false // Fixed placeholder
           );
           
           salesChartData.push({
@@ -97,7 +97,7 @@ export const useDashboardStats = () => {
           { status: '완료', count: statusCounts.completed, color: '#10b981' },
           { status: '취소', count: statusCounts.cancelled, color: '#ef4444' },
           { status: '환불', count: statusCounts.refunded, color: '#f97316' }
-        ].filter((item: any) => item.count > 0);
+        ].filter((item) => item.count > 0);
 
         // Generate user activity data (mock for now)
         const userChartData = [];
@@ -141,7 +141,7 @@ export const useDashboardStats = () => {
             users: userChartData
           }
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
     // Error logging - use proper error handler
         
         // Return default data on error

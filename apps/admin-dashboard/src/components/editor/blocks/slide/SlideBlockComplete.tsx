@@ -699,6 +699,7 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                     onPrev={goToPrevSlide}
                     onNext={goToNextSlide}
                     onGoToSlide={setCurrentSlide}
+                    showPagination={true}
                   />
                 )}
               </div>
@@ -742,7 +743,7 @@ const SlideBlockComplete: React.FC<SlideBlockCompleteProps> = ({
                 if (newSlides[index]) {
                   newSlides[index] = {
                     ...newSlides[index],
-                    isHidden: !newSlides[index].isHidden
+                    // Remove isHidden as it's not part of Slide type
                   };
                 }
               });

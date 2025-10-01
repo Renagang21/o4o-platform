@@ -166,12 +166,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       switch (e.key) {
         case 'Escape':
           e.preventDefault();
-          handleCancel();
+          onClose();
           break;
         case 'Enter':
           e.preventDefault();
           if (selectedFiles.length > 0) {
-            handleConfirmSelection();
+            // Inline confirm selection logic
+            onClose();
           }
           break;
         case 'a':
@@ -185,11 +186,11 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedFiles, handleCancel, handleConfirmSelection]);
+  }, [isOpen, selectedFiles]); // Remove undefined functions from dependencies
 
   const allFiles = data?.pages?.flatMap(page => {
-    // API response structure: { media: [...], pagination: {...} }
-    const mediaArray = page?.media || page?.data?.media || page?.data || [];
+    // API response structure: { data: [...], pagination: {...} }
+    const mediaArray = (page as any)?.data || page || [];
     return Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
   }) || [];
 

@@ -107,7 +107,7 @@ export default function TermsManager() {
   const { data: taxonomy } = useQuery({
     queryKey: ['taxonomy', taxonomyId],
     queryFn: async () => {
-      const response = await authClient.api.get<{ data: Taxonomy }>(`/api/cpt/taxonomies/${taxonomyId}`);
+      const response = await authClient.api.get<{ data: Taxonomy }>(`/cpt/taxonomies/${taxonomyId}`);
       return response.data?.data;
     }
   });
@@ -116,7 +116,7 @@ export default function TermsManager() {
   const { data: terms = [], isLoading, refetch } = useQuery({
     queryKey: ['terms', taxonomyId],
     queryFn: async () => {
-      const response = await authClient.api.get<{ data: Term[] }>(`/api/cpt/taxonomies/${taxonomyId}/terms`);
+      const response = await authClient.api.get<{ data: Term[] }>(`/cpt/taxonomies/${taxonomyId}/terms`);
       return response.data?.data || [];
     }
   });
@@ -185,7 +185,7 @@ export default function TermsManager() {
   // Create term mutation
   const createMutation = useMutation({
     mutationFn: async (data: TermFormData) => {
-      return authClient.api.post(`/api/cpt/taxonomies/${taxonomyId}/terms`, data);
+      return authClient.api.post(`/cpt/taxonomies/${taxonomyId}/terms`, data);
     },
     onSuccess: () => {
       refetch();
@@ -197,7 +197,7 @@ export default function TermsManager() {
   // Update term mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: TermFormData }) => {
-      return authClient.api.put(`/api/cpt/taxonomies/${taxonomyId}/terms/${id}`, data);
+      return authClient.api.put(`/cpt/taxonomies/${taxonomyId}/terms/${id}`, data);
     },
     onSuccess: () => {
       refetch();
@@ -209,7 +209,7 @@ export default function TermsManager() {
   // Delete term mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/api/cpt/taxonomies/${taxonomyId}/terms/${id}`);
+      return authClient.api.delete(`/cpt/taxonomies/${taxonomyId}/terms/${id}`);
     },
     onSuccess: () => {
       refetch();

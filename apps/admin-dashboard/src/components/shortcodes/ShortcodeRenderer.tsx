@@ -14,7 +14,7 @@ import {
   UserDashboard,
   RoleVerification
 } from './dropshipping';
-import { AdminApprovalQueue, AdminPlatformStats } from './admin';
+import adminComponents from './admin';
 
 // Shortcode component map
 const COMPONENT_MAP = {
@@ -27,10 +27,10 @@ const COMPONENT_MAP = {
   'PayoutRequests': PayoutRequests,
   
   // Admin components
-  'AdminApprovalQueue': AdminApprovalQueue,
-  'admin_approval_queue': AdminApprovalQueue,
-  'AdminPlatformStats': AdminPlatformStats,
-  'admin_platform_stats': AdminPlatformStats,
+  'AdminApprovalQueue': adminComponents.AdminApprovalQueue,
+  'admin_approval_queue': adminComponents.AdminApprovalQueue,
+  'AdminPlatformStats': adminComponents.AdminPlatformStats,
+  'admin_platform_stats': adminComponents.AdminPlatformStats,
   
   // Core components
   'UserDashboard': UserDashboard,
@@ -39,7 +39,7 @@ const COMPONENT_MAP = {
 
 interface ShortcodeProps {
   name: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
   content?: string;
 }
 
@@ -185,13 +185,15 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
 // WordPress-style shortcode registration function
 export const registerShortcodes = () => {
   // This would be called by WordPress to register shortcodes
-  const shortcodes = {};
+  const shortcodes: Record<string, {
+    callback: (attributes?: Record<string, unknown>, content?: string) => string;
+  }> = {};
   
   Object.keys(dropshippingShortcodes).forEach(shortcodeName => {
-    const config = dropshippingShortcodes[shortcodeName];
+    const config = dropshippingShortcodes[shortcodeName as keyof typeof dropshippingShortcodes];
     
     shortcodes[shortcodeName] = {
-      callback: (attributes: Record<string, any> = {}, content: string = '') => {
+      callback: (attributes: Record<string, unknown> = {}, content: string = '') => {
         return `<div id="shortcode-${shortcodeName}-${Date.now()}"></div>
         <script>
           window.renderShortcode('${shortcodeName}', ${JSON.stringify(attributes)}, '${content}');
@@ -206,7 +208,7 @@ export const registerShortcodes = () => {
 };
 
 // Helper function to render shortcode in WordPress context
-export const renderShortcodeInWordPress = (name: string, attributes: Record<string, any>, content: string) => {
+export const renderShortcodeInWordPress = (name: string, attributes: Record<string, unknown>, content: string) => {
   const container = document.getElementById(`shortcode-${name}-container`);
   if (container && window.React && window.ReactDOM) {
     window.ReactDOM.render(
@@ -222,10 +224,10 @@ export const getShortcodeInfo = () => {
     name,
     tag: `[${name}]`,
     description: dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.description,
-    attributes: dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {},
+    attributes: (dropshippingShortcodes as any)[name]?.attributes || {},
     example: `[${name}${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).length > 0 
-      ? ` ${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).slice(0, 2).map(attr => 
-          `${attr}="${dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes![attr].default || 'value'}"`
+      ? ` ${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).slice(0, 2).map((attr: string) => 
+          `${attr}="${dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes?.[attr]?.default || 'value'}"`
         ).join(' ')}`
       : ''}]`,
     category: name.startsWith('partner_') ? 'Partner Portal' : 'General'

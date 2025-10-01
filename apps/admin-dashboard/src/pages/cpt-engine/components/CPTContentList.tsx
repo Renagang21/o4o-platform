@@ -192,8 +192,8 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
 
   // Get status badge variant
   const getStatusBadge = (status: PostStatus) => {
-    const variants: Record<PostStatus, { label: string; variant: any }> = {
-      publish: { label: '발행됨', variant: 'default' },
+    const variants: Partial<Record<PostStatus, { label: string; variant: string }>> = {
+      published: { label: '발행됨', variant: 'default' },
       draft: { label: '임시저장', variant: 'secondary' },
       private: { label: '비공개', variant: 'outline' },
       trash: { label: '휴지통', variant: 'destructive' }

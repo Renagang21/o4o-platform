@@ -110,7 +110,7 @@ export default function FieldGroupsList() {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this field group?')) {
       try {
-        await authClient.api.delete(`/api/cpt/field-groups/${id}`);
+        await authClient.api.delete(`/cpt/field-groups/${id}`);
         refetch();
       } catch (error) {
         console.error('Failed to delete field group:', error);
@@ -121,7 +121,7 @@ export default function FieldGroupsList() {
   // Duplicate field group
   const handleDuplicate = async (group: FieldGroup) => {
     try {
-      await authClient.api.post('/api/cpt/field-groups', {
+      await authClient.api.post('/cpt/field-groups', {
         ...group,
         title: `${group.title} (Copy)`,
         id: undefined
@@ -135,7 +135,7 @@ export default function FieldGroupsList() {
   // Toggle active status
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      await authClient.api.patch(`/api/cpt/field-groups/${id}`, {
+      await authClient.api.patch(`/cpt/field-groups/${id}`, {
         isActive: !currentStatus
       });
       refetch();

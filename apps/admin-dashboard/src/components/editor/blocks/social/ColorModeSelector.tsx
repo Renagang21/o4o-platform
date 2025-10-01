@@ -196,7 +196,7 @@ export const ColorModeSelector: React.FC<ColorModeSelectorProps> = ({
                   >
                     <IconComponent
                       size={24}
-                      color={platform === 'kakao' && colorMode === 'brand' ? platformInfo.textColor : '#ffffff'}
+                      color={platform === 'kakao' && colorMode === 'brand' ? (platformInfo as any).textColor || '#ffffff' : '#ffffff'}
                     />
                   </div>
                   <span className="text-xs text-gray-500 mt-1 block">

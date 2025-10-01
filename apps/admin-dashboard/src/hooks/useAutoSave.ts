@@ -7,13 +7,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useDebounce as useDebounceHook } from './useDebounce';
 import toast from 'react-hot-toast';
 
-interface AutoSaveConfig {
+interface AutoSaveConfig<T = unknown> {
   saveInterval?: number; // milliseconds
   debounceDelay?: number; // milliseconds
   enableLocalStorage?: boolean;
   enableCloudSave?: boolean;
-  onSave?: (data: any) => Promise<void>;
-  onRestore?: () => Promise<any>;
+  onSave?: (data: T) => Promise<void>;
+  onRestore?: () => Promise<T>;
   storageKey?: string;
   postId?: string;
   postType?: string;
@@ -29,7 +29,7 @@ interface AutoSaveState {
   backupExists: boolean;
 }
 
-export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
+export function useAutoSave<T = unknown>(initialContent?: T, config: AutoSaveConfig = {}) {
   const {
     saveInterval = config.interval || 30000, // 30 seconds
     debounceDelay = 1000, // 1 second
@@ -51,7 +51,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
     backupExists: false
   });
 
-  const [content, setContent] = useState<any>(initialContent || null);
+  const [content, setContent] = useState<T | null>(initialContent || null);
   const debouncedContent = useDebounceHook(content, debounceDelay);
   const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const isRestoringRef = useRef(false);
@@ -65,7 +65,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
   }, [enableLocalStorage, storageKey]);
 
   // Save to local storage
-  const saveToLocalStorage = useCallback((data: any) => {
+  const saveToLocalStorage = useCallback((data: T) => {
     if (!enableLocalStorage) return;
 
     try {
@@ -91,7 +91,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
   }, [enableLocalStorage, storageKey]);
 
   // Save to cloud
-  const saveToCloud = useCallback(async (data: any) => {
+  const saveToCloud = useCallback(async (data: T) => {
     if (!enableCloudSave || !onSave) return;
 
     setState(prev => ({ ...prev, isSaving: true, error: null }));
@@ -132,7 +132,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
   }, [enableCloudSave, onSave, enableLocalStorage, storageKey, saveToLocalStorage, onSaveSuccess]);
 
   // Main save function
-  const save = useCallback(async (data: any = content, force: boolean = false) => {
+  const save = useCallback(async (data: T | null = content, force: boolean = false) => {
     if (!data || isRestoringRef.current) return;
 
     // Save to local storage immediately
@@ -145,7 +145,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
   }, [content, saveToLocalStorage, saveToCloud]);
 
   // Track content changes
-  const updateContent = useCallback((newContent: any) => {
+  const updateContent = useCallback((newContent: T) => {
     if (isRestoringRef.current) return;
     
     setContent(newContent);
@@ -181,7 +181,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
       if (onRestore) {
         const cloudData = await onRestore();
         if (cloudData) {
-          setContent(cloudData);
+          setContent(cloudData as T);
           setState(prev => ({ 
             ...prev, 
             hasUnsavedChanges: false,

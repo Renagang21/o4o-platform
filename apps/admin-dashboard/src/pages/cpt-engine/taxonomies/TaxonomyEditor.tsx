@@ -124,7 +124,7 @@ export default function TaxonomyEditor() {
   const { data: cptTypes = [] } = useQuery({
     queryKey: ['cpt-types'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ data: CPTType[] }>('/api/public/cpt/types');
+      const response = await authClient.api.get<{ data: CPTType[] }>('/cpt/types');
       return response.data?.data || [];
     }
   });
@@ -134,7 +134,7 @@ export default function TaxonomyEditor() {
     queryKey: ['taxonomy', id],
     queryFn: async () => {
       if (!isEdit) return null;
-      const response = await authClient.api.get(`/api/cpt/taxonomies/${id}`);
+      const response = await authClient.api.get(`/cpt/taxonomies/${id}`);
       return response.data?.data;
     },
     enabled: isEdit
@@ -189,9 +189,9 @@ export default function TaxonomyEditor() {
   const saveMutation = useMutation({
     mutationFn: async (data: TaxonomyFormData) => {
       if (isEdit) {
-        return authClient.api.put(`/api/cpt/taxonomies/${id}`, data);
+        return authClient.api.put(`/cpt/taxonomies/${id}`, data);
       } else {
-        return authClient.api.post('/api/cpt/taxonomies', data);
+        return authClient.api.post('/cpt/taxonomies', data);
       }
     },
     onSuccess: () => {

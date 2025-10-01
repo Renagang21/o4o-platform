@@ -134,7 +134,7 @@ export default function FormBuilder() {
   const { data: cptTypes = [] } = useQuery({
     queryKey: ['cpt-types'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ data: CPTType[] }>('/api/public/cpt/types');
+      const response = await authClient.api.get<{ data: CPTType[] }>('/cpt/types');
       return response.data?.data || [];
     }
   });
@@ -144,7 +144,7 @@ export default function FormBuilder() {
     queryKey: ['field-groups', formData.cptSlug],
     queryFn: async () => {
       if (!formData.cptSlug) return [];
-      const response = await authClient.api.get(`/api/cpt/field-groups?postType=${formData.cptSlug}`);
+      const response = await authClient.api.get(`/cpt/field-groups?postType=${formData.cptSlug}`);
       return response.data?.data || [];
     },
     enabled: !!formData.cptSlug
@@ -155,7 +155,7 @@ export default function FormBuilder() {
     queryKey: ['form', id],
     queryFn: async () => {
       if (!isEdit) return null;
-      const response = await authClient.api.get(`/api/cpt/forms/${id}`);
+      const response = await authClient.api.get(`/cpt/forms/${id}`);
       return response.data?.data;
     },
     enabled: isEdit
@@ -172,9 +172,9 @@ export default function FormBuilder() {
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
       if (isEdit) {
-        return authClient.api.put(`/api/cpt/forms/${id}`, data);
+        return authClient.api.put(`/cpt/forms/${id}`, data);
       } else {
-        return authClient.api.post('/api/cpt/forms', data);
+        return authClient.api.post('/cpt/forms', data);
       }
     },
     onSuccess: () => {

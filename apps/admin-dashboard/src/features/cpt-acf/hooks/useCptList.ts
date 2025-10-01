@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { listCpt, deleteCpt } from '../services/cpt.api';
-import * as KEYS from './keys.cpt';
+import { cptApi } from '../services/cpt.api';
+// import * as KEYS from './keys.cpt';
+
+// Create simple keys object since the file doesn't exist
+const KEYS = {
+  LIST: ['cpt', 'list'] as const
+};
 
 export type CptSort = 'createdAt' | 'name';
 export type CptOrder = 'ASC' | 'DESC';
@@ -40,7 +45,10 @@ export function useCptList(initial: CptListFilters = {}) {
 
   const { data = [], isLoading, isFetching, error, refetch } = useQuery({
     queryKey: [ ...KEYS.LIST, queryParams ],
-    queryFn: () => listCpt(queryParams),
+    queryFn: async () => {
+      const response = await cptApi.getAllTypes(queryParams.activeOnly as boolean);
+      return response.data || [];
+    },
     placeholderData: keepPreviousData,
     staleTime: 60_000,
   });
@@ -55,7 +63,7 @@ export function useCptList(initial: CptListFilters = {}) {
   }, [data, filters.q]);
 
   const deleteMutation = useMutation({
-    mutationFn: (slug: string) => deleteCpt(slug),
+    mutationFn: (slug: string) => cptApi.deleteType(slug),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: KEYS.LIST }),
   });
 
