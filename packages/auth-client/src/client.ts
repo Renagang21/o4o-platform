@@ -70,10 +70,10 @@ export class AuthClient {
             const refreshToken = localStorage.getItem('refreshToken');
             
             if (refreshToken) {
-              // Call refresh endpoint
+              // Call refresh endpoint - remove /v1 from baseURL for auth endpoints
               const refreshUrl = this.baseURL.includes('api.neture.co.kr') 
                 ? 'https://api.neture.co.kr/api/auth/refresh'
-                : `${this.baseURL}/auth/refresh`;
+                : `${this.baseURL.replace('/v1', '')}/auth/refresh`;
                 
               const response = await axios.post(refreshUrl, { refreshToken });
               const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken: string; refreshToken?: string };
@@ -145,8 +145,8 @@ export class AuthClient {
       // Production API server - use /api/auth/login
       authUrl = 'https://api.neture.co.kr/api/auth/login';
     } else {
-      // Development - remove /api/v1 prefix for auth endpoints
-      authUrl = `${this.baseURL.replace('/api/v1', '/api')}/auth/login`;
+      // Development - remove /v1 from baseURL for auth endpoints
+      authUrl = `${this.baseURL.replace('/v1', '')}/auth/login`;
     }
     const response = await axios.post(authUrl, credentials);
     return response.data as AuthResponse;
@@ -175,8 +175,8 @@ export class AuthClient {
         // Production API server - use /api/auth/logout
         authUrl = 'https://api.neture.co.kr/api/auth/logout';
       } else {
-        // Development - remove /api/v1 prefix for auth endpoints
-        authUrl = `${this.baseURL.replace('/api/v1', '/api')}/auth/logout`;
+        // Development - remove /v1 from baseURL for auth endpoints
+        authUrl = `${this.baseURL.replace('/v1', '')}/auth/logout`;
       }
       
       // Get token for authorization
@@ -214,19 +214,22 @@ const getApiUrl = () => {
                       (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL);
 
     if (envApiUrl) {
-      return envApiUrl.endsWith('/api') ? envApiUrl : `${envApiUrl}/api`;
+      // Add /api/v1 as the base path for API calls
+      return envApiUrl.endsWith('/api/v1') ? envApiUrl : 
+             envApiUrl.endsWith('/api') ? `${envApiUrl}/v1` : 
+             `${envApiUrl}/api/v1`;
     }
 
     // Auto-detect based on current location for development
     if (window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1' ||
         window.location.hostname.includes('.local')) {
-      return 'http://localhost:3002/api';
+      return 'http://localhost:3002/api/v1';
     }
   }
 
-  // Default to production API server
-  return 'https://api.neture.co.kr/api';
+  // Default to production API server with /api/v1 path
+  return 'https://api.neture.co.kr/api/v1';
 };
 
 export const authClient = new AuthClient(getApiUrl());
