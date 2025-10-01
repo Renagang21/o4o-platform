@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
+import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraImageUploader } from '../../components/controls/AstraImageUploader';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraToggle } from '../../components/controls/AstraToggle';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { Monitor, Tablet, Smartphone } from 'lucide-react';
-import { AstraCustomizerSettings, PreviewDevice } from '../../types/customizer-types';
 
-interface SiteIdentitySectionProps {
-  settings: AstraCustomizerSettings;
-  updateSetting: (section: keyof AstraCustomizerSettings, value: any, path?: string[]) => void;
-  previewDevice: PreviewDevice;
-}
-
-export const SiteIdentitySection: React.FC<SiteIdentitySectionProps> = ({ settings, updateSetting }) => {
+export const SiteIdentitySection: React.FC = () => {
+  const { settings, updateSetting } = useCustomizerState();
   const siteIdentity = settings.siteIdentity;
   
   const [logoTab, setLogoTab] = useState<'desktop' | 'mobile'>('desktop');

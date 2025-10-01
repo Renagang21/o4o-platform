@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
+import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { AstraToggle } from '../../components/controls/AstraToggle';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraSelect } from '../../components/controls/AstraSelect';
 import { Grid, Type, Layout } from 'lucide-react';
-import { AstraCustomizerSettings, PreviewDevice } from '../../types/customizer-types';
 
-interface FooterSectionProps {
-  settings: AstraCustomizerSettings;
-  updateSetting: (section: keyof AstraCustomizerSettings, value: any, path?: string[]) => void;
-  previewDevice: PreviewDevice;
-}
-
-export const FooterSection: React.FC<FooterSectionProps> = ({ settings, updateSetting }) => {
+export const FooterSection: React.FC = () => {
+  const { settings, updateSetting } = useCustomizerState();
   const footer = settings.footer;
   
   const [activeTab, setActiveTab] = useState<'widgets' | 'bottom'>('widgets');

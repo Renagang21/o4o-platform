@@ -5,13 +5,14 @@ import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
 
-// Import Astra sections
+// Import Astra sections and context
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
 import { ColorsSection } from './sections/global/ColorsSection';
 import { TypographySection } from './sections/global/TypographySection';
 import { ContainerSection } from './sections/layout/ContainerSection';
 import { HeaderLayoutSection } from './sections/header/HeaderLayoutSection';
 import { FooterSection } from './sections/footer/FooterSection';
+import { CustomizerProvider } from './context/CustomizerContext';
 
 import './styles/controls.css';
 import './styles/sections.css';
@@ -214,7 +215,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           </h2>
         </div>
         <div className="p-4">
-          <SectionComponent {...customizerContext} />
+          <SectionComponent />
         </div>
       </div>
     );
@@ -227,24 +228,49 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     mobile: { width: '375px', height: '667px' },
   };
 
+  const handleSaveWrapper = async () => {
+    if (!onSave) return;
+    
+    setIsSaving(true);
+    try {
+      const success = await onSave(settings);
+      if (success) {
+        setIsDirty(false);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-white z-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-md"
-          >
-            <X size={20} />
-          </button>
-          <h1 className="text-lg font-medium">사용자 정의하기</h1>
-          {activeSection && (
-            <span className="text-sm text-gray-500">
-              › {sections.find(s => s.key === activeSection)?.label}
-            </span>
-          )}
-        </div>
+    <CustomizerProvider 
+      initialSettings={settings}
+      previewUrl={previewUrl}
+      eventHandlers={{
+        onSave: handleSaveWrapper,
+        onSettingChange: (section, value) => {
+          // Update local state when context changes
+          updateSetting(section as keyof AstraCustomizerSettings, value);
+        }
+      }}
+    >
+      <div className="fixed inset-0 bg-white z-50">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-md"
+            >
+              <X size={20} />
+            </button>
+            <h1 className="text-lg font-medium">사용자 정의하기</h1>
+            {activeSection && (
+              <span className="text-sm text-gray-500">
+                › {sections.find(s => s.key === activeSection)?.label}
+              </span>
+            )}
+          </div>
 
         <div className="flex items-center gap-2">
           <button
@@ -345,6 +371,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </CustomizerProvider>
   );
 };

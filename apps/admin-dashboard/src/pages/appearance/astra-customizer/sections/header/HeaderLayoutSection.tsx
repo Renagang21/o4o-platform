@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
+import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraToggle } from '../../components/controls/AstraToggle';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { AstraSelect } from '../../components/controls/AstraSelect';
 import { Menu, MoreHorizontal, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
-import { AstraCustomizerSettings, PreviewDevice } from '../../types/customizer-types';
 
-interface HeaderLayoutSectionProps {
-  settings: AstraCustomizerSettings;
-  updateSetting: (section: keyof AstraCustomizerSettings, value: any, path?: string[]) => void;
-  previewDevice: PreviewDevice;
-}
-
-export const HeaderLayoutSection: React.FC<HeaderLayoutSectionProps> = ({ settings, updateSetting }) => {
+export const HeaderLayoutSection: React.FC = () => {
+  const { settings, updateSetting } = useCustomizerState();
   const header = settings.header;
   
   const [activeTab, setActiveTab] = useState<'general' | 'primary' | 'above' | 'below'>('general');

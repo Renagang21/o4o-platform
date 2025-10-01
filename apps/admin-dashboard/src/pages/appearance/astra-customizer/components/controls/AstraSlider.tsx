@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Monitor, Tablet, Smartphone } from 'lucide-react';
 import { ResponsiveValue, PreviewDevice } from '../../types/customizer-types';
-import { useCustomizer } from '../../context/CustomizerContext';
 
 type Unit = 'px' | 'em' | 'rem' | '%' | 'vh' | 'vw';
 
@@ -16,6 +15,7 @@ interface AstraSliderProps {
   description?: string;
   responsive?: boolean;
   defaultUnit?: Unit;
+  previewDevice?: PreviewDevice; // Context 대신 props로 받기
 }
 
 export const AstraSlider: React.FC<AstraSliderProps> = ({
@@ -29,9 +29,9 @@ export const AstraSlider: React.FC<AstraSliderProps> = ({
   description,
   responsive = false,
   defaultUnit = 'px',
+  previewDevice = 'desktop',
 }) => {
-  const { state } = useCustomizer();
-  const currentDevice = state.previewDevice;
+  const currentDevice = previewDevice;
   
   const [selectedUnit, setSelectedUnit] = useState<Unit>(defaultUnit);
   const [linkedDevices, setLinkedDevices] = useState(true);
