@@ -229,7 +229,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
             {/* AI 프로바이더 선택 */}
             <div className="space-y-2">
               <Label>AI 서비스</Label>
-              <Select value={provider} onValueChange={handleProviderChange}>
+              <Select value={provider} onValueChange={(value) => handleProviderChange(value as 'openai' | 'gemini' | 'claude')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -249,7 +249,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
             {/* 모델 선택 */}
             <div className="space-y-2">
               <Label>모델</Label>
-              <Select value={model} onValueChange={(v: AIModel) => setModel(v)}>
+              <Select value={model} onValueChange={(v) => setModel(v as AIModel)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
