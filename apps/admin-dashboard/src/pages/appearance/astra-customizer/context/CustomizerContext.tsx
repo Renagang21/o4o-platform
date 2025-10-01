@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   AstraCustomizerSettings,
   PreviewDevice,
@@ -33,7 +33,7 @@ type CustomizerAction =
   | { type: 'MARK_DIRTY'; isDirty: boolean }
   | { type: 'UNDO' }
   | { type: 'REDO' }
-  | { type: 'ADD_TO_HISTORY'; settings: AstraCustomizerSettings }
+  | { type: 'ADD_TO_HISTORY' }
   | { type: 'RESET_TO_DEFAULT' };
 
 interface CustomizerContextValue {
@@ -128,8 +128,17 @@ const customizerReducer = (state: CustomizerState, action: CustomizerAction): Cu
       };
     
     case 'ADD_TO_HISTORY': {
+      // Use current settings from state, not from action
+      const currentSettings = state.settings;
+      
+      // Don't add if it's the same as the last item in history
+      const lastHistoryItem = state.history[state.historyIndex];
+      if (JSON.stringify(lastHistoryItem) === JSON.stringify(currentSettings)) {
+        return state;
+      }
+      
       const newHistory = state.history.slice(0, state.historyIndex + 1);
-      newHistory.push(action.settings);
+      newHistory.push(currentSettings);
       
       // Keep only last 50 states
       if (newHistory.length > 50) {
@@ -201,10 +210,13 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
   previewUrl = '/',
   eventHandlers,
 }) => {
-  const defaultSettings = getDefaultSettings();
-  const mergedSettings = initialSettings 
-    ? deepMerge(defaultSettings, initialSettings as any)
-    : defaultSettings;
+  const defaultSettings = useMemo(() => getDefaultSettings(), []);
+  const mergedSettings = useMemo(() => 
+    initialSettings 
+      ? deepMerge(defaultSettings, initialSettings as any)
+      : defaultSettings,
+    [defaultSettings, initialSettings]
+  );
   
   const [state, dispatch] = useReducer(customizerReducer, {
     settings: mergedSettings,
@@ -218,39 +230,25 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
   });
   
   const previewIframeRef = useRef<HTMLIFrameElement | null>(null);
-  const lastSettingsRef = useRef(state.settings);
+  const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Update setting with history tracking
   const updateSetting = useCallback((section: SettingSection, value: any, path?: string[]) => {
     dispatch({ type: 'UPDATE_SETTING', section, value, path });
     
-    // Add to history after a delay (debounced)
-    setTimeout(() => {
-      if (lastSettingsRef.current !== state.settings) {
-        dispatch({ type: 'ADD_TO_HISTORY', settings: state.settings });
-        lastSettingsRef.current = state.settings;
-      }
-    }, 500);
-    
-    // Special handling for logo updates - force preview refresh
-    if (section === 'siteIdentity' && path && path[0] === 'logo') {
-      setTimeout(() => {
-        const iframe = document.getElementById('customizer-preview-iframe') as HTMLIFrameElement;
-        if (iframe?.contentWindow) {
-          iframe.contentWindow.postMessage(
-            {
-              type: 'update-logo',
-              settings: state.settings
-            },
-            '*'
-          );
-        }
-      }, 100);
+    // Debounced history tracking - clear previous timeout
+    if (historyTimeoutRef.current) {
+      clearTimeout(historyTimeoutRef.current);
     }
+    
+    // Add to history after a delay (debounced)
+    historyTimeoutRef.current = setTimeout(() => {
+      dispatch({ type: 'ADD_TO_HISTORY' } as any);
+    }, 1000);
     
     // Call event handler if provided
     eventHandlers?.onSettingChange?.(section, value);
-  }, [state.settings, eventHandlers]);
+  }, [eventHandlers]); // Remove state.settings from dependencies
   
   // PostMessage communication with preview iframe
   useEffect(() => {
@@ -349,6 +347,15 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     if (iframe) {
       previewIframeRef.current = iframe;
     }
+  }, []);
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (historyTimeoutRef.current) {
+        clearTimeout(historyTimeoutRef.current);
+      }
+    };
   }, []);
   
   return (
