@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useCustomizer } from '../context/CustomizerContext';
 import { 
   AstraCustomizerSettings, 
@@ -101,13 +101,15 @@ export function useCustomizerState(
     [state.settings]
   );
   
+  // Memoize default settings to prevent infinite loops
+  const defaultSettings = useMemo(() => getDefaultSettings(), []);
+  
   // Reset section to default
   const resetSection = useCallback(
     (section: SettingSection) => {
-      const defaultSettings = getDefaultSettings();
       contextUpdateSetting(section, defaultSettings[section]);
     },
-    [contextUpdateSetting]
+    [contextUpdateSetting, defaultSettings]
   );
   
   // Reset all settings
