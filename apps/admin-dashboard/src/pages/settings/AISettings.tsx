@@ -12,17 +12,19 @@ export class AIApiKeyService {
   static async getKeys(): Promise<Record<string, string>> {
     try {
       const dbSettings = await aiSettingsApi.getSettings();
+      // Debug: 데이터베이스에서 불러온 설정 확인
+      console.log('🔍 AI 설정 로딩:', Object.keys(dbSettings).length, '개 프로바이더');
+      
       const keys: Record<string, string> = {};
       
       Object.entries(dbSettings).forEach(([provider, settings]) => {
-        if (settings.apiKey) {
+        if (settings.apiKey && settings.apiKey.trim()) {
           keys[provider] = settings.apiKey;
         }
       });
-      
       return keys;
     } catch (error) {
-      // Failed to get API keys from database
+      console.error('❌ API 키 로딩 실패:', error);
       return {};
     }
   }

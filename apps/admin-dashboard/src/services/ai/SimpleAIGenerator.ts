@@ -285,19 +285,53 @@ export class SimpleAIGenerator {
    * 템플릿별 시스템 프롬프트
    */
   private getSystemPrompt(template: string): string {
+    const baseRules = `
+중요한 규칙:
+1. 반드시 JSON 형식으로만 응답하세요: {"blocks": [...]}
+2. 이미지 URL은 절대 사용하지 마세요 (placeholder 사이트 포함)
+3. 이미지 블록에는 alt 텍스트만 포함하고 src는 비워두세요
+4. 버튼은 실제 링크 대신 "#" 사용
+5. 한국어로 작성하세요
+6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
+
     const prompts = {
-      landing: `WordPress Gutenberg 블록 형식으로 랜딩 페이지를 생성하세요.
-사용 가능한 블록: core/heading, core/paragraph, core/image, core/button, core/columns, core/separator
-반드시 JSON 형식으로 응답하세요: {"blocks": [...]}`,
+      landing: `${baseRules}
+
+랜딩 페이지 구성 요소:
+- 매력적인 헤드라인 (H1)
+- 부제목 설명 (H2)
+- 주요 기능/장점 3개 (단락)
+- CTA 버튼
+- 이미지는 alt 텍스트만 (src 없음)
+
+사용 가능한 블록: core/heading, core/paragraph, core/image, core/button, core/columns, core/separator`,
       
-      about: `회사 소개 페이지를 생성하세요. 회사 비전, 핵심 가치, 팀 소개를 포함하세요.
-JSON 형식으로 응답하세요: {"blocks": [...]}`,
+      about: `${baseRules}
+
+회사 소개 페이지 구성:
+- 회사 소개 헤드라인
+- 회사 비전/미션
+- 핵심 가치 3-4개
+- 팀 소개 섹션
+- 연락처 정보`,
       
-      product: `제품 소개 페이지를 생성하세요. 제품명, 주요 기능, 장점, 가격 정보를 포함하세요.
-JSON 형식으로 응답하세요: {"blocks": [...]}`,
+      product: `${baseRules}
+
+제품 소개 페이지 구성:
+- 제품명과 한 줄 설명
+- 주요 기능 소개
+- 제품 장점 3-5개
+- 사용법/활용 사례
+- 가격 정보 (있다면)`,
       
-      blog: `블로그 포스트를 생성하세요. 제목, 소개, 본문 섹션, 결론을 포함하세요.
-JSON 형식으로 응답하세요: {"blocks": [...]}`
+      blog: `${baseRules}
+
+블로그 포스트 구성:
+- 매력적인 제목
+- 서론 (문제 제기)
+- 본문 3-4개 섹션
+- 실용적인 팁이나 해결책
+- 결론 및 요약`
     };
     
     return prompts[template as keyof typeof prompts] || prompts.landing;
@@ -307,7 +341,7 @@ JSON 형식으로 응답하세요: {"blocks": [...]}`
    * 사용자 프롬프트 구성
    */
   private buildUserPrompt(prompt: string): string {
-    return `다음 요구사항으로 페이지를 생성하세요: ${prompt}
+    return `다음 요구사항으로 페이지를 정확히 생성하세요: ${prompt}
 
 블록 형식 예시:
 {
@@ -321,9 +355,21 @@ JSON 형식으로 응답하세요: {"blocks": [...]}`
       "type": "core/paragraph", 
       "content": {"text": "내용"},
       "attributes": {}
+    },
+    {
+      "type": "core/image",
+      "content": {"alt": "이미지 설명"},
+      "attributes": {}
+    },
+    {
+      "type": "core/button",
+      "content": {"text": "버튼 텍스트", "url": "#"},
+      "attributes": {}
     }
   ]
-}`;
+}
+
+중요: 이미지 src는 절대 포함하지 말고, alt 텍스트만 사용하세요. 외부 URL 사용 금지.`;
   }
 
   /**
