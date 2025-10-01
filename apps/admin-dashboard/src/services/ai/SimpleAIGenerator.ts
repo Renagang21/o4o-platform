@@ -183,25 +183,7 @@ export class SimpleAIGenerator {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 8192,
-            responseMimeType: 'application/json',
-            // 2025년 응답 스키마 (구조화된 출력)
-            responseSchema: {
-              type: 'OBJECT',
-              properties: {
-                blocks: {
-                  type: 'ARRAY',
-                  items: {
-                    type: 'OBJECT',
-                    properties: {
-                      type: { type: 'STRING' },
-                      content: { type: 'OBJECT' },
-                      attributes: { type: 'OBJECT' }
-                    }
-                  }
-                }
-              }
-            }
+            maxOutputTokens: 8192
           }
         }),
         signal
@@ -221,10 +203,24 @@ export class SimpleAIGenerator {
     }
 
     try {
-      const parsed = JSON.parse(content);
-      return parsed.blocks || parsed;
-    } catch {
-      throw new Error('Gemini 응답을 파싱할 수 없습니다');
+      // Gemini 응답에서 JSON 부분 추출
+      let jsonContent = content;
+      
+      // 마크다운 코드 블록이나 기타 텍스트 제거
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       content.match(/\{[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        jsonContent = jsonMatch[1] || jsonMatch[0];
+      }
+      
+      const parsed = JSON.parse(jsonContent);
+      const blocks = parsed.blocks || (Array.isArray(parsed) ? parsed : [parsed]);
+      
+      return blocks;
+    } catch (error) {
+      console.error('Gemini JSON 파싱 오류:', error, 'Content:', content);
+      throw new Error('Gemini 응답을 파싱할 수 없습니다. AI가 올바른 JSON 형식을 반환하지 않았습니다.');
     }
   }
 

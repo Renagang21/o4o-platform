@@ -100,7 +100,7 @@ const AISettings: FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [testingProvider, setTestingProvider] = useState<string | null>(null);
-  const [testResults, setTestResults] = useState<Record<string, boolean>>({});
+  const [testResults, setTestResults] = useState<Record<string, boolean | undefined>>({});
 
   // 프로바이더 정보
   const providers = [
@@ -159,9 +159,17 @@ const AISettings: FC = () => {
           }
         }
 
-        // 실제로 값이 있는 경우에만 설정
+        // 실제로 값이 있는 키만 업데이트 (빈 키는 덮어쓰지 않음)
         if (Object.keys(savedKeys).length > 0) {
-          setApiKeys(savedKeys);
+          setApiKeys(prev => {
+            const updated = { ...prev };
+            Object.entries(savedKeys).forEach(([provider, key]) => {
+              if (key && key.trim()) {
+                updated[provider] = key;
+              }
+            });
+            return updated;
+          });
         }
 
         if (Object.keys(savedModels).length > 0) {
@@ -315,10 +323,18 @@ const AISettings: FC = () => {
                           'sk-ant-...'
                         }
                         value={apiKeys[provider.id] || ''}
-                        onChange={(e) => setApiKeys(prev => ({
-                          ...prev,
-                          [provider.id]: e.target.value
-                        }))}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          setApiKeys(prev => ({
+                            ...prev,
+                            [provider.id]: newValue
+                          }));
+                          // API 키가 변경되면 테스트 결과 초기화
+                          setTestResults(prev => ({
+                            ...prev,
+                            [provider.id]: undefined
+                          }));
+                        }}
                         autoComplete="current-password"
                       />
                       <button
@@ -340,10 +356,12 @@ const AISettings: FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleTestKey(provider.id)}
-                      disabled={testingProvider === provider.id}
+                      disabled={testingProvider === provider.id || !apiKeys[provider.id]?.trim()}
                     >
                       {testingProvider === provider.id ? (
                         <span className="animate-spin">⏳</span>
+                      ) : (!apiKeys[provider.id]?.trim()) ? (
+                        '키 입력 필요'
                       ) : testResults[provider.id] === true ? (
                         <Check className="w-4 h-4 text-green-500" />
                       ) : testResults[provider.id] === false ? (
