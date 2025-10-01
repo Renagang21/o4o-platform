@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { shortcodeIntegrator } from './shortcodeIntegrator';
+import { blockGuideLoader } from './blockGuideLoader';
+import { visionAI, VisionAIResult } from './visionAI';
 
 export interface Block {
   id: string;
@@ -38,12 +40,6 @@ export const CLAUDE_MODELS = {
   'claude-3-haiku-20240307': 'Claude 3 Haiku',
 } as const;
 
-export interface PageTemplate {
-  name: string;
-  description: string;
-  systemPrompt: string;
-  exampleBlocks?: Block[];
-}
 
 // 진행률 콜백 타입
 export interface ProgressCallback {
@@ -53,60 +49,13 @@ export interface ProgressCallback {
 // 생성 옵션 타입
 export interface GenerateOptions {
   prompt: string;
-  template: keyof typeof PAGE_TEMPLATES;
   onProgress?: ProgressCallback;
   signal?: AbortSignal;
   useShortcodes?: boolean; // shortcode 사용 여부
   shortcodeCategories?: string[]; // 포함할 shortcode 카테고리
+  imageAnalyses?: VisionAIResult[]; // 업로드된 이미지의 Vision AI 분석 결과
 }
 
-// 페이지 템플릿 정의
-const PAGE_TEMPLATES: Record<string, PageTemplate> = {
-  landing: {
-    name: '랜딩 페이지',
-    description: '제품이나 서비스를 소개하는 랜딩 페이지',
-    systemPrompt: `당신은 WordPress Gutenberg 블록 형식으로 페이지를 생성하는 전문가입니다.
-    랜딩 페이지를 생성할 때 다음 블록들을 사용하세요:
-    - core/heading: 제목과 부제목
-    - core/paragraph: 설명 텍스트
-    - core/image: 이미지 (placeholder 사용)
-    - core/columns: 다단 레이아웃
-    - core/button: CTA 버튼
-    - core/separator: 구분선
-    
-    JSON 형식으로 블록 배열을 반환하세요.`,
-  },
-  about: {
-    name: '회사 소개',
-    description: '회사나 팀을 소개하는 페이지',
-    systemPrompt: `회사 소개 페이지를 생성합니다. 다음 구조를 따르세요:
-    - 회사 비전과 미션
-    - 핵심 가치
-    - 팀 소개
-    - 연혁
-    - 연락처 정보`,
-  },
-  product: {
-    name: '제품 소개',
-    description: '제품의 특징과 장점을 설명하는 페이지',
-    systemPrompt: `제품 소개 페이지를 생성합니다. 다음을 포함하세요:
-    - 제품명과 설명
-    - 주요 기능
-    - 장점과 이점
-    - 가격 정보
-    - 고객 후기`,
-  },
-  blog: {
-    name: '블로그 포스트',
-    description: '블로그 형식의 글',
-    systemPrompt: `블로그 포스트를 생성합니다. 다음 구조를 사용하세요:
-    - 제목 (h1)
-    - 소개 단락
-    - 본문 섹션들 (h2, h3)
-    - 이미지
-    - 결론`,
-  },
-};
 
 export class AIPageGenerator {
   private provider: AIProvider;
@@ -117,18 +66,72 @@ export class AIPageGenerator {
   }
 
   /**
+   * 동적 시스템 프롬프트 생성 (자유형)
+   */
+  private async buildDynamicSystemPrompt(): Promise<string> {
+    try {
+      // 블록 가이드 로드
+      const blockGuide = await blockGuideLoader.getAIPrompt();
+      
+      // 완전한 시스템 프롬프트 생성 (템플릿 제약 없음)
+      return `당신은 WordPress Gutenberg 블록 형식으로 페이지를 생성하는 전문가입니다.
+
+${blockGuide}
+
+페이지 생성 원칙:
+- 사용자의 요청을 정확히 분석하여 가장 적합한 구조와 블록을 선택하세요
+- 창의적이고 독창적인 레이아웃을 구성하세요
+- 콘텐츠의 목적과 맥락에 맞는 블록을 자유롭게 조합하세요
+- 사용자가 명시적으로 요청하지 않은 구조는 강요하지 마세요
+
+응답 형식:
+- 반드시 JSON 배열 형식으로만 응답하세요
+- 각 블록은 {"type": "", "content": {}, "attributes": {}} 형식
+- 설명이나 추가 텍스트는 포함하지 마세요`;
+      
+    } catch (error) {
+      console.error('동적 프롬프트 생성 실패:', error);
+      
+      // Fallback: 기본 프롬프트 사용
+      return this.getFallbackPrompt();
+    }
+  }
+
+
+  /**
+   * Fallback 프롬프트 (블록 가이드 로드 실패 시)
+   */
+  private getFallbackPrompt(): string {
+    return `당신은 WordPress Gutenberg 블록 전문가입니다.
+
+기본 블록 사용법:
+- core/heading: 제목 (level 1-6)
+- core/paragraph: 본문 텍스트
+- core/image: 이미지 (alt만, src 없음)
+- core/button: 버튼 (url="#")
+- core/columns: 다단 레이아웃
+- enhanced/gallery: 갤러리/슬라이더
+- core/separator: 구분선
+
+중요: 슬라이드 요청 시 enhanced/gallery 사용, core/image 반복 금지
+
+사용자의 요청을 자유롭게 해석하여 가장 적합한 블록 구조를 생성하세요.
+
+JSON 배열 형식으로만 응답하세요.`;
+  }
+
+  /**
    * 프롬프트를 기반으로 페이지 블록을 생성합니다 (개선된 버전)
    */
   async generateBlocks(options: GenerateOptions): Promise<Block[]> {
     const { 
       prompt, 
-      template = 'landing', 
       onProgress, 
       signal, 
       useShortcodes = true, 
-      shortcodeCategories 
+      shortcodeCategories,
+      imageAnalyses = []
     } = options;
-    const pageTemplate = PAGE_TEMPLATES[template];
     
     // 진행률 업데이트 헬퍼
     const updateProgress = (progress: number, message: string) => {
@@ -156,6 +159,18 @@ export class AIPageGenerator {
         }
       }
 
+      // 0.5단계: 이미지 컨텍스트 통합 (3%)
+      if (imageAnalyses.length > 0) {
+        updateProgress(6, '이미지 컨텍스트를 통합 중...');
+        const imageContext = visionAI.combineImageContexts(imageAnalyses);
+        if (imageContext.trim()) {
+          enhancedPrompt = `${enhancedPrompt}
+
+${imageContext}`;
+          updateProgress(8, `${imageAnalyses.length}개 이미지의 컨텍스트가 통합되었습니다`);
+        }
+      }
+
       // 1단계: AI 모델 연결 (15%)
       updateProgress(10, 'AI 모델에 연결 중...');
       
@@ -171,18 +186,18 @@ export class AIPageGenerator {
       
       switch (this.provider.name) {
         case 'openai':
-          blocks = await this.generateWithOpenAI(enhancedPrompt, pageTemplate, updateProgress, signal);
+          blocks = await this.generateWithOpenAI(enhancedPrompt, updateProgress, signal);
           break;
         case 'claude':
-          blocks = await this.generateWithClaude(enhancedPrompt, pageTemplate, updateProgress, signal);
+          blocks = await this.generateWithClaude(enhancedPrompt, updateProgress, signal);
           break;
         case 'gemini':
-          blocks = await this.generateWithGemini(enhancedPrompt, pageTemplate, updateProgress, signal);
+          blocks = await this.generateWithGemini(enhancedPrompt, updateProgress, signal);
           break;
         default:
           // 테스트/개발용 모의 생성
           updateProgress(30, '테스트 데이터를 생성 중...');
-          blocks = await this.generateMockBlocks(enhancedPrompt, template, updateProgress);
+          blocks = await this.generateMockBlocks(enhancedPrompt, updateProgress);
       }
 
       // 3단계: 블록 검증 및 정규화 (30%)
@@ -209,10 +224,9 @@ export class AIPageGenerator {
    * 이전 버전과의 호환성을 위한 래퍼 메서드
    */
   async generateBlocksLegacy(
-    prompt: string,
-    template: keyof typeof PAGE_TEMPLATES = 'landing'
+    prompt: string
   ): Promise<Block[]> {
-    return this.generateBlocks({ prompt, template });
+    return this.generateBlocks({ prompt });
   }
 
   /**
@@ -220,7 +234,6 @@ export class AIPageGenerator {
    */
   private async generateWithOpenAI(
     prompt: string,
-    template: PageTemplate,
     updateProgress: (progress: number, message: string) => void,
     signal?: AbortSignal
   ): Promise<Block[]> {
@@ -229,6 +242,9 @@ export class AIPageGenerator {
     }
 
     updateProgress(30, 'OpenAI GPT-4에 요청을 전송 중...');
+    
+    // 동적 프롬프트 생성 (템플릿 제약 없음)
+    const systemPrompt = await this.buildDynamicSystemPrompt();
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -241,7 +257,7 @@ export class AIPageGenerator {
         messages: [
           {
             role: 'system',
-            content: template.systemPrompt,
+            content: systemPrompt,
           },
           {
             role: 'user',
@@ -278,7 +294,7 @@ export class AIPageGenerator {
       return JSON.parse(content);
     } catch (error) {
       // Fallback to mock blocks
-      return this.generateMockBlocks(prompt, 'landing', updateProgress);
+      return this.generateMockBlocks(prompt, updateProgress);
     }
   }
 
@@ -287,7 +303,6 @@ export class AIPageGenerator {
    */
   private async generateWithClaude(
     prompt: string,
-    template: PageTemplate,
     updateProgress: (progress: number, message: string) => void,
     signal?: AbortSignal
   ): Promise<Block[]> {
@@ -296,6 +311,9 @@ export class AIPageGenerator {
     }
 
     updateProgress(30, 'Claude AI에 요청을 전송 중...');
+    
+    // 동적 프롬프트 생성 (템플릿 제약 없음)
+    const systemPrompt = await this.buildDynamicSystemPrompt();
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -310,7 +328,7 @@ export class AIPageGenerator {
         messages: [
           {
             role: 'user',
-            content: `${template.systemPrompt}
+            content: `${systemPrompt}
             
             다음 요구사항으로 페이지를 생성하세요: ${prompt}
             
@@ -336,7 +354,7 @@ export class AIPageGenerator {
       return JSON.parse(content);
     } catch (error) {
       // Fallback to mock blocks
-      return this.generateMockBlocks(prompt, 'landing', updateProgress);
+      return this.generateMockBlocks(prompt, updateProgress);
     }
   }
 
@@ -345,7 +363,6 @@ export class AIPageGenerator {
    */
   private async generateWithGemini(
     prompt: string,
-    template: PageTemplate,
     updateProgress: (progress: number, message: string) => void,
     signal?: AbortSignal
   ): Promise<Block[]> {
@@ -372,7 +389,10 @@ export class AIPageGenerator {
     // API 버전 결정 - 2.5 모델은 v1 사용, 나머지는 v1beta
     const apiVersion = modelName.includes('2.5') ? 'v1' : 'v1beta';
     
-    const systemInstruction = `${template.systemPrompt}
+    // 동적 프롬프트 생성 (템플릿 제약 없음)
+    const dynamicSystemPrompt = await this.buildDynamicSystemPrompt();
+    
+    const systemInstruction = `${dynamicSystemPrompt}
     
 중요: 반드시 유효한 JSON 배열 형식으로만 응답하세요.
 각 블록은 다음 구조를 가져야 합니다:
@@ -447,7 +467,7 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
         if (data.error?.message?.includes('is not found')) {
           // ${modelName} 모델을 찾을 수 없습니다. 기본 모델로 재시도합니다.
           this.provider.model = 'gemini-2.5-flash';
-          return this.generateWithGemini(prompt, template, updateProgress, signal);
+          return this.generateWithGemini(prompt, updateProgress, signal);
         }
         
         throw new Error(data.error?.message || `Gemini API 오류: ${response.status}`);
@@ -485,7 +505,7 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
         // Gemini 응답 파싱 실패
         // Fallback to mock blocks
         updateProgress(60, '기본 템플릿을 사용합니다...');
-        return this.generateMockBlocks(prompt, 'landing', updateProgress);
+        return this.generateMockBlocks(prompt, updateProgress);
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -501,7 +521,6 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
    */
   private async generateMockBlocks(
     prompt: string,
-    template: string,
     updateProgress?: (progress: number, message: string) => void
   ): Promise<Block[]> {
     // 모의 지연을 추가하여 실제 API 호출처럼 보이게 함
@@ -531,233 +550,67 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
       updateProgress(60, '블록을 구성하고 있습니다...');
     }
 
-    // 템플릿별 기본 구조
-    switch (template) {
-      case 'landing':
-        blocks.push(
+    // 간단한 블록 구조만 생성 (배치 중심, 내용 최소화)
+    blocks.push(
+      {
+        id: uuidv4(),
+        type: 'core/paragraph',
+        content: { text: '' }, // 빈 내용
+        attributes: { placeholder: '여기에 설명을 입력하세요' },
+      },
+      {
+        id: uuidv4(),
+        type: 'core/columns',
+        innerBlocks: [
           {
             id: uuidv4(),
-            type: 'core/paragraph',
-            content: {
-              text: '혁신적인 솔루션으로 여러분의 비즈니스를 한 단계 발전시키세요.',
-            },
-            attributes: { align: 'center', fontSize: 'large' },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/columns',
+            type: 'core/column',
             innerBlocks: [
               {
                 id: uuidv4(),
-                type: 'core/column',
-                innerBlocks: [
-                  {
-                    id: uuidv4(),
-                    type: 'core/heading',
-                    content: { text: '빠른 성능' },
-                    attributes: { level: 3 },
-                  },
-                  {
-                    id: uuidv4(),
-                    type: 'core/paragraph',
-                    content: {
-                      text: '최적화된 코드로 빠른 로딩 속도를 제공합니다.',
-                    },
-                  },
-                ],
+                type: 'core/heading',
+                content: { text: '' },
+                attributes: { level: 3, placeholder: '제목 입력' },
               },
               {
                 id: uuidv4(),
-                type: 'core/column',
-                innerBlocks: [
-                  {
-                    id: uuidv4(),
-                    type: 'core/heading',
-                    content: { text: '쉬운 사용' },
-                    attributes: { level: 3 },
-                  },
-                  {
-                    id: uuidv4(),
-                    type: 'core/paragraph',
-                    content: {
-                      text: '직관적인 인터페이스로 누구나 쉽게 사용할 수 있습니다.',
-                    },
-                  },
-                ],
-              },
-              {
-                id: uuidv4(),
-                type: 'core/column',
-                innerBlocks: [
-                  {
-                    id: uuidv4(),
-                    type: 'core/heading',
-                    content: { text: '24/7 지원' },
-                    attributes: { level: 3 },
-                  },
-                  {
-                    id: uuidv4(),
-                    type: 'core/paragraph',
-                    content: {
-                      text: '언제든지 전문가의 도움을 받을 수 있습니다.',
-                    },
-                  },
-                ],
+                type: 'core/paragraph',
+                content: { text: '' },
+                attributes: { placeholder: '내용 입력' },
               },
             ],
           },
           {
             id: uuidv4(),
-            type: 'core/button',
-            content: { text: '지금 시작하기' },
-            attributes: {
-              url: '#',
-              backgroundColor: '#007cba',
-              textColor: '#ffffff',
-              align: 'center',
-            },
-          }
-        );
-        break;
-
-      case 'about':
-        blocks.push(
-          {
-            id: uuidv4(),
-            type: 'core/heading',
-            content: { text: '우리의 비전' },
-            attributes: { level: 2 },
+            type: 'core/column',
+            innerBlocks: [
+              {
+                id: uuidv4(),
+                type: 'core/heading',
+                content: { text: '' },
+                attributes: { level: 3, placeholder: '제목 입력' },
+              },
+              {
+                id: uuidv4(),
+                type: 'core/paragraph',
+                content: { text: '' },
+                attributes: { placeholder: '내용 입력' },
+              },
+            ],
           },
-          {
-            id: uuidv4(),
-            type: 'core/paragraph',
-            content: {
-              text: '우리는 기술을 통해 더 나은 세상을 만들어갑니다.',
-            },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/heading',
-            content: { text: '핵심 가치' },
-            attributes: { level: 2 },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/list',
-            content: {
-              values: ['혁신', '협력', '신뢰', '고객 중심'],
-            },
-          }
-        );
-        break;
-
-      case 'product':
-        blocks.push(
-          {
-            id: uuidv4(),
-            type: 'core/image',
-            attributes: {
-              url: '/images/product-placeholder.jpg',
-              alt: '제품 이미지',
-              align: 'center',
-            },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/heading',
-            content: { text: '주요 기능' },
-            attributes: { level: 2 },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/list',
-            content: {
-              values: [
-                '실시간 데이터 동기화',
-                '강력한 보안 시스템',
-                '직관적인 대시보드',
-                '맞춤형 리포트',
-              ],
-            },
-          }
-        );
-        break;
-
-      case 'blog':
-        blocks.push(
-          {
-            id: uuidv4(),
-            type: 'core/paragraph',
-            content: {
-              text: '오늘은 흥미로운 주제에 대해 이야기해보겠습니다.',
-            },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/heading',
-            content: { text: '서론' },
-            attributes: { level: 2 },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/paragraph',
-            content: {
-              text: '이 주제가 왜 중요한지 설명합니다...',
-            },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/heading',
-            content: { text: '본론' },
-            attributes: { level: 2 },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/paragraph',
-            content: {
-              text: '핵심 내용을 자세히 다룹니다...',
-            },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/quote',
-            content: {
-              value: '인용문을 통해 신뢰성을 높입니다.',
-              citation: '출처',
-            },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/heading',
-            content: { text: '결론' },
-            attributes: { level: 2 },
-          },
-          {
-            id: uuidv4(),
-            type: 'core/paragraph',
-            content: {
-              text: '오늘 다룬 내용을 정리하면...',
-            },
-          }
-        );
-        break;
-
-      default:
-        blocks.push({
-          id: uuidv4(),
-          type: 'core/paragraph',
-          content: {
-            text: 'AI가 생성한 콘텐츠가 여기에 표시됩니다.',
-          },
-        });
-    }
-
-    // 페이지 끝에 구분선 추가
-    blocks.push({
-      id: uuidv4(),
-      type: 'core/separator',
-      attributes: {},
-    });
+        ],
+      },
+      {
+        id: uuidv4(),
+        type: 'core/button',
+        content: { text: '' },
+        attributes: {
+          url: '#',
+          placeholder: '버튼 텍스트 입력',
+          align: 'center',
+        },
+      }
+    );
 
     return blocks;
   }
@@ -786,35 +639,7 @@ JSON 배열 형식으로만 응답하세요. 다른 설명이나 텍스트는 �
     });
   }
 
-  /**
-   * 프롬프트에서 템플릿 자동 추론
-   */
-  inferTemplate(prompt: string): keyof typeof PAGE_TEMPLATES {
-    const lowerPrompt = prompt.toLowerCase();
 
-    if (lowerPrompt.includes('랜딩') || lowerPrompt.includes('landing')) {
-      return 'landing';
-    } else if (lowerPrompt.includes('회사') || lowerPrompt.includes('소개')) {
-      return 'about';
-    } else if (lowerPrompt.includes('제품') || lowerPrompt.includes('product')) {
-      return 'product';
-    } else if (lowerPrompt.includes('블로그') || lowerPrompt.includes('blog')) {
-      return 'blog';
-    }
-
-    return 'landing';
-  }
-
-  /**
-   * 사용 가능한 템플릿 목록 반환
-   */
-  getTemplates() {
-    return Object.entries(PAGE_TEMPLATES).map(([key, template]) => ({
-      key,
-      name: template.name,
-      description: template.description,
-    }));
-  }
 
   /**
    * 생성 취소

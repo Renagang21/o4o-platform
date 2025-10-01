@@ -17,6 +17,8 @@ import { Loader2, Sparkles, AlertCircle, X, Check } from 'lucide-react';
 import { AIPageGenerator, AIProvider, Block, GenerateOptions, GEMINI_MODELS, OPENAI_MODELS, CLAUDE_MODELS } from '@/services/ai/pageGenerator';
 import { AIApiKeyService } from '@/pages/settings/AISettings';
 import { useNavigate } from 'react-router-dom';
+import { PostGenerationEditor } from './PostGenerationEditor';
+import { ImageUploader, UploadedImage } from './ImageUploader';
 
 interface AIPageGeneratorModalProps {
   isOpen: boolean;
@@ -30,13 +32,15 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
   onGenerate,
 }) => {
   const [prompt, setPrompt] = useState('');
-  const [template, setTemplate] = useState('landing');
   const [provider, setProvider] = useState<AIProvider['name']>('gemini');
   const [apiKey, setApiKey] = useState('');
   const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [useSavedKey, setUseSavedKey] = useState(true);
+  const [showEditor, setShowEditor] = useState(false);
+  const [generatedBlocks, setGeneratedBlocks] = useState<Block[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const navigate = useNavigate();
   
   // 진행률 관련 상태
@@ -75,12 +79,6 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
     loadProviderSettings();
   }, [provider]);
 
-  const templates = [
-    { key: 'landing', name: '랜딩 페이지', description: '제품이나 서비스를 소개하는 페이지' },
-    { key: 'about', name: '회사 소개', description: '회사나 팀을 소개하는 페이지' },
-    { key: 'product', name: '제품 소개', description: '제품의 특징과 장점을 설명' },
-    { key: 'blog', name: '블로그 포스트', description: '블로그 형식의 글' },
-  ];
 
   const providers = [
     { key: 'gemini', name: 'Google Gemini (추천)', requiresKey: true },
@@ -148,19 +146,25 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
         setProgressMessage(message);
       };
 
+      // 이미지 분석 결과 수집
+      const imageAnalyses = uploadedImages
+        .filter(img => img.analysis) // 분석이 완료된 이미지만
+        .map(img => img.analysis!);
+
       const options: GenerateOptions = {
         prompt,
-        template: template as any,
         onProgress,
         signal: abortControllerRef.current.signal,
+        imageAnalyses, // Vision AI 분석 결과 전달
       };
 
       const blocks = provider === 'mock' 
         ? await generator.generateBlocks(options)
         : await generator.generateBlocks(options);
 
-      onGenerate(blocks);
-      onClose();
+      // 생성 후 편집 인터페이스 표시
+      setGeneratedBlocks(blocks);
+      setShowEditor(true);
       
       // 성공 후 초기화
       setPrompt('');
@@ -196,18 +200,54 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
     if (isGenerating) {
       handleCancel();
     }
+    if (showEditor) {
+      setShowEditor(false);
+      setGeneratedBlocks([]);
+    } else {
+      onClose();
+    }
+  };
+
+  // 편집 완료 후 페이지에 적용
+  const handleEditorSave = (editedBlocks: Block[]) => {
+    onGenerate(editedBlocks);
+    setShowEditor(false);
+    setGeneratedBlocks([]);
     onClose();
   };
 
-  const examplePrompts = {
-    landing: '네추어 플랫폼을 소개하는 랜딩 페이지를 만들어주세요. 드롭쉬핑, 포럼, 사이니지 기능을 강조해주세요.',
-    about: '혁신적인 기술 스타트업 회사 소개 페이지를 만들어주세요.',
-    product: 'AI 기반 콘텐츠 생성 도구를 소개하는 페이지를 만들어주세요.',
-    blog: '2025년 웹 개발 트렌드에 대한 블로그 포스트를 작성해주세요.',
+  // 편집 취소
+  const handleEditorCancel = () => {
+    setShowEditor(false);
+    setGeneratedBlocks([]);
   };
 
+  // 이미지 업로드 처리
+  const handleImagesChange = (images: UploadedImage[]) => {
+    setUploadedImages(images);
+  };
+
+  const examplePrompts = [
+    '네추어 플랫폼을 소개하는 랜딩 페이지를 만들어주세요. 드롭쉽핑, 포럼, 사이니지 기능을 강조해주세요.',
+    '혁신적인 기술 스타트업 회사 소개 페이지를 만들어주세요.',
+    'AI 기반 콘텐츠 생성 도구를 소개하는 페이지를 만들어주세요.',
+    '2025년 웹 개발 트렌드에 대한 블로그 포스트를 작성해주세요.',
+    '창의적인 포트폴리오 페이지를 만들어주세요.',
+    '역동적인 이벤트 소개 페이지를 만들어주세요.',
+    '미니멀한 아티스트 갤러리 페이지를 만들어주세요.',
+    '인터랙티브한 FAQ 페이지를 만들어주세요.',
+  ];
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <>
+      <PostGenerationEditor
+        isOpen={showEditor}
+        onClose={handleEditorCancel}
+        onSave={handleEditorSave}
+        initialBlocks={generatedBlocks}
+      />
+      
+      <Dialog open={isOpen && !showEditor} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
@@ -261,26 +301,6 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
         ) : (
           // 입력 화면
           <div className="space-y-4 py-4">
-            {/* 템플릿 선택 */}
-            <div className="space-y-2">
-              <Label htmlFor="template">템플릿</Label>
-              <Select value={template} onValueChange={setTemplate}>
-                <SelectTrigger id="template">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((t) => (
-                    <SelectItem key={t.key} value={t.key}>
-                      <div>
-                        <div className="font-medium">{t.name}</div>
-                        <div className="text-xs text-muted-foreground">{t.description}</div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* AI 프로바이더 선택 */}
             <div className="space-y-2">
               <Label htmlFor="provider">AI 서비스</Label>
@@ -410,7 +430,10 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setPrompt(examplePrompts[template as keyof typeof examplePrompts])}
+                  onClick={() => {
+                    const randomExample = examplePrompts[Math.floor(Math.random() * examplePrompts.length)];
+                    setPrompt(randomExample);
+                  }}
                 >
                   예시 사용
                 </Button>
@@ -425,6 +448,21 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
               />
               <p className="text-xs text-muted-foreground">
                 페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.
+              </p>
+            </div>
+
+            {/* 이미지 업로드 */}
+            <div className="space-y-2">
+              <Label>참고 이미지 (선택사항)</Label>
+              <ImageUploader
+                onImagesChange={handleImagesChange}
+                maxImages={3}
+                maxSizeMB={5}
+                enableVisionAI={provider !== 'mock'}
+                className=""
+              />
+              <p className="text-xs text-muted-foreground">
+                이미지를 업로드하면 AI가 이미지를 분석하여 페이지 생성에 반영합니다.
               </p>
             </div>
 
@@ -450,7 +488,8 @@ const AIPageGeneratorModal: React.FC<AIPageGeneratorModalProps> = ({
           </DialogFooter>
         )}
       </DialogContent>
-    </Dialog>
+      </Dialog>
+    </>
   );
 };
 
