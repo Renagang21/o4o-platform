@@ -272,7 +272,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             )}
           </div>
 
-        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSidebar(!showSidebar)}
             className="p-2 hover:bg-gray-100 rounded-md md:hidden"
@@ -296,8 +296,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             <Save size={16} />
             {isSaving ? '저장 중...' : '저장'}
           </Button>
+          </div>
         </div>
-      </div>
 
       <div className="flex h-[calc(100vh-80px)]">
         {/* Sidebar */}
@@ -370,6 +370,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </CustomizerProvider>
   );

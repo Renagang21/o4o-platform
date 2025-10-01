@@ -12,8 +12,6 @@ export class AIApiKeyService {
   static async getKeys(): Promise<Record<string, string>> {
     try {
       const dbSettings = await aiSettingsApi.getSettings();
-      // Debug: 데이터베이스에서 불러온 설정 확인
-      console.log('🔍 AI 설정 로딩:', Object.keys(dbSettings).length, '개 프로바이더');
       
       const keys: Record<string, string> = {};
       
