@@ -210,24 +210,24 @@ export function useLoadingState(
 } {
   const [loading, setLoading] = React.useState(initialLoading);
   const [timedOut, setTimedOut] = React.useState(false);
-  const timeoutRef = React.useRef<number | undefined>();
+  const timeoutRef = React.useRef<any>(undefined);
 
   React.useEffect(() => {
     if (loading) {
-      timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = window.setTimeout(() => {
         setTimedOut(true);
         setLoading(false);
       }, timeout);
     } else {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        window.clearTimeout(timeoutRef.current);
       }
       setTimedOut(false);
     }
 
     return () => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        window.clearTimeout(timeoutRef.current);
       }
     };
   }, [loading, timeout]);
