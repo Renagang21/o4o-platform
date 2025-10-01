@@ -92,7 +92,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         clearTimeout(cssUpdateTimeoutRef.current);
       }
     };
-  }, [settings, injectCSS]);
+  }, [settings]);
 
   // Handle save
   const handleSave = async () => {
@@ -119,7 +119,14 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
   // Handle iframe load
   const handleIframeLoad = () => {
-    injectCSS();
+    // Debounce iframe load injection to prevent potential loops
+    if (cssUpdateTimeoutRef.current) {
+      clearTimeout(cssUpdateTimeoutRef.current);
+    }
+    
+    cssUpdateTimeoutRef.current = setTimeout(() => {
+      injectCSS();
+    }, 100);
   };
 
   // Device sizes for responsive preview
