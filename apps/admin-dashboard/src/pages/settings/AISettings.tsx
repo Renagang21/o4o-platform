@@ -80,11 +80,7 @@ export class AIApiKeyService {
 }
 
 const AISettings: FC = () => {
-  const [apiKeys, setApiKeys] = useState<Record<string, string>>({
-    gemini: '',
-    openai: '',
-    claude: ''
-  });
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
   
   const [defaultModels, setDefaultModels] = useState<Record<string, string>>({
     gemini: 'gemini-2.5-flash',
@@ -159,18 +155,8 @@ const AISettings: FC = () => {
           }
         }
 
-        // 실제로 값이 있는 키만 업데이트 (빈 키는 덮어쓰지 않음)
-        if (Object.keys(savedKeys).length > 0) {
-          setApiKeys(prev => {
-            const updated = { ...prev };
-            Object.entries(savedKeys).forEach(([provider, key]) => {
-              if (key && key.trim()) {
-                updated[provider] = key;
-              }
-            });
-            return updated;
-          });
-        }
+        // 실제로 키가 있는 프로바이더만 설정
+        setApiKeys(savedKeys);
 
         if (Object.keys(savedModels).length > 0) {
           setDefaultModels(prev => ({
@@ -271,7 +257,7 @@ const AISettings: FC = () => {
           <AlertDescription>
             AI 페이지 생성 및 기타 AI 기능을 사용하려면 API 키가 필요합니다.
             각 서비스에서 API 키를 발급받아 아래에 입력해주세요.
-            키는 브라우저에만 안전하게 저장되며 서버로 전송되지 않습니다.
+            키는 데이터베이스에 안전하게 암호화되어 저장됩니다.
           </AlertDescription>
         </Alert>
 
@@ -282,7 +268,19 @@ const AISettings: FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{provider.icon}</span>
                   <div>
-                    <h3 className="font-semibold">{provider.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold">{provider.name}</h3>
+                      {apiKeys[provider.id]?.trim() ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <Check className="w-3 h-3 mr-1" />
+                          설정됨
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                          미설정
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500">{provider.description}</p>
                   </div>
                 </div>
