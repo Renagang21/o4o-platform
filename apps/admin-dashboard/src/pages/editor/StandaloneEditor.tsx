@@ -30,7 +30,7 @@ import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaListWordPress from '@/pages/media/MediaListWordPress';
 import ContentTemplates from '@/components/editor/ContentTemplates';
-import AIPageGeneratorModal from '@/components/ai/AIPageGeneratorModal';
+import { SimpleAIModal } from '@/components/ai/SimpleAIModal';
 import {
   Dialog,
   DialogContent,
@@ -1057,7 +1057,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       </Dialog>
 
       {/* AI Generator Modal */}
-      <AIPageGeneratorModal
+      <SimpleAIModal
         isOpen={showAIGenerator}
         onClose={() => setShowAIGenerator(false)}
         onGenerate={(generatedBlocks) => {

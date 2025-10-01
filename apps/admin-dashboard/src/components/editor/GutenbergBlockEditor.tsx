@@ -13,7 +13,7 @@ import { Block } from '@/types/post.types';
 import GutenbergBlockInserter from './GutenbergBlockInserter';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
 import DesignLibraryModalImproved from './DesignLibraryModalImproved';
-import AIPageGeneratorModal from '../ai/AIPageGeneratorModal';
+import { SimpleAIModal } from '../ai/SimpleAIModal';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
@@ -888,7 +888,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       />
 
       {/* AI Generator Modal */}
-      <AIPageGeneratorModal
+      <SimpleAIModal
         isOpen={isAIGeneratorOpen}
         onClose={() => setIsAIGeneratorOpen(false)}
         onGenerate={(generatedBlocks) => {
