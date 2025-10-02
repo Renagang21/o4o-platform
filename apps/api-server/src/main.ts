@@ -594,6 +594,7 @@ app.use('/v1/users', limiter, usersV1Routes); // V1 user management routes (back
 app.use('/api/admin', limiter, adminRoutes);
 app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
 app.use('/api/cpt', limiter, cptRoutes);
+app.use('/api/v1/cpt', limiter, cptRoutes); // V1 compatibility for CPT routes
 app.use('/api/post-creation', limiter, postCreationRoutes);
 app.use('/api/services', limiter, servicesRoutes);
 app.use('/api/signage', limiter, signageRoutes);
@@ -758,6 +759,7 @@ app.use('/api/monitoring', monitoringRoutes); // Monitoring routes (primary API 
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
 app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
+app.use('/api/v1/template-parts', templatePartsRoutes); // V1 compatibility for template parts
 app.use('/api/preview', publicLimiter, previewRoutes); // Preview routes for theme customization
 app.use('/api/content', contentRoutes); // Content routes - moved to specific path to avoid conflicts
 app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full features)
