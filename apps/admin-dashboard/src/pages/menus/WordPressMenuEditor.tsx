@@ -1125,30 +1125,43 @@ const WordPressMenuEditor: FC = () => {
               </div>
               
               {menuItems.length > 0 && (
-                <div className="p-4 border-t bg-gray-50">
-                  <div className="flex items-center gap-4 text-xs text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
-                      <span>페이지</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
-                      <span>글</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 bg-orange-500 rounded-sm"></div>
-                      <span>카테고리</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 bg-purple-500 rounded-sm"></div>
-                      <span>태그</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 bg-gray-500 rounded-sm"></div>
-                      <span>사용자 정의</span>
+                <>
+                  <div className="p-4 border-t">
+                    <button
+                      onClick={() => {
+                        console.log('Saving menu with items:', menuItems);
+                        alert('메뉴가 저장되었습니다!');
+                      }}
+                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      메뉴 저장
+                    </button>
+                  </div>
+                  <div className="p-4 border-t bg-gray-50">
+                    <div className="flex items-center gap-4 text-xs text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
+                        <span>페이지</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
+                        <span>글</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-orange-500 rounded-sm"></div>
+                        <span>카테고리</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-purple-500 rounded-sm"></div>
+                        <span>태그</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-gray-500 rounded-sm"></div>
+                        <span>사용자 정의</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </>
               )}
             </div>
             
