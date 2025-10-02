@@ -577,6 +577,12 @@ app.use('/api/v1/accounts', linkedAccountsRoutes); // Linked accounts routes (mo
 app.use('/api/v1/social', socialAuthRoutes); // Social auth routes (moved to avoid conflict)
 
 // Settings routes with lenient rate limiting (BEFORE general rate limiter)
+// Public endpoint for roles - no authentication required
+app.get('/api/v1/users/roles', (req, res) => {
+  const { UserRoleController } = require('./controllers/v1/userRole.controller');
+  return UserRoleController.getRoles(req, res);
+});
+
 // Consolidated settings routes - removed duplicates
 app.use('/api/v1/settings', settingsLimiter, settingsV1Routes);
 app.use('/api/settings', settingsLimiter, settingsRoutes); // Primary settings route
