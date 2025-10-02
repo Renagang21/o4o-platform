@@ -123,22 +123,38 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
         const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
+        console.log('Fetching categories from:', `${apiUrl}/api/v1/content/categories`);
+        console.log('Token available:', !!token);
+        
         const response = await fetch(`${apiUrl}/api/v1/content/categories`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
           }
         });
         
+        console.log('Categories API response status:', response.status);
+        
         if (response.ok) {
           const result = await response.json();
+          console.log('Categories API result:', result);
+          
           const categoriesData = result.data || result.categories || [];
-          setAvailableCategories(categoriesData.map((cat: any) => ({
+          const mappedCategories = categoriesData.map((cat: any) => ({
             id: cat.id,
             name: cat.name || cat.title,
             slug: cat.slug || ''
-          })));
+          }));
+          
+          console.log('Mapped categories:', mappedCategories);
+          setAvailableCategories(mappedCategories);
+        } else {
+          console.error('Categories API failed with status:', response.status);
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
         }
       } catch (error) {
+        console.error('Categories fetch error:', error);
         // Fallback to empty array on error
         setAvailableCategories([]);
       } finally {
@@ -146,8 +162,13 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
       }
     };
 
-    fetchCategories();
-  }, []);
+    // Only fetch if we're in post mode
+    if (mode === 'post') {
+      fetchCategories();
+    } else {
+      setCategoriesLoading(false);
+    }
+  }, [mode]);
 
   // Check user permissions
   const canPublish = () => {
@@ -157,7 +178,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
 
   const canEditCategories = () => {
     if (!user) return false;
-    return ['super_admin', 'admin', 'moderator'].includes(user.role);
+    // Allow most content creators to select categories
+    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role);
   };
 
   const canSetFeaturedImage = () => {
@@ -332,8 +354,21 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
               </div>
             </Panel>
 
-            {/* Categories - Only show for posts and users with permission */}
-            {mode === 'post' && canEditCategories() && (
+            {/* Debug Info - Remove after testing */}
+            <div className="bg-yellow-50 border border-yellow-200 p-2 rounded text-xs">
+              Debug: Mode: {mode}, 
+              User role: {user?.role || 'not logged in'}, 
+              User exists: {!!user},
+              Can edit categories: {canEditCategories().toString()},
+              Categories loading: {categoriesLoading.toString()},
+              Categories count: {availableCategories.length}
+              <br />
+              Condition check: mode=post: {(mode === 'post').toString()}, 
+              user exists: {!!user}
+            </div>
+
+            {/* Categories - Show for all logged in users creating posts */}
+            {mode === 'post' && user && (
             <Panel title="Categories">
               <div className="space-y-3">
                 <div className="relative">
