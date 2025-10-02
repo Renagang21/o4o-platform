@@ -16,9 +16,9 @@ jobs:
       - name: Deploy to API Server
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: 43.202.242.215
-          username: ubuntu
-          key: ${{ secrets.API_SERVER_SSH_KEY }}
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          key: ${{ secrets.API_SSH_KEY }}
           script: |
             cd /home/ubuntu/o4o-platform
             git pull origin main
@@ -38,11 +38,12 @@ jobs:
       - name: Deploy to Web Server
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: 13.125.144.8
-          username: sohae21
-          key: ${{ secrets.WEB_SERVER_SSH_KEY }}
+          host: ${{ secrets.WEB_HOST }}
+          username: ${{ secrets.WEB_USER }}
+          key: ${{ secrets.WEB_SSH_KEY }}
           script: |
-            cd /home/sohae21/o4o-platform
+            cd /home/ubuntu/o4o-platform
             git pull origin main
             npm install
+            npm run build:packages
             npm run build:admin
