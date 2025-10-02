@@ -31,7 +31,7 @@ const Navigation: FC<NavigationProps> = ({
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await authClient.api.get(`/v1/menus/${menuRef}`);
+        const response = await authClient.api.get(`/menus/${menuRef}`);
         if (response.status === 200 && response.data) {
           // Handle new API response structure
           const data = response.data;

@@ -25,7 +25,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await authClient.api.get(`/v1/menus/${menuRef}`);
+        const response = await authClient.api.get(`/menus/${menuRef}`);
         if (response.data?.success && response.data?.data?.items) {
           setMenuItems(response.data.data.items);
         } else if (response.data?.items) {
