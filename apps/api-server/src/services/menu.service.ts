@@ -422,6 +422,68 @@ class MenuService {
       }
     }
   }
+
+  // Role-based menu filtering
+  async getFilteredMenuItems(
+    menuId: string, 
+    userRole?: string, 
+    isLoggedIn: boolean = false
+  ): Promise<MenuItem[]> {
+    const menu = await this.findMenuById(menuId);
+    if (!menu || !menu.items) {
+      return [];
+    }
+
+    return this.filterMenuItemsByRole(menu.items, userRole, isLoggedIn);
+  }
+
+  private filterMenuItemsByRole(
+    items: MenuItem[], 
+    userRole?: string, 
+    isLoggedIn: boolean = false
+  ): MenuItem[] {
+    return items
+      .filter(item => this.shouldShowMenuItem(item, userRole, isLoggedIn))
+      .map(item => ({
+        ...item,
+        children: item.children ? this.filterMenuItemsByRole(item.children, userRole, isLoggedIn) : []
+      }));
+  }
+
+  private shouldShowMenuItem(
+    item: MenuItem, 
+    userRole?: string, 
+    isLoggedIn: boolean = false
+  ): boolean {
+    // If display mode is hide, don't show
+    if (item.display_mode === 'hide') {
+      return false;
+    }
+
+    // If no target audience specified, show to everyone (backward compatibility)
+    if (!item.target_audience || !item.target_audience.roles) {
+      return true;
+    }
+
+    const targetRoles = item.target_audience.roles;
+
+    // Check for special audience types
+    if (targetRoles.includes('everyone')) {
+      return true;
+    }
+
+    if (targetRoles.includes('logged_out') && !isLoggedIn) {
+      return true;
+    }
+
+    // If user is logged in and has a role, check against target roles
+    if (isLoggedIn && userRole && targetRoles.includes(userRole)) {
+      return true;
+    }
+
+    // Hide by default if none of the conditions match
+    return false;
+  }
 }
 
 // Export singleton instance

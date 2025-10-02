@@ -39,6 +39,12 @@ interface MenuItem {
   menu_id?: string;
   parent_id?: string;
   order_num?: number;
+  // Role-based access control
+  display_mode?: 'show' | 'hide';
+  target_audience?: {
+    roles: string[];
+    user_ids?: string[];
+  };
 }
 
 interface MenuLocation {
@@ -85,7 +91,54 @@ const WordPressMenuEditor: FC = () => {
   const [posts, setPosts] = useState<AvailableItem[]>([]);
   const [categories, setCategories] = useState<AvailableItem[]>([]);
   const [tags, setTags] = useState<AvailableItem[]>([]);
+  
+  // Role-based access control
+  const [availableRoles, setAvailableRoles] = useState<Array<{value: string, label: string}>>([]);
   const [menuLocations, setMenuLocations] = useState<MenuLocation[]>([]);
+
+  // Load user roles
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/v1/users/roles`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            const roles = [
+              { value: 'everyone', label: 'Everyone' },
+              { value: 'logged_out', label: 'Logged Out Users' },
+              ...result.data.map((role: any) => ({
+                value: role.value,
+                label: role.label
+              }))
+            ];
+            setAvailableRoles(roles);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+        // Fallback to basic roles
+        setAvailableRoles([
+          { value: 'everyone', label: 'Everyone' },
+          { value: 'logged_out', label: 'Logged Out Users' },
+          { value: 'super_admin', label: 'Super Admin' },
+          { value: 'admin', label: 'Admin' },
+          { value: 'moderator', label: 'Moderator' }
+        ]);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   // Load available items and menu locations
   useEffect(() => {
@@ -229,6 +282,8 @@ const WordPressMenuEditor: FC = () => {
       description: item.description,
       order_num: index,
       is_active: true,
+      display_mode: item.display_mode || 'show',
+      target_audience: item.target_audience || { roles: ['everyone'] },
       children: item.children ? convertMenuItemsToApiFormat(item.children, menuId, item.id) : []
     }));
   };
@@ -291,7 +346,11 @@ const WordPressMenuEditor: FC = () => {
           title: item.title,
           url: item.url,
           type: item.type,
-          originalId: item.id
+          originalId: item.id,
+          display_mode: 'show',
+          target_audience: {
+            roles: ['everyone']
+          }
         };
       }
       return null;
@@ -313,7 +372,11 @@ const WordPressMenuEditor: FC = () => {
       id: Date.now().toString(),
       title: customLinkTitle,
       url: customLinkUrl,
-      type: 'custom'
+      type: 'custom',
+      display_mode: 'show',
+      target_audience: {
+        roles: ['everyone']
+      }
     };
     
     setMenuItems([...menuItems, newItem]);
@@ -604,6 +667,65 @@ const WordPressMenuEditor: FC = () => {
                         className="w-full px-2 py-1 border rounded text-sm"
                         placeholder="설명 (선택사항)"
                       />
+                      
+                      {/* Role-based Access Control */}
+                      <div className="border-t pt-3 space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Display Settings</h4>
+                        
+                        {/* Display Mode */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Display Mode</label>
+                          <select
+                            value={item.display_mode || 'show'}
+                            onChange={(e) => updateMenuItem(item.id, { display_mode: e.target.value as 'show' | 'hide' })}
+                            className="w-full px-2 py-1 border rounded text-sm"
+                          >
+                            <option value="show">Show</option>
+                            <option value="hide">Hide</option>
+                          </select>
+                        </div>
+                        
+                        {/* Target Audience */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Target Audience</label>
+                          <div className="space-y-1 max-h-32 overflow-y-auto border rounded p-2 bg-gray-50">
+                            {availableRoles.map(role => (
+                              <label key={role.value} className="flex items-center text-sm">
+                                <input
+                                  type="checkbox"
+                                  checked={(item.target_audience?.roles || ['everyone']).includes(role.value)}
+                                  onChange={(e) => {
+                                    const currentRoles = item.target_audience?.roles || ['everyone'];
+                                    let newRoles;
+                                    
+                                    if (e.target.checked) {
+                                      // Add role, remove 'everyone' if adding specific roles
+                                      newRoles = role.value === 'everyone' 
+                                        ? ['everyone'] 
+                                        : [...currentRoles.filter(r => r !== 'everyone'), role.value];
+                                    } else {
+                                      // Remove role, add 'everyone' if no roles left
+                                      newRoles = currentRoles.filter(r => r !== role.value);
+                                      if (newRoles.length === 0) {
+                                        newRoles = ['everyone'];
+                                      }
+                                    }
+                                    
+                                    updateMenuItem(item.id, {
+                                      target_audience: {
+                                        ...item.target_audience,
+                                        roles: newRoles
+                                      }
+                                    });
+                                  }}
+                                  className="mr-2"
+                                />
+                                <span>{role.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div>

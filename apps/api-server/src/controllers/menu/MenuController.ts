@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { menuService } from '../../services/menu.service';
 import logger from '../../utils/logger';
-import { MenuItemType, MenuItemTarget } from '../../entities/MenuItem';
+import { MenuItemType, MenuItemTarget, MenuItemDisplayMode } from '../../entities/MenuItem';
+import { AuthRequest } from '../../types/auth';
 
 export class MenuController {
   // GET /api/menus - Get all menus
@@ -112,6 +113,54 @@ export class MenuController {
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve menu'
+      });
+    }
+  };
+
+  // GET /api/menus/:id/filtered - Get menu with role-based filtering
+  getFilteredMenu = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const user = req.authUser || req.user;
+      
+      // Determine user role and login status
+      const userRole = user?.role;
+      const isLoggedIn = !!user;
+
+      // Get filtered menu items
+      const filteredItems = await menuService.getFilteredMenuItems(id, userRole, isLoggedIn);
+      
+      // Get basic menu info
+      const menu = await menuService.findMenuById(id);
+      if (!menu) {
+        res.status(404).json({
+          success: false,
+          error: 'Menu not found'
+        });
+        return;
+      }
+
+      // Return menu with filtered items
+      const filteredMenu = {
+        ...menu,
+        items: filteredItems
+      };
+      
+      res.json({
+        success: true,
+        data: filteredMenu,
+        meta: {
+          filtered_for_role: userRole || 'anonymous',
+          is_logged_in: isLoggedIn,
+          total_items: menu.items?.length || 0,
+          visible_items: filteredItems.length
+        }
+      });
+    } catch (error) {
+      logger.error('Error getting filtered menu:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve filtered menu'
       });
     }
   };

@@ -11,6 +11,7 @@ router.get('/', menuController.getMenus);
 router.get('/locations', menuController.getMenuLocations);
 router.get('/location/:key', menuController.getMenuByLocation);
 router.get('/:id', menuController.getMenu);
+router.get('/:id/filtered', menuController.getFilteredMenu); // Role-based filtered menu
 
 // Protected routes (require authentication)
 router.use(authenticateToken);

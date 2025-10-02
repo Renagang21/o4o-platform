@@ -28,6 +28,11 @@ export enum MenuItemTarget {
   TOP = '_top'
 }
 
+export enum MenuItemDisplayMode {
+  SHOW = 'show',
+  HIDE = 'hide'
+}
+
 @Entity('menu_items')
 @Tree('closure-table')
 export class MenuItem {
@@ -76,6 +81,23 @@ export class MenuItem {
 
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
+
+  // Role-based access control fields
+  @Column({
+    type: 'enum',
+    enum: MenuItemDisplayMode,
+    default: MenuItemDisplayMode.SHOW
+  })
+  display_mode: MenuItemDisplayMode;
+
+  @Column({ 
+    type: 'jsonb',
+    default: () => "'{\"roles\": [\"everyone\"]}'"
+  })
+  target_audience: {
+    roles: string[]; // ['everyone', 'logged_out', 'super_admin', 'admin', etc.]
+    user_ids?: string[]; // Optional: specific user IDs
+  };
 
   @TreeChildren()
   children: MenuItem[];
