@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { formatDate, formatFileSize } from '@/lib/utils';
 import { authClient } from '@o4o/auth-client';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { getFileTypeFromMime, getFileIcon, getFileColorClass } from '@/utils/fileIcons';
 
@@ -51,7 +50,7 @@ const MediaListWordPress: React.FC = () => {
   const fetchMedia = async () => {
     try {
       setLoading(true);
-      const response = await authClient.api.get('/v1/content/media?limit=100');
+      const response = await authClient.api.get('/content/media?limit=100');
       
       let mediaData = [];
       if (response.data?.data?.media) {
@@ -100,7 +99,7 @@ const MediaListWordPress: React.FC = () => {
 
   const handleEdit = async (id: string, newTitle: string) => {
     try {
-      await authClient.api.put(`/v1/content/media/${id}`, { title: newTitle });
+      await authClient.api.put(`/content/media/${id}`, { title: newTitle });
       setMedia(prev => prev.map(m => 
         m.id === id ? { ...m, title: newTitle } : m
       ));
@@ -153,12 +152,7 @@ const MediaListWordPress: React.FC = () => {
       }
       
       // Perform delete request
-      await axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      await authClient.api.delete(`/content/media/${id}`);
       
       toast.success('Media deleted successfully');
     } catch (error: any) {
@@ -217,13 +211,8 @@ const MediaListWordPress: React.FC = () => {
       }
       
       // Delete items in parallel but don't block UI
-      const deletePromises = Array.from(selectedIds).map(id => 
-        axios.delete(`https://api.neture.co.kr/api/v1/content/media/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }).catch(error => {
+      const deletePromises = Array.from(selectedIds).map(id =>
+        authClient.api.delete(`/content/media/${id}`).catch(error => {
           // Failed to delete media item
           return { error, id };
         })

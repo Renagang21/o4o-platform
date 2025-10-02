@@ -37,7 +37,7 @@ const MediaUpload: React.FC = () => {
         formData.append('file', file);
         formData.append('title', file.name.replace(/\.[^/.]+$/, ''));
 
-        await authClient.api.post('/v1/content/media/upload', formData, {
+        await authClient.api.post('/content/media/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         successCount++;
