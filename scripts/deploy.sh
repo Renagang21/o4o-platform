@@ -13,8 +13,8 @@ NC='\033[0m' # No Color
 
 # Configuration
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-API_SERVER="o4o-api"
-WEB_SERVER="o4o-web"
+API_SERVER="apiserver"
+WEB_SERVER="webserver"
 SKIP_BUILD=false
 
 # Parse arguments
@@ -159,8 +159,24 @@ deploy_web() {
         print_warning "Main site build not found, skipping..."
     fi
     
-    # Update nginx if needed
+    # Copy files to actual web directories with proper permissions
     ssh $WEB_SERVER << 'ENDSSH'
+        # Backup existing sites
+        sudo cp -r /var/www/admin.neture.co.kr /var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+        sudo cp -r /var/www/neture.co.kr /var/www/neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+        
+        # Copy admin dashboard
+        if [ -d ~/o4o-platform/apps/admin-dashboard/dist ]; then
+            sudo cp -r ~/o4o-platform/apps/admin-dashboard/dist/* /var/www/admin.neture.co.kr/
+            sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
+        fi
+        
+        # Copy main site
+        if [ -d ~/o4o-platform/apps/main-site/dist ]; then
+            sudo cp -r ~/o4o-platform/apps/main-site/dist/* /var/www/neture.co.kr/
+            sudo chown -R www-data:www-data /var/www/neture.co.kr/
+        fi
+        
         # Restart nginx to ensure new files are served
         sudo nginx -t && sudo systemctl reload nginx
         
