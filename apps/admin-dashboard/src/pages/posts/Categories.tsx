@@ -22,10 +22,7 @@ interface Category {
 
 const Categories = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>([
-    { id: '1', name: '공지사항', description: '중요한 공지사항', slug: 'notice', count: 0, date: '-' },
-    { id: '2', name: '이벤트', description: '이벤트 및 행사', slug: 'events', count: 0, date: '-' }
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [showBulkActions, setShowBulkActions] = useState(false);
@@ -54,6 +51,45 @@ const Categories = () => {
   useEffect(() => {
     localStorage.setItem('categories-visible-columns', JSON.stringify(visibleColumns));
   }, [visibleColumns]);
+
+  // Load categories from API
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/v1/content/categories`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          const categoriesData = result.data || result.categories || [];
+          
+          // Transform API data to match our Category interface
+          const transformedCategories = categoriesData.map((cat: any) => ({
+            id: cat.id || cat._id, // Handle both id and _id fields
+            name: cat.name || cat.title,
+            description: cat.description || '',
+            slug: cat.slug || '',
+            count: cat.postCount || cat.count || 0,
+            date: cat.createdAt ? new Date(cat.createdAt).toLocaleDateString('ko-KR') : '-'
+          })).filter((cat: any) => cat.id); // Filter out items without ID
+          
+          setCategories(transformedCategories);
+        }
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        // Fallback to empty array on error
+        setCategories([]);
+      }
+    };
+
+    loadCategories();
+  }, []);
   
   const handleColumnToggle = (column: string) => {
     setVisibleColumns((prev: any) => ({

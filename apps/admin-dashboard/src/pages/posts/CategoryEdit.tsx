@@ -9,16 +9,17 @@ import { Category as CategoryType } from '@/types/content';
 
 interface CategoryWithPermissions extends CategoryType {
   permissions?: {
-    visibility: 'public' | 'admin' | 'editor' | 'custom';
+    visibility: 'public' | 'admin' | 'moderator' | 'custom';
     allowedRoles?: string[];
     allowedUsers?: string[];
   };
 }
 
-interface UserRole {
-  id: string;
-  name: string;
+interface SystemRole {
+  value: string;
   label: string;
+  permissions: string[];
+  permissionCount: number;
 }
 
 const CategoryEdit = () => {
@@ -28,6 +29,8 @@ const CategoryEdit = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<SystemRole[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
   const [category, setCategory] = useState<CategoryWithPermissions>({
     id: '',
     name: '',
@@ -46,25 +49,54 @@ const CategoryEdit = () => {
     }
   });
 
-  // Available roles
-  const availableRoles: UserRole[] = [
-    { id: 'admin', name: 'administrator', label: 'Administrator' },
-    { id: 'editor', name: 'editor', label: 'Editor' },
-    { id: 'author', name: 'author', label: 'Author' },
-    { id: 'contributor', name: 'contributor', label: 'Contributor' },
-    { id: 'subscriber', name: 'subscriber', label: 'Subscriber' }
-  ];
-
   // Check if user has permission to edit
   const hasEditPermission = () => {
     if (!user) return false;
-    if (user.role === 'admin' || user.role === 'administrator') return true;
-    if (user.role === 'editor') {
-      // Editors can edit if visibility is not admin-only
+    // Super Admin and Admin have full access
+    if (user.role === 'super_admin' || user.role === 'admin') return true;
+    // Moderator can edit if visibility is not admin-only
+    if (user.role === 'moderator') {
       return category.permissions?.visibility !== 'admin';
+    }
+    // Vendor Manager can edit vendor-related categories
+    if (user.role === 'vendor_manager') {
+      return category.permissions?.visibility === 'public' || 
+             category.permissions?.allowedRoles?.includes('vendor_manager');
     }
     return false;
   };
+
+  // Fetch available roles from API
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/v1/users/roles`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setAvailableRoles(result.data);
+          }
+        } else {
+          toast.error('Failed to load user roles');
+        }
+      } catch (error) {
+        toast.error('Error loading user roles');
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -82,17 +114,21 @@ const CategoryEdit = () => {
 
       // Load specific category if editing
       if (id && id !== 'new') {
-        const response = await ContentApi.getCategory(id);
-        if (response.data) {
-          const categoryData = response.data;
-          setCategory({
-            ...categoryData,
-            permissions: (categoryData as any).permissions || {
-              visibility: 'public',
-              allowedRoles: [],
-              allowedUsers: []
-            }
-          });
+        try {
+          const response = await ContentApi.getCategory(id);
+          if (response.data) {
+            const categoryData = response.data;
+            setCategory({
+              ...categoryData,
+              permissions: (categoryData as any).permissions || {
+                visibility: 'public',
+                allowedRoles: [],
+                allowedUsers: []
+              }
+            });
+          }
+        } catch (error) {
+          toast.error('Failed to load category');
         }
       }
     } catch (error) {
@@ -119,10 +155,10 @@ const CategoryEdit = () => {
       };
 
       let response;
-      if (id === 'new') {
+      if (!id || id === 'new') {
         response = await ContentApi.createCategory(categoryData);
       } else {
-        response = await ContentApi.updateCategory(id!, categoryData);
+        response = await ContentApi.updateCategory(id, categoryData);
       }
 
       if (response.data) {
@@ -138,7 +174,7 @@ const CategoryEdit = () => {
     }
   };
 
-  const handlePermissionChange = (visibility: 'public' | 'admin' | 'editor' | 'custom') => {
+  const handlePermissionChange = (visibility: 'public' | 'admin' | 'moderator' | 'custom') => {
     setCategory({
       ...category,
       permissions: {
@@ -329,12 +365,12 @@ const CategoryEdit = () => {
                     <input
                       type="radio"
                       name="visibility"
-                      value="editor"
-                      checked={category.permissions?.visibility === 'editor'}
-                      onChange={() => handlePermissionChange('editor')}
+                      value="moderator"
+                      checked={category.permissions?.visibility === 'moderator'}
+                      onChange={() => handlePermissionChange('moderator')}
                       className="mr-2"
                     />
-                    <span>Editors and Above</span>
+                    <span>Moderators and Above</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -356,17 +392,23 @@ const CategoryEdit = () => {
                     Select allowed roles:
                   </label>
                   <div className="space-y-2">
-                    {availableRoles.map(role => (
-                      <label key={role.id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={(category.permissions?.allowedRoles || []).includes(role.id)}
-                          onChange={() => handleRoleToggle(role.id)}
-                          className="mr-2"
-                        />
-                        <span>{role.label}</span>
-                      </label>
-                    ))}
+                    {rolesLoading ? (
+                      <span className="text-sm text-gray-500">Loading roles...</span>
+                    ) : availableRoles.length > 0 ? (
+                      availableRoles.map(role => (
+                        <label key={role.value} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={(category.permissions?.allowedRoles || []).includes(role.value)}
+                            onChange={() => handleRoleToggle(role.value)}
+                            className="mr-2"
+                          />
+                          <span>{role.label}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-500">No roles available</span>
+                    )}
                   </div>
                 </div>
               )}
