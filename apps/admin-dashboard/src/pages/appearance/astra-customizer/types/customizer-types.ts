@@ -396,6 +396,7 @@ export interface CustomizerMessage {
 export interface CustomizerEventHandlers {
   onSettingChange?: (section: keyof AstraCustomizerSettings, value: any) => void;
   onSave?: (settings: AstraCustomizerSettings) => Promise<void>;
+  onPublish?: (settings: AstraCustomizerSettings) => Promise<void>;
   onReset?: () => void;
   onDeviceChange?: (device: PreviewDevice) => void;
 }

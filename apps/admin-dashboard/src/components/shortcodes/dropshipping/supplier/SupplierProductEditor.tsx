@@ -126,7 +126,7 @@ const SupplierProductEditor: React.FC<SupplierProductEditorProps> = ({
       setPendingApproval(data.has_pending_approval);
 
     } catch (error) {
-      console.error('Error fetching product:', error);
+      
       setErrors({ general: '상품 정보를 불러오는데 실패했습니다' });
     } finally {
       setLoading(false);
@@ -188,7 +188,7 @@ const SupplierProductEditor: React.FC<SupplierProductEditorProps> = ({
       return result.data.isCompliant;
 
     } catch (error) {
-      console.error('Compliance check failed:', error);
+      
       return true; // Default to compliant if check fails
     }
   };
@@ -278,7 +278,7 @@ const SupplierProductEditor: React.FC<SupplierProductEditorProps> = ({
       }
 
     } catch (error) {
-      console.error('Save error:', error);
+      
       setErrors({ general: error instanceof Error ? error.message : '저장 중 오류가 발생했습니다' });
     } finally {
       setSaving(false);

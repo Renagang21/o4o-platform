@@ -101,7 +101,7 @@ const SupplierProducts: React.FC<SupplierProductsProps> = ({
       setStats(data.stats || stats);
 
     } catch (err) {
-      console.error('Error fetching supplier products:', err);
+      
       setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다');
     } finally {
       setLoading(false);

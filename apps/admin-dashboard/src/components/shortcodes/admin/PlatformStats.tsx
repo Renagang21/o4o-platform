@@ -134,7 +134,7 @@ const AdminPlatformStats: React.FC<AdminPlatformStatsProps> = ({
         });
       }
     } catch (error) {
-      console.error('Failed to fetch platform stats:', error);
+      
       toast({
         title: 'Error',
         description: '통계 데이터를 불러올 수 없습니다',

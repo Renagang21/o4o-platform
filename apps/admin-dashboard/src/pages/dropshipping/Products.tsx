@@ -46,7 +46,7 @@ const Products: React.FC = () => {
         setProducts(response.data);
       }
     } catch (error) {
-      console.error('Failed to fetch products:', error);
+      
       toast.error('상품 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ const Products: React.FC = () => {
         fetchProducts();
       }
     } catch (error) {
-      console.error('Failed to delete product:', error);
+      
       toast.error('상품 삭제에 실패했습니다');
     }
   };
@@ -82,7 +82,7 @@ const Products: React.FC = () => {
       setBulkSelection([]);
       fetchProducts();
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      
       toast.error('일괄 삭제에 실패했습니다');
     }
   };

@@ -38,7 +38,7 @@ const Partners: React.FC = () => {
         setPartners(response.data);
       }
     } catch (error) {
-      console.error('Failed to fetch partners:', error);
+      
       toast.error('파트너 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -55,7 +55,7 @@ const Partners: React.FC = () => {
         fetchPartners();
       }
     } catch (error) {
-      console.error('Failed to delete partner:', error);
+      
       toast.error('파트너 삭제에 실패했습니다');
     }
   };
@@ -74,7 +74,7 @@ const Partners: React.FC = () => {
       setBulkSelection([]);
       fetchPartners();
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      
       toast.error('일괄 삭제에 실패했습니다');
     }
   };

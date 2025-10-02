@@ -62,7 +62,7 @@ const SuppliersList: React.FC = () => {
         totalProducts: 0 // This would come from a separate API
       });
     } catch (error) {
-      console.error('Failed to fetch suppliers:', error);
+      
       toast.error('공급자 목록을 불러오는데 실패했습니다');
       // Set empty data on error
       setSuppliers([]);
@@ -85,7 +85,7 @@ const SuppliersList: React.FC = () => {
       toast.success('공급자가 삭제되었습니다');
       fetchSuppliers();
     } catch (error) {
-      console.error('Failed to delete supplier:', error);
+      
       toast.error('공급자 삭제에 실패했습니다');
     }
   };
@@ -104,7 +104,7 @@ const SuppliersList: React.FC = () => {
       setSelectedSuppliers(new Set());
       fetchSuppliers();
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      
       toast.error('일괄 삭제에 실패했습니다');
     }
   };
@@ -115,7 +115,7 @@ const SuppliersList: React.FC = () => {
       toast.success('공급자가 승인되었습니다');
       fetchSuppliers();
     } catch (error) {
-      console.error('Failed to approve supplier:', error);
+      
       toast.error('공급자 승인에 실패했습니다');
     }
   };

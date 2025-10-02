@@ -113,7 +113,7 @@ const ApprovalQueue: React.FC<ApprovalQueueProps> = ({
         });
       }
     } catch (error) {
-      console.error('Fetch approval requests error:', error);
+      
       toast({
         title: 'Error',
         description: 'Network error occurred',
@@ -155,7 +155,7 @@ const ApprovalQueue: React.FC<ApprovalQueueProps> = ({
         });
       }
     } catch (error) {
-      console.error('Approval error:', error);
+      
       toast({
         title: 'Error',
         description: 'Failed to process approval',
@@ -197,7 +197,7 @@ const ApprovalQueue: React.FC<ApprovalQueueProps> = ({
         });
       }
     } catch (error) {
-      console.error('Rejection error:', error);
+      
       toast({
         title: 'Error',
         description: 'Failed to process rejection',

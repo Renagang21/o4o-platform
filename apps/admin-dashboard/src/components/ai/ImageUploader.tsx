@@ -148,7 +148,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           : img
       ));
     } catch (error) {
-      console.error('이미지 분석 실패:', error);
+      
       setImages(prevImages => 
         prevImages.map(img => 
           img.id === image.id 

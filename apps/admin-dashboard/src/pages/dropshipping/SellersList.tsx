@@ -60,7 +60,7 @@ const SellersList: React.FC = () => {
         totalSales: 0 // This would come from a separate API
       });
     } catch (error) {
-      console.error('Failed to fetch sellers:', error);
+      
       toast.error('판매자 목록을 불러오는데 실패했습니다');
       // Set empty data on error
       setSellers([]);
@@ -83,7 +83,7 @@ const SellersList: React.FC = () => {
       toast.success('판매자가 삭제되었습니다');
       fetchSellers();
     } catch (error) {
-      console.error('Failed to delete seller:', error);
+      
       toast.error('판매자 삭제에 실패했습니다');
     }
   };
@@ -102,7 +102,7 @@ const SellersList: React.FC = () => {
       setSelectedSellers(new Set());
       fetchSellers();
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      
       toast.error('일괄 삭제에 실패했습니다');
     }
   };
@@ -113,7 +113,7 @@ const SellersList: React.FC = () => {
       toast.success('판매자가 승인되었습니다');
       fetchSellers();
     } catch (error) {
-      console.error('Failed to approve seller:', error);
+      
       toast.error('판매자 승인에 실패했습니다');
     }
   };

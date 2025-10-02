@@ -78,7 +78,7 @@ const Approvals: React.FC = () => {
       ];
       setApprovals(mockData);
     } catch (error) {
-      console.error('Failed to fetch approvals:', error);
+      
       toast.error('승인 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);

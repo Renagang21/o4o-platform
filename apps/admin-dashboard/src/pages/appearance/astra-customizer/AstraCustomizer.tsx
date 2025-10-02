@@ -188,12 +188,125 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
     }
   };
 
+  const handlePublish = async (settings: AstraCustomizerSettings) => {
+    try {
+      // Convert customizer settings to template parts format
+      const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
+      
+      // Check if default header exists and update it
+      const existingResponse = await authClient.api.get('/api/public/template-parts');
+      const existingParts = existingResponse.data?.data || [];
+      const defaultHeader = existingParts.find((part: any) => 
+        part.area === 'header' && part.isDefault === true
+      );
+
+      if (defaultHeader) {
+        // Update existing default header
+        await authClient.api.put(`/api/template-parts/${defaultHeader.id}`, headerTemplatePart);
+        toast.success('Header template updated successfully');
+      } else {
+        // Create new header template part
+        await authClient.api.post('/api/template-parts', {
+          ...headerTemplatePart,
+          isDefault: true,
+          isActive: true
+        });
+        toast.success('Header template created successfully');
+      }
+      
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to publish settings');
+      throw error;
+    }
+  };
+
+  const convertSettingsToHeaderTemplatePart = (settings: AstraCustomizerSettings) => {
+    return {
+      name: 'Default Header',
+      slug: 'default-header',
+      description: 'Default site header with logo, navigation menu, and search',
+      area: 'header',
+      content: [
+        {
+          id: 'header-container',
+          type: 'o4o/group',
+          data: {
+            layout: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            className: 'site-header',
+            padding: {
+              top: '16px',
+              bottom: '16px',
+              left: '24px',
+              right: '24px'
+            }
+          },
+          innerBlocks: [
+            {
+              id: 'site-logo',
+              type: 'core/site-logo',
+              data: {
+                width: settings.siteIdentity.logo.width.desktop || 120,
+                isLink: true,
+                linkTarget: '_self',
+                logoUrl: settings.siteIdentity.logo.desktop
+              }
+            },
+            {
+              id: 'navigation-container',
+              type: 'o4o/group',
+              data: {
+                layout: 'flex',
+                flexDirection: 'row',
+                gap: '32px',
+                alignItems: 'center'
+              },
+              innerBlocks: [
+                {
+                  id: 'primary-menu',
+                  type: 'core/navigation',
+                  data: {
+                    menuRef: 'primary-menu',
+                    orientation: 'horizontal',
+                    showSubmenuIcon: true
+                  }
+                },
+                {
+                  id: 'header-search',
+                  type: 'core/search',
+                  data: {
+                    label: 'Search',
+                    showLabel: false,
+                    placeholder: 'Search...',
+                    buttonPosition: 'button-inside'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      settings: {
+        containerWidth: 'wide',
+        backgroundColor: settings.header.primary.background || '#ffffff',
+        textColor: settings.colors.textColor || '#333333',
+        padding: {
+          top: '0',
+          bottom: '0'
+        }
+      }
+    };
+  };
+
   return (
     <CustomizerProvider
       initialSettings={initialSettings}
       previewUrl={previewUrl}
       eventHandlers={{
         onSave: handleSave,
+        onPublish: handlePublish,
         onSettingChange: (section, value) => {
           // Handle setting change
         },

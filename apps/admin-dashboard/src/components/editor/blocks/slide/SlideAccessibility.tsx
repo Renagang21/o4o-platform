@@ -332,7 +332,7 @@ export class SlideErrorBoundary extends React.Component<ErrorBoundaryProps, Erro
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
-    console.error('Slide error:', error, errorInfo);
+    
   }
 
   render() {

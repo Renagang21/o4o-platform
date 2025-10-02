@@ -104,7 +104,7 @@ const PartnerCommissions: React.FC<PartnerCommissionsProps> = ({
         setSummary(data.summary);
       }
     } catch (error) {
-      console.error('Commissions fetch error:', error);
+      
       toast({
         title: 'Error',
         description: 'Failed to fetch commission data',

@@ -65,7 +65,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onClose }) => {
         onClose();
       }
     } catch (error) {
-      console.error('Failed to save supplier:', error);
+      
       toast.error('공급자 저장에 실패했습니다');
     } finally {
       setSaving(false);

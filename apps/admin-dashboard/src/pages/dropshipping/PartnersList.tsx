@@ -60,7 +60,7 @@ const PartnersList: React.FC = () => {
         totalCommission: 0 // This would come from a separate API
       });
     } catch (error) {
-      console.error('Failed to fetch partners:', error);
+      
       toast.error('파트너 목록을 불러오는데 실패했습니다');
       // Set empty data on error
       setPartners([]);
@@ -83,7 +83,7 @@ const PartnersList: React.FC = () => {
       toast.success('파트너가 삭제되었습니다');
       fetchPartners();
     } catch (error) {
-      console.error('Failed to delete partner:', error);
+      
       toast.error('파트너 삭제에 실패했습니다');
     }
   };
@@ -102,7 +102,7 @@ const PartnersList: React.FC = () => {
       setSelectedPartners(new Set());
       fetchPartners();
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      
       toast.error('일괄 삭제에 실패했습니다');
     }
   };
@@ -113,7 +113,7 @@ const PartnersList: React.FC = () => {
       toast.success('파트너가 승인되었습니다');
       fetchPartners();
     } catch (error) {
-      console.error('Failed to approve partner:', error);
+      
       toast.error('파트너 승인에 실패했습니다');
     }
   };

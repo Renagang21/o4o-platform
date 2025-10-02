@@ -219,7 +219,7 @@ export class SimpleAIGenerator {
       
       return blocks;
     } catch (error) {
-      console.error('Gemini JSON 파싱 오류:', error, 'Content:', content);
+      
       throw new Error('Gemini 응답을 파싱할 수 없습니다. AI가 올바른 JSON 형식을 반환하지 않았습니다.');
     }
   }

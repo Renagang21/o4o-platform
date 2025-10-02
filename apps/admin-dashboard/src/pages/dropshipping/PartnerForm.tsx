@@ -57,7 +57,7 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ partner, onClose }) => {
         onClose();
       }
     } catch (error) {
-      console.error('Failed to save partner:', error);
+      
       toast.error('파트너 저장에 실패했습니다');
     } finally {
       setSaving(false);

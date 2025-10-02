@@ -122,7 +122,7 @@ export default function TaxonomiesList() {
         await authClient.api.delete(`/cpt/taxonomies/${id}`);
         refetch();
       } catch (error) {
-        console.error('Failed to delete taxonomy:', error);
+        
       }
     }
   };
@@ -138,7 +138,7 @@ export default function TaxonomiesList() {
       });
       refetch();
     } catch (error) {
-      console.error('Failed to duplicate taxonomy:', error);
+      
     }
   };
 

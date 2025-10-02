@@ -39,7 +39,7 @@ const Suppliers: React.FC = () => {
         setSuppliers(response.data);
       }
     } catch (error) {
-      console.error('Failed to fetch suppliers:', error);
+      
       toast.error('공급자 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -56,7 +56,7 @@ const Suppliers: React.FC = () => {
         fetchSuppliers();
       }
     } catch (error) {
-      console.error('Failed to delete supplier:', error);
+      
       toast.error('공급자 삭제에 실패했습니다');
     }
   };
@@ -75,7 +75,7 @@ const Suppliers: React.FC = () => {
       setBulkSelection([]);
       fetchSuppliers();
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      
       toast.error('일괄 삭제에 실패했습니다');
     }
   };

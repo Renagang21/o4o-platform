@@ -57,7 +57,7 @@ const SystemSetup: React.FC = () => {
       //   setStatus(response.data.status);
       // }
     } catch (error) {
-      console.error('Failed to check system status:', error);
+      
       // Default status on error
       setStatus({
         cpts: {
@@ -96,7 +96,7 @@ const SystemSetup: React.FC = () => {
       //   await checkSystemStatus();
       // }
     } catch (error) {
-      console.error('Failed to initialize system:', error);
+      
       toast.error('시스템 초기화에 실패했습니다');
     } finally {
       setInitializing(false);
@@ -121,7 +121,7 @@ const SystemSetup: React.FC = () => {
       //   await checkSystemStatus();
       // }
     } catch (error) {
-      console.error('Failed to create sample data:', error);
+      
       toast.error('샘플 데이터 생성에 실패했습니다');
     } finally {
       setSeeding(false);

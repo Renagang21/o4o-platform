@@ -92,7 +92,7 @@ const ProductEditor: React.FC<ProductEditorProps> = ({ product, onClose }) => {
         onClose();
       }
     } catch (error) {
-      console.error('Failed to save product:', error);
+      
       toast.error('상품 저장에 실패했습니다');
     } finally {
       setSaving(false);

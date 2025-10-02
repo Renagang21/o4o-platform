@@ -70,7 +70,7 @@ export const RoleBasedMenu: React.FC<RoleBasedMenuProps> = ({
         }
       } catch (err) {
         setError('Error loading menu');
-        console.error('Menu loading error:', err);
+        
       } finally {
         setLoading(false);
       }

@@ -318,7 +318,7 @@ class VisionAIService {
           return await this.mockAnalyze();
       }
     } catch (error) {
-      console.error('이미지 분석 오류:', error);
+      
       // 실패 시 모의 분석으로 폴백
       return this.mockAnalyze();
     }

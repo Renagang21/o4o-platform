@@ -113,7 +113,7 @@ export default function FieldGroupsList() {
         await authClient.api.delete(`/cpt/field-groups/${id}`);
         refetch();
       } catch (error) {
-        console.error('Failed to delete field group:', error);
+        
       }
     }
   };
@@ -128,7 +128,7 @@ export default function FieldGroupsList() {
       });
       refetch();
     } catch (error) {
-      console.error('Failed to duplicate field group:', error);
+      
     }
   };
 
@@ -140,7 +140,7 @@ export default function FieldGroupsList() {
       });
       refetch();
     } catch (error) {
-      console.error('Failed to toggle status:', error);
+      
     }
   };
 

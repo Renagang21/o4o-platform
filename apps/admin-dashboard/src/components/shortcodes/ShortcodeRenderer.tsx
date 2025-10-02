@@ -74,7 +74,6 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
 
       setAuthenticated(response.ok);
     } catch (error) {
-      console.error('Auth check failed:', error);
       setAuthenticated(false);
     } finally {
       setLoading(false);

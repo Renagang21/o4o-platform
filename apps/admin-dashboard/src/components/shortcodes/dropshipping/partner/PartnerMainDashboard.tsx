@@ -76,7 +76,7 @@ const PartnerMainDashboard: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Dashboard fetch error:', error);
+      
       toast({
         title: 'Error',
         description: 'Network error occurred',

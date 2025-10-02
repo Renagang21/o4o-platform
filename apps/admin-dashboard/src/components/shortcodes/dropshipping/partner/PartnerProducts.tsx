@@ -115,7 +115,7 @@ const PartnerProducts: React.FC<PartnerProductsProps> = ({
         });
       }
     } catch (error) {
-      console.error('Products fetch error:', error);
+      
       toast({
         title: 'Error',
         description: 'Network error occurred',
@@ -147,7 +147,7 @@ const PartnerProducts: React.FC<PartnerProductsProps> = ({
       }
       return null;
     } catch (error) {
-      console.error('Link generation error:', error);
+      
       return null;
     }
   };
