@@ -85,64 +85,64 @@ export interface ReorderMenuItem {
 export class MenuApi {
   // Menu operations
   static async getMenus(params?: { location?: string; is_active?: boolean }) {
-    const response = await unifiedApi.raw.get('/api/v1/menus', { params });
+    const response = await unifiedApi.raw.get('/v1/menus', { params });
     return response.data;
   }
 
   static async getMenu(id: string) {
-    const response = await unifiedApi.raw.get(`/api/v1/menus/${id}`);
+    const response = await unifiedApi.raw.get(`/v1/menus/${id}`);
     return response.data;
   }
 
   static async getMenuByLocation(location: string) {
-    const response = await unifiedApi.raw.get(`/api/v1/menus/location/${location}`);
+    const response = await unifiedApi.raw.get(`/v1/menus/location/${location}`);
     return response.data;
   }
 
   static async createMenu(data: CreateMenuDto) {
-    const response = await unifiedApi.raw.post('/api/v1/menus', data);
+    const response = await unifiedApi.raw.post('/v1/menus', data);
     return response.data;
   }
 
   static async updateMenu(id: string, data: UpdateMenuDto) {
-    const response = await unifiedApi.raw.put(`/api/v1/menus/${id}`, data);
+    const response = await unifiedApi.raw.put(`/v1/menus/${id}`, data);
     return response.data;
   }
 
   static async deleteMenu(id: string) {
-    const response = await unifiedApi.raw.delete(`/api/v1/menus/${id}`);
+    const response = await unifiedApi.raw.delete(`/v1/menus/${id}`);
     return response.data;
   }
 
   static async duplicateMenu(id: string, name: string, slug?: string) {
-    const response = await unifiedApi.raw.post(`/api/v1/menus/${id}/duplicate`, { name, slug });
+    const response = await unifiedApi.raw.post(`/v1/menus/${id}/duplicate`, { name, slug });
     return response.data;
   }
 
   static async reorderMenuItems(menuId: string, items: ReorderMenuItem[]) {
-    const response = await unifiedApi.raw.put(`/api/v1/menus/${menuId}/reorder`, items);
+    const response = await unifiedApi.raw.put(`/v1/menus/${menuId}/reorder`, items);
     return response.data;
   }
 
   // Menu item operations
   static async createMenuItem(data: CreateMenuItemDto) {
-    const response = await unifiedApi.raw.post('/api/v1/menu-items', data);
+    const response = await unifiedApi.raw.post('/v1/menu-items', data);
     return response.data;
   }
 
   static async updateMenuItem(id: string, data: UpdateMenuItemDto) {
-    const response = await unifiedApi.raw.put(`/api/v1/menu-items/${id}`, data);
+    const response = await unifiedApi.raw.put(`/v1/menu-items/${id}`, data);
     return response.data;
   }
 
   static async deleteMenuItem(id: string) {
-    const response = await unifiedApi.raw.delete(`/api/v1/menu-items/${id}`);
+    const response = await unifiedApi.raw.delete(`/v1/menu-items/${id}`);
     return response.data;
   }
 
   // Menu location operations
   static async getMenuLocations() {
-    const response = await unifiedApi.raw.get('/api/v1/menus/locations');
+    const response = await unifiedApi.raw.get('/v1/menus/locations');
     return response.data;
   }
 
@@ -150,49 +150,49 @@ export class MenuApi {
   
   // Conditional display
   static async createMenuItemConditions(itemId: string, conditions: any) {
-    const response = await unifiedApi.raw.post(`/api/v1/menu-items/${itemId}/conditions`, conditions);
+    const response = await unifiedApi.raw.post(`/v1/menu-items/${itemId}/conditions`, conditions);
     return response.data;
   }
 
   static async getMenuItemConditions(itemId: string) {
-    const response = await unifiedApi.raw.get(`/api/v1/menu-items/${itemId}/conditions`);
+    const response = await unifiedApi.raw.get(`/v1/menu-items/${itemId}/conditions`);
     return response.data;
   }
 
   static async deleteMenuItemConditions(itemId: string) {
-    const response = await unifiedApi.raw.delete(`/api/v1/menu-items/${itemId}/conditions`);
+    const response = await unifiedApi.raw.delete(`/v1/menu-items/${itemId}/conditions`);
     return response.data;
   }
 
   // Menu styles
   static async createMenuStyles(menuId: string, styles: any) {
-    const response = await unifiedApi.raw.post(`/api/v1/menus/${menuId}/styles`, styles);
+    const response = await unifiedApi.raw.post(`/v1/menus/${menuId}/styles`, styles);
     return response.data;
   }
 
   static async getMenuStyles(menuId: string) {
-    const response = await unifiedApi.raw.get(`/api/v1/menus/${menuId}/styles`);
+    const response = await unifiedApi.raw.get(`/v1/menus/${menuId}/styles`);
     return response.data;
   }
 
   static async updateMenuStyles(menuId: string, styles: any) {
-    const response = await unifiedApi.raw.put(`/api/v1/menus/${menuId}/styles`, styles);
+    const response = await unifiedApi.raw.put(`/v1/menus/${menuId}/styles`, styles);
     return response.data;
   }
 
   // Mega menu
   static async createMegaMenu(menuId: string, config: any) {
-    const response = await unifiedApi.raw.post(`/api/v1/menus/${menuId}/mega-menu`, config);
+    const response = await unifiedApi.raw.post(`/v1/menus/${menuId}/mega-menu`, config);
     return response.data;
   }
 
   static async getMegaMenu(menuId: string) {
-    const response = await unifiedApi.raw.get(`/api/v1/menus/${menuId}/mega-menu`);
+    const response = await unifiedApi.raw.get(`/v1/menus/${menuId}/mega-menu`);
     return response.data;
   }
 
   static async updateMegaMenu(menuId: string, config: any) {
-    const response = await unifiedApi.raw.put(`/api/v1/menus/${menuId}/mega-menu`, config);
+    const response = await unifiedApi.raw.put(`/v1/menus/${menuId}/mega-menu`, config);
     return response.data;
   }
 

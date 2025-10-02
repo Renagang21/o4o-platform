@@ -103,7 +103,7 @@ const WordPressMenuEditor: FC = () => {
   const loadAvailableItems = async () => {
     try {
       // Load pages
-      const pagesResponse = await (unifiedApi as any).raw.get('/api/pages?limit=100');
+      const pagesResponse = await (unifiedApi as any).raw.get('/pages?limit=100');
       if (pagesResponse.data?.success && Array.isArray(pagesResponse.data?.data)) {
         setPages(pagesResponse.data.data.map((page: any) => ({
           id: page.id,
@@ -114,7 +114,7 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load posts
-      const postsResponse = await (unifiedApi as any).raw.get('/api/posts?limit=100');
+      const postsResponse = await (unifiedApi as any).raw.get('/posts?limit=100');
       if (postsResponse.data?.success && Array.isArray(postsResponse.data?.data)) {
         setPosts(postsResponse.data.data.map((post: any) => ({
           id: post.id,
