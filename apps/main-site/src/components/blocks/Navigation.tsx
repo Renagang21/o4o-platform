@@ -1,7 +1,6 @@
-import { FC, useState, useEffect } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import { authClient } from '@o4o/auth-client';
 import HamburgerMenu from '../layout/HamburgerMenu';
 
 interface MenuItem {
@@ -17,50 +16,27 @@ interface NavigationProps {
   orientation?: 'horizontal' | 'vertical';
   showSubmenuIcon?: boolean;
   className?: string;
+  menuItems?: MenuItem[];
+  data?: {
+    menuRef?: string;
+    orientation?: 'horizontal' | 'vertical';
+    showSubmenuIcon?: boolean;
+  };
 }
 
 const Navigation: FC<NavigationProps> = ({
-  menuRef = 'primary-menu',
-  orientation = 'horizontal',
-  showSubmenuIcon = true,
-  className = ''
+  menuRef,
+  orientation,
+  showSubmenuIcon,
+  className = '',
+  menuItems: propMenuItems = [],
+  data
 }) => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const response = await authClient.api.get(`/menus/${menuRef}`);
-        if (response.status === 200 && response.data) {
-          // Handle new API response structure
-          const data = response.data;
-          if (data && typeof data === 'object' && 'success' in data) {
-            // New structure: {success: true, data: {...}}
-            if (data.success && data.data) {
-              setMenuItems(data.data.items || []);
-            } else {
-              throw new Error(data.error || 'Failed to fetch menu');
-            }
-          } else if (data && data.items) {
-            // Old structure: direct object with items
-            setMenuItems(data.items);
-          } else {
-            throw new Error('Invalid menu data structure');
-          }
-        } else {
-          throw new Error('Failed to fetch menu');
-        }
-      } catch (error) {
-        // Don't show fallback menu items - let admin configure it
-        setMenuItems([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMenu();
-  }, [menuRef]);
+  // Extract values from props or data object (from TemplatePartRenderer)
+  const finalMenuRef = data?.menuRef || menuRef || 'primary-menu';
+  const finalOrientation = data?.orientation || orientation || 'horizontal';
+  const finalShowSubmenuIcon = data?.showSubmenuIcon !== undefined ? data.showSubmenuIcon : (showSubmenuIcon ?? true);
+  const menuItems = propMenuItems;
 
   const renderMenuItem = (item: MenuItem, depth = 0): React.ReactNode => {
     const hasChildren = item.children && item.children.length > 0;
@@ -75,14 +51,14 @@ const Navigation: FC<NavigationProps> = ({
             className="menu-link"
           >
             {item.title}
-            {hasChildren && showSubmenuIcon && (
+            {hasChildren && finalShowSubmenuIcon && (
               <ChevronDown className="submenu-icon ml-1 h-4 w-4" />
             )}
           </a>
         ) : (
           <Link to={item.url} className="menu-link">
             {item.title}
-            {hasChildren && showSubmenuIcon && (
+            {hasChildren && finalShowSubmenuIcon && (
               <ChevronDown className="submenu-icon ml-1 h-4 w-4" />
             )}
           </Link>
@@ -97,25 +73,21 @@ const Navigation: FC<NavigationProps> = ({
     );
   };
 
-  if (loading) {
-    return <div className="navigation-skeleton animate-pulse h-10 w-64 bg-gray-200 rounded" />;
-  }
-
   const navClasses = [
     'navigation',
-    `navigation-${orientation}`,
+    `navigation-${finalOrientation}`,
     className
   ].filter(Boolean).join(' ');
 
   return (
     <>
       <nav className={`${navClasses} hidden md:block`}>
-        <ul className={`menu menu-${orientation}`}>
+        <ul className={`menu menu-${finalOrientation}`}>
           {menuItems.map(item => renderMenuItem(item))}
         </ul>
       </nav>
       
-      <HamburgerMenu menuRef={menuRef} />
+      <HamburgerMenu menuRef={finalMenuRef} />
       
       <style>{`
         .navigation-horizontal .menu {

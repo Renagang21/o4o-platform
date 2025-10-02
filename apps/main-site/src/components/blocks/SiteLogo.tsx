@@ -1,6 +1,5 @@
-import { FC, useState, useEffect } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { authClient } from '@o4o/auth-client';
 
 interface SiteLogoProps {
   width?: number;
@@ -8,68 +7,35 @@ interface SiteLogoProps {
   isLink?: boolean;
   linkTarget?: string;
   className?: string;
+  logoUrl?: string;
+  siteName?: string;
+  data?: {
+    width?: number;
+    logoUrl?: string;
+    isLink?: boolean;
+    linkTarget?: string;
+  };
 }
 
 const SiteLogo: FC<SiteLogoProps> = ({
-  width = 120,
+  width,
   height,
-  isLink = true,
-  linkTarget = '_self',
-  className = ''
+  isLink,
+  linkTarget,
+  className = '',
+  logoUrl: propLogoUrl,
+  siteName: propSiteName,
+  data
 }) => {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [siteName, setSiteName] = useState<string>('Neture Platform');
-  const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    const fetchSiteSettings = async () => {
-      try {
-        // Try to get site identity settings from API
-        const response = await authClient.api.get('/settings/customizer');
-        if (response.status === 200 && response.data) {
-          // API returns { success: true, data: {...} }
-          const settings = response.data.data || response.data;
-          if (settings?.siteIdentity?.logo?.desktop) {
-            // Remove any existing timestamp for clean comparison
-            const cleanUrl = settings.siteIdentity.logo.desktop.split('?')[0];
-            // Add fresh timestamp for cache busting
-            setLogoUrl(`${cleanUrl}?t=${Date.now()}`);
-          }
-          if (settings?.siteIdentity?.siteTitle?.text) {
-            setSiteName(settings.siteIdentity.siteTitle.text);
-          }
-        }
-      } catch (error) {
-        // Fallback to local image if API fails
-        setLogoUrl('/images/logo.svg');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchSiteSettings();
-    
-    // Listen for logo update messages from customizer
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'update-logo' && event.data.url) {
-        setLogoUrl(event.data.url);
-      } else if (event.data.type === 'customizer-update' && event.data.settings) {
-        const settings = event.data.settings;
-        if (settings?.siteIdentity?.logo?.desktop) {
-          setLogoUrl(settings.siteIdentity.logo.desktop);
-        }
-        if (settings?.siteIdentity?.siteTitle?.text) {
-          setSiteName(settings.siteIdentity.siteTitle.text);
-        }
-      }
-    };
-    
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  // Extract values from props or data object (from TemplatePartRenderer)
+  const logoWidth = data?.width || width || 120;
+  const logoUrl = data?.logoUrl || propLogoUrl || '/images/logo.svg';
+  const siteName = propSiteName || 'Neture Platform';
+  const shouldLink = data?.isLink !== undefined ? data.isLink : (isLink ?? true);
+  const target = data?.linkTarget || linkTarget || '_self';
 
-  // Don't render anything if loading or no logo URL
-  if (loading || !logoUrl) {
+  // Don't render anything if no logo URL
+  if (!logoUrl) {
     return null;
   }
   
@@ -77,7 +43,7 @@ const SiteLogo: FC<SiteLogoProps> = ({
     <img
       src={logoUrl}
       alt={siteName}
-      width={width}
+      width={logoWidth}
       height={height || 'auto'}
       className={`site-logo ${className}`}
       onError={(e) => {
@@ -96,11 +62,11 @@ const SiteLogo: FC<SiteLogoProps> = ({
     />
   );
 
-  if (!isLink) {
+  if (!shouldLink) {
     return logo;
   }
 
-  if (linkTarget === '_blank') {
+  if (target === '_blank') {
     return (
       <a href="/" target="_blank" rel="noopener noreferrer" className="site-logo-link">
         {logo}

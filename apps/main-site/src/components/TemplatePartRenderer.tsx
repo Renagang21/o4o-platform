@@ -66,7 +66,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   // Note: removed a no-op useMemo to satisfy lint rules
 
   // Render blocks recursively
-  const renderBlock = (block: TemplatePartBlock): React.ReactNode => {
+  const renderBlock = (block: TemplatePartBlock, menuData?: any[]): React.ReactNode => {
     const BlockComponent = blockComponents[block.type];
     
     if (!BlockComponent) {
@@ -78,7 +78,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     const { ref, ...safeData } = block.data || {};
     const { ref: attrRef, ...safeAttributes } = block.attributes || {};
     
-    const blockProps = {
+    let blockProps = {
       ...safeData,
       ...safeAttributes,
       key: block.id,
@@ -87,11 +87,32 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
       ...(block.type === 'core/navigation' && (ref || attrRef) ? { menuRef: ref || attrRef } : {})
     };
 
+    // Add specific props based on block type
+    if (block.type === 'core/site-logo') {
+      blockProps = {
+        ...blockProps,
+        logoUrl: block.data?.logoUrl,
+        width: block.data?.width,
+        isLink: block.data?.isLink,
+        linkTarget: block.data?.linkTarget,
+        data: block.data
+      };
+    } else if (block.type === 'core/navigation') {
+      blockProps = {
+        ...blockProps,
+        menuRef: block.data?.menuRef || ref || attrRef,
+        orientation: block.data?.orientation,
+        showSubmenuIcon: block.data?.showSubmenuIcon,
+        menuItems: menuData || [],
+        data: block.data
+      };
+    }
+
     // Handle blocks with inner blocks
     if (block.innerBlocks && block.innerBlocks.length > 0) {
       return (
         <BlockComponent {...blockProps}>
-          {block.innerBlocks.map(innerBlock => renderBlock(innerBlock))}
+          {block.innerBlocks.map(innerBlock => renderBlock(innerBlock, menuData))}
         </BlockComponent>
       );
     }
@@ -102,6 +123,9 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   // Render template part with its settings
   const renderTemplatePart = (templatePart: any) => {
     const { settings = {}, content } = templatePart;
+    
+    // Extract menu data from the template part blocks for navigation
+    const menuData = extractMenuDataFromBlocks(content);
     
     // Build container styles
     const containerStyles: React.CSSProperties = {
@@ -132,10 +156,22 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
           <style dangerouslySetInnerHTML={{ __html: settings.customCss }} />
         )}
         <div className={containerClass}>
-          {Array.isArray(content) ? content.map((block: TemplatePartBlock) => renderBlock(block)) : null}
+          {Array.isArray(content) ? content.map((block: TemplatePartBlock) => renderBlock(block, menuData)) : null}
         </div>
       </div>
     );
+  };
+
+  // Extract menu data from blocks (could be enhanced to fetch from API based on menuRef)
+  const extractMenuDataFromBlocks = (blocks: TemplatePartBlock[]): any[] => {
+    // For now, return default menu items
+    // In the future, this could fetch menu data based on menuRef found in navigation blocks
+    return [
+      { id: '1', title: '홈', url: '/', target: '_self' },
+      { id: '2', title: '로그인', url: '/login', target: '_self' },
+      { id: '3', title: '쇼핑', url: '/shop', target: '_self' },
+      { id: '4', title: '블로그', url: '/posts', target: '_self' }
+    ];
   };
 
   // Show loading state
