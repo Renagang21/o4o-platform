@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import toast from 'react-hot-toast';
-import { UserApi } from '@/api/userApi';
+import { authClient } from '@o4o/auth-client';
 
 interface Permission {
   id: string;
@@ -76,8 +76,8 @@ export default function RoleManagement() {
     try {
       setLoading(true);
       const [rolesResponse, permissionsResponse] = await Promise.all([
-        UserApi.get('/api/v1/users/roles'),
-        UserApi.get('/api/v1/users/permissions'),
+        authClient.api.get('/users/roles'),
+        authClient.api.get('/users/permissions'),
       ]);
 
       if (rolesResponse.data.success) {
@@ -99,10 +99,10 @@ export default function RoleManagement() {
     
     try {
       if (editingRole) {
-        await UserApi.put(`/api/v1/users/roles/${editingRole.id}`, formData);
+        await authClient.api.put(`/users/roles/${editingRole.id}`, formData);
         toast.success('Role updated successfully');
       } else {
-        await UserApi.post('/api/v1/users/roles', formData);
+        await authClient.api.post('/users/roles', formData);
         toast.success('Role created successfully');
       }
       
@@ -140,7 +140,7 @@ export default function RoleManagement() {
 
     if (confirm(`Are you sure you want to delete the role "${role.displayName}"?`)) {
       try {
-        await UserApi.delete(`/api/v1/users/roles/${role.id}`);
+        await authClient.api.delete(`/users/roles/${role.id}`);
         toast.success('Role deleted successfully');
         fetchData();
       } catch (error) {

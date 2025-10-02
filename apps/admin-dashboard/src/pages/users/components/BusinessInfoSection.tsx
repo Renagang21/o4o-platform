@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import toast from 'react-hot-toast';
-import { UserApi } from '@/api/userApi';
+import { authClient } from '@o4o/auth-client';
 
 interface BusinessInfo {
   id?: string;
@@ -110,7 +110,7 @@ export default function BusinessInfoSection({ userId, userRole, onBusinessInfoCh
   const fetchBusinessInfo = async () => {
     try {
       setLoading(true);
-      const response = await UserApi.get(`/api/v1/users/${userId}/business-info`);
+      const response = await authClient.api.get(`/users/${userId}/business-info`);
       
       if (response.data.success) {
         setBusinessInfo(response.data.data);
@@ -145,10 +145,10 @@ export default function BusinessInfoSection({ userId, userRole, onBusinessInfoCh
       setSaving(true);
       
       if (businessInfo.id) {
-        await UserApi.put(`/api/v1/users/${userId}/business-info`, businessInfo);
+        await authClient.api.put(`/users/${userId}/business-info`, businessInfo);
         toast.success('Business information updated successfully');
       } else {
-        const response = await UserApi.post(`/api/v1/users/${userId}/business-info`, businessInfo);
+        const response = await authClient.api.post(`/users/${userId}/business-info`, businessInfo);
         setBusinessInfo(response.data.data);
         toast.success('Business information created successfully');
       }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, User, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserApi } from '@/api/userApi';
+import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 
 interface ActivityLog {
@@ -79,7 +79,7 @@ export default function UserActivityLog({ userId }: UserActivityLogProps) {
   const fetchActivities = async () => {
     try {
       setLoading(true);
-      const response = await UserApi.get(`/api/v1/users/${userId}/activity-log?page=${page}&limit=20`);
+      const response = await authClient.api.get(`/users/${userId}/activity-log?page=${page}&limit=20`);
       
       if (response.data.success) {
         if (page === 1) {
