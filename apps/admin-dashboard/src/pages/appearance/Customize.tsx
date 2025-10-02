@@ -45,7 +45,7 @@ const Customize: React.FC = () => {
   const handleSave = async (settings: any) => {
     try {
       // API를 통해 설정 저장
-      const response = await authClient.api.post('/v1/settings/customizer', {
+      const response = await authClient.api.post('/settings/customizer', {
         settings: settings,
         type: 'astra-customizer'
       });

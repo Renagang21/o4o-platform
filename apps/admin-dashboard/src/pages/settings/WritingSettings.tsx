@@ -111,7 +111,7 @@ const WritingSettings: React.FC = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/v1/settings/writing');
+      const response = await authClient.api.get('/settings/writing');
       if (response.data?.data) {
         setSettings(response.data.data);
       }
@@ -125,7 +125,7 @@ const WritingSettings: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await authClient.api.put('/v1/settings/writing', settings);
+      await authClient.api.put('/settings/writing', settings);
       toast.success('Writing settings saved successfully');
     } catch (error: any) {
       toast.error('Failed to save settings');
