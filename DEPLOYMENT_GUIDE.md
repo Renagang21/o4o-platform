@@ -1,29 +1,47 @@
 # O4O Platform 배포 가이드
 
+## 🚀 자동 배포 (GitHub Actions)
+
+### 설정 방법
+1. SSH 키 설정 스크립트 실행:
+   ```bash
+   ./scripts/setup-github-secrets.sh
+   ```
+
+2. GitHub Secrets 설정:
+   - Repository Settings → Secrets → Actions
+   - `API_SERVER_SSH_KEY`: API 서버 SSH 개인키
+   - `WEB_SERVER_SSH_KEY`: 웹 서버 SSH 개인키
+
+3. 배포 트리거:
+   - main 브랜치 push 시 자동 배포
+   - GitHub Actions 탭에서 수동 실행 가능
+
 ## 🖥️ 서버 구조
 
 | 서버 | IP | 사용자 | 용도 | URL |
 |------|-----|--------|------|-----|
 | **API 서버** | 43.202.242.215 | ubuntu | API 백엔드 | https://api.neture.co.kr |
-| **웹 서버** | 13.125.144.8 | sohae21 | Admin Dashboard | https://admin.neture.co.kr |
+| **웹 서버** | 13.125.144.8 | ubuntu | Admin Dashboard | https://admin.neture.co.kr |
 
 ## 📁 프로젝트 경로
 
 - **API 서버**: `/home/ubuntu/o4o-platform`
-- **웹 서버**: `/home/sohae21/o4o-platform`
+- **웹 서버**: `/home/ubuntu/o4o-platform`
 
-## 🚀 배포 스크립트 정리
+## 🚀 배포 방법
 
-### 메인 배포 스크립트
-- `deploy.sh` - 로컬 빌드 스크립트 (Admin + API)
-- `deploy-production.sh` - 프로덕션 배포 가이드 스크립트
+### 자동 배포 (권장)
+GitHub Actions를 통한 자동 배포가 설정되어 있습니다:
+- main 브랜치에 push하면 자동으로 배포
+- `.github/workflows/deploy.yml` 파일 참조
 
-### 서버별 배포 스크립트
-- `scripts/deploy-apiserver.sh` - API 서버 전용 배포
-- `scripts/deploy-webserver.sh` - 웹 서버 전용 배포 (deprecated)
-- `scripts/deploy-unified.sh` - 통합 배포 스크립트
+### 수동 배포 스크립트
+- `deploy.sh` - 로컬 빌드 스크립트
+- `deploy-remote.sh` - 서버에서 직접 실행하는 배포 스크립트
+- `scripts/setup-github-secrets.sh` - GitHub Actions 설정 가이드
 
-## 📋 배포 절차
+## 📋 수동 배포 절차
 
 ### 1. 로컬 빌드
 ```bash
