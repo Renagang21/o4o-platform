@@ -82,7 +82,6 @@ const Categories = () => {
           setCategories(transformedCategories);
         }
       } catch (error) {
-        console.error('Failed to load categories:', error);
         // Fallback to empty array on error
         setCategories([]);
       }
