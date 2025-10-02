@@ -197,27 +197,27 @@ export class ContentApi {
 
   // Tags Management
   static async getTags(): Promise<ApiResponse<Tag[]>> {
-    const response = await unifiedApi.raw.get('/api/tags')
+    const response = await unifiedApi.raw.get('/tags')
     return response.data
   }
 
   static async getTag(id: string): Promise<ApiResponse<Tag>> {
-    const response = await unifiedApi.raw.get(`/api/tags/${id}`)
+    const response = await unifiedApi.raw.get(`/tags/${id}`)
     return response.data
   }
 
   static async createTag(tag: Partial<Tag>): Promise<ApiResponse<Tag>> {
-    const response = await unifiedApi.raw.post('/api/tags', tag)
+    const response = await unifiedApi.raw.post('/tags', tag)
     return response.data
   }
 
   static async updateTag(id: string, tag: Partial<Tag>): Promise<ApiResponse<Tag>> {
-    const response = await unifiedApi.raw.put(`/api/tags/${id}`, tag)
+    const response = await unifiedApi.raw.put(`/tags/${id}`, tag)
     return response.data
   }
 
   static async deleteTag(id: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete(`/api/tags/${id}`)
+    const response = await unifiedApi.raw.delete(`/tags/${id}`)
     return response.data
   }
 

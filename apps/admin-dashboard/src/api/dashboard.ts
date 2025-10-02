@@ -88,7 +88,7 @@ export const dashboardApi = {
     try {
       // Ecommerce removed - using default values
       const [usersResponse] = await Promise.all([
-        unifiedApi.raw.get('/api/users/stats').catch(() => {
+        unifiedApi.raw.get('/users/stats').catch(() => {
           // API 오류 시 기본값 반환하고 토스트 메시지 표시
           import('react-hot-toast').then(({ default: toast }) => {
             toast.error('사용자 통계를 불러올 수 없습니다');
@@ -264,7 +264,7 @@ export const dashboardApi = {
   // 알림 데이터 조회
   async getNotifications() {
     try {
-      const response = await unifiedApi.raw.get('/api/admin/notifications?limit=20');
+      const response = await unifiedApi.raw.get('/admin/notifications?limit=20');
       const notifications = response.data.notifications || [];
 
       // 알림 타입별 카운트
@@ -291,7 +291,7 @@ export const dashboardApi = {
   // 최근 활동 조회
   async getRecentActivities() {
     try {
-      const response = await unifiedApi.raw.get('/api/admin/activities?limit=15');
+      const response = await unifiedApi.raw.get('/admin/activities?limit=15');
       return response.data.activities || this.getDefaultActivities();
     } catch (error: any) {
     // Error logging - use proper error handler
@@ -302,7 +302,7 @@ export const dashboardApi = {
   // 시스템 상태 조회
   async getSystemHealth() {
     try {
-      const response = await unifiedApi.raw.get('/api/system/health');
+      const response = await unifiedApi.raw.get('/system/health');
       return response.data;
     } catch (error: any) {
     // Error logging - use proper error handler

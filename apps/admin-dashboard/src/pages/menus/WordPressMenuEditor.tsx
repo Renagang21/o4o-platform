@@ -125,7 +125,7 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load categories
-      const categoriesResponse = await (unifiedApi as any).raw.get('/api/categories?limit=100');
+      const categoriesResponse = await (unifiedApi as any).raw.get('/categories?limit=100');
       if (categoriesResponse.data?.success && Array.isArray(categoriesResponse.data?.data)) {
         setCategories(categoriesResponse.data.data.map((cat: any) => ({
           id: cat.id,
@@ -136,7 +136,7 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load tags
-      const tagsResponse = await (unifiedApi as any).raw.get('/api/tags?limit=100');
+      const tagsResponse = await (unifiedApi as any).raw.get('/tags?limit=100');
       if (tagsResponse.data?.success && Array.isArray(tagsResponse.data?.data)) {
         setTags(tagsResponse.data.data.map((tag: any) => ({
           id: tag.id,
