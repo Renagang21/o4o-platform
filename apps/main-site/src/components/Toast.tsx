@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 import useToast from '../hooks/useToast';
 

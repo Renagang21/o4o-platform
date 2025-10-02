@@ -1,6 +1,6 @@
 import { FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { mockAuthService } from '../services/mockAuth';
 

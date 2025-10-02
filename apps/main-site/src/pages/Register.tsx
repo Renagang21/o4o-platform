@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 import { authAPI } from '../api/client';
 import toast from 'react-hot-toast';

@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react';
-import TemplatePartRenderer from './TemplatePartRenderer';
+import TemplatePartRenderer from '../TemplatePartRenderer';
 
 interface LayoutProps {
   children: ReactNode;

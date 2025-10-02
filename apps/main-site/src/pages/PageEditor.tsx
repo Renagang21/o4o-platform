@@ -2,8 +2,8 @@
 
 import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import NotionEditor from '@o4o/ui/editor/NotionEditor';
-import { loadPageContent, savePageContent, PageContent, getPageViewUrl } from '../utils/pageSystem';
+import NotionEditor from '../components/NotionEditor';
+import { loadPageContent, savePageContent, PageContent, getPageViewUrl } from '@/utils/pageSystem';
 
 const PageEditor: FC = () => {
   const { slug } = useParams<{ slug: string }>();

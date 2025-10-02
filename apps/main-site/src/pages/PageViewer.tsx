@@ -3,7 +3,7 @@
 import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, ArrowLeft } from 'lucide-react';
-import { loadPageContent, PageContent } from '../utils/pageSystem';
+import { loadPageContent, PageContent } from '@/utils/pageSystem';
 import DOMPurify from 'dompurify';
 
 // 사용자 권한 확인

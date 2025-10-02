@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, FC, ChangeEvent } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import {
   Upload,
   Image as ImageIcon,
