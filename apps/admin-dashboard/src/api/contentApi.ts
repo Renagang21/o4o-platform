@@ -233,7 +233,7 @@ export class ContentApi {
     folderId?: string,
     type?: string,
     search?: string
-  ): Promise<ApiResponse<MediaFile[]>> {
+  ): Promise<any> {
     const params = {
       page,
       pageSize,
@@ -243,7 +243,9 @@ export class ContentApi {
     }
     
     const response = await unifiedApi.content.media.list(params)
-    return response.data
+    // The API returns { success: true, data: { media: [], pagination: {} } }
+    // We need to return the nested data object which contains media and pagination
+    return response.data.data
   }
 
   static async getMediaFile(id: string): Promise<ApiResponse<MediaFile>> {

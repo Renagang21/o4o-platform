@@ -112,11 +112,11 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       id: file.id,
       url: file.url || file.path || '',
       type: mediaType,
-      title: file.originalName || file.filename || file.name || file.title || 'Untitled',
-      alt: file.altText || file.alt || file.originalName || file.filename || '',
+      title: file.originalFilename || file.filename || file.name || file.title || 'Untitled',
+      alt: file.altText || file.alt || file.originalFilename || file.filename || '',
       width: file.width || file.dimensions?.width,
       height: file.height || file.dimensions?.height,
-      fileSize: file.fileSize || file.size,
+      fileSize: file.size || file.fileSize,
       mimeType: file.mimeType || file.mime_type,
       thumbnailUrl: file.thumbnailUrl || file.thumbnail || file.url,
       caption: file.caption || file.description || '',
@@ -146,9 +146,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       return response;
     },
     getNextPageParam: (lastPage) => {
-      const { pagination } = lastPage;
-      if (pagination && pagination.currentPage < pagination.totalPages) {
-        return pagination.currentPage + 1;
+      // Handle nested response structure: { success: true, data: { media: [], pagination: {} } }
+      const pagination = lastPage?.data?.pagination || lastPage?.pagination;
+      if (pagination && pagination.page < pagination.totalPages) {
+        return pagination.page + 1;
       }
       return undefined;
     },
@@ -202,8 +203,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   }, [isOpen, selectedFiles]); // Remove undefined functions from dependencies
 
   const allFiles = data?.pages?.flatMap(page => {
-    // API response structure: { data: [...], pagination: {...} }
-    const mediaArray = (page as any)?.data || page || [];
+    // API response structure: { success: true, data: { media: [...], pagination: {...} } }
+    const mediaArray = (page as any)?.data?.media || (page as any)?.media || (page as any)?.data || [];
     return Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
   }) || [];
 
