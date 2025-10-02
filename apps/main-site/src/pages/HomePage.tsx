@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import BlogList from '../components/BlogList';
 import PageRenderer from '../components/PageRenderer';
-import Layout from '../components/Layout';
+import Layout from '../components/layout/Layout';
 
 interface HomepageSettings {
   type: 'latest_posts' | 'static_page';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import Layout from '../../components/Layout';
+import Layout from '../../components/layout/Layout';
 import { apiClient as api } from '../../services/api';
 import { renderShortcodes } from '@o4o/shortcodes';
 

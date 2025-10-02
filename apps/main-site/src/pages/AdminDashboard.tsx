@@ -36,46 +36,29 @@ const AdminDashboard: FC = () => {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<Pagination | null>(null);
 
-  // Mock data for demonstration
+  // Fetch users from API
   useEffect(() => {
-    const mockUsers: User[] = [
-      {
-        id: '1',
-        name: '김철수',
-        email: 'kim@example.com',
-        role: 'b2c',
-        status: 'active',
-        createdAt: '2025-01-01'
-      },
-      {
-        id: '2',
-        name: '이영희',
-        email: 'lee@example.com',
-        role: 'yaksa',
-        status: 'pending',
-        createdAt: '2025-01-02'
-      },
-      {
-        id: '3',
-        name: '박민수',
-        email: 'park@example.com',
-        role: 'admin',
-        status: 'active',
-        createdAt: '2025-01-03'
-      }
-    ];
-
-    setUsers(mockUsers);
-    setPagination({
-      current: 1,
-      total: 1,
-      totalUsers: mockUsers.length
-    });
-    setLoading(false);
+    loadUsers(1);
   }, []);
 
-  const loadUsers = (page: number = 1) => {
-    // Mock function for pagination
+  const loadUsers = async (page: number = 1) => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/users?page=${page}&limit=10`);
+      if (response.data) {
+        setUsers(response.data.users || []);
+        setPagination({
+          current: page,
+          total: response.data.totalPages || 1,
+          totalUsers: response.data.total || 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getActionButtons = (user: User) => {

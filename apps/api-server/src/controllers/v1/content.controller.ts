@@ -20,39 +20,11 @@ export class ContentController {
     try {
       const { page = 1, pageSize = 20, type = 'post', status, search } = req.query;
       
-      // Return mock data if DB not initialized
+      // Check database connection
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: [
-            {
-              id: '1',
-              title: 'Welcome to O4O Platform',
-              slug: 'welcome-to-o4o-platform',
-              content: { type: 'doc', content: [] },
-              excerpt: 'Welcome to our new platform',
-              status: 'publish',
-              author: { id: '1', name: 'Admin', email: 'admin@example.com' },
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              publishedAt: new Date().toISOString(),
-              categories: [],
-              tags: [],
-              featuredImage: null,
-              type: 'post',
-              visibility: 'public',
-              allowComments: true,
-              viewCount: 0,
-              likeCount: 0,
-              commentsCount: 0
-            }
-          ],
-          pagination: {
-            page: Number(page),
-            pageSize: Number(pageSize),
-            totalItems: 1,
-            totalPages: 1
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -100,19 +72,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: {
-            id,
-            title: '',
-            slug: '',
-            content: { type: 'doc', content: [] },
-            excerpt: '',
-            status: 'draft',
-            author: { id: '1', name: 'Admin', email: 'admin@example.com' },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -157,16 +119,9 @@ export class ContentController {
       const userId = user?.id || user?.userId;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          success: true,
-          data: {
-            id: Date.now().toString(),
-            title,
-            content,
-            status,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -250,7 +205,7 @@ export class ContentController {
           userId: (req as any).user?.userId
         });
       } else {
-        console.error('Failed to create post:', error);
+        // console.error('Failed to create post:', error);
       }
       
       return res.status(500).json({
@@ -268,16 +223,9 @@ export class ContentController {
       const userId = user?.id || user?.userId;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          success: true,
-          data: {
-            id: Date.now().toString(),
-            title,
-            content,
-            status: 'draft',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -340,14 +288,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          success: true,
-          data: {
-            id,
-            status: 'publish',
-            publishedAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -410,13 +353,9 @@ export class ContentController {
       }
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          success: true,
-          data: {
-            id,
-            ...updateData,
-            updatedAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -445,7 +384,7 @@ export class ContentController {
       });
     } catch (error: any) {
       // Log the actual error
-      console.error('Update post error:', error);
+      // console.error('Update post error:', error);
       
       // Check for unique constraint violation
       if (error.code === '23505' && error.detail?.includes('slug')) {
@@ -467,9 +406,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          success: true,
-          message: 'Post deleted successfully'
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -491,13 +430,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: {
-            id: Date.now().toString(),
-            title: 'Cloned Post',
-            createdAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -537,9 +472,9 @@ export class ContentController {
       const { ids, data } = req.body;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          message: 'Posts updated successfully'
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -562,9 +497,9 @@ export class ContentController {
       const { ids } = req.body;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          message: 'Posts deleted successfully'
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -586,26 +521,29 @@ export class ContentController {
   getCategories = async (req: Request, res: Response) => {
     try {
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: [
-            { id: '1', name: 'Technology', slug: 'technology', description: 'Tech related posts', count: 5 },
-            { id: '2', name: 'Business', slug: 'business', description: 'Business related posts', count: 3 },
-            { id: '3', name: 'Design', slug: 'design', description: 'Design related posts', count: 2 }
-          ]
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
-      const categories = await this.categoryRepository.find();
+      const categories = await this.categoryRepository.find({
+        order: {
+          sortOrder: 'ASC',
+          name: 'ASC'
+        }
+      });
 
       return res.json({
         status: 'success',
         data: categories
       });
     } catch (error) {
+      // console.error('Error fetching categories:', error);
       return res.status(500).json({
         status: 'error',
-        message: 'Failed to fetch categories'
+        message: 'Failed to fetch categories',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -615,9 +553,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: { id, name: 'Sample Category', slug: 'sample-category' }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -647,13 +585,9 @@ export class ContentController {
       const categoryData = req.body;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: {
-            id: Date.now().toString(),
-            ...categoryData,
-            createdAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -678,9 +612,9 @@ export class ContentController {
       const updateData = req.body;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: { id, ...updateData }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -704,9 +638,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          message: 'Category deleted successfully'
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -730,14 +664,9 @@ export class ContentController {
       const { search } = req.query;
       
       if (!AppDataSource.isInitialized) {
-        // Return mock data for development
-        return res.json({
-          status: 'success',
-          data: [
-            { id: '1', name: 'JavaScript', slug: 'javascript', description: 'JavaScript programming', postCount: 10 },
-            { id: '2', name: 'React', slug: 'react', description: 'React framework', postCount: 8 },
-            { id: '3', name: 'Node.js', slug: 'nodejs', description: 'Node.js runtime', postCount: 5 }
-          ]
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -783,9 +712,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: { id, name: 'Sample Tag', slug: 'sample-tag', description: 'Sample description' }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -831,17 +760,9 @@ export class ContentController {
       }
 
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: {
-            id: Date.now().toString(),
-            name,
-            slug: slug || name.toLowerCase().replace(/[^a-z0-9가-힣]/g, '-'),
-            description,
-            postCount: 0,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -893,9 +814,9 @@ export class ContentController {
       const { name, description, slug } = req.body;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: { id, name, slug, description, updatedAt: new Date().toISOString() }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -941,9 +862,9 @@ export class ContentController {
       const { id } = req.params;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          message: 'Tag deleted successfully'
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -977,26 +898,9 @@ export class ContentController {
       const { page = 1, pageSize = 20, status } = req.query;
       
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: [
-            {
-              id: '1',
-              title: 'About Us',
-              slug: 'about-us',
-              content: { type: 'doc', content: [] },
-              status: 'publish',
-              type: 'page',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString()
-            }
-          ],
-          pagination: {
-            page: Number(page),
-            pageSize: Number(pageSize),
-            totalItems: 1,
-            totalPages: 1
-          }
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -1027,7 +931,7 @@ export class ContentController {
         }
       });
     } catch (error) {
-      console.error('getPages error:', error);
+      // console.error('getPages error:', error);
       return res.status(500).json({
         status: 'error',
         message: 'Failed to fetch pages'
@@ -1073,9 +977,9 @@ export class ContentController {
     try {
       // 데이터베이스가 초기화되지 않은 경우 빈 배열 반환
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: []
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 
@@ -1130,13 +1034,9 @@ export class ContentController {
   getAuthors = async (req: Request, res: Response) => {
     try {
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: [
-            { id: '1', name: 'Admin' },
-            { id: '2', name: 'Editor' },
-            { id: '3', name: 'Author' }
-          ]
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
         });
       }
 

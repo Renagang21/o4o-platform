@@ -8,6 +8,7 @@ import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { ApprovalLog } from '../entities/ApprovalLog';
 import { LinkedAccount } from '../entities/LinkedAccount';
 import { AccountActivity } from '../entities/AccountActivity';
+import { UserActivityLog } from '../entities/UserActivityLog';
 import { Media } from '../entities/Media';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
@@ -98,6 +99,7 @@ export const AppDataSource = new DataSource({
     ApprovalLog,
     LinkedAccount,
     AccountActivity,
+    UserActivityLog,
     Media,
     MediaFile,
     MediaFolder,

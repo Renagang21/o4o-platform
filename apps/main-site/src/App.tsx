@@ -1,6 +1,6 @@
-import { FC, useEffect  } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
+import { FC, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
 import { useAuthStore } from './stores/authStore';
@@ -14,34 +14,25 @@ import { EmailVerificationError } from './pages/auth/EmailVerificationError';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 
-// User Type Dashboards (non-shared components)
-import CustomerShop from './pages/customer/Shop';
-
-// Digital Signage Pages
-import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
-
-// Removed deprecated TheDANGStyleEditorPage
-
-// Test Dashboard
-import { TestDashboard } from './features/test-dashboard';
-
-// Demo Pages
-import SpectraBlocksDemo from './pages/SpectraBlocksDemo';
-
 // Archive Pages
 import CPTArchive from './pages/archive/CPTArchive';
-import TemplateArchive from './pages/archive/TemplateArchive';
 
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
-// Temporary placeholder for disabled features
-const DisabledFeaturePage: FC = () => (
+// Lazy load admin pages
+import { lazy, Suspense } from 'react';
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const PageEditor = lazy(() => import('./pages/PageEditor'));
+const PageViewer = lazy(() => import('./pages/PageViewer'));
+
+// Loading component
+const PageLoader: FC = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
     <div className="text-center">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Feature Temporarily Disabled</h1>
-      <p className="text-gray-600">This feature is temporarily disabled during production build conversion.</p>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p className="mt-4 text-gray-600">Loading...</p>
     </div>
   </div>
 );
@@ -53,31 +44,37 @@ const App: FC = () => {
     // Initialize auth interceptor
     initializeAuthInterceptor();
     
-    // 앱 시작 시 인증 상태 확인
+    // Check auth status on app start
     checkAuth();
   }, []);
 
   return (
     <ErrorBoundary>
-        <Router>
-          <Routes>
+      <Router>
+        <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          
+          {/* Post/Page Routes */}
           <Route path="/posts/:slugOrId" element={
             <Layout>
               <PostDetail />
             </Layout>
           } />
-          <Route path="/login" element={
+          <Route path="/pages/:slug" element={
             <Layout>
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                  <h1 className="text-2xl font-bold mb-4">로그인</h1>
-                  <p className="text-gray-600">로그인 페이지는 개발 중입니다.</p>
-                </div>
-              </div>
+              <PageViewer />
             </Layout>
           } />
+          
+          {/* Archive Routes */}
+          <Route path="/archive/:postType" element={
+            <Layout>
+              <CPTArchive />
+            </Layout>
+          } />
+          
+          {/* Auth Routes */}
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           <Route path="/auth/verify-email/pending" element={
@@ -106,155 +103,38 @@ const App: FC = () => {
             </Layout>
           } />
           
-          {/* CPT Archive Routes */}
-          <Route path="/archive/:cptSlug" element={<TemplateArchive />} />
-          <Route path="/cpt/:cptSlug" element={<CPTArchive />} />
-          
-          {/* Dropshipping CPT Archive Routes with friendly URLs */}
-          <Route path="/ds-products" element={<TemplateArchive />} />
-          <Route path="/ds-suppliers" element={<CPTArchive />} />
-          <Route path="/ds-partners" element={<CPTArchive />} />
-          
-          {/* Single CPT Post Routes */}
-          <Route path="/cpt/:cptSlug/:postSlug" element={
-            <Layout>
-              <PostDetail />
-            </Layout>
-          } />
-          
           {/* Protected Admin Routes */}
-          <Route path="/admin" element={
-            <PrivateRoute allowedRoles={['admin']}>
-              <Layout>
-                <DisabledFeaturePage />
-              </Layout>
+          <Route path="/admin/*" element={
+            <PrivateRoute>
+              <Suspense fallback={<PageLoader />}>
+                <AdminDashboard />
+              </Suspense>
             </PrivateRoute>
           } />
           
-          {/* Protected Supplier Routes */}
-          <Route path="/supplier" element={
-            <PrivateRoute allowedRoles={['supplier']}>
-              <Layout>
-                <DisabledFeaturePage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          <Route path="/supplier/products" element={
-            <PrivateRoute allowedRoles={['supplier']}>
-              <Layout>
-                <DisabledFeaturePage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          <Route path="/supplier/products/new" element={
-            <PrivateRoute allowedRoles={['supplier']}>
-              <Layout>
-                <DisabledFeaturePage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          <Route path="/supplier/products/:id" element={
-            <PrivateRoute allowedRoles={['supplier']}>
-              <Layout>
-                <DisabledFeaturePage />
-              </Layout>
+          {/* Editor Routes (Protected) */}
+          <Route path="/editor/page/:id?" element={
+            <PrivateRoute>
+              <Suspense fallback={<PageLoader />}>
+                <PageEditor />
+              </Suspense>
             </PrivateRoute>
           } />
           
-          {/* Protected Retailer Routes */}
-          <Route path="/retailer" element={
-            <PrivateRoute allowedRoles={['retailer']}>
-              <Layout>
-                <DisabledFeaturePage />
-              </Layout>
-            </PrivateRoute>
-          } />
-          
-          {/* Customer Routes */}
-          <Route path="/shop" element={
+          {/* 404 Fallback */}
+          <Route path="*" element={
             <Layout>
-              <CustomerShop />
+              <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                  <p className="text-gray-600 mb-4">페이지를 찾을 수 없습니다.</p>
+                  <a href="/" className="text-blue-600 hover:underline">홈으로 돌아가기</a>
+                </div>
+              </div>
             </Layout>
           } />
-          
-          {/* Digital Signage Routes */}
-          <Route
-            path="/signage"
-            element={
-                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                  <Layout>
-                    <DigitalSignageDashboard />
-                  </Layout>
-                </PrivateRoute>
-            }
-          />
-          <Route
-            path="/signage/*"
-            element={
-                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                  <Layout>
-                    <DigitalSignageDashboard />
-                  </Layout>
-                </PrivateRoute>
-            }
-          />
-
-          {/* Test Dashboard */}
-          <Route path="/test-dashboard" element={
-            <Layout>
-              <TestDashboard />
-            </Layout>
-          } />
-          <Route path="/test/session-sync" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          
-          {/* Demo Pages */}
-          <Route path="/spectra-blocks-demo" element={
-            <Layout>
-              <SpectraBlocksDemo />
-            </Layout>
-          } />
-          
-          {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
-          <Route path="/editor" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          <Route path="/editor-demo" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          {/* Removed deprecated /thedang-editor route */}
-          <Route path="/fullscreen-editor" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          <Route path="/admin-test" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          <Route path="/dropshipping" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          <Route path="/healthcare" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
-          
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
+        </Routes>
+      </Router>
     </ErrorBoundary>
   );
 };

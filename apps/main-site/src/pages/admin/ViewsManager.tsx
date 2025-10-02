@@ -429,14 +429,15 @@ const ViewsManager: FC = () => {
   };
 
   const previewView = async (view: View) => {
-    // Mock preview data
-    const mockData = [
-      { id: 1, title: '샘플 상품 1', price: 150000, brand: '브랜드 A' },
-      { id: 2, title: '샘플 상품 2', price: 200000, brand: '브랜드 B' },
-      { id: 3, title: '샘플 상품 3', price: 120000, brand: '브랜드 C' }
-    ];
+    // Fetch actual preview data from API
+    try {
+      const response = await api.get(`/views/${view.id}/preview`);
+      setPreviewData(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch preview data:', error);
+      setPreviewData([]);
+    }
     
-    setPreviewData(mockData);
     setEditingView(view);
     setActiveTab('preview');
   };

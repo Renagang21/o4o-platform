@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
-import HamburgerMenu from '../HamburgerMenu';
+import HamburgerMenu from '../layout/HamburgerMenu';
 
 interface MenuItem {
   id: string;

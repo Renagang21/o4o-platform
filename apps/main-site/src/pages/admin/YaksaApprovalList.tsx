@@ -1,6 +1,7 @@
-import { useState, FC } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useToast from '../../hooks/useToast';
+import { apiClient as api } from '../../services/api';
 
 interface ApprovalUser {
   id: string;
@@ -11,43 +12,50 @@ interface ApprovalUser {
   createdAt: string;
 }
 
-// Mock data for testing
-const mockUsers: ApprovalUser[] = [
-  {
-    id: '1',
-    name: '김약사',
-    email: 'pharmacist1@example.com',
-    licenseNumber: '12345',
-    status: 'pending',
-    createdAt: '2024-03-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    name: '이약사',
-    email: 'pharmacist2@example.com',
-    licenseNumber: '67890',
-    status: 'pending',
-    createdAt: '2024-03-15T11:30:00Z',
-  },
-];
 
 const YaksaApprovalList: FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState<ApprovalUser[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleApprove = (id: string) => {
-    setUsers(users.map((user: any) => 
-      user.id === id ? { ...user, status: 'approved' } : user
-    ));
-    showToast({ type: 'success', message: '약사 회원이 승인되었습니다.' });
+  useEffect(() => {
+    fetchPendingUsers();
+  }, []);
+
+  const fetchPendingUsers = async () => {
+    try {
+      const response = await api.get('/users/yaksa/pending');
+      setUsers(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch pending users:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReject = (id: string) => {
-    setUsers(users.map((user: any) => 
-      user.id === id ? { ...user, status: 'rejected' } : user
-    ));
-    showToast({ type: 'error', message: '약사 회원이 거절되었습니다.' });
+  const handleApprove = async (id: string) => {
+    try {
+      await api.put(`/users/yaksa/${id}/approve`);
+      setUsers(users.map((user: any) => 
+        user.id === id ? { ...user, status: 'approved' } : user
+      ));
+      showToast({ type: 'success', message: '약사 회원이 승인되었습니다.' });
+    } catch (error) {
+      showToast({ type: 'error', message: '승인 처리 중 오류가 발생했습니다.' });
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      await api.put(`/users/yaksa/${id}/reject`);
+      setUsers(users.map((user: any) => 
+        user.id === id ? { ...user, status: 'rejected' } : user
+      ));
+      showToast({ type: 'error', message: '약사 회원이 거절되었습니다.' });
+    } catch (error) {
+      showToast({ type: 'error', message: '거절 처리 중 오류가 발생했습니다.' });
+    }
   };
 
   const getStatusBadge = (status: ApprovalUser['status']) => {

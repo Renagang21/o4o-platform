@@ -145,21 +145,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'crowdfunding-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/crowdfunding/settings' }
     ]
   },
-  // 8. 이커머스
-  {
-    id: 'ecommerce',
-    label: '이커머스',
-    icon: <Store className="w-5 h-5" />,
-    children: [
-      { id: 'ecommerce-products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
-      { id: 'ecommerce-orders', label: '주문 관리', icon: <ShoppingCart className="w-4 h-4" />, path: '/ecommerce/orders' },
-      { id: 'ecommerce-customers', label: '고객 관리', icon: <Users className="w-4 h-4" />, path: '/ecommerce/customers' },
-      { id: 'ecommerce-coupons', label: '쿠폰 관리', icon: <Tag className="w-4 h-4" />, path: '/ecommerce/coupons' },
-      { id: 'ecommerce-reports', label: '매출 보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
-      { id: 'ecommerce-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/ecommerce/settings' }
-    ]
-  },
-  // 9. 포럼
+  // 8. 포럼
   {
     id: 'forum',
     label: '포럼',
