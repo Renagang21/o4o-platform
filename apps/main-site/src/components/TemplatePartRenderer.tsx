@@ -149,22 +149,20 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     return <div className="h-32 bg-gray-100 animate-pulse" />;
   }
 
-  // Show error or fallback
-  if (error || templateParts.length === 0) {
-    // Using fallback for template parts
-    
+  // Show error state
+  if (error) {
+    // If there's an error fetching template parts, use fallback
     if (fallback) {
       return <>{fallback}</>;
     }
     
-    // Default fallbacks
-    if (area === 'header') {
-      return <SiteHeader />;
-    }
-    if (area === 'footer') {
-      return <SiteFooter />;
-    }
-    
+    // Only show default fallbacks if explicitly configured or error occurred
+    // Don't show anything if template parts are intentionally empty
+    return null;
+  }
+  
+  // If no template parts configured, don't show anything
+  if (templateParts.length === 0) {
     return null;
   }
 

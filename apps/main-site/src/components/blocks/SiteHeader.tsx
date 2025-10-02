@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import HamburgerMenu from '../HamburgerMenu';
+import Navigation from './Navigation';
 
-// Fallback header component
+// Fallback header component - only shown when explicitly needed
 const SiteHeader: FC = () => {
   return (
     <header className="site-header bg-white shadow-sm border-b">
@@ -12,14 +12,8 @@ const SiteHeader: FC = () => {
             O4O Platform
           </Link>
           
-          <nav className="hidden md:flex space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-gray-900">홈</Link>
-            <Link to="/about" className="text-gray-700 hover:text-gray-900">소개</Link>
-            <Link to="/services" className="text-gray-700 hover:text-gray-900">서비스</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-gray-900">문의</Link>
-          </nav>
-          
-          <HamburgerMenu />
+          {/* Use dynamic Navigation component instead of hardcoded menu */}
+          <Navigation menuRef="primary-menu" />
         </div>
       </div>
     </header>

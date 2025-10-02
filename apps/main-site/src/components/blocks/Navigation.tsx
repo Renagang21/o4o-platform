@@ -52,13 +52,8 @@ const Navigation: FC<NavigationProps> = ({
           throw new Error('Failed to fetch menu');
         }
       } catch (error) {
-        // Use fallback menu items for graceful degradation
-        setMenuItems([
-          { id: '1', title: '홈', url: '/' },
-          { id: '2', title: '소개', url: '/about' },
-          { id: '3', title: '서비스', url: '/services' },
-          { id: '4', title: '문의', url: '/contact' }
-        ]);
+        // Don't show fallback menu items - let admin configure it
+        setMenuItems([]);
       } finally {
         setLoading(false);
       }

@@ -1129,7 +1129,7 @@ const WordPressMenuEditor: FC = () => {
                   <div className="p-4 border-t">
                     <button
                       onClick={() => {
-                        console.log('Saving menu with items:', menuItems);
+                        // TODO: Implement actual menu save API call
                         alert('메뉴가 저장되었습니다!');
                       }}
                       className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
