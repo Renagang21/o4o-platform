@@ -10,9 +10,6 @@ const __dirname = path.dirname(__filename)
 export default defineConfig(mergeConfig(sharedViteConfig, {
   // 빌드 캐시 디렉토리 설정
   cacheDir: '.vite-cache',
-  css: {
-    postcss: __dirname
-  },
   plugins: [
     // visualizer({
     //   open: false,
