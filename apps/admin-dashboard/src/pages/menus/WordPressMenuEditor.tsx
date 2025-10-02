@@ -103,8 +103,8 @@ const WordPressMenuEditor: FC = () => {
   const loadAvailableItems = async () => {
     try {
       // Load pages
-      const pagesResponse = await (unifiedApi as any).raw.get('/pages?limit=100');
-      if (pagesResponse.data?.success && Array.isArray(pagesResponse.data?.data)) {
+      const pagesResponse = await (unifiedApi as any).raw.get('/v1/content/pages?limit=100');
+      if (pagesResponse.data?.status === 'success' && Array.isArray(pagesResponse.data?.data)) {
         setPages(pagesResponse.data.data.map((page: any) => ({
           id: page.id,
           title: page.title,
@@ -114,8 +114,8 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load posts
-      const postsResponse = await (unifiedApi as any).raw.get('/posts?limit=100');
-      if (postsResponse.data?.success && Array.isArray(postsResponse.data?.data)) {
+      const postsResponse = await (unifiedApi as any).raw.get('/v1/content/posts?limit=100');
+      if (postsResponse.data?.status === 'success' && Array.isArray(postsResponse.data?.data)) {
         setPosts(postsResponse.data.data.map((post: any) => ({
           id: post.id,
           title: post.title,
@@ -125,8 +125,8 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load categories
-      const categoriesResponse = await (unifiedApi as any).raw.get('/categories?limit=100');
-      if (categoriesResponse.data?.success && Array.isArray(categoriesResponse.data?.data)) {
+      const categoriesResponse = await (unifiedApi as any).raw.get('/v1/content/categories?limit=100');
+      if (categoriesResponse.data?.status === 'success' && Array.isArray(categoriesResponse.data?.data)) {
         setCategories(categoriesResponse.data.data.map((cat: any) => ({
           id: cat.id,
           title: cat.name,
@@ -136,8 +136,8 @@ const WordPressMenuEditor: FC = () => {
       }
 
       // Load tags
-      const tagsResponse = await (unifiedApi as any).raw.get('/tags?limit=100');
-      if (tagsResponse.data?.success && Array.isArray(tagsResponse.data?.data)) {
+      const tagsResponse = await (unifiedApi as any).raw.get('/v1/content/tags?limit=100');
+      if (tagsResponse.data?.status === 'success' && Array.isArray(tagsResponse.data?.data)) {
         setTags(tagsResponse.data.data.map((tag: any) => ({
           id: tag.id,
           title: tag.name,
@@ -146,7 +146,8 @@ const WordPressMenuEditor: FC = () => {
         })));
       }
     } catch (error) {
-      // Error log removed
+      // Show error to help debugging
+      toast.error('콘텐츠 목록을 불러오는데 실패했습니다');
     }
   };
 
