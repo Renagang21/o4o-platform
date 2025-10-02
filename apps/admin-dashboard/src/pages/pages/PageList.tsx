@@ -21,6 +21,9 @@ interface Page {
   date: string;
   status: 'publish' | 'draft' | 'private' | 'archived' | 'scheduled' | 'trash';
   views: number;
+  parentId?: string;
+  parent?: string;
+  level?: number;
 }
 
 type SortField = 'title' | 'date' | null;
@@ -92,7 +95,9 @@ const PageList = () => {
             comments: page.commentCount || 0,
             date: date,
             status: page.status || 'draft',
-            views: page.views || 0
+            views: page.views || 0,
+            parentId: page.parentId || page.parent_id || '',
+            parent: page.parent?.title || ''
           };
         });
         
@@ -140,7 +145,8 @@ const PageList = () => {
     title: '',
     slug: '',
     status: 'publish' as 'publish' | 'draft' | 'private',
-    template: 'default'
+    template: 'default',
+    parentId: '' as string
   });
   
   // Row actions hover state
@@ -184,7 +190,8 @@ const PageList = () => {
       title: page.title,
       slug: page.slug,
       status: page.status as 'publish' | 'draft' | 'private',
-      template: page.template || 'default'
+      template: page.template || 'default',
+      parentId: page.parentId || ''
     });
   };
   
@@ -226,7 +233,8 @@ const PageList = () => {
       title: '',
       slug: '',
       status: 'publish' as 'publish' | 'draft' | 'private',
-      template: 'default'
+      template: 'default',
+      parentId: ''
     });
   };
   
@@ -777,6 +785,24 @@ const PageList = () => {
                                   <option value="page">Page Template</option>
                                   <option value="full-width">Full Width</option>
                                   <option value="no-sidebar">No Sidebar</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
+                                <select
+                                  value={quickEditData.parentId || ''}
+                                  onChange={(e) => setQuickEditData({...quickEditData, parentId: e.target.value})}
+                                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                >
+                                  <option value="">— No Parent —</option>
+                                  {pages
+                                    .filter(p => p.id !== quickEditId && p.status !== 'trash')
+                                    .sort((a, b) => a.title.localeCompare(b.title))
+                                    .map(page => (
+                                      <option key={page.id} value={page.id}>
+                                        {page.level && page.level > 0 ? '— '.repeat(page.level) : ''}{page.title}
+                                      </option>
+                                    ))}
                                 </select>
                               </div>
                             </div>

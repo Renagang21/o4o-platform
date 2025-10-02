@@ -34,7 +34,9 @@ const PostsRefactored = () => {
   const [quickEditData, setQuickEditData] = useState({
     title: '',
     slug: '',
-    status: 'published' as const
+    status: 'published' as const,
+    categoryIds: [] as string[],
+    tags: ''
   });
   
   // Screen Options state
@@ -153,7 +155,9 @@ const PostsRefactored = () => {
       setQuickEditData({
         title: post.title,
         slug: post.slug,
-        status: post.status
+        status: post.status,
+        categoryIds: post.categories || [],
+        tags: post.tags ? post.tags.join(', ') : ''
       });
     }
   };
@@ -172,7 +176,9 @@ const PostsRefactored = () => {
     setQuickEditData({
       title: '',
       slug: '',
-      status: 'published'
+      status: 'published',
+      categoryIds: [],
+      tags: ''
     });
   };
 

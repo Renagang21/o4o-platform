@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ChevronDown,
   Settings,
@@ -20,6 +21,7 @@ interface Category {
 }
 
 const Categories = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([
     { id: '1', name: '공지사항', description: '중요한 공지사항', slug: 'notice', count: 0, date: '-' },
     { id: '2', name: '이벤트', description: '이벤트 및 행사', slug: 'events', count: 0, date: '-' }
@@ -79,7 +81,8 @@ const Categories = () => {
   };
 
   const handleAddNew = () => {
-    setShowAddModal(true);
+    // Navigate to the new category page
+    navigate('/categories/new');
   };
 
   const handleSaveCategory = () => {
@@ -99,16 +102,8 @@ const Categories = () => {
   };
 
   const handleEdit = (id: string) => {
-    setEditingCategory(id);
-    const category = categories.find(c => c.id === id);
-    if (category) {
-      setFormData({
-        name: category.name,
-        slug: category.slug,
-        description: category.description,
-        parent: ''
-      });
-    }
+    // Navigate to the edit page
+    navigate(`/categories/edit/${id}`);
   };
 
   const handleQuickEdit = (id: string) => {

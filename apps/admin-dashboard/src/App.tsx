@@ -50,6 +50,7 @@ const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 // ); // Removed - content directory deleted
 const Posts = lazy(() => import('@/pages/posts/Posts'));
 const Categories = lazy(() => import('@/pages/posts/Categories'));
+const CategoryEdit = lazy(() => import('@/pages/posts/CategoryEdit'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
@@ -355,6 +356,27 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['categories:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Categories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Categories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/categories/new" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CategoryEdit />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/categories/edit/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CategoryEdit />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

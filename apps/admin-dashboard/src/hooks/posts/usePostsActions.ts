@@ -13,6 +13,8 @@ export const usePostsActions = ({ posts, setPosts }: UsePostsActionsProps) => {
     title: string;
     slug: string;
     status: Post['status'];
+    categoryIds?: string[];
+    tags?: string;
   }) => {
     try {
       // Sanitize slug
@@ -24,11 +26,18 @@ export const usePostsActions = ({ posts, setPosts }: UsePostsActionsProps) => {
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
       
+      // Process tags from comma-separated string to array
+      const tagsArray = data.tags 
+        ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+        : [];
+      
       const response = await postApi.update({
         id,
         title: data.title,
         slug: sanitizedSlug,
-        status: data.status
+        status: data.status,
+        categoryIds: data.categoryIds || [],
+        tags: tagsArray
       });
       
       if (response.success) {
@@ -38,7 +47,9 @@ export const usePostsActions = ({ posts, setPosts }: UsePostsActionsProps) => {
                 ...post,
                 title: data.title,
                 slug: sanitizedSlug,
-                status: data.status
+                status: data.status,
+                categories: data.categoryIds || [],
+                tags: tagsArray
               }
             : post
         ));
