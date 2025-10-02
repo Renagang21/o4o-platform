@@ -1,5 +1,6 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { authClient } from '@o4o/auth-client';
 
 interface SiteTitleProps {
   level?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -14,8 +15,28 @@ const SiteTitle: FC<SiteTitleProps> = ({
   textColor,
   className = ''
 }) => {
-  // TODO: Get site title from settings
-  const siteTitle = 'O4O Platform';
+  const [siteTitle, setSiteTitle] = useState<string>('O4O Platform');
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        const response = await authClient.api.get('/settings/customizer');
+        if (response.status === 200 && response.data) {
+          const settings = response.data.data || response.data;
+          if (settings?.siteIdentity?.siteTitle?.text) {
+            setSiteTitle(settings.siteIdentity.siteTitle.text);
+          }
+        }
+      } catch (error) {
+        // Keep default title on error
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSiteSettings();
+  }, []);
   
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
   

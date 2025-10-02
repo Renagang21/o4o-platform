@@ -27,7 +27,8 @@ const SiteLogo: FC<SiteLogoProps> = ({
         // Try to get site identity settings from API
         const response = await authClient.api.get('/settings/customizer');
         if (response.status === 200 && response.data) {
-          const settings = response.data.settings || response.data;
+          // API returns { success: true, data: {...} }
+          const settings = response.data.data || response.data;
           if (settings?.siteIdentity?.logo?.desktop) {
             // Remove any existing timestamp for clean comparison
             const cleanUrl = settings.siteIdentity.logo.desktop.split('?')[0];
