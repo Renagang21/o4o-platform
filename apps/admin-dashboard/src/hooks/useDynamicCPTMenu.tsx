@@ -4,7 +4,6 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { cptApi } from '@/features/cpt-acf/services/cpt.api';
 import { MenuItem } from '@/config/wordpressMenuFinal';
 import { FileText, Package, FileCode, Database, Layout } from 'lucide-react';
 
@@ -16,8 +15,11 @@ export const useDynamicCPTMenu = () => {
   const { data: cptTypesResponse, isLoading } = useQuery({
     queryKey: ['cpt-menu-items'],
     queryFn: async () => {
-      const response = await cptApi.getAllTypes(true); // Only active CPTs
-      return response.data;
+      // Use public endpoint for menu items (doesn't require auth)
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+      const response = await fetch(`${apiUrl}/api/public/cpt/types`);
+      const data = await response.json();
+      return data.data || [];
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
     gcTime: 10 * 60 * 1000,
