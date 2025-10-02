@@ -25,7 +25,7 @@ const SiteLogo: FC<SiteLogoProps> = ({
     const fetchSiteSettings = async () => {
       try {
         // Try to get site identity settings from API
-        const response = await authClient.api.get('/v1/settings/customizer');
+        const response = await authClient.api.get('/settings/customizer');
         if (response.status === 200 && response.data) {
           const settings = response.data.settings || response.data;
           if (settings?.siteIdentity?.logo?.desktop) {

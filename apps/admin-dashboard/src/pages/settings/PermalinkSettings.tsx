@@ -121,7 +121,7 @@ const PermalinkSettings: FC = () => {
   // 설정 저장
   const saveMutation = useMutation({
     mutationFn: async (newSettings: PermalinkSettings) => {
-      const response = await authClient.api.put('/v1/settings/permalink', newSettings);
+      const response = await authClient.api.put('/settings/permalink', newSettings);
       return response.data;
     },
     onSuccess: () => {
@@ -132,7 +132,7 @@ const PermalinkSettings: FC = () => {
   // 미리보기 생성
   const previewMutation = useMutation({
     mutationFn: async (structure: string) => {
-      const response = await authClient.api.post('/v1/settings/permalink/preview', { structure });
+      const response = await authClient.api.post('/settings/permalink/preview', { structure });
       return response.data.data as UrlPreview[];
     },
     onSuccess: (data) => {
@@ -143,7 +143,7 @@ const PermalinkSettings: FC = () => {
   // 검증
   const validateMutation = useMutation({
     mutationFn: async (settings: PermalinkSettings) => {
-      const response = await authClient.api.post('/v1/settings/permalink/validate', settings);
+      const response = await authClient.api.post('/settings/permalink/validate', settings);
       return response.data.data as ValidationResult;
     },
     onSuccess: (data) => {

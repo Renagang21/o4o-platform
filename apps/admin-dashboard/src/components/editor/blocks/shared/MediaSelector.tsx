@@ -96,20 +96,32 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Transform MediaFile to MediaItem
-  const transformMediaFile = (file: any): MediaItem => ({
-    id: file.id,
-    url: file.url,
-    type: file.isImage ? 'image' : file.isVideo ? 'video' : 'image',
-    title: file.originalFilename || file.filename || file.name || 'Untitled',
-    alt: file.altText || file.originalFilename || file.filename,
-    width: file.width || file.dimensions?.width,
-    height: file.height || file.dimensions?.height,
-    fileSize: file.size,
-    mimeType: file.mimeType,
-    thumbnailUrl: file.thumbnailUrl,
-    caption: file.caption,
-    uploadedAt: file.createdAt || file.uploadedAt
-  });
+  const transformMediaFile = (file: any): MediaItem => {
+    // Determine type from mimeType
+    let mediaType: 'image' | 'video' = 'image';
+    if (file.mimeType) {
+      if (file.mimeType.startsWith('video/')) {
+        mediaType = 'video';
+      } else if (file.mimeType.startsWith('image/')) {
+        mediaType = 'image';
+      }
+    }
+    
+    return {
+      id: file.id,
+      url: file.url || file.path || '',
+      type: mediaType,
+      title: file.originalName || file.filename || file.name || file.title || 'Untitled',
+      alt: file.altText || file.alt || file.originalName || file.filename || '',
+      width: file.width || file.dimensions?.width,
+      height: file.height || file.dimensions?.height,
+      fileSize: file.fileSize || file.size,
+      mimeType: file.mimeType || file.mime_type,
+      thumbnailUrl: file.thumbnailUrl || file.thumbnail || file.url,
+      caption: file.caption || file.description || '',
+      uploadedAt: file.uploadedAt || file.createdAt || file.created_at
+    };
+  };
 
   // Fetch media files with infinite scroll
   const {

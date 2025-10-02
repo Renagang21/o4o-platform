@@ -156,7 +156,7 @@ const PrivacySettings: React.FC = () => {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/v1/settings/privacy');
+      const response = await authClient.api.get('/settings/privacy');
       if (response.data?.data) {
         setSettings(response.data.data);
       }
@@ -170,7 +170,7 @@ const PrivacySettings: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await authClient.api.put('/v1/settings/privacy', settings);
+      await authClient.api.put('/settings/privacy', settings);
       toast.success('Privacy settings saved successfully');
     } catch (error: any) {
       toast.error('Failed to save settings');
