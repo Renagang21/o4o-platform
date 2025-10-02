@@ -5,7 +5,7 @@ import { authenticateToken, requireAdmin } from '../../middleware/auth';
 const router: Router = Router();
 
 // Role management routes
-router.get('/roles', authenticateToken, requireAdmin, UserRoleController.getRoles);
+router.get('/roles', authenticateToken, UserRoleController.getRoles);
 router.get('/roles/statistics', authenticateToken, requireAdmin, UserRoleController.getRoleStatistics);
 router.get('/permissions', authenticateToken, UserRoleController.getPermissions);
 
