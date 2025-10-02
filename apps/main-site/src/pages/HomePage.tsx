@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../api/client';
-import BlogList from '../components/BlogList';
 import PageRenderer from '../components/PageRenderer';
 import Layout from '../components/layout/Layout';
 
@@ -185,12 +184,17 @@ const HomePage: FC = () => {
 
   // Latest posts mode
   if (settings.type === 'latest_posts') {
+    // This should be configured from admin panel
+    // For now, redirect to posts archive
+    window.location.href = '/archive/post';
     return (
       <Layout>
-        <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded">
-          <p className="text-red-800 font-bold">⚠️ LATEST POSTS MODE DETECTED</p>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">최신 글 페이지로 이동 중...</p>
+          </div>
         </div>
-        <BlogList postsPerPage={settings.postsPerPage || 10} />
       </Layout>
     );
   }
