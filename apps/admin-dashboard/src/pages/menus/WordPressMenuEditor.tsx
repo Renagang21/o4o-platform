@@ -23,6 +23,7 @@ import {
 import toast from 'react-hot-toast';
 import MenuApi, { MenuItem as MenuItemType, MenuLocation as MenuLocationType } from '../../api/menuApi';
 import { unifiedApi } from '../../api/unified-client';
+import { useAuthStore } from '@/stores/authStore';
 
 // Types
 interface MenuItem {
@@ -64,8 +65,25 @@ interface AvailableItem {
 const WordPressMenuEditor: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuthStore();
   const dragItem = useRef<MenuItem | null>(null);
   const dragOverItem = useRef<MenuItem | null>(null);
+  
+  // Permission checks
+  const canCreateMenu = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator', 'manager'].includes(user.role);
+  };
+  
+  const canEditMenu = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator', 'manager'].includes(user.role);
+  };
+  
+  const canDeleteMenu = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin'].includes(user.role);
+  };
   
   // Menu data
   const [menuName, setMenuName] = useState('');
@@ -819,13 +837,16 @@ const WordPressMenuEditor: FC = () => {
             >
               취소
             </button>
-            <button
-              onClick={saveMenu}
-              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 shadow-sm"
-            >
-              <Save className="w-4 h-4" />
-              메뉴 저장
-            </button>
+            {canEditMenu() && (
+              <button
+                onClick={saveMenu}
+                disabled={isSaving || !canEditMenu()}
+                className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Save className="w-4 h-4" />
+                {isSaving ? '저장 중...' : '메뉴 저장'}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -989,13 +1010,15 @@ const WordPressMenuEditor: FC = () => {
                     </div>
                     
                     {/* Add button */}
-                    <button
-                      onClick={addItemsToMenu}
-                      disabled={selectedItems.length === 0}
-                      className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
-                    >
-                      메뉴에 추가
-                    </button>
+                    {canEditMenu() && (
+                      <button
+                        onClick={addItemsToMenu}
+                        disabled={selectedItems.length === 0 || !canEditMenu()}
+                        className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
+                      >
+                        메뉴에 추가
+                      </button>
+                    )}
                   </>
                 )}
               </div>

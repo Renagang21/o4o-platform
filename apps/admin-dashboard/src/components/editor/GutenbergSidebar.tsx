@@ -340,8 +340,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
               </div>
             </Panel>
 
-            {/* Categories - Show for posts (allow most users to select categories) */}
-            {mode === 'post' && (
+            {/* Categories - Show for posts with proper role permissions */}
+            {mode === 'post' && canEditCategories() && (
             <Panel title="Categories">
               <div className="space-y-3">
                 <div className="relative">
@@ -407,8 +407,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             </Panel>
             )}
 
-            {/* Tags - Show for posts */}
-            {mode === 'post' && (
+            {/* Tags - Show for posts with proper role permissions */}
+            {mode === 'post' && canEditCategories() && (
             <Panel title="Tags">
               <div className="space-y-3">
                 <div className="flex gap-2">

@@ -10,6 +10,7 @@ import {
   MoreVertical
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
+import { useAuthStore } from '@/stores/authStore';
 
 interface Category {
   id: string;
@@ -22,6 +23,7 @@ interface Category {
 
 const Categories = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
@@ -36,6 +38,22 @@ const Categories = () => {
     description: '',
     parent: ''
   });
+  
+  // Check permissions
+  const canCreateCategory = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'manager'].includes(user.role);
+  };
+  
+  const canEditCategory = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'manager'].includes(user.role);
+  };
+  
+  const canDeleteCategory = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin'].includes(user.role);
+  };
   
   // Screen Options state - load from localStorage
   const [visibleColumns, setVisibleColumns] = useState(() => {
@@ -269,12 +287,14 @@ const Categories = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-medium">Categories</h2>
-            <button
-              onClick={handleAddNew}
-              className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-            >
-              Add New
-            </button>
+            {canCreateCategory() && (
+              <button
+                onClick={handleAddNew}
+                className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+              >
+                Add New
+              </button>
+            )}
           </div>
         </div>
 
@@ -411,40 +431,52 @@ const Categories = () => {
                         </div>
                         {hoveredRow === category.id && (
                           <div className="flex items-center gap-1 mt-1">
-                            <button
-                              onClick={() => handleEdit(category.id)}
-                              className="text-xs text-blue-600 hover:text-blue-800 px-1"
-                            >
-                              Edit
-                            </button>
-                            <span className="text-gray-300">|</span>
-                            <button
-                              onClick={() => handleQuickEdit(category.id)}
-                              className="text-xs text-blue-600 hover:text-blue-800 px-1"
-                            >
-                              Quick Edit
-                            </button>
-                            <span className="text-gray-300">|</span>
+                            {canEditCategory() && (
+                              <>
+                                <button
+                                  onClick={() => handleEdit(category.id)}
+                                  className="text-xs text-blue-600 hover:text-blue-800 px-1"
+                                >
+                                  Edit
+                                </button>
+                                <span className="text-gray-300">|</span>
+                                <button
+                                  onClick={() => handleQuickEdit(category.id)}
+                                  className="text-xs text-blue-600 hover:text-blue-800 px-1"
+                                >
+                                  Quick Edit
+                                </button>
+                                <span className="text-gray-300">|</span>
+                              </>
+                            )}
                             <button
                               onClick={() => handleView(category.id)}
                               className="text-xs text-blue-600 hover:text-blue-800 px-1"
                             >
                               View
                             </button>
-                            <span className="text-gray-300">|</span>
-                            <button
-                              onClick={() => handleDuplicate(category.id)}
-                              className="text-xs text-blue-600 hover:text-blue-800 px-1"
-                            >
-                              Duplicate
-                            </button>
-                            <span className="text-gray-300">|</span>
-                            <button
-                              onClick={() => handleDelete(category.id)}
-                              className="text-xs text-red-600 hover:text-red-800 px-1"
-                            >
-                              Delete
-                            </button>
+                            {canEditCategory() && (
+                              <>
+                                <span className="text-gray-300">|</span>
+                                <button
+                                  onClick={() => handleDuplicate(category.id)}
+                                  className="text-xs text-blue-600 hover:text-blue-800 px-1"
+                                >
+                                  Duplicate
+                                </button>
+                              </>
+                            )}
+                            {canDeleteCategory() && (
+                              <>
+                                <span className="text-gray-300">|</span>
+                                <button
+                                  onClick={() => handleDelete(category.id)}
+                                  className="text-xs text-red-600 hover:text-red-800 px-1"
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
