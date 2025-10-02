@@ -87,7 +87,6 @@ const CategoryEdit = () => {
           }
         } else {
           const errorText = await response.text();
-          console.error('Failed to load roles:', response.status, errorText);
           
           // If unauthorized, user may need to login again
           if (response.status === 401) {
@@ -95,10 +94,13 @@ const CategoryEdit = () => {
           } else {
             toast.error(`Failed to load user roles: ${response.status}`);
           }
+          
+          // Keep empty - should load from API only
         }
       } catch (error) {
-        console.error('Error loading user roles:', error);
         toast.error('Error loading user roles');
+        
+        // Keep empty - should load from API only
       } finally {
         setRolesLoading(false);
       }

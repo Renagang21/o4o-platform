@@ -102,7 +102,7 @@ export class UserRoleController {
     try {
       const roles = Object.values(UserRole).map(role => ({
         value: role,
-        label: role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' '),
+        label: role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, ' '),
         permissions: ROLE_PERMISSIONS[role],
         permissionCount: ROLE_PERMISSIONS[role].length
       }));
@@ -112,10 +112,10 @@ export class UserRoleController {
         data: roles
       });
     } catch (error) {
-      // Error log removed
       res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }

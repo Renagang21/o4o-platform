@@ -140,17 +140,19 @@ const WordPressMenuEditor: FC = () => {
               }))
             ];
             setAvailableRoles(roles);
+          } else {
+            // If API fails, use basic menu-specific roles
+            setAvailableRoles([
+              { value: 'everyone', label: 'Everyone' },
+              { value: 'logged_out', label: 'Logged Out Users' }
+            ]);
           }
         }
       } catch (error) {
-        console.error('Error fetching roles:', error);
-        // Fallback to basic roles
+        // Use basic menu-specific roles on error
         setAvailableRoles([
           { value: 'everyone', label: 'Everyone' },
-          { value: 'logged_out', label: 'Logged Out Users' },
-          { value: 'super_admin', label: 'Super Admin' },
-          { value: 'admin', label: 'Admin' },
-          { value: 'moderator', label: 'Moderator' }
+          { value: 'logged_out', label: 'Logged Out Users' }
         ]);
       }
     };
@@ -690,22 +692,9 @@ const WordPressMenuEditor: FC = () => {
                       <div className="border-t pt-3 space-y-3">
                         <h4 className="text-sm font-medium text-gray-700">Display Settings</h4>
                         
-                        {/* Display Mode */}
+                        {/* Who Can See This Item */}
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Display Mode</label>
-                          <select
-                            value={item.display_mode || 'show'}
-                            onChange={(e) => updateMenuItem(item.id, { display_mode: e.target.value as 'show' | 'hide' })}
-                            className="w-full px-2 py-1 border rounded text-sm"
-                          >
-                            <option value="show">Show</option>
-                            <option value="hide">Hide</option>
-                          </select>
-                        </div>
-                        
-                        {/* Target Audience */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Target Audience</label>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Who Can See This Item</label>
                           <div className="space-y-1 max-h-32 overflow-y-auto border rounded p-2 bg-gray-50">
                             {availableRoles.map(role => (
                               <label key={role.value} className="flex items-center text-sm">

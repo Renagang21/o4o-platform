@@ -32,6 +32,7 @@ import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { formatFileSize } from '@/utils/format';
+import MediaGrid from '@/components/media/MediaGrid';
 
 export interface MediaItem {
   id: string;
@@ -748,13 +749,29 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             </div>
           ) : (
             <>
-              <div className={cn(
-                viewMode === 'grid'
-                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 gap-4"
-                  : "space-y-2"
-              )}>
-                {allFiles.map((item, index) => renderMediaItem(item, index))}
-              </div>
+              {viewMode === 'grid' ? (
+                <MediaGrid
+                  items={allFiles.map(file => ({
+                    ...file,
+                    filename: file.title,
+                    mediaType: file.type,
+                    size: file.fileSize || 0
+                  }))}
+                  selectedIds={selectedFiles}
+                  onItemSelect={(id, selected) => {
+                    if (selected) {
+                      handleFileSelect(id);
+                    } else {
+                      setSelectedFiles(prev => prev.filter(fileId => fileId !== id));
+                    }
+                  }}
+                  onItemView={(item) => setPreviewItem(item)}
+                />
+              ) : (
+                <div className="space-y-2">
+                  {allFiles.map((item, index) => renderMediaItem(item, index))}
+                </div>
+              )}
 
               {/* Load More Trigger */}
               {hasNextPage && (
