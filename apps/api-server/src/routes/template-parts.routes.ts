@@ -4,6 +4,7 @@ import { TemplatePart } from '../entities/TemplatePart'
 import { AuthRequest, authenticateToken } from '../middleware/auth'
 import { In } from 'typeorm'
 import { z } from 'zod'
+import logger from '../utils/logger'
 
 const router: Router = Router()
 
@@ -114,7 +115,7 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
             sanitizedContent = JSON.parse(templatePart.content)
           } catch (parseError) {
             // If parsing fails, set to empty array for client safety
-            console.warn(`Template part ${templatePart.id} has invalid JSON content:`, parseError)
+            logger.warn(`Template part ${templatePart.id} has invalid JSON content:`, parseError)
             sanitizedContent = []
           }
         }
@@ -126,7 +127,7 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
         
         // Ensure content is always an array
         if (!Array.isArray(sanitizedContent)) {
-          console.warn(`Template part ${templatePart.id} content is not an array, converting to empty array`)
+          logger.warn(`Template part ${templatePart.id} content is not an array, converting to empty array`)
           sanitizedContent = []
         }
         
