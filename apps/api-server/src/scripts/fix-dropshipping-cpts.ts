@@ -1,5 +1,6 @@
 import { AppDataSource } from '../database/connection';
 import { CustomPostType } from '../entities/CustomPostType';
+import { logger } from '../utils/logger';
 
 const DROPSHIPPING_CPTS = [
   {
@@ -62,9 +63,9 @@ const DROPSHIPPING_CPTS = [
 
 async function fixDropshippingCPTs() {
   try {
-    console.log('Initializing database...');
+    logger.info('Initializing database...');
     await AppDataSource.initialize();
-    console.log('Database connected!');
+    logger.info('Database connected!');
     
     const repo = AppDataSource.getRepository(CustomPostType);
     
@@ -77,20 +78,20 @@ async function fixDropshippingCPTs() {
       if (!existing) {
         const cpt = repo.create(cptData);
         await repo.save(cpt);
-        console.log(`Created: ${cptData.name} (${cptData.slug})`);
+        logger.info(`Created: ${cptData.name} (${cptData.slug})`);
       } else if (!existing.active) {
         existing.active = true;
         await repo.save(existing);
-        console.log(`Activated: ${cptData.name} (${cptData.slug})`);
+        logger.info(`Activated: ${cptData.name} (${cptData.slug})`);
       } else {
-        console.log(`Already active: ${cptData.name} (${cptData.slug})`);
+        logger.info(`Already active: ${cptData.name} (${cptData.slug})`);
       }
     }
     
-    console.log('\nAll dropshipping CPTs are ready!');
+    logger.info('All dropshipping CPTs are ready!');
     process.exit(0);
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error fixing dropshipping CPTs:', error);
     process.exit(1);
   }
 }
