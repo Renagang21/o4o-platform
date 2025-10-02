@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useState, useEffect } from 'react';
 import {
   FileText,
   Settings,
@@ -37,6 +37,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { useAuthStore } from '@/stores/authStore';
 
 interface PostSettings {
   status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
@@ -66,6 +67,7 @@ interface GutenbergSidebarProps {
   activeTab?: 'document' | 'block';
   postSettings: PostSettings;
   blockSettings?: BlockSettings;
+  mode?: 'post' | 'page' | 'template' | 'pattern';
   onPostSettingsChange: (settings: Partial<PostSettings>) => void;
   onBlockSettingsChange?: (settings: Partial<BlockSettings>) => void;
   onTabChange?: (tab: 'document' | 'block') => void;
@@ -101,22 +103,67 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   activeTab = 'document',
   postSettings,
   blockSettings,
+  mode = 'post',
   onPostSettingsChange,
   onBlockSettingsChange,
   onTabChange,
   onClose
 }) => {
+  const { user } = useAuthStore();
   const [tagInput, setTagInput] = useState('');
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
+  const [availableCategories, setAvailableCategories] = useState<Array<{id: string, name: string, slug: string}>>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-  // Mock data for categories
-  const availableCategories = [
-    { id: '1', name: 'News', slug: 'news' },
-    { id: '2', name: 'Tutorials', slug: 'tutorials' },
-    { id: '3', name: 'Updates', slug: 'updates' },
-    { id: '4', name: 'Announcements', slug: 'announcements' },
-  ];
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/v1/content/categories`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          const categoriesData = result.data || result.categories || [];
+          setAvailableCategories(categoriesData.map((cat: any) => ({
+            id: cat.id,
+            name: cat.name || cat.title,
+            slug: cat.slug || ''
+          })));
+        }
+      } catch (error) {
+        // Fallback to empty array on error
+        setAvailableCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Check user permissions
+  const canPublish = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator', 'vendor_manager'].includes(user.role);
+  };
+
+  const canEditCategories = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator'].includes(user.role);
+  };
+
+  const canSetFeaturedImage = () => {
+    if (!user) return false;
+    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor'].includes(user.role);
+  };
 
   const handleAddTag = () => {
     if (tagInput.trim()) {
@@ -285,7 +332,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
               </div>
             </Panel>
 
-            {/* Categories */}
+            {/* Categories - Only show for posts and users with permission */}
+            {mode === 'post' && canEditCategories() && (
             <Panel title="Categories">
               <div className="space-y-3">
                 <div className="relative">
@@ -313,24 +361,30 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 </div>
 
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {availableCategories
-                    .filter((cat: any) => 
-                      cat.name.toLowerCase().includes(categorySearch.toLowerCase())
-                    )
-                    .map((category: any) => (
-                      <label
-                        key={category.id}
-                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={postSettings.categories.includes(category.id)}
-                          onChange={() => handleCategoryToggle(category.id)}
-                          className="rounded border-gray-300"
-                        />
-                        <span className="text-sm">{category.name}</span>
-                      </label>
-                    ))}
+                  {categoriesLoading ? (
+                    <div className="text-sm text-gray-500">Loading categories...</div>
+                  ) : availableCategories.length > 0 ? (
+                    availableCategories
+                      .filter((cat: any) => 
+                        cat.name.toLowerCase().includes(categorySearch.toLowerCase())
+                      )
+                      .map((category: any) => (
+                        <label
+                          key={category.id}
+                          className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={postSettings.categories.includes(category.id)}
+                            onChange={() => handleCategoryToggle(category.id)}
+                            className="rounded border-gray-300"
+                          />
+                          <span className="text-sm">{category.name}</span>
+                        </label>
+                      ))
+                  ) : (
+                    <div className="text-sm text-gray-500">No categories available</div>
+                  )}
                 </div>
 
                 <Button
@@ -343,8 +397,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 </Button>
               </div>
             </Panel>
+            )}
 
-            {/* Tags */}
+            {/* Tags - Only show for posts and users with permission */}
+            {mode === 'post' && canEditCategories() && (
             <Panel title="Tags">
               <div className="space-y-3">
                 <div className="flex gap-2">
@@ -385,8 +441,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 </div>
               </div>
             </Panel>
+            )}
 
-            {/* Featured Image */}
+            {/* Featured Image - Only show for users with permission */}
+            {canSetFeaturedImage() && (
             <Panel title="Featured image">
               <div className="space-y-3">
                 {postSettings.featuredImage ? (
@@ -422,6 +480,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 )}
               </div>
             </Panel>
+            )}
 
             {/* Excerpt */}
             <Panel title="Excerpt">

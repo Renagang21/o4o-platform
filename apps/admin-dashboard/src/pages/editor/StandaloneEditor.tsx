@@ -1004,6 +1004,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlock}
+              mode={mode}
               onPostSettingsChange={(settings: any) => {
                 
                 // Clear slug error when slug is changed
