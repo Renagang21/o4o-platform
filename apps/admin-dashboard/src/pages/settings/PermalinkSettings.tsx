@@ -246,6 +246,7 @@ const PermalinkSettings: FC = () => {
                 <label key={item.value} className="flex items-start space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer">
                   <input
                     type="radio"
+                    id={`structure-${item.value.replace(/[^a-zA-Z0-9]/g, '-')}`}
                     name="structure"
                     value={item.value}
                     checked={selectedStructure === item.value}
@@ -271,6 +272,7 @@ const PermalinkSettings: FC = () => {
               <label className="flex items-start space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer">
                 <input
                   type="radio"
+                  id="structure-custom"
                   name="structure"
                   value="custom"
                   checked={selectedStructure === 'custom'}
@@ -288,6 +290,8 @@ const PermalinkSettings: FC = () => {
               <div className="mt-4 pl-6">
                 <input
                   type="text"
+                  id="custom-structure"
+                  name="custom-structure"
                   value={customStructure}
                   onChange={(e) => setCustomStructure(e.target.value)}
                   placeholder="예: /%year%/%monthnum%/%postname%/"
@@ -304,9 +308,11 @@ const PermalinkSettings: FC = () => {
           {/* 카테고리 및 태그 베이스 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">카테고리 베이스</label>
+              <label htmlFor="category-base" className="block text-sm font-medium mb-2">카테고리 베이스</label>
               <input
                 type="text"
+                id="category-base"
+                name="category-base"
                 value={categoryBase}
                 onChange={(e) => setCategoryBase(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded"
@@ -315,9 +321,11 @@ const PermalinkSettings: FC = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">태그 베이스</label>
+              <label htmlFor="tag-base" className="block text-sm font-medium mb-2">태그 베이스</label>
               <input
                 type="text"
+                id="tag-base"
+                name="tag-base"
                 value={tagBase}
                 onChange={(e) => setTagBase(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded"
@@ -330,9 +338,11 @@ const PermalinkSettings: FC = () => {
           <div>
             <h4 className="font-medium mb-3">고급 설정</h4>
             <div className="space-y-4">
-              <label className="flex items-start space-x-3">
+              <label htmlFor="remove-stop-words" className="flex items-start space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  id="remove-stop-words"
+                  name="remove-stop-words"
                   checked={removeStopWords}
                   onChange={(e) => setRemoveStopWords(e.target.checked)}
                   className="mt-1"
@@ -344,11 +354,13 @@ const PermalinkSettings: FC = () => {
               </label>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="max-url-length" className="block text-sm font-medium mb-2">
                   최대 URL 길이 ({maxUrlLength}자)
                 </label>
                 <input
                   type="range"
+                  id="max-url-length"
+                  name="max-url-length"
                   min="30"
                   max="200"
                   value={maxUrlLength}
@@ -362,9 +374,11 @@ const PermalinkSettings: FC = () => {
                 </div>
               </div>
 
-              <label className="flex items-start space-x-3">
+              <label htmlFor="auto-flush-rules" className="flex items-start space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  id="auto-flush-rules"
+                  name="auto-flush-rules"
                   checked={autoFlushRules}
                   onChange={(e) => setAutoFlushRules(e.target.checked)}
                   className="mt-1"
@@ -375,9 +389,11 @@ const PermalinkSettings: FC = () => {
                 </div>
               </label>
 
-              <label className="flex items-start space-x-3">
+              <label htmlFor="enable-seo-warnings" className="flex items-start space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  id="enable-seo-warnings"
+                  name="enable-seo-warnings"
                   checked={enableSeoWarnings}
                   onChange={(e) => setEnableSeoWarnings(e.target.checked)}
                   className="mt-1"
