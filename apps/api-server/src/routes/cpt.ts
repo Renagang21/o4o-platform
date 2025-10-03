@@ -1,5 +1,8 @@
 import { Router } from 'express';
 import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller';
+import { FieldGroupsController } from '../controllers/cpt/FieldGroupsController';
+import { TaxonomiesController } from '../controllers/cpt/TaxonomiesController';
+import { FormsController } from '../controllers/cpt/FormsController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
 const router: Router = Router();
@@ -49,286 +52,110 @@ router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePos
 // Get single published post (public)
 // router.get('/public/:slug/:postSlug', CPTController.getPublicPost);
 
-// ============= Field Groups Routes (Mock Implementation) =============
+// ============= Field Groups Routes =============
+const fieldGroupsController = new FieldGroupsController();
 
 // Get all field groups
-router.get('/field-groups', async (req, res) => {
-  try {
-    const postType = req.query.postType as string;
-    // TODO: Implement actual database query
-    // This should fetch from field_groups table
-    const fieldGroups = [];
-    res.json({ data: fieldGroups });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch field groups' });
-  }
-});
+router.get('/field-groups', authenticateToken, fieldGroupsController.getAllFieldGroups.bind(fieldGroupsController));
 
 // Get single field group
-router.get('/field-groups/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement database query
-    res.status(404).json({ error: 'Field group not found' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch field group' });
-  }
-});
+router.get('/field-groups/:id', authenticateToken, fieldGroupsController.getFieldGroupById.bind(fieldGroupsController));
 
-// Create field group
-router.post('/field-groups', authenticateToken, async (req, res) => {
-  try {
-    const fieldGroup = req.body;
-    // TODO: Implement actual database insert
-    // This should insert into field_groups table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create field group' });
-  }
-});
+// Create new field group (Admin only)
+router.post('/field-groups', authenticateToken, requireAdmin, fieldGroupsController.createFieldGroup.bind(fieldGroupsController));
 
-// Update field group
-router.put('/field-groups/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const fieldGroup = req.body;
-    // TODO: Implement actual database update
-    // This should update field_groups table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update field group' });
-  }
-});
+// Update field group (Admin only)
+router.put('/field-groups/:id', authenticateToken, requireAdmin, fieldGroupsController.updateFieldGroup.bind(fieldGroupsController));
 
-// Patch field group
-router.patch('/field-groups/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
-    // TODO: Implement actual database partial update
-    // This should update specific fields in field_groups table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update field group' });
-  }
-});
+// Delete field group (Admin only)
+router.delete('/field-groups/:id', authenticateToken, requireAdmin, fieldGroupsController.deleteFieldGroup.bind(fieldGroupsController));
 
-// Delete field group
-router.delete('/field-groups/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement actual database delete
-    // This should delete from field_groups table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete field group' });
-  }
-});
+// Duplicate field group (Admin only)
+router.post('/field-groups/:id/duplicate', authenticateToken, requireAdmin, fieldGroupsController.duplicateFieldGroup.bind(fieldGroupsController));
 
-// ============= Taxonomies Routes (Mock Implementation) =============
+// Toggle field group status (Admin only)
+router.patch('/field-groups/:id/toggle', authenticateToken, requireAdmin, fieldGroupsController.toggleFieldGroupStatus.bind(fieldGroupsController));
+
+// Reorder field groups (Admin only)
+router.patch('/field-groups/reorder', authenticateToken, requireAdmin, fieldGroupsController.reorderFieldGroups.bind(fieldGroupsController));
+
+// Get field groups by location
+router.get('/field-groups/location', authenticateToken, fieldGroupsController.getFieldGroupsByLocation.bind(fieldGroupsController));
+
+// ============= Taxonomies Routes =============
+const taxonomiesController = new TaxonomiesController();
 
 // Get all taxonomies
-router.get('/taxonomies', async (req, res) => {
-  try {
-    // TODO: Implement database query
-    const taxonomies = [];
-    res.json({ data: taxonomies });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch taxonomies' });
-  }
-});
+router.get('/taxonomies', authenticateToken, taxonomiesController.getAllTaxonomies.bind(taxonomiesController));
 
 // Get single taxonomy
-router.get('/taxonomies/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement database query
-    res.status(404).json({ error: 'Taxonomy not found' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch taxonomy' });
-  }
-});
+router.get('/taxonomies/:id', authenticateToken, taxonomiesController.getTaxonomyById.bind(taxonomiesController));
 
-// Create taxonomy
-router.post('/taxonomies', authenticateToken, async (req, res) => {
-  try {
-    const taxonomy = req.body;
-    // TODO: Implement actual database insert
-    // This should insert into taxonomies table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create taxonomy' });
-  }
-});
+// Create new taxonomy (Admin only)
+router.post('/taxonomies', authenticateToken, requireAdmin, taxonomiesController.createTaxonomy.bind(taxonomiesController));
 
-// Update taxonomy
-router.put('/taxonomies/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const taxonomy = req.body;
-    // TODO: Implement actual database update
-    // This should update taxonomies table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update taxonomy' });
-  }
-});
+// Update taxonomy (Admin only)
+router.put('/taxonomies/:id', authenticateToken, requireAdmin, taxonomiesController.updateTaxonomy.bind(taxonomiesController));
 
-// Delete taxonomy
-router.delete('/taxonomies/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement actual database delete
-    // This should delete from taxonomies table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete taxonomy' });
-  }
-});
+// Delete taxonomy (Admin only)
+router.delete('/taxonomies/:id', authenticateToken, requireAdmin, taxonomiesController.deleteTaxonomy.bind(taxonomiesController));
 
-// ============= Terms Routes (Mock Implementation) =============
+// Get terms by taxonomy
+router.get('/taxonomies/:taxonomyId/terms', authenticateToken, taxonomiesController.getTermsByTaxonomy.bind(taxonomiesController));
 
-// Get terms for a taxonomy
-router.get('/taxonomies/:taxonomyId/terms', async (req, res) => {
-  try {
-    const { taxonomyId } = req.params;
-    // TODO: Implement database query
-    const terms = [];
-    res.json({ data: terms });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch terms' });
-  }
-});
+// Get single term
+router.get('/terms/:id', authenticateToken, taxonomiesController.getTermById.bind(taxonomiesController));
 
-// Create term
-router.post('/taxonomies/:taxonomyId/terms', authenticateToken, async (req, res) => {
-  try {
-    const { taxonomyId } = req.params;
-    const term = req.body;
-    // TODO: Implement actual database insert
-    // This should insert into taxonomy_terms table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create term' });
-  }
-});
+// Create new term
+router.post('/taxonomies/:taxonomyId/terms', authenticateToken, taxonomiesController.createTerm.bind(taxonomiesController));
 
 // Update term
-router.put('/taxonomies/:taxonomyId/terms/:termId', authenticateToken, async (req, res) => {
-  try {
-    const { termId } = req.params;
-    const term = req.body;
-    // TODO: Implement actual database update
-    // This should update taxonomy_terms table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update term' });
-  }
-});
+router.put('/terms/:id', authenticateToken, taxonomiesController.updateTerm.bind(taxonomiesController));
 
 // Delete term
-router.delete('/taxonomies/:taxonomyId/terms/:termId', authenticateToken, async (req, res) => {
-  try {
-    const { termId } = req.params;
-    // TODO: Implement actual database delete
-    // This should delete from taxonomy_terms table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete term' });
-  }
-});
+router.delete('/terms/:id', authenticateToken, taxonomiesController.deleteTerm.bind(taxonomiesController));
 
-// ============= Forms Routes (Mock Implementation) =============
+// Assign terms to object
+router.post('/term-relationships', authenticateToken, taxonomiesController.assignTermsToObject.bind(taxonomiesController));
+
+// Get object terms
+router.get('/objects/:objectType/:objectId/terms', authenticateToken, taxonomiesController.getObjectTerms.bind(taxonomiesController));
+
+// ============= Terms Routes =============
+// Term routes are included in Taxonomies section above
+
+// ============= Forms Routes =============
+const formsController = new FormsController();
 
 // Get all forms
-router.get('/forms', async (req, res) => {
-  try {
-    // TODO: Fetch from database
-    const forms = [];
-    res.json({ data: forms });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch forms' });
-  }
-});
+router.get('/forms', authenticateToken, formsController.getAllForms.bind(formsController));
 
-// Get single form
-router.get('/forms/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement database query
-    res.status(404).json({ error: 'Form not found' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch form' });
-  }
-});
+// Get single form by ID
+router.get('/forms/:id', authenticateToken, formsController.getFormById.bind(formsController));
 
-// Create form
-router.post('/forms', authenticateToken, async (req, res) => {
-  try {
-    const form = req.body;
-    // TODO: Implement actual database insert
-    // This should insert into forms table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create form' });
-  }
-});
+// Get form by name (public access for rendering)
+router.get('/forms/name/:name', formsController.getFormByName.bind(formsController));
+
+// Create new form
+router.post('/forms', authenticateToken, formsController.createForm.bind(formsController));
 
 // Update form
-router.put('/forms/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const form = req.body;
-    // TODO: Implement actual database update
-    // This should update forms table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update form' });
-  }
-});
+router.put('/forms/:id', authenticateToken, formsController.updateForm.bind(formsController));
 
 // Delete form
-router.delete('/forms/:id', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Implement actual database delete
-    // This should delete from forms table
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete form' });
-  }
-});
+router.delete('/forms/:id', authenticateToken, formsController.deleteForm.bind(formsController));
 
-// Submit form
-router.post('/forms/:id/submit', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const formData = req.body;
-    
-    // TODO: Implement actual form submission processing:
-    // 1. Validate form data against form schema
-    // 2. Create CPT post if submitAction is 'create_post'
-    // 3. Create/update user if submitAction is 'create_user'
-    // 4. Send email notifications if submitAction is 'send_email'
-    // 5. Save submission record to database
-    
-    res.status(501).json({ error: 'Not implemented - database integration pending' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to submit form' });
-  }
-});
+// Duplicate form
+router.post('/forms/:id/duplicate', authenticateToken, formsController.duplicateForm.bind(formsController));
+
+// Update form status
+router.patch('/forms/:id/status', authenticateToken, formsController.updateFormStatus.bind(formsController));
 
 // Get form submissions
-router.get('/forms/:id/submissions', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    // TODO: Fetch from database
-    const submissions = [];
-    res.json({ data: submissions });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch submissions' });
-  }
-});
+router.get('/forms/:id/submissions', authenticateToken, formsController.getFormSubmissions.bind(formsController));
+
+// Submit form (public access)
+router.post('/forms/:id/submit', formsController.submitForm.bind(formsController));
 
 // ============= Utility Routes =============
 
