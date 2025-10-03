@@ -78,7 +78,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                 className="admin-header-mobile-menu"
                 aria-label="Toggle menu"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-7 h-7" strokeWidth={2} />
               </button>
             )}
             

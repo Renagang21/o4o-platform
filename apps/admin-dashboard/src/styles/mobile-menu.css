@@ -94,24 +94,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     padding: 0;
     border: none;
-    background: transparent;
-    color: #6b7280;
-    border-radius: 8px;
+    background: #f8f9fa;
+    color: #374151;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
   }
   
   .admin-header-mobile-menu:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: #e5e7eb;
     color: #111827;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
   
   .admin-header-mobile-menu:active {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #d1d5db;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }
 
