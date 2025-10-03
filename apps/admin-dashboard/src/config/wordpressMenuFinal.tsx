@@ -166,6 +166,19 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
+  // 9. CPT 엔진
+  {
+    id: 'cpt-engine',
+    label: 'CPT 엔진',
+    icon: <Code className="w-5 h-5" />,
+    children: [
+      { id: 'cpt-dashboard', label: 'CPT 대시보드', icon: <LayoutDashboard className="w-4 h-4" />, path: '/cpt-engine' },
+      { id: 'cpt-types', label: '콘텐츠 타입', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine/types' },
+      { id: 'cpt-fields', label: '필드 그룹', icon: <ClipboardList className="w-4 h-4" />, path: '/cpt-engine/field-groups' },
+      { id: 'cpt-taxonomies', label: '분류법', icon: <Tag className="w-4 h-4" />, path: '/cpt-engine/taxonomies' },
+      { id: 'cpt-forms', label: '폼 빌더', icon: <Puzzle className="w-4 h-4" />, path: '/cpt-engine/forms' }
+    ]
+  },
   // 10. 도구
   {
     id: 'tools',
@@ -174,8 +187,7 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       { id: 'tools-available', label: '사용 가능한 도구', icon: <Wrench className="w-4 h-4" />, path: '/tools' },
       { id: 'tools-import', label: '가져오기', icon: <FileText className="w-4 h-4" />, path: '/tools/import' },
-      { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' },
-      { id: 'cpt-engine', label: 'CPT 엔진', icon: <Package className="w-4 h-4" />, path: '/cpt-engine' }
+      { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
     ]
   },
   // 11. 설정
