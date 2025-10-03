@@ -151,6 +151,11 @@ export class User {
   @OneToMany('AccountActivity', 'user')
   accountActivities?: any[];
 
+  // Dropshipping relationships
+  supplier?: any; // Will be set via OneToOne in Supplier entity
+  seller?: any;   // Will be set via OneToOne in Seller entity
+  partner?: any;  // Will be set via OneToOne in Partner entity
+
   // Theme customizations
   @Column({ type: 'json', nullable: true, name: 'theme_customizations' })
   themeCustomizations?: any
@@ -188,6 +193,28 @@ export class User {
 
   isActiveUser(): boolean {
     return this.status === UserStatus.ACTIVE || this.status === UserStatus.APPROVED;
+  }
+
+  // Dropshipping role helper methods
+  isSupplier(): boolean {
+    return this.hasRole('supplier') || !!this.supplier;
+  }
+
+  isSeller(): boolean {
+    return this.hasRole('seller') || !!this.seller;
+  }
+
+  isPartner(): boolean {
+    return this.hasRole('partner') || !!this.partner;
+  }
+
+  // Get active dropshipping roles
+  getDropshippingRoles(): string[] {
+    const roles: string[] = [];
+    if (this.isSupplier()) roles.push('supplier');
+    if (this.isSeller()) roles.push('seller');
+    if (this.isPartner()) roles.push('partner');
+    return roles;
   }
 
   // 민감 정보 제거한 공개 데이터

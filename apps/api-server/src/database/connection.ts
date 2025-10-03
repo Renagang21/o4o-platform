@@ -53,6 +53,17 @@ import { MenuLocation } from '../entities/MenuLocation';
 // AI Settings entity
 import { AISetting } from '../entities/AISetting';
 import { AiSettings } from '../entities/AiSettings';
+// Cart and Order entities
+import { Cart } from '../entities/Cart';
+import { CartItem } from '../entities/CartItem';
+import { Order } from '../entities/Order';
+// Dropshipping entities
+import { Product } from '../entities/Product';
+import { Supplier } from '../entities/Supplier';
+import { Seller } from '../entities/Seller';
+import { Partner } from '../entities/Partner';
+import { SellerProduct } from '../entities/SellerProduct';
+import { PartnerCommission } from '../entities/PartnerCommission';
 
 
 import { env } from '../utils/env-validator';
@@ -150,6 +161,17 @@ export const AppDataSource = new DataSource({
     // AI Settings
     AISetting,
     AiSettings,
+    // Cart and Order entities
+    Cart,
+    CartItem,
+    Order,
+    // Dropshipping entities
+    Product,
+    Supplier,
+    Seller,
+    Partner,
+    SellerProduct,
+    PartnerCommission,
   ],
   
   // 마이그레이션 설정
