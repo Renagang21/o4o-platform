@@ -6,13 +6,20 @@ import ProductEditor from './ProductEditor';
 
 interface Product {
   id: string;
-  title: string;
-  content: string;
-  excerpt: string;
+  name: string; // Changed from title
+  description: string; // Changed from content
+  excerpt?: string;
   status: string;
   createdAt: string;
   updatedAt: string;
-  acf: {
+  price: number; // Changed from acf.selling_price
+  costPrice: number; // Changed from acf.cost_price
+  sku: string; // Changed from acf.supplier_sku
+  supplierId?: string; // Changed from acf.supplier
+  stock: number;
+  category: string;
+  // Legacy acf support for UI compatibility
+  acf?: {
     cost_price?: number;
     selling_price?: number;
     margin_rate?: string;
@@ -23,6 +30,8 @@ interface Product {
     shipping_days_max?: number;
     shipping_fee?: number;
   };
+  // Computed fields
+  title?: string; // For UI compatibility
 }
 
 const Products: React.FC = () => {
@@ -43,10 +52,28 @@ const Products: React.FC = () => {
     try {
       const response = await dropshippingAPI.getProducts();
       if (response.success) {
-        setProducts(response.data);
+        // Transform new API data to UI-compatible format
+        const transformedProducts = response.data.map((product: any) => ({
+          ...product,
+          title: product.name, // For UI compatibility
+          content: product.description,
+          acf: {
+            cost_price: product.costPrice,
+            selling_price: product.price,
+            supplier_sku: product.sku,
+            supplier: product.supplierId,
+            margin_rate: product.costPrice > 0
+              ? (((product.price - product.costPrice) / product.costPrice) * 100).toFixed(1)
+              : '0',
+            shipping_days_min: 3,
+            shipping_days_max: 7,
+            shipping_fee: 0
+          }
+        }));
+        setProducts(transformedProducts);
       }
     } catch (error) {
-      
+      console.error('Failed to fetch products:', error);
       toast.error('상품 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
