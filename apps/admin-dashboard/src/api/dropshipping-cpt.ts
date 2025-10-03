@@ -4,8 +4,8 @@ import api from './client';
 export const dropshippingAPI = {
   // Get all products
   getProducts: async () => {
-    const response = await api.get('/api/v1/dropshipping/products');
-    return response.data;
+    const response = await api.get('/api/products');
+    return { success: true, data: response.data.data || [] };
   },
 
   // Create product
@@ -24,8 +24,20 @@ export const dropshippingAPI = {
       shipping_fee?: number;
     };
   }) => {
-    const response = await api.post('/api/v1/dropshipping/products', data);
-    return response.data;
+    // Transform WordPress format to new API format
+    const newData = {
+      name: data.title,
+      description: data.content || '',
+      price: data.acf?.selling_price || 0,
+      costPrice: data.acf?.cost_price || 0,
+      sku: data.acf?.supplier_sku || '',
+      supplierId: data.acf?.supplier || null,
+      stock: 100, // Default stock
+      category: 'general',
+      status: 'active'
+    };
+    const response = await api.post('/api/products', newData);
+    return { success: true, data: response.data };
   },
 
   // Update product
@@ -44,14 +56,23 @@ export const dropshippingAPI = {
       shipping_fee?: number;
     };
   }) => {
-    const response = await api.put(`/api/v1/dropshipping/products/${id}`, data);
-    return response.data;
+    // Transform WordPress format to new API format
+    const updateData: any = {};
+    if (data.title) updateData.name = data.title;
+    if (data.content) updateData.description = data.content;
+    if (data.acf?.selling_price) updateData.price = data.acf.selling_price;
+    if (data.acf?.cost_price) updateData.costPrice = data.acf.cost_price;
+    if (data.acf?.supplier_sku) updateData.sku = data.acf.supplier_sku;
+    if (data.acf?.supplier) updateData.supplierId = data.acf.supplier;
+
+    const response = await api.put(`/api/products/${id}`, updateData);
+    return { success: true, data: response.data };
   },
 
   // Delete product
   deleteProduct: async (id: string) => {
-    const response = await api.delete(`/api/v1/dropshipping/products/${id}`);
-    return response.data;
+    const response = await api.delete(`/api/products/${id}`);
+    return { success: true, data: response.data };
   },
 
   // Calculate margin
@@ -71,8 +92,8 @@ export const dropshippingAPI = {
 
   // Partner API
   getPartners: async () => {
-    const response = await api.get('/api/v1/dropshipping/partners');
-    return response.data;
+    const response = await api.get('/api/partners');
+    return { success: true, data: response.data.data || [] };
   },
 
   createPartner: async (data: {
@@ -84,8 +105,17 @@ export const dropshippingAPI = {
       partner_commission_rate?: number;
     };
   }) => {
-    const response = await api.post('/api/v1/dropshipping/partners', data);
-    return response.data;
+    // Transform WordPress format to new API format
+    const newData = {
+      name: data.title,
+      description: data.content || '',
+      type: data.acf?.partner_type || 'individual',
+      tier: data.acf?.partner_grade || 'bronze',
+      commissionRate: data.acf?.partner_commission_rate || 5,
+      status: 'active'
+    };
+    const response = await api.post('/api/partners', newData);
+    return { success: true, data: response.data };
   },
 
   updatePartner: async (id: string, data: {
@@ -97,13 +127,21 @@ export const dropshippingAPI = {
       partner_commission_rate?: number;
     };
   }) => {
-    const response = await api.put(`/api/v1/dropshipping/partners/${id}`, data);
-    return response.data;
+    // Transform WordPress format to new API format
+    const updateData: any = {};
+    if (data.title) updateData.name = data.title;
+    if (data.content) updateData.description = data.content;
+    if (data.acf?.partner_type) updateData.type = data.acf.partner_type;
+    if (data.acf?.partner_grade) updateData.tier = data.acf.partner_grade;
+    if (data.acf?.partner_commission_rate) updateData.commissionRate = data.acf.partner_commission_rate;
+
+    const response = await api.put(`/api/partners/${id}`, updateData);
+    return { success: true, data: response.data };
   },
 
   deletePartner: async (id: string) => {
-    const response = await api.delete(`/api/v1/dropshipping/partners/${id}`);
-    return response.data;
+    const response = await api.delete(`/api/partners/${id}`);
+    return { success: true, data: response.data };
   },
 
   // Supplier API
@@ -150,13 +188,13 @@ export const dropshippingAPI = {
   // Order API
   getOrders: async (status?: string) => {
     const params = status ? `?status=${status}` : '';
-    const response = await api.get(`/api/v1/dropshipping/orders${params}`);
-    return response.data;
+    const response = await api.get(`/api/orders${params}`);
+    return { success: true, data: response.data.data || [] };
   },
 
   getOrder: async (id: string) => {
-    const response = await api.get(`/api/v1/dropshipping/orders/${id}`);
-    return response.data;
+    const response = await api.get(`/api/orders/${id}`);
+    return { success: true, data: response.data };
   },
 
   createOrder: async (data: {
@@ -181,18 +219,41 @@ export const dropshippingAPI = {
       country: string;
     };
   }) => {
-    const response = await api.post('/api/v1/dropshipping/orders', data);
-    return response.data;
+    // Transform WordPress format to new API format
+    const newData = {
+      customerId: data.customer_id,
+      customerName: data.customer_name,
+      customerEmail: data.customer_email,
+      items: data.items.map(item => ({
+        productId: item.product_id,
+        productName: item.product_name,
+        quantity: item.quantity,
+        price: item.price,
+        sellerId: item.seller_id,
+        sellerName: item.seller_name
+      })),
+      shippingFee: data.shipping_fee,
+      paymentMethod: data.payment_method,
+      shippingAddress: data.shipping_address ? {
+        street: data.shipping_address.street,
+        city: data.shipping_address.city,
+        state: data.shipping_address.state,
+        zipCode: data.shipping_address.zip,
+        country: data.shipping_address.country
+      } : undefined
+    };
+    const response = await api.post('/api/orders', newData);
+    return { success: true, data: response.data };
   },
 
   updateOrderStatus: async (id: string, status: string) => {
-    const response = await api.patch(`/api/v1/dropshipping/orders/${id}/status`, { status });
-    return response.data;
+    const response = await api.patch(`/api/orders/${id}/status`, { status });
+    return { success: true, data: response.data };
   },
 
   deleteOrder: async (id: string) => {
-    const response = await api.delete(`/api/v1/dropshipping/orders/${id}`);
-    return response.data;
+    const response = await api.delete(`/api/orders/${id}`);
+    return { success: true, data: response.data };
   },
 
   // Settlement API
