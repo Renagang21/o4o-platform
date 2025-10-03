@@ -23,39 +23,39 @@ router.post('/stores', validateStore, signageController.createStore.bind(signage
 router.put('/stores/:id', validateStore, signageController.updateStore.bind(signageController));
 router.delete('/stores/:id', signageController.deleteStore.bind(signageController));
 
-// Playlist Management Routes
-router.get('/stores/:storeId/playlists', signageController.getStorePlaylists.bind(signageController));
-router.post('/stores/:storeId/playlists', validatePlaylist, signageController.createPlaylist.bind(signageController));
-router.put('/playlists/:id', validatePlaylist, signageController.updatePlaylist.bind(signageController));
-router.delete('/playlists/:id', signageController.deletePlaylist.bind(signageController));
+// Playlist Management Routes - removed for production
+// router.get('/stores/:storeId/playlists', ...); // Removed - methods deleted from controller
+// router.post('/stores/:storeId/playlists', ...); // Removed - methods deleted from controller
+// router.put('/playlists/:id', ...); // Removed - methods deleted from controller
+// router.delete('/playlists/:id', ...); // Removed - methods deleted from controller
 
-// Playlist Items Routes
-router.get('/playlists/:playlistId/items', signageController.getPlaylistItems.bind(signageController));
-router.post('/playlists/:playlistId/items', signageController.addPlaylistItem.bind(signageController));
-router.put('/playlist-items/:itemId', signageController.updatePlaylistItem.bind(signageController));
-router.delete('/playlist-items/:itemId', signageController.deletePlaylistItem.bind(signageController));
-router.patch('/playlists/:playlistId/items/reorder', signageController.reorderPlaylistItems.bind(signageController));
+// Playlist Items Routes - removed for production
+// router.get('/playlists/:playlistId/items', ...); // Removed - methods deleted from controller
+// router.post('/playlists/:playlistId/items', ...); // Removed - methods deleted from controller
+// router.put('/playlist-items/:itemId', ...); // Removed - methods deleted from controller
+// router.delete('/playlist-items/:itemId', ...); // Removed - methods deleted from controller
+// router.patch('/playlists/:playlistId/items/reorder', ...); // Removed - methods deleted from controller
 
-// Schedule Management Routes
-router.get('/stores/:storeId/schedules', signageController.getStoreSchedules.bind(signageController));
-router.post('/stores/:storeId/schedules', signageController.createSchedule.bind(signageController));
-router.put('/schedules/:id', signageController.updateSchedule.bind(signageController));
-router.delete('/schedules/:id', signageController.deleteSchedule.bind(signageController));
-router.get('/stores/:storeId/schedules/active', signageController.getActiveSchedule.bind(signageController));
+// Schedule Management Routes - removed for production
+// router.get('/stores/:storeId/schedules', ...); // Removed - methods deleted from controller
+// router.post('/stores/:storeId/schedules', ...); // Removed - methods deleted from controller
+// router.put('/schedules/:id', ...); // Removed - methods deleted from controller
+// router.delete('/schedules/:id', ...); // Removed - methods deleted from controller
+// router.get('/stores/:storeId/schedules/active', ...); // Removed - methods deleted from controller
 
-// Template Management Routes
-router.get('/templates', signageController.getTemplates.bind(signageController));
-router.post('/templates', signageController.createTemplate.bind(signageController));
-router.put('/templates/:id', signageController.updateTemplate.bind(signageController));
-router.delete('/templates/:id', signageController.deleteTemplate.bind(signageController));
+// Template Management Routes - removed for production
+// router.get('/templates', ...); // Removed - methods deleted from controller
+// router.post('/templates', ...); // Removed - methods deleted from controller
+// router.put('/templates/:id', ...); // Removed - methods deleted from controller
+// router.delete('/templates/:id', ...); // Removed - methods deleted from controller
 
-// Analytics Routes
-router.get('/analytics/content-usage', signageController.getContentUsageAnalytics.bind(signageController));
-router.get('/analytics/store-performance', signageController.getStorePerformanceAnalytics.bind(signageController));
+// Analytics Routes - removed for production
+// router.get('/analytics/content-usage', ...); // Removed - methods deleted from controller
+// router.get('/analytics/store-performance', ...); // Removed - methods deleted from controller
 
-// Playback Control Routes
-router.get('/stores/:storeId/playback/status', signageController.getPlaybackStatus.bind(signageController));
-router.post('/stores/:storeId/playback/change', signageController.changePlaybackContent.bind(signageController));
-router.post('/stores/:storeId/playback/control', signageController.controlPlayback.bind(signageController));
+// Playback Control Routes - removed for production
+// router.get('/stores/:storeId/playback/status', ...); // Removed - methods deleted from controller
+// router.post('/stores/:storeId/playback/change', ...); // Removed - methods deleted from controller
+// router.post('/stores/:storeId/playback/control', ...); // Removed - methods deleted from controller
 
 export default router;

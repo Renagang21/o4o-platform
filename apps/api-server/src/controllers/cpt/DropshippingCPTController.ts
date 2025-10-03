@@ -308,10 +308,19 @@ export class DropshippingCPTController {
   // Get all partners
   async getPartners(req: Request, res: Response) {
     try {
-      // For now, return empty array until partners are created
+      const customPostRepo = AppDataSource.getRepository(CustomPost);
+
+      const partners = await customPostRepo.find({
+        where: {
+          postTypeSlug: 'ds_partner',
+          status: PostStatus.PUBLISHED
+        },
+        order: { createdAt: 'DESC' }
+      });
+
       res.json({
         success: true,
-        data: []
+        data: partners
       });
     } catch (error) {
       console.error('Error fetching partners:', error);
@@ -485,10 +494,19 @@ export class DropshippingCPTController {
   // Get all suppliers
   async getSuppliers(req: Request, res: Response) {
     try {
-      // For now, return empty array until suppliers are created
+      const customPostRepo = AppDataSource.getRepository(CustomPost);
+
+      const suppliers = await customPostRepo.find({
+        where: {
+          postTypeSlug: 'ds_supplier',
+          status: PostStatus.PUBLISHED
+        },
+        order: { createdAt: 'DESC' }
+      });
+
       res.json({
         success: true,
-        data: []
+        data: suppliers
       });
     } catch (error) {
       console.error('Error fetching suppliers:', error);
