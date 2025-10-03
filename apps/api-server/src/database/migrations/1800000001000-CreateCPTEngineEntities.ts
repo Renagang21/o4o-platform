@@ -120,7 +120,7 @@ export class CreateCPTEngineEntities1800000001000 implements MigrationInterface 
       SELECT 'General', 'general', 'General product category', id FROM "taxonomies" WHERE name = 'product_cat'
     `);
 
-    console.log('✅ CPT Engine entities (Taxonomies, Terms, Term Relationships) created successfully');
+    // CPT Engine entities (Taxonomies, Terms, Term Relationships) created successfully
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -145,6 +145,6 @@ export class CreateCPTEngineEntities1800000001000 implements MigrationInterface 
     await queryRunner.query(`DROP TABLE "terms"`);
     await queryRunner.query(`DROP TABLE "taxonomies"`);
 
-    console.log('✅ CPT Engine entities dropped successfully');
+    // CPT Engine entities dropped successfully
   }
 }
