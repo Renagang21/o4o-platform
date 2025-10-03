@@ -1,9 +1,8 @@
-import {
-  SelectControl,
-  RangeControl,
-  TextControl,
-  ToggleControl
-} from '@wordpress/components';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface QueryControlsProps {
   attributes: any;
@@ -39,105 +38,128 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
   ];
 
   return (
-    <div className="o4o-query-controls">
-      <RangeControl
-        label={'Number of items'}
-        value={query.perPage || 9}
-        onChange={(value: number | undefined) => updateQuery('perPage', value)}
-        min={1}
-        max={50}
-      />
+    <div className="o4o-query-controls space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="per-page-slider">Number of items: {query.perPage || 9}</Label>
+        <Slider
+          min={1}
+          max={50}
+          step={1}
+          value={[query.perPage || 9]}
+          onValueChange={(value) => updateQuery('perPage', value[0])}
+          className="w-full"
+        />
+      </div>
 
-      <SelectControl
-        label={'Order by'}
-        value={query.orderBy || 'date'}
-        options={orderByOptions}
-        onChange={(value: string) => updateQuery('orderBy', value)}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="order-by-select">Order by</Label>
+        <Select value={query.orderBy || 'date'} onValueChange={(value) => updateQuery('orderBy', value)}>
+          <SelectTrigger id="order-by-select">
+            <SelectValue placeholder="Select order by" />
+          </SelectTrigger>
+          <SelectContent>
+            {orderByOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <SelectControl
-        label={'Order'}
-        value={query.order || 'desc'}
-        options={[
-          { label: 'Descending', value: 'desc' },
-          { label: 'Ascending', value: 'asc' }
-        ]}
-        onChange={(value: string) => updateQuery('order', value)}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="order-select">Order</Label>
+        <Select value={query.order || 'desc'} onValueChange={(value) => updateQuery('order', value)}>
+          <SelectTrigger id="order-select">
+            <SelectValue placeholder="Select order" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">Descending</SelectItem>
+            <SelectItem value="asc">Ascending</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {postType === 'product' && (
         <>
-          <ToggleControl
-            label={'Featured products only'}
-            checked={query.featured || false}
-            onChange={(value: boolean) => updateQuery('featured', value)}
-            disabled={false}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="featured-switch"
+              checked={query.featured || false}
+              onCheckedChange={(checked) => updateQuery('featured', checked)}
+            />
+            <Label htmlFor="featured-switch">Featured products only</Label>
+          </div>
 
-          <ToggleControl
-            label={'On sale only'}
-            checked={query.onSale || false}
-            onChange={(value: boolean) => updateQuery('onSale', value)}
-            disabled={false}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="on-sale-switch"
+              checked={query.onSale || false}
+              onCheckedChange={(checked) => updateQuery('onSale', checked)}
+            />
+            <Label htmlFor="on-sale-switch">On sale only</Label>
+          </div>
 
-          <ToggleControl
-            label={'In stock only'}
-            checked={query.inStock || false}
-            onChange={(value: boolean) => updateQuery('inStock', value)}
-            disabled={false}
-          />
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="in-stock-switch"
+              checked={query.inStock || false}
+              onCheckedChange={(checked) => updateQuery('inStock', checked)}
+            />
+            <Label htmlFor="in-stock-switch">In stock only</Label>
+          </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>
-              <TextControl
-                label={'Min Price'}
-                type="number"
-                value={query.minPrice || ''}
-                onChange={(value: string) => updateQuery('minPrice', value ? parseInt(value) : undefined)}
-                className=""
-                help=""
-                __nextHasNoMarginBottom={false}
-                hideLabelFromVision={false}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="min-price">Min Price</Label>
+                <Input
+                  id="min-price"
+                  type="number"
+                  value={query.minPrice || ''}
+                  onChange={(e) => updateQuery('minPrice', e.target.value ? parseInt(e.target.value) : undefined)}
+                  placeholder="Min price"
+                />
+              </div>
             </div>
             <div style={{ flex: 1 }}>
-              <TextControl
-                label={'Max Price'}
-                type="number"
-                value={query.maxPrice || ''}
-                onChange={(value: string) => updateQuery('maxPrice', value ? parseInt(value) : undefined)}
-                className=""
-                help=""
-                __nextHasNoMarginBottom={false}
-                hideLabelFromVision={false}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="max-price">Max Price</Label>
+                <Input
+                  id="max-price"
+                  type="number"
+                  value={query.maxPrice || ''}
+                  onChange={(e) => updateQuery('maxPrice', e.target.value ? parseInt(e.target.value) : undefined)}
+                  placeholder="Max price"
+                />
+              </div>
             </div>
           </div>
         </>
       )}
 
-      <TextControl
-        label={'Search'}
-        value={query.search || ''}
-        onChange={(value: string) => updateQuery('search', value)}
-        placeholder={'Search products...'}
-        className=""
-        help=""
-        __nextHasNoMarginBottom={false}
-        hideLabelFromVision={false}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="search-input">Search</Label>
+        <Input
+          id="search-input"
+          type="text"
+          value={query.search || ''}
+          onChange={(e) => updateQuery('search', e.target.value)}
+          placeholder="Search products..."
+        />
+      </div>
 
-      <TextControl
-        label={'Offset'}
-        help={'Number of items to skip'}
-        type="number"
-        value={query.offset || 0}
-        onChange={(value: string) => updateQuery('offset', value ? parseInt(value) : 0)}
-        className=""
-        __nextHasNoMarginBottom={false}
-        hideLabelFromVision={false}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="offset-input">Offset</Label>
+        <Input
+          id="offset-input"
+          type="number"
+          value={query.offset || 0}
+          onChange={(e) => updateQuery('offset', e.target.value ? parseInt(e.target.value) : 0)}
+          placeholder="Number of items to skip"
+        />
+        <p className="text-sm text-muted-foreground">Number of items to skip</p>
+      </div>
     </div>
   );
 }

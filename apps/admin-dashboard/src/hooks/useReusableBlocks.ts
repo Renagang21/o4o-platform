@@ -1,11 +1,9 @@
 /**
  * useReusableBlocks Hook
- * Manages reusable blocks state and operations for WordPress block editor integration
+ * Manages reusable blocks state and operations for block editor integration
  */
 
 import { useState, useCallback } from 'react';
-
-// Type declaration is in wordpress-runtime-setup.ts
 
 interface ReusableBlock {
   id: string;
@@ -131,14 +129,9 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
       if (Array.isArray(blockData.content)) {
         parsedBlocks = blockData.content;
       } else {
-        // Dynamically import WordPress parse only when needed
-        if (window.wp?.blocks?.parse) {
-          parsedBlocks = window.wp.blocks.parse(blockData.content);
-        } else {
-          // If WordPress isn't loaded yet, dynamically import it
-          const { parse } = await import('@wordpress/blocks');
-          parsedBlocks = parse(blockData.content);
-        }
+        // Use our custom block parser instead of WordPress
+        const { parseBlocks } = await import('../utils/block-parser');
+        parsedBlocks = parseBlocks(blockData.content);
       }
 
       return parsedBlocks;

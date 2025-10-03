@@ -30,7 +30,7 @@ class MenuService {
       query.andWhere('menu.is_active = :is_active', { is_active: params.is_active });
     }
 
-    return query.orderBy('menu.createdAt', 'DESC').getMany();
+    return query.orderBy('menu.created_at', 'DESC').getMany();
   }
 
   async findMenuById(id: string): Promise<Menu | null> {
