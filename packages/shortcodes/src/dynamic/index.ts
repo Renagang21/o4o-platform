@@ -33,12 +33,7 @@ export function registerDynamicShortcodes(registry: ShortcodeRegistry): void {
   });
 
 
-  console.log('Dynamic shortcodes registered:', [
-    'cpt_list',
-    'cpt_field',
-    'acf_field',
-    'meta_field'
-  ]);
+  // Dynamic shortcodes registered: cpt_list, cpt_field, acf_field, meta_field
 }
 
 /**

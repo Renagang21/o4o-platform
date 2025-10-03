@@ -74,7 +74,7 @@ export function LoginPage() {
       <SocialLoginButtons 
         disabled={loading}
         onSocialLogin={(provider) => {
-          console.log('Social login initiated:', provider);
+          // Social login initiated for provider: ${provider}
         }}
       />
 
@@ -114,7 +114,7 @@ export function AccountSettingsPage() {
         setLinkedAccounts(data.accounts);
       }
     } catch (error) {
-      console.error('Failed to fetch linked accounts:', error);
+      // Failed to fetch linked accounts
     }
   };
 
@@ -133,7 +133,7 @@ export function AccountSettingsPage() {
         await fetchLinkedAccounts();
       }
     } catch (error) {
-      console.error('Failed to unlink account:', error);
+      // Failed to unlink account
     }
   };
 
