@@ -29,7 +29,12 @@
     "composite": true,
     "types": [
       "node"
-    ]
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
   },
   "include": [
     "src/**/*",

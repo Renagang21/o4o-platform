@@ -125,6 +125,7 @@ import pagesV1Routes from './routes/v1/pages.routes';
 import previewRoutes from './routes/preview';
 import approvalV1Routes from './routes/v1/approval.routes';
 import aiSettingsRoutes from './routes/v1/ai-settings.routes';
+import orderRoutes from './routes/orders.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -833,6 +834,18 @@ app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versioning
 // Settings routes already registered above
 
+// Order management routes
+app.use('/api/orders', orderRoutes); // Order management API
+
+// Dropshipping API routes
+import productsRoutes from './routes/products';
+import partnersRoutes from './routes/partners';
+import sellerProductsRoutes from './routes/seller-products';
+
+app.use('/api/products', productsRoutes); // Product management API
+app.use('/api/partners', partnersRoutes); // Partner management API
+app.use('/api/seller-products', sellerProductsRoutes); // Seller product management API
+
 
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {
@@ -845,6 +858,7 @@ app.get('/', (req, res) => {
       users: '/api/users',
       admin: '/api/admin',
       ecommerce: '/api/ecommerce',
+      orders: '/api/orders',
       cpt: '/api/cpt',
       postCreation: '/api/post-creation',
       services: '/api/services',

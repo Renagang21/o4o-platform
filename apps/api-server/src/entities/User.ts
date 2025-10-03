@@ -156,9 +156,6 @@ export class User {
   seller?: any;   // Will be set via OneToOne in Seller entity
   partner?: any;  // Will be set via OneToOne in Partner entity
 
-  // Theme customizations
-  @Column({ type: 'json', nullable: true, name: 'theme_customizations' })
-  themeCustomizations?: any
 
   // Password hashing
   @BeforeInsert()

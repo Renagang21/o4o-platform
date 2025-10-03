@@ -310,10 +310,7 @@ export class CreateDropshippingEntities1800000000000 implements MigrationInterfa
                 "productPrice" decimal(10,2) NOT NULL,
                 "quantity" integer NOT NULL,
                 "commissionRate" decimal(5,2) NOT NULL,
-                "baseCommission" decimal(10,2) NOT NULL,
-                "tierBonus" decimal(5,2) NOT NULL DEFAULT 0,
-                "bonusAmount" decimal(10,2) NOT NULL DEFAULT 0,
-                "totalCommission" decimal(10,2) NOT NULL,
+                "commissionAmount" decimal(10,2) NOT NULL,
                 "currency" varchar(3) NOT NULL DEFAULT 'KRW',
                 "referralCode" varchar(20) NOT NULL,
                 "referralSource" text,
@@ -355,14 +352,9 @@ export class CreateDropshippingEntities1800000000000 implements MigrationInterfa
         await queryRunner.query(`ALTER TABLE "partner_commissions" ADD CONSTRAINT "FK_partner_commissions_productId" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE`);
         await queryRunner.query(`ALTER TABLE "partner_commissions" ADD CONSTRAINT "FK_partner_commissions_sellerId" FOREIGN KEY ("sellerId") REFERENCES "sellers"("id") ON DELETE CASCADE`);
 
-        // Add theme_customizations column to users table
-        await queryRunner.query(`ALTER TABLE "users" ADD COLUMN "theme_customizations" json`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Remove theme_customizations column from users table
-        await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "theme_customizations"`);
-
         // Drop foreign key constraints
         await queryRunner.query(`ALTER TABLE "partner_commissions" DROP CONSTRAINT "FK_partner_commissions_sellerId"`);
         await queryRunner.query(`ALTER TABLE "partner_commissions" DROP CONSTRAINT "FK_partner_commissions_productId"`);

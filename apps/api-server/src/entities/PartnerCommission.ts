@@ -11,6 +11,7 @@ import {
 import { Partner } from './Partner';
 import { Product } from './Product';
 import { Seller } from './Seller';
+import { Order } from './Order';
 
 export enum CommissionStatus {
   PENDING = 'pending',     // 주문 완료, 커미션 대기
@@ -49,9 +50,9 @@ export class PartnerCommission {
   @Column({ type: 'uuid' })
   orderId!: string;
 
-  @ManyToOne('Order', { onDelete: 'CASCADE' })
+  @ManyToOne(() => Order, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
-  order?: any;
+  order?: Order;
 
   // Product relationship
   @Column({ type: 'uuid' })
@@ -90,16 +91,7 @@ export class PartnerCommission {
   commissionRate!: number; // 커미션 비율 (%)
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  baseCommission!: number; // 기본 커미션
-
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
-  tierBonus!: number; // 등급 보너스 (%)
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  bonusAmount!: number; // 보너스 금액
-
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  totalCommission!: number; // 총 커미션 (기본 + 보너스)
+  commissionAmount!: number; // 커미션 금액
 
   @Column({ type: 'varchar', length: 3, default: 'KRW' })
   currency!: string;
@@ -166,22 +158,18 @@ export class PartnerCommission {
 
   // Helper Methods
   
-  // 커미션 계산 (문서 #66: 공급자가 설정한 비율 + 파트너 등급 보너스)
+  // 커미션 계산 (문서 #66: 공급자가 설정한 단일 비율)
   static calculateCommission(
     productPrice: number,
     quantity: number,
-    baseCommissionRate: number,
-    partnerTierBonus: number = 0
-  ): { baseCommission: number; bonusAmount: number; totalCommission: number } {
+    commissionRate: number
+  ): { orderAmount: number; commission: number } {
     const orderAmount = productPrice * quantity;
-    const baseCommission = (orderAmount * baseCommissionRate) / 100;
-    const bonusAmount = (baseCommission * partnerTierBonus) / 100;
-    const totalCommission = baseCommission + bonusAmount;
+    const commission = (orderAmount * commissionRate) / 100;
 
     return {
-      baseCommission: Math.round(baseCommission * 100) / 100,
-      bonusAmount: Math.round(bonusAmount * 100) / 100,
-      totalCommission: Math.round(totalCommission * 100) / 100
+      orderAmount: Math.round(orderAmount * 100) / 100,
+      commission: Math.round(commission * 100) / 100
     };
   }
 
@@ -276,7 +264,7 @@ export class PartnerCommission {
       productName: this.product?.name || 'Unknown Product',
       orderAmount: this.orderAmount,
       commissionRate: this.commissionRate,
-      totalCommission: this.totalCommission,
+      totalCommission: this.commissionAmount,
       status: this.status,
       createdAt: this.createdAt
     };
@@ -290,8 +278,8 @@ export class PartnerCommission {
   } {
     return {
       conversionTime: this.conversionTimeMinutes,
-      commissionPercentage: (this.totalCommission / this.orderAmount) * 100,
-      effectiveRate: this.commissionRate + this.tierBonus
+      commissionPercentage: (this.commissionAmount / this.orderAmount) * 100,
+      effectiveRate: this.commissionRate
     };
   }
 
@@ -327,8 +315,8 @@ export class PartnerCommission {
       errors.push('Commission rate must be between 0 and 100');
     }
 
-    if (this.totalCommission < 0) {
-      errors.push('Total commission cannot be negative');
+    if (this.commissionAmount < 0) {
+      errors.push('Commission amount cannot be negative');
     }
 
     if (this.productPrice * this.quantity !== this.orderAmount) {

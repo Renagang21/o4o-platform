@@ -64,41 +64,63 @@ import { Seller } from '../entities/Seller';
 import { Partner } from '../entities/Partner';
 import { SellerProduct } from '../entities/SellerProduct';
 import { PartnerCommission } from '../entities/PartnerCommission';
+import { BusinessInfo } from '../entities/BusinessInfo';
 
 
 import { env } from '../utils/env-validator';
 
 // 환경변수는 env-validator를 통해 가져옴
-const DB_HOST = env.getString('DB_HOST');
-const DB_PORT = env.getNumber('DB_PORT');
-const DB_USERNAME = env.getString('DB_USERNAME');
-const DB_PASSWORD = env.getString('DB_PASSWORD');
-const DB_NAME = env.getString('DB_NAME');
+const DB_TYPE = env.getString('DB_TYPE', 'postgres');
 const NODE_ENV = env.getString('NODE_ENV', 'development');
+
+// SQLite 또는 PostgreSQL 설정
+let dataSourceConfig: any;
+
+if (DB_TYPE === 'sqlite') {
+  const DB_DATABASE = env.getString('DB_DATABASE', './data/o4o_dev.sqlite');
+  
+  dataSourceConfig = {
+    type: 'sqlite',
+    database: DB_DATABASE,
+  };
+} else {
+  // PostgreSQL 설정
+  const DB_HOST = env.getString('DB_HOST');
+  const DB_PORT = env.getNumber('DB_PORT');
+  const DB_USERNAME = env.getString('DB_USERNAME');
+  const DB_PASSWORD = env.getString('DB_PASSWORD');
+  const DB_NAME = env.getString('DB_NAME');
+  
+  dataSourceConfig = {
+    type: 'postgres',
+    host: DB_HOST,
+    port: DB_PORT,
+    username: DB_USERNAME,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+  };
+}
 
 // TypeORM 데이터소스 설정
 export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: DB_HOST,
-  port: DB_PORT,
-  username: DB_USERNAME,
-  password: DB_PASSWORD,
-  database: DB_NAME,
+  ...dataSourceConfig,
   
   // NamingStrategy 설정 - 주석 처리 (데이터베이스가 이미 camelCase 사용)
   // namingStrategy: new SnakeNamingStrategy(),
   
-  // 개발 환경 설정
-  synchronize: false, // 자동 스키마 동기화 비활성화 (마이그레이션 사용)
-  logging: env.isDevelopment() ? ['query', 'error', 'warn'] : ['error'],
+  // 프로덕션 환경 설정
+  synchronize: false, // 프로덕션에서는 항상 false
+  logging: ['error'], // 프로덕션에서는 에러만 로깅
   
-  // 연결 풀 설정 (CLAUDE.md 정책 기반)
-  extra: {
-    max: 20,           // 최대 연결 수
-    min: 5,            // 최소 연결 수
-    idleTimeoutMillis: 30000,  // 유휴 연결 타임아웃
-    connectionTimeoutMillis: 2000, // 연결 타임아웃
-  },
+  // 연결 풀 설정 (PostgreSQL에서만 사용)
+  ...(DB_TYPE === 'postgres' ? {
+    extra: {
+      max: 20,           // 최대 연결 수
+      min: 5,            // 최소 연결 수
+      idleTimeoutMillis: 30000,  // 유휴 연결 타임아웃
+      connectionTimeoutMillis: 2000, // 연결 타임아웃
+    }
+  } : {}),
   
   // 엔티티 등록 - 모든 환경에서 명시적 엔티티 배열 사용
   entities: [
@@ -172,6 +194,7 @@ export const AppDataSource = new DataSource({
     Partner,
     SellerProduct,
     PartnerCommission,
+    BusinessInfo,
   ],
   
   // 마이그레이션 설정
@@ -181,17 +204,21 @@ export const AppDataSource = new DataSource({
   migrationsTableName: 'typeorm_migrations',
   migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
   
-  // SSL 설정 (프로덕션 환경)
-  ssl: NODE_ENV === 'production' ? {
-    rejectUnauthorized: false
-  } : false,
+  // SSL 설정 (PostgreSQL 프로덕션 환경에서만)
+  ...(DB_TYPE === 'postgres' && NODE_ENV === 'production' ? {
+    ssl: {
+      rejectUnauthorized: false
+    }
+  } : {}),
   
-  // 캐시 설정
-  cache: {
-    type: 'database',
-    tableName: 'typeorm_query_cache',
-    duration: 30000 // 30초 캐시
-  }
+  // 캐시 설정 (PostgreSQL에서만)
+  ...(DB_TYPE === 'postgres' ? {
+    cache: {
+      type: 'database',
+      tableName: 'typeorm_query_cache',
+      duration: 30000 // 30초 캐시
+    }
+  } : {})
 });
 
 // 데이터베이스 연결 상태 모니터링
@@ -216,15 +243,24 @@ export async function checkDatabaseHealth() {
     // 간단한 쿼리로 연결 상태 확인
     await AppDataSource.query('SELECT 1');
     
-    return {
+    const connectionInfo: any = {
       status: 'connected',
-      host: DB_HOST,
-      port: DB_PORT,
-      database: DB_NAME,
-      connectionCount: (AppDataSource.driver as { pool?: { size?: number } })?.pool?.size || 0,
-      maxConnections: 20,
       timestamp: new Date().toISOString()
     };
+
+    if (DB_TYPE === 'sqlite') {
+      connectionInfo.type = 'sqlite';
+      connectionInfo.database = dataSourceConfig.database;
+    } else {
+      connectionInfo.type = 'postgres';
+      connectionInfo.host = dataSourceConfig.host;
+      connectionInfo.port = dataSourceConfig.port;
+      connectionInfo.database = dataSourceConfig.database;
+      connectionInfo.connectionCount = (AppDataSource.driver as { pool?: { size?: number } })?.pool?.size || 0;
+      connectionInfo.maxConnections = 20;
+    }
+
+    return connectionInfo;
   } catch (error: any) {
     return {
       status: 'error',

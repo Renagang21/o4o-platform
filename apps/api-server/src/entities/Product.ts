@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { User } from './User';
 import { Category } from './Category';
+import { Supplier } from './Supplier';
 
 export enum ProductStatus {
   DRAFT = 'draft',
@@ -80,9 +81,9 @@ export class Product {
   @Column({ type: 'uuid' })
   supplierId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Supplier, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'supplierId' })
-  supplier!: User;
+  supplier!: Supplier;
 
   // Category relationship
   @Column({ type: 'uuid', nullable: true })
@@ -115,6 +116,9 @@ export class Product {
   @Column({ type: 'enum', enum: ProductStatus, default: ProductStatus.DRAFT })
   status!: ProductStatus;
 
+  @Column({ type: 'boolean', default: true })
+  isActive!: boolean;
+
   // Pricing Information
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   supplierPrice!: number; // 공급가
@@ -134,6 +138,7 @@ export class Product {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   partnerCommissionAmount?: number; // 고정 커미션 금액
+
 
   // Inventory Management
   @Column({ type: 'integer', default: 0 })
