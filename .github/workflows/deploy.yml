@@ -3,30 +3,34 @@ name: Deploy O4O Platform
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'apps/api-server/**'  # API server deployment is handled locally
   workflow_dispatch:
 
 jobs:
-  deploy-api:
-    name: Deploy API Server
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Deploy to API Server
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.API_HOST }}
-          username: ${{ secrets.API_USER }}
-          key: ${{ secrets.API_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/o4o-platform
-            git pull origin main
-            cd apps/api-server
-            npm install
-            npm run build
-            pm2 restart o4o-api || pm2 start dist/main.js --name o4o-api
-            pm2 logs o4o-api --lines 10 --nostream
+  # deploy-api:
+  #   ⚠️ DISABLED: API server deployment is now handled locally
+  #   Use: ./scripts/deploy-api-local.sh on the API server
+  #   name: Deploy API Server
+  #   runs-on: ubuntu-latest
+  #   
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     
+  #     - name: Deploy to API Server
+  #       uses: appleboy/ssh-action@v0.1.5
+  #       with:
+  #         host: ${{ secrets.API_HOST }}
+  #         username: ${{ secrets.API_USER }}
+  #         key: ${{ secrets.API_SSH_KEY }}
+  #         script: |
+  #           cd /home/ubuntu/o4o-platform
+  #           git pull origin main
+  #           cd apps/api-server
+  #           npm install
+  #           npm run build
+  #           pm2 restart o4o-api || pm2 start dist/main.js --name o4o-api
+  #           pm2 logs o4o-api --lines 10 --nostream
 
   deploy-web:
     name: Deploy Admin Dashboard

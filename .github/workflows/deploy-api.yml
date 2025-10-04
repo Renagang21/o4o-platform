@@ -1,27 +1,26 @@
 name: Deploy API Server
 
+# ⚠️ DISABLED: API server deployment via SSH is not needed
+# The current environment IS the API server, so use local deployment instead:
+# ./scripts/deploy-api-local.sh
+
 concurrency:
   group: deploy-api-${{ github.ref }}
   cancel-in-progress: false
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'apps/api-server/**'
-      - 'packages/**'
-      - '.github/workflows/deploy-api.yml'
+  # Disabled automatic deployment - use manual deployment on the server
   workflow_dispatch:
     inputs:
       force_deploy:
-        description: 'Force deployment'
+        description: 'Force deployment (DEPRECATED - use local scripts instead)'
         required: false
         default: 'false'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: false  # Disable this workflow
 
     steps:
     - name: Checkout code
