@@ -8,51 +8,57 @@
 ## SSH 설정
 
 SSH 설정은 `~/.ssh/config`에 저장되어 있습니다:
-- `o4o-api` 또는 `api-server`: API 서버 연결
-- `o4o-web` 또는 `web-server`: Web 서버 연결
+- `o4o-apiserver`: API 서버 연결
+- `webserver`: Web 서버 연결
 
-## 배포 스크립트
+## 주요 배포 스크립트
 
-### 1. 전체 배포
+### 🚀 표준 배포 (권장)
 ```bash
-# 빌드 후 배포
+# 전체 배포 (API + Web + Nginx)
+./scripts/deploy-main.sh
+
+# API 서버만 배포
+./scripts/deploy-main.sh api
+
+# 웹 서버만 배포
+./scripts/deploy-main.sh web
+
+# Nginx 설정만 배포
+./scripts/deploy-main.sh nginx
+
+# 빌드 건너뛰고 배포
+./scripts/deploy-main.sh all --skip-build
+
+# 테스트 건너뛰고 배포
+./scripts/deploy-main.sh all --skip-tests
+
+# 강제 배포 (확인 없이)
+./scripts/deploy-main.sh all --force
+
+# 시뮬레이션 (실제 배포 안함)
+./scripts/deploy-main.sh all --dry-run
+```
+
+### ⚡ 빠른 배포 (개발용)
+```bash
+# 전체 빠른 배포 (테스트 스킵)
+./scripts/deploy-quick.sh
+
+# API 서버만 빠른 배포
+./scripts/deploy-quick.sh api
+
+# 웹 서버만 빠른 배포
+./scripts/deploy-quick.sh web
+```
+
+### 📜 레거시 스크립트 (호환성)
+```bash
+# 기존 방식들 (여전히 사용 가능)
 ./scripts/deploy-all.sh
-
-# 빌드 건너뛰고 배포만
-./scripts/deploy-all.sh --skip-build
-```
-
-### 2. API 서버만 배포
-```bash
-# 빌드 후 배포
 ./scripts/deploy-api.sh
-
-# 빌드 건너뛰고 배포만
-./scripts/deploy-api.sh --skip-build
-```
-
-### 3. Web 서버만 배포
-```bash
-# 빌드 후 배포
 ./scripts/deploy-web.sh
-
-# 빌드 건너뛰고 배포만
-./scripts/deploy-web.sh --skip-build
-```
-
-### 4. 고급 옵션 (deploy.sh)
-```bash
-# API 서버만
-./scripts/deploy.sh api
-
-# Web 서버만
-./scripts/deploy.sh web
-
-# 모든 서버
 ./scripts/deploy.sh all
-
-# 빌드 건너뛰기
-./scripts/deploy.sh all --skip-build
 ```
 
 ## 배포 프로세스

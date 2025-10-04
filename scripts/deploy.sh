@@ -76,47 +76,51 @@ build_project() {
     cd "$PROJECT_ROOT"
 }
 
-# Deploy to API server
+# Deploy to API server (Local)
 deploy_api() {
-    print_status "Deploying to API server..."
+    print_status "Deploying API server locally..."
     
-    # Create remote directories
-    ssh $API_SERVER "mkdir -p ~/o4o-platform/apps/api-server ~/o4o-platform/packages"
-    
-    # Sync API server files
-    print_status "Syncing API server files..."
-    rsync -avz --delete \
-        --exclude 'node_modules' \
-        --exclude '.env.local' \
-        --exclude 'coverage' \
-        --exclude '.turbo' \
-        "$PROJECT_ROOT/apps/api-server/" \
-        "$API_SERVER:~/o4o-platform/apps/api-server/"
-    
-    # Sync packages
-    print_status "Syncing packages..."
-    rsync -avz --delete \
-        --exclude 'node_modules' \
-        --exclude 'coverage' \
-        "$PROJECT_ROOT/packages/" \
-        "$API_SERVER:~/o4o-platform/packages/"
-    
-    # Sync root config files
-    rsync -avz \
-        "$PROJECT_ROOT/package.json" \
-        "$PROJECT_ROOT/pnpm-workspace.yaml" \
-        "$PROJECT_ROOT/turbo.json" \
-        "$API_SERVER:~/o4o-platform/"
-    
-    # Install dependencies and restart on remote
-    print_status "Installing dependencies on API server..."
-    ssh $API_SERVER << 'ENDSSH'
-        cd ~/o4o-platform
-        pnpm install --frozen-lockfile || npm install
+    # Check if we're on the API server itself
+    if [ -f "$PROJECT_ROOT/scripts/deploy-api-local.sh" ]; then
+        print_status "Running local API deployment script..."
+        cd "$PROJECT_ROOT"
         
-        # Build if dist doesn't exist
-        if [ ! -d "apps/api-server/dist" ]; then
-            echo "Building API server..."
+        # Use skip-deps if this is a quick redeploy
+        if [ "$SKIP_BUILD" = true ]; then
+            ./scripts/deploy-api-local.sh --skip-build --skip-deps
+        else
+            ./scripts/deploy-api-local.sh --skip-deps
+        fi
+    else
+        print_error "Local API deployment script not found"
+        print_warning "Falling back to remote deployment (deprecated)..."
+        
+        # Legacy remote deployment (deprecated)
+        print_status "Creating remote directories..."
+        ssh $API_SERVER "mkdir -p ~/o4o-platform/apps/api-server ~/o4o-platform/packages" || {
+            print_error "Cannot connect to API server via SSH"
+            exit 1
+        }
+        
+        # Sync API server files
+        print_status "Syncing API server files..."
+        rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.env.local' \
+            --exclude 'coverage' \
+            --exclude '.turbo' \
+            "$PROJECT_ROOT/apps/api-server/" \
+            "$API_SERVER:~/o4o-platform/apps/api-server/"
+        
+        # Install dependencies and restart on remote
+        print_status "Installing dependencies on API server..."
+        ssh $API_SERVER << 'ENDSSH'
+            cd ~/o4o-platform
+            pnpm install --frozen-lockfile || npm install
+            
+            # Build if dist doesn't exist
+            if [ ! -d "apps/api-server/dist" ]; then
+                echo "Building API server..."
             cd apps/api-server
             pnpm run build || npm run build
             cd ~/o4o-platform

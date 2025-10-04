@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# ⚠️  DEPRECATED: This script has been replaced
+# Use ./scripts/deploy-api-local.sh instead for better error handling and features
+
+echo "⚠️  WARNING: This script is DEPRECATED"
+echo "Please use: ./scripts/deploy-api-local.sh"
+echo "Continuing in 5 seconds... (Ctrl+C to cancel)"
+sleep 5
+
 # Simple O4O Platform API Server Deployment Script
 # This script performs a minimal deployment - git pull and PM2 restart
 

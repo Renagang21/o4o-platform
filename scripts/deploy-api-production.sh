@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# ⚠️  DEPRECATED: This script has dependency installation issues
+# Use ./scripts/deploy-api-local.sh instead for more reliable deployment
+
+echo "⚠️  WARNING: This script is DEPRECATED"
+echo "Please use: ./scripts/deploy-api-local.sh"
+echo "Continuing in 5 seconds... (Ctrl+C to cancel)"
+sleep 5
+
 # O4O Platform API Server Production Deployment Script
 # This script should be run on the API server (43.202.242.215)
 

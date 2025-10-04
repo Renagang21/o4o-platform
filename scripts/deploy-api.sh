@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# ⚠️  DEPRECATED: This script is no longer recommended
+# Use ./scripts/deploy-api-local.sh instead for local API server deployment
+# This script tries to deploy to remote server (43.202.242.215) which is not accessible
+
+echo "⚠️  WARNING: This script is DEPRECATED"
+echo "Please use: ./scripts/deploy-api-local.sh"
+echo "Continuing in 5 seconds... (Ctrl+C to cancel)"
+sleep 5
+
 # O4O Platform API Server Deployment Script
 # Usage: ./deploy-api.sh [--skip-build]
 
