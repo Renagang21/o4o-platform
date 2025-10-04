@@ -346,4 +346,221 @@ export const TabsContent = React.forwardRef<
 ));
 TabsContent.displayName = 'TabsContent';
 
-// (no additional exports section; components above are already exported)
+// Additional components for ecommerce app
+
+// Checkbox Component
+export const Checkbox = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, ...props }, ref) => (
+  <input
+    type="checkbox"
+    ref={ref}
+    className={cn(
+      "h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500",
+      className
+    )}
+    {...props}
+  />
+));
+Checkbox.displayName = 'Checkbox';
+
+// Radio Group Components
+export const RadioGroup = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("space-y-2", className)} {...props} />
+));
+RadioGroup.displayName = 'RadioGroup';
+
+export const RadioGroupItem = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, ...props }, ref) => (
+  <input
+    type="radio"
+    ref={ref}
+    className={cn(
+      "h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500",
+      className
+    )}
+    {...props}
+  />
+));
+RadioGroupItem.displayName = 'RadioGroupItem';
+
+// Slider Component
+export const Slider = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, ...props }, ref) => (
+  <input
+    type="range"
+    ref={ref}
+    className={cn(
+      "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer",
+      className
+    )}
+    {...props}
+  />
+));
+Slider.displayName = 'Slider';
+
+// Dialog Components
+export const Dialog: React.FC<React.HTMLAttributes<HTMLDivElement> & { open?: boolean }> = ({ 
+  children, open, className, ...props 
+}) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className={cn("bg-white rounded-lg shadow-lg", className)} {...props}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export const DialogContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6", className)} {...props} />
+));
+DialogContent.displayName = 'DialogContent';
+
+export const DialogHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("mb-4", className)} {...props} />
+));
+DialogHeader.displayName = 'DialogHeader';
+
+export const DialogTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h2 ref={ref} className={cn("text-lg font-semibold", className)} {...props} />
+));
+DialogTitle.displayName = 'DialogTitle';
+
+// Select Components (Radix-style API)
+export const SelectContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => (
+  <div ref={ref} className={cn("bg-white border rounded-md shadow-lg", className)} {...props}>
+    {children}
+  </div>
+));
+SelectContent.displayName = 'SelectContent';
+
+export const SelectItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { value?: string }
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("px-3 py-2 hover:bg-gray-100 cursor-pointer", className)} {...props} />
+));
+SelectItem.displayName = 'SelectItem';
+
+export const SelectTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => (
+  <button
+    ref={ref}
+    className={cn(
+      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
+      className
+    )}
+    {...props}
+  />
+));
+SelectTrigger.displayName = 'SelectTrigger';
+
+export const SelectValue = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
+  <span ref={ref} className={cn(className)} {...props} />
+));
+SelectValue.displayName = 'SelectValue';
+
+// Toggle Group Components
+export const ToggleGroup = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("flex space-x-1", className)} {...props} />
+));
+ToggleGroup.displayName = 'ToggleGroup';
+
+export const ToggleGroupItem = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => (
+  <button
+    ref={ref}
+    className={cn(
+      "px-3 py-2 text-sm border rounded-md hover:bg-gray-100",
+      className
+    )}
+    {...props}
+  />
+));
+ToggleGroupItem.displayName = 'ToggleGroupItem';
+
+// Dropdown Menu Components
+export const DropdownMenu: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => (
+  <div className="relative inline-block" {...props}>{children}</div>
+);
+
+export const DropdownMenuTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => (
+  <button ref={ref} className={cn(className)} {...props} />
+));
+DropdownMenuTrigger.displayName = 'DropdownMenuTrigger';
+
+export const DropdownMenuContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50",
+      className
+    )}
+    {...props}
+  />
+));
+DropdownMenuContent.displayName = 'DropdownMenuContent';
+
+export const DropdownMenuItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer", className)}
+    {...props}
+  />
+));
+DropdownMenuItem.displayName = 'DropdownMenuItem';
+
+// Progress Component
+export const Progress = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { value?: number; max?: number }
+>(({ className, value = 0, max = 100, ...props }, ref) => (
+  <div ref={ref} className={cn("w-full bg-gray-200 rounded-full h-2", className)} {...props}>
+    <div
+      className="bg-blue-600 h-2 rounded-full transition-all"
+      style={{ width: `${Math.min((value / max) * 100, 100)}%` }}
+    />
+  </div>
+));
+Progress.displayName = 'Progress';
