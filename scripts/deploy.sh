@@ -121,17 +121,19 @@ deploy_api() {
             # Build if dist doesn't exist
             if [ ! -d "apps/api-server/dist" ]; then
                 echo "Building API server..."
-            cd apps/api-server
-            pnpm run build || npm run build
-            cd ~/o4o-platform
-        fi
+                cd apps/api-server
+                pnpm run build || npm run build
+                cd ~/o4o-platform
+            fi
         
-        # Restart PM2 process
-        pm2 restart o4o-api || pm2 start apps/api-server/dist/main.js --name o4o-api
-        pm2 save
-        
-        echo "API server deployment complete!"
+            # Restart PM2 process
+            echo "Restarting PM2 process..."
+            pm2 restart o4o-api || pm2 start apps/api-server/dist/main.js --name o4o-api
+            pm2 save
+            
+            echo "API server deployment complete!"
 ENDSSH
+    fi
     
     print_status "API server deployed successfully!"
 }
