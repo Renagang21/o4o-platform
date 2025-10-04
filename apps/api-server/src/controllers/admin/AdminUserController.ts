@@ -129,17 +129,10 @@ export class AdminUserController {
         password,
         firstName,
         lastName,
+        name,
         role = UserRole.CUSTOMER,
         status = UserStatus.APPROVED,
-        isActive = true,
-        phone,
-        company,
-        address,
-        profileImage,
-        bio,
-        website,
-        linkedin,
-        twitter
+        isActive = true
       } = req.body;
 
       const userRepo = getRepository(User);
@@ -162,17 +155,12 @@ export class AdminUserController {
         password: hashedPassword,
         firstName,
         lastName,
+        name,
         role,
         status,
         isActive,
-        phone,
-        company,
-        address,
-        profileImage,
-        bio,
-        website,
-        linkedin,
-        twitter
+        roles: [role],
+        permissions: []
       });
 
       const savedUser = await userRepo.save(newUser);
@@ -224,17 +212,10 @@ export class AdminUserController {
         password,
         firstName,
         lastName,
+        name,
         role,
         status,
-        isActive,
-        phone,
-        company,
-        address,
-        profileImage,
-        bio,
-        website,
-        linkedin,
-        twitter
+        isActive
       } = req.body;
 
       // Check if email is being changed and already exists
@@ -253,17 +234,13 @@ export class AdminUserController {
       if (email) user.email = email;
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
-      if (role) user.role = role;
+      if (name) user.name = name;
+      if (role) {
+        user.role = role;
+        user.roles = [role];
+      }
       if (status !== undefined) user.status = status;
       if (isActive !== undefined) user.isActive = isActive;
-      if (phone !== undefined) user.phone = phone;
-      if (company !== undefined) user.company = company;
-      if (address !== undefined) user.address = address;
-      if (profileImage !== undefined) user.profileImage = profileImage;
-      if (bio !== undefined) user.bio = bio;
-      if (website !== undefined) user.website = website;
-      if (linkedin !== undefined) user.linkedin = linkedin;
-      if (twitter !== undefined) user.twitter = twitter;
 
       // Update password if provided
       if (password) {

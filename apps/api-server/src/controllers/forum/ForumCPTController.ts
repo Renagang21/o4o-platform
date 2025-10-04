@@ -666,7 +666,7 @@ export class ForumCPTController {
         requireApproval,
         isActive,
         sortOrder,
-        creatorId: userId,
+        creator: { id: userId } as any,
         postCount: 0
       });
 

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { Supplier } from '../../entities/Supplier';
+import { Supplier, SupplierStatus } from '../../entities/Supplier';
 import { User } from '../../entities/User';
 import { validationResult } from 'express-validator';
 
@@ -13,7 +13,6 @@ export class AdminSupplierController {
         page = 1,
         limit = 20,
         search,
-        category,
         status,
         sortBy = 'createdAt',
         sortOrder = 'DESC'
@@ -21,19 +20,15 @@ export class AdminSupplierController {
 
       const supplierRepo = getRepository(Supplier);
       const queryBuilder = supplierRepo.createQueryBuilder('supplier')
-        .leftJoinAndSelect('supplier.user', 'user');
+        .leftJoinAndSelect('supplier.user', 'user')
+        .leftJoinAndSelect('supplier.businessInfo', 'businessInfo');
 
       // Apply search filter
       if (search) {
         queryBuilder.where(
-          '(supplier.businessName ILIKE :search OR supplier.contactPerson ILIKE :search OR supplier.email ILIKE :search)',
+          '(supplier.contactPerson ILIKE :search OR supplier.contactEmail ILIKE :search OR user.email ILIKE :search)',
           { search: `%${search}%` }
         );
-      }
-
-      // Apply category filter
-      if (category && category !== 'all') {
-        queryBuilder.andWhere('supplier.category = :category', { category });
       }
 
       // Apply status filter
@@ -42,15 +37,13 @@ export class AdminSupplierController {
           queryBuilder.andWhere('supplier.isActive = true');
         } else if (status === 'inactive') {
           queryBuilder.andWhere('supplier.isActive = false');
-        } else if (status === 'verified') {
-          queryBuilder.andWhere('supplier.isVerified = true');
-        } else if (status === 'unverified') {
-          queryBuilder.andWhere('supplier.isVerified = false');
+        } else {
+          queryBuilder.andWhere('supplier.status = :status', { status });
         }
       }
 
       // Apply sorting
-      const validSortFields = ['createdAt', 'updatedAt', 'businessName', 'rating', 'totalOrders'];
+      const validSortFields = ['createdAt', 'updatedAt', 'averageRating'];
       const sortField = validSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
       const order = sortOrder === 'ASC' ? 'ASC' : 'DESC';
       queryBuilder.orderBy(`supplier.${sortField}`, order);
@@ -90,7 +83,7 @@ export class AdminSupplierController {
       
       const supplier = await supplierRepo.findOne({ 
         where: { id },
-        relations: ['user']
+        relations: ['user', 'businessInfo', 'products']
       });
       
       if (!supplier) {
@@ -128,40 +121,22 @@ export class AdminSupplierController {
       }
 
       const {
-        businessName,
-        businessNumber,
         userId,
         contactPerson,
-        email,
-        phone,
-        address,
-        category,
-        description,
+        contactEmail,
+        contactPhone,
+        companyDescription,
+        specialties,
+        certifications,
         website,
         isActive = true,
-        isVerified = false,
-        rating = 0,
-        commissionRate = 10,
-        minimumOrder = 0,
-        maxProcessingDays = 7,
-        businessLicense,
+        status = SupplierStatus.PENDING,
+        tier = 'basic',
         taxId,
-        bankAccount,
         bankName,
+        bankAccount,
         accountHolder
       } = req.body;
-
-      const supplierRepo = getRepository(Supplier);
-
-      // Check if business number already exists
-      const existingSupplier = await supplierRepo.findOne({ where: { businessNumber } });
-      if (existingSupplier) {
-        res.status(400).json({
-          success: false,
-          error: 'Business number already exists'
-        });
-        return;
-      }
 
       // Check if userId is provided and exists
       if (userId) {
@@ -176,30 +151,27 @@ export class AdminSupplierController {
         }
       }
 
+      const supplierRepo = getRepository(Supplier);
+
       const newSupplier = supplierRepo.create({
-        businessName,
-        businessNumber,
         userId,
         contactPerson,
-        email,
-        phone,
-        address,
-        category,
-        description,
+        contactEmail,
+        contactPhone,
+        companyDescription,
+        specialties,
+        certifications,
         website,
         isActive,
-        isVerified,
-        rating,
-        totalOrders: 0,
-        totalRevenue: 0,
-        commissionRate,
-        minimumOrder,
-        maxProcessingDays,
-        businessLicense,
+        status,
+        tier,
         taxId,
-        bankAccount,
         bankName,
-        accountHolder
+        bankAccount,
+        accountHolder,
+        averageRating: 0,
+        totalReviews: 0,
+        defaultPartnerCommissionRate: 5.0
       });
 
       const savedSupplier = await supplierRepo.save(newSupplier);
@@ -244,76 +216,41 @@ export class AdminSupplierController {
       }
 
       const {
-        businessName,
-        businessNumber,
         userId,
         contactPerson,
-        email,
-        phone,
-        address,
-        category,
-        description,
+        contactEmail,
+        contactPhone,
+        companyDescription,
+        specialties,
+        certifications,
         website,
         isActive,
-        isVerified,
-        rating,
-        commissionRate,
-        minimumOrder,
-        maxProcessingDays,
-        businessLicense,
+        status,
+        tier,
         taxId,
-        bankAccount,
         bankName,
-        accountHolder
+        bankAccount,
+        accountHolder,
+        defaultPartnerCommissionRate
       } = req.body;
 
-      // Check if business number is being changed and already exists
-      if (businessNumber && businessNumber !== supplier.businessNumber) {
-        const existingSupplier = await supplierRepo.findOne({ where: { businessNumber } });
-        if (existingSupplier) {
-          res.status(400).json({
-            success: false,
-            error: 'Business number already exists'
-          });
-          return;
-        }
-      }
-
-      // Check if userId is provided and exists
-      if (userId && userId !== supplier.userId) {
-        const userRepo = getRepository(User);
-        const user = await userRepo.findOne({ where: { id: userId } });
-        if (!user) {
-          res.status(400).json({
-            success: false,
-            error: 'Associated user not found'
-          });
-          return;
-        }
-      }
-
       // Update fields
-      if (businessName !== undefined) supplier.businessName = businessName;
-      if (businessNumber !== undefined) supplier.businessNumber = businessNumber;
       if (userId !== undefined) supplier.userId = userId;
       if (contactPerson !== undefined) supplier.contactPerson = contactPerson;
-      if (email !== undefined) supplier.email = email;
-      if (phone !== undefined) supplier.phone = phone;
-      if (address !== undefined) supplier.address = address;
-      if (category !== undefined) supplier.category = category;
-      if (description !== undefined) supplier.description = description;
+      if (contactEmail !== undefined) supplier.contactEmail = contactEmail;
+      if (contactPhone !== undefined) supplier.contactPhone = contactPhone;
+      if (companyDescription !== undefined) supplier.companyDescription = companyDescription;
+      if (specialties !== undefined) supplier.specialties = specialties;
+      if (certifications !== undefined) supplier.certifications = certifications;
       if (website !== undefined) supplier.website = website;
       if (isActive !== undefined) supplier.isActive = isActive;
-      if (isVerified !== undefined) supplier.isVerified = isVerified;
-      if (rating !== undefined) supplier.rating = rating;
-      if (commissionRate !== undefined) supplier.commissionRate = commissionRate;
-      if (minimumOrder !== undefined) supplier.minimumOrder = minimumOrder;
-      if (maxProcessingDays !== undefined) supplier.maxProcessingDays = maxProcessingDays;
-      if (businessLicense !== undefined) supplier.businessLicense = businessLicense;
+      if (status !== undefined) supplier.status = status;
+      if (tier !== undefined) supplier.tier = tier;
       if (taxId !== undefined) supplier.taxId = taxId;
-      if (bankAccount !== undefined) supplier.bankAccount = bankAccount;
       if (bankName !== undefined) supplier.bankName = bankName;
+      if (bankAccount !== undefined) supplier.bankAccount = bankAccount;
       if (accountHolder !== undefined) supplier.accountHolder = accountHolder;
+      if (defaultPartnerCommissionRate !== undefined) supplier.defaultPartnerCommissionRate = defaultPartnerCommissionRate;
 
       const updatedSupplier = await supplierRepo.save(supplier);
 
@@ -364,11 +301,11 @@ export class AdminSupplierController {
     }
   };
 
-  // Update supplier verification
-  updateSupplierVerification = async (req: Request, res: Response): Promise<void> => {
+  // Approve supplier
+  approveSupplier = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const { isVerified } = req.body;
+      const userId = req.user?.id;
 
       const supplierRepo = getRepository(Supplier);
       const supplier = await supplierRepo.findOne({ where: { id } });
@@ -381,18 +318,18 @@ export class AdminSupplierController {
         return;
       }
 
-      supplier.isVerified = isVerified;
+      supplier.approve(userId || 'admin');
       await supplierRepo.save(supplier);
 
       res.json({
         success: true,
-        message: `Supplier ${isVerified ? 'verified' : 'unverified'} successfully`
+        message: 'Supplier approved successfully'
       });
     } catch (error) {
-      console.error('Error updating supplier verification:', error);
+      console.error('Error approving supplier:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to update supplier verification'
+        error: 'Failed to approve supplier'
       });
     }
   };
@@ -435,22 +372,22 @@ export class AdminSupplierController {
       const [
         totalSuppliers,
         activeSuppliers,
-        verifiedSuppliers,
-        suppliersByCategory,
+        approvedSuppliers,
+        suppliersByStatus,
         topSuppliers
       ] = await Promise.all([
         supplierRepo.count(),
         supplierRepo.count({ where: { isActive: true } }),
-        supplierRepo.count({ where: { isVerified: true } }),
+        supplierRepo.count({ where: { status: SupplierStatus.APPROVED } }),
         supplierRepo
           .createQueryBuilder('supplier')
-          .select('supplier.category as category, COUNT(*) as count')
-          .groupBy('supplier.category')
+          .select('supplier.status as status, COUNT(*) as count')
+          .groupBy('supplier.status')
           .getRawMany(),
         supplierRepo.find({
-          order: { totalRevenue: 'DESC' },
+          order: { averageRating: 'DESC' },
           take: 10,
-          select: ['id', 'businessName', 'totalRevenue', 'totalOrders', 'rating']
+          select: ['id', 'contactPerson', 'averageRating', 'totalReviews']
         })
       ]);
 
@@ -460,10 +397,10 @@ export class AdminSupplierController {
           total: totalSuppliers,
           active: activeSuppliers,
           inactive: totalSuppliers - activeSuppliers,
-          verified: verifiedSuppliers,
-          unverified: totalSuppliers - verifiedSuppliers,
-          byCategory: suppliersByCategory,
-          topPerforming: topSuppliers
+          approved: approvedSuppliers,
+          pending: totalSuppliers - approvedSuppliers,
+          byStatus: suppliersByStatus,
+          topRated: topSuppliers
         }
       });
     } catch (error) {

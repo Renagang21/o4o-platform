@@ -60,13 +60,10 @@ router.patch('/:id/status',
   adminSupplierController.updateSupplierStatus
 );
 
-// Update supplier verification (admin only)
-router.patch('/:id/verify',
+// Approve supplier (admin only)
+router.patch('/:id/approve',
   validateRole(['admin', 'super_admin']),
-  [
-    body('isVerified').isBoolean().withMessage('isVerified must be a boolean')
-  ],
-  adminSupplierController.updateSupplierVerification
+  adminSupplierController.approveSupplier
 );
 
 // Supplier deletion (admin only)
