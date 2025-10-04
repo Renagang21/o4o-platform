@@ -19,7 +19,17 @@ router.get('/statistics', validateRole(['admin', 'super_admin', 'moderator']), f
 
 // Content management routes
 router.get('/categories', validateRole(['admin', 'super_admin', 'moderator']), forumController.getCategories);
+router.get('/categories/:id', validateRole(['admin', 'super_admin', 'moderator']), forumController.getCategory);
+router.post('/categories', validateRole(['admin', 'super_admin', 'moderator']), forumController.createCategory);
+router.put('/categories/:id', validateRole(['admin', 'super_admin', 'moderator']), forumController.updateCategory);
+router.delete('/categories/:id', validateRole(['admin', 'super_admin']), forumController.deleteCategory);
+
 router.get('/posts', validateRole(['admin', 'super_admin', 'moderator']), forumController.getPosts);
+router.get('/posts/:id', validateRole(['admin', 'super_admin', 'moderator']), forumController.getPost);
+router.put('/posts/:id', validateRole(['admin', 'super_admin', 'moderator']), forumController.updatePost);
+router.patch('/posts/:id/pin', validateRole(['admin', 'super_admin', 'moderator']), forumController.updatePostPin);
+router.delete('/posts/:id', validateRole(['admin', 'super_admin']), forumController.deletePost);
+
 router.get('/posts/:postId/comments', validateRole(['admin', 'super_admin', 'moderator']), forumController.getComments);
 
 // Content creation routes (all authenticated users)

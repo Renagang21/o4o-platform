@@ -568,4 +568,411 @@ export class ForumCPTController {
       });
     }
   };
+
+  // Get single category
+  getCategory = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const categoryRepo = getRepository(ForumCategory);
+      
+      const category = await categoryRepo.findOne({ 
+        where: { id },
+        relations: ['creator']
+      });
+      
+      if (!category) {
+        res.status(404).json({
+          success: false,
+          error: 'Category not found'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        category: {
+          id: category.id,
+          name: category.name,
+          slug: category.slug,
+          description: category.description || '',
+          postCount: category.postCount,
+          isActive: category.isActive,
+          sortOrder: category.sortOrder,
+          accessLevel: category.accessLevel,
+          requireApproval: category.requireApproval,
+          createdAt: category.createdAt.toISOString(),
+          creator: category.creator ? {
+            id: category.creator.id,
+            name: category.creator.fullName || category.creator.firstName || category.creator.email
+          } : null
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching category:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch category'
+      });
+    }
+  };
+
+  // Create new category
+  createCategory = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+        return;
+      }
+
+      const { 
+        name, 
+        slug, 
+        description, 
+        accessLevel = 'public', 
+        requireApproval = false, 
+        isActive = true, 
+        sortOrder = 0 
+      } = req.body;
+
+      if (!name || !slug) {
+        res.status(400).json({
+          success: false,
+          error: 'Name and slug are required'
+        });
+        return;
+      }
+
+      const categoryRepo = getRepository(ForumCategory);
+
+      // Check if slug already exists
+      const existingCategory = await categoryRepo.findOne({ where: { slug } });
+      if (existingCategory) {
+        res.status(400).json({
+          success: false,
+          error: 'Slug already exists'
+        });
+        return;
+      }
+
+      const newCategory = categoryRepo.create({
+        name,
+        slug,
+        description,
+        accessLevel,
+        requireApproval,
+        isActive,
+        sortOrder,
+        creatorId: userId,
+        postCount: 0
+      });
+
+      const savedCategory = await categoryRepo.save(newCategory);
+
+      res.status(201).json({
+        success: true,
+        category: savedCategory,
+        message: 'Category created successfully'
+      });
+    } catch (error) {
+      console.error('Error creating category:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create category'
+      });
+    }
+  };
+
+  // Update category
+  updateCategory = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { 
+        name, 
+        slug, 
+        description, 
+        accessLevel, 
+        requireApproval, 
+        isActive, 
+        sortOrder 
+      } = req.body;
+
+      const categoryRepo = getRepository(ForumCategory);
+
+      const category = await categoryRepo.findOne({ where: { id } });
+      if (!category) {
+        res.status(404).json({
+          success: false,
+          error: 'Category not found'
+        });
+        return;
+      }
+
+      // Check if slug is being changed and already exists
+      if (slug && slug !== category.slug) {
+        const existingCategory = await categoryRepo.findOne({ where: { slug } });
+        if (existingCategory) {
+          res.status(400).json({
+            success: false,
+            error: 'Slug already exists'
+          });
+          return;
+        }
+      }
+
+      // Update fields
+      if (name !== undefined) category.name = name;
+      if (slug !== undefined) category.slug = slug;
+      if (description !== undefined) category.description = description;
+      if (accessLevel !== undefined) category.accessLevel = accessLevel;
+      if (requireApproval !== undefined) category.requireApproval = requireApproval;
+      if (isActive !== undefined) category.isActive = isActive;
+      if (sortOrder !== undefined) category.sortOrder = sortOrder;
+
+      const updatedCategory = await categoryRepo.save(category);
+
+      res.json({
+        success: true,
+        category: updatedCategory,
+        message: 'Category updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating category:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update category'
+      });
+    }
+  };
+
+  // Delete category
+  deleteCategory = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const categoryRepo = getRepository(ForumCategory);
+      const postRepo = getRepository(ForumPost);
+
+      const category = await categoryRepo.findOne({ where: { id } });
+      if (!category) {
+        res.status(404).json({
+          success: false,
+          error: 'Category not found'
+        });
+        return;
+      }
+
+      // Check if category has posts
+      const postCount = await postRepo.count({ where: { categoryId: id } });
+      if (postCount > 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Cannot delete category with existing posts'
+        });
+        return;
+      }
+
+      await categoryRepo.remove(category);
+
+      res.json({
+        success: true,
+        message: 'Category deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete category'
+      });
+    }
+  };
+
+  // Get single post
+  getPost = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const postRepo = getRepository(ForumPost);
+      
+      const post = await postRepo.findOne({ 
+        where: { id },
+        relations: ['author', 'category']
+      });
+      
+      if (!post) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found'
+        });
+        return;
+      }
+
+      // Increment view count
+      post.incrementViewCount();
+      await postRepo.save(post);
+
+      res.json({
+        success: true,
+        post: {
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          excerpt: post.excerpt || '',
+          content: post.content,
+          authorId: post.authorId,
+          authorName: post.author?.fullName || post.author?.firstName || post.author?.email || 'Unknown',
+          categoryId: post.categoryId,
+          categoryName: post.category ? (await post.category).name : 'Uncategorized',
+          status: post.status,
+          isPinned: post.isPinned,
+          isLocked: post.isLocked,
+          allowComments: post.allowComments,
+          viewCount: post.viewCount,
+          commentCount: post.commentCount,
+          likeCount: post.likeCount,
+          tags: post.tags || [],
+          createdAt: post.createdAt.toISOString(),
+          updatedAt: post.updatedAt.toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching post:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch post'
+      });
+    }
+  };
+
+  // Update post
+  updatePost = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { 
+        title, 
+        slug, 
+        content, 
+        excerpt, 
+        categoryId, 
+        status, 
+        isPinned, 
+        isLocked, 
+        allowComments, 
+        tags 
+      } = req.body;
+
+      const postRepo = getRepository(ForumPost);
+
+      const post = await postRepo.findOne({ where: { id } });
+      if (!post) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found'
+        });
+        return;
+      }
+
+      // Check if slug is being changed and already exists
+      if (slug && slug !== post.slug) {
+        const existingPost = await postRepo.findOne({ where: { slug } });
+        if (existingPost) {
+          res.status(400).json({
+            success: false,
+            error: 'Slug already exists'
+          });
+          return;
+        }
+      }
+
+      // Update fields
+      if (title !== undefined) post.title = title;
+      if (slug !== undefined) post.slug = slug;
+      if (content !== undefined) post.content = content;
+      if (excerpt !== undefined) post.excerpt = excerpt;
+      if (categoryId !== undefined) post.categoryId = categoryId;
+      if (status !== undefined) post.status = status;
+      if (isPinned !== undefined) post.isPinned = isPinned;
+      if (isLocked !== undefined) post.isLocked = isLocked;
+      if (allowComments !== undefined) post.allowComments = allowComments;
+      if (tags !== undefined) post.tags = tags;
+
+      const updatedPost = await postRepo.save(post);
+
+      res.json({
+        success: true,
+        post: updatedPost,
+        message: 'Post updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating post:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update post'
+      });
+    }
+  };
+
+  // Delete post
+  deletePost = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const postRepo = getRepository(ForumPost);
+
+      const post = await postRepo.findOne({ where: { id } });
+      if (!post) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found'
+        });
+        return;
+      }
+
+      await postRepo.remove(post);
+
+      res.json({
+        success: true,
+        message: 'Post deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete post'
+      });
+    }
+  };
+
+  // Update post pin status
+  updatePostPin = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { isPinned } = req.body;
+
+      const postRepo = getRepository(ForumPost);
+      const post = await postRepo.findOne({ where: { id } });
+
+      if (!post) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found'
+        });
+        return;
+      }
+
+      post.isPinned = isPinned;
+      await postRepo.save(post);
+
+      res.json({
+        success: true,
+        message: `Post ${isPinned ? 'pinned' : 'unpinned'} successfully`
+      });
+    } catch (error) {
+      console.error('Error updating post pin status:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update post pin status'
+      });
+    }
+  };
 }

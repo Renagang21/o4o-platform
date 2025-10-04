@@ -844,6 +844,14 @@ app.use('/api/admin/dropshipping', limiter, dropshippingAdminRoutes);
 import forumAdminRoutes from './routes/admin/forum.routes';
 app.use('/api/admin/forum', limiter, forumAdminRoutes);
 
+// User admin routes
+import userAdminRoutes from './routes/admin/users.routes';
+app.use('/api/admin/users', limiter, userAdminRoutes);
+
+// Supplier admin routes
+import supplierAdminRoutes from './routes/admin/suppliers.routes';
+app.use('/api/admin/suppliers', limiter, supplierAdminRoutes);
+
 // Dropshipping API routes
 import productsRoutes from './routes/products';
 import partnersRoutes from './routes/partners';

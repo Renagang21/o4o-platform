@@ -87,6 +87,9 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 
+// CPT/ACF Router
+const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
+
 // Dropshipping Pages
 const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 // const GutenbergPage = lazy(() => 
@@ -475,6 +478,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <CPTEngine />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CPT/ACF Archive & Forms */}
+                    <Route path="/admin/cpt-acf/*" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CPTACFRouter />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
