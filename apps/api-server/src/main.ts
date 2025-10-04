@@ -840,6 +840,10 @@ app.use('/api/orders', orderRoutes); // Order management API
 import dropshippingAdminRoutes from './routes/admin/dropshipping.routes';
 app.use('/api/admin/dropshipping', limiter, dropshippingAdminRoutes);
 
+// Forum admin routes
+import forumAdminRoutes from './routes/admin/forum.routes';
+app.use('/api/admin/forum', limiter, forumAdminRoutes);
+
 // Dropshipping API routes
 import productsRoutes from './routes/products';
 import partnersRoutes from './routes/partners';
