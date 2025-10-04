@@ -65,20 +65,12 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error fetching users:', error);
       
-      // Return empty list instead of error for better UX
-      res.json({
-        success: true,
-        data: {
-          users: [],
-          pagination: {
-            total: 0,
-            page: 1,
-            limit: 20,
-            totalPages: 0
-          }
-        }
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch users',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -93,10 +85,11 @@ export class UserManagementController {
         data: statistics
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error getting user statistics:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get user statistics'
+        error: 'Failed to get user statistics',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -126,10 +119,11 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error getting pending users:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get pending users'
+        error: 'Failed to get pending users',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -157,10 +151,11 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error getting user:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get user'
+        error: 'Failed to get user',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -198,10 +193,11 @@ export class UserManagementController {
         data: savedUser.toPublicData()
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error creating user:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to create user'
+        error: 'Failed to create user',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -238,10 +234,11 @@ export class UserManagementController {
         data: updatedUser.toPublicData()
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error updating user:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to update user'
+        error: 'Failed to update user',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -267,10 +264,11 @@ export class UserManagementController {
         message: 'User deleted successfully'
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error deleting user:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to delete user'
+        error: 'Failed to delete user',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -297,10 +295,11 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error approving user:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to approve user'
+        error: 'Failed to approve user',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -327,10 +326,11 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error rejecting user:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to reject user'
+        error: 'Failed to reject user',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -358,10 +358,11 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error bulk approving users:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to bulk approve users'
+        error: 'Failed to bulk approve users',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -389,10 +390,11 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error bulk rejecting users:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to bulk reject users'
+        error: 'Failed to bulk reject users',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -410,10 +412,11 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error updating user roles:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to update user roles'
+        error: 'Failed to update user roles',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -435,10 +438,11 @@ export class UserManagementController {
         data: logs
       });
     } catch (error) {
-      // Error log removed
+      console.error('Error getting approval history:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get approval history'
+        error: 'Failed to get approval history',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };
@@ -481,10 +485,11 @@ export class UserManagementController {
 
       res.send(csv);
     } catch (error) {
-      // Error log removed
+      console.error('Error exporting users:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to export users'
+        error: 'Failed to export users',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };

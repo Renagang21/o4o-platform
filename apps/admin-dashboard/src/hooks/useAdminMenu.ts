@@ -40,6 +40,7 @@ export const useAdminMenu = () => {
  */
 function getUserPermissions(role: UserRole): string[] {
   const rolePermissionMap: Record<UserRole, string[]> = {
+    super_admin: [], // Super admin doesn't need permission checks
     admin: [], // Admin doesn't need permission checks
     manager: [
       'updates:read', 'content:read', 'content:write', 'categories:read',
@@ -65,9 +66,22 @@ function getUserPermissions(role: UserRole): string[] {
       'media:read', 'media:write', 'ecommerce:read',
       'products:read', 'orders:read', 'analytics:read', 'forum:read'
     ],
-    retailer: [
+    vendor: [
       'ecommerce:read', 'products:read', 'orders:read', 
       'analytics:read', 'forum:read', 'users:read'
+    ],
+    vendor_manager: [
+      'ecommerce:read', 'products:read', 'orders:read',
+      'analytics:read', 'vendors:read', 'vendors:write'
+    ],
+    moderator: [
+      'content:read', 'forum:read', 'forum:write', 'users:read'
+    ],
+    partner: [
+      'affiliate:read', 'forum:read', 'users:read', 'analytics:read'
+    ],
+    beta_user: [
+      'users:read', 'beta:read'
     ],
     affiliate: [
       'affiliate:read', 'forum:read', 'users:read'

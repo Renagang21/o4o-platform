@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from './User';
 
-export type ApprovalAction = 'approved' | 'rejected' | 'status_changed';
+export type ApprovalAction = 'approved' | 'rejected' | 'status_changed' | 'pending';
 
 @Entity('approval_logs')
 @Index(['user_id', 'created_at'])
@@ -25,7 +25,7 @@ export class ApprovalLog {
 
   @Column({
     type: 'enum',
-    enum: ['approved', 'rejected', 'status_changed']
+    enum: ['approved', 'rejected', 'status_changed', 'pending']
   })
   action: ApprovalAction;
 
@@ -47,6 +47,9 @@ export class ApprovalLog {
 
   @CreateDateColumn()
   created_at: Date;
+  
+  @Column({ type: 'timestamp', nullable: true })
+  updated_at?: Date;
 
   // Relations
   @ManyToOne(() => User, user => user.approvalLogs)

@@ -836,6 +836,10 @@ app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versionin
 // Order management routes
 app.use('/api/orders', orderRoutes); // Order management API
 
+// Dropshipping admin routes
+import dropshippingAdminRoutes from './routes/admin/dropshipping.routes';
+app.use('/api/admin/dropshipping', limiter, dropshippingAdminRoutes);
+
 // Dropshipping API routes
 import productsRoutes from './routes/products';
 import partnersRoutes from './routes/partners';

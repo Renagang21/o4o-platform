@@ -2,7 +2,7 @@
 // Role-based menu permissions configuration
 // Defines which roles have access to which menu items and features
 
-export type UserRole = 'admin' | 'business' | 'affiliate' | 'customer' | 'seller' | 'supplier' | 'partner' | 'manager' | 'retailer';
+export type UserRole = 'super_admin' | 'admin' | 'vendor' | 'vendor_manager' | 'seller' | 'customer' | 'business' | 'moderator' | 'partner' | 'beta_user' | 'supplier' | 'affiliate' | 'manager';
 
 export interface MenuPermission {
   menuId: string;
@@ -603,18 +603,37 @@ export function filterMenuByRole(menuItems: any[], userRole: UserRole, userPermi
 
 // Role capabilities summary
 export const roleCapabilities: Record<UserRole, string[]> = {
+  super_admin: [
+    '최고 관리자 권한',
+    '시스템 전체 관리',
+    '모든 기능 접근'
+  ],
   admin: [
     '전체 시스템 관리',
     '사용자 관리',
     '설정 변경',
     '모든 기능 접근'
   ],
-  manager: [
-    '콘텐츠 관리',
+  vendor: [
+    '벤더 관리',
+    '상품 공급',
+    '재고 관리'
+  ],
+  vendor_manager: [
+    '벤더 매니저 권한',
+    '벤더 관리',
+    '상품 관리'
+  ],
+  seller: [
+    '상품 등록',
     '주문 관리',
-    '제휴사 관리',
-    '보고서 확인',
-    'Shortcode 관리'
+    '매출 확인',
+    '미디어 업로드'
+  ],
+  customer: [
+    '대시보드 확인',
+    '프로필 관리',
+    '주문 확인'
   ],
   business: [
     '상품 관리',
@@ -623,11 +642,19 @@ export const roleCapabilities: Record<UserRole, string[]> = {
     '디지털 사이니지',
     'Shortcode 관리'
   ],
-  seller: [
-    '상품 등록',
-    '주문 관리',
-    '매출 확인',
-    '미디어 업로드'
+  moderator: [
+    '콘텐츠 검토',
+    '사용자 관리',
+    '포럼 관리'
+  ],
+  partner: [
+    '파트너 관리',
+    '제휴 계약',
+    '성과 분석'
+  ],
+  beta_user: [
+    '베타 기능 접근',
+    '테스트 참여'
   ],
   supplier: [
     '상품 공급',
@@ -641,15 +668,12 @@ export const roleCapabilities: Record<UserRole, string[]> = {
     '성과 분석',
     '프로필 관리'
   ],
-  retailer: [
-    '상품 판매',
+  manager: [
+    '콘텐츠 관리',
     '주문 관리',
-    '재고 확인',
-    '매출 분석'
-  ],
-  customer: [
-    '대시보드 확인',
-    '프로필 관리'
+    '제휴사 관리',
+    '보고서 확인',
+    'Shortcode 관리'
   ]
 };
 export { roleDisplayNames } from '@/types/user';

@@ -33,48 +33,18 @@ const SystemSetup: React.FC = () => {
   const checkSystemStatus = async () => {
     setLoading(true);
     try {
-      // For now, set mock data until the API endpoint is created
-      setStatus({
-        cpts: {
-          ds_supplier: 'installed',
-          ds_partner: 'installed',
-          ds_product: 'installed',
-          ds_commission_policy: 'installed'
-        },
-        records: {
-          suppliers: 0,
-          partners: 0,
-          products: 0,
-          commissions: 0
-        },
-        fieldGroups: 0,
-        systemReady: true
-      });
-      
-      // TODO: Uncomment when API endpoint is ready
-      // const response = await api.get('/api/v1/dropshipping/status');
-      // if (response.data.success) {
-      //   setStatus(response.data.status);
-      // }
+      // Fetch actual system status from API
+      const response = await fetch('/api/admin/dropshipping/system-status');
+      if (response.ok) {
+        const data = await response.json();
+        setStatus(data);
+      } else {
+        console.error('Failed to fetch system status');
+        toast.error('시스템 상태 확인 실패');
+      }
     } catch (error) {
-      
-      // Default status on error
-      setStatus({
-        cpts: {
-          ds_supplier: 'not_installed',
-          ds_partner: 'not_installed',
-          ds_product: 'not_installed',
-          ds_commission_policy: 'not_installed'
-        },
-        records: {
-          suppliers: 0,
-          partners: 0,
-          products: 0,
-          commissions: 0
-        },
-        fieldGroups: 0,
-        systemReady: false
-      });
+      console.error('Error checking system status:', error);
+      toast.error('시스템 상태 확인 중 오류 발생');
     } finally {
       setLoading(false);
     }
@@ -85,18 +55,22 @@ const SystemSetup: React.FC = () => {
 
     setInitializing(true);
     try {
-      // TODO: Implement API endpoint
-      toast.success('시스템이 이미 초기화되어 있습니다');
-      await checkSystemStatus();
+      const response = await fetch('/api/admin/dropshipping/initialize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
-      // TODO: Uncomment when API endpoint is ready
-      // const response = await api.post('/api/v1/dropshipping/initialize');
-      // if (response.data.success) {
-      //   toast.success('시스템이 성공적으로 초기화되었습니다');
-      //   await checkSystemStatus();
-      // }
+      if (response.ok) {
+        const data = await response.json();
+        toast.success('시스템이 성공적으로 초기화되었습니다');
+        await checkSystemStatus();
+      } else {
+        toast.error('시스템 초기화에 실패했습니다');
+      }
     } catch (error) {
-      
+      console.error('Error initializing system:', error);
       toast.error('시스템 초기화에 실패했습니다');
     } finally {
       setInitializing(false);
@@ -108,20 +82,25 @@ const SystemSetup: React.FC = () => {
 
     setSeeding(true);
     try {
-      // TODO: Implement API endpoint
-      toast.info('샘플 데이터 생성 기능은 준비 중입니다');
+      const response = await fetch('/api/admin/dropshipping/seed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
-      // TODO: Uncomment when API endpoint is ready
-      // const response = await api.post('/api/v1/dropshipping/seed');
-      // if (response.data.success) {
-      //   toast.success(`샘플 데이터가 생성되었습니다: 
-      //     공급자 ${response.data.data.suppliers}개, 
-      //     파트너 ${response.data.data.partners}개, 
-      //     상품 ${response.data.data.products}개`);
-      //   await checkSystemStatus();
-      // }
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(`샘플 데이터가 생성되었습니다: 
+          공급자 ${data.suppliers || 0}개, 
+          파트너 ${data.partners || 0}개, 
+          상품 ${data.products || 0}개`);
+        await checkSystemStatus();
+      } else {
+        toast.error('샘플 데이터 생성에 실패했습니다');
+      }
     } catch (error) {
-      
+      console.error('Error creating sample data:', error);
       toast.error('샘플 데이터 생성에 실패했습니다');
     } finally {
       setSeeding(false);

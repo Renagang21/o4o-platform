@@ -34,51 +34,17 @@ const Approvals: React.FC = () => {
   const fetchApprovals = async () => {
     setLoading(true);
     try {
-      // Mock data for now - replace with actual API call
-      const mockData: ApprovalLog[] = [
-        {
-          id: '1',
-          title: '상품 가격 변경 요청',
-          type: 'price_change',
-          status: 'pending',
-          requestedBy: '공급자 A',
-          requestedAt: '2024-01-27 10:00:00',
-          details: {
-            before: { price: 50000 },
-            after: { price: 45000 },
-            reason: '프로모션 진행'
-          }
-        },
-        {
-          id: '2',
-          title: '신규 파트너 신청',
-          type: 'partner_application',
-          status: 'approved',
-          requestedBy: '홍길동',
-          requestedAt: '2024-01-26 14:00:00',
-          reviewedBy: '관리자',
-          reviewedAt: '2024-01-26 16:00:00',
-          details: {
-            notes: '자격 요건 충족'
-          }
-        },
-        {
-          id: '3',
-          title: '광고 소재 승인 요청',
-          type: 'ad_material',
-          status: 'rejected',
-          requestedBy: '파트너 B',
-          requestedAt: '2024-01-25 09:00:00',
-          reviewedBy: '관리자',
-          reviewedAt: '2024-01-25 11:00:00',
-          details: {
-            reason: '가이드라인 위반'
-          }
-        }
-      ];
-      setApprovals(mockData);
+      // Fetch from actual API endpoint
+      const response = await fetch('/api/admin/dropshipping/approvals');
+      if (response.ok) {
+        const data = await response.json();
+        setApprovals(data.approvals || []);
+      } else {
+        console.error('Failed to fetch approvals');
+        toast.error('승인 목록을 불러오는데 실패했습니다');
+      }
     } catch (error) {
-      
+      console.error('Error fetching approvals:', error);
       toast.error('승인 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -89,9 +55,21 @@ const Approvals: React.FC = () => {
     if (!confirm('승인하시겠습니까?')) return;
     
     try {
-      toast.success('승인 처리되었습니다');
-      fetchApprovals();
+      const response = await fetch(`/api/admin/dropshipping/approvals/${id}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        toast.success('승인 처리되었습니다');
+        fetchApprovals();
+      } else {
+        toast.error('승인 처리에 실패했습니다');
+      }
     } catch (error) {
+      console.error('Error approving:', error);
       toast.error('승인 처리에 실패했습니다');
     }
   };
@@ -101,9 +79,22 @@ const Approvals: React.FC = () => {
     if (!reason) return;
     
     try {
-      toast.success('반려 처리되었습니다');
-      fetchApprovals();
+      const response = await fetch(`/api/admin/dropshipping/approvals/${id}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason })
+      });
+      
+      if (response.ok) {
+        toast.success('반려 처리되었습니다');
+        fetchApprovals();
+      } else {
+        toast.error('반려 처리에 실패했습니다');
+      }
     } catch (error) {
+      console.error('Error rejecting:', error);
       toast.error('반려 처리에 실패했습니다');
     }
   };

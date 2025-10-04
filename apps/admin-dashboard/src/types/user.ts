@@ -33,24 +33,24 @@ export interface User extends Omit<BaseUser, 'role' | 'status'> {
   status: UserStatus;
 }
 
-export type UserRole = 'admin' | 'moderator' | 'user' | 'guest' | 'vendor' | 'customer' | 'affiliate' | 'partner' | 'business' | 'seller' | 'supplier' | 'manager' | 'retailer';
+export type UserRole = 'super_admin' | 'admin' | 'vendor' | 'vendor_manager' | 'seller' | 'customer' | 'business' | 'moderator' | 'partner' | 'beta_user' | 'supplier' | 'affiliate' | 'manager';
 
 export type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended' | 'deleted' | 'approved' | 'rejected';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
+  super_admin: '최고 관리자',
   admin: '관리자',
-  moderator: '운영자',
-  user: '일반 사용자',
-  guest: '게스트',
-  business: '사업자', 
-  affiliate: '제휴사',
-  partner: '파트너',
-  customer: '고객',
-  seller: '판매자',
-  supplier: '공급업체',
   vendor: '벤더',
-  manager: '매니저',
-  retailer: '소매업체'
+  vendor_manager: '벤더 매니저',
+  seller: '판매자',
+  customer: '고객',
+  business: '사업자',
+  moderator: '운영자',
+  partner: '파트너',
+  beta_user: '베타 사용자',
+  supplier: '공급업체',
+  affiliate: '제휴사',
+  manager: '매니저'
 };
 
 export const roleDisplayNames: Record<UserRole, string> = ROLE_LABELS;

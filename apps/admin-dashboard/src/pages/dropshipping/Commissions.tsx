@@ -16,47 +16,35 @@ interface CommissionPolicy {
 }
 
 const Commissions: React.FC = () => {
-  const [policies, setPolicies] = useState<CommissionPolicy[]>([
-    // Mock data for demonstration
-    {
-      id: '1',
-      title: '기본 수수료 정책',
-      supplier: '전체 공급자',
-      partnerGrades: ['bronze', 'silver', 'gold', 'platinum'],
-      commissionRate: 10,
-      minOrderAmount: 0,
-      startDate: '2024-01-01',
-      status: 'active',
-      createdAt: '2024-01-01T00:00:00'
-    },
-    {
-      id: '2',
-      title: '골드 등급 특별 수수료',
-      supplier: '전체 공급자',
-      partnerGrades: ['gold', 'platinum'],
-      commissionRate: 15,
-      minOrderAmount: 100000,
-      startDate: '2024-02-01',
-      status: 'active',
-      createdAt: '2024-02-01T00:00:00'
-    },
-    {
-      id: '3',
-      title: '신규 파트너 프로모션',
-      supplier: '전체 공급자',
-      partnerGrades: ['bronze'],
-      commissionRate: 12,
-      minOrderAmount: 0,
-      startDate: '2024-03-01',
-      endDate: '2024-06-30',
-      status: 'scheduled',
-      createdAt: '2024-03-01T00:00:00'
-    }
-  ]);
-
+  const [policies, setPolicies] = useState<CommissionPolicy[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<CommissionPolicy | null>(null);
   const [bulkSelection, setBulkSelection] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchCommissionPolicies();
+  }, []);
+
+  const fetchCommissionPolicies = async () => {
+    try {
+      setLoading(true);
+      // Fetch from API - replace with actual endpoint
+      const response = await fetch('/api/admin/dropshipping/commission-policies');
+      if (response.ok) {
+        const data = await response.json();
+        setPolicies(data.policies || []);
+      } else {
+        console.error('Failed to fetch commission policies');
+        toast.error('Failed to load commission policies');
+      }
+    } catch (error) {
+      console.error('Error fetching commission policies:', error);
+      toast.error('Error loading commission policies');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {

@@ -59,7 +59,7 @@ export const usePermissions = () => {
   const user = useAuthStore(state => state.user)
   
   const isAdmin = () => {
-    return user?.role === 'admin' || user?.roles?.includes('admin') || false
+    return user?.role === 'admin' || user?.role === 'super_admin' || user?.roles?.includes('admin') || user?.roles?.includes('super_admin') || false
   }
   
   const hasPermission = (_permission: string): boolean => {
@@ -87,6 +87,7 @@ export const usePermissions = () => {
     if (!user) return []
     
     const rolePermissions: Record<string, PermissionKey[]> = {
+      'super_admin': Object.values(PERMISSIONS),
       'admin': Object.values(PERMISSIONS),
       'manager': [
         PERMISSIONS.USERS_VIEW,
@@ -113,6 +114,9 @@ export const usePermissions = () => {
         PERMISSIONS.CONTENT_PUBLISH,
         PERMISSIONS.MEDIA_VIEW,
         PERMISSIONS.MEDIA_UPLOAD
+      ],
+      'subscriber': [
+        PERMISSIONS.CONTENT_VIEW
       ],
       'operator': [
         PERMISSIONS.ORDERS_VIEW,
