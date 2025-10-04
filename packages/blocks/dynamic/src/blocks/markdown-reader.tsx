@@ -27,7 +27,7 @@ interface MarkdownReaderBlockAttributes {
   mediaUrl?: string;
   mediaTitle?: string;
   fontSize?: number;
-  containerWidth?: string;
+  containerWidth?: 'wide' | 'full' | 'narrow' | 'medium';
   theme?: 'github' | 'minimal' | 'dark';
   markdownContent?: string;
   lastFetched?: number;

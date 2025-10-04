@@ -44,7 +44,7 @@ export const useWebSocket = (
   events: WebSocketEvents = {}
 ) => {
   const {
-    url = process.env.REACT_APP_WEBSOCKET_URL || 'http://localhost:3001',
+    url = import.meta.env.VITE_WEBSOCKET_URL || 'http://localhost:3001',
     storeId,
     autoConnect = true,
     reconnectionAttempts = 5,
