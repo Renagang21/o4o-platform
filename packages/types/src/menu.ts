@@ -17,6 +17,8 @@ export interface MenuItem {
   pageId?: string;
   postId?: string;
   categoryId?: string;
+  // Role-based visibility
+  visibleRoles?: string[]; // Role names (빈 배열 또는 undefined면 모두에게 표시)
   // Nested items
   children?: MenuItem[];
   // Metadata
