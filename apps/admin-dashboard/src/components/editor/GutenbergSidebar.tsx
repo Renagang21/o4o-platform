@@ -403,7 +403,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             )}
 
             {/* Tags - Show for posts with proper role permissions */}
-            {mode === 'post' && canEditCategories() && (
+            {mode === 'post' && canEditCategories && (
             <Panel title="Tags">
               <div className="space-y-3">
                 <div className="flex gap-2">
