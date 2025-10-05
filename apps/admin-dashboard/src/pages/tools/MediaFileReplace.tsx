@@ -88,14 +88,16 @@ const MediaFileReplace: React.FC = () => {
         params: { limit: 1000 }
       });
 
-      const files = (response.data?.data || []).map((file: any) => ({
+      // API returns: { success: true, data: { items: [...], total: n } }
+      const items = response.data?.data?.items || [];
+      const files = items.map((file: any) => ({
         id: file.id,
         filename: file.filename,
         title: file.originalName || file.filename,
         url: file.url,
         mimeType: file.mimeType,
         mediaType: file.mediaType || 'file',
-        size: file.size,
+        size: file.size || 0,
         uploadedAt: file.createdAt || file.uploadedAt,
         thumbnailUrl: file.thumbnailUrl,
         type: file.mediaType === 'image' ? 'image' : 'video'
@@ -104,6 +106,7 @@ const MediaFileReplace: React.FC = () => {
       setAllMedia(files);
       setFilteredMedia(files);
     } catch (error) {
+      console.error('Failed to load media files:', error);
       toast.error('미디어 파일 로드 실패');
     } finally {
       setLoading(false);
