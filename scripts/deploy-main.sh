@@ -93,21 +93,24 @@ O4O Platform 배포 스크립트
   api              API 서버만 배포
   web              웹 서버만 배포 (admin dashboard)
   nginx            Nginx 설정만 배포
+  docs             문서만 배포 (빠른 배포)
   all              전체 시스템 배포 (기본값)
 
 옵션:
   --skip-build     빌드 과정 건너뛰기
   --skip-tests     배포 전 테스트 건너뛰기
-  --force          강제 배포 (확인 없이 진행)
+  --force          강제 배포 (확인 없이 진행) ⭐️ 권장
   --dry-run        실제 배포 없이 시뮬레이션만
   --help           이 도움말 표시
 
 예시:
-  $0                           # 전체 배포
-  $0 api                      # API 서버만 배포
-  $0 web --skip-build         # 웹 서버만 배포 (빌드 스킵)
-  $0 all --skip-tests         # 전체 배포 (테스트 스킵)
+  $0 docs --force             # 문서만 빠르게 배포 (권장)
+  $0 all --force              # 전체 시스템 배포
+  $0 api --force              # API 서버만 배포
+  $0 web --skip-build --force # 웹 서버만 배포 (빌드 스킵)
   $0 nginx --dry-run          # Nginx 설정 시뮬레이션
+
+💡 팁: --force 플래그를 사용하면 대화형 확인 없이 즉시 배포됩니다.
 
 EOF
 }
@@ -485,10 +488,10 @@ main() {
     
     # 인자 파싱
     TARGET="all"
-    
+
     while [[ $# -gt 0 ]]; do
         case $1 in
-            api|web|nginx|all)
+            api|web|nginx|docs|all)
                 TARGET="$1"
                 shift
                 ;;
@@ -529,15 +532,20 @@ main() {
     [ "$FORCE_DEPLOY" = true ] && log_info "강제 배포: 예"
     [ "$DRY_RUN" = true ] && log_info "DRY RUN 모드: 예"
     
-    # 배포 전 검증
-    if ! run_pre_deploy_tests; then
-        log_error "배포 전 검증 실패 - 배포를 중단합니다"
-        exit 1
+    # docs 배포는 빌드/테스트 건너뛰기
+    if [ "$TARGET" != "docs" ]; then
+        # 배포 전 검증
+        if ! run_pre_deploy_tests; then
+            log_error "배포 전 검증 실패 - 배포를 중단합니다"
+            exit 1
+        fi
+
+        # 빌드 실행
+        build_project
+    else
+        log_info "문서 배포 모드: 빌드/테스트 건너뜀"
     fi
-    
-    # 빌드 실행
-    build_project
-    
+
     # 배포 확인
     confirm_deployment
     
@@ -551,6 +559,13 @@ main() {
             ;;
         nginx)
             deploy_nginx
+            ;;
+        docs)
+            # 문서만 배포 (빌드/테스트 불필요)
+            log_step "문서 배포 시작..."
+            "$SCRIPT_DIR/deploy-docs.sh"
+            log_success "문서 배포 완료"
+            return 0
             ;;
         all)
             deploy_api_server
