@@ -58,6 +58,7 @@ interface GutenbergBlockEditorProps {
   slug?: string;
   postSettings?: Partial<PostSettings>;
   onPostSettingsChange?: (settings: Partial<PostSettings>) => void;
+  mode?: 'post' | 'page' | 'template' | 'pattern';
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
@@ -70,6 +71,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   slug = '',
   postSettings: propPostSettings,
   onPostSettingsChange,
+  mode = 'post',
 }) => {
   // Initialize with empty paragraph only if no initial blocks
   // But don't trigger onChange for this initialization
@@ -839,10 +841,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlock}
+              mode={mode}
               onPostSettingsChange={(settings) => {
                 // DEBUG: Log post settings change
                 // Logging removed for CI/CD
-                
+
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 setIsDirty(true);
                 onPostSettingsChange?.(settings);
@@ -850,7 +853,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               onBlockSettingsChange={(settings) => {
                 if (selectedBlock) {
                   const updated = { ...selectedBlock, ...settings };
-                  const newBlocks = blocks.map(block => 
+                  const newBlocks = blocks.map(block =>
                     block.id === selectedBlock.id ? updated : block
                   );
                   updateBlocks(newBlocks);

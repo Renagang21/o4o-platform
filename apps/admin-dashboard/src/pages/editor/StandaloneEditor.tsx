@@ -946,6 +946,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               initialBlocks={blocks}
               slug={postSettings.slug || ''}
               postSettings={postSettings}
+              mode={mode}
               onPostSettingsChange={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 postSettingsRef.current = { ...postSettingsRef.current, ...settings }; // Update ref
