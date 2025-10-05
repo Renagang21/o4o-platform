@@ -3,6 +3,8 @@
  * 복잡성을 제거하고 최신 AI API 패턴을 적용한 단순화된 버전
  */
 
+import { generateCompleteReference } from './block-registry-extractor';
+
 // 2025년 최신 AI 모델 목록
 export const AI_MODELS = {
   // OpenAI GPT-5 시리즈 (2025)
@@ -294,50 +296,9 @@ export class SimpleAIGenerator {
 5. 한국어로 작성하세요
 6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
 
-    // 사용 가능한 블록 및 숏코드 레퍼런스
-    const availableBlocks = `
-=== 사용 가능한 블록 (Gutenberg Blocks) ===
-
-텍스트 블록:
-- core/paragraph: 일반 단락 텍스트 {"type": "core/paragraph", "content": {"text": "내용"}}
-- core/heading: 제목 (H1-H6) {"type": "core/heading", "content": {"text": "제목"}, "attributes": {"level": 1}}
-- core/list: 리스트 (ordered/unordered) {"type": "core/list", "content": {"items": ["항목1", "항목2"]}, "attributes": {"ordered": false}}
-- core/quote: 인용구 {"type": "core/quote", "content": {"text": "인용문", "citation": "출처"}}
-- core/code: 코드 블록 {"type": "core/code", "content": {"code": "코드", "language": "javascript"}}
-
-미디어 블록:
-- core/image: 이미지 (src 없이 alt만) {"type": "core/image", "content": {"alt": "이미지 설명"}}
-- core/video: 비디오 {"type": "core/video", "content": {"caption": "설명"}}
-- core/gallery: 갤러리 {"type": "core/gallery", "content": {"images": []}}
-
-디자인 블록:
-- core/button: 버튼 {"type": "core/button", "content": {"text": "버튼", "url": "#"}, "attributes": {"variant": "primary"}}
-- core/columns: 다단 레이아웃 {"type": "core/columns", "content": {"columns": []}}
-- core/separator: 구분선 {"type": "core/separator"}
-
-=== 사용 가능한 숏코드 (Shortcodes) ===
-
-E-commerce:
-- [product id="123"]: 단일 상품 표시
-- [product_grid category="전자제품" limit="8"]: 상품 그리드
-- [add_to_cart id="123"]: 장바구니 버튼
-- [featured_products limit="4"]: 추천 상품
-
-Forms:
-- [form id="contact-form"]: 폼 삽입
-- [view id="submissions"]: 데이터 뷰
-
-Media:
-- [video url="https://youtube.com/..."]: 비디오 임베드
-- [gallery ids="1,2,3"]: 이미지 갤러리
-
-Content:
-- [recent_posts limit="5"]: 최근 게시물
-- [author id="john"]: 작성자 정보
-
-숏코드는 core/shortcode 블록으로 삽입:
-{"type": "core/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}
-`;
+    // 동적으로 블록 및 숏코드 레퍼런스 생성
+    // 런타임에 실제 등록된 블록/숏코드를 기반으로 생성됨
+    const availableBlocks = generateCompleteReference();
 
     const prompts = {
       landing: `${baseRules}
