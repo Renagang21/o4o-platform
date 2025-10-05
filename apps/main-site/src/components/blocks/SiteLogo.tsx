@@ -34,18 +34,8 @@ const SiteLogo: FC<SiteLogoProps> = ({
   const shouldLink = data?.isLink !== undefined ? data.isLink : (isLink ?? true);
   const target = data?.linkTarget || linkTarget || '_self';
 
-  // 🔍 DEBUG: Log logo rendering
-  console.log('🖼️  SiteLogo rendering:', {
-    'data?.logoUrl': data?.logoUrl,
-    'propLogoUrl': propLogoUrl,
-    'final logoUrl': logoUrl,
-    'logoWidth': logoWidth,
-    'full data': data
-  });
-
   // Don't render anything if no logo URL
   if (!logoUrl) {
-    console.warn('⚠️  SiteLogo: No logo URL, not rendering');
     return null;
   }
   

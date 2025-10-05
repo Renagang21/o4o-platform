@@ -72,14 +72,6 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
           `/template-parts/area/${area}/active?${params.toString()}`
         );
 
-        // 🔍 DEBUG: Template parts API response received
-        console.log(`🔍 useTemplateParts [${area}]:`, {
-          status: response.status,
-          dataType: typeof response.data,
-          hasSuccess: response.data && 'success' in response.data,
-          dataKeys: response.data && typeof response.data === 'object' ? Object.keys(response.data) : null
-        });
-
         if (response.status === 200) {
           // Handle both old and new API response structures
           const data = response.data;
@@ -87,29 +79,6 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
             // New structure: {success: true, data: [...], count: N}
             if (data.success) {
               const templatePartsData = Array.isArray(data.data) ? data.data : [];
-
-              // 🔍 DEBUG: Check logo URL in template parts
-              if (area === 'header' && templatePartsData.length > 0) {
-                console.log('📦 Header Template Parts:', templatePartsData.length);
-                templatePartsData.forEach((part, index) => {
-                  console.log(`\n--- Header Part ${index + 1} ---`);
-                  console.log('Name:', part.name);
-                  console.log('Content blocks:', part.content?.length);
-
-                  if (part.content?.[0]?.innerBlocks) {
-                    const logo = part.content[0].innerBlocks.find((b: any) => b.type === 'core/site-logo');
-                    if (logo) {
-                      console.log('🖼️  Logo found:', {
-                        logoUrl: logo.data?.logoUrl,
-                        width: logo.data?.width
-                      });
-                    } else {
-                      console.log('⚠️  No logo block found');
-                    }
-                  }
-                });
-              }
-
               setTemplateParts(templatePartsData);
             } else {
               throw new Error(data.error || 'Failed to fetch template parts');
