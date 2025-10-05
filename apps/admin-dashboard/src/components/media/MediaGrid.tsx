@@ -1,15 +1,16 @@
 import { FC, useState, useCallback } from 'react';
-import { 
-  Check, 
-  Trash2, 
-  Edit2, 
-  Eye, 
+import {
+  Check,
+  Trash2,
+  Edit2,
+  Eye,
   Download,
   Image as ImageIcon,
   FileText,
   Film,
   Music,
-  File
+  File,
+  ImageOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -51,6 +52,8 @@ const MediaGrid: FC<MediaGridProps> = ({
   onItemView
 }) => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
 
   const getFileIcon = useCallback((mediaType: string, mimeType: string) => {
     if (mediaType === 'image') return ImageIcon;
@@ -75,6 +78,23 @@ const MediaGrid: FC<MediaGridProps> = ({
       onItemSelect(item.id, !isSelected);
     }
   }, [selectedIds, onItemSelect]);
+
+  const handleImageError = useCallback((itemId: string) => {
+    setImageErrors(prev => new Set(prev).add(itemId));
+    setImageLoading(prev => {
+      const next = new Set(prev);
+      next.delete(itemId);
+      return next;
+    });
+  }, []);
+
+  const handleImageLoad = useCallback((itemId: string) => {
+    setImageLoading(prev => {
+      const next = new Set(prev);
+      next.delete(itemId);
+      return next;
+    });
+  }, []);
 
   return (
     <div 
@@ -142,17 +162,53 @@ const MediaGrid: FC<MediaGridProps> = ({
                     backgroundColor: '#f0f0f1'
                   }}
                 >
-                  {(item.mediaType === 'image' || item.type === 'image') && (item.thumbnailUrl || item.url) ? (
-                    <img
-                      src={item.thumbnailUrl || item.url}
-                      alt={item.alt || item.title || item.filename}
+                  {(item.mediaType === 'image' || item.type === 'image') && (item.thumbnailUrl || item.url) && !imageErrors.has(item.id) ? (
+                    <>
+                      {imageLoading.has(item.id) && (
+                        <div
+                          className="absolute inset-0 flex items-center justify-center bg-gray-100"
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0
+                          }}
+                        >
+                          <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
+                      <img
+                        src={item.thumbnailUrl || item.url}
+                        alt={item.alt || item.title || item.filename}
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          objectFit: 'contain',
+                          display: imageLoading.has(item.id) ? 'none' : 'block'
+                        }}
+                        draggable={false}
+                        onError={() => handleImageError(item.id)}
+                        onLoad={() => handleImageLoad(item.id)}
+                        loading="lazy"
+                      />
+                    </>
+                  ) : (item.mediaType === 'image' || item.type === 'image') && imageErrors.has(item.id) ? (
+                    <div
+                      className="icon"
                       style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        objectFit: 'contain'
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
                       }}
-                      draggable={false}
-                    />
+                    >
+                      <ImageOff className="w-8 h-8 text-gray-400" />
+                      <span className="text-xs text-gray-500">이미지 로드 실패</span>
+                    </div>
                   ) : (
                     <div 
                       className="icon"
