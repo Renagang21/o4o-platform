@@ -80,7 +80,11 @@
     "deploy:log:last": "ssh ubuntu@admin.neture.co.kr 'tail -50 /var/log/o4o-deploy.log'",
     "deploy:check": "curl -s https://admin.neture.co.kr/version.json | jq .",
     "deploy:rollback": "ssh ubuntu@admin.neture.co.kr 'ls -la /var/www/admin-backup/'",
-    "deploy:quick": "git add . && git commit -m 'chore: quick deployment' && git push production main"
+    "deploy:quick": "git add . && git commit -m 'chore: quick deployment' && git push production main",
+    "// === 문서 업데이트 ===": "",
+    "update:shortcode-docs": "cd apps/admin-dashboard && tsx src/scripts/update-shortcode-reference.ts",
+    "update:ai-page-docs": "cd apps/admin-dashboard && tsx src/scripts/update-ai-page-docs.ts",
+    "update:docs": "pnpm run update:shortcode-docs && pnpm run update:ai-page-docs"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
