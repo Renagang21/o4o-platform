@@ -3,6 +3,9 @@
  * 블록 레지스트리에서 메타데이터를 추출하여 AI 프롬프트에 사용
  */
 
+import { dropshippingShortcodes } from '@/components/shortcodes/dropshipping';
+import { generalShortcodes, extractFromRegistry } from './shortcode-registry';
+
 export interface BlockMetadata {
   name: string;
   title: string;
@@ -17,6 +20,7 @@ export interface ShortcodeMetadata {
   description: string;
   attributes?: string[];
   example: string;
+  category?: string;
 }
 
 /**
@@ -88,104 +92,45 @@ function getExampleContent(blockName: string): any {
 }
 
 /**
- * 숏코드 메타데이터 추출
+ * 숏코드 메타데이터 추출 (동적)
+ * 실제 등록된 숏코드를 스캔하여 추출
  */
 export function extractShortcodesMetadata(): ShortcodeMetadata[] {
-  return [
-    // E-commerce 숏코드
-    {
-      name: 'product',
-      description: '단일 상품 표시',
-      attributes: ['id'],
-      example: '[product id="123"]'
-    },
-    {
-      name: 'product_grid',
-      description: '상품 그리드 표시',
-      attributes: ['category', 'limit', 'columns'],
-      example: '[product_grid category="전자제품" limit="8" columns="4"]'
-    },
-    {
-      name: 'add_to_cart',
-      description: '장바구니 추가 버튼',
-      attributes: ['id', 'text'],
-      example: '[add_to_cart id="123" text="구매하기"]'
-    },
-    {
-      name: 'featured_products',
-      description: '추천 상품 표시',
-      attributes: ['limit'],
-      example: '[featured_products limit="4"]'
-    },
+  const shortcodes: ShortcodeMetadata[] = [];
 
-    // Forms 숏코드
-    {
-      name: 'form',
-      description: '폼 삽입',
-      attributes: ['id'],
-      example: '[form id="contact-form"]'
-    },
-    {
-      name: 'view',
-      description: '데이터 뷰 표시',
-      attributes: ['id'],
-      example: '[view id="submissions"]'
-    },
+  // 1. 일반 숏코드 레지스트리에서 추출
+  const generalShortcodesMetadata = extractFromRegistry(generalShortcodes);
+  shortcodes.push(...generalShortcodesMetadata);
 
-    // Media 숏코드
-    {
-      name: 'video',
-      description: '비디오 임베드 (YouTube, Vimeo 등)',
-      attributes: ['url', 'width', 'height'],
-      example: '[video url="https://youtube.com/watch?v=..." width="560" height="315"]'
-    },
-    {
-      name: 'gallery',
-      description: '이미지 갤러리',
-      attributes: ['ids', 'columns', 'size'],
-      example: '[gallery ids="1,2,3" columns="3" size="medium"]'
-    },
+  // 2. Dropshipping 숏코드 (실제 레지스트리에서 추출)
+  Object.entries(dropshippingShortcodes).forEach(([name, config]) => {
+    const attrs = config.attributes || {};
+    const attrNames = Object.keys(attrs);
 
-    // Content 숏코드
-    {
-      name: 'recent_posts',
-      description: '최근 게시물 표시',
-      attributes: ['limit', 'category'],
-      example: '[recent_posts limit="5" category="news"]'
-    },
-    {
-      name: 'author',
-      description: '작성자 정보 표시',
-      attributes: ['id'],
-      example: '[author id="john"]'
-    },
-
-    // Dropshipping 숏코드
-    {
-      name: 'partner_dashboard',
-      description: '파트너 대시보드',
-      attributes: [],
-      example: '[partner_dashboard]'
-    },
-    {
-      name: 'partner_products',
-      description: '파트너 상품 목록',
-      attributes: [],
-      example: '[partner_products]'
-    },
-    {
-      name: 'commission_dashboard',
-      description: '커미션 대시보드',
-      attributes: [],
-      example: '[commission_dashboard]'
-    },
-    {
-      name: 'admin_approval_queue',
-      description: '관리자 승인 대기열',
-      attributes: [],
-      example: '[admin_approval_queue]'
+    // 예제 생성
+    let example = `[${name}`;
+    if (attrNames.length > 0) {
+      const exampleAttrs = attrNames.slice(0, 2).map(attr => {
+        const attrConfig = attrs[attr];
+        const defaultValue = attrConfig.default ||
+                           (attrConfig.type === 'string' ? 'value' :
+                            attrConfig.type === 'number' ? '1' : 'true');
+        return `${attr}="${defaultValue}"`;
+      }).join(' ');
+      example += ` ${exampleAttrs}`;
     }
-  ];
+    example += ']';
+
+    shortcodes.push({
+      name,
+      description: config.description || `${name} 숏코드`,
+      attributes: attrNames,
+      example,
+      category: getShortcodeCategory(name)
+    });
+  });
+
+  return shortcodes;
 }
 
 /**

@@ -117,30 +117,34 @@ wp.blocks.registerBlockType('o4o/my-new-block', {
 // 3. 끝! AI가 자동으로 인식
 ```
 
-### 새 숏코드 추가
+### 새 숏코드 추가 (개선됨!)
 
 ```typescript
-// 1. 숏코드 컴포넌트 작성
+// 1. shortcode-registry.ts에 등록
+// apps/admin-dashboard/src/services/ai/shortcode-registry.ts
+export const contentShortcodes: Record<string, ShortcodeConfig> = {
+  'my_shortcode': {
+    description: '내 숏코드 설명',
+    category: 'Content',
+    attributes: {
+      param1: { type: 'string', default: 'value1' },
+      param2: { type: 'number', default: 10 }
+    }
+  }
+};
+
+// 2. 숏코드 컴포넌트 작성
 // apps/admin-dashboard/src/components/shortcodes/MyShortcode.tsx
 
-// 2. ShortcodeRenderer에 등록
-// apps/admin-dashboard/src/components/shortcodes/ShortcodeRenderer.tsx
+// 3. ShortcodeRenderer에 등록
 const COMPONENT_MAP = {
-  // ...
   'my_shortcode': MyShortcode,
 };
 
-// 3. block-registry-extractor.ts의 extractShortcodesMetadata()에 추가
-{
-  name: 'my_shortcode',
-  description: '내 숏코드 설명',
-  attributes: ['param1', 'param2'],
-  example: '[my_shortcode param1="value1"]'
-}
-
-// 4. 문서 업데이트 (선택사항)
-npm run update-ai-docs
+// 4. 끝! AI가 자동으로 인식
 ```
+
+**상세 가이드**: [새 숏코드 추가하기](../guide/ADD_NEW_SHORTCODE.md)
 
 ## 설정 및 커스터마이징
 
