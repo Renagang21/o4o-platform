@@ -119,9 +119,85 @@ GitHub Actions를 통한 자동 배포는 `.github/workflows/deploy.yml` 파일�
 - main 브랜치에 push 시 자동 배포
 - API와 Web 서버 병렬 배포
 
+## 📂 스크립트 구조
+
+```
+scripts/
+├── deploy-main.sh              # 🚀 주요 배포 스크립트 (권장)
+├── deploy-quick.sh             # ⚡ 빠른 배포 (개발용)
+├── deploy-status.sh            # 📊 배포 상태 확인
+├── deploy-api*.sh              # API 서버 배포 관련
+├── deploy-web.sh               # 웹 서버 배포
+├── deploy-all.sh               # 전체 배포 (레거시)
+├── deploy.sh                   # 통합 배포 스크립트
+│
+├── utilities/                  # 🛠️ 유틸리티 스크립트
+│   ├── convert_affiliate_to_partner.sh
+│   ├── convert_admin_affiliate_to_partner.sh
+│   ├── convert_main_site_affiliate_to_partner.sh
+│   ├── update_all_affiliate_references.sh
+│   └── deactivate-default-header.sh
+│
+├── testing/                    # 🧪 테스트 스크립트
+│   ├── test-api-server.sh
+│   └── update-logo-test.sh
+│
+├── deprecated/                 # 📦 더 이상 사용하지 않는 스크립트
+│   ├── deploy-simple-old.sh   # (구 deploy.sh)
+│   ├── deploy-admin.sh
+│   ├── deploy-admin-dashboard.sh
+│   ├── deploy-production.sh
+│   ├── deploy-remote.sh
+│   └── ...
+│
+├── development/                # 🔧 개발용 스크립트
+└── archive/                    # 📚 보관용
+```
+
+## 🔗 루트 심볼릭 링크
+
+```bash
+# 루트의 deploy.sh는 scripts/deploy-main.sh를 가리킴
+./deploy.sh -> scripts/deploy-main.sh
+```
+
+## 🛠️ 유틸리티 스크립트
+
+### Affiliate → Partner 마이그레이션
+```bash
+# Admin Dashboard 마이그레이션
+./scripts/utilities/convert_admin_affiliate_to_partner.sh
+
+# 일반 사이트 마이그레이션
+./scripts/utilities/convert_affiliate_to_partner.sh
+
+# Main 사이트 마이그레이션
+./scripts/utilities/convert_main_site_affiliate_to_partner.sh
+
+# 전체 참조 업데이트
+./scripts/utilities/update_all_affiliate_references.sh
+```
+
+### 기타 유틸리티
+```bash
+# 기본 헤더 비활성화
+./scripts/utilities/deactivate-default-header.sh
+```
+
+## 🧪 테스트 스크립트
+
+```bash
+# API 서버 테스트
+./scripts/testing/test-api-server.sh
+
+# 로고 업데이트 테스트
+./scripts/testing/update-logo-test.sh
+```
+
 ## 주의사항
 
 1. 배포 전 항상 변경사항을 commit & push
 2. 프로덕션 배포 전 로컬 테스트 수행
 3. 데이터베이스 마이그레이션이 필요한 경우 별도 실행
 4. 환경 변수(.env) 파일은 수동으로 관리
+5. deprecated/ 폴더의 스크립트는 사용하지 말 것 (하위 호환성 목적으로만 보관)
