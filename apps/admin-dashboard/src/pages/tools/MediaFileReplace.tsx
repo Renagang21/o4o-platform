@@ -259,15 +259,22 @@ const MediaFileReplace: React.FC = () => {
               <RefreshCw className="w-8 h-8 animate-spin text-gray-400 mx-auto mb-2" />
               <p className="text-gray-500">파일 로딩 중...</p>
             </div>
+          ) : allMedia.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <Filter className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>미디어 파일이 없습니다</p>
+              <p className="text-xs mt-2">먼저 미디어 라이브러리에 파일을 업로드하세요</p>
+            </div>
           ) : filteredMedia.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Filter className="w-12 h-12 mx-auto mb-3 text-gray-300" />
               <p>검색 결과가 없습니다</p>
+              <p className="text-xs mt-2">전체 파일: {allMedia.length}개</p>
             </div>
           ) : (
             <div className="border rounded-lg p-4 bg-gray-50">
               <p className="text-sm text-gray-600 mb-3">
-                총 {filteredMedia.length}개 파일 (교체할 파일을 클릭하세요)
+                {filteredMedia.length}개 파일 표시 (전체 {allMedia.length}개 중)
               </p>
               <MediaGrid
                 items={filteredMedia}

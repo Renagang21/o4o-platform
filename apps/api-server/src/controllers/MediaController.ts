@@ -53,7 +53,9 @@ const upload = multer({
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'text/plain',
-      'text/csv'
+      'text/csv',
+      'text/markdown',
+      'text/x-markdown'
     ];
 
     if (allowedMimes.includes(file.mimetype)) {
