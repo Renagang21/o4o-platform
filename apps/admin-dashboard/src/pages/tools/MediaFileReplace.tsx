@@ -29,11 +29,23 @@ const MediaFileReplace: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterExtension, setFilterExtension] = useState<string>('all');
+  const [availableExtensions, setAvailableExtensions] = useState<string[]>([]);
 
   // Load all media files on mount
   useEffect(() => {
     loadMediaFiles();
   }, []);
+
+  // Extract unique extensions from all media
+  useEffect(() => {
+    const extensions = new Set<string>();
+    allMedia.forEach(file => {
+      const ext = file.filename.split('.').pop()?.toLowerCase();
+      if (ext) extensions.add(ext);
+    });
+    setAvailableExtensions(Array.from(extensions).sort());
+  }, [allMedia]);
 
   // Filter media when search query or filter type changes
   useEffect(() => {
@@ -41,7 +53,20 @@ const MediaFileReplace: React.FC = () => {
 
     // Apply type filter
     if (filterType !== 'all') {
-      filtered = filtered.filter(file => file.mediaType === filterType);
+      filtered = filtered.filter(file => {
+        if (filterType === 'image') return file.mimeType?.startsWith('image/');
+        if (filterType === 'video') return file.mimeType?.startsWith('video/');
+        if (filterType === 'audio') return file.mimeType?.startsWith('audio/');
+        if (filterType === 'document') return file.mimeType?.includes('pdf') || file.mimeType?.includes('document') || file.filename.endsWith('.md') || file.filename.endsWith('.txt');
+        return true;
+      });
+    }
+
+    // Apply extension filter
+    if (filterExtension !== 'all') {
+      filtered = filtered.filter(file =>
+        file.filename.toLowerCase().endsWith(`.${filterExtension}`)
+      );
     }
 
     // Apply search filter
@@ -54,7 +79,7 @@ const MediaFileReplace: React.FC = () => {
     }
 
     setFilteredMedia(filtered);
-  }, [allMedia, searchQuery, filterType]);
+  }, [allMedia, searchQuery, filterType, filterExtension]);
 
   const loadMediaFiles = async () => {
     setLoading(true);
@@ -215,6 +240,16 @@ const MediaFileReplace: React.FC = () => {
               <option value="video">비디오</option>
               <option value="audio">오디오</option>
               <option value="document">문서</option>
+            </select>
+            <select
+              value={filterExtension}
+              onChange={(e) => setFilterExtension(e.target.value)}
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">모든 확장자</option>
+              {availableExtensions.map(ext => (
+                <option key={ext} value={ext}>.{ext}</option>
+              ))}
             </select>
           </div>
 
