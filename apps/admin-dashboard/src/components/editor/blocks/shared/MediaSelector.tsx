@@ -84,9 +84,15 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 }) => {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
+  // Initialize filter type based on acceptedTypes
+  const initialFilterType = acceptedTypes.length === 1
+    ? acceptedTypes[0]
+    : ('all' as FilterType);
+
   const [filters, setFilters] = useState({
     searchTerm: '',
-    fileType: acceptedTypes.length === 1 ? acceptedTypes[0] : ('all' as FilterType)
+    fileType: initialFilterType
   });
   const [showUploader, setShowUploader] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
@@ -95,6 +101,15 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
   const { ref: loadMoreRef, inView } = useInView();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Update filters when acceptedTypes changes (e.g., when modal reopens with different config)
+  useEffect(() => {
+    const newFilterType = acceptedTypes.length === 1 ? acceptedTypes[0] : ('all' as FilterType);
+    setFilters(prev => ({
+      ...prev,
+      fileType: newFilterType
+    }));
+  }, [acceptedTypes]);
 
   // Transform MediaFile to MediaItem
   const transformMediaFile = (file: any): MediaItem => {
