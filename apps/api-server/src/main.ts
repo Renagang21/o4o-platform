@@ -340,12 +340,10 @@ app.options('*', cors(corsOptions));
 
 // Serve static files for uploads (EARLY in middleware chain)
 // Static file serving with CORS headers for images
-// Use project root instead of process.cwd() to ensure correct path
-// Static file paths - handle both production and development
+// Use project root for uploads in both dev and production
+// Files are uploaded to project root /public/uploads
 const projectRoot = path.resolve(__dirname, '../../../');
-const staticUploadsPath = process.env.NODE_ENV === 'production'
-  ? path.join(__dirname, '../public', 'uploads')  // apps/api-server/public/uploads in production
-  : path.join(projectRoot, 'public', 'uploads');   // project root public/uploads in development
+const staticUploadsPath = path.join(projectRoot, 'public', 'uploads');
 
 // Add CORS headers for static files
 app.use('/uploads', (req, res, next) => {
