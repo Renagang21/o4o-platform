@@ -22,6 +22,7 @@ router.delete('/folders/:id', mediaController.deleteFolder);
 router.get('/', mediaController.getMedia);
 router.get('/:id', mediaController.getMediaById);
 router.put('/:id', mediaController.updateMedia);
+router.put('/:id/replace', mediaController.replaceMedia);
 router.delete('/:id', mediaController.deleteMedia);
 
 export default router;

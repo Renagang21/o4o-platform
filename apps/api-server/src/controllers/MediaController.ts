@@ -379,6 +379,105 @@ export class MediaController {
   };
 
   /**
+   * Replace media file (keeps same URL and ID)
+   */
+  replaceMedia: any[] = [
+    upload.single('file'),
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params;
+
+        if (!req.file) {
+          return res.status(400).json({
+            success: false,
+            message: 'No file uploaded'
+          });
+        }
+
+        const media = await this.mediaRepository.findOne({ where: { id } });
+
+        if (!media) {
+          return res.status(404).json({
+            success: false,
+            message: 'Media file not found'
+          });
+        }
+
+        // Delete old physical file
+        try {
+          const oldFilePath = path.join(process.cwd(), media.path);
+          await fs.unlink(oldFilePath);
+
+          // Delete old thumbnails if they exist
+          if (media.metadata?.thumbnail) {
+            const thumbnailPath = path.join(process.cwd(), media.metadata.thumbnail as string);
+            await fs.unlink(thumbnailPath);
+          }
+          if (media.metadata?.medium) {
+            const mediumPath = path.join(process.cwd(), media.metadata.medium as string);
+            await fs.unlink(mediumPath);
+          }
+        } catch (error) {
+          // Old file might not exist, continue
+        }
+
+        // Save new file with the SAME filename to keep URL consistent
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'images');
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        const newFilePath = path.join(uploadDir, media.filename);
+        await fs.writeFile(newFilePath, req.file.buffer);
+
+        // Update metadata
+        let metadata: any = {
+          size: req.file.size,
+          originalName: req.file.originalname,
+          replacedAt: new Date().toISOString()
+        };
+
+        if (req.file.mimetype.startsWith('image/')) {
+          metadata.isImage = true;
+          metadata.imageType = req.file.mimetype.split('/')[1];
+        }
+
+        // Update database record
+        media.mimeType = req.file.mimetype;
+        media.size = req.file.size;
+        media.metadata = metadata;
+
+        const updatedMedia = await this.mediaRepository.save(media);
+
+        res.json({
+          success: true,
+          message: 'Media file replaced successfully',
+          data: updatedMedia
+        });
+      } catch (error: any) {
+        // Clean up uploaded file on error
+        if (req.file) {
+          try {
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'images');
+            const { id } = req.params;
+            const media = await this.mediaRepository.findOne({ where: { id } });
+            if (media) {
+              const filePath = path.join(uploadDir, media.filename);
+              await fs.unlink(filePath);
+            }
+          } catch (unlinkError) {
+            // Ignore cleanup errors
+          }
+        }
+
+        res.status(500).json({
+          success: false,
+          message: 'Failed to replace media file',
+          error: error.message
+        });
+      }
+    }
+  ];
+
+  /**
    * Delete media
    */
   deleteMedia = async (req: Request, res: Response) => {

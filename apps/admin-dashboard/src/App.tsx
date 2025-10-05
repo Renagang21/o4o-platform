@@ -79,6 +79,7 @@ const CrowdfundingRouter = lazy(() => import('@/pages/crowdfunding/CrowdfundingR
 
 // App Pages
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
+const MediaFileReplace = lazy(() => import('@/pages/tools/MediaFileReplace'));
 
 
 // UI Showcase
@@ -559,6 +560,13 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <ToolsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/tools/media-replace" element={
+                      <AdminProtectedRoute requiredPermissions={['tools:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MediaFileReplace />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

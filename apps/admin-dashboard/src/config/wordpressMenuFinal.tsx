@@ -186,6 +186,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <Wrench className="w-5 h-5" />,
     children: [
       { id: 'tools-available', label: '사용 가능한 도구', icon: <Wrench className="w-4 h-4" />, path: '/tools' },
+      { id: 'tools-media-replace', label: '미디어 파일 교체', icon: <RefreshCw className="w-4 h-4" />, path: '/tools/media-replace' },
       { id: 'tools-import', label: '가져오기', icon: <FileText className="w-4 h-4" />, path: '/tools/import' },
       { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
     ]

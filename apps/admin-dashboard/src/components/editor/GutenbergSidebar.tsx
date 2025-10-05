@@ -38,6 +38,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useAuthStore } from '@/stores/authStore';
+import MediaSelector, { MediaItem } from './blocks/shared/MediaSelector';
 
 interface PostSettings {
   status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
@@ -115,6 +116,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [categorySearch, setCategorySearch] = useState('');
   const [availableCategories, setAvailableCategories] = useState<Array<{id: string, name: string, slug: string}>>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
 
   // Fetch categories from API
   useEffect(() => {
@@ -463,13 +465,17 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       className="w-full rounded-md"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
-                      <Button size={"sm" as const} variant="secondary">
+                      <Button
+                        size={"sm" as const}
+                        variant="secondary"
+                        onClick={() => setIsMediaSelectorOpen(true)}
+                      >
                         Replace
                       </Button>
                       <Button
                         size={"sm" as const}
                         variant="secondary"
-                        onClick={() => 
+                        onClick={() =>
                           onPostSettingsChange({ featuredImage: undefined })
                         }
                       >
@@ -481,6 +487,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Button
                     variant={"outline" as const}
                     className="w-full"
+                    onClick={() => setIsMediaSelectorOpen(true)}
                   >
                     <ImageIcon className="h-4 w-4 mr-2" />
                     Set featured image
@@ -489,6 +496,22 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
               </div>
             </Panel>
             )}
+
+            {/* Media Selector Modal */}
+            <MediaSelector
+              isOpen={isMediaSelectorOpen}
+              onClose={() => setIsMediaSelectorOpen(false)}
+              onSelect={(media) => {
+                const selectedMedia = Array.isArray(media) ? media[0] : media;
+                if (selectedMedia) {
+                  onPostSettingsChange({ featuredImage: selectedMedia.url });
+                }
+                setIsMediaSelectorOpen(false);
+              }}
+              multiple={false}
+              acceptedTypes={['image']}
+              title="Select Featured Image"
+            />
 
             {/* Excerpt */}
             <Panel title="Excerpt">

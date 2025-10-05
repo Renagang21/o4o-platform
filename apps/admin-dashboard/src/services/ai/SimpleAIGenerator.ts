@@ -294,8 +294,55 @@ export class SimpleAIGenerator {
 5. 한국어로 작성하세요
 6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
 
+    // 사용 가능한 블록 및 숏코드 레퍼런스
+    const availableBlocks = `
+=== 사용 가능한 블록 (Gutenberg Blocks) ===
+
+텍스트 블록:
+- core/paragraph: 일반 단락 텍스트 {"type": "core/paragraph", "content": {"text": "내용"}}
+- core/heading: 제목 (H1-H6) {"type": "core/heading", "content": {"text": "제목"}, "attributes": {"level": 1}}
+- core/list: 리스트 (ordered/unordered) {"type": "core/list", "content": {"items": ["항목1", "항목2"]}, "attributes": {"ordered": false}}
+- core/quote: 인용구 {"type": "core/quote", "content": {"text": "인용문", "citation": "출처"}}
+- core/code: 코드 블록 {"type": "core/code", "content": {"code": "코드", "language": "javascript"}}
+
+미디어 블록:
+- core/image: 이미지 (src 없이 alt만) {"type": "core/image", "content": {"alt": "이미지 설명"}}
+- core/video: 비디오 {"type": "core/video", "content": {"caption": "설명"}}
+- core/gallery: 갤러리 {"type": "core/gallery", "content": {"images": []}}
+
+디자인 블록:
+- core/button: 버튼 {"type": "core/button", "content": {"text": "버튼", "url": "#"}, "attributes": {"variant": "primary"}}
+- core/columns: 다단 레이아웃 {"type": "core/columns", "content": {"columns": []}}
+- core/separator: 구분선 {"type": "core/separator"}
+
+=== 사용 가능한 숏코드 (Shortcodes) ===
+
+E-commerce:
+- [product id="123"]: 단일 상품 표시
+- [product_grid category="전자제품" limit="8"]: 상품 그리드
+- [add_to_cart id="123"]: 장바구니 버튼
+- [featured_products limit="4"]: 추천 상품
+
+Forms:
+- [form id="contact-form"]: 폼 삽입
+- [view id="submissions"]: 데이터 뷰
+
+Media:
+- [video url="https://youtube.com/..."]: 비디오 임베드
+- [gallery ids="1,2,3"]: 이미지 갤러리
+
+Content:
+- [recent_posts limit="5"]: 최근 게시물
+- [author id="john"]: 작성자 정보
+
+숏코드는 core/shortcode 블록으로 삽입:
+{"type": "core/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}
+`;
+
     const prompts = {
       landing: `${baseRules}
+
+${availableBlocks}
 
 랜딩 페이지 구성 요소:
 - 매력적인 헤드라인 (H1)
@@ -303,35 +350,43 @@ export class SimpleAIGenerator {
 - 주요 기능/장점 3개 (단락)
 - CTA 버튼
 - 이미지는 alt 텍스트만 (src 없음)
-
-사용 가능한 블록: core/heading, core/paragraph, core/image, core/button, core/columns, core/separator`,
+- 필요시 숏코드 활용 (예: 상품 그리드, 문의 폼 등)`,
       
       about: `${baseRules}
+
+${availableBlocks}
 
 회사 소개 페이지 구성:
 - 회사 소개 헤드라인
 - 회사 비전/미션
-- 핵심 가치 3-4개
+- 핵심 가치 3-4개 (리스트 사용)
 - 팀 소개 섹션
-- 연락처 정보`,
-      
+- 연락처 정보 (필요시 [form] 숏코드 활용)`,
+
       product: `${baseRules}
+
+${availableBlocks}
 
 제품 소개 페이지 구성:
 - 제품명과 한 줄 설명
-- 주요 기능 소개
+- 주요 기능 소개 (리스트 활용)
 - 제품 장점 3-5개
 - 사용법/활용 사례
-- 가격 정보 (있다면)`,
-      
+- 가격 정보 (있다면 [product] 숏코드 활용 가능)
+- CTA 버튼 또는 [add_to_cart] 숏코드`,
+
       blog: `${baseRules}
 
+${availableBlocks}
+
 블로그 포스트 구성:
-- 매력적인 제목
+- 매력적인 제목 (H1)
 - 서론 (문제 제기)
-- 본문 3-4개 섹션
-- 실용적인 팁이나 해결책
-- 결론 및 요약`
+- 본문 3-4개 섹션 (H2 제목 + 단락)
+- 인용구나 코드 블록 활용 가능
+- 실용적인 팁이나 해결책 (리스트 활용)
+- 결론 및 요약
+- 관련 글: [recent_posts] 숏코드 활용 가능`
     };
     
     return prompts[template as keyof typeof prompts] || prompts.landing;
