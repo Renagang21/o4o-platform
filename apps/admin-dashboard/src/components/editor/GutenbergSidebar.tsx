@@ -450,42 +450,53 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             {canSetFeaturedImage && (
             <Panel title="Featured image">
               <div className="space-y-3">
-                {postSettings.featuredImage ? (
-                  <div className="relative group">
+                <div
+                  className="relative group cursor-pointer"
+                  onClick={() => setIsMediaSelectorOpen(true)}
+                >
+                  {postSettings.featuredImage ? (
                     <img
                       src={postSettings.featuredImage}
                       alt="Featured"
-                      className="w-full rounded-md"
+                      className="w-full rounded-md object-cover"
+                      style={{ aspectRatio: '16/9' }}
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                  ) : (
+                    <div
+                      className="w-full rounded-md bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300"
+                      style={{ aspectRatio: '16/9' }}
+                    >
+                      <div className="text-center">
+                        <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-500">Click to select image</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                    <Button
+                      size={"sm" as const}
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMediaSelectorOpen(true);
+                      }}
+                    >
+                      {postSettings.featuredImage ? 'Replace' : 'Select'}
+                    </Button>
+                    {postSettings.featuredImage && (
                       <Button
                         size={"sm" as const}
                         variant="secondary"
-                        onClick={() => setIsMediaSelectorOpen(true)}
-                      >
-                        Replace
-                      </Button>
-                      <Button
-                        size={"sm" as const}
-                        variant="secondary"
-                        onClick={() =>
-                          onPostSettingsChange({ featuredImage: undefined })
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPostSettingsChange({ featuredImage: undefined });
+                        }}
                       >
                         Remove
                       </Button>
-                    </div>
+                    )}
                   </div>
-                ) : (
-                  <Button
-                    variant={"outline" as const}
-                    className="w-full"
-                    onClick={() => setIsMediaSelectorOpen(true)}
-                  >
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    Set featured image
-                  </Button>
-                )}
+                </div>
               </div>
             </Panel>
             )}
