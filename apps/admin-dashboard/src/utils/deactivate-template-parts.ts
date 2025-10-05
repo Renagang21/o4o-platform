@@ -5,11 +5,13 @@
 
 import { authClient } from '@o4o/auth-client';
 
-export async function deactivateAllTemplateParts(): Promise<void> {
+export async function deactivateAllTemplateParts(): Promise<{ count: number; parts: string[] }> {
   try {
     // Get all template parts
     const response = await authClient.api.get('/public/template-parts');
     const templateParts = response.data?.data || response.data || [];
+
+    const deactivated: string[] = [];
 
     // Deactivate each one
     for (const part of templateParts) {
@@ -17,34 +19,36 @@ export async function deactivateAllTemplateParts(): Promise<void> {
         await authClient.api.put(`/template-parts/${part.id}`, {
           isActive: false
         });
-        console.log(`✅ Deactivated: ${part.name} (${part.area})`);
+        deactivated.push(`${part.name} (${part.area})`);
       }
     }
 
-    console.log(`✅ All template parts deactivated`);
+    return { count: deactivated.length, parts: deactivated };
   } catch (error) {
-    console.error('❌ Failed to deactivate template parts:', error);
-    throw error;
+    throw new Error(`Failed to deactivate template parts: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
-export async function deactivateTemplatePartsByArea(area: 'header' | 'footer' | 'sidebar' | 'general'): Promise<void> {
+export async function deactivateTemplatePartsByArea(
+  area: 'header' | 'footer' | 'sidebar' | 'general'
+): Promise<{ count: number; parts: string[] }> {
   try {
     const response = await authClient.api.get(`/public/template-parts?area=${area}`);
     const templateParts = response.data?.data || response.data || [];
+
+    const deactivated: string[] = [];
 
     for (const part of templateParts) {
       if (part.isActive) {
         await authClient.api.put(`/template-parts/${part.id}`, {
           isActive: false
         });
-        console.log(`✅ Deactivated: ${part.name}`);
+        deactivated.push(part.name);
       }
     }
 
-    console.log(`✅ All ${area} template parts deactivated`);
+    return { count: deactivated.length, parts: deactivated };
   } catch (error) {
-    console.error(`❌ Failed to deactivate ${area} template parts:`, error);
-    throw error;
+    throw new Error(`Failed to deactivate ${area} template parts: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
