@@ -530,9 +530,9 @@ export class MediaController {
   }
 
   private formatMediaResponse(media: any): any {
-    // Use PUBLIC_URL for static file serving (nginx serves from webserver)
-    // API server doesn't serve static files - they're served by nginx on the webserver
-    const baseUrl = process.env.PUBLIC_URL || process.env.MEDIA_BASE_URL || 'https://neture.co.kr';
+    // API server serves static files via express.static at /uploads
+    // Use API_BASE_URL since files are served from API server, not webserver
+    const baseUrl = process.env.API_BASE_URL || 'https://api.neture.co.kr';
 
     // Convert relative URLs to absolute URLs
     const makeAbsolute = (url: string | null) => {
