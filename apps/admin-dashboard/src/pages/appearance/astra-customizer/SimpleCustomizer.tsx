@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
+import { convertSettingsToHeaderTemplatePart } from './utils/template-parts-converter';
+import { authClient } from '@o4o/auth-client';
+import toast from 'react-hot-toast';
 
 // Import Astra sections and context
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -106,16 +109,57 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     };
   }, [settings]);
 
-  // Handle save
+  // Handle save (stores settings in customizer settings table)
   const handleSave = async () => {
     if (!onSave) return;
-    
+
     setIsSaving(true);
     try {
       const success = await onSave(settings);
       if (success) {
         setIsDirty(false);
       }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle publish (creates/updates template parts for live site)
+  const handlePublish = async () => {
+    setIsSaving(true);
+    try {
+      // Convert customizer settings to template parts format
+      const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
+
+      // Check if default header exists and update it
+      const existingResponse = await authClient.api.get('/api/public/template-parts');
+      const existingParts = existingResponse.data?.data || [];
+      const defaultHeader = existingParts.find((part: any) =>
+        part.area === 'header' && part.isDefault === true
+      );
+
+      if (defaultHeader) {
+        // Update existing default header
+        await authClient.api.put(`/api/template-parts/${defaultHeader.id}`, headerTemplatePart);
+        toast.success('헤더 템플릿이 업데이트되었습니다');
+      } else {
+        // Create new header template part
+        await authClient.api.post('/api/template-parts', {
+          ...headerTemplatePart,
+          isDefault: true,
+          isActive: true
+        });
+        toast.success('헤더 템플릿이 생성되었습니다');
+      }
+
+      // Also save to customizer settings
+      if (onSave) {
+        await onSave(settings);
+      }
+
+      setIsDirty(false);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || '템플릿 업데이트에 실패했습니다');
     } finally {
       setIsSaving(false);
     }
@@ -277,12 +321,20 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             초기화
           </Button>
           <Button
+            variant="outline"
             onClick={handleSave}
             disabled={!isDirty || isSaving}
             size="sm"
           >
             <Save size={16} />
-            {isSaving ? '저장 중...' : '저장'}
+            임시 저장
+          </Button>
+          <Button
+            onClick={handlePublish}
+            disabled={isSaving}
+            size="sm"
+          >
+            {isSaving ? '게시 중...' : '게시'}
           </Button>
           </div>
         </div>

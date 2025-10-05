@@ -12,6 +12,7 @@ import { useCustomizerState } from './hooks/useCustomizerState';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
+import { convertSettingsToHeaderTemplatePart } from './utils/template-parts-converter';
 
 // Import section components
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -220,85 +221,6 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
     }
   };
 
-  const convertSettingsToHeaderTemplatePart = (settings: AstraCustomizerSettings) => {
-    return {
-      name: 'Default Header',
-      slug: 'default-header',
-      description: 'Default site header with logo, navigation menu, and search',
-      area: 'header',
-      content: [
-        {
-          id: 'header-container',
-          type: 'o4o/group',
-          data: {
-            layout: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            className: 'site-header',
-            padding: {
-              top: '16px',
-              bottom: '16px',
-              left: '24px',
-              right: '24px'
-            }
-          },
-          innerBlocks: [
-            {
-              id: 'site-logo',
-              type: 'core/site-logo',
-              data: {
-                width: settings.siteIdentity.logo.width.desktop || 120,
-                isLink: true,
-                linkTarget: '_self',
-                logoUrl: settings.siteIdentity.logo.desktop
-              }
-            },
-            {
-              id: 'navigation-container',
-              type: 'o4o/group',
-              data: {
-                layout: 'flex',
-                flexDirection: 'row',
-                gap: '32px',
-                alignItems: 'center'
-              },
-              innerBlocks: [
-                {
-                  id: 'primary-menu',
-                  type: 'core/navigation',
-                  data: {
-                    menuRef: 'primary-menu',
-                    orientation: 'horizontal',
-                    showSubmenuIcon: true
-                  }
-                },
-                {
-                  id: 'header-search',
-                  type: 'core/search',
-                  data: {
-                    label: 'Search',
-                    showLabel: false,
-                    placeholder: 'Search...',
-                    buttonPosition: 'button-inside'
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      settings: {
-        containerWidth: 'wide',
-        backgroundColor: settings.header.primary.background || '#ffffff',
-        textColor: settings.colors.textColor || '#333333',
-        padding: {
-          top: '0',
-          bottom: '0'
-        }
-      }
-    };
-  };
 
   return (
     <CustomizerProvider
