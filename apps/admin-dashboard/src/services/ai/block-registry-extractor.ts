@@ -80,7 +80,7 @@ function getExampleContent(blockName: string): any {
     'core/image': { alt: '이미지 설명', caption: '캡션' },
     'core/button': { text: '버튼 텍스트', url: '#' },
     'core/quote': { text: '인용문', citation: '출처' },
-    'core/code': { code: 'console.log("Hello")', language: 'javascript' },
+    'core/code': { code: 'function greet() { return "Hello"; }', language: 'javascript' },
     'core/columns': { columns: [] },
     'core/separator': {},
     'core/spacer': { height: 50 },

@@ -444,11 +444,11 @@ function updateDocumentation() {
 
     fs.writeFileSync(docsPath, content, 'utf-8');
 
-    console.log(`✅ 숏코드 레퍼런스가 업데이트되었습니다: ${docsPath}`);
-    console.log(`📊 총 ${shortcodes.length}개의 숏코드 문서화됨`);
-    console.log(`📅 업데이트 시간: ${new Date().toLocaleString('ko-KR')}`);
+    process.stdout.write(`✅ 숏코드 레퍼런스가 업데이트되었습니다: ${docsPath}\n`);
+    process.stdout.write(`📊 총 ${shortcodes.length}개의 숏코드 문서화됨\n`);
+    process.stdout.write(`📅 업데이트 시간: ${new Date().toLocaleString('ko-KR')}\n`);
   } catch (error) {
-    console.error('❌ 문서 업데이트 실패:', error);
+    process.stderr.write(`❌ 문서 업데이트 실패: ${error}\n`);
     process.exit(1);
   }
 }

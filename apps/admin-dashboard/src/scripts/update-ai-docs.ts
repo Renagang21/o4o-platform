@@ -274,10 +274,10 @@ function updateDocumentation() {
 
   try {
     fs.writeFileSync(docsPath, content, 'utf-8');
-    console.log(`✅ AI 문서가 업데이트되었습니다: ${docsPath}`);
-    console.log(`📅 업데이트 시간: ${new Date().toLocaleString('ko-KR')}`);
+    process.stdout.write(`✅ AI 문서가 업데이트되었습니다: ${docsPath}\n`);
+    process.stdout.write(`📅 업데이트 시간: ${new Date().toLocaleString('ko-KR')}\n`);
   } catch (error) {
-    console.error('❌ 문서 업데이트 실패:', error);
+    process.stderr.write(`❌ 문서 업데이트 실패: ${error}\n`);
     process.exit(1);
   }
 }

@@ -250,7 +250,7 @@ const dynamicShortcodes: Record<string, ShortcodeConfig> = {};
 
 export function registerShortcode(name: string, config: ShortcodeConfig) {
   dynamicShortcodes[name] = config;
-  console.log(`✅ 숏코드 등록됨: [${name}]`);
+  // Shortcode registered successfully
 }
 
 export function getAllRegisteredShortcodes(): Record<string, ShortcodeConfig> {
