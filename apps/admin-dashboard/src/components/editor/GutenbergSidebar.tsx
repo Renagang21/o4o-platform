@@ -39,6 +39,11 @@ import {
 } from '@/components/ui/collapsible';
 import { useAuthStore } from '@/stores/authStore';
 import MediaSelector, { MediaItem } from './blocks/shared/MediaSelector';
+import {
+  canPublish as checkCanPublish,
+  canEditCategories as checkCanEditCategories,
+  canSetFeaturedImage as checkCanSetFeaturedImage
+} from '@/utils/permissions';
 
 interface PostSettings {
   status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
@@ -158,23 +163,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
     }
   }, [mode]);
 
-  // Check user permissions
-  const canPublish = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'vendor_manager'].includes(user.role);
-  };
-
-  const canEditCategories = () => {
-    if (!user) return false;
-    const hasPermission = ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role);
-    // Allow most content creators to select categories
-    return hasPermission;
-  };
-
-  const canSetFeaturedImage = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role);
-  };
+  // Permission checks using utility functions
+  const canPublish = checkCanPublish(user);
+  const canEditCategories = checkCanEditCategories(user);
+  const canSetFeaturedImage = checkCanSetFeaturedImage(user);
 
   const handleAddTag = () => {
     if (tagInput.trim()) {
@@ -344,7 +336,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             </Panel>
 
             {/* Categories - Show for posts with proper role permissions */}
-            {mode === 'post' && canEditCategories() && (
+            {mode === 'post' && canEditCategories && (
             <Panel title="Categories">
               <div className="space-y-3">
                 <div className="relative">
@@ -455,7 +447,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             )}
 
             {/* Featured Image - Show for most content creators */}
-            {canSetFeaturedImage() && (
+            {canSetFeaturedImage && (
             <Panel title="Featured image">
               <div className="space-y-3">
                 {postSettings.featuredImage ? (

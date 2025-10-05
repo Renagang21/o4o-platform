@@ -8,6 +8,7 @@ export interface User {
   name: string
   role: string
   roles?: string[]
+  permissions?: string[]
   avatar?: string
   createdAt?: string
 }
@@ -116,14 +117,15 @@ export const useAuthStore = create<AuthState>()(
           if (response.isAuthenticated && response.user) {
             // Get token from cookie or use stored token
             const token = ssoService.getTokenFromCookie() || get().token || 'sso-token'
-            
+
             set({
               user: {
                 id: response.user.id,
                 email: response.user.email,
                 name: response.user.name,
                 role: response.user.roles?.[0] || 'user',
-                roles: response.user.roles
+                roles: response.user.roles,
+                permissions: response.user.permissions
               },
               token,
               isAuthenticated: true,

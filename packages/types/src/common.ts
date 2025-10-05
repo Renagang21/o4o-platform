@@ -45,7 +45,7 @@ export interface ContactInfo {
 // API response types are now in api.ts to avoid duplicates
 
 // Permission types
-export interface Permission {
+export interface PermissionObject {
   id: string;
   name: string;
   description?: string;
@@ -57,7 +57,7 @@ export interface Role {
   id: string;
   name: string;
   description?: string;
-  permissions: Permission[];
+  permissions: PermissionObject[];
   isSystem?: boolean;
   createdAt: Date;
   updatedAt: Date;
