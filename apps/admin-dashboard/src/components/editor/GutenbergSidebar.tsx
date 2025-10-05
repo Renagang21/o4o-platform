@@ -165,9 +165,14 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   };
 
   const canEditCategories = () => {
-    if (!user) return false;
+    if (!user) {
+      console.log('🔍 [Categories] user is null/undefined');
+      return false;
+    }
+    const hasPermission = ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role);
+    console.log('🔍 [Categories] user.role:', user.role, '| hasPermission:', hasPermission, '| mode:', mode);
     // Allow most content creators to select categories
-    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role);
+    return hasPermission;
   };
 
   const canSetFeaturedImage = () => {
