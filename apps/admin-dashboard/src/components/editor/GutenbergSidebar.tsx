@@ -118,16 +118,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
 
-  // Debug: Log user and mode information
-  useEffect(() => {
-    console.log('🔍 [GutenbergSidebar] Debug Info:', {
-      user: user ? { id: user.id, role: user.role, email: user.email } : null,
-      mode,
-      canEditCategories: user ? ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role) : false,
-      canSetFeaturedImage: user ? ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role) : false
-    });
-  }, [user, mode]);
-
   // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
@@ -183,7 +173,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
 
   const canSetFeaturedImage = () => {
     if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor'].includes(user.role);
+    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role);
   };
 
   const handleAddTag = () => {
@@ -465,7 +455,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             )}
 
             {/* Featured Image - Show for most content creators */}
-            {(user && ['super_admin', 'admin', 'moderator', 'vendor_manager', 'vendor', 'seller', 'business'].includes(user.role)) && (
+            {canSetFeaturedImage() && (
             <Panel title="Featured image">
               <div className="space-y-3">
                 {postSettings.featuredImage ? (
