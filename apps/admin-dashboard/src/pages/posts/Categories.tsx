@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { useAuthStore } from '@/stores/authStore';
+import { hasPermission, hasAnyPermission } from '@/utils/permissions';
 
 interface Category {
   id: string;
@@ -40,20 +41,9 @@ const Categories = () => {
   });
   
   // Check permissions
-  const canCreateCategory = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'manager'].includes(user.role);
-  };
-  
-  const canEditCategory = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'vendor_manager', 'manager'].includes(user.role);
-  };
-  
-  const canDeleteCategory = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin'].includes(user.role);
-  };
+  const canCreateCategory = hasPermission(user, 'categories:write');
+  const canEditCategory = hasPermission(user, 'categories:write');
+  const canDeleteCategory = hasAnyPermission(user, ['categories:write', 'system:admin']);
   
   // Screen Options state - load from localStorage
   const [visibleColumns, setVisibleColumns] = useState(() => {

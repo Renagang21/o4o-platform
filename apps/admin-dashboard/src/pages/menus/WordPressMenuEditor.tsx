@@ -24,6 +24,7 @@ import toast from 'react-hot-toast';
 import MenuApi, { MenuItem as MenuItemType, MenuLocation as MenuLocationType } from '../../api/menuApi';
 import { unifiedApi } from '../../api/unified-client';
 import { useAuthStore } from '@/stores/authStore';
+import { hasPermission, hasAnyPermission } from '@/utils/permissions';
 
 // Types
 interface MenuItem {
@@ -70,20 +71,9 @@ const WordPressMenuEditor: FC = () => {
   const dragOverItem = useRef<MenuItem | null>(null);
   
   // Permission checks
-  const canCreateMenu = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'manager'].includes(user.role);
-  };
-  
-  const canEditMenu = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin', 'moderator', 'manager'].includes(user.role);
-  };
-  
-  const canDeleteMenu = () => {
-    if (!user) return false;
-    return ['super_admin', 'admin'].includes(user.role);
-  };
+  const canCreateMenu = hasPermission(user, 'menus:write');
+  const canEditMenu = hasPermission(user, 'menus:write');
+  const canDeleteMenu = hasAnyPermission(user, ['menus:write', 'system:admin']);
   
   // Menu data
   const [menuName, setMenuName] = useState('');

@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/stores/authStore'
+import { Permission } from '@o4o/types';
 
-export interface Permission {
+export interface PermissionObject {
   resource: string
   action: string
 }
@@ -57,19 +58,21 @@ export type PermissionKey = typeof PERMISSIONS[keyof typeof PERMISSIONS]
 
 export const usePermissions = () => {
   const user = useAuthStore(state => state.user)
-  
+
   const isAdmin = () => {
-    return user?.role === 'admin' || user?.role === 'super_admin' || user?.roles?.includes('admin') || user?.roles?.includes('super_admin') || false
+    if (!user) return false;
+    // Admin role has all permissions
+    return user.role === 'admin';
   }
-  
-  const hasPermission = (_permission: string): boolean => {
-    if (!user) return false
-    
-    // Super admin has all permissions
-    if (isAdmin()) return true
-    
+
+  const hasPermission = (permission: Permission): boolean => {
+    if (!user) return false;
+
+    // Admin has all permissions
+    if (user.role === 'admin') return true;
+
     // Check specific permission in user permissions
-    return false // For now, as permissions are not stored in the current user object
+    return user.permissions?.includes(permission) ?? false;
   }
   
   const checkPermission = (permission: PermissionKey): boolean => {
@@ -85,50 +88,9 @@ export const usePermissions = () => {
   
   const getRoleBasedPermissions = () => {
     if (!user) return []
-    
-    const rolePermissions: Record<string, PermissionKey[]> = {
-      'super_admin': Object.values(PERMISSIONS),
-      'admin': Object.values(PERMISSIONS),
-      'manager': [
-        PERMISSIONS.USERS_VIEW,
-        PERMISSIONS.USERS_EDIT,
-        PERMISSIONS.CONTENT_VIEW,
-        PERMISSIONS.CONTENT_CREATE,
-        PERMISSIONS.CONTENT_EDIT,
-        PERMISSIONS.CONTENT_PUBLISH,
-        PERMISSIONS.PRODUCTS_VIEW,
-        PERMISSIONS.PRODUCTS_CREATE,
-        PERMISSIONS.PRODUCTS_EDIT,
-        PERMISSIONS.ORDERS_VIEW,
-        PERMISSIONS.ORDERS_EDIT,
-        PERMISSIONS.ORDERS_PROCESS,
-        PERMISSIONS.ANALYTICS_VIEW,
-        PERMISSIONS.MEDIA_VIEW,
-        PERMISSIONS.MEDIA_UPLOAD,
-        PERMISSIONS.SETTINGS_VIEW
-      ],
-      'editor': [
-        PERMISSIONS.CONTENT_VIEW,
-        PERMISSIONS.CONTENT_CREATE,
-        PERMISSIONS.CONTENT_EDIT,
-        PERMISSIONS.CONTENT_PUBLISH,
-        PERMISSIONS.MEDIA_VIEW,
-        PERMISSIONS.MEDIA_UPLOAD
-      ],
-      'subscriber': [
-        PERMISSIONS.CONTENT_VIEW
-      ],
-      'operator': [
-        PERMISSIONS.ORDERS_VIEW,
-        PERMISSIONS.ORDERS_EDIT,
-        PERMISSIONS.ORDERS_PROCESS,
-        PERMISSIONS.PRODUCTS_VIEW,
-        PERMISSIONS.PRODUCTS_EDIT,
-        PERMISSIONS.PRODUCTS_MANAGE_INVENTORY
-      ]
-    }
-    
-    return rolePermissions[user.role] || []
+
+    // Return user's actual permissions from database
+    return user.permissions || []
   }
   
   const canAccessMenu = (menuId: string): boolean => {
@@ -156,7 +118,7 @@ export const usePermissions = () => {
     canAccessMenu,
     isAdmin: isAdmin(),
     userRole: user?.role,
-    userPermissions: []
+    userPermissions: user?.permissions || []
   }
 }
 

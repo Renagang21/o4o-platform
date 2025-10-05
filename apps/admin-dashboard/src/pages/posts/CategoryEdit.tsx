@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { ContentApi } from '@/api/contentApi';
 import { useAuthStore } from '@/stores/authStore';
 import { Category as CategoryType } from '@/types/content';
+import { hasPermission, hasAnyPermission } from '@/utils/permissions';
 
 interface CategoryWithPermissions extends CategoryType {
   permissions?: {
@@ -50,21 +51,7 @@ const CategoryEdit = () => {
   });
 
   // Check if user has permission to edit
-  const hasEditPermission = () => {
-    if (!user) return false;
-    // Super Admin and Admin have full access
-    if (user.role === 'super_admin' || user.role === 'admin') return true;
-    // Moderator can edit if visibility is not admin-only
-    if (user.role === 'moderator') {
-      return category.permissions?.visibility !== 'admin';
-    }
-    // Vendor Manager can edit vendor-related categories
-    if (user.role === 'vendor_manager') {
-      return category.permissions?.visibility === 'public' || 
-             category.permissions?.allowedRoles?.includes('vendor_manager');
-    }
-    return false;
-  };
+  const hasEditPermission = hasAnyPermission(user, ['categories:write', 'system:admin']);
 
   // Fetch available roles from API
   useEffect(() => {

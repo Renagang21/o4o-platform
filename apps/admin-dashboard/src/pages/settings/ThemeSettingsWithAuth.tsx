@@ -2,12 +2,13 @@ import { FC } from 'react';
 import { useAuthStore } from '@/stores/authStore'
 import ThemeSettings from './ThemeSettings'
 import { Shield } from 'lucide-react'
+import { hasAnyPermission } from '@/utils/permissions';
 
 const ThemeSettingsWithAuth: FC = () => {
   const { user } = useAuthStore()
-  
+
   // Only admins can manage themes
-  const hasPermission = user?.role === 'admin'
+  const hasPermission = hasAnyPermission(user, ['settings:write', 'system:admin'])
   
   if (!hasPermission) {
     return (
