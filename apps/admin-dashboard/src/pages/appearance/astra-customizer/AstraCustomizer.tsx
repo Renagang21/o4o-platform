@@ -190,31 +190,44 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
 
   const handlePublish = async (settings: AstraCustomizerSettings) => {
     try {
+      // 🔍 DEBUG: Check logo URL before conversion
+      console.log('🔍 Publishing with logo:', settings.siteIdentity.logo.desktop);
+      console.log('🔍 Full siteIdentity:', JSON.stringify(settings.siteIdentity, null, 2));
+
       // Convert customizer settings to template parts format
       const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
-      
+
+      // 🔍 DEBUG: Check converted template part
+      console.log('📦 Template Part:', JSON.stringify(headerTemplatePart, null, 2));
+      console.log('📦 Logo URL in template:', headerTemplatePart.content[0].innerBlocks[0].data.logoUrl);
+
       // Check if default header exists and update it
       const existingResponse = await authClient.api.get('/api/public/template-parts');
       const existingParts = existingResponse.data?.data || [];
-      const defaultHeader = existingParts.find((part: any) => 
+      const defaultHeader = existingParts.find((part: any) =>
         part.area === 'header' && part.isDefault === true
       );
 
       if (defaultHeader) {
+        console.log('📝 Updating existing header:', defaultHeader.id);
         // Update existing default header
-        await authClient.api.put(`/api/template-parts/${defaultHeader.id}`, headerTemplatePart);
+        const response = await authClient.api.put(`/api/template-parts/${defaultHeader.id}`, headerTemplatePart);
+        console.log('✅ Update response:', response.data);
         toast.success('Header template updated successfully');
       } else {
+        console.log('📝 Creating new header template');
         // Create new header template part
-        await authClient.api.post('/api/template-parts', {
+        const response = await authClient.api.post('/api/template-parts', {
           ...headerTemplatePart,
           isDefault: true,
           isActive: true
         });
+        console.log('✅ Create response:', response.data);
         toast.success('Header template created successfully');
       }
-      
+
     } catch (error: any) {
+      console.error('❌ Publish error:', error);
       toast.error(error?.response?.data?.message || 'Failed to publish settings');
       throw error;
     }
