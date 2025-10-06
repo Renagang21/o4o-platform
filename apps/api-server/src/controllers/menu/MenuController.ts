@@ -403,20 +403,50 @@ export class MenuController {
   getMenuByLocation = async (req: Request, res: Response): Promise<void> => {
     try {
       const { key } = req.params;
-      const menu = await menuService.getMenuByLocation(key);
-      
+      const { subdomain, path } = req.query;
+
+      // Extract subdomain and path prefix
+      const subdomainStr = subdomain ? String(subdomain) : null;
+      const pathStr = path ? String(path) : null;
+
+      // Extract path prefix from path (/seller1/products -> /seller1)
+      let pathPrefix: string | null = null;
+      if (pathStr && pathStr !== '/') {
+        const segments = pathStr.split('/').filter(Boolean);
+        if (segments.length > 0) {
+          pathPrefix = `/${segments[0]}`;
+        }
+      }
+
+      // Get menu with context filtering
+      const menu = await menuService.getMenuByLocationWithContext(
+        key,
+        subdomainStr,
+        pathPrefix
+      );
+
       if (!menu) {
         res.json({
           success: false,
           data: null,
-          message: `No active menu found for location: ${key}`
+          message: `No active menu found for location: ${key}`,
+          context: {
+            subdomain: subdomainStr,
+            path: pathStr,
+            pathPrefix
+          }
         });
         return;
       }
-      
+
       res.json({
         success: true,
-        data: menu
+        data: menu,
+        context: {
+          subdomain: subdomainStr,
+          path: pathStr,
+          pathPrefix
+        }
       });
     } catch (error) {
       logger.error('Error getting menu by location:', error);

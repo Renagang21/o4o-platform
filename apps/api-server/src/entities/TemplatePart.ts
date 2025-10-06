@@ -85,6 +85,8 @@ export class TemplatePart {
     postTypes?: string[] // post, page, product, etc.
     categories?: string[] // Category IDs
     userRoles?: string[] // Show only to specific user roles
+    subdomain?: string // Show only on specific subdomain (shop, forum, etc.)
+    path_prefix?: string // Show only on specific path prefix (/seller1, etc.)
   }
 
   @CreateDateColumn({ name: 'created_at' })

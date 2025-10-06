@@ -370,6 +370,79 @@ class MenuService {
     return this.findMenuById(menu.id);
   }
 
+  /**
+   * Get menu by location with subdomain and path filtering
+   * @param location Menu location (primary, footer, etc.)
+   * @param subdomain Current subdomain (shop, forum, etc.) or null
+   * @param pathPrefix Current path prefix (/seller1, etc.) or null
+   * @returns Matching menu or null
+   */
+  async getMenuByLocationWithContext(
+    location: string,
+    subdomain?: string | null,
+    pathPrefix?: string | null
+  ): Promise<Menu | null> {
+    // Get all active menus for the location
+    const menus = await this.menuRepository.find({
+      where: { location, is_active: true }
+    });
+
+    if (menus.length === 0) {
+      return null;
+    }
+
+    // Filter menus by subdomain and path_prefix in metadata
+    const filteredMenus = menus.filter(menu => {
+      if (!menu.metadata) {
+        // No metadata means global menu (show everywhere)
+        return true;
+      }
+
+      const menuSubdomain = menu.metadata.subdomain as string | undefined;
+      const menuPathPrefix = menu.metadata.path_prefix as string | undefined;
+
+      // Check subdomain match
+      if (menuSubdomain) {
+        if (!subdomain || menuSubdomain !== subdomain) {
+          return false;
+        }
+      }
+
+      // Check path prefix match
+      if (menuPathPrefix) {
+        if (!pathPrefix || !pathPrefix.startsWith(menuPathPrefix)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    if (filteredMenus.length === 0) {
+      return null;
+    }
+
+    // Priority order:
+    // 1. subdomain + path_prefix match
+    // 2. subdomain only match
+    // 3. global menu (no subdomain/path_prefix)
+    const sortedMenus = filteredMenus.sort((a, b) => {
+      const aHasSubdomain = !!a.metadata?.subdomain;
+      const aHasPath = !!a.metadata?.path_prefix;
+      const bHasSubdomain = !!b.metadata?.subdomain;
+      const bHasPath = !!b.metadata?.path_prefix;
+
+      // Both conditions > subdomain only > global
+      const aScore = (aHasSubdomain ? 2 : 0) + (aHasPath ? 1 : 0);
+      const bScore = (bHasSubdomain ? 2 : 0) + (bHasPath ? 1 : 0);
+
+      return bScore - aScore; // Descending order
+    });
+
+    // Return the most specific matching menu
+    return this.findMenuById(sortedMenus[0].id);
+  }
+
   // Bulk operations
   async duplicateMenu(id: string, newName: string, newSlug?: string): Promise<Menu | null> {
     const sourceMenu = await this.findMenuById(id);

@@ -44,18 +44,18 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
   try {
     // Check database connection first
     if (!AppDataSource.isInitialized) {
-      return res.status(503).json({ 
+      return res.status(503).json({
         success: false,
         error: 'Database not available',
-        code: 'DB_NOT_READY' 
+        code: 'DB_NOT_READY'
       })
     }
 
     const { area } = req.params
-    const { context } = req.query // Optional context for conditional rendering
-    
+    const { context, subdomain, path } = req.query // Optional context for conditional rendering
+
     const templatePartRepository = AppDataSource.getRepository(TemplatePart)
-    
+
     // Get all active template parts for the area
     let templateParts = await templatePartRepository.find({
       where: {
@@ -66,43 +66,73 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
         priority: 'ASC'
       }
     })
-    
-    // Filter by conditions if context is provided
-    if (context) {
-      try {
-        const contextData = JSON.parse(String(context))
-        templateParts = templateParts.filter(part => {
-          if (!part.conditions) return true
-          
-          // Check page conditions
-          if (part.conditions.pages && contextData.pageId) {
-            if (!part.conditions.pages.includes(contextData.pageId)) return false
-          }
-          
-          // Check post type conditions
-          if (part.conditions.postTypes && contextData.postType) {
-            if (!part.conditions.postTypes.includes(contextData.postType)) return false
-          }
-          
-          // Check category conditions
-          if (part.conditions.categories && contextData.categories) {
-            const hasCategory = part.conditions.categories.some(cat => 
-              contextData.categories.includes(cat)
-            )
-            if (!hasCategory) return false
-          }
-          
-          // Check user role conditions
-          if (part.conditions.userRoles && contextData.userRole) {
-            if (!part.conditions.userRoles.includes(contextData.userRole)) return false
-          }
-          
-          return true
-        })
-      } catch (parseError) {
-        // Invalid context JSON, ignore and return all active parts
+
+    // Extract subdomain and path prefix from query params
+    const subdomainStr = subdomain ? String(subdomain) : null
+    const pathStr = path ? String(path) : null
+    let pathPrefix: string | null = null
+    if (pathStr && pathStr !== '/') {
+      const segments = pathStr.split('/').filter(Boolean)
+      if (segments.length > 0) {
+        pathPrefix = `/${segments[0]}`
       }
     }
+
+    // Filter by conditions if context is provided
+    let contextData: any = {}
+    if (context) {
+      try {
+        contextData = JSON.parse(String(context))
+      } catch (parseError) {
+        // Invalid context JSON, ignore
+      }
+    }
+
+    templateParts = templateParts.filter(part => {
+      if (!part.conditions) {
+        // No conditions means show everywhere
+        return true
+      }
+
+      // Check subdomain condition
+      if (part.conditions.subdomain) {
+        if (!subdomainStr || part.conditions.subdomain !== subdomainStr) {
+          return false
+        }
+      }
+
+      // Check path prefix condition
+      if (part.conditions.path_prefix) {
+        if (!pathPrefix || !pathPrefix.startsWith(part.conditions.path_prefix)) {
+          return false
+        }
+      }
+
+      // Check page conditions
+      if (part.conditions.pages && contextData.pageId) {
+        if (!part.conditions.pages.includes(contextData.pageId)) return false
+      }
+
+      // Check post type conditions
+      if (part.conditions.postTypes && contextData.postType) {
+        if (!part.conditions.postTypes.includes(contextData.postType)) return false
+      }
+
+      // Check category conditions
+      if (part.conditions.categories && contextData.categories) {
+        const hasCategory = part.conditions.categories.some(cat =>
+          contextData.categories.includes(cat)
+        )
+        if (!hasCategory) return false
+      }
+
+      // Check user role conditions
+      if (part.conditions.userRoles && contextData.userRole) {
+        if (!part.conditions.userRoles.includes(contextData.userRole)) return false
+      }
+
+      return true
+    })
     
     // Sanitize content field for each template part before sending to client
     const sanitizedTemplateParts = templateParts.map(templatePart => {
