@@ -57,7 +57,9 @@ export default function TemplatePartEditor() {
       pages: [] as string[],
       postTypes: [] as string[],
       categories: [] as string[],
-      userRoles: [] as string[]
+      userRoles: [] as string[],
+      subdomain: '' as string,
+      path_prefix: '' as string
     }
   });
 
@@ -431,12 +433,64 @@ export default function TemplatePartEditor() {
                 </TabsContent>
 
                 <TabsContent value="conditions" className="space-y-4 mt-4">
-                  <p className="text-sm text-gray-600">
-                    특정 페이지나 조건에서만 이 템플릿 파트가 표시되도록 설정할 수 있습니다.
+                  <p className="text-sm text-gray-600 mb-4">
+                    특정 서브도메인이나 경로에서만 이 템플릿 파트가 표시되도록 설정할 수 있습니다.
                   </p>
-                  <div className="text-center py-8 text-gray-500">
-                    조건부 표시 설정은 추후 업데이트될 예정입니다.
+
+                  {/* Subdomain Condition */}
+                  <div>
+                    <Label htmlFor="condition-subdomain">서브도메인</Label>
+                    <Select
+                      value={formData.conditions.subdomain}
+                      onValueChange={(value: string) => setFormData({
+                        ...formData,
+                        conditions: { ...formData.conditions, subdomain: value }
+                      })}
+                    >
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="모든 서브도메인" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">모든 서브도메인</SelectItem>
+                        <SelectItem value="shop">shop</SelectItem>
+                        <SelectItem value="forum">forum</SelectItem>
+                        <SelectItem value="crowdfunding">crowdfunding</SelectItem>
+                        <SelectItem value="admin">admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-gray-500 mt-1">
+                      이 템플릿을 표시할 서브도메인을 선택하세요.
+                    </p>
                   </div>
+
+                  {/* Path Prefix Condition */}
+                  <div>
+                    <Label htmlFor="condition-path">경로 접두사 (선택사항)</Label>
+                    <Input
+                      id="condition-path"
+                      value={formData.conditions.path_prefix}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        conditions: { ...formData.conditions, path_prefix: e.target.value }
+                      })}
+                      placeholder="/seller1"
+                      className="mt-2"
+                    />
+                    <p className="text-sm text-gray-500 mt-1">
+                      특정 경로에서만 표시하려면 입력하세요 (예: /seller1). / 로 시작해야 합니다.
+                    </p>
+                  </div>
+
+                  {/* Preview */}
+                  {(formData.conditions.subdomain || formData.conditions.path_prefix) && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="text-sm text-blue-800">
+                        <strong>표시 위치:</strong>{' '}
+                        {formData.conditions.subdomain ? `${formData.conditions.subdomain}.neture.co.kr` : 'neture.co.kr'}
+                        {formData.conditions.path_prefix && `${formData.conditions.path_prefix}`}
+                      </div>
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="advanced" className="space-y-4 mt-4">

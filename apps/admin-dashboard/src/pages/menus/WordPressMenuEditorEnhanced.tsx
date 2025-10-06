@@ -71,6 +71,12 @@ const WordPressMenuEditorEnhanced: FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [menuDescription, setMenuDescription] = useState('');
+
+  // Advanced settings (metadata)
+  const [subdomain, setSubdomain] = useState<string>('');
+  const [pathPrefix, setPathPrefix] = useState<string>('');
+  const [theme, setTheme] = useState<string>('');
+  const [logoUrl, setLogoUrl] = useState<string>('');
   
   // UI state
   const [activeTab, setActiveTab] = useState<'pages' | 'posts' | 'links' | 'categories' | 'tags'>('pages');
@@ -382,10 +388,40 @@ const WordPressMenuEditorEnhanced: FC = () => {
       toast.error('메뉴 이름을 입력해주세요');
       return;
     }
-    
+
+    // Validate path prefix
+    if (pathPrefix && !pathPrefix.startsWith('/')) {
+      toast.error('경로 접두사는 /로 시작해야 합니다');
+      return;
+    }
+
     try {
+      // Build metadata
+      const metadata: any = {};
+      if (subdomain) metadata.subdomain = subdomain;
+      if (pathPrefix) metadata.path_prefix = pathPrefix;
+      if (theme) metadata.theme = theme;
+      if (logoUrl) metadata.logo_url = logoUrl;
+
+      const menuData = {
+        name: menuName,
+        slug: menuSlug,
+        location: selectedLocation,
+        description: menuDescription,
+        metadata: Object.keys(metadata).length > 0 ? metadata : null,
+        items: menuItems
+      };
+
+      // TODO: Implement actual API call
+      // if (id) {
+      //   await authClient.api.put(`/menus/${id}`, menuData);
+      // } else {
+      //   await authClient.api.post('/menus', menuData);
+      // }
+
+      console.log('Menu data to save:', menuData);
       toast.success('메뉴가 저장되었습니다!');
-      
+
       if (!id) {
         navigate('/menus');
       }
@@ -713,6 +749,116 @@ const WordPressMenuEditorEnhanced: FC = () => {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Advanced Settings */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
+              <div className="p-4 border-b cursor-pointer" onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-900">고급 설정</h3>
+                  {showAdvancedSettings ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
+              </div>
+              {showAdvancedSettings && (
+                <div className="p-4 space-y-4">
+                  {/* Subdomain Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      서브도메인
+                    </label>
+                    <select
+                      value={subdomain}
+                      onChange={(e) => setSubdomain(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">전역 (모든 서브도메인)</option>
+                      <option value="shop">shop</option>
+                      <option value="forum">forum</option>
+                      <option value="crowdfunding">crowdfunding</option>
+                      <option value="admin">admin</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      이 메뉴를 표시할 서브도메인을 선택하세요. 선택하지 않으면 모든 서브도메인에서 표시됩니다.
+                    </p>
+                  </div>
+
+                  {/* Path Prefix */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      경로 접두사 (선택사항)
+                    </label>
+                    <input
+                      type="text"
+                      value={pathPrefix}
+                      onChange={(e) => setPathPrefix(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="/seller1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      특정 경로에서만 표시하려면 입력하세요 (예: /seller1). / 로 시작해야 합니다.
+                    </p>
+                  </div>
+
+                  {/* Theme Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      테마
+                    </label>
+                    <select
+                      value={theme}
+                      onChange={(e) => setTheme(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">기본 테마 (변경 없음)</option>
+                      <option value="afternoon">🌅 Afternoon</option>
+                      <option value="evening">🌆 Evening</option>
+                      <option value="noon">☀️ Noon</option>
+                      <option value="dusk">🌇 Dusk</option>
+                      <option value="twilight">🌃 Twilight</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      이 메뉴가 활성화될 때 적용할 테마를 선택하세요.
+                    </p>
+                  </div>
+
+                  {/* Logo URL */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      로고 URL (선택사항)
+                    </label>
+                    <input
+                      type="text"
+                      value={logoUrl}
+                      onChange={(e) => setLogoUrl(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://example.com/logo.png"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      이 메뉴가 활성화될 때 표시할 로고 URL을 입력하세요.
+                    </p>
+                    {logoUrl && (
+                      <div className="mt-2">
+                        <img src={logoUrl} alt="Logo preview" className="h-12 object-contain border rounded p-1" onError={(e) => {
+                          e.currentTarget.src = '';
+                          e.currentTarget.alt = '이미지를 불러올 수 없습니다';
+                        }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Context Preview */}
+                  {(subdomain || pathPrefix) && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="text-sm text-blue-800">
+                        <Globe className="w-4 h-4 inline mr-1" />
+                        <strong>표시 위치:</strong>{' '}
+                        {subdomain ? `${subdomain}.neture.co.kr` : 'neture.co.kr'}
+                        {pathPrefix && `${pathPrefix}`}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Add Items */}

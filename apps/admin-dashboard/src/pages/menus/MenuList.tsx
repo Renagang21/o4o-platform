@@ -67,32 +67,35 @@ const MenuList: FC = () => {
       const now = new Date();
       return {
         menus: [
-          { 
-            id: '1', 
-            name: 'Main Menu', 
-            location: 'primary' as MenuLocation, 
-            items: [{}, {}, {}], 
-            isActive: true, 
-            createdAt: now, 
-            updatedAt: now 
+          {
+            id: '1',
+            name: 'Main Menu',
+            location: 'primary' as MenuLocation,
+            items: [{}, {}, {}],
+            isActive: true,
+            createdAt: now,
+            updatedAt: now,
+            metadata: null // Global menu
           },
-          { 
-            id: '2', 
-            name: 'Footer Menu', 
-            location: 'footer' as MenuLocation, 
-            items: [{}, {}], 
-            isActive: true, 
-            createdAt: now, 
-            updatedAt: now 
+          {
+            id: '2',
+            name: 'Shop Menu',
+            location: 'primary' as MenuLocation,
+            items: [{}, {}, {}, {}],
+            isActive: true,
+            createdAt: now,
+            updatedAt: now,
+            metadata: { subdomain: 'shop', theme: 'afternoon' }
           },
-          { 
-            id: '3', 
-            name: 'Mobile Navigation', 
-            location: 'mobile' as MenuLocation, 
-            items: [{}], 
-            isActive: false, 
-            createdAt: now, 
-            updatedAt: now 
+          {
+            id: '3',
+            name: 'Seller1 Menu',
+            location: 'primary' as MenuLocation,
+            items: [{}],
+            isActive: true,
+            createdAt: now,
+            updatedAt: now,
+            metadata: { subdomain: 'shop', path_prefix: '/seller1', theme: 'twilight' }
           }
         ]
       };
@@ -171,11 +174,34 @@ const MenuList: FC = () => {
     data: {
       name: (
         <div>
-          <strong>
-            <a href={`/appearance/menus/${menu.id}/edit`} className="row-title">
-              {menu.name}
-            </a>
-          </strong>
+          <div className="flex items-center gap-2">
+            <strong>
+              <a href={`/appearance/menus/${menu.id}/edit`} className="row-title">
+                {menu.name}
+              </a>
+            </strong>
+            {/* Metadata badges */}
+            {menu.metadata?.subdomain && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                {menu.metadata.subdomain}
+              </Badge>
+            )}
+            {menu.metadata?.path_prefix && (
+              <Badge variant="outline" className="bg-gray-100 text-gray-700">
+                {menu.metadata.path_prefix}
+              </Badge>
+            )}
+            {menu.metadata?.theme && (
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                {menu.metadata.theme}
+              </Badge>
+            )}
+            {!menu.metadata && (
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                전역
+              </Badge>
+            )}
+          </div>
           {menu.description && (
             <div className="text-sm text-gray-500">{menu.description}</div>
           )}
