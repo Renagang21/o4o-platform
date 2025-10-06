@@ -46,6 +46,9 @@ interface UseTemplatePartsOptions {
     postType?: string;
     categories?: string[];
     userRole?: string;
+    subdomain?: string | null;
+    path?: string;
+    pathPrefix?: string | null;
   };
 }
 
@@ -62,8 +65,24 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
 
         // Build query params
         const params = new URLSearchParams();
+
+        // Add subdomain and path for Backend filtering
+        if (context?.subdomain) {
+          params.append('subdomain', context.subdomain);
+        }
+        if (context?.path) {
+          params.append('path', context.path);
+        }
+
+        // Add legacy context for backward compatibility
         if (context) {
-          params.append('context', JSON.stringify(context));
+          const legacyContext = {
+            pageId: context.pageId,
+            postType: context.postType,
+            categories: context.categories,
+            userRole: context.userRole
+          };
+          params.append('context', JSON.stringify(legacyContext));
         }
 
         // Fetching template parts for area

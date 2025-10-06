@@ -52,6 +52,12 @@ interface TemplatePartRendererProps {
     postType?: string;
     categories?: string[];
     userRole?: string;
+    subdomain?: string | null;
+    path?: string;
+    pathPrefix?: string | null;
+    menuData?: any;
+    menuLoading?: boolean;
+    logoUrl?: string;
   };
   fallback?: React.ReactNode;
 }
@@ -91,7 +97,8 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     if (block.type === 'core/site-logo') {
       blockProps = {
         ...blockProps,
-        logoUrl: block.data?.logoUrl,
+        // Use logo from context (menu metadata) if available, otherwise use block data
+        logoUrl: context?.logoUrl || block.data?.logoUrl,
         width: block.data?.width,
         isLink: block.data?.isLink,
         linkTarget: block.data?.linkTarget,
@@ -162,16 +169,15 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     );
   };
 
-  // Extract menu data from blocks (could be enhanced to fetch from API based on menuRef)
+  // Extract menu data from context (fetched from Backend API)
   const extractMenuDataFromBlocks = (blocks: TemplatePartBlock[]): any[] => {
-    // For now, return default menu items
-    // In the future, this could fetch menu data based on menuRef found in navigation blocks
-    return [
-      { id: '1', title: '홈', url: '/', target: '_self' },
-      { id: '2', title: '로그인', url: '/login', target: '_self' },
-      { id: '3', title: '쇼핑', url: '/shop', target: '_self' },
-      { id: '4', title: '블로그', url: '/posts', target: '_self' }
-    ];
+    // Use menu data from context (fetched by Layout component)
+    if (context?.menuData?.items && Array.isArray(context.menuData.items)) {
+      return context.menuData.items;
+    }
+
+    // Fallback: empty menu if no data available
+    return [];
   };
 
   // Show loading state
