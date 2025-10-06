@@ -27,6 +27,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { authClient } from '@o4o/auth-client';
 
 // Types
 interface MenuItem {
@@ -128,57 +129,67 @@ const WordPressMenuEditorEnhanced: FC = () => {
 
   // Load menu data if editing
   useEffect(() => {
-    if (id) {
-      setMenuName('주 메뉴');
-      setMenuSlug('primary-menu');
-      setSelectedLocation('primary');
-      setMenuDescription('사이트의 주요 네비게이션 메뉴');
-      setMenuItems([
-        {
-          id: '1',
-          title: '홈',
-          url: '/',
-          type: 'page',
-          originalId: 'page-1',
-          isExpanded: false
-        },
-        {
-          id: '2',
-          title: '회사 소개',
-          url: '/about',
-          type: 'page',
-          originalId: 'page-2',
-          isExpanded: false,
-          children: [
-            {
-              id: '2-1',
-              title: '연혁',
-              url: '/about/history',
-              type: 'page',
-              originalId: 'page-2-1',
-              isExpanded: false
-            },
-            {
-              id: '2-2',
-              title: '팀 소개',
-              url: '/about/team',
-              type: 'page',
-              originalId: 'page-2-2',
-              isExpanded: false
-            }
-          ]
-        },
-        {
-          id: '3',
-          title: '서비스',
-          url: '/services',
-          type: 'page',
-          originalId: 'page-3',
-          isExpanded: false
+    const loadMenuData = async () => {
+      if (!id) return;
+
+      try {
+        const response = await authClient.api.get(`/api/menus/${id}`);
+
+        if (response.data.success && response.data.data) {
+          const menu = response.data.data;
+
+          // Set basic menu data
+          setMenuName(menu.name || '');
+          setMenuSlug(menu.slug || '');
+          setSelectedLocation(menu.location || '');
+          setMenuDescription(menu.description || '');
+
+          // Load metadata if exists
+          if (menu.metadata) {
+            setSubdomain(menu.metadata.subdomain || '');
+            setPathPrefix(menu.metadata.path_prefix || '');
+            setTheme(menu.metadata.theme || '');
+            setLogoUrl(menu.metadata.logo_url || '');
+          }
+
+          // Convert and set menu items
+          if (menu.items && Array.isArray(menu.items)) {
+            const convertedItems = menu.items.map((item: any) => convertApiItemToMenuItem(item));
+            setMenuItems(convertedItems);
+          }
         }
-      ]);
-    }
+      } catch (error) {
+        console.error('Failed to load menu data:', error);
+        toast.error('메뉴 데이터를 불러오는데 실패했습니다');
+      }
+    };
+
+    loadMenuData();
   }, [id]);
+
+  // Convert API menu item to UI format
+  const convertApiItemToMenuItem = (apiItem: any): MenuItem => {
+    const item: MenuItem = {
+      id: apiItem.id || Date.now().toString() + Math.random(),
+      title: apiItem.title,
+      url: apiItem.url,
+      type: apiItem.type || 'custom',
+      target: apiItem.target,
+      cssClass: apiItem.css_class,
+      description: apiItem.description,
+      linkRelationship: apiItem.link_relationship,
+      titleAttribute: apiItem.title_attribute,
+      visibility: apiItem.visibility,
+      isExpanded: false,
+      originalId: apiItem.original_id
+    };
+
+    if (apiItem.children && Array.isArray(apiItem.children)) {
+      item.children = apiItem.children.map((child: any) => convertApiItemToMenuItem(child));
+    }
+
+    return item;
+  };
 
   // Generate slug from menu name
   useEffect(() => {
@@ -389,6 +400,11 @@ const WordPressMenuEditorEnhanced: FC = () => {
       return;
     }
 
+    if (!selectedLocation) {
+      toast.error('메뉴 위치를 선택해주세요');
+      return;
+    }
+
     // Validate path prefix
     if (pathPrefix && !pathPrefix.startsWith('/')) {
       toast.error('경로 접두사는 /로 시작해야 합니다');
@@ -407,27 +423,53 @@ const WordPressMenuEditorEnhanced: FC = () => {
         name: menuName,
         slug: menuSlug,
         location: selectedLocation,
-        description: menuDescription,
+        description: menuDescription || undefined,
+        is_active: true,
         metadata: Object.keys(metadata).length > 0 ? metadata : null,
-        items: menuItems
+        items: menuItems.map(item => convertMenuItemForApi(item))
       };
 
-      // TODO: Implement actual API call
-      // if (id) {
-      //   await authClient.api.put(`/menus/${id}`, menuData);
-      // } else {
-      //   await authClient.api.post('/menus', menuData);
-      // }
-
-      console.log('Menu data to save:', menuData);
-      toast.success('메뉴가 저장되었습니다!');
-
-      if (!id) {
-        navigate('/menus');
+      let response;
+      if (id) {
+        // Update existing menu
+        response = await authClient.api.put(`/api/menus/${id}`, menuData);
+      } else {
+        // Create new menu
+        response = await authClient.api.post('/api/menus', menuData);
       }
-    } catch (error) {
-      toast.error('메뉴 저장 중 오류가 발생했습니다');
+
+      if (response.data.success) {
+        toast.success(id ? '메뉴가 수정되었습니다!' : '메뉴가 생성되었습니다!');
+        navigate('/menus');
+      } else {
+        throw new Error(response.data.error || 'Failed to save menu');
+      }
+    } catch (error: any) {
+      console.error('Menu save error:', error);
+      const errorMessage = error.response?.data?.error || error.message || '메뉴 저장 중 오류가 발생했습니다';
+      toast.error(errorMessage);
     }
+  };
+
+  // Convert menu item to API format
+  const convertMenuItemForApi = (item: MenuItem): any => {
+    const apiItem: any = {
+      title: item.title,
+      url: item.url || '',
+      type: item.type,
+      target: item.target || '_self',
+      css_class: item.cssClass,
+      description: item.description,
+      link_relationship: item.linkRelationship,
+      title_attribute: item.titleAttribute,
+      visibility: item.visibility || 'public'
+    };
+
+    if (item.children && item.children.length > 0) {
+      apiItem.children = item.children.map(child => convertMenuItemForApi(child));
+    }
+
+    return apiItem;
   };
 
   // Render menu item with WordPress-style accordion
