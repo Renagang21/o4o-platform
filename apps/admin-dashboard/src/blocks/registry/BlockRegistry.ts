@@ -78,10 +78,6 @@ class BlockRegistry {
     if (categoryBlocks) {
       categoryBlocks.add(definition.name);
     }
-
-    if (import.meta.env.DEV) {
-      console.log(`✓ Registered block: ${definition.name}`);
-    }
   }
 
   /**
@@ -220,9 +216,6 @@ class BlockRegistry {
     // Remove from blocks map
     this.blocks.delete(name);
 
-    if (import.meta.env.DEV) {
-      console.log(`✓ Unregistered block: ${name}`);
-    }
     return true;
   }
 
@@ -252,9 +245,6 @@ class BlockRegistry {
   public clear(): void {
     this.blocks.clear();
     this.categoryIndex.forEach((set) => set.clear());
-    if (import.meta.env.DEV) {
-      console.log('✓ Registry cleared');
-    }
   }
 
   /**
