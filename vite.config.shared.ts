@@ -52,23 +52,19 @@ export const sharedViteConfig: UserConfig = {
           }
           
           if (id.includes('node_modules')) {
-            // React 관련 - react-query는 제외하고 순수 React만
-            if (id.includes('react') && !id.includes('react-query') && !id.includes('@tanstack')) {
+            // React 관련 - react-query 포함 (createContext 오류 방지)
+            if (id.includes('react') || id.includes('@tanstack/react-query')) {
               return 'vendor-react';
             }
             // 기타 UI 라이브러리
-            if (id.includes('lucide-react') || 
+            if (id.includes('lucide-react') ||
                 id.includes('clsx') || id.includes('tailwind-merge')) {
               return 'vendor-ui';
             }
             // 폼 관련
-            if (id.includes('react-hook-form') || id.includes('@hookform') || 
+            if (id.includes('react-hook-form') || id.includes('@hookform') ||
                 id.includes('zod')) {
               return 'vendor-forms';
-            }
-            // React Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'vendor-query';
             }
             // 유틸리티
             if (id.includes('date-fns') || id.includes('axios') || 

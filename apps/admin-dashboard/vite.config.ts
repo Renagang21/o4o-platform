@@ -67,9 +67,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react-dom',
       'react/jsx-runtime',
       '@tanstack/react-query',
-      '@o4o/utils', 
-      '@o4o/ui', 
-      '@o4o/auth-client', 
+      '@tanstack/react-query/devtools',
+      '@o4o/utils',
+      '@o4o/ui',
+      '@o4o/auth-client',
       '@o4o/auth-context',
       'date-fns',
       '@wordpress/blocks',
@@ -86,6 +87,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       define: {
         global: 'globalThis',
       },
+      // Force React to be external in all modules
+      external: [],
     },
   },
   build: {
@@ -150,16 +153,28 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           // 공통 설정 먼저 적용
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
           if (sharedChunk) return sharedChunk;
-          
+
+          // React와 ReactDOM은 항상 vendor-react에 포함
+          if (id.includes('node_modules/react/') ||
+              id.includes('node_modules/react-dom/')) {
+            return 'vendor-react';
+          }
+
+          // @tanstack/react-query는 vendor-react와 함께 번들링
+          // createContext 오류 방지
+          if (id.includes('@tanstack/react-query')) {
+            return 'vendor-react';
+          }
+
           // WordPress 관련 모듈은 절대 초기 번들에 포함되지 않도록 함
-          if (id.includes('@wordpress') || 
+          if (id.includes('@wordpress') ||
               id.includes('wordpress-initializer') ||
               id.includes('wordpress-dynamic-loader') ||
               id.includes('WordPressBlockEditor') ||
               id.includes('WordPressEditor') ||
               id.includes('GutenbergEditor') ||
               id.includes('blocks/') && !id.includes('node_modules')) {
-            
+
             // 모든 WordPress 패키지를 단일 번들로 통합
             // 초기화 순서 문제를 완전히 해결하기 위한 최종 솔루션
             // components, block-editor, data, core, blocks, i18n 등 모든 것 포함
@@ -167,7 +182,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
               return 'wp-all';  // 모든 WordPress 모듈을 하나로
             }
           }
-          
+
           if (id.includes('node_modules')) {
             // WordPress 패키지들은 위에서 이미 처리됨
             // 중복 정의 제거
