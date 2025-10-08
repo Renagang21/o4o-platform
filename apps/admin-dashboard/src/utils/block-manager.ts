@@ -40,7 +40,7 @@ class BlockManager {
     this.categories.set('media', {
       name: 'Media Blocks',
       priority: 'low',
-      blocks: ['gallery', 'audio', 'video', 'file', 'media-text', 'o4o/slide'],
+      blocks: ['gallery', 'audio', 'video', 'file', 'media-text', 'o4o/slide', 'o4o/markdown-reader', 'o4o/youtube', 'core/file'],
       loaded: false
     });
 
@@ -52,19 +52,7 @@ class BlockManager {
       loaded: false
     });
 
-    // Embed blocks - removed, now handled by new block registry
-    // Markdown reader is in 'media' category in blocks/definitions/
-    // YouTube, Twitter, Instagram will be added to new registry when needed
-    /*
-    this.categories.set('embeds', {
-      name: 'Embed Blocks',
-      priority: 'low',
-      blocks: ['o4o/youtube', 'o4o/twitter', 'o4o/instagram'],
-      loaded: false
-    });
-    */
-
-    // Dynamic blocks - lazy loaded (without markdown-reader)
+    // Dynamic blocks - lazy loaded
     this.categories.set('dynamic', {
       name: 'Dynamic Blocks',
       priority: 'low',
@@ -115,14 +103,6 @@ class BlockManager {
         case 'widgets':
           // Widgets blocks will be implemented later
           break;
-        /* Embeds now handled by new block registry system
-        case 'embeds':
-          // These blocks are now registered in blocks/definitions/
-          // o4o/markdown-reader -> moved to 'media' category
-          // o4o/youtube, twitter, instagram -> to be added to new registry
-          category.loaded = true;
-          break;
-        */
         case 'dynamic':
           // Register dynamic blocks directly with proper namespace
           this.registerBlock('o4o/cpt-acf-loop', {

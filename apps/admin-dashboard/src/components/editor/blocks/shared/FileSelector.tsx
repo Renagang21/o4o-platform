@@ -336,8 +336,11 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         // Audio formats
         acc['audio/*'] = [];
       } else if (type === 'other') {
-        // Allow all file types
-        acc['*/*'] = [];
+        // Allow common file types for 'other' category
+        acc['application/json'] = ['.json'];
+        acc['application/xml'] = ['.xml'];
+        acc['application/zip'] = ['.zip'];
+        acc['text/csv'] = ['.csv'];
       } else {
         // image, video
         acc[`${type}/*`] = [];

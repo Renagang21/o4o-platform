@@ -53,7 +53,7 @@ interface YouTubeBlockProps extends StandardBlockProps {
 const youtubeConfig: StandardBlockConfig = {
   type: 'youtube',
   icon: Youtube,
-  category: 'embed',
+  category: 'media',
   title: 'YouTube',
   description: 'Embed a YouTube video.',
   keywords: ['youtube', 'video', 'embed', 'media'],
