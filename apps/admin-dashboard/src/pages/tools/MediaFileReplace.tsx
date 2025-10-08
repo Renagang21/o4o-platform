@@ -84,7 +84,7 @@ const MediaFileReplace: React.FC = () => {
   const loadMediaFiles = async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/api/media', {
+      const response = await authClient.api.get('/media', {
         params: { limit: 1000 }
       });
 
@@ -146,7 +146,7 @@ const MediaFileReplace: React.FC = () => {
       const formData = new FormData();
       formData.append('file', newFile);
 
-      await authClient.api.put(`/api/media/${selectedFile.id}/replace`, formData, {
+      await authClient.api.put(`/media/${selectedFile.id}/replace`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
