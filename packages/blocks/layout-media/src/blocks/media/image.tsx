@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface ImageBlockProps {
+  attributes: {
+    url: string;
+    alt: string;
+    caption: string;
+    align: string;
+    width: number;
+    height: number;
+    linkTo: string;
+    href: string;
+  };
+  setAttributes: (attrs: Partial<ImageBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<ImageBlockProps> = ({ attributes, setAttributes }) => {
   const { url, alt, caption, align, width, height, linkTo, href } = attributes;
   const [isEditing, setIsEditing] = useState(!url);
   
@@ -120,7 +134,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<ImageBlockProps, 'attributes'>> = ({ attributes }) => {
   const { url, alt, caption, align, width, height, linkTo, href } = attributes;
   
   if (!url) return null;

@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
+interface HtmlBlockProps {
+  attributes: {
+    content?: string;
+  };
+  setAttributes: (attrs: Partial<HtmlBlockProps['attributes']>) => void;
+}
+
 // Edit Component
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+const Edit: React.FC<HtmlBlockProps> = ({ attributes, setAttributes }) => {
   const { content } = attributes;
   const [isEditing, setIsEditing] = useState(true);
   
@@ -45,9 +52,9 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
         </div>
       ) : (
         <div className="html-preview">
-          <div 
+          <div
             className="wp-block-html"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: content || '' }}
             style={{
               padding: '10px',
               border: '1px dashed #ddd',
@@ -62,15 +69,15 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
 };
 
 // Save Component
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<HtmlBlockProps, 'attributes'>> = ({ attributes }) => {
   const { content } = attributes;
   
   // For custom HTML, we return the raw HTML without wrapper
   // WordPress will handle the rendering
   return (
-    <div 
+    <div
       className="wp-block-html"
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: content || '' }}
     />
   );
 };

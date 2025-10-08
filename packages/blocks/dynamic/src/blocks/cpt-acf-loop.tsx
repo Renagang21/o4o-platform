@@ -1,9 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface CPTACFLoopAttributes {
+  postType: string;
+  postsPerPage: number;
+  orderBy: string;
+  order: string;
+  showPagination: boolean;
+}
+
+interface Post {
+  id: number;
+  title: string;
+  excerpt: string;
+}
+
+interface BlockEditProps {
+  attributes: CPTACFLoopAttributes;
+  setAttributes: (attrs: Partial<CPTACFLoopAttributes>) => void;
+}
+
+interface BlockSaveProps {
+  attributes: CPTACFLoopAttributes;
+}
+
+const Edit: React.FC<BlockEditProps> = ({ attributes, setAttributes }) => {
   const { postType, postsPerPage, orderBy, order, showPagination } = attributes;
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   
   // Simulated post fetching
@@ -96,7 +119,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<BlockSaveProps> = ({ attributes }) => {
   const { postType, postsPerPage, orderBy, order, showPagination } = attributes;
   
   // Server-side rendering placeholder

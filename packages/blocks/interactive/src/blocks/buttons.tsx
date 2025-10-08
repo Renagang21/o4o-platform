@@ -2,7 +2,15 @@ import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
 // Buttons Container Block
-const ButtonsEdit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface ButtonsBlockProps {
+  attributes: {
+    layout: string;
+    orientation: string;
+  };
+  setAttributes: (attrs: Partial<ButtonsBlockProps['attributes']>) => void;
+}
+
+const ButtonsEdit: React.FC<ButtonsBlockProps> = ({ attributes, setAttributes }) => {
   const { layout, orientation } = attributes;
   
   const classNames = [
@@ -36,7 +44,7 @@ const ButtonsEdit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const ButtonsSave: React.FC<any> = ({ attributes }) => {
+const ButtonsSave: React.FC<Pick<ButtonsBlockProps, 'attributes'>> = ({ attributes }) => {
   const { layout, orientation } = attributes;
   
   const classNames = [
@@ -78,7 +86,21 @@ export const ButtonsBlock: BlockDefinition = {
 };
 
 // Individual Button Block
-const ButtonEdit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface ButtonBlockProps {
+  attributes: {
+    text: string;
+    url?: string;
+    linkTarget?: string;
+    rel?: string;
+    style: string;
+    backgroundColor?: string;
+    textColor?: string;
+    width?: number;
+  };
+  setAttributes: (attrs: Partial<ButtonBlockProps['attributes']>) => void;
+}
+
+const ButtonEdit: React.FC<ButtonBlockProps> = ({ attributes, setAttributes }) => {
   const { text, url, linkTarget, rel, style, backgroundColor, textColor, width } = attributes;
   
   const buttonClass = [
@@ -141,7 +163,7 @@ const ButtonEdit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const ButtonSave: React.FC<any> = ({ attributes }) => {
+const ButtonSave: React.FC<Pick<ButtonBlockProps, 'attributes'>> = ({ attributes }) => {
   const { text, url, linkTarget, rel, style, backgroundColor, textColor, width } = attributes;
   
   const buttonClass = [

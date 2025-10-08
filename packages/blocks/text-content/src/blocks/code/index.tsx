@@ -1,8 +1,16 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
+interface CodeBlockProps {
+  attributes: {
+    content?: string;
+    language?: string;
+  };
+  setAttributes: (attrs: Partial<CodeBlockProps['attributes']>) => void;
+}
+
 // Edit Component
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+const Edit: React.FC<CodeBlockProps> = ({ attributes, setAttributes }) => {
   const { content, language } = attributes;
   
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -50,7 +58,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
 };
 
 // Save Component
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<CodeBlockProps, 'attributes'>> = ({ attributes }) => {
   const { content, language } = attributes;
   
   return (

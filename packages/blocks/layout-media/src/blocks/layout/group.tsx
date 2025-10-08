@@ -1,9 +1,19 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface GroupBlockProps {
+  attributes: {
+    tagName: string;
+    layout: string;
+    backgroundColor: string;
+    textColor: string;
+  };
+  setAttributes: (attrs: Partial<GroupBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<GroupBlockProps> = ({ attributes, setAttributes }) => {
   const { tagName, layout, backgroundColor, textColor } = attributes;
-  const Tag = tagName || 'div';
+  const Tag = (tagName || 'div') as keyof JSX.IntrinsicElements;
   
   const updateTagName = (newTag: string) => {
     setAttributes({ tagName: newTag });
@@ -53,9 +63,9 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<GroupBlockProps, 'attributes'>> = ({ attributes }) => {
   const { tagName, layout, backgroundColor, textColor } = attributes;
-  const Tag = tagName || 'div';
+  const Tag = (tagName || 'div') as keyof JSX.IntrinsicElements;
   
   const classNames = [
     'wp-block-group',

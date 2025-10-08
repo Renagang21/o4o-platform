@@ -1,7 +1,15 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface SeparatorBlockProps {
+  attributes: {
+    style: string;
+    color: string;
+  };
+  setAttributes: (attrs: Partial<SeparatorBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<SeparatorBlockProps> = ({ attributes, setAttributes }) => {
   const { style, color } = attributes;
   
   const updateStyle = (newStyle: string) => {
@@ -28,7 +36,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<SeparatorBlockProps, 'attributes'>> = ({ attributes }) => {
   const { style, color } = attributes;
   
   const classNames = [

@@ -1,7 +1,14 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface SpacerBlockProps {
+  attributes: {
+    height: number;
+  };
+  setAttributes: (attrs: Partial<SpacerBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<SpacerBlockProps> = ({ attributes, setAttributes }) => {
   const { height } = attributes;
   
   const updateHeight = (newHeight: number) => {
@@ -31,7 +38,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<SpacerBlockProps, 'attributes'>> = ({ attributes }) => {
   const { height } = attributes;
   
   return (

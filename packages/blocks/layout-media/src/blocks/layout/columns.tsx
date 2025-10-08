@@ -1,8 +1,17 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
+interface ColumnsBlockProps {
+  attributes: {
+    verticalAlignment: string;
+    isStackedOnMobile: boolean;
+    columnCount: number;
+  };
+  setAttributes: (attrs: Partial<ColumnsBlockProps['attributes']>) => void;
+}
+
 // Columns Container Block
-const ColumnsEdit: React.FC<any> = ({ attributes, setAttributes }) => {
+const ColumnsEdit: React.FC<ColumnsBlockProps> = ({ attributes, setAttributes }) => {
   const { verticalAlignment, isStackedOnMobile, columnCount } = attributes;
   
   const updateColumnCount = (count: number) => {
@@ -65,7 +74,7 @@ const ColumnsEdit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const ColumnsSave: React.FC<any> = ({ attributes }) => {
+const ColumnsSave: React.FC<Pick<ColumnsBlockProps, 'attributes'>> = ({ attributes }) => {
   const { verticalAlignment, isStackedOnMobile } = attributes;
   
   const classNames = [
@@ -124,7 +133,15 @@ export const ColumnsBlock: BlockDefinition = {
 };
 
 // Individual Column Block
-const ColumnEdit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface ColumnBlockProps {
+  attributes: {
+    width: string;
+    verticalAlignment: string;
+  };
+  setAttributes: (attrs: Partial<ColumnBlockProps['attributes']>) => void;
+}
+
+const ColumnEdit: React.FC<ColumnBlockProps> = ({ attributes, setAttributes }) => {
   const { width, verticalAlignment } = attributes;
   
   const updateWidth = (newWidth: string) => {
@@ -155,7 +172,7 @@ const ColumnEdit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const ColumnSave: React.FC<any> = ({ attributes }) => {
+const ColumnSave: React.FC<Pick<ColumnBlockProps, 'attributes'>> = ({ attributes }) => {
   const { width, verticalAlignment } = attributes;
   
   const classNames = [

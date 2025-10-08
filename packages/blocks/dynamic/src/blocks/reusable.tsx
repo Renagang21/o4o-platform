@@ -1,10 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface ReusableBlockAttributes {
+  ref: number | null;
+}
+
+interface ReusableBlockData {
+  id: number;
+  title: string;
+  content: string;
+}
+
+interface BlockEditProps {
+  attributes: ReusableBlockAttributes;
+  setAttributes: (attrs: Partial<ReusableBlockAttributes>) => void;
+}
+
+interface BlockSaveProps {
+  attributes: ReusableBlockAttributes;
+}
+
+const Edit: React.FC<BlockEditProps> = ({ attributes, setAttributes }) => {
   const { ref } = attributes;
-  const [reusableBlocks, setReusableBlocks] = useState<any[]>([]);
-  const [selectedBlock, setSelectedBlock] = useState<any>(null);
+  const [reusableBlocks, setReusableBlocks] = useState<ReusableBlockData[]>([]);
+  const [selectedBlock, setSelectedBlock] = useState<ReusableBlockData | null>(null);
   
   useEffect(() => {
     // Simulated fetching of reusable blocks
@@ -18,14 +37,14 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   useEffect(() => {
     if (ref) {
       const block = reusableBlocks.find(b => b.id === ref);
-      setSelectedBlock(block);
+      setSelectedBlock(block || null);
     }
   }, [ref, reusableBlocks]);
-  
+
   const handleSelect = (blockId: number) => {
     setAttributes({ ref: blockId });
     const block = reusableBlocks.find(b => b.id === blockId);
-    setSelectedBlock(block);
+    setSelectedBlock(block || null);
   };
   
   if (!ref) {
@@ -57,7 +76,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<BlockSaveProps> = ({ attributes }) => {
   const { ref } = attributes;
   
   // Server-side rendering

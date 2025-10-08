@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface TableCell {
+  content: string;
+}
+
+interface TableRow {
+  cells: TableCell[];
+}
+
+interface TableBlockProps {
+  attributes: {
+    hasFixedLayout: boolean;
+    head?: TableRow[];
+    body?: TableRow[];
+    foot?: TableRow[];
+  };
+  setAttributes: (attrs: Partial<TableBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<TableBlockProps> = ({ attributes, setAttributes }) => {
   const { hasFixedLayout, head, body, foot } = attributes;
   const [rows, setRows] = useState(body?.length || 2);
   const [cols, setCols] = useState(body?.[0]?.cells?.length || 2);
@@ -15,13 +33,13 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
     setCols(newCols);
   };
   
-  const updateCell = (section: string, rowIndex: number, colIndex: number, content: string) => {
+  const updateCell = (section: 'head' | 'body' | 'foot', rowIndex: number, colIndex: number, content: string) => {
     const newSection = [...(attributes[section] || [])];
     if (!newSection[rowIndex]) {
       newSection[rowIndex] = { cells: [] };
     }
     if (!newSection[rowIndex].cells[colIndex]) {
-      newSection[rowIndex].cells[colIndex] = {};
+      newSection[rowIndex].cells[colIndex] = { content: '' };
     }
     newSection[rowIndex].cells[colIndex].content = content;
     setAttributes({ [section]: newSection });
@@ -94,7 +112,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<TableBlockProps, 'attributes'>> = ({ attributes }) => {
   const { hasFixedLayout, head, body, foot } = attributes;
   
   const classNames = [
@@ -107,9 +125,9 @@ const Save: React.FC<any> = ({ attributes }) => {
       <table>
         {head && head.length > 0 && (
           <thead>
-            {head.map((row: any, idx: number) => (
+            {head.map((row: TableRow, idx: number) => (
               <tr key={idx}>
-                {row.cells.map((cell: any, cellIdx: number) => (
+                {row.cells.map((cell: TableCell, cellIdx: number) => (
                   <th key={cellIdx}>{cell.content}</th>
                 ))}
               </tr>
@@ -118,9 +136,9 @@ const Save: React.FC<any> = ({ attributes }) => {
         )}
         {body && body.length > 0 && (
           <tbody>
-            {body.map((row: any, idx: number) => (
+            {body.map((row: TableRow, idx: number) => (
               <tr key={idx}>
-                {row.cells.map((cell: any, cellIdx: number) => (
+                {row.cells.map((cell: TableCell, cellIdx: number) => (
                   <td key={cellIdx}>{cell.content}</td>
                 ))}
               </tr>
@@ -129,9 +147,9 @@ const Save: React.FC<any> = ({ attributes }) => {
         )}
         {foot && foot.length > 0 && (
           <tfoot>
-            {foot.map((row: any, idx: number) => (
+            {foot.map((row: TableRow, idx: number) => (
               <tr key={idx}>
-                {row.cells.map((cell: any, cellIdx: number) => (
+                {row.cells.map((cell: TableCell, cellIdx: number) => (
                   <td key={cellIdx}>{cell.content}</td>
                 ))}
               </tr>

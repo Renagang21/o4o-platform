@@ -1,7 +1,18 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface SearchBlockProps {
+  attributes: {
+    label: string;
+    placeholder: string;
+    buttonText: string;
+    buttonPosition: string;
+    showLabel: boolean;
+  };
+  setAttributes: (attrs: Partial<SearchBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<SearchBlockProps> = ({ attributes, setAttributes }) => {
   const { label, placeholder, buttonText, buttonPosition, showLabel } = attributes;
   
   return (
@@ -65,7 +76,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<SearchBlockProps, 'attributes'>> = ({ attributes }) => {
   const { label, placeholder, buttonText, buttonPosition, showLabel } = attributes;
   
   return (

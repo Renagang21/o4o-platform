@@ -125,13 +125,24 @@ export const parseMarkdown = (markdown: string): string => {
   return html;
 };
 
+// Front matter metadata structure
+interface FrontMatterMetadata {
+  [key: string]: string;
+}
+
+// Front matter result
+interface FrontMatterResult {
+  metadata: FrontMatterMetadata;
+  content: string;
+}
+
 // Parse front matter if present
-export const parseFrontMatter = (markdown: string): { metadata: any; content: string } => {
+export const parseFrontMatter = (markdown: string): FrontMatterResult => {
   const frontMatterRegex = /^---\n([\s\S]*?)\n---\n/;
   const match = markdown.match(frontMatterRegex);
 
   if (match) {
-    const metadata: any = {};
+    const metadata: FrontMatterMetadata = {};
     const lines = match[1].split('\n');
 
     lines.forEach(line => {

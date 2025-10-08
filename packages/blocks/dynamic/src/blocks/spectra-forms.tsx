@@ -1,15 +1,38 @@
 import React, { useState } from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface SpectraFormAttributes {
+  formType: string;
+  showLabels: boolean;
+  submitText: string;
+  successMessage: string;
+}
+
+interface FormField {
+  id: string;
+  label: string;
+  type: 'text' | 'email' | 'textarea';
+  required: boolean;
+}
+
+interface BlockEditProps {
+  attributes: SpectraFormAttributes;
+  setAttributes: (attrs: Partial<SpectraFormAttributes>) => void;
+}
+
+interface BlockSaveProps {
+  attributes: SpectraFormAttributes;
+}
+
+const Edit: React.FC<BlockEditProps> = ({ attributes, setAttributes }) => {
   const { formType, showLabels, submitText, successMessage } = attributes;
-  const [formFields, setFormFields] = useState([
+  const [formFields, setFormFields] = useState<FormField[]>([
     { id: 'name', label: 'Name', type: 'text', required: true },
     { id: 'email', label: 'Email', type: 'email', required: true },
     { id: 'message', label: 'Message', type: 'textarea', required: false },
   ]);
-  
-  const handleFieldChange = (fieldId: string, property: string, value: any) => {
+
+  const handleFieldChange = (fieldId: string, property: string, value: string | boolean) => {
     setFormFields(fields => 
       fields.map(field => 
         field.id === fieldId ? { ...field, [property]: value } : field
@@ -87,7 +110,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<BlockSaveProps> = ({ attributes }) => {
   const { formType, showLabels, submitText, successMessage } = attributes;
   
   return (

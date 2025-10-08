@@ -1,8 +1,20 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
+interface ParagraphBlockProps {
+  attributes: {
+    content?: string;
+    align?: 'left' | 'center' | 'right' | 'justify';
+    dropCap?: boolean;
+    fontSize?: string;
+    textColor?: string;
+    backgroundColor?: string;
+  };
+  setAttributes: (attrs: Partial<ParagraphBlockProps['attributes']>) => void;
+}
+
 // Edit Component
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+const Edit: React.FC<ParagraphBlockProps> = ({ attributes, setAttributes }) => {
   const { content, align, dropCap, fontSize, textColor, backgroundColor } = attributes;
   
   const handleContentChange = (e: React.ChangeEvent<HTMLDivElement>) => {
@@ -31,7 +43,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
 };
 
 // Save Component
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<ParagraphBlockProps, 'attributes'>> = ({ attributes }) => {
   const { content, align, dropCap, fontSize, textColor, backgroundColor } = attributes;
   
   const classNames = [

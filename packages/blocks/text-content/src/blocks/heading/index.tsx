@@ -1,8 +1,18 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
+interface HeadingBlockProps {
+  attributes: {
+    content?: string;
+    level?: number;
+    align?: string;
+    textColor?: string;
+  };
+  setAttributes: (attrs: Partial<HeadingBlockProps['attributes']>) => void;
+}
+
 // Edit Component
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+const Edit: React.FC<HeadingBlockProps> = ({ attributes, setAttributes }) => {
   const { content, level, align, textColor } = attributes;
   const Tag = `h${level || 2}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   
@@ -47,7 +57,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
 };
 
 // Save Component
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<HeadingBlockProps, 'attributes'>> = ({ attributes }) => {
   const { content, level, align, textColor } = attributes;
   const Tag = `h${level || 2}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   
@@ -58,9 +68,9 @@ const Save: React.FC<any> = ({ attributes }) => {
   ].filter(Boolean).join(' ');
   
   return (
-    <Tag 
+    <Tag
       className={classNames}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: content || '' }}
     />
   );
 };

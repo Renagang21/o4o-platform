@@ -1,7 +1,19 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+interface VideoBlockProps {
+  attributes: {
+    src: string;
+    poster: string;
+    autoplay: boolean;
+    loop: boolean;
+    muted: boolean;
+    controls: boolean;
+  };
+  setAttributes: (attrs: Partial<VideoBlockProps['attributes']>) => void;
+}
+
+const Edit: React.FC<VideoBlockProps> = ({ attributes, setAttributes }) => {
   const { src, poster, autoplay, loop, muted, controls } = attributes;
   
   return (
@@ -29,7 +41,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   );
 };
 
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<VideoBlockProps, 'attributes'>> = ({ attributes }) => {
   const { src, poster, autoplay, loop, muted, controls } = attributes;
   
   return (

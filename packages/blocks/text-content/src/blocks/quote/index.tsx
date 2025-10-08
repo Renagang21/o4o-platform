@@ -1,8 +1,17 @@
 import React from 'react';
 import { BlockDefinition } from '@o4o/block-core';
 
+interface QuoteBlockProps {
+  attributes: {
+    content?: string;
+    citation?: string;
+    align?: string;
+  };
+  setAttributes: (attrs: Partial<QuoteBlockProps['attributes']>) => void;
+}
+
 // Edit Component
-const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
+const Edit: React.FC<QuoteBlockProps> = ({ attributes, setAttributes }) => {
   const { content, citation, align } = attributes;
   
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -41,7 +50,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
 };
 
 // Save Component
-const Save: React.FC<any> = ({ attributes }) => {
+const Save: React.FC<Pick<QuoteBlockProps, 'attributes'>> = ({ attributes }) => {
   const { content, citation, align } = attributes;
   
   const classNames = [
@@ -51,7 +60,7 @@ const Save: React.FC<any> = ({ attributes }) => {
   
   return (
     <blockquote className={classNames}>
-      <p dangerouslySetInnerHTML={{ __html: content }} />
+      <p dangerouslySetInnerHTML={{ __html: content || '' }} />
       {citation && (
         <cite dangerouslySetInnerHTML={{ __html: citation }} />
       )}
