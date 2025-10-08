@@ -201,7 +201,12 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
         part.area === 'header' && part.isDefault === true
       );
 
-      if (defaultHeader) {
+      // Check if defaultHeader has valid UUID (not placeholder UUID)
+      const isValidUUID = defaultHeader?.id &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(defaultHeader.id) &&
+        defaultHeader.id !== 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+
+      if (defaultHeader && isValidUUID) {
         // Update existing default header
         await authClient.api.put(`/template-parts/${defaultHeader.id}`, headerTemplatePart);
         toast.success('Header template updated successfully');
