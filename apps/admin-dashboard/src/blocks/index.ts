@@ -63,9 +63,11 @@ export function registerAllBlocks(): void {
   blockRegistry.register(shortcodeBlockDefinition);
   blockRegistry.register(markdownReaderBlockDefinition);
 
-  // Log registration summary
-  const metadata = blockRegistry.getMetadata();
-  console.log('✓ Block Registry Initialized:', metadata);
+  // Log registration summary (dev only)
+  if (import.meta.env.DEV) {
+    const metadata = blockRegistry.getMetadata();
+    console.log('✓ Block Registry Initialized:', metadata);
+  }
 }
 
 // Export registry for external use

@@ -59,7 +59,9 @@ class BlockRegistry {
 
     // Check for duplicate registration
     if (this.blocks.has(definition.name)) {
-      console.warn(`Block "${definition.name}" is already registered. Overwriting...`);
+      if (import.meta.env.DEV) {
+        console.warn(`Block "${definition.name}" is already registered. Overwriting...`);
+      }
     }
 
     // Create registry entry
@@ -77,7 +79,9 @@ class BlockRegistry {
       categoryBlocks.add(definition.name);
     }
 
-    console.log(`✓ Registered block: ${definition.name}`);
+    if (import.meta.env.DEV) {
+      console.log(`✓ Registered block: ${definition.name}`);
+    }
   }
 
   /**
@@ -216,7 +220,9 @@ class BlockRegistry {
     // Remove from blocks map
     this.blocks.delete(name);
 
-    console.log(`✓ Unregistered block: ${name}`);
+    if (import.meta.env.DEV) {
+      console.log(`✓ Unregistered block: ${name}`);
+    }
     return true;
   }
 
@@ -246,7 +252,9 @@ class BlockRegistry {
   public clear(): void {
     this.blocks.clear();
     this.categoryIndex.forEach((set) => set.clear());
-    console.log('✓ Registry cleared');
+    if (import.meta.env.DEV) {
+      console.log('✓ Registry cleared');
+    }
   }
 
   /**
