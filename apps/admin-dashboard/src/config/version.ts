@@ -2,18 +2,18 @@
  * Application version configuration
  * This file provides a centralized location for version information
  *
- * Version is sourced from package.json and should be updated there
- * during release process
+ * IMPORTANT: Keep this version in sync with package.json
+ * TODO: Automate version injection during build process
  */
-
-// Read from package.json to ensure single source of truth
-import packageJson from '../../package.json';
 
 /**
  * Current application version
  * Format: MAJOR.MINOR.PATCH (e.g., 0.5.0)
+ *
+ * NOTE: This must be manually updated to match package.json version
+ * package.json version: "0.5.0"
  */
-export const APP_VERSION = packageJson.version;
+export const APP_VERSION = '0.5.0';
 
 /**
  * Formatted version string for display
