@@ -9,7 +9,6 @@ System design, components, and technical architecture documentation.
 
 - **Core Architecture**
   - [API Server Requirements](./architecture/API_SERVER_REQUIREMENTS.md)
-  - [API Server Status](./API_SERVER_STATUS.md)
   - [Page Management Implementation](./architecture/PAGE_MANAGEMENT_IMPLEMENTATION_GUIDE.md)
   - [Shortcode Reference](./architecture/SHORTCODE_REFERENCE.md)
   - [Shortcode Usage Guide](./architecture/SHORTCODE_USAGE_GUIDE.md)
@@ -30,17 +29,13 @@ Development guidelines, setup instructions, and coding standards.
 - [TypeScript Guidelines](./development/TYPESCRIPT_GUIDELINES.md)
 - [NPM Scripts Guide](./development/NPM_SCRIPTS_GUIDE.md)
 - [Code Quality Analysis](./development/CODE_QUALITY_ANALYSIS.md)
-- [Admin Dashboard TypeScript Status](./admin-dashboard-ts-status.md)
 
 ### 🚀 [Deployment](./deployment/)
 Production deployment, CI/CD, and infrastructure documentation.
 
-- **Main Guides**
-  - [Deployment Guide](./deployment/DEPLOYMENT_GUIDE.md)
+- **Main Guide**
+  - [📖 Deployment Master Guide](./deployment/README.md) ⭐ **Start Here**
   - [Deployment Checklist](./deployment/DEPLOYMENT_CHECKLIST.md)
-  - [Deployment Scripts Guide](./DEPLOYMENT_SCRIPTS_GUIDE.md)
-  - [Unified Deployment Guide](./DEPLOYMENT_GUIDE_UNIFIED.md)
-  - [Direct Deployment Plan](./deployment/DIRECT_DEPLOYMENT_PLAN.md)
 
 - **CI/CD & Automation**
   - [GitHub Actions Setup](./deployment/GITHUB_ACTIONS_SETUP.md)
@@ -80,9 +75,10 @@ Operational guides for running and maintaining the platform.
 ### 🛠️ [Setup](./setup/)
 Environment configuration and initial setup documentation.
 
-- [API Server Setup](./setup/API_SERVER_SETUP.md)
+- [API Server Setup Guide](./setup/API_SERVER_SETUP_GUIDE.md)
 - [API Server Environment](./setup/API_SERVER_ENV_REQUIREMENTS.md)
 - [Webserver Environment](./setup/WEBSERVER_ENV_REQUIREMENTS.md)
+- [GitHub Secrets Setup](./setup/SETUP_GITHUB_SECRETS.md)
 - [PM2 Autostart Setup](./setup/PM2_AUTOSTART_SETUP-webserver.md)
 - [Environment Variables Design](./setup/ENV_VARIABLES_DESIGN.md)
 
@@ -110,34 +106,40 @@ Security guidelines and audit reports.
 
 - [Security Audit Report](./security/SECURITY_AUDIT_REPORT.md)
 
-### 📚 [Guides](./guides/)
-Comprehensive guides for various platform features.
+### 🔐 [Authentication](./authentication/)
+Authentication system documentation and implementation guides.
 
-- **Authentication & Security**
-  - [Authentication Integration](./guides/authentication-integration.md)
-  - [OAuth Integration Guide](./guides/oauth-integration-guide.md)
-  - [Password Reset Implementation](./guides/password-reset-implementation.md)
-  - [Refresh Token Implementation](./guides/refresh-token-implementation.md)
-  - [Session Management](./guides/session-management-implementation.md)
-  - [Login Security](./guides/login-security-implementation.md)
-  - [Cross-App Session Sync](./guides/cross-app-session-sync.md)
+- [📖 Authentication System Overview](./authentication/README.md) ⭐ **Start Here**
+- [Authentication Integration](./authentication/authentication-integration.md)
+- [OAuth Integration Guide](./authentication/oauth-integration-guide.md)
+- [Refresh Token Implementation](./authentication/refresh-token-implementation.md)
+- [Session Management](./authentication/session-management-implementation.md)
+- [Login Security](./authentication/login-security-implementation.md)
+- [Password Reset](./authentication/password-reset-implementation.md)
+- [Cross-App Session Sync](./authentication/cross-app-session-sync.md)
 
-- **API & Development**
-  - [API Documentation](./guides/API_DOCUMENTATION.md)
-  - [API CORS Fix Guide](./guides/API_CORS_FIX_GUIDE.md)
-  - [API Server Setup Guide](./guides/API_SERVER_SETUP_GUIDE.md)
-  - [AI Collaboration Guide](./guides/AI_COLLABORATION_GUIDE.md)
-  - [AI Development Lecture Material](./guides/AI_DEVELOPMENT_LECTURE_MATERIAL.md)
+### 📚 [Guides](./guide/)
+Additional platform guides and tutorials.
 
-- **Quick Start**
-  - [Quick Start Guide](./guides/QUICK_START.md)
-  - [Unified Deployment Guide](./guides/UNIFIED_DEPLOYMENT_GUIDE.md)
+- [Add New Shortcode Guide](./guide/ADD_NEW_SHORTCODE.md)
 
 ### 📂 [API Analysis](./api-analysis/)
 API-related analysis and fixes.
 
 - [API Error Analysis Report](./api-analysis/API_ERROR_ANALYSIS_REPORT.md)
 - [API Server Fix Instructions](./api-analysis/API_SERVER_FIX_INSTRUCTIONS.md)
+
+### 📊 [Project Status](./status/)
+Development progress tracking and status reports.
+
+- [API Server Status](./status/API_SERVER_STATUS.md)
+- [Admin Dashboard TypeScript Migration](./status/admin-dashboard-ts-status.md)
+
+### 📖 [User Manual](./manual/)
+사용자 가이드 (한국어)
+
+- [관리자 매뉴얼](./manual/admin-manual.md)
+- [숏코드 레퍼런스](./manual/shortcode-reference.md)
 
 ### 📦 [Archive](./archive/)
 Historical documentation and investigation reports.
@@ -148,9 +150,10 @@ Historical documentation and investigation reports.
 
 ## 🚀 Quick Links
 
-- **Getting Started**: [Quick Start Guide](./guides/QUICK_START.md)
+- **Getting Started**: [Quick Start Guide](./QUICK_START.md)
 - **Local Development**: [Local Setup Guide](./development/LOCAL_SETUP_GUIDE.md)
-- **Deploy to Production**: [Deployment Guide](./deployment/DEPLOYMENT_GUIDE.md)
+- **Deploy to Production**: [Deployment Master Guide](./deployment/README.md) ⭐
+- **Authentication**: [Authentication System Overview](./authentication/README.md) ⭐
 - **Troubleshooting**: [Troubleshooting README](./troubleshooting/README.md)
 
 ## 📖 Document Status
@@ -159,12 +162,13 @@ Historical documentation and investigation reports.
 |----------|--------|--------------|
 | Architecture | ✅ Complete | 2025-01-30 |
 | Development | ✅ Complete | 2025-01-30 |
-| Deployment | ✅ Complete | 2025-01-30 |
+| Deployment | ✅ Complete | 2025-10-08 |
+| Authentication | ✅ Complete | 2025-10-08 |
 | Operations | ✅ Complete | 2025-01-30 |
 | Testing | 🔄 In Progress | 2025-01-30 |
 | Security | 📝 Needs Update | 2024-08-05 |
 | Troubleshooting | ✅ Complete | 2025-01-30 |
-| Guides | ✅ Complete | 2025-01-30 |
+| User Manual | ✅ Complete | 2025-10-05 |
 
 ## 🔄 Documentation Maintenance
 
@@ -201,19 +205,22 @@ For questions or issues with the documentation:
 docs/
 ├── architecture/       # System design and architecture
 ├── development/       # Development guides and standards
-├── deployment/        # Deployment and CI/CD
+├── deployment/        # Deployment and CI/CD (⭐ README.md)
+├── authentication/    # Authentication system (⭐ README.md)
 ├── apps/             # App-specific documentation
 ├── operations/       # Operational guides
 ├── setup/           # Environment setup
-├── troubleshooting/ # Problem solving guides
+├── troubleshooting/  # Problem solving guides
 ├── testing/         # Test documentation
 ├── security/        # Security guidelines
-├── guides/          # Comprehensive feature guides
+├── guide/           # Additional guides
+├── manual/          # User manual (Korean)
 ├── api-analysis/    # API analysis and fixes
+├── status/          # Project status tracking (NEW)
 └── archive/         # Historical documentation
 ```
 
 ---
 
-*Last Updated: 2025-01-30*
-*Version: 2.0.0*
+*Last Updated: 2025-10-08*
+*Version: 2.1.0 - Cleaned and Reorganized*

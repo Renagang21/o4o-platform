@@ -1,130 +1,168 @@
 # Nginx Configuration for O4O Platform
 
-This directory contains nginx configuration files for the O4O Platform.
+> **📌 메인 설정 위치**: `/nginx-configs/` 디렉토리
+> **📖 상세 가이드**: [nginx-configs/README.md](../../nginx-configs/README.md)
 
-## Files
+---
 
-- `admin.neture.co.kr.conf` - Admin Dashboard nginx configuration
-- `neture.co.kr.conf` - Main Site nginx configuration
-- `setup-nginx.sh` - Setup script for admin site only
-- `setup-nginx-all.sh` - Complete setup script for all sites
+## 📋 개요
 
-## Quick Setup
+O4O Platform의 Nginx 설정 및 배포 가이드입니다. 모든 Nginx 설정 파일은 프로젝트 루트의 `nginx-configs/` 디렉토리에 있습니다.
 
-### 1. Run the setup script (on the server)
+---
+
+## 🚀 Quick Setup
+
+### 자동 배포 (권장)
 
 ```bash
-cd /home/ubuntu/o4o-platform/deployment/nginx
-sudo ./setup-nginx-all.sh
+# Nginx 설정 배포
+./scripts/deploy-nginx.sh
+
+# 또는 통합 배포 스크립트
+./scripts/deploy-unified.sh nginx
 ```
 
-### 2. Install SSL certificates
+### 수동 배포
 
 ```bash
-# For admin dashboard
+# 1. 서버 접속
+ssh webserver
+
+# 2. 설정 파일 복사
+sudo cp /home/ubuntu/o4o-platform/nginx-configs/*.conf /etc/nginx/sites-available/
+
+# 3. 심볼릭 링크 생성
+sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr.conf /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/api.neture.co.kr.conf /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/neture.co.kr.conf /etc/nginx/sites-enabled/
+
+# 4. 설정 테스트 및 재로드
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+---
+
+## 🔐 SSL 인증서
+
+### Let's Encrypt (Certbot)
+
+```bash
+# Admin Dashboard
 sudo certbot --nginx -d admin.neture.co.kr
 
-# For main site
+# API Server
+sudo certbot --nginx -d api.neture.co.kr
+
+# Main Site
 sudo certbot --nginx -d neture.co.kr -d www.neture.co.kr
+
+# 자동 갱신 확인
+sudo certbot renew --dry-run
 ```
 
-### 3. Verify services are running
+---
 
-```bash
-# Check PM2 services
-pm2 status
+## 📁 설정 파일
 
-# Expected output:
-# o4o-admin-dashboard - running on port 3001
-# o4o-main-site - running on port 3000
-# api-server - running on port 4000
-```
+모든 설정 파일은 `/nginx-configs/` 디렉토리에 있습니다:
 
-## Architecture
+- **admin.neture.co.kr.conf** - 관리자 대시보드
+- **api.neture.co.kr.conf** - API 서버
+- **neture.co.kr.conf** - 메인 사이트
+- **forum.neture.co.kr.conf** - 포럼
+- **shop.neture.co.kr.conf** - 쇼핑몰
+- **signage.neture.co.kr.conf** - 사이니지
+
+---
+
+## 🏗️ Architecture
 
 ```
 Internet
     ↓
 Nginx (80/443)
-    ├── admin.neture.co.kr → localhost:3001 (Admin Dashboard)
-    ├── neture.co.kr → localhost:3000 (Main Site)
-    └── /api/* → localhost:4000 (API Server)
+    ├── admin.neture.co.kr → /var/www/admin.neture.co.kr (정적 파일)
+    ├── api.neture.co.kr → localhost:3001 (API Server with PM2)
+    └── neture.co.kr → /var/www/neture.co.kr (정적 파일)
 ```
 
-## Configuration Details
+### 주요 구성
 
-### Admin Dashboard (admin.neture.co.kr)
-- Proxies to PM2 service on port 3001
-- SSL with automatic redirect from HTTP
-- API routes proxied to port 4000
-- WebSocket support for real-time features
+**Admin Dashboard (admin.neture.co.kr)**
+- 정적 파일 서빙: /var/www/admin.neture.co.kr
+- SSL 자동 리다이렉트
+- SPA 라우팅 지원
+- 보안 헤더 적용
 
-### Main Site (neture.co.kr)
-- Proxies to PM2 service on port 3000
-- SSL with automatic redirect from HTTP
-- Redirects www to non-www
-- API routes proxied to port 4000
+**API Server (api.neture.co.kr)**
+- 프록시: localhost:3001 (PM2)
+- WebSocket 지원
+- CORS 설정
+- 타임아웃: 60초
 
-## Troubleshooting
+**Main Site (neture.co.kr)**
+- 정적 파일 서빙: /var/www/neture.co.kr
+- www → non-www 리다이렉트
+- SSL 자동 리다이렉트
 
-### Check nginx configuration
+---
+
+## 🔧 Troubleshooting
+
+### 설정 테스트
 ```bash
 sudo nginx -t
 ```
 
-### View nginx logs
+### 로그 확인
 ```bash
-# Admin site logs
+# Error 로그
 sudo tail -f /var/log/nginx/admin.neture.co.kr.error.log
+sudo tail -f /var/log/nginx/api.neture.co.kr.error.log
+
+# Access 로그
 sudo tail -f /var/log/nginx/admin.neture.co.kr.access.log
-
-# Main site logs
-sudo tail -f /var/log/nginx/neture.co.kr.error.log
-sudo tail -f /var/log/nginx/neture.co.kr.access.log
 ```
 
-### Reload nginx after changes
+### 일반적인 문제
+
+**502 Bad Gateway (API 서버)**
 ```bash
-sudo systemctl reload nginx
+# PM2 상태 확인
+ssh o4o-apiserver "pm2 list"
+
+# API 서버 재시작
+ssh o4o-apiserver "pm2 restart o4o-api-server"
 ```
 
-### Check if services are listening
+**404 Not Found (정적 파일)**
 ```bash
-sudo lsof -i :3000  # Main site
-sudo lsof -i :3001  # Admin dashboard
-sudo lsof -i :4000  # API server
+# 빌드 파일 확인
+ssh webserver "ls -la /var/www/admin.neture.co.kr/"
+
+# 권한 확인
+ssh webserver "sudo chown -R www-data:www-data /var/www/admin.neture.co.kr"
 ```
 
-## Common Issues
-
-### 502 Bad Gateway
-- Check if PM2 services are running: `pm2 status`
-- Start services if needed: `pm2 start ecosystem.config.js`
-
-### SSL Certificate Issues
-- Ensure DNS is properly configured
-- Run certbot with correct domain names
-- Check certificate expiry: `sudo certbot certificates`
-
-### Static Files Not Loading
-- Verify PM2 services are using `serve` package
-- Check build output exists in dist directories
-- Ensure correct ports in nginx configuration
-
-## Manual Deployment
-
-If automatic deployment fails, you can manually update nginx:
-
+**SSL 인증서 오류**
 ```bash
-# 1. Copy configuration files
-sudo cp admin.neture.co.kr.conf /etc/nginx/sites-available/
-sudo cp neture.co.kr.conf /etc/nginx/sites-available/
+# 인증서 상태 확인
+sudo certbot certificates
 
-# 2. Create symbolic links
-sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr.conf /etc/nginx/sites-enabled/
-sudo ln -sf /etc/nginx/sites-available/neture.co.kr.conf /etc/nginx/sites-enabled/
-
-# 3. Test and reload
-sudo nginx -t
-sudo systemctl reload nginx
+# 인증서 갱신
+sudo certbot renew
 ```
+
+---
+
+## 📚 추가 문서
+
+- **📖 상세 설정 가이드**: [/nginx-configs/README.md](../../nginx-configs/README.md)
+- **🚀 배포 가이드**: [README.md](./README.md)
+- **🔍 트러블슈팅**: [../troubleshooting/](../troubleshooting/)
+- **🖥️ 서버 접속**: [../operations/SERVER_ACCESS.md](../operations/SERVER_ACCESS.md)
+
+---
+
+**최종 업데이트**: 2025-10-08
