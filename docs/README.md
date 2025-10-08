@@ -223,4 +223,4 @@ docs/
 ---
 
 *Last Updated: 2025-10-08*
-*Version: 2.1.0 - Cleaned and Reorganized*
+*Version: 0.5.0*

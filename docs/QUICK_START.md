@@ -115,4 +115,8 @@ psql -h localhost -U o4o_user -d o4o_platform
 - `PORT` - API 서버 포트 (기본: 3001)
 
 ---
+
+*Last Updated: 2025-10-08*
+*Version: 0.5.0*
+
 자세한 내용은 `SERVER_DEPLOYMENT_GUIDE.md` 참조

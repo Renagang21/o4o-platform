@@ -335,4 +335,5 @@ Content-Security-Policy: frame-ancestors 'self' https://admin.neture.co.kr
 ---
 
 **최종 업데이트**: 2025-10-08
+**시스템 버전**: 0.5.0
 **관리자**: O4O Platform Team
