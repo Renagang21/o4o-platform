@@ -167,7 +167,7 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
           onClose={() => setShowMediaSelector(false)}
           onSelect={handleMediaSelect}
           multiple={false}
-          acceptedTypes={['image']} // Note: Currently limited to image/video, will show all files
+          acceptedTypes={['document']}
           title="Select Markdown File"
         />
       )}

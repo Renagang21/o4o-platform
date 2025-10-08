@@ -37,7 +37,7 @@ import MediaGrid from '@/components/media/MediaGrid';
 export interface MediaItem {
   id: string;
   url: string;
-  type: 'image' | 'video';
+  type: 'image' | 'video' | 'document';
   title: string;
   alt?: string;
   width?: number;
@@ -54,7 +54,7 @@ export interface MediaSelectorProps {
   onClose: () => void;
   onSelect: (media: MediaItem[] | MediaItem) => void;
   multiple?: boolean;
-  acceptedTypes?: ('image' | 'video')[];
+  acceptedTypes?: ('image' | 'video' | 'document')[];
   selectedItems?: MediaItem[];
   maxSelection?: number;
   title?: string;
@@ -69,7 +69,7 @@ interface UploadProgress {
 }
 
 type ViewMode = 'grid' | 'list';
-type FilterType = 'all' | 'image' | 'video';
+type FilterType = 'all' | 'image' | 'video' | 'document';
 
 const MediaSelector: React.FC<MediaSelectorProps> = ({
   isOpen,
@@ -291,7 +291,16 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: acceptedTypes.reduce((acc, type) => {
-      acc[`${type}/*`] = [];
+      if (type === 'document') {
+        // Accept various document formats
+        acc['text/markdown'] = ['.md'];
+        acc['text/plain'] = ['.txt'];
+        acc['application/pdf'] = ['.pdf'];
+        acc['application/msword'] = ['.doc'];
+        acc['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = ['.docx'];
+      } else {
+        acc[`${type}/*`] = [];
+      }
       return acc;
     }, {} as Record<string, string[]>),
     maxFiles: 10,
