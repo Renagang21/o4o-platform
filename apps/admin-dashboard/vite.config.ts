@@ -181,9 +181,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
 
           // 페이지 청크
           if (!id.includes('node_modules')) {
-            if (id.includes('TemplatePartEditor')) {
-              return 'page-template-editor';
-            }
+            // TemplatePartEditor 청크 제거 - React Context 초기화 문제 방지
+            // if (id.includes('TemplatePartEditor')) {
+            //   return 'page-template-editor';
+            // }
             if (id.includes('GutenbergEditor') || id.includes('WordPressBlockEditor')) {
               return 'page-gutenberg';
             }
