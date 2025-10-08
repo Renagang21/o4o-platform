@@ -195,7 +195,7 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
       const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
 
       // Check if default header exists and update it
-      const existingResponse = await authClient.api.get('/api/public/template-parts');
+      const existingResponse = await authClient.api.get('/public/template-parts');
       const existingParts = existingResponse.data?.data || [];
       const defaultHeader = existingParts.find((part: any) =>
         part.area === 'header' && part.isDefault === true
@@ -203,11 +203,11 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
 
       if (defaultHeader) {
         // Update existing default header
-        await authClient.api.put(`/api/template-parts/${defaultHeader.id}`, headerTemplatePart);
+        await authClient.api.put(`/template-parts/${defaultHeader.id}`, headerTemplatePart);
         toast.success('Header template updated successfully');
       } else {
         // Create new header template part
-        await authClient.api.post('/api/template-parts', {
+        await authClient.api.post('/template-parts', {
           ...headerTemplatePart,
           isDefault: true,
           isActive: true
