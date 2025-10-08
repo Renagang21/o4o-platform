@@ -1,10 +1,12 @@
 /**
- * Markdown Reader Block - Temporary Implementation
- * TODO: Migrate full implementation from packages/blocks/dynamic
+ * Markdown Reader Block
+ * Displays markdown content from media library files
  */
 
-import React, { useState } from 'react';
-import { FileCode } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { FileCode, FolderOpen, FileText, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import MediaSelector, { MediaItem } from './shared/MediaSelector';
 
 interface MarkdownReaderBlockProps {
   id: string;
@@ -13,6 +15,8 @@ interface MarkdownReaderBlockProps {
     markdownContent?: string;
   };
   attributes?: {
+    fileName?: string;
+    fileSize?: number;
     fontSize?: number;
     theme?: string;
   };
@@ -31,12 +35,42 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
   onSelect,
 }) => {
   const { url = '', markdownContent = '' } = content;
-  const { fontSize = 16, theme = 'github' } = attributes;
+  const { fileName = '', fileSize = 0, fontSize = 16, theme = 'github' } = attributes;
+  const [showMediaSelector, setShowMediaSelector] = useState(false);
 
-  const handleUrlChange = (newUrl: string) => {
-    if (onChange) {
-      onChange({ ...content, url: newUrl }, attributes);
+  // Handle media selection from library
+  const handleMediaSelect = useCallback((media: MediaItem | MediaItem[]) => {
+    const selectedMedia = Array.isArray(media) ? media[0] : media;
+    if (selectedMedia) {
+      const updatedContent = {
+        ...content,
+        url: selectedMedia.url,
+        markdownContent: '' // Will be loaded from URL
+      };
+      const updatedAttributes = {
+        ...attributes,
+        fileName: selectedMedia.title,
+        fileSize: selectedMedia.fileSize,
+      };
+      if (onChange) {
+        onChange(updatedContent, updatedAttributes);
+      }
+      setShowMediaSelector(false);
     }
+  }, [content, attributes, onChange]);
+
+  const handleRemoveFile = () => {
+    if (onChange) {
+      onChange({ url: '', markdownContent: '' }, { ...attributes, fileName: '', fileSize: 0 });
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
   return (
@@ -51,30 +85,68 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
         <h3 className="font-semibold text-gray-700">Markdown Reader</h3>
       </div>
 
-      {!url && !markdownContent ? (
+      {!url ? (
         <div className="text-center py-8 bg-gray-50 rounded border-2 border-dashed border-gray-300">
-          <FileCode className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500 mb-4">Add a Markdown file URL</p>
-          <input
-            type="url"
-            placeholder="https://example.com/document.md"
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => handleUrlChange(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-          />
+          <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500 mb-4">Select a Markdown file from Media Library</p>
+          <Button
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMediaSelector(true);
+            }}
+            className="gap-2"
+          >
+            <FolderOpen className="w-4 h-4" />
+            Select from Media Library
+          </Button>
+          <p className="text-xs text-gray-400 mt-2">Supported: .md files</p>
         </div>
       ) : (
         <div>
-          <div className="mb-3 flex items-center gap-2">
-            <span className="text-sm text-gray-600">URL:</span>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => handleUrlChange(e.target.value)}
-              className="flex-1 px-3 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={(e) => e.stopPropagation()}
-            />
+          {/* Selected File Info */}
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1">
+                <FileText className="w-8 h-8 text-blue-500" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-gray-900 truncate">
+                    {fileName || 'Markdown File'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {fileSize ? formatFileSize(fileSize) : 'Unknown size'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMediaSelector(true);
+                  }}
+                  className="gap-2"
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  Change File
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveFile();
+                  }}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           </div>
+
+          {/* Markdown Content Preview */}
           <div
             className={`markdown-content p-4 bg-white rounded border theme-${theme}`}
             style={{ fontSize: `${fontSize}px` }}
@@ -82,10 +154,22 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
             {markdownContent ? (
               <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
             ) : (
-              <p className="text-gray-400 italic">Loading markdown content...</p>
+              <p className="text-gray-400 italic">Loading markdown content from {url}...</p>
             )}
           </div>
         </div>
+      )}
+
+      {/* Media Selector Modal */}
+      {showMediaSelector && (
+        <MediaSelector
+          isOpen={showMediaSelector}
+          onClose={() => setShowMediaSelector(false)}
+          onSelect={handleMediaSelect}
+          multiple={false}
+          acceptedTypes={['image']} // Note: Currently limited to image/video, will show all files
+          title="Select Markdown File"
+        />
       )}
     </div>
   );
