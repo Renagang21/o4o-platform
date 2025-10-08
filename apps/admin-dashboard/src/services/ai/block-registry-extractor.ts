@@ -5,6 +5,7 @@
 
 import { dropshippingShortcodes } from '@/components/shortcodes/dropshipping';
 import { generalShortcodes, extractFromRegistry } from './shortcode-registry';
+import { blockRegistry } from '@/blocks/registry/BlockRegistry';
 
 export interface BlockMetadata {
   name: string;
@@ -29,19 +30,36 @@ export interface ShortcodeMetadata {
 export function extractBlocksMetadata(): BlockMetadata[] {
   const blocks: BlockMetadata[] = [];
 
-  // WordPress 블록 레지스트리에서 추출
+  // 새로운 Block Registry에서 추출
+  const allBlocks = blockRegistry.getAll();
+
+  allBlocks.forEach((block) => {
+    blocks.push({
+      name: block.name,
+      title: block.title,
+      category: block.category,
+      description: block.description || '',
+      attributes: block.attributes || {},
+      example: generateBlockExample(block)
+    });
+  });
+
+  // WordPress 블록 레지스트리에서도 추출 (하위 호환성)
   if (window.wp?.blocks?.getBlockTypes) {
     const blockTypes = window.wp.blocks.getBlockTypes();
 
     blockTypes.forEach((block: any) => {
-      blocks.push({
-        name: block.name,
-        title: block.title,
-        category: block.category || 'common',
-        description: block.description || '',
-        attributes: block.attributes || {},
-        example: generateBlockExample(block)
-      });
+      // 이미 새 레지스트리에 있는 블록은 건너뛰기
+      if (!blocks.find(b => b.name === block.name)) {
+        blocks.push({
+          name: block.name,
+          title: block.title,
+          category: block.category || 'common',
+          description: block.description || '',
+          attributes: block.attributes || {},
+          example: generateBlockExample(block)
+        });
+      }
     });
   }
 

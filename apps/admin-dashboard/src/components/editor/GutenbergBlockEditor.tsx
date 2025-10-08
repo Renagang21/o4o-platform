@@ -14,14 +14,8 @@ import GutenbergBlockInserter from './GutenbergBlockInserter';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
 import DesignLibraryModalImproved from './DesignLibraryModalImproved';
 import { SimpleAIModal } from '../ai/SimpleAIModal';
-import ParagraphBlock from './blocks/ParagraphBlock';
-import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
-import ListBlock from './blocks/ListBlock';
-import CodeBlock from './blocks/CodeBlock';
-import EnhancedQuoteBlock from './blocks/EnhancedQuoteBlock';
-import EnhancedImageBlock from './blocks/EnhancedImageBlock';
-import ButtonBlock from './blocks/ButtonBlock';
-import ColumnsBlock from './blocks/ColumnsBlock';
+import { DynamicRenderer } from '@/blocks/registry/DynamicRenderer';
+import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 // Toast 기능을 직접 구현
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
@@ -95,6 +89,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [historyIndex, setHistoryIndex] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
   
+  // Initialize block registry
+  useEffect(() => {
+    registerAllBlocks();
+  }, []);
+
   // Sync blocks with initialBlocks prop changes
   useEffect(() => {
     if (initialBlocks && initialBlocks.length > 0) {
@@ -645,47 +644,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       canMoveDown: blockIndex < blocks.length - 1,
     };
 
-    switch (block.type) {
-      case 'core/paragraph':
-      case 'paragraph': // Support both formats
-        return <ParagraphBlock key={block.id} {...enhancedProps} />;
-      case 'core/heading':
-      case 'heading': // Support both formats
-        return (
-          <EnhancedHeadingBlock
-            key={block.id}
-            {...enhancedProps}
-            attributes={{ 
-              level: block.content?.level || 2,
-              ...block.attributes
-            }}
-          />
-        );
-      case 'core/list':
-      case 'list': // Support both formats
-        return <ListBlock key={block.id} {...enhancedProps} />;
-      case 'core/code':
-      case 'code': // Support both formats
-        return <CodeBlock key={block.id} {...enhancedProps} />;
-      case 'core/quote':
-      case 'quote': // Support both formats
-        return <EnhancedQuoteBlock key={block.id} {...enhancedProps} />;
-      case 'core/image':
-      case 'image': // Support both formats
-        return <EnhancedImageBlock key={block.id} {...enhancedProps} />;
-      case 'core/button':
-      case 'button': // Support both formats
-        return <ButtonBlock key={block.id} {...commonProps} />;
-      case 'core/columns':
-      case 'columns': // Support both formats
-        return <ColumnsBlock key={block.id} {...commonProps} />;
-      default:
-        return (
-          <div key={block.id} className="p-4 border border-dashed border-gray-300">
-            <span className="text-gray-500">Unsupported block type: {block.type}</span>
-          </div>
-        );
-    }
+    // Use DynamicRenderer for all blocks
+    return (
+      <DynamicRenderer
+        key={block.id}
+        block={block}
+        {...enhancedProps}
+      />
+    );
   };
 
   return (

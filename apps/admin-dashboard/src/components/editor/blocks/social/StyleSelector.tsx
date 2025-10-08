@@ -10,7 +10,7 @@ import {
   Settings,
   Square,
   Circle,
-  BorderOuter,
+  RectangleHorizontal,
   Maximize,
   Minimize,
   Zap,
@@ -87,7 +87,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({
             onClick={() => onStyleChange('outlined')}
             className="h-12 flex flex-col items-center justify-center p-2"
           >
-            <BorderOuter className="h-4 w-4 mb-1" />
+            <RectangleHorizontal className="h-4 w-4 mb-1" />
             <span className="text-xs">Outlined</span>
           </Button>
           <Button

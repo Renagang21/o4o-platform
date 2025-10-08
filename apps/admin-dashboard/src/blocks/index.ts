@@ -3,9 +3,74 @@
  * Import and register all custom blocks for the WordPress editor
  */
 
+import { blockRegistry } from './registry/BlockRegistry';
+
+// Core text blocks
+import paragraphBlockDefinition from './definitions/paragraph';
+import headingBlockDefinition from './definitions/heading';
+import quoteBlockDefinition from './definitions/quote';
+import codeBlockDefinition from './definitions/code';
+import listBlockDefinition from './definitions/list';
+import tableBlockDefinition from './definitions/table';
+
+// Media blocks
+import imageBlockDefinition from './definitions/image';
+import coverBlockDefinition from './definitions/cover';
+import galleryBlockDefinition from './definitions/gallery';
+import slideBlockDefinition from './definitions/slide';
+
+// Design blocks
+import buttonBlockDefinition from './definitions/button';
+
+// Layout blocks
+import columnsBlockDefinition from './definitions/columns';
+
+// Widget blocks
+import socialBlockDefinition from './definitions/social';
+import shortcodeBlockDefinition from './definitions/shortcode';
+import markdownReaderBlockDefinition from './definitions/markdown-reader';
+
 // Type declaration is in wordpress-runtime-setup.ts
 
 // Custom block types are dynamically loaded via lazy.ts to improve performance
+
+/**
+ * Register all blocks with the new registry system
+ */
+export function registerAllBlocks(): void {
+  // Register core text blocks
+  blockRegistry.register(paragraphBlockDefinition);
+  blockRegistry.register(headingBlockDefinition);
+  blockRegistry.register(quoteBlockDefinition);
+  blockRegistry.register(codeBlockDefinition);
+  blockRegistry.register(listBlockDefinition);
+  blockRegistry.register(tableBlockDefinition);
+
+  // Register media blocks
+  blockRegistry.register(imageBlockDefinition);
+  blockRegistry.register(coverBlockDefinition);
+  blockRegistry.register(galleryBlockDefinition);
+  blockRegistry.register(slideBlockDefinition);
+
+  // Register design blocks
+  blockRegistry.register(buttonBlockDefinition);
+
+  // Register layout blocks
+  blockRegistry.register(columnsBlockDefinition);
+
+  // Register widget blocks
+  blockRegistry.register(socialBlockDefinition);
+  blockRegistry.register(shortcodeBlockDefinition);
+  blockRegistry.register(markdownReaderBlockDefinition);
+
+  // Log registration summary
+  const metadata = blockRegistry.getMetadata();
+  console.log('✓ Block Registry Initialized:', metadata);
+}
+
+// Export registry for external use
+export { blockRegistry } from './registry/BlockRegistry';
+export * from './registry/types';
 
 // Additional block styles
 const blockStyles = `
