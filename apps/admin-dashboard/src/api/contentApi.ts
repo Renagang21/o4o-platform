@@ -261,7 +261,7 @@ export class ContentApi {
     const formData = new FormData()
     
     files.forEach((file: any) => {
-      formData.append('files', file)
+      formData.append('file', file)
     })
     
     if (folderId) {
