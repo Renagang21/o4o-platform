@@ -52,17 +52,15 @@ export const sharedViteConfig: UserConfig = {
           }
           
           if (id.includes('node_modules')) {
-            // React 관련은 admin-dashboard의 vite.config.ts에서 처리
-            // 여기서는 제외하여 중복 방지
-            if ((id.includes('/react/') ||
-                 id.includes('/react-dom/') ||
-                 id.includes('@tanstack/react-query')) &&
-                !id.includes('lucide-react')) {
+            // React 관련 - lucide-react도 React에 의존하므로 함께 번들링
+            if (id.includes('/react/') ||
+                id.includes('/react-dom/') ||
+                id.includes('@tanstack/react-query') ||
+                id.includes('lucide-react')) {
               return 'vendor-react';
             }
-            // 기타 UI 라이브러리
-            if (id.includes('lucide-react') ||
-                id.includes('clsx') || id.includes('tailwind-merge')) {
+            // 기타 UI 라이브러리 (React 의존성 없음)
+            if (id.includes('clsx') || id.includes('tailwind-merge')) {
               return 'vendor-ui';
             }
             // 폼 관련
