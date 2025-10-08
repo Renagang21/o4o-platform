@@ -644,11 +644,19 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       canMoveDown: blockIndex < blocks.length - 1,
     };
 
+    // Normalize block content to ensure it's a string
+    const normalizedBlock = {
+      ...block,
+      content: typeof block.content === 'string'
+        ? block.content
+        : block.content?.text || '',
+    };
+
     // Use DynamicRenderer for all blocks
     return (
       <DynamicRenderer
         key={block.id}
-        block={block}
+        block={normalizedBlock}
         {...enhancedProps}
       />
     );
