@@ -302,13 +302,51 @@ const Edit: React.FC<MarkdownReaderBlockProps> = ({
   );
 };
 
-const Save = () => {
-  // Server-side rendering
-  return null;
+const Save: React.FC<MarkdownReaderBlockProps> = ({ attributes }) => {
+  const {
+    mediaUrl,
+    fontSize = 16,
+    containerWidth = 'full',
+    theme = 'github',
+    markdownContent
+  } = attributes;
+
+  // Get container class
+  const getContainerClass = () => {
+    switch (containerWidth) {
+      case 'narrow':
+        return 'max-w-3xl mx-auto';
+      case 'medium':
+        return 'max-w-5xl mx-auto';
+      case 'wide':
+        return 'max-w-7xl mx-auto';
+      default:
+        return 'w-full';
+    }
+  };
+
+  // Parse markdown on save
+  const parsedHtml = markdownContent ? parseMarkdown(markdownContent) : '';
+
+  if (!mediaUrl || !parsedHtml) {
+    return null;
+  }
+
+  return (
+    <div className={`markdown-reader-block markdown-theme-${theme}`}>
+      <div className={`markdown-content-wrapper ${getContainerClass()}`}>
+        <div
+          className="markdown-rendered-content"
+          style={{ fontSize: `${fontSize}px` }}
+          dangerouslySetInnerHTML={{ __html: parsedHtml }}
+        />
+      </div>
+    </div>
+  );
 };
 
 const MarkdownReaderBlock: BlockDefinition = {
-  name: 'markdown-reader',
+  name: 'o4o/markdown-reader',
   title: 'Markdown Reader',
   category: 'widgets',
   icon: FileCode,

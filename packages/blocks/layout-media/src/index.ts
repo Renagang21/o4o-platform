@@ -5,47 +5,14 @@ import { ColumnsBlock, ColumnBlock } from './blocks/layout/columns';
 import GroupBlock from './blocks/layout/group';
 import SpacerBlock from './blocks/layout/spacer';
 import SeparatorBlock from './blocks/layout/separator';
+import CoverBlock from './blocks/layout/cover';
 
 // Media blocks
 import ImageBlock from './blocks/media/image';
 import VideoBlock from './blocks/media/video';
-
-// Simplified placeholder blocks for now
-const CoverBlock = {
-  name: 'o4o/cover',
-  title: 'Cover',
-  category: 'layout',
-  icon: 'cover-image',
-  edit: () => null,
-  save: () => null
-};
-
-const GalleryBlock = {
-  name: 'o4o/gallery',
-  title: 'Gallery',
-  category: 'media',
-  icon: 'gallery',
-  edit: () => null,
-  save: () => null
-};
-
-const AudioBlock = {
-  name: 'o4o/audio',
-  title: 'Audio',
-  category: 'media',
-  icon: 'format-audio',
-  edit: () => null,
-  save: () => null
-};
-
-const EmbedBlock = {
-  name: 'o4o/embed',
-  title: 'Embed',
-  category: 'media',
-  icon: 'embed-generic',
-  edit: () => null,
-  save: () => null
-};
+import GalleryBlock from './blocks/media/gallery';
+import AudioBlock from './blocks/media/audio';
+import EmbedBlock from './blocks/media/embed';
 
 /**
  * Layout & Media Blocks Plugin
@@ -67,14 +34,14 @@ class LayoutMediaBlocksPlugin implements BlockPlugin {
     GroupBlock,
     SpacerBlock,
     SeparatorBlock,
-    CoverBlock as any,
-    
+    CoverBlock,
+
     // Media blocks
     ImageBlock,
     VideoBlock,
-    GalleryBlock as any,
-    AudioBlock as any,
-    EmbedBlock as any
+    GalleryBlock,
+    AudioBlock,
+    EmbedBlock
   ];
   
   settings = {

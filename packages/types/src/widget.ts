@@ -4,7 +4,7 @@ export interface Widget {
   id: string
   type: WidgetType
   title: string
-  content: Record<string, any>
+  content: Record<string, unknown>
   settings: WidgetSettings
   position: WidgetPosition
   order: number
@@ -254,14 +254,14 @@ export interface CalendarWidgetContent {
 export interface CreateWidgetDto {
   type: WidgetType
   title: string
-  content: Record<string, any>
+  content: Record<string, unknown>
   position: WidgetPosition
   settings?: Partial<WidgetSettings>
 }
 
 export interface UpdateWidgetDto {
   title?: string
-  content?: Record<string, any>
+  content?: Record<string, unknown>
   settings?: Partial<WidgetSettings>
   position?: WidgetPosition
   order?: number
@@ -298,7 +298,7 @@ export interface WidgetTypeDefinition {
   description: string
   icon: string
   category: WidgetCategory
-  defaultContent: Record<string, any>
+  defaultContent: Record<string, unknown>
   defaultSettings: Partial<WidgetSettings>
   fields: WidgetField[]
 }

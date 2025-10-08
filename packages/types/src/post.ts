@@ -135,15 +135,15 @@ export interface EditorBlock {
   id: string;
   type: string;
   content: any;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
 }
 
 export interface Block {
   id: string;
   type: string;
   content: any;
-  attributes?: Record<string, any>;
-  settings?: Record<string, any>;
+  attributes?: Record<string, unknown>;
+  settings?: Record<string, unknown>;
   children?: Block[];
   order?: number;
 }

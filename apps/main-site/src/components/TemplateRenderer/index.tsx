@@ -11,6 +11,7 @@ import ShortcodeBlock from './blocks/ShortcodeBlock';
 import ErrorBlock from './blocks/ErrorBlock';
 import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
 import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
+import MarkdownReaderBlock from './blocks/MarkdownReaderBlock';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 import { formShortcodes } from '@/components/shortcodes/formShortcodes';
@@ -27,7 +28,11 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   columns: ColumnsBlock,
   spacer: SpacerBlock,
   shortcode: ShortcodeBlock,
-  
+
+  // Dynamic blocks
+  'o4o/markdown-reader': MarkdownReaderBlock,
+  'markdown-reader': MarkdownReaderBlock,  // Legacy support
+
   // Spectra blocks
   'uagb/call-to-action': CTABlock,
   'uagb/pricing-table': PricingTableBlock,

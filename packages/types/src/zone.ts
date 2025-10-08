@@ -45,7 +45,7 @@ export interface ZoneSettings {
 export interface ZoneBlock {
   id: string
   type: string
-  attributes?: Record<string, any>
+  attributes?: Record<string, unknown>
   innerBlocks?: ZoneBlock[]
   content?: string
   order?: number
@@ -62,7 +62,7 @@ export interface Zone {
   constraints: BlockConstraint
   defaultBlocks?: ZoneBlock[]
   settings: ZoneSettings
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 // Zone-based Content Structure
@@ -235,7 +235,7 @@ export interface ZoneConfig {
   blockConstraintRules?: Record<string, {
     maxInstances?: number
     allowedZones?: string[]
-    requiredAttributes?: Record<string, any>
+    requiredAttributes?: Record<string, unknown>
   }>
 }
 
@@ -290,7 +290,7 @@ export interface LegacyContent {
     id: string
     type: string
     content: any
-    attributes?: Record<string, any>
+    attributes?: Record<string, unknown>
   }>
 }
 

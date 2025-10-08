@@ -6,7 +6,7 @@ type ComponentType<P = {}> = (props: P) => any;
 export interface TemplateBlock {
   id: string
   type: TemplateBlockType
-  content: Record<string, any>
+  content: Record<string, unknown>
   settings: TemplateBlockSettings
   children?: TemplateBlock[]
   order: number
@@ -350,7 +350,7 @@ export interface BlockDefinition {
   icon: string
   category: BlockCategory
   description: string
-  defaultContent: Record<string, any>
+  defaultContent: Record<string, unknown>
   defaultSettings: TemplateBlockSettings
   contentSchema: ContentSchema
   settingsSchema: SettingsSchema

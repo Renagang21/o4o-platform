@@ -49,7 +49,34 @@ npm run update:shortcode-docs
 
 ---
 
-### 3. [외모 커스터마이징 가이드](./appearance-customize.md)
+### 3. [블록 레퍼런스](./blocks-reference.md)
+
+**대상:** 관리자, 콘텐츠 편집자, 개발자
+
+**내용:**
+- 사용 가능한 모든 블록 목록
+- 각 블록의 속성과 사용법
+- 카테고리별 분류 (텍스트, 레이아웃, 미디어, 인터랙티브, 동적)
+- 실제 사용 예시 및 CSS 클래스
+- 블록 개발 가이드
+
+**업데이트:** 수동 관리 (코드 변경 시 문서 업데이트 필요)
+
+**페이지로 만들기:**
+1. 관리 대시보드 → 페이지 → 새 페이지 추가
+2. 제목: "블록 레퍼런스"
+3. `blocks-reference.md` 파일 내용을 복사하여 붙여넣기
+4. 게시
+
+**자동 동기화 (권장):**
+- 마크다운 리더 블록 사용:
+  ```
+  [markdown_reader url="/docs/manual/blocks-reference.md"]
+  ```
+
+---
+
+### 4. [외모 커스터마이징 가이드](./appearance-customize.md)
 
 **대상:** 관리자, 디자이너
 
@@ -168,6 +195,7 @@ npm run update:shortcode-docs
 |------|------|----------------|-----------|
 | shortcode-reference.md | ✅ | 2025-10-05 | ✅ |
 | ai-page-generation.md | ✅ | 2025-10-05 | ⚠️ 부분 |
+| blocks-reference.md | ✅ | 2025-10-08 | ❌ |
 | appearance-customize.md | ✅ | - | ❌ |
 | appearance-menus.md | ✅ | - | ❌ |
 | appearance-template-parts.md | ✅ | - | ❌ |
