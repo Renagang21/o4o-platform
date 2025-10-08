@@ -165,11 +165,22 @@ const FileSelector: React.FC<FileSelectorProps> = ({
   } = useInfiniteQuery({
     queryKey: ['mediaFiles', filters],
     queryFn: async ({ pageParam = 1 }) => {
+      // Map frontend types to backend API types
+      let apiType: string | undefined;
+      if (filters.fileType !== 'all') {
+        // Backend only understands 'image', 'video'
+        // For 'document', 'audio', 'other', fetch all and filter client-side
+        if (filters.fileType === 'image' || filters.fileType === 'video') {
+          apiType = filters.fileType;
+        }
+        // For other types, don't send type parameter (fetch all)
+      }
+
       const response = await ContentApi.getMediaFiles(
         pageParam,
-        10,
+        50, // Increased to get more files for client-side filtering
         undefined,
-        filters.fileType === 'all' ? undefined : filters.fileType,
+        apiType,
         filters.searchTerm
       );
       return response;
@@ -237,7 +248,14 @@ const FileSelector: React.FC<FileSelectorProps> = ({
     return Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
   }) || [];
 
-  const selectedFileObjects = allFiles.filter(file => selectedFiles.includes(file.id));
+  // Client-side filtering for file types (document, audio, other)
+  // Backend API only supports 'image' and 'video' filtering, so we filter client-side for other types
+  const filteredFiles = allFiles.filter(file => {
+    if (filters.fileType === 'all') return true;
+    return file.type === filters.fileType;
+  });
+
+  const selectedFileObjects = filteredFiles.filter(file => selectedFiles.includes(file.id));
 
   // Handle file selection
   const handleFileSelect = useCallback((fileId: string) => {
@@ -259,16 +277,16 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
   // Handle select all
   const handleSelectAll = useCallback(() => {
-    if (selectedFiles.length === allFiles.length) {
+    if (selectedFiles.length === filteredFiles.length) {
       setSelectedFiles([]);
     } else {
-      const fileIds = allFiles.slice(0, maxSelection).map(file => file.id);
+      const fileIds = filteredFiles.slice(0, maxSelection).map(file => file.id);
       setSelectedFiles(fileIds);
-      if (allFiles.length > maxSelection) {
+      if (filteredFiles.length > maxSelection) {
         toast.error(`최대 ${maxSelection}개까지 선택할 수 있습니다.`);
       }
     }
-  }, [selectedFiles.length, allFiles, maxSelection]);
+  }, [selectedFiles.length, filteredFiles, maxSelection]);
 
   // Handle confirm selection
   const handleConfirmSelection = useCallback(() => {
@@ -764,13 +782,13 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                 업로드
               </button>
 
-              {multiple && allFiles.length > 0 && (
+              {multiple && filteredFiles.length > 0 && (
                 <button
                   onClick={handleSelectAll}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                  aria-label={selectedFiles.length === allFiles.length ? '전체 선택 해제' : '전체 선택'}
+                  aria-label={selectedFiles.length === filteredFiles.length ? '전체 선택 해제' : '전체 선택'}
                 >
-                  {selectedFiles.length === allFiles.length ? '전체 해제' : '전체 선택'}
+                  {selectedFiles.length === filteredFiles.length ? '전체 해제' : '전체 선택'}
                 </button>
               )}
             </div>
@@ -797,7 +815,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
               <AlertCircle className="w-8 h-8 mr-2" />
               <span>미디어를 불러오는데 실패했습니다.</span>
             </div>
-          ) : allFiles.length === 0 ? (
+          ) : filteredFiles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-500">
               <FileImage className="w-16 h-16 mb-4" />
               <span className="text-lg font-medium mb-2">미디어 파일이 없습니다</span>
@@ -807,7 +825,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
             <>
               {viewMode === 'grid' ? (
                 <MediaGrid
-                  items={allFiles.map(file => ({
+                  items={filteredFiles.map(file => ({
                     ...file,
                     filename: file.title,
                     mediaType: file.type,
@@ -825,7 +843,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                 />
               ) : (
                 <div className="space-y-2">
-                  {allFiles.map((item, index) => renderMediaItem(item, index))}
+                  {filteredFiles.map((item, index) => renderMediaItem(item, index))}
                 </div>
               )}
 

@@ -52,13 +52,17 @@ class BlockManager {
       loaded: false
     });
 
-    // Embed blocks - lazy loaded (including markdown reader)
+    // Embed blocks - removed, now handled by new block registry
+    // Markdown reader is in 'media' category in blocks/definitions/
+    // YouTube, Twitter, Instagram will be added to new registry when needed
+    /*
     this.categories.set('embeds', {
       name: 'Embed Blocks',
       priority: 'low',
-      blocks: ['o4o/markdown-reader', 'o4o/youtube', 'o4o/twitter', 'o4o/instagram'],
+      blocks: ['o4o/youtube', 'o4o/twitter', 'o4o/instagram'],
       loaded: false
     });
+    */
 
     // Dynamic blocks - lazy loaded (without markdown-reader)
     this.categories.set('dynamic', {
@@ -111,74 +115,14 @@ class BlockManager {
         case 'widgets':
           // Widgets blocks will be implemented later
           break;
+        /* Embeds now handled by new block registry system
         case 'embeds':
-          // Register embed blocks directly
-          this.registerBlock('o4o/markdown-reader', {
-            title: 'Markdown Reader',
-            category: 'embed',
-            icon: 'media-document',
-            description: 'Display markdown files',
-            supports: {
-              align: ['wide', 'full'],
-              html: false
-            },
-            attributes: {
-              url: {
-                type: 'string',
-                default: ''
-              }
-            },
-            edit: () => null,
-            save: () => null
-          });
-          
-          this.registerBlock('o4o/youtube', {
-            title: 'YouTube',
-            category: 'embed',
-            icon: 'video',
-            description: 'Embed a YouTube video',
-            attributes: {
-              url: {
-                type: 'string',
-                default: ''
-              }
-            },
-            edit: () => null,
-            save: () => null
-          });
-          
-          this.registerBlock('o4o/twitter', {
-            title: 'Twitter',
-            category: 'embed',
-            icon: 'twitter',
-            description: 'Embed a tweet',
-            attributes: {
-              url: {
-                type: 'string',
-                default: ''
-              }
-            },
-            edit: () => null,
-            save: () => null
-          });
-          
-          this.registerBlock('o4o/instagram', {
-            title: 'Instagram',
-            category: 'embed',
-            icon: 'instagram',
-            description: 'Embed an Instagram post',
-            attributes: {
-              url: {
-                type: 'string',
-                default: ''
-              }
-            },
-            edit: () => null,
-            save: () => null
-          });
-          
+          // These blocks are now registered in blocks/definitions/
+          // o4o/markdown-reader -> moved to 'media' category
+          // o4o/youtube, twitter, instagram -> to be added to new registry
           category.loaded = true;
           break;
+        */
         case 'dynamic':
           // Register dynamic blocks directly with proper namespace
           this.registerBlock('o4o/cpt-acf-loop', {

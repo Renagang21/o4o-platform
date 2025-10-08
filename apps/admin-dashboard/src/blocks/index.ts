@@ -30,6 +30,10 @@ import socialBlockDefinition from './definitions/social';
 import shortcodeBlockDefinition from './definitions/shortcode';
 import markdownReaderBlockDefinition from './definitions/markdown-reader';
 
+// Embed blocks
+import youtubeBlockDefinition from './definitions/youtube';
+import fileBlockDefinition from './definitions/file';
+
 // Type declaration is in wordpress-runtime-setup.ts
 
 // Custom block types are dynamically loaded via lazy.ts to improve performance
@@ -62,6 +66,10 @@ export function registerAllBlocks(): void {
   blockRegistry.register(socialBlockDefinition);
   blockRegistry.register(shortcodeBlockDefinition);
   blockRegistry.register(markdownReaderBlockDefinition);
+
+  // Register embed blocks
+  blockRegistry.register(youtubeBlockDefinition);
+  blockRegistry.register(fileBlockDefinition);
 }
 
 // Export registry for external use
