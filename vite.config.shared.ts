@@ -52,8 +52,12 @@ export const sharedViteConfig: UserConfig = {
           }
           
           if (id.includes('node_modules')) {
-            // React 관련 - react-query 포함 (createContext 오류 방지)
-            if (id.includes('react') || id.includes('@tanstack/react-query')) {
+            // React 관련은 admin-dashboard의 vite.config.ts에서 처리
+            // 여기서는 제외하여 중복 방지
+            if ((id.includes('/react/') ||
+                 id.includes('/react-dom/') ||
+                 id.includes('@tanstack/react-query')) &&
+                !id.includes('lucide-react')) {
               return 'vendor-react';
             }
             // 기타 UI 라이브러리

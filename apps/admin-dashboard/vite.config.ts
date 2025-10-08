@@ -150,73 +150,43 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         exports: 'named',
         interop: 'auto',
         manualChunks: (id) => {
-          // 공통 설정 먼저 적용
+          // 공통 설정 먼저 적용 - React 처리 포함
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
           if (sharedChunk) return sharedChunk;
 
-          // React와 ReactDOM은 항상 vendor-react에 포함
-          if (id.includes('node_modules/react/') ||
-              id.includes('node_modules/react-dom/')) {
-            return 'vendor-react';
-          }
-
-          // @tanstack/react-query는 vendor-react와 함께 번들링
-          // createContext 오류 방지
-          if (id.includes('@tanstack/react-query')) {
-            return 'vendor-react';
-          }
-
-          // WordPress 관련 모듈은 절대 초기 번들에 포함되지 않도록 함
+          // WordPress 관련 모듈
           if (id.includes('@wordpress') ||
               id.includes('wordpress-initializer') ||
               id.includes('wordpress-dynamic-loader') ||
               id.includes('WordPressBlockEditor') ||
               id.includes('WordPressEditor') ||
-              id.includes('GutenbergEditor') ||
-              id.includes('blocks/') && !id.includes('node_modules')) {
-
-            // 모든 WordPress 패키지를 단일 번들로 통합
-            // 초기화 순서 문제를 완전히 해결하기 위한 최종 솔루션
-            // components, block-editor, data, core, blocks, i18n 등 모든 것 포함
+              id.includes('GutenbergEditor')) {
             if (id.includes('@wordpress')) {
-              return 'wp-all';  // 모든 WordPress 모듈을 하나로
+              return 'wp-all';
             }
           }
 
+          // 나머지 node_modules
           if (id.includes('node_modules')) {
-            // WordPress 패키지들은 위에서 이미 처리됨
-            // 중복 정의 제거
-            // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {
               return 'vendor-tiptap';
             }
-            // Monaco editor removed - using Gutenberg instead
-            // 기타 큰 라이브러리들
             if (id.includes('socket.io')) {
               return 'vendor-socket';
             }
           }
-          
-          // 블록별 청크 분리 - Cover, Group, Columns 등 큰 블록들
-          if (id.includes('blocks/cover')) {
-            return 'block-cover';
-          }
-          if (id.includes('blocks/group')) {
-            return 'block-group';
-          }
-          if (id.includes('blocks/columns')) {
-            return 'block-columns';
-          }
-          if (id.includes('blocks/cpt-acf-loop')) {
-            return 'block-cpt-loop';
-          }
-          
-          // 페이지별 청크 분리
-          if (id.includes('TemplatePartEditor')) {
-            return 'page-template-editor';
-          }
-          if (id.includes('GutenbergEditor') || id.includes('WordPressBlockEditor')) {
-            return 'page-gutenberg';
+
+          // 블록 청크는 제거 - 너무 크고 React 의존성 문제 발생
+          // 대신 메인 번들에 포함되도록 함
+
+          // 페이지 청크
+          if (!id.includes('node_modules')) {
+            if (id.includes('TemplatePartEditor')) {
+              return 'page-template-editor';
+            }
+            if (id.includes('GutenbergEditor') || id.includes('WordPressBlockEditor')) {
+              return 'page-gutenberg';
+            }
           }
         }
       }
