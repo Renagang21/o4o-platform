@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { FileCode, FolderOpen, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import MediaSelector, { MediaItem } from './shared/MediaSelector';
+import FileSelector, { FileItem } from './shared/FileSelector';
 
 interface MarkdownReaderBlockProps {
   id: string;
@@ -38,19 +38,19 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
   const { fileName = '', fileSize = 0, fontSize = 16, theme = 'github' } = attributes;
   const [showMediaSelector, setShowMediaSelector] = useState(false);
 
-  // Handle media selection from library
-  const handleMediaSelect = useCallback((media: MediaItem | MediaItem[]) => {
-    const selectedMedia = Array.isArray(media) ? media[0] : media;
-    if (selectedMedia) {
+  // Handle file selection from library
+  const handleMediaSelect = useCallback((file: FileItem | FileItem[]) => {
+    const selectedFile = Array.isArray(file) ? file[0] : file;
+    if (selectedFile) {
       const updatedContent = {
         ...content,
-        url: selectedMedia.url,
+        url: selectedFile.url,
         markdownContent: '' // Will be loaded from URL
       };
       const updatedAttributes = {
         ...attributes,
-        fileName: selectedMedia.title,
-        fileSize: selectedMedia.fileSize,
+        fileName: selectedFile.title,
+        fileSize: selectedFile.fileSize,
       };
       if (onChange) {
         onChange(updatedContent, updatedAttributes);
@@ -160,9 +160,9 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
         </div>
       )}
 
-      {/* Media Selector Modal */}
+      {/* File Selector Modal */}
       {showMediaSelector && (
-        <MediaSelector
+        <FileSelector
           isOpen={showMediaSelector}
           onClose={() => setShowMediaSelector(false)}
           onSelect={handleMediaSelect}

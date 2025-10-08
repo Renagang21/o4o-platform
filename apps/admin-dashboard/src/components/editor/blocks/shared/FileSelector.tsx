@@ -1,6 +1,6 @@
 /**
- * MediaSelector Component
- * Cover Block과 Gallery Block에서 공용으로 사용하는 미디어 선택 컴포넌트
+ * FileSelector Component
+ * 모든 파일 타입(비디오, 문서, 오디오 등)을 선택할 수 있는 범용 파일 선택 컴포넌트
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -18,6 +18,9 @@ import {
   Play,
   FileImage,
   FileVideo,
+  FileText,
+  File,
+  Music,
   Loader2,
   AlertCircle,
   Eye,
@@ -34,10 +37,10 @@ import { cn } from '@/lib/utils';
 import { formatFileSize } from '@/utils/format';
 import MediaGrid from '@/components/media/MediaGrid';
 
-export interface MediaItem {
+export interface FileItem {
   id: string;
   url: string;
-  type: 'image' | 'video';
+  type: 'image' | 'video' | 'document' | 'audio' | 'other';
   title: string;
   alt?: string;
   width?: number;
@@ -49,13 +52,13 @@ export interface MediaItem {
   uploadedAt?: string;
 }
 
-export interface MediaSelectorProps {
+export interface FileSelectorProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (media: MediaItem[] | MediaItem) => void;
+  onSelect: (media: FileItem[] | FileItem) => void;
   multiple?: boolean;
-  acceptedTypes?: ('image' | 'video')[];
-  selectedItems?: MediaItem[];
+  acceptedTypes?: ('image' | 'video' | 'document' | 'audio' | 'other')[];
+  selectedItems?: FileItem[];
   maxSelection?: number;
   title?: string;
   className?: string;
@@ -69,17 +72,17 @@ interface UploadProgress {
 }
 
 type ViewMode = 'grid' | 'list';
-type FilterType = 'all' | 'image' | 'video';
+type FilterType = 'all' | 'image' | 'video' | 'document' | 'audio' | 'other';
 
-const MediaSelector: React.FC<MediaSelectorProps> = ({
+const FileSelector: React.FC<FileSelectorProps> = ({
   isOpen,
   onClose,
   onSelect,
   multiple = false,
-  acceptedTypes = ['image', 'video'],
+  acceptedTypes = ['document', 'video', 'audio'],
   selectedItems = [],
   maxSelection = multiple ? 50 : 1,
-  title = '미디어 선택',
+  title = '파일 선택',
   className
 }) => {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
@@ -111,22 +114,33 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     }));
   }, [acceptedTypes]);
 
-  // Transform MediaFile to MediaItem
-  const transformMediaFile = (file: any): MediaItem => {
+  // Transform MediaFile to FileItem
+  const transformMediaFile = (file: any): FileItem => {
     // Determine type from mimeType
-    let mediaType: 'image' | 'video' = 'image';
+    let fileType: 'image' | 'video' | 'document' | 'audio' | 'other' = 'other';
     if (file.mimeType) {
-      if (file.mimeType.startsWith('video/')) {
-        mediaType = 'video';
-      } else if (file.mimeType.startsWith('image/')) {
-        mediaType = 'image';
+      if (file.mimeType.startsWith('image/')) {
+        fileType = 'image';
+      } else if (file.mimeType.startsWith('video/')) {
+        fileType = 'video';
+      } else if (file.mimeType.startsWith('audio/')) {
+        fileType = 'audio';
+      } else if (
+        file.mimeType.startsWith('text/') ||
+        file.mimeType.includes('pdf') ||
+        file.mimeType.includes('document') ||
+        file.mimeType.includes('word') ||
+        file.mimeType.includes('sheet') ||
+        file.mimeType.includes('presentation')
+      ) {
+        fileType = 'document';
       }
     }
-    
+
     return {
       id: file.id,
       url: file.url || file.path || '',
-      type: mediaType,
+      type: fileType,
       title: file.originalFilename || file.filename || file.name || file.title || 'Untitled',
       alt: file.altText || file.alt || file.originalFilename || file.filename || '',
       width: file.width || file.dimensions?.width,
@@ -291,7 +305,25 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: acceptedTypes.reduce((acc, type) => {
-      acc[`${type}/*`] = [];
+      if (type === 'document') {
+        // Document formats
+        acc['text/markdown'] = ['.md'];
+        acc['text/plain'] = ['.txt'];
+        acc['application/pdf'] = ['.pdf'];
+        acc['application/msword'] = ['.doc'];
+        acc['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = ['.docx'];
+        acc['application/vnd.ms-excel'] = ['.xls'];
+        acc['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] = ['.xlsx'];
+      } else if (type === 'audio') {
+        // Audio formats
+        acc['audio/*'] = [];
+      } else if (type === 'other') {
+        // Allow all file types
+        acc['*/*'] = [];
+      } else {
+        // image, video
+        acc[`${type}/*`] = [];
+      }
       return acc;
     }, {} as Record<string, string[]>),
     maxFiles: 10,
@@ -351,15 +383,23 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   };
 
   // Render file icon
-  const renderFileIcon = (item: MediaItem) => {
-    if (item.type === 'video') {
-      return <FileVideo className="w-8 h-8 text-purple-500" />;
+  const renderFileIcon = (item: FileItem) => {
+    switch (item.type) {
+      case 'video':
+        return <FileVideo className="w-8 h-8 text-purple-500" />;
+      case 'document':
+        return <FileText className="w-8 h-8 text-blue-500" />;
+      case 'audio':
+        return <Music className="w-8 h-8 text-green-500" />;
+      case 'image':
+        return <FileImage className="w-8 h-8 text-blue-500" />;
+      default:
+        return <File className="w-8 h-8 text-gray-500" />;
     }
-    return <FileImage className="w-8 h-8 text-blue-500" />;
   };
 
-  // Render media item
-  const renderMediaItem = (item: MediaItem, index: number) => {
+  // Render file item
+  const renderMediaItem = (item: FileItem, index: number) => {
     const isSelected = selectedFiles.includes(item.id);
 
     if (viewMode === 'list') {
@@ -843,4 +883,4 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   );
 };
 
-export default MediaSelector;
+export default FileSelector;
