@@ -82,8 +82,8 @@ const FileBlock: React.FC<FileBlockProps> = ({ attributes = {}, onChange }) => {
           onClose={() => setShowFileSelector(false)}
           onSelect={handleFileSelect}
           multiple={false}
-          acceptedTypes={['document', 'audio', 'other']}
-          title="Select File"
+          acceptedTypes={['document']}
+          title="파일 선택"
         />
       </div>
     );
@@ -131,8 +131,8 @@ const FileBlock: React.FC<FileBlockProps> = ({ attributes = {}, onChange }) => {
         onClose={() => setShowFileSelector(false)}
         onSelect={handleFileSelect}
         multiple={false}
-        acceptedTypes={['document', 'audio', 'other']}
-        title="Select File"
+        acceptedTypes={['document']}
+        title="파일 선택"
       />
     </div>
   );

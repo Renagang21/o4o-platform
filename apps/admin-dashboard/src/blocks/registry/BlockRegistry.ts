@@ -78,6 +78,27 @@ class BlockRegistry {
     if (categoryBlocks) {
       categoryBlocks.add(definition.name);
     }
+
+    // Register with WordPress if available
+    if (window.wp?.blocks?.registerBlockType) {
+      try {
+        window.wp.blocks.registerBlockType(definition.name, {
+          title: definition.title,
+          description: definition.description || '',
+          category: definition.category,
+          icon: definition.icon,
+          keywords: definition.keywords || [],
+          attributes: definition.attributes || {},
+          supports: definition.supports || {},
+          edit: definition.component,
+          save: () => null, // We handle saving separately
+        });
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error(`Failed to register block "${definition.name}" with WordPress:`, error);
+        }
+      }
+    }
   }
 
   /**
