@@ -70,20 +70,26 @@ const getFileType = (mimeType: string): string => {
 
 // Custom file filter
 const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
-  // Check if file type is allowed
-  if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+  // More flexible MIME type checking using pattern matching
+  const allowedPatterns = [
+    /^image\//,           // All image types
+    /^video\//,           // All video types
+    /^audio\//,           // All audio types
+    /^text\//,            // All text types
+    /^application\/pdf$/,
+    /^application\/json$/,
+    /^application\/(msword|vnd\.)/  // Office documents
+  ];
+
+  const isAllowed = allowedPatterns.some(pattern => pattern.test(file.mimetype));
+
+  if (!isAllowed) {
+    logger.warn(`Rejected file upload: ${file.originalname} with MIME type: ${file.mimetype}`);
     const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname);
     error.message = `File type ${file.mimetype} is not allowed`;
     return cb(error);
   }
 
-  // Check file size based on type
-  const fileType = getFileType(file.mimetype);
-  const sizeLimit = FILE_SIZE_LIMITS[fileType] || FILE_SIZE_LIMITS.default;
-  
-  // Note: file.size is not available here in multer's fileFilter
-  // Size checking is done in the controller after upload
-  
   cb(null, true);
 };
 
