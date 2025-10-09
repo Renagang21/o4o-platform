@@ -15,7 +15,7 @@ export const markdownReaderBlockDefinition: BlockDefinition = {
   description: 'Display markdown content from media library files.',
   keywords: ['markdown', 'md', 'document', 'reader'],
   component: MarkdownReaderBlock,
-  content: {
+  attributes: {
     url: {
       type: 'string',
       default: '',
@@ -24,8 +24,6 @@ export const markdownReaderBlockDefinition: BlockDefinition = {
       type: 'string',
       default: '',
     },
-  },
-  attributes: {
     fileName: {
       type: 'string',
       default: '',

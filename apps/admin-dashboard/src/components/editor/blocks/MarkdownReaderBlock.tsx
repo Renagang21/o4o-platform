@@ -10,16 +10,15 @@ import FileSelector, { FileItem } from './shared/FileSelector';
 
 interface MarkdownReaderBlockProps {
   id: string;
-  content?: {
+  attributes?: {
     url?: string;
     markdownContent?: string;
-  };
-  attributes?: {
     fileName?: string;
     fileSize?: number;
     fontSize?: number;
     theme?: string;
   };
+  setAttributes?: (attributes: any) => void;
   onChange?: (content: any, attributes?: any) => void;
   onDelete?: () => void;
   isSelected?: boolean;
@@ -28,40 +27,56 @@ interface MarkdownReaderBlockProps {
 
 const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
   id,
-  content = {},
   attributes = {},
+  setAttributes,
   onChange,
   isSelected,
   onSelect,
 }) => {
-  const { url = '', markdownContent = '' } = content;
-  const { fileName = '', fileSize = 0, fontSize = 16, theme = 'github' } = attributes;
+  const {
+    url = '',
+    markdownContent = '',
+    fileName = '',
+    fileSize = 0,
+    fontSize = 16,
+    theme = 'github'
+  } = attributes;
   const [showMediaSelector, setShowMediaSelector] = useState(false);
 
   // Handle file selection from library
   const handleMediaSelect = useCallback((file: FileItem | FileItem[]) => {
     const selectedFile = Array.isArray(file) ? file[0] : file;
     if (selectedFile) {
-      const updatedContent = {
-        ...content,
-        url: selectedFile.url,
-        markdownContent: '' // Will be loaded from URL
-      };
       const updatedAttributes = {
         ...attributes,
+        url: selectedFile.url,
+        markdownContent: '', // Will be loaded from URL
         fileName: selectedFile.title,
         fileSize: selectedFile.fileSize,
       };
-      if (onChange) {
-        onChange(updatedContent, updatedAttributes);
+
+      if (setAttributes) {
+        setAttributes(updatedAttributes);
+      } else if (onChange) {
+        onChange(null, updatedAttributes);
       }
       setShowMediaSelector(false);
     }
-  }, [content, attributes, onChange]);
+  }, [attributes, setAttributes, onChange]);
 
   const handleRemoveFile = () => {
-    if (onChange) {
-      onChange({ url: '', markdownContent: '' }, { ...attributes, fileName: '', fileSize: 0 });
+    const updatedAttributes = {
+      ...attributes,
+      url: '',
+      markdownContent: '',
+      fileName: '',
+      fileSize: 0
+    };
+
+    if (setAttributes) {
+      setAttributes(updatedAttributes);
+    } else if (onChange) {
+      onChange(null, updatedAttributes);
     }
   };
 
