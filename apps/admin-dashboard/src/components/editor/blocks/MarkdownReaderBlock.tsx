@@ -90,25 +90,44 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
     loadMarkdownFile();
   }, [url]); // Only depend on url, not on markdownContent to avoid loops
 
+  // Validate markdown file
+  const isValidMarkdownFile = (file: FileItem): boolean => {
+    const fileName = file.title?.toLowerCase() || '';
+    const hasValidExtension = fileName.endsWith('.md') || fileName.endsWith('.markdown');
+    const hasValidMimeType = !file.mimeType || file.mimeType === 'text/markdown' || file.mimeType === 'text/plain';
+
+    return hasValidExtension && hasValidMimeType;
+  };
+
   // Handle file selection from library
   const handleMediaSelect = useCallback((file: FileItem | FileItem[]) => {
     const selectedFile = Array.isArray(file) ? file[0] : file;
-    if (selectedFile) {
-      const updatedAttributes = {
-        ...attributes,
-        url: selectedFile.url,
-        markdownContent: '', // Will be loaded from URL
-        fileName: selectedFile.title,
-        fileSize: selectedFile.fileSize,
-      };
+    if (!selectedFile) return;
 
-      if (setAttributes) {
-        setAttributes(updatedAttributes);
-      } else if (onChange) {
-        onChange(null, updatedAttributes);
-      }
+    // Validate file type
+    if (!isValidMarkdownFile(selectedFile)) {
+      setLoadError('Please select a valid Markdown file (.md or .markdown)');
       setShowMediaSelector(false);
+      return;
     }
+
+    // Clear any previous errors
+    setLoadError(null);
+
+    const updatedAttributes = {
+      ...attributes,
+      url: selectedFile.url,
+      markdownContent: '', // Will be loaded from URL
+      fileName: selectedFile.title,
+      fileSize: selectedFile.fileSize,
+    };
+
+    if (setAttributes) {
+      setAttributes(updatedAttributes);
+    } else if (onChange) {
+      onChange(null, updatedAttributes);
+    }
+    setShowMediaSelector(false);
   }, [attributes, setAttributes, onChange]);
 
   const handleRemoveFile = () => {
@@ -151,10 +170,21 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
         <div className="text-center py-8 bg-gray-50 rounded border-2 border-dashed border-gray-300">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500 mb-4">Select a Markdown file from Media Library</p>
+
+          {loadError && (
+            <div className="mb-4 mx-auto max-w-md">
+              <div className="flex items-start gap-2 text-red-600 bg-red-50 p-3 rounded text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <p className="text-left">{loadError}</p>
+              </div>
+            </div>
+          )}
+
           <Button
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
+              setLoadError(null); // Clear error when opening selector
               setShowMediaSelector(true);
             }}
             className="gap-2"
@@ -162,7 +192,7 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
             <FolderOpen className="w-4 h-4" />
             Select from Media Library
           </Button>
-          <p className="text-xs text-gray-400 mt-2">Supported: .md files</p>
+          <p className="text-xs text-gray-400 mt-2">Supported: .md, .markdown files only</p>
         </div>
       ) : (
         <div>
