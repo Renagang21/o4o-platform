@@ -141,6 +141,29 @@ const FileSelector: React.FC<FileSelectorProps> = ({
       }
     }
 
+    // Fallback: Check file extension for application/octet-stream or unrecognized MIME types
+    if (fileType === 'other' && (file.originalFilename || file.filename)) {
+      const filename = (file.originalFilename || file.filename || '').toLowerCase();
+      if (filename.endsWith('.md') || filename.endsWith('.markdown') ||
+          filename.endsWith('.txt') || filename.endsWith('.pdf') ||
+          filename.endsWith('.doc') || filename.endsWith('.docx') ||
+          filename.endsWith('.csv') || filename.endsWith('.xlsx') ||
+          filename.endsWith('.xls') || filename.endsWith('.ppt') ||
+          filename.endsWith('.pptx')) {
+        fileType = 'document';
+      } else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg') ||
+                 filename.endsWith('.png') || filename.endsWith('.gif') ||
+                 filename.endsWith('.webp') || filename.endsWith('.svg')) {
+        fileType = 'image';
+      } else if (filename.endsWith('.mp4') || filename.endsWith('.webm') ||
+                 filename.endsWith('.mov') || filename.endsWith('.avi')) {
+        fileType = 'video';
+      } else if (filename.endsWith('.mp3') || filename.endsWith('.wav') ||
+                 filename.endsWith('.ogg') || filename.endsWith('.m4a')) {
+        fileType = 'audio';
+      }
+    }
+
     return {
       id: file.id,
       url: file.url || file.path || '',
