@@ -171,19 +171,14 @@ export const createPost = async (req: Request, res: Response) => {
     const existingRequest = recentRequests.get(requestHash)
     
     if (existingRequest) {
-      // If request was made within last 2 seconds, return the cached result
-      if (Date.now() - existingRequest.timestamp < 2000) {
+      // If request was made within last 1 second, return the cached result
+      if (Date.now() - existingRequest.timestamp < 1000) {
         // Duplicate request detected, returning cached result
         if (existingRequest.result) {
           return res.status(201).json(existingRequest.result)
         }
-        // Request is still being processed
-        return res.status(409).json({ 
-          error: { 
-            code: 'DUPLICATE_REQUEST', 
-            message: 'A similar request is already being processed' 
-          } 
-        })
+        // Request is still being processed - wait a bit and continue
+        // This prevents 409 errors for legitimate quick retries
       }
     }
     
