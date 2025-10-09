@@ -2,6 +2,7 @@ import { FC, ReactNode, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import TemplatePartRenderer from '../TemplatePartRenderer';
 import { getPageContext } from '../../utils/context-detector';
+import { useCustomizerSettings } from '../../hooks/useCustomizerSettings';
 
 interface MenuItem {
   id: string;
@@ -50,6 +51,7 @@ const Layout: FC<LayoutProps> = ({
   const location = useLocation();
   const [menuData, setMenuData] = useState<MenuData | null>(null);
   const [menuLoading, setMenuLoading] = useState(true);
+  const { currentWidth, currentPadding } = useCustomizerSettings();
 
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -112,7 +114,11 @@ const Layout: FC<LayoutProps> = ({
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 main-content">
+      <main className="flex-1 main-content mx-auto" style={{
+        maxWidth: `${currentWidth}px`,
+        paddingLeft: `${currentPadding.left}px`,
+        paddingRight: `${currentPadding.right}px`,
+      }}>
         {children}
       </main>
 

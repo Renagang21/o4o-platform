@@ -41,10 +41,10 @@ export default function PostDetail() {
         for (const mode of tryOrder) {
           try {
             if (mode === 'slug') {
-              const res = await axios.get(`/api/public/posts/post/${encodeURIComponent(slugOrId)}`);
+              const res = await axios.get(`/public/posts/post/${encodeURIComponent(slugOrId)}`);
               fetched = res.data?.data || res.data;
             } else {
-              const res = await axios.get(`/api/posts/${encodeURIComponent(slugOrId)}`);
+              const res = await axios.get(`/posts/${encodeURIComponent(slugOrId)}`);
               fetched = res.data?.data || res.data;
             }
             if (fetched) break;
@@ -158,14 +158,12 @@ export default function PostDetail() {
   };
 
   return (
-    <main className="min-h-screen max-w-3xl mx-auto px-4 py-10">
-      <article>
-        <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-        {post.excerpt && (
-          <p className="text-gray-600 mb-6">{post.excerpt}</p>
-        )}
-        {renderContent()}
-      </article>
-    </main>
+    <article className="py-10">
+      <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
+      {post.excerpt && (
+        <p className="text-gray-600 mb-6">{post.excerpt}</p>
+      )}
+      {renderContent()}
+    </article>
   );
 }

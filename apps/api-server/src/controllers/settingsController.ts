@@ -6,7 +6,7 @@ export class SettingsController {
   async getSettings(req: Request, res: Response) {
     try {
       const { type } = req.params;
-      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email'];
+      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email', 'customizer'];
 
       if (!validTypes.includes(type as SettingsType)) {
         return res.status(400).json({
@@ -35,7 +35,7 @@ export class SettingsController {
   async updateSettings(req: Request, res: Response) {
     try {
       const { type } = req.params;
-      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email'];
+      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email', 'customizer'];
 
       if (!validTypes.includes(type as SettingsType)) {
         return res.status(400).json({
@@ -94,6 +94,25 @@ export class SettingsController {
       res.status(500).json({
         success: false,
         message: 'Failed to fetch general settings',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // GET /api/settings/customizer (public endpoint for frontend)
+  async getCustomizerSettings(req: Request, res: Response) {
+    try {
+      const settings = await settingsService.getSettings('customizer');
+
+      res.json({
+        success: true,
+        data: settings
+      });
+    } catch (error) {
+      // Error log removed
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch customizer settings',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }

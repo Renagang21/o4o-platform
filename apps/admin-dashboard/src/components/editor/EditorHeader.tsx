@@ -24,6 +24,8 @@ import {
   Settings2,
   Sparkles,
 } from 'lucide-react';
+import { ViewportSwitcher } from './ViewportSwitcher';
+import { ViewportMode } from '@/hooks/useCustomizerSettings';
 
 interface EditorHeaderProps {
   onSave: () => void;
@@ -50,6 +52,14 @@ interface EditorHeaderProps {
   title?: string;
   subtitle?: string;
   actions?: React.ReactNode;
+  // Viewport mode props
+  viewportMode?: ViewportMode;
+  onViewportModeChange?: (mode: ViewportMode) => void;
+  containerWidth?: {
+    desktop: number;
+    tablet: number;
+    mobile: number;
+  };
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -72,6 +82,9 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   title,
   subtitle,
   actions,
+  viewportMode = 'desktop',
+  onViewportModeChange,
+  containerWidth,
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -180,6 +193,14 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         <div className="flex items-center gap-2">
           {/* Custom Actions (optional) */}
           {actions}
+
+          {/* Viewport Switcher */}
+          {onViewportModeChange && (
+            <ViewportSwitcher
+              currentMode={viewportMode}
+              onModeChange={onViewportModeChange}
+            />
+          )}
 
           {/* Preview */}
           <Button

@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, ArrowLeft } from 'lucide-react';
 import { loadPageContent, PageContent } from '@/utils/pageSystem';
 import DOMPurify from 'dompurify';
+import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
 
 // 사용자 권한 확인
 const isAdmin = () => {
@@ -22,6 +23,7 @@ const PageViewer: FC = () => {
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentWidth, currentPadding } = useCustomizerSettings();
 
   useEffect(() => {
     if (!slug) {
@@ -92,7 +94,11 @@ const PageViewer: FC = () => {
       {/* 관리자용 편집 바 */}
       {isAdmin() && (
         <div className="bg-yellow-50 border-b border-yellow-200">
-          <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="mx-auto py-3 flex items-center justify-between" style={{
+            maxWidth: `${currentWidth}px`,
+            paddingLeft: `${currentPadding.left}px`,
+            paddingRight: `${currentPadding.right}px`,
+          }}>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
               <span className="text-sm text-yellow-800 font-medium">관리자 모드</span>
@@ -110,7 +116,11 @@ const PageViewer: FC = () => {
       )}
 
       {/* 메인 콘텐츠 */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="mx-auto py-8" style={{
+        maxWidth: `${currentWidth}px`,
+        paddingLeft: `${currentPadding.left}px`,
+        paddingRight: `${currentPadding.right}px`,
+      }}>
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* 페이지 헤더 */}
           <div className="border-b border-gray-200 px-8 py-6">

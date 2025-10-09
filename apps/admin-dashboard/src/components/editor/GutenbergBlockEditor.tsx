@@ -21,6 +21,7 @@ import GutenbergSidebar from './GutenbergSidebar';
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
 
 // Block interface는 이제 @/types/post.types에서 import
 
@@ -149,7 +150,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   });
   
   const navigate = useNavigate();
-  
+
+  // Viewport mode hook
+  const { viewportMode, currentConfig, switchViewport, containerSettings } = useCustomizerSettings();
+
   // Initialize WordPress on mount
   useEffect(() => {
     initializeWordPress().catch(error => {
@@ -684,6 +688,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
         onToggleInspector={() => setSidebarOpen(!sidebarOpen)}
         isInspectorOpen={sidebarOpen}
+        viewportMode={viewportMode}
+        onViewportModeChange={switchViewport}
+        containerWidth={containerSettings.width}
       />
 
       {/* Main Layout */}
@@ -697,14 +704,20 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
         {/* Editor Canvas */}
         <div
-          className={`flex-1 transition-all duration-300 overflow-y-auto ${
+          className={`flex-1 transition-all duration-300 overflow-y-auto bg-gray-100 ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
           } ${
             sidebarOpen ? 'mr-80' : 'mr-0'
           }`}
           style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 60px)' }}
         >
-          <div className="max-w-4xl mx-auto p-8">
+          <div
+            className="mx-auto p-8 bg-white shadow-md transition-all duration-300 ease-in-out"
+            style={{
+              width: `${currentConfig.width}px`,
+              maxWidth: '100%',
+            }}
+          >
             {/* Title Section - WordPress-style two-tier design */}
             <div className="mb-10">
               {/* Title Preview Display */}

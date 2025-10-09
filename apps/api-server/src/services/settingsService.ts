@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { Settings, GeneralSettings, ReadingSettings, ThemeSettings, EmailSettings, PermalinkSettings } from '../entities/Settings';
 
-export type SettingsType = 'general' | 'reading' | 'theme' | 'email' | 'permalink';
+export type SettingsType = 'general' | 'reading' | 'theme' | 'email' | 'permalink' | 'customizer';
 export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | Record<string, unknown>;
 
 export class SettingsService {
