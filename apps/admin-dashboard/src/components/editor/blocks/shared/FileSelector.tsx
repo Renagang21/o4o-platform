@@ -259,8 +259,12 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         type: f.type,
         url: f.url
       })));
-      console.log('🔍 [FileSelector Debug] Document files:', transformed.filter(f => f.type === 'document'));
-      console.log('🔍 [FileSelector Debug] Markdown MIME filter:', acceptedMimeTypes);
+      console.log('🔍 [FileSelector Debug] Document files:', transformed.filter(f => f.type === 'document').map(f => ({
+        title: f.title,
+        mimeType: f.mimeType,
+        hasMarkdownExt: f.title.toLowerCase().endsWith('.md') || f.title.toLowerCase().endsWith('.markdown')
+      })));
+      console.log('🔍 [FileSelector Debug] Filters - MIME:', acceptedMimeTypes, 'Extensions:', acceptedExtensions);
     }
 
     return transformed;
@@ -274,21 +278,44 @@ const FileSelector: React.FC<FileSelectorProps> = ({
       return false;
     }
 
-    // Filter by MIME type if specified
-    if (acceptedMimeTypes && acceptedMimeTypes.length > 0) {
-      if (!file.mimeType || !acceptedMimeTypes.includes(file.mimeType)) {
-        return false;
-      }
-    }
+    // Filter by MIME type or extension if specified (OR condition)
+    // If both are specified, file must match at least one
+    const hasMimeTypeFilter = acceptedMimeTypes && acceptedMimeTypes.length > 0;
+    const hasExtensionFilter = acceptedExtensions && acceptedExtensions.length > 0;
 
-    // Filter by extension if specified
-    if (acceptedExtensions && acceptedExtensions.length > 0) {
-      const fileName = file.title.toLowerCase();
-      const hasMatchingExtension = acceptedExtensions.some(ext =>
-        fileName.endsWith(ext.toLowerCase())
-      );
-      if (!hasMatchingExtension) {
-        return false;
+    if (hasMimeTypeFilter || hasExtensionFilter) {
+      let passedMimeFilter = false;
+      let passedExtensionFilter = false;
+
+      // Check MIME type
+      if (hasMimeTypeFilter) {
+        passedMimeFilter = file.mimeType && acceptedMimeTypes.includes(file.mimeType);
+      }
+
+      // Check extension
+      if (hasExtensionFilter) {
+        const fileName = file.title.toLowerCase();
+        passedExtensionFilter = acceptedExtensions.some(ext =>
+          fileName.endsWith(ext.toLowerCase())
+        );
+      }
+
+      // Must pass at least one filter
+      if (hasMimeTypeFilter && hasExtensionFilter) {
+        // Both filters specified: pass if either matches
+        if (!passedMimeFilter && !passedExtensionFilter) {
+          return false;
+        }
+      } else if (hasMimeTypeFilter) {
+        // Only MIME filter specified
+        if (!passedMimeFilter) {
+          return false;
+        }
+      } else if (hasExtensionFilter) {
+        // Only extension filter specified
+        if (!passedExtensionFilter) {
+          return false;
+        }
       }
     }
 
