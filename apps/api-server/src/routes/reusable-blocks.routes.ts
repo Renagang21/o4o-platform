@@ -9,6 +9,8 @@ import { ReusableBlock } from '../entities/ReusableBlock';
 import { User } from '../entities/User';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { Like, ILike } from 'typeorm';
+import logger from '../utils/logger';
+import { PAGINATION_DEFAULTS, REVISION_LIMITS, BLOCK_DUPLICATE } from '../config/editor.constants';
 
 const router: Router = Router();
 const reusableBlockRepository = AppDataSource.getRepository(ReusableBlock);
@@ -22,7 +24,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const {
       page = 1,
-      per_page = 20,
+      per_page = PAGINATION_DEFAULTS.BLOCKS_PER_PAGE,
       search = '',
       status = 'active',
       category = '',
@@ -33,7 +35,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     } = req.query;
 
     const userId = req.user?.id;
-    const take = Math.min(parseInt(per_page as string), 100);
+    const take = Math.min(parseInt(per_page as string), PAGINATION_DEFAULTS.MAX_PER_PAGE);
     const skip = (parseInt(page as string) - 1) * take;
 
     // Build query conditions
@@ -131,10 +133,14 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     })));
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error fetching reusable blocks:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to fetch reusable blocks',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -197,10 +203,15 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error fetching reusable block:', {
+      blockId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to fetch reusable block',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -284,10 +295,15 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error creating reusable block:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id,
+      title: req.body.title
+    });
+    res.status(500).json({
       error: 'Failed to create reusable block',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -327,9 +343,9 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       
       const revisions = Array.isArray(block.revisions) ? block.revisions : [];
       revisions.push(revision);
-      
-      // Keep only last 10 revisions
-      block.revisions = revisions.slice(-10);
+
+      // Keep only last N revisions
+      block.revisions = revisions.slice(-REVISION_LIMITS.MAX_REVISIONS);
     }
 
     // Update fields
@@ -396,10 +412,15 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error updating reusable block:', {
+      blockId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to update reusable block',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -434,10 +455,15 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error deleting reusable block:', {
+      blockId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to delete reusable block',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -466,7 +492,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     }
 
     // Generate unique slug for duplicate
-    const duplicateTitle = title || `${originalBlock.title} (Copy)`;
+    const duplicateTitle = title || `${originalBlock.title} ${BLOCK_DUPLICATE.SUFFIX}`;
     let slug = ReusableBlock.generateSlug(duplicateTitle);
     let slugExists = await reusableBlockRepository.findOne({ where: { slug } });
     let counter = 1;
@@ -519,10 +545,15 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error duplicating reusable block:', {
+      blockId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to duplicate reusable block',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -548,10 +579,14 @@ router.get('/categories', authenticateToken, async (req: AuthRequest, res: Respo
     res.json(categoryList);
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error fetching block categories:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to fetch categories',
-      message: error.message 
+      message: error.message
     });
   }
 });

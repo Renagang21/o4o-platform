@@ -47,7 +47,7 @@ class MenuService {
     const rootItems = await this.menuItemRepository
       .createQueryBuilder('item')
       .where('item.menu_id = :menuId', { menuId: id })
-      .andWhere('item.parentId IS NULL')
+      .andWhere('item.parent IS NULL')
       .orderBy('item.order_num', 'ASC')
       .getMany();
 
@@ -179,15 +179,24 @@ class MenuService {
     metadata?: Record<string, any>;
   }): Promise<MenuItem | null> {
     const menu = await this.findMenuById(data.menu_id);
-    
+
     if (!menu) {
       return null;
     }
 
     const menuItem = this.menuItemRepository.create({
-      ...data,
-      menu
-    } as any);
+      menu_id: data.menu_id,
+      title: data.title,
+      url: data.url,
+      type: data.type,
+      target: data.target as any,
+      icon: data.icon,
+      css_class: data.css_class,
+      order_num: data.order_num,
+      reference_id: data.reference_id,
+      metadata: data.metadata,
+      menu: menu
+    });
 
     if (data.parent_id) {
       const parent = await this.menuItemRepository.findOne({
@@ -196,10 +205,10 @@ class MenuService {
       if (!parent) {
         throw new Error(`Parent menu item with ID ${data.parent_id} not found`);
       }
-      (menuItem as any).parent = parent;
+      menuItem.parent = parent;
     }
 
-    return this.menuItemRepository.save(menuItem) as any;
+    return this.menuItemRepository.save(menuItem);
   }
 
   async updateMenuItem(
@@ -225,7 +234,7 @@ class MenuService {
     }
 
     Object.assign(menuItem, data);
-    return this.menuItemRepository.save(menuItem) as any;
+    return this.menuItemRepository.save(menuItem);
   }
 
   async deleteMenuItem(id: string): Promise<boolean> {
@@ -281,7 +290,7 @@ class MenuService {
             if (!parent) {
               throw new Error(`Parent menu item with ID ${item.parent_id} not found`);
             }
-            (menuItem as any).parent = parent;
+            menuItem.parent = parent;
           } else {
             menuItem.parent = null;
           }

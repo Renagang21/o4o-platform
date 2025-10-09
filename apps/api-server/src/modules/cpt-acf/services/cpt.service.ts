@@ -5,6 +5,7 @@ import { WordPressTransformer } from '../../../utils/wordpress-transformer';
 import { metaDataService } from '../../../services/MetaDataService';
 import { In } from 'typeorm';
 import logger from '../../../utils/logger';
+import { CPT_PAGINATION, CPT_QUERY_DEFAULTS, DEFAULT_CPTS } from '../../../config/cpt.constants';
 
 /**
  * CPT Service - Business logic layer for Custom Post Types
@@ -173,12 +174,12 @@ export class CPTService {
   } = {}) {
     try {
       const {
-        page = 1,
-        limit = 10,
+        page = CPT_PAGINATION.DEFAULT_PAGE,
+        limit = CPT_PAGINATION.DEFAULT_LIMIT,
         status,
         search,
-        orderBy = 'createdAt',
-        order = 'DESC'
+        orderBy = CPT_QUERY_DEFAULTS.ORDER_BY,
+        order = CPT_QUERY_DEFAULTS.ORDER
       } = options;
 
       const queryBuilder = this.postRepository.createQueryBuilder('post');
@@ -324,39 +325,8 @@ export class CPTService {
         };
       }
 
-      const defaultCPTs = [
-        {
-          slug: 'products',
-          name: 'Products',
-          description: 'Product catalog',
-          icon: 'package',
-          active: true
-        },
-        {
-          slug: 'portfolio',
-          name: 'Portfolio',
-          description: 'Portfolio items',
-          icon: 'briefcase',
-          active: true
-        },
-        {
-          slug: 'testimonials',
-          name: 'Testimonials',
-          description: 'Customer testimonials',
-          icon: 'message-circle',
-          active: true
-        },
-        {
-          slug: 'team',
-          name: 'Team',
-          description: 'Team members',
-          icon: 'users',
-          active: true
-        }
-      ];
-
       const created = [];
-      for (const cptData of defaultCPTs) {
+      for (const cptData of DEFAULT_CPTS) {
         const cpt = this.cptRepository.create(cptData);
         const saved = await this.cptRepository.save(cpt);
         created.push(saved);

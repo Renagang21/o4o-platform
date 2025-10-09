@@ -9,6 +9,8 @@ import { BlockPattern } from '../entities/BlockPattern';
 import { User } from '../entities/User';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { ILike } from 'typeorm';
+import logger from '../utils/logger';
+import { PAGINATION_DEFAULTS, BLOCK_DUPLICATE, BLOCK_PATTERN_CATEGORIES } from '../config/editor.constants';
 
 const router: Router = Router();
 const blockPatternRepository = AppDataSource.getRepository(BlockPattern);
@@ -21,7 +23,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const {
       page = 1,
-      per_page = 20,
+      per_page = PAGINATION_DEFAULTS.PATTERNS_PER_PAGE,
       search = '',
       category = '',
       source = '',
@@ -32,7 +34,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     } = req.query;
 
     const userId = req.user?.id;
-    const take = Math.min(parseInt(per_page as string), 100);
+    const take = Math.min(parseInt(per_page as string), PAGINATION_DEFAULTS.MAX_PER_PAGE);
     const skip = (parseInt(page as string) - 1) * take;
 
     // Build query conditions
@@ -125,10 +127,14 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     })));
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error fetching block patterns:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to fetch block patterns',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -139,20 +145,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
  */
 router.get('/categories', async (req: AuthRequest, res: Response) => {
   try {
-    const categories = [
-      { id: 'header', name: 'Headers', description: 'Site headers and navigation' },
-      { id: 'footer', name: 'Footers', description: 'Site footers' },
-      { id: 'hero', name: 'Hero Sections', description: 'Hero banners and introductions' },
-      { id: 'cta', name: 'Call to Action', description: 'CTA sections and buttons' },
-      { id: 'features', name: 'Features', description: 'Feature lists and showcases' },
-      { id: 'testimonials', name: 'Testimonials', description: 'Customer testimonials and reviews' },
-      { id: 'pricing', name: 'Pricing', description: 'Pricing tables and plans' },
-      { id: 'contact', name: 'Contact', description: 'Contact forms and information' },
-      { id: 'about', name: 'About', description: 'About sections and team' },
-      { id: 'gallery', name: 'Gallery', description: 'Image and media galleries' },
-      { id: 'posts', name: 'Posts', description: 'Blog post layouts' },
-      { id: 'general', name: 'General', description: 'General purpose patterns' }
-    ];
+    const categories = BLOCK_PATTERN_CATEGORIES;
 
     // Get counts for each category
     const categoriesWithCounts = await Promise.all(
@@ -167,10 +160,14 @@ router.get('/categories', async (req: AuthRequest, res: Response) => {
     res.json(categoriesWithCounts);
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error fetching pattern categories:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to fetch categories',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -234,10 +231,15 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error fetching block pattern:', {
+      patternId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to fetch block pattern',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -328,10 +330,15 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error creating block pattern:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id,
+      title: req.body.title
+    });
+    res.status(500).json({
       error: 'Failed to create block pattern',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -428,10 +435,15 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error updating block pattern:', {
+      patternId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to update block pattern',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -466,10 +478,15 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error deleting block pattern:', {
+      patternId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to delete block pattern',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -498,7 +515,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     }
 
     // Generate unique slug for duplicate
-    const duplicateTitle = title || `${originalPattern.title} (Copy)`;
+    const duplicateTitle = title || `${originalPattern.title} ${BLOCK_DUPLICATE.SUFFIX}`;
     let slug = BlockPattern.generateSlug(duplicateTitle);
     let slugExists = await blockPatternRepository.findOne({ where: { slug } });
     let counter = 1;
@@ -556,10 +573,15 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     });
 
   } catch (error: any) {
-    // Error log removed
-    res.status(500).json({ 
+    logger.error('Error duplicating block pattern:', {
+      patternId: req.params.id,
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({
       error: 'Failed to duplicate block pattern',
-      message: error.message 
+      message: error.message
     });
   }
 });

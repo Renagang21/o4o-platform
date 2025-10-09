@@ -3,12 +3,15 @@ import { ThemeService } from '../services/ThemeService';
 import { hooks } from '../services/HookSystem';
 import multer from 'multer';
 import * as path from 'path';
+import logger from '../utils/logger';
+import { THEME_UPLOAD } from '../config/appearance.constants';
 
 const upload = multer({
-  dest: 'uploads/themes/',
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+  dest: THEME_UPLOAD.UPLOAD_DIR,
+  limits: { fileSize: THEME_UPLOAD.MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
-    if (path.extname(file.originalname) !== '.zip') {
+    const ext = path.extname(file.originalname);
+    if (!THEME_UPLOAD.ALLOWED_EXTENSIONS.includes(ext)) {
       cb(new Error('Only ZIP files are allowed'));
     } else {
       cb(null, true);
@@ -36,7 +39,10 @@ export class ThemeController {
         count: themes.length
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error fetching all themes:', {
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to fetch themes',
@@ -65,7 +71,11 @@ export class ThemeController {
         data: theme
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error fetching theme by ID:', {
+        themeId: req.params.id,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to fetch theme',
@@ -96,7 +106,12 @@ export class ThemeController {
         data: installation
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error installing theme:', {
+        themeUrl: req.body.themeUrl,
+        siteId: req.body.siteId,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to install theme',
@@ -137,7 +152,12 @@ export class ThemeController {
           data: installation
         });
       } catch (error: any) {
-        // Error log removed
+        logger.error('Error uploading theme:', {
+          fileName: req.file?.originalname,
+          siteId: req.body.siteId,
+          error: error.message,
+          stack: error.stack
+        });
         res.status(500).json({
           success: false,
           message: 'Failed to upload theme',
@@ -169,7 +189,12 @@ export class ThemeController {
         message: 'Theme activated successfully'
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error activating theme:', {
+        themeId: req.params.id,
+        siteId: req.body.siteId,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to activate theme',
@@ -200,7 +225,12 @@ export class ThemeController {
         message: 'Theme deactivated successfully'
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error deactivating theme:', {
+        themeId: req.params.id,
+        siteId: req.body.siteId,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to deactivate theme',
@@ -231,7 +261,12 @@ export class ThemeController {
         message: 'Theme uninstalled successfully'
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error uninstalling theme:', {
+        themeId: req.params.id,
+        siteId: req.body.siteId,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to uninstall theme',
@@ -263,7 +298,12 @@ export class ThemeController {
         data: theme
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error updating theme:', {
+        themeId: req.params.id,
+        updateUrl: req.body.updateUrl,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to update theme',
@@ -285,7 +325,11 @@ export class ThemeController {
         data: preview
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error getting theme preview:', {
+        themeId: req.params.id,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to get theme preview',
@@ -316,7 +360,12 @@ export class ThemeController {
         message: 'Customizations saved successfully'
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error saving theme customizations:', {
+        themeId: req.params.id,
+        siteId: req.body.siteId,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to save customizations',
@@ -346,7 +395,11 @@ export class ThemeController {
         data: theme
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error getting active theme:', {
+        siteId: req.query.siteId,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to get active theme',
@@ -378,7 +431,17 @@ export class ThemeController {
         count: themes.length
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error searching marketplace:', {
+        query: req.query.q,
+        filters: {
+          type: req.query.type,
+          isPremium: req.query.isPremium,
+          minRating: req.query.minRating,
+          maxPrice: req.query.maxPrice
+        },
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to search marketplace',
@@ -408,7 +471,12 @@ export class ThemeController {
         message: `Hook ${hookName} executed successfully`
       });
     } catch (error: any) {
-      // Error log removed
+      logger.error('Error executing hook:', {
+        hookName: req.body.hookName,
+        args: req.body.args,
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to execute hook',

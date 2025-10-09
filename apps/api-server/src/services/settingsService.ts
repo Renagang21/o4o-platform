@@ -64,51 +64,51 @@ export class SettingsService {
     switch (type) {
       case 'general':
         return {
-          siteName: 'O4O Platform',
-          siteDescription: 'Multi-tenant e-commerce platform',
-          siteUrl: '',
-          adminEmail: '',
-          timezone: 'Asia/Seoul',
-          dateFormat: 'YYYY-MM-DD',
-          timeFormat: 'HH:mm',
-          language: 'ko',
-          maintenanceMode: false,
-          maintenanceMessage: '',
-          allowRegistration: true,
-          defaultUserRole: 'customer',
-          requireEmailVerification: true,
-          enableApiAccess: false,
-          apiRateLimit: 100
+          siteName: process.env.DEFAULT_SITE_NAME || 'O4O Platform',
+          siteDescription: process.env.DEFAULT_SITE_DESCRIPTION || 'Multi-tenant e-commerce platform',
+          siteUrl: process.env.DEFAULT_SITE_URL || '',
+          adminEmail: process.env.DEFAULT_ADMIN_EMAIL || '',
+          timezone: process.env.DEFAULT_TIMEZONE || 'Asia/Seoul',
+          dateFormat: process.env.DEFAULT_DATE_FORMAT || 'YYYY-MM-DD',
+          timeFormat: process.env.DEFAULT_TIME_FORMAT || 'HH:mm',
+          language: process.env.DEFAULT_LANGUAGE || 'ko',
+          maintenanceMode: process.env.DEFAULT_MAINTENANCE_MODE === 'true' || false,
+          maintenanceMessage: process.env.DEFAULT_MAINTENANCE_MESSAGE || '',
+          allowRegistration: process.env.DEFAULT_ALLOW_REGISTRATION !== 'false',
+          defaultUserRole: process.env.DEFAULT_USER_ROLE || 'customer',
+          requireEmailVerification: process.env.DEFAULT_REQUIRE_EMAIL_VERIFICATION !== 'false',
+          enableApiAccess: process.env.DEFAULT_ENABLE_API_ACCESS === 'true' || false,
+          apiRateLimit: parseInt(process.env.DEFAULT_API_RATE_LIMIT || '100', 10)
         } as GeneralSettings;
 
       case 'reading':
         return {
-          homepageType: 'latest_posts',
-          homepageId: undefined,
-          postsPerPage: 10,
-          showSummary: 'excerpt',
-          excerptLength: 200
+          homepageType: (process.env.DEFAULT_HOMEPAGE_TYPE as 'latest_posts' | 'static_page') || 'latest_posts',
+          homepageId: process.env.DEFAULT_HOMEPAGE_ID || undefined,
+          postsPerPage: parseInt(process.env.DEFAULT_POSTS_PER_PAGE || '10', 10),
+          showSummary: (process.env.DEFAULT_SHOW_SUMMARY as 'full' | 'excerpt') || 'excerpt',
+          excerptLength: parseInt(process.env.DEFAULT_EXCERPT_LENGTH || '200', 10)
         } as ReadingSettings;
 
       case 'theme':
         return {
-          theme: 'default',
-          primaryColor: '#0066cc',
-          secondaryColor: '#666666',
-          fontFamily: 'system-ui',
-          fontSize: '16px',
-          darkMode: false
+          theme: process.env.DEFAULT_THEME || 'default',
+          primaryColor: process.env.DEFAULT_PRIMARY_COLOR || '#0066cc',
+          secondaryColor: process.env.DEFAULT_SECONDARY_COLOR || '#666666',
+          fontFamily: process.env.DEFAULT_FONT_FAMILY || 'system-ui',
+          fontSize: process.env.DEFAULT_FONT_SIZE || '16px',
+          darkMode: process.env.DEFAULT_DARK_MODE === 'true' || false
         } as ThemeSettings;
 
       case 'email':
         return {
-          smtpHost: '',
-          smtpPort: 587,
-          smtpUser: '',
-          smtpPassword: '',
-          smtpSecure: false,
-          fromEmail: '',
-          fromName: ''
+          smtpHost: process.env.SMTP_HOST || '',
+          smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
+          smtpUser: process.env.SMTP_USER || '',
+          smtpPassword: process.env.SMTP_PASSWORD || '',
+          smtpSecure: process.env.SMTP_SECURE === 'true' || false,
+          fromEmail: process.env.SMTP_FROM_EMAIL || '',
+          fromName: process.env.SMTP_FROM_NAME || ''
         } as EmailSettings;
 
       default:

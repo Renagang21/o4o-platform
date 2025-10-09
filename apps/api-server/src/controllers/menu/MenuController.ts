@@ -58,29 +58,13 @@ export class MenuController {
     try {
       const { id } = req.params;
 
-      // Handle numeric IDs by creating a default menu
-      if (id === '1' || id === '2' || id === '3') {
-        const defaultMenu = {
-          id: id,
-          name: `Menu ${id}`,
-          slug: `menu-${id}`,
-          location: 'primary',
-          is_active: true,
-          items: [],
-          created_at: new Date(),
-          updated_at: new Date()
-        };
-        res.json({
-          success: true,
-          data: defaultMenu
-        });
-        return;
-      }
+      // Try to find menu by ID first
+      let menu = await menuService.findMenuById(id);
 
-      // For slug-based lookup, query database directly
-      if (id === 'primary-menu') {
+      // If not found by ID, try to find by slug
+      if (!menu) {
         try {
-          const menuData = await menuService.getMenuBySlug('primary-menu');
+          const menuData = await menuService.getMenuBySlug(id);
           if (menuData) {
             res.json({
               success: true,
@@ -89,13 +73,10 @@ export class MenuController {
             return;
           }
         } catch (dbError) {
-          logger.error('Database error for primary-menu:', dbError);
-          // Fall through to service lookup
+          logger.error('Database error looking up menu by slug:', dbError);
         }
       }
 
-      const menu = await menuService.findMenuById(id);
-      
       if (!menu) {
         res.status(404).json({
           success: false,
@@ -103,7 +84,7 @@ export class MenuController {
         });
         return;
       }
-      
+
       res.json({
         success: true,
         data: menu

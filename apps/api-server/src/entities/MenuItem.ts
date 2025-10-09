@@ -43,9 +43,9 @@ export class MenuItem {
   @Index()
   menu_id: string;
 
-  @ManyToOne(() => Menu, { onDelete: 'CASCADE', lazy: true })
+  @ManyToOne(() => Menu, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menu_id' })
-  menu: Promise<Menu>;
+  menu: Menu;
 
   @Column({ type: 'varchar', length: 255 })
   title: string;
