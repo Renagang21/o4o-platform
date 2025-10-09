@@ -251,6 +251,34 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
+      case 'o4o/markdown-reader':
+        const markdownUrl = attributes?.url || '';
+        const markdownContent = attributes?.markdownContent || '';
+        const fileName = attributes?.fileName || 'Markdown File';
+
+        if (!markdownUrl && !markdownContent) {
+          return (
+            <div key={block.id} className="p-6 mb-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+              <p className="text-sm text-gray-500 text-center">No markdown file selected</p>
+            </div>
+          );
+        }
+
+        return (
+          <div key={block.id} className="mb-6 p-6 bg-white rounded-lg border border-gray-200">
+            <div className="prose prose-gray max-w-none">
+              {markdownContent ? (
+                <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
+              ) : (
+                <div className="text-gray-500 italic">
+                  <p className="text-sm font-medium text-gray-700 mb-2">{fileName}</p>
+                  <p className="text-xs">Loading markdown from: {markdownUrl}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div key={block.id} className="p-4 mb-4 bg-gray-100 rounded">
