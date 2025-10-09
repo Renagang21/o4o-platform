@@ -152,7 +152,7 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
       onChange('', {
         ...attributes,
         src: selectedFile.url,
-        poster: selectedFile.thumbnail || '',
+        poster: selectedFile.thumbnailUrl || '',
       });
       setShowMediaSelector(false);
     }
