@@ -68,6 +68,15 @@ const getFileType = (mimeType: string): string => {
   return 'other';
 };
 
+// Allowed file extensions for application/octet-stream
+const ALLOWED_EXTENSIONS = [
+  '.json', '.txt', '.md', '.csv', '.log',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
+  '.mp4', '.webm', '.mov', '.avi',
+  '.mp3', '.wav', '.ogg',
+  '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'
+];
+
 // Custom file filter
 const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
   // More flexible MIME type checking using pattern matching
@@ -81,16 +90,29 @@ const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
     /^application\/(msword|vnd\.)/  // Office documents
   ];
 
-  const isAllowed = allowedPatterns.some(pattern => pattern.test(file.mimetype));
+  const isAllowedByMimeType = allowedPatterns.some(pattern => pattern.test(file.mimetype));
 
-  if (!isAllowed) {
-    logger.warn(`Rejected file upload: ${file.originalname} with MIME type: ${file.mimetype}`);
-    const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname);
-    error.message = `File type ${file.mimetype} is not allowed`;
-    return cb(error);
+  // If MIME type is allowed, accept
+  if (isAllowedByMimeType) {
+    return cb(null, true);
   }
 
-  cb(null, true);
+  // If MIME type is application/octet-stream, check file extension
+  if (file.mimetype === 'application/octet-stream') {
+    const ext = file.originalname.substring(file.originalname.lastIndexOf('.')).toLowerCase();
+    const isAllowedByExtension = ALLOWED_EXTENSIONS.includes(ext);
+
+    if (isAllowedByExtension) {
+      logger.info(`Accepted file by extension: ${file.originalname} (${ext})`);
+      return cb(null, true);
+    }
+  }
+
+  // Reject if neither MIME type nor extension is allowed
+  logger.warn(`Rejected file upload: ${file.originalname} with MIME type: ${file.mimetype}`);
+  const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname);
+  error.message = `File type ${file.mimetype} is not allowed`;
+  return cb(error);
 };
 
 // Multer configuration using memory storage
