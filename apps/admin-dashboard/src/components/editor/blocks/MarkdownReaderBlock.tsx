@@ -168,6 +168,8 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
           onSelect={handleMediaSelect}
           multiple={false}
           acceptedTypes={['document']}
+          acceptedMimeTypes={['text/markdown']}
+          acceptedExtensions={['.md', '.markdown']}
           title="Select Markdown File"
         />
       )}

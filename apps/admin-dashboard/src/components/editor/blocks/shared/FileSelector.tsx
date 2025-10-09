@@ -274,22 +274,6 @@ const FileSelector: React.FC<FileSelectorProps> = ({
     const mediaArray = (page as any)?.data?.media || (page as any)?.media || (page as any)?.data || [];
     const transformed = Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
 
-    // DEBUG: Log file info for markdown debugging
-    if (acceptedMimeTypes?.includes('text/markdown')) {
-      console.log('🔍 [FileSelector Debug] All files:', transformed.map(f => ({
-        title: f.title,
-        mimeType: f.mimeType,
-        type: f.type,
-        url: f.url
-      })));
-      console.log('🔍 [FileSelector Debug] Document files:', transformed.filter(f => f.type === 'document').map(f => ({
-        title: f.title,
-        mimeType: f.mimeType,
-        hasMarkdownExt: f.title.toLowerCase().endsWith('.md') || f.title.toLowerCase().endsWith('.markdown')
-      })));
-      console.log('🔍 [FileSelector Debug] Filters - MIME:', acceptedMimeTypes, 'Extensions:', acceptedExtensions);
-    }
-
     return transformed;
   }) || [];
 
