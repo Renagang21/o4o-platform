@@ -102,6 +102,51 @@ class BlockErrorBoundary extends React.Component<
 }
 
 /**
+ * Normalize block type name
+ * Handles legacy block types without namespace prefix
+ */
+function normalizeBlockType(type: string): string {
+  // If already has a namespace, return as-is
+  if (type.includes('/')) {
+    return type;
+  }
+
+  // Map of legacy block types to namespaced types
+  const legacyBlockMap: Record<string, string> = {
+    // Core blocks
+    'paragraph': 'core/paragraph',
+    'heading': 'core/heading',
+    'image': 'core/image',
+    'list': 'core/list',
+    'quote': 'core/quote',
+    'code': 'core/code',
+    'video': 'core/video',
+    'audio': 'core/audio',
+    'file': 'core/file',
+    'gallery': 'core/gallery',
+    'cover': 'core/cover',
+    'button': 'core/button',
+    'buttons': 'core/buttons',
+    'columns': 'core/columns',
+    'column': 'core/column',
+    'group': 'core/group',
+    'separator': 'core/separator',
+    'spacer': 'core/spacer',
+    'table': 'core/table',
+    'shortcode': 'core/shortcode',
+    'social-links': 'core/social-links',
+
+    // O4O custom blocks
+    'slide': 'o4o/slide',
+    'youtube': 'o4o/youtube',
+    'markdown-reader': 'o4o/markdown-reader',
+  };
+
+  // Return mapped type or add 'core/' prefix as default
+  return legacyBlockMap[type] || `core/${type}`;
+}
+
+/**
  * DynamicRenderer Component
  * Automatically renders blocks based on registry lookup
  */
@@ -126,13 +171,16 @@ export const DynamicRenderer: React.FC<DynamicRendererProps> = ({
   canMoveUp,
   canMoveDown,
 }) => {
+  // Normalize block type (handle legacy types without namespace)
+  const normalizedType = normalizeBlockType(block.type);
+
   // Get block definition from registry
-  const blockDefinition = blockRegistry.get(block.type);
+  const blockDefinition = blockRegistry.get(normalizedType);
 
   // Handle unregistered blocks
   if (!blockDefinition) {
-    console.warn(`Block type "${block.type}" not found in registry`);
-    return <UnregisteredBlockFallback blockType={block.type} />;
+    console.warn(`Block type "${block.type}" (normalized: "${normalizedType}") not found in registry`);
+    return <UnregisteredBlockFallback blockType={`${block.type} → ${normalizedType}`} />;
   }
 
   // Get the component from the definition
@@ -170,7 +218,7 @@ export const DynamicRenderer: React.FC<DynamicRendererProps> = ({
 
   // Render the block with error boundary
   return (
-    <BlockErrorBoundary blockType={block.type}>
+    <BlockErrorBoundary blockType={normalizedType}>
       <BlockComponent {...blockProps} />
     </BlockErrorBoundary>
   );
