@@ -144,6 +144,11 @@ export interface BlockDefinition {
   component: BlockComponent;
 
   /**
+   * Block content schema
+   */
+  content?: Record<string, AttributeSchema>;
+
+  /**
    * Block attributes schema
    */
   attributes?: Record<string, AttributeSchema>;
