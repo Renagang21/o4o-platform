@@ -39,12 +39,22 @@ export class MediaController {
       for (const file of files) {
         try {
           // Validate file type
-          const allowedTypes = ['image/', 'application/pdf', 'text/', 'video/', 'audio/'];
+          const allowedTypes = ['image/', 'application/pdf', 'application/json', 'text/', 'video/', 'audio/', 'application/octet-stream'];
           const isAllowedType = allowedTypes.some(type => file.mimetype.startsWith(type));
 
           if (!isAllowedType) {
             logger.warn(`Rejected file upload: ${file.originalname} (${file.mimetype})`);
             continue;
+          }
+
+          // Additional validation for application/octet-stream
+          if (file.mimetype === 'application/octet-stream') {
+            const allowedExtensions = ['.json', '.txt', '.md', '.csv', '.log', '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.mp4', '.webm', '.mov', '.avi', '.mp3', '.wav', '.ogg', '.pdf'];
+            const ext = path.extname(file.originalname).toLowerCase();
+            if (!allowedExtensions.includes(ext)) {
+              logger.warn(`Rejected octet-stream file with disallowed extension: ${file.originalname}`);
+              continue;
+            }
           }
 
           // Determine file category and upload path
@@ -421,7 +431,10 @@ export class MediaController {
     if (mimeType.startsWith('image/')) return 'images';
     if (mimeType.startsWith('video/')) return 'videos';
     if (mimeType.startsWith('audio/')) return 'audio';
-    if (mimeType === 'application/pdf' || mimeType.startsWith('text/')) return 'documents';
+    if (mimeType === 'application/pdf' ||
+        mimeType === 'application/json' ||
+        mimeType === 'application/octet-stream' ||
+        mimeType.startsWith('text/')) return 'documents';
     return 'others';
   }
 
