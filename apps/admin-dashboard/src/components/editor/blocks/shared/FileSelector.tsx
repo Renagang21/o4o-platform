@@ -58,6 +58,8 @@ export interface FileSelectorProps {
   onSelect: (media: FileItem[] | FileItem) => void;
   multiple?: boolean;
   acceptedTypes?: ('image' | 'video' | 'document' | 'audio' | 'other')[];
+  acceptedMimeTypes?: string[]; // 특정 MIME 타입만 허용 (예: ['text/markdown'])
+  acceptedExtensions?: string[]; // 특정 확장자만 허용 (예: ['.md', '.markdown'])
   selectedItems?: FileItem[];
   maxSelection?: number;
   title?: string;
@@ -80,6 +82,8 @@ const FileSelector: React.FC<FileSelectorProps> = ({
   onSelect,
   multiple = false,
   acceptedTypes = ['document', 'video', 'audio'],
+  acceptedMimeTypes,
+  acceptedExtensions,
   selectedItems = [],
   maxSelection = multiple ? 50 : 1,
   title = '파일 선택',
@@ -134,6 +138,29 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         file.mimeType.includes('presentation')
       ) {
         fileType = 'document';
+      }
+    }
+
+    // Fallback: Check file extension for application/octet-stream or unrecognized MIME types
+    if (fileType === 'other' && (file.originalFilename || file.filename)) {
+      const filename = (file.originalFilename || file.filename || '').toLowerCase();
+      if (filename.endsWith('.md') || filename.endsWith('.markdown') ||
+          filename.endsWith('.txt') || filename.endsWith('.pdf') ||
+          filename.endsWith('.doc') || filename.endsWith('.docx') ||
+          filename.endsWith('.csv') || filename.endsWith('.xlsx') ||
+          filename.endsWith('.xls') || filename.endsWith('.ppt') ||
+          filename.endsWith('.pptx')) {
+        fileType = 'document';
+      } else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg') ||
+                 filename.endsWith('.png') || filename.endsWith('.gif') ||
+                 filename.endsWith('.webp') || filename.endsWith('.svg')) {
+        fileType = 'image';
+      } else if (filename.endsWith('.mp4') || filename.endsWith('.webm') ||
+                 filename.endsWith('.mov') || filename.endsWith('.avi')) {
+        fileType = 'video';
+      } else if (filename.endsWith('.mp3') || filename.endsWith('.wav') ||
+                 filename.endsWith('.ogg') || filename.endsWith('.m4a')) {
+        fileType = 'audio';
       }
     }
 
@@ -245,14 +272,77 @@ const FileSelector: React.FC<FileSelectorProps> = ({
   const allFiles = data?.pages?.flatMap(page => {
     // API response structure: { success: true, data: { media: [...], pagination: {...} } }
     const mediaArray = (page as any)?.data?.media || (page as any)?.media || (page as any)?.data || [];
-    return Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
+    const transformed = Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
+
+    // DEBUG: Log file info for markdown debugging
+    if (acceptedMimeTypes?.includes('text/markdown')) {
+      console.log('🔍 [FileSelector Debug] All files:', transformed.map(f => ({
+        title: f.title,
+        mimeType: f.mimeType,
+        type: f.type,
+        url: f.url
+      })));
+      console.log('🔍 [FileSelector Debug] Document files:', transformed.filter(f => f.type === 'document').map(f => ({
+        title: f.title,
+        mimeType: f.mimeType,
+        hasMarkdownExt: f.title.toLowerCase().endsWith('.md') || f.title.toLowerCase().endsWith('.markdown')
+      })));
+      console.log('🔍 [FileSelector Debug] Filters - MIME:', acceptedMimeTypes, 'Extensions:', acceptedExtensions);
+    }
+
+    return transformed;
   }) || [];
 
   // Client-side filtering for file types (document, audio, other)
   // Backend API only supports 'image' and 'video' filtering, so we filter client-side for other types
   const filteredFiles = allFiles.filter(file => {
-    if (filters.fileType === 'all') return true;
-    return file.type === filters.fileType;
+    // Filter by file type
+    if (filters.fileType !== 'all' && file.type !== filters.fileType) {
+      return false;
+    }
+
+    // Filter by MIME type or extension if specified (OR condition)
+    // If both are specified, file must match at least one
+    const hasMimeTypeFilter = acceptedMimeTypes && acceptedMimeTypes.length > 0;
+    const hasExtensionFilter = acceptedExtensions && acceptedExtensions.length > 0;
+
+    if (hasMimeTypeFilter || hasExtensionFilter) {
+      let passedMimeFilter = false;
+      let passedExtensionFilter = false;
+
+      // Check MIME type
+      if (hasMimeTypeFilter) {
+        passedMimeFilter = file.mimeType && acceptedMimeTypes.includes(file.mimeType);
+      }
+
+      // Check extension
+      if (hasExtensionFilter) {
+        const fileName = file.title.toLowerCase();
+        passedExtensionFilter = acceptedExtensions.some(ext =>
+          fileName.endsWith(ext.toLowerCase())
+        );
+      }
+
+      // Must pass at least one filter
+      if (hasMimeTypeFilter && hasExtensionFilter) {
+        // Both filters specified: pass if either matches
+        if (!passedMimeFilter && !passedExtensionFilter) {
+          return false;
+        }
+      } else if (hasMimeTypeFilter) {
+        // Only MIME filter specified
+        if (!passedMimeFilter) {
+          return false;
+        }
+      } else if (hasExtensionFilter) {
+        // Only extension filter specified
+        if (!passedExtensionFilter) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   });
 
   const selectedFileObjects = filteredFiles.filter(file => selectedFiles.includes(file.id));
@@ -482,6 +572,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setPreviewItem(item);
@@ -559,6 +650,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         {/* Preview button */}
         <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               setPreviewItem(item);
@@ -592,6 +684,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">파일 업로드</h3>
             <button
+              type="button"
               onClick={() => setShowUploader(false)}
               disabled={isUploading}
               className="text-gray-400 hover:text-gray-600"
@@ -642,6 +735,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
       >
         <div className="max-w-4xl max-h-screen p-8 relative">
           <button
+            type="button"
             onClick={() => setPreviewItem(null)}
             className="absolute -top-4 -right-4 p-2 bg-white rounded-full text-gray-600 hover:text-gray-800"
           >
@@ -696,6 +790,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
               {title}
             </h2>
             <button
+              type="button"
               onClick={handleCancel}
               className="text-gray-400 hover:text-gray-600 p-1 rounded"
               aria-label="닫기"
@@ -739,6 +834,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
               <div className="flex items-center bg-gray-100 rounded-lg p-1">
                 <button
+                  type="button"
                   onClick={() => setViewMode('grid')}
                   className={cn(
                     "p-2 rounded transition-colors",
@@ -750,6 +846,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                   <Grid3X3 className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setViewMode('list')}
                   className={cn(
                     "p-2 rounded transition-colors",
@@ -764,6 +861,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
               <input {...getInputProps()} />
               <button
+                type="button"
                 onClick={() => {
                   const input = document.createElement('input');
                   input.type = 'file';
@@ -787,6 +885,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
               {multiple && filteredFiles.length > 0 && (
                 <button
+                  type="button"
                   onClick={handleSelectAll}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                   aria-label={selectedFiles.length === filteredFiles.length ? '전체 선택 해제' : '전체 선택'}
@@ -877,12 +976,14 @@ const FileSelector: React.FC<FileSelectorProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={handleCancel}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 취소
               </button>
               <button
+                type="button"
                 onClick={handleConfirmSelection}
                 disabled={selectedFiles.length === 0}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
