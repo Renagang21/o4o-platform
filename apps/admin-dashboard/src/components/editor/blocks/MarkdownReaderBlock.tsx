@@ -3,10 +3,11 @@
  * Displays markdown content from media library files
  */
 
-import React, { useState, useCallback } from 'react';
-import { FileCode, FolderOpen, FileText, X } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { FileCode, FolderOpen, FileText, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FileSelector, { FileItem } from './shared/FileSelector';
+import { marked } from 'marked';
 
 interface MarkdownReaderBlockProps {
   id: string;
@@ -42,6 +43,52 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
     theme = 'github'
   } = attributes;
   const [showMediaSelector, setShowMediaSelector] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Load and parse markdown file when URL changes
+  useEffect(() => {
+    const loadMarkdownFile = async () => {
+      if (!url || markdownContent) {
+        return; // Skip if no URL or content already loaded
+      }
+
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        }
+
+        const markdownText = await response.text();
+
+        // Convert markdown to HTML using marked
+        const htmlContent = await marked(markdownText);
+
+        // Update attributes with the parsed HTML
+        const updatedAttributes = {
+          ...attributes,
+          markdownContent: htmlContent,
+        };
+
+        if (setAttributes) {
+          setAttributes(updatedAttributes);
+        } else if (onChange) {
+          onChange(null, updatedAttributes);
+        }
+      } catch (error) {
+        console.error('Failed to load markdown file:', error);
+        setLoadError(error instanceof Error ? error.message : 'Failed to load markdown file');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMarkdownFile();
+  }, [url]); // Only depend on url, not on markdownContent to avoid loops
 
   // Handle file selection from library
   const handleMediaSelect = useCallback((file: FileItem | FileItem[]) => {
@@ -166,10 +213,26 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
             className={`markdown-content p-4 bg-white rounded border theme-${theme}`}
             style={{ fontSize: `${fontSize}px` }}
           >
-            {markdownContent ? (
-              <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
+            {loadError ? (
+              <div className="flex items-start gap-2 text-red-600 bg-red-50 p-4 rounded">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Failed to load markdown file</p>
+                  <p className="text-sm mt-1">{loadError}</p>
+                </div>
+              </div>
+            ) : isLoading ? (
+              <div className="flex items-center justify-center gap-2 text-gray-500 py-8">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <p>Loading markdown content...</p>
+              </div>
+            ) : markdownContent ? (
+              <div
+                className="prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: markdownContent }}
+              />
             ) : (
-              <p className="text-gray-400 italic">Loading markdown content from {url}...</p>
+              <p className="text-gray-400 italic">Waiting to load content from {url}...</p>
             )}
           </div>
         </div>
