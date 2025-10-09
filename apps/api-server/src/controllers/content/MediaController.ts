@@ -171,6 +171,9 @@ export class MediaController {
       }
 
       // MIME type filter
+      // Note: document type filter is handled separately using query builder
+      // because it requires OR conditions (text/* OR application/pdf)
+      let useQueryBuilder = false;
       if (mimeType) {
         if (mimeType === 'image') {
           where.mimeType = Like('image/%');
@@ -179,8 +182,7 @@ export class MediaController {
         } else if (mimeType === 'audio') {
           where.mimeType = Like('audio/%');
         } else if (mimeType === 'document') {
-          // For document type, we'll need to use raw query or In operator
-          // For simplicity, let's handle this in a different way
+          useQueryBuilder = true;
         } else {
           where.mimeType = mimeType;
         }
@@ -197,18 +199,51 @@ export class MediaController {
       const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'createdAt';
       const orderDirection = order === 'ASC' ? 'ASC' : 'DESC';
 
-      // Get total count first
-      const total = await this.mediaRepository.count({ where });
-
-      // Get paginated results
+      // Get total count and media list
+      let total: number;
+      let media: Media[];
       const skip = (Number(page) - 1) * Number(limit);
-      const media = await this.mediaRepository.find({
-        where,
-        // relations: ['user'], // Temporarily disabled due to DB schema issue
-        order: { [orderByField as string]: orderDirection as any },
-        skip,
-        take: Number(limit)
-      });
+
+      if (useQueryBuilder) {
+        // Use query builder for document type filtering (requires OR conditions)
+        const queryBuilder = this.mediaRepository.createQueryBuilder('media');
+
+        // Apply document type filter
+        queryBuilder.where('media.mimeType = :pdf', { pdf: 'application/pdf' })
+          .orWhere('media.mimeType LIKE :text', { text: 'text/%' })
+          .orWhere('media.mimeType LIKE :doc', { doc: '%document%' })
+          .orWhere('media.mimeType LIKE :word', { word: '%word%' })
+          .orWhere('media.mimeType LIKE :sheet', { sheet: '%sheet%' })
+          .orWhere('media.mimeType LIKE :presentation', { presentation: '%presentation%' });
+
+        // Apply other filters
+        if (userId) {
+          queryBuilder.andWhere('media.userId = :userId', { userId });
+        }
+        if (folder) {
+          queryBuilder.andWhere('media.folderPath = :folder', { folder });
+        }
+
+        // Get total count
+        total = await queryBuilder.getCount();
+
+        // Get paginated results
+        media = await queryBuilder
+          .orderBy(`media.${orderByField as string}`, orderDirection as any)
+          .skip(skip)
+          .take(Number(limit))
+          .getMany();
+      } else {
+        // Use standard find for other types
+        total = await this.mediaRepository.count({ where });
+        media = await this.mediaRepository.find({
+          where,
+          // relations: ['user'], // Temporarily disabled due to DB schema issue
+          order: { [orderByField as string]: orderDirection as any },
+          skip,
+          take: Number(limit)
+        });
+      }
 
       // Filter by search if provided
       let filteredMedia = media;
