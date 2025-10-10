@@ -293,19 +293,20 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
           position: 'top',
           ratio: '16:9',
           customRatio: { width: 16, height: 9 },
+          size: 'medium',
           hoverEffect: 'zoom'
         },
         meta: {
           position: 'after-title',
           showIcons: true,
           items: [
-            { id: 'date', enabled: true, order: 1 },
-            { id: 'author', enabled: true, order: 2 },
-            { id: 'category', enabled: true, order: 3 },
-            { id: 'comments', enabled: false, order: 4 },
-            { id: 'views', enabled: false, order: 5 },
-            { id: 'readTime', enabled: false, order: 6 },
-            { id: 'tags', enabled: false, order: 7 }
+            { id: 'date', label: 'Date', enabled: true, showIcon: true, order: 1 },
+            { id: 'author', label: 'Author', enabled: true, showIcon: true, order: 2 },
+            { id: 'category', label: 'Category', enabled: true, showIcon: true, order: 3 },
+            { id: 'comments', label: 'Comments', enabled: false, showIcon: false, order: 4 },
+            { id: 'views', label: 'Views', enabled: false, showIcon: false, order: 5 },
+            { id: 'readTime', label: 'Read Time', enabled: false, showIcon: false, order: 6 },
+            { id: 'tags', label: 'Tags', enabled: false, showIcon: false, order: 7 }
           ],
           colors: {
             text: '#6c757d',
@@ -315,6 +316,7 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
         },
         content: {
           showTitle: true,
+          titleTag: 'h2',
           showExcerpt: true,
           excerptSource: 'auto',
           excerptLength: 25,
@@ -322,22 +324,19 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
           readMoreText: 'Read More'
         },
         pagination: {
-          enabled: true,
           type: 'numbers',
           postsPerPage: 12,
           showNumbers: true,
           showPrevNext: true,
-          maxVisiblePages: 5,
-          loadMoreText: 'Load More',
           prevText: 'Previous',
           nextText: 'Next',
-          alignment: 'center'
+          infiniteScrollThreshold: 100
         },
         sorting: {
-          enabled: true,
-          sortBy: 'date',
-          order: 'desc',
-          allowUserSort: true
+          defaultOrder: 'date-desc',
+          showSortOptions: true,
+          enableSearch: false,
+          enableFilters: false
         },
         cardStyle: 'shadow',
         styling: {
@@ -348,6 +347,7 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
           titleColor: '#333333',
           titleHoverColor: '#0073e6',
           excerptColor: '#6c757d',
+          metaColor: '#6c757d',
           typography: {
             titleSize: { desktop: 20, tablet: 18, mobile: 16 },
             titleWeight: 600,

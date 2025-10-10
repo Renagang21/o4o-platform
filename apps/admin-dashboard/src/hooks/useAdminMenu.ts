@@ -1,95 +1,150 @@
 import { wordpressMenuItems } from '@/config/wordpressMenuFinal';
 import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
-import { filterMenuByRole, UserRole } from '@/config/rolePermissions';
+import { hasMenuPermission, getAccessibleMenus } from '@/config/rolePermissions';
+import { useEffect, useState } from 'react';
 
 /**
- * Simplified admin menu hook that shows all menus for admin users
- * and applies filtering only for non-admin users
+ * Admin menu hook that dynamically filters menus based on user roles and permissions
+ * Fetches user permissions from database/API
  */
 export const useAdminMenu = () => {
   const { user } = useAuth();
   const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [permissionsLoading, setPermissionsLoading] = useState(true);
+  
+  // Fetch user permissions from API
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      if (!user?.id) {
+        setUserPermissions([]);
+        setPermissionsLoading(false);
+        return;
+      }
+      
+      try {
+        // Fetch user permissions from API
+        const response = await fetch(`/api/v1/users/${user.id}/permissions`);
+        if (response.ok) {
+          const data = await response.json();
+          setUserPermissions(data.permissions || []);
+        } else {
+          // Fallback to user's permissions property if API fails
+          setUserPermissions(user.permissions || []);
+        }
+      } catch (error) {
+        // Use user's permissions property as fallback
+        setUserPermissions(user.permissions || []);
+      } finally {
+        setPermissionsLoading(false);
+      }
+    };
+    
+    fetchPermissions();
+  }, [user]);
   
   // Inject CPT menus into static menu
   const allMenuItems = injectCPTMenuItems([...wordpressMenuItems], cptMenuItems);
   
-  // Get user role
-  const userRole = (user?.role || 'customer') as UserRole;
+  // Get user roles (support multiple roles)
+  const userRoles = user?.roles || (user?.role ? [user.role] : []);
   
-  // For admin users, show everything without filtering
-  if (userRole === 'admin') {
-    return {
-      menuItems: allMenuItems,
-      isLoading: cptLoading
-    };
-  }
+  // Filter menu items based on permissions
+  const filterMenuItems = (items: any[]): any[] => {
+    return items.filter(item => {
+      // Check if user has permission for this menu item
+      const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id || item.key);
+      
+      if (!hasAccess) {
+        return false;
+      }
+      
+      // Recursively filter children
+      if (item.children && item.children.length > 0) {
+        const filteredChildren = filterMenuItems(item.children);
+        if (filteredChildren.length > 0) {
+          item.children = filteredChildren;
+          return true;
+        }
+        return false;
+      }
+      
+      return true;
+    });
+  };
   
-  // For non-admin users, apply role-based filtering
-  const userPermissions = getUserPermissions(userRole);
-  const filteredMenuItems = filterMenuByRole(allMenuItems, userRole, userPermissions);
+  const filteredMenuItems = filterMenuItems([...allMenuItems]);
   
   return {
     menuItems: filteredMenuItems,
-    isLoading: cptLoading
+    isLoading: cptLoading || permissionsLoading,
+    userRoles,
+    userPermissions
   };
 };
 
 /**
- * Get permissions for non-admin roles
+ * Get default permissions for a role
+ * This is a fallback when API is not available
+ * In production, all permissions should come from database
  */
-function getUserPermissions(role: UserRole): string[] {
-  const rolePermissionMap: Record<UserRole, string[]> = {
-    super_admin: [], // Super admin doesn't need permission checks
-    admin: [], // Admin doesn't need permission checks
-    manager: [
-      'updates:read', 'content:read', 'content:write', 'categories:read',
-      'media:read', 'media:write', 'pages:read', 'pages:write',
-      'ecommerce:read', 'products:read', 'orders:read',
-      'coupons:read', 'analytics:read', 'vendors:read', 'vendors:write',
-      'affiliate:read', 'affiliate:write', 'forum:read',
-      'signage:read', 'crowdfunding:read', 'mail:read', 'mail:write',
-      'templates:read', 'templates:write', 'menus:write',
-      'users:read', 'tools:read', 'shortcodes:read', 'monitoring:read'
-    ],
-    business: [
-      'content:read', 'content:write', 'media:read', 'media:write',
-      'ecommerce:read', 'products:read', 'orders:read',
-      'coupons:read', 'analytics:read', 'forum:read',
-      'signage:read', 'crowdfunding:read', 'shortcodes:read'
-    ],
-    seller: [
-      'media:read', 'media:write', 'ecommerce:read',
-      'products:read', 'orders:read', 'analytics:read', 'forum:read'
-    ],
-    supplier: [
-      'media:read', 'media:write', 'ecommerce:read',
-      'products:read', 'orders:read', 'analytics:read', 'forum:read'
-    ],
-    vendor: [
-      'ecommerce:read', 'products:read', 'orders:read', 
-      'analytics:read', 'forum:read', 'users:read'
-    ],
-    vendor_manager: [
-      'ecommerce:read', 'products:read', 'orders:read',
-      'analytics:read', 'vendors:read', 'vendors:write'
-    ],
-    moderator: [
-      'content:read', 'forum:read', 'forum:write', 'users:read'
-    ],
-    partner: [
-      'affiliate:read', 'forum:read', 'users:read', 'analytics:read'
-    ],
-    beta_user: [
-      'users:read', 'beta:read'
-    ],
-    affiliate: [
-      'affiliate:read', 'forum:read', 'users:read'
-    ],
-    customer: [
-      'users:read'
-    ]
-  };
-  
-  return rolePermissionMap[role] || [];
+function getDefaultPermissions(role: string): string[] {
+  // Basic fallback permissions
+  // These should be replaced with API data
+  switch (role) {
+    case 'admin':
+      // Admin gets all permissions
+      return [
+        'dashboard:view',
+        'users:manage',
+        'users:read',
+        'users:create',
+        'users:update',
+        'roles:manage',
+        'permissions:manage',
+        'settings:manage',
+        'appearance:manage',
+        'cms:read',
+        'cms:write',
+        'ecommerce:read',
+        'ecommerce:write',
+        'forum:read',
+        'forum:moderate',
+        'reports:read',
+        'analytics:read',
+        'tools:access',
+        'database:manage',
+        'system:admin'
+      ];
+    case 'manager':
+      return [
+        'dashboard:view',
+        'users:read',
+        'ecommerce:read',
+        'ecommerce:write',
+        'products:manage',
+        'orders:manage',
+        'reports:read',
+        'analytics:read'
+      ];
+    case 'vendor':
+    case 'seller':
+    case 'supplier':
+      return [
+        'dashboard:view',
+        'products:read',
+        'products:manage',
+        'orders:read',
+        'reports:sales'
+      ];
+    case 'customer':
+      return [
+        'dashboard:view',
+        'orders:read'
+      ];
+    default:
+      // Minimal permissions for unknown roles
+      return ['dashboard:view'];
+  }
 }

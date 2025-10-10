@@ -33,25 +33,51 @@ export interface User extends Omit<BaseUser, 'role' | 'status'> {
   status: UserStatus;
 }
 
-export type UserRole = 'super_admin' | 'admin' | 'vendor' | 'vendor_manager' | 'seller' | 'customer' | 'business' | 'moderator' | 'partner' | 'beta_user' | 'supplier' | 'affiliate' | 'manager';
+// UserRole should be fetched dynamically from database
+// Using string type to allow any role from database
+export type UserRole = string;
 
 export type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended' | 'deleted' | 'approved' | 'rejected';
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  super_admin: '최고 관리자',
-  admin: '관리자',
-  vendor: '벤더',
-  vendor_manager: '벤더 매니저',
-  seller: '판매자',
-  customer: '고객',
-  business: '사업자',
-  moderator: '운영자',
-  partner: '파트너',
-  beta_user: '베타 사용자',
-  supplier: '공급업체',
-  affiliate: '제휴사',
-  manager: '매니저'
-};
+// Role labels should be fetched from database
+// This is a temporary mapping that should be replaced with API data
+export const ROLE_LABELS: Record<string, string> = {};
+
+/**
+ * Get role label from database or API
+ * @param role - Role identifier
+ * @returns Display label for the role
+ */
+export async function getRoleLabel(role: string): Promise<string> {
+  // This should fetch from API/database
+  // For now, return the role as-is
+  return role;
+}
+
+/**
+ * Fetch all available roles from database
+ */
+export interface RoleDefinition {
+  id: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  permissions: string[];
+  isActive: boolean;
+}
+
+export async function fetchAvailableRoles(): Promise<RoleDefinition[]> {
+  try {
+    const response = await fetch('/api/v1/roles');
+    if (!response.ok) {
+      throw new Error('Failed to fetch roles');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching roles:', error);
+    return [];
+  }
+}
 
 export const roleDisplayNames: Record<UserRole, string> = ROLE_LABELS;
 

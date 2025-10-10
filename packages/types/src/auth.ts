@@ -1,34 +1,40 @@
 // Authentication related types
-export type UserRole = 'admin' | 'business' | 'affiliate' | 'partner' | 'customer' | 'seller' | 'supplier' | 'vendor' | 'manager' | 'retailer';
+// UserRole is now dynamic - any string from database is valid
+export type UserRole = string;
 
-export type Permission =
-  | 'apps:manage'
-  | 'apps:view'
-  | 'content:read'
-  | 'content:write'
-  | 'categories:read'
-  | 'categories:write'
-  | 'users:read'
-  | 'users:write'
-  | 'settings:read'
-  | 'settings:write'
-  | 'templates:read'
-  | 'templates:write'
-  | 'menus:read'
-  | 'menus:write'
-  | 'ecommerce:read'
-  | 'ecommerce:write'
-  | 'orders:manage'
-  | 'products:manage'
-  | 'forum:moderate'
-  | 'system:admin';
+// Permissions should also be dynamic, but we keep common ones for type hints
+export type Permission = string;
+
+// Common permissions for type hints (not exhaustive)
+export const COMMON_PERMISSIONS = {
+  APPS_MANAGE: 'apps:manage',
+  APPS_VIEW: 'apps:view',
+  CONTENT_READ: 'content:read',
+  CONTENT_WRITE: 'content:write',
+  CATEGORIES_READ: 'categories:read',
+  CATEGORIES_WRITE: 'categories:write',
+  USERS_READ: 'users:read',
+  USERS_WRITE: 'users:write',
+  SETTINGS_READ: 'settings:read',
+  SETTINGS_WRITE: 'settings:write',
+  TEMPLATES_READ: 'templates:read',
+  TEMPLATES_WRITE: 'templates:write',
+  MENUS_READ: 'menus:read',
+  MENUS_WRITE: 'menus:write',
+  ECOMMERCE_READ: 'ecommerce:read',
+  ECOMMERCE_WRITE: 'ecommerce:write',
+  ORDERS_MANAGE: 'orders:manage',
+  PRODUCTS_MANAGE: 'products:manage',
+  FORUM_MODERATE: 'forum:moderate',
+  SYSTEM_ADMIN: 'system:admin'
+} as const;
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: UserRole;
-  permissions?: Permission[];
+  role: UserRole; // Dynamic role from database
+  permissions?: Permission[]; // Dynamic permissions from database
   isApproved?: boolean;
   avatar?: string;
   lastLoginAt?: Date;

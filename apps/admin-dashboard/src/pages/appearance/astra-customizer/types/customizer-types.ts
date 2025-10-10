@@ -552,6 +552,11 @@ export interface BlogArchiveContext {
 export interface BlogSettings {
   // 아카이브 페이지
   archive: {
+    // 헤더 및 UI 옵션
+    showArchiveHeader?: boolean;
+    showLayoutSwitcher?: boolean;
+    showSortOptions?: boolean;
+    
     // 레이아웃 설정
     layout: BlogLayoutType;
     columns: ResponsiveValue<number>;
