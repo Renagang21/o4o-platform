@@ -183,6 +183,47 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
       layout: 'header-main-layout-1',
       sticky: false,
       transparentHeader: false,
+      // New Header Builder Layout
+      builder: {
+        above: {
+          left: [],
+          center: [],
+          right: [],
+          settings: {
+            enabled: false,
+            height: { desktop: 40, tablet: 40, mobile: 40 },
+            background: '#f5f5f5',
+            padding: { desktop: { top: 10, bottom: 10 }, tablet: { top: 10, bottom: 10 }, mobile: { top: 10, bottom: 10 } }
+          }
+        },
+        primary: {
+          left: [
+            { id: 'logo-default', type: 'logo', label: 'Logo', settings: { visibility: { desktop: true, tablet: true, mobile: true } } }
+          ],
+          center: [],
+          right: [
+            { id: 'menu-primary', type: 'primary-menu', label: 'Primary Menu', settings: { visibility: { desktop: true, tablet: true, mobile: false } } },
+            { id: 'search-main', type: 'search', label: 'Search', settings: { visibility: { desktop: true, tablet: true, mobile: true } } }
+          ],
+          settings: {
+            height: { desktop: 80, tablet: 70, mobile: 60 },
+            background: '#ffffff',
+            padding: { desktop: { top: 0, bottom: 0 }, tablet: { top: 0, bottom: 0 }, mobile: { top: 0, bottom: 0 } }
+          }
+        },
+        below: {
+          left: [],
+          center: [],
+          right: [],
+          settings: {
+            enabled: false,
+            height: { desktop: 50, tablet: 50, mobile: 50 },
+            background: '#f5f5f5',
+            padding: { desktop: { top: 10, bottom: 10 }, tablet: { top: 10, bottom: 10 }, mobile: { top: 10, bottom: 10 } }
+          }
+        }
+      },
+      // Legacy settings for backward compatibility
       above: {
         enabled: false,
         height: { desktop: 40, tablet: 40, mobile: 40 },
@@ -242,41 +283,79 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
     // Blog
     blog: {
       archive: {
-        layout: 'blog-layout-1',
-        columns: { desktop: 3, tablet: 2, mobile: 1 },
-        contentWidth: 'default',
-        showFeaturedImage: true,
-        imagePosition: 'top',
-        imageSize: 'medium',
+        layout: 'grid',
+        showArchiveHeader: true,
+        showLayoutSwitcher: true,
+        showSortOptions: true,
+        cardSpacing: 20,
+        featuredImage: {
+          enabled: true,
+          position: 'top',
+          ratio: '16:9',
+          customRatio: { width: 16, height: 9 },
+          hoverEffect: 'zoom'
+        },
         meta: {
-          showAuthor: true,
-          showDate: true,
-          showCategory: true,
-          showComments: false,
-          showReadTime: true,
+          position: 'after-title',
+          showIcons: true,
+          items: [
+            { id: 'date', enabled: true, order: 1 },
+            { id: 'author', enabled: true, order: 2 },
+            { id: 'category', enabled: true, order: 3 },
+            { id: 'comments', enabled: false, order: 4 },
+            { id: 'views', enabled: false, order: 5 },
+            { id: 'readTime', enabled: false, order: 6 },
+            { id: 'tags', enabled: false, order: 7 }
+          ],
+          colors: {
+            text: '#6c757d',
+            links: '#0073e6',
+            icons: '#6c757d'
+          }
         },
-        excerpt: {
-          length: 150,
-          readMoreText: 'Read More',
+        content: {
+          showTitle: true,
+          showExcerpt: true,
+          excerptSource: 'auto',
+          excerptLength: 25,
+          showReadMoreButton: true,
+          readMoreText: 'Read More'
         },
-      },
-      single: {
-        layout: 'default',
-        showFeaturedImage: true,
-        showBreadcrumb: true,
-        showPostNavigation: true,
-        showAuthorBox: true,
-        showRelatedPosts: true,
-        relatedPostsCount: 3,
-        meta: {
-          showAuthor: true,
-          showDate: true,
-          showCategory: true,
-          showTags: true,
-          showComments: true,
-          showReadTime: true,
+        pagination: {
+          enabled: true,
+          type: 'numbers',
+          postsPerPage: 12,
+          showNumbers: true,
+          showPrevNext: true,
+          maxVisiblePages: 5,
+          loadMoreText: 'Load More',
+          prevText: 'Previous',
+          nextText: 'Next',
+          alignment: 'center'
         },
-      },
+        sorting: {
+          enabled: true,
+          sortBy: 'date',
+          order: 'desc',
+          allowUserSort: true
+        },
+        cardStyle: 'shadow',
+        styling: {
+          backgroundColor: '#ffffff',
+          borderColor: '#e1e5e9',
+          borderRadius: 8,
+          cardPadding: 20,
+          titleColor: '#333333',
+          titleHoverColor: '#0073e6',
+          excerptColor: '#6c757d',
+          typography: {
+            titleSize: { desktop: 20, tablet: 18, mobile: 16 },
+            titleWeight: 600,
+            excerptSize: { desktop: 14, tablet: 13, mobile: 12 },
+            metaSize: { desktop: 12, tablet: 11, mobile: 10 }
+          }
+        }
+      }
     },
     
     // Custom CSS

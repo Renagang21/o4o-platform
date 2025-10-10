@@ -6,6 +6,7 @@ import React from 'react';
 import { Youtube } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import StandardYouTubeBlock from '@/components/editor/blocks/embed/StandardYouTubeBlock';
+import { BlockComponent } from '../registry/types';
 
 export const youtubeBlockDefinition: BlockDefinition = {
   name: 'o4o/youtube',
@@ -14,7 +15,7 @@ export const youtubeBlockDefinition: BlockDefinition = {
   icon: <Youtube className="w-5 h-5" />,
   description: 'Embed a YouTube video.',
   keywords: ['youtube', 'video', 'embed', 'media'],
-  component: StandardYouTubeBlock,
+  component: StandardYouTubeBlock as unknown as BlockComponent,
   attributes: {
     url: {
       type: 'string',

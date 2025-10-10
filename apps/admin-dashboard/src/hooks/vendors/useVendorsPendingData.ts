@@ -7,12 +7,23 @@ export interface VendorsPendingData {
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
   businessInfo?: any;
+  // Additional fields that may be present
+  urgencyLevel?: 'high' | 'medium' | 'low' | 'critical' | 'urgent';
+  businessName?: string;
+  businessNumber?: string;
+  businessType?: string;
+  phoneNumber?: string;
+  address?: string;
+  appliedAt?: string;
+  documents?: any;
+  message?: string;
 }
 
 export type PendingVendor = VendorsPendingData;
 export type VendorStatus = 'pending' | 'approved' | 'rejected';
 export type SortField = 'name' | 'email' | 'createdAt' | 'status';
 export type SortOrder = 'asc' | 'desc';
+export type DocumentStatus = 'complete' | 'incomplete' | 'pending';
 
 interface UseVendorsPendingDataParams {
   activeTab: VendorStatus;

@@ -6,6 +6,7 @@ import React from 'react';
 import { File } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import FileBlock from '@/components/editor/blocks/FileBlock';
+import { BlockComponent } from '../registry/types';
 
 export const fileBlockDefinition: BlockDefinition = {
   name: 'core/file',
@@ -14,7 +15,7 @@ export const fileBlockDefinition: BlockDefinition = {
   icon: <File className="w-5 h-5" />,
   description: 'Add a link to a downloadable file.',
   keywords: ['file', 'download', 'document', 'pdf', 'attachment'],
-  component: FileBlock,
+  component: FileBlock as unknown as BlockComponent,
   attributes: {
     url: {
       type: 'string',

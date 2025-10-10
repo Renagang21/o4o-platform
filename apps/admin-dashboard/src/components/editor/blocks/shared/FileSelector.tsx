@@ -30,6 +30,7 @@ import {
 import { useDropzone } from 'react-dropzone';
 import { MediaFile } from '@/types/content';
 import { ContentApi } from '@/api/contentApi';
+import { MediaItem } from './types';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
@@ -104,7 +105,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
   const [showUploader, setShowUploader] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewItem, setPreviewItem] = useState<MediaItem | null>(null);
+  const [previewItem, setPreviewItem] = useState<FileItem | null>(null);
 
   const { ref: loadMoreRef, inView } = useInView();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -986,7 +987,8 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                     ...file,
                     filename: file.title,
                     mediaType: file.type,
-                    size: file.fileSize || 0
+                    size: file.fileSize || 0,
+                    type: (file.type === 'image' || file.type === 'video') ? file.type : 'image' as 'image' | 'video'
                   }))}
                   selectedIds={selectedFiles}
                   onItemSelect={(id, selected) => {

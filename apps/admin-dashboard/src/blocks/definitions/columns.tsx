@@ -6,6 +6,7 @@ import React from 'react';
 import { Columns } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import ColumnsBlock from '@/components/editor/blocks/ColumnsBlock';
+import { BlockComponent } from '../registry/types';
 
 export const columnsBlockDefinition: BlockDefinition = {
   name: 'core/columns',
@@ -14,7 +15,7 @@ export const columnsBlockDefinition: BlockDefinition = {
   icon: <Columns className="w-5 h-5" />,
   description: 'Display content in multiple columns, with blocks added to each column.',
   keywords: ['columns', 'layout', 'grid', 'split'],
-  component: ColumnsBlock,
+  component: ColumnsBlock as unknown as BlockComponent,
   attributes: {
     columns: {
       type: 'array',

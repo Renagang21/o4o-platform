@@ -6,6 +6,7 @@ import React from 'react';
 import { Video } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import StandardVideoBlock from '@/components/editor/blocks/media/StandardVideoBlock';
+import { BlockComponent } from '../registry/types';
 
 export const videoBlockDefinition: BlockDefinition = {
   name: 'core/video',
@@ -14,7 +15,7 @@ export const videoBlockDefinition: BlockDefinition = {
   icon: <Video className="w-5 h-5" />,
   description: 'Embed a video file or URL.',
   keywords: ['video', 'movie', 'media', 'mp4'],
-  component: StandardVideoBlock,
+  component: StandardVideoBlock as unknown as BlockComponent,
   attributes: {
     src: {
       type: 'string',

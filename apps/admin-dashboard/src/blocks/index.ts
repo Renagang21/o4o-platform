@@ -150,7 +150,7 @@ const blockStyles = `
 // Initialize custom blocks
 export function initializeCustomBlocks() {
   // WordPress polyfill이 초기화되었는지 확인
-  const domReady: (callback: () => void) => void = window.wp?.domReady || ((callback: () => void) => {
+  const domReady = (window.wp?.domReady as ((callback: () => void) => void) | undefined) || ((callback: () => void) => {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', callback);
     } else {

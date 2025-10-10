@@ -6,6 +6,7 @@ import React from 'react';
 import { List } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import ListBlock from '@/components/editor/blocks/ListBlock';
+import { BlockComponent } from '../registry/types';
 
 export const listBlockDefinition: BlockDefinition = {
   name: 'core/list',
@@ -14,7 +15,7 @@ export const listBlockDefinition: BlockDefinition = {
   icon: <List className="w-5 h-5" />,
   description: 'Create a bulleted or numbered list.',
   keywords: ['list', 'bullet', 'numbered', 'ordered', 'unordered'],
-  component: ListBlock,
+  component: ListBlock as unknown as BlockComponent,
   attributes: {
     items: {
       type: 'array',

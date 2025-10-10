@@ -6,6 +6,7 @@ import React from 'react';
 import { Brackets } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import ShortcodeBlock from '@/components/editor/blocks/ShortcodeBlock';
+import { BlockComponent } from '../registry/types';
 
 export const shortcodeBlockDefinition: BlockDefinition = {
   name: 'core/shortcode',
@@ -14,7 +15,7 @@ export const shortcodeBlockDefinition: BlockDefinition = {
   icon: <Brackets className="w-5 h-5" />,
   description: 'Insert additional custom elements with a WordPress shortcode.',
   keywords: ['shortcode', 'embed', 'custom'],
-  component: ShortcodeBlock,
+  component: ShortcodeBlock as unknown as BlockComponent,
   attributes: {
     shortcode: {
       type: 'string',

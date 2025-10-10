@@ -53,7 +53,7 @@ interface CustomizerContextValue {
   eventHandlers?: CustomizerEventHandlers;
 }
 
-const CustomizerContext = createContext<CustomizerContextValue | undefined>(undefined);
+export const CustomizerContext = createContext<CustomizerContextValue | undefined>(undefined);
 
 const customizerReducer = (state: CustomizerState, action: CustomizerAction): CustomizerState => {
   switch (action.type) {

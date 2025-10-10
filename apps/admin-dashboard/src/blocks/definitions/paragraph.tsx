@@ -6,6 +6,7 @@ import React from 'react';
 import { Type } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
+import { BlockComponent } from '../registry/types';
 
 export const paragraphBlockDefinition: BlockDefinition = {
   name: 'core/paragraph',
@@ -14,7 +15,7 @@ export const paragraphBlockDefinition: BlockDefinition = {
   icon: <Type className="w-5 h-5" />,
   description: 'Start with the basic building block of all narrative.',
   keywords: ['text', 'paragraph', 'content'],
-  component: ParagraphBlock,
+  component: ParagraphBlock as unknown as BlockComponent,
   attributes: {
     content: {
       type: 'string',

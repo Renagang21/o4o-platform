@@ -6,6 +6,7 @@ import React from 'react';
 import { Table } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import TableBlock from '@/components/editor/blocks/TableBlock';
+import { BlockComponent } from '../registry/types';
 
 export const tableBlockDefinition: BlockDefinition = {
   name: 'core/table',
@@ -14,7 +15,7 @@ export const tableBlockDefinition: BlockDefinition = {
   icon: <Table className="w-5 h-5" />,
   description: 'Create tables with structured data.',
   keywords: ['table', 'data', 'grid', 'spreadsheet'],
-  component: TableBlock,
+  component: TableBlock as unknown as BlockComponent,
   attributes: {
     tableData: {
       type: 'object',

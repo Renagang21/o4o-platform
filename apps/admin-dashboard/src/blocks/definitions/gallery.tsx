@@ -6,6 +6,7 @@ import React from 'react';
 import { Images } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import EnhancedGalleryBlock from '@/components/editor/blocks/EnhancedGalleryBlock';
+import { BlockComponent } from '../registry/types';
 
 export const galleryBlockDefinition: BlockDefinition = {
   name: 'core/gallery',
@@ -14,7 +15,7 @@ export const galleryBlockDefinition: BlockDefinition = {
   icon: <Images className="w-5 h-5" />,
   description: 'Display multiple images in a rich gallery.',
   keywords: ['photos', 'images', 'album', 'pictures'],
-  component: EnhancedGalleryBlock,
+  component: EnhancedGalleryBlock as unknown as BlockComponent,
   attributes: {
     images: {
       type: 'array',

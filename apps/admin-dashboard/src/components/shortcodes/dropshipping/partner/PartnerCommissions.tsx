@@ -216,7 +216,7 @@ const PartnerCommissions: React.FC<PartnerCommissionsProps> = ({
             <p className="text-gray-600">Track your earnings and payment status</p>
           </div>
           <div className="flex space-x-2">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as typeof selectedPeriod)}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
@@ -227,7 +227,7 @@ const PartnerCommissions: React.FC<PartnerCommissionsProps> = ({
                 <SelectItem value="1y">Last year</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as typeof selectedStatus)}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue />
               </SelectTrigger>
