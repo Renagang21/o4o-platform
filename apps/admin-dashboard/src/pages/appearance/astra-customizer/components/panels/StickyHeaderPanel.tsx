@@ -135,7 +135,6 @@ export const StickyHeaderPanel: React.FC<StickyHeaderPanelProps> = ({
                 </span>
               </Label>
               <Slider
-                id="trigger-height"
                 min={0}
                 max={500}
                 step={10}
@@ -229,7 +228,6 @@ export const StickyHeaderPanel: React.FC<StickyHeaderPanelProps> = ({
                     </span>
                   </Label>
                   <Slider
-                    id="bg-opacity"
                     min={0}
                     max={1}
                     step={0.1}
@@ -293,7 +291,6 @@ export const StickyHeaderPanel: React.FC<StickyHeaderPanelProps> = ({
                     </span>
                   </Label>
                   <Slider
-                    id="animation-duration"
                     min={100}
                     max={1000}
                     step={50}

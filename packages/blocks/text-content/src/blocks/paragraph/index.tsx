@@ -56,9 +56,9 @@ const Save: React.FC<Pick<ParagraphBlockProps, 'attributes'>> = ({ attributes })
   ].filter(Boolean).join(' ');
   
   return (
-    <p 
+    <p
       className={classNames}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: content || '' }}
     />
   );
 };

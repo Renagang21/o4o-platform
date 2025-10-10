@@ -15,7 +15,7 @@ export interface PostCategory {
   updatedAt: Date;
 }
 
-export type PostStatus = 'draft' | 'published' | 'scheduled' | 'trash' | 'private';
+export type PostStatus = 'draft' | 'published' | 'publish' | 'scheduled' | 'trash' | 'private';
 export type PostType = 'post' | 'page';
 export type PostVisibility = 'public' | 'private' | 'password';
 export type CommentStatus = 'open' | 'closed';
@@ -101,6 +101,8 @@ export interface CreatePostDto {
     alt?: string;
   };
   meta?: PostMeta;
+  metadata?: Record<string, any>; // For CPT compatibility
+  acfFields?: Record<string, any>; // For ACF fields
   scheduledAt?: Date;
   template?: string;
   parentId?: string;
@@ -144,8 +146,10 @@ export interface Block {
   content: any;
   attributes?: Record<string, unknown>;
   settings?: Record<string, unknown>;
-  children?: Block[];
+  children?: Block[]; // Legacy support
+  innerBlocks?: Block[]; // Gutenberg-style nested blocks
   order?: number;
+  clientId?: string; // Unique client-side identifier for React keys
 }
 
 export interface EditorState {

@@ -28,8 +28,9 @@ import { Button } from '@/components/ui/button';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import CoverBackground from './cover/CoverBackground';
 import CoverOverlay from './cover/CoverOverlay';
-import CoverContent from './cover/CoverContent';
+import CoverContentNew from './cover/CoverContentNew';
 import CoverSettings from './cover/CoverSettings';
+import { Block } from '@/types/post.types';
 import {
   CoverBlockProps,
   CoverBlockAttributes,
@@ -54,6 +55,8 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
   isSelected,
   onSelect,
   attributes = DEFAULT_COVER_ATTRIBUTES,
+  innerBlocks = [],
+  onInnerBlocksChange,
   canMoveUp = true,
   canMoveDown = true,
   isDragging,
@@ -137,9 +140,11 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
   }, [updateAttributes]);
 
   // Handle inner blocks change
-  const handleInnerBlocksChange = useCallback((innerBlocks: any[]) => {
-    updateAttributes({ innerBlocks });
-  }, [updateAttributes]);
+  const handleInnerBlocksChange = useCallback((newInnerBlocks: Block[]) => {
+    if (onInnerBlocksChange) {
+      onInnerBlocksChange(newInnerBlocks);
+    }
+  }, [onInnerBlocksChange]);
 
   // Handle tag name change
   const handleTagNameChange = useCallback((tagName: TagName) => {
@@ -198,8 +203,8 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
   const handleBlockConversion = useCallback((targetType: string) => {
     if (!onChangeType) return;
 
-    const baseContent = localAttributes.innerBlocks.length > 0
-      ? localAttributes.innerBlocks[0].content
+    const baseContent = innerBlocks.length > 0
+      ? innerBlocks[0].content
       : content;
 
     const baseAttributes = {
@@ -231,7 +236,7 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
           type: 'core/group',
           backgroundColor: localAttributes.backgroundColor,
           gradient: localAttributes.gradient,
-          innerBlocks: localAttributes.innerBlocks
+          innerBlocks: innerBlocks
         });
         break;
 
@@ -427,7 +432,7 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
           </div>
           <div className="flex justify-between">
             <span>Inner blocks:</span>
-            <span>{localAttributes.innerBlocks.length}</span>
+            <span>{innerBlocks.length}</span>
           </div>
         </div>
       </div>
@@ -552,8 +557,8 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
         />
 
         {/* Content Layer */}
-        <CoverContent
-          innerBlocks={localAttributes.innerBlocks}
+        <CoverContentNew
+          innerBlocks={innerBlocks as Block[]}
           layout={localAttributes.layout}
           onInnerBlocksChange={handleInnerBlocksChange}
           onLayoutChange={handleLayoutChange}

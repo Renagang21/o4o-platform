@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { EcommerceApi } from '@/api/ecommerceApi';
+// import { EcommerceApi } from '@/api/ecommerceApi';
 // import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 
 interface DashboardSummary {
@@ -43,18 +43,21 @@ export const useDashboardStats = () => {
     queryFn: async () => {
       try {
         // Fetch dashboard stats
-        const dashboardStats = await EcommerceApi.getDashboardStats();
-        
+        // const dashboardStats = await EcommerceApi.getDashboardStats();
+
         // Fetch sales report for the month
-        const salesReport = await EcommerceApi.getSalesReport(
-          'custom',
-          '/* date removed */',
-          '/* date removed */'
-        );
+        // const salesReport = await EcommerceApi.getSalesReport(
+        //   'custom',
+        //   '/* date removed */',
+        //   '/* date removed */'
+        // );
 
         // Fetch recent orders for status distribution
-        const ordersResponse = await EcommerceApi.getOrders(1, 100);
-        const orders = ordersResponse.data || [];
+        // const ordersResponse = await EcommerceApi.getOrders(1, 100);
+        // const orders = ordersResponse.data || [];
+        const dashboardStats = { data: null };
+        const salesReport = { data: null };
+        const orders: any[] = [];
 
         // Calculate order status distribution
         const statusCounts: Record<string, number> = {

@@ -601,6 +601,7 @@ export interface BlogSettings {
     
     // 페이지네이션
     pagination: {
+      enabled: boolean;
       type: PaginationType;
       postsPerPage: number;
       showNumbers: boolean;

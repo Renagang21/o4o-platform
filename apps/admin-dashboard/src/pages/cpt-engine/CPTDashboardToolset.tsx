@@ -129,14 +129,20 @@ const CPTDashboardToolset = () => {
           id: dsCPT.slug,
           slug: dsCPT.slug,
           name: dsCPT.name,
+          pluralName: dsCPT.name,
+          singularName: dsCPT.name,
           description: `Dropshipping ${dsCPT.name}`,
+          isPublic: dsCPT.slug === 'ds_product',
           public: dsCPT.slug === 'ds_product',
           hasArchive: dsCPT.slug === 'ds_product',
           showInMenu: true,
           active: false, // Mark as inactive if not found
-          supports: ['title', 'editor', 'custom-fields', 'revisions'],
-          taxonomies: dsCPT.slug === 'ds_product' ? ['ds_product_category', 'ds_product_tag'] : []
-        } as CPTType);
+          isActive: false,
+          supports: ['title', 'editor', 'custom-fields', 'revisions'] as any,
+          taxonomies: dsCPT.slug === 'ds_product' ? ['ds_product_category', 'ds_product_tag'] : [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        } as any);
       }
     });
     
@@ -646,8 +652,9 @@ const CPTDashboardToolset = () => {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
           {DROPSHIPPING_CPTS.map(dsCPT => {
-            const exists = Array.isArray(cptTypes) && cptTypes.some((cpt: CPTType) => cpt.slug === dsCPT.slug);
-            const isActive = Array.isArray(cptTypes) && cptTypes.find((cpt: CPTType) => cpt.slug === dsCPT.slug)?.active;
+            const exists = Array.isArray(cptTypes) && cptTypes.some(cpt => cpt.slug === dsCPT.slug);
+            const foundCPT = Array.isArray(cptTypes) && cptTypes.find(cpt => cpt.slug === dsCPT.slug);
+            const isActive = foundCPT?.active || foundCPT?.isActive;
             
             return (
               <div key={dsCPT.slug} style={{ padding: '10px', background: '#f9f9f9', borderRadius: '4px' }}>

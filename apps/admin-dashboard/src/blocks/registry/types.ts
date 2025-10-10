@@ -87,16 +87,22 @@ export interface BlockProps {
   isSelected?: boolean;
   onSelect?: () => void;
   isDragging?: boolean;
-  onDragStart?: () => void;
+  onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
-  onDragEnd?: () => void;
+  onDragEnd?: (e: React.DragEvent) => void;
   onCopy?: () => void;
   onPaste?: () => void;
   onChangeType?: (newType: string) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   className?: string;
+  // InnerBlocks support
+  innerBlocks?: unknown[]; // Block[] type, but using unknown to avoid circular reference
+  onInnerBlocksChange?: (innerBlocks: unknown[]) => void;
+  allowedBlocks?: string[];
+  template?: unknown[];
+  templateLock?: boolean | 'all' | 'insert';
 }
 
 /**

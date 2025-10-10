@@ -1,7 +1,8 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Minus, Plus } from 'lucide-react';
-import { Button, Input, Checkbox } from '@o4o/ui';
+import { Button, Input } from '@o4o/ui';
+import { Checkbox } from '@/components/ui/checkbox';
 import { CartItem as CartItemType } from '@o4o/types';
 import { PriceDisplay, StockStatus } from '@/components/common';
 import { cn } from '@o4o/utils';
@@ -45,7 +46,7 @@ export const CartItem: FC<CartItemProps> = ({
       <div className="flex items-center">
         <Checkbox
           checked={isSelected}
-          onCheckedChange={(checked) => onSelect(item.id, checked as boolean)}
+          onCheckedChange={(checked: boolean) => onSelect(item.id, checked)}
         />
       </div>
 

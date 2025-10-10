@@ -104,9 +104,12 @@ export default function UserStatistics() {
     try {
       setLoading(true);
       const response = await UserApi.getUserStats();
-      
-      if (response.data.success) {
-        setStats(response.data.data);
+      const responseAny = response as any;
+
+      if (responseAny.data?.success) {
+        setStats(responseAny.data.data);
+      } else if (response) {
+        setStats(response as unknown as UserStats);
       }
     } catch (error) {
       toast.error('Failed to load user statistics');

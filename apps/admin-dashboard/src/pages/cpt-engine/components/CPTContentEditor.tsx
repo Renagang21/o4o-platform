@@ -52,7 +52,7 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
     title: '',
     content: '',
     excerpt: '',
-    status: 'draft',
+    status: 'draft' as any,
     slug: '',
     featuredImage: undefined,
     metadata: {},
@@ -74,8 +74,15 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
   const { data: fieldGroups } = useQuery({
     queryKey: ['acf-groups', cptSlug],
     queryFn: async () => {
-      const response = await acfGroupApi.getByPostType(cptSlug);
-      return response.data;
+      const response = await acfGroupApi.getAllGroups();
+      // Filter field groups that apply to this post type
+      const allGroups = response.data || [];
+      return allGroups.filter(group => {
+        if (!group.location) return false;
+        return group.location.some(rule =>
+          rule.param === 'post_type' && rule.value === cptSlug
+        );
+      });
     }
   });
 
@@ -171,10 +178,10 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
   };
 
   // Handle save
-  const handleSave = async (status?: PostStatus) => {
+  const handleSave = async (status?: string) => {
     const dataToSave = {
       ...formData,
-      status: status || formData.status || 'draft'
+      status: (status || formData.status || 'draft') as any
     };
 
     if (postId) {
@@ -293,7 +300,7 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
                   </div>
 
                   {/* Content Editor */}
-                  {cptType?.supports?.includes('editor') && (
+                  {(Array.isArray(cptType?.supports) ? cptType?.supports?.includes('editor') : cptType?.supports?.editor) && (
                     <div className="grid gap-2">
                       <Label htmlFor="content">내용</Label>
                       <Textarea
@@ -307,7 +314,7 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
                   )}
 
                   {/* Excerpt */}
-                  {cptType?.supports?.includes('excerpt') && (
+                  {(Array.isArray(cptType?.supports) ? cptType?.supports?.includes('excerpt') : cptType?.supports?.excerpt) && (
                     <div className="grid gap-2">
                       <Label htmlFor="excerpt">요약</Label>
                       <Textarea
@@ -464,7 +471,7 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
           </Card>
 
           {/* Featured Image Card */}
-          {cptType?.supports?.includes('thumbnail') && (
+          {(Array.isArray(cptType?.supports) ? cptType?.supports?.includes('thumbnail') : cptType?.supports?.thumbnail) && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">대표 이미지</CardTitle>

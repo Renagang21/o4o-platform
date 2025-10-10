@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { formatDate, formatFileSize } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStore';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
 import { getFileTypeFromMime, getFileIcon, getFileColorClass } from '@/utils/fileIcons';
@@ -21,26 +22,12 @@ interface MediaItem {
 
 const MediaListWordPress: React.FC = () => {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuthStore();
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'image' | 'document' | 'unattached'>('all');
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  
-  // Get current logged in user
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const user = await authClient.getUser();
-        setCurrentUser(user);
-      } catch (error) {
-        // User not logged in or error fetching
-        setCurrentUser(null);
-      }
-    };
-    fetchUser();
-  }, []);
 
   // Fetch media from API
   useEffect(() => {

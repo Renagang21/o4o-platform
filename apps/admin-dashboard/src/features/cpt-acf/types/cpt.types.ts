@@ -10,6 +10,13 @@ export interface CustomPostType {
   description?: string;
   icon?: string;
   active: boolean;
+
+  // Compatibility aliases
+  label?: string; // Alias for pluralName/name
+  singularLabel?: string; // Alias for singularName
+  isActive?: boolean; // Alias for active
+  public?: boolean; // Public visibility flag
+
   supports?: {
     title: boolean;
     editor: boolean;
@@ -55,7 +62,9 @@ export interface CustomPost {
     email: string;
   };
   meta?: Record<string, any>;
+  metadata?: Record<string, any>; // Alias for compatibility
   customFields?: Record<string, any>;
+  acfFields?: Record<string, any>; // Alias for ACF fields
   featuredImage?: string;
   createdAt: string;
   updatedAt: string;
@@ -65,6 +74,7 @@ export interface CustomPost {
 export enum PostStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
+  PUBLISH = 'publish', // Alias for published
   PRIVATE = 'private',
   TRASH = 'trash'
 }
@@ -75,7 +85,7 @@ export interface CPTListOptions {
   status?: PostStatus;
   search?: string;
   orderBy?: string;
-  order?: 'ASC' | 'DESC';
+  order?: 'ASC' | 'DESC' | 'asc' | 'desc'; // Allow both cases
 }
 
 export interface CPTApiResponse<T = any> {
@@ -124,7 +134,9 @@ export interface CreatePostDto {
   slug?: string;
   status?: PostStatus;
   meta?: Record<string, any>;
+  metadata?: Record<string, any>; // Alias for compatibility
   customFields?: Record<string, any>;
+  acfFields?: Record<string, any>; // Alias for ACF fields
   featuredImage?: string;
 }
 

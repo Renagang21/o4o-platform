@@ -7,6 +7,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditorHeader } from './EditorHeader';
 import '../../styles/editor.css';
+import '../../styles/inspector-sidebar.css';
 import { postApi } from '@/services/api/postApi';
 import { debugTokenStatus } from '@/utils/token-debug';
 import { Block } from '@/types/post.types';
@@ -17,6 +18,8 @@ import { SimpleAIModal } from '../ai/SimpleAIModal';
 import { DynamicRenderer } from '@/blocks/registry/DynamicRenderer';
 import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
+import { BlockWrapper } from './BlockWrapper';
+import { InspectorSidebar } from '../inspector/InspectorSidebar';
 // Toast 기능을 직접 구현
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -422,20 +425,20 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   }, [isCodeView]);
 
   // Handle drag start
-  const handleDragStart = useCallback((blockId: string) => {
+  const handleDragStart = useCallback((blockId: string, e: React.DragEvent) => {
     setDraggedBlockId(blockId);
   }, []);
 
   // Handle drag over
-  const handleDragOver = useCallback((e: React.DragEvent, blockId: string) => {
+  const handleDragOver = useCallback((blockId: string, e: React.DragEvent) => {
     e.preventDefault();
     setDragOverBlockId(blockId);
   }, []);
 
   // Handle drop
-  const handleDrop = useCallback((e: React.DragEvent, targetBlockId: string) => {
+  const handleDrop = useCallback((targetBlockId: string, draggedBlockId: string, e: React.DragEvent) => {
     e.preventDefault();
-    
+
     if (!draggedBlockId || draggedBlockId === targetBlockId) {
       setDraggedBlockId(null);
       setDragOverBlockId(null);
@@ -444,7 +447,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
     const draggedIndex = blocks.findIndex(b => b.id === draggedBlockId);
     const targetIndex = blocks.findIndex(b => b.id === targetBlockId);
-    
+
     if (draggedIndex === -1 || targetIndex === -1) {
       setDraggedBlockId(null);
       setDragOverBlockId(null);
@@ -453,21 +456,60 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
     const newBlocks = [...blocks];
     const [draggedBlock] = newBlocks.splice(draggedIndex, 1);
-    
+
     // Insert at the correct position
     const insertIndex = draggedIndex < targetIndex ? targetIndex : targetIndex;
     newBlocks.splice(insertIndex, 0, draggedBlock);
-    
+
     updateBlocks(newBlocks);
     setDraggedBlockId(null);
     setDragOverBlockId(null);
-  }, [draggedBlockId, blocks, updateBlocks]);
+  }, [blocks, updateBlocks]);
 
   // Handle drag end
-  const handleDragEnd = useCallback(() => {
+  const handleDragEnd = useCallback((blockId: string, e: React.DragEvent) => {
     setDraggedBlockId(null);
     setDragOverBlockId(null);
   }, []);
+
+  // Handle block duplication
+  const handleDuplicate = useCallback((blockId: string) => {
+    const blockIndex = blocks.findIndex((b) => b.id === blockId);
+    if (blockIndex === -1) return;
+
+    const blockToDuplicate = blocks[blockIndex];
+    const duplicatedBlock: Block = {
+      ...blockToDuplicate,
+      id: `block-${Date.now()}`,
+    };
+
+    const newBlocks = [...blocks];
+    newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
+    updateBlocks(newBlocks);
+    setSelectedBlockId(duplicatedBlock.id);
+  }, [blocks, updateBlocks]);
+
+  // Handle block move up
+  const handleMoveUp = useCallback((blockId: string) => {
+    const blockIndex = blocks.findIndex((b) => b.id === blockId);
+    if (blockIndex <= 0) return;
+
+    const newBlocks = [...blocks];
+    const [block] = newBlocks.splice(blockIndex, 1);
+    newBlocks.splice(blockIndex - 1, 0, block);
+    updateBlocks(newBlocks);
+  }, [blocks, updateBlocks]);
+
+  // Handle block move down
+  const handleMoveDown = useCallback((blockId: string) => {
+    const blockIndex = blocks.findIndex((b) => b.id === blockId);
+    if (blockIndex === -1 || blockIndex >= blocks.length - 1) return;
+
+    const newBlocks = [...blocks];
+    const [block] = newBlocks.splice(blockIndex, 1);
+    newBlocks.splice(blockIndex + 1, 0, block);
+    updateBlocks(newBlocks);
+  }, [blocks, updateBlocks]);
 
   // Handle preview
   const handlePreview = useCallback(() => {
@@ -528,29 +570,103 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       }
       // Tab navigation between blocks
       if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        if (selectedBlockId) {
-          const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
-          if (e.shiftKey) {
-            // Previous block
-            if (currentIndex > 0) {
-              setSelectedBlockId(blocks[currentIndex - 1].id);
+        const target = e.target as HTMLElement;
+        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          if (selectedBlockId) {
+            const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+            if (e.shiftKey) {
+              // Previous block
+              if (currentIndex > 0) {
+                setSelectedBlockId(blocks[currentIndex - 1].id);
+              }
+            } else {
+              // Next block
+              if (currentIndex < blocks.length - 1) {
+                setSelectedBlockId(blocks[currentIndex + 1].id);
+              }
             }
-          } else {
-            // Next block
-            if (currentIndex < blocks.length - 1) {
+          } else if (blocks.length > 0) {
+            setSelectedBlockId(blocks[0].id);
+          }
+        }
+      }
+      // Arrow key navigation
+      if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !e.ctrlKey && !e.metaKey) {
+        const target = e.target as HTMLElement;
+        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          if (selectedBlockId) {
+            const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+            if (e.key === 'ArrowUp' && currentIndex > 0) {
+              setSelectedBlockId(blocks[currentIndex - 1].id);
+            } else if (e.key === 'ArrowDown' && currentIndex < blocks.length - 1) {
               setSelectedBlockId(blocks[currentIndex + 1].id);
             }
+          } else if (blocks.length > 0) {
+            setSelectedBlockId(blocks[0].id);
           }
-        } else if (blocks.length > 0) {
-          setSelectedBlockId(blocks[0].id);
         }
+      }
+      // Enter key to add new block after selected
+      if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        const target = e.target as HTMLElement;
+        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          if (selectedBlockId) {
+            const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+            const newBlock: Block = {
+              id: `block-${Date.now()}`,
+              type: 'core/paragraph',
+              content: { text: '' },
+              attributes: {},
+            };
+            const newBlocks = [...blocks];
+            newBlocks.splice(currentIndex + 1, 0, newBlock);
+            updateBlocks(newBlocks);
+            setSelectedBlockId(newBlock.id);
+            setIsDirty(true);
+          }
+        }
+      }
+      // Backspace to delete empty selected block
+      if (e.key === 'Backspace' && selectedBlockId) {
+        const target = e.target as HTMLElement;
+        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          const block = blocks.find(b => b.id === selectedBlockId);
+          if (block) {
+            const isEmpty = !block.content ||
+                           (typeof block.content === 'string' && !block.content.trim()) ||
+                           (typeof block.content === 'object' && 'text' in block.content && !block.content.text?.trim());
+            if (isEmpty && blocks.length > 1) {
+              e.preventDefault();
+              const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+              handleBlockDelete(selectedBlockId);
+              // Select previous block if available, otherwise next
+              if (currentIndex > 0) {
+                setSelectedBlockId(blocks[currentIndex - 1].id);
+              } else if (blocks.length > 1) {
+                setSelectedBlockId(blocks[currentIndex + 1].id);
+              }
+            }
+          }
+        }
+      }
+      // Ctrl/Cmd + D to duplicate block
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd' && selectedBlockId) {
+        e.preventDefault();
+        handleDuplicate(selectedBlockId);
+      }
+      // Ctrl/Cmd + Y for redo (alternative to Ctrl+Shift+Z)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        handleRedo();
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen, selectedBlockId, blocks, handleBlockDelete]);
+  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen, selectedBlockId, blocks, handleBlockDelete, handleDuplicate, updateBlocks]);
 
   // Handle block type change
   const handleBlockTypeChange = useCallback(
@@ -632,13 +748,22 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       onSelect: () => setSelectedBlockId(block.id),
       attributes: block.attributes || {},
       isDragging: draggedBlockId === block.id,
-      onDragStart: () => handleDragStart(block.id),
-      onDragOver: (e: React.DragEvent) => handleDragOver(e, block.id),
-      onDrop: (e: React.DragEvent) => handleDrop(e, block.id),
-      onDragEnd: handleDragEnd,
+      onDragStart: (e: React.DragEvent) => handleDragStart(block.id, e),
+      onDragOver: (e: React.DragEvent) => handleDragOver(block.id, e),
+      onDrop: (e: React.DragEvent) => {
+        const draggedId = e.dataTransfer.getData('application/block-id') || e.dataTransfer.getData('text/plain');
+        handleDrop(block.id, draggedId, e);
+      },
+      onDragEnd: (e: React.DragEvent) => handleDragEnd(block.id, e),
       onCopy: () => handleBlockCopy(block.id),
       onPaste: () => handleBlockPaste(block.id),
       onChangeType: (newType: string) => handleBlockTypeChange(block.id, newType),
+      onInnerBlocksChange: (newInnerBlocks: Block[]) => {
+        const newBlocks = blocks.map(b =>
+          b.id === block.id ? { ...b, innerBlocks: newInnerBlocks } : b
+        );
+        updateBlocks(newBlocks);
+      },
     };
 
     const blockIndex = blocks.findIndex((b) => b.id === block.id);
@@ -772,19 +897,26 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             ) : (
               <div className="blocks-container">
-                {blocks.map((block) => (
-                  <div
+                {blocks.map((block, index) => (
+                  <BlockWrapper
                     key={block.id}
-                    className={`block-item ${
-                      dragOverBlockId === block.id ? 'drag-over' : ''
-                    } ${
-                      selectedBlockId === block.id ? 'block-selected' : ''
-                    }`}
-                    onDragOver={(e) => handleDragOver(e, block.id)}
-                    onDrop={(e) => handleDrop(e, block.id)}
+                    blockId={block.id}
+                    blockType={block.type}
+                    isSelected={selectedBlockId === block.id}
+                    onSelect={setSelectedBlockId}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    onDuplicate={handleDuplicate}
+                    onDelete={handleBlockDelete}
+                    onMoveUp={handleMoveUp}
+                    onMoveDown={handleMoveDown}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < blocks.length - 1}
                   >
                     {renderBlock(block)}
-                  </div>
+                  </BlockWrapper>
                 ))}
               </div>
             )}
@@ -803,52 +935,46 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
 
-        {/* GutenbergSidebar - Right Sidebar */}
+        {/* InspectorSidebar - Right Sidebar */}
         {sidebarOpen && (
           <div className={cn(
-            "fixed right-0 top-[60px] w-80 bg-white border-l overflow-y-auto transition-all duration-300 z-30",
+            "fixed right-0 top-[60px] bg-white border-l overflow-y-auto transition-all duration-300 z-30",
             "shadow-lg"
           )}
-               style={{ height: 'calc(100vh - 60px)' }}>
-            {/* Sidebar Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="font-semibold text-gray-900">Settings</h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* GutenbergSidebar Component */}
-            <GutenbergSidebar
-              activeTab={activeTab}
-              postSettings={postSettings}
-              blockSettings={selectedBlock}
-              mode={mode}
-              onPostSettingsChange={(settings) => {
-                // DEBUG: Log post settings change
-                // Logging removed for CI/CD
-
+               style={{ height: 'calc(100vh - 60px)', width: '280px' }}>
+            <InspectorSidebar
+              selectedBlock={selectedBlockId ? blocks.find(b => b.id === selectedBlockId) : null}
+              blocks={blocks}
+              documentSettings={{
+                status: postSettings.status,
+                visibility: postSettings.visibility,
+                publishDate: postSettings.publishDate,
+                categories: postSettings.categories,
+                tags: postSettings.tags,
+                featuredImage: postSettings.featuredImage,
+                excerpt: postSettings.excerpt,
+              }}
+              onBlockUpdate={(blockId, updates) => {
+                const newBlocks = blocks.map(block => {
+                  if (block.id === blockId) {
+                    return {
+                      ...block,
+                      ...(updates.content && { content: updates.content }),
+                      ...(updates.attributes && { attributes: { ...block.attributes, ...updates.attributes } }),
+                    };
+                  }
+                  return block;
+                });
+                updateBlocks(newBlocks);
+                setIsDirty(true);
+              }}
+              onDocumentUpdate={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 setIsDirty(true);
                 onPostSettingsChange?.(settings);
               }}
-              onBlockSettingsChange={(settings) => {
-                if (selectedBlock) {
-                  const updated = { ...selectedBlock, ...settings };
-                  const newBlocks = blocks.map(block =>
-                    block.id === selectedBlock.id ? updated : block
-                  );
-                  updateBlocks(newBlocks);
-                  setSelectedBlock(updated);
-                }
-              }}
-              onTabChange={(tab) => setActiveTab(tab)}
-              onClose={() => setSidebarOpen(false)}
+              isOpen={sidebarOpen}
+              onToggle={() => setSidebarOpen(!sidebarOpen)}
             />
           </div>
         )}

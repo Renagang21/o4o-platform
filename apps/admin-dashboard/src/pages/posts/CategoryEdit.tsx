@@ -139,7 +139,7 @@ const CategoryEdit = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!hasEditPermission()) {
+    if (!hasEditPermission) {
       toast.error('You do not have permission to edit this category');
       return;
     }
@@ -215,7 +215,7 @@ const CategoryEdit = () => {
     );
   }
 
-  if (!hasEditPermission()) {
+  if (!hasEditPermission) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">

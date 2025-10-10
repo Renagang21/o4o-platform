@@ -5,7 +5,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@o4o/ui';
+} from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@o4o/ui';
 import { Star, CheckCircle } from 'lucide-react';
 import { cn } from '@o4o/utils';
@@ -56,7 +56,7 @@ export function ReviewFiltersBar({
         {/* Sort */}
         <Select
           value={filters.sort || 'recent'}
-          onChange={(e: any) => handleSortChange(e.target.value)}
+          onValueChange={handleSortChange}
         >
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -75,7 +75,7 @@ export function ReviewFiltersBar({
         <ToggleGroup
           type="single"
           value={filters.rating?.toString() || 'all'}
-          onValueChange={(value) => handleRatingFilter(typeof value === 'string' ? value : value[0] || '')}
+          onValueChange={(value: string) => handleRatingFilter(value)}
         >
           <ToggleGroupItem value="all" className="gap-1">
             전체
@@ -96,7 +96,7 @@ export function ReviewFiltersBar({
         <ToggleGroup
           type="single"
           value={filters.verified === true ? 'verified' : 'all'}
-          onValueChange={(value) => handleVerifiedFilter(typeof value === 'string' ? value : value[0] || '')}
+          onValueChange={(value: string) => handleVerifiedFilter(value)}
         >
           <ToggleGroupItem value="all">
             모든 리뷰

@@ -19,13 +19,15 @@ interface DynamicRendererProps {
   onMoveDown?: () => void;
   onAddBlock?: (position: 'before' | 'after', type?: string) => void;
   onSelect?: () => void;
-  onDragStart?: () => void;
+  onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
-  onDragEnd?: () => void;
+  onDragEnd?: (e: React.DragEvent) => void;
   onCopy?: () => void;
   onPaste?: () => void;
   onChangeType?: (newType: string) => void;
+  // InnerBlocks support
+  onInnerBlocksChange?: (innerBlocks: Block[]) => void;
   // Block state
   isSelected?: boolean;
   isDragging?: boolean;
@@ -166,6 +168,7 @@ export const DynamicRenderer: React.FC<DynamicRendererProps> = ({
   onCopy,
   onPaste,
   onChangeType,
+  onInnerBlocksChange,
   isSelected,
   isDragging,
   canMoveUp,
@@ -214,6 +217,11 @@ export const DynamicRenderer: React.FC<DynamicRendererProps> = ({
     onChangeType,
     canMoveUp,
     canMoveDown,
+    // InnerBlocks support
+    innerBlocks: block.innerBlocks || [],
+    onInnerBlocksChange: onInnerBlocksChange ? (newInnerBlocks: unknown[]) => {
+      onInnerBlocksChange(newInnerBlocks as Block[]);
+    } : undefined,
   };
 
   // Render the block with error boundary

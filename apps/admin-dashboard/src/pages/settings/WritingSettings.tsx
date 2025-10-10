@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@o4o/auth-context';
+import { authClient } from '@o4o/auth-client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -61,7 +62,7 @@ interface WritingSettings {
 }
 
 const WritingSettings: React.FC = () => {
-  const { authClient } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<WritingSettings>({

@@ -169,7 +169,12 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
   onCancel
 }) => {
   const [selectedType, setSelectedType] = useState(widget?.type || 'text')
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    position: WidgetPosition;
+    content: Record<string, any>;
+    settings: any;
+  }>({
     title: widget?.title || '',
     position: widget?.position || 'footer-1' as WidgetPosition,
     content: widget?.content || {},

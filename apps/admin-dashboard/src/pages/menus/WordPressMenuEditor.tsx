@@ -825,10 +825,10 @@ const WordPressMenuEditor: FC = () => {
             >
               취소
             </button>
-            {canEditMenu() && (
+            {canEditMenu && (
               <button
                 onClick={saveMenu}
-                disabled={isSaving || !canEditMenu()}
+                disabled={isSaving || !canEditMenu}
                 className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
@@ -1001,10 +1001,10 @@ const WordPressMenuEditor: FC = () => {
                     </div>
                     
                     {/* Add button */}
-                    {canEditMenu() && (
+                    {canEditMenu && (
                       <button
                         onClick={addItemsToMenu}
-                        disabled={selectedItems.length === 0 || !canEditMenu()}
+                        disabled={selectedItems.length === 0 || !canEditMenu}
                         className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
                       >
                         메뉴에 추가

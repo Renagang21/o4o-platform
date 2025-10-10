@@ -315,7 +315,7 @@ export const FooterBuilder: React.FC<FooterBuilderProps> = React.memo(({
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .footer-builder {
           padding: 20px;
         }

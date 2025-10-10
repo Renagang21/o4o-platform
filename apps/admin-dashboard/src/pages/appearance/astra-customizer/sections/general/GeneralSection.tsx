@@ -3,16 +3,16 @@
  * 일반 설정 섹션
  */
 
-import React, { useContext } from 'react';
-import { CustomizerContext } from '../../context/CustomizerContext';
+import React from 'react';
+import { useCustomizer } from '../../context/CustomizerContext';
 import { GeneralPanel } from '../../components/panels/GeneralPanel';
 
 export const GeneralSection: React.FC = () => {
-  const { settings, updateSettings } = useContext(CustomizerContext);
+  const { state, setSettings } = useCustomizer();
 
   const handleChange = (generalSettings: any) => {
-    updateSettings({
-      ...settings,
+    setSettings({
+      ...state.settings,
       scrollToTop: generalSettings.scrollToTop,
       buttons: generalSettings.buttons,
       breadcrumbs: generalSettings.breadcrumbs
@@ -22,9 +22,9 @@ export const GeneralSection: React.FC = () => {
   return (
     <GeneralPanel
       settings={{
-        scrollToTop: settings.scrollToTop,
-        buttons: settings.buttons,
-        breadcrumbs: settings.breadcrumbs
+        scrollToTop: state.settings.scrollToTop,
+        buttons: state.settings.buttons,
+        breadcrumbs: state.settings.breadcrumbs
       }}
       onChange={handleChange}
     />

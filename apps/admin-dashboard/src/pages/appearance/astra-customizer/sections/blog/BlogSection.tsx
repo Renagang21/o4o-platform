@@ -9,7 +9,7 @@ import { BlogPanel } from '../../components/panels/BlogPanel';
 import { BlogSettings } from '../../types/customizer-types';
 
 export const BlogSection: React.FC = () => {
-  const { settings, updateSetting } = useCustomizer();
+  const { state, updateSetting } = useCustomizer();
 
   const handleBlogSettingsChange = (newSettings: BlogSettings) => {
     updateSetting('blog', newSettings);
@@ -25,7 +25,7 @@ export const BlogSection: React.FC = () => {
       </div>
 
       <BlogPanel
-        settings={settings.blog}
+        settings={state.settings.blog}
         onChange={handleBlogSettingsChange}
       />
     </div>

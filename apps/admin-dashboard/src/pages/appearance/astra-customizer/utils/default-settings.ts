@@ -284,9 +284,12 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
     blog: {
       archive: {
         layout: 'grid',
+        columns: { desktop: 3, tablet: 2, mobile: 1 },
+        contentWidth: 'default',
         showArchiveHeader: true,
         showLayoutSwitcher: true,
         showSortOptions: true,
+        cardStyle: 'shadow',
         cardSpacing: 20,
         featuredImage: {
           enabled: true,
@@ -298,6 +301,7 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
         },
         meta: {
           position: 'after-title',
+          separator: '·',
           showIcons: true,
           items: [
             { id: 'date', label: 'Date', enabled: true, showIcon: true, order: 1 },
@@ -324,6 +328,7 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
           readMoreText: 'Read More'
         },
         pagination: {
+          enabled: true,
           type: 'numbers',
           postsPerPage: 12,
           showNumbers: true,
@@ -338,7 +343,6 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
           enableSearch: false,
           enableFilters: false
         },
-        cardStyle: 'shadow',
         styling: {
           backgroundColor: '#ffffff',
           borderColor: '#e1e5e9',
@@ -355,6 +359,37 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
             metaSize: { desktop: 12, tablet: 11, mobile: 10 }
           }
         }
+      },
+      single: {
+        layout: 'default',
+        showFeaturedImage: true,
+        showBreadcrumb: true,
+        showPostNavigation: true,
+        showAuthorBox: true,
+        showRelatedPosts: true,
+        relatedPostsCount: 3,
+        meta: {
+          showAuthor: true,
+          showDate: true,
+          showCategory: true,
+          showTags: true,
+          showComments: true,
+          showReadTime: false,
+          showViews: false,
+          position: 'after-title'
+        },
+        relatedPosts: {
+          title: 'Related Posts',
+          layout: 'grid',
+          columns: { desktop: 3, tablet: 2, mobile: 1 },
+          basedOn: 'category'
+        }
+      },
+      taxonomy: {
+        showDescription: true,
+        showPostCount: true,
+        showHierarchy: true,
+        inheritArchiveSettings: true
       }
     },
     

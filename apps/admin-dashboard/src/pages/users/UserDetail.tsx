@@ -49,13 +49,16 @@ export default function UserDetail() {
       // Fetch user details
       const userResponse = await UserApi.getUser(id!);
       if (userResponse) {
-        setUser(userResponse.data || userResponse);
+        const userData = (userResponse as any).data || userResponse;
+        setUser(userData as User);
       }
 
       // Fetch approval history
       const historyResponse = await UserApi.getUserActivity(id!);
-      if (historyResponse.data.success) {
-        setApprovalHistory(historyResponse.data.data);
+      if (Array.isArray(historyResponse)) {
+        setApprovalHistory(historyResponse);
+      } else if ((historyResponse as any).success) {
+        setApprovalHistory((historyResponse as any).data);
       }
     } catch (error: any) {
     // Error logging - use proper error handler

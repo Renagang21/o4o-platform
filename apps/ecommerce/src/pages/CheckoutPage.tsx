@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
-import { Button, Input, Card, Label, RadioGroup, RadioGroupItem, Textarea, Checkbox } from '@o4o/ui';
+import { Button, Input, Card, Textarea } from '@o4o/ui';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { CreditCard, Smartphone, Building, DollarSign, AlertCircle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import { formatCurrency } from '@o4o/utils';
@@ -129,8 +132,10 @@ export function CheckoutPage() {
                   <Input
                     id="recipientName"
                     {...register('recipientName', { required: '수령인을 입력해주세요' })}
-                    error={errors.recipientName?.message}
                   />
+                  {errors.recipientName && (
+                    <p className="text-sm text-red-600 mt-1">{errors.recipientName.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="recipientPhone">연락처 *</Label>
@@ -145,8 +150,10 @@ export function CheckoutPage() {
                         message: '올바른 휴대폰 번호를 입력해주세요'
                       }
                     })}
-                    error={errors.recipientPhone?.message}
                   />
+                  {errors.recipientPhone && (
+                    <p className="text-sm text-red-600 mt-1">{errors.recipientPhone.message}</p>
+                  )}
                 </div>
               </div>
 

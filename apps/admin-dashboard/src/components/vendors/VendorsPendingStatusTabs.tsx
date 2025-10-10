@@ -1,9 +1,10 @@
 import React from 'react';
-import { VendorStatus } from '@/hooks/vendors/useVendorsPendingData';
+
+export type VendorFilterTab = 'all' | 'today' | 'urgent' | 'incomplete';
 
 interface VendorsPendingStatusTabsProps {
-  activeTab: VendorStatus;
-  setActiveTab: (tab: VendorStatus) => void;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
   counts: {
     all: number;
     today: number;

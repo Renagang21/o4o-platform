@@ -11,7 +11,7 @@ export interface BusinessInfo {
   contactPhone?: string;
 }
 
-export interface User extends Omit<BaseUser, 'role' | 'status'> {
+export interface User extends Omit<BaseUser, 'role' | 'status' | 'lastLoginAt'> {
   // Unified fields
   fullName?: string;
   firstName?: string;

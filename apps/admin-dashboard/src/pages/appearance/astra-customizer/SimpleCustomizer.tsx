@@ -27,6 +27,7 @@ interface SimpleCustomizerProps {
   onSave?: (settings: AstraCustomizerSettings) => Promise<boolean>;
   previewUrl?: string;
   siteName?: string;
+  initialSettings?: AstraCustomizerSettings;
 }
 
 export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
@@ -34,9 +35,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   onSave,
   previewUrl = '/',
   siteName = 'Site Preview',
+  initialSettings,
 }) => {
   // Enhanced state management for full Astra functionality
-  const [settings, setSettings] = useState<AstraCustomizerSettings>(() => getDefaultSettings());
+  const [settings, setSettings] = useState<AstraCustomizerSettings>(() =>
+    initialSettings || getDefaultSettings()
+  );
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -201,7 +205,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     { key: 'header', label: '헤더', icon: '🔝' },
     { key: 'footer', label: '푸터', icon: '🔻' },
     { key: 'blog', label: '블로그', icon: '📰' },
-    { key: 'general', label: '일반 설정', icon: '⚙️' },
+    // { key: 'general', label: '일반 설정', icon: '⚙️' },
   ] as const;
 
   // Render section content
@@ -239,7 +243,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         case 'header': return <HeaderLayoutSection />;
         case 'footer': return <FooterSection />;
         case 'blog': return <BlogSection />;
-        case 'general': return <GeneralSection />;
+        // case 'general': return <GeneralSection />;
         default: return <div className="p-6">섹션을 찾을 수 없습니다.</div>;
       }
     };

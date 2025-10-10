@@ -163,7 +163,7 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
       }
       
       if (['dropshipping-dashboard', 'partner-products', 'partner-commissions', 'approval-queue'].includes(shortcodeKey)) {
-        return <Component {...attributes} />;
+        return <Component type="supplier" {...attributes} />;
       }
       // For other components that don't need special handling
       // Default to providing a type prop if the component is RoleVerification
@@ -175,7 +175,7 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
         return <Component {...defaultProps} />;
       }
       // For all other components
-      return <Component {...attributes} />;
+      return <Component type="supplier" {...attributes} />;
     } catch (componentError) {
       setError({
         type: 'unknown',

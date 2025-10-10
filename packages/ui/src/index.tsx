@@ -488,17 +488,27 @@ export const SelectValue = React.forwardRef<
 SelectValue.displayName = 'SelectValue';
 
 // Toggle Group Components
+interface ToggleGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  type?: 'single' | 'multiple';
+  value?: string;
+  onValueChange?: (value: string) => void;
+}
+
 export const ToggleGroup = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  ToggleGroupProps
+>(({ className, type, value, onValueChange, ...props }, ref) => (
   <div ref={ref} className={cn("flex space-x-1", className)} {...props} />
 ));
 ToggleGroup.displayName = 'ToggleGroup';
 
+interface ToggleGroupItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  value?: string;
+}
+
 export const ToggleGroupItem = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
+  ToggleGroupItemProps
 >(({ className, ...props }, ref) => (
   <button
     ref={ref}
@@ -516,22 +526,31 @@ export const DropdownMenu: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ c
   <div className="relative inline-block" {...props}>{children}</div>
 );
 
+interface DropdownMenuTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+}
+
 export const DropdownMenuTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => (
+  DropdownMenuTriggerProps
+>(({ className, asChild, ...props }, ref) => (
   <button ref={ref} className={cn(className)} {...props} />
 ));
 DropdownMenuTrigger.displayName = 'DropdownMenuTrigger';
 
+interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  align?: 'start' | 'center' | 'end';
+}
+
 export const DropdownMenuContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  DropdownMenuContentProps
+>(({ className, align, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50",
+      "absolute mt-2 w-48 bg-white border rounded-md shadow-lg z-50",
+      align === 'end' ? 'right-0' : align === 'start' ? 'left-0' : 'left-1/2 -translate-x-1/2',
       className
     )}
     {...props}

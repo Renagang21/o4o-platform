@@ -1,0 +1,480 @@
+/**
+ * Inspector Sidebar Styles
+ * WordPress Gutenberg-style settings panel
+ */
+
+/* =============================================================================
+   INSPECTOR SIDEBAR - Main Container
+   ============================================================================= */
+
+.inspector-sidebar {
+  width: 280px;
+  height: 100%;
+  background: #fff;
+  border-left: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+/* =============================================================================
+   INSPECTOR TABS
+   ============================================================================= */
+
+.inspector-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.inspector-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: #757575;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  border-bottom: 3px solid transparent;
+}
+
+.inspector-tab:hover {
+  color: #1e1e1e;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.inspector-tab.is-active {
+  color: #0073aa;
+  border-bottom-color: #0073aa;
+}
+
+.inspector-tab svg {
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   INSPECTOR CONTENT
+   ============================================================================= */
+
+.inspector-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.inspector-panel {
+  padding: 16px;
+}
+
+/* =============================================================================
+   INSPECTOR HEADER
+   ============================================================================= */
+
+.inspector-header {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.inspector-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.inspector-subtitle {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #757575;
+}
+
+/* =============================================================================
+   INSPECTOR PANEL SECTIONS
+   ============================================================================= */
+
+.inspector-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inspector-panel-section {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 16px;
+}
+
+.inspector-panel-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.inspector-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e1e1e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+}
+
+.inspector-panel-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.inspector-panel-toggle:hover {
+  color: #0073aa;
+}
+
+.inspector-panel-toggle .inspector-section-title {
+  margin: 0;
+}
+
+/* =============================================================================
+   INSPECTOR CONTROLS
+   ============================================================================= */
+
+.inspector-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inspector-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inspector-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e1e1e;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.inspector-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #1e1e1e;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.inspector-input:focus {
+  outline: none;
+  border-color: #0073aa;
+  box-shadow: 0 0 0 1px #0073aa;
+}
+
+.inspector-input::placeholder {
+  color: #949494;
+}
+
+/* =============================================================================
+   INSPECTOR STATISTICS
+   ============================================================================= */
+
+.inspector-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.inspector-stat:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* =============================================================================
+   INSPECTOR EMPTY STATE
+   ============================================================================= */
+
+.inspector-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* =============================================================================
+   INSPECTOR SELECT
+   ============================================================================= */
+
+.inspector-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-size: 13px;
+  color: #1e1e1e;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.inspector-select:focus {
+  outline: none;
+  border-color: #0073aa;
+  box-shadow: 0 0 0 1px #0073aa;
+}
+
+/* =============================================================================
+   INSPECTOR TOGGLE
+   ============================================================================= */
+
+.inspector-toggle-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.inspector-toggle-control .inspector-label {
+  margin: 0;
+  text-transform: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.inspector-toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.inspector-toggle.is-checked {
+  background: #0073aa;
+}
+
+.inspector-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.inspector-toggle.is-checked::after {
+  transform: translateX(16px);
+}
+
+/* =============================================================================
+   INSPECTOR RANGE
+   ============================================================================= */
+
+.inspector-range-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inspector-range-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inspector-range-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e1e1e;
+  min-width: 40px;
+  text-align: right;
+}
+
+.inspector-range {
+  width: 100%;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.inspector-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #0073aa;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.15s ease;
+}
+
+.inspector-range::-webkit-slider-thumb:hover {
+  background: #005a87;
+}
+
+.inspector-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #0073aa;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.15s ease;
+}
+
+.inspector-range::-moz-range-thumb:hover {
+  background: #005a87;
+}
+
+/* =============================================================================
+   INSPECTOR COLOR PICKER
+   ============================================================================= */
+
+.inspector-color-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inspector-color-preview {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inspector-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  background-image:
+    linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%),
+    linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%);
+}
+
+.inspector-color-swatch:hover {
+  transform: scale(1.05);
+}
+
+.inspector-color-value {
+  font-size: 13px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  color: #757575;
+}
+
+/* =============================================================================
+   INSPECTOR BUTTON GROUP
+   ============================================================================= */
+
+.inspector-button-group {
+  display: flex;
+  gap: 4px;
+}
+
+.inspector-button {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 2px;
+}
+
+.inspector-button:hover {
+  border-color: #999;
+  color: #1e1e1e;
+}
+
+.inspector-button.is-active {
+  background: #0073aa;
+  border-color: #0073aa;
+  color: #fff;
+}
+
+.inspector-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #0073aa;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 1280px) {
+  .inspector-sidebar {
+    width: 260px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .inspector-sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 280px;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+  }
+}
+
+/* =============================================================================
+   ACCESSIBILITY
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .inspector-tab,
+  .inspector-toggle,
+  .inspector-toggle::after,
+  .inspector-button {
+    transition: none;
+  }
+}
+
+.inspector-tab:focus-visible,
+.inspector-input:focus-visible,
+.inspector-select:focus-visible,
+.inspector-button:focus-visible {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}

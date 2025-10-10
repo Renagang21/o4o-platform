@@ -57,10 +57,18 @@ export interface CustomPostType {
   description?: string;
   icon?: string;
   menuPosition?: number;
+
+  // Compatibility aliases
+  label?: string; // Alias for pluralName
+  singularLabel?: string; // Alias for singularName
+  isActive?: boolean; // Alias for active
+  public?: boolean; // Alias for isPublic
+
   isPublic: boolean;
   showInMenu: boolean;
   showInAdminBar: boolean;
   hasArchive: boolean;
+  active?: boolean; // For compatibility
   supports: {
     title: boolean;
     editor: boolean;
@@ -68,9 +76,9 @@ export interface CustomPostType {
     thumbnail: boolean;
     customFields: boolean;
     comments: boolean;
-    revisions: boolean;
-    author: boolean;
-    pageAttributes: boolean;
+    revisions?: boolean;
+    author?: boolean;
+    pageAttributes?: boolean;
   };
   labels: {
     addNew?: string;
@@ -94,10 +102,10 @@ export interface CustomPostType {
     readPrivatePosts?: string;
   };
   taxonomies: string[]; // Associated taxonomies (categories, tags, custom)
-  fieldGroups: CustomFieldGroup[];
+  fieldGroups?: CustomFieldGroup[];
   restApiEndpoint?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface CustomPostTypePost {

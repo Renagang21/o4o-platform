@@ -56,7 +56,7 @@ export const VendorsPendingRow: React.FC<VendorsPendingRowProps> = ({
   const getDocumentStatusIcon = () => {
     if (documentStatus === 'complete') {
       return <CheckCircle className="w-4 h-4 text-green-600" />;
-    } else if (documentStatus === 'partial') {
+    } else if (documentStatus === 'incomplete') {
       return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
     } else {
       return <XCircle className="w-4 h-4 text-red-600" />;
@@ -153,8 +153,8 @@ export const VendorsPendingRow: React.FC<VendorsPendingRowProps> = ({
             <div className="documents-status">
               {getDocumentStatusIcon()}
               <span className="ml-1">
-                {documentStatus === 'complete' ? '완료' : 
-                 documentStatus === 'partial' ? '일부' : '미제출'}
+                {documentStatus === 'complete' ? '완료' :
+                 documentStatus === 'incomplete' ? '일부' : '미제출'}
               </span>
             </div>
           </td>

@@ -1,0 +1,463 @@
+/**
+ * Block Placeholder Styles
+ * Unified placeholder design for empty blocks
+ * WordPress Gutenberg-inspired design system
+ */
+
+/* =============================================================================
+   BASE PLACEHOLDER STYLES
+   ============================================================================= */
+
+.block-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  background: #fafafa;
+  min-height: 200px;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.block-placeholder:hover {
+  border-color: #0073aa;
+  background: #f5f9fc;
+}
+
+/* =============================================================================
+   PLACEHOLDER ICON
+   ============================================================================= */
+
+.block-placeholder__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: #fff;
+  color: #757575;
+  font-size: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.block-placeholder:hover .block-placeholder__icon {
+  color: #0073aa;
+  box-shadow: 0 4px 12px rgba(0, 115, 170, 0.2);
+  transform: scale(1.05);
+}
+
+/* =============================================================================
+   PLACEHOLDER TEXT
+   ============================================================================= */
+
+.block-placeholder__label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e1e1e;
+  margin: 0 0 8px 0;
+}
+
+.block-placeholder__instructions {
+  font-size: 13px;
+  color: #757575;
+  margin: 0 0 20px 0;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   PLACEHOLDER ACTIONS
+   ============================================================================= */
+
+.block-placeholder__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.block-placeholder__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid #0073aa;
+  border-radius: 4px;
+  background: #0073aa;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.block-placeholder__button:hover {
+  background: #005a87;
+  border-color: #005a87;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 115, 170, 0.3);
+}
+
+.block-placeholder__button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 115, 170, 0.3);
+}
+
+.block-placeholder__button--secondary {
+  background: transparent;
+  color: #0073aa;
+  border-color: #ddd;
+}
+
+.block-placeholder__button--secondary:hover {
+  background: #f0f0f0;
+  border-color: #999;
+  color: #005a87;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================================================
+   PLACEHOLDER VARIANTS
+   ============================================================================= */
+
+/* Media Placeholder (Image, Video, Gallery) */
+.block-placeholder--media {
+  min-height: 300px;
+}
+
+.block-placeholder--media .block-placeholder__icon {
+  width: 80px;
+  height: 80px;
+  font-size: 40px;
+}
+
+/* Small Placeholder (Button, Separator) */
+.block-placeholder--small {
+  min-height: 120px;
+  padding: 24px 16px;
+}
+
+.block-placeholder--small .block-placeholder__icon {
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.block-placeholder--small .block-placeholder__label {
+  font-size: 14px;
+}
+
+.block-placeholder--small .block-placeholder__instructions {
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+/* Inline Placeholder (for inline elements) */
+.block-placeholder--inline {
+  flex-direction: row;
+  min-height: auto;
+  padding: 16px 20px;
+  text-align: left;
+}
+
+.block-placeholder--inline .block-placeholder__icon {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
+.block-placeholder--inline .block-placeholder__label {
+  margin-bottom: 4px;
+}
+
+.block-placeholder--inline .block-placeholder__instructions {
+  margin-bottom: 0;
+}
+
+/* Fullwidth Placeholder */
+.block-placeholder--fullwidth {
+  width: 100%;
+}
+
+/* =============================================================================
+   PLACEHOLDER STATES
+   ============================================================================= */
+
+/* Loading State */
+.block-placeholder--loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.block-placeholder--loading .block-placeholder__icon {
+  animation: placeholder-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes placeholder-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Error State */
+.block-placeholder--error {
+  border-color: #cc1818;
+  background: #fff5f5;
+}
+
+.block-placeholder--error .block-placeholder__icon {
+  color: #cc1818;
+  background: #ffe5e5;
+}
+
+.block-placeholder--error .block-placeholder__label {
+  color: #cc1818;
+}
+
+/* Success State */
+.block-placeholder--success {
+  border-color: #46b450;
+  background: #f0f9f1;
+}
+
+.block-placeholder--success .block-placeholder__icon {
+  color: #46b450;
+  background: #e7f7e9;
+}
+
+/* =============================================================================
+   PLACEHOLDER UPLOAD ZONE
+   ============================================================================= */
+
+.block-placeholder__upload-zone {
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  background: #fff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.block-placeholder__upload-zone:hover {
+  border-color: #0073aa;
+  background: #f5f9fc;
+}
+
+.block-placeholder__upload-zone--dragover {
+  border-color: #0073aa;
+  background: #e5f3ff;
+  transform: scale(1.02);
+}
+
+.block-placeholder__upload-input {
+  display: none;
+}
+
+/* =============================================================================
+   PLACEHOLDER URL INPUT
+   ============================================================================= */
+
+.block-placeholder__url-input-wrapper {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 16px;
+}
+
+.block-placeholder__url-input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: border-color 0.2s ease;
+}
+
+.block-placeholder__url-input:focus {
+  outline: none;
+  border-color: #0073aa;
+  box-shadow: 0 0 0 1px #0073aa;
+}
+
+.block-placeholder__url-submit {
+  padding: 10px 20px;
+  border: 1px solid #0073aa;
+  border-radius: 4px;
+  background: #0073aa;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.block-placeholder__url-submit:hover {
+  background: #005a87;
+  border-color: #005a87;
+}
+
+.block-placeholder__url-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =============================================================================
+   PLACEHOLDER GRID (for multiple options)
+   ============================================================================= */
+
+.block-placeholder__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 16px;
+}
+
+.block-placeholder__option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.block-placeholder__option:hover {
+  border-color: #0073aa;
+  background: #f5f9fc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.block-placeholder__option-icon {
+  font-size: 32px;
+  color: #757575;
+  margin-bottom: 8px;
+  transition: color 0.2s ease;
+}
+
+.block-placeholder__option:hover .block-placeholder__option-icon {
+  color: #0073aa;
+}
+
+.block-placeholder__option-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e1e1e;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .block-placeholder {
+    padding: 32px 16px;
+    min-height: 180px;
+  }
+
+  .block-placeholder__icon {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+
+  .block-placeholder__label {
+    font-size: 15px;
+  }
+
+  .block-placeholder__instructions {
+    font-size: 12px;
+  }
+
+  .block-placeholder__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .block-placeholder__button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .block-placeholder__options {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .block-placeholder {
+    padding: 24px 12px;
+  }
+
+  .block-placeholder--inline {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .block-placeholder--inline .block-placeholder__icon {
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+}
+
+/* =============================================================================
+   ACCESSIBILITY
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .block-placeholder,
+  .block-placeholder__icon,
+  .block-placeholder__button,
+  .block-placeholder__option {
+    transition: none;
+  }
+
+  .block-placeholder--loading .block-placeholder__icon {
+    animation: none;
+  }
+}
+
+.block-placeholder__button:focus-visible,
+.block-placeholder__option:focus-visible {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.block-placeholder__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

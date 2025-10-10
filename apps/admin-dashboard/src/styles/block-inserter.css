@@ -1,0 +1,296 @@
+/**
+ * Block Inserter Button Styles
+ * + button that appears between blocks
+ */
+
+/* =============================================================================
+   BLOCK INSERTER - Container
+   ============================================================================= */
+
+.block-inserter {
+  position: relative;
+  height: 28px;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.block-inserter:hover,
+.block-inserter:focus-within {
+  opacity: 1;
+}
+
+/* Show inserter between blocks on editor hover */
+.blocks-container:hover .block-inserter {
+  opacity: 1;
+}
+
+/* Always show the end inserter */
+.block-inserter--end {
+  opacity: 1;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Line
+   ============================================================================= */
+
+.block-inserter__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.block-inserter:hover .block-inserter__line {
+  background: #0073aa;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Button
+   ============================================================================= */
+
+.block-inserter__button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid #0073aa;
+  border-radius: 50%;
+  background: #fff;
+  color: #0073aa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 1;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.block-inserter__button.is-visible,
+.block-inserter:hover .block-inserter__button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.block-inserter__button:hover {
+  background: #0073aa;
+  color: #fff;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 115, 170, 0.3);
+}
+
+.block-inserter__button:active {
+  transform: scale(1);
+}
+
+.block-inserter__button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.2);
+}
+
+/* Icon inside button */
+.block-inserter__button svg {
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Tooltip
+   ============================================================================= */
+
+.block-inserter__button::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: #1e1e1e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.block-inserter__button:hover::after {
+  opacity: 0.95;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Variants
+   ============================================================================= */
+
+/* Inserter at the start */
+.block-inserter--start {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* Inserter at the end */
+.block-inserter--end {
+  margin-top: 24px;
+  margin-bottom: 0;
+}
+
+.block-inserter--end .block-inserter__line {
+  background: #e0e0e0;
+}
+
+.block-inserter--end:hover .block-inserter__line {
+  background: #0073aa;
+}
+
+.block-inserter--end .block-inserter__button {
+  opacity: 1;
+  transform: scale(1);
+  border-color: #ddd;
+  color: #757575;
+}
+
+.block-inserter--end .block-inserter__button:hover {
+  border-color: #0073aa;
+  background: #0073aa;
+  color: #fff;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - With Block Wrapper
+   ============================================================================= */
+
+/* Add margin to block wrapper for inserter space */
+.block-editor-block + .block-editor-block {
+  margin-top: 16px;
+}
+
+/* When a block is selected, show the inserter more prominently */
+.block-editor-block.is-selected + .block-inserter,
+.block-inserter + .block-editor-block.is-selected {
+  opacity: 1;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Responsive
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .block-inserter {
+    height: 24px;
+    margin: 6px 0;
+  }
+
+  .block-inserter__button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .block-inserter__button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Always show on mobile for easier access */
+  .block-inserter {
+    opacity: 0.7;
+  }
+
+  .block-inserter:hover {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .block-inserter__button::after {
+    display: none; /* Hide tooltip on very small screens */
+  }
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Accessibility
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .block-inserter,
+  .block-inserter__button,
+  .block-inserter__line {
+    transition: none;
+  }
+}
+
+.block-inserter__button:focus-visible {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .block-inserter__line {
+    background: currentColor;
+  }
+
+  .block-inserter__button {
+    border-width: 3px;
+  }
+}
+
+/* =============================================================================
+   BLOCK INSERTER - Animation
+   ============================================================================= */
+
+@keyframes inserter-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.block-inserter__button.is-visible {
+  animation: inserter-appear 0.2s ease;
+}
+
+/* =============================================================================
+   BLOCK INSERTER - States
+   ============================================================================= */
+
+/* Disabled state */
+.block-inserter__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading state */
+.block-inserter__button--loading {
+  pointer-events: none;
+}
+
+.block-inserter__button--loading svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

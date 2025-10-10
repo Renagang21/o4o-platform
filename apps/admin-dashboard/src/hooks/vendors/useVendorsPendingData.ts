@@ -20,8 +20,8 @@ export interface VendorsPendingData {
 }
 
 export type PendingVendor = VendorsPendingData;
-export type VendorStatus = 'pending' | 'approved' | 'rejected';
-export type SortField = 'name' | 'email' | 'createdAt' | 'status';
+export type VendorStatus = 'all' | 'pending' | 'approved' | 'rejected';
+export type SortField = 'name' | 'email' | 'createdAt' | 'status' | 'businessName' | 'appliedAt' | 'waitingDays' | null;
 export type SortOrder = 'asc' | 'desc';
 export type DocumentStatus = 'complete' | 'incomplete' | 'pending';
 
@@ -57,17 +57,25 @@ export const useVendorsPendingData = (params: UseVendorsPendingDataParams) => {
 
   // Filter and sort data based on params
   const filteredVendors = data.filter(vendor => {
-    if (params.activeTab !== 'pending' && vendor.status !== params.activeTab) return false;
+    if (params.activeTab !== 'all' && vendor.status !== params.activeTab) return false;
     if (params.searchQuery && !vendor.name.toLowerCase().includes(params.searchQuery.toLowerCase())) return false;
     return true;
   }).sort((a, b) => {
+    if (!params.sortField) return 0;
     const field = params.sortField;
     const order = params.sortOrder === 'asc' ? 1 : -1;
-    return a[field] > b[field] ? order : -order;
+    const aValue = a[field as keyof VendorsPendingData];
+    const bValue = b[field as keyof VendorsPendingData];
+    if (aValue === undefined || bValue === undefined) return 0;
+    return aValue > bValue ? order : -order;
   });
 
   // Calculate counts
   const counts = {
+    all: data.length,
+    today: data.filter(v => new Date(v.createdAt).toDateString() === new Date().toDateString()).length,
+    urgent: data.filter(v => v.urgencyLevel === 'urgent' || v.urgencyLevel === 'critical').length,
+    incomplete: data.filter(v => getDocumentStatus(v) === 'incomplete').length,
     pending: data.filter(v => v.status === 'pending').length,
     approved: data.filter(v => v.status === 'approved').length,
     rejected: data.filter(v => v.status === 'rejected').length,
@@ -80,7 +88,7 @@ export const useVendorsPendingData = (params: UseVendorsPendingDataParams) => {
     return days;
   };
 
-  const getDocumentStatus = (vendor: VendorsPendingData) => {
+  const getDocumentStatus = (vendor: VendorsPendingData): DocumentStatus => {
     // Mock implementation
     return 'complete';
   };

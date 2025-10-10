@@ -21,9 +21,12 @@ interface BlogPanelProps {
 const defaultSettings: BlogSettings = {
   archive: {
     layout: 'grid',
+    columns: { desktop: 3, tablet: 2, mobile: 1 },
+    contentWidth: 'default',
     showArchiveHeader: true,
     showLayoutSwitcher: true,
     showSortOptions: true,
+    cardStyle: 'shadow',
     cardSpacing: 20,
     featuredImage: {
       enabled: true,
@@ -36,6 +39,7 @@ const defaultSettings: BlogSettings = {
     meta: {
       position: 'after-title',
       showIcons: true,
+      separator: '·',
       items: [
         { id: 'date', label: 'Date', enabled: true, showIcon: true, order: 1 },
         { id: 'author', label: 'Author', enabled: true, showIcon: true, order: 2 },
@@ -58,6 +62,7 @@ const defaultSettings: BlogSettings = {
       readMoreText: 'Read More'
     },
     pagination: {
+      enabled: true,
       type: 'numbers',
       postsPerPage: 12,
       showNumbers: true,
@@ -72,7 +77,6 @@ const defaultSettings: BlogSettings = {
       enableSearch: false,
       enableFilters: false
     },
-    cardStyle: 'shadow',
     styling: {
       backgroundColor: '#ffffff',
       borderColor: '#e1e5e9',
@@ -89,6 +93,37 @@ const defaultSettings: BlogSettings = {
         metaSize: { desktop: 12, tablet: 11, mobile: 10 }
       }
     }
+  },
+  single: {
+    layout: 'default',
+    showFeaturedImage: true,
+    showBreadcrumb: true,
+    showPostNavigation: true,
+    showAuthorBox: true,
+    showRelatedPosts: true,
+    relatedPostsCount: 3,
+    meta: {
+      showAuthor: true,
+      showDate: true,
+      showCategory: true,
+      showTags: true,
+      showComments: true,
+      showReadTime: false,
+      showViews: false,
+      position: 'after-title'
+    },
+    relatedPosts: {
+      title: 'Related Posts',
+      layout: 'grid',
+      columns: { desktop: 3, tablet: 2, mobile: 1 },
+      basedOn: 'category'
+    }
+  },
+  taxonomy: {
+    showDescription: true,
+    showPostCount: true,
+    showHierarchy: true,
+    inheritArchiveSettings: true
   }
 };
 
@@ -123,7 +158,7 @@ export const BlogPanel: React.FC<BlogPanelProps> = ({
       archive: {
         ...settings.archive,
         [section]: {
-          ...settings.archive[section],
+          ...(settings.archive[section] as any),
           [field]: value
         }
       }
@@ -767,6 +802,7 @@ export const BlogPanel: React.FC<BlogPanelProps> = ({
                     />
                   </div>
 
+                  {/* Pagination Alignment - Not in current type definition
                   <div className="space-y-2">
                     <Label>Pagination Alignment</Label>
                     <Select
@@ -783,6 +819,7 @@ export const BlogPanel: React.FC<BlogPanelProps> = ({
                       </SelectContent>
                     </Select>
                   </div>
+                  */}
                 </>
               )}
             </div>
@@ -792,12 +829,13 @@ export const BlogPanel: React.FC<BlogPanelProps> = ({
               <div className="flex items-center space-x-2">
                 <Switch
                   id="sorting"
-                  checked={settings.archive.sorting.enabled}
-                  onCheckedChange={(checked) => handleNestedChange('sorting', 'enabled', checked)}
+                  checked={settings.archive.sorting.showSortOptions}
+                  onCheckedChange={(checked) => handleNestedChange('sorting', 'showSortOptions', checked)}
                 />
-                <Label htmlFor="sorting">Enable Sorting</Label>
+                <Label htmlFor="sorting">Show Sort Options</Label>
               </div>
 
+              {/* Additional sorting options - Not in current type definition
               {settings.archive.sorting.enabled && (
                 <>
                   <div className="space-y-2">
@@ -844,6 +882,44 @@ export const BlogPanel: React.FC<BlogPanelProps> = ({
                   </div>
                 </>
               )}
+              */}
+
+              <div className="space-y-2">
+                <Label>Default Order</Label>
+                <Select
+                  value={settings.archive.sorting.defaultOrder}
+                  onValueChange={(value) => handleNestedChange('sorting', 'defaultOrder', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-desc">Date (Newest First)</SelectItem>
+                    <SelectItem value="date-asc">Date (Oldest First)</SelectItem>
+                    <SelectItem value="popular">Popular</SelectItem>
+                    <SelectItem value="views">Most Views</SelectItem>
+                    <SelectItem value="title">Title</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="enable-search"
+                  checked={settings.archive.sorting.enableSearch}
+                  onCheckedChange={(checked) => handleNestedChange('sorting', 'enableSearch', checked)}
+                />
+                <Label htmlFor="enable-search">Enable Search</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="enable-filters"
+                  checked={settings.archive.sorting.enableFilters}
+                  onCheckedChange={(checked) => handleNestedChange('sorting', 'enableFilters', checked)}
+                />
+                <Label htmlFor="enable-filters">Enable Filters</Label>
+              </div>
             </div>
           </TabsContent>
         </Tabs>

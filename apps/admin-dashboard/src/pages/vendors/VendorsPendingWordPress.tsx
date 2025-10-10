@@ -161,7 +161,7 @@ const VendorsPendingWordPress = () => {
 
       <VendorsPendingStatusTabs
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab) => setActiveTab(tab as VendorStatus)}
         counts={counts}
       />
 
