@@ -128,7 +128,7 @@ export const useBlogSettings = (): UseBlogSettingsReturn => {
           return;
         }
       } catch (apiError) {
-        console.log('Blog settings API not available, using default settings');
+        // console.log('Blog settings API not available, using default settings');
       }
 
       // Fallback to default settings

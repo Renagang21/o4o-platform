@@ -40,7 +40,7 @@ export const useScrollToTopSettings = () => {
           });
         }
       } catch (error) {
-        console.log('Using default scroll to top settings');
+        // console.log('Using default scroll to top settings');
       } finally {
         setLoading(false);
       }

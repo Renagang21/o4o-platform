@@ -129,7 +129,7 @@ const BlogArchivePage: React.FC<BlogArchivePageProps> = ({ className = '' }) => 
         setTotalPosts(pagination.totalPosts);
       } else {
         // Fallback to mock data if API fails
-        console.log('API failed, using mock data');
+        // console.log('API failed, using mock data');
         const startId = (page - 1) * postsPerPage + 1;
         const mockPosts = generateMockPosts(postsPerPage, startId);
         
@@ -142,7 +142,7 @@ const BlogArchivePage: React.FC<BlogArchivePageProps> = ({ className = '' }) => 
         setTotalPosts(50); // Mock total
       }
     } catch (error) {
-      console.log('API call failed, using mock data:', error);
+      // console.log('API call failed, using mock data:', error);
       
       // Fallback to mock data
       const postsPerPage = blogSettings?.archive.pagination.postsPerPage || 12;

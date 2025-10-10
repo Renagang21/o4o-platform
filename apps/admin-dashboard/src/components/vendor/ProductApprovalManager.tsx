@@ -85,7 +85,7 @@ export const ProductApprovalManager: FC = () => {
           await approveProducts(productId);
           approvedCount++;
         } catch (err) {
-          console.error(`Failed to approve product ${productId}`);
+          // console.error(`Failed to approve product ${productId}`);
         }
       }
       
@@ -136,7 +136,7 @@ export const ProductApprovalManager: FC = () => {
           await rejectProduct(productId, rejectReason);
           rejectedCount++;
         } catch (err) {
-          console.error(`Failed to reject product ${productId}`);
+          // console.error(`Failed to reject product ${productId}`);
         }
       }
       

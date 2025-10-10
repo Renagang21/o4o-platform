@@ -60,7 +60,7 @@ export const useStickyHeaderSettings = () => {
           });
         }
       } catch (error) {
-        console.log('Using default sticky header settings');
+        // console.log('Using default sticky header settings');
       } finally {
         setLoading(false);
       }
