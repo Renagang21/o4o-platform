@@ -84,11 +84,12 @@ class ReferenceFetcherService {
 
     } catch (error) {
       // 2단계: 서버 실패 시 로컬 폴백
-      console.warn('⚠️ 서버 참조 데이터 로드 실패, 로컬 폴백 사용:', error);
+      const err = error as Error;
+      console.warn('⚠️ 서버 참조 데이터 로드 실패, 로컬 폴백 사용:', err.message);
 
       // 관리자에게 경고 표시 (한 번만)
       if (!this.hasWarnedFallback) {
-        this.showFallbackWarning();
+        this.showFallbackWarning(err);
         this.hasWarnedFallback = true;
       }
 
@@ -97,7 +98,24 @@ class ReferenceFetcherService {
   }
 
   /**
-   * 서버에서 데이터 가져오기 (ETag 캐싱 지원)
+   * 인증 토큰 가져오기
+   */
+  private getAuthToken(): string | null {
+    // Cookie에서 accessToken 가져오기 (우선순위)
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'accessToken') {
+        return value;
+      }
+    }
+
+    // localStorage에서 가져오기 (폴백)
+    return localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+  }
+
+  /**
+   * 서버에서 데이터 가져오기 (ETag 캐싱 + 인증 지원)
    */
   private async fetchFromServer(endpoint: string, cacheKey: string): Promise<ServerResponse> {
     const url = `${this.API_BASE}${endpoint}`;
@@ -109,10 +127,17 @@ class ReferenceFetcherService {
       return JSON.parse(cached.data);
     }
 
-    // ETag 헤더 추가
+    // 인증 토큰 가져오기
+    const token = this.getAuthToken();
+
+    // ETag 및 인증 헤더 추가
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
     if (cached?.etag) {
       headers['If-None-Match'] = cached.etag;
@@ -122,6 +147,15 @@ class ReferenceFetcherService {
       headers,
       credentials: 'include',
     });
+
+    // 401/403 인증 오류 처리
+    if (response.status === 401) {
+      throw new Error('UNAUTHORIZED: 로그인이 필요합니다');
+    }
+
+    if (response.status === 403) {
+      throw new Error('FORBIDDEN: 접근 권한이 없습니다');
+    }
 
     if (!response.ok) {
       throw new Error(`서버 응답 오류: ${response.status} ${response.statusText}`);
@@ -239,20 +273,37 @@ class ReferenceFetcherService {
   /**
    * 관리자에게 폴백 경고 표시
    */
-  private showFallbackWarning(): void {
-    // React toast/alert 시스템이 있다면 여기서 사용
-    console.warn(`
+  private showFallbackWarning(error?: Error): void {
+    const isAuthError = error?.message.includes('UNAUTHORIZED') || error?.message.includes('FORBIDDEN');
+
+    if (isAuthError) {
+      console.error(`
+🔒 인증 오류: AI 참조 데이터 접근 권한이 없습니다
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${error?.message}
+- 로그인 상태를 확인하세요
+- 로컬 폴백 모드로 동작합니다 (구버전 데이터)
+- 관리자 권한이 필요할 수 있습니다
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      `);
+    } else {
+      console.warn(`
 ⚠️ 경고: 서버 참조 데이터를 사용할 수 없습니다
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 로컬 폴백 모드로 동작 중입니다.
 - 최신 블록/숏코드 정보가 반영되지 않을 수 있습니다
 - API 서버 연결을 확인하세요: ${this.API_BASE}
-- 네트워크 관리자에게 문의하세요
+- 오류: ${error?.message || '알 수 없음'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    `);
+      `);
+    }
 
     // TODO: React toast 시스템과 통합
-    // toast.warn('서버 연결 실패 - 로컬 데이터 사용 중');
+    // if (isAuthError) {
+    //   toast.error('인증 오류 - 로그인이 필요합니다');
+    // } else {
+    //   toast.warn('서버 연결 실패 - 로컬 데이터 사용 중');
+    // }
   }
 
   /**
