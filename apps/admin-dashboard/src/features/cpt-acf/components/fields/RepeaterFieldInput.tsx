@@ -16,6 +16,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -47,6 +49,7 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   renderSubField,
 }) => {
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(new Set());
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   // Setup drag and drop sensors
   const sensors = useSensors(
@@ -127,11 +130,17 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     onChange?.(newRows);
   }, [disabled, rows, onChange]);
 
+  // Handle drag start
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  }, []);
+
   // Handle drag end
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over || active.id === over.id) {
+      setActiveId(null);
       return;
     }
 
@@ -142,7 +151,14 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
       const newRows = arrayMove(rows, oldIndex, newIndex);
       onChange?.(newRows);
     }
+
+    setActiveId(null);
   }, [rows, onChange]);
+
+  // Handle drag cancel
+  const handleDragCancel = useCallback(() => {
+    setActiveId(null);
+  }, []);
 
   // Toggle row collapse
   const toggleRowCollapse = useCallback((rowId: string) => {
@@ -294,10 +310,13 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
       isDragging,
     } = useSortable({ id });
 
-    const style = {
+    const style: React.CSSProperties = {
       transform: CSS.Transform.toString(transform),
-      transition,
-      opacity: isDragging ? 0.5 : 1,
+      transition: transition || 'transform 200ms ease, opacity 200ms ease, box-shadow 200ms ease',
+      opacity: isDragging ? 0.4 : 1,
+      position: 'relative',
+      zIndex: isDragging ? 999 : 'auto',
+      cursor: isDragging ? 'grabbing' : 'default',
     };
 
     return (
@@ -512,11 +531,19 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   // Check if can add more rows
   const canAddRow = !disabled && (config.maxRows === 0 || rows.length < config.maxRows);
 
+  // Get active row for drag overlay
+  const activeRow = useMemo(() => {
+    if (!activeId) return null;
+    return rows.find(row => row._id === activeId);
+  }, [activeId, rows]);
+
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
     >
       <SortableContext
         items={rows.map(row => row._id)}
@@ -611,6 +638,23 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
         </p>
       )}
     </div>
+      </SortableContext>
+
+      {/* Drag Overlay - Shows a preview of the dragged item */}
+      <DragOverlay>
+        {activeRow && (
+          <div className="opacity-90 shadow-2xl ring-2 ring-blue-500 rounded-md bg-white">
+            {config.layout === 'block' && renderBlockRow(activeRow, -1)}
+            {config.layout === 'row' && renderRowLayoutRow(activeRow, -1)}
+            {config.layout === 'table' && (
+              <div className="p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div className="font-medium">Row being moved...</div>
+              </div>
+            )}
+          </div>
+        )}
+      </DragOverlay>
+    </DndContext>
   );
 };
 
