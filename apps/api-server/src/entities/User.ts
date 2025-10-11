@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth';
 import { BusinessInfo } from '../types/user';
+import { Role } from './Role';
 import * as bcrypt from 'bcryptjs';
 
 // Re-export types for external use
@@ -46,21 +47,31 @@ export class User {
   businessInfo?: BusinessInfo;
 
   // Single role for backward compatibility
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: UserRole,
     default: UserRole.CUSTOMER
   })
   // @IsEnum(UserRole)
   role!: UserRole;
 
-  // Multiple roles support
+  // Multiple roles support (legacy string array - kept for backward compatibility)
   @Column({
     type: 'simple-array',
     default: () => `'${UserRole.CUSTOMER}'`
   })
   roles!: string[];
 
+  // Database roles (new ManyToMany relation)
+  @ManyToMany(() => Role, role => role.users, { eager: true })
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' }
+  })
+  dbRoles?: Role[];
+
+  // Direct permissions (in addition to role permissions)
   @Column({ type: 'json', default: () => "'[]'" })
   // @IsArray()
   permissions!: string[];
@@ -173,7 +184,13 @@ export class User {
 
   // Role helper methods
   hasRole(role: UserRole | string): boolean {
-    return this.roles.includes(role) || this.role === role;
+    // Check database roles first
+    const hasDbRole = this.dbRoles?.some(r => r.name === role) || false;
+    // Check legacy roles array
+    const hasLegacyRoles = this.roles?.includes(role) || false;
+    // Check legacy role field
+    const hasLegacyRole = this.role === role;
+    return hasDbRole || hasLegacyRoles || hasLegacyRole;
   }
 
   hasAnyRole(roles: (UserRole | string)[]): boolean {
@@ -182,6 +199,39 @@ export class User {
 
   isAdmin(): boolean {
     return this.hasAnyRole([UserRole.SUPER_ADMIN, UserRole.ADMIN]);
+  }
+
+  // Get all permissions from database roles and direct permissions
+  getAllPermissions(): string[] {
+    const rolePermissions = this.dbRoles?.flatMap(role => role.getPermissionKeys()) || [];
+    const directPermissions = this.permissions || [];
+    // Remove duplicates
+    return [...new Set([...rolePermissions, ...directPermissions])];
+  }
+
+  // Check if user has a specific permission
+  hasPermission(permission: string): boolean {
+    return this.getAllPermissions().includes(permission);
+  }
+
+  // Check if user has any of the permissions
+  hasAnyPermission(permissions: string[]): boolean {
+    const userPermissions = this.getAllPermissions();
+    return permissions.some(p => userPermissions.includes(p));
+  }
+
+  // Check if user has all of the permissions
+  hasAllPermissions(permissions: string[]): boolean {
+    const userPermissions = this.getAllPermissions();
+    return permissions.every(p => userPermissions.includes(p));
+  }
+
+  // Get role names as string array (for backward compatibility)
+  getRoleNames(): string[] {
+    if (this.dbRoles && this.dbRoles.length > 0) {
+      return this.dbRoles.map(r => r.name);
+    }
+    return this.roles || [this.role];
   }
 
   isPending(): boolean {
@@ -223,9 +273,9 @@ export class User {
       lastName: this.lastName,
       fullName: this.fullName,
       role: this.role,
-      roles: this.roles,
+      roles: this.getRoleNames(), // Return role names as string array
       status: this.status,
-      permissions: this.permissions,
+      permissions: this.getAllPermissions(), // Include all permissions from roles and direct
       isActive: this.isActive,
       isEmailVerified: this.isEmailVerified,
       lastLoginAt: this.lastLoginAt,

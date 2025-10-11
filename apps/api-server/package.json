@@ -21,6 +21,7 @@
     "db:logs": "sudo journalctl -u postgresql -f",
     "db:reset": "pnpm run migration:drop && pnpm run migration:run && pnpm run db:seed",
     "db:seed": "ts-node src/database/seeds/index.ts",
+    "db:seed:roles": "ts-node scripts/seed-roles-permissions.ts",
     "db:setup": "pnpm run migration:run && pnpm run db:seed",
     "db:start": "sudo systemctl start postgresql",
     "db:stop": "sudo systemctl stop postgresql",

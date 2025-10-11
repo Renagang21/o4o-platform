@@ -1,19 +1,21 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { User, UserRole } from '../../entities/User';
+import { Role } from '../../entities/Role';
+import { Permission } from '../../entities/Permission';
 import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog';
 import { validate } from 'class-validator';
 
-// Define available permissions
-export const PERMISSIONS = {
+// Legacy hardcoded permissions (kept as fallback during migration)
+export const PERMISSIONS_LEGACY = {
   // User management
   'users.view': 'View users',
   'users.create': 'Create users',
-  'users.edit': 'Edit users', 
+  'users.edit': 'Edit users',
   'users.delete': 'Delete users',
   'users.suspend': 'Suspend/unsuspend users',
   'users.approve': 'Approve users',
-  
+
   // Content management
   'content.view': 'View content',
   'content.create': 'Create content',
@@ -21,27 +23,27 @@ export const PERMISSIONS = {
   'content.delete': 'Delete content',
   'content.publish': 'Publish content',
   'content.moderate': 'Moderate content',
-  
+
   // System administration
   'admin.settings': 'Manage system settings',
   'admin.analytics': 'View analytics',
   'admin.logs': 'View system logs',
   'admin.backup': 'Manage backups',
-  
+
   // ACF and CPT
   'acf.manage': 'Manage custom fields',
   'cpt.manage': 'Manage custom post types',
   'shortcodes.manage': 'Manage shortcodes',
-  
+
   // API access
   'api.access': 'Access API',
   'api.admin': 'Admin API access'
 } as const;
 
-// Define role permissions mapping
-export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  [UserRole.SUPER_ADMIN]: Object.keys(PERMISSIONS),
-  [UserRole.ADMIN]: Object.keys(PERMISSIONS),
+// Legacy role permissions mapping (kept as fallback during migration)
+export const ROLE_PERMISSIONS_LEGACY: Record<UserRole, string[]> = {
+  [UserRole.SUPER_ADMIN]: Object.keys(PERMISSIONS_LEGACY),
+  [UserRole.ADMIN]: Object.keys(PERMISSIONS_LEGACY),
   [UserRole.MODERATOR]: [
     'users.view', 'users.suspend', 'users.approve',
     'content.view', 'content.edit', 'content.moderate', 'content.publish',
@@ -94,23 +96,143 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   ]
 };
 
+// Simple in-memory cache for permissions (5 minutes TTL)
+const permissionsCache = {
+  data: null as any,
+  timestamp: 0,
+  ttl: 5 * 60 * 1000 // 5 minutes
+};
+
+const rolesCache = {
+  data: null as any,
+  timestamp: 0,
+  ttl: 5 * 60 * 1000 // 5 minutes
+};
+
 export class UserRoleController {
   private static userRepository = AppDataSource.getRepository(User);
+  private static roleRepository = AppDataSource.getRepository(Role);
+  private static permissionRepository = AppDataSource.getRepository(Permission);
   private static activityRepository = AppDataSource.getRepository(UserActivityLog);
+
+  /**
+   * Get all permissions from database (with caching)
+   */
+  private static async getAllPermissions(): Promise<Permission[]> {
+    const now = Date.now();
+    if (permissionsCache.data && (now - permissionsCache.timestamp < permissionsCache.ttl)) {
+      return permissionsCache.data;
+    }
+
+    try {
+      const permissions = await UserRoleController.permissionRepository.find({
+        where: { isActive: true }
+      });
+      permissionsCache.data = permissions;
+      permissionsCache.timestamp = now;
+      return permissions;
+    } catch (error) {
+      console.error('Failed to fetch permissions from database, using legacy fallback', error);
+      // Fallback to legacy permissions
+      return Object.entries(PERMISSIONS_LEGACY).map(([key, description]) => {
+        const [category] = key.split('.');
+        return { key, description, category, isActive: true } as Permission;
+      });
+    }
+  }
+
+  /**
+   * Get all roles from database (with caching)
+   */
+  private static async getAllRoles(): Promise<Role[]> {
+    const now = Date.now();
+    if (rolesCache.data && (now - rolesCache.timestamp < rolesCache.ttl)) {
+      return rolesCache.data;
+    }
+
+    try {
+      const roles = await UserRoleController.roleRepository.find({
+        where: { isActive: true },
+        relations: ['permissions']
+      });
+      rolesCache.data = roles;
+      rolesCache.timestamp = now;
+      return roles;
+    } catch (error) {
+      console.error('Failed to fetch roles from database, using legacy fallback', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get role by name from database
+   */
+  private static async getRoleByName(name: string): Promise<Role | null> {
+    try {
+      const role = await UserRoleController.roleRepository.findOne({
+        where: { name, isActive: true },
+        relations: ['permissions']
+      });
+      return role;
+    } catch (error) {
+      console.error(`Failed to fetch role ${name} from database`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get role permissions (from DB or legacy fallback)
+   */
+  private static async getRolePermissions(roleName: string): Promise<string[]> {
+    // Try to get from database first
+    const role = await UserRoleController.getRoleByName(roleName);
+    if (role && role.permissions) {
+      return role.getPermissionKeys();
+    }
+
+    // Fallback to legacy hardcoded permissions
+    const legacyRole = roleName as UserRole;
+    if (ROLE_PERMISSIONS_LEGACY[legacyRole]) {
+      return ROLE_PERMISSIONS_LEGACY[legacyRole];
+    }
+
+    return [];
+  }
 
   static async getRoles(req: Request, res: Response): Promise<void> {
     try {
-      const roles = Object.values(UserRole).map(role => ({
-        value: role,
-        label: role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, ' '),
-        permissions: ROLE_PERMISSIONS[role],
-        permissionCount: ROLE_PERMISSIONS[role].length
-      }));
+      const dbRoles = await UserRoleController.getAllRoles();
 
-      res.status(200).json({
-        success: true,
-        data: roles
-      });
+      if (dbRoles.length > 0) {
+        // Use database roles
+        const roles = dbRoles.map(role => ({
+          value: role.name,
+          label: role.displayName,
+          permissions: role.getPermissionKeys(),
+          permissionCount: role.getPermissionKeys().length,
+          isSystem: role.isSystem,
+          description: role.description
+        }));
+
+        res.status(200).json({
+          success: true,
+          data: roles
+        });
+      } else {
+        // Fallback to legacy enum-based roles
+        const roles = Object.values(UserRole).map(role => ({
+          value: role,
+          label: role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, ' '),
+          permissions: ROLE_PERMISSIONS_LEGACY[role],
+          permissionCount: ROLE_PERMISSIONS_LEGACY[role].length
+        }));
+
+        res.status(200).json({
+          success: true,
+          data: roles,
+          warning: 'Using legacy role definitions. Run database migrations and seed data.'
+        });
+      }
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -137,6 +259,9 @@ export class UserRoleController {
         return;
       }
 
+      // Get permissions from database or fallback
+      const permissions = await UserRoleController.getRolePermissions(user.role);
+
       const userRole = {
         userId: user.id,
         email: user.email,
@@ -144,7 +269,7 @@ export class UserRoleController {
         lastName: user.lastName,
         role: user.role,
         status: user.status,
-        permissions: ROLE_PERMISSIONS[user.role],
+        permissions,
         roleLabel: user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')
       };
 
@@ -153,7 +278,6 @@ export class UserRoleController {
         data: userRole
       });
     } catch (error) {
-      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -241,6 +365,9 @@ export class UserRoleController {
       const activity = UserRoleController.activityRepository.create(activityData);
       await UserRoleController.activityRepository.save(activity);
 
+      // Get permissions from database or fallback
+      const permissions = await UserRoleController.getRolePermissions(role);
+
       res.status(200).json({
         success: true,
         data: {
@@ -250,13 +377,12 @@ export class UserRoleController {
           lastName: user.lastName,
           oldRole,
           newRole: role,
-          permissions: ROLE_PERMISSIONS[role],
+          permissions,
           updatedAt: new Date()
         },
         message: 'User role updated successfully'
       });
     } catch (error) {
-      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -268,29 +394,28 @@ export class UserRoleController {
     try {
       const { role } = req.query;
 
-      let permissions = PERMISSIONS;
-      let rolePermissions: string[] = [];
+      // Get all permissions from database
+      const allPermissions = await UserRoleController.getAllPermissions();
 
-      if (role && Object.values(UserRole).includes(role as UserRole)) {
-        rolePermissions = ROLE_PERMISSIONS[role as UserRole];
+      let rolePermissions: string[] = [];
+      if (role && typeof role === 'string') {
+        rolePermissions = await UserRoleController.getRolePermissions(role);
       }
 
-      const permissionsData = Object.entries(permissions).map(([key, description]) => ({
-        key,
-        description,
-        granted: rolePermissions.length > 0 ? rolePermissions.includes(key) : false
+      const permissionsData = allPermissions.map(p => ({
+        key: p.key,
+        description: p.description,
+        category: p.category,
+        granted: rolePermissions.length > 0 ? rolePermissions.includes(p.key) : false
       }));
 
       // Group permissions by category
-      const groupedPermissions = {
-        users: permissionsData.filter(p => p.key.startsWith('users.')),
-        content: permissionsData.filter(p => p.key.startsWith('content.')),
-        admin: permissionsData.filter(p => p.key.startsWith('admin.')),
-        acf: permissionsData.filter(p => p.key.startsWith('acf.')),
-        cpt: permissionsData.filter(p => p.key.startsWith('cpt.')),
-        shortcodes: permissionsData.filter(p => p.key.startsWith('shortcodes.')),
-        api: permissionsData.filter(p => p.key.startsWith('api.'))
-      };
+      const categories = [...new Set(allPermissions.map(p => p.category))];
+      const groupedPermissions: Record<string, any[]> = {};
+
+      categories.forEach(category => {
+        groupedPermissions[category] = permissionsData.filter(p => p.category === category);
+      });
 
       res.status(200).json({
         success: true,
@@ -301,7 +426,6 @@ export class UserRoleController {
         }
       });
     } catch (error) {
-      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -315,7 +439,8 @@ export class UserRoleController {
 
       const user = await UserRoleController.userRepository.findOne({
         where: { id: userId },
-        select: ['id', 'role', 'email', 'firstName', 'lastName', 'name', 'status']
+        select: ['id', 'role', 'email', 'firstName', 'lastName', 'name', 'status'],
+        relations: ['dbRoles']
       });
 
       if (!user) {
@@ -326,23 +451,25 @@ export class UserRoleController {
         return;
       }
 
-      const userPermissions = ROLE_PERMISSIONS[user.role];
-      const allPermissions = Object.entries(PERMISSIONS).map(([key, description]) => ({
-        key,
-        description,
-        granted: userPermissions.includes(key)
+      // Get all permissions (from DB roles + direct permissions)
+      const userPermissions = user.getAllPermissions();
+
+      // Get all available permissions
+      const allPermissionsDb = await UserRoleController.getAllPermissions();
+      const allPermissions = allPermissionsDb.map(p => ({
+        key: p.key,
+        description: p.description,
+        category: p.category,
+        granted: userPermissions.includes(p.key)
       }));
 
       // Group permissions by category
-      const groupedPermissions = {
-        users: allPermissions.filter(p => p.key.startsWith('users.')),
-        content: allPermissions.filter(p => p.key.startsWith('content.')),
-        admin: allPermissions.filter(p => p.key.startsWith('admin.')),
-        acf: allPermissions.filter(p => p.key.startsWith('acf.')),
-        cpt: allPermissions.filter(p => p.key.startsWith('cpt.')),
-        shortcodes: allPermissions.filter(p => p.key.startsWith('shortcodes.')),
-        api: allPermissions.filter(p => p.key.startsWith('api.'))
-      };
+      const categories = [...new Set(allPermissionsDb.map(p => p.category))];
+      const groupedPermissions: Record<string, any[]> = {};
+
+      categories.forEach(category => {
+        groupedPermissions[category] = allPermissions.filter(p => p.category === category);
+      });
 
       res.status(200).json({
         success: true,
@@ -380,7 +507,8 @@ export class UserRoleController {
 
       const user = await UserRoleController.userRepository.findOne({
         where: { id: userId },
-        select: ['id', 'role']
+        select: ['id', 'role'],
+        relations: ['dbRoles']
       });
 
       if (!user) {
@@ -391,7 +519,7 @@ export class UserRoleController {
         return;
       }
 
-      const hasPermission = ROLE_PERMISSIONS[user.role].includes(permission);
+      const hasPermission = user.hasPermission(permission);
 
       res.status(200).json({
         success: true,
@@ -403,7 +531,6 @@ export class UserRoleController {
         }
       });
     } catch (error) {
-      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -413,40 +540,94 @@ export class UserRoleController {
 
   static async getRoleStatistics(req: Request, res: Response): Promise<void> {
     try {
-      const roleStats = await Promise.all(
-        Object.values(UserRole).map(async (role) => {
-          const count = await UserRoleController.userRepository.count({
-            where: { role }
-          });
-          return {
-            role,
-            label: role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' '),
-            count,
-            permissions: ROLE_PERMISSIONS[role].length
-          };
-        })
-      );
+      const dbRoles = await UserRoleController.getAllRoles();
 
-      const totalUsers = await UserRoleController.userRepository.count();
+      if (dbRoles.length > 0) {
+        // Use database roles for statistics
+        const roleStats = await Promise.all(
+          dbRoles.map(async (dbRole) => {
+            const count = await UserRoleController.userRepository
+              .createQueryBuilder('user')
+              .leftJoin('user.dbRoles', 'role')
+              .where('role.name = :name', { name: dbRole.name })
+              .orWhere('user.role = :legacyRole', { legacyRole: dbRole.name })
+              .getCount();
 
-      res.status(200).json({
-        success: true,
-        data: {
-          roleDistribution: roleStats,
-          totalUsers,
-          summary: {
-            admins: roleStats.find(r => r.role === UserRole.ADMIN)?.count || 0,
-            activeUsers: roleStats.reduce((sum, r) => sum + r.count, 0),
-            pendingUsers: 0
+            return {
+              role: dbRole.name,
+              label: dbRole.displayName,
+              count,
+              permissions: dbRole.getPermissionKeys().length
+            };
+          })
+        );
+
+        const totalUsers = await UserRoleController.userRepository.count();
+
+        res.status(200).json({
+          success: true,
+          data: {
+            roleDistribution: roleStats,
+            totalUsers,
+            summary: {
+              admins: roleStats.find(r => r.role === 'admin')?.count || 0,
+              activeUsers: roleStats.reduce((sum, r) => sum + r.count, 0),
+              pendingUsers: 0
+            }
           }
-        }
-      });
+        });
+      } else {
+        // Fallback to legacy enum-based statistics
+        const roleStats = await Promise.all(
+          Object.values(UserRole).map(async (role) => {
+            const count = await UserRoleController.userRepository.count({
+              where: { role }
+            });
+            return {
+              role,
+              label: role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' '),
+              count,
+              permissions: ROLE_PERMISSIONS_LEGACY[role].length
+            };
+          })
+        );
+
+        const totalUsers = await UserRoleController.userRepository.count();
+
+        res.status(200).json({
+          success: true,
+          data: {
+            roleDistribution: roleStats,
+            totalUsers,
+            summary: {
+              admins: roleStats.find(r => r.role === UserRole.ADMIN)?.count || 0,
+              activeUsers: roleStats.reduce((sum, r) => sum + r.count, 0),
+              pendingUsers: 0
+            }
+          },
+          warning: 'Using legacy role definitions. Run database migrations and seed data.'
+        });
+      }
     } catch (error) {
-      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
       });
     }
   }
+
+  /**
+   * Clear permissions and roles cache
+   * Useful after updating roles/permissions in database
+   */
+  static clearCache(): void {
+    permissionsCache.data = null;
+    permissionsCache.timestamp = 0;
+    rolesCache.data = null;
+    rolesCache.timestamp = 0;
+  }
 }
+
+// Export legacy constants for backward compatibility
+export const PERMISSIONS = PERMISSIONS_LEGACY;
+export const ROLE_PERMISSIONS = ROLE_PERMISSIONS_LEGACY;
