@@ -15,6 +15,7 @@
  */
 
 import logger from '../utils/logger';
+import { startLLMCallSpan, endSpanSuccess, endSpanError } from '../utils/telemetry';
 import {
   AIProvider,
   AIGenerateRequest,
@@ -264,6 +265,9 @@ class AIProxyService {
 
     const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 4000 } = request;
 
+    // Sprint 3: Start tracing span for LLM call
+    const span = startLLMCallSpan('openai', model, requestId);
+
     // Create AbortSignal with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.DEFAULT_TIMEOUT);
@@ -311,9 +315,9 @@ class AIProxyService {
       // Parse JSON response
       const parsed = JSON.parse(content);
 
-      return {
+      const result: AIGenerateResponse = {
         success: true,
-        provider: 'openai',
+        provider: 'openai' as AIProvider,
         model,
         usage: {
           promptTokens: data.usage?.prompt_tokens,
@@ -324,8 +328,20 @@ class AIProxyService {
         requestId,
       };
 
+      // Sprint 3: End span with success
+      endSpanSuccess(span, {
+        'ai.tokens.prompt': data.usage?.prompt_tokens,
+        'ai.tokens.completion': data.usage?.completion_tokens,
+        'ai.tokens.total': data.usage?.total_tokens,
+      });
+
+      return result;
+
     } catch (error: any) {
       clearTimeout(timeoutId);
+
+      // Sprint 3: End span with error
+      endSpanError(span, error);
 
       if (error.name === 'AbortError') {
         throw this.createError('TIMEOUT_ERROR', 'OpenAI request timeout (15s)', true);

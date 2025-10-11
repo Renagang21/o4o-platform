@@ -1,3 +1,7 @@
+// Sprint 3: Initialize OpenTelemetry before any other imports
+import { initTelemetry } from './utils/telemetry';
+const telemetrySDK = initTelemetry();
+
 import 'reflect-metadata';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors, { CorsOptions } from 'cors';
@@ -104,6 +108,7 @@ import blockPatternsRoutes from './routes/block-patterns.routes';
 import aiShortcodesRoutes from './routes/ai-shortcodes';
 import aiBlocksRoutes from './routes/ai-blocks';
 import aiProxyRoutes from './routes/ai-proxy';
+import aiSchemaRoutes from './routes/ai-schema';
 import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
 import menusRoutes from './routes/menus';
@@ -119,6 +124,7 @@ import themeRoutes from './routes/v1/theme.routes';
 import appsV1Routes from './routes/v1/apps.routes';
 import pluginsV1Routes from './routes/v1/plugins.routes';
 import healthRoutes from './routes/health';
+import metricsRoutes from './routes/metrics';
 import settingsV1Routes from './routes/v1/settings.routes';
 import customizerV1Routes from './routes/v1/customizer.routes';
 import galleryRoutes from './routes/gallery.routes';
@@ -544,6 +550,9 @@ app.get('/health', (req, res) => {
 // Use the health router for comprehensive health checks
 app.use('/api/health', healthRoutes);
 
+// Sprint 4: Prometheus metrics endpoint
+app.use('/metrics', metricsRoutes);
+
 // Additional health endpoints for specific services
 app.get('/api/auth/health', (req, res) => {
   res.status(200).json({ 
@@ -646,6 +655,9 @@ app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
 
 // AI Blocks API (SSOT for AI page generation)
 app.use('/api/ai/blocks', publicLimiter, aiBlocksRoutes);
+
+// AI Schema API (JSON Schema for AI output validation)
+app.use('/api/ai/schema', publicLimiter, aiSchemaRoutes);
 
 // AI Proxy API (server-side LLM proxy with security)
 app.use('/api/ai', limiter, aiProxyRoutes);
@@ -1164,7 +1176,16 @@ const startServer = async () => {
   } catch (scheduleError) {
     logger.warn('Failed to start some scheduled jobs (non-critical):', scheduleError);
   }
-  
+
+  // Sprint 2 - P2: Start AI job worker (BullMQ)
+  try {
+    await import('./workers/ai-job.worker');
+    logger.info('✅ AI job worker started (BullMQ)');
+  } catch (workerError) {
+    logger.error('Failed to start AI job worker:', workerError);
+    // Non-critical: server can still start without worker
+  }
+
   // Initialize image processing folders
   try {
     const { imageProcessingService } = await import('./services/image-processing.service');
