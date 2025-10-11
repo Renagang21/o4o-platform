@@ -3,6 +3,7 @@ import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
 import { hasMenuPermission, getAccessibleMenus } from '@/config/rolePermissions';
 import { useEffect, useState } from 'react';
+import { apiClient } from '@/services/api';
 
 /**
  * Admin menu hook that dynamically filters menus based on user roles and permissions
@@ -24,16 +25,16 @@ export const useAdminMenu = () => {
       }
       
       try {
-        // Fetch user permissions from API
-        const response = await fetch(`/api/v1/users/${user.id}/permissions`);
-        if (response.ok) {
-          const data = await response.json();
-          setUserPermissions(data.permissions || []);
+        // Fetch user permissions from API with authentication
+        const response = await apiClient.get(`/api/v1/users/${user.id}/permissions`);
+        if (response.data?.success) {
+          setUserPermissions(response.data.data.permissions || []);
         } else {
           // Fallback to user's permissions property if API fails
           setUserPermissions(user.permissions || []);
         }
       } catch (error) {
+        console.error('Failed to fetch user permissions:', error);
         // Use user's permissions property as fallback
         setUserPermissions(user.permissions || []);
       } finally {
