@@ -3,7 +3,7 @@
  * Enhanced WordPress Gutenberg-like editor with 3-column layout
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditorHeader } from './EditorHeader';
 import '../../styles/editor.css';
@@ -20,11 +20,21 @@ import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
 import { InspectorSidebar } from '../inspector/InspectorSidebar';
+import SlashCommandMenu from './SlashCommandMenu';
 // Toast 기능을 직접 구현
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
+import {
+  saveEditorSession,
+  loadEditorSession,
+  clearEditorSession,
+  hasStoredSession,
+  createHistoryEntry,
+  trimHistory,
+  type HistoryEntry,
+} from '@/utils/history-manager';
 
 // Block interface는 이제 @/types/post.types에서 import
 
@@ -89,29 +99,60 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [history, setHistory] = useState<Block[][]>([blocks]);
+  const [history, setHistory] = useState<HistoryEntry[]>([createHistoryEntry(blocks)]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
+  const [sessionRestored, setSessionRestored] = useState(false);
   
   // Initialize block registry
   useEffect(() => {
     registerAllBlocks();
   }, []);
 
+  // Session restoration on mount
+  useEffect(() => {
+    if (sessionRestored || initialBlocks.length > 0) return;
+
+    const storedSession = loadEditorSession();
+    if (storedSession && storedSession.history.length > 0) {
+      // Restore session
+      setHistory(storedSession.history);
+      setHistoryIndex(storedSession.historyIndex);
+      setBlocks(storedSession.history[storedSession.historyIndex].blocks);
+      setDocumentTitle(storedSession.documentTitle);
+      setSessionRestored(true);
+      showToast('편집 내역이 복원되었습니다', 'info');
+    }
+  }, [sessionRestored, initialBlocks.length]);
+
   // Sync blocks with initialBlocks prop changes
   useEffect(() => {
-    if (initialBlocks && initialBlocks.length > 0) {
+    if (initialBlocks && initialBlocks.length > 0 && !sessionRestored) {
       setBlocks(initialBlocks);
-      setHistory([initialBlocks]);
+      setHistory([createHistoryEntry(initialBlocks)]);
       setHistoryIndex(0);
       setIsDirty(false);
     }
-  }, [initialBlocks]);
+  }, [initialBlocks, sessionRestored]);
   
   // Sync title with prop changes
   useEffect(() => {
     setDocumentTitle(propDocumentTitle);
   }, [propDocumentTitle]);
+
+  // Save session on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveEditorSession(history, historyIndex, documentTitle);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Final save on unmount
+      saveEditorSession(history, historyIndex, documentTitle);
+    };
+  }, [history, historyIndex, documentTitle]);
   
   // Sync post settings with prop changes
   useEffect(() => {
@@ -126,6 +167,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+
+  // Slash command menu states
+  const [isSlashMenuOpen, setIsSlashMenuOpen] = useState(false);
+  const [slashQuery, setSlashQuery] = useState('');
+  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
+  const [slashTriggerBlockId, setSlashTriggerBlockId] = useState<string | null>(null);
+  const [recentBlocks, setRecentBlocks] = useState<string[]>([]);
+  const slashMenuRef = useRef<{ query: string; blockId: string | null }>({ query: '', blockId: null });
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -194,18 +243,24 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setBlocks(newBlocks);
       setIsDirty(true);
 
-      // Add to history
+      // Add to history with optimization
       const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(newBlocks);
-      setHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
+      newHistory.push(createHistoryEntry(newBlocks));
+
+      // Trim history to max size
+      const trimmedHistory = trimHistory(newHistory);
+      setHistory(trimmedHistory);
+      setHistoryIndex(trimmedHistory.length - 1);
+
+      // Save to session storage
+      saveEditorSession(trimmedHistory, trimmedHistory.length - 1, documentTitle);
 
       // Notify parent (unless skipped for initialization)
       if (!skipOnChange) {
         onChange?.(newBlocks);
       }
     },
-    [history, historyIndex, onChange]
+    [history, historyIndex, documentTitle, onChange]
   );
 
   // Undo
@@ -213,18 +268,24 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
-      setBlocks(history[newIndex]);
+      setBlocks(history[newIndex].blocks);
+
+      // Update session storage
+      saveEditorSession(history, newIndex, documentTitle);
     }
-  }, [history, historyIndex]);
+  }, [history, historyIndex, documentTitle]);
 
   // Redo
   const handleRedo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
       setHistoryIndex(newIndex);
-      setBlocks(history[newIndex]);
+      setBlocks(history[newIndex].blocks);
+
+      // Update session storage
+      saveEditorSession(history, newIndex, documentTitle);
     }
-  }, [history, historyIndex]);
+  }, [history, historyIndex, documentTitle]);
 
   // Handle block update
   const handleBlockUpdate = useCallback(
@@ -262,31 +323,211 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     [blocks, updateBlocks]
   );
 
-  // Handle block copy
+  // Convert block to HTML representation
+  const blockToHTML = useCallback((block: Block): string => {
+    const { type, content, attributes } = block;
+
+    // Handle different block types
+    if (type === 'core/paragraph') {
+      return `<p class="block-paragraph">${content?.text || ''}</p>`;
+    } else if (type === 'core/heading') {
+      const level = content?.level || 2;
+      return `<h${level} class="block-heading">${content?.text || ''}</h${level}>`;
+    } else if (type === 'core/image') {
+      return `<figure class="block-image"><img src="${content?.url || ''}" alt="${content?.alt || ''}" /></figure>`;
+    } else if (type === 'core/list') {
+      const tag = content?.ordered ? 'ol' : 'ul';
+      const items = (content?.items || []).map((item: string) => `<li>${item}</li>`).join('');
+      return `<${tag} class="block-list">${items}</${tag}>`;
+    } else if (type === 'core/quote') {
+      return `<blockquote class="block-quote"><p>${content?.text || ''}</p><cite>${content?.citation || ''}</cite></blockquote>`;
+    } else if (type === 'core/code') {
+      return `<pre class="block-code"><code>${content?.code || ''}</code></pre>`;
+    } else if (type === 'core/button') {
+      return `<a href="${content?.url || '#'}" class="block-button">${content?.text || 'Button'}</a>`;
+    }
+
+    // Default fallback
+    return `<div class="block-${type.replace('/', '-')}" data-block-type="${type}">${JSON.stringify(content)}</div>`;
+  }, []);
+
+  // Handle block copy with HTML + JSON clipboard support
   const handleBlockCopy = useCallback(
-    (blockId: string) => {
+    async (blockId: string) => {
       const block = blocks.find((b) => b.id === blockId);
-      if (block) {
-        setCopiedBlock({ ...block });
-        // 선택사항: 클립보드에도 복사
-        const blockData = JSON.stringify(block);
-        navigator.clipboard.writeText(blockData).catch(() => {
-          // 클립보드 접근 실패 시 내부 상태만 사용
-        });
+      if (!block) return;
+
+      setCopiedBlock({ ...block });
+
+      try {
+        // Prepare both HTML and JSON representations
+        const jsonContent = JSON.stringify(block);
+        const htmlContent = blockToHTML(block);
+
+        // Use ClipboardItem API for multi-format clipboard
+        if (typeof ClipboardItem !== 'undefined') {
+          const clipboardItem = new ClipboardItem({
+            'text/html': new Blob([htmlContent], { type: 'text/html' }),
+            'text/plain': new Blob([jsonContent], { type: 'text/plain' }),
+            'application/json': new Blob([jsonContent], { type: 'application/json' })
+          });
+          await navigator.clipboard.write([clipboardItem]);
+        } else {
+          // Fallback for browsers without ClipboardItem
+          await navigator.clipboard.writeText(jsonContent);
+        }
+      } catch (error) {
+        // 클립보드 접근 실패 시 내부 상태만 사용
+        console.warn('Clipboard write failed, using internal state only:', error);
       }
     },
-    [blocks]
+    [blocks, blockToHTML]
   );
 
-  // Handle block paste
+  // Parse HTML to block
+  const htmlToBlock = useCallback((html: string): Block | null => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const element = doc.body.firstChild as HTMLElement;
+
+    if (!element) return null;
+
+    const tagName = element.tagName.toLowerCase();
+    const className = element.className;
+
+    // Try to parse based on tag name and class
+    if (tagName === 'p' || className.includes('block-paragraph')) {
+      return {
+        id: `block-${Date.now()}`,
+        type: 'core/paragraph',
+        content: { text: element.textContent || '' },
+        attributes: {}
+      };
+    } else if (tagName.match(/^h[1-6]$/) || className.includes('block-heading')) {
+      const level = parseInt(tagName.charAt(1)) || 2;
+      return {
+        id: `block-${Date.now()}`,
+        type: 'core/heading',
+        content: { text: element.textContent || '', level },
+        attributes: {}
+      };
+    } else if ((tagName === 'ul' || tagName === 'ol') || className.includes('block-list')) {
+      const items = Array.from(element.querySelectorAll('li')).map(li => li.textContent || '');
+      return {
+        id: `block-${Date.now()}`,
+        type: 'core/list',
+        content: { items, ordered: tagName === 'ol' },
+        attributes: {}
+      };
+    } else if (tagName === 'blockquote' || className.includes('block-quote')) {
+      const text = element.querySelector('p')?.textContent || '';
+      const citation = element.querySelector('cite')?.textContent || '';
+      return {
+        id: `block-${Date.now()}`,
+        type: 'core/quote',
+        content: { text, citation },
+        attributes: {}
+      };
+    } else if (tagName === 'pre' || className.includes('block-code')) {
+      const code = element.querySelector('code')?.textContent || element.textContent || '';
+      return {
+        id: `block-${Date.now()}`,
+        type: 'core/code',
+        content: { code },
+        attributes: {}
+      };
+    } else if (tagName === 'figure' && element.querySelector('img')) {
+      const img = element.querySelector('img')!;
+      return {
+        id: `block-${Date.now()}`,
+        type: 'core/image',
+        content: { url: img.src, alt: img.alt },
+        attributes: {}
+      };
+    }
+
+    // Fallback to paragraph
+    return {
+      id: `block-${Date.now()}`,
+      type: 'core/paragraph',
+      content: { text: element.textContent || '' },
+      attributes: {}
+    };
+  }, []);
+
+  // Handle block paste with clipboard reading support
   const handleBlockPaste = useCallback(
-    (afterBlockId?: string) => {
-      if (copiedBlock) {
-        const newBlock = {
+    async (afterBlockId?: string) => {
+      let newBlock: Block | null = null;
+
+      // Try to read from system clipboard first
+      try {
+        if (navigator.clipboard && navigator.clipboard.read) {
+          const clipboardItems = await navigator.clipboard.read();
+
+          for (const item of clipboardItems) {
+            // Try JSON first (most accurate)
+            if (item.types.includes('application/json')) {
+              const blob = await item.getType('application/json');
+              const text = await blob.text();
+              const parsedBlock = JSON.parse(text) as Block;
+              newBlock = { ...parsedBlock, id: `block-${Date.now()}` };
+              break;
+            }
+            // Try plain text JSON
+            else if (item.types.includes('text/plain')) {
+              const blob = await item.getType('text/plain');
+              const text = await blob.text();
+              try {
+                const parsedBlock = JSON.parse(text) as Block;
+                if (parsedBlock.type && parsedBlock.content) {
+                  newBlock = { ...parsedBlock, id: `block-${Date.now()}` };
+                  break;
+                }
+              } catch {
+                // Not JSON, will try HTML next
+              }
+            }
+            // Try HTML
+            if (!newBlock && item.types.includes('text/html')) {
+              const blob = await item.getType('text/html');
+              const html = await blob.text();
+              newBlock = htmlToBlock(html);
+              break;
+            }
+          }
+        } else {
+          // Fallback: try readText
+          const text = await navigator.clipboard.readText();
+          try {
+            const parsedBlock = JSON.parse(text) as Block;
+            if (parsedBlock.type && parsedBlock.content) {
+              newBlock = { ...parsedBlock, id: `block-${Date.now()}` };
+            }
+          } catch {
+            // Not JSON, create as paragraph
+            newBlock = {
+              id: `block-${Date.now()}`,
+              type: 'core/paragraph',
+              content: { text },
+              attributes: {}
+            };
+          }
+        }
+      } catch (error) {
+        console.warn('Clipboard read failed, using internal state:', error);
+      }
+
+      // Fallback to internal copiedBlock state
+      if (!newBlock && copiedBlock) {
+        newBlock = {
           ...copiedBlock,
           id: `block-${Date.now()}`,
         };
-        
+      }
+
+      // Insert the block
+      if (newBlock) {
         if (afterBlockId) {
           const index = blocks.findIndex((b) => b.id === afterBlockId);
           const newBlocks = [...blocks];
@@ -296,11 +537,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           // 마지막에 추가
           updateBlocks([...blocks, newBlock]);
         }
-        
+
         setSelectedBlockId(newBlock.id);
+        setIsDirty(true);
       }
     },
-    [blocks, copiedBlock, updateBlocks]
+    [blocks, copiedBlock, updateBlocks, htmlToBlock]
   );
 
   // Handle block insertion
@@ -345,6 +587,139 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     },
     [blocks, updateBlocks]
   );
+
+  // Handle slash command block selection
+  const handleSlashCommandSelect = useCallback(
+    (blockType: string) => {
+      const triggerBlockId = slashTriggerBlockId || selectedBlockId;
+      if (!triggerBlockId) return;
+
+      // Find the block that triggered slash command
+      const blockIndex = blocks.findIndex(b => b.id === triggerBlockId);
+      if (blockIndex === -1) return;
+
+      const triggerBlock = blocks[blockIndex];
+
+      // Remove "/" and query text from the trigger block
+      let cleanedText = '';
+      if (triggerBlock.content && typeof triggerBlock.content === 'object' && 'text' in triggerBlock.content) {
+        const text = triggerBlock.content.text as string || '';
+        // Find and remove the "/" and everything after it
+        const slashIndex = text.lastIndexOf('/');
+        if (slashIndex !== -1) {
+          cleanedText = text.substring(0, slashIndex);
+        } else {
+          cleanedText = text;
+        }
+      }
+
+      // Create new block
+      const newBlock: Block = {
+        id: `block-${Date.now()}`,
+        type: blockType,
+        content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
+        attributes: {},
+      };
+
+      const newBlocks = [...blocks];
+
+      // If trigger block is empty (only had "/"), replace it
+      if (!cleanedText.trim()) {
+        newBlocks[blockIndex] = newBlock;
+      } else {
+        // Update trigger block and insert new block after
+        newBlocks[blockIndex] = {
+          ...triggerBlock,
+          content: { ...triggerBlock.content, text: cleanedText }
+        };
+        newBlocks.splice(blockIndex + 1, 0, newBlock);
+      }
+
+      updateBlocks(newBlocks);
+      setSelectedBlockId(newBlock.id);
+
+      // Update recent blocks
+      setRecentBlocks(prev => {
+        const updated = [blockType, ...prev.filter(t => t !== blockType)];
+        return updated.slice(0, 5); // Keep only 5 most recent
+      });
+
+      // Close slash menu
+      setIsSlashMenuOpen(false);
+      setSlashQuery('');
+      setSlashTriggerBlockId(null);
+
+      // Focus new block
+      setTimeout(() => {
+        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+        if (newBlockElement) {
+          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+          if (editableElement) {
+            editableElement.focus();
+          }
+        }
+      }, 50);
+    },
+    [blocks, selectedBlockId, slashTriggerBlockId, updateBlocks]
+  );
+
+  // Detect "/" input in contentEditable elements
+  useEffect(() => {
+    const handleInput = (e: Event) => {
+      const target = e.target as HTMLElement;
+
+      // Only proceed if it's a contentEditable element
+      if (!target.isContentEditable) return;
+
+      // Get the block ID from the closest block wrapper
+      const blockWrapper = target.closest('[data-block-id]') as HTMLElement;
+      if (!blockWrapper) return;
+
+      const blockId = blockWrapper.getAttribute('data-block-id');
+      if (!blockId) return;
+
+      const text = target.textContent || '';
+
+      // Check if text contains "/"
+      const slashIndex = text.lastIndexOf('/');
+      if (slashIndex !== -1) {
+        // Get query after "/"
+        const query = text.substring(slashIndex + 1);
+
+        // Only show menu if "/" is at the end or followed by search text
+        const afterSlash = text.substring(slashIndex);
+        if (afterSlash === '/' || /^\/[\w\s]*$/.test(afterSlash)) {
+          // Get cursor position for menu placement
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+
+            setSlashMenuPosition({
+              top: rect.bottom + window.scrollY + 4,
+              left: rect.left + window.scrollX
+            });
+          }
+
+          setSlashQuery(query);
+          setSlashTriggerBlockId(blockId);
+          setIsSlashMenuOpen(true);
+          slashMenuRef.current = { query, blockId };
+          return;
+        }
+      }
+
+      // Close menu if "/" was removed
+      if (isSlashMenuOpen && !text.includes('/')) {
+        setIsSlashMenuOpen(false);
+        setSlashQuery('');
+        setSlashTriggerBlockId(null);
+      }
+    };
+
+    document.addEventListener('input', handleInput);
+    return () => document.removeEventListener('input', handleInput);
+  }, [isSlashMenuOpen]);
 
   // Handle save
   const handleSave = useCallback(async () => {
@@ -537,6 +912,38 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     navigate('/admin');
   }, [isDirty, navigate]);
 
+  // Handle block type change
+  const handleBlockTypeChange = useCallback(
+    (blockId: string, newType: string) => {
+      const newBlocks = blocks.map((block) => {
+        if (block.id === blockId) {
+          // Convert heading types
+          if (newType.startsWith('core/heading-')) {
+            const level = parseInt(newType.replace('core/heading-h', ''));
+            return {
+              ...block,
+              type: 'core/heading',
+              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '', level },
+              attributes: block.attributes || {},
+            };
+          }
+          // Convert to paragraph
+          if (newType === 'core/paragraph') {
+            return {
+              ...block,
+              type: 'core/paragraph',
+              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '' },
+              attributes: block.attributes || {},
+            };
+          }
+        }
+        return block;
+      });
+      updateBlocks(newBlocks);
+    },
+    [blocks, updateBlocks]
+  );
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -609,9 +1016,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         }
       }
       // Enter key to add new block after selected
-      if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      // Support both Shift+Enter (forced) and regular Enter (when content is empty)
+      if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
         const target = e.target as HTMLElement;
-        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+
+        // Skip if in input or textarea
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          return;
+        }
+
+        // Shift+Enter: Always create new block (works in contentEditable too)
+        if (e.shiftKey) {
           e.preventDefault();
           if (selectedBlockId) {
             const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
@@ -626,30 +1041,157 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             updateBlocks(newBlocks);
             setSelectedBlockId(newBlock.id);
             setIsDirty(true);
+
+            // Focus the new block
+            setTimeout(() => {
+              const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+              if (newBlockElement) {
+                const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+                if (editableElement) {
+                  editableElement.focus();
+                }
+              }
+            }, 50);
+          }
+          return;
+        }
+
+        // Regular Enter: Smart block-specific behavior
+        if (!e.shiftKey) {
+          // If in contentEditable, check if content is empty
+          if (target.isContentEditable) {
+            const block = blocks.find(b => b.id === selectedBlockId);
+            if (block) {
+              const isEmpty = !block.content ||
+                             (typeof block.content === 'string' && !block.content.trim()) ||
+                             (typeof block.content === 'object' && 'text' in block.content && !block.content.text?.trim());
+
+              if (isEmpty) {
+                e.preventDefault();
+                const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+
+                // Smart behavior based on block type
+                let newBlockType = 'core/paragraph';
+
+                // Heading → always Paragraph
+                if (block.type === 'core/heading') {
+                  newBlockType = 'core/paragraph';
+                }
+                // Quote → always Paragraph
+                else if (block.type === 'core/quote') {
+                  newBlockType = 'core/paragraph';
+                }
+                // List → exit list (create Paragraph)
+                else if (block.type === 'core/list') {
+                  newBlockType = 'core/paragraph';
+                }
+                // Other blocks → Paragraph
+                else {
+                  newBlockType = 'core/paragraph';
+                }
+
+                const newBlock: Block = {
+                  id: `block-${Date.now()}`,
+                  type: newBlockType,
+                  content: { text: '' },
+                  attributes: {},
+                };
+                const newBlocks = [...blocks];
+                newBlocks.splice(currentIndex + 1, 0, newBlock);
+                updateBlocks(newBlocks);
+                setSelectedBlockId(newBlock.id);
+                setIsDirty(true);
+
+                // Focus the new block
+                setTimeout(() => {
+                  const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+                  if (newBlockElement) {
+                    const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+                    if (editableElement) {
+                      editableElement.focus();
+                    }
+                  }
+                }, 50);
+              }
+            }
+          } else {
+            // Outside contentEditable: works as before
+            e.preventDefault();
+            if (selectedBlockId) {
+              const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+              const newBlock: Block = {
+                id: `block-${Date.now()}`,
+                type: 'core/paragraph',
+                content: { text: '' },
+                attributes: {},
+              };
+              const newBlocks = [...blocks];
+              newBlocks.splice(currentIndex + 1, 0, newBlock);
+              updateBlocks(newBlocks);
+              setSelectedBlockId(newBlock.id);
+              setIsDirty(true);
+            }
           }
         }
       }
       // Backspace to delete empty selected block
       if (e.key === 'Backspace' && selectedBlockId) {
         const target = e.target as HTMLElement;
-        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+
+        // Check if we should delete the block
+        const shouldDeleteBlock = () => {
           const block = blocks.find(b => b.id === selectedBlockId);
-          if (block) {
-            const isEmpty = !block.content ||
-                           (typeof block.content === 'string' && !block.content.trim()) ||
-                           (typeof block.content === 'object' && 'text' in block.content && !block.content.text?.trim());
-            if (isEmpty && blocks.length > 1) {
-              e.preventDefault();
-              const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
-              handleBlockDelete(selectedBlockId);
-              // Select previous block if available, otherwise next
-              if (currentIndex > 0) {
-                setSelectedBlockId(blocks[currentIndex - 1].id);
-              } else if (blocks.length > 1) {
-                setSelectedBlockId(blocks[currentIndex + 1].id);
-              }
+          if (!block || blocks.length <= 1) return false;
+
+          const isEmpty = !block.content ||
+                         (typeof block.content === 'string' && !block.content.trim()) ||
+                         (typeof block.content === 'object' && 'text' in block.content && !block.content.text?.trim());
+
+          if (!isEmpty) return false;
+
+          // If in contentEditable, check cursor position
+          if (target.isContentEditable) {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+              const range = selection.getRangeAt(0);
+              // Only delete if cursor is at the start (offset 0)
+              return range.startOffset === 0 && range.endOffset === 0;
             }
+            return false;
           }
+
+          // Outside contentEditable, allow deletion
+          return target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA';
+        };
+
+        if (shouldDeleteBlock()) {
+          e.preventDefault();
+          const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+          handleBlockDelete(selectedBlockId);
+
+          // Select previous block if available, otherwise next
+          setTimeout(() => {
+            if (currentIndex > 0) {
+              setSelectedBlockId(blocks[currentIndex - 1].id);
+              // Focus the previous block
+              const prevBlockElement = document.querySelector(`[data-block-id="${blocks[currentIndex - 1].id}"]`);
+              if (prevBlockElement) {
+                const editableElement = prevBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+                if (editableElement) {
+                  editableElement.focus();
+                  // Move cursor to end
+                  const range = document.createRange();
+                  const sel = window.getSelection();
+                  range.selectNodeContents(editableElement);
+                  range.collapse(false);
+                  sel?.removeAllRanges();
+                  sel?.addRange(range);
+                }
+              }
+            } else if (blocks.length > 1) {
+              setSelectedBlockId(blocks[1].id);
+            }
+          }, 10);
         }
       }
       // Ctrl/Cmd + D to duplicate block
@@ -662,43 +1204,125 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         e.preventDefault();
         handleRedo();
       }
+
+      // Text formatting shortcuts (Cmd+B/I/U/K/Shift+X)
+      // Only work in contentEditable elements (text blocks)
+      const target = e.target as HTMLElement;
+      if (target.isContentEditable || target.getAttribute('contenteditable') === 'true') {
+        // Cmd+B for Bold
+        if ((e.ctrlKey || e.metaKey) && e.key === 'b' && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('bold', false);
+        }
+
+        // Cmd+I for Italic
+        if ((e.ctrlKey || e.metaKey) && e.key === 'i' && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('italic', false);
+        }
+
+        // Cmd+U for Underline
+        if ((e.ctrlKey || e.metaKey) && e.key === 'u' && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('underline', false);
+        }
+
+        // Cmd+Shift+X for Strikethrough
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'x') {
+          e.preventDefault();
+          document.execCommand('strikeThrough', false);
+        }
+
+        // Cmd+K for Link
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k' && !e.shiftKey) {
+          e.preventDefault();
+          const selection = window.getSelection();
+          if (selection && selection.toString()) {
+            const url = prompt('Enter URL:', 'https://');
+            if (url) {
+              document.execCommand('createLink', false, url);
+            }
+          } else {
+            showToast('Please select text to create a link', 'info');
+          }
+        }
+      }
+
+      // Copy/Paste shortcuts (Cmd+C/V)
+      // Cmd+C to copy selected block
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedBlockId) {
+        // Only intercept if not in contentEditable (allow native copy in text)
+        if (!target.isContentEditable && target.getAttribute('contenteditable') !== 'true') {
+          e.preventDefault();
+          handleBlockCopy(selectedBlockId);
+        }
+      }
+
+      // Cmd+V to paste block
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+        // Only intercept if not in contentEditable (allow native paste in text)
+        if (!target.isContentEditable && target.getAttribute('contenteditable') !== 'true') {
+          e.preventDefault();
+          handleBlockPaste(selectedBlockId || undefined);
+        }
+      }
+
+      // Cmd+/ to trigger slash command
+      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        if (selectedBlockId && target.isContentEditable) {
+          // Insert "/" at cursor position to trigger slash menu
+          document.execCommand('insertText', false, '/');
+        } else {
+          showToast('Slash commands work in text blocks. Try typing "/" in a paragraph.', 'info');
+        }
+      }
+
+      // Cmd+Opt+I to open Block Inserter
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'i') {
+        e.preventDefault();
+        setIsBlockInserterOpen(prev => !prev);
+      }
+
+      // Ctrl+Opt+T or Cmd+Opt+T to show block type converter
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 't') {
+        e.preventDefault();
+        if (selectedBlockId) {
+          const block = blocks.find(b => b.id === selectedBlockId);
+          if (block && (block.type === 'core/paragraph' || block.type === 'core/heading')) {
+            // Cycle through: paragraph → h2 → h3 → h4 → paragraph
+            if (block.type === 'core/paragraph') {
+              handleBlockTypeChange(selectedBlockId, 'core/heading-h2');
+              showToast('Changed to Heading 2', 'success');
+            } else if (block.type === 'core/heading') {
+              const level = (block.content as any)?.level || 2;
+              if (level === 2) {
+                handleBlockTypeChange(selectedBlockId, 'core/heading-h3');
+                showToast('Changed to Heading 3', 'success');
+              } else if (level === 3) {
+                handleBlockTypeChange(selectedBlockId, 'core/heading-h4');
+                showToast('Changed to Heading 4', 'success');
+              } else {
+                handleBlockTypeChange(selectedBlockId, 'core/paragraph');
+                showToast('Changed to Paragraph', 'success');
+              }
+            }
+          } else {
+            showToast('Block type conversion works for text blocks only', 'info');
+          }
+        }
+      }
+
+      // Shift+Alt+H to show keyboard shortcuts help
+      if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        showToast('Keyboard Shortcuts: Cmd+K (Link), Cmd+Shift+X (Strikethrough), Cmd+/ (Slash menu), Cmd+Opt+I (Inserter), Ctrl+Opt+T (Block type), Cmd+B/I/U (Format)', 'info');
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen, selectedBlockId, blocks, handleBlockDelete, handleDuplicate, updateBlocks]);
-
-  // Handle block type change
-  const handleBlockTypeChange = useCallback(
-    (blockId: string, newType: string) => {
-      const newBlocks = blocks.map((block) => {
-        if (block.id === blockId) {
-          // Convert heading types
-          if (newType.startsWith('core/heading-')) {
-            const level = parseInt(newType.replace('core/heading-h', ''));
-            return {
-              ...block,
-              type: 'core/heading',
-              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '', level },
-              attributes: block.attributes || {},
-            };
-          }
-          // Convert to paragraph
-          if (newType === 'core/paragraph') {
-            return {
-              ...block,
-              type: 'core/paragraph',
-              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '' },
-              attributes: block.attributes || {},
-            };
-          }
-        }
-        return block;
-      });
-      updateBlocks(newBlocks);
-    },
-    [blocks, updateBlocks]
-  );
+  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen, selectedBlockId, blocks, handleBlockDelete, handleDuplicate, updateBlocks, handleBlockCopy, handleBlockPaste, handleBlockTypeChange, showToast]);
 
   // Handle template application
   const handleApplyTemplate = useCallback(
@@ -758,6 +1382,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       onCopy: () => handleBlockCopy(block.id),
       onPaste: () => handleBlockPaste(block.id),
       onChangeType: (newType: string) => handleBlockTypeChange(block.id, newType),
+      onUpdate: (updates: any) => {
+        const newBlocks = blocks.map(b =>
+          b.id === block.id ? { ...b, ...updates } : b
+        );
+        updateBlocks(newBlocks);
+      },
       onInnerBlocksChange: (newInnerBlocks: Block[]) => {
         const newBlocks = blocks.map(b =>
           b.id === block.id ? { ...b, innerBlocks: newInnerBlocks } : b
@@ -1018,6 +1648,21 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           showToast('AI 페이지가 생성되었습니다!', 'success');
         }}
       />
+
+      {/* Slash Command Menu */}
+      {isSlashMenuOpen && (
+        <SlashCommandMenu
+          query={slashQuery}
+          onSelectBlock={handleSlashCommandSelect}
+          onClose={() => {
+            setIsSlashMenuOpen(false);
+            setSlashQuery('');
+            setSlashTriggerBlockId(null);
+          }}
+          position={slashMenuPosition}
+          recentBlocks={recentBlocks}
+        />
+      )}
     </div>
   );
 };

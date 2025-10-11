@@ -6,6 +6,7 @@
 import React, { useState, useRef } from 'react';
 import { BlockDragHandle } from './BlockDragHandle';
 import { BlockControls } from './BlockControls';
+import { BlockToolbar } from './BlockToolbar';
 
 interface BlockWrapperProps {
   blockId: string;
@@ -22,6 +23,8 @@ interface BlockWrapperProps {
   onDelete?: (blockId: string) => void;
   onMoveUp?: (blockId: string) => void;
   onMoveDown?: (blockId: string) => void;
+  onUpdate?: (updates: any) => void;
+  onChangeType?: (newType: string) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   className?: string;
@@ -42,12 +45,15 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   onDelete,
   onMoveUp,
   onMoveDown,
+  onUpdate,
+  onChangeType,
   canMoveUp = true,
   canMoveDown = true,
   className = ''
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDropTarget, setIsDropTarget] = useState(false);
+  const [dropPosition, setDropPosition] = useState<'before' | 'after' | null>(null);
   const blockRef = useRef<HTMLDivElement>(null);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -69,6 +75,18 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
+
+    // Calculate drop position based on mouse Y position
+    if (blockRef.current) {
+      const rect = blockRef.current.getBoundingClientRect();
+      const mouseY = e.clientY;
+      const blockMiddle = rect.top + rect.height / 2;
+
+      // Determine if dropping before or after
+      const position = mouseY < blockMiddle ? 'before' : 'after';
+      setDropPosition(position);
+    }
+
     setIsDropTarget(true);
     onDragOver?.(blockId, e);
   };
@@ -76,13 +94,20 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDropTarget(false);
+
+    // Only clear if leaving the block entirely
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (!blockRef.current?.contains(relatedTarget)) {
+      setIsDropTarget(false);
+      setDropPosition(null);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDropTarget(false);
+    setDropPosition(null);
 
     const draggedBlockId = e.dataTransfer.getData('application/block-id') ||
                            e.dataTransfer.getData('text/plain');
@@ -98,68 +123,91 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
     isMultiSelected && 'is-multi-selected',
     isHovered && 'is-hovered',
     isDropTarget && 'is-drop-target',
+    isDropTarget && dropPosition === 'before' && 'is-drop-before',
+    isDropTarget && dropPosition === 'after' && 'is-drop-after',
     className
   ].filter(Boolean).join(' ');
 
   return (
-    <div
-      ref={blockRef}
-      className={classNames}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      data-block-id={blockId}
-      data-block-type={blockType}
-      tabIndex={isSelected ? 0 : -1}
-      role="article"
-      aria-label={`${blockType.replace('core/', '').replace('o4o/', '')} block${isSelected ? ', selected' : ''}`}
-      aria-selected={isSelected}
-      aria-describedby={isSelected ? `block-desc-${blockId}` : undefined}
-    >
-      {/* Drag Handle */}
-      <BlockDragHandle
-        blockId={blockId}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      />
+    <>
+      <div
+        ref={blockRef}
+        className={classNames}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        data-block-id={blockId}
+        data-block-type={blockType}
+        tabIndex={isSelected ? 0 : -1}
+        role="article"
+        aria-label={`${blockType.replace('core/', '').replace('o4o/', '')} block${isSelected ? ', selected' : ''}`}
+        aria-selected={isSelected}
+        aria-describedby={isSelected ? `block-desc-${blockId}` : undefined}
+      >
+        {/* Drag Handle */}
+        <BlockDragHandle
+          blockId={blockId}
+          blockType={blockType}
+          multiSelectedCount={isMultiSelected ? 1 : 0}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+        />
 
-      {/* Block Type Label */}
-      <div className="block-editor-block__type-label">
-        {blockType}
-      </div>
-
-      {/* Block Controls */}
-      <BlockControls
-        blockId={blockId}
-        onDuplicate={onDuplicate}
-        onDelete={onDelete}
-        onMoveUp={onMoveUp}
-        onMoveDown={onMoveDown}
-        canMoveUp={canMoveUp}
-        canMoveDown={canMoveDown}
-      />
-
-      {/* Block Content */}
-      <div className="block-editor-block__content">
-        {children}
-      </div>
-
-      {/* Screen reader description */}
-      {isSelected && (
-        <div id={`block-desc-${blockId}`} className="sr-only">
-          {blockType.replace('core/', '').replace('o4o/', '')} block is selected.
-          Press Tab to move to next block, Shift+Tab for previous.
-          Press Enter to add a new block after this one.
-          Press Delete or Backspace to remove empty blocks.
-          Press Ctrl+D to duplicate this block.
-          {canMoveUp && ' Press up arrow to select previous block.'}
-          {canMoveDown && ' Press down arrow to select next block.'}
+        {/* Block Type Label */}
+        <div className="block-editor-block__type-label">
+          {blockType}
         </div>
+
+        {/* Block Controls */}
+        <BlockControls
+          blockId={blockId}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
+          onMoveUp={onMoveUp}
+          onMoveDown={onMoveDown}
+          canMoveUp={canMoveUp}
+          canMoveDown={canMoveDown}
+        />
+
+        {/* Block Content */}
+        <div className="block-editor-block__content">
+          {children}
+        </div>
+
+        {/* Screen reader description */}
+        {isSelected && (
+          <div id={`block-desc-${blockId}`} className="sr-only">
+            {blockType.replace('core/', '').replace('o4o/', '')} block is selected.
+            Press Tab to move to next block, Shift+Tab for previous.
+            Press Enter to add a new block after this one.
+            Press Delete or Backspace to remove empty blocks.
+            Press Ctrl+D to duplicate this block.
+            {canMoveUp && ' Press up arrow to select previous block.'}
+            {canMoveDown && ' Press down arrow to select next block.'}
+          </div>
+        )}
+      </div>
+
+      {/* Block Toolbar (Portal) */}
+      {isSelected && (
+        <BlockToolbar
+          blockId={blockId}
+          blockType={blockType}
+          blockElement={blockRef.current}
+          onUpdate={onUpdate}
+          onDelete={() => onDelete?.(blockId)}
+          onDuplicate={() => onDuplicate?.(blockId)}
+          onMoveUp={() => onMoveUp?.(blockId)}
+          onMoveDown={() => onMoveDown?.(blockId)}
+          onChangeType={onChangeType}
+          canMoveUp={canMoveUp}
+          canMoveDown={canMoveDown}
+        />
       )}
-    </div>
+    </>
   );
 };
 
