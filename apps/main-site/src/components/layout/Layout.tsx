@@ -93,7 +93,17 @@ const Layout: FC<LayoutProps> = ({
           // Apply theme if specified in metadata
           if (result.data.metadata?.theme) {
             const themeClass = `theme-${result.data.metadata.theme}`;
-            document.documentElement.className = themeClass;
+
+            // Remove all existing theme-* classes without removing other classes (e.g., 'dark')
+            const existingClasses = document.documentElement.className.split(' ');
+            existingClasses.forEach(cls => {
+              if (cls.startsWith('theme-')) {
+                document.documentElement.classList.remove(cls);
+              }
+            });
+
+            // Add the new theme class
+            document.documentElement.classList.add(themeClass);
           }
         }
       } catch (error) {
