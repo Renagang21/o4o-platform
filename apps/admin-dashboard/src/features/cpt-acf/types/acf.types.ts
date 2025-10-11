@@ -61,6 +61,7 @@ export type FieldType =
   | 'number'
   | 'email'
   | 'url'
+  | 'link'
   | 'select'
   | 'checkbox'
   | 'radio'
@@ -107,6 +108,12 @@ export interface FieldLayout {
   label: string;
   display: 'table' | 'block' | 'row';
   subFields: CustomField[];
+}
+
+export interface LinkValue {
+  url: string;
+  title?: string;
+  target?: '_blank' | '_self';
 }
 
 export interface FieldValue {
