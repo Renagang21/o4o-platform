@@ -85,7 +85,7 @@ class AIValidationService {
       if (!force && this.lastFetched) {
         const cacheAge = Date.now() - this.lastFetched.getTime();
         if (cacheAge < this.CACHE_DURATION_MS) {
-          console.log('Using cached schema, age:', Math.floor(cacheAge / 1000), 's');
+          // Using cached schema
           return;
         }
       }
@@ -102,7 +102,6 @@ class AIValidationService {
 
       // 304 Not Modified - schema unchanged
       if (response.status === 304) {
-        console.log('Schema unchanged (304 Not Modified)');
         this.lastFetched = new Date();
         return;
       }
@@ -126,12 +125,6 @@ class AIValidationService {
 
       // Store ETag for caching
       this.etag = response.headers['etag'] || null;
-
-      console.log('Schema loaded successfully:', {
-        version: this.schemaVersion,
-        lastUpdated: metadata.lastUpdated,
-        etag: this.etag
-      });
 
     } catch (error: any) {
       console.error('Failed to fetch schema:', error);

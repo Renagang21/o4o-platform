@@ -97,7 +97,7 @@ export const useAIJob = () => {
       const data = JSON.parse(event.data);
 
       if (data.type === 'connected') {
-        console.log('SSE connected for job:', data.jobId);
+        // SSE connection established
       }
 
       if (data.type === 'progress') {
