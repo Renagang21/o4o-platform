@@ -491,6 +491,7 @@ export default function FieldGroupEditor() {
         <FieldEditor
           field={editingField}
           cptTypes={cptTypes}
+          allFields={formData.fields}
           onSave={handleSaveField}
           onCancel={() => {
             setShowFieldEditor(false);

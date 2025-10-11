@@ -41,7 +41,8 @@ export interface CustomField {
   allowNull?: boolean;
   multiple?: boolean;
   returnFormat?: string;
-  conditional?: FieldConditional;
+  conditional?: FieldConditional; // Legacy single condition
+  conditionalLogic?: ConditionalLogic; // New multi-condition logic
   wrapper?: {
     width?: string;
     class?: string;
@@ -96,10 +97,40 @@ export interface FieldLocation {
   value: string;
 }
 
+// Legacy single condition (for backward compatibility)
 export interface FieldConditional {
   field: string;
   operator: '==' | '!=' | 'empty' | '!empty' | '>' | '<';
   value: any;
+}
+
+// Conditional Logic Operator Types
+export type ConditionalOperator =
+  | '=='
+  | '!='
+  | '>'
+  | '<'
+  | '>='
+  | '<='
+  | 'contains'
+  | 'not_contains'
+  | 'empty'
+  | '!empty'
+  | 'pattern' // regex pattern match
+  | '!pattern';
+
+// Single conditional rule
+export interface ConditionalRule {
+  field: string; // field name/key to check
+  operator: ConditionalOperator;
+  value: any;
+}
+
+// Multi-condition logic with AND/OR support
+export interface ConditionalLogic {
+  enabled: boolean;
+  logic: 'and' | 'or'; // how to combine rules
+  rules: ConditionalRule[];
 }
 
 export interface FieldLayout {

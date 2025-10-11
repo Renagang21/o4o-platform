@@ -53,3 +53,10 @@ export {
   usePreviewUrl,
   useBlockEditor,
 } from './useBlockData';
+
+// Conditional Logic hooks
+export {
+  useConditionalLogic,
+  useFieldDependencies,
+  useDebouncedFieldValues,
+} from './useConditionalLogic';
