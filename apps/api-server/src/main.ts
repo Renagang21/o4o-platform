@@ -241,12 +241,28 @@ const publicLimiter = rateLimit({
 
 
 // 미들웨어 설정
+// Sprint 2 - P3: Restore Helmet security headers
 app.use(helmet({
-  contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
-  frameguard: false, // Disable X-Frame-Options for iframe preview support
+  // Enable Content Security Policy with sensible defaults
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Allow inline scripts for React
+      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+      imgSrc: ["'self'", "data:", "https:", "http:"], // Allow images from any HTTPS source
+      connectSrc: ["'self'", "https:", "http:"], // Allow API connections
+      fontSrc: ["'self'", "data:", "https:"], // Allow fonts
+      objectSrc: ["'none'"], // Block plugins
+      mediaSrc: ["'self'", "https:", "http:"], // Allow media
+      frameSrc: ["'self'"], // Allow same-origin frames only (preview overrides this)
+      frameAncestors: ["'none'"], // Default: no framing (preview overrides this per route)
+    },
+  },
+  // Enable frameguard with DENY by default (preview route overrides this)
+  frameguard: { action: 'deny' },
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin access to resources
   crossOriginEmbedderPolicy: false, // Disable COEP to allow loading cross-origin resources
-  crossOriginOpenerPolicy: false, // Disable COOP for better compatibility
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }, // Safer than false
 }));
 
 // Enable compression for all responses
@@ -263,12 +279,14 @@ app.use(compression({
 }) as any);
 
 // CORS configuration for multiple origins
+// Sprint 2 - P3: Stricter CORS whitelist
 const corsOptions: CorsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Get allowed origins from environment variable
     const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((o: any) => o.trim()) : [];
-    
-    const allowedOrigins = [
+
+    // Development origins (localhost)
+    const devOrigins = [
       process.env.FRONTEND_URL || "http://localhost:3011",
       "http://localhost:3000", // main-site
       "http://localhost:3001", // admin dashboard
@@ -279,57 +297,68 @@ const corsOptions: CorsOptions = {
       "http://localhost:5175", // vite dev server - ecommerce
       "http://localhost:5176", // vite dev server - crowdfunding
       "http://localhost:5177", // vite dev server - signage
-      // Web server IPs
-      "http://13.125.144.8:3000", // web server main-site
-      "http://13.125.144.8:3001", // web server admin-dashboard
-      "http://13.125.144.8", // web server direct IP
-      "https://13.125.144.8", // web server direct IP (https)
-      // Production domains
+    ];
+
+    // IP-based origins (development/staging only)
+    const ipOrigins = process.env.NODE_ENV !== 'production' ? [
+      "http://13.125.144.8:3000",
+      "http://13.125.144.8:3001",
+      "http://13.125.144.8",
+      "https://13.125.144.8",
+    ] : [];
+
+    // Production domains (explicit subdomain whitelist)
+    const prodOrigins = [
       "https://neture.co.kr",
       "https://www.neture.co.kr",
       "https://admin.neture.co.kr",
-      "http://admin.neture.co.kr", // Allow both http and https for admin
       "https://shop.neture.co.kr",
       "https://forum.neture.co.kr",
       "https://signage.neture.co.kr",
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
-      "https://api.neture.co.kr", // API server itself
-      "http://api.neture.co.kr",
-      // Add environment-defined origins
+      "https://api.neture.co.kr",
+    ];
+
+    const allowedOrigins = [
+      ...devOrigins,
+      ...ipOrigins,
+      ...prodOrigins,
       ...envOrigins
     ];
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
+
+    // Sprint 2 - P3: Reject requests with no origin in production
+    // (Development: allow for testing with curl/Postman)
     if (!origin) {
-      callback(null, true);
-      return;
+      if (process.env.NODE_ENV === 'production') {
+        logger.warn('[CORS] Blocked request with no origin (production mode)');
+        callback(new Error('Origin header required'));
+        return;
+      } else {
+        // Allow in development for easier testing
+        callback(null, true);
+        return;
+      }
     }
-    
+
     // Debug logging in development
     if (process.env.NODE_ENV !== 'production' || process.env.DEBUG_CORS === 'true') {
       logger.debug(`[CORS] Request from origin: ${origin}`);
       logger.debug(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
     }
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      // In production, allow any *.neture.co.kr subdomain
-      if (process.env.NODE_ENV === 'production' && origin && origin.endsWith('.neture.co.kr')) {
-        logger.info(`[CORS] Allowing subdomain: ${origin}`);
-        callback(null, true);
-      } else {
-        logger.warn(`[CORS] Blocked origin: ${origin}`);
-        logger.warn(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
-        callback(new Error('Not allowed by CORS'));
-      }
+      logger.warn(`[CORS] Blocked origin: ${origin}`);
+      logger.warn(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After'],
   maxAge: 86400, // 24 hours
   preflightContinue: false,
   optionsSuccessStatus: 204
