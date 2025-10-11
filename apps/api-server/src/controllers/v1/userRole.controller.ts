@@ -309,6 +309,67 @@ export class UserRoleController {
     }
   }
 
+  static async getUserPermissions(req: Request, res: Response): Promise<void> {
+    try {
+      const { id: userId } = req.params;
+
+      const user = await UserRoleController.userRepository.findOne({
+        where: { id: userId },
+        select: ['id', 'email', 'name', 'role', 'status']
+      });
+
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+        return;
+      }
+
+      const userPermissions = ROLE_PERMISSIONS[user.role];
+      const allPermissions = Object.entries(PERMISSIONS).map(([key, description]) => ({
+        key,
+        description,
+        granted: userPermissions.includes(key)
+      }));
+
+      // Group permissions by category
+      const groupedPermissions = {
+        users: allPermissions.filter(p => p.key.startsWith('users.')),
+        content: allPermissions.filter(p => p.key.startsWith('content.')),
+        admin: allPermissions.filter(p => p.key.startsWith('admin.')),
+        acf: allPermissions.filter(p => p.key.startsWith('acf.')),
+        cpt: allPermissions.filter(p => p.key.startsWith('cpt.')),
+        shortcodes: allPermissions.filter(p => p.key.startsWith('shortcodes.')),
+        api: allPermissions.filter(p => p.key.startsWith('api.'))
+      };
+
+      res.status(200).json({
+        success: true,
+        data: {
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            status: user.status
+          },
+          permissions: allPermissions,
+          groupedPermissions,
+          rolePermissions: userPermissions,
+          totalPermissions: allPermissions.length,
+          grantedPermissions: userPermissions.length
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
   static async checkUserPermission(req: Request, res: Response): Promise<void> {
     try {
       const { id: userId } = req.params;
