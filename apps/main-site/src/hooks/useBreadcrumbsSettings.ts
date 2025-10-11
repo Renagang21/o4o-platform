@@ -37,20 +37,25 @@ export const useBreadcrumbsSettings = () => {
     const fetchSettings = async () => {
       try {
         setIsLoading(true);
-        
-        // Fetch from API
-        const response = await fetch('/api/customizer/breadcrumbs-settings');
-        
+
+        // Fetch from new API endpoint
+        const response = await fetch('/api/v1/customizer/breadcrumbs-settings');
+
         if (!response.ok) {
           throw new Error('Failed to fetch breadcrumbs settings');
         }
-        
-        const data = await response.json();
-        
+
+        const result = await response.json();
+
+        // Extract data from API response (format: { success: true, data: {...} })
+        if (!result.success || !result.data) {
+          throw new Error('Invalid API response format');
+        }
+
         // Merge with defaults to ensure all properties exist
         setSettings({
           ...defaultSettings,
-          ...data
+          ...result.data
         });
       } catch (err) {
         console.error('Error fetching breadcrumbs settings:', err);

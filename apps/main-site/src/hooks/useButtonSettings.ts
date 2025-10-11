@@ -65,16 +65,23 @@ export const useButtonSettings = () => {
     const fetchSettings = async () => {
       try {
         setIsLoading(true);
-        
-        // Fetch from API
-        const response = await fetch('/api/customizer/button-settings');
-        
+
+        // Fetch from new API endpoint
+        const response = await fetch('/api/v1/customizer/button-settings');
+
         if (!response.ok) {
           throw new Error('Failed to fetch button settings');
         }
-        
-        const data = await response.json();
-        
+
+        const result = await response.json();
+
+        // Extract data from API response (format: { success: true, data: {...} })
+        if (!result.success || !result.data) {
+          throw new Error('Invalid API response format');
+        }
+
+        const data = result.data;
+
         // Merge with defaults to ensure all properties exist
         const mergedSettings: ButtonVariants = {
           primary: { ...defaultButtonStyle, ...data.primary },
@@ -83,7 +90,7 @@ export const useButtonSettings = () => {
           text: data.text ? { ...defaultButtonStyle, ...defaultSettings.text, ...data.text } : defaultSettings.text,
           global: { ...defaultSettings.global, ...data.global }
         };
-        
+
         setSettings(mergedSettings);
       } catch (err) {
         console.error('Error fetching button settings:', err);

@@ -29,18 +29,28 @@ export const useScrollToTopSettings = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        // Try to get settings from API
-        const response = await fetch('/api/customizer/settings/scrollToTop');
-        
+        // Get settings from new API endpoint
+        const response = await fetch('/api/v1/customizer/scroll-to-top');
+
         if (response.ok) {
-          const data = await response.json();
-          setSettings({
-            ...defaultSettings,
-            ...data
-          });
+          const result = await response.json();
+
+          // Extract data from API response (format: { success: true, data: {...} })
+          if (result.success && result.data) {
+            setSettings({
+              ...defaultSettings,
+              ...result.data
+            });
+          } else {
+            setSettings(defaultSettings);
+          }
+        } else {
+          // API error - use default settings
+          setSettings(defaultSettings);
         }
       } catch (error) {
-        // console.log('Using default scroll to top settings');
+        console.error('Failed to fetch scroll-to-top settings:', error);
+        setSettings(defaultSettings);
       } finally {
         setLoading(false);
       }
