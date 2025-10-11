@@ -102,6 +102,7 @@ import postsRoutes from './routes/posts';
 import reusableBlocksRoutes from './routes/reusable-blocks.routes';
 import blockPatternsRoutes from './routes/block-patterns.routes';
 import aiShortcodesRoutes from './routes/ai-shortcodes';
+import aiBlocksRoutes from './routes/ai-blocks';
 import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
 import menusRoutes from './routes/menus';
@@ -612,6 +613,9 @@ app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management rout
 
 // AI Shortcodes API (public access for AI page generation)
 app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
+
+// AI Blocks API (SSOT for AI page generation)
+app.use('/api/ai/blocks', publicLimiter, aiBlocksRoutes);
 
 // AI Settings API (admin only)
 app.use('/api/v1/ai-settings', limiter, aiSettingsRoutes);
