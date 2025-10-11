@@ -283,9 +283,11 @@ export const ACFShortcodeRenderer: React.FC<ACFShortcodeRendererProps> = ({
   className = '',
 }) => {
   // Replace [acf] shortcodes
-  const processed = replaceShortcodes(content, 'acf', (match, index) =>
-    renderACFShortcode(match, index, fields, values)
-  );
+  let index = 0;
+  const processed = replaceShortcodes(content, 'acf', (match) => {
+    const result = renderACFShortcode(match, index++, fields, values);
+    return result;
+  });
 
   return (
     <div className={`acf-shortcode-content ${className}`}>

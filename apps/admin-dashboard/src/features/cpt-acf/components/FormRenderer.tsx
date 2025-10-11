@@ -118,13 +118,12 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
           ? `/api/cpt-engine/forms/${formId}`
           : `/api/cpt-engine/forms/slug/${formSlug}`;
 
-        const response = await authClient.fetch(endpoint);
-        const data = await response.json();
+        const response = await authClient.api.get(endpoint);
 
-        if (data.success && data.data) {
-          setFormData(data.data);
+        if (response.success && response.data) {
+          setFormData(response.data);
         } else {
-          throw new Error(data.error || 'Failed to load form');
+          throw new Error(response.error || 'Failed to load form');
         }
       } catch (error) {
         console.error('FormRenderer: Error loading form:', error);
@@ -248,16 +247,10 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
         await customSubmit(values);
       } else {
         // Default submit handler
-        const response = await authClient.fetch('/api/cpt-engine/forms/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            formId: formData?.id,
-            values,
-          }),
+        const result = await authClient.api.post('/api/cpt-engine/forms/submit', {
+          formId: formData?.id,
+          values,
         });
-
-        const result = await response.json();
 
         if (!result.success) {
           throw new Error(result.error || 'Form submission failed');
