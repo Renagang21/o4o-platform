@@ -236,8 +236,8 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     }
   }, [renderSubField, handleRowFieldChange, disabled]);
 
-  // Render single row
-  const renderRow = useCallback((row: RepeaterRow, index: number) => {
+  // Render single row (Block layout)
+  const renderBlockRow = useCallback((row: RepeaterRow, index: number) => {
     const isCollapsed = collapsedRows.has(row._id);
     const collapsedValue = config.collapsed ? getCollapsedValue(row) : '';
 
@@ -246,7 +246,7 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
         {/* Row Header */}
         <div className="flex items-center justify-between p-3 bg-gray-50 border-b">
           <div className="flex items-center gap-2 flex-1">
-            {/* Drag Handle (placeholder for future drag-drop) */}
+            {/* Drag Handle */}
             <div className="cursor-grab text-gray-400 hover:text-gray-600">
               <GripVertical className="w-4 h-4" />
             </div>
@@ -315,13 +315,112 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     );
   }, [collapsedRows, config, getCollapsedValue, toggleRowCollapse, handleRemoveRow, disabled, rows.length, renderFieldInput]);
 
+  // Render single row (Row layout - compact inline)
+  const renderRowLayoutRow = useCallback((row: RepeaterRow, index: number) => {
+    return (
+      <div key={row._id} className="flex items-center gap-2 p-2 border border-gray-200 rounded-md bg-white mb-2 hover:bg-gray-50">
+        {/* Drag Handle */}
+        <div className="cursor-grab text-gray-400 hover:text-gray-600 flex-shrink-0">
+          <GripVertical className="w-4 h-4" />
+        </div>
+
+        {/* Row Number */}
+        <span className="text-xs font-medium text-gray-600 w-12 flex-shrink-0">
+          #{index + 1}
+        </span>
+
+        {/* Fields in a row */}
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {config.subFields.map((subField, idx) => (
+            <div key={subField.name} className={`flex-1 min-w-0 ${idx < config.subFields.length - 1 ? 'border-r border-gray-200 pr-2' : ''}`}>
+              <div className="text-xs text-gray-500 mb-1 truncate">{subField.label}</div>
+              {renderFieldInput(row, subField)}
+            </div>
+          ))}
+        </div>
+
+        {/* Delete Button */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => handleRemoveRow(row._id)}
+          disabled={disabled || (config.minRows > 0 && rows.length <= config.minRows)}
+          className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+        >
+          <Trash2 className="w-3 h-3" />
+        </Button>
+      </div>
+    );
+  }, [config, renderFieldInput, handleRemoveRow, disabled, rows.length]);
+
+  // Render table layout
+  const renderTableLayout = useCallback(() => {
+    if (rows.length === 0) return null;
+
+    return (
+      <div className="border border-gray-200 rounded-md overflow-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="px-3 py-2 text-left w-16">#</th>
+              {config.subFields.map((subField) => (
+                <th key={subField.name} className="px-3 py-2 text-left font-medium text-gray-700">
+                  {subField.label}
+                  {subField.required && <span className="text-red-500 ml-1">*</span>}
+                </th>
+              ))}
+              <th className="px-3 py-2 w-16"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={row._id} className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
+                {/* Row Number with Drag Handle */}
+                <td className="px-3 py-2">
+                  <div className="flex items-center gap-1">
+                    <div className="cursor-grab text-gray-400 hover:text-gray-600">
+                      <GripVertical className="w-3 h-3" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-600">{index + 1}</span>
+                  </div>
+                </td>
+
+                {/* Field Cells */}
+                {config.subFields.map((subField) => (
+                  <td key={subField.name} className="px-3 py-2">
+                    {renderFieldInput(row, subField)}
+                  </td>
+                ))}
+
+                {/* Delete Button */}
+                <td className="px-3 py-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveRow(row._id)}
+                    disabled={disabled || (config.minRows > 0 && rows.length <= config.minRows)}
+                    className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }, [rows, config, renderFieldInput, handleRemoveRow, disabled]);
+
   // Check if can add more rows
   const canAddRow = !disabled && (config.maxRows === 0 || rows.length < config.maxRows);
 
   return (
     <div className="space-y-3">
-      {/* Header with Collapse/Expand All */}
-      {rows.length > 0 && (
+      {/* Header with Collapse/Expand All (Block layout only) */}
+      {rows.length > 0 && config.layout === 'block' && (
         <div className="flex items-center justify-between pb-2">
           <span className="text-sm font-medium text-gray-700">
             {rows.length} {rows.length === 1 ? 'Row' : 'Rows'}
@@ -348,10 +447,18 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
         </div>
       )}
 
-      {/* Rows List */}
-      {rows.length > 0 && (
+      {/* Rows List - Layout-specific rendering */}
+      {rows.length > 0 && config.layout === 'block' && (
         <div>
-          {rows.map((row, index) => renderRow(row, index))}
+          {rows.map((row, index) => renderBlockRow(row, index))}
+        </div>
+      )}
+
+      {rows.length > 0 && config.layout === 'table' && renderTableLayout()}
+
+      {rows.length > 0 && config.layout === 'row' && (
+        <div>
+          {rows.map((row, index) => renderRowLayoutRow(row, index))}
         </div>
       )}
 
