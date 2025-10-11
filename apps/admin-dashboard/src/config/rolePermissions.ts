@@ -27,11 +27,11 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'dashboard-overview',
-    permissions: ['dashboard:view']
+    // No permissions - available to all authenticated users
   },
   {
     menuId: 'dashboard-stats',
-    permissions: ['dashboard:stats']
+    // No permissions - available to all authenticated users
   },
   
   // User Management - Permission based
@@ -67,19 +67,19 @@ export const menuPermissions: MenuPermission[] = [
   // Seller Management
   {
     menuId: 'sellers',
-    permissions: ['sellers:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'sellers-list',
-    permissions: ['sellers:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'sellers-add',
-    permissions: ['sellers:create']
+    permissions: ['content.view']
   },
   {
     menuId: 'sellers-analytics',
-    permissions: ['sellers:analytics']
+    permissions: ['content.view']
   },
   
   // E-commerce
@@ -101,89 +101,89 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'inventory',
-    permissions: ['inventory:read']
+    permissions: ['content.view']
   },
   
   // Finance
   {
     menuId: 'finance',
-    permissions: ['finance:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'payments',
-    permissions: ['payments:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'invoices',
-    permissions: ['invoices:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'transactions',
-    permissions: ['transactions:read']
+    permissions: ['content.view']
   },
   
   // Marketing
   {
     menuId: 'marketing',
-    permissions: ['marketing:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'campaigns',
-    permissions: ['campaigns:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'promotions',
-    permissions: ['promotions:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'coupons',
-    permissions: ['coupons:read']
+    permissions: ['content.view']
   },
   
   // Support
   {
     menuId: 'support',
-    permissions: ['support:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'tickets',
-    permissions: ['tickets:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'faq',
-    permissions: ['faq:read']
+    permissions: ['content.view']
   },
   
   // Forum
   {
     menuId: 'forum',
-    permissions: ['forum:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'forum-categories',
-    permissions: ['forum:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'forum-topics',
-    permissions: ['forum:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'forum-moderation',
-    permissions: ['forum:moderate']
+    permissions: ['content.view']
   },
   
   // Crowdfunding
   {
     menuId: 'crowdfunding',
-    permissions: ['crowdfunding:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'projects',
-    permissions: ['projects:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'backers',
-    permissions: ['backers:read']
+    permissions: ['content.view']
   },
   
   // CMS
@@ -229,51 +229,51 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'system-settings',
-    permissions: ['settings:system']
+    permissions: ['admin.settings']
   },
   {
     menuId: 'integrations',
-    permissions: ['integrations:manage']
+    permissions: ['admin.settings']
   },
   
   // Appearance
   {
     menuId: 'appearance',
-    permissions: ['appearance:manage']
+    permissions: ['content.view']
   },
   {
     menuId: 'themes',
-    permissions: ['themes:manage']
+    permissions: ['content.view']
   },
   {
     menuId: 'widgets',
-    permissions: ['widgets:manage']
+    permissions: ['content.view']
   },
   {
     menuId: 'menus',
-    permissions: ['menus:manage']
+    permissions: ['content.view']
   },
   {
     menuId: 'customizer',
-    permissions: ['customizer:manage']
+    permissions: ['content.view']
   },
   
   // Tools
   {
     menuId: 'tools',
-    permissions: ['tools:access']
+    permissions: ['admin.settings']
   },
   {
     menuId: 'import-export',
-    permissions: ['tools:import_export']
+    permissions: ['admin.settings']
   },
   {
     menuId: 'database',
-    permissions: ['database:manage']
+    permissions: ['admin.settings']
   },
   {
     menuId: 'logs',
-    permissions: ['logs:view']
+    permissions: ['admin.logs']
   },
   
   // Profile - All authenticated users
