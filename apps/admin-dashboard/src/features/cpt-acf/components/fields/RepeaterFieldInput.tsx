@@ -138,7 +138,23 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     onChange?.(newRows.length > 0 ? newRows : null);
   }, [disabled, config.minRows, rows, onChange]);
 
-  // Update row field value
+  /**
+   * Task 4.2: Nested Value Management
+   *
+   * This callback handles value changes for both simple and nested repeater fields.
+   * For nested repeaters, the fieldValue is the entire nested RepeaterValue array,
+   * which gets stored as a field in the parent row object.
+   *
+   * Example structure:
+   * {
+   *   _id: 'row_123',
+   *   name: 'Product',
+   *   variants: [  // nested repeater value
+   *     { _id: 'row_456', size: 'S', color: 'red' },
+   *     { _id: 'row_789', size: 'M', color: 'blue' }
+   *   ]
+   * }
+   */
   const handleRowFieldChange = useCallback((rowId: string, fieldName: string, fieldValue: any) => {
     if (disabled) return;
 
@@ -365,13 +381,13 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     }
   }, [renderSubField, handleRowFieldChange, disabled, isMaxNestingReached, maxNestingLevel, nestingLevel, instanceId]);
 
-  // Sortable Row Wrapper Component
+  // Sortable Row Wrapper Component (Memoized for performance)
   interface SortableRowWrapperProps {
     id: string;
     children: React.ReactNode;
   }
 
-  const SortableRowWrapper: React.FC<SortableRowWrapperProps> = ({ id, children }) => {
+  const SortableRowWrapper: React.FC<SortableRowWrapperProps> = React.memo(({ id, children }) => {
     const {
       attributes,
       listeners,
@@ -401,7 +417,10 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
         })}
       </div>
     );
-  };
+  });
+
+  // Set display name for React DevTools
+  SortableRowWrapper.displayName = 'SortableRowWrapper';
 
   // Render single row (Block layout)
   const renderBlockRow = useCallback((row: RepeaterRow, index: number, dragListeners?: any) => {
