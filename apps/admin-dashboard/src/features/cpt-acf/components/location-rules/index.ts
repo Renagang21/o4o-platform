@@ -9,3 +9,4 @@ export { LocationRulesEditor } from './LocationRulesEditor';
 export { CurrentUserInfo } from './CurrentUserInfo';
 export { TaxonomyTermSelector } from './TaxonomyTermSelector';
 export { CategorySelector } from './CategorySelector';
+export { TemplateSelector } from './TemplateSelector';

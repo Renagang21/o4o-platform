@@ -8,6 +8,7 @@ import { X, ChevronDown } from 'lucide-react';
 import type { FieldLocation } from '../../types/acf.types';
 import { TaxonomyTermSelector } from './TaxonomyTermSelector';
 import { CategorySelector } from './CategorySelector';
+import { TemplateSelector } from './TemplateSelector';
 
 interface LocationRuleRowProps {
   rule: FieldLocation;
@@ -33,11 +34,13 @@ export const LocationRuleRow: React.FC<LocationRuleRowProps> = ({
 }) => {
   const [showTaxonomySelector, setShowTaxonomySelector] = useState(false);
   const [showCategorySelector, setShowCategorySelector] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const handleParamChange = (param: string) => {
     onChange({ ...rule, param, value: '' });
     setShowTaxonomySelector(false);
     setShowCategorySelector(false);
+    setShowTemplateSelector(false);
   };
 
   const handleOperatorChange = (operator: FieldLocation['operator']) => {
@@ -51,14 +54,18 @@ export const LocationRuleRow: React.FC<LocationRuleRowProps> = ({
   // Check if this param needs special selector
   const needsTaxonomySelector = rule.param === 'post_taxonomy';
   const needsCategorySelector = rule.param === 'post_category';
+  const needsTemplateSelector = rule.param === 'page_template' || rule.param === 'post_template';
 
-  // Get display value for taxonomy/category
+  // Get display value for taxonomy/category/template
   const getDisplayValue = () => {
     if (needsTaxonomySelector && rule.value) {
       const parts = rule.value.split(':');
       return parts.length === 2 ? `${parts[0]}: ${parts[1]}` : rule.value;
     }
     if (needsCategorySelector && rule.value) {
+      return rule.value;
+    }
+    if (needsTemplateSelector && rule.value) {
       return rule.value;
     }
     return rule.value;
@@ -101,12 +108,13 @@ export const LocationRuleRow: React.FC<LocationRuleRowProps> = ({
       </select>
 
       {/* Value Select/Input */}
-      {needsTaxonomySelector || needsCategorySelector ? (
+      {needsTaxonomySelector || needsCategorySelector || needsTemplateSelector ? (
         <button
           type="button"
           onClick={() => {
             if (needsTaxonomySelector) setShowTaxonomySelector(!showTaxonomySelector);
             if (needsCategorySelector) setShowCategorySelector(!showCategorySelector);
+            if (needsTemplateSelector) setShowTemplateSelector(!showTemplateSelector);
           }}
           className="
             flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm text-left
@@ -183,6 +191,20 @@ export const LocationRuleRow: React.FC<LocationRuleRowProps> = ({
             onChange={(value) => {
               handleValueChange(value);
               setShowCategorySelector(false);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Template Selector */}
+      {showTemplateSelector && needsTemplateSelector && (
+        <div className="pl-2 pr-10 border-l-2 border-purple-200">
+          <TemplateSelector
+            type={rule.param === 'page_template' ? 'page' : 'post'}
+            value={rule.value}
+            onChange={(value) => {
+              handleValueChange(value);
+              setShowTemplateSelector(false);
             }}
           />
         </div>

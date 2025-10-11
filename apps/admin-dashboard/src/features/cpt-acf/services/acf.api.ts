@@ -247,30 +247,71 @@ export const acfLocationApi = {
   },
 
   // Get page templates for location rules
-  async getPageTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
-    // This would come from theme or config
+  async getPageTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string; description?: string }>>> {
+    try {
+      // Try to fetch from backend first
+      const response = await authClient.api.get('/api/v1/templates/page');
+      const templates = response.data?.data || response.data || [];
+
+      if (templates.length > 0) {
+        return {
+          success: true,
+          data: templates.map((tpl: any) => ({
+            value: tpl.slug || tpl.template || tpl.value,
+            label: tpl.name || tpl.label || tpl.slug,
+            description: tpl.description
+          }))
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to fetch page templates from API, using defaults:', error);
+    }
+
+    // Fallback to default page templates
     return {
       success: true,
       data: [
-        { value: 'default', label: 'Default Template' },
-        { value: 'full-width', label: 'Full Width' },
-        { value: 'sidebar-left', label: 'Sidebar Left' },
-        { value: 'sidebar-right', label: 'Sidebar Right' },
-        { value: 'landing-page', label: 'Landing Page' },
+        { value: 'default', label: 'Default Template', description: 'Standard page layout' },
+        { value: 'full-width', label: 'Full Width', description: 'Full width without sidebar' },
+        { value: 'sidebar-left', label: 'Sidebar Left', description: 'Sidebar on the left' },
+        { value: 'sidebar-right', label: 'Sidebar Right', description: 'Sidebar on the right' },
+        { value: 'landing-page', label: 'Landing Page', description: 'Marketing landing page' },
+        { value: 'blank', label: 'Blank Template', description: 'Minimal template with no header/footer' },
       ]
     };
   },
 
   // Get post templates for location rules
-  async getPostTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
-    // This would come from theme or config
+  async getPostTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string; description?: string }>>> {
+    try {
+      // Try to fetch from backend first
+      const response = await authClient.api.get('/api/v1/templates/post');
+      const templates = response.data?.data || response.data || [];
+
+      if (templates.length > 0) {
+        return {
+          success: true,
+          data: templates.map((tpl: any) => ({
+            value: tpl.slug || tpl.template || tpl.value,
+            label: tpl.name || tpl.label || tpl.slug,
+            description: tpl.description
+          }))
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to fetch post templates from API, using defaults:', error);
+    }
+
+    // Fallback to default post templates
     return {
       success: true,
       data: [
-        { value: 'default', label: 'Default Template' },
-        { value: 'featured', label: 'Featured Post' },
-        { value: 'gallery', label: 'Gallery Post' },
-        { value: 'video', label: 'Video Post' },
+        { value: 'default', label: 'Default Template', description: 'Standard post layout' },
+        { value: 'featured', label: 'Featured Post', description: 'Highlighted post with large image' },
+        { value: 'gallery', label: 'Gallery Post', description: 'Image gallery layout' },
+        { value: 'video', label: 'Video Post', description: 'Video-focused layout' },
+        { value: 'audio', label: 'Audio Post', description: 'Audio player layout' },
+        { value: 'minimal', label: 'Minimal Post', description: 'Clean, minimal design' },
       ]
     };
   }
