@@ -816,7 +816,7 @@ export interface CustomizerMessage {
  * 커스터마이저 이벤트 핸들러
  */
 export interface CustomizerEventHandlers {
-  onSettingChange?: (section: keyof AstraCustomizerSettings, value: any) => void;
+  onSettingChange?: (section: SettingSection, value: any) => void;
   onSave?: (settings: AstraCustomizerSettings) => Promise<void>;
   onPublish?: (settings: AstraCustomizerSettings) => Promise<void>;
   onReset?: () => void;
@@ -941,8 +941,9 @@ export type DeepPartial<T> = {
 
 /**
  * 설정 섹션 키 타입
+ * Note: 'general' is a UI section that groups scrollToTop, buttons, and breadcrumbs settings
  */
-export type SettingSection = keyof AstraCustomizerSettings;
+export type SettingSection = keyof AstraCustomizerSettings | 'general';
 
 /**
  * 설정 변경 액션 타입
