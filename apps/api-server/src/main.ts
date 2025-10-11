@@ -118,6 +118,7 @@ import appsV1Routes from './routes/v1/apps.routes';
 import pluginsV1Routes from './routes/v1/plugins.routes';
 import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
+import customizerV1Routes from './routes/v1/customizer.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
 import pagesV1Routes from './routes/v1/pages.routes';
@@ -583,6 +584,7 @@ app.get('/api/v1/users/roles', (req, res) => {
 
 // Consolidated settings routes - removed duplicates
 app.use('/api/v1/settings', settingsLimiter, settingsV1Routes);
+app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes); // Customizer API routes
 app.use('/api/settings', settingsLimiter, settingsRoutes); // Primary settings route
 // Removed duplicate: app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
 app.use('/settings', settingsLimiter, settingsRoutes); // Backward compatibility
