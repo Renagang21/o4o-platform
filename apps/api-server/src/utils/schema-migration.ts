@@ -215,7 +215,7 @@ export function migrateCustomizerSettings(settings: any): any {
 
   // Migrate from legacy
   if (version === LEGACY_VERSION) {
-    console.log('[Migration] Migrating customizer settings from legacy to v1.0.0');
+    console.warn('[Migration] Migrating customizer settings from legacy to v1.0.0');
     return migrateFromLegacy(settings);
   }
 
