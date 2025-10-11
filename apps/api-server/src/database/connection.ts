@@ -1,6 +1,8 @@
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from './SnakeNamingStrategy';
 import { User } from '../entities/User';
+import { Role } from '../entities/Role';
+import { Permission } from '../entities/Permission';
 import { RefreshToken } from '../entities/RefreshToken';
 import { LoginAttempt } from '../entities/LoginAttempt';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
@@ -125,6 +127,8 @@ export const AppDataSource = new DataSource({
   // 엔티티 등록 - 모든 환경에서 명시적 엔티티 배열 사용
   entities: [
     User,
+    Role,
+    Permission,
     RefreshToken,
     LoginAttempt,
     PasswordResetToken,
