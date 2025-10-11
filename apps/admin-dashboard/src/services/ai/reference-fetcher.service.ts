@@ -77,7 +77,7 @@ class ReferenceFetcherService {
 
       const reference = this.formatServerReference(blocksRef, shortcodesRef);
 
-      console.log('✅ 서버로부터 최신 참조 데이터 로드 성공');
+      // 서버 참조 데이터 로드 성공
       this.hasWarnedFallback = false;
 
       return reference;
@@ -123,7 +123,6 @@ class ReferenceFetcherService {
 
     // 캐시가 유효한 경우 캐시 사용
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      console.log(`📦 캐시된 ${cacheKey} 데이터 사용`);
       return JSON.parse(cached.data);
     }
 
@@ -163,7 +162,6 @@ class ReferenceFetcherService {
 
     // 304 Not Modified - 캐시 재사용
     if (response.status === 304 && cached) {
-      console.log(`✅ ${cacheKey} 데이터 변경 없음 (304)`);
       cached.timestamp = Date.now(); // 타임스탬프 갱신
       return JSON.parse(cached.data);
     }
@@ -266,7 +264,6 @@ class ReferenceFetcherService {
    * 로컬 폴백 (기존 block-registry-extractor 사용)
    */
   private fetchLocalFallback(): string {
-    console.log('📂 로컬 레지스트리에서 참조 데이터 로드');
     return generateCompleteReference();
   }
 
@@ -311,7 +308,6 @@ ${error?.message}
    */
   clearCache(): void {
     this.cache.clear();
-    console.log('🗑️ 참조 데이터 캐시 초기화됨');
   }
 
   /**
