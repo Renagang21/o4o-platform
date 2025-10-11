@@ -16,6 +16,7 @@ import {
   BreadcrumbsInput,
 } from '../../validators/customizer.validators';
 import { deepMerge } from '../../utils/deep-merge';
+import { migrateCustomizerSettings, validateMigration } from '../../utils/schema-migration';
 import { ZodError } from 'zod';
 
 const router: Router = Router();
@@ -86,7 +87,11 @@ const defaultBreadcrumbs: BreadcrumbsInput = {
  */
 router.get('/scroll-to-top', async (req: Request, res: Response) => {
   try {
-    const customizerSettings = await settingsService.getSettings('customizer');
+    let customizerSettings = await settingsService.getSettings('customizer');
+
+    // Apply migration if needed
+    customizerSettings = migrateCustomizerSettings(customizerSettings);
+
     const scrollToTop = (customizerSettings as any)?.scrollToTop || defaultScrollToTop;
 
     res.json({
@@ -116,8 +121,10 @@ router.put(
       // Validate request body with Zod
       const validatedData = ScrollToTopSchema.parse(req.body);
 
-      // Get existing customizer settings
-      const customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      // Get existing customizer settings and migrate
+      let customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      customizerSettings = migrateCustomizerSettings(customizerSettings);
+
       const existingScrollToTop = (customizerSettings as any)?.scrollToTop || defaultScrollToTop;
 
       // Deep merge existing + new data
@@ -127,7 +134,18 @@ router.put(
       const updatedSettings = {
         ...customizerSettings,
         scrollToTop: mergedScrollToTop,
+        _meta: {
+          ...(customizerSettings as any)?._meta,
+          lastModified: new Date().toISOString(),
+          isDirty: false,
+        },
       };
+
+      // Validate migration
+      const validation = validateMigration(updatedSettings);
+      if (!validation.valid) {
+        console.warn('[Customizer] Migration validation warnings:', validation.errors);
+      }
 
       await settingsService.updateSettings('customizer', updatedSettings);
 
@@ -165,7 +183,11 @@ router.put(
  */
 router.get('/button-settings', async (req: Request, res: Response) => {
   try {
-    const customizerSettings = await settingsService.getSettings('customizer');
+    let customizerSettings = await settingsService.getSettings('customizer');
+
+    // Apply migration if needed
+    customizerSettings = migrateCustomizerSettings(customizerSettings);
+
     const buttons = (customizerSettings as any)?.buttons || defaultButtonSettings;
 
     res.json({
@@ -195,8 +217,10 @@ router.put(
       // Validate request body with Zod
       const validatedData = ButtonSettingsSchema.parse(req.body);
 
-      // Get existing customizer settings
-      const customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      // Get existing customizer settings and migrate
+      let customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      customizerSettings = migrateCustomizerSettings(customizerSettings);
+
       const existingButtons = (customizerSettings as any)?.buttons || defaultButtonSettings;
 
       // Deep merge existing + new data
@@ -206,7 +230,18 @@ router.put(
       const updatedSettings = {
         ...customizerSettings,
         buttons: mergedButtons,
+        _meta: {
+          ...(customizerSettings as any)?._meta,
+          lastModified: new Date().toISOString(),
+          isDirty: false,
+        },
       };
+
+      // Validate migration
+      const validation = validateMigration(updatedSettings);
+      if (!validation.valid) {
+        console.warn('[Customizer] Migration validation warnings:', validation.errors);
+      }
 
       await settingsService.updateSettings('customizer', updatedSettings);
 
@@ -244,7 +279,11 @@ router.put(
  */
 router.get('/breadcrumbs-settings', async (req: Request, res: Response) => {
   try {
-    const customizerSettings = await settingsService.getSettings('customizer');
+    let customizerSettings = await settingsService.getSettings('customizer');
+
+    // Apply migration if needed
+    customizerSettings = migrateCustomizerSettings(customizerSettings);
+
     const breadcrumbs = (customizerSettings as any)?.breadcrumbs || defaultBreadcrumbs;
 
     res.json({
@@ -274,8 +313,10 @@ router.put(
       // Validate request body with Zod
       const validatedData = BreadcrumbsSchema.parse(req.body);
 
-      // Get existing customizer settings
-      const customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      // Get existing customizer settings and migrate
+      let customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      customizerSettings = migrateCustomizerSettings(customizerSettings);
+
       const existingBreadcrumbs = (customizerSettings as any)?.breadcrumbs || defaultBreadcrumbs;
 
       // Deep merge existing + new data
@@ -285,7 +326,18 @@ router.put(
       const updatedSettings = {
         ...customizerSettings,
         breadcrumbs: mergedBreadcrumbs,
+        _meta: {
+          ...(customizerSettings as any)?._meta,
+          lastModified: new Date().toISOString(),
+          isDirty: false,
+        },
       };
+
+      // Validate migration
+      const validation = validateMigration(updatedSettings);
+      if (!validation.valid) {
+        console.warn('[Customizer] Migration validation warnings:', validation.errors);
+      }
 
       await settingsService.updateSettings('customizer', updatedSettings);
 
