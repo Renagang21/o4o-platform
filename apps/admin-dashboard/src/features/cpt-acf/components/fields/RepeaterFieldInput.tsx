@@ -3,8 +3,8 @@
  * Allows users to add, remove, and edit rows of sub-fields
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp } from 'lucide-react';
 import type { CustomField, RepeaterValue, RepeaterRow } from '../../types/acf.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -114,6 +114,22 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
       return newSet;
     });
   }, []);
+
+  // Collapse all rows
+  const collapseAll = useCallback(() => {
+    const allRowIds = new Set(rows.map(row => row._id));
+    setCollapsedRows(allRowIds);
+  }, [rows]);
+
+  // Expand all rows
+  const expandAll = useCallback(() => {
+    setCollapsedRows(new Set());
+  }, []);
+
+  // Check if all rows are collapsed
+  const allCollapsed = useMemo(() => {
+    return rows.length > 0 && rows.every(row => collapsedRows.has(row._id));
+  }, [rows, collapsedRows]);
 
   // Get collapsed field display value
   const getCollapsedValue = useCallback((row: RepeaterRow): string => {
@@ -304,6 +320,34 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
 
   return (
     <div className="space-y-3">
+      {/* Header with Collapse/Expand All */}
+      {rows.length > 0 && (
+        <div className="flex items-center justify-between pb-2">
+          <span className="text-sm font-medium text-gray-700">
+            {rows.length} {rows.length === 1 ? 'Row' : 'Rows'}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={allCollapsed ? expandAll : collapseAll}
+            className="text-xs h-7"
+          >
+            {allCollapsed ? (
+              <>
+                <ChevronsDown className="w-3 h-3 mr-1" />
+                Expand All
+              </>
+            ) : (
+              <>
+                <ChevronsUp className="w-3 h-3 mr-1" />
+                Collapse All
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
       {/* Rows List */}
       {rows.length > 0 && (
         <div>
