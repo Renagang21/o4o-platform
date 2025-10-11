@@ -37,31 +37,31 @@ export const menuPermissions: MenuPermission[] = [
   // User Management - Permission based
   {
     menuId: 'user-management',
-    permissions: ['users:manage']
+    permissions: ['users.view']
   },
   {
     menuId: 'users',
-    permissions: ['users:read']
+    permissions: ['users.view']
   },
   {
     menuId: 'users-list',
-    permissions: ['users:read']
+    permissions: ['users.view']
   },
   {
     menuId: 'users-create',
-    permissions: ['users:create']
+    permissions: ['users.create']
   },
   {
     menuId: 'users-edit',
-    permissions: ['users:update']
+    permissions: ['users.edit']
   },
   {
     menuId: 'users-roles',
-    permissions: ['roles:manage']
+    permissions: ['users.view']
   },
   {
     menuId: 'users-permissions',
-    permissions: ['permissions:manage']
+    permissions: ['users.view']
   },
   
   // Seller Management
@@ -85,19 +85,19 @@ export const menuPermissions: MenuPermission[] = [
   // E-commerce
   {
     menuId: 'ecommerce',
-    permissions: ['ecommerce:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'products',
-    permissions: ['products:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'orders',
-    permissions: ['orders:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'categories',
-    permissions: ['categories:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'inventory',
@@ -189,43 +189,43 @@ export const menuPermissions: MenuPermission[] = [
   // CMS
   {
     menuId: 'cms',
-    permissions: ['cms:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'pages',
-    permissions: ['pages:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'posts',
-    permissions: ['posts:read']
+    permissions: ['content.view']
   },
   {
     menuId: 'media',
-    permissions: ['media:read']
+    permissions: ['content.view']
   },
   
   // Reports & Analytics
   {
     menuId: 'reports',
-    permissions: ['reports:read']
+    permissions: ['admin.analytics']
   },
   {
     menuId: 'analytics',
-    permissions: ['analytics:read']
+    permissions: ['admin.analytics']
   },
   {
     menuId: 'sales-reports',
-    permissions: ['reports:sales']
+    permissions: ['admin.analytics']
   },
-  
+
   // Settings - Admin only
   {
     menuId: 'settings',
-    permissions: ['settings:manage']
+    permissions: ['admin.settings']
   },
   {
     menuId: 'general-settings',
-    permissions: ['settings:general']
+    permissions: ['admin.settings']
   },
   {
     menuId: 'system-settings',
