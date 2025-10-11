@@ -36,7 +36,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
 
       // Basic styles
       if (styles.backgroundColor) variables.push(`${prefix}-bg: ${styles.backgroundColor};`);
-      if (styles.textColor) variables.push(`${prefix}-color: ${styles.textColor};`);
+      if (styles.textColor) variables.push(`${prefix}-text: ${styles.textColor};`);
       if (styles.borderWidth !== undefined) variables.push(`${prefix}-border-width: ${styles.borderWidth}px;`);
       if (styles.borderColor) variables.push(`${prefix}-border-color: ${styles.borderColor};`);
       if (styles.borderStyle) variables.push(`${prefix}-border-style: ${styles.borderStyle};`);
@@ -46,7 +46,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
 
       // Hover styles
       if (styles.hoverBackgroundColor) variables.push(`${prefix}-hover-bg: ${styles.hoverBackgroundColor};`);
-      if (styles.hoverTextColor) variables.push(`${prefix}-hover-color: ${styles.hoverTextColor};`);
+      if (styles.hoverTextColor) variables.push(`${prefix}-hover-text: ${styles.hoverTextColor};`);
       if (styles.hoverBorderColor) variables.push(`${prefix}-hover-border-color: ${styles.hoverBorderColor};`);
       if (styles.transitionDuration !== undefined) variables.push(`${prefix}-transition: all ${styles.transitionDuration}ms ease;`);
 
@@ -112,7 +112,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
   .wp-block-button__link {
     /* Use primary by default */
     background-color: var(--btn-primary-bg);
-    color: var(--btn-primary-color);
+    color: var(--btn-primary-text);
     border-width: var(--btn-primary-border-width);
     border-color: var(--btn-primary-border-color);
     border-style: var(--btn-primary-border-style);
@@ -142,7 +142,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
   input[type="button"]:hover,
   .wp-block-button__link:hover {
     background-color: var(--btn-primary-hover-bg);
-    color: var(--btn-primary-hover-color);
+    color: var(--btn-primary-hover-text);
     border-color: var(--btn-primary-hover-border-color);
     box-shadow: var(--btn-primary-hover-shadow);
     transform: var(--btn-primary-hover-transform);
@@ -151,7 +151,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
   /* Secondary Button */
   .btn-secondary {
     background-color: var(--btn-secondary-bg);
-    color: var(--btn-secondary-color);
+    color: var(--btn-secondary-text);
     border-width: var(--btn-secondary-border-width);
     border-color: var(--btn-secondary-border-color);
     border-style: var(--btn-secondary-border-style);
@@ -167,7 +167,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
 
   .btn-secondary:hover {
     background-color: var(--btn-secondary-hover-bg);
-    color: var(--btn-secondary-hover-color);
+    color: var(--btn-secondary-hover-text);
     border-color: var(--btn-secondary-hover-border-color);
     box-shadow: var(--btn-secondary-hover-shadow);
     transform: var(--btn-secondary-hover-transform);
@@ -176,7 +176,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
   /* Outline Button */
   .btn-outline {
     background-color: var(--btn-outline-bg);
-    color: var(--btn-outline-color);
+    color: var(--btn-outline-text);
     border-width: var(--btn-outline-border-width);
     border-color: var(--btn-outline-border-color);
     border-style: var(--btn-outline-border-style);
@@ -192,7 +192,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
 
   .btn-outline:hover {
     background-color: var(--btn-outline-hover-bg);
-    color: var(--btn-outline-hover-color);
+    color: var(--btn-outline-hover-text);
     border-color: var(--btn-outline-hover-border-color);
     box-shadow: var(--btn-outline-hover-shadow);
     transform: var(--btn-outline-hover-transform);
@@ -201,7 +201,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
   /* Text Button */
   .btn-text {
     background-color: var(--btn-text-bg);
-    color: var(--btn-text-color);
+    color: var(--btn-text-text);
     border-width: var(--btn-text-border-width);
     border-color: var(--btn-text-border-color);
     border-style: var(--btn-text-border-style);
@@ -217,7 +217,7 @@ const ButtonStyleProvider: React.FC<ButtonStyleProviderProps> = ({ settings }) =
 
   .btn-text:hover {
     background-color: var(--btn-text-hover-bg);
-    color: var(--btn-text-hover-color);
+    color: var(--btn-text-hover-text);
     border-color: var(--btn-text-hover-border-color);
     box-shadow: var(--btn-text-hover-shadow);
     transform: var(--btn-text-hover-transform);
