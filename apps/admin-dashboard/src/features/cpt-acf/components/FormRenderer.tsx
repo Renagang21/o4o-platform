@@ -119,11 +119,15 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
           : `/api/cpt-engine/forms/slug/${formSlug}`;
 
         const response = await authClient.api.get(endpoint);
+        const responseData = response.data;
 
-        if (response.success && response.data) {
-          setFormData(response.data);
+        if (responseData?.success && responseData?.data) {
+          setFormData(responseData.data);
+        } else if (responseData?.data) {
+          // Some APIs might return data directly without success wrapper
+          setFormData(responseData.data);
         } else {
-          throw new Error(response.error || 'Failed to load form');
+          throw new Error(responseData?.error || 'Failed to load form');
         }
       } catch (error) {
         console.error('FormRenderer: Error loading form:', error);
@@ -247,13 +251,14 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
         await customSubmit(values);
       } else {
         // Default submit handler
-        const result = await authClient.api.post('/api/cpt-engine/forms/submit', {
+        const response = await authClient.api.post('/api/cpt-engine/forms/submit', {
           formId: formData?.id,
           values,
         });
+        const result = response.data;
 
-        if (!result.success) {
-          throw new Error(result.error || 'Form submission failed');
+        if (result?.success === false) {
+          throw new Error(result?.error || 'Form submission failed');
         }
 
         // Success
@@ -261,7 +266,7 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
         setValues({}); // Reset form
 
         if (onSuccess) {
-          onSuccess(result.data);
+          onSuccess(result?.data || result);
         }
 
         // Redirect if configured
@@ -319,7 +324,15 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
             {...commonProps}
             min={field.validation?.min}
             max={field.validation?.max}
-            onChange={(e) => handleFieldChange(field.name, parseFloat(e.target.value) || '')}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === '') {
+                handleFieldChange(field.name, '');
+              } else {
+                const num = parseFloat(val);
+                handleFieldChange(field.name, isNaN(num) ? '' : num);
+              }
+            }}
           />
         );
 
@@ -330,7 +343,7 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
         return (
           <select {...commonProps}>
             <option value="">Select...</option>
-            {field.options?.choices?.map((choice: any) => (
+            {(field.options?.choices || []).map((choice: any) => (
               <option key={choice.value} value={choice.value}>
                 {choice.label}
               </option>
@@ -359,7 +372,7 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
       case 'radio':
         return (
           <div className="space-y-2">
-            {field.options?.choices?.map((choice: any) => (
+            {(field.options?.choices || []).map((choice: any) => (
               <div key={choice.value} className="flex items-center gap-2">
                 <input
                   type="radio"

@@ -180,9 +180,9 @@ const renderFieldValue = (
     case 'select':
     case 'radio':
       // Try to find label from choices
-      if (field.choices) {
+      if (Array.isArray(field.choices)) {
         const choice = field.choices.find(c => c.value === value);
-        return choice?.label || value;
+        return choice?.label || String(value);
       }
       return String(value);
 
@@ -194,6 +194,7 @@ const renderFieldValue = (
 
     case 'wysiwyg':
       // Render HTML content
+      // WARNING: Ensure content is sanitized on the server to prevent XSS attacks
       return (
         <div
           className="acf-wysiwyg prose"
@@ -233,6 +234,13 @@ const renderFieldValue = (
 
     default:
       // Default: render as text
+      if (typeof value === 'object') {
+        try {
+          return JSON.stringify(value);
+        } catch {
+          return '[Complex Object]';
+        }
+      }
       return String(value);
   }
 };
