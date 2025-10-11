@@ -1,74 +1,26 @@
 import { Router } from 'express';
 import { AdminApprovalController } from '../controllers/admin/adminApprovalController';
 import adminStatsController from '../controllers/admin/adminStatsController';
-import { authenticate } from '../middleware/auth.middleware';
-import { validateRole } from '../middleware/roleValidation';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
 
+// All admin routes require authentication and admin role
+router.use(authenticateToken);
+router.use(requireAdmin);
+
 // Approval management routes
-router.get(
-  '/queue',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  AdminApprovalController.getApprovalQueue
-);
-
-router.get(
-  '/stats',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  AdminApprovalController.getApprovalStats
-);
-
-router.get(
-  '/request/:id',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  AdminApprovalController.getRequestDetails
-);
-
-router.post(
-  '/approve/:id',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  AdminApprovalController.approveRequest
-);
-
-router.post(
-  '/reject/:id',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  AdminApprovalController.rejectRequest
-);
+router.get('/queue', AdminApprovalController.getApprovalQueue);
+router.get('/stats', AdminApprovalController.getApprovalStats);
+router.get('/request/:id', AdminApprovalController.getRequestDetails);
+router.post('/approve/:id', AdminApprovalController.approveRequest);
+router.post('/reject/:id', AdminApprovalController.rejectRequest);
 
 // Platform statistics routes
-router.get(
-  '/platform-stats',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  adminStatsController.getPlatformStats.bind(adminStatsController)
-);
-
-router.get(
-  '/revenue-summary',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  adminStatsController.getRevenueSummary.bind(adminStatsController)
-);
-
-router.get(
-  '/pending-settlements',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  adminStatsController.getPendingSettlements.bind(adminStatsController)
-);
-
-router.post(
-  '/process-settlement/:id',
-  authenticate,
-  validateRole(['admin', 'administrator']),
-  adminStatsController.processSettlement.bind(adminStatsController)
-);
+router.get('/platform-stats', adminStatsController.getPlatformStats.bind(adminStatsController));
+router.get('/revenue-summary', adminStatsController.getRevenueSummary.bind(adminStatsController));
+router.get('/pending-settlements', adminStatsController.getPendingSettlements.bind(adminStatsController));
+router.post('/process-settlement/:id', adminStatsController.processSettlement.bind(adminStatsController));
 
 export default router;

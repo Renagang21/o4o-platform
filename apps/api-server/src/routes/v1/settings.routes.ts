@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../../middleware/auth';
-import { checkPermission } from '../../middleware/permissions';
+import { requireAdmin } from '../../middleware/permission.middleware';
 import logger from '../../utils/logger';
 import { AppDataSource } from '../../database/connection';
 import { Settings, ReadingSettings, PermalinkSettings } from '../../entities/Settings';
@@ -452,7 +452,7 @@ router.get('/:section', authenticateToken, async (req: Request, res: Response) =
  */
 router.put('/reading',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     const traceId = `rs-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     
@@ -685,9 +685,9 @@ router.put('/reading',
  * @desc    Update settings for a specific section
  * @access  Private (Admin only)
  */
-router.put('/:section', 
+router.put('/:section',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { section } = req.params;
@@ -727,9 +727,9 @@ router.put('/:section',
  * @desc    Get all settings
  * @access  Private (Admin only)
  */
-router.get('/', 
+router.get('/',
   authenticateToken,
-  checkPermission('settings:read'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const allSettings: Record<string, any> = {};
@@ -759,7 +759,7 @@ router.get('/',
  */
 router.post('/reset/:section',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { section } = req.params;
@@ -836,9 +836,9 @@ router.get('/permalink', async (req: Request, res: Response) => {
  * @desc    Update permalink settings
  * @access  Private (Admin only)
  */
-router.put('/permalink', 
+router.put('/permalink',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const settings: PermalinkSettings = req.body;
@@ -879,7 +879,7 @@ router.put('/permalink',
  */
 router.post('/permalink/preview',
   authenticateToken,
-  checkPermission('settings:read'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { structure } = req.body;
@@ -914,7 +914,7 @@ router.post('/permalink/preview',
  */
 router.post('/permalink/validate',
   authenticateToken,
-  checkPermission('settings:read'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const settings: PermalinkSettings = req.body;
@@ -942,7 +942,7 @@ router.post('/permalink/validate',
  */
 router.post('/customizer',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const newSettings = req.body;

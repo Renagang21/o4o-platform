@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../../middleware/auth';
-import { checkPermission } from '../../middleware/permissions';
+import { requireAdmin } from '../../middleware/permission.middleware';
 import { SettingsService } from '../../services/settingsService';
 import {
   ScrollToTopSchema,
@@ -115,7 +115,7 @@ router.get('/scroll-to-top', async (req: Request, res: Response) => {
 router.put(
   '/scroll-to-top',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       // Validate request body with Zod
@@ -211,7 +211,7 @@ router.get('/button-settings', async (req: Request, res: Response) => {
 router.put(
   '/button-settings',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       // Validate request body with Zod
@@ -307,7 +307,7 @@ router.get('/breadcrumbs-settings', async (req: Request, res: Response) => {
 router.put(
   '/breadcrumbs-settings',
   authenticateToken,
-  checkPermission('settings:write'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       // Validate request body with Zod

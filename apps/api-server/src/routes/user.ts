@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/userController';
-import { authenticateToken, requireAdmin, requireManagerOrAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin, requireAnyRole } from '../middleware/permission.middleware';
+import { UserRole } from '../entities/User';
 
 const router: Router = Router();
 const userController = new UserController();
@@ -12,7 +14,7 @@ router.get('/profile', authenticateToken, userController.getProfile.bind(userCon
 router.put('/business-info', authenticateToken, userController.updateBusinessInfo.bind(userController));
 
 // 관리자 전용 라우트
-router.get('/', requireManagerOrAdmin, userController.getUsers.bind(userController));
+router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), userController.getUsers.bind(userController));
 router.put('/:userId/role', requireAdmin, userController.updateUserRole.bind(userController));
 router.put('/:userId/suspend', requireAdmin, userController.suspendUser.bind(userController));
 

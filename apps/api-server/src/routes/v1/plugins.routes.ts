@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../../middleware/auth';
-import { checkPermission } from '../../middleware/permissions';
+import { requireAdmin } from '../../middleware/permission.middleware';
 import AppDataSource from '../../database/data-source';
 import { In } from 'typeorm';
 
@@ -186,9 +186,9 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
  * @desc    Toggle plugin activation status
  * @access  Private (Admin only)
  */
-router.put('/:id/toggle', 
-  authenticateToken, 
-  checkPermission('apps:manage'),
+router.put('/:id/toggle',
+  authenticateToken,
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -263,7 +263,7 @@ router.put('/:id/toggle',
  */
 router.post('/:id/settings',
   authenticateToken,
-  checkPermission('apps:manage'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -304,7 +304,7 @@ router.post('/:id/settings',
  */
 router.delete('/:id',
   authenticateToken,
-  checkPermission('apps:manage'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -361,7 +361,7 @@ router.delete('/:id',
  */
 router.post('/install',
   authenticateToken,
-  checkPermission('apps:manage'),
+  requireAdmin,
   async (req: Request, res: Response) => {
     try {
       const { pluginData } = req.body;

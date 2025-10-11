@@ -3,7 +3,8 @@ import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller';
 import { FieldGroupsController } from '../controllers/cpt/FieldGroupsController';
 import { TaxonomiesController } from '../controllers/cpt/TaxonomiesController';
 import { FormsController } from '../controllers/cpt/FormsController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
 

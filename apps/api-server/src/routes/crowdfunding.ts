@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { FundingProjectController } from '../controllers/crowdfunding/FundingProjectController';
 import { BackingController } from '../controllers/crowdfunding/BackingController';
-import { authenticateToken, requireRole } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
 const projectController = new FundingProjectController();
@@ -30,7 +31,7 @@ router.post('/webhook/payment', (req, res) => backingController.updatePaymentSta
 router.patch(
   '/admin/projects/:id/status',
   authenticateToken,
-  requireRole(['admin']),
+  requireAdmin,
   async (req, res) => {
     try {
       const projectService = new (await import('../services/crowdfunding/FundingProjectService')).FundingProjectService();

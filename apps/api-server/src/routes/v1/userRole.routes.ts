@@ -1,18 +1,24 @@
 import { Router } from 'express';
 import { UserRoleController } from '../../controllers/v1/userRole.controller';
-import { authenticateToken, requireAdmin } from '../../middleware/auth';
+import { authenticateToken } from '../../middleware/auth';
+// New unified permission middleware
+import {
+  ensureAuthenticated,
+  requireAdmin,
+  requireSelfOrAdmin
+} from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 
 // Role management routes
 router.get('/roles', UserRoleController.getRoles);  // Public endpoint - just returns role definitions
-router.get('/roles/statistics', authenticateToken, requireAdmin, UserRoleController.getRoleStatistics);
-router.get('/permissions', authenticateToken, UserRoleController.getPermissions);
+router.get('/roles/statistics', ensureAuthenticated, requireAdmin, UserRoleController.getRoleStatistics);
+router.get('/permissions', ensureAuthenticated, UserRoleController.getPermissions);
 
 // User role routes
-router.get('/:id/role', authenticateToken, UserRoleController.getUserRole);
-router.put('/:id/role', authenticateToken, requireAdmin, UserRoleController.updateUserRole);
-router.get('/:id/permissions', authenticateToken, UserRoleController.getUserPermissions);
-router.get('/:id/permissions/check', authenticateToken, UserRoleController.checkUserPermission);
+router.get('/:id/role', ensureAuthenticated, requireSelfOrAdmin(), UserRoleController.getUserRole);
+router.put('/:id/role', ensureAuthenticated, requireAdmin, UserRoleController.updateUserRole);
+router.get('/:id/permissions', ensureAuthenticated, requireSelfOrAdmin(), UserRoleController.getUserPermissions);
+router.get('/:id/permissions/check', ensureAuthenticated, requireSelfOrAdmin(), UserRoleController.checkUserPermission);
 
 export default router;

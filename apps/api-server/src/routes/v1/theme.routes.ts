@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ThemeController } from '../../controllers/ThemeController';
 import { authenticateToken } from '../../middleware/auth';
-import { requireAdmin } from '../../middleware/auth';
+import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 const themeController = new ThemeController();

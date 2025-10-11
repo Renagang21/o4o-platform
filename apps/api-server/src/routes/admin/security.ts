@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import type { Router as ExpressRouter } from 'express';
-import { authenticateToken, requireAdmin } from '../../middleware/auth';
+import { authenticateToken } from '../../middleware/auth';
+import { requireAdmin } from '../../middleware/permission.middleware';
 import { LoginSecurityService } from '../../services/LoginSecurityService';
 import { UserService } from '../../services/UserService';
 

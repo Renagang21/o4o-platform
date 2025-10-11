@@ -167,31 +167,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
   }
 };
 
-export const requireRole = (roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const authReq = req as AuthRequest;
-    if (!authReq.user) {
-      return res.status(401).json({ 
-        error: 'Authentication required',
-        code: 'AUTH_REQUIRED'
-      });
-    }
-
-    if (!roles.includes((authReq.user as any).role)) {
-      return res.status(403).json({ 
-        error: 'Insufficient permissions',
-        code: 'INSUFFICIENT_PERMISSIONS',
-        required: roles,
-        current: (authReq.user as any).role
-      });
-    }
-
-    next();
-  };
-};
-
-export const requireAdmin = requireRole(['admin']);
-export const requireManagerOrAdmin = requireRole(['admin', 'manager']);
+// Legacy role checking functions removed - use permission.middleware instead
+// import { requireAdmin, requireRole, requireAnyRole } from './permission.middleware';
 
 // Optional authentication - doesn't fail if no token
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { AdminSupplierController } from '../../controllers/admin/AdminSupplierController';
 import { authenticateToken } from '../../middleware/auth';
-import { validateRole } from '../../middleware/roleValidation';
+import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
+import { UserRole } from '../../entities/User';
 import { body } from 'express-validator';
 
 const router: Router = Router();
@@ -11,13 +12,13 @@ const adminSupplierController = new AdminSupplierController();
 router.use(authenticateToken);
 
 // Supplier management routes (admin/manager only)
-router.get('/', validateRole(['admin', 'super_admin', 'manager']), adminSupplierController.getSuppliers);
-router.get('/statistics', validateRole(['admin', 'super_admin', 'manager']), adminSupplierController.getSupplierStatistics);
-router.get('/:id', validateRole(['admin', 'super_admin', 'manager']), adminSupplierController.getSupplier);
+router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSuppliers);
+router.get('/statistics', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSupplierStatistics);
+router.get('/:id', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSupplier);
 
 // Supplier creation (admin only)
-router.post('/', 
-  validateRole(['admin', 'super_admin']),
+router.post('/',
+  requireAdmin,
   [
     body('businessName').notEmpty().withMessage('Business name is required'),
     body('businessNumber').notEmpty().withMessage('Business number is required'),
@@ -35,7 +36,7 @@ router.post('/',
 
 // Supplier updates (admin/manager only)
 router.put('/:id',
-  validateRole(['admin', 'super_admin', 'manager']),
+  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
   [
     body('businessName').optional().notEmpty().withMessage('Business name cannot be empty'),
     body('businessNumber').optional().notEmpty().withMessage('Business number cannot be empty'),
@@ -53,7 +54,7 @@ router.put('/:id',
 
 // Update supplier status (admin/manager only)
 router.patch('/:id/status',
-  validateRole(['admin', 'super_admin', 'manager']),
+  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
   [
     body('isActive').isBoolean().withMessage('isActive must be a boolean')
   ],
@@ -62,11 +63,11 @@ router.patch('/:id/status',
 
 // Approve supplier (admin only)
 router.patch('/:id/approve',
-  validateRole(['admin', 'super_admin']),
+  requireAdmin,
   adminSupplierController.approveSupplier
 );
 
 // Supplier deletion (admin only)
-router.delete('/:id', validateRole(['admin', 'super_admin']), adminSupplierController.deleteSupplier);
+router.delete('/:id', requireAdmin, adminSupplierController.deleteSupplier);
 
 export default router;

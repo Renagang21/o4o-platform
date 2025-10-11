@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { MonitoringController } from '../controllers/monitoringController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
 

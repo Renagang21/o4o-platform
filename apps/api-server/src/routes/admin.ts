@@ -9,7 +9,8 @@ import {
   reactivateUser,
   getDashboardStats
 } from '../controllers/adminController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 import securityRoutes from './admin/security';
 import { PagesController } from '../controllers/pagesController';
 

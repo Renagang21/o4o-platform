@@ -1,7 +1,7 @@
 import { Router, IRouter } from 'express';
 import { ACFController } from '../controllers/acf.controller';
-import { authenticate as authenticateToken } from '../../../middleware/auth.middleware';
-import { requireAdmin } from '../../../middleware/admin.middleware';
+import { authenticateToken } from '../../../middleware/auth';
+import { requireAdmin } from '../../../middleware/permission.middleware';
 
 const router: IRouter = Router();
 

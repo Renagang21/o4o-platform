@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { AdminUserController } from '../../controllers/admin/AdminUserController';
 import { authenticateToken } from '../../middleware/auth';
-import { validateRole } from '../../middleware/roleValidation';
+import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
+import { UserRole } from '../../entities/User';
 import { body } from 'express-validator';
 
 const router: Router = Router();
@@ -11,13 +12,13 @@ const adminUserController = new AdminUserController();
 router.use(authenticateToken);
 
 // User management routes (admin/manager only)
-router.get('/', validateRole(['admin', 'super_admin', 'manager']), adminUserController.getUsers);
-router.get('/statistics', validateRole(['admin', 'super_admin', 'manager']), adminUserController.getUserStatistics);
-router.get('/:id', validateRole(['admin', 'super_admin', 'manager']), adminUserController.getUser);
+router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUsers);
+router.get('/statistics', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUserStatistics);
+router.get('/:id', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUser);
 
 // User creation (admin only)
-router.post('/', 
-  validateRole(['admin', 'super_admin']),
+router.post('/',
+  requireAdmin,
   [
     body('email').isEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -34,7 +35,7 @@ router.post('/',
 
 // User updates (admin/manager only)
 router.put('/:id',
-  validateRole(['admin', 'super_admin', 'manager']),
+  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
   [
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -51,7 +52,7 @@ router.put('/:id',
 
 // Update user status (admin/manager only)
 router.patch('/:id/status',
-  validateRole(['admin', 'super_admin', 'manager']),
+  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
   [
     body('status').isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],
@@ -59,6 +60,6 @@ router.patch('/:id/status',
 );
 
 // User deletion (admin only)
-router.delete('/:id', validateRole(['admin', 'super_admin']), adminUserController.deleteUser);
+router.delete('/:id', requireAdmin, adminUserController.deleteUser);
 
 export default router;

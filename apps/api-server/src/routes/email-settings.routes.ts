@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 import { EmailService } from '../services/email.service';
 import logger from '../utils/logger';
 
@@ -19,7 +20,7 @@ interface SMTPSettings {
 }
 
 // 현재 이메일 설정 가져오기
-router.get('/email', authMiddleware.verifyToken, authMiddleware.requireAdmin, async (req: Request, res: Response) => {
+router.get('/email', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     // 환경변수에서 현재 설정 읽기 (비밀번호 제외)
     const settings: SMTPSettings = {
@@ -49,7 +50,7 @@ router.get('/email', authMiddleware.verifyToken, authMiddleware.requireAdmin, as
 });
 
 // 이메일 설정 업데이트
-router.put('/email', authMiddleware.verifyToken, authMiddleware.requireAdmin, async (req: Request, res: Response) => {
+router.put('/email', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     const settings: SMTPSettings = req.body;
 
@@ -93,7 +94,7 @@ router.put('/email', authMiddleware.verifyToken, authMiddleware.requireAdmin, as
 });
 
 // 테스트 이메일 발송
-router.post('/email/test', authMiddleware.verifyToken, authMiddleware.requireAdmin, async (req: Request, res: Response) => {
+router.post('/email/test', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     const { testEmail } = req.body;
 

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { UserManagementController } from '../controllers/UserManagementController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requireAdmin } from '../middleware/permission.middleware';
 import { UserRole } from '../types/auth';
 import { validationResult } from 'express-validator';
 import { body, param, query } from 'express-validator';

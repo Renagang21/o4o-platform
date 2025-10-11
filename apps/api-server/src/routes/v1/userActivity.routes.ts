@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { UserActivityController } from '../../controllers/v1/userActivity.controller';
-import { authenticateToken, requireAdmin } from '../../middleware/auth';
+import { authenticateToken } from '../../middleware/auth';
+import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 
