@@ -3,7 +3,7 @@
  * 복잡성을 제거하고 최신 AI API 패턴을 적용한 단순화된 버전
  */
 
-import { generateCompleteReference } from './block-registry-extractor';
+import { referenceFetcher } from './reference-fetcher.service';
 
 // 2025년 최신 AI 모델 목록
 export const AI_MODELS = {
@@ -61,15 +61,20 @@ export class SimpleAIGenerator {
    */
   async generatePage(request: GenerateRequest): Promise<Block[]> {
     const { prompt, template = 'landing', config, onProgress, signal } = request;
-    
+
     const updateProgress = (progress: number, message: string) => {
       onProgress?.(progress, message);
     };
 
     try {
+      updateProgress(5, '서버에서 최신 참조 데이터 로드 중...');
+
+      // 서버 우선 전략으로 참조 데이터 가져오기
+      const availableBlocks = await this.fetchReferenceData();
+
       updateProgress(10, 'AI 모델에 연결 중...');
-      
-      const systemPrompt = this.getSystemPrompt(template);
+
+      const systemPrompt = this.getSystemPrompt(template, availableBlocks);
       const userPrompt = this.buildUserPrompt(prompt);
       
       updateProgress(30, 'AI 응답 생성 중...');
@@ -284,9 +289,16 @@ export class SimpleAIGenerator {
   }
 
   /**
+   * 서버 우선 전략으로 참조 데이터 가져오기
+   */
+  private async fetchReferenceData(): Promise<string> {
+    return await referenceFetcher.fetchCompleteReference();
+  }
+
+  /**
    * 템플릿별 시스템 프롬프트
    */
-  private getSystemPrompt(template: string): string {
+  private getSystemPrompt(template: string, availableBlocks: string): string {
     const baseRules = `
 중요한 규칙:
 1. 반드시 JSON 형식으로만 응답하세요: {"blocks": [...]}
@@ -295,10 +307,6 @@ export class SimpleAIGenerator {
 4. 버튼은 실제 링크 대신 "#" 사용
 5. 한국어로 작성하세요
 6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
-
-    // 동적으로 블록 및 숏코드 레퍼런스 생성
-    // 런타임에 실제 등록된 블록/숏코드를 기반으로 생성됨
-    const availableBlocks = generateCompleteReference();
 
     const prompts = {
       landing: `${baseRules}
