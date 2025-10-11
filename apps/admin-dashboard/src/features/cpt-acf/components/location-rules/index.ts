@@ -6,3 +6,4 @@
 export { LocationRuleRow } from './LocationRuleRow';
 export { LocationRuleGroup } from './LocationRuleGroup';
 export { LocationRulesEditor } from './LocationRulesEditor';
+export { CurrentUserInfo } from './CurrentUserInfo';

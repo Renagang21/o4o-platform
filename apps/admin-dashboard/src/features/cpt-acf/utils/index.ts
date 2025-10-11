@@ -4,3 +4,4 @@
  */
 
 export * from './conditionalLogic';
+export * from './locationEvaluation';

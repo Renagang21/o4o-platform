@@ -62,6 +62,9 @@ import { authClient } from '@o4o/auth-client';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import FieldEditor from './components/FieldEditor';
 import { SortableField } from './components/SortableField';
+import { LocationRulesEditor, CurrentUserInfo } from '@/features/cpt-acf/components/location-rules';
+import { useLocationRules, useLocationParams } from '@/features/cpt-acf/hooks';
+import type { FieldLocation } from '@/features/cpt-acf/types/acf.types';
 
 interface Field {
   id: string;
@@ -80,7 +83,8 @@ interface FieldGroup {
   id?: string;
   title: string;
   description?: string;
-  postTypes: string[];
+  postTypes: string[]; // Legacy - kept for backward compatibility
+  location?: FieldLocation[][]; // New location rules (array of groups for OR logic)
   fields: Field[];
   position: 'normal' | 'side' | 'advanced';
   style: 'default' | 'seamless';
@@ -114,15 +118,20 @@ export default function FieldGroupEditor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addNotice } = useAdminNotices();
-  
+
   const [activeTab, setActiveTab] = useState('fields');
   const [editingField, setEditingField] = useState<Field | null>(null);
   const [showFieldEditor, setShowFieldEditor] = useState(false);
-  
+
+  // Location Rules hooks
+  const { getAvailableValues } = useLocationRules();
+  const locationParams = useLocationParams();
+
   const [formData, setFormData] = useState<FieldGroup>({
     title: '',
     description: '',
     postTypes: [],
+    location: [[{ param: '', operator: '==', value: '' }]], // Initialize with one empty rule group
     fields: [],
     position: 'normal',
     style: 'default',
@@ -198,13 +207,29 @@ export default function FieldGroupEditor() {
       });
       return;
     }
-    if (formData.postTypes.length === 0) {
+
+    // Validate location rules
+    if (!formData.location || formData.location.length === 0) {
       addNotice({
         type: 'error',
-        message: 'Please select at least one post type'
+        message: 'Please add at least one location rule'
       });
       return;
     }
+
+    // Check if any rule group has at least one valid rule
+    const hasValidRule = formData.location.some(group =>
+      group.some(rule => rule.param && rule.value)
+    );
+
+    if (!hasValidRule) {
+      addNotice({
+        type: 'error',
+        message: 'Please configure at least one location rule with a parameter and value'
+      });
+      return;
+    }
+
     saveMutation.mutate(formData);
   };
 
@@ -410,29 +435,28 @@ export default function FieldGroupEditor() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Post Types */}
+          {/* Location Rules */}
           <Card>
             <CardHeader>
-              <CardTitle>Post Types *</CardTitle>
+              <CardTitle>Location Rules *</CardTitle>
               <CardDescription>
-                Select which post types this field group applies to
+                Define where this field group should appear
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {cptTypes.map((cpt: any) => (
-                  <div key={cpt.slug} className="flex items-center justify-between">
-                    <Label htmlFor={`cpt-${cpt.slug}`} className="font-normal cursor-pointer">
-                      {cpt.name}
-                    </Label>
-                    <Switch
-                      id={`cpt-${cpt.slug}`}
-                      checked={formData.postTypes.includes(cpt.slug)}
-                      onCheckedChange={() => handlePostTypeToggle(cpt.slug)}
-                    />
-                  </div>
-                ))}
-              </div>
+            <CardContent className="space-y-4">
+              {/* Show current user info if any rule uses user role parameters */}
+              {formData.location?.some(group =>
+                group.some(rule =>
+                  rule.param === 'user_role' || rule.param === 'current_user_role'
+                )
+              ) && <CurrentUserInfo />}
+
+              <LocationRulesEditor
+                ruleGroups={formData.location || []}
+                onChange={(location) => setFormData({ ...formData, location })}
+                availableParams={locationParams}
+                getAvailableValues={getAvailableValues}
+              />
             </CardContent>
           </Card>
 

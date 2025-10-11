@@ -60,3 +60,15 @@ export {
   useFieldDependencies,
   useDebouncedFieldValues,
 } from './useConditionalLogic';
+
+// Location Rules hooks
+export {
+  useLocationRules,
+  useLocationParams,
+} from './useLocationRules';
+
+// Location Evaluation hooks
+export {
+  useLocationEvaluation,
+  useFieldGroupsByLocation,
+} from './useLocationEvaluation';

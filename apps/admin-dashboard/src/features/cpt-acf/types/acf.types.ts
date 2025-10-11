@@ -91,8 +91,25 @@ export interface FieldChoice {
   label: string;
 }
 
+// Location parameter types
+export type LocationParam =
+  | 'post_type'
+  | 'user_role'
+  | 'post_taxonomy'
+  | 'post_category'
+  | 'page_template'
+  | 'post_template'
+  | 'post_status'
+  | 'post_format'
+  | 'page_type'
+  | 'page_parent'
+  | 'page_template'
+  | 'current_user'
+  | 'current_user_role'
+  | 'user_form';
+
 export interface FieldLocation {
-  param: string;
+  param: LocationParam | string; // Allow custom params
   operator: '==' | '!=' | 'contains' | 'not_contains';
   value: string;
 }

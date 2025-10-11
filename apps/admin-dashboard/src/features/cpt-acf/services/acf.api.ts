@@ -160,9 +160,107 @@ export const acfUtilsApi = {
   }
 };
 
+/**
+ * ACF Location Management
+ */
+export const acfLocationApi = {
+  // Get available values for a location parameter
+  async getLocationValues(
+    param: string
+  ): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get(
+      `${API_BASE}/location/values/${param}`
+    );
+    return response.data;
+  },
+
+  // Get user roles for location rules
+  async getUserRoles(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/api/v1/roles');
+    // Transform role definitions to value/label pairs
+    const roles = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: roles.map((role: any) => ({
+        value: role.name || role.id,
+        label: role.displayName || role.name || role.id
+      }))
+    };
+  },
+
+  // Get post types for location rules
+  async getPostTypes(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/cpt/custom-post-types');
+    const types = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: types.map((type: any) => ({
+        value: type.name || type.slug,
+        label: type.label || type.name || type.slug
+      }))
+    };
+  },
+
+  // Get taxonomies for location rules
+  async getTaxonomies(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/api/v1/taxonomies');
+    const taxonomies = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: taxonomies.map((tax: any) => ({
+        value: tax.name || tax.slug,
+        label: tax.label || tax.name || tax.slug
+      }))
+    };
+  },
+
+  // Get categories for location rules
+  async getCategories(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/api/v1/posts/categories');
+    const categories = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: categories.map((cat: any) => ({
+        value: cat.id || cat.slug,
+        label: cat.name || cat.slug
+      }))
+    };
+  },
+
+  // Get page templates for location rules
+  async getPageTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    // This would come from theme or config
+    return {
+      success: true,
+      data: [
+        { value: 'default', label: 'Default Template' },
+        { value: 'full-width', label: 'Full Width' },
+        { value: 'sidebar-left', label: 'Sidebar Left' },
+        { value: 'sidebar-right', label: 'Sidebar Right' },
+        { value: 'landing-page', label: 'Landing Page' },
+      ]
+    };
+  },
+
+  // Get post templates for location rules
+  async getPostTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    // This would come from theme or config
+    return {
+      success: true,
+      data: [
+        { value: 'default', label: 'Default Template' },
+        { value: 'featured', label: 'Featured Post' },
+        { value: 'gallery', label: 'Gallery Post' },
+        { value: 'video', label: 'Video Post' },
+      ]
+    };
+  }
+};
+
 // Export combined API
 export default {
   groups: acfGroupApi,
   values: acfValueApi,
-  utils: acfUtilsApi
+  utils: acfUtilsApi,
+  location: acfLocationApi
 };
