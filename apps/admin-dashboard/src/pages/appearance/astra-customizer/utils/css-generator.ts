@@ -34,7 +34,18 @@ export function generateCSS(settings: AstraCustomizerSettings): string {
 function generateColorVariables(settings: AstraCustomizerSettings): string[] {
   const vars: string[] = [];
   const { colors } = settings;
-  
+
+  // Unified --wp-* variables (matching token-map.ts)
+  vars.push(`  --wp-color-primary-500: ${colors.primaryColor};`);
+  vars.push(`  --wp-color-secondary-500: ${colors.secondaryColor};`);
+  vars.push(`  --wp-text-primary: ${colors.textColor};`);
+  vars.push(`  --wp-link-color: ${colors.linkColor.normal};`);
+  vars.push(`  --wp-link-color-hover: ${colors.linkColor.hover || colors.linkColor.normal};`);
+  vars.push(`  --wp-border-primary: ${colors.borderColor};`);
+  vars.push(`  --wp-bg-body: ${colors.bodyBackground};`);
+  vars.push(`  --wp-bg-content: ${colors.contentBackground};`);
+
+  // Legacy backward compatibility
   vars.push(`  --ast-primary-color: ${colors.primaryColor};`);
   vars.push(`  --ast-secondary-color: ${colors.secondaryColor};`);
   vars.push(`  --ast-text-color: ${colors.textColor};`);
@@ -43,47 +54,61 @@ function generateColorVariables(settings: AstraCustomizerSettings): string[] {
   vars.push(`  --ast-border-color: ${colors.borderColor};`);
   vars.push(`  --ast-body-bg: ${colors.bodyBackground};`);
   vars.push(`  --ast-content-bg: ${colors.contentBackground};`);
-  
+
   // Palette colors
   Object.entries(colors.palette).forEach(([key, value]) => {
     vars.push(`  --ast-palette-${key}: ${value};`);
   });
-  
+
   return vars;
 }
 
 function generateTypographyVariables(settings: AstraCustomizerSettings): string[] {
   const vars: string[] = [];
   const { typography } = settings;
-  
-  // Body font
+
+  // Unified --wp-* variables
+  vars.push(`  --wp-font-body: ${typography.bodyFont.fontFamily};`);
+  vars.push(`  --wp-font-size-body-desktop: ${typography.bodyFont.fontSize.desktop}px;`);
+  vars.push(`  --wp-font-size-body-tablet: ${typography.bodyFont.fontSize.tablet}px;`);
+  vars.push(`  --wp-font-size-body-mobile: ${typography.bodyFont.fontSize.mobile}px;`);
+  vars.push(`  --wp-line-height-body-desktop: ${typography.bodyFont.lineHeight.desktop};`);
+  vars.push(`  --wp-line-height-body-tablet: ${typography.bodyFont.lineHeight.tablet};`);
+  vars.push(`  --wp-line-height-body-mobile: ${typography.bodyFont.lineHeight.mobile};`);
+
+  // Legacy backward compatibility
   vars.push(`  --ast-body-font-family: ${typography.bodyFont.fontFamily};`);
   vars.push(`  --ast-body-font-weight: ${typography.bodyFont.fontWeight};`);
   vars.push(`  --ast-body-text-transform: ${typography.bodyFont.textTransform};`);
-  
+
   // Button font
   vars.push(`  --ast-button-font-family: ${typography.button.fontFamily};`);
   vars.push(`  --ast-button-font-weight: ${typography.button.fontWeight};`);
   vars.push(`  --ast-button-text-transform: ${typography.button.textTransform};`);
-  
+
   return vars;
 }
 
 function generateSpacingVariables(settings: AstraCustomizerSettings): string[] {
   const vars: string[] = [];
   const { container, sidebar } = settings;
-  
-  // Container widths
+
+  // Unified --wp-* variables
+  vars.push(`  --wp-container-width-desktop: ${container.width.desktop}px;`);
+  vars.push(`  --wp-container-width-tablet: ${container.width.tablet}px;`);
+  vars.push(`  --wp-container-width-mobile: ${container.width.mobile}px;`);
+
+  // Legacy backward compatibility
   vars.push(`  --ast-container-width-desktop: ${container.width.desktop}px;`);
   vars.push(`  --ast-container-width-tablet: ${container.width.tablet}px;`);
   vars.push(`  --ast-container-width-mobile: ${container.width.mobile}px;`);
-  
+
   // Sidebar
   vars.push(`  --ast-sidebar-width-desktop: ${sidebar.width.desktop}%;`);
   vars.push(`  --ast-sidebar-width-tablet: ${sidebar.width.tablet}%;`);
   vars.push(`  --ast-sidebar-width-mobile: ${sidebar.width.mobile}%;`);
   vars.push(`  --ast-sidebar-gap: ${sidebar.gap.desktop}px;`);
-  
+
   return vars;
 }
 
