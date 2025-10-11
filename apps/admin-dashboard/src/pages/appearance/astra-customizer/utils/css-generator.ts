@@ -123,10 +123,10 @@ function generateResponsiveCSS(settings: AstraCustomizerSettings): string[] {
   css.push(`  font-weight: ${typography.bodyFont.fontWeight};`);
   css.push(`  line-height: ${typography.bodyFont.lineHeight.desktop};`);
   css.push(`  letter-spacing: ${typography.bodyFont.letterSpacing.desktop}px;`);
-  css.push(`  color: var(--ast-text-color);`);
-  css.push(`  background-color: var(--ast-body-bg);`);
+  css.push(`  color: var(--wp-text-primary);`);
+  css.push(`  background-color: var(--wp-bg-body);`);
   css.push('}');
-  
+
   // Headings
   ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
     const heading = typography.headings[tag as keyof typeof typography.headings];
@@ -139,15 +139,15 @@ function generateResponsiveCSS(settings: AstraCustomizerSettings): string[] {
     css.push(`  text-transform: ${heading.textTransform};`);
     css.push('}');
   });
-  
+
   // Links
   css.push('a {');
-  css.push(`  color: var(--ast-link-color);`);
+  css.push(`  color: var(--wp-link-color);`);
   css.push(`  text-decoration: none;`);
   css.push(`  transition: color 0.2s;`);
   css.push('}');
   css.push('a:hover {');
-  css.push(`  color: var(--ast-link-hover-color);`);
+  css.push(`  color: var(--wp-link-color-hover);`);
   css.push('}');
   
   // Tablet styles
