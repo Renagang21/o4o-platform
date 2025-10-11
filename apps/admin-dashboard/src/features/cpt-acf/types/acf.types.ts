@@ -50,6 +50,7 @@ export interface CustomField {
   };
   subFields?: CustomField[]; // For repeater/flexible content
   layouts?: FieldLayout[]; // For flexible content
+  layout?: 'table' | 'block' | 'row'; // For repeater layout
   buttonLabel?: string; // For repeater
   minRows?: number; // For repeater
   maxRows?: number; // For repeater
@@ -162,6 +163,32 @@ export interface LinkValue {
   url: string;
   title?: string;
   target?: '_blank' | '_self';
+}
+
+/**
+ * Repeater Field Types
+ */
+
+// Single repeater row - map of field names to values
+export interface RepeaterRow {
+  _id: string; // Unique ID for this row (for React keys and drag-drop)
+  [fieldName: string]: any; // Field values keyed by field name
+}
+
+// Repeater field value - array of rows
+export type RepeaterValue = RepeaterRow[];
+
+// Repeater layout options
+export type RepeaterLayout = 'table' | 'block' | 'row';
+
+// Repeater configuration (extends CustomField properties)
+export interface RepeaterConfig {
+  layout?: RepeaterLayout; // Default: 'block'
+  buttonLabel?: string; // Label for "Add Row" button
+  minRows?: number; // Minimum number of rows (0 = no minimum)
+  maxRows?: number; // Maximum number of rows (0 = no maximum)
+  collapsed?: string; // Field name to show when row is collapsed
+  subFields: CustomField[]; // Sub-fields for each row
 }
 
 export interface FieldValue {
