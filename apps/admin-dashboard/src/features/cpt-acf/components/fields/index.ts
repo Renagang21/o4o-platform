@@ -6,4 +6,5 @@
 export { LinkFieldInput } from './LinkFieldInput';
 export { LinkFieldDisplay } from './LinkFieldDisplay';
 export { RepeaterFieldInput } from './RepeaterFieldInput';
+export { GroupFieldInput } from './GroupFieldInput';
 export { FormRenderer } from '../FormRenderer';
