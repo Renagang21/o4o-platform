@@ -33,6 +33,10 @@ interface RepeaterFieldInputProps {
   value?: RepeaterValue | null;
   onChange?: (value: RepeaterValue | null) => void;
   disabled?: boolean;
+  /** Unique identifier for this repeater instance (important for nested repeaters) */
+  repeaterId?: string;
+  /** Parent repeater ID (for nested repeaters) */
+  parentRepeaterId?: string;
   renderSubField?: (
     subField: CustomField,
     value: any,
@@ -46,10 +50,17 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   value = [],
   onChange,
   disabled = false,
+  repeaterId,
+  parentRepeaterId,
   renderSubField,
 }) => {
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(new Set());
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Generate a unique ID for this repeater instance if not provided
+  const instanceId = useMemo(() => {
+    return repeaterId || `repeater_${field.name}_${Date.now()}`;
+  }, [repeaterId, field.name]);
 
   // Setup drag and drop sensors
   const sensors = useSensors(
@@ -132,8 +143,17 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
 
   // Handle drag start
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  }, []);
+    const draggedRowId = event.active.id as string;
+
+    // Verify the row belongs to this repeater instance
+    const rowExists = rows.some(row => row._id === draggedRowId);
+    if (!rowExists) {
+      console.warn(`[Repeater ${instanceId}] Attempted to drag row from different repeater`);
+      return;
+    }
+
+    setActiveId(draggedRowId);
+  }, [rows, instanceId]);
 
   // Handle drag end
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -144,16 +164,22 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
       return;
     }
 
+    // Validate both items belong to this repeater
     const oldIndex = rows.findIndex(row => row._id === active.id);
     const newIndex = rows.findIndex(row => row._id === over.id);
 
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const newRows = arrayMove(rows, oldIndex, newIndex);
-      onChange?.(newRows);
+    if (oldIndex === -1 || newIndex === -1) {
+      console.warn(`[Repeater ${instanceId}] Attempted to drop row from different repeater`);
+      setActiveId(null);
+      return;
     }
 
+    // Perform the reorder
+    const newRows = arrayMove(rows, oldIndex, newIndex);
+    onChange?.(newRows);
+
     setActiveId(null);
-  }, [rows, onChange]);
+  }, [rows, onChange, instanceId]);
 
   // Handle drag cancel
   const handleDragCancel = useCallback(() => {
@@ -539,6 +565,7 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
 
   return (
     <DndContext
+      id={instanceId}
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
@@ -549,7 +576,11 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
         items={rows.map(row => row._id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="space-y-3">
+        <div
+          className="space-y-3"
+          data-repeater-id={instanceId}
+          data-parent-repeater={parentRepeaterId || 'root'}
+        >
           {/* Header with Collapse/Expand All (Block layout only) */}
           {rows.length > 0 && config.layout === 'block' && (
             <div className="flex items-center justify-between pb-2">
