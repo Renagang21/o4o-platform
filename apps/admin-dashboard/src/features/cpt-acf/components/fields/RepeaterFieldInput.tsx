@@ -8,6 +8,23 @@ import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, ChevronsDown, Chevr
 import type { CustomField, RepeaterValue, RepeaterRow } from '../../types/acf.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface RepeaterFieldInputProps {
   field: CustomField;
@@ -30,6 +47,14 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   renderSubField,
 }) => {
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(new Set());
+
+  // Setup drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Ensure value is an array
   const rows = useMemo(() => {
@@ -101,6 +126,23 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
 
     onChange?.(newRows);
   }, [disabled, rows, onChange]);
+
+  // Handle drag end
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = rows.findIndex(row => row._id === active.id);
+    const newIndex = rows.findIndex(row => row._id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newRows = arrayMove(rows, oldIndex, newIndex);
+      onChange?.(newRows);
+    }
+  }, [rows, onChange]);
 
   // Toggle row collapse
   const toggleRowCollapse = useCallback((rowId: string) => {
@@ -236,8 +278,43 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     }
   }, [renderSubField, handleRowFieldChange, disabled]);
 
+  // Sortable Row Wrapper Component
+  interface SortableRowWrapperProps {
+    id: string;
+    children: React.ReactNode;
+  }
+
+  const SortableRowWrapper: React.FC<SortableRowWrapperProps> = ({ id, children }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...attributes}>
+        {React.Children.map(children, child => {
+          if (React.isValidElement(child)) {
+            // Pass drag listeners to the child
+            return React.cloneElement(child, { dragListeners: listeners } as any);
+          }
+          return child;
+        })}
+      </div>
+    );
+  };
+
   // Render single row (Block layout)
-  const renderBlockRow = useCallback((row: RepeaterRow, index: number) => {
+  const renderBlockRow = useCallback((row: RepeaterRow, index: number, dragListeners?: any) => {
     const isCollapsed = collapsedRows.has(row._id);
     const collapsedValue = config.collapsed ? getCollapsedValue(row) : '';
 
@@ -247,7 +324,10 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
         <div className="flex items-center justify-between p-3 bg-gray-50 border-b">
           <div className="flex items-center gap-2 flex-1">
             {/* Drag Handle */}
-            <div className="cursor-grab text-gray-400 hover:text-gray-600">
+            <div
+              className="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+              {...(dragListeners || {})}
+            >
               <GripVertical className="w-4 h-4" />
             </div>
 
@@ -316,11 +396,14 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   }, [collapsedRows, config, getCollapsedValue, toggleRowCollapse, handleRemoveRow, disabled, rows.length, renderFieldInput]);
 
   // Render single row (Row layout - compact inline)
-  const renderRowLayoutRow = useCallback((row: RepeaterRow, index: number) => {
+  const renderRowLayoutRow = useCallback((row: RepeaterRow, index: number, dragListeners?: any) => {
     return (
       <div key={row._id} className="flex items-center gap-2 p-2 border border-gray-200 rounded-md bg-white mb-2 hover:bg-gray-50">
         {/* Drag Handle */}
-        <div className="cursor-grab text-gray-400 hover:text-gray-600 flex-shrink-0">
+        <div
+          className="cursor-grab text-gray-400 hover:text-gray-600 flex-shrink-0 active:cursor-grabbing"
+          {...(dragListeners || {})}
+        >
           <GripVertical className="w-4 h-4" />
         </div>
 
@@ -354,6 +437,47 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
     );
   }, [config, renderFieldInput, handleRemoveRow, disabled, rows.length]);
 
+  // Render single table row
+  const renderTableRow = useCallback((row: RepeaterRow, index: number, dragListeners?: any) => {
+    return (
+      <tr key={row._id} className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
+        {/* Row Number with Drag Handle */}
+        <td className="px-3 py-2">
+          <div className="flex items-center gap-1">
+            <div
+              className="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+              {...(dragListeners || {})}
+            >
+              <GripVertical className="w-3 h-3" />
+            </div>
+            <span className="text-xs font-medium text-gray-600">{index + 1}</span>
+          </div>
+        </td>
+
+        {/* Field Cells */}
+        {config.subFields.map((subField) => (
+          <td key={subField.name} className="px-3 py-2">
+            {renderFieldInput(row, subField)}
+          </td>
+        ))}
+
+        {/* Delete Button */}
+        <td className="px-3 py-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleRemoveRow(row._id)}
+            disabled={disabled || (config.minRows > 0 && rows.length <= config.minRows)}
+            className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="w-3 h-3" />
+          </Button>
+        </td>
+      </tr>
+    );
+  }, [config, renderFieldInput, handleRemoveRow, disabled, rows.length]);
+
   // Render table layout
   const renderTableLayout = useCallback(() => {
     if (rows.length === 0) return null;
@@ -375,92 +499,80 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={row._id} className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
-                {/* Row Number with Drag Handle */}
-                <td className="px-3 py-2">
-                  <div className="flex items-center gap-1">
-                    <div className="cursor-grab text-gray-400 hover:text-gray-600">
-                      <GripVertical className="w-3 h-3" />
-                    </div>
-                    <span className="text-xs font-medium text-gray-600">{index + 1}</span>
-                  </div>
-                </td>
-
-                {/* Field Cells */}
-                {config.subFields.map((subField) => (
-                  <td key={subField.name} className="px-3 py-2">
-                    {renderFieldInput(row, subField)}
-                  </td>
-                ))}
-
-                {/* Delete Button */}
-                <td className="px-3 py-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveRow(row._id)}
-                    disabled={disabled || (config.minRows > 0 && rows.length <= config.minRows)}
-                    className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </td>
-              </tr>
+              <SortableRowWrapper key={row._id} id={row._id}>
+                {renderTableRow(row, index)}
+              </SortableRowWrapper>
             ))}
           </tbody>
         </table>
       </div>
     );
-  }, [rows, config, renderFieldInput, handleRemoveRow, disabled]);
+  }, [rows, config, renderTableRow]);
 
   // Check if can add more rows
   const canAddRow = !disabled && (config.maxRows === 0 || rows.length < config.maxRows);
 
   return (
-    <div className="space-y-3">
-      {/* Header with Collapse/Expand All (Block layout only) */}
-      {rows.length > 0 && config.layout === 'block' && (
-        <div className="flex items-center justify-between pb-2">
-          <span className="text-sm font-medium text-gray-700">
-            {rows.length} {rows.length === 1 ? 'Row' : 'Rows'}
-          </span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={allCollapsed ? expandAll : collapseAll}
-            className="text-xs h-7"
-          >
-            {allCollapsed ? (
-              <>
-                <ChevronsDown className="w-3 h-3 mr-1" />
-                Expand All
-              </>
-            ) : (
-              <>
-                <ChevronsUp className="w-3 h-3 mr-1" />
-                Collapse All
-              </>
-            )}
-          </Button>
-        </div>
-      )}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={rows.map(row => row._id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-3">
+          {/* Header with Collapse/Expand All (Block layout only) */}
+          {rows.length > 0 && config.layout === 'block' && (
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-sm font-medium text-gray-700">
+                {rows.length} {rows.length === 1 ? 'Row' : 'Rows'}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={allCollapsed ? expandAll : collapseAll}
+                className="text-xs h-7"
+              >
+                {allCollapsed ? (
+                  <>
+                    <ChevronsDown className="w-3 h-3 mr-1" />
+                    Expand All
+                  </>
+                ) : (
+                  <>
+                    <ChevronsUp className="w-3 h-3 mr-1" />
+                    Collapse All
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
 
-      {/* Rows List - Layout-specific rendering */}
-      {rows.length > 0 && config.layout === 'block' && (
-        <div>
-          {rows.map((row, index) => renderBlockRow(row, index))}
-        </div>
-      )}
+          {/* Rows List - Layout-specific rendering */}
+          {rows.length > 0 && config.layout === 'block' && (
+            <div>
+              {rows.map((row, index) => (
+                <SortableRowWrapper key={row._id} id={row._id}>
+                  {renderBlockRow(row, index)}
+                </SortableRowWrapper>
+              ))}
+            </div>
+          )}
 
-      {rows.length > 0 && config.layout === 'table' && renderTableLayout()}
+          {rows.length > 0 && config.layout === 'table' && renderTableLayout()}
 
-      {rows.length > 0 && config.layout === 'row' && (
-        <div>
-          {rows.map((row, index) => renderRowLayoutRow(row, index))}
-        </div>
-      )}
+          {rows.length > 0 && config.layout === 'row' && (
+            <div>
+              {rows.map((row, index) => (
+                <SortableRowWrapper key={row._id} id={row._id}>
+                  {renderRowLayoutRow(row, index)}
+                </SortableRowWrapper>
+              ))}
+            </div>
+          )}
 
       {/* Empty State */}
       {rows.length === 0 && (
