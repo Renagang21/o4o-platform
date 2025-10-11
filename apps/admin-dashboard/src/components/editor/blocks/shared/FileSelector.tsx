@@ -30,6 +30,7 @@ import {
 import { useDropzone } from 'react-dropzone';
 import { MediaFile } from '@/types/content';
 import { ContentApi } from '@/api/contentApi';
+import { MediaItem } from './types';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import toast from 'react-hot-toast';
@@ -104,7 +105,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
   const [showUploader, setShowUploader] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewItem, setPreviewItem] = useState<MediaItem | null>(null);
+  const [previewItem, setPreviewItem] = useState<FileItem | null>(null);
 
   const { ref: loadMoreRef, inView } = useInView();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -274,22 +275,6 @@ const FileSelector: React.FC<FileSelectorProps> = ({
     const mediaArray = (page as any)?.data?.media || (page as any)?.media || (page as any)?.data || [];
     const transformed = Array.isArray(mediaArray) ? mediaArray.map(transformMediaFile) : [];
 
-    // DEBUG: Log file info for markdown debugging
-    if (acceptedMimeTypes?.includes('text/markdown')) {
-      console.log('🔍 [FileSelector Debug] All files:', transformed.map(f => ({
-        title: f.title,
-        mimeType: f.mimeType,
-        type: f.type,
-        url: f.url
-      })));
-      console.log('🔍 [FileSelector Debug] Document files:', transformed.filter(f => f.type === 'document').map(f => ({
-        title: f.title,
-        mimeType: f.mimeType,
-        hasMarkdownExt: f.title.toLowerCase().endsWith('.md') || f.title.toLowerCase().endsWith('.markdown')
-      })));
-      console.log('🔍 [FileSelector Debug] Filters - MIME:', acceptedMimeTypes, 'Extensions:', acceptedExtensions);
-    }
-
     return transformed;
   }) || [];
 
@@ -412,31 +397,57 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: acceptedTypes.reduce((acc, type) => {
-      if (type === 'document') {
-        // Document formats
-        acc['text/markdown'] = ['.md'];
-        acc['text/plain'] = ['.txt'];
-        acc['application/pdf'] = ['.pdf'];
-        acc['application/msword'] = ['.doc'];
-        acc['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = ['.docx'];
-        acc['application/vnd.ms-excel'] = ['.xls'];
-        acc['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] = ['.xlsx'];
-      } else if (type === 'audio') {
-        // Audio formats
-        acc['audio/*'] = [];
-      } else if (type === 'other') {
-        // Allow common file types for 'other' category
-        acc['application/json'] = ['.json'];
-        acc['application/xml'] = ['.xml'];
-        acc['application/zip'] = ['.zip'];
-        acc['text/csv'] = ['.csv'];
-      } else {
-        // image, video
-        acc[`${type}/*`] = [];
+    accept: (() => {
+      // If specific MIME types and extensions are provided, use them
+      if ((acceptedMimeTypes && acceptedMimeTypes.length > 0) || (acceptedExtensions && acceptedExtensions.length > 0)) {
+        const acceptMap: Record<string, string[]> = {};
+
+        // Add MIME types
+        if (acceptedMimeTypes && acceptedMimeTypes.length > 0) {
+          acceptedMimeTypes.forEach(mimeType => {
+            acceptMap[mimeType] = acceptedExtensions || [];
+          });
+        }
+
+        // If only extensions are provided, add common MIME types for those extensions
+        if (acceptedExtensions && acceptedExtensions.length > 0 && (!acceptedMimeTypes || acceptedMimeTypes.length === 0)) {
+          // For .md and .markdown files
+          if (acceptedExtensions.some(ext => ext === '.md' || ext === '.markdown')) {
+            acceptMap['text/markdown'] = acceptedExtensions;
+            acceptMap['text/plain'] = acceptedExtensions;
+          }
+        }
+
+        return acceptMap;
       }
-      return acc;
-    }, {} as Record<string, string[]>),
+
+      // Otherwise, use acceptedTypes
+      return acceptedTypes.reduce((acc, type) => {
+        if (type === 'document') {
+          // Document formats
+          acc['text/markdown'] = ['.md'];
+          acc['text/plain'] = ['.txt'];
+          acc['application/pdf'] = ['.pdf'];
+          acc['application/msword'] = ['.doc'];
+          acc['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = ['.docx'];
+          acc['application/vnd.ms-excel'] = ['.xls'];
+          acc['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] = ['.xlsx'];
+        } else if (type === 'audio') {
+          // Audio formats
+          acc['audio/*'] = [];
+        } else if (type === 'other') {
+          // Allow common file types for 'other' category
+          acc['application/json'] = ['.json'];
+          acc['application/xml'] = ['.xml'];
+          acc['application/zip'] = ['.zip'];
+          acc['text/csv'] = ['.csv'];
+        } else {
+          // image, video
+          acc[`${type}/*`] = [];
+        }
+        return acc;
+      }, {} as Record<string, string[]>);
+    })(),
     maxFiles: 10,
     maxSize: 100 * 1024 * 1024, // 100MB
     noClick: true
@@ -444,8 +455,53 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
   // Handle file upload
   const handleFileUpload = async (files: File[]) => {
+    // Validate files against acceptedExtensions and acceptedMimeTypes
+    const invalidFiles: File[] = [];
+    const validFiles: File[] = [];
+
+    files.forEach(file => {
+      let isValid = true;
+
+      // Check MIME type
+      if (acceptedMimeTypes && acceptedMimeTypes.length > 0) {
+        isValid = acceptedMimeTypes.includes(file.type);
+      }
+
+      // Check extension
+      if (acceptedExtensions && acceptedExtensions.length > 0) {
+        const fileName = file.name.toLowerCase();
+        const hasValidExtension = acceptedExtensions.some(ext =>
+          fileName.endsWith(ext.toLowerCase())
+        );
+        // If MIME type check passed, extension must also pass (AND condition)
+        // If MIME type check didn't run, extension check is sufficient
+        if (acceptedMimeTypes && acceptedMimeTypes.length > 0) {
+          isValid = isValid && hasValidExtension;
+        } else {
+          isValid = hasValidExtension;
+        }
+      }
+
+      if (isValid) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file);
+      }
+    });
+
+    // Show error for invalid files
+    if (invalidFiles.length > 0) {
+      const fileNames = invalidFiles.map(f => f.name).join(', ');
+      const extensionsText = acceptedExtensions?.join(', ') || 'allowed types';
+      toast.error(`Invalid file type: ${fileNames}. Only ${extensionsText} files are allowed.`);
+
+      if (validFiles.length === 0) {
+        return; // No valid files to upload
+      }
+    }
+
     setIsUploading(true);
-    const uploadItems: UploadProgress[] = files.map(file => ({
+    const uploadItems: UploadProgress[] = validFiles.map(file => ({
       file,
       progress: 0,
       status: 'uploading' as const
@@ -462,7 +518,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         })));
       }, 500);
 
-      await ContentApi.uploadFiles(files);
+      await ContentApi.uploadFiles(validFiles);
 
       clearInterval(progressInterval);
 
@@ -472,7 +528,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         status: 'success' as const
       })));
 
-      toast.success(`${files.length}개 파일이 업로드되었습니다.`);
+      toast.success(`${validFiles.length}개 파일이 업로드되었습니다.`);
 
       // Refresh media list
       setTimeout(() => {
@@ -931,7 +987,8 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                     ...file,
                     filename: file.title,
                     mediaType: file.type,
-                    size: file.fileSize || 0
+                    size: file.fileSize || 0,
+                    type: (file.type === 'image' || file.type === 'video') ? file.type : 'image' as 'image' | 'video'
                   }))}
                   selectedIds={selectedFiles}
                   onItemSelect={(id, selected) => {

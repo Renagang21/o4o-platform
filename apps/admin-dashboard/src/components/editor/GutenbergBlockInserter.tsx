@@ -63,7 +63,7 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
       // Wait a bit for blocks to be registered
       setTimeout(() => {
         // Get categories from WordPress
-        const wpCategories = window.wp?.blocks?.getCategories?.() || [];
+        const wpCategories = (window.wp?.blocks?.getCategories?.() as Category[] | undefined) || [];
         setCategories(wpCategories);
 
         // Get blocks from WordPress

@@ -1,0 +1,44 @@
+# Prometheus Configuration for AI Page Builder
+# Sprint 4: Monitoring Configuration
+#
+# Usage:
+# docker run -d -p 9090:9090 -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+
+global:
+  scrape_interval: 15s # Scrape targets every 15 seconds
+  evaluation_interval: 15s # Evaluate rules every 15 seconds
+  external_labels:
+    cluster: 'ai-page-builder'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'localhost:9093' # AlertManager address
+
+# Load rules files
+rule_files:
+  - 'alert_rules.yml'
+
+# Scrape configurations
+scrape_configs:
+  # AI API Server metrics
+  - job_name: 'ai-api-server'
+    static_configs:
+      - targets: ['localhost:3000'] # API server address
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # Node.js application metrics (if using prom-client's default metrics)
+  - job_name: 'nodejs-app'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: '/metrics'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

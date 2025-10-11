@@ -1,5 +1,8 @@
 import { FC } from 'react';
-import { Card, Checkbox, RadioGroup, RadioGroupItem, Label, Slider, Button } from '@o4o/ui';
+import { Card, Slider, Button } from '@o4o/ui';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { formatCurrency } from '@o4o/utils';
 import { cn } from '@o4o/utils';
 

@@ -62,9 +62,10 @@ export default function UserForm() {
     try {
       setLoading(true);
       const response = await UserApi.getUser(id);
-      
-      if (response.data.success) {
-        const userData = response.data.data;
+      const responseAny = response as any;
+
+      if (responseAny.data?.success) {
+        const userData = responseAny.data.data;
         
         // Set form values
         setValue('email', userData.email);
@@ -86,9 +87,10 @@ export default function UserForm() {
     try {
       setLoading(true);
       
-      const payload = {
+      const payload: any = {
         ...data,
         role: data.roles[0], // Primary role
+        name: `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.email
       };
 
       if (isEdit) {

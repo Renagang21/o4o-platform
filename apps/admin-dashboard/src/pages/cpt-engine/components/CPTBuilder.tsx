@@ -57,7 +57,7 @@ const CPTBuilder: React.FC<CPTBuilderProps> = ({
     showInMenu: selectedType?.showInMenu ?? true,
     menuPosition: selectedType?.menuPosition || 25,
     hasArchive: selectedType?.hasArchive ?? true,
-    supports: selectedType?.supports || ['title', 'editor', 'thumbnail'],
+    supports: (selectedType?.supports || ['title', 'editor', 'thumbnail']) as any,
     rewrite: selectedType?.rewrite || { slug: '', withFront: true },
     capabilities: selectedType?.capabilities || {},
     taxonomies: selectedType?.taxonomies || []
@@ -185,7 +185,7 @@ const CPTBuilder: React.FC<CPTBuilderProps> = ({
       showInMenu: cpt.showInMenu,
       menuPosition: cpt.menuPosition,
       hasArchive: cpt.hasArchive,
-      supports: cpt.supports,
+      supports: cpt.supports as any,
       rewrite: cpt.rewrite,
       capabilities: cpt.capabilities,
       taxonomies: cpt.taxonomies

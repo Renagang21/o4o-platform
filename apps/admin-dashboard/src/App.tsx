@@ -9,6 +9,12 @@ import { useAuthStore } from '@/stores/authStore';
 import '@/styles/wordpress-theme.css';
 import '@/styles/wordpress-sidebar.css';
 import '@/styles/admin-layout-fixed.css';
+import '@/styles/block-toolbar.css';
+import '@/styles/block-selection.css';
+import '@/styles/inspector-sidebar.css';
+import '@/styles/block-placeholder.css';
+import '@/styles/block-inserter.css';
+import '@/styles/inner-blocks.css';
 
 // Register Dynamic Shortcodes
 import '@/utils/register-dynamic-shortcodes';

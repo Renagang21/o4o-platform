@@ -21,7 +21,7 @@ const SlideBlockWrapper: React.FC<BlockProps> = (props) => {
 
   return (
     <OriginalSlideBlock
-      attributes={props.attributes as SlideBlockAttributes}
+      attributes={props.attributes as unknown as SlideBlockAttributes}
       setAttributes={handleSetAttributes}
       isSelected={props.isSelected}
       className={props.className}

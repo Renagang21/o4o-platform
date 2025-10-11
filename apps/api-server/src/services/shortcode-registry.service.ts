@@ -16,6 +16,7 @@ class ShortcodeRegistryService {
   private shortcodes: Map<string, ShortcodeInfo> = new Map();
   private categories: Map<string, ShortcodeCategory> = new Map();
   private lastUpdated: Date = new Date();
+  private schemaVersion = '1.0.0';
 
   private constructor() {
     this.initializeDefaultCategories();
@@ -383,6 +384,7 @@ class ShortcodeRegistryService {
       total: shortcodes.length,
       categories,
       shortcodes: aiShortcodes,
+      schemaVersion: this.schemaVersion,
       lastUpdated: this.lastUpdated.toISOString()
     };
   }

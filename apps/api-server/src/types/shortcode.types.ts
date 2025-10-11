@@ -16,6 +16,12 @@ export interface ShortcodeParameter {
   };
 }
 
+export interface ShortcodeMigration {
+  version: string;
+  description: string;
+  migrate?: string; // 마이그레이션 함수 설명 (실행은 향후 구현)
+}
+
 export interface ShortcodeInfo {
   name: string;
   description: string;
@@ -26,6 +32,7 @@ export interface ShortcodeInfo {
   tags: string[];
   deprecated?: boolean;
   replacedBy?: string;
+  migrations?: ShortcodeMigration[];
   aiPrompts?: string[]; // AI가 이 shortcode를 사용할 때의 힌트
 }
 
@@ -51,5 +58,6 @@ export interface ShortcodeRegistryResponse {
   total: number;
   categories: ShortcodeCategory[];
   shortcodes: ShortcodeAIReference[];
+  schemaVersion: string; // 레지스트리 스키마 버전
   lastUpdated: string;
 }

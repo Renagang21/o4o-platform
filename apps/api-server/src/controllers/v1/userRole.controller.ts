@@ -315,7 +315,7 @@ export class UserRoleController {
 
       const user = await UserRoleController.userRepository.findOne({
         where: { id: userId },
-        select: ['id', 'email', 'name', 'role', 'status']
+        select: ['id', 'role', 'email', 'firstName', 'lastName', 'name', 'status']
       });
 
       if (!user) {
@@ -347,16 +347,12 @@ export class UserRoleController {
       res.status(200).json({
         success: true,
         data: {
-          user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            status: user.status
-          },
+          userId: user.id,
+          email: user.email,
+          role: user.role,
           permissions: allPermissions,
           groupedPermissions,
-          rolePermissions: userPermissions,
+          allPermissions: userPermissions,
           totalPermissions: allPermissions.length,
           grantedPermissions: userPermissions.length
         }
@@ -364,8 +360,7 @@ export class UserRoleController {
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        message: 'Internal server error'
       });
     }
   }

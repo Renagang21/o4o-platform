@@ -6,6 +6,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import AdmZip from 'adm-zip';
 import axios from 'axios';
+import { THEME_DIRS, THEME_SUBDIRS, THEME_FILES } from '../config/appearance.constants';
 
 export interface ThemeManifest {
   name: string;
@@ -37,7 +38,7 @@ export class ThemeService {
   constructor() {
     this.themeRepository = AppDataSource.getRepository(Theme);
     this.installationRepository = AppDataSource.getRepository(ThemeInstallation);
-    this.themesDir = path.join(process.cwd(), 'themes');
+    this.themesDir = THEME_DIRS.BASE;
   }
 
   /**
@@ -79,7 +80,7 @@ export class ThemeService {
       const zipBuffer = Buffer.from(response.data);
 
       // Create temp directory
-      const tempDir = path.join(this.themesDir, 'temp', Date.now().toString());
+      const tempDir = path.join(THEME_DIRS.TEMP, Date.now().toString());
       await fs.mkdir(tempDir, { recursive: true });
 
       // Extract theme
@@ -87,7 +88,7 @@ export class ThemeService {
       zip.extractAllTo(tempDir, true);
 
       // Read theme manifest
-      const manifestPath = path.join(tempDir, 'theme.json');
+      const manifestPath = path.join(tempDir, THEME_FILES.MANIFEST);
       const manifestContent = await fs.readFile(manifestPath, 'utf-8');
       const manifest: ThemeManifest = JSON.parse(manifestContent);
 
@@ -257,7 +258,7 @@ export class ThemeService {
     await hooks.doAction('before_theme_update', theme);
 
     // Backup current theme
-    const backupDir = path.join(this.themesDir, 'backups', theme.slug, Date.now().toString());
+    const backupDir = path.join(THEME_DIRS.BACKUPS, theme.slug, Date.now().toString());
     await fs.mkdir(backupDir, { recursive: true });
     
     const themeDir = path.join(this.themesDir, theme.slug);
@@ -273,7 +274,7 @@ export class ThemeService {
       zip.extractAllTo(themeDir, true);
 
       // Read updated manifest
-      const manifestPath = path.join(themeDir, 'theme.json');
+      const manifestPath = path.join(themeDir, THEME_FILES.MANIFEST);
       const manifestContent = await fs.readFile(manifestPath, 'utf-8');
       const manifest: ThemeManifest = JSON.parse(manifestContent);
 
@@ -417,9 +418,9 @@ export class ThemeService {
   private async getThemeStyles(theme: Theme): Promise<string[]> {
     const styles: string[] = [];
     const themeDir = path.join(this.themesDir, theme.slug);
-    
+
     try {
-      const stylesDir = path.join(themeDir, 'styles');
+      const stylesDir = path.join(themeDir, THEME_SUBDIRS.STYLES);
       const files = await fs.readdir(stylesDir);
       
       for (const file of files) {
@@ -445,9 +446,9 @@ export class ThemeService {
   private async getThemeScripts(theme: Theme): Promise<string[]> {
     const scripts: string[] = [];
     const themeDir = path.join(this.themesDir, theme.slug);
-    
+
     try {
-      const scriptsDir = path.join(themeDir, 'scripts');
+      const scriptsDir = path.join(themeDir, THEME_SUBDIRS.SCRIPTS);
       const files = await fs.readdir(scriptsDir);
       
       for (const file of files) {

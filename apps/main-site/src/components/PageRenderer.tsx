@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
 
 interface Page {
   id: string;
@@ -15,6 +16,8 @@ interface PageRendererProps {
 }
 
 const PageRenderer: FC<PageRendererProps> = ({ page }) => {
+  const { currentWidth, currentPadding } = useCustomizerSettings();
+
   // Simple rendering logic - prioritize displaying content
   const renderContent = () => {
     // Check blocks field first (from API response)
@@ -131,7 +134,11 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   };
 
   return (
-    <div className="page-content">
+    <div className="page-content mx-auto py-10" style={{
+      maxWidth: `${currentWidth}px`,
+      paddingLeft: `${currentPadding.left}px`,
+      paddingRight: `${currentPadding.right}px`,
+    }}>
       <article className="prose prose-lg max-w-none">
         {/* Always show title */}
         <h1 className="text-4xl font-bold text-gray-900 mb-8">{page.title}</h1>

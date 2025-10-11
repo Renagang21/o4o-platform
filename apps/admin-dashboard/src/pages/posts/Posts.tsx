@@ -31,11 +31,17 @@ const PostsRefactored = () => {
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
-  const [quickEditData, setQuickEditData] = useState({
+  const [quickEditData, setQuickEditData] = useState<{
+    title: string;
+    slug: string;
+    status: 'pending' | 'draft' | 'published' | 'trash';
+    categoryIds: string[];
+    tags: string;
+  }>({
     title: '',
     slug: '',
-    status: 'published' as const,
-    categoryIds: [] as string[],
+    status: 'published',
+    categoryIds: [],
     tags: ''
   });
   
@@ -155,7 +161,7 @@ const PostsRefactored = () => {
       setQuickEditData({
         title: post.title,
         slug: post.slug,
-        status: post.status,
+        status: post.status as 'pending' | 'draft' | 'published' | 'trash',
         categoryIds: post.categories || [],
         tags: post.tags ? post.tags.join(', ') : ''
       });

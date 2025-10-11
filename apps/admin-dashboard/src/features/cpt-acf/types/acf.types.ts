@@ -41,7 +41,8 @@ export interface CustomField {
   allowNull?: boolean;
   multiple?: boolean;
   returnFormat?: string;
-  conditional?: FieldConditional;
+  conditional?: FieldConditional; // Legacy single condition
+  conditionalLogic?: ConditionalLogic; // New multi-condition logic
   wrapper?: {
     width?: string;
     class?: string;
@@ -49,6 +50,7 @@ export interface CustomField {
   };
   subFields?: CustomField[]; // For repeater/flexible content
   layouts?: FieldLayout[]; // For flexible content
+  layout?: 'table' | 'block' | 'row'; // For repeater layout
   buttonLabel?: string; // For repeater
   minRows?: number; // For repeater
   maxRows?: number; // For repeater
@@ -61,6 +63,7 @@ export type FieldType =
   | 'number'
   | 'email'
   | 'url'
+  | 'link'
   | 'select'
   | 'checkbox'
   | 'radio'
@@ -89,16 +92,63 @@ export interface FieldChoice {
   label: string;
 }
 
+// Location parameter types
+export type LocationParam =
+  | 'post_type'
+  | 'user_role'
+  | 'post_taxonomy'
+  | 'post_category'
+  | 'page_template'
+  | 'post_template'
+  | 'post_status'
+  | 'post_format'
+  | 'page_type'
+  | 'page_parent'
+  | 'page_template'
+  | 'current_user'
+  | 'current_user_role'
+  | 'user_form';
+
 export interface FieldLocation {
-  param: string;
+  param: LocationParam | string; // Allow custom params
   operator: '==' | '!=' | 'contains' | 'not_contains';
   value: string;
 }
 
+// Legacy single condition (for backward compatibility)
 export interface FieldConditional {
   field: string;
   operator: '==' | '!=' | 'empty' | '!empty' | '>' | '<';
   value: any;
+}
+
+// Conditional Logic Operator Types
+export type ConditionalOperator =
+  | '=='
+  | '!='
+  | '>'
+  | '<'
+  | '>='
+  | '<='
+  | 'contains'
+  | 'not_contains'
+  | 'empty'
+  | '!empty'
+  | 'pattern' // regex pattern match
+  | '!pattern';
+
+// Single conditional rule
+export interface ConditionalRule {
+  field: string; // field name/key to check
+  operator: ConditionalOperator;
+  value: any;
+}
+
+// Multi-condition logic with AND/OR support
+export interface ConditionalLogic {
+  enabled: boolean;
+  logic: 'and' | 'or'; // how to combine rules
+  rules: ConditionalRule[];
 }
 
 export interface FieldLayout {
@@ -107,6 +157,38 @@ export interface FieldLayout {
   label: string;
   display: 'table' | 'block' | 'row';
   subFields: CustomField[];
+}
+
+export interface LinkValue {
+  url: string;
+  title?: string;
+  target?: '_blank' | '_self';
+}
+
+/**
+ * Repeater Field Types
+ */
+
+// Single repeater row - map of field names to values
+export interface RepeaterRow {
+  _id: string; // Unique ID for this row (for React keys and drag-drop)
+  [fieldName: string]: any; // Field values keyed by field name
+}
+
+// Repeater field value - array of rows
+export type RepeaterValue = RepeaterRow[];
+
+// Repeater layout options
+export type RepeaterLayout = 'table' | 'block' | 'row';
+
+// Repeater configuration (extends CustomField properties)
+export interface RepeaterConfig {
+  layout?: RepeaterLayout; // Default: 'block'
+  buttonLabel?: string; // Label for "Add Row" button
+  minRows?: number; // Minimum number of rows (0 = no minimum)
+  maxRows?: number; // Maximum number of rows (0 = no maximum)
+  collapsed?: string; // Field name to show when row is collapsed
+  subFields: CustomField[]; // Sub-fields for each row
 }
 
 export interface FieldValue {

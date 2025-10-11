@@ -1,0 +1,458 @@
+/**
+ * Block Selection & Interaction Styles
+ * WordPress Gutenberg-inspired block selection and drag-and-drop system
+ */
+
+/* ============================================================================
+   Block Wrapper Base
+   ============================================================================ */
+
+.block-editor-block {
+  position: relative;
+  margin: 28px 0;
+  transition: all 0.1s ease;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+}
+
+.block-editor-block:first-child {
+  margin-top: 0;
+}
+
+.block-editor-block:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================================================
+   Block Selection States
+   ============================================================================ */
+
+/* Hover state */
+.block-editor-block.is-hovered {
+  outline-color: rgba(0, 115, 170, 0.25);
+  cursor: pointer;
+}
+
+.block-editor-block.is-hovered .block-editor-block__drag-handle {
+  opacity: 1;
+}
+
+/* Selected state */
+.block-editor-block.is-selected {
+  outline-color: #007cba;
+  outline-width: 1px;
+  z-index: 60;
+}
+
+.block-editor-block.is-selected .block-editor-block__drag-handle {
+  opacity: 1;
+}
+
+/* Multi-selected state */
+.block-editor-block.is-multi-selected {
+  outline-color: rgba(0, 115, 170, 0.4);
+  background: rgba(0, 115, 170, 0.05);
+}
+
+/* Focus state (keyboard navigation) */
+.block-editor-block:focus-within {
+  outline-color: #007cba;
+  outline-width: 2px;
+}
+
+/* Dragging state */
+.block-editor-block.is-dragging {
+  opacity: 0.5;
+  outline-color: #949494;
+  cursor: move;
+}
+
+.block-editor-block.is-dragging * {
+  pointer-events: none;
+}
+
+/* Drop target */
+.block-editor-block.is-drop-target {
+  outline-color: #00a32a;
+  outline-width: 2px;
+  outline-style: dashed;
+}
+
+.block-editor-block.is-drop-target::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #00a32a;
+}
+
+/* ============================================================================
+   Drag Handle
+   ============================================================================ */
+
+.block-editor-block__drag-handle {
+  position: absolute;
+  top: -2px;
+  left: -40px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  z-index: 61;
+}
+
+.block-editor-block__drag-handle:hover {
+  background: #f0f0f0;
+  border-color: #949494;
+}
+
+.block-editor-block__drag-handle:active {
+  cursor: grabbing;
+  background: #e0e0e0;
+}
+
+.block-editor-block__drag-handle svg {
+  width: 16px;
+  height: 16px;
+  fill: #1e1e1e;
+  pointer-events: none;
+}
+
+/* Always show handle when block is selected */
+.block-editor-block.is-selected .block-editor-block__drag-handle {
+  opacity: 1;
+}
+
+/* ============================================================================
+   Block Inserter (+ button between blocks)
+   ============================================================================ */
+
+.block-editor-block__inserter {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #007cba;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  z-index: 30;
+  transition: all 0.1s ease;
+}
+
+.block-editor-block__inserter:hover {
+  background: #005a87;
+  transform: translateX(-50%) scale(1.1);
+}
+
+.block-editor-block__inserter svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.block-editor-block:hover .block-editor-block__inserter {
+  display: flex;
+}
+
+.block-editor-block.is-selected .block-editor-block__inserter {
+  display: flex;
+}
+
+/* ============================================================================
+   Block Controls (top-right actions)
+   ============================================================================ */
+
+.block-editor-block__controls {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  z-index: 61;
+}
+
+.block-editor-block.is-hovered .block-editor-block__controls,
+.block-editor-block.is-selected .block-editor-block__controls {
+  opacity: 1;
+}
+
+.block-editor-block__control-button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  color: #1e1e1e;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.block-editor-block__control-button:hover {
+  background: #f0f0f0;
+  border-color: #949494;
+}
+
+.block-editor-block__control-button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.block-editor-block__control-button--remove {
+  color: #cc1818;
+}
+
+.block-editor-block__control-button--remove:hover {
+  background: #f7ebec;
+  border-color: #cc1818;
+}
+
+/* ============================================================================
+   Block Type Label (appears on hover)
+   ============================================================================ */
+
+.block-editor-block__type-label {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+  white-space: nowrap;
+  z-index: 70;
+}
+
+.block-editor-block.is-hovered .block-editor-block__type-label {
+  opacity: 1;
+}
+
+/* ============================================================================
+   Nested Blocks (InnerBlocks)
+   ============================================================================ */
+
+.block-editor-block__inner-blocks {
+  position: relative;
+  padding: 14px;
+  min-height: 50px;
+}
+
+.block-editor-block__inner-blocks::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px dashed #ddd;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.block-editor-block.is-selected .block-editor-block__inner-blocks::before {
+  border-color: rgba(0, 115, 170, 0.3);
+}
+
+.block-editor-block__inner-blocks:empty::after {
+  content: 'Add blocks here...';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #949494;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   Block Placeholder
+   ============================================================================ */
+
+.block-editor-block__placeholder {
+  padding: 40px;
+  background: #f0f0f0;
+  border: 1px dashed #949494;
+  border-radius: 4px;
+  text-align: center;
+  color: #1e1e1e;
+}
+
+.block-editor-block__placeholder-title {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.block-editor-block__placeholder-description {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  color: #757575;
+}
+
+.block-editor-block__placeholder-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================================================
+   Responsive Adjustments
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .block-editor-block {
+    margin: 20px 0;
+  }
+
+  .block-editor-block__drag-handle {
+    left: -36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .block-editor-block__controls {
+    top: -4px;
+    right: -4px;
+  }
+
+  .block-editor-block__control-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .block-editor-block__inserter {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .block-editor-block {
+    margin: 16px 0;
+  }
+
+  .block-editor-block__drag-handle {
+    left: 0;
+    top: -36px;
+  }
+
+  .block-editor-block__type-label {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   Animation & Transitions
+   ============================================================================ */
+
+@keyframes block-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.block-editor-block--newly-inserted {
+  animation: block-appear 0.2s ease;
+}
+
+/* Drop indicator animation */
+@keyframes drop-indicator {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.block-editor-block.is-drop-target::before {
+  animation: drop-indicator 0.8s ease infinite;
+}
+
+/* ============================================================================
+   Accessibility
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .block-editor-block,
+  .block-editor-block *,
+  .block-editor-block::before,
+  .block-editor-block::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.block-editor-block:focus-visible {
+  outline: 2px solid #007cba;
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+  .block-editor-block__drag-handle,
+  .block-editor-block__controls,
+  .block-editor-block__inserter,
+  .block-editor-block__type-label {
+    display: none !important;
+  }
+
+  .block-editor-block {
+    outline: none !important;
+    margin: 16px 0 !important;
+  }
+}
+
+/* =============================================================================
+   SCREEN READER ONLY
+   ============================================================================= */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

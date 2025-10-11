@@ -6,6 +6,7 @@ import React from 'react';
 import { FileCode } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import MarkdownReaderBlock from '@/components/editor/blocks/MarkdownReaderBlock';
+import { BlockComponent } from '../registry/types';
 
 export const markdownReaderBlockDefinition: BlockDefinition = {
   name: 'o4o/markdown-reader',
@@ -14,7 +15,7 @@ export const markdownReaderBlockDefinition: BlockDefinition = {
   icon: <FileCode className="w-5 h-5" />,
   description: 'Display markdown content from media library files.',
   keywords: ['markdown', 'md', 'document', 'reader'],
-  component: MarkdownReaderBlock,
+  component: MarkdownReaderBlock as unknown as BlockComponent,
   attributes: {
     url: {
       type: 'string',

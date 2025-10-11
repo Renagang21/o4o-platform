@@ -1,0 +1,523 @@
+/**
+ * InnerBlocks Styles
+ * Nested blocks visualization and container styles
+ */
+
+/* =============================================================================
+   INNER BLOCKS - Container
+   ============================================================================= */
+
+.inner-blocks {
+  position: relative;
+  min-height: 40px;
+  padding: 8px;
+  border: 1px dashed #e0e0e0;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.01);
+  transition: all 0.2s ease;
+}
+
+.inner-blocks:hover {
+  border-color: #0073aa;
+  background: rgba(0, 115, 170, 0.02);
+}
+
+/* Vertical orientation (default) */
+.inner-blocks--vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Horizontal orientation (for columns) */
+.inner-blocks--horizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Depth Visualization
+   ============================================================================= */
+
+/* Level 1 (direct children) */
+.inner-blocks[data-depth="1"] {
+  padding: 12px;
+  border-width: 2px;
+}
+
+/* Level 2 */
+.inner-blocks[data-depth="2"] {
+  padding: 10px;
+  border-style: dotted;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Level 3 */
+.inner-blocks[data-depth="3"] {
+  padding: 8px;
+  border-color: #ccc;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* Level 4+ (deeper nesting) */
+.inner-blocks[data-depth="4"],
+.inner-blocks[data-depth="5"] {
+  padding: 6px;
+  border-color: #bbb;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* =============================================================================
+   INNER BLOCKS - Empty State
+   ============================================================================= */
+
+.inner-blocks-empty {
+  min-height: 120px;
+  padding: 24px;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.inner-blocks-empty:hover {
+  border-color: #0073aa;
+  background: #f5f9fc;
+}
+
+.inner-blocks-empty__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.inner-blocks-empty__placeholder svg {
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.inner-blocks-empty__placeholder p {
+  color: #757575;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Nested Block Wrapper
+   ============================================================================= */
+
+.inner-blocks .block-editor-block {
+  margin: 0; /* Remove default margin for nested blocks */
+}
+
+.inner-blocks .block-editor-block + .block-editor-block {
+  margin-top: 8px; /* Add spacing between nested blocks */
+}
+
+/* Nested blocks should have reduced selection indicator */
+.inner-blocks .block-editor-block.is-selected {
+  outline-width: 1px;
+  outline-offset: 1px;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Drag Over State
+   ============================================================================= */
+
+.inner-blocks.is-drag-over {
+  border-color: #0073aa;
+  background: rgba(0, 115, 170, 0.05);
+  box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
+}
+
+/* =============================================================================
+   INNER BLOCKS - Template Lock States
+   ============================================================================= */
+
+.inner-blocks--locked {
+  border-color: #999;
+  background: #f5f5f5;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.inner-blocks--locked::after {
+  content: 'Locked';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 2px 6px;
+  background: #999;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 2px;
+  z-index: 10;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Column Layout Specific
+   ============================================================================= */
+
+.inner-blocks--columns {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+.inner-blocks--columns[data-columns="1"] {
+  grid-template-columns: 1fr;
+}
+
+.inner-blocks--columns[data-columns="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.inner-blocks--columns[data-columns="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.inner-blocks--columns[data-columns="4"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Column block wrapper */
+.inner-blocks--column {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.inner-blocks--column:hover {
+  border-color: #0073aa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* =============================================================================
+   INNER BLOCKS - Group Block
+   ============================================================================= */
+
+.inner-blocks--group {
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 20px;
+  background: #fff;
+}
+
+.inner-blocks--group:hover {
+  border-color: #0073aa;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Cover Block
+   ============================================================================= */
+
+.inner-blocks--cover {
+  position: relative;
+  min-height: 300px;
+  padding: 40px;
+  border: none;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inner-blocks--cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
+}
+
+.inner-blocks--cover > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Allowed Blocks Indicator
+   ============================================================================= */
+
+.inner-blocks--restricted::before {
+  content: attr(data-allowed-blocks);
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: 2px 6px;
+  background: #0073aa;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 2px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.inner-blocks--restricted:hover::before {
+  opacity: 1;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Responsive Design
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .inner-blocks--horizontal {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .inner-blocks--columns {
+    grid-template-columns: 1fr !important; /* Stack columns on mobile */
+    gap: 12px;
+  }
+
+  .inner-blocks--cover {
+    min-height: 200px;
+    padding: 24px;
+  }
+
+  .inner-blocks[data-depth="1"],
+  .inner-blocks[data-depth="2"],
+  .inner-blocks[data-depth="3"] {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inner-blocks {
+    padding: 6px;
+  }
+
+  .inner-blocks-empty {
+    min-height: 100px;
+    padding: 16px;
+  }
+
+  .inner-blocks--column {
+    padding: 12px;
+  }
+}
+
+/* =============================================================================
+   INNER BLOCKS - Accessibility
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .inner-blocks,
+  .inner-blocks-empty,
+  .inner-blocks--column {
+    transition: none;
+  }
+}
+
+.inner-blocks:focus-within {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* =============================================================================
+   INNER BLOCKS - Print Styles
+   ============================================================================= */
+
+@media print {
+  .inner-blocks,
+  .inner-blocks-empty {
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .inner-blocks--locked::after,
+  .inner-blocks--restricted::before {
+    display: none;
+  }
+}
+
+/* =============================================================================
+   INNER BLOCKS - High Contrast Mode
+   ============================================================================= */
+
+@media (prefers-contrast: high) {
+  .inner-blocks {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+
+  .inner-blocks-empty {
+    border-width: 3px;
+  }
+}
+
+/* =============================================================================
+   INNER BLOCKS - Animation
+   ============================================================================= */
+
+@keyframes inner-block-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inner-blocks .block-editor-block {
+  animation: inner-block-appear 0.3s ease;
+}
+
+/* Disable animation on first load */
+.inner-blocks--no-animation .block-editor-block {
+  animation: none;
+}
+
+/* =============================================================================
+   GROUP BLOCK - Container Styles
+   ============================================================================= */
+
+.wp-block-group {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 50px;
+}
+
+/* Flow layout (default) */
+.wp-block-group--layout-flow {
+  display: block;
+}
+
+.wp-block-group--layout-flow > .group-inner-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Flex layout */
+.wp-block-group--layout-flex {
+  display: flex;
+}
+
+.wp-block-group--layout-flex > .group-inner-blocks {
+  display: flex;
+  width: 100%;
+}
+
+/* Grid layout */
+.wp-block-group--layout-grid {
+  display: grid;
+}
+
+.wp-block-group--layout-grid > .group-inner-blocks {
+  display: contents;
+}
+
+/* Group toolbar */
+.group-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.group-toolbar .toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.group-toolbar .toolbar-button:hover:not(.active) {
+  background: rgba(0, 115, 170, 0.1) !important;
+}
+
+/* Group inner blocks styling */
+.group-inner-blocks {
+  min-height: 40px;
+}
+
+/* Selected state */
+.wp-block-group.is-selected {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* Empty state */
+.wp-block-group:empty::before {
+  content: 'Add blocks to this group...';
+  display: block;
+  padding: 20px;
+  text-align: center;
+  color: #757575;
+  font-size: 14px;
+}
+
+/* =============================================================================
+   COVER BLOCK - InnerBlocks Support
+   ============================================================================= */
+
+.cover-inner-blocks-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.cover-inner-blocks {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.cover-inner-blocks .inner-blocks {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.cover-inner-blocks .inner-blocks:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Cover content positioning */
+.cover-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* InnerBlocks inside cover should have light text by default */
+.wp-block-cover .cover-inner-blocks {
+  color: #ffffff;
+}
+
+/* Override inner-blocks empty state for cover */
+.cover-inner-blocks .inner-blocks-empty {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.cover-inner-blocks .inner-blocks-empty__placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Block inserter button in cover */
+.cover-inner-blocks .block-inserter-button {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000000;
+}
+
+.cover-inner-blocks .block-inserter-button:hover {
+  background: rgba(255, 255, 255, 1);
+}

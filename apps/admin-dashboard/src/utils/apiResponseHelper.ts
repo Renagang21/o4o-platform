@@ -122,26 +122,24 @@ export function extractPagination(response: unknown): {
   const nestedDataObj = dataObj?.data as Record<string, unknown> | undefined;
   const metaObj = responseObj.meta as Record<string, unknown> | undefined;
   
-  const pagination = 
+  const pagination =
     responseObj.pagination ||
     dataObj?.pagination ||
     nestedDataObj?.pagination ||
     metaObj?.pagination;
 
   if (pagination) {
+    const paginationObj = pagination as Record<string, any>;
     return {
-      total: pagination.totalItems || pagination.total || 0,
-      totalPages: pagination.totalPages || pagination.total_pages || 0,
-      currentPage: pagination.currentPage || pagination.current_page || 1,
-      pageSize: pagination.pageSize || pagination.per_page || 10
+      total: paginationObj.totalItems || paginationObj.total || 0,
+      totalPages: paginationObj.totalPages || paginationObj.total_pages || 0,
+      currentPage: paginationObj.currentPage || paginationObj.current_page || 1,
+      pageSize: paginationObj.pageSize || paginationObj.per_page || 10
     };
   }
 
   // Check for total in response
-  const responseObj = response as Record<string, unknown>;
-  const dataObj = responseObj.data as Record<string, unknown> | undefined;
-  
-  const total = 
+  const total =
     (responseObj.total as number) ||
     (dataObj?.total as number) ||
     (responseObj.totalCount as number) ||

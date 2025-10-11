@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { approveProducts, getPendingProducts } from '@/api/vendor/products';
+import { approveProducts, getPendingProducts, ProductApi } from '@/api/vendor/products';
+const { rejectProduct } = ProductApi;
 import { formatPrice, calculateProfitDistribution } from '@/utils/vendorUtils';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
@@ -32,8 +33,8 @@ export const ProductApprovalManager: FC = () => {
   const loadPendingProducts = async () => {
     try {
       setLoading(true);
-      const response = await getPendingProducts({ limit: 50 });
-      setProducts(response.data || []);
+      const response = await getPendingProducts();
+      setProducts(response.products || []);
     } catch (error: any) {
       toast.error('승인 대기 제품을 불러오는데 실패했습니다');
     } finally {
@@ -75,13 +76,25 @@ export const ProductApprovalManager: FC = () => {
     };
 
     try {
-      const response = await approveProducts(request);
-      if (response.success) {
-        toast.success(`${response.approved.length}개 제품이 승인되었습니다`);
+      // Approve products one by one since API only accepts single product
+      const productIds = Array.from(selectedProducts);
+      let approvedCount = 0;
+      
+      for (const productId of productIds) {
+        try {
+          await approveProducts(productId);
+          approvedCount++;
+        } catch (err) {
+          // console.error(`Failed to approve product ${productId}`);
+        }
+      }
+      
+      if (approvedCount > 0) {
+        toast.success(`${approvedCount}개 제품이 승인되었습니다`);
         setSelectedProducts(new Set());
         loadPendingProducts();
       } else {
-        toast.error(response.message || '승인 처리 중 오류가 발생했습니다');
+        toast.error('승인 처리 중 오류가 발생했습니다');
       }
     } catch (error: any) {
       toast.error('승인 처리 중 오류가 발생했습니다');
@@ -114,15 +127,27 @@ export const ProductApprovalManager: FC = () => {
     };
 
     try {
-      const response = await approveProducts(request);
-      if (response.success) {
-        toast.success(`${response.rejected.length}개 제품이 거절되었습니다`);
+      // Reject products one by one since API only accepts single product
+      const productIds = Array.from(selectedProducts);
+      let rejectedCount = 0;
+      
+      for (const productId of productIds) {
+        try {
+          await rejectProduct(productId, rejectReason);
+          rejectedCount++;
+        } catch (err) {
+          // console.error(`Failed to reject product ${productId}`);
+        }
+      }
+      
+      if (rejectedCount > 0) {
+        toast.success(`${rejectedCount}개 제품이 거절되었습니다`);
         setSelectedProducts(new Set());
         setRejectReason('');
         setShowRejectDialog(false);
         loadPendingProducts();
       } else {
-        toast.error(response.message || '거절 처리 중 오류가 발생했습니다');
+        toast.error('거절 처리 중 오류가 발생했습니다');
       }
     } catch (error: any) {
       toast.error('거절 처리 중 오류가 발생했습니다');

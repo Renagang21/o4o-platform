@@ -1,16 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraToggle } from '../../components/controls/AstraToggle';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { AstraSelect } from '../../components/controls/AstraSelect';
-import { Menu, MoreHorizontal, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { HeaderBuilder } from '../../components/HeaderBuilder';
+import { HeaderBuilderLayout, StickyHeaderSettings, MobileHeaderSettings } from '../../types/customizer-types';
+import { StickyHeaderPanel } from '../../components/panels/StickyHeaderPanel';
+import { MobileHeaderPanel } from '../../components/panels/MobileHeaderPanel';
+import { Menu, MoreHorizontal, AlignLeft, AlignCenter, AlignRight, Layout, Smartphone } from 'lucide-react';
 
 export const HeaderLayoutSection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const header = settings.header;
   
-  const [activeTab, setActiveTab] = useState<'general' | 'primary' | 'above' | 'below'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'builder' | 'sticky' | 'mobile' | 'primary' | 'above' | 'below'>('general');
+  const [currentDevice, setCurrentDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  
+  // Initialize header builder layout if not exists
+  useEffect(() => {
+    if (!header.builder) {
+      const initialLayout: HeaderBuilderLayout = {
+        above: {
+          left: [],
+          center: [],
+          right: [],
+          settings: {
+            enabled: false,
+            height: { desktop: 40, tablet: 40, mobile: 40 },
+            background: '#f8f9fa',
+          }
+        },
+        primary: {
+          left: [{ id: 'logo-1', type: 'logo', label: 'Logo', settings: {} }],
+          center: [],
+          right: [{ id: 'menu-1', type: 'primary-menu', label: 'Primary Menu', settings: {} }],
+          settings: {
+            height: { desktop: 60, tablet: 60, mobile: 60 },
+            background: '#ffffff',
+          }
+        },
+        below: {
+          left: [],
+          center: [],
+          right: [],
+          settings: {
+            enabled: false,
+            height: { desktop: 40, tablet: 40, mobile: 40 },
+            background: '#f8f9fa',
+          }
+        }
+      };
+      updateSetting('header', initialLayout, ['builder']);
+    }
+  }, [header.builder]);
   
   const layoutOptions = [
     { value: 'header-main-layout-1', label: 'Layout 1 - Logo Left, Menu Right' },
@@ -47,6 +90,27 @@ export const HeaderLayoutSection: React.FC = () => {
           General
         </button>
         <button
+          onClick={() => setActiveTab('builder')}
+          className={`astra-tab ${activeTab === 'builder' ? 'active' : ''}`}
+        >
+          <Layout size={14} />
+          Builder
+        </button>
+        <button
+          onClick={() => setActiveTab('sticky')}
+          className={`astra-tab ${activeTab === 'sticky' ? 'active' : ''}`}
+        >
+          <Menu size={14} />
+          Sticky Header
+        </button>
+        <button
+          onClick={() => setActiveTab('mobile')}
+          className={`astra-tab ${activeTab === 'mobile' ? 'active' : ''}`}
+        >
+          <Smartphone size={14} />
+          Mobile Header
+        </button>
+        <button
           onClick={() => setActiveTab('primary')}
           className={`astra-tab ${activeTab === 'primary' ? 'active' : ''}`}
         >
@@ -68,6 +132,42 @@ export const HeaderLayoutSection: React.FC = () => {
           Below Header
         </button>
       </div>
+      
+      {activeTab === 'builder' && header.builder && (
+        <>
+          {/* Header Builder */}
+          <div className="astra-section-group">
+            <h4 className="astra-group-title">Header Layout Builder</h4>
+            <p className="astra-control-description">
+              Drag and drop modules to build your custom header layout
+            </p>
+            
+            <HeaderBuilder
+              layout={header.builder}
+              onChange={(newLayout) => updateSetting('header', newLayout, ['builder'])}
+              device={currentDevice}
+            />
+          </div>
+        </>
+      )}
+      
+      {activeTab === 'sticky' && (
+        <StickyHeaderPanel
+          settings={header.stickySettings}
+          onChange={(stickySettings: StickyHeaderSettings) => 
+            updateSetting('header', stickySettings, ['stickySettings'])
+          }
+        />
+      )}
+      
+      {activeTab === 'mobile' && (
+        <MobileHeaderPanel
+          settings={header.mobileSettings}
+          onChange={(mobileSettings: MobileHeaderSettings) => 
+            updateSetting('header', mobileSettings, ['mobileSettings'])
+          }
+        />
+      )}
       
       {activeTab === 'general' && (
         <>

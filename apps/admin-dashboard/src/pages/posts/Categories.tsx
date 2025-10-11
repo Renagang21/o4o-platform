@@ -277,7 +277,7 @@ const Categories = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-medium">Categories</h2>
-            {canCreateCategory() && (
+            {canCreateCategory && (
               <button
                 onClick={handleAddNew}
                 className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
@@ -421,7 +421,7 @@ const Categories = () => {
                         </div>
                         {hoveredRow === category.id && (
                           <div className="flex items-center gap-1 mt-1">
-                            {canEditCategory() && (
+                            {canEditCategory && (
                               <>
                                 <button
                                   onClick={() => handleEdit(category.id)}
@@ -445,7 +445,7 @@ const Categories = () => {
                             >
                               View
                             </button>
-                            {canEditCategory() && (
+                            {canEditCategory && (
                               <>
                                 <span className="text-gray-300">|</span>
                                 <button
@@ -456,7 +456,7 @@ const Categories = () => {
                                 </button>
                               </>
                             )}
-                            {canDeleteCategory() && (
+                            {canDeleteCategory && (
                               <>
                                 <span className="text-gray-300">|</span>
                                 <button

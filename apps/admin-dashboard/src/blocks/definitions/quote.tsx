@@ -6,6 +6,7 @@ import React from 'react';
 import { Quote } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import EnhancedQuoteBlock from '@/components/editor/blocks/EnhancedQuoteBlock';
+import { BlockComponent } from '../registry/types';
 
 export const quoteBlockDefinition: BlockDefinition = {
   name: 'core/quote',
@@ -14,7 +15,7 @@ export const quoteBlockDefinition: BlockDefinition = {
   icon: <Quote className="w-5 h-5" />,
   description: 'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar',
   keywords: ['quote', 'citation', 'blockquote', 'pullquote'],
-  component: EnhancedQuoteBlock,
+  component: EnhancedQuoteBlock as unknown as BlockComponent,
   attributes: {
     quote: {
       type: 'string',

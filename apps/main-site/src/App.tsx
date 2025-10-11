@@ -16,6 +16,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 
 // Archive Pages
 import CPTArchive from './pages/archive/CPTArchive';
+import BlogArchivePage from './pages/BlogArchive';
 
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
@@ -68,6 +69,7 @@ const App: FC = () => {
           } />
           
           {/* Archive Routes */}
+          <Route path="/blog" element={<BlogArchivePage />} />
           <Route path="/archive/:postType" element={
             <Layout>
               <CPTArchive />

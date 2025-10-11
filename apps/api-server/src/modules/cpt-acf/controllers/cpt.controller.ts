@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { cptService } from '../services/cpt.service';
 import { AuthRequest } from '../../../types/auth';
 import logger from '../../../utils/logger';
+import { CPT_PAGINATION, CPT_QUERY_DEFAULTS } from '../../../config/cpt.constants';
 
 /**
  * CPT Controller - HTTP layer only, delegates business logic to service
@@ -137,12 +138,12 @@ export class CPTController {
     try {
       const { slug } = req.params;
       const {
-        page = '1',
-        limit = '10',
+        page = String(CPT_PAGINATION.DEFAULT_PAGE),
+        limit = String(CPT_PAGINATION.DEFAULT_LIMIT),
         status,
         search,
-        orderBy = 'createdAt',
-        order = 'DESC'
+        orderBy = CPT_QUERY_DEFAULTS.ORDER_BY,
+        order = CPT_QUERY_DEFAULTS.ORDER
       } = req.query;
 
       const result = await cptService.getPostsByCPT(slug, {

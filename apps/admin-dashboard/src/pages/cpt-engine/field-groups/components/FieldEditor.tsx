@@ -27,6 +27,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2 } from 'lucide-react';
+import { ConditionalLogicEditor } from '@/features/cpt-acf/components/conditional-logic';
+import type { ConditionalLogic, CustomField } from '@/features/cpt-acf/types/acf.types';
 
 interface Field {
   id: string;
@@ -39,11 +41,13 @@ interface Field {
   description?: string;
   options?: any;
   order: number;
+  conditionalLogic?: ConditionalLogic;
 }
 
 interface FieldEditorProps {
   field: Field | null;
   cptTypes?: any[];
+  allFields?: Field[]; // All fields in the group for conditional logic
   onSave: (field: Field) => void;
   onCancel?: () => void;
   onClose?: () => void;
@@ -69,7 +73,7 @@ const FIELD_TYPES = [
   { value: 'repeater', label: 'Repeater' },
 ];
 
-export default function FieldEditor({ field, cptTypes = [], onSave, onCancel, onClose }: FieldEditorProps) {
+export default function FieldEditor({ field, cptTypes = [], allFields = [], onSave, onCancel, onClose }: FieldEditorProps) {
   const initialField: Field = field || {
     id: `field_${Date.now()}`,
     name: '',
@@ -141,10 +145,11 @@ export default function FieldEditor({ field, cptTypes = [], onSave, onCancel, on
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="options">Options</TabsTrigger>
             <TabsTrigger value="validation">Validation</TabsTrigger>
+            <TabsTrigger value="conditional">Conditional</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-4">
@@ -376,6 +381,17 @@ export default function FieldEditor({ field, cptTypes = [], onSave, onCancel, on
                 />
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="conditional" className="space-y-4">
+            <ConditionalLogicEditor
+              conditionalLogic={formData.conditionalLogic}
+              onChange={(conditionalLogic) =>
+                setFormData({ ...formData, conditionalLogic })
+              }
+              availableFields={allFields as unknown as CustomField[]}
+              currentFieldName={formData.name}
+            />
           </TabsContent>
         </Tabs>
 

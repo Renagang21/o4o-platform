@@ -3,6 +3,7 @@ import { authenticate as authenticateToken } from '../../middleware/auth.middlew
 import { AppDataSource } from '../../database/connection';
 import { Page } from '../../entities/Page';
 import logger from '../../utils/logger';
+import { PAGINATION_DEFAULTS, SORT_FIELDS } from '../../config/editor.constants';
 
 const router: Router = Router();
 
@@ -53,7 +54,7 @@ router.get('/', async (req: Request, res: Response) => {
     const pageRepository = AppDataSource.getRepository(Page);
     const {
       page = 1,
-      per_page = 10,
+      per_page = PAGINATION_DEFAULTS.PAGES_PER_PAGE,
       search,
       status,
       parent,
@@ -63,7 +64,7 @@ router.get('/', async (req: Request, res: Response) => {
     } = req.query;
 
     const pageNumber = parseInt(page as string);
-    const perPage = Math.min(parseInt(per_page as string), 100); // Limit to 100
+    const perPage = Math.min(parseInt(per_page as string), PAGINATION_DEFAULTS.MAX_PER_PAGE);
     const offset = (pageNumber - 1) * perPage;
 
     const queryBuilder = pageRepository.createQueryBuilder('page')
@@ -95,8 +96,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
 
     // Apply ordering
-    const validOrderFields = ['createdAt', 'updatedAt', 'title', 'menuOrder', 'publishedAt'];
-    const orderField = validOrderFields.includes(orderby as string) ? orderby as string : 'menuOrder';
+    const orderField = SORT_FIELDS.PAGES.includes(orderby as string) ? orderby as string : 'menuOrder';
     const orderDirection = (order as string).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
     
     queryBuilder.orderBy(`page.${orderField}`, orderDirection);

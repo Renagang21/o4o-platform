@@ -1,9 +1,14 @@
 /**
  * Simplified AI Page Generator (2025)
- * 복잡성을 제거하고 최신 AI API 패턴을 적용한 단순화된 버전
+ * Sprint 2 - P1: Use server-side proxy instead of direct LLM calls
+ *
+ * Security:
+ * - NO API keys in frontend code
+ * - All LLM calls go through /api/ai/generate proxy
+ * - Server handles authentication, rate limiting, and key injection
  */
 
-import { generateCompleteReference } from './block-registry-extractor';
+import { referenceFetcher } from './reference-fetcher.service';
 
 // 2025년 최신 AI 모델 목록
 export const AI_MODELS = {
@@ -13,12 +18,12 @@ export const AI_MODELS = {
   'gpt-5-nano': 'GPT-5 Nano (초고속)',
   'gpt-4.1': 'GPT-4.1 (복잡한 작업용)',
   'gpt-4o': 'GPT-4o (멀티모달)',
-  
+
   // Google Gemini 2025
   'gemini-2.5-flash': 'Gemini 2.5 Flash (권장)',
   'gemini-2.5-pro': 'Gemini 2.5 Pro (최강력)',
   'gemini-2.0-flash': 'Gemini 2.0 Flash (멀티모달)',
-  
+
   // Claude 2025 (Anthropic)
   'claude-sonnet-4.5': 'Claude Sonnet 4.5 (최신)',
   'claude-opus-4': 'Claude Opus 4 (최강력)',
@@ -34,10 +39,10 @@ export interface Block {
   attributes?: Record<string, any>;
 }
 
+// Sprint 2 - P1: Removed apiKey from config (server-side only)
 export interface AIConfig {
   provider: 'openai' | 'gemini' | 'claude';
   model: AIModel;
-  apiKey: string;
 }
 
 export interface GenerateRequest {
@@ -49,244 +54,247 @@ export interface GenerateRequest {
 }
 
 /**
+ * AI Proxy Error Response
+ */
+interface AIProxyError {
+  success: false;
+  error: string;
+  type: 'VALIDATION_ERROR' | 'AUTH_ERROR' | 'PROVIDER_ERROR' | 'TIMEOUT_ERROR' | 'RATE_LIMIT_ERROR';
+  retryable: boolean;
+  requestId?: string;
+}
+
+/**
+ * AI Proxy Success Response
+ */
+interface AIProxyResponse {
+  success: true;
+  provider: string;
+  model: string;
+  usage?: {
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+  };
+  result: {
+    blocks: any[];
+  };
+  requestId?: string;
+}
+
+/**
  * 단순화된 AI 페이지 생성기
- * - 복잡한 추상화 제거
- * - 2025년 최신 API 패턴 적용
- * - 에러 처리 단순화
+ * - Sprint 2 - P1: 모든 LLM 호출을 서버 프록시로 변경
+ * - API 키 제거 (서버에서만 보관)
+ * - 표준화된 에러 처리
  */
 export class SimpleAIGenerator {
-  
+  private readonly API_BASE: string;
+
+  constructor() {
+    // Determine API base URL
+    this.API_BASE = this.getApiBaseUrl();
+  }
+
+  /**
+   * Get API base URL
+   */
+  private getApiBaseUrl(): string {
+    // Vite environment variable
+    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL as string;
+    }
+
+    // Production environment
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname === 'admin.neture.co.kr') {
+        return 'https://api.neture.co.kr';
+      }
+    }
+
+    // Development default
+    return 'http://localhost:3002';
+  }
+
+  /**
+   * Get authentication token
+   */
+  private getAuthToken(): string | null {
+    // Cookie (priority)
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'accessToken') {
+        return value;
+      }
+    }
+
+    // localStorage (fallback)
+    return localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+  }
+
   /**
    * 메인 생성 메서드
    */
   async generatePage(request: GenerateRequest): Promise<Block[]> {
     const { prompt, template = 'landing', config, onProgress, signal } = request;
-    
+
     const updateProgress = (progress: number, message: string) => {
       onProgress?.(progress, message);
     };
 
     try {
-      updateProgress(10, 'AI 모델에 연결 중...');
-      
-      const systemPrompt = this.getSystemPrompt(template);
+      updateProgress(5, '서버에서 최신 참조 데이터 로드 중...');
+
+      // 서버 우선 전략으로 참조 데이터 가져오기
+      const availableBlocks = await this.fetchReferenceData();
+
+      updateProgress(10, 'AI 프록시 서버에 연결 중...');
+
+      const systemPrompt = this.getSystemPrompt(template, availableBlocks);
       const userPrompt = this.buildUserPrompt(prompt);
-      
+
       updateProgress(30, 'AI 응답 생성 중...');
-      
-      let blocks: Block[];
-      
-      switch (config.provider) {
-        case 'openai':
-          blocks = await this.generateWithOpenAI(systemPrompt, userPrompt, config, signal);
-          break;
-        case 'gemini':
-          blocks = await this.generateWithGemini(systemPrompt, userPrompt, config, signal);
-          break;
-        case 'claude':
-          blocks = await this.generateWithClaude(systemPrompt, userPrompt, config, signal);
-          break;
-        default:
-          throw new Error(`지원하지 않는 AI 제공자: ${config.provider}`);
-      }
-      
+
+      // Sprint 2 - P1: Use server-side proxy (single call)
+      const blocks = await this.generateWithProxy(
+        systemPrompt,
+        userPrompt,
+        config,
+        signal,
+        updateProgress
+      );
+
       updateProgress(80, '응답 처리 중...');
-      
+
       // 블록 검증 및 ID 추가
       const validatedBlocks = this.validateBlocks(blocks);
-      
+
       updateProgress(100, '페이지 생성 완료!');
-      
+
       return validatedBlocks;
-      
+
     } catch (error: any) {
       if (error.name === 'AbortError') {
         throw new Error('생성이 취소되었습니다');
       }
+
+      // Handle proxy errors
+      if (error.type) {
+        throw new Error(this.formatProxyError(error));
+      }
+
       throw new Error(error.message || 'AI 페이지 생성 중 오류가 발생했습니다');
     }
   }
 
   /**
-   * OpenAI API 호출 (2025년 최신 패턴)
+   * Sprint 2 - P1: Call server-side AI proxy
+   * Replaces direct OpenAI/Gemini/Claude calls
    */
-  private async generateWithOpenAI(
+  private async generateWithProxy(
     systemPrompt: string,
     userPrompt: string,
     config: AIConfig,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    updateProgress?: (progress: number, message: string) => void
   ): Promise<Block[]> {
-    
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const token = this.getAuthToken();
+
+    if (!token) {
+      throw new Error('로그인이 필요합니다. 다시 로그인해 주세요.');
+    }
+
+    const url = `${this.API_BASE}/api/ai/generate`;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${token}`,
       },
+      credentials: 'include',
       body: JSON.stringify({
+        provider: config.provider,
         model: config.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        // 2025년 최신 파라미터
+        systemPrompt,
+        userPrompt,
         temperature: 0.7,
-        max_tokens: 4000,
-        response_format: { type: 'json_object' },
-        // GPT-5 전용 파라미터
-        ...(config.model.startsWith('gpt-5') && {
-          verbosity: 'medium',
-          reasoning_effort: 'standard'
-        })
+        maxTokens: config.provider === 'gemini' ? 8192 : 4000,
       }),
-      signal
+      signal,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'OpenAI API 오류');
+    // Handle rate limit
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After');
+      const waitTime = retryAfter ? `${retryAfter}초` : '잠시';
+      throw new Error(`요청 한도를 초과했습니다. ${waitTime} 후 다시 시도해 주세요.`);
     }
 
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    try {
-      const parsed = JSON.parse(content);
-      return parsed.blocks || parsed;
-    } catch {
-      throw new Error('AI 응답을 파싱할 수 없습니다');
+    // Handle authentication errors
+    if (response.status === 401) {
+      throw new Error('인증이 만료되었습니다. 다시 로그인해 주세요.');
     }
+
+    // Handle timeout
+    if (response.status === 504) {
+      throw new Error('요청 시간이 초과되었습니다. 프롬프트를 간단히 하거나 다시 시도해 주세요.');
+    }
+
+    // Parse response
+    const data: AIProxyResponse | AIProxyError = await response.json();
+
+    // Handle error response
+    if (!data.success) {
+      const errorData = data as AIProxyError;
+      throw errorData;
+    }
+
+    // Success response
+    const successData = data as AIProxyResponse;
+
+    // Update progress with usage info
+    if (updateProgress && successData.usage?.totalTokens) {
+      updateProgress(70, `AI 응답 수신 완료 (토큰: ${successData.usage.totalTokens})`);
+    }
+
+    return successData.result.blocks || [];
   }
 
   /**
-   * Gemini API 호출 (2025년 최신 패턴)
+   * Format proxy error message for user
    */
-  private async generateWithGemini(
-    systemPrompt: string,
-    userPrompt: string,
-    config: AIConfig,
-    signal?: AbortSignal
-  ): Promise<Block[]> {
-    
-    // 2025년 Gemini API 버전 자동 선택
-    const apiVersion = config.model.includes('2.5') ? 'v1' : 'v1beta';
-    
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/${apiVersion}/models/${config.model}:generateContent?key=${config.apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 8192
-          }
-        }),
-        signal
-      }
-    );
+  private formatProxyError(error: AIProxyError): string {
+    const errorMessages: Record<string, string> = {
+      VALIDATION_ERROR: `잘못된 요청: ${error.error}`,
+      AUTH_ERROR: '인증 오류: 로그인이 필요합니다.',
+      PROVIDER_ERROR: `AI 서비스 오류: ${error.error}`,
+      TIMEOUT_ERROR: '요청 시간 초과: 프롬프트를 간단히 하거나 다시 시도해 주세요.',
+      RATE_LIMIT_ERROR: `요청 한도 초과: ${error.error}`,
+    };
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Gemini API 오류');
+    const baseMessage = errorMessages[error.type] || error.error;
+
+    if (error.retryable) {
+      return `${baseMessage}\n다시 시도할 수 있습니다.`;
     }
 
-    const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!content) {
-      throw new Error('Gemini로부터 응답을 받지 못했습니다');
-    }
-
-    try {
-      // Gemini 응답에서 JSON 부분 추출
-      let jsonContent = content;
-      
-      // 마크다운 코드 블록이나 기타 텍스트 제거
-      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
-                       content.match(/\{[\s\S]*\}/);
-      
-      if (jsonMatch) {
-        jsonContent = jsonMatch[1] || jsonMatch[0];
-      }
-      
-      const parsed = JSON.parse(jsonContent);
-      const blocks = parsed.blocks || (Array.isArray(parsed) ? parsed : [parsed]);
-      
-      return blocks;
-    } catch (error) {
-      
-      throw new Error('Gemini 응답을 파싱할 수 없습니다. AI가 올바른 JSON 형식을 반환하지 않았습니다.');
-    }
+    return baseMessage;
   }
 
   /**
-   * Claude API 호출 (2025년 최신 패턴)
+   * 서버 우선 전략으로 참조 데이터 가져오기
    */
-  private async generateWithClaude(
-    systemPrompt: string,
-    userPrompt: string,
-    config: AIConfig,
-    signal?: AbortSignal
-  ): Promise<Block[]> {
-    
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': config.apiKey,
-        'anthropic-version': '2025-01-01',
-        // 2025년 Claude 4 전용 헤더
-        'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14'
-      },
-      body: JSON.stringify({
-        model: config.model,
-        max_tokens: 4000,
-        system: systemPrompt,
-        messages: [{
-          role: 'user',
-          content: userPrompt
-        }],
-        temperature: 0.7,
-        // Claude 4 전용 기능
-        ...(config.model.includes('4') && {
-          stream: false,
-          stop_sequences: ['</json>']
-        })
-      }),
-      signal
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Claude API 오류');
-    }
-
-    const data = await response.json();
-    const content = data.content?.[0]?.text;
-    
-    if (!content) {
-      throw new Error('Claude로부터 응답을 받지 못했습니다');
-    }
-
-    try {
-      const parsed = JSON.parse(content);
-      return parsed.blocks || parsed;
-    } catch {
-      throw new Error('Claude 응답을 파싱할 수 없습니다');
-    }
+  private async fetchReferenceData(): Promise<string> {
+    return await referenceFetcher.fetchCompleteReference();
   }
 
   /**
    * 템플릿별 시스템 프롬프트
    */
-  private getSystemPrompt(template: string): string {
+  private getSystemPrompt(template: string, availableBlocks: string): string {
     const baseRules = `
 중요한 규칙:
 1. 반드시 JSON 형식으로만 응답하세요: {"blocks": [...]}
@@ -295,10 +303,6 @@ export class SimpleAIGenerator {
 4. 버튼은 실제 링크 대신 "#" 사용
 5. 한국어로 작성하세요
 6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
-
-    // 동적으로 블록 및 숏코드 레퍼런스 생성
-    // 런타임에 실제 등록된 블록/숏코드를 기반으로 생성됨
-    const availableBlocks = generateCompleteReference();
 
     const prompts = {
       landing: `${baseRules}
@@ -312,7 +316,7 @@ ${availableBlocks}
 - CTA 버튼
 - 이미지는 alt 텍스트만 (src 없음)
 - 필요시 숏코드 활용 (예: 상품 그리드, 문의 폼 등)`,
-      
+
       about: `${baseRules}
 
 ${availableBlocks}
@@ -349,7 +353,7 @@ ${availableBlocks}
 - 결론 및 요약
 - 관련 글: [recent_posts] 숏코드 활용 가능`
     };
-    
+
     return prompts[template as keyof typeof prompts] || prompts.landing;
   }
 
@@ -368,7 +372,7 @@ ${availableBlocks}
       "attributes": {"level": 1}
     },
     {
-      "type": "core/paragraph", 
+      "type": "core/paragraph",
       "content": {"text": "내용"},
       "attributes": {}
     },

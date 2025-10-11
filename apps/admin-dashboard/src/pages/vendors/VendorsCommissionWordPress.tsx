@@ -371,9 +371,9 @@ const VendorsCommissionWordPress = () => {
 
   return (
     <div className="wordpress-admin-container">
-      <AdminBreadcrumb 
+      <AdminBreadcrumb
         items={[
-          { label: '판매자/공급자', href: '/admin/vendors' },
+          { label: '판매자/공급자', path: '/admin/vendors' },
           { label: '수수료 관리' }
         ]} 
       />

@@ -6,6 +6,7 @@ import React from 'react';
 import { Image } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import EnhancedImageBlock from '@/components/editor/blocks/EnhancedImageBlock';
+import { BlockComponent } from '../registry/types';
 
 export const imageBlockDefinition: BlockDefinition = {
   name: 'core/image',
@@ -14,7 +15,7 @@ export const imageBlockDefinition: BlockDefinition = {
   icon: <Image className="w-5 h-5" />,
   description: 'Insert an image to make a visual statement.',
   keywords: ['photo', 'picture', 'media', 'img'],
-  component: EnhancedImageBlock,
+  component: EnhancedImageBlock as unknown as BlockComponent,
   attributes: {
     url: {
       type: 'string',

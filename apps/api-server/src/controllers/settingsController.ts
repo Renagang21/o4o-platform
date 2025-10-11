@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
 import { settingsService, SettingsType } from '../services/settingsService';
+import logger from '../utils/logger';
 
 export class SettingsController {
+  private readonly validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email', 'customizer', 'permalink'];
+
   // GET /api/settings/:type
   async getSettings(req: Request, res: Response) {
     try {
       const { type } = req.params;
-      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email'];
 
-      if (!validTypes.includes(type as SettingsType)) {
+      if (!this.validTypes.includes(type as SettingsType)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid settings type'
@@ -22,7 +24,7 @@ export class SettingsController {
         data: settings
       });
     } catch (error) {
-      // Error log removed
+      logger.error('Error fetching settings:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch settings',
@@ -35,9 +37,8 @@ export class SettingsController {
   async updateSettings(req: Request, res: Response) {
     try {
       const { type } = req.params;
-      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email'];
 
-      if (!validTypes.includes(type as SettingsType)) {
+      if (!this.validTypes.includes(type as SettingsType)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid settings type'
@@ -52,7 +53,7 @@ export class SettingsController {
         message: 'Settings updated successfully'
       });
     } catch (error) {
-      // Error log removed
+      logger.error('Error updating settings:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to update settings',
@@ -71,7 +72,7 @@ export class SettingsController {
         data: settings
       });
     } catch (error) {
-      // Error log removed
+      logger.error('Error fetching homepage settings:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch homepage settings',
@@ -90,10 +91,29 @@ export class SettingsController {
         data: settings
       });
     } catch (error) {
-      // Error log removed
+      logger.error('Error fetching general settings:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch general settings',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // GET /api/settings/customizer (public endpoint for frontend)
+  async getCustomizerSettings(req: Request, res: Response) {
+    try {
+      const settings = await settingsService.getSettings('customizer');
+
+      res.json({
+        success: true,
+        data: settings
+      });
+    } catch (error) {
+      logger.error('Error fetching customizer settings:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch customizer settings',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
@@ -109,7 +129,7 @@ export class SettingsController {
         message: 'Settings initialized successfully'
       });
     } catch (error) {
-      // Error log removed
+      logger.error('Error initializing settings:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to initialize settings',

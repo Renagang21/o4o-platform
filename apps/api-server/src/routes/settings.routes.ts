@@ -2,72 +2,22 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { authenticateToken as authenticate } from '../middleware/auth';
 import { adminOnly } from '../middleware/adminOnly';
 import { validateDto } from '../middleware/validateDto';
-import { 
-  OAuthSettingsData, 
-  OAuthProvider, 
+import {
+  OAuthSettingsData,
+  OAuthProvider,
   OAuthConfig,
   OAuthUpdateRequest,
-  OAuthTestRequest 
+  OAuthTestRequest
 } from '../types/settings';
-import { body, param } from 'express-validator';
+import { body } from 'express-validator';
 import logger from '../utils/logger';
 import { encrypt, decrypt } from '../utils/crypto';
 import { AppDataSource } from '../database/connection';
 import { Settings as Setting } from '../entities/Settings';
 import { reloadPassportStrategies } from '../config/passportDynamic';
+import { getOAuthProviderConfig } from '../config/oauth-providers';
 
 const router: Router = Router();
-
-// Helper function to get OAuth settings
-async function getOAuthSettings(): Promise<OAuthSettingsData> {
-  const settingsRepo = AppDataSource.getRepository(Setting);
-  const setting = await settingsRepo.findOne({ where: { key: 'oauth' } });
-  
-  if (!setting) {
-    // Return default settings if not found
-    return {
-      google: { 
-        provider: 'google',
-        enabled: false, 
-        clientId: '', 
-        clientSecret: '',
-        callbackUrl: '',
-        scope: []
-      },
-      kakao: { 
-        provider: 'kakao',
-        enabled: false, 
-        clientId: '', 
-        clientSecret: '',
-        callbackUrl: '',
-        scope: []
-      },
-      naver: { 
-        provider: 'naver',
-        enabled: false, 
-        clientId: '', 
-        clientSecret: '',
-        callbackUrl: '',
-        scope: []
-      }
-    };
-  }
-  
-  const data = setting.value as unknown as OAuthSettingsData;
-  
-  // Decrypt secrets
-  if (data.google.clientSecret) {
-    data.google.clientSecret = decrypt(data.google.clientSecret);
-  }
-  if (data.kakao.clientSecret) {
-    data.kakao.clientSecret = decrypt(data.kakao.clientSecret);
-  }
-  if (data.naver.clientSecret) {
-    data.naver.clientSecret = decrypt(data.naver.clientSecret);
-  }
-  
-  return data;
-}
 
 // Validation rules
 const oauthUpdateValidation = [
@@ -89,8 +39,15 @@ const getDefaultOAuthConfig = (provider: OAuthProvider): OAuthConfig => ({
   enabled: false,
   clientId: '',
   clientSecret: '',
-  callbackUrl: `${process.env.APP_URL}/api/auth/callback/${provider}`,
+  callbackUrl: `${process.env.APP_URL || ''}/api/auth/callback/${provider}`,
   scope: []
+});
+
+// Helper function to get default OAuth settings
+const getDefaultOAuthSettings = (): OAuthSettingsData => ({
+  google: getDefaultOAuthConfig('google'),
+  kakao: getDefaultOAuthConfig('kakao'),
+  naver: getDefaultOAuthConfig('naver')
 });
 
 // Helper function to encrypt sensitive OAuth data
@@ -110,7 +67,7 @@ const encryptOAuthData = (data: OAuthSettingsData): OAuthSettingsData => {
 // Helper function to decrypt sensitive OAuth data
 const decryptOAuthData = (data: OAuthSettingsData): OAuthSettingsData => {
   const decrypted = { ...data };
-  
+
   Object.keys(decrypted).forEach((provider) => {
     const config = decrypted[provider as OAuthProvider];
     if (config.clientSecret) {
@@ -122,45 +79,37 @@ const decryptOAuthData = (data: OAuthSettingsData): OAuthSettingsData => {
       }
     }
   });
-  
+
   return decrypted;
+};
+
+// Helper function to get OAuth settings from database
+const getOAuthSettings = async (): Promise<OAuthSettingsData> => {
+  const settingRepository = AppDataSource.getRepository(Setting);
+
+  const oauthSetting = await settingRepository.findOne({
+    where: { key: 'oauth_settings' }
+  });
+
+  if (!oauthSetting || !oauthSetting.value) {
+    return getDefaultOAuthSettings();
+  }
+
+  try {
+    const parsedData = typeof oauthSetting.value === 'string'
+      ? JSON.parse(oauthSetting.value)
+      : oauthSetting.value as unknown as OAuthSettingsData;
+    return decryptOAuthData(parsedData);
+  } catch (error) {
+    logger.error('Failed to parse OAuth settings:', error);
+    return getDefaultOAuthSettings();
+  }
 };
 
 // GET /api/settings/oauth - Get OAuth settings
 router.get('/oauth', authenticate, adminOnly, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const settingRepository = AppDataSource.getRepository(Setting);
-    
-    // Get OAuth settings from database
-    const oauthSetting = await settingRepository.findOne({
-      where: { key: 'oauth_settings' }
-    });
-
-    let oauthData: OAuthSettingsData;
-    
-    if (oauthSetting && oauthSetting.value) {
-      try {
-        const parsedData = typeof oauthSetting.value === 'string' 
-          ? JSON.parse(oauthSetting.value) 
-          : oauthSetting.value as unknown as OAuthSettingsData;
-        oauthData = decryptOAuthData(parsedData);
-      } catch (error) {
-        logger.error('Failed to parse OAuth settings:', error);
-        // Return default settings if parsing fails
-        oauthData = {
-          google: getDefaultOAuthConfig('google'),
-          kakao: getDefaultOAuthConfig('kakao'),
-          naver: getDefaultOAuthConfig('naver')
-        };
-      }
-    } else {
-      // Return default settings if not found
-      oauthData = {
-        google: getDefaultOAuthConfig('google'),
-        kakao: getDefaultOAuthConfig('kakao'),
-        naver: getDefaultOAuthConfig('naver')
-      };
-    }
+    const oauthData = await getOAuthSettings();
 
     res.json({
       success: true,
@@ -173,42 +122,22 @@ router.get('/oauth', authenticate, adminOnly, async (req: Request, res: Response
 });
 
 // PUT /api/settings/oauth - Update OAuth settings
-router.put('/oauth', 
-  authenticate, 
-  adminOnly, 
+router.put('/oauth',
+  authenticate,
+  adminOnly,
   oauthUpdateValidation,
   validateDto,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { provider, config } = req.body as OAuthUpdateRequest;
       const settingRepository = AppDataSource.getRepository(Setting);
-      
+
       // Get current settings
+      const currentData = await getOAuthSettings();
+
       let oauthSetting = await settingRepository.findOne({
         where: { key: 'oauth_settings' }
       });
-
-      let currentData: OAuthSettingsData;
-      
-      if (oauthSetting && oauthSetting.value) {
-        try {
-          currentData = typeof oauthSetting.value === 'string'
-            ? JSON.parse(oauthSetting.value)
-            : oauthSetting.value as unknown as OAuthSettingsData;
-        } catch (error) {
-          currentData = {
-            google: getDefaultOAuthConfig('google'),
-            kakao: getDefaultOAuthConfig('kakao'),
-            naver: getDefaultOAuthConfig('naver')
-          };
-        }
-      } else {
-        currentData = {
-          google: getDefaultOAuthConfig('google'),
-          kakao: getDefaultOAuthConfig('kakao'),
-          naver: getDefaultOAuthConfig('naver')
-        };
-      }
 
       // Update specific provider config
       currentData[provider] = {
@@ -292,7 +221,7 @@ router.post('/oauth/test',
       }
 
       const config = oauthData[provider];
-      
+
       if (!config.enabled) {
         return res.status(400).json({
           success: false,
@@ -307,45 +236,23 @@ router.post('/oauth/test',
         });
       }
 
-      // Provider-specific test logic
-      let authUrl: string;
-      let tokenUrl: string;
-      let userInfoUrl: string;
+      // Get provider configuration
+      const providerConfig = getOAuthProviderConfig(provider);
 
-      switch (provider) {
-        case 'google':
-          authUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
-          tokenUrl = 'https://oauth2.googleapis.com/token';
-          userInfoUrl = 'https://www.googleapis.com/oauth2/v2/userinfo';
-          break;
-        case 'kakao':
-          authUrl = 'https://kauth.kakao.com/oauth/authorize';
-          tokenUrl = 'https://kauth.kakao.com/oauth/token';
-          userInfoUrl = 'https://kapi.kakao.com/v2/user/me';
-          break;
-        case 'naver':
-          authUrl = 'https://nid.naver.com/oauth2.0/authorize';
-          tokenUrl = 'https://nid.naver.com/oauth2.0/token';
-          userInfoUrl = 'https://openapi.naver.com/v1/nid/me';
-          break;
-        default:
-          return res.status(400).json({
-            success: false,
-            message: 'Invalid OAuth provider'
-          });
+      if (!providerConfig) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid OAuth provider'
+        });
       }
 
       // TODO: Implement actual OAuth flow test
       // For now, just return the URLs to verify configuration
-      
+
       res.json({
         success: true,
         message: `${provider} OAuth configuration is valid`,
-        details: {
-          authUrl,
-          tokenUrl,
-          userInfoUrl
-        }
+        details: providerConfig
       });
     } catch (error) {
       logger.error('Error testing OAuth connection:', error);

@@ -131,6 +131,13 @@ export const gatewayConfig: GatewayConfig = {
     // User Routes
     { path: '/api/v1/users', service: 'user', methods: ['GET'], auth: true },
     { path: '/api/v1/users/:id', service: 'user', methods: ['GET', 'PUT', 'DELETE'], auth: true },
+    // User role and permission routes
+    { path: '/api/v1/users/:id/permissions', service: 'user', methods: ['GET'], auth: true },
+    { path: '/api/v1/users/:id/permissions/check', service: 'user', methods: ['GET'], auth: true },
+    { path: '/api/v1/users/:id/role', service: 'user', methods: ['GET', 'PUT'], auth: true },
+    { path: '/api/v1/users/roles', service: 'user', methods: ['GET'], auth: false },
+    { path: '/api/v1/users/roles/statistics', service: 'user', methods: ['GET'], auth: true },
+    { path: '/api/v1/users/permissions', service: 'user', methods: ['GET'], auth: true },
     { path: '/api/v1/users/profile', service: 'user', methods: ['GET', 'PUT'], auth: true },
     
     // E-commerce Routes

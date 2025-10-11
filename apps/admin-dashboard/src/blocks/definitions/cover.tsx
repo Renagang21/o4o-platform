@@ -6,6 +6,7 @@ import React from 'react';
 import { Layers } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import EnhancedCoverBlock from '@/components/editor/blocks/EnhancedCoverBlock';
+import { BlockComponent } from '../registry/types';
 
 export const coverBlockDefinition: BlockDefinition = {
   name: 'core/cover',
@@ -14,7 +15,7 @@ export const coverBlockDefinition: BlockDefinition = {
   icon: <Layers className="w-5 h-5" />,
   description: 'Add an image or video with a text overlay.',
   keywords: ['header', 'hero', 'banner', 'background'],
-  component: EnhancedCoverBlock,
+  component: EnhancedCoverBlock as unknown as BlockComponent,
   attributes: {
     backgroundType: {
       type: 'string',

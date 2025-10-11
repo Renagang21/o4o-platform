@@ -150,7 +150,32 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
 
     // Render component with attributes
     try {
-      return <Component {...attributes} content={content} />;
+      // Pass attributes directly without content prop for these components
+      const shortcodeKey = name.split('_')[0];
+      
+      // Special handling for role-verification which requires a type prop
+      if (shortcodeKey === 'role-verification' || name === 'RoleVerification') {
+        const verificationAttributes = {
+          type: (attributes.type as 'supplier' | 'seller' | 'affiliate') || 'supplier',
+          ...attributes
+        };
+        return <Component {...verificationAttributes} />;
+      }
+      
+      if (['dropshipping-dashboard', 'partner-products', 'partner-commissions', 'approval-queue'].includes(shortcodeKey)) {
+        return <Component type="supplier" {...attributes} />;
+      }
+      // For other components that don't need special handling
+      // Default to providing a type prop if the component is RoleVerification
+      if (shortcodeConfig.component === 'RoleVerification') {
+        const defaultProps = {
+          type: 'supplier' as const,
+          ...attributes
+        };
+        return <Component {...defaultProps} />;
+      }
+      // For all other components
+      return <Component type="supplier" {...attributes} />;
     } catch (componentError) {
       setError({
         type: 'unknown',
@@ -197,9 +222,7 @@ export const registerShortcodes = () => {
         <script>
           window.renderShortcode('${shortcodeName}', ${JSON.stringify(attributes)}, '${content}');
         </script>`;
-      },
-      attributes: config.attributes || {},
-      description: config.description
+      }
     };
   });
   

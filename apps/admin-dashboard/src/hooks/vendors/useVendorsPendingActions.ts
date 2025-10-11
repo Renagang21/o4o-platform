@@ -93,25 +93,26 @@ export const useVendorsPendingActions = (params: UseVendorsPendingActionsParams)
     }
   };
 
-  const handleBulkAction = async (vendorIds: string[], action: 'approve' | 'reject' | 'request_documents') => {
+  const handleBulkAction = async (action: string, vendorIds: Set<string> | string[]) => {
     // Mock implementation
     setLoading(true);
+    const vendorIdArray = Array.isArray(vendorIds) ? vendorIds : Array.from(vendorIds);
     try {
       // Bulk action logic here
       if (action === 'approve') {
-        params.setVendors(params.vendors.map(v => 
-          vendorIds.includes(v.id) ? { ...v, status: 'approved' as const } : v
+        params.setVendors(params.vendors.map(v =>
+          vendorIdArray.includes(v.id) ? { ...v, status: 'approved' as const } : v
         ));
       } else if (action === 'reject') {
-        params.setVendors(params.vendors.map(v => 
-          vendorIds.includes(v.id) ? { ...v, status: 'rejected' as const } : v
+        params.setVendors(params.vendors.map(v =>
+          vendorIdArray.includes(v.id) ? { ...v, status: 'rejected' as const } : v
         ));
       }
       setError(null);
-      return { success: true };
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      return { success: false };
+      return false;
     } finally {
       setLoading(false);
     }

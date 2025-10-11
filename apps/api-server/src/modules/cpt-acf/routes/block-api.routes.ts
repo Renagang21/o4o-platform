@@ -1,6 +1,7 @@
 import { Router, IRouter, Request, Response } from 'express';
 import { blockDataService } from '../services/block-data.service';
 import logger from '../../../utils/logger';
+import { CACHE_CONFIG } from '../../../config/editor.constants';
 
 /**
  * Block API Routes - Optimized endpoints for block editor
@@ -28,7 +29,7 @@ router.get('/data/:postId', async (req: Request, res: Response) => {
 
     // Add cache headers
     res.set({
-      'Cache-Control': 'public, max-age=300', // 5 minutes
+      'Cache-Control': `public, max-age=${CACHE_CONFIG.MAX_AGE}`,
       'X-Cache-Status': result.source || 'unknown'
     });
 
@@ -63,7 +64,7 @@ router.get('/featured-image/:postId', async (req: Request, res: Response) => {
 
     // Add cache headers
     res.set({
-      'Cache-Control': 'public, max-age=300',
+      'Cache-Control': `public, max-age=${CACHE_CONFIG.MAX_AGE}`,
       'X-Cache-Status': result.source || 'unknown'
     });
 
@@ -99,7 +100,7 @@ router.get('/acf-fields/:postId/:fieldName', async (req: Request, res: Response)
 
     // Add cache headers
     res.set({
-      'Cache-Control': 'public, max-age=300',
+      'Cache-Control': `public, max-age=${CACHE_CONFIG.MAX_AGE}`,
       'X-Cache-Status': result.source || 'unknown'
     });
 
@@ -129,7 +130,7 @@ router.post('/dynamic-content', async (req: Request, res: Response) => {
     // Add cache headers for GET-like POST requests
     if (req.body.postId) {
       res.set({
-        'Cache-Control': 'public, max-age=300',
+        'Cache-Control': `public, max-age=${CACHE_CONFIG.MAX_AGE}`,
         'X-Cache-Status': 'dynamic'
       });
     }

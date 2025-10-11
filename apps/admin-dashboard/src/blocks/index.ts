@@ -25,6 +25,8 @@ import buttonBlockDefinition from './definitions/button';
 
 // Layout blocks
 import columnsBlockDefinition from './definitions/columns';
+import columnBlockDefinition from './definitions/column';
+import groupBlockDefinition from './definitions/group';
 
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
@@ -63,6 +65,8 @@ export function registerAllBlocks(): void {
 
   // Register layout blocks
   blockRegistry.register(columnsBlockDefinition);
+  blockRegistry.register(columnBlockDefinition);
+  blockRegistry.register(groupBlockDefinition);
 
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
@@ -150,7 +154,7 @@ const blockStyles = `
 // Initialize custom blocks
 export function initializeCustomBlocks() {
   // WordPress polyfill이 초기화되었는지 확인
-  const domReady: (callback: () => void) => void = window.wp?.domReady || ((callback: () => void) => {
+  const domReady = (window.wp?.domReady as ((callback: () => void) => void) | undefined) || ((callback: () => void) => {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', callback);
     } else {
@@ -173,6 +177,6 @@ export function initializeCustomBlocks() {
 
 // Export block names for use in allowed blocks lists
 export const CUSTOM_BLOCKS = [
-  'o4o/group',
-  'o4o/columns'
+  'core/group',
+  'core/columns'
 ];

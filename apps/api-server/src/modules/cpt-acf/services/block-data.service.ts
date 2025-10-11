@@ -5,6 +5,7 @@ import { metaDataService } from '../../../services/MetaDataService';
 import { cptService } from './cpt.service';
 import { acfService } from './acf.service';
 import logger from '../../../utils/logger';
+import { CACHE_CONFIG, BLOCK_DYNAMIC_FIELDS } from '../../../config/editor.constants';
 
 /**
  * Block Data Service - Optimized data service for block editor
@@ -16,7 +17,7 @@ export class BlockDataService {
 
   // Cache configuration
   private cache = new Map<string, { data: any; timestamp: number }>();
-  private cacheTTL = 5 * 60 * 1000; // 5 minutes
+  private cacheTTL = CACHE_CONFIG.TTL;
 
   /**
    * Get all block data for a post (optimized single query)
@@ -283,7 +284,7 @@ export class BlockDataService {
     const sources: Record<string, any> = {};
 
     // Extract image sources
-    const imageFields = ['featuredImage', 'backgroundImage', 'coverImage'];
+    const imageFields = BLOCK_DYNAMIC_FIELDS.IMAGE_FIELDS;
     for (const field of imageFields) {
       if (customFields[field]) {
         sources[field] = customFields[field];
@@ -294,7 +295,7 @@ export class BlockDataService {
     }
 
     // Extract text sources
-    const textFields = ['subtitle', 'tagline', 'description'];
+    const textFields = BLOCK_DYNAMIC_FIELDS.TEXT_FIELDS;
     for (const field of textFields) {
       if (customFields[field]) {
         sources[field] = customFields[field];

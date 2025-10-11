@@ -1,0 +1,141 @@
+# Prometheus Alert Rules for AI Page Builder
+# Sprint 4: AlertManager Rules
+#
+# Alerts:
+# - High failure rate (>10%)
+# - Long processing time (>15s p95)
+# - High retry rate
+# - Queue congestion
+# - Low validation pass rate
+
+groups:
+  - name: ai_page_builder_alerts
+    interval: 30s
+    rules:
+      # Alert when failure rate exceeds 10%
+      - alert: HighAIJobFailureRate
+        expr: |
+          (
+            sum(rate(ai_jobs_total{status="failed"}[5m]))
+            /
+            sum(rate(ai_jobs_total[5m]))
+          ) * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-worker
+        annotations:
+          summary: "High AI job failure rate detected"
+          description: "AI job failure rate is {{ $value | humanizePercentage }} (threshold: 10%)"
+
+      # Alert when failure rate exceeds 25% (critical)
+      - alert: CriticalAIJobFailureRate
+        expr: |
+          (
+            sum(rate(ai_jobs_total{status="failed"}[5m]))
+            /
+            sum(rate(ai_jobs_total[5m]))
+          ) * 100 > 25
+        for: 3m
+        labels:
+          severity: critical
+          component: ai-worker
+        annotations:
+          summary: "CRITICAL: AI job failure rate is very high"
+          description: "AI job failure rate is {{ $value | humanizePercentage }} (threshold: 25%)"
+
+      # Alert when p95 processing time exceeds 15 seconds
+      - alert: SlowAIJobProcessing
+        expr: |
+          histogram_quantile(0.95, sum(rate(ai_jobs_processing_duration_seconds_bucket[5m])) by (le, provider, model)) > 15
+        for: 10m
+        labels:
+          severity: warning
+          component: ai-worker
+        annotations:
+          summary: "AI jobs are processing slowly"
+          description: "P95 processing time is {{ $value | humanizeDuration }} for {{ $labels.provider }}/{{ $labels.model }} (threshold: 15s)"
+
+      # Alert when retry rate is high
+      - alert: HighAIJobRetryRate
+        expr: |
+          rate(ai_jobs_retry_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-worker
+        annotations:
+          summary: "High AI job retry rate"
+          description: "AI jobs are being retried at {{ $value | humanize }} retries/sec for {{ $labels.provider }}/{{ $labels.model }}"
+
+      # Alert when queue is growing (waiting jobs increasing)
+      - alert: AIQueueCongestion
+        expr: |
+          ai_queue_size{status="waiting"} > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: queue
+        annotations:
+          summary: "AI queue is congested"
+          description: "{{ $value }} jobs are waiting in queue (threshold: 100)"
+
+      # Alert when queue is severely congested (critical)
+      - alert: AIQueueSeverelyCongested
+        expr: |
+          ai_queue_size{status="waiting"} > 500
+        for: 3m
+        labels:
+          severity: critical
+          component: queue
+        annotations:
+          summary: "CRITICAL: AI queue is severely congested"
+          description: "{{ $value }} jobs are waiting in queue (threshold: 500)"
+
+      # Alert when validation pass rate is low
+      - alert: LowValidationPassRate
+        expr: |
+          ai_jobs_validation_pass_rate < 80
+        for: 10m
+        labels:
+          severity: warning
+          component: validation
+        annotations:
+          summary: "Low schema validation pass rate"
+          description: "Validation pass rate is {{ $value | humanizePercentage }} (threshold: 80%)"
+
+      # Alert when no jobs processed recently (possible worker failure)
+      - alert: NoAIJobsProcessed
+        expr: |
+          rate(ai_jobs_total[5m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+          component: ai-worker
+        annotations:
+          summary: "No AI jobs being processed"
+          description: "No AI jobs have been processed in the last 10 minutes. Worker may be down."
+
+      # Alert when LLM token usage is abnormally high
+      - alert: HighTokenUsage
+        expr: |
+          sum(rate(ai_llm_tokens_total[1h])) > 1000000
+        for: 30m
+        labels:
+          severity: info
+          component: cost
+        annotations:
+          summary: "High LLM token usage detected"
+          description: "Token usage rate is {{ $value | humanize }} tokens/sec in the last hour"
+
+      # Alert for specific provider failures
+      - alert: ProviderFailures
+        expr: |
+          rate(ai_jobs_total{status="failed"}[5m]) by (provider) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: provider
+        annotations:
+          summary: "High failure rate for {{ $labels.provider }}"
+          description: "{{ $labels.provider }} is failing at {{ $value | humanize }} jobs/sec"

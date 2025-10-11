@@ -15,6 +15,7 @@ import FieldGroupEditor from './field-groups/FieldGroupEditor';
 import TaxonomiesList from './taxonomies/TaxonomiesList';
 import TaxonomyEditor from './taxonomies/TaxonomyEditor';
 import TermsManager from './taxonomies/TermsManager';
+import ToolsPage from './tools/ToolsPage';
 
 const CPTEngine = () => {
   return (
@@ -52,7 +53,10 @@ const CPTEngine = () => {
       <Route path="forms" element={<FormsManager />} />
       <Route path="forms/new" element={<FormBuilder />} />
       <Route path="forms/:id/edit" element={<FormBuilder />} />
-      
+
+      {/* Tools Routes */}
+      <Route path="tools" element={<ToolsPage />} />
+
       {/* Other routes handled by dashboard */}
       <Route path="*" element={<CPTDashboardToolset />} />
     </Routes>

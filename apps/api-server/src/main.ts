@@ -1,3 +1,7 @@
+// Sprint 3: Initialize OpenTelemetry before any other imports
+import { initTelemetry } from './utils/telemetry';
+const telemetrySDK = initTelemetry();
+
 import 'reflect-metadata';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors, { CorsOptions } from 'cors';
@@ -102,6 +106,9 @@ import postsRoutes from './routes/posts';
 import reusableBlocksRoutes from './routes/reusable-blocks.routes';
 import blockPatternsRoutes from './routes/block-patterns.routes';
 import aiShortcodesRoutes from './routes/ai-shortcodes';
+import aiBlocksRoutes from './routes/ai-blocks';
+import aiProxyRoutes from './routes/ai-proxy';
+import aiSchemaRoutes from './routes/ai-schema';
 import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
 import menusRoutes from './routes/menus';
@@ -117,7 +124,9 @@ import themeRoutes from './routes/v1/theme.routes';
 import appsV1Routes from './routes/v1/apps.routes';
 import pluginsV1Routes from './routes/v1/plugins.routes';
 import healthRoutes from './routes/health';
+import metricsRoutes from './routes/metrics';
 import settingsV1Routes from './routes/v1/settings.routes';
+import customizerV1Routes from './routes/v1/customizer.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
 import pagesV1Routes from './routes/v1/pages.routes';
@@ -238,12 +247,28 @@ const publicLimiter = rateLimit({
 
 
 // 미들웨어 설정
+// Sprint 2 - P3: Restore Helmet security headers
 app.use(helmet({
-  contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
-  frameguard: false, // Disable X-Frame-Options for iframe preview support
+  // Enable Content Security Policy with sensible defaults
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Allow inline scripts for React
+      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+      imgSrc: ["'self'", "data:", "https:", "http:"], // Allow images from any HTTPS source
+      connectSrc: ["'self'", "https:", "http:"], // Allow API connections
+      fontSrc: ["'self'", "data:", "https:"], // Allow fonts
+      objectSrc: ["'none'"], // Block plugins
+      mediaSrc: ["'self'", "https:", "http:"], // Allow media
+      frameSrc: ["'self'"], // Allow same-origin frames only (preview overrides this)
+      frameAncestors: ["'none'"], // Default: no framing (preview overrides this per route)
+    },
+  },
+  // Enable frameguard with DENY by default (preview route overrides this)
+  frameguard: { action: 'deny' },
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin access to resources
   crossOriginEmbedderPolicy: false, // Disable COEP to allow loading cross-origin resources
-  crossOriginOpenerPolicy: false, // Disable COOP for better compatibility
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }, // Safer than false
 }));
 
 // Enable compression for all responses
@@ -260,12 +285,14 @@ app.use(compression({
 }) as any);
 
 // CORS configuration for multiple origins
+// Sprint 2 - P3: Stricter CORS whitelist
 const corsOptions: CorsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Get allowed origins from environment variable
     const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((o: any) => o.trim()) : [];
-    
-    const allowedOrigins = [
+
+    // Development origins (localhost)
+    const devOrigins = [
       process.env.FRONTEND_URL || "http://localhost:3011",
       "http://localhost:3000", // main-site
       "http://localhost:3001", // admin dashboard
@@ -276,57 +303,68 @@ const corsOptions: CorsOptions = {
       "http://localhost:5175", // vite dev server - ecommerce
       "http://localhost:5176", // vite dev server - crowdfunding
       "http://localhost:5177", // vite dev server - signage
-      // Web server IPs
-      "http://13.125.144.8:3000", // web server main-site
-      "http://13.125.144.8:3001", // web server admin-dashboard
-      "http://13.125.144.8", // web server direct IP
-      "https://13.125.144.8", // web server direct IP (https)
-      // Production domains
+    ];
+
+    // IP-based origins (development/staging only)
+    const ipOrigins = process.env.NODE_ENV !== 'production' ? [
+      "http://13.125.144.8:3000",
+      "http://13.125.144.8:3001",
+      "http://13.125.144.8",
+      "https://13.125.144.8",
+    ] : [];
+
+    // Production domains (explicit subdomain whitelist)
+    const prodOrigins = [
       "https://neture.co.kr",
       "https://www.neture.co.kr",
       "https://admin.neture.co.kr",
-      "http://admin.neture.co.kr", // Allow both http and https for admin
       "https://shop.neture.co.kr",
       "https://forum.neture.co.kr",
       "https://signage.neture.co.kr",
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
-      "https://api.neture.co.kr", // API server itself
-      "http://api.neture.co.kr",
-      // Add environment-defined origins
+      "https://api.neture.co.kr",
+    ];
+
+    const allowedOrigins = [
+      ...devOrigins,
+      ...ipOrigins,
+      ...prodOrigins,
       ...envOrigins
     ];
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
+
+    // Sprint 2 - P3: Reject requests with no origin in production
+    // (Development: allow for testing with curl/Postman)
     if (!origin) {
-      callback(null, true);
-      return;
+      if (process.env.NODE_ENV === 'production') {
+        logger.warn('[CORS] Blocked request with no origin (production mode)');
+        callback(new Error('Origin header required'));
+        return;
+      } else {
+        // Allow in development for easier testing
+        callback(null, true);
+        return;
+      }
     }
-    
+
     // Debug logging in development
     if (process.env.NODE_ENV !== 'production' || process.env.DEBUG_CORS === 'true') {
       logger.debug(`[CORS] Request from origin: ${origin}`);
       logger.debug(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
     }
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      // In production, allow any *.neture.co.kr subdomain
-      if (process.env.NODE_ENV === 'production' && origin && origin.endsWith('.neture.co.kr')) {
-        logger.info(`[CORS] Allowing subdomain: ${origin}`);
-        callback(null, true);
-      } else {
-        logger.warn(`[CORS] Blocked origin: ${origin}`);
-        logger.warn(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
-        callback(new Error('Not allowed by CORS'));
-      }
+      logger.warn(`[CORS] Blocked origin: ${origin}`);
+      logger.warn(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After'],
   maxAge: 86400, // 24 hours
   preflightContinue: false,
   optionsSuccessStatus: 204
@@ -512,6 +550,9 @@ app.get('/health', (req, res) => {
 // Use the health router for comprehensive health checks
 app.use('/api/health', healthRoutes);
 
+// Sprint 4: Prometheus metrics endpoint
+app.use('/metrics', metricsRoutes);
+
 // Additional health endpoints for specific services
 app.get('/api/auth/health', (req, res) => {
   res.status(200).json({ 
@@ -583,6 +624,7 @@ app.get('/api/v1/users/roles', (req, res) => {
 
 // Consolidated settings routes - removed duplicates
 app.use('/api/v1/settings', settingsLimiter, settingsV1Routes);
+app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes); // Customizer API routes
 app.use('/api/settings', settingsLimiter, settingsRoutes); // Primary settings route
 // Removed duplicate: app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
 app.use('/settings', settingsLimiter, settingsRoutes); // Backward compatibility
@@ -610,6 +652,15 @@ app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management rout
 
 // AI Shortcodes API (public access for AI page generation)
 app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
+
+// AI Blocks API (SSOT for AI page generation)
+app.use('/api/ai/blocks', publicLimiter, aiBlocksRoutes);
+
+// AI Schema API (JSON Schema for AI output validation)
+app.use('/api/ai/schema', publicLimiter, aiSchemaRoutes);
+
+// AI Proxy API (server-side LLM proxy with security)
+app.use('/api/ai', limiter, aiProxyRoutes);
 
 // AI Settings API (admin only)
 app.use('/api/v1/ai-settings', limiter, aiSettingsRoutes);
@@ -1125,7 +1176,16 @@ const startServer = async () => {
   } catch (scheduleError) {
     logger.warn('Failed to start some scheduled jobs (non-critical):', scheduleError);
   }
-  
+
+  // Sprint 2 - P2: Start AI job worker (BullMQ)
+  try {
+    await import('./workers/ai-job.worker');
+    logger.info('✅ AI job worker started (BullMQ)');
+  } catch (workerError) {
+    logger.error('Failed to start AI job worker:', workerError);
+    // Non-critical: server can still start without worker
+  }
+
   // Initialize image processing folders
   try {
     const { imageProcessingService } = await import('./services/image-processing.service');

@@ -71,6 +71,7 @@ const PartnerProducts: React.FC<PartnerProductsProps> = ({
   const [selectedCategory, setSelectedCategory] = useState(category || 'all');
   const [sortOption, setSortOption] = useState(sortBy);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [displayLimit, setDisplayLimit] = useState(limit);
 
   const categories = [
     'all',
@@ -263,7 +264,7 @@ const PartnerProducts: React.FC<PartnerProductsProps> = ({
             ))}
           </SelectContent>
         </Select>
-        <Select value={sortOption} onValueChange={setSortOption}>
+        <Select value={sortOption} onValueChange={(value) => setSortOption(value as typeof sortOption)}>
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -416,9 +417,9 @@ const PartnerProducts: React.FC<PartnerProductsProps> = ({
       )}
 
       {/* Load More */}
-      {products.length >= limit && (
+      {products.length >= displayLimit && (
         <div className="text-center">
-          <Button variant="outline" onClick={() => setLimit(prev => prev + 12)}>
+          <Button variant="outline" onClick={() => setDisplayLimit(prev => prev + 12)}>
             Load More Products
           </Button>
         </div>

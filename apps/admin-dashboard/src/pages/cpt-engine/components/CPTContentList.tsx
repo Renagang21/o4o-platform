@@ -54,7 +54,7 @@ import { ko } from 'date-fns/locale';
 interface CPTContentListProps {
   selectedType?: string | null;
   onTypeSelect?: (slug: string) => void;
-  cptTypes: CustomPostType[];
+  cptTypes?: CustomPostType[];
 }
 
 const CPTContentList: React.FC<CPTContentListProps> = ({
@@ -74,7 +74,7 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
   const [itemsPerPage] = useState(20);
 
   // Current CPT type
-  const currentCPT = cptTypes.find(cpt => cpt.slug === selectedType);
+  const currentCPT = cptTypes?.find(cpt => cpt.slug === selectedType);
 
   // Query options
   const queryOptions: CPTListOptions = useMemo(() => ({
@@ -191,15 +191,15 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
   };
 
   // Get status badge variant
-  const getStatusBadge = (status: PostStatus) => {
-    const variants: Partial<Record<PostStatus, { label: string; variant: string }>> = {
+  const getStatusBadge = (status: PostStatus): { label: string; variant: "secondary" | "success" | "default" | "warning" | "destructive" | "outline" } => {
+    const variants: Partial<Record<PostStatus, { label: string; variant: "secondary" | "success" | "default" | "warning" | "destructive" | "outline" }>> = {
       published: { label: '발행됨', variant: 'default' },
       draft: { label: '임시저장', variant: 'secondary' },
       private: { label: '비공개', variant: 'outline' },
       trash: { label: '휴지통', variant: 'destructive' }
     };
-    
-    return variants[status] || { label: status, variant: 'secondary' };
+
+    return variants[status] || { label: status, variant: 'secondary' as const };
   };
 
   if (!selectedType) {
@@ -216,7 +216,7 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
               <SelectValue placeholder="콘텐츠 타입 선택..." />
             </SelectTrigger>
             <SelectContent>
-              {cptTypes.map(cpt => (
+              {cptTypes?.map(cpt => (
                 <SelectItem key={cpt.slug} value={cpt.slug}>
                   {cpt.label}
                 </SelectItem>
@@ -290,7 +290,7 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {cptTypes.map(cpt => (
+                {cptTypes?.map(cpt => (
                   <SelectItem key={cpt.slug} value={cpt.slug}>
                     {cpt.label}
                   </SelectItem>

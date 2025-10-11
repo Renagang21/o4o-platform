@@ -8,6 +8,7 @@ const settingsController = new SettingsController();
 // Public endpoints
 router.get('/homepage', settingsController.getHomepageSettings.bind(settingsController));
 router.get('/general', settingsController.getGeneralSettings.bind(settingsController));
+router.get('/customizer', settingsController.getCustomizerSettings.bind(settingsController));
 
 // Admin only endpoints
 router.get('/:type', authMiddleware.verifyToken, authMiddleware.requireAdmin, settingsController.getSettings.bind(settingsController));

@@ -91,22 +91,26 @@ export class PostMessageAPI {
       if (this.targetOrigin !== '*' && event.origin !== this.targetOrigin) {
         return;
       }
-      
+
       // Check if message has the expected structure
       if (!event.data || typeof event.data.type !== 'string') {
         return;
       }
-      
-      // Trigger registered callbacks
+
+      // Trigger registered callbacks - optimized with early exit
       const callbacks = this.listeners.get(event.data.type);
-      if (callbacks) {
-        callbacks.forEach(callback => {
-          try {
-            callback(event.data.payload);
-          } catch (error) {
-            // Error in PostMessage callback
-          }
-        });
+      if (!callbacks || callbacks.size === 0) {
+        return;
+      }
+
+      // Use for...of instead of forEach for better performance
+      const payload = event.data.payload;
+      for (const callback of callbacks) {
+        try {
+          callback(payload);
+        } catch (error) {
+          // Error in PostMessage callback - fail silently
+        }
       }
     });
   }
@@ -172,10 +176,13 @@ export function destroyCustomizerPostMessage() {
  */
 export const PREVIEW_SCRIPT = `
 (function() {
-  // Listen for customizer messages
+  let pendingUpdate = null;
+  let rafId = null;
+
+  // Debounced message handler
   window.addEventListener('message', function(event) {
     if (!event.data || !event.data.type) return;
-    
+
     switch(event.data.type) {
       case 'setting-change':
         handleSettingChange(event.data.payload);
@@ -191,70 +198,96 @@ export const PREVIEW_SCRIPT = `
         break;
     }
   });
-  
+
   function handleSettingChange(payload) {
     const { settings, css } = payload;
-    
-    // Update CSS
-    if (css) {
-      let styleEl = document.getElementById('astra-customizer-css');
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = 'astra-customizer-css';
-        document.head.appendChild(styleEl);
+
+    // Batch DOM updates with RAF
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(function() {
+      // Update CSS
+      if (css) {
+        let styleEl = document.getElementById('astra-customizer-css');
+        if (!styleEl) {
+          styleEl = document.createElement('style');
+          styleEl.id = 'astra-customizer-css';
+          document.head.appendChild(styleEl);
+        }
+        styleEl.textContent = css;
       }
-      styleEl.textContent = css;
-    }
-    
-    // Trigger custom event for any JavaScript that needs to respond
-    window.dispatchEvent(new CustomEvent('customizer-update', {
-      detail: settings
-    }));
+
+      // Trigger custom event for any JavaScript that needs to respond
+      window.dispatchEvent(new CustomEvent('customizer-update', {
+        detail: settings
+      }));
+    });
   }
-  
+
   function handleDeviceChange(payload) {
     const { device } = payload;
-    
-    // Add device class to body
-    document.body.className = document.body.className
-      .replace(/device-\\w+/g, '')
-      .trim() + ' device-' + device;
-    
-    // Trigger custom event
-    window.dispatchEvent(new CustomEvent('customizer-device-change', {
-      detail: { device }
-    }));
+
+    // Use classList API to avoid forced reflow
+    requestAnimationFrame(function() {
+      const classList = document.body.classList;
+      classList.forEach(function(className) {
+        if (className.startsWith('device-')) {
+          classList.remove(className);
+        }
+      });
+      classList.add('device-' + device);
+
+      // Trigger custom event
+      window.dispatchEvent(new CustomEvent('customizer-device-change', {
+        detail: { device }
+      }));
+    });
   }
-  
+
   function handleSave() {
     // Trigger save event
     window.dispatchEvent(new CustomEvent('customizer-save'));
   }
-  
+
   function handleReset() {
     // Reset any temporary changes
-    const styleEl = document.getElementById('astra-customizer-css');
-    if (styleEl) {
-      styleEl.remove();
-    }
-    
-    // Trigger reset event
-    window.dispatchEvent(new CustomEvent('customizer-reset'));
+    requestAnimationFrame(function() {
+      const styleEl = document.getElementById('astra-customizer-css');
+      if (styleEl) {
+        styleEl.remove();
+      }
+
+      // Trigger reset event
+      window.dispatchEvent(new CustomEvent('customizer-reset'));
+    });
   }
-  
+
   // Send ready message to parent
   window.parent.postMessage({ type: 'preview-ready' }, '*');
-  
-  // Track navigation
+
+  // Track navigation efficiently using popstate and hashchange events
   let currentUrl = window.location.href;
-  setInterval(function() {
-    if (window.location.href !== currentUrl) {
-      currentUrl = window.location.href;
-      window.parent.postMessage({ 
-        type: 'navigate', 
-        url: currentUrl 
+
+  function notifyNavigation() {
+    const newUrl = window.location.href;
+    if (newUrl !== currentUrl) {
+      currentUrl = newUrl;
+      window.parent.postMessage({
+        type: 'navigate',
+        url: currentUrl
       }, '*');
     }
-  }, 500);
+  }
+
+  // Use native events instead of polling
+  window.addEventListener('popstate', notifyNavigation);
+  window.addEventListener('hashchange', notifyNavigation);
+
+  // Also watch for click events on links (for SPA navigation)
+  document.addEventListener('click', function(e) {
+    const target = e.target.closest('a');
+    if (target && target.href) {
+      setTimeout(notifyNavigation, 100);
+    }
+  });
 })();
 `;

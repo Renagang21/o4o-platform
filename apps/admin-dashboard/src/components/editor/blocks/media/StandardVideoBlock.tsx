@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
-import { 
+import {
   Video,
   Upload,
   Play,
@@ -13,7 +13,8 @@ import {
   VolumeX,
   Maximize,
   Link2,
-  Settings
+  Settings,
+  FolderOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,7 @@ import {
 import { StandardBlockTemplate, StandardBlockProps, StandardBlockConfig } from '../StandardBlockTemplate';
 import { RichText } from '../../gutenberg/RichText';
 import { cn } from '@/lib/utils';
+import FileSelector, { FileItem } from '../shared/FileSelector';
 
 interface VideoBlockProps extends StandardBlockProps {
   attributes?: {
@@ -105,6 +107,7 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
   const [isUploading, setIsUploading] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [tempUrl, setTempUrl] = useState('');
+  const [showMediaSelector, setShowMediaSelector] = useState(false);
 
   // Update attribute helper
   const updateAttribute = useCallback((key: string, value: any) => {
@@ -142,6 +145,19 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
     }
   };
 
+  // Handle media library selection
+  const handleMediaSelect = useCallback((file: FileItem | FileItem[]) => {
+    const selectedFile = Array.isArray(file) ? file[0] : file;
+    if (selectedFile) {
+      onChange('', {
+        ...attributes,
+        src: selectedFile.url,
+        poster: selectedFile.thumbnailUrl || '',
+      });
+      setShowMediaSelector(false);
+    }
+  }, [attributes, onChange]);
+
   // Get aspect ratio style
   const getAspectRatioStyle = () => {
     const ratioData = ASPECT_RATIOS.find(r => r.value === aspectRatio);
@@ -159,13 +175,13 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setShowMediaSelector(true)}
             className="h-9 px-2"
           >
-            <Upload className="h-4 w-4 mr-1" />
+            <FolderOpen className="h-4 w-4 mr-1" />
             <span className="text-xs">Replace</span>
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -181,14 +197,13 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
+            onClick={() => setShowMediaSelector(true)}
             className="h-9 px-2"
           >
-            <Upload className="h-4 w-4 mr-1" />
-            <span className="text-xs">{isUploading ? 'Uploading...' : 'Upload'}</span>
+            <FolderOpen className="h-4 w-4 mr-1" />
+            <span className="text-xs">Media Library</span>
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -303,16 +318,15 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
       <Video className="mx-auto h-16 w-16 text-gray-400 mb-4" />
       <div className="space-y-2">
         <h3 className="text-lg font-medium text-gray-900">Add a video</h3>
-        <p className="text-sm text-gray-600">Upload a video file or add from URL</p>
+        <p className="text-sm text-gray-600">Select from media library or add from URL</p>
         <div className="flex gap-2 justify-center mt-4">
-          <Button 
-            onClick={() => fileInputRef.current?.click()} 
-            disabled={isUploading}
+          <Button
+            onClick={() => setShowMediaSelector(true)}
           >
-            <Upload className="mr-2 h-4 w-4" />
-            {isUploading ? 'Uploading...' : 'Upload'}
+            <FolderOpen className="mr-2 h-4 w-4" />
+            Media Library
           </Button>
-          <Button 
+          <Button
             variant="outline"
             onClick={() => setShowUrlInput(!showUrlInput)}
           >
@@ -320,7 +334,7 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
             Add URL
           </Button>
         </div>
-        
+
         {showUrlInput && (
           <div className="mt-4 flex gap-2">
             <Input
@@ -393,7 +407,7 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
     >
       <div className="w-full">
         <VideoContent />
-        
+
         {/* Hidden file input */}
         <input
           ref={fileInputRef}
@@ -402,6 +416,19 @@ const StandardVideoBlock: React.FC<VideoBlockProps> = (props) => {
           onChange={handleFileUpload}
           className="hidden"
         />
+
+        {/* Media Library Selector */}
+        {showMediaSelector && (
+          <FileSelector
+            isOpen={showMediaSelector}
+            onClose={() => setShowMediaSelector(false)}
+            onSelect={handleMediaSelect}
+            multiple={false}
+            acceptedTypes={['video']}
+            acceptedMimeTypes={['video/mp4', 'video/webm', 'video/ogg']}
+            title="Select Video"
+          />
+        )}
       </div>
     </StandardBlockTemplate>
   );

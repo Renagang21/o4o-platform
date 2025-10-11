@@ -53,3 +53,22 @@ export {
   usePreviewUrl,
   useBlockEditor,
 } from './useBlockData';
+
+// Conditional Logic hooks
+export {
+  useConditionalLogic,
+  useFieldDependencies,
+  useDebouncedFieldValues,
+} from './useConditionalLogic';
+
+// Location Rules hooks
+export {
+  useLocationRules,
+  useLocationParams,
+} from './useLocationRules';
+
+// Location Evaluation hooks
+export {
+  useLocationEvaluation,
+  useFieldGroupsByLocation,
+} from './useLocationEvaluation';

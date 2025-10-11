@@ -42,15 +42,16 @@ jobs:
     
     - name: Check for console.log statements
       run: |
-        # Find all console.log statements, excluding comments and test files
+        # Find all console.log statements, excluding comments, test files, and CLI scripts
         CONSOLE_LOGS=$(grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
           --exclude-dir=node_modules --exclude-dir=dist \
           --exclude-dir=test --exclude-dir=e2e \
+          --exclude-dir=scripts \
           --exclude="*test*" --exclude="*spec*" \
           | grep -v "//.*console\.log" \
           | grep -v "^\s*//" \
           | grep -v "\*.*console\.log" || true)
-        
+
         if [ -n "$CONSOLE_LOGS" ]; then
           echo "❌ Found console.log statements in production code:"
           echo "$CONSOLE_LOGS"

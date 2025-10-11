@@ -7,10 +7,10 @@ import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
  */
 export const useDynamicMenu = () => {
   const cptMenu = useDynamicCPTMenu();
-  
+
   // CPT 메뉴 항목 주입
-  const menuItemsWithCPT = injectCPTMenuItems(wordpressMenuItems, cptMenu);
-  
+  const menuItemsWithCPT = injectCPTMenuItems(wordpressMenuItems, cptMenu.cptMenuItems);
+
   return {
     menuItems: menuItemsWithCPT,
     isLoading: cptMenu.isLoading

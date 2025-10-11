@@ -1,679 +1,414 @@
-// import { roleDisplayNames } from "@/types/user"; // Unused - available from bottom export
 // Role-based menu permissions configuration
-// Defines which roles have access to which menu items and features
-
-export type UserRole = 'super_admin' | 'admin' | 'vendor' | 'vendor_manager' | 'seller' | 'customer' | 'business' | 'moderator' | 'partner' | 'beta_user' | 'supplier' | 'affiliate' | 'manager';
+// Dynamically handles roles from database
 
 export interface MenuPermission {
   menuId: string;
-  roles: UserRole[];
+  roles?: string[]; // Dynamic roles from database
   permissions?: string[];
+  requireAll?: boolean; // Requires all permissions if true
 }
 
-// Complete menu permission mapping
+// Menu permission configuration without hardcoded roles
+// Roles should be fetched from database and checked dynamically
 export const menuPermissions: MenuPermission[] = [
-  // Home - All roles can access
+  // Home - All authenticated users can access
   {
     menuId: 'home',
-    roles: ['admin', 'business', 'affiliate', 'customer', 'seller', 'supplier', 'manager', 'retailer'],
+    // No specific roles - available to all authenticated users
   },
-  // Dashboard - All roles can access
+  // Dashboard - All authenticated users can access
   {
     menuId: 'dashboard',
-    roles: ['admin', 'business', 'affiliate', 'customer', 'seller', 'supplier', 'manager', 'retailer'],
+    // No specific roles - available to all authenticated users
   },
   {
     menuId: 'dashboard-home',
-    roles: ['admin', 'business', 'affiliate', 'customer', 'seller', 'supplier', 'manager', 'retailer'],
+    // No specific roles - available to all authenticated users
   },
   {
-    menuId: 'dashboard-updates',
-    roles: ['admin', 'manager'],
-    permissions: ['updates:read']
-  },
-
-  // Content Management - Admin, Manager, Business
-  {
-    menuId: 'posts',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['content:read']
+    menuId: 'dashboard-overview',
+    permissions: ['dashboard:view']
   },
   {
-    menuId: 'posts-all',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['content:read']
+    menuId: 'dashboard-stats',
+    permissions: ['dashboard:stats']
+  },
+  
+  // User Management - Permission based
+  {
+    menuId: 'user-management',
+    permissions: ['users:manage']
   },
   {
-    menuId: 'posts-new',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['content:write']
+    menuId: 'users',
+    permissions: ['users:read']
   },
   {
-    menuId: 'posts-categories',
-    roles: ['admin', 'manager'],
-    permissions: ['categories:read']
+    menuId: 'users-list',
+    permissions: ['users:read']
   },
   {
-    menuId: 'posts-tags',
-    roles: ['admin', 'manager'],
-    permissions: ['categories:read']
-  },
-
-  // Media - Admin, Manager, Business, Seller
-  {
-    menuId: 'media',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
-    permissions: ['media:read']
+    menuId: 'users-create',
+    permissions: ['users:create']
   },
   {
-    menuId: 'media-library',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
-    permissions: ['media:read']
+    menuId: 'users-edit',
+    permissions: ['users:update']
   },
   {
-    menuId: 'media-new',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
-    permissions: ['media:write']
-  },
-
-  // Pages - Admin, Manager
-  {
-    menuId: 'pages',
-    roles: ['admin', 'manager'],
-    permissions: ['pages:read']
+    menuId: 'users-roles',
+    permissions: ['roles:manage']
   },
   {
-    menuId: 'pages-all',
-    roles: ['admin', 'manager'],
-    permissions: ['pages:read']
+    menuId: 'users-permissions',
+    permissions: ['permissions:manage']
+  },
+  
+  // Seller Management
+  {
+    menuId: 'sellers',
+    permissions: ['sellers:read']
   },
   {
-    menuId: 'pages-new',
-    roles: ['admin', 'manager'],
-    permissions: ['pages:write']
+    menuId: 'sellers-list',
+    permissions: ['sellers:read']
   },
-
-  // E-commerce - Admin, Manager, Business, Seller, Supplier
+  {
+    menuId: 'sellers-add',
+    permissions: ['sellers:create']
+  },
+  {
+    menuId: 'sellers-analytics',
+    permissions: ['sellers:analytics']
+  },
+  
+  // E-commerce
   {
     menuId: 'ecommerce',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier', 'retailer'],
     permissions: ['ecommerce:read']
   },
   {
     menuId: 'products',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier', 'retailer'],
     permissions: ['products:read']
   },
   {
     menuId: 'orders',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier', 'retailer'],
     permissions: ['orders:read']
   },
   {
+    menuId: 'categories',
+    permissions: ['categories:read']
+  },
+  {
+    menuId: 'inventory',
+    permissions: ['inventory:read']
+  },
+  
+  // Finance
+  {
+    menuId: 'finance',
+    permissions: ['finance:read']
+  },
+  {
+    menuId: 'payments',
+    permissions: ['payments:read']
+  },
+  {
+    menuId: 'invoices',
+    permissions: ['invoices:read']
+  },
+  {
+    menuId: 'transactions',
+    permissions: ['transactions:read']
+  },
+  
+  // Marketing
+  {
+    menuId: 'marketing',
+    permissions: ['marketing:read']
+  },
+  {
+    menuId: 'campaigns',
+    permissions: ['campaigns:read']
+  },
+  {
+    menuId: 'promotions',
+    permissions: ['promotions:read']
+  },
+  {
     menuId: 'coupons',
-    roles: ['admin', 'manager', 'business'],
     permissions: ['coupons:read']
   },
+  
+  // Support
   {
-    menuId: 'reports',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
-    permissions: ['analytics:read']
+    menuId: 'support',
+    permissions: ['support:read']
   },
   {
-    menuId: 'ecommerce-tools',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['products:read']
+    menuId: 'tickets',
+    permissions: ['tickets:read']
   },
   {
-    menuId: 'ecommerce-settings',
-    roles: ['admin', 'manager'],
-    permissions: ['settings:write']
+    menuId: 'faq',
+    permissions: ['faq:read']
   },
-
-  // Vendor Management - Admin, Manager
-  {
-    menuId: 'vendors',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:read']
-  },
-  {
-    menuId: 'vendors-all',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:read']
-  },
-  {
-    menuId: 'vendors-pending',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:write']
-  },
-  {
-    menuId: 'vendors-commission',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:write']
-  },
-  {
-    menuId: 'vendors-reports',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:read']
-  },
-
-  // Affiliate Marketing - Admin, Manager, Affiliate
-  {
-    menuId: 'affiliate',
-    roles: ['admin', 'manager', 'affiliate'],
-    permissions: ['affiliate:read']
-  },
-  {
-    menuId: 'affiliates-manage',
-    roles: ['admin', 'manager'],
-    permissions: ['affiliate:write']
-  },
-  {
-    menuId: 'affiliate-links',
-    roles: ['admin', 'manager', 'affiliate'],
-    permissions: ['affiliate:read']
-  },
-  {
-    menuId: 'affiliate-commission',
-    roles: ['admin', 'manager', 'affiliate'],
-    permissions: ['affiliate:read']
-  },
-  {
-    menuId: 'affiliate-analytics',
-    roles: ['admin', 'manager', 'affiliate'],
-    permissions: ['affiliate:read']
-  },
-
-  // Forum - All roles except customer
+  
+  // Forum
   {
     menuId: 'forum',
-    roles: ['admin', 'manager', 'business', 'affiliate', 'seller', 'supplier', 'retailer'],
-    permissions: ['forum:read']
-  },
-  {
-    menuId: 'forum-boards',
-    roles: ['admin', 'manager', 'business'],
     permissions: ['forum:read']
   },
   {
     menuId: 'forum-categories',
-    roles: ['admin', 'manager', 'business'],
     permissions: ['forum:read']
   },
   {
-    menuId: 'forum-posts',
-    roles: ['admin', 'manager', 'business'],
+    menuId: 'forum-topics',
     permissions: ['forum:read']
   },
   {
-    menuId: 'forum-comments',
-    roles: ['admin', 'manager'],
-    permissions: ['forum:read']
-  },
-  {
-    menuId: 'forum-reports',
-    roles: ['admin', 'manager'],
-    permissions: ['forum:read']
-  },
-  {
-    menuId: 'forum-settings',
-    roles: ['admin'],
-    permissions: ['forum:write']
-  },
-
-  // Digital Signage - Admin, Manager, Business
-  {
-    menuId: 'signage',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['signage:read']
-  },
-  {
-    menuId: 'signage-screens',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['signage:read']
-  },
-  {
-    menuId: 'signage-content',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['signage:read']
-  },
-  {
-    menuId: 'signage-playlists',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['signage:read']
-  },
-  {
-    menuId: 'signage-schedule',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['signage:write']
-  },
-  {
-    menuId: 'signage-devices',
-    roles: ['admin', 'manager'],
-    permissions: ['signage:write']
-  },
-  {
-    menuId: 'signage-analytics',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['signage:read']
-  },
-
-  // Crowdfunding - Admin, Manager, Business
-  {
-    menuId: 'crowdfunding',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['crowdfunding:read']
-  },
-  {
-    menuId: 'crowdfunding-projects',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['crowdfunding:read']
-  },
-  {
-    menuId: 'crowdfunding-backers',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['crowdfunding:read']
-  },
-  {
-    menuId: 'crowdfunding-rewards',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['crowdfunding:read']
-  },
-  {
-    menuId: 'crowdfunding-payments',
-    roles: ['admin', 'manager'],
-    permissions: ['crowdfunding:write']
-  },
-  {
-    menuId: 'crowdfunding-reports',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['crowdfunding:read']
-  },
-  {
-    menuId: 'crowdfunding-settings',
-    roles: ['admin'],
-    permissions: ['crowdfunding:write']
-  },
-
-  // Mail Management - Admin, Manager
-  {
-    menuId: 'mail',
-    roles: ['admin', 'manager'],
-    permissions: ['mail:read']
-  },
-  {
-    menuId: 'mail-templates',
-    roles: ['admin', 'manager'],
-    permissions: ['mail:write']
-  },
-  {
-    menuId: 'mail-smtp',
-    roles: ['admin'],
-    permissions: ['settings:write']
-  },
-  {
-    menuId: 'mail-logs',
-    roles: ['admin', 'manager'],
-    permissions: ['mail:read']
-  },
-
-  // Dropshipping - Admin, Manager, Business, Seller, Supplier, Partner
-  {
-    menuId: 'dropshipping',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier', 'partner'],
-    permissions: ['ecommerce:read']
-  },
-  {
-    menuId: 'ds-products',
-    roles: ['admin', 'manager', 'business', 'seller', 'supplier'],
-    permissions: ['products:read']
-  },
-  {
-    menuId: 'ds-sellers',
-    roles: ['admin', 'manager', 'seller'],
-    permissions: ['users:read']
-  },
-  {
-    menuId: 'ds-partners',
-    roles: ['admin', 'manager', 'partner'],
-    permissions: ['vendors:read']
-  },
-  {
-    menuId: 'ds-suppliers',
-    roles: ['admin', 'manager', 'supplier'],
-    permissions: ['vendors:read']
-  },
-  {
-    menuId: 'ds-approvals',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:write']
-  },
-  {
-    menuId: 'ds-commissions',
-    roles: ['admin', 'manager'],
-    permissions: ['vendors:write']
-  },
-  {
-    menuId: 'ds-setup',
-    roles: ['admin'],
-    permissions: ['settings:write']
-  },
-
-  // CPT Engine - Admin only
-  {
-    menuId: 'cpt-engine',
-    roles: ['admin'],
-    permissions: ['content:write']
+    menuId: 'forum-moderation',
+    permissions: ['forum:moderate']
   },
   
-  // CPT & ACF - Admin only
+  // Crowdfunding
   {
-    menuId: 'cpt-acf',
-    roles: ['admin'],
-    permissions: ['content:write']
+    menuId: 'crowdfunding',
+    permissions: ['crowdfunding:read']
   },
   {
-    menuId: 'cpt-types',
-    roles: ['admin'],
-    permissions: ['content:write']
+    menuId: 'projects',
+    permissions: ['projects:read']
   },
   {
-    menuId: 'acf-fields',
-    roles: ['admin'],
-    permissions: ['custom_fields:write']
+    menuId: 'backers',
+    permissions: ['backers:read']
+  },
+  
+  // CMS
+  {
+    menuId: 'cms',
+    permissions: ['cms:read']
   },
   {
-    menuId: 'acf-groups',
-    roles: ['admin'],
-    permissions: ['custom_fields:write']
+    menuId: 'pages',
+    permissions: ['pages:read']
   },
   {
-    menuId: 'forms',
-    roles: ['admin', 'manager'],
-    permissions: ['forms:write']
-  },
-
-  // Appearance/Theme - Admin, Manager
-  {
-    menuId: 'appearance',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:read']
+    menuId: 'posts',
+    permissions: ['posts:read']
   },
   {
-    menuId: 'theme',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:read']
+    menuId: 'media',
+    permissions: ['media:read']
+  },
+  
+  // Reports & Analytics
+  {
+    menuId: 'reports',
+    permissions: ['reports:read']
   },
   {
-    menuId: 'themes',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:read']
+    menuId: 'analytics',
+    permissions: ['analytics:read']
   },
   {
-    menuId: 'customize',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:write']
+    menuId: 'sales-reports',
+    permissions: ['reports:sales']
   },
-  {
-    menuId: 'appearance-menus',
-    roles: ['admin', 'manager'],
-    permissions: ['menus:write']
-  },
-  {
-    menuId: 'appearance-widgets',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:write']
-  },
-  {
-    menuId: 'appearance-template-parts',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:write']
-  },
-  {
-    menuId: 'menus',
-    roles: ['admin', 'manager'],
-    permissions: ['menus:write']
-  },
-  {
-    menuId: 'widgets',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:write']
-  },
-  {
-    menuId: 'template-parts',
-    roles: ['admin', 'manager'],
-    permissions: ['templates:write']
-  },
-
-  // Users - Admin, Manager (limited)
-  {
-    menuId: 'users',
-    roles: ['admin', 'manager'],
-    permissions: ['users:read']
-  },
-  {
-    menuId: 'users-all',
-    roles: ['admin', 'manager'],
-    permissions: ['users:read']
-  },
-  {
-    menuId: 'users-new',
-    roles: ['admin'],
-    permissions: ['users:create']
-  },
-  {
-    menuId: 'users-profile',
-    roles: ['admin', 'manager', 'business', 'affiliate', 'seller', 'supplier', 'retailer'],
-    permissions: ['users:read']
-  },
-  {
-    menuId: 'users-roles',
-    roles: ['admin'],
-    permissions: ['users:update']
-  },
-
-  // Tools - Admin, Manager
-  {
-    menuId: 'tools',
-    roles: ['admin', 'manager'],
-    permissions: ['tools:read']
-  },
-
-  // System Monitoring - Admin, Manager
-  {
-    menuId: 'monitoring',
-    roles: ['admin', 'manager'],
-    permissions: ['monitoring:read']
-  },
-  {
-    menuId: 'monitoring-dashboard',
-    roles: ['admin', 'manager'],
-    permissions: ['monitoring:read']
-  },
-  {
-    menuId: 'performance',
-    roles: ['admin', 'manager'],
-    permissions: ['monitoring:read']
-  },
-  {
-    menuId: 'security-logs',
-    roles: ['admin'],
-    permissions: ['monitoring:read']
-  },
-
-  // Shortcode Management - Admin, Manager, Business
-  {
-    menuId: 'shortcodes',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['shortcodes:read']
-  },
-  {
-    menuId: 'shortcodes-all',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['shortcodes:read']
-  },
-  {
-    menuId: 'shortcodes-by-app',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['shortcodes:read']
-  },
-  {
-    menuId: 'shortcodes-by-category',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['shortcodes:read']
-  },
-  {
-    menuId: 'shortcodes-stats',
-    roles: ['admin', 'manager'],
-    permissions: ['shortcodes:read']
-  },
-  {
-    menuId: 'shortcodes-settings',
-    roles: ['admin'],
-    permissions: ['shortcodes:write']
-  },
-
+  
   // Settings - Admin only
   {
     menuId: 'settings',
-    roles: ['admin'],
-    permissions: ['settings:read']
+    permissions: ['settings:manage']
   },
-
-  // Collapse menu - All roles
   {
-    menuId: 'collapse',
-    roles: ['admin', 'business', 'affiliate', 'customer', 'seller', 'supplier', 'manager', 'retailer'],
+    menuId: 'general-settings',
+    permissions: ['settings:general']
+  },
+  {
+    menuId: 'system-settings',
+    permissions: ['settings:system']
+  },
+  {
+    menuId: 'integrations',
+    permissions: ['integrations:manage']
+  },
+  
+  // Appearance
+  {
+    menuId: 'appearance',
+    permissions: ['appearance:manage']
+  },
+  {
+    menuId: 'themes',
+    permissions: ['themes:manage']
+  },
+  {
+    menuId: 'widgets',
+    permissions: ['widgets:manage']
+  },
+  {
+    menuId: 'menus',
+    permissions: ['menus:manage']
+  },
+  {
+    menuId: 'customizer',
+    permissions: ['customizer:manage']
+  },
+  
+  // Tools
+  {
+    menuId: 'tools',
+    permissions: ['tools:access']
+  },
+  {
+    menuId: 'import-export',
+    permissions: ['tools:import_export']
+  },
+  {
+    menuId: 'database',
+    permissions: ['database:manage']
+  },
+  {
+    menuId: 'logs',
+    permissions: ['logs:view']
+  },
+  
+  // Profile - All authenticated users
+  {
+    menuId: 'profile',
+    // No specific permissions - available to all authenticated users
+  },
+  {
+    menuId: 'users-profile',
+    // No specific permissions - available to all authenticated users
+  },
+  
+  // UI Elements - Development/Demo
+  {
+    menuId: 'ui-elements',
+    permissions: ['ui:demo']
+  },
+  {
+    menuId: 'ui-components',
+    permissions: ['ui:demo']
   }
 ];
 
-// Helper function to check if a role has access to a menu item
-export function hasMenuAccess(menuId: string, userRole: UserRole, userPermissions?: string[]): boolean {
-  const menuPermission = menuPermissions.find((mp: any) => mp.menuId === menuId);
+/**
+ * Check if a user has permission for a menu item
+ * @param userRoles - User's roles from database
+ * @param userPermissions - User's permissions from database
+ * @param menuId - Menu item ID to check
+ * @returns boolean indicating if user has access
+ */
+export function hasMenuPermission(
+  userRoles: string[],
+  userPermissions: string[],
+  menuId: string
+): boolean {
+  const menuConfig = menuPermissions.find(m => m.menuId === menuId);
   
-  if (!menuPermission) {
-    // CPT Engine 관련 메뉴 확인
-    return false; // Menu item not found
-  }
-
-  // Check if user has the required role
-  if (!menuPermission.roles.includes(userRole)) {
+  if (!menuConfig) {
+    // Menu not found in configuration - deny by default
     return false;
   }
-
-  // If menu requires specific permissions, check if user has them
-  if (menuPermission.permissions && menuPermission.permissions.length > 0) {
-    if (!userPermissions || userPermissions.length === 0) {
-      return false;
-    }
-    
-    // User must have at least one of the required permissions
-    return menuPermission.permissions.some((permission: any) => 
-      userPermissions.includes(permission)
-    );
+  
+  // If no roles or permissions specified, allow all authenticated users
+  if (!menuConfig.roles?.length && !menuConfig.permissions?.length) {
+    return true;
   }
-
-  return true;
+  
+  // Check role-based access
+  if (menuConfig.roles?.length) {
+    const hasRole = menuConfig.roles.some(role => userRoles.includes(role));
+    if (hasRole) return true;
+  }
+  
+  // Check permission-based access
+  if (menuConfig.permissions?.length) {
+    if (menuConfig.requireAll) {
+      // Requires all permissions
+      return menuConfig.permissions.every(permission => 
+        userPermissions.includes(permission)
+      );
+    } else {
+      // Requires at least one permission
+      return menuConfig.permissions.some(permission => 
+        userPermissions.includes(permission)
+      );
+    }
+  }
+  
+  return false;
 }
 
-// Helper function to filter menu items based on user role and permissions
-export function filterMenuByRole(menuItems: any[], userRole: UserRole, userPermissions?: string[]): any[] {
-  return menuItems
-    .filter((item: any) => {
-      // Always include separators
-      if (item.separator) return true;
-      return hasMenuAccess(item.id, userRole, userPermissions);
-    })
-    .map((item: any) => {
-      if (item.children) {
-        const filteredChildren = filterMenuByRole(item.children, userRole, userPermissions);
-        
-        // Only include parent if it has accessible children
-        if (filteredChildren.length > 0) {
-          return { ...item, children: filteredChildren };
-        }
-        return null;
-      }
-      return item;
-    })
-    .filter(Boolean);
+/**
+ * Get all accessible menu items for a user
+ * @param userRoles - User's roles from database
+ * @param userPermissions - User's permissions from database
+ * @returns Array of accessible menu IDs
+ */
+export function getAccessibleMenus(
+  userRoles: string[],
+  userPermissions: string[]
+): string[] {
+  return menuPermissions
+    .filter(menu => hasMenuPermission(userRoles, userPermissions, menu.menuId))
+    .map(menu => menu.menuId);
 }
 
-// Note: roleDisplayNames is imported from @/types/user
+/**
+ * Role configuration should be fetched from API
+ * This is a placeholder for the actual API call
+ */
+export interface RoleConfig {
+  id: string;
+  name: string;
+  displayName: string;
+  permissions: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
-// Role capabilities summary
-export const roleCapabilities: Record<UserRole, string[]> = {
-  super_admin: [
-    '최고 관리자 권한',
-    '시스템 전체 관리',
-    '모든 기능 접근'
-  ],
-  admin: [
-    '전체 시스템 관리',
-    '사용자 관리',
-    '설정 변경',
-    '모든 기능 접근'
-  ],
-  vendor: [
-    '벤더 관리',
-    '상품 공급',
-    '재고 관리'
-  ],
-  vendor_manager: [
-    '벤더 매니저 권한',
-    '벤더 관리',
-    '상품 관리'
-  ],
-  seller: [
-    '상품 등록',
-    '주문 관리',
-    '매출 확인',
-    '미디어 업로드'
-  ],
-  customer: [
-    '대시보드 확인',
-    '프로필 관리',
-    '주문 확인'
-  ],
-  business: [
-    '상품 관리',
-    '주문 확인',
-    '콘텐츠 작성',
-    '디지털 사이니지',
-    'Shortcode 관리'
-  ],
-  moderator: [
-    '콘텐츠 검토',
-    '사용자 관리',
-    '포럼 관리'
-  ],
-  partner: [
-    '파트너 관리',
-    '제휴 계약',
-    '성과 분석'
-  ],
-  beta_user: [
-    '베타 기능 접근',
-    '테스트 참여'
-  ],
-  supplier: [
-    '상품 공급',
-    '재고 관리',
-    '주문 처리',
-    '보고서 확인'
-  ],
-  affiliate: [
-    '제휴 링크 관리',
-    '수수료 확인',
-    '성과 분석',
-    '프로필 관리'
-  ],
-  manager: [
-    '콘텐츠 관리',
-    '주문 관리',
-    '제휴사 관리',
-    '보고서 확인',
-    'Shortcode 관리'
-  ]
-};
-export { roleDisplayNames } from '@/types/user';
+/**
+ * Fetch roles from database
+ * This should be replaced with actual API call
+ */
+export async function fetchRolesFromDatabase(): Promise<RoleConfig[]> {
+  try {
+    const response = await fetch('/api/v1/roles');
+    if (!response.ok) {
+      throw new Error('Failed to fetch roles');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching roles:', error);
+    // Return empty array as fallback
+    return [];
+  }
+}
+
+/**
+ * Fetch user's permissions from database
+ * This should be replaced with actual API call
+ */
+export async function fetchUserPermissions(userId: string): Promise<string[]> {
+  try {
+    const response = await fetch(`/api/v1/users/${userId}/permissions`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user permissions');
+    }
+    const data = await response.json();
+    return data.permissions || [];
+  } catch (error) {
+    console.error('Error fetching user permissions:', error);
+    return [];
+  }
+}
+
+// Export for backward compatibility
+export default menuPermissions;

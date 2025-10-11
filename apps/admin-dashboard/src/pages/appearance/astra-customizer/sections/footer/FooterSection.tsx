@@ -1,16 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCustomizerState } from '../../hooks/useCustomizerState';
 import { AstraColorPicker } from '../../components/controls/AstraColorPicker';
 import { AstraToggle } from '../../components/controls/AstraToggle';
 import { AstraSlider } from '../../components/controls/AstraSlider';
 import { AstraSelect } from '../../components/controls/AstraSelect';
-import { Grid, Type, Layout } from 'lucide-react';
+import { FooterBuilder } from '../../components/FooterBuilder';
+import { FooterBuilderLayout } from '../../types/customizer-types';
+import { Grid, Type, Layout, Columns3 } from 'lucide-react';
 
 export const FooterSection: React.FC = () => {
   const { settings, updateSetting } = useCustomizerState();
   const footer = settings.footer;
   
-  const [activeTab, setActiveTab] = useState<'widgets' | 'bottom'>('widgets');
+  const [activeTab, setActiveTab] = useState<'builder' | 'widgets' | 'bottom'>('builder');
+  const [currentDevice, setCurrentDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  
+  // Initialize footer builder layout if not exists
+  useEffect(() => {
+    if (!footer.builder) {
+      const initialLayout: FooterBuilderLayout = {
+        widgets: {
+          enabled: true,
+          columns: 3,
+          layout: [
+            [{ id: 'text-1', type: 'text', label: 'About Us', settings: { title: 'About Us', content: 'Your company description here.' } }],
+            [{ id: 'menu-1', type: 'menu', label: 'Quick Links', settings: { title: 'Quick Links', menuId: 'footer-menu' } }],
+            [{ id: 'contact-1', type: 'contact', label: 'Contact', settings: { title: 'Contact Us', email: 'info@example.com' } }]
+          ],
+          settings: {
+            background: '#333333',
+            textColor: '#ffffff',
+            linkColor: { normal: '#cccccc', hover: '#ffffff' },
+            padding: { desktop: { top: 40, bottom: 40 }, tablet: { top: 30, bottom: 30 }, mobile: { top: 20, bottom: 20 } },
+            gap: 30
+          }
+        },
+        bar: {
+          enabled: true,
+          left: [{ id: 'copyright-1', type: 'copyright', label: 'Copyright', settings: { copyrightText: '© 2025 Your Company. All rights reserved.', showYear: true } }],
+          right: [{ id: 'social-1', type: 'social', label: 'Social Icons', settings: {} }],
+          settings: {
+            background: '#222222',
+            textColor: '#999999',
+            linkColor: { normal: '#999999', hover: '#ffffff' },
+            padding: { desktop: { top: 20, bottom: 20 }, tablet: { top: 15, bottom: 15 }, mobile: { top: 10, bottom: 10 } },
+            alignment: 'space-between'
+          }
+        }
+      };
+      updateSetting('footer', initialLayout, ['builder']);
+    }
+  }, [footer.builder]);
   
   const footerLayoutOptions = [
     { value: 'footer-layout-1', label: 'Layout 1 - Equal Columns' },
@@ -30,6 +70,13 @@ export const FooterSection: React.FC = () => {
       {/* Footer Tabs */}
       <div className="astra-tabs">
         <button
+          onClick={() => setActiveTab('builder')}
+          className={`astra-tab ${activeTab === 'builder' ? 'active' : ''}`}
+        >
+          <Columns3 size={14} />
+          Builder
+        </button>
+        <button
           onClick={() => setActiveTab('widgets')}
           className={`astra-tab ${activeTab === 'widgets' ? 'active' : ''}`}
         >
@@ -44,6 +91,24 @@ export const FooterSection: React.FC = () => {
           Bottom Bar
         </button>
       </div>
+      
+      {activeTab === 'builder' && footer.builder && (
+        <>
+          {/* Footer Builder */}
+          <div className="astra-section-group">
+            <h4 className="astra-group-title">Footer Layout Builder</h4>
+            <p className="astra-control-description">
+              Build your custom footer layout with widgets and modules
+            </p>
+            
+            <FooterBuilder
+              layout={footer.builder}
+              onChange={(newLayout) => updateSetting('footer', newLayout, ['builder'])}
+              device={currentDevice}
+            />
+          </div>
+        </>
+      )}
       
       {activeTab === 'widgets' ? (
         <>

@@ -113,17 +113,30 @@ export function useSafePaginatedQuery<T = unknown>(
     queryFn: async () => {
       const response = await queryFn();
       const normalized = normalizeResponse(response);
-      
+
       return {
         data: ensureArray<T>(normalized.data),
-        pagination: normalized.pagination || {
+        pagination: (normalized.pagination || {
           total: 0,
           totalPages: 0,
           currentPage: 1,
           pageSize: 10
+        }) as {
+          total: number;
+          totalPages: number;
+          currentPage: number;
+          pageSize: number;
         }
       };
     },
     ...options
-  });
+  }) as UseQueryResult<{
+    data: T[];
+    pagination: {
+      total: number;
+      totalPages: number;
+      currentPage: number;
+      pageSize: number;
+    };
+  }, Error>;
 }

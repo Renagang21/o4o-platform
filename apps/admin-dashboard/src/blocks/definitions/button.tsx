@@ -6,6 +6,7 @@ import React from 'react';
 import { MousePointer2 } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import ButtonBlock from '@/components/editor/blocks/ButtonBlock';
+import { BlockComponent } from '../registry/types';
 
 export const buttonBlockDefinition: BlockDefinition = {
   name: 'core/button',
@@ -14,7 +15,7 @@ export const buttonBlockDefinition: BlockDefinition = {
   icon: <MousePointer2 className="w-5 h-5" />,
   description: 'Prompt visitors to take action with a button-style link.',
   keywords: ['link', 'cta', 'call to action'],
-  component: ButtonBlock,
+  component: ButtonBlock as unknown as BlockComponent,
   attributes: {
     text: {
       type: 'string',

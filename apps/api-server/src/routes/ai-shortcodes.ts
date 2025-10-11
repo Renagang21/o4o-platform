@@ -1,26 +1,84 @@
 /**
  * AI Shortcodes API Routes
  * AI 페이지 생성을 위한 shortcode 정보 제공
+ * 인증 필수 - 읽기 권한 보유자만 접근 가능
  */
 
 import { Router, Request, Response } from 'express';
 import { shortcodeRegistry } from '../services/shortcode-registry.service';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
 import logger from '../utils/logger';
 
 const router: Router = Router();
 
+// AI 엔드포인트용 레이트리밋 (읽기 전용이므로 관대한 한도)
+const aiReadRateLimit = rateLimitMiddleware({
+  windowMs: 60 * 1000, // 1분
+  max: 60, // 분당 60회
+  message: 'AI 참조 데이터 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.',
+  keyGenerator: (req) => {
+    const authReq = req as AuthRequest;
+    return authReq.user?.userId || req.ip || 'anonymous';
+  }
+});
+
 /**
  * AI를 위한 shortcode 참조 데이터
  * GET /api/ai/shortcodes/reference
+ * 인증 필수 + 레이트리밋 적용
  */
-router.get('/reference', async (req: Request, res: Response) => {
+router.get('/reference', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+  const authReq = req as AuthRequest;
+  const startTime = Date.now();
+
   try {
     const reference = shortcodeRegistry.getAIReference();
-    
+    const etag = `"${Buffer.from(reference.lastUpdated).toString('base64')}"`;
+
+    // ETag 검증 (304 Not Modified)
+    const clientEtag = req.headers['if-none-match'];
+    if (clientEtag === etag) {
+      const duration = Date.now() - startTime;
+
+      // Operational logging
+      logger.info('AI shortcodes reference - 304 Not Modified', {
+        userId: authReq.user?.userId,
+        userEmail: authReq.user?.email,
+        route: '/api/ai/shortcodes/reference',
+        method: 'GET',
+        status: 304,
+        etag: etag,
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString()
+      });
+
+      return res.status(304).set({
+        'Cache-Control': 'public, max-age=300',
+        'ETag': etag
+      }).end();
+    }
+
     // 응답 헤더 설정 (캐싱)
     res.set({
       'Cache-Control': 'public, max-age=300', // 5분 캐싱
-      'ETag': `"${Buffer.from(reference.lastUpdated).toString('base64')}"`
+      'ETag': etag
+    });
+
+    const duration = Date.now() - startTime;
+
+    // Operational logging
+    logger.info('AI shortcodes reference - Success', {
+      userId: authReq.user?.userId,
+      userEmail: authReq.user?.email,
+      route: '/api/ai/shortcodes/reference',
+      method: 'GET',
+      status: 200,
+      etag: etag,
+      schemaVersion: reference.schemaVersion,
+      totalShortcodes: reference.total,
+      duration: `${duration}ms`,
+      timestamp: new Date().toISOString()
     });
 
     res.json({
@@ -33,7 +91,19 @@ router.get('/reference', async (req: Request, res: Response) => {
     });
 
   } catch (error: any) {
-    logger.error('AI shortcode reference error:', error);
+    const duration = Date.now() - startTime;
+
+    logger.error('AI shortcode reference error', {
+      userId: authReq.user?.userId,
+      userEmail: authReq.user?.email,
+      route: '/api/ai/shortcodes/reference',
+      method: 'GET',
+      status: 500,
+      error: error.message,
+      duration: `${duration}ms`,
+      timestamp: new Date().toISOString()
+    });
+
     res.status(500).json({
       success: false,
       error: 'Failed to fetch shortcode reference',
@@ -45,8 +115,9 @@ router.get('/reference', async (req: Request, res: Response) => {
 /**
  * AI용 간소화된 shortcode 목록
  * GET /api/ai/shortcodes/simple
+ * 인증 필수 + 레이트리밋 적용
  */
-router.get('/simple', async (req: Request, res: Response) => {
+router.get('/simple', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { category, limit } = req.query;
     let shortcodes = shortcodeRegistry.getAll();
@@ -94,8 +165,9 @@ router.get('/simple', async (req: Request, res: Response) => {
 /**
  * AI 프롬프트 생성 도우미
  * POST /api/ai/shortcodes/prompt
+ * 인증 필수 + 레이트리밋 적용
  */
-router.post('/prompt', async (req: Request, res: Response) => {
+router.post('/prompt', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { userRequest, includeCategories, maxShortcodes = 20 } = req.body;
 
@@ -167,8 +239,9 @@ Please generate a page that fulfills the user's request using the available shor
 /**
  * Shortcode 검색
  * GET /api/ai/shortcodes/search?q=query
+ * 인증 필수 + 레이트리밋 적용
  */
-router.get('/search', async (req: Request, res: Response) => {
+router.get('/search', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { q: query } = req.query;
 
@@ -208,10 +281,35 @@ router.get('/search', async (req: Request, res: Response) => {
 });
 
 /**
+ * Registry 통계
+ * GET /api/ai/shortcodes/stats
+ * 인증 필수 + 레이트리밋 적용
+ */
+router.get('/stats', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+  try {
+    const stats = shortcodeRegistry.getStats();
+
+    res.json({
+      success: true,
+      data: stats
+    });
+
+  } catch (error: any) {
+    logger.error('Shortcode stats error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch shortcode statistics',
+      message: error.message
+    });
+  }
+});
+
+/**
  * Shortcode 상세 정보
  * GET /api/ai/shortcodes/:name
+ * 인증 필수 + 레이트리밋 적용
  */
-router.get('/:name', async (req: Request, res: Response) => {
+router.get('/:name', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
     const shortcode = shortcodeRegistry.get(name);
@@ -239,29 +337,6 @@ router.get('/:name', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch shortcode details',
-      message: error.message
-    });
-  }
-});
-
-/**
- * Registry 통계
- * GET /api/ai/shortcodes/stats
- */
-router.get('/stats', async (req: Request, res: Response) => {
-  try {
-    const stats = shortcodeRegistry.getStats();
-    
-    res.json({
-      success: true,
-      data: stats
-    });
-
-  } catch (error: any) {
-    logger.error('Shortcode stats error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch shortcode statistics',
       message: error.message
     });
   }

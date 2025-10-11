@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Menu,
@@ -15,9 +15,12 @@ import {
   X,
   Smartphone,
   Monitor,
-  Users
+  Users,
+  Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { MenuApi, Menu as MenuType } from '../../api/menuApi';
+import { MenuLocations } from '../../types/menu.types';
 
 interface MenuData {
   id: string;
@@ -33,48 +36,50 @@ const WordPressMenuList: FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
+
+  // API state management
+  const [menus, setMenus] = useState<MenuData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Utility: Transform API menu to display format
+  const transformMenu = (menu: MenuType): MenuData => ({
+    id: menu.id,
+    name: menu.name,
+    slug: menu.slug,
+    location: menu.location,
+    itemCount: menu.items?.length || 0,
+    createdAt: menu.created_at || new Date().toISOString(),
+    updatedAt: menu.updated_at || new Date().toISOString()
+  });
+
+  // Utility: Reload menus from API
+  const reloadMenus = async () => {
+    const response = await MenuApi.getMenus();
+    setMenus(response.data.map(transformMenu));
+  };
+
+  // Fetch menus from API
+  useEffect(() => {
+    const loadMenus = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        await reloadMenus();
+      } catch (err) {
+        const errorMessage = '메뉴 목록을 불러올 수 없습니다';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        console.error('Failed to load menus:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMenus();
+  }, []);
   
-  // Mock data
-  const [menus] = useState<MenuData[]>([
-    {
-      id: '1',
-      name: '주 메뉴',
-      slug: 'primary-menu',
-      location: 'primary',
-      itemCount: 7,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-20'
-    },
-    {
-      id: '2',
-      name: '푸터 메뉴',
-      slug: 'footer-menu',
-      location: 'footer',
-      itemCount: 5,
-      createdAt: '2024-01-16',
-      updatedAt: '2024-01-19'
-    },
-    {
-      id: '3',
-      name: '모바일 메뉴',
-      slug: 'mobile-menu',
-      location: 'mobile',
-      itemCount: 6,
-      createdAt: '2024-01-17',
-      updatedAt: '2024-01-18'
-    },
-    {
-      id: '4',
-      name: '소셜 링크',
-      slug: 'social-links',
-      location: 'social',
-      itemCount: 4,
-      createdAt: '2024-01-18',
-      updatedAt: '2024-01-18'
-    }
-  ]);
-  
-  const menuLocations: Record<string, { name: string; icon: any; color: 'blue' | 'gray' | 'green' | 'purple' }> = {
+  const menuLocations: MenuLocations = {
     primary: { name: '주 메뉴', icon: Monitor, color: 'blue' },
     footer: { name: '푸터 메뉴', icon: MapPin, color: 'gray' },
     mobile: { name: '모바일 메뉴', icon: Smartphone, color: 'green' },
@@ -88,27 +93,56 @@ const WordPressMenuList: FC = () => {
   );
   
   // Delete menu
-  const deleteMenu = (_menuId: string) => {
-    if (confirm('이 메뉴를 삭제하시겠습니까?')) {
+  const deleteMenu = async (menuId: string) => {
+    if (!confirm('이 메뉴를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await MenuApi.deleteMenu(menuId);
+      setMenus(menus.filter(m => m.id !== menuId));
+      setSelectedMenus(selectedMenus.filter(id => id !== menuId));
       toast.success('메뉴가 삭제되었습니다');
+    } catch (err) {
+      toast.error('메뉴 삭제에 실패했습니다');
+      console.error('Failed to delete menu:', err);
+    }
+  };
+
+  // Duplicate menu
+  const duplicateMenu = async (menu: MenuData) => {
+    try {
+      const duplicatedName = `${menu.name} (복사본)`;
+      const duplicatedSlug = `${menu.slug}-copy`;
+      await MenuApi.duplicateMenu(menu.id, duplicatedName, duplicatedSlug);
+      await reloadMenus();
+      toast.success(`"${menu.name}" 메뉴가 복제되었습니다`);
+    } catch (err) {
+      toast.error('메뉴 복제에 실패했습니다');
+      console.error('Failed to duplicate menu:', err);
     }
   };
   
-  // Duplicate menu
-  const duplicateMenu = (menu: MenuData) => {
-    toast.success(`"${menu.name}" 메뉴가 복제되었습니다`);
-  };
-  
   // Bulk delete
-  const bulkDelete = () => {
+  const bulkDelete = async () => {
     if (selectedMenus.length === 0) {
       toast.error('삭제할 메뉴를 선택하세요');
       return;
     }
-    
-    if (confirm(`선택한 ${selectedMenus.length}개 메뉴를 삭제하시겠습니까?`)) {
+
+    if (!confirm(`선택한 ${selectedMenus.length}개 메뉴를 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      // Delete all selected menus
+      await Promise.all(selectedMenus.map(id => MenuApi.deleteMenu(id)));
+      setMenus(menus.filter(m => !selectedMenus.includes(m.id)));
       toast.success(`${selectedMenus.length}개 메뉴가 삭제되었습니다`);
       setSelectedMenus([]);
+    } catch (err) {
+      toast.error('일부 메뉴 삭제에 실패했습니다');
+      console.error('Failed to bulk delete menus:', err);
     }
   };
   
@@ -168,7 +202,7 @@ const WordPressMenuList: FC = () => {
             const menuCount = menus.filter(m => m.location === key).length;
             const LocationIcon = location.icon;
             const style = getLocationStyle(key);
-            
+
             return (
               <div key={key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
@@ -238,18 +272,42 @@ const WordPressMenuList: FC = () => {
       {/* Menu List */}
       <div className="px-8 pb-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {filteredMenus.length === 0 ? (
+          {isLoading ? (
             <div className="text-center py-16">
-              <Menu className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">메뉴가 없습니다</h3>
-              <p className="text-gray-500 mb-6">첫 번째 메뉴를 만들어보세요</p>
-              <Link
-                to="/appearance/menus/new"
+              <Loader2 className="w-16 h-16 text-blue-500 mx-auto mb-4 animate-spin" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">메뉴 목록 불러오는 중...</h3>
+              <p className="text-gray-500">잠시만 기다려주세요</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <Menu className="w-16 h-16 text-red-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">오류가 발생했습니다</h3>
+              <p className="text-gray-500 mb-6">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                <Plus className="w-4 h-4" />
-                새 메뉴 만들기
-              </Link>
+                다시 시도
+              </button>
+            </div>
+          ) : filteredMenus.length === 0 ? (
+            <div className="text-center py-16">
+              <Menu className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchTerm ? '검색 결과가 없습니다' : '메뉴가 없습니다'}
+              </h3>
+              <p className="text-gray-500 mb-6">
+                {searchTerm ? '다른 검색어를 시도해보세요' : '첫 번째 메뉴를 만들어보세요'}
+              </p>
+              {!searchTerm && (
+                <Link
+                  to="/appearance/menus/new"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  새 메뉴 만들기
+                </Link>
+              )}
             </div>
           ) : (
             <table className="w-full">

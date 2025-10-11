@@ -8,6 +8,7 @@ export interface SSOCheckResponse {
     email: string;
     name: string;
     roles: string[];
+    permissions?: string[];
   };
   expiresAt?: string;
 }

@@ -3,15 +3,16 @@
  */
 
 import { Router, Request, Response } from 'express'
-import { query } from 'express-validator'
+import { query, body } from 'express-validator'
 import { validateDto } from '../middleware/validateDto'
-import { authenticateToken } from '../middleware/auth'
+import { authenticateToken, AuthRequest } from '../middleware/auth'
 import AppDataSource from '../database/connection'
 import { User } from '../entities/User'
 import logger from '../utils/logger'
 import { Post } from '../entities/Post'
 import fs from 'fs/promises'
 import path from 'path'
+import { previewTokenService } from '../services/preview-token.service'
 
 const router: Router = Router()
 
@@ -22,7 +23,7 @@ router.use('/ws', authenticateToken)
 router.options('*', (req: Request, res: Response) => {
   // Remove X-Frame-Options to allow iframe access
   res.removeHeader('X-Frame-Options')
-  
+
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
@@ -31,18 +32,114 @@ router.options('*', (req: Request, res: Response) => {
 })
 
 /**
- * GET /api/preview
- * Generate theme customization preview HTML
+ * POST /api/preview/token
+ * Issue preview token with jti (JWT ID) for one-time consumption
+ * Sprint 2 - P1: Preview Protection
  */
-router.get('/',
-  query('userId').isString().withMessage('User ID is required'),
-  query('theme').optional().isString().withMessage('Invalid theme'),
-  query('device').optional().isIn(['desktop', 'tablet', 'mobile']).withMessage('Invalid device'),
-  query('pageId').optional().isUUID().withMessage('Invalid page ID'),
+router.post('/token',
+  authenticateToken,
+  body('pageId').isUUID().withMessage('Valid page ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest
+    const startTime = Date.now()
+
     try {
-      const { userId, theme = 'twenty-four', device = 'desktop', pageId } = req.query as Record<string, string>
+      const { pageId } = req.body
+      const userId = authReq.user?.userId
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        })
+      }
+
+      // Generate preview token with jti
+      const token = await previewTokenService.generateToken(userId, pageId)
+      const ttl = previewTokenService.getTokenTTL()
+
+      const duration = Date.now() - startTime
+
+      logger.info('Preview token issued', {
+        userId,
+        pageId,
+        ttl: `${ttl}s`,
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString()
+      })
+
+      res.json({
+        success: true,
+        data: {
+          token,
+          expiresIn: ttl,
+          pageId
+        }
+      })
+
+    } catch (error: any) {
+      const duration = Date.now() - startTime
+
+      logger.error('Preview token issuance error', {
+        userId: authReq.user?.userId,
+        error: error.message,
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString()
+      })
+
+      res.status(500).json({
+        success: false,
+        error: 'Failed to issue preview token',
+        message: error.message
+      })
+    }
+  }
+)
+
+/**
+ * GET /api/preview
+ * Generate theme customization preview HTML
+ * Sprint 2 - P1: Token-based protection with one-time consumption
+ */
+router.get('/',
+  query('token').isString().withMessage('Preview token is required'),
+  query('theme').optional().isString().withMessage('Invalid theme'),
+  query('device').optional().isIn(['desktop', 'tablet', 'mobile']).withMessage('Invalid device'),
+  validateDto,
+  async (req: Request, res: Response) => {
+    const startTime = Date.now()
+
+    try {
+      const { token, theme = 'twenty-four', device = 'desktop' } = req.query as Record<string, string>
+
+      // Verify and consume token (one-time use)
+      const tokenResult = await previewTokenService.verifyAndConsumeToken(token)
+
+      if (!tokenResult.valid) {
+        const duration = Date.now() - startTime
+
+        logger.warn('Preview access denied - Invalid token', {
+          error: tokenResult.error,
+          duration: `${duration}ms`,
+          timestamp: new Date().toISOString()
+        })
+
+        // Return appropriate error based on token validation result
+        const errorMessages = {
+          TOKEN_EXPIRED: 'Preview token has expired (max 10 minutes)',
+          TOKEN_CONSUMED: 'Preview token has already been used (one-time only)',
+          INVALID_TOKEN: 'Invalid preview token',
+          VERIFICATION_ERROR: 'Failed to verify preview token'
+        }
+
+        return res.status(403).json({
+          success: false,
+          error: errorMessages[tokenResult.error as keyof typeof errorMessages] || 'Access denied'
+        })
+      }
+
+      const { userId, pageId } = tokenResult.payload!
 
       // Get repositories
       const userRepository = AppDataSource.getRepository(User)
@@ -51,21 +148,22 @@ router.get('/',
       // Get user for customization
       const user = await userRepository.findOne({ where: { id: userId } })
       if (!user) {
+        logger.warn('Preview user not found', { userId, pageId })
         return res.status(404).json({ error: 'User not found' })
       }
 
-      // Get page content if pageId provided
+      // Get page content
       let pageContent = null
-      if (pageId) {
-        const page = await postRepository.findOne({ where: { id: pageId } })
-        if (page) {
-          pageContent = {
-            title: page.title,
-            content: page.content,
-            zones: page.meta?.zones,
-            customizations: page.meta?.themeCustomizations
-          }
+      const page = await postRepository.findOne({ where: { id: pageId } })
+      if (page) {
+        pageContent = {
+          title: page.title,
+          content: page.content,
+          zones: page.meta?.zones,
+          customizations: page.meta?.themeCustomizations
         }
+      } else {
+        logger.warn('Preview page not found', { userId, pageId })
       }
 
       // Load theme configuration
@@ -104,19 +202,37 @@ router.get('/',
 
       // Set appropriate headers
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-      
+
+      // Sprint 2 - P1: Security headers for preview protection
+      // Cache-Control: no-store prevents caching of sensitive preview content
+      res.setHeader('Cache-Control', 'no-store')
+
       // Remove X-Frame-Options to allow iframe access
       res.removeHeader('X-Frame-Options')
-      
-      // Allow iframe access from specific domains
-      res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://admin.neture.co.kr https://neture.co.kr http://localhost:3000 http://localhost:3001 http://localhost:5173 http://localhost:5174")
-      
+
+      // Minimal frame-ancestors for production security
+      const frameAncestors = process.env.NODE_ENV === 'production'
+        ? "frame-ancestors 'self' https://admin.neture.co.kr"
+        : "frame-ancestors 'self' https://admin.neture.co.kr http://localhost:3000 http://localhost:5173"
+
+      res.setHeader('Content-Security-Policy', frameAncestors)
+
       // Add CORS headers for iframe access
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-      
+
+      const duration = Date.now() - startTime
+
+      logger.info('Preview rendered successfully', {
+        userId,
+        pageId,
+        theme,
+        device,
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString()
+      })
+
       res.send(previewHtml)
 
     } catch (error) {

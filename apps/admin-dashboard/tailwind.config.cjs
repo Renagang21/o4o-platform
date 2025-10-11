@@ -22,7 +22,40 @@ module.exports = {
           900: '#111827',
           950: '#030712',
         },
-        // WordPress-style admin colors (updated to match CSS variables)
+
+        // ========================================
+        // Unified Token System - --wp-* variables
+        // ========================================
+
+        // Primary/Secondary brand colors
+        'wp-primary': {
+          50: 'var(--wp-color-primary-50)',
+          100: 'var(--wp-color-primary-100)',
+          200: 'var(--wp-color-primary-200)',
+          300: 'var(--wp-color-primary-300)',
+          400: 'var(--wp-color-primary-400)',
+          DEFAULT: 'var(--wp-color-primary-500)',
+          500: 'var(--wp-color-primary-500)',
+          600: 'var(--wp-color-primary-600)',
+          700: 'var(--wp-color-primary-700)',
+          800: 'var(--wp-color-primary-800)',
+          900: 'var(--wp-color-primary-900)',
+        },
+        'wp-secondary': {
+          50: 'var(--wp-color-secondary-50)',
+          100: 'var(--wp-color-secondary-100)',
+          200: 'var(--wp-color-secondary-200)',
+          300: 'var(--wp-color-secondary-300)',
+          400: 'var(--wp-color-secondary-400)',
+          DEFAULT: 'var(--wp-color-secondary-500)',
+          500: 'var(--wp-color-secondary-500)',
+          600: 'var(--wp-color-secondary-600)',
+          700: 'var(--wp-color-secondary-700)',
+          800: 'var(--wp-color-secondary-800)',
+          900: 'var(--wp-color-secondary-900)',
+        },
+
+        // Admin UI colors
         admin: {
           blue: 'var(--wp-admin-blue)',
           'blue-dark': 'var(--wp-admin-blue-dark)',
@@ -35,32 +68,50 @@ module.exports = {
           'gray-light': 'var(--wp-admin-gray-light)',
           'gray-dark': 'var(--wp-admin-gray-dark)'
         },
-        // WordPress sidebar colors
+
+        // Sidebar colors
         sidebar: {
           bg: 'var(--wp-sidebar-bg)',
           hover: 'var(--wp-sidebar-hover)',
           active: 'var(--wp-sidebar-active)',
+          'active-text': 'var(--wp-sidebar-active-text)',
           text: 'var(--wp-sidebar-text)',
           border: 'var(--wp-sidebar-border)'
         },
-        // WordPress background colors
+
+        // Background colors
         'wp-bg': {
+          body: 'var(--wp-bg-body)',
+          content: 'var(--wp-bg-content)',
           primary: 'var(--wp-bg-primary)',
           secondary: 'var(--wp-bg-secondary)',
-          tertiary: 'var(--wp-bg-tertiary)'
+          tertiary: 'var(--wp-bg-tertiary)',
+          inverse: 'var(--wp-bg-inverse)',
         },
-        // WordPress text colors
+
+        // Text colors
         'wp-text': {
           primary: 'var(--wp-text-primary)',
           secondary: 'var(--wp-text-secondary)',
           tertiary: 'var(--wp-text-tertiary)',
-          white: 'var(--wp-text-white)'
+          inverse: 'var(--wp-text-inverse)',
         },
-        // WordPress border colors
+
+        // Border colors
         'wp-border': {
           primary: 'var(--wp-border-primary)',
           secondary: 'var(--wp-border-secondary)',
-          tertiary: 'var(--wp-border-tertiary)'
+          focus: 'var(--wp-border-focus)',
+        },
+
+        // Button colors
+        'wp-btn': {
+          'primary-bg': 'var(--wp-btn-primary-bg)',
+          'primary-hover': 'var(--wp-btn-primary-bg-hover)',
+          'primary-text': 'var(--wp-btn-primary-text)',
+          'secondary-bg': 'var(--wp-btn-secondary-bg)',
+          'secondary-hover': 'var(--wp-btn-secondary-bg-hover)',
+          'secondary-text': 'var(--wp-btn-secondary-text)',
         },
         // Shadcn/ui colors
         border: "hsl(var(--border))",

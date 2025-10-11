@@ -6,7 +6,7 @@ import { ReviewList } from './ReviewList';
 import { ReviewForm } from './ReviewForm';
 import { Button } from '@o4o/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@o4o/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@o4o/ui';
 import { Skeleton } from '@o4o/ui';
 import { Edit2, AlertCircle } from 'lucide-react';

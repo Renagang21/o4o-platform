@@ -1,25 +1,23 @@
 import { ChangeEvent, useEffect, useState } from 'react';
-import { 
-  X, 
-  Upload, 
-  Plus, 
-  Trash2, 
+import {
+  X,
+  Upload,
+  Plus,
+  Trash2,
   Save,
-  AlertCircle,
-  Bold,
-  Italic,
-  Link2,
-  Type
+  AlertCircle
 } from 'lucide-react';
-import { 
-  Button, 
-  Input, 
-  Textarea,
+import {
+  Button,
+  Input,
+  Textarea
+} from '@o4o/ui';
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
-} from '@o4o/ui';
+} from '@/components/ui/dialog';
 import type { Product, ProductDimensions } from '@o4o/types';
 
 interface ProductFormProps {

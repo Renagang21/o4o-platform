@@ -13,29 +13,53 @@
 
 @layer base {
   :root {
-    /* Primary Colors - Clean Modern Blue */
-    --primary-50: #eff6ff;
-    --primary-100: #dbeafe;
-    --primary-200: #bfdbfe;
-    --primary-300: #93c5fd;
-    --primary-400: #60a5fa;
-    --primary-500: #3b82f6; /* Main Primary */
-    --primary-600: #2563eb;
-    --primary-700: #1d4ed8;
-    --primary-800: #1e40af;
-    --primary-900: #1e3a8a;
+    /* ========================================
+       PRIMARY COLORS - Unified Token System
+       ======================================== */
+    --wp-color-primary-50: #eff6ff;
+    --wp-color-primary-100: #dbeafe;
+    --wp-color-primary-200: #bfdbfe;
+    --wp-color-primary-300: #93c5fd;
+    --wp-color-primary-400: #60a5fa;
+    --wp-color-primary-500: #3b82f6; /* Main brand color */
+    --wp-color-primary-600: #2563eb;
+    --wp-color-primary-700: #1d4ed8;
+    --wp-color-primary-800: #1e40af;
+    --wp-color-primary-900: #1e3a8a;
 
-    /* Secondary - Modern Teal */
-    --secondary-50: #f0fdfa;
-    --secondary-100: #ccfbf1;
-    --secondary-200: #99f6e4;
-    --secondary-300: #5eead4;
-    --secondary-400: #2dd4bf;
-    --secondary-500: #14b8a6; /* Main Secondary */
-    --secondary-600: #0d9488;
-    --secondary-700: #0f766e;
-    --secondary-800: #115e59;
-    --secondary-900: #134e4a;
+    /* SECONDARY COLORS */
+    --wp-color-secondary-50: #f0fdfa;
+    --wp-color-secondary-100: #ccfbf1;
+    --wp-color-secondary-200: #99f6e4;
+    --wp-color-secondary-300: #5eead4;
+    --wp-color-secondary-400: #2dd4bf;
+    --wp-color-secondary-500: #14b8a6; /* Main accent */
+    --wp-color-secondary-600: #0d9488;
+    --wp-color-secondary-700: #0f766e;
+    --wp-color-secondary-800: #115e59;
+    --wp-color-secondary-900: #134e4a;
+
+    /* Legacy aliases for backward compatibility */
+    --primary-50: var(--wp-color-primary-50);
+    --primary-100: var(--wp-color-primary-100);
+    --primary-200: var(--wp-color-primary-200);
+    --primary-300: var(--wp-color-primary-300);
+    --primary-400: var(--wp-color-primary-400);
+    --primary-500: var(--wp-color-primary-500);
+    --primary-600: var(--wp-color-primary-600);
+    --primary-700: var(--wp-color-primary-700);
+    --primary-800: var(--wp-color-primary-800);
+    --primary-900: var(--wp-color-primary-900);
+    --secondary-50: var(--wp-color-secondary-50);
+    --secondary-100: var(--wp-color-secondary-100);
+    --secondary-200: var(--wp-color-secondary-200);
+    --secondary-300: var(--wp-color-secondary-300);
+    --secondary-400: var(--wp-color-secondary-400);
+    --secondary-500: var(--wp-color-secondary-500);
+    --secondary-600: var(--wp-color-secondary-600);
+    --secondary-700: var(--wp-color-secondary-700);
+    --secondary-800: var(--wp-color-secondary-800);
+    --secondary-900: var(--wp-color-secondary-900);
 
     /* Neutral Colors - Optimized for Readability */
     --gray-0: #ffffff;
@@ -87,26 +111,47 @@
     --error-800: #991b1b;
     --error-900: #7f1d1d;
 
-    /* Gradients - Subtle and Modern */
-    --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-    --gradient-secondary: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--wp-color-primary-500) 0%, var(--wp-color-primary-600) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--wp-color-secondary-500) 0%, var(--wp-color-secondary-600) 100%);
     --gradient-dark: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
     --gradient-light: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
 
-    /* Semantic Colors - Clean Light Mode */
-    --bg-primary: var(--gray-0);
-    --bg-secondary: var(--gray-50);
-    --bg-tertiary: var(--gray-100);
-    --bg-inverse: var(--gray-900);
-    
-    --text-primary: var(--gray-900);
-    --text-secondary: var(--gray-700);
-    --text-tertiary: var(--gray-600);
-    --text-inverse: var(--gray-0);
-    
-    --border-primary: var(--gray-200);
-    --border-secondary: var(--gray-300);
-    --border-focus: var(--primary-500);
+    /* ========================================
+       SEMANTIC COLORS - Unified Token System
+       ======================================== */
+
+    /* Background Colors */
+    --wp-bg-body: var(--gray-0);
+    --wp-bg-content: var(--gray-0);
+    --wp-bg-primary: var(--gray-0);
+    --wp-bg-secondary: var(--gray-50);
+    --wp-bg-tertiary: var(--gray-100);
+    --wp-bg-inverse: var(--gray-900);
+
+    /* Text Colors */
+    --wp-text-primary: var(--gray-900);
+    --wp-text-secondary: var(--gray-700);
+    --wp-text-tertiary: var(--gray-600);
+    --wp-text-inverse: var(--gray-0);
+
+    /* Border Colors */
+    --wp-border-primary: var(--gray-200);
+    --wp-border-secondary: var(--gray-300);
+    --wp-border-focus: var(--wp-color-primary-500);
+
+    /* Legacy aliases */
+    --bg-primary: var(--wp-bg-primary);
+    --bg-secondary: var(--wp-bg-secondary);
+    --bg-tertiary: var(--wp-bg-tertiary);
+    --bg-inverse: var(--wp-bg-inverse);
+    --text-primary: var(--wp-text-primary);
+    --text-secondary: var(--wp-text-secondary);
+    --text-tertiary: var(--wp-text-tertiary);
+    --text-inverse: var(--wp-text-inverse);
+    --border-primary: var(--wp-border-primary);
+    --border-secondary: var(--wp-border-secondary);
+    --border-focus: var(--wp-border-focus);
     
     /* Admin Bar - Clean Dark */
     --admin-bar-bg: var(--gray-900);
@@ -114,13 +159,25 @@
     --admin-bar-hover: var(--gray-800);
     --admin-bar-active: var(--gray-700);
     
-    /* Sidebar - Modern Clean */
-    --sidebar-bg: var(--gray-0);
-    --sidebar-text: var(--gray-700);
-    --sidebar-hover: var(--gray-50);
-    --sidebar-active-bg: var(--primary-50);
-    --sidebar-active-text: var(--primary-600);
-    --sidebar-border: var(--gray-200);
+    /* ========================================
+       LAYOUT COMPONENTS - Unified Token System
+       ======================================== */
+
+    /* Sidebar */
+    --wp-sidebar-bg: var(--gray-0);
+    --wp-sidebar-text: var(--gray-700);
+    --wp-sidebar-hover: var(--gray-50);
+    --wp-sidebar-active: var(--wp-color-primary-50);
+    --wp-sidebar-active-text: var(--wp-color-primary-600);
+    --wp-sidebar-border: var(--gray-200);
+
+    /* Legacy aliases */
+    --sidebar-bg: var(--wp-sidebar-bg);
+    --sidebar-text: var(--wp-sidebar-text);
+    --sidebar-hover: var(--wp-sidebar-hover);
+    --sidebar-active-bg: var(--wp-sidebar-active);
+    --sidebar-active-text: var(--wp-sidebar-active-text);
+    --sidebar-border: var(--wp-sidebar-border);
     
     /* Components */
     --card-bg: var(--gray-0);
@@ -128,23 +185,50 @@
     --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     
-    /* Buttons - Consistent Modern Style */
-    --btn-primary-bg: var(--primary-500);
-    --btn-primary-text: var(--gray-0);
-    --btn-primary-hover: var(--primary-600);
-    --btn-primary-active: var(--primary-700);
-    --btn-primary-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    
-    --btn-secondary-bg: var(--gray-0);
-    --btn-secondary-text: var(--gray-700);
-    --btn-secondary-border: var(--gray-300);
-    --btn-secondary-hover: var(--gray-50);
-    --btn-secondary-active: var(--gray-100);
-    
-    --btn-success-bg: var(--success-500);
-    --btn-success-text: var(--gray-0);
-    --btn-danger-bg: var(--error-500);
-    --btn-danger-text: var(--gray-0);
+    /* ========================================
+       BUTTON SYSTEM - Unified Token System
+       ======================================== */
+
+    /* Primary Button */
+    --wp-btn-primary-bg: var(--wp-color-primary-500);
+    --wp-btn-primary-bg-hover: var(--wp-color-primary-600);
+    --wp-btn-primary-bg-active: var(--wp-color-primary-700);
+    --wp-btn-primary-text: var(--gray-0);
+    --wp-btn-primary-text-hover: var(--gray-0);
+    --wp-btn-primary-border: transparent;
+    --wp-btn-primary-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+    /* Secondary Button */
+    --wp-btn-secondary-bg: var(--gray-0);
+    --wp-btn-secondary-bg-hover: var(--gray-50);
+    --wp-btn-secondary-bg-active: var(--gray-100);
+    --wp-btn-secondary-text: var(--gray-700);
+    --wp-btn-secondary-text-hover: var(--gray-900);
+    --wp-btn-secondary-border: var(--gray-300);
+
+    /* Success Button */
+    --wp-btn-success-bg: var(--success-500);
+    --wp-btn-success-text: var(--gray-0);
+
+    /* Danger Button */
+    --wp-btn-danger-bg: var(--error-500);
+    --wp-btn-danger-text: var(--gray-0);
+
+    /* Legacy aliases */
+    --btn-primary-bg: var(--wp-btn-primary-bg);
+    --btn-primary-text: var(--wp-btn-primary-text);
+    --btn-primary-hover: var(--wp-btn-primary-bg-hover);
+    --btn-primary-active: var(--wp-btn-primary-bg-active);
+    --btn-primary-shadow: var(--wp-btn-primary-shadow);
+    --btn-secondary-bg: var(--wp-btn-secondary-bg);
+    --btn-secondary-text: var(--wp-btn-secondary-text);
+    --btn-secondary-border: var(--wp-btn-secondary-border);
+    --btn-secondary-hover: var(--wp-btn-secondary-bg-hover);
+    --btn-secondary-active: var(--wp-btn-secondary-bg-active);
+    --btn-success-bg: var(--wp-btn-success-bg);
+    --btn-success-text: var(--wp-btn-success-text);
+    --btn-danger-bg: var(--wp-btn-danger-bg);
+    --btn-danger-text: var(--wp-btn-danger-text);
     
     /* Forms - Improved Readability */
     --input-bg: var(--gray-0);
@@ -168,49 +252,21 @@
     --transition-normal: 200ms ease-in-out;
     --transition-slow: 300ms ease-in-out;
     
-    /* WordPress Legacy Support (mapped to modern colors) */
-    --wp-color-primary: var(--primary-500);
-    --wp-color-primary-dark: var(--primary-700);
-    --wp-color-primary-light: var(--primary-300);
-    --wp-color-success: var(--success-500);
-    --wp-color-warning: var(--warning-500);
-    --wp-color-error: var(--error-500);
-    --wp-color-info: var(--primary-400);
-    
-    /* WordPress Admin Colors (mapped) */
-    --wp-admin-blue: var(--primary-500);
-    --wp-admin-blue-dark: var(--primary-700);
-    --wp-admin-blue-light: var(--primary-300);
+    /* ========================================
+       ADMIN UI COLORS - Unified Token System
+       ======================================== */
+
+    /* WordPress-style Admin Colors */
+    --wp-admin-blue: var(--wp-color-primary-500);
+    --wp-admin-blue-dark: var(--wp-color-primary-700);
+    --wp-admin-blue-light: var(--wp-color-primary-300);
     --wp-admin-red: var(--error-500);
     --wp-admin-green: var(--success-500);
     --wp-admin-orange: var(--warning-500);
-    --wp-admin-purple: var(--secondary-500);
+    --wp-admin-purple: var(--wp-color-secondary-500);
     --wp-admin-gray: var(--gray-500);
     --wp-admin-gray-light: var(--gray-300);
     --wp-admin-gray-dark: var(--gray-700);
-    
-    /* WordPress Sidebar Colors (mapped) */
-    --wp-sidebar-bg: var(--sidebar-bg);
-    --wp-sidebar-text: var(--sidebar-text);
-    --wp-sidebar-hover: var(--sidebar-hover);
-    --wp-sidebar-active: var(--sidebar-active-bg);
-    --wp-sidebar-border: var(--border-primary);
-    
-    /* WordPress Background Colors (mapped) */
-    --wp-bg-primary: var(--bg-secondary);
-    --wp-bg-secondary: var(--bg-primary);
-    --wp-bg-tertiary: var(--bg-tertiary);
-    
-    /* WordPress Text Colors (mapped) */
-    --wp-text-primary: var(--text-primary);
-    --wp-text-secondary: var(--text-secondary);
-    --wp-text-tertiary: var(--text-tertiary);
-    --wp-text-white: var(--text-inverse);
-    
-    /* WordPress Border Colors (mapped) */
-    --wp-border-primary: var(--border-primary);
-    --wp-border-secondary: var(--border-secondary);
-    --wp-border-tertiary: var(--border-primary);
     
     /* Legacy Shadcn/ui variables for compatibility */
     --background: 0 0% 100%;
@@ -235,22 +291,41 @@
     --radius: 0.5rem;
   }
 
-  /* Dark Mode */
+  /* ========================================
+     DARK MODE - Unified Token System
+     ======================================== */
   [data-theme="dark"] {
-    /* Semantic Colors - Dark Mode */
-    --bg-primary: var(--gray-950);
-    --bg-secondary: var(--gray-900);
-    --bg-tertiary: var(--gray-800);
-    --bg-inverse: var(--gray-0);
-    
-    --text-primary: var(--gray-100);
-    --text-secondary: var(--gray-400);
-    --text-tertiary: var(--gray-500);
-    --text-inverse: var(--gray-900);
-    
-    --border-primary: var(--gray-800);
-    --border-secondary: var(--gray-700);
-    --border-focus: var(--primary-400);
+    /* Background Colors */
+    --wp-bg-body: var(--gray-950);
+    --wp-bg-content: var(--gray-900);
+    --wp-bg-primary: var(--gray-950);
+    --wp-bg-secondary: var(--gray-900);
+    --wp-bg-tertiary: var(--gray-800);
+    --wp-bg-inverse: var(--gray-0);
+
+    /* Text Colors */
+    --wp-text-primary: var(--gray-100);
+    --wp-text-secondary: var(--gray-400);
+    --wp-text-tertiary: var(--gray-500);
+    --wp-text-inverse: var(--gray-900);
+
+    /* Border Colors */
+    --wp-border-primary: var(--gray-800);
+    --wp-border-secondary: var(--gray-700);
+    --wp-border-focus: var(--wp-color-primary-400);
+
+    /* Legacy aliases */
+    --bg-primary: var(--wp-bg-primary);
+    --bg-secondary: var(--wp-bg-secondary);
+    --bg-tertiary: var(--wp-bg-tertiary);
+    --bg-inverse: var(--wp-bg-inverse);
+    --text-primary: var(--wp-text-primary);
+    --text-secondary: var(--wp-text-secondary);
+    --text-tertiary: var(--wp-text-tertiary);
+    --text-inverse: var(--wp-text-inverse);
+    --border-primary: var(--wp-border-primary);
+    --border-secondary: var(--wp-border-secondary);
+    --border-focus: var(--wp-border-focus);
     
     /* Admin Bar - Dark Mode */
     --admin-bar-bg: var(--gray-900);
@@ -258,30 +333,48 @@
     --admin-bar-hover: rgba(255, 255, 255, 0.1);
     --admin-bar-active: rgba(255, 255, 255, 0.2);
     
-    /* Sidebar - Dark Mode */
-    --sidebar-bg: var(--gray-900);
-    --sidebar-text: var(--gray-300);
-    --sidebar-hover: var(--gray-800);
-    --sidebar-active-bg: var(--primary-600);
-    --sidebar-active-text: var(--gray-0);
-    
-    /* Components - Dark Mode */
+    /* Sidebar */
+    --wp-sidebar-bg: var(--gray-900);
+    --wp-sidebar-text: var(--gray-300);
+    --wp-sidebar-hover: var(--gray-800);
+    --wp-sidebar-active: var(--wp-color-primary-600);
+    --wp-sidebar-active-text: var(--gray-0);
+
+    /* Legacy aliases */
+    --sidebar-bg: var(--wp-sidebar-bg);
+    --sidebar-text: var(--wp-sidebar-text);
+    --sidebar-hover: var(--wp-sidebar-hover);
+    --sidebar-active-bg: var(--wp-sidebar-active);
+    --sidebar-active-text: var(--wp-sidebar-active-text);
+
+    /* Components */
     --card-bg: var(--gray-900);
     --card-border: var(--gray-800);
     --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    
-    /* Buttons - Dark Mode */
-    --btn-primary-bg: var(--primary-600);
-    --btn-primary-text: var(--gray-0);
-    --btn-primary-hover: var(--primary-700);
-    --btn-primary-active: var(--primary-800);
-    
-    --btn-secondary-bg: var(--gray-800);
-    --btn-secondary-text: var(--gray-200);
-    --btn-secondary-border: var(--gray-700);
-    --btn-secondary-hover: var(--gray-700);
-    --btn-secondary-active: var(--gray-600);
+
+    /* Buttons */
+    --wp-btn-primary-bg: var(--wp-color-primary-600);
+    --wp-btn-primary-bg-hover: var(--wp-color-primary-700);
+    --wp-btn-primary-bg-active: var(--wp-color-primary-800);
+    --wp-btn-primary-text: var(--gray-0);
+
+    --wp-btn-secondary-bg: var(--gray-800);
+    --wp-btn-secondary-bg-hover: var(--gray-700);
+    --wp-btn-secondary-bg-active: var(--gray-600);
+    --wp-btn-secondary-text: var(--gray-200);
+    --wp-btn-secondary-border: var(--gray-700);
+
+    /* Legacy aliases */
+    --btn-primary-bg: var(--wp-btn-primary-bg);
+    --btn-primary-text: var(--wp-btn-primary-text);
+    --btn-primary-hover: var(--wp-btn-primary-bg-hover);
+    --btn-primary-active: var(--wp-btn-primary-bg-active);
+    --btn-secondary-bg: var(--wp-btn-secondary-bg);
+    --btn-secondary-text: var(--wp-btn-secondary-text);
+    --btn-secondary-border: var(--wp-btn-secondary-border);
+    --btn-secondary-hover: var(--wp-btn-secondary-bg-hover);
+    --btn-secondary-active: var(--wp-btn-secondary-bg-active);
     
     /* Forms - Dark Mode */
     --input-bg: var(--gray-900);

@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Checkbox } from '@o4o/ui';
+import { Button } from '@o4o/ui';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, ShoppingCart as CartIcon } from 'lucide-react';
 import { Cart, OrderSummary, Product } from '@o4o/types';
 import { CartItem, CartSummary } from '@/components/cart';

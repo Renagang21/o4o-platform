@@ -111,7 +111,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
       return;
     }
 
-    const data: Partial<VendorProduct> = {
+    const data = {
       name: formData.name,
       sku: formData.sku,
       description: formData.description,
@@ -132,10 +132,10 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
     try {
       setLoading(true);
       if (isEdit) {
-        await updateVendorProduct(product.id, data);
+        await updateVendorProduct(product.id, data as any);
         toast.success('제품이 수정되었습니다');
       } else {
-        await createVendorProduct(data);
+        await createVendorProduct(data as any);
         toast.success('제품이 등록되었습니다. 관리자 승인을 기다려주세요.');
       }
       onSuccess?.();

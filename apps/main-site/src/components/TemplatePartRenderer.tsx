@@ -1,6 +1,10 @@
 import { FC } from 'react';
 import { useTemplateParts, TemplatePartBlock } from '../hooks/useTemplateParts';
 import SiteHeader from './blocks/SiteHeader';
+import StickyHeader from './common/StickyHeader';
+import { useStickyHeaderSettings } from '../hooks/useStickyHeaderSettings';
+import ResponsiveHeader from './common/ResponsiveHeader';
+import { useMobileHeaderSettings } from '../hooks/useMobileHeaderSettings';
 import SiteFooter from './blocks/SiteFooter';
 import Navigation from './blocks/Navigation';
 import SiteLogo from './blocks/SiteLogo';
@@ -11,6 +15,17 @@ import SearchBlock from './blocks/SearchBlock';
 import Group from './blocks/Group';
 import Columns from './blocks/Columns';
 import Column from './blocks/Column';
+import { AccountModule } from './blocks/AccountModule';
+import { CartModule } from './blocks/CartModule';
+import { TextWidget } from './blocks/footer/TextWidget';
+import { HTMLWidget } from './blocks/footer/HTMLWidget';
+import { MenuWidget } from './blocks/footer/MenuWidget';
+import { SocialWidget } from './blocks/footer/SocialWidget';
+import { ContactWidget } from './blocks/footer/ContactWidget';
+import { CopyrightWidget } from './blocks/footer/CopyrightWidget';
+import { RecentPostsWidget } from './blocks/footer/RecentPostsWidget';
+import { NewsletterWidget } from './blocks/footer/NewsletterWidget';
+import './blocks/footer/FooterWidgets.css';
 
 // Map block types to components
 const blockComponents: Record<string, FC<any>> = {
@@ -20,6 +35,17 @@ const blockComponents: Record<string, FC<any>> = {
   'core/navigation': Navigation,
   'core/search': SearchBlock,
   'core/social-links': SocialLinks,
+  'o4o/account-menu': AccountModule,
+  'o4o/cart-icon': CartModule,
+  'o4o/text-widget': TextWidget,
+  'o4o/html-widget': HTMLWidget,
+  'o4o/menu-widget': MenuWidget,
+  'o4o/social-widget': SocialWidget,
+  'o4o/contact-widget': ContactWidget,
+  'o4o/copyright-widget': CopyrightWidget,
+  'o4o/recent-posts-widget': RecentPostsWidget,
+  'o4o/newsletter-widget': NewsletterWidget,
+  'core/latest-posts': RecentPostsWidget,
   'core/paragraph': ({ data }: any) => (
     <p 
       className={data.className}
@@ -68,6 +94,8 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   fallback
 }) => {
   const { templateParts, loading, error } = useTemplateParts({ area, context });
+  const { settings: stickySettings } = useStickyHeaderSettings();
+  const { settings: mobileSettings } = useMobileHeaderSettings();
 
   // Note: removed a no-op useMemo to satisfy lint rules
 
@@ -153,7 +181,8 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
 
     const containerClass = widthClasses[settings.containerWidth || 'wide'];
 
-    return (
+    // Wrap header sections with StickyHeader if enabled
+    const renderContent = () => (
       <div 
         key={templatePart.id}
         className={`template-part template-part-${area}`}
@@ -167,6 +196,41 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
         </div>
       </div>
     );
+
+    // Apply sticky header wrapper for header areas
+    if (area === 'header' && stickySettings.enabled) {
+      // Determine which section this is (above, primary, below)
+      let currentSection: 'above' | 'primary' | 'below' = 'primary';
+      
+      // Check template part name or ID to determine section
+      if (templatePart.slug?.includes('above') || templatePart.title?.toLowerCase().includes('above')) {
+        currentSection = 'above';
+      } else if (templatePart.slug?.includes('below') || templatePart.title?.toLowerCase().includes('below')) {
+        currentSection = 'below';
+      }
+      
+      return (
+        <StickyHeader
+          enabled={stickySettings.enabled}
+          triggerHeight={stickySettings.triggerHeight}
+          shrinkEffect={stickySettings.shrinkEffect}
+          shrinkHeight={stickySettings.shrinkHeight}
+          backgroundColor={stickySettings.backgroundColor}
+          backgroundOpacity={stickySettings.backgroundOpacity}
+          boxShadow={stickySettings.boxShadow}
+          shadowIntensity={stickySettings.shadowIntensity}
+          animationDuration={stickySettings.animationDuration}
+          hideOnScrollDown={stickySettings.hideOnScrollDown}
+          zIndex={stickySettings.zIndex}
+          stickyOn={stickySettings.stickyOn}
+          currentSection={currentSection}
+        >
+          {renderContent()}
+        </StickyHeader>
+      );
+    }
+    
+    return renderContent();
   };
 
   // Extract menu data from context (fetched from Backend API)
@@ -209,6 +273,26 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   }
 
   // Render all active template parts for the area
+  
+  // Wrap header with ResponsiveHeader for mobile support
+  if (area === 'header') {
+    // Extract menu items for mobile menu
+    const allMenuItems = templateParts.length > 0 
+      ? extractMenuDataFromBlocks(templateParts[0].content || [])
+      : [];
+    
+    const siteName = context?.logoUrl ? '' : 'Site'; // Use default site name if no logo
+    
+    return (
+      <ResponsiveHeader
+        mobileSettings={mobileSettings}
+        menuItems={allMenuItems}
+        siteName={siteName}
+      >
+        {Array.isArray(templateParts) ? templateParts.map(templatePart => renderTemplatePart(templatePart)) : null}
+      </ResponsiveHeader>
+    );
+  }
   
   return (
     <>

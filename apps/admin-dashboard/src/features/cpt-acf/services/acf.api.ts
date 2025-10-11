@@ -160,9 +160,167 @@ export const acfUtilsApi = {
   }
 };
 
+/**
+ * ACF Location Management
+ */
+export const acfLocationApi = {
+  // Get available values for a location parameter
+  async getLocationValues(
+    param: string
+  ): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get(
+      `${API_BASE}/location/values/${param}`
+    );
+    return response.data;
+  },
+
+  // Get user roles for location rules
+  async getUserRoles(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/api/v1/roles');
+    // Transform role definitions to value/label pairs
+    const roles = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: roles.map((role: any) => ({
+        value: role.name || role.id,
+        label: role.displayName || role.name || role.id
+      }))
+    };
+  },
+
+  // Get post types for location rules
+  async getPostTypes(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/cpt/custom-post-types');
+    const types = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: types.map((type: any) => ({
+        value: type.name || type.slug,
+        label: type.label || type.name || type.slug
+      }))
+    };
+  },
+
+  // Get taxonomies for location rules
+  async getTaxonomies(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+    const response = await authClient.api.get('/api/v1/taxonomies');
+    const taxonomies = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: taxonomies.map((tax: any) => ({
+        value: tax.name || tax.slug,
+        label: tax.label || tax.name || tax.slug
+      }))
+    };
+  },
+
+  // Get terms for a specific taxonomy
+  async getTaxonomyTerms(
+    taxonomy: string
+  ): Promise<ACFApiResponse<Array<{ value: string; label: string; parent?: string; count?: number }>>> {
+    const response = await authClient.api.get(`/api/v1/taxonomies/${taxonomy}/terms`);
+    const terms = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: terms.map((term: any) => ({
+        value: term.id || term.slug,
+        label: term.name || term.slug,
+        parent: term.parent,
+        count: term.count
+      }))
+    };
+  },
+
+  // Get categories for location rules (with hierarchical support)
+  async getCategories(): Promise<ACFApiResponse<Array<{ value: string; label: string; parent?: string; count?: number }>>> {
+    const response = await authClient.api.get('/api/v1/posts/categories');
+    const categories = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: categories.map((cat: any) => ({
+        value: String(cat.id || cat.slug),
+        label: cat.name || cat.slug,
+        parent: cat.parent ? String(cat.parent) : undefined,
+        count: cat.count
+      }))
+    };
+  },
+
+  // Get page templates for location rules
+  async getPageTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string; description?: string }>>> {
+    try {
+      // Try to fetch from backend first
+      const response = await authClient.api.get('/api/v1/templates/page');
+      const templates = response.data?.data || response.data || [];
+
+      if (templates.length > 0) {
+        return {
+          success: true,
+          data: templates.map((tpl: any) => ({
+            value: tpl.slug || tpl.template || tpl.value,
+            label: tpl.name || tpl.label || tpl.slug,
+            description: tpl.description
+          }))
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to fetch page templates from API, using defaults:', error);
+    }
+
+    // Fallback to default page templates
+    return {
+      success: true,
+      data: [
+        { value: 'default', label: 'Default Template', description: 'Standard page layout' },
+        { value: 'full-width', label: 'Full Width', description: 'Full width without sidebar' },
+        { value: 'sidebar-left', label: 'Sidebar Left', description: 'Sidebar on the left' },
+        { value: 'sidebar-right', label: 'Sidebar Right', description: 'Sidebar on the right' },
+        { value: 'landing-page', label: 'Landing Page', description: 'Marketing landing page' },
+        { value: 'blank', label: 'Blank Template', description: 'Minimal template with no header/footer' },
+      ]
+    };
+  },
+
+  // Get post templates for location rules
+  async getPostTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string; description?: string }>>> {
+    try {
+      // Try to fetch from backend first
+      const response = await authClient.api.get('/api/v1/templates/post');
+      const templates = response.data?.data || response.data || [];
+
+      if (templates.length > 0) {
+        return {
+          success: true,
+          data: templates.map((tpl: any) => ({
+            value: tpl.slug || tpl.template || tpl.value,
+            label: tpl.name || tpl.label || tpl.slug,
+            description: tpl.description
+          }))
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to fetch post templates from API, using defaults:', error);
+    }
+
+    // Fallback to default post templates
+    return {
+      success: true,
+      data: [
+        { value: 'default', label: 'Default Template', description: 'Standard post layout' },
+        { value: 'featured', label: 'Featured Post', description: 'Highlighted post with large image' },
+        { value: 'gallery', label: 'Gallery Post', description: 'Image gallery layout' },
+        { value: 'video', label: 'Video Post', description: 'Video-focused layout' },
+        { value: 'audio', label: 'Audio Post', description: 'Audio player layout' },
+        { value: 'minimal', label: 'Minimal Post', description: 'Clean, minimal design' },
+      ]
+    };
+  }
+};
+
 // Export combined API
 export default {
   groups: acfGroupApi,
   values: acfValueApi,
-  utils: acfUtilsApi
+  utils: acfUtilsApi,
+  location: acfLocationApi
 };
