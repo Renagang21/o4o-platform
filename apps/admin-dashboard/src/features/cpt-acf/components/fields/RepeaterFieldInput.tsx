@@ -37,6 +37,10 @@ interface RepeaterFieldInputProps {
   repeaterId?: string;
   /** Parent repeater ID (for nested repeaters) */
   parentRepeaterId?: string;
+  /** Current nesting level (for preventing infinite recursion) */
+  nestingLevel?: number;
+  /** Maximum allowed nesting level (default: 2) */
+  maxNestingLevel?: number;
   renderSubField?: (
     subField: CustomField,
     value: any,
@@ -52,6 +56,8 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   disabled = false,
   repeaterId,
   parentRepeaterId,
+  nestingLevel = 0,
+  maxNestingLevel = 2,
   renderSubField,
 }) => {
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(new Set());
@@ -61,6 +67,11 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
   const instanceId = useMemo(() => {
     return repeaterId || `repeater_${field.name}_${Date.now()}`;
   }, [repeaterId, field.name]);
+
+  // Circular reference prevention: Check nesting level
+  const isMaxNestingReached = useMemo(() => {
+    return nestingLevel >= maxNestingLevel;
+  }, [nestingLevel, maxNestingLevel]);
 
   // Setup drag and drop sensors
   const sensors = useSensors(
@@ -311,6 +322,40 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
           </select>
         );
 
+      case 'repeater':
+        // Nested repeater support with depth limiting
+        if (isMaxNestingReached) {
+          return (
+            <div className="mt-2 p-3 border-l-2 border-orange-300 bg-orange-50 rounded-r-md">
+              <div className="text-sm text-orange-700 font-medium">
+                ⚠️ Maximum nesting level ({maxNestingLevel}) reached
+              </div>
+              <div className="text-xs text-orange-600 mt-1">
+                Cannot add more nested repeaters at this level
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="mt-2 p-3 border-l-2 border-blue-300 bg-blue-50/30 rounded-r-md">
+            <div className="text-xs text-blue-600 mb-2 font-medium">
+              📦 Nested Repeater (Level {nestingLevel + 1})
+            </div>
+            <RepeaterFieldInput
+              field={subField}
+              value={fieldValue}
+              onChange={(newValue) => handleRowFieldChange(row._id, subField.name, newValue)}
+              disabled={disabled}
+              repeaterId={`${instanceId}_${row._id}_${subField.name}`}
+              parentRepeaterId={instanceId}
+              nestingLevel={nestingLevel + 1}
+              maxNestingLevel={maxNestingLevel}
+              renderSubField={renderSubField}
+            />
+          </div>
+        );
+
       default:
         return (
           <div className="text-sm text-gray-500 italic">
@@ -318,7 +363,7 @@ export const RepeaterFieldInput: React.FC<RepeaterFieldInputProps> = ({
           </div>
         );
     }
-  }, [renderSubField, handleRowFieldChange, disabled]);
+  }, [renderSubField, handleRowFieldChange, disabled, isMaxNestingReached, maxNestingLevel, nestingLevel, instanceId]);
 
   // Sortable Row Wrapper Component
   interface SortableRowWrapperProps {
