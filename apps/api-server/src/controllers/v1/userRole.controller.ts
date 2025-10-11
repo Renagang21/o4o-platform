@@ -309,6 +309,51 @@ export class UserRoleController {
     }
   }
 
+  static async getUserPermissions(req: Request, res: Response): Promise<void> {
+    try {
+      const { id: userId } = req.params;
+
+      const user = await UserRoleController.userRepository.findOne({
+        where: { id: userId },
+        select: ['id', 'role', 'email', 'firstName', 'lastName']
+      });
+
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+        return;
+      }
+
+      const userPermissions = ROLE_PERMISSIONS[user.role];
+
+      // Format permissions with descriptions
+      const permissionsWithDetails = userPermissions.map(permKey => ({
+        key: permKey,
+        description: PERMISSIONS[permKey as keyof typeof PERMISSIONS] || permKey,
+        granted: true
+      }));
+
+      res.status(200).json({
+        success: true,
+        data: {
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+          permissions: permissionsWithDetails,
+          allPermissions: userPermissions
+        }
+      });
+    } catch (error) {
+      // Error log removed
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  }
+
   static async checkUserPermission(req: Request, res: Response): Promise<void> {
     try {
       const { id: userId } = req.params;

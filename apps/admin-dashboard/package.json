@@ -71,6 +71,7 @@
     "@types/react-dropzone": "^5.1.0",
     "@types/socket.io-client": "^1.4.36",
     "@types/uuid": "^10.0.0",
+    "ajv": "^8.17.1",
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

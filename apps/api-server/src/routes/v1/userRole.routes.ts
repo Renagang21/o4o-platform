@@ -12,6 +12,7 @@ router.get('/permissions', authenticateToken, UserRoleController.getPermissions)
 // User role routes
 router.get('/:id/role', authenticateToken, UserRoleController.getUserRole);
 router.put('/:id/role', authenticateToken, requireAdmin, UserRoleController.updateUserRole);
+router.get('/:id/permissions', authenticateToken, UserRoleController.getUserPermissions);
 router.get('/:id/permissions/check', authenticateToken, UserRoleController.checkUserPermission);
 
 export default router;
