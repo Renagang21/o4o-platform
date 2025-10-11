@@ -43,6 +43,7 @@ export function evaluateLocationRule(
 
   // Get the actual value from context based on param
   let actualValue: any;
+  let compareValue: string = value;
 
   switch (param) {
     case 'post_type':
@@ -60,12 +61,24 @@ export function evaluateLocationRule(
       break;
 
     case 'post_taxonomy':
-      // Check if post has any terms in the specified taxonomy
-      actualValue = context.taxonomies?.[value];
+      // Value format: "taxonomy:term_id"
+      // Parse the taxonomy and term
+      if (value.includes(':')) {
+        const [taxonomy, termId] = value.split(':');
+        // Get the terms for this taxonomy from context
+        const postTerms = context.taxonomies?.[taxonomy] || [];
+        // Check if the post has this term (for array operations)
+        actualValue = postTerms;
+        compareValue = termId;
+      } else {
+        // Fallback: treat value as taxonomy name and check if it has any terms
+        actualValue = context.taxonomies?.[value];
+      }
       break;
 
     case 'post_category':
-      actualValue = context.categories;
+      // Categories are stored as array of IDs
+      actualValue = context.categories || [];
       break;
 
     case 'page_template':
@@ -102,7 +115,7 @@ export function evaluateLocationRule(
   }
 
   // Evaluate based on operator
-  return evaluateOperator(actualValue, operator, value);
+  return evaluateOperator(actualValue, operator, compareValue);
 }
 
 /**

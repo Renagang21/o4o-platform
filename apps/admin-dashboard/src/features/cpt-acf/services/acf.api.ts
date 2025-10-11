@@ -214,15 +214,34 @@ export const acfLocationApi = {
     };
   },
 
-  // Get categories for location rules
-  async getCategories(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
+  // Get terms for a specific taxonomy
+  async getTaxonomyTerms(
+    taxonomy: string
+  ): Promise<ACFApiResponse<Array<{ value: string; label: string; parent?: string; count?: number }>>> {
+    const response = await authClient.api.get(`/api/v1/taxonomies/${taxonomy}/terms`);
+    const terms = response.data?.data || response.data || [];
+    return {
+      success: true,
+      data: terms.map((term: any) => ({
+        value: term.id || term.slug,
+        label: term.name || term.slug,
+        parent: term.parent,
+        count: term.count
+      }))
+    };
+  },
+
+  // Get categories for location rules (with hierarchical support)
+  async getCategories(): Promise<ACFApiResponse<Array<{ value: string; label: string; parent?: string; count?: number }>>> {
     const response = await authClient.api.get('/api/v1/posts/categories');
     const categories = response.data?.data || response.data || [];
     return {
       success: true,
       data: categories.map((cat: any) => ({
-        value: cat.id || cat.slug,
-        label: cat.name || cat.slug
+        value: String(cat.id || cat.slug),
+        label: cat.name || cat.slug,
+        parent: cat.parent ? String(cat.parent) : undefined,
+        count: cat.count
       }))
     };
   },
