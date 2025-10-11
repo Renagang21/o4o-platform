@@ -350,9 +350,9 @@ export class UserRoleController {
           userId: user.id,
           email: user.email,
           role: user.role,
-          permissions: allPermissions,
+          permissions: userPermissions, // Frontend expects string array of permission keys
+          permissionsDetailed: allPermissions, // Detailed permission info with descriptions
           groupedPermissions,
-          allPermissions: userPermissions,
           totalPermissions: allPermissions.length,
           grantedPermissions: userPermissions.length
         }
