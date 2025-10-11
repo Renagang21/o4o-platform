@@ -333,18 +333,11 @@ const corsOptions: CorsOptions = {
       ...envOrigins
     ];
 
-    // Sprint 2 - P3: Reject requests with no origin in production
-    // (Development: allow for testing with curl/Postman)
+    // Allow requests without origin header (for proxied requests from nginx)
+    // In production, nginx proxy may not pass Origin header for same-domain requests
     if (!origin) {
-      if (process.env.NODE_ENV === 'production') {
-        logger.warn('[CORS] Blocked request with no origin (production mode)');
-        callback(new Error('Origin header required'));
-        return;
-      } else {
-        // Allow in development for easier testing
-        callback(null, true);
-        return;
-      }
+      callback(null, true);
+      return;
     }
 
     // Debug logging in development
