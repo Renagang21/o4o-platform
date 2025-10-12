@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Settings, Package, LogOut, ChevronDown } from 'lucide-react';
-import { useAuth } from '@o4o/auth-context';
+import { useAuthStore } from '../../stores/authStore';
 import './AccountModule.css';
 
 interface AccountModuleProps {
@@ -25,7 +25,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
     customClass = ''
   } = data;
 
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -44,9 +44,9 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
     };
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     try {
-      await logout();
+      logout();
       setIsDropdownOpen(false);
       navigate('/');
     } catch (error) {
@@ -78,14 +78,14 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
         {showAvatar && (
           <div className="account-avatar" style={{ width: avatarSize, height: avatarSize }}>
             {user.avatar ? (
-              <img src={user.avatar} alt={user.name || user.username} />
+              <img src={user.avatar} alt={user.name || user.email} />
             ) : (
               <User size={avatarSize * 0.6} />
             )}
           </div>
         )}
         {showName && (
-          <span className="account-name">{user.name || user.username}</span>
+          <span className="account-name">{user.name || user.email}</span>
         )}
         <ChevronDown size={16} className={`account-chevron ${isDropdownOpen ? 'rotate' : ''}`} />
       </button>
@@ -94,7 +94,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
         <div className={`account-dropdown account-dropdown--${dropdownAlignment}`}>
           <div className="account-dropdown-header">
             <div className="account-info">
-              <div className="account-info-name">{user.name || user.username}</div>
+              <div className="account-info-name">{user.name || user.email}</div>
               <div className="account-info-email">{user.email}</div>
             </div>
           </div>
