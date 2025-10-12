@@ -206,7 +206,8 @@ export class MediaController {
 
       if (useQueryBuilder) {
         // Use query builder for document type filtering (requires OR conditions)
-        const queryBuilder = this.mediaRepository.createQueryBuilder('media');
+        const queryBuilder = this.mediaRepository.createQueryBuilder('media')
+          .leftJoinAndSelect('media.user', 'user'); // Join user for author info
 
         // Apply document type filter
         queryBuilder.where('media.mimeType = :pdf', { pdf: 'application/pdf' })
@@ -238,7 +239,7 @@ export class MediaController {
         total = await this.mediaRepository.count({ where });
         media = await this.mediaRepository.find({
           where,
-          // relations: ['user'], // Temporarily disabled due to DB schema issue
+          relations: ['user'], // Re-enabled to show author info
           order: { [orderByField as string]: orderDirection as any },
           skip,
           take: Number(limit)
