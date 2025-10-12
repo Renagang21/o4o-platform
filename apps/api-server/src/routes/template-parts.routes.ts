@@ -75,7 +75,7 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
     if (pathStr && pathStr !== '/') {
       const segments = pathStr.split('/').filter(Boolean)
       if (segments.length > 0) {
-        pathPrefix = `/${segments[0]}`
+        pathPrefix = `/${segments[0]}/`
       }
     }
 
