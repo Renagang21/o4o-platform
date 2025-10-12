@@ -203,6 +203,28 @@ export class User {
 
   // Get all permissions from database roles and direct permissions
   getAllPermissions(): string[] {
+    // Legacy admin users (role = 'admin' or 'super_admin') get all permissions
+    if (this.isAdmin()) {
+      // Return all available permissions for admins
+      const allPermissions = [
+        // Users
+        'users.view', 'users.create', 'users.edit', 'users.delete', 'users.suspend', 'users.approve',
+        // Content
+        'content.view', 'content.create', 'content.edit', 'content.delete', 'content.publish', 'content.moderate',
+        // Admin
+        'admin.settings', 'admin.analytics', 'admin.logs', 'admin.backup',
+        // ACF
+        'acf.manage',
+        // CPT
+        'cpt.manage',
+        // Shortcodes
+        'shortcodes.manage',
+        // API
+        'api.access', 'api.admin'
+      ];
+      return allPermissions;
+    }
+
     const rolePermissions = this.dbRoles?.flatMap(role => role.getPermissionKeys()) || [];
     const directPermissions = this.permissions || [];
     // Remove duplicates
