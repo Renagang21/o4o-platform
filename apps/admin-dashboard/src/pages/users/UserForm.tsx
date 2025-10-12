@@ -51,6 +51,28 @@ export default function UserForm() {
   });
 
   const selectedRoles = watch('roles');
+  const [roles, setRoles] = useState<Array<{ value: string; label: string; description: string }>>([]);
+  const [loadingRoles, setLoadingRoles] = useState(true);
+
+  // Fetch roles from database
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        setLoadingRoles(true);
+        const response = await fetch('https://api.neture.co.kr/api/v1/users/roles');
+        const data = await response.json();
+        if (data.success) {
+          setRoles(data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch roles:', error);
+        toast.error('Failed to load roles');
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+    fetchRoles();
+  }, []);
 
   useEffect(() => {
     if (isEdit) {

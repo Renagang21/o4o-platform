@@ -11,6 +11,12 @@ import logger from '../../utils/logger';
 
 const router: Router = Router();
 
+// Mount sub-routers FIRST (before generic /:id routes) to ensure specific routes like /statistics match correctly
+router.use('/', userActivityRoutes);
+router.use('/', userRoleRoutes);
+router.use('/', userStatisticsRoutes);
+router.use('/', businessInfoRoutes);
+
 // Basic user list endpoint
 router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
@@ -260,11 +266,5 @@ router.patch('/:id', authenticate, requireAdmin, async (req: Request, res: Respo
     });
   }
 });
-
-// Combine all user-related routes
-router.use('/', userActivityRoutes);
-router.use('/', userRoleRoutes); 
-router.use('/', userStatisticsRoutes);
-router.use('/', businessInfoRoutes);
 
 export default router;
