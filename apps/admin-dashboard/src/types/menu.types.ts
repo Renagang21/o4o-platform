@@ -44,8 +44,17 @@ export interface TagItem extends ContentItem {
 }
 
 // Menu location types
-export type MenuLocationKey = 'primary' | 'footer' | 'mobile' | 'social';
-export type MenuLocationColor = 'blue' | 'gray' | 'green' | 'purple';
+export type MenuLocationKey =
+  | 'primary'
+  | 'footer'
+  | 'mobile'
+  | 'social'
+  | 'sidebar'
+  | 'shop-categories'
+  | 'forum-menu'
+  | 'funding-categories'
+  | 'business-menu';
+export type MenuLocationColor = 'blue' | 'gray' | 'green' | 'purple' | 'red' | 'yellow';
 
 export interface MenuLocationConfig {
   name: string;
