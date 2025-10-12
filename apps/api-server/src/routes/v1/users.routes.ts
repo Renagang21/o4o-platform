@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import userActivityRoutes from './userActivity.routes';
 import userRoleRoutes from './userRole.routes';
+import userRoleSwitchRoutes from './userRoleSwitch.routes';
 import userStatisticsRoutes from './userStatistics.routes';
 import businessInfoRoutes from './businessInfo.routes';
 import { authenticate } from '../../middleware/auth.middleware';
@@ -14,6 +15,7 @@ const router: Router = Router();
 // Mount sub-routers FIRST (before generic /:id routes) to ensure specific routes like /statistics match correctly
 router.use('/', userActivityRoutes);
 router.use('/', userRoleRoutes);
+router.use('/', userRoleSwitchRoutes);
 router.use('/', userStatisticsRoutes);
 router.use('/', businessInfoRoutes);
 

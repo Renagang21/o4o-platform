@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth';
 import { BusinessInfo } from '../types/user';
 import { Role } from './Role';
@@ -70,6 +70,11 @@ export class User {
     inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' }
   })
   dbRoles?: Role[];
+
+  // Active role (for users with multiple roles)
+  @ManyToOne(() => Role, { nullable: true, eager: true })
+  @JoinColumn({ name: 'active_role_id' })
+  activeRole?: Role | null;
 
   // Direct permissions (in addition to role permissions)
   @Column({ type: 'json', default: () => "'[]'" })
@@ -288,8 +293,37 @@ export class User {
     return roles;
   }
 
+  // Get active role (with fallback to first dbRole)
+  getActiveRole(): Role | null {
+    // If activeRole is explicitly set, use it
+    if (this.activeRole) {
+      return this.activeRole;
+    }
+
+    // Fallback: return first dbRole if available
+    if (this.dbRoles && this.dbRoles.length > 0) {
+      return this.dbRoles[0];
+    }
+
+    return null;
+  }
+
+  // Check if user can switch to a specific role
+  canSwitchToRole(roleId: string): boolean {
+    if (!this.dbRoles || this.dbRoles.length === 0) {
+      return false;
+    }
+    return this.dbRoles.some(r => r.id === roleId);
+  }
+
+  // Check if user has multiple roles
+  hasMultipleRoles(): boolean {
+    return this.dbRoles ? this.dbRoles.length > 1 : false;
+  }
+
   // 민감 정보 제거한 공개 데이터
   toPublicData() {
+    const activeRole = this.getActiveRole();
     return {
       id: this.id,
       email: this.email,
@@ -298,6 +332,17 @@ export class User {
       fullName: this.fullName,
       role: this.role,
       roles: this.getRoleNames(), // Return role names as string array
+      activeRole: activeRole ? {
+        id: activeRole.id,
+        name: activeRole.name,
+        displayName: activeRole.displayName
+      } : null,
+      dbRoles: this.dbRoles?.map(r => ({
+        id: r.id,
+        name: r.name,
+        displayName: r.displayName
+      })) || [],
+      canSwitchRoles: this.hasMultipleRoles(),
       status: this.status,
       permissions: this.getAllPermissions(), // Include all permissions from roles and direct
       isActive: this.isActive,

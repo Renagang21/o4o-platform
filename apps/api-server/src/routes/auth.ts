@@ -29,9 +29,10 @@ router.post('/login',
     }
       
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ 
+    const user = await userRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'name', 'role', 'status', 'password', 'businessInfo']
+      select: ['id', 'email', 'name', 'role', 'status', 'password', 'businessInfo'],
+      relations: ['dbRoles', 'activeRole']
     });
 
     if (!user) {
@@ -69,6 +70,9 @@ router.post('/login',
       user.lastLoginAt = new Date();
       await userRepository.save(user);
 
+      // Get active role information
+      const activeRole = user.getActiveRole();
+
       return res.json({
         success: true,
         message: 'Login successful',
@@ -77,7 +81,18 @@ router.post('/login',
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: user.role, // Legacy field for backward compatibility
+          activeRole: activeRole ? {
+            id: activeRole.id,
+            name: activeRole.name,
+            displayName: activeRole.displayName
+          } : null,
+          roles: user.dbRoles?.map(r => ({
+            id: r.id,
+            name: r.name,
+            displayName: r.displayName
+          })) || [],
+          canSwitchRoles: user.hasMultipleRoles(),
           status: user.status,
           businessInfo: user.businessInfo
         }
@@ -172,12 +187,15 @@ router.get('/status', authenticate, asyncHandler(async (req: Request, res) => {
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
     where: { id: req.user.id },
-    select: ['id', 'email', 'name', 'role', 'status', 'createdAt', 'lastLoginAt']
+    select: ['id', 'email', 'name', 'role', 'status', 'createdAt', 'lastLoginAt'],
+    relations: ['dbRoles', 'activeRole']
   });
 
   if (!user) {
     throw new UnauthorizedError('User not found', 'USER_NOT_FOUND');
   }
+
+  const activeRole = user.getActiveRole();
 
   return res.json({
     authenticated: true,
@@ -185,7 +203,18 @@ router.get('/status', authenticate, asyncHandler(async (req: Request, res) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: user.role, // Legacy field
+      activeRole: activeRole ? {
+        id: activeRole.id,
+        name: activeRole.name,
+        displayName: activeRole.displayName
+      } : null,
+      roles: user.dbRoles?.map(r => ({
+        id: r.id,
+        name: r.name,
+        displayName: r.displayName
+      })) || [],
+      canSwitchRoles: user.hasMultipleRoles(),
       status: user.status,
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt
