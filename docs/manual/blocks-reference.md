@@ -1,6 +1,6 @@
 # 블록 레퍼런스
 
-> 마지막 업데이트: 2025-10-08
+> 마지막 업데이트: 2025-10-12
 
 ## 개요
 
@@ -263,6 +263,148 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성되어 있습니다:
 ```html
 <hr class="wp-block-separator" />
 ```
+
+---
+
+### Conditional (조건부 블록)
+
+**블록명:** `o4o/conditional`
+**카테고리:** layout
+**키워드:** conditional, visibility, logic, conditions, show, hide
+
+**설명:** 조건에 따라 콘텐츠를 표시하거나 숨깁니다. WordPress Toolset 스타일의 조건 빌더를 제공합니다.
+
+**속성:**
+- `conditions` (array): 조건 배열
+  - `id` (string): 조건 고유 ID
+  - `type` (string): 조건 타입 (user_logged_in, user_role, user_id, post_type, post_category, post_id, url_parameter, current_path, subdomain, date_range, time_range, day_of_week, device_type, browser_type)
+  - `operator` (string): 연산자 (is, is_not, contains, not_contains, greater_than, less_than, between, exists, not_exists)
+  - `value` (any): 비교 값
+- `logicOperator` (string): 조건 간 논리 연산자 (AND, OR)
+- `showWhenMet` (boolean): true = 조건 충족 시 표시, false = 조건 충족 시 숨김
+- `showIndicator` (boolean): 편집기에서 시각적 표시기 표시
+- `indicatorText` (string): 표시기 텍스트
+
+**지원하는 조건 타입:**
+
+1. **User Conditions (사용자 조건)**
+   - `user_logged_in`: 로그인 여부
+   - `user_role`: 사용자 역할 (admin, editor, author, contributor, subscriber, customer, supplier, retailer)
+   - `user_id`: 특정 사용자 ID
+
+2. **Content Conditions (콘텐츠 조건)**
+   - `post_type`: 포스트 타입
+   - `post_category`: 포스트 카테고리
+   - `post_id`: 특정 포스트 ID
+
+3. **URL Conditions (URL 조건)**
+   - `url_parameter`: URL 파라미터 (예: `key=value` 또는 `key`)
+   - `current_path`: 현재 경로
+   - `subdomain`: 서브도메인
+
+4. **Time Conditions (시간 조건)**
+   - `date_range`: 날짜 범위
+   - `time_range`: 시간 범위
+   - `day_of_week`: 요일 (0=일요일, 6=토요일)
+
+5. **Device Conditions (디바이스 조건)**
+   - `device_type`: 디바이스 타입 (mobile, tablet, desktop)
+   - `browser_type`: 브라우저 타입 (chrome, firefox, safari, edge, other)
+
+**사용 예시:**
+
+```json
+// 로그인한 사용자에게만 표시
+{
+  "type": "o4o/conditional",
+  "attributes": {
+    "conditions": [
+      {
+        "id": "cond1",
+        "type": "user_logged_in",
+        "operator": "is",
+        "value": true
+      }
+    ],
+    "logicOperator": "AND",
+    "showWhenMet": true
+  },
+  "innerBlocks": [
+    {
+      "type": "core/paragraph",
+      "content": { "text": "로그인한 사용자만 볼 수 있는 콘텐츠" }
+    }
+  ]
+}
+
+// 관리자 또는 에디터에게만 표시
+{
+  "type": "o4o/conditional",
+  "attributes": {
+    "conditions": [
+      {
+        "id": "cond1",
+        "type": "user_role",
+        "operator": "is",
+        "value": "admin"
+      },
+      {
+        "id": "cond2",
+        "type": "user_role",
+        "operator": "is",
+        "value": "editor"
+      }
+    ],
+    "logicOperator": "OR",
+    "showWhenMet": true
+  },
+  "innerBlocks": []
+}
+
+// 특정 경로에서만 숨김
+{
+  "type": "o4o/conditional",
+  "attributes": {
+    "conditions": [
+      {
+        "id": "cond1",
+        "type": "current_path",
+        "operator": "is",
+        "value": "/admin"
+      }
+    ],
+    "logicOperator": "AND",
+    "showWhenMet": false
+  },
+  "innerBlocks": []
+}
+
+// 모바일에서만 표시
+{
+  "type": "o4o/conditional",
+  "attributes": {
+    "conditions": [
+      {
+        "id": "cond1",
+        "type": "device_type",
+        "operator": "is",
+        "value": "mobile"
+      }
+    ],
+    "logicOperator": "AND",
+    "showWhenMet": true
+  },
+  "innerBlocks": []
+}
+```
+
+**편집기 사용법:**
+1. Conditional 블록 추가
+2. "Add Condition" 버튼 클릭
+3. 조건 타입, 연산자, 값 선택
+4. 여러 조건 추가 가능 (AND/OR 선택)
+5. Show/Hide when met 선택
+6. 내부에 표시/숨길 블록 추가
 
 ---
 
@@ -689,5 +831,5 @@ const MyBlock: BlockDefinition = {
 
 ---
 
-**버전:** 0.5.0
-**마지막 업데이트:** 2025-10-08
+**버전:** 0.5.1
+**마지막 업데이트:** 2025-10-12

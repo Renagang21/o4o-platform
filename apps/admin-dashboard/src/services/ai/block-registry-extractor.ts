@@ -104,6 +104,14 @@ function getExampleContent(blockName: string): any {
     'core/spacer': { height: 50 },
     'core/gallery': { images: [] },
     'core/video': { caption: '비디오 설명' },
+    'o4o/conditional': {
+      conditions: [
+        { id: 'cond1', type: 'user_logged_in', operator: 'is', value: true }
+      ],
+      logicOperator: 'AND',
+      showWhenMet: true,
+      innerBlocks: []
+    },
   };
 
   return examples[blockName] || {};
