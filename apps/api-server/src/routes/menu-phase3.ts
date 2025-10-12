@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { MenuCacheController } from '../controllers/menu/MenuCacheController';
 import { MenuAnalyticsController } from '../controllers/menu/MenuAnalyticsController';
 import { MenuWidgetController } from '../controllers/menu/MenuWidgetController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { checkRole } from '../middleware/checkRole';
 
 const router: Router = Router();
@@ -17,21 +17,21 @@ const menuWidgetController = new MenuWidgetController();
 // Cache management - Admin only
 router.post(
   '/menus/:id/cache',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin']),
   menuCacheController.createMenuCache.bind(menuCacheController)
 );
 
 router.delete(
   '/menus/:id/cache',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin']),
   menuCacheController.deleteMenuCache.bind(menuCacheController)
 );
 
 router.get(
   '/menus/cache-status',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin']),
   menuCacheController.getCacheStatus.bind(menuCacheController)
 );
@@ -43,14 +43,14 @@ router.get(
 // Analytics - Admin and Editor can view
 router.get(
   '/menus/:id/analytics',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin', 'editor']),
   menuAnalyticsController.getMenuAnalytics.bind(menuAnalyticsController)
 );
 
 router.get(
   '/menus/:id/performance',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin', 'editor']),
   menuAnalyticsController.getMenuPerformance.bind(menuAnalyticsController)
 );
@@ -68,33 +68,33 @@ router.post(
 // Widget management
 router.get(
   '/menu-widgets',
-  authenticateToken,
+  authenticate,
   menuWidgetController.getMenuWidgets.bind(menuWidgetController)
 );
 
 router.post(
   '/menu-widgets',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin', 'editor']),
   menuWidgetController.createMenuWidget.bind(menuWidgetController)
 );
 
 router.get(
   '/menu-widgets/:id',
-  authenticateToken,
+  authenticate,
   menuWidgetController.getMenuWidget.bind(menuWidgetController)
 );
 
 router.put(
   '/menu-widgets/:id',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin', 'editor']),
   menuWidgetController.updateMenuWidget.bind(menuWidgetController)
 );
 
 router.delete(
   '/menu-widgets/:id',
-  authenticateToken,
+  authenticate,
   checkRole(['admin', 'super_admin']),
   menuWidgetController.deleteMenuWidget.bind(menuWidgetController)
 );

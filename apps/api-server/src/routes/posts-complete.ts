@@ -3,7 +3,7 @@ import AppDataSource from '../database/data-source';
 import { Post } from '../entities/Post';
 import { User } from '../entities/User';
 import { Category } from '../entities/Category';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { In, Like, IsNull, Not } from 'typeorm';
 import { validateDto } from '../middleware/validateDto';
 import { body, query, param } from 'express-validator';
@@ -283,7 +283,7 @@ router.get('/:id',
 
 // POST /api/posts - Create post (Gutenberg compatible)
 router.post('/',
-  authenticateToken,
+  authenticate,
   // Make title and content optional for auto-save support
   body('title').optional(),
   body('content').optional(),
@@ -436,7 +436,7 @@ router.post('/',
 
 // PUT /api/posts/:id - Update post (Gutenberg compatible)
 router.put('/:id',
-  authenticateToken,
+  authenticate,
   param('id').notEmpty(),
   validateDto,
   async (req: Request, res: Response) => {
@@ -578,7 +578,7 @@ router.put('/:id',
 
 // DELETE /api/posts/:id - Delete post
 router.delete('/:id',
-  authenticateToken,
+  authenticate,
   param('id').notEmpty(),
   validateDto,
   async (req: Request, res: Response) => {

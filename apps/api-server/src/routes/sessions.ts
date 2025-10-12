@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
 import type { Router as ExpressRouter } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { SessionSyncService } from '../services/sessionSyncService';
 
 const router: ExpressRouter = Router();
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 /**
  * Get all active sessions for current user

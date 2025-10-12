@@ -11,7 +11,7 @@ import {
   JwtPayload
 } from '../types/email-auth';
 import { validateDto } from '../middleware/validateDto';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
@@ -589,7 +589,7 @@ router.post('/refresh',
 
 // POST /api/auth/logout - Logout (authenticated)
 router.post('/logout',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any).user?.userId || (req as any).user?.id;

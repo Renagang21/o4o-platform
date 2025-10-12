@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router: Router = Router();
 
@@ -107,7 +107,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // POST /api/v1/categories - Create category (requires auth)
-router.post('/', authenticateToken, async (req: Request, res: Response) => {
+router.post('/', authenticate, async (req: Request, res: Response) => {
   try {
     const { name, slug, description, parent } = req.body;
 
@@ -144,7 +144,7 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
 });
 
 // PUT /api/v1/categories/:id - Update category (requires auth)
-router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
+router.put('/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, slug, description, parent } = req.body;
@@ -179,7 +179,7 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
 });
 
 // DELETE /api/v1/categories/:id - Delete category (requires auth)
-router.delete('/:id', authenticateToken, async (req: Request, res: Response) => {
+router.delete('/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const categoryIndex = mockCategories.findIndex(cat => cat.id === id);

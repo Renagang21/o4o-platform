@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { SessionSyncService } from '../services/sessionSyncService';
 import { AuthRequest } from '../types/auth';
 
@@ -54,7 +54,7 @@ router.get('/sso/check', async (req: Request, res: Response) => {
 /**
  * Get user's linked accounts
  */
-router.get('/linked-accounts', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/linked-accounts', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
     const user = await req.app.locals.AppDataSource
@@ -94,7 +94,7 @@ router.get('/linked-accounts', authenticateToken, async (req: AuthRequest, res: 
 /**
  * Get user's active sessions
  */
-router.get('/sessions', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/sessions', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
     const sessions = await SessionSyncService.getUserSessions(userId);
@@ -116,7 +116,7 @@ router.get('/sessions', authenticateToken, async (req: AuthRequest, res: Respons
 /**
  * Logout from specific session
  */
-router.delete('/sessions/:sessionId', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.delete('/sessions/:sessionId', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
     const { sessionId } = req.params;
@@ -139,7 +139,7 @@ router.delete('/sessions/:sessionId', authenticateToken, async (req: AuthRequest
 /**
  * Logout from all devices
  */
-router.post('/logout-all-devices', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/logout-all-devices', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
     

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ForumCPTController } from '../../controllers/forum/ForumCPTController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
 import { UserRole } from '../../entities/User';
 
@@ -8,7 +8,7 @@ const router: Router = Router();
 const forumController = new ForumCPTController();
 
 // All forum admin routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // System management routes (admin/moderator only)
 router.get('/system-status', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MODERATOR]), forumController.getSystemStatus);

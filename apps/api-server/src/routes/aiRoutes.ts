@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import AppDataSource from '../database/data-source';
 import { AiSettings } from '../entities/AiSettings';
 
@@ -11,7 +11,7 @@ const router: Router = Router();
  */
 
 // GET AI settings
-router.get('/ai-settings', authenticateToken, async (req: Request, res: Response) => {
+router.get('/ai-settings', authenticate, async (req: Request, res: Response) => {
   try {
     // Check if data source is initialized
     if (!AppDataSource.isInitialized) {
@@ -77,7 +77,7 @@ router.get('/ai-settings', authenticateToken, async (req: Request, res: Response
 });
 
 // POST AI settings (update)
-router.post('/ai-settings', authenticateToken, async (req: Request, res: Response) => {
+router.post('/ai-settings', authenticate, async (req: Request, res: Response) => {
   try {
     // Check if data source is initialized
     if (!AppDataSource.isInitialized) {

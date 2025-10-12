@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { body, validationResult } from 'express-validator';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection';
 import { User, UserRole, UserStatus } from '../entities/User';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error-handler';
 import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error';
 import { env } from '../utils/env-validator';
@@ -140,7 +140,7 @@ router.post('/register',
 );
 
 // 토큰 검증
-router.get('/verify', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/verify', authenticate, asyncHandler(async (req: Request, res) => {
   return res.json({
     success: true,
     message: 'Token is valid',
@@ -149,7 +149,7 @@ router.get('/verify', authenticateToken, asyncHandler(async (req: AuthRequest, r
 }));
 
 // 로그아웃 (클라이언트 측에서 토큰 삭제)
-router.post('/logout', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.post('/logout', authenticate, asyncHandler(async (req: Request, res) => {
   // 서버 측에서는 특별히 할 일이 없음 (JWT는 stateless)
   // 향후 token blacklist 구현 시 여기서 처리
   return res.json({
@@ -159,7 +159,7 @@ router.post('/logout', authenticateToken, asyncHandler(async (req: AuthRequest, 
 }));
 
 // 인증 상태 확인
-router.get('/status', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/status', authenticate, asyncHandler(async (req: Request, res) => {
   if (!req.user) {
     throw new UnauthorizedError('Not authenticated', 'NOT_AUTHENTICATED');
   }

@@ -6,7 +6,8 @@
 
 import { Router, Request, Response } from 'express';
 import { shortcodeRegistry } from '../services/shortcode-registry.service';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
 import logger from '../utils/logger';
 
@@ -28,7 +29,7 @@ const aiReadRateLimit = rateLimitMiddleware({
  * GET /api/ai/shortcodes/reference
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/reference', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/reference', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;
   const startTime = Date.now();
 
@@ -117,7 +118,7 @@ router.get('/reference', authenticateToken, aiReadRateLimit, async (req: Request
  * GET /api/ai/shortcodes/simple
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/simple', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/simple', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { category, limit } = req.query;
     let shortcodes = shortcodeRegistry.getAll();
@@ -167,7 +168,7 @@ router.get('/simple', authenticateToken, aiReadRateLimit, async (req: Request, r
  * POST /api/ai/shortcodes/prompt
  * 인증 필수 + 레이트리밋 적용
  */
-router.post('/prompt', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.post('/prompt', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { userRequest, includeCategories, maxShortcodes = 20 } = req.body;
 
@@ -241,7 +242,7 @@ Please generate a page that fulfills the user's request using the available shor
  * GET /api/ai/shortcodes/search?q=query
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/search', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/search', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { q: query } = req.query;
 
@@ -285,7 +286,7 @@ router.get('/search', authenticateToken, aiReadRateLimit, async (req: Request, r
  * GET /api/ai/shortcodes/stats
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/stats', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/stats', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const stats = shortcodeRegistry.getStats();
 
@@ -309,7 +310,7 @@ router.get('/stats', authenticateToken, aiReadRateLimit, async (req: Request, re
  * GET /api/ai/shortcodes/:name
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/:name', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/:name', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
     const shortcode = shortcodeRegistry.get(name);

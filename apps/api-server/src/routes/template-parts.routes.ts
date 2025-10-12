@@ -1,7 +1,8 @@
 import { Router, Response, Request } from 'express'
 import AppDataSource from '../database/data-source'
 import { TemplatePart } from '../entities/TemplatePart'
-import { AuthRequest, authenticateToken } from '../middleware/auth'
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth'
 import { In } from 'typeorm'
 import { z } from 'zod'
 import logger from '../utils/logger'
@@ -191,7 +192,7 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
 })
 
 // Get all template parts with filtering
-router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const {
       area,
@@ -263,7 +264,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 })
 
 // Get template part by ID or slug
-router.get('/:identifier', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/:identifier', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { identifier } = req.params
     const templatePartRepository = AppDataSource.getRepository(TemplatePart)
@@ -289,7 +290,7 @@ router.get('/:identifier', authenticateToken, async (req: AuthRequest, res: Resp
 
 
 // Create new template part
-router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const validatedData = templatePartSchema.parse(req.body)
     const templatePartRepository = AppDataSource.getRepository(TemplatePart)
@@ -337,7 +338,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 })
 
 // Update template part
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
     const validatedData = templatePartSchema.partial().parse(req.body)
@@ -391,7 +392,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 })
 
 // Delete template part
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
     const templatePartRepository = AppDataSource.getRepository(TemplatePart)
@@ -419,7 +420,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
 })
 
 // Duplicate template part
-router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/:id/duplicate', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
     const { name } = req.body

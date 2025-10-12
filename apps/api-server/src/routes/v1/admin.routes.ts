@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 
 // Admin pages endpoint
-router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {
+router.get('/pages', authenticate, requireAdmin, async (req, res) => {
   try {
     // Mock data for now - replace with actual database query
     const pages = [

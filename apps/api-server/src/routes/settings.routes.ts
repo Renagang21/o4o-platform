@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authenticateToken as authenticate } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { adminOnly } from '../middleware/adminOnly';
 import { validateDto } from '../middleware/validateDto';
 import {

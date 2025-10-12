@@ -9,7 +9,7 @@ import {
   reactivateUser,
   getDashboardStats
 } from '../controllers/adminController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/permission.middleware';
 import securityRoutes from './admin/security';
 import { PagesController } from '../controllers/pagesController';
@@ -57,7 +57,7 @@ router.get('/custom-field-groups', async (req, res) => {
 });
 
 // 모든 관리자 라우트는 인증 및 관리자 권한 필요
-router.use(authenticateToken);
+router.use(authenticate);
 router.use(requireAdmin);
 
 // 대시보드 통계

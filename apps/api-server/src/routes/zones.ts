@@ -7,7 +7,7 @@ import { body, param, query } from 'express-validator'
 import AppDataSource from '../database/connection'
 import { Post } from '../entities/Post'
 import { User } from '../entities/User'
-import { authenticateToken } from '../middleware/auth'
+import { authenticate } from '../middleware/auth.middleware'
 import logger from '../utils/logger'
 import { validateDto } from '../middleware/validateDto'
 import { ZoneContentAdapter } from '../utils/zone-adapter'
@@ -29,7 +29,7 @@ import path from 'path'
 const router: Router = Router()
 
 // Apply authentication to all routes
-router.use(authenticateToken)
+router.use(authenticate)
 
 // Helper to get repositories
 const getRepositories = () => {

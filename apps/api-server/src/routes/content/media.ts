@@ -1,6 +1,6 @@
 import { Router, RequestHandler } from 'express';
 import { MediaController } from '../../controllers/content/MediaController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 // Simple role guard for now - replace with actual implementation
 const roleGuard = (roles: string[]) => (req: any, res: any, next: any) => {
   // For now, allow all authenticated users
@@ -12,7 +12,7 @@ const router: Router = Router();
 const mediaController = new MediaController();
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 /**
  * Media API Routes

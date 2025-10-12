@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { MenuController } from '../controllers/menu/MenuController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { checkRole } from '../middleware/checkRole';
 
 const router: Router = Router();
 const menuController = new MenuController();
 
 // All menu item routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Admin and Editor routes
 router.post('/', checkRole(['admin', 'editor']), menuController.addMenuItem);

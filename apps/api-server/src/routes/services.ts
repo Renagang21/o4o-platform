@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 
 const router: Router = Router();
 
 // 모든 서비스 라우트는 인증 필요
-router.use(authenticateToken);
+router.use(authenticate);
 
 // AI 서비스 접근
 router.get('/ai', (req: AuthRequest, res) => {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ThemeController } from '../../controllers/ThemeController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
@@ -11,7 +11,7 @@ router.get('/marketplace', themeController.searchMarketplace);
 router.get('/:id/preview', themeController.getThemePreview);
 
 // Protected routes
-router.use(authenticateToken);
+router.use(authenticate);
 router.use(requireAdmin);
 
 // Theme management

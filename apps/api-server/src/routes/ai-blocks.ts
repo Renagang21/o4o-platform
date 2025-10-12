@@ -6,7 +6,8 @@
 
 import { Router, Request, Response } from 'express';
 import { blockRegistry } from '../services/block-registry.service';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
 import logger from '../utils/logger';
 
@@ -28,7 +29,7 @@ const aiReadRateLimit = rateLimitMiddleware({
  * GET /api/ai/blocks/reference
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/reference', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/reference', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;
   const startTime = Date.now();
 
@@ -117,7 +118,7 @@ router.get('/reference', authenticateToken, aiReadRateLimit, async (req: Request
  * GET /api/ai/blocks/simple
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/simple', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/simple', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { category, limit } = req.query;
     let blocks = blockRegistry.getAll();
@@ -167,7 +168,7 @@ router.get('/simple', authenticateToken, aiReadRateLimit, async (req: Request, r
  * GET /api/ai/blocks/search?q=query
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/search', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/search', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { q: query } = req.query;
 
@@ -211,7 +212,7 @@ router.get('/search', authenticateToken, aiReadRateLimit, async (req: Request, r
  * GET /api/ai/blocks/stats
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/stats', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/stats', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const stats = blockRegistry.getStats();
 
@@ -235,7 +236,7 @@ router.get('/stats', authenticateToken, aiReadRateLimit, async (req: Request, re
  * GET /api/ai/blocks/:name
  * 인증 필수 + 레이트리밋 적용
  */
-router.get('/:name', authenticateToken, aiReadRateLimit, async (req: Request, res: Response) => {
+router.get('/:name', authenticate, aiReadRateLimit, async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
     const block = blockRegistry.get(name);

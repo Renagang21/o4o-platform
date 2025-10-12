@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { UserRoleController } from '../../controllers/v1/userRole.controller';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 // New unified permission middleware
 import {
   ensureAuthenticated,

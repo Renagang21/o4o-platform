@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { UserManagementController } from '../controllers/UserManagementController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/permission.middleware';
 import { UserRole } from '../types/auth';
 import { validationResult } from 'express-validator';
@@ -39,7 +39,7 @@ const paginationValidation = [
 // Public routes (none for user management)
 
 // Protected routes - require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Validation middleware
 const validateRequest = (req: any, res: any, next: any) => {

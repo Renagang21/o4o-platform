@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 import logger from '../../utils/logger';
 import { AppDataSource } from '../../database/connection';
@@ -420,7 +420,7 @@ router.get('/customizer',
  * @desc    Get settings for a specific section
  * @access  Private
  */
-router.get('/:section', authenticateToken, async (req: Request, res: Response) => {
+router.get('/:section', authenticate, async (req: Request, res: Response) => {
   try {
     const { section } = req.params;
     const settings = settingsStore.get(section);
@@ -451,7 +451,7 @@ router.get('/:section', authenticateToken, async (req: Request, res: Response) =
  * @access  Private (Admin only)
  */
 router.put('/reading',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     const traceId = `rs-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
@@ -686,7 +686,7 @@ router.put('/reading',
  * @access  Private (Admin only)
  */
 router.put('/:section',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -728,7 +728,7 @@ router.put('/:section',
  * @access  Private (Admin only)
  */
 router.get('/',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -758,7 +758,7 @@ router.get('/',
  * @access  Private (Admin only)
  */
 router.post('/reset/:section',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -837,7 +837,7 @@ router.get('/permalink', async (req: Request, res: Response) => {
  * @access  Private (Admin only)
  */
 router.put('/permalink',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -878,7 +878,7 @@ router.put('/permalink',
  * @access  Private (Admin only)
  */
 router.post('/permalink/preview',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -913,7 +913,7 @@ router.post('/permalink/preview',
  * @access  Private (Admin only)
  */
 router.post('/permalink/validate',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -941,7 +941,7 @@ router.post('/permalink/validate',
  * @access  Private (Admin only)
  */
 router.post('/customizer',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {

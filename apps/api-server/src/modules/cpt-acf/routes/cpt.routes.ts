@@ -1,28 +1,28 @@
 import { Router, IRouter } from 'express';
 import { CPTController } from '../controllers/cpt.controller';
-import { authenticateToken } from '../../../middleware/auth';
+import { authenticate } from '../../../middleware/auth.middleware';
 import { requireAdmin } from '../../../middleware/permission.middleware';
 
 const router: IRouter = Router();
 
 // CPT Management Routes
-router.get('/types', authenticateToken, CPTController.getAllCPTs);
-router.get('/types/:slug', authenticateToken, CPTController.getCPTBySlug);
-router.post('/types', authenticateToken, requireAdmin, CPTController.createCPT);
-router.put('/types/:slug', authenticateToken, requireAdmin, CPTController.updateCPT);
-router.delete('/types/:slug', authenticateToken, requireAdmin, CPTController.deleteCPT);
+router.get('/types', authenticate, CPTController.getAllCPTs);
+router.get('/types/:slug', authenticate, CPTController.getCPTBySlug);
+router.post('/types', authenticate, requireAdmin, CPTController.createCPT);
+router.put('/types/:slug', authenticate, requireAdmin, CPTController.updateCPT);
+router.delete('/types/:slug', authenticate, requireAdmin, CPTController.deleteCPT);
 
 // Post Management Routes
-router.get('/:slug/posts', authenticateToken, CPTController.getPostsByCPT);
-router.get('/:slug/posts/:postId', authenticateToken, CPTController.getPostById);
-router.post('/:slug/posts', authenticateToken, CPTController.createPost);
-router.put('/:slug/posts/:postId', authenticateToken, CPTController.updatePost);
-router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePost);
+router.get('/:slug/posts', authenticate, CPTController.getPostsByCPT);
+router.get('/:slug/posts/:postId', authenticate, CPTController.getPostById);
+router.post('/:slug/posts', authenticate, CPTController.createPost);
+router.put('/:slug/posts/:postId', authenticate, CPTController.updatePost);
+router.delete('/:slug/posts/:postId', authenticate, CPTController.deletePost);
 
 // Initialize defaults
-router.post('/initialize', authenticateToken, requireAdmin, CPTController.initializeDefaults);
+router.post('/initialize', authenticate, requireAdmin, CPTController.initializeDefaults);
 
 // Backward compatibility aliases
-router.get('/:slug', authenticateToken, CPTController.getCPT);
+router.get('/:slug', authenticate, CPTController.getCPT);
 
 export default router;

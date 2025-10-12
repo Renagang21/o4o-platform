@@ -1,6 +1,6 @@
 import { Router, RequestHandler } from 'express';
 import { ImageEditingController } from '../../controllers/content/ImageEditingController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 // Simple role guard for now - replace with actual implementation
 const roleGuard = (roles: string[]) => (req: any, res: any, next: any) => {
   // For now, allow all authenticated users
@@ -11,7 +11,7 @@ const router: Router = Router();
 const imageEditingController = new ImageEditingController();
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 /**
  * Image Editing API Routes

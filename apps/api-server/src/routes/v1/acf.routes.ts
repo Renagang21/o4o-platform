@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ACFController } from '../../controllers/acfController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
@@ -11,20 +11,20 @@ router.get('/field-groups', ACFController.getFieldGroups);
 router.get('/custom-field-groups', ACFController.getFieldGroups);
 router.get('/field-groups/:id', ACFController.getFieldGroup);
 router.get('/custom-field-groups/:id', ACFController.getFieldGroup);
-router.post('/field-groups', authenticateToken, requireAdmin, ACFController.createFieldGroup);
-router.post('/custom-field-groups', authenticateToken, requireAdmin, ACFController.createFieldGroup);
-router.put('/field-groups/:id', authenticateToken, requireAdmin, ACFController.updateFieldGroup);
-router.put('/custom-field-groups/:id', authenticateToken, requireAdmin, ACFController.updateFieldGroup);
-router.delete('/field-groups/:id', authenticateToken, requireAdmin, ACFController.deleteFieldGroup);
-router.delete('/custom-field-groups/:id', authenticateToken, requireAdmin, ACFController.deleteFieldGroup);
+router.post('/field-groups', authenticate, requireAdmin, ACFController.createFieldGroup);
+router.post('/custom-field-groups', authenticate, requireAdmin, ACFController.createFieldGroup);
+router.put('/field-groups/:id', authenticate, requireAdmin, ACFController.updateFieldGroup);
+router.put('/custom-field-groups/:id', authenticate, requireAdmin, ACFController.updateFieldGroup);
+router.delete('/field-groups/:id', authenticate, requireAdmin, ACFController.deleteFieldGroup);
+router.delete('/custom-field-groups/:id', authenticate, requireAdmin, ACFController.deleteFieldGroup);
 
 // Field Values API
 router.get('/fields/:entityType/:entityId', ACFController.getFieldValues);
-router.post('/fields/:entityType/:entityId', authenticateToken, ACFController.saveFieldValues);
+router.post('/fields/:entityType/:entityId', authenticate, ACFController.saveFieldValues);
 
 // Utility endpoints
-router.post('/export', authenticateToken, requireAdmin, ACFController.exportFieldGroups);
-router.post('/import', authenticateToken, requireAdmin, ACFController.importFieldGroups);
+router.post('/export', authenticate, requireAdmin, ACFController.exportFieldGroups);
+router.post('/import', authenticate, requireAdmin, ACFController.importFieldGroups);
 
 // Get available field types
 router.get('/field-types', (req, res) => {

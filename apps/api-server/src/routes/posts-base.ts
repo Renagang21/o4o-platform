@@ -3,7 +3,7 @@ import AppDataSource from '../database/data-source';
 import { Post } from '../entities/Post';
 import { User } from '../entities/User';
 import { Category } from '../entities/Category';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { In, Like, IsNull, Not } from 'typeorm';
 import { validateDto } from '../middleware/validateDto';
 import { body, query, param } from 'express-validator';
@@ -339,7 +339,7 @@ router.get('/:id',
 
 // POST /api/posts - Create post
 router.post('/',
-  authenticateToken,
+  authenticate,
   body('title').notEmpty().withMessage('Title is required'),
   body('content').notEmpty().withMessage('Content is required'),
   body('status').optional().isIn(['draft', 'publish', 'private', 'archived', 'scheduled']),
@@ -410,7 +410,7 @@ router.post('/',
 
 // PUT /api/posts/:id - Update post
 router.put('/:id',
-  authenticateToken,
+  authenticate,
   param('id').notEmpty(),
   validateDto,
   async (req: Request, res: Response) => {
@@ -479,7 +479,7 @@ router.put('/:id',
 
 // DELETE /api/posts/:id - Delete post
 router.delete('/:id',
-  authenticateToken,
+  authenticate,
   param('id').notEmpty(),
   validateDto,
   async (req: Request, res: Response) => {

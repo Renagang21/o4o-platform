@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { FundingProjectController } from '../controllers/crowdfunding/FundingProjectController';
 import { BackingController } from '../controllers/crowdfunding/BackingController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
@@ -15,14 +15,14 @@ router.get('/projects/:id/stats', (req, res) => projectController.getProjectStat
 router.get('/projects/:projectId/backers', (req, res) => backingController.getProjectBackers(req as any, res));
 
 // Protected routes - Projects
-router.post('/projects', authenticateToken, (req, res) => projectController.createProject(req as any, res));
-router.patch('/projects/:id', authenticateToken, (req, res) => projectController.updateProject(req as any, res));
-router.get('/my-projects', authenticateToken, (req, res) => projectController.getMyProjects(req as any, res));
+router.post('/projects', authenticate, (req, res) => projectController.createProject(req as any, res));
+router.patch('/projects/:id', authenticate, (req, res) => projectController.updateProject(req as any, res));
+router.get('/my-projects', authenticate, (req, res) => projectController.getMyProjects(req as any, res));
 
 // Protected routes - Backings
-router.post('/backings', authenticateToken, (req, res) => backingController.createBacking(req as any, res));
-router.post('/backings/:id/cancel', authenticateToken, (req, res) => backingController.cancelBacking(req as any, res));
-router.get('/my-backings', authenticateToken, (req, res) => backingController.getUserBackings(req as any, res));
+router.post('/backings', authenticate, (req, res) => backingController.createBacking(req as any, res));
+router.post('/backings/:id/cancel', authenticate, (req, res) => backingController.cancelBacking(req as any, res));
+router.get('/my-backings', authenticate, (req, res) => backingController.getUserBackings(req as any, res));
 
 // Webhook route (should be protected with webhook signature verification in production)
 router.post('/webhook/payment', (req, res) => backingController.updatePaymentStatus(req as any, res));
@@ -30,7 +30,7 @@ router.post('/webhook/payment', (req, res) => backingController.updatePaymentSta
 // Admin routes
 router.patch(
   '/admin/projects/:id/status',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req, res) => {
     try {

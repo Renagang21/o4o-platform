@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { formController } from '../controllers/formController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { checkRole } from '../middleware/checkRole';
 import multer from 'multer';
 import path from 'path';
@@ -39,10 +39,10 @@ const upload = multer({
 });
 
 // Admin routes - require authentication and admin/business role
-router.post('/', authenticateToken, checkRole(['admin', 'business']), formController.createForm);
-router.put('/:id', authenticateToken, checkRole(['admin', 'business']), formController.updateForm);
-router.get('/', authenticateToken, checkRole(['admin', 'business']), formController.getForms);
-router.delete('/:id', authenticateToken, checkRole(['admin']), formController.deleteForm);
+router.post('/', authenticate, checkRole(['admin', 'business']), formController.createForm);
+router.put('/:id', authenticate, checkRole(['admin', 'business']), formController.updateForm);
+router.get('/', authenticate, checkRole(['admin', 'business']), formController.getForms);
+router.delete('/:id', authenticate, checkRole(['admin']), formController.deleteForm);
 
 // Public routes - get form for display
 router.get('/:id', formController.getForm);
@@ -51,11 +51,11 @@ router.get('/:id', formController.getForm);
 router.post('/:formId/submit', upload.array('files', 10) as any, formController.submitForm);
 
 // Submission management - require authentication
-router.get('/:formId/submissions', authenticateToken, checkRole(['admin', 'business']), formController.getSubmissions);
-router.put('/submissions/:id', authenticateToken, checkRole(['admin', 'business']), formController.updateSubmission);
-router.delete('/submissions/:id', authenticateToken, checkRole(['admin']), formController.deleteSubmission);
+router.get('/:formId/submissions', authenticate, checkRole(['admin', 'business']), formController.getSubmissions);
+router.put('/submissions/:id', authenticate, checkRole(['admin', 'business']), formController.updateSubmission);
+router.delete('/submissions/:id', authenticate, checkRole(['admin']), formController.deleteSubmission);
 
 // Reports
-router.get('/:formId/report', authenticateToken, checkRole(['admin', 'business']), formController.getFormReport);
+router.get('/:formId/report', authenticate, checkRole(['admin', 'business']), formController.getFormReport);
 
 export default router;

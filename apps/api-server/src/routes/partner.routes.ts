@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PartnerController } from '../controllers/partner/partnerController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAnyRole } from '../middleware/permission.middleware';
 import { UserRole } from '../entities/User';
 import logger from '../utils/logger';
@@ -10,11 +10,11 @@ const router: Router = Router();
 // Partner dashboard routes (partner and admin access)
 const partnerOrAdmin = requireAnyRole([UserRole.PARTNER, UserRole.ADMIN, UserRole.SUPER_ADMIN]);
 
-router.get('/dashboard/summary', authenticateToken, partnerOrAdmin, PartnerController.getDashboardSummary);
-router.get('/commissions', authenticateToken, partnerOrAdmin, PartnerController.getCommissionHistory);
-router.get('/analytics', authenticateToken, partnerOrAdmin, PartnerController.getPerformanceAnalytics);
-router.post('/links/generate', authenticateToken, partnerOrAdmin, PartnerController.generatePartnerLink);
-router.get('/products', authenticateToken, partnerOrAdmin, PartnerController.getPromotionalProducts);
+router.get('/dashboard/summary', authenticate, partnerOrAdmin, PartnerController.getDashboardSummary);
+router.get('/commissions', authenticate, partnerOrAdmin, PartnerController.getCommissionHistory);
+router.get('/analytics', authenticate, partnerOrAdmin, PartnerController.getPerformanceAnalytics);
+router.post('/links/generate', authenticate, partnerOrAdmin, PartnerController.generatePartnerLink);
+router.get('/products', authenticate, partnerOrAdmin, PartnerController.getPromotionalProducts);
 
 // Public routes for tracking
 router.get('/track/click/:linkId', async (req, res) => {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { ContentController } from '../../controllers/v1/content.controller';
 import { MediaController } from '../../controllers/content/MediaController';
 import { cache } from '../../middleware/cache';
@@ -124,43 +124,43 @@ const mediaController = new MediaController();
 // Posts endpoints (with caching for public GET requests)
 router.get('/posts', cache({ ttl: 300 }), contentController.getPosts);
 router.get('/posts/:id', cache({ ttl: 600 }), contentController.getPost);
-router.post('/posts', authenticateToken, contentController.createPost);
-router.post('/posts/draft', authenticateToken, contentController.createDraft);
-router.post('/posts/:id/publish', authenticateToken, contentController.publishPost);
-router.put('/posts/:id', authenticateToken, contentController.updatePost);
-router.delete('/posts/:id', authenticateToken, contentController.deletePost);
-router.post('/posts/:id/clone', authenticateToken, contentController.clonePost);
-router.patch('/posts/bulk', authenticateToken, contentController.bulkUpdatePosts);
-router.delete('/posts/bulk', authenticateToken, contentController.bulkDeletePosts);
+router.post('/posts', authenticate, contentController.createPost);
+router.post('/posts/draft', authenticate, contentController.createDraft);
+router.post('/posts/:id/publish', authenticate, contentController.publishPost);
+router.put('/posts/:id', authenticate, contentController.updatePost);
+router.delete('/posts/:id', authenticate, contentController.deletePost);
+router.post('/posts/:id/clone', authenticate, contentController.clonePost);
+router.patch('/posts/bulk', authenticate, contentController.bulkUpdatePosts);
+router.delete('/posts/bulk', authenticate, contentController.bulkDeletePosts);
 
 // Categories endpoints (with longer cache for relatively static data)
 router.get('/categories', cache({ ttl: 1800 }), contentController.getCategories);
 router.get('/categories/:id', cache({ ttl: 1800 }), contentController.getCategory);
-router.post('/categories', authenticateToken, contentController.createCategory);
-router.put('/categories/:id', authenticateToken, contentController.updateCategory);
-router.delete('/categories/:id', authenticateToken, contentController.deleteCategory);
+router.post('/categories', authenticate, contentController.createCategory);
+router.put('/categories/:id', authenticate, contentController.updateCategory);
+router.delete('/categories/:id', authenticate, contentController.deleteCategory);
 
 // Tags endpoints
 router.get('/tags', contentController.getTags);
 router.get('/tags/:id', contentController.getTag);
-router.post('/tags', authenticateToken, contentController.createTag);
-router.put('/tags/:id', authenticateToken, contentController.updateTag);
-router.delete('/tags/:id', authenticateToken, contentController.deleteTag);
+router.post('/tags', authenticate, contentController.createTag);
+router.put('/tags/:id', authenticate, contentController.updateTag);
+router.delete('/tags/:id', authenticate, contentController.deleteTag);
 
 // Pages endpoints
 router.get('/pages', contentController.getPages);
 router.get('/pages/:id', contentController.getPage);
-router.post('/pages', authenticateToken, contentController.createPage);
-router.put('/pages/:id', authenticateToken, contentController.updatePage);
-router.delete('/pages/:id', authenticateToken, contentController.deletePage);
+router.post('/pages', authenticate, contentController.createPage);
+router.put('/pages/:id', authenticate, contentController.updatePage);
+router.delete('/pages/:id', authenticate, contentController.deletePage);
 
 // Media endpoints
 router.get('/media', mediaController.getMedia);
 router.get('/media/:id', mediaController.getMediaById);
 // Temporarily allow upload without auth for admin dashboard
 router.post('/media/upload', uploadMiddleware('file', 10), mediaController.uploadMedia);
-router.put('/media/:id', authenticateToken, mediaController.updateMedia);
-router.delete('/media/:id', authenticateToken, mediaController.deleteMedia);
+router.put('/media/:id', authenticate, mediaController.updateMedia);
+router.delete('/media/:id', authenticate, mediaController.deleteMedia);
 
 // Authors endpoint
 router.get('/authors', contentController.getAuthors);

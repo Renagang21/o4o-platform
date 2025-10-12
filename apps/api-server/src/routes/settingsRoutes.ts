@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { SettingsController } from '../controllers/settingsController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
@@ -12,8 +12,8 @@ router.get('/general', settingsController.getGeneralSettings.bind(settingsContro
 router.get('/customizer', settingsController.getCustomizerSettings.bind(settingsController));
 
 // Admin only endpoints
-router.get('/:type', authenticateToken, requireAdmin, settingsController.getSettings.bind(settingsController));
-router.put('/:type', authenticateToken, requireAdmin, settingsController.updateSettings.bind(settingsController));
-router.post('/initialize', authenticateToken, requireAdmin, settingsController.initializeSettings.bind(settingsController));
+router.get('/:type', authenticate, requireAdmin, settingsController.getSettings.bind(settingsController));
+router.put('/:type', authenticate, requireAdmin, settingsController.updateSettings.bind(settingsController));
+router.post('/initialize', authenticate, requireAdmin, settingsController.initializeSettings.bind(settingsController));
 
 export default router;

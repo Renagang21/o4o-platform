@@ -18,7 +18,8 @@
 import { Router, Request, Response } from 'express';
 import { body, param } from 'express-validator';
 import { validateDto } from '../middleware/validateDto';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
 import { aiProxyService } from '../services/ai-proxy.service';
 import { aiJobQueue } from '../services/ai-job-queue.service';
@@ -50,7 +51,7 @@ const aiProxyRateLimit = rateLimitMiddleware({
  * Returns: { success, provider, model, usage, result, requestId }
  */
 router.post('/generate',
-  authenticateToken,
+  authenticate,
   aiProxyRateLimit,
   body('provider').isIn(['openai', 'gemini', 'claude']).withMessage('Invalid provider'),
   body('model').isString().notEmpty().withMessage('Model is required'),
@@ -190,7 +191,7 @@ router.post('/generate',
  * Enqueues job and returns jobId for status tracking
  */
 router.post('/generate/async',
-  authenticateToken,
+  authenticate,
   aiProxyRateLimit,
   body('provider').isIn(['openai', 'gemini', 'claude']).withMessage('Invalid provider'),
   body('model').isString().notEmpty().withMessage('Model is required'),
@@ -284,7 +285,7 @@ router.post('/generate/async',
  * Sprint 2 - P2: Get job status
  */
 router.get('/jobs/:jobId',
-  authenticateToken,
+  authenticate,
   param('jobId').isString().notEmpty().withMessage('Job ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
@@ -334,7 +335,7 @@ router.get('/jobs/:jobId',
  * Sprint 2 - P2: Cancel job
  */
 router.delete('/jobs/:jobId',
-  authenticateToken,
+  authenticate,
   param('jobId').isString().notEmpty().withMessage('Job ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
@@ -400,7 +401,7 @@ router.delete('/jobs/:jobId',
  * Sprint 2 - P2: SSE streaming for job progress
  */
 router.get('/stream/:jobId',
-  authenticateToken,
+  authenticate,
   param('jobId').isString().notEmpty().withMessage('Job ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
@@ -504,7 +505,7 @@ router.get('/stream/:jobId',
  * Get list of allowed models per provider
  */
 router.get('/models',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const { MODEL_WHITELIST, PARAMETER_LIMITS } = await import('../types/ai-proxy.types');
 
@@ -524,7 +525,7 @@ router.get('/models',
  * Returns: success rate, processing time, retry counts, validation rates, queue status
  */
 router.get('/jobs/metrics',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 
@@ -570,7 +571,7 @@ router.get('/jobs/metrics',
  * Sprint 3: Get recent job history
  */
 router.get('/jobs/history',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 
@@ -606,7 +607,7 @@ router.get('/jobs/history',
  * Links original job to re-run job via relatedJobId
  */
 router.post('/jobs/:jobId/retry',
-  authenticateToken,
+  authenticate,
   param('jobId').isString().notEmpty().withMessage('Job ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
@@ -685,7 +686,7 @@ router.post('/jobs/:jobId/retry',
  * Sprint 4: Get Dead Letter Queue entries
  */
 router.get('/dlq',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 
@@ -724,7 +725,7 @@ router.get('/dlq',
  * Sprint 4: Get DLQ statistics
  */
 router.get('/dlq/stats',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 
@@ -755,7 +756,7 @@ router.get('/dlq/stats',
  * Sprint 4: Retry job from DLQ
  */
 router.post('/dlq/:dlqJobId/retry',
-  authenticateToken,
+  authenticate,
   param('dlqJobId').isString().notEmpty().withMessage('DLQ Job ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
@@ -819,7 +820,7 @@ router.post('/dlq/:dlqJobId/retry',
  * - format: 'json' | 'csv' (default: 'json')
  */
 router.get('/usage/report',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 
@@ -888,7 +889,7 @@ router.get('/usage/report',
  * Get current month usage report
  */
 router.get('/usage/current-month',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 
@@ -928,7 +929,7 @@ router.get('/usage/current-month',
  * - days: Number of days (default: 7)
  */
 router.get('/usage/last-n-days',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import PartnerController from '../controllers/PartnerController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router: Router = Router();
 const partnerController = new PartnerController();
@@ -9,7 +9,7 @@ const partnerController = new PartnerController();
 router.post('/track-click', partnerController.trackClick);
 
 // 나머지는 모두 인증 필요
-router.use(authenticateToken);
+router.use(authenticate);
 
 // 파트너 신청 및 승인
 router.post('/apply', partnerController.applyAsPartner);

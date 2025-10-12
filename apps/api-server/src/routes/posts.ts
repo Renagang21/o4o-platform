@@ -3,7 +3,7 @@ import AppDataSource from '../database/data-source';
 import { Post } from '../entities/Post';
 import { User } from '../entities/User';
 import { Category } from '../entities/Category';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { In, Like, IsNull, Not } from 'typeorm';
 import { validateDto } from '../middleware/validateDto';
 import { body, query, param } from 'express-validator';
@@ -270,7 +270,7 @@ router.post('/',
       next();
     } else {
       // Require auth for other statuses
-      authenticateToken(req, res, next);
+      authenticate(req, res, next);
     }
   },
   // Make title and content optional for auto-save support
@@ -429,7 +429,7 @@ router.post('/',
 
 // PUT /api/posts/:id - Update post (Gutenberg compatible)
 router.put('/:id',
-  authenticateToken,
+  authenticate,
   param('id').notEmpty(),
   validateDto,
   async (req: Request, res: Response) => {
@@ -553,7 +553,7 @@ router.put('/:id',
 
 // DELETE /api/posts/:id - Delete post
 router.delete('/:id',
-  authenticateToken,
+  authenticate,
   param('id').notEmpty(),
   validateDto,
   async (req: Request, res: Response) => {
@@ -586,7 +586,7 @@ router.delete('/:id',
 
 // POST /api/posts/preview - Save preview data temporarily
 router.post('/preview',
-  authenticateToken,
+  authenticate,
   body('title').optional(),
   body('content').optional(),
   body('blocks').optional(),
@@ -691,7 +691,7 @@ router.get('/preview/:previewId',
 
 // DELETE /api/posts/preview/:previewId - Delete preview data
 router.delete('/preview/:previewId',
-  authenticateToken,
+  authenticate,
   param('previewId').isUUID(),
   validateDto,
   async (req: Request, res: Response) => {

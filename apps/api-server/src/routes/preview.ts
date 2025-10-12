@@ -5,7 +5,8 @@
 import { Router, Request, Response } from 'express'
 import { query, body } from 'express-validator'
 import { validateDto } from '../middleware/validateDto'
-import { authenticateToken, AuthRequest } from '../middleware/auth'
+import { authenticate } from '../middleware/auth.middleware'
+import { AuthRequest } from '../types/auth'
 import AppDataSource from '../database/connection'
 import { User } from '../entities/User'
 import logger from '../utils/logger'
@@ -17,7 +18,7 @@ import { previewTokenService } from '../services/preview-token.service'
 const router: Router = Router()
 
 // Apply authentication to protected routes
-router.use('/ws', authenticateToken)
+router.use('/ws', authenticate)
 
 // Handle preflight OPTIONS requests for CORS
 router.options('*', (req: Request, res: Response) => {
@@ -37,7 +38,7 @@ router.options('*', (req: Request, res: Response) => {
  * Sprint 2 - P1: Preview Protection
  */
 router.post('/token',
-  authenticateToken,
+  authenticate,
   body('pageId').isUUID().withMessage('Valid page ID is required'),
   validateDto,
   async (req: Request, res: Response) => {
@@ -247,7 +248,7 @@ router.get('/',
  * Generate preview URL for customization
  */
 router.post('/generate',
-  authenticateToken,
+  authenticate,
   async (req: Request, res: Response) => {
     try {
       const { customization, device = 'desktop' } = req.body

@@ -3,7 +3,7 @@ import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller';
 import { FieldGroupsController } from '../controllers/cpt/FieldGroupsController';
 import { TaxonomiesController } from '../controllers/cpt/TaxonomiesController';
 import { FormsController } from '../controllers/cpt/FormsController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
@@ -11,36 +11,36 @@ const router: Router = Router();
 // ============= Custom Post Type Routes =============
 
 // Get all CPTs
-router.get('/types', authenticateToken, CPTController.getAllCPTs);
+router.get('/types', authenticate, CPTController.getAllCPTs);
 
 // Get single CPT by slug
-router.get('/types/:slug', authenticateToken, CPTController.getCPTBySlug);
+router.get('/types/:slug', authenticate, CPTController.getCPTBySlug);
 
 // Create new CPT (Admin only)
-router.post('/types', authenticateToken, requireAdmin, CPTController.createCPT);
+router.post('/types', authenticate, requireAdmin, CPTController.createCPT);
 
 // Update CPT (Admin only)
-router.put('/types/:slug', authenticateToken, requireAdmin, CPTController.updateCPT);
+router.put('/types/:slug', authenticate, requireAdmin, CPTController.updateCPT);
 
 // Delete CPT (Admin only)
-router.delete('/types/:slug', authenticateToken, requireAdmin, CPTController.deleteCPT);
+router.delete('/types/:slug', authenticate, requireAdmin, CPTController.deleteCPT);
 
 // ============= Custom Post Routes =============
 
 // Get posts by CPT slug
-router.get('/:slug/posts', authenticateToken, CPTController.getPostsByCPT);
+router.get('/:slug/posts', authenticate, CPTController.getPostsByCPT);
 
 // Get single post
-router.get('/:slug/posts/:postId', authenticateToken, CPTController.getPostById);
+router.get('/:slug/posts/:postId', authenticate, CPTController.getPostById);
 
 // Create new post
-router.post('/:slug/posts', authenticateToken, CPTController.createPost);
+router.post('/:slug/posts', authenticate, CPTController.createPost);
 
 // Update post
-router.put('/:slug/posts/:postId', authenticateToken, CPTController.updatePost);
+router.put('/:slug/posts/:postId', authenticate, CPTController.updatePost);
 
 // Delete post
-router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePost);
+router.delete('/:slug/posts/:postId', authenticate, CPTController.deletePost);
 
 // Publish post
 // router.patch('/:slug/posts/:postId/publish', authenticateToken, CPTController.publishPost);
@@ -57,70 +57,70 @@ router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePos
 const fieldGroupsController = new FieldGroupsController();
 
 // Get all field groups
-router.get('/field-groups', authenticateToken, fieldGroupsController.getAllFieldGroups.bind(fieldGroupsController));
+router.get('/field-groups', authenticate, fieldGroupsController.getAllFieldGroups.bind(fieldGroupsController));
 
 // Get single field group
-router.get('/field-groups/:id', authenticateToken, fieldGroupsController.getFieldGroupById.bind(fieldGroupsController));
+router.get('/field-groups/:id', authenticate, fieldGroupsController.getFieldGroupById.bind(fieldGroupsController));
 
 // Create new field group (Admin only)
-router.post('/field-groups', authenticateToken, requireAdmin, fieldGroupsController.createFieldGroup.bind(fieldGroupsController));
+router.post('/field-groups', authenticate, requireAdmin, fieldGroupsController.createFieldGroup.bind(fieldGroupsController));
 
 // Update field group (Admin only)
-router.put('/field-groups/:id', authenticateToken, requireAdmin, fieldGroupsController.updateFieldGroup.bind(fieldGroupsController));
+router.put('/field-groups/:id', authenticate, requireAdmin, fieldGroupsController.updateFieldGroup.bind(fieldGroupsController));
 
 // Delete field group (Admin only)
-router.delete('/field-groups/:id', authenticateToken, requireAdmin, fieldGroupsController.deleteFieldGroup.bind(fieldGroupsController));
+router.delete('/field-groups/:id', authenticate, requireAdmin, fieldGroupsController.deleteFieldGroup.bind(fieldGroupsController));
 
 // Duplicate field group (Admin only)
-router.post('/field-groups/:id/duplicate', authenticateToken, requireAdmin, fieldGroupsController.duplicateFieldGroup.bind(fieldGroupsController));
+router.post('/field-groups/:id/duplicate', authenticate, requireAdmin, fieldGroupsController.duplicateFieldGroup.bind(fieldGroupsController));
 
 // Toggle field group status (Admin only)
-router.patch('/field-groups/:id/toggle', authenticateToken, requireAdmin, fieldGroupsController.toggleFieldGroupStatus.bind(fieldGroupsController));
+router.patch('/field-groups/:id/toggle', authenticate, requireAdmin, fieldGroupsController.toggleFieldGroupStatus.bind(fieldGroupsController));
 
 // Reorder field groups (Admin only)
-router.patch('/field-groups/reorder', authenticateToken, requireAdmin, fieldGroupsController.reorderFieldGroups.bind(fieldGroupsController));
+router.patch('/field-groups/reorder', authenticate, requireAdmin, fieldGroupsController.reorderFieldGroups.bind(fieldGroupsController));
 
 // Get field groups by location
-router.get('/field-groups/location', authenticateToken, fieldGroupsController.getFieldGroupsByLocation.bind(fieldGroupsController));
+router.get('/field-groups/location', authenticate, fieldGroupsController.getFieldGroupsByLocation.bind(fieldGroupsController));
 
 // ============= Taxonomies Routes =============
 const taxonomiesController = new TaxonomiesController();
 
 // Get all taxonomies
-router.get('/taxonomies', authenticateToken, taxonomiesController.getAllTaxonomies.bind(taxonomiesController));
+router.get('/taxonomies', authenticate, taxonomiesController.getAllTaxonomies.bind(taxonomiesController));
 
 // Get single taxonomy
-router.get('/taxonomies/:id', authenticateToken, taxonomiesController.getTaxonomyById.bind(taxonomiesController));
+router.get('/taxonomies/:id', authenticate, taxonomiesController.getTaxonomyById.bind(taxonomiesController));
 
 // Create new taxonomy (Admin only)
-router.post('/taxonomies', authenticateToken, requireAdmin, taxonomiesController.createTaxonomy.bind(taxonomiesController));
+router.post('/taxonomies', authenticate, requireAdmin, taxonomiesController.createTaxonomy.bind(taxonomiesController));
 
 // Update taxonomy (Admin only)
-router.put('/taxonomies/:id', authenticateToken, requireAdmin, taxonomiesController.updateTaxonomy.bind(taxonomiesController));
+router.put('/taxonomies/:id', authenticate, requireAdmin, taxonomiesController.updateTaxonomy.bind(taxonomiesController));
 
 // Delete taxonomy (Admin only)
-router.delete('/taxonomies/:id', authenticateToken, requireAdmin, taxonomiesController.deleteTaxonomy.bind(taxonomiesController));
+router.delete('/taxonomies/:id', authenticate, requireAdmin, taxonomiesController.deleteTaxonomy.bind(taxonomiesController));
 
 // Get terms by taxonomy
-router.get('/taxonomies/:taxonomyId/terms', authenticateToken, taxonomiesController.getTermsByTaxonomy.bind(taxonomiesController));
+router.get('/taxonomies/:taxonomyId/terms', authenticate, taxonomiesController.getTermsByTaxonomy.bind(taxonomiesController));
 
 // Get single term
-router.get('/terms/:id', authenticateToken, taxonomiesController.getTermById.bind(taxonomiesController));
+router.get('/terms/:id', authenticate, taxonomiesController.getTermById.bind(taxonomiesController));
 
 // Create new term
-router.post('/taxonomies/:taxonomyId/terms', authenticateToken, taxonomiesController.createTerm.bind(taxonomiesController));
+router.post('/taxonomies/:taxonomyId/terms', authenticate, taxonomiesController.createTerm.bind(taxonomiesController));
 
 // Update term
-router.put('/terms/:id', authenticateToken, taxonomiesController.updateTerm.bind(taxonomiesController));
+router.put('/terms/:id', authenticate, taxonomiesController.updateTerm.bind(taxonomiesController));
 
 // Delete term
-router.delete('/terms/:id', authenticateToken, taxonomiesController.deleteTerm.bind(taxonomiesController));
+router.delete('/terms/:id', authenticate, taxonomiesController.deleteTerm.bind(taxonomiesController));
 
 // Assign terms to object
-router.post('/term-relationships', authenticateToken, taxonomiesController.assignTermsToObject.bind(taxonomiesController));
+router.post('/term-relationships', authenticate, taxonomiesController.assignTermsToObject.bind(taxonomiesController));
 
 // Get object terms
-router.get('/objects/:objectType/:objectId/terms', authenticateToken, taxonomiesController.getObjectTerms.bind(taxonomiesController));
+router.get('/objects/:objectType/:objectId/terms', authenticate, taxonomiesController.getObjectTerms.bind(taxonomiesController));
 
 // ============= Terms Routes =============
 // Term routes are included in Taxonomies section above
@@ -129,31 +129,31 @@ router.get('/objects/:objectType/:objectId/terms', authenticateToken, taxonomies
 const formsController = new FormsController();
 
 // Get all forms
-router.get('/forms', authenticateToken, formsController.getAllForms.bind(formsController));
+router.get('/forms', authenticate, formsController.getAllForms.bind(formsController));
 
 // Get single form by ID
-router.get('/forms/:id', authenticateToken, formsController.getFormById.bind(formsController));
+router.get('/forms/:id', authenticate, formsController.getFormById.bind(formsController));
 
 // Get form by name (public access for rendering)
 router.get('/forms/name/:name', formsController.getFormByName.bind(formsController));
 
 // Create new form
-router.post('/forms', authenticateToken, formsController.createForm.bind(formsController));
+router.post('/forms', authenticate, formsController.createForm.bind(formsController));
 
 // Update form
-router.put('/forms/:id', authenticateToken, formsController.updateForm.bind(formsController));
+router.put('/forms/:id', authenticate, formsController.updateForm.bind(formsController));
 
 // Delete form
-router.delete('/forms/:id', authenticateToken, formsController.deleteForm.bind(formsController));
+router.delete('/forms/:id', authenticate, formsController.deleteForm.bind(formsController));
 
 // Duplicate form
-router.post('/forms/:id/duplicate', authenticateToken, formsController.duplicateForm.bind(formsController));
+router.post('/forms/:id/duplicate', authenticate, formsController.duplicateForm.bind(formsController));
 
 // Update form status
-router.patch('/forms/:id/status', authenticateToken, formsController.updateFormStatus.bind(formsController));
+router.patch('/forms/:id/status', authenticate, formsController.updateFormStatus.bind(formsController));
 
 // Get form submissions
-router.get('/forms/:id/submissions', authenticateToken, formsController.getFormSubmissions.bind(formsController));
+router.get('/forms/:id/submissions', authenticate, formsController.getFormSubmissions.bind(formsController));
 
 // Submit form (public access)
 router.post('/forms/:id/submit', formsController.submitForm.bind(formsController));

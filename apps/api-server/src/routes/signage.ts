@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { SignageController } from '../controllers/signageController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { validateSignageContent, validateStore, validatePlaylist } from '../middleware/validation';
 
 const router: Router = Router();
 const signageController = new SignageController();
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Content Management Routes
 router.get('/contents', signageController.getContents.bind(signageController));

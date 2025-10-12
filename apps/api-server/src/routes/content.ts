@@ -3,7 +3,7 @@ import { PagesController } from '../controllers/pagesController';
 import { MediaController } from '../controllers/MediaController';
 import { TemplatesController } from '../controllers/templatesController';
 import { CustomFieldsController } from '../controllers/customFieldsController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router: express.Router = express.Router();
 
@@ -14,7 +14,7 @@ const templatesController = new TemplatesController();
 const customFieldsController = new CustomFieldsController();
 
 // Apply authentication middleware to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 // ============================================================================
 // PAGES ROUTES

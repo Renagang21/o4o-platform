@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, param, query } from 'express-validator';
 import { OrderController } from '../controllers/OrderController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error-handler';
 
 const router: Router = Router();
@@ -116,7 +116,7 @@ const validateRefundRequest = [
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authenticateToken, asyncHandler(orderController.getOrders));
+router.get('/', authenticate, asyncHandler(orderController.getOrders));
 
 /**
  * @swagger
@@ -132,7 +132,7 @@ router.get('/', authenticateToken, asyncHandler(orderController.getOrders));
  *       401:
  *         description: Unauthorized
  */
-router.get('/stats', authenticateToken, asyncHandler(orderController.getOrderStats));
+router.get('/stats', authenticate, asyncHandler(orderController.getOrderStats));
 
 /**
  * @swagger
@@ -158,7 +158,7 @@ router.get('/stats', authenticateToken, asyncHandler(orderController.getOrderSta
  *       401:
  *         description: Unauthorized
  */
-router.get('/:id', authenticateToken, validateOrderId, asyncHandler(orderController.getOrder));
+router.get('/:id', authenticate, validateOrderId, asyncHandler(orderController.getOrder));
 
 /**
  * @swagger
@@ -217,7 +217,7 @@ router.get('/:id', authenticateToken, validateOrderId, asyncHandler(orderControl
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authenticateToken, validateCreateOrder, asyncHandler(orderController.createOrder));
+router.post('/', authenticate, validateCreateOrder, asyncHandler(orderController.createOrder));
 
 /**
  * @swagger
@@ -261,7 +261,7 @@ router.post('/', authenticateToken, validateCreateOrder, asyncHandler(orderContr
  *       401:
  *         description: Unauthorized
  */
-router.post('/from-cart', authenticateToken, validateCreateOrderFromCart, asyncHandler(orderController.createOrderFromCart));
+router.post('/from-cart', authenticate, validateCreateOrderFromCart, asyncHandler(orderController.createOrderFromCart));
 
 /**
  * @swagger
@@ -301,7 +301,7 @@ router.post('/from-cart', authenticateToken, validateCreateOrderFromCart, asyncH
  *       404:
  *         description: Order not found
  */
-router.patch('/:id/status', authenticateToken, validateOrderId, validateOrderStatus, asyncHandler(orderController.updateOrderStatus));
+router.patch('/:id/status', authenticate, validateOrderId, validateOrderStatus, asyncHandler(orderController.updateOrderStatus));
 
 /**
  * @swagger
@@ -341,7 +341,7 @@ router.patch('/:id/status', authenticateToken, validateOrderId, validateOrderSta
  *       404:
  *         description: Order not found
  */
-router.patch('/:id/payment-status', authenticateToken, validateOrderId, validatePaymentStatus, asyncHandler(orderController.updatePaymentStatus));
+router.patch('/:id/payment-status', authenticate, validateOrderId, validatePaymentStatus, asyncHandler(orderController.updatePaymentStatus));
 
 /**
  * @swagger
@@ -378,7 +378,7 @@ router.patch('/:id/payment-status', authenticateToken, validateOrderId, validate
  *       401:
  *         description: Unauthorized
  */
-router.post('/:id/cancel', authenticateToken, validateOrderId, asyncHandler(orderController.cancelOrder));
+router.post('/:id/cancel', authenticate, validateOrderId, asyncHandler(orderController.cancelOrder));
 
 /**
  * @swagger
@@ -422,7 +422,7 @@ router.post('/:id/cancel', authenticateToken, validateOrderId, asyncHandler(orde
  *       401:
  *         description: Unauthorized
  */
-router.post('/:id/refund', authenticateToken, validateOrderId, validateRefundRequest, asyncHandler(orderController.requestRefund));
+router.post('/:id/refund', authenticate, validateOrderId, validateRefundRequest, asyncHandler(orderController.requestRefund));
 
 /**
  * @swagger
@@ -448,7 +448,7 @@ router.post('/:id/refund', authenticateToken, validateOrderId, validateRefundReq
  *       401:
  *         description: Unauthorized
  */
-router.post('/:id/reorder', authenticateToken, validateOrderId, asyncHandler(orderController.reorder));
+router.post('/:id/reorder', authenticate, validateOrderId, asyncHandler(orderController.reorder));
 
 /**
  * @swagger
@@ -474,7 +474,7 @@ router.post('/:id/reorder', authenticateToken, validateOrderId, asyncHandler(ord
  *       401:
  *         description: Unauthorized
  */
-router.get('/:id/tracking', authenticateToken, validateOrderId, asyncHandler(orderController.getOrderTracking));
+router.get('/:id/tracking', authenticate, validateOrderId, asyncHandler(orderController.getOrderTracking));
 
 /**
  * @swagger
@@ -504,6 +504,6 @@ router.get('/:id/tracking', authenticateToken, validateOrderId, asyncHandler(ord
  *       401:
  *         description: Unauthorized
  */
-router.get('/:id/invoice', authenticateToken, validateOrderId, asyncHandler(orderController.downloadInvoice));
+router.get('/:id/invoice', authenticate, validateOrderId, asyncHandler(orderController.downloadInvoice));
 
 export default router;

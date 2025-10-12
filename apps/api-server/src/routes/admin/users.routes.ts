@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AdminUserController } from '../../controllers/admin/AdminUserController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
 import { UserRole } from '../../entities/User';
 import { body } from 'express-validator';
@@ -9,7 +9,7 @@ const router: Router = Router();
 const adminUserController = new AdminUserController();
 
 // All admin user routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // User management routes (admin/manager only)
 router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUsers);

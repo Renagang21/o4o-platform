@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { MenuController } from '../controllers/menu/MenuController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { checkRole } from '../middleware/checkRole';
 
 const router: Router = Router();
@@ -14,7 +14,7 @@ router.get('/:id', menuController.getMenu);
 router.get('/:id/filtered', menuController.getFilteredMenu); // Role-based filtered menu
 
 // Protected routes (require authentication)
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Admin and Editor routes
 router.post('/', checkRole(['admin', 'editor']), menuController.createMenu);

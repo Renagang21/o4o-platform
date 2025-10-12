@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { MenuAdvancedController } from '../controllers/menu/MenuAdvancedController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { checkRole } from '../middleware/checkRole';
 
 const router: Router = Router();
 const menuAdvancedController = new MenuAdvancedController();
 
 // All advanced menu routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // ============================================================================
 // CONDITIONAL DISPLAY APIs

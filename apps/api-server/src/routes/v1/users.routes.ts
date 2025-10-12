@@ -3,7 +3,7 @@ import userActivityRoutes from './userActivity.routes';
 import userRoleRoutes from './userRole.routes';
 import userStatisticsRoutes from './userStatistics.routes';
 import businessInfoRoutes from './businessInfo.routes';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 import { AppDataSource } from '../../database/connection';
 import { User } from '../../entities/User';
@@ -12,7 +12,7 @@ import logger from '../../utils/logger';
 const router: Router = Router();
 
 // Basic user list endpoint
-router.get('/', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -87,7 +87,7 @@ router.get('/', authenticateToken, requireAdmin, async (req: Request, res: Respo
 });
 
 // Get single user
-router.get('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+router.get('/:id', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { id: req.params.id } });
@@ -113,7 +113,7 @@ router.get('/:id', authenticateToken, requireAdmin, async (req: Request, res: Re
 });
 
 // Delete user
-router.delete('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+router.delete('/:id', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const result = await userRepository.delete({ id: req.params.id });
@@ -139,7 +139,7 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req: Request, res:
 });
 
 // Create new user
-router.post('/', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+router.post('/', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
@@ -187,7 +187,7 @@ router.post('/', authenticateToken, requireAdmin, async (req: Request, res: Resp
 });
 
 // Update user (PUT for full update)
-router.put('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+router.put('/:id', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { id: req.params.id } });
@@ -229,7 +229,7 @@ router.put('/:id', authenticateToken, requireAdmin, async (req: Request, res: Re
 });
 
 // Update user (PATCH for partial update)
-router.patch('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
+router.patch('/:id', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { id: req.params.id } });

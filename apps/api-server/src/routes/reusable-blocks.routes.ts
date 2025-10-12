@@ -7,7 +7,8 @@ import { Router, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { ReusableBlock } from '../entities/ReusableBlock';
 import { User } from '../entities/User';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 import { Like, ILike } from 'typeorm';
 import logger from '../utils/logger';
 import { PAGINATION_DEFAULTS, REVISION_LIMITS, BLOCK_DUPLICATE } from '../config/editor.constants';
@@ -20,7 +21,7 @@ const userRepository = AppDataSource.getRepository(User);
  * GET /api/reusable-blocks
  * List reusable blocks with filtering and pagination
  */
-router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const {
       page = 1,
@@ -149,7 +150,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
  * GET /api/reusable-blocks/:id
  * Get a single reusable block
  */
-router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -220,7 +221,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
  * POST /api/reusable-blocks
  * Create a new reusable block
  */
-router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const {
@@ -312,7 +313,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
  * PUT /api/reusable-blocks/:id
  * Update a reusable block
  */
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -429,7 +430,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
  * DELETE /api/reusable-blocks/:id
  * Delete a reusable block
  */
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -472,7 +473,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
  * POST /api/reusable-blocks/:id/duplicate
  * Duplicate a reusable block
  */
-router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/:id/duplicate', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -562,7 +563,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
  * GET /api/reusable-blocks/categories
  * Get all block categories
  */
-router.get('/categories', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/categories', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const categories = await reusableBlockRepository
       .createQueryBuilder('block')

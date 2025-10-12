@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 
 // Get app information
-router.get('/info', authenticateToken, requireAdmin, (req, res) => {
+router.get('/info', authenticate, requireAdmin, (req, res) => {
   try {
     // Return static app information
     const apps = [

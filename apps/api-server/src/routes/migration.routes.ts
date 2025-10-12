@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { MigrationController } from '../controllers/MigrationController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router: Router = Router();
 const controller = new MigrationController();
 
 // All migration routes require admin authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Initialize dropshipping system (CPTs and ACF)
 router.post('/initialize', controller.initializeDropshippingSystem);

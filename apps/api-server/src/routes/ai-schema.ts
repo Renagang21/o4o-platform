@@ -6,7 +6,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
 import {
   AI_OUTPUT_JSON_SCHEMA,
@@ -41,7 +42,7 @@ const aiSchemaRateLimit = rateLimitMiddleware({
  * - JWT authentication required
  */
 router.get('/',
-  authenticateToken,
+  authenticate,
   aiSchemaRateLimit,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
@@ -133,7 +134,7 @@ router.get('/',
  * Returns current schema version (lightweight endpoint)
  */
 router.get('/version',
-  authenticateToken,
+  authenticate,
   aiSchemaRateLimit,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
@@ -172,7 +173,7 @@ router.get('/version',
  * Returns full migration history with diffs between versions
  */
 router.get('/history',
-  authenticateToken,
+  authenticate,
   aiSchemaRateLimit,
   async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;

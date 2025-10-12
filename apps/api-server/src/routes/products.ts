@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import ProductController from '../controllers/ProductController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router: Router = Router();
 const productController = new ProductController();
 
 // 모든 제품 관련 라우트는 인증 필요
-router.use(authenticateToken);
+router.use(authenticate);
 
 // 제품 CRUD
 router.post('/', productController.createProduct);

@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { MonitoringController } from '../controllers/monitoringController';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/permission.middleware';
 
 const router: Router = Router();
 
 // All monitoring routes require authentication and admin role
-router.use(authenticateToken);
+router.use(authenticate);
 router.use(requireAdmin);
 
 // System metrics

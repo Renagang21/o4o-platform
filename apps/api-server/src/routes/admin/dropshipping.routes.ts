@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { DropshippingController } from '../../controllers/dropshipping/DropshippingController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 const dropshippingController = new DropshippingController();
 
 // All routes require admin authentication
-router.use(authenticateToken);
+router.use(authenticate);
 router.use(requireAdmin);
 
 // Commission Policies

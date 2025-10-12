@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 import AppDataSource from '../../database/data-source';
 import { In } from 'typeorm';
@@ -133,7 +133,7 @@ const pluginStates: Map<string, Plugin> = new Map([
  * @desc    Get all plugins
  * @access  Private
  */
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', authenticate, async (req: Request, res: Response) => {
   try {
     const plugins = Array.from(pluginStates.values());
     
@@ -156,7 +156,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
  * @desc    Get plugin by ID
  * @access  Private
  */
-router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
+router.get('/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const plugin = pluginStates.get(id);
@@ -187,7 +187,7 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
  * @access  Private (Admin only)
  */
 router.put('/:id/toggle',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -262,7 +262,7 @@ router.put('/:id/toggle',
  * @access  Private (Admin only)
  */
 router.post('/:id/settings',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -303,7 +303,7 @@ router.post('/:id/settings',
  * @access  Private (Admin only)
  */
 router.delete('/:id',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -360,7 +360,7 @@ router.delete('/:id',
  * @access  Private (Admin only)
  */
 router.post('/install',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {

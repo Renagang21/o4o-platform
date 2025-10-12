@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { MediaController } from '../../controllers/MediaController';
 import { MediaUploadController, upload } from '../../controllers/media/mediaUploadController';
 
@@ -7,7 +7,7 @@ const router: Router = Router();
 const mediaController = new MediaController();
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Logo/Media upload routes (for customizer)
 router.post('/upload', upload.single('file') as any, MediaUploadController.uploadMedia);

@@ -7,7 +7,8 @@ import { Router, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { BlockPattern } from '../entities/BlockPattern';
 import { User } from '../entities/User';
-import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
+import { AuthRequest } from '../types/auth';
 import { ILike } from 'typeorm';
 import logger from '../utils/logger';
 import { PAGINATION_DEFAULTS, BLOCK_DUPLICATE, BLOCK_PATTERN_CATEGORIES } from '../config/editor.constants';
@@ -248,7 +249,7 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
  * POST /api/block-patterns
  * Create a new block pattern
  */
-router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const {
@@ -347,7 +348,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
  * PUT /api/block-patterns/:id
  * Update a block pattern
  */
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -452,7 +453,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
  * DELETE /api/block-patterns/:id
  * Delete a block pattern
  */
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -495,7 +496,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
  * POST /api/block-patterns/:id/duplicate
  * Duplicate a block pattern
  */
-router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/:id/duplicate', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;

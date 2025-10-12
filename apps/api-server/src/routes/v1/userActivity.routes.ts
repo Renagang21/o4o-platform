@@ -1,17 +1,17 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { UserActivityController } from '../../controllers/v1/userActivity.controller';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 
 const router: Router = Router();
 
 // User activity log routes
-router.get('/:id/activity-log', authenticateToken, UserActivityController.getUserActivityLog);
-router.post('/:id/activity-log', authenticateToken, UserActivityController.createUserActivity);
-router.get('/:id/activity-summary', authenticateToken, UserActivityController.getActivitySummary);
+router.get('/:id/activity-log', authenticate, UserActivityController.getUserActivityLog);
+router.post('/:id/activity-log', authenticate, UserActivityController.createUserActivity);
+router.get('/:id/activity-summary', authenticate, UserActivityController.getActivitySummary);
 
 // Activity metadata routes
-router.get('/activity-categories', authenticateToken, UserActivityController.getActivityCategories);
-router.get('/activity-types', authenticateToken, UserActivityController.getActivityTypes);
+router.get('/activity-categories', authenticate, UserActivityController.getActivityCategories);
+router.get('/activity-types', authenticate, UserActivityController.getActivityTypes);
 
 export default router;

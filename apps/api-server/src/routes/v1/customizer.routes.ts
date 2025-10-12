@@ -4,7 +4,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAdmin } from '../../middleware/permission.middleware';
 import { SettingsService } from '../../services/settingsService';
 import {
@@ -114,7 +114,7 @@ router.get('/scroll-to-top', async (req: Request, res: Response) => {
  */
 router.put(
   '/scroll-to-top',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -210,7 +210,7 @@ router.get('/button-settings', async (req: Request, res: Response) => {
  */
 router.put(
   '/button-settings',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {
@@ -306,7 +306,7 @@ router.get('/breadcrumbs-settings', async (req: Request, res: Response) => {
  */
 router.put(
   '/breadcrumbs-settings',
-  authenticateToken,
+  authenticate,
   requireAdmin,
   async (req: Request, res: Response) => {
     try {

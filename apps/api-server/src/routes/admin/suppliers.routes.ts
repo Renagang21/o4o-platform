@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AdminSupplierController } from '../../controllers/admin/AdminSupplierController';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth.middleware';
 import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
 import { UserRole } from '../../entities/User';
 import { body } from 'express-validator';
@@ -9,7 +9,7 @@ const router: Router = Router();
 const adminSupplierController = new AdminSupplierController();
 
 // All admin supplier routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
 // Supplier management routes (admin/manager only)
 router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSuppliers);

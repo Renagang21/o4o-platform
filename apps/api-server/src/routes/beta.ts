@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import { 
   betaUserController, 
   betaUserRegistrationValidation, 
@@ -47,7 +47,7 @@ router.post('/feedback',
  * @access Admin/Manager
  */
 router.get('/users', 
-  authenticateToken,
+  authenticate,
   betaUserController.getBetaUsers.bind(betaUserController)
 );
 
@@ -57,7 +57,7 @@ router.get('/users',
  * @access Admin/Manager
  */
 router.get('/users/:id', 
-  authenticateToken,
+  authenticate,
   betaUserController.getBetaUserById.bind(betaUserController)
 );
 
@@ -67,7 +67,7 @@ router.get('/users/:id',
  * @access Admin
  */
 router.put('/users/:id/approve', 
-  authenticateToken,
+  authenticate,
   betaUserController.approveBetaUser.bind(betaUserController)
 );
 
@@ -77,7 +77,7 @@ router.put('/users/:id/approve',
  * @access Admin/Manager
  */
 router.put('/users/:id/status', 
-  authenticateToken,
+  authenticate,
   betaUserController.updateBetaUserStatus.bind(betaUserController)
 );
 
@@ -89,7 +89,7 @@ router.put('/users/:id/status',
  * @access Admin/Manager
  */
 router.get('/feedback-admin', 
-  authenticateToken,
+  authenticate,
   betaUserController.getFeedback.bind(betaUserController)
 );
 
@@ -99,7 +99,7 @@ router.get('/feedback-admin',
  * @access Admin/Manager
  */
 router.get('/feedback-admin/:id', 
-  authenticateToken,
+  authenticate,
   betaUserController.getFeedbackById.bind(betaUserController)
 );
 
@@ -109,7 +109,7 @@ router.get('/feedback-admin/:id',
  * @access Admin/Manager
  */
 router.put('/feedback-admin/:id/assign', 
-  authenticateToken,
+  authenticate,
   betaUserController.assignFeedback.bind(betaUserController)
 );
 
@@ -119,7 +119,7 @@ router.put('/feedback-admin/:id/assign',
  * @access Admin/Manager
  */
 router.put('/feedback-admin/:id/respond', 
-  authenticateToken,
+  authenticate,
   betaUserController.respondToFeedback.bind(betaUserController)
 );
 
@@ -129,7 +129,7 @@ router.put('/feedback-admin/:id/respond',
  * @access Admin/Manager
  */
 router.put('/feedback-admin/:id/status', 
-  authenticateToken,
+  authenticate,
   betaUserController.updateFeedbackStatus.bind(betaUserController)
 );
 
@@ -139,7 +139,7 @@ router.put('/feedback-admin/:id/status',
  * @access Admin/Manager
  */
 router.put('/feedback-admin/:id/priority', 
-  authenticateToken,
+  authenticate,
   betaUserController.updateFeedbackPriority.bind(betaUserController)
 );
 
@@ -151,7 +151,7 @@ router.put('/feedback-admin/:id/priority',
  * @access Admin
  */
 router.get('/analytics', 
-  authenticateToken,
+  authenticate,
   betaUserController.getBetaAnalytics.bind(betaUserController)
 );
 
@@ -161,7 +161,7 @@ router.get('/analytics',
  * @access Admin/Manager
  */
 router.get('/feedback-admin/high-priority', 
-  authenticateToken,
+  authenticate,
   betaUserController.getHighPriorityFeedback.bind(betaUserController)
 );
 
@@ -171,7 +171,7 @@ router.get('/feedback-admin/high-priority',
  * @access Admin/Manager
  */
 router.get('/feedback-admin/unassigned', 
-  authenticateToken,
+  authenticate,
   betaUserController.getUnassignedFeedback.bind(betaUserController)
 );
 
@@ -183,7 +183,7 @@ router.get('/feedback-admin/unassigned',
  * @access Admin/Manager
  */
 router.post('/conversations', 
-  authenticateToken,
+  authenticate,
   betaUserController.createConversation.bind(betaUserController)
 );
 
@@ -193,7 +193,7 @@ router.post('/conversations',
  * @access Admin/Manager/BetaUser
  */
 router.get('/conversations/:id', 
-  authenticateToken,
+  authenticate,
   betaUserController.getConversation.bind(betaUserController)
 );
 
@@ -203,7 +203,7 @@ router.get('/conversations/:id',
  * @access Admin/Manager/BetaUser
  */
 router.post('/conversations/:id/messages', 
-  authenticateToken,
+  authenticate,
   betaUserController.sendMessage.bind(betaUserController)
 );
 
@@ -213,7 +213,7 @@ router.post('/conversations/:id/messages',
  * @access Admin/Manager
  */
 router.put('/conversations/:id/status', 
-  authenticateToken,
+  authenticate,
   betaUserController.updateConversationStatus.bind(betaUserController)
 );
 
@@ -223,7 +223,7 @@ router.put('/conversations/:id/status',
  * @access Admin/Manager
  */
 router.get('/conversations/user/:betaUserId', 
-  authenticateToken,
+  authenticate,
   betaUserController.getUserConversations.bind(betaUserController)
 );
 
@@ -244,7 +244,7 @@ router.put('/feedback/:id/start-live-support',
  * @access Admin/Manager
  */
 router.put('/feedback-admin/:id/mark-viewed', 
-  authenticateToken,
+  authenticate,
   betaUserController.markFeedbackViewed.bind(betaUserController)
 );
 
@@ -254,7 +254,7 @@ router.put('/feedback-admin/:id/mark-viewed',
  * @access Admin
  */
 router.get('/realtime/stats', 
-  authenticateToken,
+  authenticate,
   betaUserController.getRealtimeStats.bind(betaUserController)
 );
 
@@ -264,7 +264,7 @@ router.get('/realtime/stats',
  * @access Admin/Manager
  */
 router.get('/notifications/pending', 
-  authenticateToken,
+  authenticate,
   betaUserController.getPendingNotifications.bind(betaUserController)
 );
 
