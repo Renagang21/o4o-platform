@@ -67,7 +67,9 @@ import { Partner } from '../entities/Partner';
 import { SellerProduct } from '../entities/SellerProduct';
 import { PartnerCommission } from '../entities/PartnerCommission';
 import { BusinessInfo } from '../entities/BusinessInfo';
-
+// Form entities
+import { Form } from '../entities/Form';
+import { FormSubmission } from '../entities/FormSubmission';
 
 import { env } from '../utils/env-validator';
 
@@ -199,6 +201,9 @@ export const AppDataSource = new DataSource({
     SellerProduct,
     PartnerCommission,
     BusinessInfo,
+    // Form entities
+    Form,
+    FormSubmission,
   ],
   
   // 마이그레이션 설정

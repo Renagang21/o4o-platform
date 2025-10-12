@@ -77,7 +77,12 @@ export default function FieldGroupsList() {
     queryKey: ['field-groups'],
     queryFn: async () => {
       const response = await fieldGroupApi.getAll();
-      return response.data || [];
+      const data = response.data;
+      // Ensure we always return an array
+      if (Array.isArray(data)) {
+        return data;
+      }
+      return [];
     }
   });
 
@@ -92,6 +97,10 @@ export default function FieldGroupsList() {
 
   // Filter field groups
   const filteredGroups = useMemo(() => {
+    // Ensure fieldGroups is an array before filtering
+    if (!Array.isArray(fieldGroups)) {
+      return [];
+    }
     return fieldGroups.filter(group => {
       const matchesSearch = group.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            group.description?.toLowerCase().includes(searchTerm.toLowerCase());

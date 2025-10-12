@@ -179,18 +179,18 @@ export default function PerformanceDashboard() {
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
               <CardTitle className="text-sm font-medium">CPU Usage</CardTitle>
-              <Cpu className={`w-4 h-4 ${getStatusColor(metrics.cpu.usage)}`} />
+              <Cpu className={`w-4 h-4 ${getStatusColor(metrics.cpu?.usage ?? 0)}`} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.cpu.usage.toFixed(1)}%</div>
-            <Progress 
-              value={metrics.cpu.usage} 
-              className={`mt-2 h-2 ${getProgressColor(metrics.cpu.usage)}`}
+            <div className="text-2xl font-bold">{(metrics.cpu?.usage ?? 0).toFixed(1)}%</div>
+            <Progress
+              value={metrics.cpu?.usage ?? 0}
+              className={`mt-2 h-2 ${getProgressColor(metrics.cpu?.usage ?? 0)}`}
             />
-            {metrics.cpu.loadAverage && Array.isArray(metrics.cpu.loadAverage) && (
+            {metrics.cpu?.loadAverage && Array.isArray(metrics.cpu.loadAverage) && (
               <p className="text-xs text-gray-500 mt-2">
-                Load: {metrics.cpu.loadAverage.map((l: number) => l.toFixed(2)).join(', ')}
+                Load: {metrics.cpu.loadAverage.map((l: number) => (l ?? 0).toFixed(2)).join(', ')}
               </p>
             )}
           </CardContent>
@@ -201,17 +201,17 @@ export default function PerformanceDashboard() {
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
               <CardTitle className="text-sm font-medium">Memory Usage</CardTitle>
-              <MemoryStick className={`w-4 h-4 ${getStatusColor(metrics.memory.percentage)}`} />
+              <MemoryStick className={`w-4 h-4 ${getStatusColor(metrics.memory?.percentage ?? 0)}`} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.memory.percentage.toFixed(1)}%</div>
-            <Progress 
-              value={metrics.memory.percentage} 
-              className={`mt-2 h-2 ${getProgressColor(metrics.memory.percentage)}`}
+            <div className="text-2xl font-bold">{(metrics.memory?.percentage ?? 0).toFixed(1)}%</div>
+            <Progress
+              value={metrics.memory?.percentage ?? 0}
+              className={`mt-2 h-2 ${getProgressColor(metrics.memory?.percentage ?? 0)}`}
             />
             <p className="text-xs text-gray-500 mt-2">
-              {formatBytes(metrics.memory.used)} / {formatBytes(metrics.memory.total)}
+              {formatBytes(metrics.memory?.used ?? 0)} / {formatBytes(metrics.memory?.total ?? 0)}
             </p>
           </CardContent>
         </Card>
@@ -221,17 +221,17 @@ export default function PerformanceDashboard() {
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
               <CardTitle className="text-sm font-medium">Disk Usage</CardTitle>
-              <HardDrive className={`w-4 h-4 ${getStatusColor(metrics.disk.percentage)}`} />
+              <HardDrive className={`w-4 h-4 ${getStatusColor(metrics.disk?.percentage ?? 0)}`} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.disk.percentage.toFixed(1)}%</div>
-            <Progress 
-              value={metrics.disk.percentage} 
-              className={`mt-2 h-2 ${getProgressColor(metrics.disk.percentage)}`}
+            <div className="text-2xl font-bold">{(metrics.disk?.percentage ?? 0).toFixed(1)}%</div>
+            <Progress
+              value={metrics.disk?.percentage ?? 0}
+              className={`mt-2 h-2 ${getProgressColor(metrics.disk?.percentage ?? 0)}`}
             />
             <p className="text-xs text-gray-500 mt-2">
-              {formatBytes(metrics.disk.used)} / {formatBytes(metrics.disk.total)}
+              {formatBytes(metrics.disk?.used ?? 0)} / {formatBytes(metrics.disk?.total ?? 0)}
             </p>
           </CardContent>
         </Card>
@@ -245,10 +245,10 @@ export default function PerformanceDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.api.averageResponseTime}ms</div>
+            <div className="text-2xl font-bold">{metrics.api?.averageResponseTime ?? 0}ms</div>
             <div className="flex justify-between text-xs text-gray-500 mt-2">
-              <span>{metrics.api.requestsPerMinute} req/min</span>
-              <span>{metrics.api.errorRate.toFixed(2)}% errors</span>
+              <span>{metrics.api?.requestsPerMinute ?? 0} req/min</span>
+              <span>{(metrics.api?.errorRate ?? 0).toFixed(2)}% errors</span>
             </div>
           </CardContent>
         </Card>
@@ -312,15 +312,15 @@ export default function PerformanceDashboard() {
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">Used Memory:</span>
-                    <span className="ml-2 font-medium">{formatBytes(metrics.memory.used)}</span>
+                    <span className="ml-2 font-medium">{formatBytes(metrics.memory?.used ?? 0)}</span>
                   </div>
                   <div>
                     <span className="text-gray-500">Free Memory:</span>
-                    <span className="ml-2 font-medium">{formatBytes(metrics.memory.free)}</span>
+                    <span className="ml-2 font-medium">{formatBytes(metrics.memory?.free ?? 0)}</span>
                   </div>
                   <div className="col-span-2">
                     <span className="text-gray-500">Usage:</span>
-                    <span className="ml-2 font-medium">{metrics.memory.percentage.toFixed(1)}%</span>
+                    <span className="ml-2 font-medium">{(metrics.memory?.percentage ?? 0).toFixed(1)}%</span>
                   </div>
                 </div>
               </CardContent>
@@ -494,7 +494,7 @@ export default function PerformanceDashboard() {
                 <CardTitle>Error Rate</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{metrics.api.errorRate.toFixed(2)}%</div>
+                <div className="text-3xl font-bold">{(metrics.api?.errorRate ?? 0).toFixed(2)}%</div>
                 <p className="text-sm text-gray-500">of all requests</p>
                 <div className="flex items-center gap-2 mt-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />

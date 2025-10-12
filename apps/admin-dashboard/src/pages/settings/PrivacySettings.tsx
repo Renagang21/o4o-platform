@@ -159,7 +159,20 @@ const PrivacySettings: React.FC = () => {
     try {
       const response = await authClient.api.get('/settings/privacy');
       if (response.data?.data) {
-        setSettings(response.data.data);
+        // Merge API data with default settings to ensure all properties exist
+        setSettings(prev => ({
+          ...prev,
+          ...response.data.data,
+          gdpr: { ...prev.gdpr, ...response.data.data.gdpr },
+          cookies: { ...prev.cookies, ...response.data.data.cookies },
+          retentionPeriod: { ...prev.retentionPeriod, ...response.data.data.retentionPeriod },
+          dataHandling: { ...prev.dataHandling, ...response.data.data.dataHandling },
+          thirdPartyServices: {
+            googleAnalytics: { ...prev.thirdPartyServices.googleAnalytics, ...response.data.data.thirdPartyServices?.googleAnalytics },
+            facebook: { ...prev.thirdPartyServices.facebook, ...response.data.data.thirdPartyServices?.facebook },
+            mailchimp: { ...prev.thirdPartyServices.mailchimp, ...response.data.data.thirdPartyServices?.mailchimp }
+          }
+        }));
       }
     } catch (error: any) {
       // Using default settings on error

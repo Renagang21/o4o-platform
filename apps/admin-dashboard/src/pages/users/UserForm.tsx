@@ -61,12 +61,16 @@ export default function UserForm() {
         setLoadingRoles(true);
         const response = await fetch('https://api.neture.co.kr/api/v1/users/roles');
         const data = await response.json();
-        if (data.success) {
+        if (data.success && Array.isArray(data.data)) {
           setRoles(data.data);
+        } else {
+          console.warn('Invalid roles data format:', data);
+          setRoles([]);
         }
       } catch (error) {
         console.error('Failed to fetch roles:', error);
         toast.error('Failed to load roles');
+        setRoles([]);
       } finally {
         setLoadingRoles(false);
       }
