@@ -17,6 +17,7 @@ import Columns from './blocks/Columns';
 import Column from './blocks/Column';
 import { AccountModule } from './blocks/AccountModule';
 import { CartModule } from './blocks/CartModule';
+import Button from './blocks/Button';
 import { TextWidget } from './blocks/footer/TextWidget';
 import { HTMLWidget } from './blocks/footer/HTMLWidget';
 import { MenuWidget } from './blocks/footer/MenuWidget';
@@ -37,6 +38,7 @@ const blockComponents: Record<string, FC<any>> = {
   'core/social-links': SocialLinks,
   'o4o/account-menu': AccountModule,
   'o4o/cart-icon': CartModule,
+  'o4o/button': Button,
   'o4o/text-widget': TextWidget,
   'o4o/html-widget': HTMLWidget,
   'o4o/menu-widget': MenuWidget,
