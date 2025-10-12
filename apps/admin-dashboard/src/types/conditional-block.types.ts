@@ -210,16 +210,3 @@ export interface ConditionBuilderState {
   logicOperator: LogicOperator;
   showWhenMet: boolean;
 }
-
-// ============================================
-// Export Types
-// ============================================
-
-export type {
-  Condition,
-  ConditionGroup,
-  ConditionalBlockData,
-  EvaluationContext,
-  ConditionTypeDefinition,
-  ConditionBuilderState,
-};

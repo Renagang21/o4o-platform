@@ -27,6 +27,7 @@ import buttonBlockDefinition from './definitions/button';
 import columnsBlockDefinition from './definitions/columns';
 import columnBlockDefinition from './definitions/column';
 import groupBlockDefinition from './definitions/group';
+import conditionalBlockDefinition from './definitions/conditional';
 
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
@@ -67,6 +68,7 @@ export function registerAllBlocks(): void {
   blockRegistry.register(columnsBlockDefinition);
   blockRegistry.register(columnBlockDefinition);
   blockRegistry.register(groupBlockDefinition);
+  blockRegistry.register(conditionalBlockDefinition);
 
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
@@ -178,5 +180,6 @@ export function initializeCustomBlocks() {
 // Export block names for use in allowed blocks lists
 export const CUSTOM_BLOCKS = [
   'core/group',
-  'core/columns'
+  'core/columns',
+  'o4o/conditional'
 ];
