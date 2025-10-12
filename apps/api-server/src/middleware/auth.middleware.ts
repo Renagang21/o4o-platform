@@ -31,7 +31,7 @@ export const authenticate = async (
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({
       where: { id: decoded.userId || decoded.sub },
-      relations: ['linkedAccounts']
+      relations: ['linkedAccounts', 'dbRoles', 'dbRoles.permissions']
     });
 
     if (!user) {
