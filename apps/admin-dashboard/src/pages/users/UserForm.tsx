@@ -151,17 +151,6 @@ export default function UserForm() {
     }
   };
 
-  const roles = [
-    { value: 'super_admin', label: 'Super Admin', description: 'Full system access' },
-    { value: 'admin', label: 'Admin', description: 'Administrative access' },
-    { value: 'vendor', label: 'Vendor', description: 'Vendor/supplier access' },
-    { value: 'seller', label: 'Seller', description: 'Can sell products' },
-    { value: 'customer', label: 'Customer', description: 'Regular user' },
-    { value: 'business', label: 'Business', description: 'Business account' },
-    { value: 'moderator', label: 'Moderator', description: 'Content moderation' },
-    { value: 'partner', label: 'Partner', description: 'Partner access' },
-  ];
-
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -271,25 +260,35 @@ export default function UserForm() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {roles.map((role) => (
-                    <div
-                      key={role.value}
-                      className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleRoleToggle(role.value)}
-                    >
-                      <Checkbox
-                        checked={selectedRoles?.includes(role.value) || false}
-                        onCheckedChange={() => handleRoleToggle(role.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium">{role.label}</div>
-                        <div className="text-sm text-gray-600">{role.description}</div>
+                {loadingRoles ? (
+                  <div className="flex items-center justify-center py-8 text-gray-500">
+                    Loading roles...
+                  </div>
+                ) : roles.length === 0 ? (
+                  <div className="flex items-center justify-center py-8 text-gray-500">
+                    No roles available
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {roles.map((role) => (
+                      <div
+                        key={role.value}
+                        className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                        onClick={() => handleRoleToggle(role.value)}
+                      >
+                        <Checkbox
+                          checked={selectedRoles?.includes(role.value) || false}
+                          onCheckedChange={() => handleRoleToggle(role.value)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">{role.label}</div>
+                          <div className="text-sm text-gray-600">{role.description}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
                 {errors.roles && (
                   <p className="text-sm text-red-500 mt-2">{errors.roles.message}</p>
                 )}
