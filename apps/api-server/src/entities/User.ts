@@ -211,6 +211,8 @@ export class User {
         'users.view', 'users.create', 'users.edit', 'users.delete', 'users.suspend', 'users.approve',
         // Content
         'content.view', 'content.create', 'content.edit', 'content.delete', 'content.publish', 'content.moderate',
+        // Categories & Tags
+        'categories:write', 'categories:read', 'tags:write', 'tags:read',
         // Admin
         'admin.settings', 'admin.analytics', 'admin.logs', 'admin.backup',
         // ACF

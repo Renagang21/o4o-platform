@@ -49,11 +49,15 @@ const PostPreview: React.FC = () => {
             return;
           }
           let blocks: Block[] = [];
-          
-          if (post.content) {
+
+          // Extract title and content from WordPress-compatible format
+          const title = post.title?.rendered || post.title || 'Untitled Post';
+          const contentData = post.content?.rendered || post.content || '';
+
+          if (contentData) {
             try {
-              const parsed = JSON.parse(post.content);
-              
+              const parsed = JSON.parse(contentData);
+
               // Handle different possible formats
               if (Array.isArray(parsed)) {
                 blocks = parsed;
@@ -62,17 +66,17 @@ const PostPreview: React.FC = () => {
               } else if (parsed && typeof parsed === 'object') {
                 blocks = [parsed];
               }
-              
+
               // Ensure all blocks have required properties
               blocks = blocks.filter(block => block && typeof block === 'object' && block.type);
-              
+
             } catch (error) {
               blocks = [];
             }
           }
-          
+
           setContent({
-            title: post.title || 'Untitled Post',
+            title: title,
             blocks: blocks,
             postId: post.id,
             status: post.status

@@ -100,11 +100,11 @@ const MediaListWordPress: React.FC = () => {
     // Use non-blocking confirmation
     const shouldDelete = window.confirm('Delete this media permanently?');
     if (!shouldDelete) return;
-    
+
     // Find the item to delete for potential restoration
     const itemToDelete = media.find(m => m.id === id);
     if (!itemToDelete) return;
-    
+
     // Optimistically remove from UI immediately for better perceived performance
     setMedia(prev => prev.filter(m => m.id !== id));
     

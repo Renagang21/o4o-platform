@@ -310,38 +310,39 @@ export function hasMenuPermission(
   menuId: string
 ): boolean {
   const menuConfig = menuPermissions.find(m => m.menuId === menuId);
-  
+
   if (!menuConfig) {
-    // Menu not found in configuration - deny by default
-    return false;
+    // Menu not found in configuration - allow by default for backward compatibility
+    // This allows all menus to be visible unless explicitly restricted
+    return true;
   }
-  
+
   // If no roles or permissions specified, allow all authenticated users
   if (!menuConfig.roles?.length && !menuConfig.permissions?.length) {
     return true;
   }
-  
+
   // Check role-based access
   if (menuConfig.roles?.length) {
     const hasRole = menuConfig.roles.some(role => userRoles.includes(role));
     if (hasRole) return true;
   }
-  
+
   // Check permission-based access
   if (menuConfig.permissions?.length) {
     if (menuConfig.requireAll) {
       // Requires all permissions
-      return menuConfig.permissions.every(permission => 
+      return menuConfig.permissions.every(permission =>
         userPermissions.includes(permission)
       );
     } else {
       // Requires at least one permission
-      return menuConfig.permissions.some(permission => 
+      return menuConfig.permissions.some(permission =>
         userPermissions.includes(permission)
       );
     }
   }
-  
+
   return false;
 }
 
