@@ -42,11 +42,8 @@ export const authenticate = async (
       });
     }
 
-    // Attach user to request
-    req.user = {
-      ...user,
-      userId: user.id
-    } as any;
+    // Attach user to request (preserve User instance methods)
+    req.user = user as any;
     next();
   } catch (error) {
     return res.status(403).json({
