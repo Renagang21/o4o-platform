@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig(mergeConfig(sharedViteConfig, {
+  base: '/shop/',
   server: {
     port: 3002,
     host: true

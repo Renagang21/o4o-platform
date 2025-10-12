@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig(mergeConfig(sharedViteConfig, {
+  base: '/funding/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

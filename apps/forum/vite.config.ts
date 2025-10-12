@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = resolve(fileURLToPath(import.meta.url), '..');
 
 export default defineConfig(mergeConfig(sharedViteConfig, {
+  base: '/forum/',
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
