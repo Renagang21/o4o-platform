@@ -81,11 +81,13 @@ export default function RoleManagement() {
       ]);
 
       if (rolesResponse.data.success) {
-        setRoles(rolesResponse.data.data);
+        const rolesData = rolesResponse.data.data;
+        setRoles(Array.isArray(rolesData) ? rolesData : []);
       }
 
       if (permissionsResponse.data.success) {
-        setPermissions(permissionsResponse.data.data);
+        const permissionsData = permissionsResponse.data.data;
+        setPermissions(Array.isArray(permissionsData) ? permissionsData : []);
       }
     } catch (error) {
       toast.error('Failed to load roles and permissions');
@@ -170,7 +172,7 @@ export default function RoleManagement() {
     }));
   };
 
-  const groupedPermissions = permissions.reduce((acc, permission) => {
+  const groupedPermissions = (Array.isArray(permissions) ? permissions : []).reduce((acc, permission) => {
     if (!acc[permission.category]) {
       acc[permission.category] = [];
     }
