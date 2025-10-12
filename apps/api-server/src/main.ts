@@ -626,10 +626,35 @@ app.use('/settings', settingsLimiter, settingsRoutes); // Backward compatibility
 // Note: Public routes (/api/public) should not have rate limiting
 // Non-existent routes should return 404, not 401
 
+// Lenient rate limiting for user permissions endpoint (frequently called on login)
+const userPermissionsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 500, // 최대 500 요청 (permissions는 자주 호출됨)
+  message: {
+    error: 'Too many permission requests from this IP',
+    code: 'RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    if (process.env.NODE_ENV === 'production') {
+      const forwarded = req.headers['x-forwarded-for'];
+      if (forwarded) {
+        return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
+      }
+    }
+    return req.ip || 'unknown';
+  },
+  skip: (req) => {
+    const ip = req.ip || '';
+    return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  }
+});
+
 // Protected API routes (with individual rate limiting)
 app.use('/api/users', limiter, userRoutes);
-app.use('/api/v1/users', limiter, usersV1Routes); // V1 user management routes with comprehensive functionality
-app.use('/v1/users', limiter, usersV1Routes); // V1 user management routes (backward compatibility)
+app.use('/api/v1/users', userPermissionsLimiter, usersV1Routes); // V1 user management routes - more lenient for permissions
+app.use('/v1/users', userPermissionsLimiter, usersV1Routes); // V1 user management routes (backward compatibility)
 app.use('/api/admin', limiter, adminRoutes);
 app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
 app.use('/api/cpt', limiter, cptRoutes);
