@@ -4,8 +4,6 @@ export class AddActiveRoleToUsers1749876543210 implements MigrationInterface {
   name = 'AddActiveRoleToUsers1749876543210';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    console.log('🔄 Adding active_role_id column to users table...');
-
     // Add active_role_id column
     await queryRunner.addColumn(
       'users',
@@ -34,10 +32,7 @@ export class AddActiveRoleToUsers1749876543210 implements MigrationInterface {
       CREATE INDEX "IDX_users_active_role_id" ON "users" ("active_role_id");
     `);
 
-    console.log('✅ active_role_id column added successfully');
-
     // Migrate existing user data
-    console.log('🔄 Migrating existing user data...');
 
     // Set active_role_id for users who have roles in user_roles table
     await queryRunner.query(`
@@ -54,28 +49,9 @@ export class AddActiveRoleToUsers1749876543210 implements MigrationInterface {
       );
     `);
 
-    // Count users with active_role_id set
-    const result = await queryRunner.query(`
-      SELECT COUNT(*) as count FROM users WHERE active_role_id IS NOT NULL;
-    `);
-
-    console.log(`✅ Set active_role_id for ${result[0].count} users`);
-
-    // Count users without active_role_id (should investigate these)
-    const nullResult = await queryRunner.query(`
-      SELECT COUNT(*) as count FROM users WHERE active_role_id IS NULL;
-    `);
-
-    if (parseInt(nullResult[0].count) > 0) {
-      console.warn(`⚠️  ${nullResult[0].count} users do not have active_role_id set`);
-    }
-
-    console.log('✅ Migration completed successfully');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    console.log('🔄 Rolling back active_role_id column...');
-
     // Drop foreign key
     await queryRunner.dropForeignKey('users', 'FK_users_active_role');
 
@@ -84,7 +60,5 @@ export class AddActiveRoleToUsers1749876543210 implements MigrationInterface {
 
     // Drop column
     await queryRunner.dropColumn('users', 'active_role_id');
-
-    console.log('✅ Rollback completed successfully');
   }
 }
