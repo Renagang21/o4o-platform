@@ -9,7 +9,7 @@ export const checkRole = (roles: string[]) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!roles.includes(authReq.user.role)) {
+    if (!authReq.user.hasAnyRole(roles)) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
 

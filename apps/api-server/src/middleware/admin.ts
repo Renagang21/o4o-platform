@@ -9,12 +9,11 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  // Check for admin roles
-  const adminRoles = [UserRole.ADMIN, UserRole.SUPER_ADMIN];
-  if (!adminRoles.includes(req.user.role as UserRole)) {
-    return res.status(403).json({ 
+  // Check for admin roles using database roles
+  if (!req.user.hasAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN])) {
+    return res.status(403).json({
       status: 'error',
-      message: 'Admin access required' 
+      message: 'Admin access required'
     });
   }
 

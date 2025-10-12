@@ -60,7 +60,7 @@ export class SignageService {
     }
 
     // Admin can access everything
-    if (user.role === 'admin') {
+    if (user.isAdmin()) {
       return content;
     }
 
@@ -75,7 +75,7 @@ export class SignageService {
     }
 
     // Customers can only access approved public content
-    if (user.role === 'customer' && content.status === 'approved' && content.isPublic) {
+    if (user.hasRole('customer') && content.status === 'approved' && content.isPublic) {
       return content;
     }
 
@@ -94,12 +94,12 @@ export class SignageService {
     }
 
     // Admin can access all stores
-    if (user.role === 'admin') {
+    if (user.isAdmin()) {
       return store;
     }
 
     // Manager can only access their own store
-    if (user.role === 'manager' && store.managerId === user.id) {
+    if (user.hasRole('manager') && store.managerId === user.id) {
       return store;
     }
 
@@ -171,15 +171,15 @@ export class SignageService {
     }
 
     // Admin can access all playlists
-    if (user.role === 'admin') {
+    if (user.isAdmin()) {
       return playlist;
     }
 
     // Await the store promise before accessing managerId
     const store = await playlist.store;
-    
+
     // Store manager can access their store's playlists
-    if (user.role === 'manager' && store.managerId === user.id) {
+    if (user.hasRole('manager') && store.managerId === user.id) {
       return playlist;
     }
 

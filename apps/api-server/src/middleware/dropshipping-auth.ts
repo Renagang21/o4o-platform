@@ -21,15 +21,12 @@ export const requireDropshippingRole = (allowedRoles: UserRole[]) => {
       });
     }
 
-    const userRoles = req.user.roles || [req.user.role];
-    const hasRequiredRole = allowedRoles.some(role => 
-      userRoles.includes(role) || req.user?.role === role
-    );
+    const hasRequiredRole = req.user.hasAnyRole(allowedRoles);
 
-    if (!hasRequiredRole && !userRoles.includes(UserRole.ADMIN) && !userRoles.includes(UserRole.SUPER_ADMIN)) {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Insufficient role permissions' 
+    if (!hasRequiredRole && !req.user.isAdmin()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Insufficient role permissions'
       });
     }
 
@@ -47,12 +44,10 @@ export const requirePermission = (permission: string) => {
       });
     }
 
-    const userRoles = req.user.roles || [req.user.role];
-    
-    if (!hasPermission(userRoles, permission)) {
-      return res.status(403).json({ 
-        success: false, 
-        message: `Permission denied: ${permission}` 
+    if (!req.user.hasPermission(permission)) {
+      return res.status(403).json({
+        success: false,
+        message: `Permission denied: ${permission}`
       });
     }
 
@@ -98,8 +93,7 @@ export const requireResourceOwner = (resourceIdParam: string = 'id') => {
     const userId = req.user.id;
 
     // Admins can access any resource
-    const userRoles = req.user.roles || [req.user.role];
-    if (userRoles.includes(UserRole.ADMIN) || userRoles.includes(UserRole.SUPER_ADMIN)) {
+    if (req.user.isAdmin()) {
       return next();
     }
 
@@ -123,7 +117,7 @@ export const validateRoleTransition = (req: AuthenticatedRequest, res: Response,
   }
 
   const requestedRole = req.body.role as UserRole;
-  const currentRoles = req.user.roles || [req.user.role];
+  const currentRoles = req.user.getRoleNames();
 
   // Define allowed transitions
   const allowedTransitions: any = {
@@ -168,7 +162,7 @@ export const validateRoleTransition = (req: AuthenticatedRequest, res: Response,
   }
 
   // Admins can approve any transition
-  if (currentRoles.includes(UserRole.ADMIN) || currentRoles.includes(UserRole.SUPER_ADMIN)) {
+  if (req.user.isAdmin()) {
     canTransition = true;
   }
 
@@ -188,8 +182,8 @@ export const roleBasedRateLimit = (req: AuthenticatedRequest, res: Response, nex
     return next();
   }
 
-  const userRoles = req.user.roles || [req.user.role];
-  
+  const userRoles = req.user.getRoleNames();
+
   // Different rate limits for different roles
   const rateLimits: Record<string, number> = {
     [UserRole.CUSTOMER]: 100,
