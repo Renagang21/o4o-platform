@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken as authMiddleware, requireRole } from '../middleware/auth';
+import { authenticateToken as authMiddleware } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error-handler';
 import { ServiceUnavailableError } from '../utils/api-error';
 // import { InventoryController } from '../controllers/inventory/inventoryController';

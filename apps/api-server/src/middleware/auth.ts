@@ -240,3 +240,6 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
 
 // Export authenticateToken as authenticate for compatibility
 export const authenticate = authenticateToken;
+
+// Export authenticateToken as authenticateCookie for auth-v2 compatibility
+export const authenticateCookie = authenticateToken;

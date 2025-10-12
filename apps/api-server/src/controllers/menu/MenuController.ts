@@ -58,10 +58,18 @@ export class MenuController {
     try {
       const { id } = req.params;
 
-      // Try to find menu by ID first
-      let menu = await menuService.findMenuById(id);
+      // UUID validation regex
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isUuid = uuidRegex.test(id);
 
-      // If not found by ID, try to find by slug
+      let menu = null;
+
+      // Try to find menu by ID first (only if it's a valid UUID)
+      if (isUuid) {
+        menu = await menuService.findMenuById(id);
+      }
+
+      // If not found by ID or not a UUID, try to find by slug
       if (!menu) {
         try {
           const menuData = await menuService.getMenuBySlug(id);

@@ -9,7 +9,7 @@ import { UserService } from '../services/UserService';
 import { RefreshTokenService } from '../services/RefreshTokenService';
 import { SessionSyncService } from '../services/sessionSyncService';
 import { PasswordResetService } from '../services/passwordResetService';
-import { authenticateCookie, AuthRequest } from '../middleware/auth-v2';
+import { authenticateCookie, AuthRequest } from '../middleware/auth';
 
 const router: Router = Router();
 

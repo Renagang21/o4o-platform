@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { analyticsController } from '../controllers/analyticsController';
 import { analyticsMiddleware } from '../middleware/analyticsMiddleware';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router: Router = Router();
 
 // Apply authentication middleware to all routes
-router.use(authMiddleware.verifyToken);
+router.use(authenticate);
 
 // Apply analytics tracking middleware
 router.use(analyticsMiddleware.initializeTracking());
