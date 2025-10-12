@@ -357,30 +357,38 @@ function generateSidebarCSS(settings: AstraCustomizerSettings): string[] {
 function generateBlogCSS(settings: AstraCustomizerSettings): string[] {
   const css: string[] = [];
   const { blog } = settings;
-  
+
+  // Safety check - if blog settings are incomplete, return empty CSS
+  if (!blog?.archive?.styling) {
+    return css;
+  }
+
+  const { archive } = blog;
+  const { styling, meta } = archive;
+
   // CSS Variables for blog styling
   css.push(':root {');
-  css.push(`  --blog-card-spacing: ${blog.archive.cardSpacing}px;`);
-  css.push(`  --blog-card-bg: ${blog.archive.styling.backgroundColor};`);
-  css.push(`  --blog-card-border: ${blog.archive.styling.borderColor};`);
-  css.push(`  --blog-card-border-radius: ${blog.archive.styling.borderRadius}px;`);
-  css.push(`  --blog-card-padding: ${blog.archive.styling.cardPadding}px;`);
-  css.push(`  --blog-title-color: ${blog.archive.styling.titleColor};`);
-  css.push(`  --blog-title-hover-color: ${blog.archive.styling.titleHoverColor};`);
-  css.push(`  --blog-excerpt-color: ${blog.archive.styling.excerptColor};`);
-  css.push(`  --blog-meta-text-color: ${blog.archive.meta.colors.text};`);
-  css.push(`  --blog-meta-link-color: ${blog.archive.meta.colors.links};`);
-  css.push(`  --blog-meta-icon-color: ${blog.archive.meta.colors.icons};`);
-  css.push(`  --blog-title-size-desktop: ${blog.archive.styling.typography.titleSize.desktop}px;`);
-  css.push(`  --blog-title-size-tablet: ${blog.archive.styling.typography.titleSize.tablet}px;`);
-  css.push(`  --blog-title-size-mobile: ${blog.archive.styling.typography.titleSize.mobile}px;`);
-  css.push(`  --blog-title-weight: ${blog.archive.styling.typography.titleWeight};`);
-  css.push(`  --blog-excerpt-size-desktop: ${blog.archive.styling.typography.excerptSize.desktop}px;`);
-  css.push(`  --blog-excerpt-size-tablet: ${blog.archive.styling.typography.excerptSize.tablet}px;`);
-  css.push(`  --blog-excerpt-size-mobile: ${blog.archive.styling.typography.excerptSize.mobile}px;`);
-  css.push(`  --blog-meta-size-desktop: ${blog.archive.styling.typography.metaSize.desktop}px;`);
-  css.push(`  --blog-meta-size-tablet: ${blog.archive.styling.typography.metaSize.tablet}px;`);
-  css.push(`  --blog-meta-size-mobile: ${blog.archive.styling.typography.metaSize.mobile}px;`);
+  css.push(`  --blog-card-spacing: ${archive.cardSpacing || 20}px;`);
+  css.push(`  --blog-card-bg: ${styling.backgroundColor || '#ffffff'};`);
+  css.push(`  --blog-card-border: ${styling.borderColor || '#e1e5e9'};`);
+  css.push(`  --blog-card-border-radius: ${styling.borderRadius || 8}px;`);
+  css.push(`  --blog-card-padding: ${styling.cardPadding || 20}px;`);
+  css.push(`  --blog-title-color: ${styling.titleColor || '#333333'};`);
+  css.push(`  --blog-title-hover-color: ${styling.titleHoverColor || '#0073e6'};`);
+  css.push(`  --blog-excerpt-color: ${styling.excerptColor || '#6c757d'};`);
+  css.push(`  --blog-meta-text-color: ${meta?.colors?.text || '#6c757d'};`);
+  css.push(`  --blog-meta-link-color: ${meta?.colors?.links || '#0073e6'};`);
+  css.push(`  --blog-meta-icon-color: ${meta?.colors?.icons || '#6c757d'};`);
+  css.push(`  --blog-title-size-desktop: ${styling.typography?.titleSize?.desktop || 20}px;`);
+  css.push(`  --blog-title-size-tablet: ${styling.typography?.titleSize?.tablet || 18}px;`);
+  css.push(`  --blog-title-size-mobile: ${styling.typography?.titleSize?.mobile || 16}px;`);
+  css.push(`  --blog-title-weight: ${styling.typography?.titleWeight || 600};`);
+  css.push(`  --blog-excerpt-size-desktop: ${styling.typography?.excerptSize?.desktop || 14}px;`);
+  css.push(`  --blog-excerpt-size-tablet: ${styling.typography?.excerptSize?.tablet || 13}px;`);
+  css.push(`  --blog-excerpt-size-mobile: ${styling.typography?.excerptSize?.mobile || 12}px;`);
+  css.push(`  --blog-meta-size-desktop: ${styling.typography?.metaSize?.desktop || 12}px;`);
+  css.push(`  --blog-meta-size-tablet: ${styling.typography?.metaSize?.tablet || 11}px;`);
+  css.push(`  --blog-meta-size-mobile: ${styling.typography?.metaSize?.mobile || 10}px;`);
   css.push('}');
   
   // Blog Archive Container
