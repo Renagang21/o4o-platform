@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import HamburgerMenu from '../layout/HamburgerMenu';
+import { useMenu } from '../../hooks/useMenu';
 
 interface MenuItem {
   id: string;
@@ -12,16 +13,19 @@ interface MenuItem {
 }
 
 interface NavigationProps {
-  menuRef?: string; // Menu reference/slug (renamed from ref to avoid React conflict)
+  menuRef?: string; // Menu location key (e.g., 'primary', 'shop-categories')
   orientation?: 'horizontal' | 'vertical';
   showSubmenuIcon?: boolean;
   className?: string;
-  menuItems?: MenuItem[];
+  menuItems?: MenuItem[]; // Legacy support - will be deprecated
   data?: {
     menuRef?: string;
+    menuLocation?: string; // Alternative to menuRef
     orientation?: 'horizontal' | 'vertical';
     showSubmenuIcon?: boolean;
   };
+  subdomain?: string | null;
+  path?: string;
 }
 
 const Navigation: FC<NavigationProps> = ({
@@ -29,14 +33,45 @@ const Navigation: FC<NavigationProps> = ({
   orientation,
   showSubmenuIcon,
   className = '',
-  menuItems: propMenuItems = [],
-  data
+  menuItems: propMenuItems,
+  data,
+  subdomain,
+  path
 }) => {
   // Extract values from props or data object (from TemplatePartRenderer)
-  const finalMenuRef = data?.menuRef || menuRef || 'primary-menu';
+  const finalMenuRef = data?.menuLocation || data?.menuRef || menuRef || 'primary';
   const finalOrientation = data?.orientation || orientation || 'horizontal';
   const finalShowSubmenuIcon = data?.showSubmenuIcon !== undefined ? data.showSubmenuIcon : (showSubmenuIcon ?? true);
-  const menuItems = propMenuItems;
+
+  // Fetch menu data using the hook
+  const { items: fetchedItems, isLoading, error } = useMenu({
+    location: finalMenuRef,
+    subdomain,
+    path,
+    enabled: !propMenuItems, // Only fetch if menuItems not provided
+  });
+
+  // Use provided menuItems (legacy) or fetched items
+  const menuItems = propMenuItems || fetchedItems;
+
+  // Loading state
+  if (isLoading && !propMenuItems) {
+    return (
+      <nav className={`navigation navigation-${finalOrientation} ${className}`}>
+        <div className="animate-pulse flex gap-4">
+          <div className="h-8 w-20 bg-gray-200 rounded"></div>
+          <div className="h-8 w-20 bg-gray-200 rounded"></div>
+          <div className="h-8 w-20 bg-gray-200 rounded"></div>
+        </div>
+      </nav>
+    );
+  }
+
+  // Error state - render empty menu
+  if (error && !propMenuItems) {
+    console.error('Failed to load menu:', error);
+    return null;
+  }
 
   const renderMenuItem = (item: MenuItem, depth = 0): React.ReactNode => {
     const hasChildren = item.children && item.children.length > 0;

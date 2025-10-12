@@ -100,9 +100,9 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   // Note: removed a no-op useMemo to satisfy lint rules
 
   // Render blocks recursively
-  const renderBlock = (block: TemplatePartBlock, menuData?: any[]): React.ReactNode => {
+  const renderBlock = (block: TemplatePartBlock): React.ReactNode => {
     const BlockComponent = blockComponents[block.type];
-    
+
     if (!BlockComponent) {
       // Unknown block type - skip rendering
       return null;
@@ -111,7 +111,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     // Filter out React reserved props and rename ref to menuRef for Navigation
     const { ref, ...safeData } = block.data || {};
     const { ref: attrRef, ...safeAttributes } = block.attributes || {};
-    
+
     let blockProps = {
       ...safeData,
       ...safeAttributes,
@@ -135,10 +135,11 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     } else if (block.type === 'core/navigation') {
       blockProps = {
         ...blockProps,
-        menuRef: block.data?.menuRef || ref || attrRef,
+        menuRef: block.data?.menuRef || block.data?.menuLocation || ref || attrRef || 'primary',
         orientation: block.data?.orientation,
         showSubmenuIcon: block.data?.showSubmenuIcon,
-        menuItems: menuData || [],
+        subdomain: context?.subdomain,
+        path: context?.path,
         data: block.data
       };
     }
@@ -147,7 +148,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     if (block.innerBlocks && block.innerBlocks.length > 0) {
       return (
         <BlockComponent {...blockProps}>
-          {block.innerBlocks.map(innerBlock => renderBlock(innerBlock, menuData))}
+          {block.innerBlocks.map(innerBlock => renderBlock(innerBlock))}
         </BlockComponent>
       );
     }
@@ -158,10 +159,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   // Render template part with its settings
   const renderTemplatePart = (templatePart: any) => {
     const { settings = {}, content } = templatePart;
-    
-    // Extract menu data from the template part blocks for navigation
-    const menuData = extractMenuDataFromBlocks(content);
-    
+
     // Build container styles
     const containerStyles: React.CSSProperties = {
       backgroundColor: settings.backgroundColor,
@@ -192,7 +190,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
           <style dangerouslySetInnerHTML={{ __html: settings.customCss }} />
         )}
         <div className={containerClass}>
-          {Array.isArray(content) ? content.map((block: TemplatePartBlock) => renderBlock(block, menuData)) : null}
+          {Array.isArray(content) ? content.map((block: TemplatePartBlock) => renderBlock(block)) : null}
         </div>
       </div>
     );
@@ -233,16 +231,6 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     return renderContent();
   };
 
-  // Extract menu data from context (fetched from Backend API)
-  const extractMenuDataFromBlocks = (blocks: TemplatePartBlock[]): any[] => {
-    // Use menu data from context (fetched by Layout component)
-    if (context?.menuData?.items && Array.isArray(context.menuData.items)) {
-      return context.menuData.items;
-    }
-
-    // Fallback: empty menu if no data available
-    return [];
-  };
 
   // Show loading state
   if (loading) {
@@ -276,17 +264,12 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
   
   // Wrap header with ResponsiveHeader for mobile support
   if (area === 'header') {
-    // Extract menu items for mobile menu
-    const allMenuItems = templateParts.length > 0 
-      ? extractMenuDataFromBlocks(templateParts[0].content || [])
-      : [];
-    
     const siteName = context?.logoUrl ? '' : 'Site'; // Use default site name if no logo
-    
+
     return (
       <ResponsiveHeader
         mobileSettings={mobileSettings}
-        menuItems={allMenuItems}
+        menuItems={[]} // Mobile menu will be handled by HamburgerMenu component
         siteName={siteName}
       >
         {Array.isArray(templateParts) ? templateParts.map(templatePart => renderTemplatePart(templatePart)) : null}

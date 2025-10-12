@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect, useState } from 'react';
+import { FC, ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import TemplatePartRenderer from '../TemplatePartRenderer';
 import { getPageContext } from '../../utils/context-detector';
@@ -10,29 +10,6 @@ import { useButtonSettings } from '../../hooks/useButtonSettings';
 import Breadcrumbs from '../common/Breadcrumbs';
 import { useBreadcrumbsSettings } from '../../hooks/useBreadcrumbsSettings';
 import { generateBreadcrumbs } from '../../utils/breadcrumb-generator';
-
-interface MenuItem {
-  id: string;
-  title: string;
-  url: string;
-  type: string;
-  target: string;
-  children?: MenuItem[];
-}
-
-interface MenuData {
-  id: string;
-  name: string;
-  slug: string;
-  location: string;
-  metadata?: {
-    theme?: string;
-    logo_url?: string;
-    subdomain?: string;
-    path_prefix?: string;
-  };
-  items: MenuItem[];
-}
 
 interface LayoutProps {
   children: ReactNode;
@@ -48,7 +25,6 @@ interface LayoutProps {
 /**
  * WordPress Theme Layout Component
  * Provides consistent header/footer using TemplatePartRenderer
- * Fetches menu data from Backend API and applies theme automatically
  */
 const Layout: FC<LayoutProps> = ({
   children,
@@ -56,73 +32,15 @@ const Layout: FC<LayoutProps> = ({
   className = ''
 }) => {
   const location = useLocation();
-  const [menuData, setMenuData] = useState<MenuData | null>(null);
-  const [menuLoading, setMenuLoading] = useState(true);
   const { currentWidth, currentPadding } = useCustomizerSettings();
   const { settings: scrollSettings } = useScrollToTopSettings();
   const { settings: buttonSettings } = useButtonSettings();
   const { settings: breadcrumbsSettings } = useBreadcrumbsSettings();
 
-  useEffect(() => {
-    const fetchMenuData = async () => {
-      try {
-        setMenuLoading(true);
-
-        // Get current page context (subdomain, path)
-        const pageContext = getPageContext(location.pathname);
-
-        // Build API URL with query parameters
-        const apiUrl = process.env.VITE_API_URL || 'https://api.neture.co.kr';
-        const params = new URLSearchParams();
-
-        if (pageContext.subdomain) {
-          params.set('subdomain', pageContext.subdomain);
-        }
-        if (pageContext.path) {
-          params.set('path', pageContext.path);
-        }
-
-        const url = `${apiUrl}/api/v1/menus/location/primary${params.toString() ? `?${params.toString()}` : ''}`;
-
-        const response = await fetch(url);
-        const result = await response.json();
-
-        if (result.success && result.data) {
-          setMenuData(result.data);
-
-          // Apply theme if specified in metadata
-          if (result.data.metadata?.theme) {
-            const themeClass = `theme-${result.data.metadata.theme}`;
-
-            // Remove all existing theme-* classes without removing other classes (e.g., 'dark')
-            const existingClasses = document.documentElement.className.split(' ');
-            existingClasses.forEach(cls => {
-              if (cls.startsWith('theme-')) {
-                document.documentElement.classList.remove(cls);
-              }
-            });
-
-            // Add the new theme class
-            document.documentElement.classList.add(themeClass);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch menu data:', error);
-      } finally {
-        setMenuLoading(false);
-      }
-    };
-
-    fetchMenuData();
-  }, [location.pathname]);
-
   // Enhanced context with page context info
   const enhancedContext = {
     ...context,
-    ...getPageContext(location.pathname),
-    menuData,
-    menuLoading,
-    logoUrl: menuData?.metadata?.logo_url
+    ...getPageContext(location.pathname)
   };
 
   // Generate breadcrumb items

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { authClient } from '@o4o/auth-client';
+import { useMenu } from '../../hooks/useMenu';
 import './HamburgerMenu.css';
 
 interface MenuItem {
@@ -12,42 +12,36 @@ interface MenuItem {
 }
 
 interface HamburgerMenuProps {
-  menuRef?: string;
+  menuRef?: string; // Menu location key (e.g., 'primary', 'mobile')
+  subdomain?: string | null;
+  path?: string;
 }
 
-const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' }) => {
+const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
+  menuRef = 'mobile',
+  subdomain,
+  path
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const response = await authClient.api.get(`/menus/${menuRef}`);
-        if (response.data?.success && response.data?.data?.items) {
-          setMenuItems(response.data.data.items);
-        } else if (response.data?.items) {
-          setMenuItems(response.data.items);
-        } else {
-          throw new Error('Invalid menu data');
-        }
-      } catch (error) {
-        // Fallback menu items
-        setMenuItems([
-          { id: '1', title: '홈', url: '/' },
-          { id: '2', title: '소개', url: '/about' },
-          { id: '3', title: '서비스', url: '/services' },
-          { id: '4', title: '문의', url: '/contact' }
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch menu data using the hook
+  const { items: menuItems, isLoading: loading, error } = useMenu({
+    location: menuRef,
+    subdomain,
+    path,
+  });
 
-    fetchMenu();
-  }, [menuRef]);
+  // Fallback menu items if fetch fails
+  const fallbackItems: MenuItem[] = [
+    { id: '1', title: '홈', url: '/' },
+    { id: '2', title: '소개', url: '/about' },
+    { id: '3', title: '서비스', url: '/services' },
+    { id: '4', title: '문의', url: '/contact' }
+  ];
+
+  const displayMenuItems = error ? fallbackItems : menuItems;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -165,13 +159,13 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ menuRef = 'primary-menu' 
       {isOpen && <div className="hm-backdrop" onClick={() => setIsOpen(false)} />}
 
       {/* Menu Panel */}
-      <div 
+      <div
         ref={menuPanelRef}
         className={`hm-panel ${isOpen ? 'is-open' : ''}`}
       >
         <nav className="hm-nav">
           <ul className="hm-list">
-            {menuItems.map(item => renderMenuItem(item))}
+            {displayMenuItems.map(item => renderMenuItem(item))}
           </ul>
         </nav>
       </div>
