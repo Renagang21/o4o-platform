@@ -3,12 +3,13 @@
  * Container block that shows/hides content based on conditions
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Block } from '@/types/post.types';
 import { InnerBlocks } from '../InnerBlocks';
 import { BlockProps } from '@/blocks/registry/types';
 import { GitBranch, Eye, EyeOff, Plus } from 'lucide-react';
-import { Condition, LogicOperator } from '@/types/conditional-block.types';
+import { Condition, LogicOperator, ConditionalBlockData } from '@/types/conditional-block.types';
+import ConditionBuilder from '../conditional/ConditionBuilder';
 
 interface ConditionalBlockProps extends BlockProps {
   attributes?: {
@@ -39,6 +40,9 @@ const ConditionalBlock: React.FC<ConditionalBlockProps> = ({
     indicatorText = 'Conditional Content',
   } = attributes;
 
+  // State for ConditionBuilder modal
+  const [showBuilder, setShowBuilder] = useState(false);
+
   // Handle inner blocks change
   const handleInnerBlocksChange = useCallback((newBlocks: Block[]) => {
     if (onInnerBlocksChange) {
@@ -46,10 +50,27 @@ const ConditionalBlock: React.FC<ConditionalBlockProps> = ({
     }
   }, [onInnerBlocksChange]);
 
-  // Handle add condition (placeholder for Phase 6)
-  const handleAddCondition = useCallback(() => {
-    // TODO: Open ConditionBuilder modal/panel in Phase 6
-    console.log('Add condition clicked - UI to be implemented in Phase 6');
+  // Handle open condition builder
+  const handleOpenBuilder = useCallback(() => {
+    setShowBuilder(true);
+  }, []);
+
+  // Handle save conditions
+  const handleSaveConditions = useCallback((data: ConditionalBlockData) => {
+    if (onChange) {
+      onChange(null, {
+        ...attributes,
+        conditions: data.conditions,
+        logicOperator: data.logicOperator,
+        showWhenMet: data.showWhenMet,
+      });
+    }
+    setShowBuilder(false);
+  }, [attributes, onChange]);
+
+  // Handle cancel
+  const handleCancelBuilder = useCallback(() => {
+    setShowBuilder(false);
   }, []);
 
   // Get condition summary text
@@ -125,7 +146,7 @@ const ConditionalBlock: React.FC<ConditionalBlockProps> = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            handleAddCondition();
+            handleOpenBuilder();
           }}
           style={{
             display: 'flex',
@@ -211,6 +232,19 @@ const ConditionalBlock: React.FC<ConditionalBlockProps> = ({
           ⚠️ <strong>No conditions set:</strong> This content will always be visible.
           Click "Add Condition" to set visibility rules.
         </div>
+      )}
+
+      {/* Condition Builder Modal */}
+      {showBuilder && (
+        <ConditionBuilder
+          initialData={{
+            conditions,
+            logicOperator,
+            showWhenMet,
+          }}
+          onSave={handleSaveConditions}
+          onCancel={handleCancelBuilder}
+        />
       )}
     </div>
   );
