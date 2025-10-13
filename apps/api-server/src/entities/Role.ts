@@ -57,7 +57,7 @@ export class Role {
 
   // Helper methods
   hasPermission(permissionKey: string): boolean {
-    return this.permissions.some(p => p.key === permissionKey && p.isActive);
+    return this.permissions?.some(p => p.key === permissionKey && p.isActive) || false;
   }
 
   hasAnyPermission(permissionKeys: string[]): boolean {
@@ -69,7 +69,7 @@ export class Role {
   }
 
   getActivePermissions(): Permission[] {
-    return this.permissions.filter(p => p.isActive);
+    return this.permissions?.filter(p => p.isActive) || [];
   }
 
   getPermissionKeys(): string[] {
