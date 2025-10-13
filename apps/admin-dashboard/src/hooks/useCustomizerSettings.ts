@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { authClient } from '@o4o/auth-client';
 
 export type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 
@@ -116,14 +117,9 @@ export const useCustomizerSettings = () => {
         }
 
         // Fetch from API
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-        const response = await fetch(`${apiUrl}/api/settings/customizer`);
+        const response = await authClient.api.get('/settings/customizer');
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const result = await response.json();
+        const result = response.data;
 
         if (result.success && result.data) {
           // Ensure container settings exist, merge with defaults
@@ -207,14 +203,9 @@ export const useCustomizerSettings = () => {
 
     // Re-fetch
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${apiUrl}/api/settings/customizer`);
+      const response = await authClient.api.get('/settings/customizer');
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
 
       if (result.success && result.data) {
         const mergedSettings: CustomizerSettings = {

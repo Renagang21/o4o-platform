@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
+import {
   Search,
   Download,
   DollarSign,
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import toast from 'react-hot-toast';
+import { authClient } from '@o4o/auth-client';
 
 type CommissionStatus = 'all' | 'paid' | 'pending' | 'processing' | 'scheduled';
 type SortField = 'vendorName' | 'sales' | 'rate' | 'amount' | 'date' | null;
@@ -88,25 +89,10 @@ const VendorsCommissionWordPress = () => {
     const fetchCommissions = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/vendors/commissions?period=${selectedPeriod}`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        });
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            toast.error('인증이 필요합니다. 다시 로그인해주세요.');
-            window.location.href = '/login';
-            return;
-          }
-          throw new Error(`Failed to fetch commissions: ${response.status}`);
-        }
-        
-        const data = await response.json();
+
+        const response = await authClient.api.get(`/vendors/commissions?period=${selectedPeriod}`);
+
+        const data = response.data;
         const commissionsArray = data.data || data.commissions || [];
         
         // Transform API data to match CommissionRecord interface

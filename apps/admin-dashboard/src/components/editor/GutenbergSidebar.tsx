@@ -44,6 +44,7 @@ import {
   canEditCategories as checkCanEditCategories,
   canSetFeaturedImage as checkCanSetFeaturedImage
 } from '@/utils/permissions';
+import { authClient } from '@o4o/auth-client';
 
 interface PostSettings {
   status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
@@ -127,26 +128,16 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/v1/content/categories`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          const categoriesData = result.data || result.categories || [];
-          const mappedCategories = categoriesData.map((cat: any) => ({
-            id: cat.id,
-            name: cat.name || cat.title,
-            slug: cat.slug || ''
-          }));
-          setAvailableCategories(mappedCategories);
-        }
+        const response = await authClient.api.get('/v1/content/categories');
+
+        const result = response.data;
+        const categoriesData = result.data || result.categories || [];
+        const mappedCategories = categoriesData.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name || cat.title,
+          slug: cat.slug || ''
+        }));
+        setAvailableCategories(mappedCategories);
       } catch (error) {
         // Fallback to empty array on error
         setAvailableCategories([]);

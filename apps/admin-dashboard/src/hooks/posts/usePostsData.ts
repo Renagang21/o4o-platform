@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { postApi } from '@/services/api/postApi';
+import { authClient } from '@o4o/auth-client';
 
 export interface Post {
   id: string;
@@ -42,32 +43,14 @@ export const usePostsData = ({
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const params = new URLSearchParams();
-        params.append('per_page', '1000');
-        
-        const response = await fetch(`${apiUrl}/api/posts?${params}`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
+
+        const response = await authClient.api.get('/posts', {
+          params: {
+            per_page: '1000'
           }
         });
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            setError('Authentication required. Please login.');
-            window.location.href = '/login';
-          } else if (response.status === 500 || response.status === 503) {
-            setError('Server error. Please try again later.');
-          } else {
-            setError(`Failed to fetch posts: ${response.status}`);
-          }
-          setPosts([]);
-          return;
-        }
-        
-        const data = await response.json();
+
+        const data = response.data;
         const postsArray = data.data || data.posts || [];
         const transformedPosts = postsArray.map((post: any) => {
           let date = new Date().toISOString().split('T')[0];

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   ChevronDown,
   Settings,
   Eye,
@@ -12,6 +12,7 @@ import {
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { useAuthStore } from '@/stores/authStore';
 import { hasPermission, hasAnyPermission } from '@/utils/permissions';
+import { authClient } from '@o4o/auth-client';
 
 interface Category {
   id: string;
@@ -64,31 +65,22 @@ const Categories = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/v1/content/categories`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          const categoriesData = result.data || result.categories || [];
-          
-          // Transform API data to match our Category interface
-          const transformedCategories = categoriesData.map((cat: any) => ({
-            id: cat.id || cat._id, // Handle both id and _id fields
-            name: cat.name || cat.title,
-            description: cat.description || '',
-            slug: cat.slug || '',
-            count: cat.postCount || cat.count || 0,
-            date: cat.createdAt ? new Date(cat.createdAt).toLocaleDateString('ko-KR') : '-'
-          })).filter((cat: any) => cat.id); // Filter out items without ID
-          
-          setCategories(transformedCategories);
-        }
+        const response = await authClient.api.get('/v1/content/categories');
+
+        const result = response.data;
+        const categoriesData = result.data || result.categories || [];
+
+        // Transform API data to match our Category interface
+        const transformedCategories = categoriesData.map((cat: any) => ({
+          id: cat.id || cat._id, // Handle both id and _id fields
+          name: cat.name || cat.title,
+          description: cat.description || '',
+          slug: cat.slug || '',
+          count: cat.postCount || cat.count || 0,
+          date: cat.createdAt ? new Date(cat.createdAt).toLocaleDateString('ko-KR') : '-'
+        })).filter((cat: any) => cat.id); // Filter out items without ID
+
+        setCategories(transformedCategories);
       } catch (error) {
         // Fallback to empty array on error
         setCategories([]);

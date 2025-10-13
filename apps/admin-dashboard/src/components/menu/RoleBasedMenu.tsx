@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { authClient } from '@o4o/auth-client';
 
 interface MenuItem {
   id: string;
@@ -48,25 +49,12 @@ export const RoleBasedMenu: React.FC<RoleBasedMenuProps> = ({
   useEffect(() => {
     const fetchFilteredMenu = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        
-        const response = await fetch(`${apiUrl}/api/menus/${menuId}/filtered`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            setMenu(result.data);
-          } else {
-            setError('Failed to load menu');
-          }
+        const response = await authClient.api.get(`/menus/${menuId}/filtered`);
+
+        if (response.data.success) {
+          setMenu(response.data.data);
         } else {
-          setError('Menu not found');
+          setError('Failed to load menu');
         }
       } catch (err) {
         setError('Error loading menu');

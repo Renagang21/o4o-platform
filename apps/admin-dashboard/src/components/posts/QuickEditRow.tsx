@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Post } from '@/hooks/posts/usePostsData';
+import { authClient } from '@o4o/auth-client';
 
 interface QuickEditRowProps {
   data: {
@@ -29,23 +30,14 @@ export const QuickEditRow: React.FC<QuickEditRowProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/v1/content/categories`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          const categoriesData = result.data || result.categories || [];
-          setCategories(categoriesData.map((cat: any) => ({
-            id: cat.id,
-            name: cat.name || cat.title
-          })));
-        }
+        const response = await authClient.api.get('/v1/content/categories');
+
+        const result = response.data;
+        const categoriesData = result.data || result.categories || [];
+        setCategories(categoriesData.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name || cat.title
+        })));
       } catch (error) {
         // Error handling
       } finally {

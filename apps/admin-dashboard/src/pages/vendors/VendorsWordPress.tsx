@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   ChevronDown,
   ChevronUp,
   Settings,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import toast from 'react-hot-toast';
+import { authClient } from '@o4o/auth-client';
 
 type VendorStatus = 'active' | 'pending' | 'suspended' | 'trash';
 type VendorTab = 'all' | 'active' | 'pending' | 'suspended' | 'trash';
@@ -92,25 +93,9 @@ const VendorsWordPress = () => {
     const fetchVendors = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/vendors`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        });
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            toast.error('인증이 필요합니다. 다시 로그인해주세요.');
-            window.location.href = '/login';
-            return;
-          }
-          throw new Error(`Failed to fetch vendors: ${response.status}`);
-        }
-        
-        const data = await response.json();
+
+        const response = await authClient.api.get('/vendors');
+        const data = response.data;
         const vendorsArray = data.data || data.vendors || [];
         
         // Transform API data to match Vendor interface

@@ -201,7 +201,7 @@ const WordPressPluginManager: FC = () => {
     queryKey: ['plugins'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/api/v1/apps/plugins');
+        const response = await apiClient.get('/apps/plugins');
         return response.data.data || pluginsList;
       } catch {
         return pluginsList;
@@ -212,7 +212,7 @@ const WordPressPluginManager: FC = () => {
   // 플러그인 활성화/비활성화
   const togglePlugin = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return apiClient.put(`/api/v1/apps/plugins/${id}/toggle`, { isActive });
+      return apiClient.put(`/apps/plugins/${id}/toggle`, { isActive });
     },
     onSuccess: (_, variables) => {
       const action = variables.isActive ? '활성화' : '비활성화';
@@ -227,7 +227,7 @@ const WordPressPluginManager: FC = () => {
   // 플러그인 삭제
   const deletePlugin = useMutation({
     mutationFn: async (id: string) => {
-      return apiClient.delete(`/api/v1/apps/plugins/${id}`);
+      return apiClient.delete(`/apps/plugins/${id}`);
     },
     onSuccess: () => {
       toast.success('플러그인이 삭제되었습니다.');

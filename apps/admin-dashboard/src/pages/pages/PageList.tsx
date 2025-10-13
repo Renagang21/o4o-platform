@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   ChevronDown,
   ChevronUp,
   Settings,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import toast from 'react-hot-toast';
+import { authClient } from '@o4o/auth-client';
 
 interface Page {
   id: string;
@@ -46,32 +47,15 @@ const PageList = () => {
     const fetchPages = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const params = new URLSearchParams();
-        params.append('type', 'page');
-        params.append('per_page', '1000');
-        
-        const response = await fetch(`${apiUrl}/api/posts?${params}`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
+
+        const response = await authClient.api.get('/posts', {
+          params: {
+            type: 'page',
+            per_page: '1000'
           }
         });
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            setError('Authentication required. Please login.');
-            window.location.href = '/login';
-          } else {
-            setError(`Failed to fetch pages: ${response.status}`);
-          }
-          setPages([]);
-          return;
-        }
-        
-        const data = await response.json();
+
+        const data = response.data;
         
         const pagesArray = data.data || data.posts || [];
         const transformedPages = pagesArray.map((page: any) => {
@@ -198,19 +182,9 @@ const PageList = () => {
   const handleSaveQuickEdit = async () => {
     if (quickEditId) {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/posts/${quickEditId}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(quickEditData)
-        });
-        
-        if (response.ok) {
+        await authClient.api.put(`/posts/${quickEditId}`, quickEditData);
+
+        if (true) {
           setPages(prevPages => prevPages.map(p => 
             p.id === quickEditId 
               ? { ...p, ...quickEditData }
@@ -241,19 +215,9 @@ const PageList = () => {
   const handleDelete = async (id: string) => {
     if (confirm('정말 이 페이지를 휴지통으로 이동하시겠습니까?')) {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ status: 'trash' })
-        });
-        
-        if (response.ok) {
+        await authClient.api.put(`/posts/${id}`, { status: 'trash' });
+
+        if (true) {
           setPages(prevPages => prevPages.map(p => 
             p.id === id ? { ...p, status: 'trash' as const } : p
           ));
@@ -270,17 +234,9 @@ const PageList = () => {
   const handlePermanentDelete = async (id: string) => {
     if (confirm('이 페이지를 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        });
-        
-        if (response.ok) {
+        await authClient.api.delete(`/posts/${id}`);
+
+        if (true) {
           setPages(prevPages => prevPages.filter(p => p.id !== id));
           sessionStorage.removeItem('pages-data');
           toast.success('Page deleted permanently');
@@ -296,19 +252,9 @@ const PageList = () => {
   const handleRestore = async (id: string) => {
     if (confirm('이 페이지를 복원하시겠습니까?')) {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ status: 'draft' })
-        });
-        
-        if (response.ok) {
+        await authClient.api.put(`/posts/${id}`, { status: 'draft' });
+
+        if (true) {
           setPages(prevPages => prevPages.map(p => 
             p.id === id ? { ...p, status: 'draft' as const } : p
           ));
@@ -340,24 +286,13 @@ const PageList = () => {
     if (selectedBulkAction === 'trash') {
       if (confirm(`선택한 ${selectedPages.size}개의 페이지를 휴지통으로 이동하시겠습니까?`)) {
         try {
-          const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-          const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-          
-          const promises = Array.from(selectedPages).map(id => 
-            fetch(`${apiUrl}/api/posts/${id}`, {
-              method: 'PUT',
-              headers: {
-                'Authorization': token ? `Bearer ${token}` : '',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ status: 'trash' })
-            })
+          const promises = Array.from(selectedPages).map(id =>
+            authClient.api.put(`/posts/${id}`, { status: 'trash' })
           );
-          
-          const results = await Promise.all(promises);
-          const allSuccessful = results.every(r => r.ok);
-          
-          if (allSuccessful) {
+
+          await Promise.all(promises);
+
+          if (true) {
             setPages(prevPages => prevPages.map(p => 
               selectedPages.has(p.id) ? { ...p, status: 'trash' as const } : p
             ));

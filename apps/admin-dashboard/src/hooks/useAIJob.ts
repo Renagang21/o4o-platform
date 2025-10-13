@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
+import { authClient } from '@o4o/auth-client';
 import { aiValidation, ValidationResult } from '../utils/ai-validation';
 import { AIJobStatus } from '../components/AIProgressPanel';
 
@@ -47,7 +47,7 @@ export const useAIJob = () => {
       setIsLoading(true);
 
       // Enqueue job
-      const response = await axios.post('/api/ai/generate/async', request);
+      const response = await authClient.api.post('/ai/generate/async', request);
 
       if (!response.data.success) {
         throw new Error(response.data.error || 'Failed to start job');
@@ -168,7 +168,7 @@ export const useAIJob = () => {
     try {
       setIsLoading(true);
 
-      const response = await axios.post(`/api/ai/jobs/${jobData.jobId}/retry`);
+      const response = await authClient.api.post(`/ai/jobs/${jobData.jobId}/retry`);
 
       if (!response.data.success) {
         throw new Error(response.data.error || 'Failed to retry job');
@@ -204,7 +204,7 @@ export const useAIJob = () => {
     if (!jobData || !jobData.jobId) return;
 
     try {
-      await axios.delete(`/api/ai/jobs/${jobData.jobId}`);
+      await authClient.api.delete(`/ai/jobs/${jobData.jobId}`);
 
       // Close SSE connection
       if (eventSourceRef.current) {

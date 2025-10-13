@@ -76,7 +76,7 @@ export default function ReadingSettings() {
     queryKey: ['pages', 'published'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/api/posts', {
+        const response = await apiClient.get('/posts', {
           params: {
             type: 'page',
             status: 'publish',
@@ -96,7 +96,7 @@ export default function ReadingSettings() {
     queryKey: ['settings', 'reading'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/api/v1/settings/reading');
+        const response = await apiClient.get('/settings/reading');
         const data = response.data.data;
         if (data) {
           // Preserve homepageId even if it comes as undefined from API
@@ -132,7 +132,7 @@ export default function ReadingSettings() {
           ...data,
           homepageId: data.homepageType === 'static_page' ? data.homepageId : undefined
         };
-        const response = await apiClient.put('/api/v1/settings/reading', payload);
+        const response = await apiClient.put('/settings/reading', payload);
         return response;
       } catch (apiError: any) {
         // 구체적인 에러 상황별 메시지 처리
