@@ -11,6 +11,7 @@ on:
       - 'apps/admin-dashboard/**'
       - 'packages/**'
       - '.github/workflows/deploy-admin.yml'
+      - '.github/nginx/admin.neture.co.kr.conf'
 
 jobs:
   deploy:
@@ -61,6 +62,16 @@ jobs:
           # Create temp directory
           mkdir -p /tmp/admin-build
 
+    - name: Copy Nginx config
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
+        source: ".github/nginx/admin.neture.co.kr.conf"
+        target: "/tmp/nginx/"
+        strip_components: 2
+
     - name: Copy build files
       uses: appleboy/scp-action@v0.1.7
       with:
@@ -78,17 +89,43 @@ jobs:
         username: ${{ secrets.WEB_USER }}
         key: ${{ secrets.WEB_SSH_KEY }}
         script: |
+          # Update Nginx configuration
+          echo "🔧 Updating Nginx configuration..."
+          if [ -f /tmp/nginx/admin.neture.co.kr.conf ]; then
+            # Backup current nginx config
+            sudo cp /etc/nginx/sites-available/admin.neture.co.kr /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+
+            # Copy new config
+            sudo cp /tmp/nginx/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
+
+            # Test nginx configuration
+            if sudo nginx -t; then
+              echo "✅ Nginx configuration is valid"
+            else
+              echo "❌ Nginx configuration test failed, restoring backup"
+              sudo cp /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d) /etc/nginx/sites-available/admin.neture.co.kr 2>/dev/null || true
+              exit 1
+            fi
+
+            # Clean up temp nginx config
+            rm -rf /tmp/nginx
+          else
+            echo "⚠️ Nginx config not found, skipping configuration update"
+          fi
+
           # Move files from temp to web directory
+          echo "📦 Deploying build files..."
           sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
-          
+
           # Set permissions
           sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
           sudo chmod -R 755 /var/www/admin.neture.co.kr/
-          
-          # Clean up
+
+          # Clean up temp build files
           rm -rf /tmp/admin-build
-          
-          # Reload nginx
+
+          # Reload nginx to apply changes
+          echo "🔄 Reloading Nginx..."
           sudo systemctl reload nginx
-          
-          echo "✅ Admin dashboard deployed successfully!"
+
+          echo "✅ Admin dashboard deployed successfully with updated cache settings!"
