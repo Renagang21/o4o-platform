@@ -276,14 +276,16 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
         menuItems={[]} // Mobile menu will be handled by HamburgerMenu component
         siteName={siteName}
       >
-        {Array.isArray(templateParts) ? templateParts.map(templatePart => renderTemplatePart(templatePart)) : null}
+        {/* Render only the highest priority template (first in sorted array) */}
+        {Array.isArray(templateParts) && templateParts.length > 0 ? renderTemplatePart(templateParts[0]) : null}
       </ResponsiveHeader>
     );
   }
-  
+
   return (
     <>
-      {Array.isArray(templateParts) ? templateParts.map(templatePart => renderTemplatePart(templatePart)) : null}
+      {/* Render only the highest priority template (first in sorted array) */}
+      {Array.isArray(templateParts) && templateParts.length > 0 ? renderTemplatePart(templateParts[0]) : null}
     </>
   );
 };
