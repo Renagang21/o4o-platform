@@ -44,19 +44,17 @@ jobs:
           git fetch origin
           git config pull.rebase false
           git pull origin main
-          
-          # Remove any existing API server nginx config (not needed for web server)
-          sudo rm -f /etc/nginx/sites-enabled/api.neture.co.kr.conf || true
-          sudo rm -f /etc/nginx/sites-available/api.neture.co.kr.conf || true
-          
-          # Copy nginx configs to system (web server only)
+
+          # Copy nginx configs to system
           echo "📋 Deploying nginx configs..."
           sudo cp nginx-configs/admin.neture.co.kr.conf /etc/nginx/sites-available/
           sudo cp nginx-configs/neture.co.kr.conf /etc/nginx/sites-available/
+          sudo cp nginx-configs/api.neture.co.kr.conf /etc/nginx/sites-available/
 
-          # Enable sites (create symlinks - web server only)
+          # Enable sites (create symlinks)
           sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr.conf /etc/nginx/sites-enabled/
           sudo ln -sf /etc/nginx/sites-available/neture.co.kr.conf /etc/nginx/sites-enabled/
+          sudo ln -sf /etc/nginx/sites-available/api.neture.co.kr /etc/nginx/sites-enabled/
           
           # Test nginx configuration
           echo "🧪 Testing nginx configuration..."
