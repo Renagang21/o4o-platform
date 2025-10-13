@@ -41,6 +41,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     ],
     fs: {
       allow: ['..', '../..']
+    },
+    headers: {
+      // Allow iframe embedding from admin subdomains for customizer preview
+      'Content-Security-Policy': "frame-ancestors 'self' https://admin.neture.co.kr http://localhost:3001 http://localhost:5174",
     }
   }
 }))

@@ -18,12 +18,12 @@ const Customize: React.FC = () => {
   const getSitePreviewUrl = () => {
     const currentHost = window.location.host;
     const protocol = window.location.protocol;
-    
+
     // admin.neture.co.kr -> neture.co.kr 같은 변환
     if (currentHost.startsWith('admin.')) {
       return `${protocol}//${currentHost.replace('admin.', '')}`;
     }
-    
+
     // 기타 경우는 환경변수에서 가져오기
     return import.meta.env.VITE_SITE_URL || `${protocol}//${currentHost}`;
   };
