@@ -60,17 +60,17 @@ export class TemplatePart {
     customCss?: string
   }
 
-  @Column({ name: 'is_active', default: true })
+  @Column({ default: true })
   isActive!: boolean
 
-  @Column({ name: 'is_default', default: false })
+  @Column({ default: false })
   isDefault!: boolean // Default template part for the area
 
-  @Column({ name: 'author_id', type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   authorId!: string
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'author_id' })
+  @JoinColumn({ name: 'authorId' })
   author!: User
 
   @Column({ default: 0 })
@@ -89,9 +89,9 @@ export class TemplatePart {
     path_prefix?: string // Show only on specific path prefix (/seller1, etc.)
   }
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date
 }

@@ -36,7 +36,9 @@ const templatePartSchema = z.object({
     pages: z.array(z.string()).optional(),
     postTypes: z.array(z.string()).optional(),
     categories: z.array(z.string()).optional(),
-    userRoles: z.array(z.string()).optional()
+    userRoles: z.array(z.string()).optional(),
+    subdomain: z.string().optional(),
+    path_prefix: z.string().optional()
   }).optional()
 })
 

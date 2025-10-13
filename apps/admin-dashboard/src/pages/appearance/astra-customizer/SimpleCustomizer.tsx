@@ -137,6 +137,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       // Convert customizer settings to template parts format
       const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
 
+      console.log('[Customizer - Publish] 전송할 데이터:', headerTemplatePart);
+
       // Check if default header exists and update it
       const existingResponse = await authClient.api.get('/public/template-parts');
       const existingParts = existingResponse.data?.data || [];
@@ -151,10 +153,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
       if (defaultHeader && isValidUUID) {
         // Update existing default header
+        console.log('[Customizer - Publish] 기존 헤더 업데이트:', defaultHeader.id);
         await authClient.api.put(`/template-parts/${defaultHeader.id}`, headerTemplatePart);
         toast.success('헤더 템플릿이 업데이트되었습니다');
       } else {
         // Create new header template part
+        console.log('[Customizer - Publish] 새 헤더 생성');
         await authClient.api.post('/template-parts', {
           ...headerTemplatePart,
           isDefault: true,
@@ -170,7 +174,14 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
       setIsDirty(false);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || '템플릿 업데이트에 실패했습니다');
+      console.error('[Customizer - Publish] 에러 발생:', error);
+      console.error('[Customizer - Publish] 에러 응답:', error?.response?.data);
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || '템플릿 업데이트에 실패했습니다';
+      const errorDetails = error?.response?.data?.details;
+      if (errorDetails) {
+        console.error('[Customizer - Publish] 에러 상세:', errorDetails);
+      }
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
