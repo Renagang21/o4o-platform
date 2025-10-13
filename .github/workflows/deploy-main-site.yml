@@ -11,6 +11,7 @@ on:
       - 'apps/main-site/**'
       - 'packages/**'
       - '.github/workflows/deploy-main-site.yml'
+      - 'nginx-configs/neture.co.kr.conf'
 
 jobs:
   deploy:
@@ -41,9 +42,13 @@ jobs:
         cd apps/main-site
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
-        VITE_API_URL=https://api.neture.co.kr/api \
-        VITE_API_BASE_URL=https://api.neture.co.kr/api \
+        VITE_API_URL=https://api.neture.co.kr/api/v1 \
         pnpm run build
+
+    - name: Prepare Nginx config for deployment
+      run: |
+        mkdir -p apps/main-site/dist/nginx-config
+        cp nginx-configs/neture.co.kr.conf apps/main-site/dist/nginx-config/
 
     - name: Deploy to web server
       uses: appleboy/ssh-action@v1.0.3
@@ -79,16 +84,51 @@ jobs:
         key: ${{ secrets.WEB_SSH_KEY }}
         script: |
           # Move files from temp to web directory
+          echo "📦 Deploying build files..."
           sudo cp -r /tmp/main-site-build/* /var/www/neture.co.kr/
-          
+
+          # Update Nginx configuration
+          echo "🔧 Updating Nginx configuration..."
+          echo "📋 Checking deployment artifacts..."
+          ls -la /var/www/neture.co.kr/ || true
+          if [ -f /var/www/neture.co.kr/nginx-config/neture.co.kr.conf ]; then
+            echo "✅ Found Nginx config in deployment artifacts"
+
+            # Backup current nginx config
+            sudo cp /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-available/neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+
+            # Copy new config
+            sudo cp /var/www/neture.co.kr/nginx-config/neture.co.kr.conf /etc/nginx/sites-available/neture.co.kr
+
+            # Test nginx configuration
+            if sudo nginx -t; then
+              echo "✅ Nginx configuration is valid"
+            else
+              echo "❌ Nginx configuration test failed, restoring backup"
+              latest_backup=$(ls -t /etc/nginx/sites-available/neture.co.kr.backup.* 2>/dev/null | head -1)
+              if [ -n "$latest_backup" ]; then
+                sudo cp "$latest_backup" /etc/nginx/sites-available/neture.co.kr
+              fi
+              exit 1
+            fi
+
+            # Clean up nginx config from web directory
+            sudo rm -rf /var/www/neture.co.kr/nginx-config
+          else
+            echo "⚠️ Nginx config not found in deployment artifacts at /var/www/neture.co.kr/nginx-config/"
+            echo "📋 Listing /var/www/neture.co.kr/ contents:"
+            ls -la /var/www/neture.co.kr/ || true
+          fi
+
           # Set permissions
           sudo chown -R www-data:www-data /var/www/neture.co.kr/
           sudo chmod -R 755 /var/www/neture.co.kr/
-          
-          # Clean up
+
+          # Clean up temp build files
           rm -rf /tmp/main-site-build
-          
-          # Reload nginx
+
+          # Reload nginx to apply changes
+          echo "🔄 Reloading Nginx..."
           sudo systemctl reload nginx
-          
+
           echo "✅ Main site deployed successfully!"

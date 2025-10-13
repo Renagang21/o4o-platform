@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@o4o/crowdfunding-types": ["../../packages/crowdfunding-types/dist"]
+      "@o4o/crowdfunding-types": ["../../packages/crowdfunding-types/src"]
     }
   },
   "include": [
