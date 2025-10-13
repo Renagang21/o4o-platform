@@ -55,12 +55,13 @@ jobs:
         script: |
           # Backup current deployment
           sudo cp -r /var/www/admin.neture.co.kr /var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) || true
-          
+
           # Clear current files
           sudo rm -rf /var/www/admin.neture.co.kr/*
-          
-          # Create temp directory
+
+          # Create temp directories
           mkdir -p /tmp/admin-build
+          mkdir -p /tmp/nginx
 
     - name: Copy Nginx config
       uses: appleboy/scp-action@v0.1.7
