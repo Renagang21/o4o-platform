@@ -341,6 +341,14 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
 router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
+
+    // Log incoming request for debugging
+    logger.info('[Template Parts] PUT request received:', {
+      id,
+      bodyKeys: Object.keys(req.body),
+      bodyPreview: JSON.stringify(req.body).substring(0, 500)
+    })
+
     const validatedData = templatePartSchema.partial().parse(req.body)
     const templatePartRepository = AppDataSource.getRepository(TemplatePart)
     
@@ -384,10 +392,20 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
     res.json(updated)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Validation error', details: error.issues })
+      logger.error('[Template Parts] Validation error:', error.issues)
+      return res.status(400).json({
+        error: 'Validation error',
+        message: 'Request body validation failed',
+        details: error.issues,
+        code: 'VALIDATION_ERROR'
+      })
     }
-    console.error('Error updating template part:', error)
-    res.status(500).json({ error: 'Failed to update template part' })
+    logger.error('[Template Parts] Error updating template part:', error)
+    res.status(500).json({
+      error: 'Failed to update template part',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: 'UPDATE_ERROR'
+    })
   }
 })
 
