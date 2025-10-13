@@ -92,49 +92,66 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
     }
 
     templateParts = templateParts.filter(part => {
-      if (!part.conditions) {
+      // Parse conditions if it's a string
+      let conditions = part.conditions
+      if (typeof conditions === 'string') {
+        try {
+          conditions = JSON.parse(conditions)
+        } catch (parseError) {
+          logger.warn(`Template part ${part.id} has invalid JSON conditions:`, parseError)
+          conditions = null
+        }
+      }
+
+      if (!conditions) {
         // No conditions means show everywhere
         return true
       }
 
-      // Check subdomain condition
-      if (part.conditions.subdomain) {
-        if (!subdomainStr || part.conditions.subdomain !== subdomainStr) {
-          return false
+      try {
+        // Check subdomain condition
+        if (conditions.subdomain) {
+          if (!subdomainStr || conditions.subdomain !== subdomainStr) {
+            return false
+          }
         }
-      }
 
-      // Check path prefix condition
-      if (part.conditions.path_prefix) {
-        if (!pathPrefix || !pathPrefix.startsWith(part.conditions.path_prefix)) {
-          return false
+        // Check path prefix condition
+        if (conditions.path_prefix) {
+          if (!pathPrefix || !pathPrefix.startsWith(conditions.path_prefix)) {
+            return false
+          }
         }
-      }
 
-      // Check page conditions
-      if (part.conditions.pages && contextData.pageId) {
-        if (!part.conditions.pages.includes(contextData.pageId)) return false
-      }
+        // Check page conditions
+        if (conditions.pages && contextData.pageId) {
+          if (!conditions.pages.includes(contextData.pageId)) return false
+        }
 
-      // Check post type conditions
-      if (part.conditions.postTypes && contextData.postType) {
-        if (!part.conditions.postTypes.includes(contextData.postType)) return false
-      }
+        // Check post type conditions
+        if (conditions.postTypes && contextData.postType) {
+          if (!conditions.postTypes.includes(contextData.postType)) return false
+        }
 
-      // Check category conditions
-      if (part.conditions.categories && contextData.categories) {
-        const hasCategory = part.conditions.categories.some(cat =>
-          contextData.categories.includes(cat)
-        )
-        if (!hasCategory) return false
-      }
+        // Check category conditions
+        if (conditions.categories && contextData.categories) {
+          const hasCategory = conditions.categories.some(cat =>
+            contextData.categories.includes(cat)
+          )
+          if (!hasCategory) return false
+        }
 
-      // Check user role conditions
-      if (part.conditions.userRoles && contextData.userRole) {
-        if (!part.conditions.userRoles.includes(contextData.userRole)) return false
-      }
+        // Check user role conditions
+        if (conditions.userRoles && contextData.userRole) {
+          if (!conditions.userRoles.includes(contextData.userRole)) return false
+        }
 
-      return true
+        return true
+      } catch (conditionError) {
+        logger.warn(`Error evaluating conditions for template part ${part.id}:`, conditionError)
+        // If there's an error evaluating conditions, include the part by default
+        return true
+      }
     })
     
     // Sanitize content field for each template part before sending to client
@@ -183,8 +200,13 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
       count: sanitizedTemplateParts.length
     })
   } catch (error) {
-    console.error('Template Parts API Error:', error)
-    res.status(500).json({ 
+    logger.error('Template Parts API Error:', {
+      area: req.params.area,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      query: req.query
+    })
+    res.status(500).json({
       success: false,
       error: 'Failed to fetch active template parts',
       code: 'TEMPLATE_PARTS_ERROR',
