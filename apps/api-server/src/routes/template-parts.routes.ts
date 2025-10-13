@@ -3,7 +3,7 @@ import AppDataSource from '../database/data-source'
 import { TemplatePart } from '../entities/TemplatePart'
 import { authenticate } from '../middleware/auth.middleware';
 import { AuthRequest } from '../types/auth'
-import { In } from 'typeorm'
+import { In, Not } from 'typeorm'
 import { z } from 'zod'
 import logger from '../utils/logger'
 
@@ -387,9 +387,12 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
     // Check slug uniqueness if changing
     if (validatedData.slug && validatedData.slug !== templatePart.slug) {
       const existing = await templatePartRepository.findOne({
-        where: { slug: validatedData.slug }
+        where: {
+          slug: validatedData.slug,
+          id: Not(id)  // Exclude current record from uniqueness check
+        }
       })
-      
+
       if (existing) {
         return res.status(400).json({ error: 'Slug already exists' })
       }
