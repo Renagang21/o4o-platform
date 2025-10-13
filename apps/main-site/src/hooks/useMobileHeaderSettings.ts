@@ -52,7 +52,8 @@ export const useMobileHeaderSettings = () => {
           ...data
         });
       } catch (err) {
-        console.error('Error fetching mobile header settings:', err);
+        // Silently use default settings if API endpoint doesn't exist yet
+        // console.log('Using default mobile header settings');
         setError(err instanceof Error ? err.message : 'Unknown error');
         // Use default settings on error
         setSettings(defaultSettings);

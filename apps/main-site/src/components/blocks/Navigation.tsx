@@ -69,7 +69,8 @@ const Navigation: FC<NavigationProps> = ({
 
   // Error state - render empty menu
   if (error && !propMenuItems) {
-    console.error('Failed to load menu:', error);
+    // Silently return null if menu doesn't exist yet
+    // console.log('Menu not found, using fallback');
     return null;
   }
 
