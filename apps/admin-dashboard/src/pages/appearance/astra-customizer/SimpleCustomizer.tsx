@@ -151,7 +151,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
       if (defaultHeader && isValidUUID) {
         // Update existing default header
-        await authClient.api.put(`/template-parts/${defaultHeader.id}`, headerTemplatePart);
+        // Preserve the existing slug to avoid uniqueness conflicts
+        const updateData = {
+          ...headerTemplatePart,
+          slug: defaultHeader.slug // Keep existing slug
+        };
+        await authClient.api.put(`/template-parts/${defaultHeader.id}`, updateData);
         toast.success('헤더 템플릿이 업데이트되었습니다');
       } else {
         // Create new header template part
