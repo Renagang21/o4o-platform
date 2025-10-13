@@ -35,8 +35,10 @@ export type AIModel = keyof typeof AI_MODELS;
 export interface Block {
   id: string;
   type: string;
-  content?: any;
+  content: any;
   attributes?: Record<string, any>;
+  clientId?: string;
+  innerBlocks?: Block[];
 }
 
 // Sprint 2 - P1: Removed apiKey from config (server-side only)

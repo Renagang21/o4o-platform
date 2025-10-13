@@ -122,7 +122,7 @@ export const PostRow: React.FC<PostRowProps> = ({
       </td>
       {visibleColumns.author && (
         <td className="px-3 py-3 text-sm text-gray-600">
-          {post.author?.name || post.author?.email?.split('@')[0] || 'Unknown'}
+          {post.author || 'Unknown'}
         </td>
       )}
       {visibleColumns.categories && (

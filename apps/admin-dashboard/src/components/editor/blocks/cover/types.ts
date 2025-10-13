@@ -108,6 +108,8 @@ export interface CoverBlockProps {
   isSelected: boolean;
   onSelect: () => void;
   attributes?: CoverBlockAttributes;
+  innerBlocks?: any[];
+  onInnerBlocksChange?: (blocks: any[]) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   isDragging?: boolean;

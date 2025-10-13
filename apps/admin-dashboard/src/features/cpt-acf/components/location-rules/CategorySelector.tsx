@@ -14,6 +14,10 @@ interface CategoryOption {
   count?: number;
 }
 
+interface CategoryTreeNode extends CategoryOption {
+  children: CategoryTreeNode[];
+}
+
 interface CategorySelectorProps {
   value: string;
   onChange: (value: string) => void;
@@ -74,8 +78,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       );
     }
 
-    const tree: (CategoryOption & { children: CategoryOption[] })[] = [];
-    const categoryMap = new Map<string, CategoryOption & { children: CategoryOption[] }>();
+    const tree: CategoryTreeNode[] = [];
+    const categoryMap = new Map<string, CategoryTreeNode>();
 
     // Create map of all categories
     filteredCategories.forEach(cat => {
@@ -97,7 +101,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
     });
 
     // Sort by label
-    const sortTree = (nodes: typeof tree) => {
+    const sortTree = (nodes: CategoryTreeNode[]): void => {
       nodes.sort((a, b) => a.label.localeCompare(b.label));
       nodes.forEach(node => {
         if (node.children.length > 0) {
@@ -128,7 +132,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   // Render category tree recursively
   const renderCategoryTree = (
-    nodes: (CategoryOption & { children?: CategoryOption[] })[],
+    nodes: CategoryTreeNode[],
     level: number = 0
   ) => {
     return nodes.map(node => {

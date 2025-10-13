@@ -129,8 +129,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         template,
         config: {
           provider,
-          model,
-          apiKey
+          model
         },
         onProgress: (progress, message) => {
           setProgress(progress);

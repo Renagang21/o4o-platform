@@ -83,7 +83,12 @@ const WordPressMenuList: FC = () => {
     primary: { name: '주 메뉴', icon: Monitor, color: 'blue' },
     footer: { name: '푸터 메뉴', icon: MapPin, color: 'gray' },
     mobile: { name: '모바일 메뉴', icon: Smartphone, color: 'green' },
-    social: { name: '소셜 링크', icon: Users, color: 'purple' }
+    social: { name: '소셜 링크', icon: Users, color: 'purple' },
+    sidebar: { name: '사이드바', icon: Menu, color: 'gray' },
+    'shop-categories': { name: '쇼핑 카테고리', icon: Menu, color: 'green' },
+    'forum-menu': { name: '포럼 메뉴', icon: Menu, color: 'purple' },
+    'funding-categories': { name: '펀딩 카테고리', icon: Menu, color: 'yellow' },
+    'business-menu': { name: '비즈니스 메뉴', icon: Menu, color: 'red' }
   };
   
   // Filter menus based on search

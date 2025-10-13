@@ -9,6 +9,8 @@ export interface Block {
   type: string;
   content: any;
   attributes?: Record<string, any>;
+  clientId?: string;
+  innerBlocks?: Block[];
 }
 
 // 게시글 상태

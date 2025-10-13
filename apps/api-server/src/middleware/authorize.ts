@@ -1,17 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-// Use module augmentation to extend Express Request
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: {
-      id: string;
-      email: string;
-      role?: string;
-      roles?: string[];
-    };
-  }
-}
-
 /**
  * Authorization middleware to check user roles
  * @param allowedRoles Array of roles that are allowed to access the route

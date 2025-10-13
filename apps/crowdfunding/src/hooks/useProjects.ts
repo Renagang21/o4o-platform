@@ -88,7 +88,7 @@ export function useCreateProject() {
 
       // 추가 이미지들 추가
       if (data.images && Array.isArray(data.images)) {
-        data.images.forEach((image) => {
+        data.images.forEach((image: unknown) => {
           if (image instanceof File) {
             formData.append('images', image);
           }

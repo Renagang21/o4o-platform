@@ -9,7 +9,7 @@ export interface FieldGroup {
   key: string;
   title: string;
   description?: string;
-  location: FieldLocation[];
+  location: FieldLocation[][];
   fields: CustomField[];
   menuOrder: number;
   position: 'normal' | 'side' | 'acf_after_title';
