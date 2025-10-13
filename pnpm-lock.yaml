@@ -510,7 +510,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@18.3.1)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: link:../../packages/utils
@@ -539,7 +539,7 @@ importers:
         specifier: ^7.5.0
         version: 7.5.1(express@4.21.2)
       helmet:
-        specifier: ^8.0.0
+        specifier: ^8.1.0
         version: 8.1.0
       http-proxy-middleware:
         specifier: ^3.0.0
@@ -568,7 +568,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/compression':
         specifier: ^1.7.5
         version: 1.8.1
@@ -616,7 +616,7 @@ importers:
         version: link:../../packages/crowdfunding-types
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@18.3.1)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: link:../../packages/utils
@@ -714,8 +714,8 @@ importers:
         specifier: ^6.15.0
         version: 6.15.0
       helmet:
-        specifier: ^6.2.0
-        version: 6.2.0
+        specifier: ^8.1.0
+        version: 8.1.0
       ioredis:
         specifier: ^5.7.0
         version: 5.7.0
@@ -833,7 +833,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/bcryptjs':
         specifier: 2.4.6
         version: 2.4.6
@@ -953,7 +953,7 @@ importers:
         version: link:../../packages/auth-context
       '@o4o/crowdfunding-types':
         specifier: file:../../packages/crowdfunding-types
-        version: file:packages/crowdfunding-types(react@18.2.0)
+        version: link:../../packages/crowdfunding-types
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1265,7 +1265,7 @@ importers:
         version: link:../../packages/auth-context
       '@o4o/forum-types':
         specifier: file:../../packages/forum-types
-        version: file:packages/forum-types(react@18.2.0)
+        version: link:../../packages/forum-types
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1630,7 +1630,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../types
-        version: file:packages/types(react@18.3.1)
+        version: link:../types
     devDependencies:
       tsup:
         specifier: ^8.0.1
@@ -1643,7 +1643,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../types
-        version: file:packages/types(react@18.3.1)
+        version: link:../types
     devDependencies:
       '@types/node':
         specifier: 24.2.1
@@ -2957,6 +2957,10 @@ packages:
     resolution: {integrity: sha512-bndDP83naYYkfayr/qhBHMhk0YGwS1iv6vaEGcr0SQbO0IZtbOPqjKjds/WcG+bJA+1T5vCx6kprKOzn5Bg+Vw==}
     engines: {node: '>=18'}
 
+  '@mswjs/interceptors@0.39.7':
+    resolution: {integrity: sha512-sURvQbbKsq5f8INV54YJgJEdk8oxBanqkTiXXd33rKmofFCwZLhLRszPduMZ9TA9b8/1CHc/IJmOlBHJk2Q5AQ==}
+    engines: {node: '>=18'}
+
   '@mui/core-downloads-tracker@7.3.2':
     resolution: {integrity: sha512-AOyfHjyDKVPGJJFtxOlept3EYEdLoar/RvssBTWVAvDJGIE676dLi2oT/Kx+FoVXFoA/JdV7DEMq/BVWV3KHRw==}
 
@@ -3063,20 +3067,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@o4o/crowdfunding-types@file:packages/crowdfunding-types':
-    resolution: {directory: packages/crowdfunding-types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/forum-types@file:packages/forum-types':
-    resolution: {directory: packages/forum-types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/types@file:packages/types':
-    resolution: {directory: packages/types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-    peerDependencies:
-      react: 18.2.0
 
   '@open-draft/deferred-promise@2.2.0':
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
@@ -7332,10 +7322,6 @@ packages:
 
   headers-polyfill@4.0.3:
     resolution: {integrity: sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ==}
-
-  helmet@6.2.0:
-    resolution: {integrity: sha512-DWlwuXLLqbrIOltR6tFQXShj/+7Cyp0gLi6uAb8qMdFh/YBBFbKSgQ6nbXmScYd8emMctuthmgIa7tUfo9Rtyg==}
-    engines: {node: '>=14.0.0'}
 
   helmet@8.1.0:
     resolution: {integrity: sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==}
@@ -12023,6 +12009,16 @@ snapshots:
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
 
+  '@mswjs/interceptors@0.39.7':
+    dependencies:
+      '@open-draft/deferred-promise': 2.2.0
+      '@open-draft/logger': 0.3.0
+      '@open-draft/until': 2.1.0
+      is-node-process: 1.2.0
+      outvariant: 1.4.3
+      strict-event-emitter: 0.5.1
+    optional: true
+
   '@mui/core-downloads-tracker@7.3.2': {}
 
   '@mui/icons-material@7.3.1(@mui/material@7.3.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react@18.2.0))(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.2.79)(react@18.2.0)':
@@ -12123,26 +12119,6 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
-
-  '@o4o/crowdfunding-types@file:packages/crowdfunding-types(react@18.2.0)':
-    dependencies:
-      '@o4o/types': file:packages/types(react@18.2.0)
-    transitivePeerDependencies:
-      - react
-
-  '@o4o/forum-types@file:packages/forum-types(react@18.2.0)':
-    dependencies:
-      '@o4o/types': file:packages/types(react@18.2.0)
-    transitivePeerDependencies:
-      - react
-
-  '@o4o/types@file:packages/types(react@18.2.0)':
-    dependencies:
-      react: 18.2.0
-
-  '@o4o/types@file:packages/types(react@18.3.1)':
-    dependencies:
-      react: 18.3.1
 
   '@open-draft/deferred-promise@2.2.0': {}
 
@@ -14024,16 +14000,6 @@ snapshots:
       '@testing-library/dom': 10.4.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    optionalDependencies:
-      '@types/react': 18.2.79
-      '@types/react-dom': 18.2.25
-
-  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@babel/runtime': 7.28.4
-      '@testing-library/dom': 10.4.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.2.79
       '@types/react-dom': 18.2.25
@@ -17557,8 +17523,6 @@ snapshots:
 
   headers-polyfill@4.0.3: {}
 
-  helmet@6.2.0: {}
-
   helmet@8.1.0: {}
 
   highlight-words-core@1.2.3: {}
@@ -18797,7 +18761,7 @@ snapshots:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
       '@inquirer/confirm': 5.1.18(@types/node@22.17.2)
-      '@mswjs/interceptors': 0.39.6
+      '@mswjs/interceptors': 0.39.7
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/until': 2.1.0
       '@types/cookie': 0.6.0
@@ -18824,7 +18788,7 @@ snapshots:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
       '@inquirer/confirm': 5.1.18(@types/node@24.2.1)
-      '@mswjs/interceptors': 0.39.6
+      '@mswjs/interceptors': 0.39.7
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/until': 2.1.0
       '@types/cookie': 0.6.0
