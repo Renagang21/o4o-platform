@@ -618,6 +618,7 @@ app.get('/api/v1/users/roles', (req, res) => {
 // Consolidated settings routes - removed duplicates
 app.use('/api/v1/settings', settingsLimiter, settingsV1Routes);
 app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes); // Customizer API routes
+app.use('/api/customizer', settingsLimiter, customizerV1Routes); // Customizer API routes (no v1 prefix for frontend compatibility)
 app.use('/api/settings', settingsLimiter, settingsRoutes); // Primary settings route
 // Removed duplicate: app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
 app.use('/settings', settingsLimiter, settingsRoutes); // Backward compatibility
@@ -867,6 +868,7 @@ app.use('/api', tagRoutes); // Tags at /api/tags (mounted at specific paths in t
 // AI routes - Removed duplicate (using v1/ai-settings.routes.ts instead)
 
 app.use('/api/v1/menus', menusRoutes); // Menus routes
+app.use('/api/menus', menusRoutes); // Menus routes (no v1 prefix for frontend compatibility)
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
 
 // Advanced menu features (Phase 2)

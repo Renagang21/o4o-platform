@@ -365,4 +365,102 @@ router.put(
   }
 );
 
+// ============================================
+// Mobile Header Settings Endpoints
+// ============================================
+
+const defaultMobileHeaderSettings = {
+  enabled: true,
+  breakpoint: 768,
+  mobileLogoUrl: '',
+  mobileLogoWidth: 120,
+  hamburgerStyle: 'default',
+  menuPosition: 'left',
+  menuAnimation: 'slide',
+  overlayEnabled: true,
+  overlayColor: '#000000',
+  overlayOpacity: 0.5,
+  backgroundColor: '#ffffff',
+  textColor: '#000000',
+  showAccountIcon: true,
+  showCartIcon: true,
+  showSearchIcon: false,
+  submenuStyle: 'accordion',
+  closeOnItemClick: false,
+  swipeToClose: true
+};
+
+/**
+ * GET /api/customizer/mobile-header-settings
+ * Get mobile header settings (public)
+ */
+router.get('/mobile-header-settings', async (req: Request, res: Response) => {
+  try {
+    let customizerSettings = await settingsService.getSettings('customizer');
+    customizerSettings = migrateCustomizerSettings(customizerSettings);
+
+    const mobileHeader = (customizerSettings as any)?.mobileHeader || defaultMobileHeaderSettings;
+
+    res.json({
+      success: true,
+      data: mobileHeader,
+    });
+  } catch (error: any) {
+    console.error('Error fetching mobile header settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch mobile header settings',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// Header Sticky Settings Endpoints
+// ============================================
+
+const defaultStickyHeaderSettings = {
+  enabled: false,
+  triggerHeight: 100,
+  stickyOn: ['primary'],
+  shrinkEffect: false,
+  shrinkHeight: {
+    desktop: 60,
+    tablet: 55,
+    mobile: 50
+  },
+  backgroundColor: '#ffffff',
+  backgroundOpacity: 1,
+  boxShadow: true,
+  shadowIntensity: 'medium',
+  animationDuration: 300,
+  hideOnScrollDown: false,
+  zIndex: 999
+};
+
+/**
+ * GET /api/customizer/settings/header/sticky
+ * Get sticky header settings (public)
+ */
+router.get('/settings/header/sticky', async (req: Request, res: Response) => {
+  try {
+    let customizerSettings = await settingsService.getSettings('customizer');
+    customizerSettings = migrateCustomizerSettings(customizerSettings);
+
+    const sticky = (customizerSettings as any)?.header?.sticky || defaultStickyHeaderSettings;
+
+    res.json({
+      success: true,
+      data: sticky,
+    });
+  } catch (error: any) {
+    console.error('Error fetching sticky header settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch sticky header settings',
+      message: error.message,
+    });
+  }
+});
+
 export default router;
