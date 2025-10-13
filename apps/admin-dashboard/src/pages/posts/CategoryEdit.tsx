@@ -7,6 +7,7 @@ import { ContentApi } from '@/api/contentApi';
 import { useAuthStore } from '@/stores/authStore';
 import { Category as CategoryType } from '@/types/content';
 import { hasPermission, hasAnyPermission } from '@/utils/permissions';
+import { authClient } from '@o4o/auth-client';
 
 interface CategoryWithPermissions extends CategoryType {
   permissions?: {
@@ -57,37 +58,18 @@ const CategoryEdit = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${apiUrl}/api/v1/users/roles`, {
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setAvailableRoles(result.data);
-          }
-        } else {
-          const errorText = await response.text();
-          
-          // If unauthorized, user may need to login again
-          if (response.status === 401) {
-            toast.error('Session expired. Please login again.');
-          } else {
-            toast.error(`Failed to load user roles: ${response.status}`);
-          }
-          
-          // Keep empty - should load from API only
+        const response = await authClient.api.get('/users/roles');
+
+        if (response.data?.success && response.data.data) {
+          setAvailableRoles(response.data.data);
         }
-      } catch (error) {
-        toast.error('Error loading user roles');
-        
-        // Keep empty - should load from API only
+      } catch (error: any) {
+        // If unauthorized, user may need to login again
+        if (error.response?.status === 401) {
+          toast.error('Session expired. Please login again.');
+        } else {
+          toast.error('Failed to load user roles');
+        }
       } finally {
         setRolesLoading(false);
       }

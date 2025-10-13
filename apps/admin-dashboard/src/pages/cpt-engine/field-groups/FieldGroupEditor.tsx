@@ -150,10 +150,8 @@ export default function FieldGroupEditor() {
     queryKey: ['cpt-types'],
     queryFn: async () => {
       // Use public endpoint for fetching CPT types
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${apiUrl}/api/public/cpt/types`);
-      const data = await response.json();
-      return data.data || [];
+      const response = await authClient.api.get('/public/cpt/types');
+      return response.data?.data || [];
     }
   });
 

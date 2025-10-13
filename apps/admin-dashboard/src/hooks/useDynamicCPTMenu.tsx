@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { MenuItem } from '@/config/wordpressMenuFinal';
 import { FileText, Package, FileCode, Database, Layout } from 'lucide-react';
+import { authClient } from '@o4o/auth-client';
 
 /**
  * CPT를 메뉴 아이템으로 변환
@@ -16,10 +17,8 @@ export const useDynamicCPTMenu = () => {
     queryKey: ['cpt-menu-items'],
     queryFn: async () => {
       // Use public endpoint for menu items (doesn't require auth)
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${apiUrl}/api/public/cpt/types`);
-      const data = await response.json();
-      return data.data || [];
+      const response = await authClient.api.get('/public/cpt/types');
+      return response.data?.data || [];
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
     gcTime: 10 * 60 * 1000,

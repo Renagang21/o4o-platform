@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import BusinessInfoSection from './components/BusinessInfoSection';
 import toast from 'react-hot-toast';
 import { UserApi } from '@/api/userApi';
+import { authClient } from '@o4o/auth-client';
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -59,12 +60,11 @@ export default function UserForm() {
     const fetchRoles = async () => {
       try {
         setLoadingRoles(true);
-        const response = await fetch('https://api.neture.co.kr/api/v1/users/roles');
-        const data = await response.json();
-        if (data.success && Array.isArray(data.data)) {
-          setRoles(data.data);
+        const response = await authClient.api.get('/users/roles');
+        if (response.data?.success && Array.isArray(response.data.data)) {
+          setRoles(response.data.data);
         } else {
-          console.warn('Invalid roles data format:', data);
+          console.warn('Invalid roles data format:', response.data);
           setRoles([]);
         }
       } catch (error) {

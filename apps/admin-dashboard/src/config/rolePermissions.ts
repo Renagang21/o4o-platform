@@ -1,6 +1,8 @@
 // Role-based menu permissions configuration
 // Dynamically handles roles from database
 
+import { authClient } from '@o4o/auth-client';
+
 export interface MenuPermission {
   menuId: string;
   roles?: string[]; // Dynamic roles from database
@@ -381,11 +383,8 @@ export interface RoleConfig {
  */
 export async function fetchRolesFromDatabase(): Promise<RoleConfig[]> {
   try {
-    const response = await fetch('/api/v1/roles');
-    if (!response.ok) {
-      throw new Error('Failed to fetch roles');
-    }
-    return await response.json();
+    const response = await authClient.api.get('/roles');
+    return response.data || [];
   } catch (error) {
     console.error('Error fetching roles:', error);
     // Return empty array as fallback
@@ -399,14 +398,10 @@ export async function fetchRolesFromDatabase(): Promise<RoleConfig[]> {
  */
 export async function fetchUserPermissions(userId: string): Promise<string[]> {
   try {
-    const response = await fetch(`/api/v1/users/${userId}/permissions`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch user permissions');
-    }
-    const data = await response.json();
-    return data.permissions || [];
+    const response = await authClient.api.get(`/users/${userId}/permissions`);
+    return response.data?.permissions || [];
   } catch (error) {
-    console.error('Error fetching user permissions:', error);
+    console.error('Failed to fetch user permissions:', error);
     return [];
   }
 }
