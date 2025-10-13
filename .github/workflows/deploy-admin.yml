@@ -11,7 +11,7 @@ on:
       - 'apps/admin-dashboard/**'
       - 'packages/**'
       - '.github/workflows/deploy-admin.yml'
-      - '.github/nginx/admin.neture.co.kr.conf'
+      - 'nginx-configs/admin.neture.co.kr.conf'
 
 jobs:
   deploy:
@@ -49,7 +49,7 @@ jobs:
     - name: Prepare Nginx config for deployment
       run: |
         mkdir -p apps/admin-dashboard/dist/nginx-config
-        cp .github/nginx/admin.neture.co.kr.conf apps/admin-dashboard/dist/nginx-config/
+        cp nginx-configs/admin.neture.co.kr.conf apps/admin-dashboard/dist/nginx-config/
 
     - name: Deploy to web server
       uses: appleboy/ssh-action@v1.0.3
@@ -98,7 +98,7 @@ jobs:
             # Backup current nginx config
             sudo cp /etc/nginx/sites-available/admin.neture.co.kr /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
-            # Copy new config
+            # Copy new config (remove .conf extension for consistency)
             sudo cp /var/www/admin.neture.co.kr/nginx-config/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
 
             # Test nginx configuration

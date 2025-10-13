@@ -97,7 +97,7 @@ jobs:
             # Backup current nginx config
             sudo cp /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-available/neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
-            # Copy new config
+            # Copy new config (remove .conf extension for consistency)
             sudo cp /var/www/neture.co.kr/nginx-config/neture.co.kr.conf /etc/nginx/sites-available/neture.co.kr
 
             # Test nginx configuration

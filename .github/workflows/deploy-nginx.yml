@@ -45,16 +45,16 @@ jobs:
           git config pull.rebase false
           git pull origin main
 
-          # Copy nginx configs to system
+          # Copy nginx configs to system (remove .conf extension for consistency)
           echo "📋 Deploying nginx configs..."
-          sudo cp nginx-configs/admin.neture.co.kr.conf /etc/nginx/sites-available/
-          sudo cp nginx-configs/neture.co.kr.conf /etc/nginx/sites-available/
-          sudo cp nginx-configs/api.neture.co.kr.conf /etc/nginx/sites-available/
+          sudo cp nginx-configs/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
+          sudo cp nginx-configs/neture.co.kr.conf /etc/nginx/sites-available/neture.co.kr
+          sudo cp nginx-configs/api.neture.co.kr.conf /etc/nginx/sites-available/api.neture.co.kr
 
-          # Enable sites (create symlinks)
-          sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr.conf /etc/nginx/sites-enabled/
-          sudo ln -sf /etc/nginx/sites-available/neture.co.kr.conf /etc/nginx/sites-enabled/
-          sudo ln -sf /etc/nginx/sites-available/api.neture.co.kr /etc/nginx/sites-enabled/
+          # Enable sites (create symlinks without .conf extension)
+          sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr /etc/nginx/sites-enabled/admin.neture.co.kr
+          sudo ln -sf /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-enabled/neture.co.kr
+          sudo ln -sf /etc/nginx/sites-available/api.neture.co.kr /etc/nginx/sites-enabled/api.neture.co.kr
           
           # Test nginx configuration
           echo "🧪 Testing nginx configuration..."
