@@ -81,7 +81,8 @@ const Customize: React.FC = () => {
       errorHandler.log('설정 저장 시작', ErrorLevel.INFO, 'Settings');
 
       // API를 통해 설정 저장 (PUT 메서드 사용)
-      const response = await authClient.api.put('/settings/customizer', settings);
+      // 서버는 { settings: {...} } 형식을 기대함
+      const response = await authClient.api.put('/settings/customizer', { settings });
 
       if (response.data?.success) {
         toast.success('설정이 저장되었습니다.');
