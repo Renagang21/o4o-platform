@@ -98,11 +98,12 @@ export class UserStatisticsController {
           security: securityStats
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       // Error log removed
       res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: 'Failed to fetch user statistics',
+        error: error.message || 'Internal server error'
       });
     }
   }
@@ -196,40 +197,49 @@ export class UserStatisticsController {
   }
 
   static async getGeographicDistribution(days: number) {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
 
-    const locations = await UserStatisticsController.activityRepository
-      .createQueryBuilder('activity')
-      .select('activity.metadata->>"$.location.country" as country, COUNT(*) as count')
-      .where('activity.createdAt >= :startDate', { startDate })
-      .andWhere('activity.metadata->>"$.location.country" IS NOT NULL')
-      .groupBy('country')
-      .orderBy('count', 'DESC')
-      .limit(20)
-      .getRawMany();
+      // PostgreSQL JSON query syntax
+      const locations = await UserStatisticsController.activityRepository
+        .createQueryBuilder('activity')
+        .select("(activity.metadata::json->'location'->>'country') as country, COUNT(*) as count")
+        .where('activity.createdAt >= :startDate', { startDate })
+        .andWhere("activity.metadata::json->'location'->>'country' IS NOT NULL")
+        .groupBy('country')
+        .orderBy('count', 'DESC')
+        .limit(20)
+        .getRawMany();
 
-    const cities = await UserStatisticsController.activityRepository
-      .createQueryBuilder('activity')
-      .select('activity.metadata->>"$.location.city" as city, activity.metadata->>"$.location.country" as country, COUNT(*) as count')
-      .where('activity.createdAt >= :startDate', { startDate })
-      .andWhere('activity.metadata->>"$.location.city" IS NOT NULL')
-      .groupBy('city, country')
-      .orderBy('count', 'DESC')
-      .limit(20)
-      .getRawMany();
+      const cities = await UserStatisticsController.activityRepository
+        .createQueryBuilder('activity')
+        .select("(activity.metadata::json->'location'->>'city') as city, (activity.metadata::json->'location'->>'country') as country, COUNT(*) as count")
+        .where('activity.createdAt >= :startDate', { startDate })
+        .andWhere("activity.metadata::json->'location'->>'city' IS NOT NULL")
+        .groupBy('city, country')
+        .orderBy('count', 'DESC')
+        .limit(20)
+        .getRawMany();
 
-    return {
-      countries: locations.map(l => ({
-        country: l.country,
-        count: parseInt(l.count, 10)
-      })),
-      cities: cities.map(c => ({
-        city: c.city,
-        country: c.country,
-        count: parseInt(c.count, 10)
-      }))
-    };
+      return {
+        countries: locations.map(l => ({
+          country: l.country,
+          count: parseInt(l.count, 10)
+        })),
+        cities: cities.map(c => ({
+          city: c.city,
+          country: c.country,
+          count: parseInt(c.count, 10)
+        }))
+      };
+    } catch (error) {
+      // Return empty data if JSON queries fail
+      return {
+        countries: [],
+        cities: []
+      };
+    }
   }
 
   static async getTopActiveUsers(days: number, limit: number) {
