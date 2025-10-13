@@ -46,6 +46,11 @@ jobs:
         VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
         pnpm run build
 
+    - name: Prepare Nginx config for deployment
+      run: |
+        mkdir -p apps/admin-dashboard/dist/.nginx-config
+        cp .github/nginx/admin.neture.co.kr.conf apps/admin-dashboard/dist/.nginx-config/
+
     - name: Deploy to web server
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -61,17 +66,6 @@ jobs:
 
           # Create temp directories
           mkdir -p /tmp/admin-build
-          mkdir -p /tmp/nginx
-
-    - name: Copy Nginx config
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.WEB_HOST }}
-        username: ${{ secrets.WEB_USER }}
-        key: ${{ secrets.WEB_SSH_KEY }}
-        source: ".github/nginx/admin.neture.co.kr.conf"
-        target: "/tmp/nginx/"
-        strip_components: 2
 
     - name: Copy build files
       uses: appleboy/scp-action@v0.1.7
@@ -90,33 +84,38 @@ jobs:
         username: ${{ secrets.WEB_USER }}
         key: ${{ secrets.WEB_SSH_KEY }}
         script: |
+          # Move files from temp to web directory
+          echo "📦 Deploying build files..."
+          sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
+
           # Update Nginx configuration
           echo "🔧 Updating Nginx configuration..."
-          if [ -f /tmp/nginx/admin.neture.co.kr.conf ]; then
+          if [ -f /var/www/admin.neture.co.kr/.nginx-config/admin.neture.co.kr.conf ]; then
+            echo "✅ Found Nginx config in deployment artifacts"
+
             # Backup current nginx config
             sudo cp /etc/nginx/sites-available/admin.neture.co.kr /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
             # Copy new config
-            sudo cp /tmp/nginx/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
+            sudo cp /var/www/admin.neture.co.kr/.nginx-config/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
 
             # Test nginx configuration
             if sudo nginx -t; then
               echo "✅ Nginx configuration is valid"
             else
               echo "❌ Nginx configuration test failed, restoring backup"
-              sudo cp /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d) /etc/nginx/sites-available/admin.neture.co.kr 2>/dev/null || true
+              latest_backup=$(ls -t /etc/nginx/sites-available/admin.neture.co.kr.backup.* 2>/dev/null | head -1)
+              if [ -n "$latest_backup" ]; then
+                sudo cp "$latest_backup" /etc/nginx/sites-available/admin.neture.co.kr
+              fi
               exit 1
             fi
 
-            # Clean up temp nginx config
-            rm -rf /tmp/nginx
+            # Clean up nginx config from web directory
+            sudo rm -rf /var/www/admin.neture.co.kr/.nginx-config
           else
-            echo "⚠️ Nginx config not found, skipping configuration update"
+            echo "⚠️ Nginx config not found in deployment artifacts, skipping configuration update"
           fi
-
-          # Move files from temp to web directory
-          echo "📦 Deploying build files..."
-          sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
 
           # Set permissions
           sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
