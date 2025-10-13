@@ -137,8 +137,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       // Convert customizer settings to template parts format
       const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
 
-      console.log('[Customizer - Publish] 전송할 데이터:', headerTemplatePart);
-
       // Check if default header exists and update it
       const existingResponse = await authClient.api.get('/public/template-parts');
       const existingParts = existingResponse.data?.data || [];
@@ -153,12 +151,10 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
       if (defaultHeader && isValidUUID) {
         // Update existing default header
-        console.log('[Customizer - Publish] 기존 헤더 업데이트:', defaultHeader.id);
         await authClient.api.put(`/template-parts/${defaultHeader.id}`, headerTemplatePart);
         toast.success('헤더 템플릿이 업데이트되었습니다');
       } else {
         // Create new header template part
-        console.log('[Customizer - Publish] 새 헤더 생성');
         await authClient.api.post('/template-parts', {
           ...headerTemplatePart,
           isDefault: true,
