@@ -71,7 +71,8 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       <WordPressRouter />
       
       {/* WordPress Admin Bar (hidden in fullscreen customizer) */}
-      {!isFullscreenMode && <AdminBar onLogout={handleLogout} />}
+      {/* AdminBar 임시 비활성화 - 헤더 중복 문제 해결 */}
+      {/* {!isFullscreenMode && <AdminBar onLogout={handleLogout} />} */}
       
       
       {/* Sidebar */}
