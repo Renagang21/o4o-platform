@@ -300,7 +300,7 @@ export class UserStatisticsController {
       .createQueryBuilder('activity')
       .where('activity.activityType = :type', { type: ActivityType.LOGIN })
       .andWhere('activity.createdAt >= :startDate', { startDate })
-      .andWhere('activity.isError = true OR activity.metadata->>"$.success" = "false"')
+      .andWhere("activity.isError = true OR (activity.metadata::json->>'success') = 'false'")
       .getCount();
 
     const suspiciousIPs = await UserStatisticsController.activityRepository
