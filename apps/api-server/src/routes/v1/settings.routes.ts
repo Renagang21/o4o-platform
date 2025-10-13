@@ -936,100 +936,108 @@ router.post('/permalink/validate',
 );
 
 /**
+ * Handle customizer settings update (shared logic for POST and PUT)
+ */
+const updateCustomizerSettings = async (req: Request, res: Response) => {
+  try {
+    const newSettings = req.body;
+    const actor = (req as any).user?.id || 'unknown';
+
+    logger.info('Customizer settings update request:', {
+      actor,
+      settings: newSettings,
+      timestamp: new Date().toISOString()
+    });
+
+    // Validate settings structure
+    if (!newSettings.settings && !newSettings.type) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid customizer settings format'
+      });
+    }
+
+    const customizerSettings = newSettings.settings || newSettings;
+
+    // Save to database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+
+    try {
+      let dbSettings = await settingsRepository.findOne({
+        where: { key: 'customizer', type: 'customizer' }
+      });
+
+      if (dbSettings) {
+        // Merge with existing settings
+        const existingSettings = dbSettings.value || {};
+        dbSettings.value = { ...existingSettings, ...customizerSettings };
+        dbSettings.updatedAt = new Date();
+      } else {
+        dbSettings = settingsRepository.create({
+          key: 'customizer',
+          type: 'customizer',
+          value: customizerSettings,
+          description: 'Website customizer settings (logo, colors, typography, layout)'
+        });
+      }
+
+      await settingsRepository.save(dbSettings);
+
+      logger.info('Customizer settings saved to database:', {
+        actor,
+        settings: dbSettings.value,
+        timestamp: new Date().toISOString()
+      });
+
+      // Also update memory store for backward compatibility
+      settingsStore.set('customizer', customizerSettings);
+
+      res.json({
+        success: true,
+        data: dbSettings.value,
+        message: 'Customizer settings updated successfully'
+      });
+
+    } catch (dbError) {
+      logger.error('Database save failed for customizer settings:', {
+        actor,
+        error: dbError instanceof Error ? dbError.message : 'Unknown DB error'
+      });
+
+      // Fallback to memory store
+      settingsStore.set('customizer', customizerSettings);
+
+      res.status(500).json({
+        success: false,
+        error: 'Database save failed, settings saved temporarily'
+      });
+    }
+
+  } catch (error) {
+    logger.error('Customizer settings update failed:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update customizer settings'
+    });
+  }
+};
+
+/**
  * @route   POST /api/v1/settings/customizer
  * @desc    Update customizer settings
  * @access  Private (Admin only)
  */
-router.post('/customizer',
-  authenticate,
-  requireAdmin,
-  async (req: Request, res: Response) => {
-    try {
-      const newSettings = req.body;
-      const actor = (req as any).user?.id || 'unknown';
-      
-      logger.info('Customizer settings update request:', {
-        actor,
-        settings: newSettings,
-        timestamp: new Date().toISOString()
-      });
-      
-      // Validate settings structure
-      if (!newSettings.settings && !newSettings.type) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid customizer settings format'
-        });
-      }
-      
-      const customizerSettings = newSettings.settings || newSettings;
-      
-      // Save to database
-      const settingsRepository = AppDataSource.getRepository(Settings);
-      
-      try {
-        let dbSettings = await settingsRepository.findOne({ 
-          where: { key: 'customizer', type: 'customizer' } 
-        });
-        
-        if (dbSettings) {
-          // Merge with existing settings
-          const existingSettings = dbSettings.value || {};
-          dbSettings.value = { ...existingSettings, ...customizerSettings };
-          dbSettings.updatedAt = new Date();
-        } else {
-          dbSettings = settingsRepository.create({
-            key: 'customizer',
-            type: 'customizer',
-            value: customizerSettings,
-            description: 'Website customizer settings (logo, colors, typography, layout)'
-          });
-        }
-        
-        await settingsRepository.save(dbSettings);
-        
-        logger.info('Customizer settings saved to database:', {
-          actor,
-          settings: dbSettings.value,
-          timestamp: new Date().toISOString()
-        });
-        
-        // Also update memory store for backward compatibility
-        settingsStore.set('customizer', customizerSettings);
-        
-        res.json({
-          success: true,
-          data: dbSettings.value,
-          message: 'Customizer settings updated successfully'
-        });
-        
-      } catch (dbError) {
-        logger.error('Database save failed for customizer settings:', {
-          actor,
-          error: dbError instanceof Error ? dbError.message : 'Unknown DB error'
-        });
-        
-        // Fallback to memory store
-        settingsStore.set('customizer', customizerSettings);
-        
-        res.status(500).json({
-          success: false,
-          error: 'Database save failed, settings saved temporarily'
-        });
-      }
-      
-    } catch (error) {
-      logger.error('Customizer settings update failed:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      });
-      
-      res.status(500).json({
-        success: false,
-        error: 'Failed to update customizer settings'
-      });
-    }
-  }
-);
+router.post('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
+
+/**
+ * @route   PUT /api/v1/settings/customizer
+ * @desc    Update customizer settings
+ * @access  Private (Admin only)
+ */
+router.put('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
 
 export default router;
