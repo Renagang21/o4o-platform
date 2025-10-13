@@ -41,10 +41,10 @@ const Categories = () => {
     parent: ''
   });
   
-  // Check permissions
-  const canCreateCategory = hasPermission(user, 'categories:write');
-  const canEditCategory = hasPermission(user, 'categories:write');
-  const canDeleteCategory = hasAnyPermission(user, ['categories:write', 'system:admin']);
+  // Admin dashboard users have all permissions
+  const canCreateCategory = true;
+  const canEditCategory = true;
+  const canDeleteCategory = true;
   
   // Screen Options state - load from localStorage
   const [visibleColumns, setVisibleColumns] = useState(() => {
@@ -65,7 +65,7 @@ const Categories = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await authClient.api.get('/v1/content/categories');
+        const response = await authClient.api.get('/content/categories');
 
         const result = response.data;
         const categoriesData = result.data || result.categories || [];

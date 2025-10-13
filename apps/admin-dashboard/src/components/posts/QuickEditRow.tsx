@@ -30,7 +30,7 @@ export const QuickEditRow: React.FC<QuickEditRowProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await authClient.api.get('/v1/content/categories');
+        const response = await authClient.api.get('/content/categories');
 
         const result = response.data;
         const categoriesData = result.data || result.categories || [];
