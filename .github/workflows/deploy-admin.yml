@@ -48,8 +48,8 @@ jobs:
 
     - name: Prepare Nginx config for deployment
       run: |
-        mkdir -p apps/admin-dashboard/dist/.nginx-config
-        cp .github/nginx/admin.neture.co.kr.conf apps/admin-dashboard/dist/.nginx-config/
+        mkdir -p apps/admin-dashboard/dist/nginx-config
+        cp .github/nginx/admin.neture.co.kr.conf apps/admin-dashboard/dist/nginx-config/
 
     - name: Deploy to web server
       uses: appleboy/ssh-action@v1.0.3
@@ -90,14 +90,16 @@ jobs:
 
           # Update Nginx configuration
           echo "🔧 Updating Nginx configuration..."
-          if [ -f /var/www/admin.neture.co.kr/.nginx-config/admin.neture.co.kr.conf ]; then
+          echo "📋 Checking deployment artifacts..."
+          ls -la /var/www/admin.neture.co.kr/ || true
+          if [ -f /var/www/admin.neture.co.kr/nginx-config/admin.neture.co.kr.conf ]; then
             echo "✅ Found Nginx config in deployment artifacts"
 
             # Backup current nginx config
             sudo cp /etc/nginx/sites-available/admin.neture.co.kr /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
 
             # Copy new config
-            sudo cp /var/www/admin.neture.co.kr/.nginx-config/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
+            sudo cp /var/www/admin.neture.co.kr/nginx-config/admin.neture.co.kr.conf /etc/nginx/sites-available/admin.neture.co.kr
 
             # Test nginx configuration
             if sudo nginx -t; then
@@ -112,9 +114,11 @@ jobs:
             fi
 
             # Clean up nginx config from web directory
-            sudo rm -rf /var/www/admin.neture.co.kr/.nginx-config
+            sudo rm -rf /var/www/admin.neture.co.kr/nginx-config
           else
-            echo "⚠️ Nginx config not found in deployment artifacts, skipping configuration update"
+            echo "⚠️ Nginx config not found in deployment artifacts at /var/www/admin.neture.co.kr/nginx-config/"
+            echo "📋 Listing /var/www/admin.neture.co.kr/ contents:"
+            ls -la /var/www/admin.neture.co.kr/ || true
           fi
 
           # Set permissions
