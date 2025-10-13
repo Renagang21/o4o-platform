@@ -66,7 +66,7 @@ export function useMenu(options: UseMenuOptions): UseMenuResult {
   const query = useQuery({
     queryKey: ['menu', location, finalSubdomain, finalPath],
     queryFn: async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
       const params = new URLSearchParams();
 
       if (finalSubdomain) {
@@ -76,7 +76,7 @@ export function useMenu(options: UseMenuOptions): UseMenuResult {
         params.set('path', finalPath);
       }
 
-      const url = `${apiUrl}/api/v1/menus/location/${location}${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `${apiUrl}/menus/location/${location}${params.toString() ? `?${params.toString()}` : ''}`;
 
       const response = await fetch(url);
 

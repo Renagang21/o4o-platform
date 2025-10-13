@@ -67,7 +67,8 @@ export const useButtonSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const response = await fetch('/api/v1/customizer/button-settings');
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
+        const response = await fetch(`${apiUrl}/customizer/button-settings`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch button settings');

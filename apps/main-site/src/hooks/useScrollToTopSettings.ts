@@ -30,7 +30,8 @@ export const useScrollToTopSettings = () => {
     const fetchSettings = async () => {
       try {
         // Get settings from new API endpoint
-        const response = await fetch('/api/v1/customizer/scroll-to-top');
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
+        const response = await fetch(`${apiUrl}/customizer/scroll-to-top`);
 
         if (response.ok) {
           const result = await response.json();
