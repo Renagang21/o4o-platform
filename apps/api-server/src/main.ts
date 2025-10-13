@@ -596,7 +596,6 @@ app.use('/api/public', publicLimiter);
 // Direct frontend routes (without /api prefix)
 app.use('/accounts', linkedAccountsRoutes);
 app.use('/settings', settingsRoutes);
-app.use('/v1/content', contentV1Routes);
 
 // API 라우트 - auth routes MUST be before general rate limiter
 // IMPORTANT: Basic auth routes must come FIRST before any other auth-related routes
@@ -694,7 +693,9 @@ import tagsApiRoutes from './routes/api/tags';
 
 // Canonical posts API - Apply publicLimiter for read operations
 app.use('/api/posts', publicLimiter, postsApiRoutes);
+app.use('/api/v1/posts', publicLimiter, postsApiRoutes); // V1 compatibility
 app.use('/api/pages', publicLimiter, pagesApiRoutes);
+app.use('/api/v1/pages', publicLimiter, pagesApiRoutes); // V1 compatibility
 app.use('/api/categories', publicLimiter, categoriesApiRoutes); // Primary categories API
 app.use('/api/tags', publicLimiter, tagsApiRoutes);
 

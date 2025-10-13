@@ -681,6 +681,20 @@ router.put('/reading',
 );
 
 /**
+ * @route   POST /api/v1/settings/customizer
+ * @desc    Update customizer settings
+ * @access  Private (Admin only)
+ */
+router.post('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
+
+/**
+ * @route   PUT /api/v1/settings/customizer
+ * @desc    Update customizer settings
+ * @access  Private (Admin only)
+ */
+router.put('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
+
+/**
  * @route   PUT /api/v1/settings/:section
  * @desc    Update settings for a specific section
  * @access  Private (Admin only)
@@ -938,7 +952,7 @@ router.post('/permalink/validate',
 /**
  * Handle customizer settings update (shared logic for POST and PUT)
  */
-const updateCustomizerSettings = async (req: Request, res: Response) => {
+async function updateCustomizerSettings(req: Request, res: Response) {
   try {
     const newSettings = req.body;
     const actor = (req as any).user?.id || 'unknown';
@@ -1024,20 +1038,6 @@ const updateCustomizerSettings = async (req: Request, res: Response) => {
       error: 'Failed to update customizer settings'
     });
   }
-};
-
-/**
- * @route   POST /api/v1/settings/customizer
- * @desc    Update customizer settings
- * @access  Private (Admin only)
- */
-router.post('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
-
-/**
- * @route   PUT /api/v1/settings/customizer
- * @desc    Update customizer settings
- * @access  Private (Admin only)
- */
-router.put('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
+}
 
 export default router;

@@ -1,7 +1,6 @@
 import { FC, ReactNode, useState, useEffect, useMemo } from 'react';
 import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
-import AdminBar from './AdminBar'
 import { AdminNotices } from '../notices/AdminNotices'
 import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
@@ -69,12 +68,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
     <div className="wordpress-admin">
       {/* WordPress Router - only loads when admin is authenticated */}
       <WordPressRouter />
-      
-      {/* WordPress Admin Bar (hidden in fullscreen customizer) */}
-      {/* AdminBar 임시 비활성화 - 헤더 중복 문제 해결 */}
-      {/* {!isFullscreenMode && <AdminBar onLogout={handleLogout} />} */}
-      
-      
+
       {/* Sidebar */}
       {!isFullscreenMode && (
         <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>

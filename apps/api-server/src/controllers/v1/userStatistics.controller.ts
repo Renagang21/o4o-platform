@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import AppDataSource from '../../database/data-source';
+import { AppDataSource } from '../../database/connection';
 import { User, UserRole, UserStatus } from '../../entities/User';
 import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog';
 import { BetaUser, BetaUserStatus } from '../../entities/BetaUser';
