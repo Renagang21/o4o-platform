@@ -51,15 +51,26 @@ export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
 
     // Event listeners
     document.addEventListener('selectionchange', handleUpdate);
+    document.addEventListener('click', handleUpdate); // Add click handler for block selection
     window.addEventListener('scroll', handleUpdate, true);
     window.addEventListener('resize', handleUpdate);
 
+    // MutationObserver to detect DOM changes (block selection)
+    const observer = new MutationObserver(handleUpdate);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+      subtree: true
+    });
+
     return () => {
       document.removeEventListener('selectionchange', handleUpdate);
+      document.removeEventListener('click', handleUpdate);
       window.removeEventListener('scroll', handleUpdate, true);
       window.removeEventListener('resize', handleUpdate);
+      observer.disconnect();
     };
-  }, []);
+  }, []); // Empty deps - setup once, cleanup on unmount
 
   if (!isVisible) return null;
 
