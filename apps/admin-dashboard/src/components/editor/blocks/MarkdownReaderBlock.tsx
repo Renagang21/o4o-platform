@@ -8,6 +8,7 @@ import { FileCode, FolderOpen, FileText, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FileSelector, { FileItem } from './shared/FileSelector';
 import { marked } from 'marked';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 
 interface MarkdownReaderBlockProps {
   id: string;
@@ -22,6 +23,10 @@ interface MarkdownReaderBlockProps {
   setAttributes?: (attributes: any) => void;
   onChange?: (content: any, attributes?: any) => void;
   onDelete?: () => void;
+  onDuplicate?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onAddBlock?: (position: 'before' | 'after') => void;
   isSelected?: boolean;
   onSelect?: () => void;
 }
@@ -31,6 +36,11 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
   attributes = {},
   setAttributes,
   onChange,
+  onDelete,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
+  onAddBlock,
   isSelected,
   onSelect,
 }) => {
@@ -156,16 +166,23 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
   };
 
   return (
-    <div
-      className={`markdown-reader-block p-6 border-2 rounded-lg transition-all ${
-        isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-      }`}
-      onClick={onSelect}
+    <EnhancedBlockWrapper
+      id={id}
+      type="markdown"
+      isSelected={isSelected || false}
+      onSelect={onSelect || (() => {})}
+      onDelete={onDelete || (() => {})}
+      onDuplicate={onDuplicate || (() => {})}
+      onMoveUp={onMoveUp || (() => {})}
+      onMoveDown={onMoveDown || (() => {})}
+      onAddBlock={onAddBlock}
+      className="markdown-reader-block"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <FileCode className="w-5 h-5 text-gray-600" />
-        <h3 className="font-semibold text-gray-700">Markdown Reader</h3>
-      </div>
+      <div className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <FileCode className="w-5 h-5 text-gray-600" />
+          <h3 className="font-semibold text-gray-700">Markdown Reader</h3>
+        </div>
 
       {!url ? (
         <div className="text-center py-8 bg-gray-50 rounded border-2 border-dashed border-gray-300">
@@ -268,6 +285,7 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
           </div>
         </div>
       )}
+      </div>
 
       {/* File Selector Modal */}
       {showMediaSelector && (
@@ -282,7 +300,7 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
           title="Select Markdown File"
         />
       )}
-    </div>
+    </EnhancedBlockWrapper>
   );
 };
 
