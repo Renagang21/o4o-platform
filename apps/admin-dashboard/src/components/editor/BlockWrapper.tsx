@@ -6,7 +6,6 @@
 import React, { useState, useRef } from 'react';
 import { BlockDragHandle } from './BlockDragHandle';
 import { BlockControls } from './BlockControls';
-import { BlockToolbar } from './BlockToolbar';
 
 interface BlockWrapperProps {
   blockId: string;
@@ -191,22 +190,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
         )}
       </div>
 
-      {/* Block Toolbar (Portal) */}
-      {isSelected && (
-        <BlockToolbar
-          blockId={blockId}
-          blockType={blockType}
-          blockElement={blockRef.current}
-          onUpdate={onUpdate}
-          onDelete={() => onDelete?.(blockId)}
-          onDuplicate={() => onDuplicate?.(blockId)}
-          onMoveUp={() => onMoveUp?.(blockId)}
-          onMoveDown={() => onMoveDown?.(blockId)}
-          onChangeType={onChangeType}
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
-        />
-      )}
+      {/* Block Toolbar removed - now rendered by individual block components to avoid duplication */}
     </>
   );
 };
