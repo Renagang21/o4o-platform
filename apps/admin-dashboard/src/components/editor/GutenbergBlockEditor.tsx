@@ -19,7 +19,6 @@ import { DynamicRenderer } from '@/blocks/registry/DynamicRenderer';
 import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
-import { InspectorSidebar } from '../inspector/InspectorSidebar';
 import SlashCommandMenu from './SlashCommandMenu';
 // Toast 기능을 직접 구현
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
@@ -1565,46 +1564,44 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
 
-        {/* InspectorSidebar - Right Sidebar */}
+        {/* GutenbergSidebar - Right Sidebar */}
         {sidebarOpen && (
           <div className={cn(
             "fixed right-0 top-[60px] bg-white border-l overflow-y-auto transition-all duration-300 z-30",
             "shadow-lg"
           )}
                style={{ height: 'calc(100vh - 60px)', width: '280px' }}>
-            <InspectorSidebar
-              selectedBlock={selectedBlockId ? blocks.find(b => b.id === selectedBlockId) : null}
-              blocks={blocks}
-              documentSettings={{
-                status: postSettings.status,
-                visibility: postSettings.visibility,
-                publishDate: postSettings.publishDate,
-                categories: postSettings.categories,
-                tags: postSettings.tags,
-                featuredImage: postSettings.featuredImage,
-                excerpt: postSettings.excerpt,
-              }}
-              onBlockUpdate={(blockId, updates) => {
-                const newBlocks = blocks.map(block => {
-                  if (block.id === blockId) {
-                    return {
-                      ...block,
-                      ...(updates.content && { content: updates.content }),
-                      ...(updates.attributes && { attributes: { ...block.attributes, ...updates.attributes } }),
-                    };
-                  }
-                  return block;
-                });
-                updateBlocks(newBlocks);
-                setIsDirty(true);
-              }}
-              onDocumentUpdate={(settings) => {
+            <GutenbergSidebar
+              activeTab={activeTab}
+              postSettings={postSettings}
+              blockSettings={selectedBlockId ? {
+                id: selectedBlockId,
+                type: blocks.find(b => b.id === selectedBlockId)?.type || '',
+                attributes: blocks.find(b => b.id === selectedBlockId)?.attributes || {}
+              } : undefined}
+              mode={mode}
+              onPostSettingsChange={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 setIsDirty(true);
                 onPostSettingsChange?.(settings);
               }}
-              isOpen={sidebarOpen}
-              onToggle={() => setSidebarOpen(!sidebarOpen)}
+              onBlockSettingsChange={(settings) => {
+                if (selectedBlockId && settings.attributes) {
+                  const newBlocks = blocks.map(block => {
+                    if (block.id === selectedBlockId) {
+                      return {
+                        ...block,
+                        attributes: { ...block.attributes, ...settings.attributes }
+                      };
+                    }
+                    return block;
+                  });
+                  updateBlocks(newBlocks);
+                  setIsDirty(true);
+                }
+              }}
+              onTabChange={(tab) => setActiveTab(tab)}
+              onClose={() => setSidebarOpen(false)}
             />
           </div>
         )}
