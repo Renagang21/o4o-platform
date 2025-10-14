@@ -80,19 +80,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onPostSettingsChange,
   mode = 'post',
 }) => {
-  // Initialize with empty paragraph only if no initial blocks
-  // But don't trigger onChange for this initialization
+  // Initialize with empty state
+  // Don't create any blocks automatically - user should add blocks manually
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialBlocks.length > 0) {
       return initialBlocks;
     }
-    // Create a default empty paragraph for new posts
-    return [{
-      id: `block-${Date.now()}`,
-      type: 'core/paragraph',
-      content: { text: '' },
-      attributes: {},
-    }];
+    // Start with completely empty editor
+    return [];
   });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
@@ -307,15 +302,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const handleBlockDelete = useCallback(
     (blockId: string) => {
       const newBlocks = blocks.filter((block) => block.id !== blockId);
-      if (newBlocks.length === 0) {
-        // Always keep at least one paragraph block
-        newBlocks.push({
-          id: `block-${Date.now()}`,
-          type: 'core/paragraph',
-          content: { text: '' },
-          attributes: {},
-        });
-      }
+      // Allow completely empty editor - don't auto-create blocks
       updateBlocks(newBlocks);
       setSelectedBlockId(null);
     },
@@ -1140,7 +1127,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         // Check if we should delete the block
         const shouldDeleteBlock = () => {
           const block = blocks.find(b => b.id === selectedBlockId);
-          if (!block || blocks.length <= 1) return false;
+          if (!block) return false;
 
           const isEmpty = !block.content ||
                          (typeof block.content === 'string' && !block.content.trim()) ||
