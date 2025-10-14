@@ -3,5 +3,5 @@
  */
 
 export { BlockDragHandle } from './BlockDragHandle';
-export { BlockControls } from './BlockControls';
+// BlockControls moved to gutenberg/BlockControls.tsx - import from there
 export { BlockWrapper } from './BlockWrapper';

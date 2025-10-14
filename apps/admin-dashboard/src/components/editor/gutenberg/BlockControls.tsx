@@ -1,9 +1,13 @@
 /**
- * BlockControls Component - Simplified & Clean
- * 블록 상단에 표시되는 툴바 - 단순하고 명확한 구조
+ * BlockControls - Gutenberg-style Block Toolbar
+ *
+ * 블록 상단에 표시되는 포맷팅 툴바 (WordPress Gutenberg 스타일)
+ * - Portal을 사용하여 body에 렌더링
+ * - 선택된 블록(.is-selected) 위쪽에 고정 위치로 표시
+ * - 자동으로 위치 업데이트 (스크롤, 리사이즈, 블록 선택 변경 시)
  */
 
-import { FC, ReactNode, useEffect, useState, useRef } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
@@ -12,17 +16,17 @@ interface BlockControlsProps {
 }
 
 /**
- * BlockControls - Main toolbar component
- * Renders toolbar above selected block using Portal
+ * BlockControls - 메인 툴바 컴포넌트
+ *
+ * 선택된 블록 위에 포맷팅 툴바를 표시합니다.
+ * Portal을 사용하여 DOM 계층 구조와 독립적으로 렌더링됩니다.
  */
 export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
   const [isVisible, setIsVisible] = useState(false);
-  const toolbarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updatePosition = () => {
-      // Find selected block
       const selectedBlock = document.querySelector('.is-selected');
 
       if (selectedBlock) {
@@ -31,7 +35,7 @@ export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
         setPosition({
-          top: rect.top + scrollTop - 45, // 45px above block (toolbar height + small gap)
+          top: rect.top + scrollTop - 45, // 블록 위쪽 45px (툴바 높이 + 간격)
           left: rect.left + scrollLeft,
           width: rect.width
         });
@@ -41,21 +45,20 @@ export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
       }
     };
 
-    // Update on selection change, scroll, resize
     const handleUpdate = () => {
       requestAnimationFrame(updatePosition);
     };
 
-    // Initial position
+    // 초기 위치 계산
     updatePosition();
 
-    // Event listeners
+    // 이벤트 리스너 등록
     document.addEventListener('selectionchange', handleUpdate);
-    document.addEventListener('click', handleUpdate); // Add click handler for block selection
+    document.addEventListener('click', handleUpdate);
     window.addEventListener('scroll', handleUpdate, true);
     window.addEventListener('resize', handleUpdate);
 
-    // MutationObserver to detect DOM changes (block selection)
+    // DOM 변경 감지 (블록 선택 시 class 변경)
     const observer = new MutationObserver(handleUpdate);
     observer.observe(document.body, {
       attributes: true,
@@ -70,13 +73,12 @@ export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
       window.removeEventListener('resize', handleUpdate);
       observer.disconnect();
     };
-  }, []); // Empty deps - setup once, cleanup on unmount
+  }, []);
 
   if (!isVisible) return null;
 
   return createPortal(
     <div
-      ref={toolbarRef}
       className="fixed z-[100] bg-white border border-gray-300 rounded shadow-sm"
       style={{
         top: `${position.top}px`,
@@ -92,7 +94,9 @@ export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
 };
 
 /**
- * ToolbarGroup - Groups related toolbar buttons
+ * ToolbarGroup - 관련 버튼들을 그룹화
+ *
+ * 세로 구분선으로 그룹을 구분합니다.
  */
 export const ToolbarGroup: FC<{ children: ReactNode }> = ({ children }) => {
   return (
@@ -103,7 +107,13 @@ export const ToolbarGroup: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 /**
- * ToolbarButton - Individual toolbar button
+ * ToolbarButton - 개별 툴바 버튼
+ *
+ * @param icon - 아이콘 컴포넌트 (React Node)
+ * @param label - 툴팁 텍스트
+ * @param isActive - 활성 상태 (예: Bold가 적용된 경우)
+ * @param onClick - 클릭 핸들러
+ * @param className - 추가 CSS 클래스
  */
 export const ToolbarButton: FC<{
   icon?: ReactNode;
@@ -132,7 +142,9 @@ export const ToolbarButton: FC<{
 };
 
 /**
- * AlignmentToolbar - Text alignment controls
+ * AlignmentToolbar - 텍스트 정렬 컨트롤
+ *
+ * 왼쪽, 가운데, 오른쪽, 양쪽 정렬 버튼을 제공합니다.
  */
 export const AlignmentToolbar: FC<{
   value?: 'left' | 'center' | 'right' | 'justify';

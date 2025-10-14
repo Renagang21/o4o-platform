@@ -4,11 +4,11 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Replace, Link2, Trash2 } from 'lucide-react';
 import EnhancedBlockWrapper from '../EnhancedBlockWrapper';
 import FileSelector, { FileItem } from '../shared/FileSelector';
 import ImageUploader from './ImageUploader';
 import ImageDisplay from './ImageDisplay';
-import ImageToolbar from './ImageToolbar';
 import ImageSidebar from './ImageSidebar';
 import { useImageUpload } from './useImageUpload';
 
@@ -219,12 +219,29 @@ const EnhancedImageBlock: React.FC<EnhancedImageBlockProps> = ({
 
   // Custom toolbar content
   const customToolbarContent = isSelected && url ? (
-    <ImageToolbar
-      linkTo={linkTo}
-      onReplace={handleReplaceImage}
-      onToggleLink={() => updateAttribute('linkTo', linkTo === 'media' ? 'none' : 'media')}
-      onDelete={handleDeleteImage}
-    />
+    <div className="flex gap-1">
+      <button
+        onClick={handleReplaceImage}
+        title="Replace image"
+        className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+      >
+        <Replace className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => updateAttribute('linkTo', linkTo === 'media' ? 'none' : 'media')}
+        title={linkTo === 'media' ? 'Remove link' : 'Link to media'}
+        className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+      >
+        <Link2 className="w-4 h-4" />
+      </button>
+      <button
+        onClick={handleDeleteImage}
+        title="Delete image"
+        className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
   ) : null;
 
   // Custom sidebar content
