@@ -1,6 +1,7 @@
 /**
  * GroupBlock Component
  * Container block that groups multiple blocks together with layout options
+ * WordPress Gutenberg style with EnhancedBlockWrapper
  */
 
 import React, { useCallback } from 'react';
@@ -8,6 +9,8 @@ import { Block } from '@/types/post.types';
 import { InnerBlocks } from '../InnerBlocks';
 import { BlockProps } from '@/blocks/registry/types';
 import { LayoutGrid, LayoutList, Rows3 } from 'lucide-react';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import { cn } from '@/lib/utils';
 
 interface GroupBlockProps extends BlockProps {
   attributes?: {
@@ -117,91 +120,81 @@ const GroupBlock: React.FC<GroupBlockProps> = ({
   // Create element based on tagName
   const TagName = tagName as keyof JSX.IntrinsicElements;
 
-  return (
-    <TagName
-      className={`wp-block-group wp-block-group--layout-${layout}`}
-      style={getLayoutStyles()}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect?.();
-      }}
-    >
-      {/* Toolbar when selected */}
-      {isSelected && (
-        <div className="group-toolbar" style={{
-          position: 'absolute',
-          top: '-40px',
-          left: '0',
-          display: 'flex',
-          gap: '8px',
-          background: '#fff',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          padding: '4px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-          zIndex: 100,
-        }}>
-          <button
-            className={`toolbar-button ${layout === 'flow' ? 'active' : ''}`}
-            onClick={() => handleLayoutChange('flow')}
-            title="Flow Layout"
-            style={{
-              padding: '6px',
-              border: 'none',
-              background: layout === 'flow' ? '#0073aa' : 'transparent',
-              color: layout === 'flow' ? '#fff' : '#000',
-              cursor: 'pointer',
-              borderRadius: '2px',
-            }}
-          >
-            <LayoutList size={16} />
-          </button>
-          <button
-            className={`toolbar-button ${layout === 'flex' ? 'active' : ''}`}
-            onClick={() => handleLayoutChange('flex')}
-            title="Flex Layout"
-            style={{
-              padding: '6px',
-              border: 'none',
-              background: layout === 'flex' ? '#0073aa' : 'transparent',
-              color: layout === 'flex' ? '#fff' : '#000',
-              cursor: 'pointer',
-              borderRadius: '2px',
-            }}
-          >
-            <Rows3 size={16} />
-          </button>
-          <button
-            className={`toolbar-button ${layout === 'grid' ? 'active' : ''}`}
-            onClick={() => handleLayoutChange('grid')}
-            title="Grid Layout"
-            style={{
-              padding: '6px',
-              border: 'none',
-              background: layout === 'grid' ? '#0073aa' : 'transparent',
-              color: layout === 'grid' ? '#fff' : '#000',
-              cursor: 'pointer',
-              borderRadius: '2px',
-            }}
-          >
-            <LayoutGrid size={16} />
-          </button>
-        </div>
-      )}
+  // Extract required props for EnhancedBlockWrapper
+  const {
+    onDelete = () => {},
+    onDuplicate = () => {},
+    onMoveUp = () => {},
+    onMoveDown = () => {},
+    onAddBlock,
+  } = (attributes as any) || {};
 
-      {/* Inner blocks container */}
-      <InnerBlocks
-        parentBlockId={id || 'group'}
-        blocks={innerBlocks}
-        onBlocksChange={handleInnerBlocksChange}
-        selectedBlockId={isSelected ? id : null}
-        placeholder="Add blocks to this group..."
-        renderAppender={true}
-        orientation={layout === 'flex' && flexDirection === 'row' ? 'horizontal' : 'vertical'}
-        className="group-inner-blocks"
-        currentDepth={2}
-      />
-    </TagName>
+  return (
+    <EnhancedBlockWrapper
+      id={id || 'group'}
+      type="group"
+      isSelected={isSelected || false}
+      onSelect={onSelect || (() => {})}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
+      className="wp-block-group"
+      customToolbarButtons={(
+        <>
+          {/* Layout switcher */}
+          <button
+            onClick={() => handleLayoutChange('flow')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              layout === 'flow' && "bg-blue-100 text-blue-600"
+            )}
+            title="Flow Layout"
+          >
+            <LayoutList className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => handleLayoutChange('flex')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              layout === 'flex' && "bg-blue-100 text-blue-600"
+            )}
+            title="Flex Layout"
+          >
+            <Rows3 className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => handleLayoutChange('grid')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              layout === 'grid' && "bg-blue-100 text-blue-600"
+            )}
+            title="Grid Layout"
+          >
+            <LayoutGrid className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+        </>
+      )}
+    >
+      <TagName
+        className={`wp-block-group__inner wp-block-group--layout-${layout}`}
+        style={getLayoutStyles()}
+      >
+        {/* Inner blocks container */}
+        <InnerBlocks
+          parentBlockId={id || 'group'}
+          blocks={innerBlocks}
+          onBlocksChange={handleInnerBlocksChange}
+          selectedBlockId={isSelected ? id : null}
+          placeholder="Add blocks to this group..."
+          renderAppender={true}
+          orientation={layout === 'flex' && flexDirection === 'row' ? 'horizontal' : 'vertical'}
+          className="group-inner-blocks"
+          currentDepth={2}
+        />
+      </TagName>
+    </EnhancedBlockWrapper>
   );
 };
 

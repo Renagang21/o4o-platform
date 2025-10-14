@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
-import { BlockControls, ToolbarGroup, ToolbarButton } from '../gutenberg/BlockControls';
 import { GradientEditor } from './button/GradientEditor';
 import { ShadowEditor } from './button/ShadowEditor';
 import { IconInserter } from './button/IconInserter';
@@ -302,82 +301,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
   };
 
   return (
-    <>
-      {/* Block Controls - Floating Toolbar */}
-      {isSelected && (
-        <BlockControls>
-          {/* Link Settings */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Link2 className="h-4 w-4" />}
-              label="Edit Link"
-              onClick={() => {
-                const newUrl = prompt('Enter URL:', localUrl);
-                if (newUrl !== null) {
-                  setLocalUrl(newUrl);
-                  updateAttribute('url', newUrl);
-                }
-              }}
-            />
-            {localUrl && localUrl !== '#' && (
-              <ToolbarButton
-                icon={<ExternalLink className="h-4 w-4" />}
-                label="Open in New Tab"
-                isActive={linkTarget === '_blank'}
-                onClick={() => {
-                  updateAttribute('linkTarget', linkTarget === '_blank' ? '' : '_blank');
-                  if (linkTarget !== '_blank') {
-                    updateAttribute('rel', 'noopener noreferrer');
-                  }
-                }}
-              />
-            )}
-          </ToolbarGroup>
-
-          {/* Alignment */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<AlignLeft className="h-4 w-4" />}
-              label="Align left"
-              isActive={align === 'left'}
-              onClick={() => updateAttribute('align', 'left')}
-            />
-            <ToolbarButton
-              icon={<AlignCenter className="h-4 w-4" />}
-              label="Align center"
-              isActive={align === 'center'}
-              onClick={() => updateAttribute('align', 'center')}
-            />
-            <ToolbarButton
-              icon={<AlignRight className="h-4 w-4" />}
-              label="Align right"
-              isActive={align === 'right'}
-              onClick={() => updateAttribute('align', 'right')}
-            />
-            <ToolbarButton
-              icon={<AlignJustify className="h-4 w-4" />}
-              label="Full width"
-              isActive={align === 'full'}
-              onClick={() => updateAttribute('align', align === 'full' ? 'center' : 'full')}
-            />
-          </ToolbarGroup>
-
-          {/* Gradient Controls */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Palette className="h-4 w-4" />}
-              label="Gradient Background"
-              isActive={gradientEnabled}
-              onClick={() => updateAttribute('gradientEnabled', !gradientEnabled)}
-            />
-          </ToolbarGroup>
-        </BlockControls>
-      )}
-
-      {/* Inspector Controls removed - now handled by GutenbergSidebar */}
-
-      {/* Block Content */}
-      <EnhancedBlockWrapper
+    <EnhancedBlockWrapper
         id={id}
         type="button"
         isSelected={isSelected}
@@ -578,7 +502,6 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
           </div>
         )}
       </EnhancedBlockWrapper>
-    </>
   );
 };
 

@@ -1,13 +1,16 @@
 /**
  * File Block Component
  * Display a downloadable file with optional description
+ * WordPress Gutenberg style with EnhancedBlockWrapper
  */
 
 import { useCallback, useState } from 'react';
 import { File, Download, Upload, ExternalLink } from 'lucide-react';
 import FileSelector, { FileItem } from './shared/FileSelector';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 
 interface FileBlockProps {
+  id?: string;
   attributes?: {
     url?: string;
     fileName?: string;
@@ -18,9 +21,27 @@ interface FileBlockProps {
     openInNewTab?: boolean;
   };
   onChange?: (event: any, newAttributes: any) => void;
+  onDelete?: () => void;
+  onDuplicate?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onAddBlock?: (position: 'before' | 'after') => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
-const FileBlock: React.FC<FileBlockProps> = ({ attributes = {}, onChange }) => {
+const FileBlock: React.FC<FileBlockProps> = ({
+  id = 'file',
+  attributes = {},
+  onChange,
+  onDelete,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
+  onAddBlock,
+  isSelected = false,
+  onSelect,
+}) => {
   const {
     url = '',
     fileName = '',
@@ -61,36 +82,45 @@ const FileBlock: React.FC<FileBlockProps> = ({ attributes = {}, onChange }) => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  if (!url) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-        <File className="w-16 h-16 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">파일 추가</h3>
-        <p className="text-sm text-gray-500 mb-4 text-center">
-          미디어 라이브러리에서 파일을 선택하세요
-        </p>
-        <button
-          onClick={() => setShowFileSelector(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
-        >
-          <Upload className="w-4 h-4" />
-          파일 선택
-        </button>
-
-        <FileSelector
-          isOpen={showFileSelector}
-          onClose={() => setShowFileSelector(false)}
-          onSelect={handleFileSelect}
-          multiple={false}
-          acceptedTypes={['document']}
-          title="파일 선택"
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
+    <EnhancedBlockWrapper
+      id={id}
+      type="file"
+      isSelected={isSelected}
+      onSelect={onSelect || (() => {})}
+      onDelete={onDelete || (() => {})}
+      onDuplicate={onDuplicate || (() => {})}
+      onMoveUp={onMoveUp || (() => {})}
+      onMoveDown={onMoveDown || (() => {})}
+      onAddBlock={onAddBlock}
+      className="wp-block-file"
+    >
+      {!url ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <File className="w-16 h-16 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">파일 추가</h3>
+          <p className="text-sm text-gray-500 mb-4 text-center">
+            미디어 라이브러리에서 파일을 선택하세요
+          </p>
+          <button
+            onClick={() => setShowFileSelector(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            파일 선택
+          </button>
+
+          <FileSelector
+            isOpen={showFileSelector}
+            onClose={() => setShowFileSelector(false)}
+            onSelect={handleFileSelect}
+            multiple={false}
+            acceptedTypes={['document']}
+            title="파일 선택"
+          />
+        </div>
+      ) : (
+        <div className="p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0">
           <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -134,7 +164,9 @@ const FileBlock: React.FC<FileBlockProps> = ({ attributes = {}, onChange }) => {
         acceptedTypes={['document']}
         title="파일 선택"
       />
-    </div>
+        </div>
+      )}
+    </EnhancedBlockWrapper>
   );
 };
 
