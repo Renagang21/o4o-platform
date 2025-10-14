@@ -16,26 +16,52 @@ import {
 // API 기본 URL (환경변수에서 가져오기)
 // Production: admin.neture.co.kr에서는 api.neture.co.kr 사용
 // Development: localhost:3000/api 사용
+const removeTrailingSlashes = (value: string) => value.replace(/\/+$/, '');
+
+const ensureApiSegment = (value: string): string => {
+  const normalized = removeTrailingSlashes(value.trim());
+  if (!normalized) {
+    return '/api';
+  }
+
+  // 이미 /api 세그먼트가 포함되어 있으면 그대로 반환 (/api, /api/v1 등)
+  if (/\/api(\/|$)/.test(normalized)) {
+    return normalized;
+  }
+
+  return `${normalized}/api`;
+};
+
 const getApiBaseUrl = () => {
   // 환경변수가 설정되어 있으면 사용
   if (import.meta.env.VITE_API_URL) {
-    // Normalize to ensure trailing /api is present
-    const v = String(import.meta.env.VITE_API_URL).trim();
-    const url = v.replace(/\/$/, '');
-    return /\/api$/.test(url) ? url : `${url}/api`;
+    const raw = String(import.meta.env.VITE_API_URL).trim();
+    return ensureApiSegment(raw);
   }
   
   // Production 환경 (admin.neture.co.kr -> api.neture.co.kr)
   if (window.location.hostname === 'admin.neture.co.kr') {
-    return 'https://api.neture.co.kr/api';
+    return ensureApiSegment('https://api.neture.co.kr');
   }
   
   // Development 환경
-  return 'http://localhost:3001/api';
+  return ensureApiSegment('http://localhost:3001');
+};
+
+const buildApiV1Url = (baseUrl: string): string => {
+  const normalized = removeTrailingSlashes(baseUrl);
+
+  if (/\/v1(\/|$)/.test(normalized)) {
+    return /\/v1\/content$/.test(normalized)
+      ? normalized
+      : `${normalized}/content`;
+  }
+
+  return `${normalized}/v1/content`;
 };
 
 const API_BASE_URL = getApiBaseUrl();
-const API_V1_URL = `${API_BASE_URL}/v1/content`;
+const API_V1_URL = buildApiV1Url(API_BASE_URL);
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
