@@ -6,9 +6,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import CommonTools from './CommonTools';
-import TextBlockToolbar from './TextBlockToolbar';
-import ImageBlockToolbar from './ImageBlockToolbar';
-import ButtonBlockToolbar from './ButtonBlockToolbar';
 
 interface BlockToolbarProps {
   blockId: string;
@@ -137,23 +134,12 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
     };
   }, [blockElement]);
 
-  // Determine which toolbar to show based on block type
-  const isTextBlock = [
-    'core/paragraph',
-    'core/heading',
-    'core/quote',
-    'core/list',
-  ].includes(blockType);
-
-  const isImageBlock = blockType === 'core/image';
-  const isButtonBlock = blockType === 'core/button';
-
   if (!blockElement) return null;
 
   const toolbarContent = (
     <div
       ref={toolbarRef}
-      className={`block-toolbar ${isVisible ? 'is-visible' : ''}`}
+      className={`block-editor-block-toolbar block-editor-block-toolbar--floating ${isVisible ? 'is-visible' : ''}`}
       style={{
         position: 'absolute',
         top: `${position.top}px`,
@@ -162,8 +148,7 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
       }}
       onMouseDown={(e) => e.preventDefault()} // Prevent losing selection
     >
-      <div className="block-toolbar-inner">
-        {/* Common tools (always visible) */}
+        {/* Unified toolbar - same for all 21 blocks */}
         <CommonTools
           blockId={blockId}
           blockType={blockType}
@@ -175,32 +160,6 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
           canMoveUp={canMoveUp}
           canMoveDown={canMoveDown}
         />
-
-        {/* Block-specific tools */}
-        {isTextBlock && (
-          <TextBlockToolbar
-            blockId={blockId}
-            blockType={blockType}
-            onUpdate={onUpdate}
-          />
-        )}
-
-        {isImageBlock && (
-          <ImageBlockToolbar
-            blockId={blockId}
-            blockType={blockType}
-            onUpdate={onUpdate}
-          />
-        )}
-
-        {isButtonBlock && (
-          <ButtonBlockToolbar
-            blockId={blockId}
-            blockType={blockType}
-            onUpdate={onUpdate}
-          />
-        )}
-      </div>
     </div>
   );
 

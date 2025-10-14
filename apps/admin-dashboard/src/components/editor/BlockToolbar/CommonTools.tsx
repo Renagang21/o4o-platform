@@ -85,36 +85,39 @@ const CommonTools: React.FC<CommonToolsProps> = ({
   };
 
   return (
-    <div className="block-toolbar-group block-toolbar-common">
+    <>
       {/* Drag Handle */}
       <button
-        className="block-toolbar-button"
+        type="button"
+        className="block-editor-block-toolbar__button"
         title="Drag to reorder"
         aria-label="Drag handle"
       >
-        <GripVertical size={18} />
+        <GripVertical size={20} />
       </button>
 
       {/* Block Type Converter */}
-      <div className="block-toolbar-dropdown" ref={typeMenuRef}>
+      <div className="block-editor-block-toolbar__group" ref={typeMenuRef} style={{ position: 'relative' }}>
         <button
-          className="block-toolbar-button"
+          type="button"
+          className="block-editor-block-toolbar__button"
           title="Change block type"
           aria-label="Change block type"
           onClick={() => setIsTypeMenuOpen(!isTypeMenuOpen)}
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={20} />
         </button>
 
         {isTypeMenuOpen && (
-          <div className="block-toolbar-menu">
-            <div className="block-toolbar-menu-header">
+          <div className="block-editor-block-toolbar__menu">
+            <div className="block-editor-block-toolbar__menu-header">
               Change to:
             </div>
             {getTypeOptions().map(option => (
               <button
                 key={option.value}
-                className="block-toolbar-menu-item"
+                type="button"
+                className="block-editor-block-toolbar__menu-item"
                 onClick={() => handleTypeChange(option.value)}
               >
                 {option.label}
@@ -125,23 +128,25 @@ const CommonTools: React.FC<CommonToolsProps> = ({
       </div>
 
       {/* Separator */}
-      <div className="block-toolbar-separator" />
+      <div className="block-editor-block-toolbar__separator" />
 
       {/* More Options */}
-      <div className="block-toolbar-dropdown" ref={moreMenuRef}>
+      <div className="block-editor-block-toolbar__group" ref={moreMenuRef} style={{ position: 'relative' }}>
         <button
-          className="block-toolbar-button"
+          type="button"
+          className="block-editor-block-toolbar__button"
           title="More options"
           aria-label="More options"
           onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
         >
-          <MoreVertical size={18} />
+          <MoreVertical size={20} />
         </button>
 
         {isMoreMenuOpen && (
-          <div className="block-toolbar-menu block-toolbar-menu-right">
+          <div className="block-editor-block-toolbar__menu block-editor-block-toolbar__menu--right">
             <button
-              className="block-toolbar-menu-item"
+              type="button"
+              className="block-editor-block-toolbar__menu-item"
               onClick={() => {
                 onDuplicate?.();
                 setIsMoreMenuOpen(false);
@@ -154,7 +159,8 @@ const CommonTools: React.FC<CommonToolsProps> = ({
 
             {canMoveUp && (
               <button
-                className="block-toolbar-menu-item"
+                type="button"
+                className="block-editor-block-toolbar__menu-item"
                 onClick={() => {
                   onMoveUp?.();
                   setIsMoreMenuOpen(false);
@@ -167,7 +173,8 @@ const CommonTools: React.FC<CommonToolsProps> = ({
 
             {canMoveDown && (
               <button
-                className="block-toolbar-menu-item"
+                type="button"
+                className="block-editor-block-toolbar__menu-item"
                 onClick={() => {
                   onMoveDown?.();
                   setIsMoreMenuOpen(false);
@@ -178,10 +185,11 @@ const CommonTools: React.FC<CommonToolsProps> = ({
               </button>
             )}
 
-            <div className="block-toolbar-menu-separator" />
+            <div className="block-editor-block-toolbar__menu-separator" />
 
             <button
-              className="block-toolbar-menu-item block-toolbar-menu-item-danger"
+              type="button"
+              className="block-editor-block-toolbar__menu-item is-destructive"
               onClick={() => {
                 onDelete?.();
                 setIsMoreMenuOpen(false);
@@ -193,7 +201,7 @@ const CommonTools: React.FC<CommonToolsProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
