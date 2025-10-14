@@ -176,29 +176,29 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
   };
 
   return (
-    <div className="gutenberg-block-inserter fixed inset-y-0 left-0 w-96 bg-white border-r shadow-lg z-50 flex flex-col">
+    <div className="gutenberg-block-inserter fixed inset-y-0 left-0 w-64 sm:w-72 md:w-80 bg-white border-r shadow-lg z-50 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-        <h2 className="text-base font-semibold text-gray-900">Add Block</h2>
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gray-50">
+        <h2 className="text-sm sm:text-base font-semibold text-gray-900">Add Block</h2>
         <button
           onClick={onClose}
-          className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
+          className="p-1 sm:p-1.5 hover:bg-gray-200 rounded-md transition-colors"
           aria-label="Close"
         >
-          <X className="h-5 w-5 text-gray-600" />
+          <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
         </button>
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b bg-white">
+      <div className="p-2 sm:p-4 border-b bg-white">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
           <Input
             type="text"
             placeholder="Search blocks"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-3 py-2 bg-gray-50 border-gray-200 focus:bg-white"
+            className="pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-gray-50 border-gray-200 focus:bg-white"
             autoFocus
           />
         </div>
@@ -206,12 +206,12 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
 
       {/* Category tabs */}
       {!searchTerm && categories.length > 0 && (
-        <div className="flex items-center gap-1 px-4 py-2 border-b bg-gray-50 overflow-x-auto">
+        <div className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5 sm:py-2 border-b bg-gray-50 overflow-x-auto">
           <button
             onClick={() => setSelectedCategory(null)}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors ${
-              !selectedCategory 
-                ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium rounded-md whitespace-nowrap transition-colors ${
+              !selectedCategory
+                ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
@@ -221,9 +221,9 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
             <button
               key={cat.slug}
               onClick={() => setSelectedCategory(cat.slug)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors ${
-                selectedCategory === cat.slug 
-                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
+              className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium rounded-md whitespace-nowrap transition-colors ${
+                selectedCategory === cat.slug
+                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
@@ -235,16 +235,16 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
 
       {/* Blocks Grid */}
       <ScrollArea className="flex-1 bg-gray-50">
-        <div className="p-4">
+        <div className="p-2 sm:p-4">
           {Object.entries(groupedBlocks).map(([categorySlug, categoryBlocks]) => (
             <div key={categorySlug} className="mb-6">
               {/* Category header */}
               {!searchTerm && !selectedCategory && (
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                   {categorySlug === 'mostUsed' && (
-                    <Sparkles className="h-4 w-4 text-blue-500" />
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
                   )}
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <h3 className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500">
                     {getCategoryTitle(categorySlug)}
                   </h3>
                 </div>
@@ -256,16 +256,16 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
                   <button
                     key={block.name}
                     onClick={() => handleBlockSelect(block.name)}
-                    className="relative flex flex-col items-center justify-center p-3 h-24 text-center bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-300 hover:shadow-sm transition-all group"
+                    className="relative flex flex-col items-center justify-center p-1.5 sm:p-2 h-16 sm:h-18 text-center bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-300 hover:shadow-sm transition-all group"
                     title={block.description || block.title}
                   >
                     {/* Block Icon */}
-                    <div className="mb-2 transition-transform group-hover:scale-110">
-                      {renderBlockIcon(block.name, block.category, '', 'lg')}
+                    <div className="mb-1 transition-transform group-hover:scale-110">
+                      {renderBlockIcon(block.name, block.category, '', 'sm')}
                     </div>
-                    
+
                     {/* Block Title */}
-                    <div className="text-xs font-medium text-gray-700 group-hover:text-blue-700 line-clamp-2 leading-tight">
+                    <div className="text-[9px] sm:text-[10px] font-medium text-gray-700 group-hover:text-blue-700 line-clamp-2 leading-tight">
                       {block.title}
                     </div>
                     
