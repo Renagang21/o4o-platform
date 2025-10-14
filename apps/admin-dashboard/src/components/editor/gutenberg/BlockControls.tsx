@@ -34,8 +34,8 @@ export const BlockControls: FC<BlockControlsProps> = ({
         element = element.parentElement as HTMLElement;
       }
       
-      // 블록 래퍼 찾기 (wp-block 클래스를 가진 요소)
-      while (element && !element.classList?.contains('wp-block')) {
+      // 블록 래퍼 찾기 (block-editor-block 또는 wp-block 클래스를 가진 요소)
+      while (element && !element.classList?.contains('block-editor-block') && !element.classList?.contains('wp-block')) {
         element = element.parentElement as HTMLElement;
       }
       
