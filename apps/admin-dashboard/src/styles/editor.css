@@ -183,9 +183,8 @@
 /* Block Drag Handle Styles */
 .block-editor-block__drag-handle {
   position: absolute;
-  left: -32px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: -40px;  /* 블록 왼쪽 바깥으로 이동 */
+  top: 0;       /* 블록 최상단 */
   z-index: 10;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -197,8 +196,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -236,10 +235,15 @@
 /* Block Editor Block positioning */
 .block-editor-block {
   position: relative;
-  margin: 12px 0;
+  margin: 60px 0 12px 0;  /* 상단 여백 크게 증가 - 툴바, 레이블 공간 확보 */
   padding: 12px;
   border-radius: 4px;
   transition: all 0.2s ease;
+}
+
+/* 첫 번째 블록은 상단 여백 줄이기 */
+.block-editor-block:first-child {
+  margin-top: 40px;
 }
 
 .block-editor-block__content {
@@ -250,8 +254,8 @@
 
 .block-editor-block__type-label {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: -22px;   /* 블록 위로 완전히 이동 */
+  left: 0;
   font-size: 11px;
   color: #6b7280;
   opacity: 0;
@@ -261,6 +265,7 @@
   border-radius: 3px;
   border: 1px solid #e5e7eb;
   z-index: 5;
+  white-space: nowrap;
 }
 
 .block-editor-block:hover .block-editor-block__type-label,
@@ -290,8 +295,8 @@
 /* Block Controls positioning */
 .block-editor-block__controls {
   position: absolute;
-  right: -8px;
-  top: -8px;
+  right: 0;     /* 블록 오른쪽 끝 */
+  top: -36px;   /* 블록 위로 완전히 이동 */
   z-index: 10;
   opacity: 0;
   transition: opacity 0.2s ease;

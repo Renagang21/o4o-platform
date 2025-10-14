@@ -24,21 +24,26 @@ export const BlockControls: FC<BlockControlsProps> = ({
   const [selectedBlock, setSelectedBlock] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    // 선택된 블록 찾기
+    // DOM에서 is-selected 클래스를 가진 블록 찾기 (더 확실한 방법)
     const findSelectedBlock = () => {
+      // 먼저 is-selected 클래스로 찾기
+      const selected = document.querySelector('.block-editor-block.is-selected, .wp-block.is-selected, .block-editor-block-list__block.is-selected');
+      if (selected) return selected as HTMLElement;
+
+      // 폴백: selection으로 찾기
       const selection = window.getSelection();
       if (!selection || selection.rangeCount === 0) return null;
-      
+
       let element = selection.anchorNode as HTMLElement;
       if (element?.nodeType === Node.TEXT_NODE) {
         element = element.parentElement as HTMLElement;
       }
-      
-      // 블록 래퍼 찾기 (block-editor-block 또는 wp-block 클래스를 가진 요소)
-      while (element && !element.classList?.contains('block-editor-block') && !element.classList?.contains('wp-block')) {
+
+      // 블록 래퍼 찾기
+      while (element && !element.classList?.contains('block-editor-block-list__block') && !element.classList?.contains('block-editor-block') && !element.classList?.contains('wp-block')) {
         element = element.parentElement as HTMLElement;
       }
-      
+
       return element;
     };
 
@@ -47,9 +52,9 @@ export const BlockControls: FC<BlockControlsProps> = ({
       if (block) {
         const rect = block.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
+
         setPosition({
-          top: rect.top + scrollTop - 48, // 툴바 높이만큼 위로
+          top: rect.top + scrollTop - 52, // 툴바 높이 + 여백
           left: rect.left
         });
         setSelectedBlock(block);
