@@ -1,4 +1,5 @@
 import { FC, lazy, Suspense } from 'react';
+import { PanelBody } from '@/components/inspector/controls/PanelBody';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -34,25 +35,23 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
   // Common settings for all blocks
   const renderCommonSettings = () => (
     <>
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium">Block Info</h3>
+      <PanelBody title="Block Info">
         <div className="space-y-4">
           <div className="p-3 bg-gray-50 rounded-md">
             <p className="text-sm font-medium">{block.type}</p>
             <p className="text-xs text-gray-500">Block ID: {block.id}</p>
           </div>
         </div>
-      </div>
+      </PanelBody>
 
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium">Advanced</h3>
+      <PanelBody title="Advanced">
         <div className="space-y-4">
           <div>
             <Label className="text-xs">CSS Class</Label>
             <Input
               placeholder="custom-class"
               value={block.attributes?.className || ''}
-              onChange={(e: any) => 
+              onChange={(e: any) =>
                 onBlockSettingsChange?.({
                   attributes: { ...block.attributes, className: e.target.value }
                 })
@@ -64,7 +63,7 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
             <Input
               placeholder="anchor-id"
               value={block.attributes?.anchor || ''}
-              onChange={(e: any) => 
+              onChange={(e: any) =>
                 onBlockSettingsChange?.({
                   attributes: { ...block.attributes, anchor: e.target.value }
                 })
@@ -72,7 +71,7 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
             />
           </div>
         </div>
-      </div>
+      </PanelBody>
     </>
   );
 
