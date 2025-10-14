@@ -1,7 +1,6 @@
 /**
- * BlockControls Component
- * 구텐베르그 스타일 블록 툴바 - 블록 상단에 표시되는 컨트롤
- * WordPress Gutenberg 패턴 완전 모방
+ * BlockControls Component - Simplified & Clean
+ * 블록 상단에 표시되는 툴바 - 단순하고 명확한 구조
  */
 
 import { FC, ReactNode, useEffect, useState, useRef } from 'react';
@@ -10,104 +9,70 @@ import { cn } from '@/lib/utils';
 
 interface BlockControlsProps {
   children: ReactNode;
-  group?: 'block' | 'inline' | 'other';
-  controls?: any[];
 }
 
-export const BlockControls: FC<BlockControlsProps> = ({ 
-  children, 
-  group = 'block' 
-}) => {
+/**
+ * BlockControls - Main toolbar component
+ * Renders toolbar above selected block using Portal
+ */
+export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
   const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const [selectedBlock, setSelectedBlock] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    // DOM에서 is-selected 클래스를 가진 블록 찾기 (더 확실한 방법)
-    const findSelectedBlock = () => {
-      // 먼저 is-selected 클래스로 찾기
-      const selected = document.querySelector('.block-editor-block.is-selected, .wp-block.is-selected, .block-editor-block-list__block.is-selected');
-      if (selected) return selected as HTMLElement;
-
-      // 폴백: selection으로 찾기
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return null;
-
-      let element = selection.anchorNode as HTMLElement;
-      if (element?.nodeType === Node.TEXT_NODE) {
-        element = element.parentElement as HTMLElement;
-      }
-
-      // 블록 래퍼 찾기
-      while (element && !element.classList?.contains('block-editor-block-list__block') && !element.classList?.contains('block-editor-block') && !element.classList?.contains('wp-block')) {
-        element = element.parentElement as HTMLElement;
-      }
-
-      return element;
-    };
-
     const updatePosition = () => {
-      const block = findSelectedBlock();
-      if (block) {
-        const rect = block.getBoundingClientRect();
+      // Find selected block
+      const selectedBlock = document.querySelector('.is-selected');
+
+      if (selectedBlock) {
+        const rect = selectedBlock.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
         setPosition({
-          top: rect.top + scrollTop - 52, // 툴바 높이 + 여백
-          left: rect.left
+          top: rect.top + scrollTop - 40, // 40px above block (toolbar height + gap)
+          left: rect.left + scrollLeft,
+          width: rect.width
         });
-        setSelectedBlock(block);
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
 
-    // 이벤트 리스너
-    const handleSelectionChange = () => {
-      updatePosition();
+    // Update on selection change, scroll, resize
+    const handleUpdate = () => {
+      requestAnimationFrame(updatePosition);
     };
 
-    const handleScroll = () => {
-      if (selectedBlock) {
-        updatePosition();
-      }
-    };
-
-    document.addEventListener('selectionchange', handleSelectionChange);
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', updatePosition);
-
-    // 초기 위치 설정
+    // Initial position
     updatePosition();
 
+    // Event listeners
+    document.addEventListener('selectionchange', handleUpdate);
+    window.addEventListener('scroll', handleUpdate, true);
+    window.addEventListener('resize', handleUpdate);
+
     return () => {
-      document.removeEventListener('selectionchange', handleSelectionChange);
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', updatePosition);
+      document.removeEventListener('selectionchange', handleUpdate);
+      window.removeEventListener('scroll', handleUpdate, true);
+      window.removeEventListener('resize', handleUpdate);
     };
-  }, [selectedBlock]);
+  }, []);
 
   if (!isVisible) return null;
 
-  // 포털을 사용하여 body에 직접 렌더링
   return createPortal(
     <div
       ref={toolbarRef}
-      className={cn(
-        'block-editor-block-controls',
-        'fixed z-[100] bg-white border border-gray-300 rounded-sm shadow-sm',
-        'flex items-center p-0',
-        group === 'inline' && 'block-editor-block-controls--inline'
-      )}
+      className="fixed z-[100] bg-white border border-gray-300 rounded shadow-sm"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
-        transform: 'translateY(-100%)',
       }}
     >
-      <div className="block-editor-block-toolbar flex items-center">
+      <div className="flex items-center">
         {children}
       </div>
     </div>,
@@ -115,7 +80,9 @@ export const BlockControls: FC<BlockControlsProps> = ({
   );
 };
 
-// 툴바 그룹 컴포넌트
+/**
+ * ToolbarGroup - Groups related toolbar buttons
+ */
 export const ToolbarGroup: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <div className="flex items-center border-r border-gray-200 last:border-r-0">
@@ -124,7 +91,9 @@ export const ToolbarGroup: FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-// 툴바 버튼 컴포넌트
+/**
+ * ToolbarButton - Individual toolbar button
+ */
 export const ToolbarButton: FC<{
   icon?: ReactNode;
   label?: string;
@@ -143,6 +112,7 @@ export const ToolbarButton: FC<{
       )}
       onClick={onClick}
       title={label}
+      type="button"
     >
       {icon && <span className="w-4 h-4">{icon}</span>}
       {!icon && label && <span className="text-xs">{label}</span>}
@@ -150,7 +120,9 @@ export const ToolbarButton: FC<{
   );
 };
 
-// 정렬 툴바 컴포넌트
+/**
+ * AlignmentToolbar - Text alignment controls
+ */
 export const AlignmentToolbar: FC<{
   value?: 'left' | 'center' | 'right' | 'justify';
   onChange?: (align: 'left' | 'center' | 'right' | 'justify' | undefined) => void;

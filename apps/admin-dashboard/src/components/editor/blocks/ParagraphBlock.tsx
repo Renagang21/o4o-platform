@@ -13,7 +13,8 @@ import {
   Link2,
   Strikethrough,
   Code,
-  Underline
+  Underline,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -385,6 +386,16 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             value={align}
             onChange={(newAlign) => updateAttribute('align', newAlign)}
           />
+
+          {/* Delete Block */}
+          <ToolbarGroup>
+            <ToolbarButton
+              icon={<Trash2 className="h-4 w-4" />}
+              label="Delete block (Delete)"
+              onClick={onDelete}
+              className="hover:bg-red-50 hover:text-red-600"
+            />
+          </ToolbarGroup>
         </BlockControls>
       )}
 
