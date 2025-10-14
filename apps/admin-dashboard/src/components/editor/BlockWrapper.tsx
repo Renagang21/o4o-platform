@@ -116,8 +116,14 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
     }
   };
 
+  // WordPress Gutenberg-style class names
+  const blockTypeClass = `wp-block-${blockType.replace('/', '-')}`;
+
   const classNames = [
-    'block-editor-block',
+    'block-editor-block-list__block',  // Gutenberg standard wrapper class
+    'wp-block',                        // Generic block class
+    'block-editor-block',              // Our existing class for compatibility
+    blockTypeClass,                    // Block-specific class (e.g., wp-block-core-paragraph)
     isSelected && 'is-selected',
     isMultiSelected && 'is-multi-selected',
     isHovered && 'is-hovered',
