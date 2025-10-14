@@ -65,21 +65,7 @@
   transform: scale(0.98);
 }
 
-/* Block toolbar positioning */
-.block-wrapper .block-toolbar {
-  position: absolute;
-  top: -38px;
-  left: 0;
-  z-index: 100;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: all 0.2s ease;
-}
-
-.block-wrapper.is-selected .block-toolbar {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* Block toolbar positioning - REMOVED (now using block-toolbar.css) */
 
 /* Block hover effects */
 .block-wrapper:hover {
@@ -192,19 +178,7 @@
   box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
 }
 
-/* Toolbar button hover effects */
-.block-toolbar button {
-  transition: all 0.15s ease;
-}
-
-.block-toolbar button:hover {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-}
-
-.block-toolbar button:active {
-  transform: translateY(0);
-}
+/* Toolbar button hover effects - REMOVED (now using block-toolbar.css) */
 
 /* Block Drag Handle Styles */
 .block-editor-block__drag-handle {
@@ -511,10 +485,6 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .block-toolbar {
-    scale: 0.9;
-  }
-
   .blocks-container {
     padding: 0 16px;
   }

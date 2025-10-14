@@ -62,33 +62,8 @@
   border-radius: 2px;
 }
 
-/* 블록 툴바 */
-.block-toolbar {
-  background: white;
-  border: 1px solid var(--editor-border-color);
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  padding: 4px;
-  display: flex;
-  gap: 2px;
-}
-
-.block-toolbar button {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.block-toolbar button:hover {
-  background: var(--editor-hover-color);
-}
+/* 블록 툴바 - REMOVED (now using block-toolbar.css with .block-editor-block-toolbar) */
+/* Old .block-toolbar styles have been replaced with Gutenberg-style .block-editor-block-toolbar */
 
 /* 블록 인서터 */
 .block-inserter-line {
@@ -171,11 +146,6 @@
   .editor-canvas {
     max-width: 100%;
     padding: 16px;
-  }
-  
-  .block-toolbar {
-    flex-wrap: wrap;
-    max-width: 200px;
   }
 }
 
