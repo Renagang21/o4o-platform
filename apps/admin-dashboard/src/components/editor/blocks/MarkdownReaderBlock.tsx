@@ -94,9 +94,10 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
   const isValidMarkdownFile = (file: FileItem): boolean => {
     const fileName = file.title?.toLowerCase() || '';
     const hasValidExtension = fileName.endsWith('.md') || fileName.endsWith('.markdown');
-    const hasValidMimeType = !file.mimeType || file.mimeType === 'text/markdown' || file.mimeType === 'text/plain';
 
-    return hasValidExtension && hasValidMimeType;
+    // Accept file if it has valid extension, regardless of mimeType
+    // (mimeType can be 'application/octet-stream' or other values)
+    return hasValidExtension;
   };
 
   // Handle file selection from library
