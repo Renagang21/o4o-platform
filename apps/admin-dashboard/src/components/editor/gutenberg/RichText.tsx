@@ -49,7 +49,9 @@ export const RichText: FC<RichTextProps> = ({
     if (editorRef.current && !isUpdatingRef.current) {
       const currentContent = editorRef.current.innerHTML;
       const normalizedCurrent = currentContent.replace(/<br\s*\/?>/gi, '').trim();
-      const normalizedValue = (value || '').replace(/<br\s*\/?>/gi, '').trim();
+      // Ensure value is a string before calling replace
+      const stringValue = typeof value === 'string' ? value : String(value || '');
+      const normalizedValue = stringValue.replace(/<br\s*\/?>/gi, '').trim();
 
       if (normalizedCurrent !== normalizedValue) {
         // 현재 포커스 상태 저장
@@ -65,7 +67,7 @@ export const RichText: FC<RichTextProps> = ({
         }
 
         // 내용 업데이트
-        editorRef.current.innerHTML = value || '';
+        editorRef.current.innerHTML = stringValue;
 
         // 포커스 상태였다면 커서 위치 복원
         if (wasActive) {
