@@ -590,7 +590,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
             }
           }}
         >
-          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
             {item.type === 'image' ? (
               <img
                 src={item.thumbnailUrl || item.url}
@@ -600,7 +600,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Play className="w-6 h-6 text-purple-500" />
+                {renderFileIcon(item)}
               </div>
             )}
           </div>
@@ -679,8 +679,16 @@ const FileSelector: React.FC<FileSelectorProps> = ({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-            <Play className="w-8 h-8 text-white opacity-80" />
+          <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center gap-3">
+            <div className="flex items-center justify-center">
+              {renderFileIcon(item)}
+            </div>
+            <div className="px-2 text-center">
+              <p className="text-xs font-medium text-gray-700 line-clamp-2">{item.title}</p>
+              {item.fileSize && (
+                <p className="text-xs text-gray-500 mt-1">{formatFileSize(item.fileSize)}</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -703,27 +711,20 @@ const FileSelector: React.FC<FileSelectorProps> = ({
           )}
         </div>
 
-        {/* Preview button */}
-        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setPreviewItem(item);
-            }}
-            className="p-1 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-70"
-            title="미리보기"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Type indicator */}
-        {item.type === 'video' && (
-          <div className="absolute bottom-2 left-2">
-            <div className="px-2 py-1 bg-black bg-opacity-70 text-white text-xs rounded">
-              비디오
-            </div>
+        {/* Preview button - only for image and video */}
+        {(item.type === 'image' || item.type === 'video') && (
+          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPreviewItem(item);
+              }}
+              className="p-1 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-70"
+              title="미리보기"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>
@@ -829,20 +830,20 @@ const FileSelector: React.FC<FileSelectorProps> = ({
 
   return (
     <div
-      className={cn("fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50", className)}
+      className={cn("fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4", className)}
       role="dialog"
       aria-modal="true"
       aria-labelledby="media-selector-title"
       {...getRootProps()}
     >
       <div
-        className="bg-white rounded-lg max-w-6xl w-full mx-4 h-[90vh] overflow-hidden flex flex-col"
+        className="bg-white rounded-lg w-full max-w-6xl h-[95vh] sm:h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h2 id="media-selector-title" className="text-xl font-semibold text-gray-900">
+        <div className="p-3 sm:p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 id="media-selector-title" className="text-lg sm:text-xl font-semibold text-gray-900">
               {title}
             </h2>
             <button
@@ -851,12 +852,12 @@ const FileSelector: React.FC<FileSelectorProps> = ({
               className="text-gray-400 hover:text-gray-600 p-1 rounded"
               aria-label="닫기"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
           {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-3">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -871,12 +872,12 @@ const FileSelector: React.FC<FileSelectorProps> = ({
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {acceptedTypes.length > 1 && (
                 <select
                   value={filters.fileType}
                   onChange={(e) => updateFilter('fileType', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-[120px] sm:flex-none px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   aria-label="파일 타입 필터"
                 >
                   <option value="all">모든 파일</option>
@@ -932,18 +933,18 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                   };
                   input.click();
                 }}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 text-sm"
                 aria-label="파일 업로드"
               >
                 <Upload className="w-4 h-4" />
-                업로드
+                <span className="hidden sm:inline">업로드</span>
               </button>
 
               {multiple && filteredFiles.length > 0 && (
                 <button
                   type="button"
                   onClick={handleSelectAll}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                   aria-label={selectedFiles.length === filteredFiles.length ? '전체 선택 해제' : '전체 선택'}
                 >
                   {selectedFiles.length === filteredFiles.length ? '전체 해제' : '전체 선택'}
@@ -962,7 +963,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6" ref={scrollRef}>
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6" ref={scrollRef}>
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -982,24 +983,9 @@ const FileSelector: React.FC<FileSelectorProps> = ({
           ) : (
             <>
               {viewMode === 'grid' ? (
-                <MediaGrid
-                  items={filteredFiles.map(file => ({
-                    ...file,
-                    filename: file.title,
-                    mediaType: file.type,
-                    size: file.fileSize || 0,
-                    type: (file.type === 'image' || file.type === 'video') ? file.type : 'image' as 'image' | 'video'
-                  }))}
-                  selectedIds={selectedFiles}
-                  onItemSelect={(id, selected) => {
-                    if (selected) {
-                      handleFileSelect(id);
-                    } else {
-                      setSelectedFiles(prev => prev.filter(fileId => fileId !== id));
-                    }
-                  }}
-                  onItemView={(item) => setPreviewItem(item)}
-                />
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                  {filteredFiles.map((item, index) => renderMediaItem(item, index))}
+                </div>
               ) : (
                 <div className="space-y-2">
                   {filteredFiles.map((item, index) => renderMediaItem(item, index))}
@@ -1019,9 +1005,9 @@ const FileSelector: React.FC<FileSelectorProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+        <div className="p-3 sm:p-6 border-t border-gray-200 bg-gray-50">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
               {selectedFiles.length > 0 ? (
                 <span>
                   {selectedFiles.length}개 선택됨
@@ -1035,7 +1021,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
               >
                 취소
               </button>
@@ -1043,7 +1029,7 @@ const FileSelector: React.FC<FileSelectorProps> = ({
                 type="button"
                 onClick={handleConfirmSelection}
                 disabled={selectedFiles.length === 0}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                className="flex-1 sm:flex-none px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <Check className="w-4 h-4" />
                 선택 완료
