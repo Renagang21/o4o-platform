@@ -203,11 +203,11 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 
       {/* Block toolbar - integrated design with better positioning */}
       {showToolbar && isSelected && (
-        <div className="absolute left-0 right-0 flex items-center justify-between z-50" style={{ top: '-65px' }}>
-          <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-1 py-1">
+        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2" style={{ top: '-70px' }}>
+          <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full">
             {/* Drag handle - now in toolbar */}
             <div
-              className="cursor-move p-1 hover:bg-gray-100 rounded flex items-center"
+              className="cursor-move p-0.5 sm:p-1 hover:bg-gray-100 rounded flex items-center flex-shrink-0"
               draggable
               onDragStart={(e) => {
                 e.dataTransfer.effectAllowed = 'move';
@@ -217,10 +217,10 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
               onDragEnd={onDragEnd}
               title="Drag to move block"
             >
-              <GripVertical className="h-4 w-4 text-gray-400" />
+              <GripVertical className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             </div>
-            
-            <div className="w-px h-5 bg-gray-200" />
+
+            <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
             
             {/* Block Type Selector (Heading levels, Paragraph) */}
             {onChangeType && (
@@ -230,13 +230,13 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-1.5 gap-0.5 hover:bg-gray-100"
+                      className="h-6 sm:h-7 px-1 sm:px-1.5 gap-0.5 hover:bg-gray-100 flex-shrink-0"
                       title="Block Type"
                     >
-                      {currentType === 'core/paragraph' && <Type className="h-4 w-4" />}
-                      {currentType === 'core/heading' && <Heading2 className="h-4 w-4" />}
-                      {(!currentType || currentType === 'core/paragraph') && <Type className="h-4 w-4" />}
-                      <ChevronDownIcon className="h-3 w-3 text-gray-500" />
+                      {currentType === 'core/paragraph' && <Type className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {currentType === 'core/heading' && <Heading2 className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {(!currentType || currentType === 'core/paragraph') && <Type className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      <ChevronDownIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-500" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-44">
@@ -299,10 +299,10 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="w-px h-5 bg-gray-200" />
+                <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
               </>
             )}
-            
+
             {/* Bold and Italic buttons for text blocks */}
             {(onToggleBold || onToggleItalic) && (
               <>
@@ -311,7 +311,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-7 px-2 hover:bg-gray-100",
+                      "h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0",
                       isBold && "bg-gray-200"
                     )}
                     onClick={(e) => {
@@ -320,7 +320,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     }}
                     title="Bold (Ctrl+B)"
                   >
-                    <Bold className="h-4 w-4" />
+                    <Bold className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 )}
                 {onToggleItalic && (
@@ -328,7 +328,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-7 px-2 hover:bg-gray-100",
+                      "h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0",
                       isItalic && "bg-gray-200"
                     )}
                     onClick={(e) => {
@@ -337,10 +337,10 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     }}
                     title="Italic (Ctrl+I)"
                   >
-                    <Italic className="h-4 w-4" />
+                    <Italic className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 )}
-                <div className="w-px h-5 bg-gray-200" />
+                <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
               </>
             )}
             
@@ -352,14 +352,14 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-1.5 gap-0.5 hover:bg-gray-100"
+                      className="h-6 sm:h-7 px-1 sm:px-1.5 gap-0.5 hover:bg-gray-100 flex-shrink-0"
                       title="Text Alignment"
                     >
-                      {currentAlign === 'center' && <AlignCenter className="h-4 w-4" />}
-                      {currentAlign === 'right' && <AlignRight className="h-4 w-4" />}
-                      {currentAlign === 'justify' && <AlignJustify className="h-4 w-4" />}
-                      {(!currentAlign || currentAlign === 'left') && <AlignLeft className="h-4 w-4" />}
-                      <ChevronDownIcon className="h-3 w-3 text-gray-500" />
+                      {currentAlign === 'center' && <AlignCenter className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {currentAlign === 'right' && <AlignRight className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {currentAlign === 'justify' && <AlignJustify className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {(!currentAlign || currentAlign === 'left') && <AlignLeft className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      <ChevronDownIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-500" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-44">
@@ -397,18 +397,18 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="w-px h-5 bg-gray-200" />
+                <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
               </>
             )}
-            
+
             {/* Custom toolbar content (e.g., heading level selector) */}
             {customToolbarContent}
-            
-            {/* Move buttons */}
+
+            {/* Move buttons - hide on mobile, show in More menu */}
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 hover:bg-gray-100"
+              className="hidden sm:flex h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onMoveUp();
@@ -416,12 +416,12 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
               disabled={!canMoveUp}
               title="Move block up (Alt+↑)"
             >
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 hover:bg-gray-100"
+              className="hidden sm:flex h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onMoveDown();
@@ -429,40 +429,40 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
               disabled={!canMoveDown}
               title="Move block down (Alt+↓)"
             >
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
-            
-            <div className="w-px h-5 bg-gray-200" />
 
-            {/* Duplicate button */}
+            <div className="hidden sm:block w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
+
+            {/* Duplicate button - hide on mobile */}
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 hover:bg-gray-100"
+              className="hidden sm:flex h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onDuplicate();
               }}
               title="Duplicate block (Ctrl+D)"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
 
-            {/* Delete button */}
+            {/* Delete button - always visible */}
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 hover:bg-red-100 hover:text-red-600"
+              className="h-6 sm:h-7 px-1 sm:px-2 hover:bg-red-100 hover:text-red-600 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete();
               }}
               title="Delete block (Delete)"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
 
-            <div className="w-px h-5 bg-gray-200" />
+            <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
 
             {/* More options */}
             <DropdownMenu>
@@ -470,31 +470,59 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-2 hover:bg-gray-100"
+                  className="h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0"
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => onCopy?.()}>
+                {/* Mobile-only: Move and Duplicate options */}
+                <div className="sm:hidden">
+                  <DropdownMenuItem
+                    onClick={() => onMoveUp()}
+                    disabled={!canMoveUp}
+                    className="gap-2"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                    Move up
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onMoveDown()}
+                    disabled={!canMoveDown}
+                    className="gap-2"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                    Move down
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onDuplicate()} className="gap-2">
+                    <Copy className="h-4 w-4" />
+                    Duplicate (Ctrl+D)
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </div>
+
+                <DropdownMenuItem onClick={() => onCopy?.()} className="gap-2">
+                  <Copy className="h-4 w-4" />
                   Copy block (Ctrl+C)
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onPaste?.()}>
+                <DropdownMenuItem onClick={() => onPaste?.()} className="gap-2">
                   Paste block (Ctrl+V)
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => onAddBlock?.('before')}>
+                <DropdownMenuItem onClick={() => onAddBlock?.('before')} className="gap-2">
+                  <Plus className="h-4 w-4" />
                   Add block before
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onAddBlock?.('after')}>
+                <DropdownMenuItem onClick={() => onAddBlock?.('after')} className="gap-2">
+                  <Plus className="h-4 w-4" />
                   Add block after
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
-          {/* Block type indicator */}
-          <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
+          {/* Block type indicator - hide on mobile */}
+          <div className="hidden sm:block bg-gray-800 text-white text-xs px-2 py-1 rounded flex-shrink-0">
             {type.replace('core/', '').charAt(0).toUpperCase() + type.replace('core/', '').slice(1)}
           </div>
         </div>
