@@ -1,32 +1,22 @@
 /**
  * ParagraphBlock Component
- * 
- * 구텐베르크 수준의 단락 블록 - 완전히 새롭게 구현
- * 직접 조작 원칙과 시각적 피드백 강화
+ * WordPress Gutenberg Paragraph 블록 완전 모방
+ * 가장 기본적인 텍스트 입력 블록
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   Bold,
   Italic,
   Link2,
-  Strikethrough,
-  Code,
-  Underline,
-  Trash2
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Input } from '@/components/ui/input';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
-import { BlockControls, ToolbarGroup, ToolbarButton, AlignmentToolbar } from '../gutenberg/BlockControls';
-import { InlineImageInserter, InlineImageData } from './paragraph/InlineImageInserter';
-import './paragraph/paragraph-styles.css';
 
 interface ParagraphBlockProps {
   id: string;
@@ -42,82 +32,45 @@ interface ParagraphBlockProps {
   attributes?: {
     align?: 'left' | 'center' | 'right' | 'justify';
     dropCap?: boolean;
-    dropCapLines?: number;
-    dropCapColor?: string;
-    dropCapFontSize?: number;
-    dropCapFontWeight?: number;
     fontSize?: number;
-    lineHeight?: number;
-    letterSpacing?: number;
-    wordSpacing?: number;
     textColor?: string;
     backgroundColor?: string;
-    highlightColor?: string;
-    highlightOpacity?: number;
-    padding?: number;
-    margin?: number;
-    borderRadius?: number;
-    fontWeight?: number;
-    fontStyle?: 'normal' | 'italic';
-    textTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
   };
 }
 
 const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
-  id: _id,  // Prefixed with underscore since not used directly
+  id,
   content,
   onChange,
   onDelete,
-  onDuplicate: _onDuplicate,  // Not used in this implementation
-  onMoveUp: _onMoveUp,  // Not used in this implementation
-  onMoveDown: _onMoveDown,  // Not used in this implementation
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
   onAddBlock,
   isSelected,
   onSelect,
   attributes = {}
 }) => {
-  // State
-  const [localContent, setLocalContent] = useState(content);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [showLinkPopover, setShowLinkPopover] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-  const [selectedText, setSelectedText] = useState('');
-  const editorRef = useRef<HTMLDivElement>(null);
-  
-  // Default attributes with fallbacks
   const {
     align = 'left',
     dropCap = false,
-    dropCapLines = 3,
-    dropCapColor = '#000000',
-    dropCapFontSize = 64,
-    dropCapFontWeight = 700,
     fontSize = 16,
-    lineHeight = 1.6,
-    letterSpacing = 0,
-    wordSpacing = 0,
     textColor = '#1e293b',
     backgroundColor = '',
-    padding = 0,
-    margin = 0,
-    borderRadius = 0,
-    fontWeight = 400,
-    fontStyle = 'normal',
-    textTransform = 'none'
   } = attributes;
 
-  // Sync content changes
+  const [localContent, setLocalContent] = useState(content);
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  // Sync content
   useEffect(() => {
     setLocalContent(content);
   }, [content]);
 
-  // Auto-focus when selected
-  useEffect(() => {
-    if (isSelected && editorRef.current) {
-      editorRef.current.focus();
-    }
-  }, [isSelected]);
+  // Update attribute
+  const updateAttribute = useCallback((key: string, value: any) => {
+    onChange(localContent, { ...attributes, [key]: value });
+  }, [onChange, localContent, attributes]);
 
   // Handle content change
   const handleContentChange = useCallback((newContent: string) => {
@@ -125,330 +78,145 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     onChange(newContent, attributes);
   }, [onChange, attributes]);
 
-  // Update attribute helper
-  const updateAttribute = useCallback((key: string, value: any) => {
-    onChange(localContent, { ...attributes, [key]: value });
-  }, [onChange, localContent, attributes]);
-
-  // Handle text selection for link insertion
-  const handleTextSelection = useCallback(() => {
-    const selection = window.getSelection();
-    if (selection && selection.toString()) {
-      setSelectedText(selection.toString());
-    }
-  }, []);
-
-  // Apply text formatting
-  const applyFormat = useCallback((command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    // Update content after formatting
-    if (editorRef.current) {
-      handleContentChange(editorRef.current.innerHTML);
-    }
-  }, [handleContentChange]);
-
-
-  // Insert inline image
-  const insertInlineImage = useCallback((imageData: InlineImageData) => {
-    const selection = window.getSelection();
-    if (selection && editorRef.current) {
-      const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-
-      if (range) {
-        // Create image element
-        const img = document.createElement('img');
-        img.src = imageData.src;
-        img.alt = imageData.alt;
-        img.style.width = `${imageData.width}px`;
-        img.style.height = `${imageData.height}px`;
-        img.style.verticalAlign = imageData.align;
-        img.style.display = imageData.textWrap ? 'inline' : 'inline-block';
-        img.style.margin = '0 4px';
-        img.className = 'inline-image';
-
-        // Insert at cursor position
-        range.insertNode(img);
-
-        // Move cursor after image
-        range.setStartAfter(img);
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        // Update content
-        handleContentChange(editorRef.current.innerHTML);
-      }
-    }
-  }, [handleContentChange]);
-
-
-  // Insert link with better UX
-  const insertLink = useCallback(() => {
-    const selection = window.getSelection();
-    if (selection && selection.toString()) {
-      setSelectedText(selection.toString());
-      setShowLinkPopover(true);
-    } else {
-      // If no text selected, prompt to select text first
-      alert('Please select some text first to add a link');
-    }
-  }, []);
-
-  // Apply link to selected text
-  const applyLink = useCallback(() => {
-    if (linkUrl && selectedText) {
-      applyFormat('createLink', linkUrl);
-      setShowLinkPopover(false);
-      setLinkUrl('');
-      setSelectedText('');
-    }
-  }, [linkUrl, selectedText, applyFormat]);
-
   // Handle Enter key for block split
   const handleSplit = useCallback((value: string, isOriginal?: boolean) => {
     if (isOriginal) {
       onChange(value, attributes);
     }
-    // Create new paragraph block after this one
     onAddBlock?.('after', 'paragraph');
   }, [onChange, attributes, onAddBlock]);
 
-  // Handle block merge
-  const handleMerge = useCallback(() => {
-    // Merge with previous block logic would go here
-  }, []);
-
-  // Handle block removal when empty
+  // Handle backspace on empty block
   const handleRemove = useCallback(() => {
     if (!localContent || localContent === '' || localContent === '<br>') {
       onDelete();
     }
   }, [localContent, onDelete]);
 
-  // Keyboard shortcuts
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Format shortcuts
-    if (e.ctrlKey || e.metaKey) {
-      switch (e.key) {
-        case 'b':
-          e.preventDefault();
-          applyFormat('bold');
-          break;
-        case 'i':
-          e.preventDefault();
-          applyFormat('italic');
-          break;
-        case 'u':
-          e.preventDefault();
-          applyFormat('underline');
-          break;
-        case 'k':
-          e.preventDefault();
-          insertLink();
-          break;
-      }
+  // Get alignment class
+  const getAlignmentClass = () => {
+    switch (align) {
+      case 'center': return 'text-center';
+      case 'right': return 'text-right';
+      case 'justify': return 'text-justify';
+      default: return 'text-left';
     }
-    
-    // Block navigation
-    if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
-      if (e.key === '/' && localContent === '') {
-        // Trigger block inserter
-        e.preventDefault();
-        // This would open block selector in real implementation
-      }
-    }
-  }, [applyFormat, insertLink, localContent]);
-
-  // Content area classes with enhanced drop cap
-  const contentClasses = cn(
-    'paragraph-content relative',
-    'min-h-[1.8em] outline-none',
-    align === 'center' && 'text-center',
-    align === 'right' && 'text-right',
-    align === 'justify' && 'text-justify',
-    isFocused && 'ring-2 ring-blue-500 ring-opacity-20 rounded'
-  );
-
-  // Drop cap styles
-  const dropCapStyles = dropCap ? {
-    '--drop-cap-font-size': `${dropCapFontSize}px`,
-    '--drop-cap-color': dropCapColor,
-    '--drop-cap-font-weight': dropCapFontWeight,
-    '--drop-cap-line-height': `${dropCapLines * 0.8}rem`,
-  } as React.CSSProperties : {};
-
-  // Content styles with enhanced typography
-  const contentStyles: React.CSSProperties = {
-    fontSize: `${fontSize}px`,
-    lineHeight,
-    letterSpacing: letterSpacing ? `${letterSpacing}em` : undefined,
-    wordSpacing: wordSpacing ? `${wordSpacing}em` : undefined,
-    color: textColor || undefined,
-    backgroundColor: backgroundColor || undefined,
-    padding: padding ? `${padding}px` : undefined,
-    margin: margin ? `${margin}px` : undefined,
-    borderRadius: borderRadius ? `${borderRadius}px` : undefined,
-    fontWeight,
-    fontStyle,
-    textTransform,
-    ...dropCapStyles,
   };
 
   return (
-    <>
-      {/* Enhanced Block Controls */}
-      {isSelected && (
-        <BlockControls>
-          {/* Primary Text Formatting */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Bold className="h-4 w-4" />}
-              label="Bold (Ctrl+B)"
-              onClick={() => applyFormat('bold')}
-              isActive={document.queryCommandState('bold')}
-            />
-            <ToolbarButton
-              icon={<Italic className="h-4 w-4" />}
-              label="Italic (Ctrl+I)"
-              onClick={() => applyFormat('italic')}
-              isActive={document.queryCommandState('italic')}
-            />
-            <ToolbarButton
-              icon={<Underline className="h-4 w-4" />}
-              label="Underline (Ctrl+U)"
-              onClick={() => applyFormat('underline')}
-              isActive={document.queryCommandState('underline')}
-            />
-            <ToolbarButton
-              icon={<Strikethrough className="h-4 w-4" />}
-              label="Strikethrough"
-              onClick={() => applyFormat('strikeThrough')}
-              isActive={document.queryCommandState('strikeThrough')}
-            />
-          </ToolbarGroup>
-
-          {/* Link, Image and Code */}
-          <ToolbarGroup>
-            <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
-              <PopoverTrigger>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 px-2"
-                  onClick={insertLink}
-                >
-                  <Link2 className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Add Link</h4>
-                  <Input
-                    placeholder="https://example.com"
-                    value={linkUrl}
-                    onChange={(e) => setLinkUrl(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && applyLink()}
-                  />
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowLinkPopover(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button size="sm" onClick={applyLink}>
-                      Apply
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <InlineImageInserter onInsert={insertInlineImage} />
-
-            <ToolbarButton
-              icon={<Code className="h-4 w-4" />}
-              label="Inline Code"
-              onClick={() => {
-                const selection = window.getSelection();
-                if (selection && selection.toString()) {
-                  applyFormat('insertHTML', `<code>${selection.toString()}</code>`);
-                }
-              }}
-            />
-          </ToolbarGroup>
-
-          {/* Advanced Formatting - Removed (too complex for now) */}
-
+    <EnhancedBlockWrapper
+      id={id}
+      type="paragraph"
+      isSelected={isSelected}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
+      className="wp-block-paragraph"
+      customToolbarButtons={(
+        <>
           {/* Text Alignment */}
-          <AlignmentToolbar
-            value={align}
-            onChange={(newAlign) => updateAttribute('align', newAlign)}
-          />
+          <button
+            onClick={() => updateAttribute('align', 'left')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              align === 'left' && "bg-blue-100 text-blue-600"
+            )}
+            title="Align Left"
+          >
+            <AlignLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => updateAttribute('align', 'center')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              align === 'center' && "bg-blue-100 text-blue-600"
+            )}
+            title="Align Center"
+          >
+            <AlignCenter className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => updateAttribute('align', 'right')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              align === 'right' && "bg-blue-100 text-blue-600"
+            )}
+            title="Align Right"
+          >
+            <AlignRight className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => updateAttribute('align', 'justify')}
+            className={cn(
+              "p-1 rounded hover:bg-gray-100",
+              align === 'justify' && "bg-blue-100 text-blue-600"
+            )}
+            title="Justify"
+          >
+            <AlignJustify className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
 
-          {/* Delete Block */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Trash2 className="h-4 w-4" />}
-              label="Delete block (Delete)"
-              onClick={onDelete}
-              className="hover:bg-red-50 hover:text-red-600"
-            />
-          </ToolbarGroup>
-        </BlockControls>
+          <div className="w-px h-4 bg-gray-300 mx-1" />
+
+          {/* Text Formatting - handled by RichText */}
+          <button
+            onClick={() => document.execCommand('bold')}
+            className="p-1 rounded hover:bg-gray-100"
+            title="Bold (Ctrl+B)"
+          >
+            <Bold className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => document.execCommand('italic')}
+            className="p-1 rounded hover:bg-gray-100"
+            title="Italic (Ctrl+I)"
+          >
+            <Italic className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <button
+            onClick={() => {
+              const url = prompt('Enter URL:');
+              if (url) document.execCommand('createLink', false, url);
+            }}
+            className="p-1 rounded hover:bg-gray-100"
+            title="Link (Ctrl+K)"
+          >
+            <Link2 className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+        </>
       )}
-
-      {/* Inspector Controls removed - now handled by GutenbergSidebar */}
-
-      {/* Block Content - Removed wrapper div, content directly in BlockWrapper */}
+    >
       <div
         ref={editorRef}
         className={cn(
-          contentClasses,
-          dropCap && 'drop-cap-enabled',
-          dropCap && `lines-${dropCapLines}`
+          'paragraph-content min-h-[1.5em]',
+          getAlignmentClass(),
+          dropCap && 'first-letter:text-7xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:leading-none'
         )}
-        style={contentStyles}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={onSelect}
-        onKeyDown={handleKeyDown}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        onMouseUp={handleTextSelection}
+        style={{
+          fontSize: `${fontSize}px`,
+          color: textColor || undefined,
+          backgroundColor: backgroundColor || undefined,
+        }}
       >
         <RichText
           tagName="p"
           value={localContent}
           onChange={handleContentChange}
           onSplit={handleSplit}
-          onMerge={handleMerge}
           onRemove={handleRemove}
           placeholder="Start writing or type / to choose a block"
           allowedFormats={[
             'core/bold',
             'core/italic',
             'core/link',
-            'core/strikethrough',
-            'core/code',
-            'core/underline',
-            'core/subscript',
-            'core/superscript'
           ]}
         />
-
-        {/* Hover hint when empty */}
-        {!localContent && isHovered && !isSelected && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-sm text-gray-400">
-              Click to start writing
-            </span>
-          </div>
-        )}
       </div>
-
-    </>
+    </EnhancedBlockWrapper>
   );
 };
 
