@@ -7,28 +7,15 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { 
-  Bold, 
-  Italic, 
-  Link2, 
+import {
+  Bold,
+  Italic,
+  Link2,
   Strikethrough,
   Code,
-  Underline,
-  Highlighter,
-  Subscript,
-  Superscript,
-  RemoveFormatting,
-  MoreHorizontal,
-  Type
+  Underline
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Popover,
   PopoverContent,
@@ -37,9 +24,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { RichText } from '../gutenberg/RichText';
 import { BlockControls, ToolbarGroup, ToolbarButton, AlignmentToolbar } from '../gutenberg/BlockControls';
-import { DropCapController } from './paragraph/DropCapController';
-import { TypographyPanel } from './paragraph/TypographyPanel';
-import { HighlightSelector } from './paragraph/HighlightSelector';
 import { InlineImageInserter, InlineImageData } from './paragraph/InlineImageInserter';
 import './paragraph/paragraph-styles.css';
 
@@ -98,8 +82,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [selectedText, setSelectedText] = useState('');
-  const [showDropCapSettings, setShowDropCapSettings] = useState(false);
-  const [showTypographySettings, setShowTypographySettings] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   
   // Default attributes with fallbacks
@@ -116,8 +98,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     wordSpacing = 0,
     textColor = '#1e293b',
     backgroundColor = '',
-    highlightColor = '',
-    highlightOpacity = 0.3,
     padding = 0,
     margin = 0,
     borderRadius = 0,
@@ -166,14 +146,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [handleContentChange]);
 
-  // Apply highlight to selected text
-  const applyHighlight = useCallback(() => {
-    const selection = window.getSelection();
-    if (selection && selection.toString() && highlightColor) {
-      const rgba = `rgba(${highlightColor.slice(1).match(/.{2}/g)?.map(hex => parseInt(hex, 16)).join(', ')}, ${highlightOpacity})`;
-      applyFormat('hiliteColor', rgba);
-    }
-  }, [highlightColor, highlightOpacity, applyFormat]);
 
   // Insert inline image
   const insertInlineImage = useCallback((imageData: InlineImageData) => {
@@ -208,30 +180,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [handleContentChange]);
 
-  // Reset drop cap to defaults
-  const resetDropCap = useCallback(() => {
-    onChange(localContent, {
-      ...attributes,
-      dropCapLines: 3,
-      dropCapColor: '#000000',
-      dropCapFontSize: 64,
-      dropCapFontWeight: 700,
-    });
-  }, [localContent, attributes, onChange]);
-
-  // Reset typography to defaults
-  const resetTypography = useCallback(() => {
-    onChange(localContent, {
-      ...attributes,
-      fontSize: 16,
-      lineHeight: 1.6,
-      letterSpacing: 0,
-      wordSpacing: 0,
-      fontWeight: 400,
-      fontStyle: 'normal',
-      textTransform: 'none',
-    });
-  }, [localContent, attributes, onChange]);
 
   // Insert link with better UX
   const insertLink = useCallback(() => {
@@ -430,49 +378,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             />
           </ToolbarGroup>
 
-          {/* Advanced Formatting */}
-          <ToolbarGroup>
-            <HighlightSelector
-              selectedColor={highlightColor}
-              opacity={highlightOpacity}
-              onColorChange={(color) => updateAttribute('highlightColor', color)}
-              onOpacityChange={(opacity) => updateAttribute('highlightOpacity', opacity)}
-              onClear={() => updateAttribute('highlightColor', '')}
-              onApply={applyHighlight}
-            />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="ghost" size="sm" className="h-9 px-2">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => applyFormat('subscript')}>
-                  <Subscript className="h-4 w-4 mr-2" />
-                  Subscript
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => applyFormat('superscript')}>
-                  <Superscript className="h-4 w-4 mr-2" />
-                  Superscript
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowDropCapSettings(!showDropCapSettings)}>
-                  <Type className="h-4 w-4 mr-2" />
-                  Drop Cap Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowTypographySettings(!showTypographySettings)}>
-                  <Type className="h-4 w-4 mr-2" />
-                  Typography Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => applyFormat('removeFormat')}>
-                  <RemoveFormatting className="h-4 w-4 mr-2" />
-                  Clear Formatting
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </ToolbarGroup>
+          {/* Advanced Formatting - Removed (too complex for now) */}
 
           {/* Text Alignment */}
           <AlignmentToolbar
@@ -531,47 +437,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         )}
       </div>
 
-      {/* Drop Cap Settings Panel */}
-      {isSelected && showDropCapSettings && (
-        <div className="mt-4">
-          <DropCapController
-            isEnabled={dropCap}
-            lines={dropCapLines}
-            color={dropCapColor}
-            fontSize={dropCapFontSize}
-            fontWeight={dropCapFontWeight}
-            onToggle={(enabled) => updateAttribute('dropCap', enabled)}
-            onLinesChange={(lines) => updateAttribute('dropCapLines', lines)}
-            onColorChange={(color) => updateAttribute('dropCapColor', color)}
-            onFontSizeChange={(size) => updateAttribute('dropCapFontSize', size)}
-            onFontWeightChange={(weight) => updateAttribute('dropCapFontWeight', weight)}
-            onReset={resetDropCap}
-          />
-        </div>
-      )}
-
-      {/* Typography Settings Panel */}
-      {isSelected && showTypographySettings && (
-        <div className="mt-4">
-          <TypographyPanel
-            fontSize={fontSize}
-            lineHeight={lineHeight}
-            letterSpacing={letterSpacing}
-            wordSpacing={wordSpacing}
-            textTransform={textTransform}
-            fontWeight={fontWeight}
-            fontStyle={fontStyle}
-            onFontSizeChange={(size) => updateAttribute('fontSize', size)}
-            onLineHeightChange={(height) => updateAttribute('lineHeight', height)}
-            onLetterSpacingChange={(spacing) => updateAttribute('letterSpacing', spacing)}
-            onWordSpacingChange={(spacing) => updateAttribute('wordSpacing', spacing)}
-            onTextTransformChange={(transform) => updateAttribute('textTransform', transform)}
-            onFontWeightChange={(weight) => updateAttribute('fontWeight', weight)}
-            onFontStyleChange={(style) => updateAttribute('fontStyle', style)}
-            onReset={resetTypography}
-          />
-        </div>
-      )}
     </>
   );
 };
