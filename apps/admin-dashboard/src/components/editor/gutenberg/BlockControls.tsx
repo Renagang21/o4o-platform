@@ -135,17 +135,17 @@ export const ToolbarButton: FC<{
   return (
     <button
       className={cn(
-        'p-2 hover:bg-gray-100 transition-colors',
+        'p-1.5 hover:bg-gray-100 transition-colors',
         'flex items-center justify-center',
-        'min-w-[36px] h-[36px]',
+        'min-w-[32px] h-[32px]',
         isActive && 'bg-gray-200',
         className
       )}
       onClick={onClick}
       title={label}
     >
-      {icon && <span className="w-5 h-5">{icon}</span>}
-      {!icon && label && <span className="text-sm">{label}</span>}
+      {icon && <span className="w-4 h-4">{icon}</span>}
+      {!icon && label && <span className="text-xs">{label}</span>}
     </button>
   );
 };

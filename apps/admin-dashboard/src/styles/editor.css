@@ -180,25 +180,9 @@
 
 /* Toolbar button hover effects - REMOVED (now using block-toolbar.css) */
 
-/* Block Drag Handle Styles */
+/* Block Drag Handle Styles - HIDDEN (using Gutenberg toolbar instead) */
 .block-editor-block__drag-handle {
-  position: absolute;
-  left: -40px;  /* 블록 왼쪽 바깥으로 이동 */
-  top: 0;       /* 블록 최상단 */
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  padding: 4px;
-  cursor: grab;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: none !important;
 }
 
 .block-editor-block__drag-handle:hover {
@@ -253,19 +237,7 @@
 }
 
 .block-editor-block__type-label {
-  position: absolute;
-  top: -22px;   /* 블록 위로 완전히 이동 */
-  left: 0;
-  font-size: 11px;
-  color: #6b7280;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid #e5e7eb;
-  z-index: 5;
-  white-space: nowrap;
+  display: none !important;
 }
 
 .block-editor-block:hover .block-editor-block__type-label,
@@ -292,20 +264,9 @@
   border-color: #3b82f6;
 }
 
-/* Block Controls positioning */
+/* Block Controls - HIDDEN (using Gutenberg toolbar instead) */
 .block-editor-block__controls {
-  position: absolute;
-  right: 0;     /* 블록 오른쪽 끝 */
-  top: -36px;   /* 블록 위로 완전히 이동 */
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  display: flex;
-  gap: 4px;
-  background: #ffffff;
-  padding: 4px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: none !important;
 }
 
 .block-editor-block:hover .block-editor-block__controls,
