@@ -5,7 +5,7 @@
 
 import React, { useState, useRef } from 'react';
 import { BlockDragHandle } from './BlockDragHandle';
-import { BlockControls } from './BlockControls';
+// BlockControls removed - now handled by individual block components (e.g. ParagraphBlock)
 
 interface BlockWrapperProps {
   blockId: string;
@@ -166,16 +166,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
           {blockType}
         </div>
 
-        {/* Block Controls */}
-        <BlockControls
-          blockId={blockId}
-          onDuplicate={onDuplicate}
-          onDelete={onDelete}
-          onMoveUp={onMoveUp}
-          onMoveDown={onMoveDown}
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
-        />
+        {/* Block Controls - removed, now handled by ParagraphBlock's Gutenberg toolbar */}
 
         {/* Block Content */}
         <div className="block-editor-block__content">

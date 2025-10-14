@@ -31,7 +31,7 @@ export const BlockControls: FC<BlockControlsProps> = ({ children }) => {
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
         setPosition({
-          top: rect.top + scrollTop - 50, // 50px above block (increased gap from 40px)
+          top: rect.top + scrollTop - 45, // 45px above block (toolbar height + small gap)
           left: rect.left + scrollLeft,
           width: rect.width
         });
