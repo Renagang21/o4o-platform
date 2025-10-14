@@ -100,7 +100,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const [selectedText, setSelectedText] = useState('');
   const [showDropCapSettings, setShowDropCapSettings] = useState(false);
   const [showTypographySettings, setShowTypographySettings] = useState(false);
-  const blockRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   
   // Default attributes with fallbacks
@@ -311,17 +310,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [applyFormat, insertLink, localContent]);
 
-  // Visual state classes
-  const blockClasses = cn(
-    'paragraph-test-block relative transition-all duration-200',
-    'before:content-[""] before:absolute before:inset-0 before:pointer-events-none',
-    'before:border-2 before:rounded before:transition-all',
-    !isSelected && !isHovered && 'before:border-transparent',
-    isHovered && !isSelected && 'before:border-gray-200 before:border-dashed',
-    isSelected && 'before:border-blue-500',
-    isSelected && 'before:shadow-sm'
-  );
-
   // Content area classes with enhanced drop cap
   const contentClasses = cn(
     'paragraph-content relative',
@@ -496,48 +484,43 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
       {/* Inspector Controls removed - now handled by GutenbergSidebar */}
 
-      {/* Block Content with Enhanced Visual Feedback */}
+      {/* Block Content - Removed wrapper div, content directly in BlockWrapper */}
       <div
-        ref={blockRef}
-        className={blockClasses}
+        ref={editorRef}
+        className={cn(
+          contentClasses,
+          dropCap && 'drop-cap-enabled',
+          dropCap && `lines-${dropCapLines}`
+        )}
+        style={contentStyles}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={onSelect}
         onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onMouseUp={handleTextSelection}
       >
-        <div
-          ref={editorRef}
-          className={cn(
-            contentClasses,
-            dropCap && 'drop-cap-enabled',
-            dropCap && `lines-${dropCapLines}`
-          )}
-          style={contentStyles}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          onMouseUp={handleTextSelection}
-        >
-          <RichText
-            tagName="p"
-            value={localContent}
-            onChange={handleContentChange}
-            onSplit={handleSplit}
-            onMerge={handleMerge}
-            onRemove={handleRemove}
-            placeholder="Start writing or type / to choose a block"
-            allowedFormats={[
-              'core/bold',
-              'core/italic',
-              'core/link',
-              'core/strikethrough',
-              'core/code',
-              'core/underline',
-              'core/subscript',
-              'core/superscript'
-            ]}
-          />
-        </div>
-        
+        <RichText
+          tagName="p"
+          value={localContent}
+          onChange={handleContentChange}
+          onSplit={handleSplit}
+          onMerge={handleMerge}
+          onRemove={handleRemove}
+          placeholder="Start writing or type / to choose a block"
+          allowedFormats={[
+            'core/bold',
+            'core/italic',
+            'core/link',
+            'core/strikethrough',
+            'core/code',
+            'core/underline',
+            'core/subscript',
+            'core/superscript'
+          ]}
+        />
+
         {/* Hover hint when empty */}
         {!localContent && isHovered && !isSelected && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
