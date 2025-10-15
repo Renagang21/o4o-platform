@@ -19,6 +19,7 @@ import { GeneralSection } from './sections/general/GeneralSection';
 import { BlogSection } from './sections/blog/BlogSection';
 import { CustomizerProvider } from './context/CustomizerContext';
 import { HeaderBuilder } from './components/HeaderBuilder';
+import { FooterBuilder } from './components/FooterBuilder';
 
 import './styles/controls.css';
 import './styles/sections.css';
@@ -48,16 +49,22 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showHeaderBuilderOverlay, setShowHeaderBuilderOverlay] = useState(false);
+  const [showFooterBuilderOverlay, setShowFooterBuilderOverlay] = useState(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const cssUpdateTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Auto-show header builder overlay when header section is active
+  // Auto-show builder overlays when header/footer sections are active
   useEffect(() => {
     if (activeSection === 'header') {
       setShowHeaderBuilderOverlay(true);
+      setShowFooterBuilderOverlay(false);
+    } else if (activeSection === 'footer') {
+      setShowFooterBuilderOverlay(true);
+      setShowHeaderBuilderOverlay(false);
     } else {
       setShowHeaderBuilderOverlay(false);
+      setShowFooterBuilderOverlay(false);
     }
   }, [activeSection]);
 
@@ -445,6 +452,26 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                 )}
               </button>
             )}
+
+            {/* Footer Builder Toggle - Only show when footer section is active */}
+            {activeSection === 'footer' && (
+              <button
+                onClick={() => setShowFooterBuilderOverlay(!showFooterBuilderOverlay)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  showFooterBuilderOverlay
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <span>🔻</span>
+                <span>푸터 빌더</span>
+                {showFooterBuilderOverlay ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronUp size={16} />
+                )}
+              </button>
+            )}
           </div>
 
           {/* Preview Frame */}
@@ -495,6 +522,41 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                     layout={settings.header.layout}
                     onChange={(newLayout) => {
                       updateSetting('header', { ...settings.header, layout: newLayout });
+                    }}
+                    device={previewDevice}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Footer Builder Overlay - Astra Style */}
+            {showFooterBuilderOverlay && (
+              <div className="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 shadow-2xl"
+                style={{
+                  maxHeight: '500px',
+                  height: '450px',
+                  transition: 'transform 0.3s ease-out',
+                  transform: showFooterBuilderOverlay ? 'translateY(0)' : 'translateY(100%)'
+                }}
+              >
+                <div className="flex items-center justify-between px-4 py-2 bg-gray-100 border-b">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <span>🔻</span>
+                    푸터 빌더 - HTML 위젯으로 커스텀 콘텐츠를 추가하세요
+                  </h3>
+                  <button
+                    onClick={() => setShowFooterBuilderOverlay(false)}
+                    className="p-1 hover:bg-gray-200 rounded"
+                    title="빌더 닫기"
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
+                <div className="h-[calc(100%-44px)] overflow-y-auto">
+                  <FooterBuilder
+                    layout={settings.footer.builder}
+                    onChange={(newLayout) => {
+                      updateSetting('footer', newLayout, ['builder']);
                     }}
                     device={previewDevice}
                   />
