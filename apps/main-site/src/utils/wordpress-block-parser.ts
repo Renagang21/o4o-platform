@@ -334,6 +334,23 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
         }
       };
 
+    // Custom blocks
+    case 'o4o/markdown-reader':
+      const markdownData = (wpBlock as any).data || wpBlock.attributes;
+      return {
+        ...block,
+        type: 'o4o/markdown-reader',
+        data: {
+          mediaId: markdownData?.mediaId,
+          mediaUrl: markdownData?.mediaUrl,
+          mediaTitle: markdownData?.mediaTitle,
+          fontSize: markdownData?.fontSize || 16,
+          theme: markdownData?.theme || 'github',
+          markdownContent: markdownData?.markdownContent,
+          lastFetched: markdownData?.lastFetched,
+        }
+      };
+
     // Default case for unknown blocks
     default:
     // Removed console.warn
