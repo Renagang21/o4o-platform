@@ -93,11 +93,7 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
   onPaste,
   onChangeType,
 }) => {
-  const [showLayoutSettings, setShowLayoutSettings] = useState(false);
-  const [showStyleSettings, setShowStyleSettings] = useState(false);
-  const [showColorSettings, setShowColorSettings] = useState(false);
-  const [showLinkEditor, setShowLinkEditor] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  // No longer need these state variables - settings moved to sidebar
 
   // Parse attributes with defaults
   const {
@@ -238,94 +234,170 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
     platform => !links.some(link => link.platform === platform)
   ) as PlatformType[];
 
-  return (
-    <>
-      {/* Block Content */}
-      <EnhancedBlockWrapper
-        id={id}
-        type="social-icons"
-        isSelected={isSelected}
-        onSelect={onSelect}
-        onDelete={onDelete}
-        onDuplicate={onDuplicate}
-        onMoveUp={onMoveUp}
-        onMoveDown={onMoveDown}
-        onAddBlock={onAddBlock}
-        canMoveUp={canMoveUp}
-        canMoveDown={canMoveDown}
-        isDragging={isDragging}
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDrop={onDrop}
-        onDragEnd={onDragEnd}
-        onCopy={onCopy}
-        onPaste={onPaste}
-        onChangeType={onChangeType}
-        currentType="core/social-icons"
-        customToolbarContent={
-          isSelected ? (
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Quick Layout Selector */}
-              <div className="flex gap-1">
-                {(['horizontal', 'vertical', 'grid'] as const).map((layoutOption) => (
-                  <Button
-                    key={layoutOption}
-                    variant={layout === layoutOption ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => updateAttributes({ layout: layoutOption })}
-                    className="h-7 px-3 text-xs capitalize"
-                  >
-                    {layoutOption}
-                  </Button>
-                ))}
+  // Custom sidebar content - move all settings here
+  const customSidebarContent = isSelected ? (
+    <div className="space-y-4">
+      {/* Links Editor */}
+      <div className="pb-4 border-b border-gray-200">
+        <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">Social Media Links</h4>
+        <div className="space-y-2">
+          {links.map((link, index) => {
+            const platformInfo = PLATFORM_INFO[link.platform];
+            const IconComponent = platformInfo.icon;
+
+            return (
+              <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded border">
+                <IconComponent size={16} color={platformInfo.color} />
+                <span className="text-xs font-medium w-16 truncate">{platformInfo.name}</span>
+                <Input
+                  type="url"
+                  placeholder="URL"
+                  value={link.url}
+                  onChange={(e) => updateLink(index, { url: e.target.value })}
+                  className="flex-1 h-7 text-xs"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => togglePlatform(index)}
+                  className="h-7 w-7 p-0"
+                >
+                  {link.enabled ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3 text-gray-400" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removePlatform(index)}
+                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
+            );
+          })}
 
-              <div className="w-px h-4 bg-gray-300" />
+          {/* Add New Platform */}
+          {availablePlatforms.length > 0 && (
+            <div className="pt-2 border-t">
+              <Label className="text-xs text-gray-600 mb-2 block">Add Platform</Label>
+              <div className="flex gap-1 flex-wrap">
+                {availablePlatforms.map((platform) => {
+                  const platformInfo = PLATFORM_INFO[platform];
+                  const IconComponent = platformInfo.icon;
 
-              {/* Settings Buttons */}
-              <Button
-                variant={showLayoutSettings ? "default" : "ghost"}
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => setShowLayoutSettings(!showLayoutSettings)}
-              >
-                <Layout className="h-3 w-3 mr-1" />
-                Layout
-              </Button>
-
-              <Button
-                variant={showStyleSettings ? "default" : "ghost"}
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => setShowStyleSettings(!showStyleSettings)}
-              >
-                <Settings className="h-3 w-3 mr-1" />
-                Style
-              </Button>
-
-              <Button
-                variant={showColorSettings ? "default" : "ghost"}
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => setShowColorSettings(!showColorSettings)}
-              >
-                <Palette className="h-3 w-3 mr-1" />
-                Colors
-              </Button>
-
-              <Button
-                variant={showLinkEditor ? "default" : "ghost"}
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => setShowLinkEditor(!showLinkEditor)}
-              >
-                <Link2 className="h-3 w-3 mr-1" />
-                Links
-              </Button>
+                  return (
+                    <Button
+                      key={platform}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => addPlatform(platform)}
+                      className="h-8 px-2"
+                      title={`Add ${platformInfo.name}`}
+                    >
+                      <IconComponent size={14} color={platformInfo.color} />
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
-          ) : null
-        }
-      >
+          )}
+        </div>
+      </div>
+
+      {/* Layout Settings */}
+      <div className="pb-4 border-b border-gray-200">
+        <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">Layout</h4>
+        <LayoutSelector
+          layout={layout}
+          alignment={alignment}
+          spacing={spacing}
+          showLabels={showLabels}
+          labelPosition={labelPosition}
+          onLayoutChange={(newLayout) => updateAttributes({ layout: newLayout })}
+          onAlignmentChange={(newAlignment) => updateAttributes({ alignment: newAlignment })}
+          onSpacingChange={(newSpacing) => updateAttributes({ spacing: newSpacing })}
+          onShowLabelsChange={(show) => updateAttributes({ showLabels: show })}
+          onLabelPositionChange={(position) => updateAttributes({ labelPosition: position })}
+        />
+      </div>
+
+      {/* Style Settings */}
+      <div className="pb-4 border-b border-gray-200">
+        <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">Style</h4>
+        <StyleSelector
+          style={style}
+          size={size}
+          animationEnabled={animationEnabled}
+          animationType={animationType}
+          showTooltips={showTooltips}
+          openInNewTab={openInNewTab}
+          onStyleChange={(newStyle) => updateAttributes({ style: newStyle })}
+          onSizeChange={(newSize) => updateAttributes({ size: newSize })}
+          onAnimationEnabledChange={(enabled) => updateAttributes({ animationEnabled: enabled })}
+          onAnimationTypeChange={(type) => updateAttributes({ animationType: type })}
+          onShowTooltipsChange={(show) => updateAttributes({ showTooltips: show })}
+          onOpenInNewTabChange={(open) => updateAttributes({ openInNewTab: open })}
+        />
+      </div>
+
+      {/* Color Settings */}
+      <div>
+        <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">Colors</h4>
+        <ColorModeSelector
+          colorMode={colorMode}
+          customColor={customColor}
+          onColorModeChange={(mode) => updateAttributes({ colorMode: mode })}
+          onCustomColorChange={(color) => updateAttributes({ customColor: color })}
+        />
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <EnhancedBlockWrapper
+      id={id}
+      type="social-icons"
+      isSelected={isSelected}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
+      isDragging={isDragging}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      onCopy={onCopy}
+      onPaste={onPaste}
+      onChangeType={onChangeType}
+      currentType="core/social-icons"
+      customToolbarContent={
+        isSelected ? (
+          <div className="flex items-center gap-1">
+            {/* Quick Layout Selector */}
+            {(['horizontal', 'vertical', 'grid'] as const).map((layoutOption) => (
+              <button
+                key={layoutOption}
+                onClick={() => updateAttributes({ layout: layoutOption })}
+                className={`p-1.5 rounded transition-colors capitalize text-xs ${
+                  layout === layoutOption
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'hover:bg-gray-100 text-gray-600'
+                }`}
+                title={`${layoutOption} layout`}
+              >
+                {layoutOption}
+              </button>
+            ))}
+          </div>
+        ) : null
+      }
+      customSidebarContent={customSidebarContent}
+    >
         {/* Social Icons Display */}
         <div
           className={getLayoutClasses()}
@@ -397,134 +469,7 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
             );
           })}
         </div>
-
-        {/* Link Editor Panel */}
-        {isSelected && showLinkEditor && (
-          <div className="mt-4 p-4 border rounded-lg bg-gray-50">
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Social Media Links</Label>
-
-              {/* Existing Links */}
-              {links.map((link, index) => {
-                const platformInfo = PLATFORM_INFO[link.platform];
-                const IconComponent = platformInfo.icon;
-
-                return (
-                  <div key={index} className="flex items-center gap-2 p-2 bg-white rounded border">
-                    <IconComponent size={20} color={platformInfo.color} />
-                    <span className="text-sm font-medium w-20">{platformInfo.name}</span>
-                    <Input
-                      type="url"
-                      placeholder={`Enter ${platformInfo.name} URL`}
-                      value={link.url}
-                      onChange={(e) => updateLink(index, { url: e.target.value })}
-                      className="flex-1 h-8 text-xs"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => togglePlatform(index)}
-                      className="h-8 w-8 p-0"
-                    >
-                      {link.enabled ? (
-                        <Eye className="h-3 w-3" />
-                      ) : (
-                        <EyeOff className="h-3 w-3 text-gray-400" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removePlatform(index)}
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                );
-              })}
-
-              {/* Add New Platform */}
-              {availablePlatforms.length > 0 && (
-                <div className="pt-2 border-t">
-                  <Label className="text-xs text-gray-600">Add Platform</Label>
-                  <div className="flex gap-2 mt-2">
-                    {availablePlatforms.map((platform) => {
-                      const platformInfo = PLATFORM_INFO[platform];
-                      const IconComponent = platformInfo.icon;
-
-                      return (
-                        <Button
-                          key={platform}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => addPlatform(platform)}
-                          className="h-10 px-3"
-                          title={`Add ${platformInfo.name}`}
-                        >
-                          <IconComponent size={16} color={platformInfo.color} />
-                          <Plus className="h-3 w-3 ml-1" />
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Layout Settings Panel */}
-        {isSelected && showLayoutSettings && (
-          <div className="mt-4">
-            <LayoutSelector
-              layout={layout}
-              alignment={alignment}
-              spacing={spacing}
-              showLabels={showLabels}
-              labelPosition={labelPosition}
-              onLayoutChange={(newLayout) => updateAttributes({ layout: newLayout })}
-              onAlignmentChange={(newAlignment) => updateAttributes({ alignment: newAlignment })}
-              onSpacingChange={(newSpacing) => updateAttributes({ spacing: newSpacing })}
-              onShowLabelsChange={(show) => updateAttributes({ showLabels: show })}
-              onLabelPositionChange={(position) => updateAttributes({ labelPosition: position })}
-            />
-          </div>
-        )}
-
-        {/* Style Settings Panel */}
-        {isSelected && showStyleSettings && (
-          <div className="mt-4">
-            <StyleSelector
-              style={style}
-              size={size}
-              animationEnabled={animationEnabled}
-              animationType={animationType}
-              showTooltips={showTooltips}
-              openInNewTab={openInNewTab}
-              onStyleChange={(newStyle) => updateAttributes({ style: newStyle })}
-              onSizeChange={(newSize) => updateAttributes({ size: newSize })}
-              onAnimationEnabledChange={(enabled) => updateAttributes({ animationEnabled: enabled })}
-              onAnimationTypeChange={(type) => updateAttributes({ animationType: type })}
-              onShowTooltipsChange={(show) => updateAttributes({ showTooltips: show })}
-              onOpenInNewTabChange={(open) => updateAttributes({ openInNewTab: open })}
-            />
-          </div>
-        )}
-
-        {/* Color Settings Panel */}
-        {isSelected && showColorSettings && (
-          <div className="mt-4">
-            <ColorModeSelector
-              colorMode={colorMode}
-              customColor={customColor}
-              onColorModeChange={(mode) => updateAttributes({ colorMode: mode })}
-              onCustomColorChange={(color) => updateAttributes({ customColor: color })}
-            />
-          </div>
-        )}
       </EnhancedBlockWrapper>
-    </>
   );
 };
 
