@@ -66,6 +66,7 @@ interface GutenbergBlockEditorProps {
   postSettings?: Partial<PostSettings>;
   onPostSettingsChange?: (settings: Partial<PostSettings>) => void;
   mode?: 'post' | 'page' | 'template' | 'pattern';
+  hideHeader?: boolean; // Hide header when embedded in another editor
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
@@ -79,6 +80,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   postSettings: propPostSettings,
   onPostSettingsChange,
   mode = 'post',
+  hideHeader = false,
 }) => {
   // Initialize with empty state
   // Don't create any blocks automatically - user should add blocks manually
@@ -1408,31 +1410,33 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
-      {/* Header */}
-      <EditorHeader
-        onSave={handleSave}
-        onPublish={handlePublish}
-        onBack={handleNavigation}
-        canUndo={historyIndex > 0}
-        canRedo={historyIndex < history.length - 1}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        isFullscreen={isFullscreen}
-        onToggleFullscreen={handleToggleFullscreen}
-        isDirty={isDirty}
-        onToggleListView={() => {}}
-        onToggleCodeView={handleToggleCodeView}
-        isCodeView={isCodeView}
-        onPreview={handlePreview}
-        onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
-        onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
-        onToggleInspector={() => setSidebarOpen(!sidebarOpen)}
-        isInspectorOpen={sidebarOpen}
-        viewportMode={viewportMode}
-        onViewportModeChange={switchViewport}
-        containerWidth={containerSettings.width}
-      />
+    <div className="h-full w-full bg-transparent flex flex-col">
+      {/* Header - Hidden when used within StandaloneEditor */}
+      {!hideHeader && (
+        <EditorHeader
+          onSave={handleSave}
+          onPublish={handlePublish}
+          onBack={handleNavigation}
+          canUndo={historyIndex > 0}
+          canRedo={historyIndex < history.length - 1}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={handleToggleFullscreen}
+          isDirty={isDirty}
+          onToggleListView={() => {}}
+          onToggleCodeView={handleToggleCodeView}
+          isCodeView={isCodeView}
+          onPreview={handlePreview}
+          onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
+          onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
+          onToggleInspector={() => setSidebarOpen(!sidebarOpen)}
+          isInspectorOpen={sidebarOpen}
+          viewportMode={viewportMode}
+          onViewportModeChange={switchViewport}
+          containerWidth={containerSettings.width}
+        />
+      )}
 
       {/* Main Layout */}
       <div className="flex-1 flex relative">

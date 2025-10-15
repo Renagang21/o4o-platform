@@ -44,6 +44,8 @@ import {
 import toast from 'react-hot-toast';
 import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
+import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
+import { ViewportSwitcher } from '@/components/editor/ViewportSwitcher';
 
 interface StandaloneEditorProps {
   mode?: 'post' | 'page' | 'template' | 'pattern';
@@ -56,13 +58,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [currentPostId, setCurrentPostId] = useState<string | number | undefined>(
     initialPostId === 'new' ? undefined : initialPostId
   );
-  
+
   // 모바일 감지
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -70,6 +72,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+
+  // Viewport mode hook for editor width control
+  const { viewportMode, currentConfig, switchViewport, containerSettings } = useCustomizerSettings();
   
   // Simple and reliable check for new post
   const isNewPost = !currentPostId;
@@ -804,6 +809,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </TooltipProvider>
           )}
 
+          {/* Viewport Switcher - 모바일에서 숨김 */}
+          {!isMobile && (
+            <ViewportSwitcher
+              currentMode={viewportMode}
+              onModeChange={switchViewport}
+              containerWidth={containerSettings.width}
+            />
+          )}
+
           {/* Preview Toggle - 모바일에서 숨김 */}
           {!isMobile && (
             <TooltipProvider>
@@ -947,6 +961,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               slug={postSettings.slug || ''}
               postSettings={postSettings}
               mode={mode}
+              hideHeader={true}
               onPostSettingsChange={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 postSettingsRef.current = { ...postSettingsRef.current, ...settings }; // Update ref
@@ -968,7 +983,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   }
                   return true; // Other block types are considered real content
                 });
-                
+
                 // Only mark dirty if we have a post ID or real content
                 if (currentPostId || hasRealContent) {
                   setIsDirty(true);
