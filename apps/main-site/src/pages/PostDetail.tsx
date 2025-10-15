@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/config/axios';
+import { WordPressBlockRenderer } from '../components/WordPressBlockRenderer';
 
 type PostData = {
   id: string;
@@ -102,59 +103,13 @@ export default function PostDetail() {
   const renderContent = () => {
     const c = post.content;
     if (!c) return null;
-    // If blocks array
-    if (Array.isArray(c)) {
-      return (
-        <div className="prose max-w-none">
-          {c.map((b: any) => (
-            <div key={b.id || Math.random()}>
-              {b.type === 'core/paragraph' ? (
-                <p>{b.content?.text || b.attributes?.content || ''}</p>
-              ) : (
-                <pre className="bg-gray-50 p-3 rounded">{JSON.stringify(b, null, 2)}</pre>
-              )}
-            </div>
-          ))}
-        </div>
-      );
-    }
-    // If object with blocks
-    if (c && typeof c === 'object' && 'blocks' in c) {
-      const blocks = (c as any).blocks || [];
-      return (
-        <div className="prose max-w-none">
-          {blocks.map((b: any) => (
-            <div key={b.id || Math.random()}>
-              {b.type === 'core/paragraph' ? (
-                <p>{b.content?.text || b.attributes?.content || ''}</p>
-              ) : (
-                <pre className="bg-gray-50 p-3 rounded">{JSON.stringify(b, null, 2)}</pre>
-              )}
-            </div>
-          ))}
-        </div>
-      );
-    }
-    // If string (raw/html)
-    if (typeof c === 'string') {
-      try {
-        const parsed = JSON.parse(c);
-        if (Array.isArray(parsed)) {
-          return (
-            <div className="prose max-w-none">
-              {parsed.map((b: any) => (
-                <p key={b.id || Math.random()}>{b.content?.text || b.attributes?.content || ''}</p>
-              ))}
-            </div>
-          );
-        }
-      } catch (err) {
-        // Ignore JSON parse error and fall back to rendering as HTML
-        void err;
-      }
-      return <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: c }} />;
-    }
-    return null;
+
+    // Use WordPressBlockRenderer for all block-based content
+    return (
+      <div className="prose max-w-none">
+        <WordPressBlockRenderer blocks={c} />
+      </div>
+    );
   };
 
   return (
