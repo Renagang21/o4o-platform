@@ -198,6 +198,11 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
+        // Don't interfere with contentEditable elements
+        const target = e.target as HTMLElement;
+        if (target.isContentEditable || target.closest('[contenteditable="true"]')) {
+          return;
+        }
         e.stopPropagation();
         onSelect();
       }}
