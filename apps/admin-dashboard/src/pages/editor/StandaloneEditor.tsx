@@ -12,7 +12,9 @@ import {
   Redo2,
   Plus,
   List,
-  Info
+  Info,
+  Library,
+  Sparkles
 } from 'lucide-react';
 import type { Post } from '@/types/post.types';
 import { Button } from '@/components/ui/button';
@@ -45,7 +47,7 @@ import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
 import { ViewportSwitcher } from '@/components/editor/ViewportSwitcher';
-import { Monitor, MonitorOff } from 'lucide-react';
+import { Monitor, MonitorOff, Palette } from 'lucide-react';
 
 interface StandaloneEditorProps {
   mode?: 'post' | 'page' | 'template' | 'pattern';
@@ -772,7 +774,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              
+
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -788,6 +790,31 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </div>
           )}
 
+          {/* Design Library - 모바일에서 숨김 */}
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowTemplates(true)}
+              className="h-8 px-3 hover:bg-gray-100 border border-gray-300"
+            >
+              <Library className="h-4 w-4 mr-1" />
+              디자인 라이브러리
+            </Button>
+          )}
+
+          {/* AI Generator - 모바일에서 숨김 */}
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAIGenerator(true)}
+              className="h-8 px-3 hover:bg-gray-100 border border-gray-300 text-purple-600 hover:text-purple-700"
+            >
+              <Sparkles className="h-4 w-4 mr-1" />
+              AI 페이지 생성
+            </Button>
+          )}
 
           {/* View Options - 모바일에서 숨김 */}
           {!isMobile && (
@@ -842,6 +869,27 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{isThemePreviewMode ? 'Disable' : 'Enable'} theme width preview</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
+          {/* Customizer Button - 모바일에서 숨김 */}
+          {!isMobile && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => navigate('/appearance/customize')}
+                  >
+                    <Palette className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>사용자 정의하기</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
