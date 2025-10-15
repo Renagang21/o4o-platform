@@ -200,7 +200,8 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onClick={(e) => {
         // Don't interfere with contentEditable elements
         const target = e.target as HTMLElement;
-        if (target.isContentEditable || target.closest('[contenteditable="true"]')) {
+        // Check if target itself or any parent is contentEditable
+        if (target.isContentEditable || target.closest('[contenteditable]')) {
           return;
         }
         e.stopPropagation();
