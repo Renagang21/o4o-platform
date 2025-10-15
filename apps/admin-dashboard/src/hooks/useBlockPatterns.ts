@@ -295,7 +295,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     const blockTypes = selectedBlocks.map(b => b.name);
     let category = 'general';
     
-    if (blockTypes.includes('core/navigation') || blockTypes.includes('core/site-logo')) {
+    if (blockTypes.includes('o4o/navigation') || blockTypes.includes('o4o/site-logo')) {
       category = 'header';
     } else if (blockTypes.includes('o4o/heading') && blockTypes.includes('o4o/buttons')) {
       category = 'hero';

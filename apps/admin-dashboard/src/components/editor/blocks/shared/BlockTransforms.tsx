@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 // Type definitions for block attributes
 interface ImageAttributes {
-  type: 'core/image';
+  type: 'o4o/image';
   url: string;
   alt?: string;
   caption?: string;
@@ -36,7 +36,7 @@ interface ImageAttributes {
 }
 
 interface CoverAttributes {
-  type: 'core/cover';
+  type: 'o4o/cover';
   backgroundType: 'image' | 'video' | 'color' | 'gradient';
   backgroundImage?: string;
   backgroundVideo?: string;
@@ -55,7 +55,7 @@ interface CoverAttributes {
 }
 
 interface GalleryAttributes {
-  type: 'core/gallery';
+  type: 'o4o/gallery';
   images: GalleryImage[];
   ids: string[];
   layout: 'grid' | 'masonry' | 'slider';
@@ -85,7 +85,7 @@ interface GalleryImage {
 }
 
 export interface BlockTransformProps {
-  currentType: 'core/image' | 'core/cover' | 'core/gallery';
+  currentType: 'o4o/image' | 'o4o/cover' | 'o4o/gallery';
   currentAttributes: ImageAttributes | CoverAttributes | GalleryAttributes;
   onTransform: (newType: string, newAttributes: any, newContent?: string) => void;
   className?: string;
@@ -96,7 +96,7 @@ export interface BlockTransformProps {
  */
 export const transformImageToCover = (imageAttributes: ImageAttributes): CoverAttributes => {
   return {
-    type: 'core/cover',
+    type: 'o4o/cover',
     backgroundType: 'image',
     backgroundImage: imageAttributes.url,
     focalPoint: imageAttributes.focalPoint || { x: 50, y: 50 },
@@ -109,7 +109,7 @@ export const transformImageToCover = (imageAttributes: ImageAttributes): CoverAt
     hasParallax: false,
     innerBlocks: [
       {
-        name: 'core/paragraph',
+        name: 'o4o/paragraph',
         attributes: {
           content: imageAttributes.caption || '',
           align: 'center',
@@ -148,7 +148,7 @@ export const transformImageToGallery = (imageAttributes: ImageAttributes): Galle
   };
 
   return {
-    type: 'core/gallery',
+    type: 'o4o/gallery',
     images: [galleryImage],
     ids: [imageAttributes.mediaId || ''],
     layout: 'grid',
@@ -169,14 +169,14 @@ export const transformImageToGallery = (imageAttributes: ImageAttributes): Galle
 export const transformCoverToImage = (coverAttributes: CoverAttributes): ImageAttributes => {
   // Extract text content from inner blocks
   const textContent = coverAttributes.innerBlocks
-    ?.filter(block => block.name === 'core/paragraph' || block.name === 'core/heading')
+    ?.filter(block => block.name === 'o4o/paragraph' || block.name === 'o4o/heading')
     .map(block => block.attributes?.content || '')
     .join(' ')
     .replace(/<[^>]*>/g, '') // Strip HTML tags
     .trim();
 
   return {
-    type: 'core/image',
+    type: 'o4o/image',
     url: coverAttributes.backgroundImage || '',
     alt: textContent ? `Cover image: ${textContent.substring(0, 100)}` : 'Cover image',
     caption: textContent || '',
@@ -201,7 +201,7 @@ export const transformCoverToGallery = (coverAttributes: CoverAttributes): Galle
 
   // Extract text content from inner blocks
   const textContent = coverAttributes.innerBlocks
-    ?.filter(block => block.name === 'core/paragraph' || block.name === 'core/heading')
+    ?.filter(block => block.name === 'o4o/paragraph' || block.name === 'o4o/heading')
     .map(block => block.attributes?.content || '')
     .join(' ')
     .replace(/<[^>]*>/g, '')
@@ -220,7 +220,7 @@ export const transformCoverToGallery = (coverAttributes: CoverAttributes): Galle
   };
 
   return {
-    type: 'core/gallery',
+    type: 'o4o/gallery',
     images: [galleryImage],
     ids: [''],
     layout: 'grid',
@@ -245,7 +245,7 @@ export const transformGalleryToImage = (galleryAttributes: GalleryAttributes): I
   }
 
   return {
-    type: 'core/image',
+    type: 'o4o/image',
     url: firstImage.url,
     alt: firstImage.alt || '',
     caption: firstImage.caption || '',
@@ -273,7 +273,7 @@ export const transformGalleryToCover = (galleryAttributes: GalleryAttributes): C
   }
 
   return {
-    type: 'core/cover',
+    type: 'o4o/cover',
     backgroundType: 'image',
     backgroundImage: firstImage.url,
     focalPoint: firstImage.focalPoint || { x: 50, y: 50 },
@@ -287,7 +287,7 @@ export const transformGalleryToCover = (galleryAttributes: GalleryAttributes): C
     hasParallax: false,
     innerBlocks: firstImage.caption ? [
       {
-        name: 'core/paragraph',
+        name: 'o4o/paragraph',
         attributes: {
           content: firstImage.caption,
           align: 'center',
@@ -321,22 +321,22 @@ export const BlockTransforms: React.FC<BlockTransformProps> = ({
       let newContent = '';
 
       // Determine transformation based on current and target types
-      if (currentType === 'core/image' && targetType === 'core/cover') {
+      if (currentType === 'o4o/image' && targetType === 'o4o/cover') {
         newAttributes = transformImageToCover(currentAttributes as ImageAttributes);
         newContent = newAttributes.backgroundImage || '';
-      } else if (currentType === 'core/image' && targetType === 'core/gallery') {
+      } else if (currentType === 'o4o/image' && targetType === 'o4o/gallery') {
         newAttributes = transformImageToGallery(currentAttributes as ImageAttributes);
         newContent = newAttributes.images[0]?.url || '';
-      } else if (currentType === 'core/cover' && targetType === 'core/image') {
+      } else if (currentType === 'o4o/cover' && targetType === 'o4o/image') {
         newAttributes = transformCoverToImage(currentAttributes as CoverAttributes);
         newContent = newAttributes.url || '';
-      } else if (currentType === 'core/cover' && targetType === 'core/gallery') {
+      } else if (currentType === 'o4o/cover' && targetType === 'o4o/gallery') {
         newAttributes = transformCoverToGallery(currentAttributes as CoverAttributes);
         newContent = newAttributes.images[0]?.url || '';
-      } else if (currentType === 'core/gallery' && targetType === 'core/image') {
+      } else if (currentType === 'o4o/gallery' && targetType === 'o4o/image') {
         newAttributes = transformGalleryToImage(currentAttributes as GalleryAttributes);
         newContent = newAttributes.url || '';
-      } else if (currentType === 'core/gallery' && targetType === 'core/cover') {
+      } else if (currentType === 'o4o/gallery' && targetType === 'o4o/cover') {
         newAttributes = transformGalleryToCover(currentAttributes as GalleryAttributes);
         newContent = newAttributes.backgroundImage || '';
       } else {
@@ -352,24 +352,24 @@ export const BlockTransforms: React.FC<BlockTransformProps> = ({
   const getAvailableTransforms = () => {
     const transforms = [];
 
-    if (currentType === 'core/image') {
+    if (currentType === 'o4o/image') {
       // Check if image exists for cover transformation
       const imageAttrs = currentAttributes as ImageAttributes;
       if (imageAttrs.url) {
-        transforms.push({ type: 'core/cover', label: 'Cover', icon: Layers });
-        transforms.push({ type: 'core/gallery', label: 'Gallery', icon: Grid3X3 });
+        transforms.push({ type: 'o4o/cover', label: 'Cover', icon: Layers });
+        transforms.push({ type: 'o4o/gallery', label: 'Gallery', icon: Grid3X3 });
       }
-    } else if (currentType === 'core/cover') {
+    } else if (currentType === 'o4o/cover') {
       const coverAttrs = currentAttributes as CoverAttributes;
       if (coverAttrs.backgroundImage) {
-        transforms.push({ type: 'core/image', label: 'Image', icon: ImageIcon });
-        transforms.push({ type: 'core/gallery', label: 'Gallery', icon: Grid3X3 });
+        transforms.push({ type: 'o4o/image', label: 'Image', icon: ImageIcon });
+        transforms.push({ type: 'o4o/gallery', label: 'Gallery', icon: Grid3X3 });
       }
-    } else if (currentType === 'core/gallery') {
+    } else if (currentType === 'o4o/gallery') {
       const galleryAttrs = currentAttributes as GalleryAttributes;
       if (galleryAttrs.images.length > 0) {
-        transforms.push({ type: 'core/image', label: 'Image', icon: ImageIcon });
-        transforms.push({ type: 'core/cover', label: 'Cover', icon: Layers });
+        transforms.push({ type: 'o4o/image', label: 'Image', icon: ImageIcon });
+        transforms.push({ type: 'o4o/cover', label: 'Cover', icon: Layers });
       }
     }
 
@@ -416,17 +416,17 @@ export const canTransformBlock = (
   if (fromType === toType) return false;
 
   try {
-    if (fromType === 'core/image' && toType === 'core/cover') {
+    if (fromType === 'o4o/image' && toType === 'o4o/cover') {
       return Boolean(attributes.url);
-    } else if (fromType === 'core/image' && toType === 'core/gallery') {
+    } else if (fromType === 'o4o/image' && toType === 'o4o/gallery') {
       return Boolean(attributes.url);
-    } else if (fromType === 'core/cover' && toType === 'core/image') {
+    } else if (fromType === 'o4o/cover' && toType === 'o4o/image') {
       return Boolean(attributes.backgroundImage);
-    } else if (fromType === 'core/cover' && toType === 'core/gallery') {
+    } else if (fromType === 'o4o/cover' && toType === 'o4o/gallery') {
       return Boolean(attributes.backgroundImage);
-    } else if (fromType === 'core/gallery' && toType === 'core/image') {
+    } else if (fromType === 'o4o/gallery' && toType === 'o4o/image') {
       return Boolean(attributes.images?.length > 0);
-    } else if (fromType === 'core/gallery' && toType === 'core/cover') {
+    } else if (fromType === 'o4o/gallery' && toType === 'o4o/cover') {
       return Boolean(attributes.images?.length > 0);
     }
   } catch (error) {

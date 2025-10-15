@@ -324,15 +324,15 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     } else if (type === 'o4o/heading') {
       const level = content?.level || 2;
       return `<h${level} class="block-heading">${content?.text || ''}</h${level}>`;
-    } else if (type === 'core/image') {
+    } else if (type === 'o4o/image') {
       return `<figure class="block-image"><img src="${content?.url || ''}" alt="${content?.alt || ''}" /></figure>`;
-    } else if (type === 'core/list') {
+    } else if (type === 'o4o/list') {
       const tag = content?.ordered ? 'ol' : 'ul';
       const items = (content?.items || []).map((item: string) => `<li>${item}</li>`).join('');
       return `<${tag} class="block-list">${items}</${tag}>`;
-    } else if (type === 'core/quote') {
+    } else if (type === 'o4o/quote') {
       return `<blockquote class="block-quote"><p>${content?.text || ''}</p><cite>${content?.citation || ''}</cite></blockquote>`;
-    } else if (type === 'core/code') {
+    } else if (type === 'o4o/code') {
       return `<pre class="block-code"><code>${content?.code || ''}</code></pre>`;
     } else if (type === 'o4o/button') {
       return `<a href="${content?.url || '#'}" class="block-button">${content?.text || 'Button'}</a>`;
@@ -406,7 +406,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       const items = Array.from(element.querySelectorAll('li')).map(li => li.textContent || '');
       return {
         id: `block-${Date.now()}`,
-        type: 'core/list',
+        type: 'o4o/list',
         content: { items, ordered: tagName === 'ol' },
         attributes: {}
       };
@@ -415,7 +415,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       const citation = element.querySelector('cite')?.textContent || '';
       return {
         id: `block-${Date.now()}`,
-        type: 'core/quote',
+        type: 'o4o/quote',
         content: { text, citation },
         attributes: {}
       };
@@ -423,7 +423,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       const code = element.querySelector('code')?.textContent || element.textContent || '';
       return {
         id: `block-${Date.now()}`,
-        type: 'core/code',
+        type: 'o4o/code',
         content: { code },
         attributes: {}
       };
@@ -431,7 +431,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       const img = element.querySelector('img')!;
       return {
         id: `block-${Date.now()}`,
-        type: 'core/image',
+        type: 'o4o/image',
         content: { url: img.src, alt: img.alt },
         attributes: {}
       };
@@ -909,7 +909,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       const newBlocks = blocks.map((block) => {
         if (block.id === blockId) {
           // Convert heading types
-          if (newType.startsWith('core/heading-')) {
+          if (newType.startsWith('o4o/heading-')) {
             const level = parseInt(newType.replace('o4o/heading-h', ''));
             return {
               ...block,
@@ -1069,11 +1069,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                   newBlockType = 'o4o/paragraph';
                 }
                 // Quote → always Paragraph
-                else if (block.type === 'core/quote') {
+                else if (block.type === 'o4o/quote') {
                   newBlockType = 'o4o/paragraph';
                 }
                 // List → exit list (create Paragraph)
-                else if (block.type === 'core/list') {
+                else if (block.type === 'o4o/list') {
                   newBlockType = 'o4o/paragraph';
                 }
                 // Other blocks → Paragraph

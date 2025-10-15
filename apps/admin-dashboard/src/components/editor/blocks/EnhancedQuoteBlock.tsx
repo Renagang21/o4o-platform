@@ -170,7 +170,7 @@ const EnhancedQuoteBlock: React.FC<EnhancedQuoteBlockProps> = ({
       if (localCitation === '') {
         citationRef.current?.focus();
       } else {
-        onAddBlock?.('after', 'core/paragraph');
+        onAddBlock?.('after', 'o4o/paragraph');
       }
     }
 
@@ -183,7 +183,7 @@ const EnhancedQuoteBlock: React.FC<EnhancedQuoteBlockProps> = ({
   const handleCitationKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      onAddBlock?.('after', 'core/paragraph');
+      onAddBlock?.('after', 'o4o/paragraph');
     }
 
     if (e.key === 'Backspace' && localCitation === '') {

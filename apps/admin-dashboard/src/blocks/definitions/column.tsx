@@ -45,7 +45,7 @@ export const columnBlockDefinition: BlockDefinition = {
     },
   },
   // Column can only exist within Columns block
-  parent: ['core/columns'],
+  parent: ['o4o/columns'],
 };
 
 export default columnBlockDefinition;

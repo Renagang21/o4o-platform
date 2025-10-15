@@ -219,7 +219,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             // Plain text - create paragraph block
             parsedBlocks = [{ 
               id: 'block-1', 
-              type: 'core/paragraph', 
+              type: 'o4o/paragraph', 
               attributes: { content: data.content }
             }];
           }
@@ -1088,7 +1088,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 // Only mark as dirty if we have actual content changes, not just initialization
                 // Check if this is not just an empty paragraph block (default initialization)
                 const hasRealContent = newBlocks.some(block => {
-                  if (block.type === 'core/paragraph') {
+                  if (block.type === 'o4o/paragraph') {
                     const text = block.content?.text || block.content || '';
                     return typeof text === 'string' && text.trim().length > 0;
                   }

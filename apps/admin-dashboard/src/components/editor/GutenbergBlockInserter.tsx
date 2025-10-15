@@ -83,10 +83,10 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
           try {
             setMostUsedBlocks(JSON.parse(stored));
           } catch {
-            setMostUsedBlocks(['core/paragraph', 'core/heading', 'core/image']);
+            setMostUsedBlocks(['o4o/paragraph', 'o4o/heading', 'o4o/image']);
           }
         } else {
-          setMostUsedBlocks(['core/paragraph', 'core/heading', 'core/image']);
+          setMostUsedBlocks(['o4o/paragraph', 'o4o/heading', 'o4o/image']);
         }
       }, 100);
     };

@@ -51,7 +51,7 @@ export function applyDiff(baseBlocks: Block[], diff: any): Block[] {
 export function optimizeBlocksForStorage(blocks: Block[]): Block[] {
   return blocks.map(block => {
     // Keep block structure but optimize large content
-    if (block.type === 'core/image' && block.content && typeof block.content === 'object') {
+    if (block.type === 'o4o/image' && block.content && typeof block.content === 'object') {
       return {
         ...block,
         content: {

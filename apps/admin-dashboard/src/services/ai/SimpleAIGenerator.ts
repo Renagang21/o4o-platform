@@ -404,7 +404,7 @@ ${availableBlocks}
 
     return blocks.map((block, index) => ({
       id: `block-${Date.now()}-${index}`,
-      type: block.type || 'core/paragraph',
+      type: block.type || 'o4o/paragraph',
       content: block.content || { text: '' },
       attributes: block.attributes || {}
     }));

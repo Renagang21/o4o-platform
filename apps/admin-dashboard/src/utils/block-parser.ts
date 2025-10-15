@@ -119,7 +119,7 @@ function finishBlock(
   const innerHTML = content.join('\n').trim();
   
   blocks.push({
-    blockName: block.blockName || 'core/paragraph',
+    blockName: block.blockName || 'o4o/paragraph',
     attrs: block.attrs || {},
     innerHTML,
     innerContent: innerHTML ? [innerHTML] : [],

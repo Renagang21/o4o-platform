@@ -17,7 +17,7 @@ interface BlockDragHandleProps {
 
 export const BlockDragHandle: React.FC<BlockDragHandleProps> = ({
   blockId,
-  blockType = 'core/paragraph',
+  blockType = 'o4o/paragraph',
   multiSelectedCount = 0,
   onDragStart,
   onDragEnd,
@@ -93,16 +93,16 @@ export const BlockDragHandle: React.FC<BlockDragHandleProps> = ({
 
   const getBlockIcon = (type: string): string => {
     const icons: { [key: string]: string } = {
-      'core/paragraph': '¶',
-      'core/heading': 'H',
-      'core/image': '🖼',
-      'core/button': '🔘',
-      'core/quote': '"',
-      'core/list': '•',
-      'core/columns': '▦',
-      'core/group': '◫',
-      'core/gallery': '🖼',
-      'core/video': '▶',
+      'o4o/paragraph': '¶',
+      'o4o/heading': 'H',
+      'o4o/image': '🖼',
+      'o4o/button': '🔘',
+      'o4o/quote': '"',
+      'o4o/list': '•',
+      'o4o/columns': '▦',
+      'o4o/group': '◫',
+      'o4o/gallery': '🖼',
+      'o4o/video': '▶',
     };
     return icons[type] || '□';
   };

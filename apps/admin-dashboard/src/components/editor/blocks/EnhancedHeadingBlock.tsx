@@ -130,7 +130,7 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
         onChange(currentContent, attributes);
       }
       // Add new paragraph block after
-      onAddBlock?.('after', 'core/paragraph');
+      onAddBlock?.('after', 'o4o/paragraph');
     }
     
     // Backspace on empty - delete block

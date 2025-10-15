@@ -233,69 +233,69 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                       className="h-6 sm:h-7 px-1 sm:px-1.5 gap-0.5 hover:bg-gray-100 flex-shrink-0"
                       title="Block Type"
                     >
-                      {currentType === 'core/paragraph' && <Type className="h-3 w-3 sm:h-4 sm:w-4" />}
-                      {currentType === 'core/heading' && <Heading2 className="h-3 w-3 sm:h-4 sm:w-4" />}
-                      {(!currentType || currentType === 'core/paragraph') && <Type className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {currentType === 'o4o/paragraph' && <Type className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {currentType === 'o4o/heading' && <Heading2 className="h-3 w-3 sm:h-4 sm:w-4" />}
+                      {(!currentType || currentType === 'o4o/paragraph') && <Type className="h-3 w-3 sm:h-4 sm:w-4" />}
                       <ChevronDownIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-500" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-44">
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/paragraph')}
+                      onClick={() => onChangeType('o4o/paragraph')}
                       className="gap-2 cursor-pointer"
                     >
                       <Type className="h-4 w-4" />
                       <span>Paragraph</span>
-                      {currentType === 'core/paragraph' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/paragraph' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/heading-h1')}
+                      onClick={() => onChangeType('o4o/heading-h1')}
                       className="gap-2 cursor-pointer"
                     >
                       <Heading1 className="h-4 w-4" />
                       <span>Heading 1</span>
-                      {currentType === 'core/heading-h1' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/heading-h1' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/heading-h2')}
+                      onClick={() => onChangeType('o4o/heading-h2')}
                       className="gap-2 cursor-pointer"
                     >
                       <Heading2 className="h-4 w-4" />
                       <span>Heading 2</span>
-                      {currentType === 'core/heading-h2' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/heading-h2' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/heading-h3')}
+                      onClick={() => onChangeType('o4o/heading-h3')}
                       className="gap-2 cursor-pointer"
                     >
                       <Heading3 className="h-4 w-4" />
                       <span>Heading 3</span>
-                      {currentType === 'core/heading-h3' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/heading-h3' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/heading-h4')}
+                      onClick={() => onChangeType('o4o/heading-h4')}
                       className="gap-2 cursor-pointer"
                     >
                       <Heading4 className="h-4 w-4" />
                       <span>Heading 4</span>
-                      {currentType === 'core/heading-h4' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/heading-h4' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/heading-h5')}
+                      onClick={() => onChangeType('o4o/heading-h5')}
                       className="gap-2 cursor-pointer"
                     >
                       <Heading5 className="h-4 w-4" />
                       <span>Heading 5</span>
-                      {currentType === 'core/heading-h5' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/heading-h5' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => onChangeType('core/heading-h6')}
+                      onClick={() => onChangeType('o4o/heading-h6')}
                       className="gap-2 cursor-pointer"
                     >
                       <Heading6 className="h-4 w-4" />
                       <span>Heading 6</span>
-                      {currentType === 'core/heading-h6' && <Check className="h-4 w-4 ml-auto" />}
+                      {currentType === 'o4o/heading-h6' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

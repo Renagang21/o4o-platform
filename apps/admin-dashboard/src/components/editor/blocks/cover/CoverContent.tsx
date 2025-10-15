@@ -150,20 +150,20 @@ const CoverContent: React.FC<CoverContentProps> = ({
   // Get default attributes for block type
   function getDefaultAttributesForType(type: string): Record<string, any> {
     switch (type) {
-      case 'core/heading':
+      case 'o4o/heading':
         return {
           level: 2,
           align: 'center',
           color: '#ffffff',
           fontSize: 'large'
         };
-      case 'core/paragraph':
+      case 'o4o/paragraph':
         return {
           align: 'center',
           color: '#ffffff',
           fontSize: 'medium'
         };
-      case 'core/button':
+      case 'o4o/button':
         return {
           align: 'center',
           backgroundColor: '#ffffff',
@@ -181,9 +181,9 @@ const CoverContent: React.FC<CoverContentProps> = ({
     if (!showBlockInserter) return null;
 
     const blockTypes = [
-      { type: 'core/heading', label: 'Heading', icon: Heading },
-      { type: 'core/paragraph', label: 'Paragraph', icon: Type },
-      { type: 'core/button', label: 'Button', icon: MousePointer }
+      { type: 'o4o/heading', label: 'Heading', icon: Heading },
+      { type: 'o4o/paragraph', label: 'Paragraph', icon: Type },
+      { type: 'o4o/button', label: 'Button', icon: MousePointer }
     ];
 
     return (
@@ -216,7 +216,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
         </div>
 
         {/* Text formatting (for text blocks) */}
-        {(block.type === 'core/paragraph' || block.type === 'core/heading') && (
+        {(block.type === 'o4o/paragraph' || block.type === 'o4o/heading') && (
           <>
             <div className="w-px h-4 bg-gray-300" />
             <Button
@@ -316,7 +316,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
     const handleBlockKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        addInnerBlock('core/paragraph', index + 1);
+        addInnerBlock('o4o/paragraph', index + 1);
       } else if (e.key === 'Backspace' && block.content === '') {
         e.preventDefault();
         deleteInnerBlock(block.id);
@@ -324,7 +324,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
     };
 
     switch (block.type) {
-      case 'core/heading':
+      case 'o4o/heading':
         const HeadingTag = `h${attributes.level || 2}` as keyof JSX.IntrinsicElements;
         return (
           <div key={block.id} className="relative group" onClick={handleBlockClick}>
@@ -347,7 +347,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
           </div>
         );
 
-      case 'core/paragraph':
+      case 'o4o/paragraph':
         return (
           <div key={block.id} className="relative group" onClick={handleBlockClick}>
             <p
@@ -369,7 +369,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
           </div>
         );
 
-      case 'core/button':
+      case 'o4o/button':
         return (
           <div key={block.id} className="relative group" onClick={handleBlockClick}>
             <button
@@ -476,7 +476,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
               <div className="text-center">
                 <h2
                   className="text-3xl font-bold text-white text-opacity-60 cursor-pointer"
-                  onClick={() => addInnerBlock('core/heading')}
+                  onClick={() => addInnerBlock('o4o/heading')}
                 >
                   {placeholder}
                 </h2>

@@ -45,7 +45,7 @@ const ColumnsBlockNew: React.FC<ColumnsBlockProps> = ({
       const initialColumns: Block[] = Array.from({ length: columnCount }, (_, i) => ({
         id: `column-${Date.now()}-${i}`,
         clientId: `client-column-${Date.now()}-${i}`,
-        type: 'core/column',
+        type: 'o4o/column',
         content: {},
         attributes: {
           width: 100 / columnCount,
@@ -74,7 +74,7 @@ const ColumnsBlockNew: React.FC<ColumnsBlockProps> = ({
     const newColumn: Block = {
       id: `column-${Date.now()}`,
       clientId: `client-column-${Date.now()}`,
-      type: 'core/column',
+      type: 'o4o/column',
       content: {},
       attributes: {
         width: newWidth,

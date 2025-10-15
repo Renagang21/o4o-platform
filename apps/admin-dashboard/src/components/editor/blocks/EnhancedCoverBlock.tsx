@@ -213,12 +213,12 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
     };
 
     switch (targetType) {
-      case 'core/image':
+      case 'o4o/image':
         if (localAttributes.backgroundImage?.url) {
           onChangeType(targetType);
           onChange(localAttributes.backgroundImage.url, {
             ...baseAttributes,
-            type: 'core/image',
+            type: 'o4o/image',
             url: localAttributes.backgroundImage.url,
             alt: localAttributes.backgroundImage.alt || '',
             caption: baseContent,
@@ -229,22 +229,22 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
         }
         break;
 
-      case 'core/group':
+      case 'o4o/group':
         onChangeType(targetType);
         onChange(baseContent, {
           ...baseAttributes,
-          type: 'core/group',
+          type: 'o4o/group',
           backgroundColor: localAttributes.backgroundColor,
           gradient: localAttributes.gradient,
           innerBlocks: innerBlocks
         });
         break;
 
-      case 'core/hero':
+      case 'o4o/hero':
         onChangeType(targetType);
         onChange(baseContent, {
           ...baseAttributes,
-          type: 'core/hero',
+          type: 'o4o/hero',
           backgroundImage: localAttributes.backgroundImage,
           backgroundColor: localAttributes.backgroundColor,
           overlay: localAttributes.overlay,
@@ -376,7 +376,7 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
           <div className="py-1">
             {localAttributes.backgroundImage && (
               <button
-                onClick={() => handleBlockConversion('core/image')}
+                onClick={() => handleBlockConversion('o4o/image')}
                 className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center"
               >
                 <ImageIcon className="h-3 w-3 mr-2" />
@@ -384,7 +384,7 @@ const EnhancedCoverBlock: React.FC<CoverBlockProps> = ({
               </button>
             )}
             <button
-              onClick={() => handleBlockConversion('core/group')}
+              onClick={() => handleBlockConversion('o4o/group')}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center"
             >
               <Layers className="h-3 w-3 mr-2" />

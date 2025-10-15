@@ -108,7 +108,7 @@ const PostPreview: React.FC = () => {
     const blockContent = typeof content === 'string' ? content : content?.text || '';
 
     switch (type) {
-      case 'core/paragraph':
+      case 'o4o/paragraph':
       case 'paragraph':
         return (
           <p 
@@ -124,7 +124,7 @@ const PostPreview: React.FC = () => {
           </p>
         );
 
-      case 'core/heading':
+      case 'o4o/heading':
       case 'heading':
         const HeadingTag = `h${content?.level || 2}` as 'h1'|'h2'|'h3'|'h4'|'h5'|'h6';
         const headingClasses = {
@@ -148,7 +148,7 @@ const PostPreview: React.FC = () => {
           </HeadingTag>
         );
 
-      case 'core/list':
+      case 'o4o/list':
       case 'list':
         const ListTag = attributes?.ordered ? 'ol' : 'ul';
         const listItems = content?.items || [blockContent];
@@ -163,7 +163,7 @@ const PostPreview: React.FC = () => {
           </ListTag>
         );
 
-      case 'core/quote':
+      case 'o4o/quote':
       case 'quote':
         return (
           <blockquote 
@@ -179,7 +179,7 @@ const PostPreview: React.FC = () => {
           </blockquote>
         );
 
-      case 'core/code':
+      case 'o4o/code':
       case 'code':
         return (
           <pre 
@@ -190,7 +190,7 @@ const PostPreview: React.FC = () => {
           </pre>
         );
 
-      case 'core/image':
+      case 'o4o/image':
       case 'image':
         return (
           <figure key={block.id} className="mb-6">
@@ -211,7 +211,7 @@ const PostPreview: React.FC = () => {
           </figure>
         );
 
-      case 'core/button':
+      case 'o4o/button':
       case 'button':
         return (
           <div key={block.id} className="mb-4">
@@ -228,13 +228,13 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/separator':
+      case 'o4o/separator':
       case 'separator':
         return (
           <hr key={block.id} className="my-8 border-t border-gray-300" />
         );
 
-      case 'core/spacer':
+      case 'o4o/spacer':
       case 'spacer':
         return (
           <div 
@@ -243,7 +243,7 @@ const PostPreview: React.FC = () => {
           />
         );
 
-      case 'core/columns':
+      case 'o4o/columns':
       case 'columns':
         return (
           <div key={block.id} className="grid grid-cols-2 gap-4 mb-4">
@@ -283,7 +283,7 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/table':
+      case 'o4o/table':
         const tableContent = content?.tableData || attributes?.tableData || [];
         return (
           <div key={block.id} className="mb-6 overflow-x-auto">
@@ -309,7 +309,7 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/cover':
+      case 'o4o/cover':
         const coverUrl = attributes?.url || content?.url || '';
         const coverOverlayColor = attributes?.overlayColor || 'rgba(0,0,0,0.3)';
         return (
@@ -332,7 +332,7 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/gallery':
+      case 'o4o/gallery':
         const galleryImages = attributes?.images || [];
         return (
           <div key={block.id} className="mb-6">
@@ -371,7 +371,7 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/video':
+      case 'o4o/video':
         const videoUrl = attributes?.src || attributes?.url || content?.url || '';
         const videoPoster = attributes?.poster || '';
         return (
@@ -410,7 +410,7 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/shortcode':
+      case 'o4o/shortcode':
         const shortcode = attributes?.shortcode || blockContent || '';
         return (
           <div key={block.id} className="mb-6 p-4 bg-gray-50 rounded border border-gray-200">
@@ -447,7 +447,7 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'core/file':
+      case 'o4o/file':
         const fileUrl = attributes?.url || content?.url || '';
         const fileFileName = attributes?.fileName || content?.fileName || 'Download File';
         const fileSize = attributes?.fileSize || content?.fileSize || 0;

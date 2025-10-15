@@ -32,7 +32,7 @@ export interface TemplatePartData {
 function convertModuleToBlock(module: ModuleConfig): any {
   const blockMap: Record<HeaderModuleType, any> = {
     'logo': {
-      type: 'core/site-logo',
+      type: 'o4o/site-logo',
       data: {
         width: 120,
         isLink: true,
@@ -48,7 +48,7 @@ function convertModuleToBlock(module: ModuleConfig): any {
       }
     },
     'primary-menu': {
-      type: 'core/navigation',
+      type: 'o4o/navigation',
       data: {
         menuRef: 'primary-menu',
         orientation: 'horizontal',
@@ -56,7 +56,7 @@ function convertModuleToBlock(module: ModuleConfig): any {
       }
     },
     'secondary-menu': {
-      type: 'core/navigation',
+      type: 'o4o/navigation',
       data: {
         menuRef: 'secondary-menu',
         orientation: 'horizontal',
@@ -89,7 +89,7 @@ function convertModuleToBlock(module: ModuleConfig): any {
       }
     },
     'button': {
-      type: 'core/button',
+      type: 'o4o/button',
       data: {
         text: module.settings.text || 'Click Here',
         url: module.settings.url || '#',
@@ -97,7 +97,7 @@ function convertModuleToBlock(module: ModuleConfig): any {
       }
     },
     'html': {
-      type: 'core/html',
+      type: 'o4o/html',
       data: {
         content: module.settings.content || '',
         ...module.settings
@@ -279,7 +279,7 @@ export function convertSettingsToHeaderTemplatePart(
         innerBlocks: [
           {
             id: 'site-logo',
-            type: 'core/site-logo',
+            type: 'o4o/site-logo',
             data: {
               width: settings.siteIdentity.logo.width.desktop || 120,
               isLink: true,
@@ -299,7 +299,7 @@ export function convertSettingsToHeaderTemplatePart(
             innerBlocks: [
               {
                 id: 'primary-menu',
-                type: 'core/navigation',
+                type: 'o4o/navigation',
                 data: {
                   menuRef: 'primary-menu',
                   orientation: 'horizontal',
@@ -339,14 +339,14 @@ export function convertSettingsToHeaderTemplatePart(
 function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
   const widgetMap: Record<FooterWidgetType, any> = {
     'text': {
-      type: 'core/paragraph',
+      type: 'o4o/paragraph',
       data: {
         content: widget.settings.content || '',
         className: widget.settings.customClass
       }
     },
     'menu': {
-      type: 'core/navigation',
+      type: 'o4o/navigation',
       data: {
         menuRef: widget.settings.menuId || 'footer-menu',
         orientation: 'vertical',
@@ -363,7 +363,7 @@ function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
       }
     },
     'contact': {
-      type: 'core/group',
+      type: 'o4o/group',
       data: {
         layout: 'flex',
         flexDirection: 'column',
@@ -371,28 +371,28 @@ function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
       },
       innerBlocks: [
         widget.settings.address && {
-          type: 'core/paragraph',
+          type: 'o4o/paragraph',
           data: { content: `📍 ${widget.settings.address}` }
         },
         widget.settings.phone && {
-          type: 'core/paragraph',
+          type: 'o4o/paragraph',
           data: { content: `📞 ${widget.settings.phone}` }
         },
         widget.settings.email && {
-          type: 'core/paragraph',
+          type: 'o4o/paragraph',
           data: { content: `✉️ ${widget.settings.email}` }
         }
       ].filter(Boolean)
     },
     'copyright': {
-      type: 'core/paragraph',
+      type: 'o4o/paragraph',
       data: {
         content: widget.settings.copyrightText || '© 2025 Your Company',
         className: 'copyright-text'
       }
     },
     'html': {
-      type: 'core/html',
+      type: 'o4o/html',
       data: {
         content: widget.settings.htmlContent || ''
       }
@@ -406,7 +406,7 @@ function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
       }
     },
     'newsletter': {
-      type: 'core/group',
+      type: 'o4o/group',
       data: {
         layout: 'flex',
         flexDirection: 'row',
@@ -431,7 +431,7 @@ function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
   if (widget.settings.title && widget.type !== 'copyright') {
     return {
       id: widget.id,
-      type: 'core/group',
+      type: 'o4o/group',
       data: {
         layout: 'flex',
         flexDirection: 'column',
@@ -439,7 +439,7 @@ function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
       },
       innerBlocks: [
         {
-          type: 'core/heading',
+          type: 'o4o/heading',
           data: {
             level: 3,
             content: widget.settings.title
@@ -596,7 +596,7 @@ export function convertSettingsToFooterTemplatePart(
             innerBlocks: [
               {
                 id: 'copyright',
-                type: 'core/paragraph',
+                type: 'o4o/paragraph',
                 data: {
                   content: settings.footer.bottomBar.section1 || '© 2025 O4O Platform. All rights reserved.'
                 }

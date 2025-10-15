@@ -31,33 +31,33 @@ function extractBlocksFromFiles(): BlockInfo[] {
 
   // 기본 블록 정보 (실제로는 파일을 스캔해야 하지만, 여기서는 간단히 정의)
   const coreBlocks: BlockInfo[] = [
-    { name: 'core/paragraph', title: '단락', category: '텍스트', description: '일반 단락 텍스트' },
-    { name: 'core/heading', title: '제목', category: '텍스트', description: '제목 (H1-H6)' },
-    { name: 'core/list', title: '리스트', category: '텍스트', description: '순서 있는/없는 리스트' },
-    { name: 'core/quote', title: '인용구', category: '텍스트', description: '인용구 블록' },
-    { name: 'core/code', title: '코드', category: '텍스트', description: '코드 블록' },
+    { name: 'o4o/paragraph', title: '단락', category: '텍스트', description: '일반 단락 텍스트' },
+    { name: 'o4o/heading', title: '제목', category: '텍스트', description: '제목 (H1-H6)' },
+    { name: 'o4o/list', title: '리스트', category: '텍스트', description: '순서 있는/없는 리스트' },
+    { name: 'o4o/quote', title: '인용구', category: '텍스트', description: '인용구 블록' },
+    { name: 'o4o/code', title: '코드', category: '텍스트', description: '코드 블록' },
     { name: 'core/preformatted', title: '사전 서식', category: '텍스트', description: '사전 서식 텍스트' },
 
-    { name: 'core/image', title: '이미지', category: '미디어', description: '이미지 블록' },
-    { name: 'core/gallery', title: '갤러리', category: '미디어', description: '이미지 갤러리' },
-    { name: 'core/video', title: '비디오', category: '미디어', description: '비디오 블록' },
-    { name: 'core/audio', title: '오디오', category: '미디어', description: '오디오 블록' },
-    { name: 'core/file', title: '파일', category: '미디어', description: '파일 다운로드' },
+    { name: 'o4o/image', title: '이미지', category: '미디어', description: '이미지 블록' },
+    { name: 'o4o/gallery', title: '갤러리', category: '미디어', description: '이미지 갤러리' },
+    { name: 'o4o/video', title: '비디오', category: '미디어', description: '비디오 블록' },
+    { name: 'o4o/audio', title: '오디오', category: '미디어', description: '오디오 블록' },
+    { name: 'o4o/file', title: '파일', category: '미디어', description: '파일 다운로드' },
 
-    { name: 'core/button', title: '버튼', category: '디자인', description: '버튼 블록' },
+    { name: 'o4o/button', title: '버튼', category: '디자인', description: '버튼 블록' },
     { name: 'core/buttons', title: '버튼 그룹', category: '디자인', description: '버튼 그룹' },
-    { name: 'core/columns', title: '다단', category: '디자인', description: '다단 레이아웃' },
-    { name: 'core/column', title: '단', category: '디자인', description: '단 블록' },
-    { name: 'core/group', title: '그룹', category: '디자인', description: '블록 그룹' },
-    { name: 'core/separator', title: '구분선', category: '디자인', description: '수평 구분선' },
-    { name: 'core/spacer', title: '공백', category: '디자인', description: '공백 추가' },
-    { name: 'core/cover', title: '커버', category: '디자인', description: '커버 이미지' },
+    { name: 'o4o/columns', title: '다단', category: '디자인', description: '다단 레이아웃' },
+    { name: 'o4o/column', title: '단', category: '디자인', description: '단 블록' },
+    { name: 'o4o/group', title: '그룹', category: '디자인', description: '블록 그룹' },
+    { name: 'o4o/separator', title: '구분선', category: '디자인', description: '수평 구분선' },
+    { name: 'o4o/spacer', title: '공백', category: '디자인', description: '공백 추가' },
+    { name: 'o4o/cover', title: '커버', category: '디자인', description: '커버 이미지' },
 
-    { name: 'core/table', title: '표', category: '레이아웃', description: '표 블록' },
+    { name: 'o4o/table', title: '표', category: '레이아웃', description: '표 블록' },
     { name: 'core/media-text', title: '미디어와 텍스트', category: '레이아웃', description: '미디어와 텍스트 조합' },
 
-    { name: 'core/embed', title: '임베드', category: '임베드', description: '외부 콘텐츠 임베드' },
-    { name: 'core/shortcode', title: '숏코드', category: '위젯', description: '숏코드 삽입' },
+    { name: 'o4o/embed', title: '임베드', category: '임베드', description: '외부 콘텐츠 임베드' },
+    { name: 'o4o/shortcode', title: '숏코드', category: '위젯', description: '숏코드 삽입' },
 
     { name: 'o4o/slide', title: '슬라이드', category: '미디어', description: '슬라이드쇼 블록' },
   ];

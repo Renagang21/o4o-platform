@@ -115,7 +115,7 @@ export const RichText: FC<RichTextProps> = ({
       'core/italic': 'italic',
       'core/link': 'createLink',
       'core/strikethrough': 'strikeThrough',
-      'core/code': 'code',
+      'o4o/code': 'code',
     };
 
     const command = formatMap[format];

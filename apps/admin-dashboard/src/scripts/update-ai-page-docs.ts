@@ -105,103 +105,103 @@ const TEMPLATES = {
 
 // 블록 예시
 const BLOCK_EXAMPLES = {
-  'core/paragraph': {
+  'o4o/paragraph': {
     name: '단락',
     category: '텍스트',
     description: '일반 텍스트 단락',
     example: {
-      type: 'core/paragraph',
+      type: 'o4o/paragraph',
       content: { text: '여기에 텍스트 내용이 들어갑니다.' }
     }
   },
-  'core/heading': {
+  'o4o/heading': {
     name: '제목',
     category: '텍스트',
     description: 'H1~H6 제목 (level: 1-6)',
     example: {
-      type: 'core/heading',
+      type: 'o4o/heading',
       content: { text: '페이지 제목' },
       attributes: { level: 1 }
     }
   },
-  'core/list': {
+  'o4o/list': {
     name: '리스트',
     category: '텍스트',
     description: '순서 있는/없는 리스트',
     example: {
-      type: 'core/list',
+      type: 'o4o/list',
       content: { items: ['항목 1', '항목 2', '항목 3'] },
       attributes: { ordered: false }
     }
   },
-  'core/quote': {
+  'o4o/quote': {
     name: '인용구',
     category: '텍스트',
     example: {
-      type: 'core/quote',
+      type: 'o4o/quote',
       content: { text: '훌륭한 제품은 디테일에서 나온다.', citation: '스티브 잡스' }
     }
   },
-  'core/code': {
+  'o4o/code': {
     name: '코드 블록',
     category: '텍스트',
     example: {
-      type: 'core/code',
+      type: 'o4o/code',
       content: { code: 'function greet() { return "Hello"; }', language: 'javascript' }
     }
   },
-  'core/image': {
+  'o4o/image': {
     name: '이미지',
     category: '미디어',
     description: '**중요**: AI 생성 시 `src`는 비워두고 `alt`만 포함',
     example: {
-      type: 'core/image',
+      type: 'o4o/image',
       content: { alt: '스마트폰을 사용하는 사람' }
     }
   },
-  'core/video': {
+  'o4o/video': {
     name: '비디오',
     category: '미디어',
     example: {
-      type: 'core/video',
+      type: 'o4o/video',
       content: { caption: '제품 소개 영상' }
     }
   },
-  'core/gallery': {
+  'o4o/gallery': {
     name: '갤러리',
     category: '미디어',
     example: {
-      type: 'core/gallery',
+      type: 'o4o/gallery',
       content: { images: [] }
     }
   },
-  'core/button': {
+  'o4o/button': {
     name: '버튼',
     category: '디자인',
     description: '**variant 옵션**: `primary`, `secondary`, `outline`',
     example: {
-      type: 'core/button',
+      type: 'o4o/button',
       content: { text: '지금 시작하기', url: '#' },
       attributes: { variant: 'primary' }
     }
   },
-  'core/columns': {
+  'o4o/columns': {
     name: '다단 레이아웃',
     category: '디자인',
     example: {
-      type: 'core/columns',
+      type: 'o4o/columns',
       content: {
         columns: [
-          { blocks: [{ type: 'core/heading', content: { text: '왼쪽 칼럼' } }] },
-          { blocks: [{ type: 'core/heading', content: { text: '오른쪽 칼럼' } }] }
+          { blocks: [{ type: 'o4o/heading', content: { text: '왼쪽 칼럼' } }] },
+          { blocks: [{ type: 'o4o/heading', content: { text: '오른쪽 칼럼' } }] }
         ]
       }
     }
   },
-  'core/separator': {
+  'o4o/separator': {
     name: '구분선',
     category: '디자인',
-    example: { type: 'core/separator' }
+    example: { type: 'o4o/separator' }
   }
 };
 

@@ -92,18 +92,18 @@ function generateBlockExample(block: any): string {
  */
 function getExampleContent(blockName: string): any {
   const examples: Record<string, any> = {
-    'core/paragraph': { text: '단락 텍스트 내용' },
-    'core/heading': { text: '제목', level: 2 },
-    'core/list': { items: ['항목 1', '항목 2'], ordered: false },
-    'core/image': { alt: '이미지 설명', caption: '캡션' },
-    'core/button': { text: '버튼 텍스트', url: '#' },
-    'core/quote': { text: '인용문', citation: '출처' },
-    'core/code': { code: 'function greet() { return "Hello"; }', language: 'javascript' },
-    'core/columns': { columns: [] },
-    'core/separator': {},
-    'core/spacer': { height: 50 },
-    'core/gallery': { images: [] },
-    'core/video': { caption: '비디오 설명' },
+    'o4o/paragraph': { text: '단락 텍스트 내용' },
+    'o4o/heading': { text: '제목', level: 2 },
+    'o4o/list': { items: ['항목 1', '항목 2'], ordered: false },
+    'o4o/image': { alt: '이미지 설명', caption: '캡션' },
+    'o4o/button': { text: '버튼 텍스트', url: '#' },
+    'o4o/quote': { text: '인용문', citation: '출처' },
+    'o4o/code': { code: 'function greet() { return "Hello"; }', language: 'javascript' },
+    'o4o/columns': { columns: [] },
+    'o4o/separator': {},
+    'o4o/spacer': { height: 50 },
+    'o4o/gallery': { images: [] },
+    'o4o/video': { caption: '비디오 설명' },
     'o4o/conditional': {
       conditions: [
         { id: 'cond1', type: 'user_logged_in', operator: 'is', value: true }

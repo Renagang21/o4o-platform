@@ -115,7 +115,7 @@ export type BlockComponent = ComponentType<BlockProps>;
  */
 export interface BlockDefinition {
   /**
-   * Unique block identifier (e.g., 'o4o/slide', 'core/paragraph')
+   * Unique block identifier (e.g., 'o4o/slide', 'o4o/paragraph')
    */
   name: string;
 

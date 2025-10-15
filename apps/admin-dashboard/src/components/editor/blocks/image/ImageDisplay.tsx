@@ -111,7 +111,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                onAddBlock?.('after', 'core/paragraph');
+                onAddBlock?.('after', 'o4o/paragraph');
               }
             }}
             data-placeholder="Write a caption..."
