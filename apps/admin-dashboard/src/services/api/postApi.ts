@@ -313,7 +313,8 @@ export const postApi = {
   get: async (id: string): Promise<PostResponse> => {
     try {
       const response = await apiClient.get(`/posts/${id}`);
-      return { success: true, data: response.data };
+      const payload = response?.data?.data ?? response.data;
+      return { success: true, data: payload };
     } catch (error: any) {
       return { 
         success: false, 
