@@ -33,17 +33,14 @@ const Customize: React.FC = () => {
     const loadSettings = async () => {
       try {
         setIsLoading(true);
-        errorHandler.log('설정 불러오기 시작', ErrorLevel.INFO, 'Settings');
 
         const response = await authClient.api.get('/settings/customizer');
 
         if (response.data?.success && response.data?.data) {
           setInitialSettings(response.data.data);
-          errorHandler.log('설정 불러오기 성공', ErrorLevel.INFO, 'Settings');
         } else {
           // 설정이 없으면 기본값 사용
           setInitialSettings(getDefaultSettings());
-          errorHandler.log('저장된 설정이 없습니다. 기본 설정을 사용합니다.', ErrorLevel.INFO, 'Settings');
         }
       } catch (error: any) {
         // 에러 시 기본값 사용
@@ -78,15 +75,12 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
-      errorHandler.log('설정 저장 시작', ErrorLevel.INFO, 'Settings');
-
       // API를 통해 설정 저장 (PUT 메서드 사용)
       // 서버는 { settings: {...} } 형식을 기대함
       const response = await authClient.api.put('/settings/customizer', { settings });
 
       if (response.data?.success) {
         toast.success('설정이 저장되었습니다.');
-        errorHandler.log('설정 저장 성공', ErrorLevel.INFO, 'Settings');
         return true;
       }
 
