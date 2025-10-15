@@ -36,7 +36,7 @@ const blockComponents: Record<string, FC<any>> = {
   'core/site-tagline': SiteTagline,
   'core/navigation': Navigation,
   'core/search': SearchBlock,
-  'core/social-links': SocialLinks,
+  'o4o/social-links': SocialLinks,
   'o4o/account-menu': AccountModule,
   'o4o/cart-icon': CartModule,
   'o4o/button': Button,
