@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
+import ParagraphBlockSettings from './ParagraphBlockSettings';
 
 interface ParagraphBlockProps {
   id: string;
@@ -52,6 +53,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
   const [localContent, setLocalContent] = useState(content);
   const editorRef = useRef<HTMLDivElement>(null);
+  const richApiRef = useRef<{ applyFormat: (format: string) => void } | null>(null);
 
   // Sync content
   useEffect(() => {
@@ -106,9 +108,22 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      // Integrate with standard toolbar system (alignment only)
+      // Integrate with standard toolbar system
       onAlignChange={(next) => updateAttribute('align', next)}
       currentAlign={align}
+      onToggleBold={() => richApiRef.current?.applyFormat('core/bold')}
+      onToggleItalic={() => richApiRef.current?.applyFormat('core/italic')}
+      // Sidebar settings
+      customSidebarContent={
+        <ParagraphBlockSettings
+          attributes={{ fontSize, textColor, backgroundColor, dropCap }}
+          onChange={(newAttrs) => {
+            Object.entries(newAttrs).forEach(([key, value]) => {
+              updateAttribute(key, value);
+            });
+          }}
+        />
+      }
     >
       <div
         ref={editorRef}
@@ -135,6 +150,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             'core/italic',
             'core/link',
           ]}
+          exposeApi={(api) => { richApiRef.current = api; }}
         />
       </div>
     </EnhancedBlockWrapper>

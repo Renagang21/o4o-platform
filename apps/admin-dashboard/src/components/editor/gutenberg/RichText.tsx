@@ -6,6 +6,7 @@
 
 import React, { FC, useRef, useState, useEffect, KeyboardEvent } from 'react';
 import { cn } from '@/lib/utils';
+import LinkPopover from './LinkPopover';
 
 interface RichTextProps {
   tagName?: string;
@@ -23,6 +24,8 @@ interface RichTextProps {
   className?: string;
   style?: React.CSSProperties;
   multiline?: boolean | string;
+  // Expose simple formatting API to parents (no execCommand usage outside)
+  exposeApi?: (api: { applyFormat: (format: string) => void }) => void;
 }
 
 export const RichText: FC<RichTextProps> = ({
@@ -39,10 +42,18 @@ export const RichText: FC<RichTextProps> = ({
   className,
   style,
   multiline = false,
+  exposeApi,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isEmpty, setIsEmpty] = useState(!value || value === '');
   const isUpdatingRef = useRef(false);
+
+  // Link editing state
+  const [showLinkPopover, setShowLinkPopover] = useState(false);
+  const [linkPopoverPosition, setLinkPopoverPosition] = useState({ top: 0, left: 0 });
+  const [currentLinkUrl, setCurrentLinkUrl] = useState('');
+  const [currentLinkOpenInNewTab, setCurrentLinkOpenInNewTab] = useState(false);
+  const savedRangeRef = useRef<Range | null>(null);
 
   // 초기값 및 외부 value 변경 처리 - 텍스트 역순 문제 해결
   useEffect(() => {
@@ -106,28 +117,100 @@ export const RichText: FC<RichTextProps> = ({
     setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
   }, [value]);
 
-  // 포맷 적용 함수
-  const applyFormat = (format: string) => {
-    if (!allowedFormats.includes(format)) return;
+  // 링크 편집 팝업 열기
+  const openLinkPopover = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
 
-    const formatMap: { [key: string]: string } = {
-      'core/bold': 'bold',
-      'core/italic': 'italic',
-      'core/link': 'createLink',
-      'core/strikethrough': 'strikeThrough',
-      'o4o/code': 'code',
-    };
+    const range = selection.getRangeAt(0);
+    savedRangeRef.current = range.cloneRange();
 
-    const command = formatMap[format];
-    if (command) {
-      if (command === 'createLink') {
-        const url = prompt('Enter URL:');
-        if (url) {
-          document.execCommand(command, false, url);
-        }
-      } else {
-        document.execCommand(command, false);
+    // 기존 링크 확인
+    const ancestor = range.commonAncestorContainer;
+    const linkElement = (ancestor.nodeType === Node.TEXT_NODE ? ancestor.parentElement : ancestor) as HTMLElement;
+
+    if (linkElement && linkElement.tagName === 'A') {
+      setCurrentLinkUrl((linkElement as HTMLAnchorElement).href);
+      setCurrentLinkOpenInNewTab((linkElement as HTMLAnchorElement).target === '_blank');
+    } else {
+      setCurrentLinkUrl('');
+      setCurrentLinkOpenInNewTab(false);
+    }
+
+    // 팝업 위치 계산
+    const rect = range.getBoundingClientRect();
+    setLinkPopoverPosition({
+      top: rect.bottom + window.scrollY + 5,
+      left: rect.left + window.scrollX,
+    });
+
+    setShowLinkPopover(true);
+  };
+
+  // 링크 저장
+  const handleSaveLink = (url: string, openInNewTab: boolean) => {
+    if (!savedRangeRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    // 저장된 range 복원
+    selection.removeAllRanges();
+    selection.addRange(savedRangeRef.current);
+
+    const range = savedRangeRef.current;
+    const ancestor = range.commonAncestorContainer;
+    const existingLink = (ancestor.nodeType === Node.TEXT_NODE ? ancestor.parentElement : ancestor) as HTMLElement;
+
+    // 기존 링크 업데이트 또는 새 링크 생성
+    if (existingLink && existingLink.tagName === 'A') {
+      (existingLink as HTMLAnchorElement).href = url;
+      (existingLink as HTMLAnchorElement).target = openInNewTab ? '_blank' : '';
+      if (openInNewTab) {
+        (existingLink as HTMLAnchorElement).rel = 'noopener noreferrer';
       }
+    } else {
+      const link = document.createElement('a');
+      link.href = url;
+      if (openInNewTab) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
+
+      const contents = range.extractContents();
+      link.appendChild(contents);
+      range.insertNode(link);
+    }
+
+    if (editorRef.current) {
+      isUpdatingRef.current = true;
+      onChange?.(editorRef.current.innerHTML);
+      setTimeout(() => {
+        isUpdatingRef.current = false;
+      }, 0);
+    }
+
+    savedRangeRef.current = null;
+  };
+
+  // 링크 제거
+  const handleRemoveLink = () => {
+    if (!savedRangeRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    selection.removeAllRanges();
+    selection.addRange(savedRangeRef.current);
+
+    const range = savedRangeRef.current;
+    const ancestor = range.commonAncestorContainer;
+    const linkElement = (ancestor.nodeType === Node.TEXT_NODE ? ancestor.parentElement : ancestor) as HTMLElement;
+
+    if (linkElement && linkElement.tagName === 'A') {
+      const textContent = linkElement.textContent || '';
+      const textNode = document.createTextNode(textContent);
+      linkElement.replaceWith(textNode);
 
       if (editorRef.current) {
         isUpdatingRef.current = true;
@@ -137,7 +220,89 @@ export const RichText: FC<RichTextProps> = ({
         }, 0);
       }
     }
+
+    savedRangeRef.current = null;
   };
+
+  // 포맷 적용 함수 - Selection API 사용 (execCommand 제거)
+  const applyFormat = (format: string) => {
+    if (!allowedFormats.includes(format)) return;
+
+    // 링크는 팝업으로 처리
+    if (format === 'core/link') {
+      openLinkPopover();
+      return;
+    }
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+
+    // 선택된 텍스트가 없으면 무시
+    if (range.collapsed) return;
+
+    try {
+      let element: HTMLElement | null = null;
+
+      switch (format) {
+        case 'core/bold':
+          element = document.createElement('strong');
+          break;
+        case 'core/italic':
+          element = document.createElement('em');
+          break;
+        case 'core/strikethrough':
+          element = document.createElement('s');
+          break;
+        case 'o4o/code':
+          element = document.createElement('code');
+          break;
+        default:
+          return;
+      }
+
+      if (element) {
+        // 기존 포맷이 있는지 확인
+        const ancestor = range.commonAncestorContainer;
+        const parent = ancestor.nodeType === Node.TEXT_NODE ? ancestor.parentElement : ancestor as HTMLElement;
+
+        // 이미 같은 태그로 감싸져 있으면 제거 (토글 기능)
+        if (parent && parent.tagName === element.tagName) {
+          const textContent = parent.textContent || '';
+          const textNode = document.createTextNode(textContent);
+          parent.replaceWith(textNode);
+        } else {
+          // 선택 영역을 새 요소로 감싸기
+          const contents = range.extractContents();
+          element.appendChild(contents);
+          range.insertNode(element);
+
+          // 선택 영역 복원
+          selection.removeAllRanges();
+          const newRange = document.createRange();
+          newRange.selectNodeContents(element);
+          selection.addRange(newRange);
+        }
+
+        if (editorRef.current) {
+          isUpdatingRef.current = true;
+          onChange?.(editorRef.current.innerHTML);
+          setTimeout(() => {
+            isUpdatingRef.current = false;
+          }, 0);
+        }
+      }
+    } catch (error) {
+      console.error('Format application error:', error);
+    }
+  };
+
+  // Expose API to parent once mounted
+  useEffect(() => {
+    exposeApi?.({ applyFormat });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exposeApi]);
 
   // 키보드 이벤트 처리
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -174,7 +339,22 @@ export const RichText: FC<RichTextProps> = ({
         // 멀티라인 모드에서는 새 줄 추가
         if (multiline === 'p') {
           e.preventDefault();
-          document.execCommand('insertParagraph', false);
+
+          // Selection API 사용하여 줄바꿈 삽입
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const br = document.createElement('br');
+            range.deleteContents();
+            range.insertNode(br);
+
+            // 커서를 br 다음으로 이동
+            range.setStartAfter(br);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+
           if (editorRef.current) {
             isUpdatingRef.current = true;
             onChange?.(editorRef.current.innerHTML);
@@ -239,11 +419,27 @@ export const RichText: FC<RichTextProps> = ({
     onFocusOut?.();
   };
 
-  // 붙여넣기 처리
+  // 붙여넣기 처리 - Selection API 사용
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
+
+    // Selection API로 텍스트 삽입
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+
+      const textNode = document.createTextNode(text);
+      range.insertNode(textNode);
+
+      // 커서를 삽입한 텍스트 끝으로 이동
+      range.setStartAfter(textNode);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
     if (editorRef.current) {
       isUpdatingRef.current = true;
       onChange?.(editorRef.current.innerHTML);
@@ -272,13 +468,33 @@ export const RichText: FC<RichTextProps> = ({
   };
 
   // For specific tags that need special handling
-  if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' ||
-      tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
-    return React.createElement(tagName, commonProps);
-  }
+  const EditorElement = () => {
+    if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' ||
+        tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
+      return React.createElement(tagName, commonProps);
+    }
 
-  // For p, div, figcaption, and other simple elements
-  return <div {...commonProps} />;
+    // For p, div, figcaption, and other simple elements
+    return <div {...commonProps} />;
+  };
+
+  return (
+    <>
+      <EditorElement />
+
+      {/* Link Popover */}
+      {showLinkPopover && (
+        <LinkPopover
+          initialUrl={currentLinkUrl}
+          initialOpenInNewTab={currentLinkOpenInNewTab}
+          onSave={handleSaveLink}
+          onRemove={currentLinkUrl ? handleRemoveLink : undefined}
+          onClose={() => setShowLinkPopover(false)}
+          position={linkPopoverPosition}
+        />
+      )}
+    </>
+  );
 };
 
 // 플레인 텍스트 컴포넌트 (제목 등에 사용)
