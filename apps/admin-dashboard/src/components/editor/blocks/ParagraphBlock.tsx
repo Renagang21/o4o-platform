@@ -106,11 +106,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      // Integrate with standard toolbar system instead of custom toolbar content
+      // Integrate with standard toolbar system (alignment only)
       onAlignChange={(next) => updateAttribute('align', next)}
       currentAlign={align}
-      onToggleBold={() => document.execCommand('bold')}
-      onToggleItalic={() => document.execCommand('italic')}
     >
       <div
         ref={editorRef}
