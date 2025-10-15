@@ -286,14 +286,14 @@ export const postApi = {
       const requestData = { ...data };
       delete (requestData as any)._requestId;
       
-      
       const response = await apiClient.post('/posts', requestData, {
         signal: abortController.signal
       } as AxiosRequestConfig);
-      
-      
+
       pendingRequests.delete(requestKey);
-      return { success: true, data: response.data };
+
+      const payload = response?.data?.data ?? response.data;
+      return { success: true, data: payload };
     } catch (error: any) {
       pendingRequests.delete(requestKey);
       
@@ -343,9 +343,11 @@ export const postApi = {
       const response = await apiClient.put(`/posts/${id}`, requestData, {
         signal: abortController.signal
       } as AxiosRequestConfig);
-      
+
       pendingRequests.delete(requestKey);
-      return { success: true, data: response.data };
+
+      const payload = response?.data?.data ?? response.data;
+      return { success: true, data: payload };
     } catch (error: any) {
       pendingRequests.delete(requestKey);
       
@@ -365,7 +367,8 @@ export const postApi = {
   autoSave: async (id: string, data: { title?: string; content?: any; excerpt?: string }): Promise<PostResponse> => {
     try {
       const response = await apiClient.post(`/posts/${id}/autosave`, data);
-      return { success: true, data: response.data };
+      const payload = response?.data?.data ?? response.data;
+      return { success: true, data: payload };
     } catch (error: any) {
       return { 
         success: false, 
