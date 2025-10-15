@@ -98,6 +98,7 @@ export interface BlockProps {
   canMoveDown?: boolean;
   className?: string;
   // InnerBlocks support
+  children?: React.ReactNode; // Rendered InnerBlocks content
   innerBlocks?: unknown[]; // Block[] type, but using unknown to avoid circular reference
   onInnerBlocksChange?: (innerBlocks: unknown[]) => void;
   allowedBlocks?: string[];
@@ -109,6 +110,36 @@ export interface BlockProps {
  * Block component type
  */
 export type BlockComponent = ComponentType<BlockProps>;
+
+/**
+ * InnerBlocks settings for blocks that contain other blocks
+ */
+export interface InnerBlocksSettings {
+  /**
+   * Blocks allowed inside this block (undefined = all blocks allowed)
+   */
+  allowedBlocks?: string[];
+
+  /**
+   * Default inner blocks template
+   */
+  template?: unknown[];
+
+  /**
+   * Template lock mode
+   */
+  templateLock?: boolean | 'all' | 'insert';
+
+  /**
+   * Orientation of InnerBlocks
+   */
+  orientation?: 'vertical' | 'horizontal';
+
+  /**
+   * Render appender type
+   */
+  renderAppender?: boolean | 'default' | 'button';
+}
 
 /**
  * Block definition structure
@@ -173,6 +204,11 @@ export interface BlockDefinition {
    * Ancestor blocks (block must have one of these as ancestor)
    */
   ancestor?: string[];
+
+  /**
+   * InnerBlocks configuration (for blocks that contain other blocks)
+   */
+  innerBlocksSettings?: InnerBlocksSettings;
 
   /**
    * Example configuration for block preview

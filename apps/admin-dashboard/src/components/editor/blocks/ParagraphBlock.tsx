@@ -6,15 +6,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import {
-  Bold,
-  Italic,
-  Link2,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify
-} from 'lucide-react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
 
@@ -115,79 +106,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      customToolbarContent={(
-        <>
-          {/* Text Alignment */}
-          <button
-            onClick={() => updateAttribute('align', 'left')}
-            className={cn(
-              "p-1 rounded hover:bg-gray-100",
-              align === 'left' && "bg-blue-100 text-blue-600"
-            )}
-            title="Align Left"
-          >
-            <AlignLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-          <button
-            onClick={() => updateAttribute('align', 'center')}
-            className={cn(
-              "p-1 rounded hover:bg-gray-100",
-              align === 'center' && "bg-blue-100 text-blue-600"
-            )}
-            title="Align Center"
-          >
-            <AlignCenter className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-          <button
-            onClick={() => updateAttribute('align', 'right')}
-            className={cn(
-              "p-1 rounded hover:bg-gray-100",
-              align === 'right' && "bg-blue-100 text-blue-600"
-            )}
-            title="Align Right"
-          >
-            <AlignRight className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-          <button
-            onClick={() => updateAttribute('align', 'justify')}
-            className={cn(
-              "p-1 rounded hover:bg-gray-100",
-              align === 'justify' && "bg-blue-100 text-blue-600"
-            )}
-            title="Justify"
-          >
-            <AlignJustify className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-
-          <div className="w-px h-4 bg-gray-300 mx-1" />
-
-          {/* Text Formatting - handled by RichText */}
-          <button
-            onClick={() => document.execCommand('bold')}
-            className="p-1 rounded hover:bg-gray-100"
-            title="Bold (Ctrl+B)"
-          >
-            <Bold className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-          <button
-            onClick={() => document.execCommand('italic')}
-            className="p-1 rounded hover:bg-gray-100"
-            title="Italic (Ctrl+I)"
-          >
-            <Italic className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-          <button
-            onClick={() => {
-              const url = prompt('Enter URL:');
-              if (url) document.execCommand('createLink', false, url);
-            }}
-            className="p-1 rounded hover:bg-gray-100"
-            title="Link (Ctrl+K)"
-          >
-            <Link2 className="h-3 w-3 sm:h-4 sm:w-4" />
-          </button>
-        </>
-      )}
+      // Integrate with standard toolbar system instead of custom toolbar content
+      onAlignChange={(next) => updateAttribute('align', next)}
+      currentAlign={align}
+      onToggleBold={() => document.execCommand('bold')}
+      onToggleItalic={() => document.execCommand('italic')}
     >
       <div
         ref={editorRef}

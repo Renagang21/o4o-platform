@@ -5,10 +5,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SliderAttributes, transitionVariants } from './types';
 import { Button } from '@/components/ui/button';
+import SliderBlockSettings from './SliderBlockSettings';
 
 interface SliderBlockProps {
   attributes: SliderAttributes;
@@ -46,6 +47,7 @@ export const SliderBlock: React.FC<SliderBlockProps> = ({
   const [isPlaying, setIsPlaying] = useState(autoplay);
   const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState(1); // 1: next, -1: prev
+  const [showSettings, setShowSettings] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // children을 배열로 변환 (슬라이드 수 계산)
@@ -164,9 +166,37 @@ export const SliderBlock: React.FC<SliderBlockProps> = ({
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             {isPlaying ? 'Pause' : 'Play'}
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowSettings(!showSettings)}
+          >
+            <Settings className="w-4 h-4" />
+            Settings
+          </Button>
           <span className="text-xs text-gray-600 ml-auto">
             Slide {currentIndex + 1} / {totalSlides}
           </span>
+        </div>
+      )}
+
+      {/* Settings Panel */}
+      {isSelected && showSettings && (
+        <div className="slider-block__settings mb-4 p-4 bg-white border border-gray-200 rounded-md shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold">Slider Settings</h3>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowSettings(false)}
+            >
+              Close
+            </Button>
+          </div>
+          <SliderBlockSettings
+            attributes={attributes}
+            setAttributes={setAttributes}
+          />
         </div>
       )}
 
