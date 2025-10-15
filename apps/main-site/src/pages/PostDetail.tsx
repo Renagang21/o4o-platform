@@ -105,11 +105,8 @@ export default function PostDetail() {
     if (!c) return null;
 
     // Use WordPressBlockRenderer for all block-based content
-    return (
-      <div className="prose max-w-none">
-        <WordPressBlockRenderer blocks={c} />
-      </div>
-    );
+    // Note: Don't wrap with prose - each block has its own typography styles
+    return <WordPressBlockRenderer blocks={c} />;
   };
 
   return (

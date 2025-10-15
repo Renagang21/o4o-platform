@@ -26,7 +26,6 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
     'wp-block-markdown-reader',
     'prose prose-sm max-w-none',
     `markdown-theme-${theme}`,
-    'not-prose', // Reset parent prose styles
   ].filter(Boolean).join(' ');
 
   return (

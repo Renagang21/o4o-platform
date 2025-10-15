@@ -139,7 +139,7 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
       paddingLeft: `${currentPadding.left}px`,
       paddingRight: `${currentPadding.right}px`,
     }}>
-      <article className="prose prose-lg max-w-none">
+      <article>
         {/* Always show title */}
         <h1 className="text-4xl font-bold text-gray-900 mb-8">{page.title}</h1>
 

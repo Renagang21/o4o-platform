@@ -153,8 +153,7 @@ const PageViewer: FC = () => {
 
           {/* 페이지 콘텐츠 */}
           <div className="px-8 py-8">
-            <div 
-              className="prose prose-lg max-w-none"
+            <div
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(pageContent.content) }}
             />
           </div>
