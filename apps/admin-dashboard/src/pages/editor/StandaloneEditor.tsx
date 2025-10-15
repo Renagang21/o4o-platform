@@ -56,20 +56,23 @@ interface StandaloneEditorProps {
 
 const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: initialPostId }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   // Don't use 'new' as an ID - it should be undefined for new posts
   const [currentPostId, setCurrentPostId] = useState<string | number | undefined>(
     initialPostId === 'new' ? undefined : initialPostId
   );
-  
-  // 모바일 감지
+
+  // 모바일/태블릿 감지
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkResponsive = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1280);
     };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+
+    checkResponsive();
+    window.addEventListener('resize', checkResponsive);
+    return () => window.removeEventListener('resize', checkResponsive);
   }, []);
   const navigate = useNavigate();
   const location = useLocation();
@@ -683,7 +686,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       {/* Editor Header */}
       <div className={cn(
-        "bg-white border-b flex items-center justify-between",
+        "bg-white border-b flex items-center justify-between overflow-x-auto",
         isMobile ? "px-2 py-2" : "px-3 py-2"
       )}>
         <div className={cn(
@@ -756,8 +759,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         
         {/* Right Actions */}
         <div className={cn(
-          "flex items-center",
-          isMobile ? "gap-0" : "gap-1"
+          "flex items-center flex-shrink-0",
+          isMobile ? "gap-0" : isTablet ? "gap-0.5" : "gap-1"
         )}>
           {/* Undo/Redo - 모바일에서 숨김 */}
           {!isMobile && (
@@ -790,8 +793,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </div>
           )}
 
-          {/* Design Library - 모바일에서 숨김 */}
-          {!isMobile && (
+          {/* Design Library - 모바일/태블릿에서 숨김 */}
+          {!isMobile && !isTablet && (
             <Button
               variant="ghost"
               size="sm"
@@ -803,8 +806,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </Button>
           )}
 
-          {/* AI Generator - 모바일에서 숨김 */}
-          {!isMobile && (
+          {/* AI Generator - 모바일/태블릿에서 숨김 */}
+          {!isMobile && !isTablet && (
             <Button
               variant="ghost"
               size="sm"
@@ -997,6 +1000,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 <>
                   <DropdownMenuItem onClick={handlePreview}>
                     <Eye className="h-4 w-4 mr-2" />Preview
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              {/* 태블릿/모바일에서는 More 메뉴에 표시 */}
+              {(isMobile || isTablet) && (
+                <>
+                  <DropdownMenuItem onClick={() => setShowTemplates(true)}>
+                    <Library className="h-4 w-4 mr-2" />
+                    디자인 라이브러리
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowAIGenerator(true)}>
+                    <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                    AI 페이지 생성
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
