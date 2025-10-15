@@ -62,10 +62,8 @@ jobs:
           # Backup current deployment
           sudo cp -r /var/www/admin.neture.co.kr /var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) || true
 
-          # Clear current files
-          sudo rm -rf /var/www/admin.neture.co.kr/*
-
-          # Create temp directories
+          # Clear temp directory first
+          rm -rf /tmp/admin-build
           mkdir -p /tmp/admin-build
 
     - name: Copy build files
@@ -85,6 +83,18 @@ jobs:
         username: ${{ secrets.WEB_USER }}
         key: ${{ secrets.WEB_SSH_KEY }}
         script: |
+          # Verify files were copied
+          echo "📋 Checking temp directory..."
+          if [ ! -f "/tmp/admin-build/version.json" ]; then
+            echo "❌ Files not found in /tmp/admin-build/"
+            ls -la /tmp/admin-build/ || true
+            exit 1
+          fi
+
+          # Clear current deployment
+          echo "🗑️  Clearing current deployment..."
+          sudo rm -rf /var/www/admin.neture.co.kr/*
+
           # Move files from temp to web directory
           echo "📦 Deploying build files..."
           sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
@@ -125,6 +135,16 @@ jobs:
           # Set permissions
           sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
           sudo chmod -R 755 /var/www/admin.neture.co.kr/
+
+          # Verify deployment
+          echo "✅ Verifying deployment..."
+          if [ -f /var/www/admin.neture.co.kr/version.json ]; then
+            echo "📄 Deployed version:"
+            cat /var/www/admin.neture.co.kr/version.json
+          else
+            echo "❌ version.json not found in deployed directory!"
+            exit 1
+          fi
 
           # Clean up temp build files
           rm -rf /tmp/admin-build
