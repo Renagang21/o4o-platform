@@ -112,6 +112,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       currentAlign={align}
       onToggleBold={() => richApiRef.current?.applyFormat('core/bold')}
       onToggleItalic={() => richApiRef.current?.applyFormat('core/italic')}
+      onToggleLink={() => richApiRef.current?.applyFormat('core/link')}
       // Sidebar settings
       customSidebarContent={
         <ParagraphBlockSettings

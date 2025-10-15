@@ -5,8 +5,8 @@
 
 import { useState, useRef, useEffect, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { 
-  GripVertical, 
+import {
+  GripVertical,
   Plus,
   Copy,
   Trash2,
@@ -21,6 +21,7 @@ import {
   ChevronDown as ChevronDownIcon,
   Bold,
   Italic,
+  Link,
   Type,
   Heading1,
   Heading2,
@@ -65,6 +66,7 @@ interface EnhancedBlockWrapperProps {
   currentAlign?: 'left' | 'center' | 'right' | 'justify';
   onToggleBold?: () => void;
   onToggleItalic?: () => void;
+  onToggleLink?: () => void;
   onChangeType?: (newType: string) => void;
   currentType?: string;
   isBold?: boolean;
@@ -97,6 +99,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   currentAlign = 'left',
   onToggleBold,
   onToggleItalic,
+  onToggleLink,
   onChangeType,
   currentType,
   isBold = false,
@@ -303,8 +306,8 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
               </>
             )}
 
-            {/* Bold and Italic buttons for text blocks */}
-            {(onToggleBold || onToggleItalic) && (
+            {/* Bold, Italic, and Link buttons for text blocks */}
+            {(onToggleBold || onToggleItalic || onToggleLink) && (
               <>
                 {onToggleBold && (
                   <Button
@@ -338,6 +341,20 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                     title="Italic (Ctrl+I)"
                   >
                     <Italic className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                )}
+                {onToggleLink && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 sm:h-7 px-1 sm:px-2 hover:bg-gray-100 flex-shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleLink();
+                    }}
+                    title="Link (Ctrl+K)"
+                  >
+                    <Link className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 )}
                 <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
