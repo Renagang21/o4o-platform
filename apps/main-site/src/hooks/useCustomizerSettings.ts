@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 
 export type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 
@@ -116,8 +117,7 @@ export const useCustomizerSettings = () => {
         }
 
         // Fetch from API
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
-        const response = await fetch(`${apiUrl}/settings/customizer`);
+        const response = await fetch(`${API_BASE_URL}/settings/customizer`);
 
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);

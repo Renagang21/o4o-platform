@@ -1,9 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User, Supplier, Retailer, LoginRequest } from '../types/user';
-
-// API Base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr/api';
+import { API_BASE_URL } from '../config/api';
 
 interface AuthState {
   user: User | Supplier | Retailer | null;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../../../config/api';
 
 interface MenuItem {
   id: string | number;
@@ -37,9 +38,8 @@ export const MenuWidget: React.FC<MenuWidgetProps> = ({ data = {} }) => {
     // Fetch menu items from API
     const fetchMenu = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
         const menuIdentifier = menuRef || menuId || 'footer-menu';
-        const response = await fetch(`${apiUrl}/api/menus/${menuIdentifier}/items`);
+        const response = await fetch(`${API_BASE_URL}/menus/${menuIdentifier}/items`);
         
         if (response.ok) {
           const data = await response.json();

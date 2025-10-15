@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/api';
 
 interface NewsletterWidgetProps {
   data?: {
@@ -40,10 +41,9 @@ export const NewsletterWidget: React.FC<NewsletterWidgetProps> = ({ data = {} })
     }
 
     setStatus('loading');
-    
+
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${apiUrl}${formAction}`, {
+      const response = await fetch(`${API_BASE_URL}${formAction}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

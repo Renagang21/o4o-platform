@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { BreadcrumbsSettings } from '@/types/customizer-types';
+import { API_URLS } from '../config/api';
 
 // Default breadcrumbs settings
 const defaultSettings: BreadcrumbsSettings = {
@@ -39,8 +40,7 @@ export const useBreadcrumbsSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
-        const response = await fetch(`${apiUrl}/customizer/breadcrumbs-settings`);
+        const response = await fetch(`${API_URLS.V1}/customizer/breadcrumbs-settings`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch breadcrumbs settings');

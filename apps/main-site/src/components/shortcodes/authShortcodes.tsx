@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Loader2 } from 'lucide-react';
 import { ShortcodeAttributes, ShortcodeHandler } from '@/utils/shortcodeParser';
+import { API_BASE_URL } from '../../config/api';
 
 interface OAuthProvider {
   enabled: boolean;
@@ -73,9 +74,7 @@ const SocialLoginComponent: React.FC<{
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-        
-        const response = await fetch(`${API_BASE_URL}/api/v1/settings/oauth`);
+        const response = await fetch(`${API_BASE_URL}/v1/settings/oauth`);
         const data = await response.json();
         
         if (data.success) {
@@ -106,9 +105,7 @@ const SocialLoginComponent: React.FC<{
     setError('');
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,9 +130,7 @@ const SocialLoginComponent: React.FC<{
   };
 
   const handleSocialLogin = (provider: 'google' | 'kakao' | 'naver') => {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-    
-    window.location.href = `${API_BASE_URL}/api/v1/auth/${provider}`;
+    window.location.href = `${API_BASE_URL}/v1/auth/${provider}`;
   };
 
   const renderSocialIcon = (provider: string) => {

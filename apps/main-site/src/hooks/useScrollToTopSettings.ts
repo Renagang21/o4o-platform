@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { API_URLS } from '../config/api';
 
 interface ScrollToTopSettings {
   enabled: boolean;
@@ -30,8 +31,7 @@ export const useScrollToTopSettings = () => {
     const fetchSettings = async () => {
       try {
         // Get settings from new API endpoint
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
-        const response = await fetch(`${apiUrl}/customizer/scroll-to-top`);
+        const response = await fetch(`${API_URLS.V1}/customizer/scroll-to-top`);
 
         if (response.ok) {
           const result = await response.json();

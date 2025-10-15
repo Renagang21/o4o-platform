@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { ButtonVariants, ButtonStyleSettings } from '@/types/customizer-types';
+import { API_URLS } from '../config/api';
 
 // Default button style
 const defaultButtonStyle: ButtonStyleSettings = {
@@ -67,8 +68,7 @@ export const useButtonSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
-        const response = await fetch(`${apiUrl}/customizer/button-settings`);
+        const response = await fetch(`${API_URLS.V1}/customizer/button-settings`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch button settings');

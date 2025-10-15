@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/api';
 
 interface Post {
   id: number;
@@ -41,13 +42,12 @@ export const RecentPostsWidget: React.FC<RecentPostsWidgetProps> = ({ data = {} 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
         const params = new URLSearchParams({
           limit: postCount.toString(),
           ...(categoryId && { category: categoryId.toString() })
         });
-        
-        const response = await fetch(`${apiUrl}/api/posts?${params}`);
+
+        const response = await fetch(`${API_BASE_URL}/posts?${params}`);
         
         if (response.ok) {
           const data = await response.json();
