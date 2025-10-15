@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import useToast from '../../hooks/useToast';
+import toast from 'react-hot-toast';
 import { useApproval } from './ApprovalContext';
 
 interface ApprovalUser {
@@ -30,7 +30,6 @@ const mockUser: ApprovalUser = {
 const YaksaApprovalDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { showToast } = useToast();
   const { getUserById, approveUser, rejectUser } = useApproval();
   const [rejectionReason, setRejectionReason] = useState('');
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -43,7 +42,7 @@ const YaksaApprovalDetail: FC = () => {
     setLoading(true);
     approveUser(user.id);
     setLoading(false);
-    showToast({ type: 'success', message: '약사 회원이 승인되었습니다.' });
+    toast.success('약사 회원이 승인되었습니다.');
     navigate('/admin/approvals');
   };
 
@@ -52,7 +51,7 @@ const YaksaApprovalDetail: FC = () => {
     setLoading(true);
     rejectUser(user.id, rejectionReason);
     setLoading(false);
-    showToast({ type: 'error', message: '약사 회원이 거절되었습니다.' });
+    toast.error('약사 회원이 거절되었습니다.');
     setIsRejectModalOpen(false);
     navigate('/admin/approvals');
   };

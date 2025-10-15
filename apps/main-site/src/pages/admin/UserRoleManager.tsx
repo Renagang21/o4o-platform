@@ -1,6 +1,6 @@
 import { useState, useMemo, FC } from 'react';
 import { useUserRoleManager, UserRole } from './UserRoleManagerContext';
-import useToast from '../../hooks/useToast';
+import toast from 'react-hot-toast';
 import { logRoleChange } from '../../utils/logRoleChange';
 
 const roleLabels: Record<UserRole, string> = {
@@ -20,7 +20,6 @@ const ALL_ROLES: UserRole[] = [
 
 const UserRoleManager: FC = () => {
   const { users, changeRoles, filter, setFilter, search, setSearch, adminId } = useUserRoleManager();
-  const { showToast } = useToast();
   const [pendingRoles, setPendingRoles] = useState<{ [id: string]: UserRole[] }>({});
 
   // 필터/검색 적용된 사용자 목록
@@ -59,14 +58,14 @@ const UserRoleManager: FC = () => {
         // 역할 변경 이력 기록
         await logRoleChange(adminId, id, pendingRoles[id]);
         changeRoles(id, pendingRoles[id]);
-        showToast({ type: 'success', message: '역할이 변경되었습니다.' });
+        toast.success('역할이 변경되었습니다.');
         setPendingRoles((prev: any) => {
           const copy = { ...prev };
           delete copy[id];
           return copy;
         });
       } catch (e: any) {
-        showToast({ type: 'error', message: '서버 저장에 실패했습니다.' });
+        toast.error('서버 저장에 실패했습니다.');
       }
     }
   };

@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useToast from '../../hooks/useToast';
+import toast from 'react-hot-toast';
 import { apiClient as api } from '../../services/api';
 
 interface ApprovalUser {
@@ -15,7 +15,6 @@ interface ApprovalUser {
 
 const YaksaApprovalList: FC = () => {
   const navigate = useNavigate();
-  const { showToast } = useToast();
   const [users, setUsers] = useState<ApprovalUser[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,9 +39,9 @@ const YaksaApprovalList: FC = () => {
       setUsers(users.map((user: any) => 
         user.id === id ? { ...user, status: 'approved' } : user
       ));
-      showToast({ type: 'success', message: '약사 회원이 승인되었습니다.' });
+      toast.success('약사 회원이 승인되었습니다.');
     } catch (error) {
-      showToast({ type: 'error', message: '승인 처리 중 오류가 발생했습니다.' });
+      toast.error('승인 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -52,9 +51,9 @@ const YaksaApprovalList: FC = () => {
       setUsers(users.map((user: any) => 
         user.id === id ? { ...user, status: 'rejected' } : user
       ));
-      showToast({ type: 'error', message: '약사 회원이 거절되었습니다.' });
+      toast.error('약사 회원이 거절되었습니다.');
     } catch (error) {
-      showToast({ type: 'error', message: '거절 처리 중 오류가 발생했습니다.' });
+      toast.error('거절 처리 중 오류가 발생했습니다.');
     }
   };
 
