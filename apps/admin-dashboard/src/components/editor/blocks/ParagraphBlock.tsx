@@ -52,7 +52,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   } = attributes;
 
   const [localContent, setLocalContent] = useState(content);
-  const editorRef = useRef<HTMLDivElement>(null);
   const richApiRef = useRef<{ applyFormat: (format: string) => void } | null>(null);
 
   // Sync content
@@ -125,8 +124,19 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         />
       }
     >
-      <div
-        ref={editorRef}
+      <RichText
+        tagName="p"
+        value={localContent}
+        onChange={handleContentChange}
+        onSplit={handleSplit}
+        onRemove={handleRemove}
+        placeholder="Start writing or type / to choose a block"
+        allowedFormats={[
+          'core/bold',
+          'core/italic',
+          'core/link',
+        ]}
+        exposeApi={(api) => { richApiRef.current = api; }}
         className={cn(
           'paragraph-content min-h-[1.5em]',
           getAlignmentClass(),
@@ -137,22 +147,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           color: textColor || undefined,
           backgroundColor: backgroundColor || undefined,
         }}
-      >
-        <RichText
-          tagName="p"
-          value={localContent}
-          onChange={handleContentChange}
-          onSplit={handleSplit}
-          onRemove={handleRemove}
-          placeholder="Start writing or type / to choose a block"
-          allowedFormats={[
-            'core/bold',
-            'core/italic',
-            'core/link',
-          ]}
-          exposeApi={(api) => { richApiRef.current = api; }}
-        />
-      </div>
+      />
     </EnhancedBlockWrapper>
   );
 };
