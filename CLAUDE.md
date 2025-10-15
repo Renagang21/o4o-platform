@@ -161,5 +161,66 @@ VITE_API_URL=https://api.neture.co.kr/api/v1
 
 ---
 
-*최종 업데이트: 2025-10-13 16:02 KST*
-*상태: ✅ 하드코딩 경로 제거 완료*
+## 2025-10-15: 배포 문제 해결
+
+### 문제: GitHub Actions 자동 배포 실패
+**증상**:
+- 로컬 빌드: `index-Cd1csR2M.js` (2025-10-15 13:36)
+- 배포된 버전: `index-WRnrpVjp.js` (이전 버전)
+- 서버 디렉토리가 완전히 비어있음 (`/var/www/neture.co.kr/`)
+
+**원인**:
+- GitHub Actions workflow가 트리거되지 않음
+- 이전 수동 배포 시도가 디렉토리만 삭제하고 파일 복사 실패
+- 사용자 보고: `--frozen-lockfile` 이슈가 자주 발생
+
+**해결**:
+1. **긴급 수동 배포** (tarball 방식):
+   ```bash
+   # 로컬에서 tarball 생성
+   cd apps/main-site && tar czf /tmp/main-site-dist.tar.gz -C dist .
+
+   # 서버로 복사 및 배포
+   scp /tmp/main-site-dist.tar.gz o4o-web:/tmp/manual-deploy-main/
+   ssh o4o-web "cd /tmp/manual-deploy-main && tar xzf main-site-dist.tar.gz && \
+                sudo cp -r * /var/www/neture.co.kr/ && \
+                sudo chown -R www-data:www-data /var/www/neture.co.kr/ && \
+                sudo chmod -R 755 /var/www/neture.co.kr/"
+   ```
+
+2. **배포 확인**:
+   ```bash
+   # 서버 파일 확인
+   ssh o4o-web "cat /var/www/neture.co.kr/index.html | grep -o 'index-[^.]*\.js'"
+   # 결과: index-Cd1csR2M.js ✅
+
+   # 웹사이트 확인
+   curl -s https://neture.co.kr | grep -o 'index-[^.]*\.js'
+   # 결과: index-Cd1csR2M.js ✅
+   ```
+
+**진단 결과**:
+- YAML 문법: ✅ 정상
+- Workflow trigger paths: ✅ 정상 (apps/main-site/** 포함)
+- pnpm-lock.yaml: ✅ sync 상태 (로컬에서 `--frozen-lockfile` 성공)
+- Node 버전: ✅ 일치 (v22.18.0)
+- Repository secrets: ✅ 정상 (사용자 확인)
+
+**미해결 이슈**:
+- GitHub Actions가 왜 트리거되지 않는지 원인 불명
+- GitHub CLI 인증 없어 workflow run 로그 확인 불가
+- 수동 배포로 임시 해결, 자동 배포는 추가 조사 필요
+
+**참고 파일**:
+- 배포 스크립트: `scripts/deploy-manual.sh`
+- 배포 가이드: `DEPLOYMENT.md`
+- Workflow: `.github/workflows/deploy-main-site.yml`
+
+**커밋**:
+- `fix: Remove prose wrapper constraints for full-width block rendering` (1961d094)
+- `feat: Add workflow_dispatch trigger for manual deployment` (8a7ab1fa)
+
+---
+
+*최종 업데이트: 2025-10-15 17:55 KST*
+*상태: ✅ 수동 배포 완료 / ⚠️ GitHub Actions 자동 배포 원인 조사 중*
