@@ -206,7 +206,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 
       {/* Block toolbar - integrated design with better positioning */}
       {showToolbar && isSelected && (
-        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2 -top-20">
+        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2 mb-4" style={{ top: '-100px' }}>
           <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full">
             {/* Drag handle - now in toolbar */}
             <div

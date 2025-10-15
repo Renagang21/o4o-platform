@@ -476,13 +476,8 @@ export const RichText: FC<RichTextProps> = ({
 
   // For specific tags that need special handling
   const EditorElement = () => {
-    if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' ||
-        tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
-      return React.createElement(tagName, commonProps);
-    }
-
-    // For p, div, figcaption, and other simple elements
-    return <div {...commonProps} />;
+    // Always use the specified tagName
+    return React.createElement(tagName || 'div', commonProps);
   };
 
   return (
