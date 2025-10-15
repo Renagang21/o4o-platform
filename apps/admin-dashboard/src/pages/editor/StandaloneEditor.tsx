@@ -44,6 +44,9 @@ import {
 import toast from 'react-hot-toast';
 import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
+import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
+import { ViewportSwitcher } from '@/components/editor/ViewportSwitcher';
+import { Monitor, MonitorOff } from 'lucide-react';
 
 interface StandaloneEditorProps {
   mode?: 'post' | 'page' | 'template' | 'pattern';
@@ -70,7 +73,29 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  
+
+  // Viewport mode hook for editor width control
+  const { viewportMode, currentConfig, switchViewport, containerSettings } = useCustomizerSettings();
+
+  // Theme preview mode state (applies theme width to editor canvas)
+  const [isThemePreviewMode, setIsThemePreviewMode] = useState(() => {
+    try {
+      const stored = localStorage.getItem('editor-theme-preview-mode');
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Save theme preview mode to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('editor-theme-preview-mode', String(isThemePreviewMode));
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, [isThemePreviewMode]);
+
   // Simple and reliable check for new post
   const isNewPost = !currentPostId;
   
@@ -804,6 +829,43 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </TooltipProvider>
           )}
 
+          {/* Viewport Switcher - 모바일에서 숨김 */}
+          {!isMobile && (
+            <ViewportSwitcher
+              currentMode={viewportMode}
+              onModeChange={switchViewport}
+              containerWidth={containerSettings.width}
+            />
+          )}
+
+          {/* Theme Preview Mode Toggle - 모바일에서 숨김 */}
+          {!isMobile && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "h-9 w-9",
+                      isThemePreviewMode && "bg-blue-100 text-blue-600"
+                    )}
+                    onClick={() => setIsThemePreviewMode(!isThemePreviewMode)}
+                  >
+                    {isThemePreviewMode ? (
+                      <Monitor className="h-4 w-4" />
+                    ) : (
+                      <MonitorOff className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isThemePreviewMode ? 'Disable' : 'Enable'} theme width preview</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           {/* Preview Toggle - 모바일에서 숨김 */}
           {!isMobile && (
             <TooltipProvider>
@@ -938,9 +1000,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       <div className="flex-1 flex overflow-hidden">
         {/* Editor Canvas */}
         <div className={cn(
-          "flex-1 overflow-auto bg-gray-50"
+          "flex-1 overflow-auto bg-gray-50 transition-all duration-300",
+          isThemePreviewMode && "flex items-start justify-center pt-8"
         )}>
-          <div className="min-h-full">
+          <div
+            className={cn(
+              "min-h-full",
+              isThemePreviewMode && "bg-white shadow-xl"
+            )}
+            style={isThemePreviewMode ? {
+              width: `${currentConfig.width}px`,
+              maxWidth: '100%',
+              transition: 'width 0.3s ease-out'
+            } : undefined}
+          >
             <GutenbergBlockEditor
               documentTitle={postTitle || ''}
               initialBlocks={blocks}
