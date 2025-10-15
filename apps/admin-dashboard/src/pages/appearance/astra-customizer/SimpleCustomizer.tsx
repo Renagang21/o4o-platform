@@ -522,7 +522,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                 </div>
                 <div className="h-[calc(100%-44px)] overflow-y-auto">
                   <HeaderBuilder
-                    layout={settings.header.layout}
+                    layout={settings.header.layout as any}
                     onChange={(newLayout) => {
                       updateSetting('header', { ...settings.header, layout: newLayout });
                     }}
