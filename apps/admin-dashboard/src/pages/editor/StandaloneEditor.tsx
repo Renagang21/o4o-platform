@@ -12,7 +12,9 @@ import {
   Redo2,
   Plus,
   List,
-  Info
+  Info,
+  Monitor,
+  MonitorOff
 } from 'lucide-react';
 import type { Post } from '@/types/post.types';
 import { Button } from '@/components/ui/button';
@@ -75,7 +77,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
 
   // Viewport mode hook for editor width control
   const { viewportMode, currentConfig, switchViewport, containerSettings } = useCustomizerSettings();
-  
+
+  // Theme preview mode toggle (Astra-style feature)
+  const [isThemePreviewMode, setIsThemePreviewMode] = useState(() => {
+    try {
+      const stored = localStorage.getItem('editor-theme-preview-mode');
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Save theme preview mode to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('editor-theme-preview-mode', String(isThemePreviewMode));
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, [isThemePreviewMode]);
+
   // Simple and reliable check for new post
   const isNewPost = !currentPostId;
   
@@ -816,6 +837,38 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               onModeChange={switchViewport}
               containerWidth={containerSettings.width}
             />
+          )}
+
+          {/* Theme Preview Mode Toggle - Astra-style feature */}
+          {!isMobile && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={isThemePreviewMode ? "default" : "ghost"}
+                    size="icon"
+                    className={cn(
+                      "h-9 w-9",
+                      isThemePreviewMode && "bg-blue-600 hover:bg-blue-700 text-white"
+                    )}
+                    onClick={() => setIsThemePreviewMode(!isThemePreviewMode)}
+                  >
+                    {isThemePreviewMode ? (
+                      <Monitor className="h-4 w-4" />
+                    ) : (
+                      <MonitorOff className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {isThemePreviewMode
+                      ? `테마 폭 적용 중 (${currentConfig.width}px)`
+                      : '테마 설정 적용하기'}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
 
           {/* Preview Toggle - 모바일에서 숨김 */}

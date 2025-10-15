@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
@@ -18,6 +18,7 @@ import { FooterSection } from './sections/footer/FooterSection';
 import { GeneralSection } from './sections/general/GeneralSection';
 import { BlogSection } from './sections/blog/BlogSection';
 import { CustomizerProvider } from './context/CustomizerContext';
+import { HeaderBuilder } from './components/HeaderBuilder';
 
 import './styles/controls.css';
 import './styles/sections.css';
@@ -46,9 +47,19 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   const [isDirty, setIsDirty] = useState(false);
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
-  
+  const [showHeaderBuilderOverlay, setShowHeaderBuilderOverlay] = useState(false);
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const cssUpdateTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Auto-show header builder overlay when header section is active
+  useEffect(() => {
+    if (activeSection === 'header') {
+      setShowHeaderBuilderOverlay(true);
+    } else {
+      setShowHeaderBuilderOverlay(false);
+    }
+  }, [activeSection]);
 
   // Simple setting update
   const updateSetting = useCallback((section: keyof AstraCustomizerSettings, value: any, path?: string[]) => {
@@ -396,7 +407,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         {/* Preview Panel */}
         <div className="flex-1 flex flex-col">
           {/* Device Controls */}
-          <div className="flex items-center justify-center p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
               {(['desktop', 'tablet', 'mobile'] as const).map((device) => (
                 <button
@@ -414,11 +425,31 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                 </button>
               ))}
             </div>
+
+            {/* Header Builder Toggle - Only show when header section is active */}
+            {activeSection === 'header' && (
+              <button
+                onClick={() => setShowHeaderBuilderOverlay(!showHeaderBuilderOverlay)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  showHeaderBuilderOverlay
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <span>🔝</span>
+                <span>헤더 빌더</span>
+                {showHeaderBuilderOverlay ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronUp size={16} />
+                )}
+              </button>
+            )}
           </div>
 
           {/* Preview Frame */}
-          <div className="flex-1 flex items-center justify-center bg-gray-50 p-4">
-            <div 
+          <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 relative">
+            <div
               className="bg-white shadow-lg"
               style={{
                 width: deviceSizes[previewDevice].width,
@@ -435,6 +466,41 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                 title={`${siteName} Preview`}
               />
             </div>
+
+            {/* Header Builder Overlay - Astra Style */}
+            {showHeaderBuilderOverlay && (
+              <div className="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 shadow-2xl"
+                style={{
+                  maxHeight: '500px',
+                  height: '450px',
+                  transition: 'transform 0.3s ease-out',
+                  transform: showHeaderBuilderOverlay ? 'translateY(0)' : 'translateY(100%)'
+                }}
+              >
+                <div className="flex items-center justify-between px-4 py-2 bg-gray-100 border-b">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <span>🔝</span>
+                    헤더 빌더 - 모듈을 추가하거나 제거하세요
+                  </h3>
+                  <button
+                    onClick={() => setShowHeaderBuilderOverlay(false)}
+                    className="p-1 hover:bg-gray-200 rounded"
+                    title="빌더 닫기"
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
+                <div className="h-[calc(100%-44px)] overflow-y-auto">
+                  <HeaderBuilder
+                    layout={settings.header.layout}
+                    onChange={(newLayout) => {
+                      updateSetting('header', { ...settings.header, layout: newLayout });
+                    }}
+                    device={previewDevice}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
