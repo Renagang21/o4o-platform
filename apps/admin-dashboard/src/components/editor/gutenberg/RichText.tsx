@@ -123,6 +123,13 @@ export const RichText: FC<RichTextProps> = ({
     if (!selection || selection.rangeCount === 0) return;
 
     const range = selection.getRangeAt(0);
+
+    // 선택된 텍스트가 없으면 무시
+    if (range.collapsed) {
+      console.warn('LinkPopover: No text selected');
+      return;
+    }
+
     savedRangeRef.current = range.cloneRange();
 
     // 기존 링크 확인
@@ -137,13 +144,14 @@ export const RichText: FC<RichTextProps> = ({
       setCurrentLinkOpenInNewTab(false);
     }
 
-    // 팝업 위치 계산
+    // 팝업 위치 계산 (fixed positioning)
     const rect = range.getBoundingClientRect();
     setLinkPopoverPosition({
-      top: rect.bottom + window.scrollY + 5,
-      left: rect.left + window.scrollX,
+      top: rect.bottom + 5,
+      left: rect.left,
     });
 
+    console.log('LinkPopover opened at:', { top: rect.bottom + 5, left: rect.left });
     setShowLinkPopover(true);
   };
 

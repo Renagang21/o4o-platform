@@ -38,11 +38,14 @@ export const LinkPopover: FC<LinkPopoverProps> = ({
 
   // Auto-focus input on mount
   useEffect(() => {
-    inputRef.current?.focus();
-    inputRef.current?.select();
+    // Delay to ensure popover is rendered
+    setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 100);
   }, []);
 
-  // Close on outside click
+  // Close on outside click (delayed to prevent immediate close)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
@@ -50,8 +53,15 @@ export const LinkPopover: FC<LinkPopoverProps> = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    // Delay listener to prevent closing on the same click that opened the popover
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 200);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [onClose]);
 
   // URL validation
@@ -110,12 +120,16 @@ export const LinkPopover: FC<LinkPopoverProps> = ({
       ref={popoverRef}
       className={cn(
         'link-popover',
-        'absolute z-50 w-80',
-        'bg-white border border-gray-200 rounded-lg shadow-lg',
+        'fixed z-[9999] w-80',
+        'bg-white border border-gray-200 rounded-lg shadow-xl',
         'p-4',
         className
       )}
-      style={position ? { top: position.top, left: position.left } : undefined}
+      style={position ? {
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        maxWidth: 'calc(100vw - 40px)' // Prevent overflow
+      } : undefined}
     >
       <div className="space-y-3">
         {/* URL Input */}
