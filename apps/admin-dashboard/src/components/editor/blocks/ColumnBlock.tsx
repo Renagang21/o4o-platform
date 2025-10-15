@@ -80,7 +80,7 @@ const ColumnBlock: React.FC<ColumnBlockProps> = ({
       onMoveDown={onMoveDown || (() => {})}
       onAddBlock={onAddBlock}
       className="wp-block-column"
-      customToolbarButtons={(
+      customToolbarContent={(
         <>
           {/* Width indicator */}
           <div className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 bg-gray-50 rounded">

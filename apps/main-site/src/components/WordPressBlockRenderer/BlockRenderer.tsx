@@ -24,6 +24,7 @@ import { SpacerBlock } from './blocks/SpacerBlock';
 import { MoreBlock } from './blocks/MoreBlock';
 import { EmbedBlock } from './blocks/EmbedBlock';
 import { ReusableBlockRenderer } from './blocks/ReusableBlockRenderer';
+import { MarkdownReaderBlock } from './blocks/MarkdownReaderBlock';
 
 interface BlockRendererProps {
   block: MainSiteBlock;
@@ -91,7 +92,11 @@ export const BlockRenderer: FC<BlockRendererProps> = ({ block }) => {
     // Reusable blocks
     case 'reusable-block':
       return <ReusableBlockRenderer block={block} />;
-    
+
+    // Custom blocks
+    case 'o4o/markdown-reader':
+      return <MarkdownReaderBlock block={block} />;
+
     // Unknown block fallback
     case 'unknown':
     default:

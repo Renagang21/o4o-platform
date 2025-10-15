@@ -141,7 +141,7 @@ const GroupBlock: React.FC<GroupBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-group"
-      customToolbarButtons={(
+      customToolbarContent={(
         <>
           {/* Layout switcher */}
           <button

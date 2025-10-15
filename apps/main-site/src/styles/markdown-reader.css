@@ -5,6 +5,12 @@
   min-height: 200px;
 }
 
+/* WordPress Block Renderer compatibility */
+.wp-block-markdown-reader {
+  width: 100%;
+  /* No layout constraints - follows Gutenberg standards */
+}
+
 /* Loading and Error States */
 .markdown-loading {
   display: flex;
@@ -47,12 +53,19 @@
 }
 
 /* GitHub Theme (Default) */
+.markdown-theme-github,
 .markdown-theme-github .markdown-rendered-content {
   color: #24292e;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   line-height: 1.6;
 }
 
+.markdown-theme-github h1,
+.markdown-theme-github h2,
+.markdown-theme-github h3,
+.markdown-theme-github h4,
+.markdown-theme-github h5,
+.markdown-theme-github h6,
 .markdown-theme-github .markdown-rendered-content h1,
 .markdown-theme-github .markdown-rendered-content h2,
 .markdown-theme-github .markdown-rendered-content h3,
@@ -65,62 +78,76 @@
   line-height: 1.25;
 }
 
+.markdown-theme-github h1,
 .markdown-theme-github .markdown-rendered-content h1 {
   font-size: 2em;
   border-bottom: 1px solid #e1e4e8;
   padding-bottom: 0.3em;
 }
 
+.markdown-theme-github h2,
 .markdown-theme-github .markdown-rendered-content h2 {
   font-size: 1.5em;
   border-bottom: 1px solid #e1e4e8;
   padding-bottom: 0.3em;
 }
 
+.markdown-theme-github h3,
 .markdown-theme-github .markdown-rendered-content h3 {
   font-size: 1.25em;
 }
 
+.markdown-theme-github h4,
 .markdown-theme-github .markdown-rendered-content h4 {
   font-size: 1em;
 }
 
+.markdown-theme-github h5,
 .markdown-theme-github .markdown-rendered-content h5 {
   font-size: 0.875em;
 }
 
+.markdown-theme-github h6,
 .markdown-theme-github .markdown-rendered-content h6 {
   font-size: 0.85em;
   color: #6a737d;
 }
 
+.markdown-theme-github p,
 .markdown-theme-github .markdown-rendered-content p {
   margin-top: 0;
   margin-bottom: 16px;
 }
 
+.markdown-theme-github a,
 .markdown-theme-github .markdown-rendered-content a {
   color: #0366d6;
   text-decoration: none;
 }
 
+.markdown-theme-github a:hover,
 .markdown-theme-github .markdown-rendered-content a:hover {
   text-decoration: underline;
 }
 
+.markdown-theme-github strong,
 .markdown-theme-github .markdown-rendered-content strong {
   font-weight: 600;
 }
 
+.markdown-theme-github em,
 .markdown-theme-github .markdown-rendered-content em {
   font-style: italic;
 }
 
+.markdown-theme-github del,
 .markdown-theme-github .markdown-rendered-content del {
   text-decoration: line-through;
   color: #6a737d;
 }
 
+.markdown-theme-github ul,
+.markdown-theme-github ol,
 .markdown-theme-github .markdown-rendered-content ul,
 .markdown-theme-github .markdown-rendered-content ol {
   margin-top: 0;
@@ -128,6 +155,10 @@
   padding-left: 2em;
 }
 
+.markdown-theme-github ul ul,
+.markdown-theme-github ul ol,
+.markdown-theme-github ol ul,
+.markdown-theme-github ol ol,
 .markdown-theme-github .markdown-rendered-content ul ul,
 .markdown-theme-github .markdown-rendered-content ul ol,
 .markdown-theme-github .markdown-rendered-content ol ul,
@@ -135,14 +166,17 @@
   margin-bottom: 0;
 }
 
+.markdown-theme-github li,
 .markdown-theme-github .markdown-rendered-content li {
   margin-bottom: 0.25em;
 }
 
+.markdown-theme-github li > p,
 .markdown-theme-github .markdown-rendered-content li > p {
   margin-bottom: 0.25em;
 }
 
+.markdown-theme-github blockquote,
 .markdown-theme-github .markdown-rendered-content blockquote {
   margin: 0;
   margin-bottom: 16px;
@@ -151,14 +185,17 @@
   border-left: 0.25em solid #dfe2e5;
 }
 
+.markdown-theme-github blockquote > :first-child,
 .markdown-theme-github .markdown-rendered-content blockquote > :first-child {
   margin-top: 0;
 }
 
+.markdown-theme-github blockquote > :last-child,
 .markdown-theme-github .markdown-rendered-content blockquote > :last-child {
   margin-bottom: 0;
 }
 
+.markdown-theme-github hr,
 .markdown-theme-github .markdown-rendered-content hr {
   height: 0.25em;
   padding: 0;
@@ -167,6 +204,7 @@
   border: 0;
 }
 
+.markdown-theme-github code,
 .markdown-theme-github .markdown-rendered-content code {
   padding: 0.2em 0.4em;
   margin: 0;
@@ -176,6 +214,7 @@
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
+.markdown-theme-github pre,
 .markdown-theme-github .markdown-rendered-content pre {
   margin-top: 0;
   margin-bottom: 16px;
@@ -187,6 +226,7 @@
   border-radius: 6px;
 }
 
+.markdown-theme-github pre code,
 .markdown-theme-github .markdown-rendered-content pre code {
   display: inline;
   max-width: auto;
@@ -199,6 +239,7 @@
   border: 0;
 }
 
+.markdown-theme-github img,
 .markdown-theme-github .markdown-rendered-content img {
   max-width: 100%;
   height: auto;

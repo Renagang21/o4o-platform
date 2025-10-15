@@ -115,7 +115,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      customToolbarButtons={(
+      customToolbarContent={(
         <>
           {/* Text Alignment */}
           <button

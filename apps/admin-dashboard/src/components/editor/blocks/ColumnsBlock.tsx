@@ -110,7 +110,7 @@ const ColumnsBlock: React.FC<ColumnsBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block wp-block-columns"
-      customToolbarButtons={(
+      customToolbarContent={(
         <>
           {/* Vertical Alignment */}
           <button
