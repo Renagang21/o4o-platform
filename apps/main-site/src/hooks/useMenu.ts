@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getPageContext } from '../utils/context-detector';
 import { useLocation } from 'react-router';
-import { API_URLS } from '../config/api';
+import { apiClient } from '../services/api';
 
 interface MenuItem {
   id: string;
@@ -67,30 +67,22 @@ export function useMenu(options: UseMenuOptions): UseMenuResult {
   const query = useQuery({
     queryKey: ['menu', location, finalSubdomain, finalPath],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const params: Record<string, string> = {};
 
       if (finalSubdomain) {
-        params.set('subdomain', finalSubdomain);
+        params.subdomain = finalSubdomain;
       }
       if (finalPath) {
-        params.set('path', finalPath);
+        params.path = finalPath;
       }
 
-      const url = `${API_URLS.V1}/menus/location/${location}${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await apiClient.get(`/menus/location/${location}`, { params });
 
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch menu: ${response.statusText}`);
+      if (!response.data?.success || !response.data?.data) {
+        throw new Error(response.data?.message || 'Failed to fetch menu');
       }
 
-      const result = await response.json();
-
-      if (!result.success || !result.data) {
-        throw new Error(result.message || 'Failed to fetch menu');
-      }
-
-      return result.data as MenuData;
+      return response.data.data as MenuData;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)

@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { BreadcrumbsSettings } from '@/types/customizer-types';
-import { API_URLS } from '../config/api';
+import { apiClient } from '../services/api';
 
 // Default breadcrumbs settings
 const defaultSettings: BreadcrumbsSettings = {
@@ -40,23 +40,17 @@ export const useBreadcrumbsSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const response = await fetch(`${API_URLS.V1}/customizer/breadcrumbs-settings`);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch breadcrumbs settings');
-        }
-
-        const result = await response.json();
+        const response = await apiClient.get('/customizer/breadcrumbs-settings');
 
         // Extract data from API response (format: { success: true, data: {...} })
-        if (!result.success || !result.data) {
+        if (!response.data?.success || !response.data?.data) {
           throw new Error('Invalid API response format');
         }
 
         // Merge with defaults to ensure all properties exist
         setSettings({
           ...defaultSettings,
-          ...result.data
+          ...response.data.data
         });
       } catch (err) {
         console.error('Error fetching breadcrumbs settings:', err);

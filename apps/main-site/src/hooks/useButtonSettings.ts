@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { ButtonVariants, ButtonStyleSettings } from '@/types/customizer-types';
-import { API_URLS } from '../config/api';
+import { apiClient } from '../services/api';
 
 // Default button style
 const defaultButtonStyle: ButtonStyleSettings = {
@@ -68,20 +68,14 @@ export const useButtonSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const response = await fetch(`${API_URLS.V1}/customizer/button-settings`);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch button settings');
-        }
-
-        const result = await response.json();
+        const response = await apiClient.get('/customizer/button-settings');
 
         // Extract data from API response (format: { success: true, data: {...} })
-        if (!result.success || !result.data) {
+        if (!response.data?.success || !response.data?.data) {
           throw new Error('Invalid API response format');
         }
 
-        const data = result.data;
+        const data = response.data.data;
 
         // Merge with defaults to ensure all properties exist
         const mergedSettings: ButtonVariants = {

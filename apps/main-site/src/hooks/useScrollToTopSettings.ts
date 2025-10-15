@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { API_URLS } from '../config/api';
+import { apiClient } from '../services/api';
 
 interface ScrollToTopSettings {
   enabled: boolean;
@@ -31,22 +31,15 @@ export const useScrollToTopSettings = () => {
     const fetchSettings = async () => {
       try {
         // Get settings from new API endpoint
-        const response = await fetch(`${API_URLS.V1}/customizer/scroll-to-top`);
+        const response = await apiClient.get('/customizer/scroll-to-top');
 
-        if (response.ok) {
-          const result = await response.json();
-
-          // Extract data from API response (format: { success: true, data: {...} })
-          if (result.success && result.data) {
-            setSettings({
-              ...defaultSettings,
-              ...result.data
-            });
-          } else {
-            setSettings(defaultSettings);
-          }
+        // Extract data from API response (format: { success: true, data: {...} })
+        if (response.data?.success && response.data?.data) {
+          setSettings({
+            ...defaultSettings,
+            ...response.data.data
+          });
         } else {
-          // API error - use default settings
           setSettings(defaultSettings);
         }
       } catch (error) {
