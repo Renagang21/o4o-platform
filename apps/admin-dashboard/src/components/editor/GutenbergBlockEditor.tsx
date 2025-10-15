@@ -67,6 +67,8 @@ interface GutenbergBlockEditorProps {
   onPostSettingsChange?: (settings: Partial<PostSettings>) => void;
   mode?: 'post' | 'page' | 'template' | 'pattern';
   hideHeader?: boolean; // Hide header when embedded in another editor
+  // Skip restoring previous local session (used when editing an existing post)
+  disableSessionRestore?: boolean;
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
@@ -81,6 +83,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onPostSettingsChange,
   mode = 'post',
   hideHeader = false,
+  disableSessionRestore = false,
 }) => {
   // Initialize with empty state
   // Don't create any blocks automatically - user should add blocks manually
@@ -107,7 +110,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Session restoration on mount
   useEffect(() => {
-    if (sessionRestored || initialBlocks.length > 0) return;
+    if (disableSessionRestore || sessionRestored || initialBlocks.length > 0) return;
 
     const storedSession = loadEditorSession();
     if (storedSession && storedSession.history.length > 0) {
@@ -119,7 +122,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSessionRestored(true);
       showToast('편집 내역이 복원되었습니다', 'info');
     }
-  }, [sessionRestored, initialBlocks.length]);
+  }, [disableSessionRestore, sessionRestored, initialBlocks.length]);
 
   // Sync blocks with initialBlocks prop changes
   useEffect(() => {

@@ -28,6 +28,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
+import { clearEditorSession } from '@/utils/history-manager';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import MediaListWordPress from '@/pages/media/MediaListWordPress';
 import ContentTemplates from '@/components/editor/ContentTemplates';
@@ -319,6 +320,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         
         // Load post data if editing existing post
         if (currentPostId && !isNewPost) {
+          // Prevent GutenbergBlockEditor from restoring previous session
+          // which may belong to a different post
+          try { clearEditorSession(); } catch {}
           await loadPostData(currentPostId);
         } else {
           // Reset states for new post
@@ -1066,6 +1070,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               slug={postSettings.slug || ''}
               postSettings={postSettings}
               mode={mode}
+              // Disable session restoration when editing an existing post
+              disableSessionRestore={Boolean(currentPostId)}
               hideHeader={true}
               onPostSettingsChange={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
