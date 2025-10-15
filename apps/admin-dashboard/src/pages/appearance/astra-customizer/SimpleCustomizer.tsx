@@ -17,6 +17,7 @@ import { HeaderLayoutSection } from './sections/header/HeaderLayoutSection';
 import { FooterSection } from './sections/footer/FooterSection';
 import { GeneralSection } from './sections/general/GeneralSection';
 import { BlogSection } from './sections/blog/BlogSection';
+import { CustomCSSSection } from './sections/advanced/CustomCSSSection';
 import { CustomizerProvider } from './context/CustomizerContext';
 import { HeaderBuilder } from './components/HeaderBuilder';
 import { FooterBuilder } from './components/FooterBuilder';
@@ -235,6 +236,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     { key: 'header', label: '헤더', icon: '🔝' },
     { key: 'footer', label: '푸터', icon: '🔻' },
     { key: 'blog', label: '블로그', icon: '📰' },
+    { key: 'customCSS', label: 'Custom CSS', icon: '💅' },
     { key: 'general', label: '일반 설정', icon: '⚙️' },
   ] as const;
 
@@ -273,6 +275,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         case 'header': return <HeaderLayoutSection />;
         case 'footer': return <FooterSection />;
         case 'blog': return <BlogSection />;
+        case 'customCSS': return <CustomCSSSection />;
         case 'general': return <GeneralSection />;
         default: return <div className="p-6">섹션을 찾을 수 없습니다.</div>;
       }
