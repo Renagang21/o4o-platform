@@ -151,7 +151,6 @@ export const RichText: FC<RichTextProps> = ({
       left: rect.left,
     });
 
-    console.log('LinkPopover opened at:', { top: rect.bottom + 5, left: rect.left });
     setShowLinkPopover(true);
   };
 
