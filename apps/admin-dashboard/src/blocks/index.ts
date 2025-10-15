@@ -179,7 +179,7 @@ export function initializeCustomBlocks() {
 
 // Export block names for use in allowed blocks lists
 export const CUSTOM_BLOCKS = [
-  'core/group',
-  'core/columns',
+  'o4o/group',
+  'o4o/columns',
   'o4o/conditional'
 ];

@@ -145,7 +145,7 @@ export const InnerBlocks: React.FC<InnerBlocksProps> = ({
     const newBlock: Block = {
       id: `block-${Date.now()}`,
       clientId: `client-${Date.now()}`,
-      type: 'core/paragraph',
+      type: 'o4o/paragraph',
       content: { text: '' },
       attributes: {},
     };

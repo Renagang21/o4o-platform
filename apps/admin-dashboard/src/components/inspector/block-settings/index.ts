@@ -22,11 +22,11 @@ export type BlockSettingsComponent = React.FC<BlockSettingsProps>;
  * Registry mapping block types to their settings components
  */
 export const blockSettingsRegistry: Record<string, BlockSettingsComponent> = {
-  'core/paragraph': ParagraphSettings,
-  'core/heading': HeadingSettings,
-  'core/image': ImageSettings,
-  'core/button': ButtonSettings,
-  'core/list': ListSettings,
+  'o4o/paragraph': ParagraphSettings,
+  'o4o/heading': HeadingSettings,
+  'o4o/image': ImageSettings,
+  'o4o/button': ButtonSettings,
+  'o4o/list': ListSettings,
 };
 
 /**

@@ -297,11 +297,11 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     
     if (blockTypes.includes('core/navigation') || blockTypes.includes('core/site-logo')) {
       category = 'header';
-    } else if (blockTypes.includes('core/heading') && blockTypes.includes('core/buttons')) {
+    } else if (blockTypes.includes('o4o/heading') && blockTypes.includes('o4o/buttons')) {
       category = 'hero';
-    } else if (blockTypes.includes('core/columns') && blockTypes.length > 3) {
+    } else if (blockTypes.includes('o4o/columns') && blockTypes.length > 3) {
       category = 'features';
-    } else if (blockTypes.includes('core/quote') || blockTypes.includes('core/testimonial')) {
+    } else if (blockTypes.includes('o4o/quote') || blockTypes.includes('o4o/testimonial')) {
       category = 'testimonials';
     }
 

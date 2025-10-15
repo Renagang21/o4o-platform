@@ -319,9 +319,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     const { type, content, attributes } = block;
 
     // Handle different block types
-    if (type === 'core/paragraph') {
+    if (type === 'o4o/paragraph') {
       return `<p class="block-paragraph">${content?.text || ''}</p>`;
-    } else if (type === 'core/heading') {
+    } else if (type === 'o4o/heading') {
       const level = content?.level || 2;
       return `<h${level} class="block-heading">${content?.text || ''}</h${level}>`;
     } else if (type === 'core/image') {
@@ -334,7 +334,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       return `<blockquote class="block-quote"><p>${content?.text || ''}</p><cite>${content?.citation || ''}</cite></blockquote>`;
     } else if (type === 'core/code') {
       return `<pre class="block-code"><code>${content?.code || ''}</code></pre>`;
-    } else if (type === 'core/button') {
+    } else if (type === 'o4o/button') {
       return `<a href="${content?.url || '#'}" class="block-button">${content?.text || 'Button'}</a>`;
     }
 
@@ -390,7 +390,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     if (tagName === 'p' || className.includes('block-paragraph')) {
       return {
         id: `block-${Date.now()}`,
-        type: 'core/paragraph',
+        type: 'o4o/paragraph',
         content: { text: element.textContent || '' },
         attributes: {}
       };
@@ -398,7 +398,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       const level = parseInt(tagName.charAt(1)) || 2;
       return {
         id: `block-${Date.now()}`,
-        type: 'core/heading',
+        type: 'o4o/heading',
         content: { text: element.textContent || '', level },
         attributes: {}
       };
@@ -440,7 +440,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     // Fallback to paragraph
     return {
       id: `block-${Date.now()}`,
-      type: 'core/paragraph',
+      type: 'o4o/paragraph',
       content: { text: element.textContent || '' },
       attributes: {}
     };
@@ -499,7 +499,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             // Not JSON, create as paragraph
             newBlock = {
               id: `block-${Date.now()}`,
-              type: 'core/paragraph',
+              type: 'o4o/paragraph',
               content: { text },
               attributes: {}
             };
@@ -561,7 +561,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Handle add block at position
   const handleAddBlock = useCallback(
-    (blockId: string, position: 'before' | 'after', blockType = 'core/paragraph') => {
+    (blockId: string, position: 'before' | 'after', blockType = 'o4o/paragraph') => {
       const index = blocks.findIndex((b) => b.id === blockId);
       const newBlock: Block = {
         id: `block-${Date.now()}`,
@@ -910,19 +910,19 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         if (block.id === blockId) {
           // Convert heading types
           if (newType.startsWith('core/heading-')) {
-            const level = parseInt(newType.replace('core/heading-h', ''));
+            const level = parseInt(newType.replace('o4o/heading-h', ''));
             return {
               ...block,
-              type: 'core/heading',
+              type: 'o4o/heading',
               content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '', level },
               attributes: block.attributes || {},
             };
           }
           // Convert to paragraph
-          if (newType === 'core/paragraph') {
+          if (newType === 'o4o/paragraph') {
             return {
               ...block,
-              type: 'core/paragraph',
+              type: 'o4o/paragraph',
               content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '' },
               attributes: block.attributes || {},
             };
@@ -1023,7 +1023,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
             const newBlock: Block = {
               id: `block-${Date.now()}`,
-              type: 'core/paragraph',
+              type: 'o4o/paragraph',
               content: { text: '' },
               attributes: {},
             };
@@ -1062,23 +1062,23 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
 
                 // Smart behavior based on block type
-                let newBlockType = 'core/paragraph';
+                let newBlockType = 'o4o/paragraph';
 
                 // Heading → always Paragraph
-                if (block.type === 'core/heading') {
-                  newBlockType = 'core/paragraph';
+                if (block.type === 'o4o/heading') {
+                  newBlockType = 'o4o/paragraph';
                 }
                 // Quote → always Paragraph
                 else if (block.type === 'core/quote') {
-                  newBlockType = 'core/paragraph';
+                  newBlockType = 'o4o/paragraph';
                 }
                 // List → exit list (create Paragraph)
                 else if (block.type === 'core/list') {
-                  newBlockType = 'core/paragraph';
+                  newBlockType = 'o4o/paragraph';
                 }
                 // Other blocks → Paragraph
                 else {
-                  newBlockType = 'core/paragraph';
+                  newBlockType = 'o4o/paragraph';
                 }
 
                 const newBlock: Block = {
@@ -1112,7 +1112,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
               const newBlock: Block = {
                 id: `block-${Date.now()}`,
-                type: 'core/paragraph',
+                type: 'o4o/paragraph',
                 content: { text: '' },
                 attributes: {},
               };
@@ -1280,21 +1280,21 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         e.preventDefault();
         if (selectedBlockId) {
           const block = blocks.find(b => b.id === selectedBlockId);
-          if (block && (block.type === 'core/paragraph' || block.type === 'core/heading')) {
+          if (block && (block.type === 'o4o/paragraph' || block.type === 'o4o/heading')) {
             // Cycle through: paragraph → h2 → h3 → h4 → paragraph
-            if (block.type === 'core/paragraph') {
-              handleBlockTypeChange(selectedBlockId, 'core/heading-h2');
+            if (block.type === 'o4o/paragraph') {
+              handleBlockTypeChange(selectedBlockId, 'o4o/heading-h2');
               showToast('Changed to Heading 2', 'success');
-            } else if (block.type === 'core/heading') {
+            } else if (block.type === 'o4o/heading') {
               const level = (block.content as any)?.level || 2;
               if (level === 2) {
-                handleBlockTypeChange(selectedBlockId, 'core/heading-h3');
+                handleBlockTypeChange(selectedBlockId, 'o4o/heading-h3');
                 showToast('Changed to Heading 3', 'success');
               } else if (level === 3) {
-                handleBlockTypeChange(selectedBlockId, 'core/heading-h4');
+                handleBlockTypeChange(selectedBlockId, 'o4o/heading-h4');
                 showToast('Changed to Heading 4', 'success');
               } else {
-                handleBlockTypeChange(selectedBlockId, 'core/paragraph');
+                handleBlockTypeChange(selectedBlockId, 'o4o/paragraph');
                 showToast('Changed to Paragraph', 'success');
               }
             }

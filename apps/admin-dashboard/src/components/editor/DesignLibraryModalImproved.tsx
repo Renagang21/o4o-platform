@@ -80,19 +80,19 @@ const templateCategories: TemplateCategory[] = [
         blocks: [
           {
             id: 'block-1',
-            type: 'core/paragraph',
+            type: 'o4o/paragraph',
             content: { text: '여기에 글의 도입부를 작성하세요. 독자의 관심을 끌 수 있는 내용으로 시작하는 것이 좋습니다.' },
             attributes: { align: 'left' },
           },
           {
             id: 'block-2',
-            type: 'core/heading',
+            type: 'o4o/heading',
             content: { text: '주요 내용', level: 2 },
             attributes: { level: 2 },
           },
           {
             id: 'block-3',
-            type: 'core/paragraph',
+            type: 'o4o/paragraph',
             content: { text: '본문의 핵심 내용을 여기에 작성하세요. 구체적인 정보와 예시를 포함하면 더욱 효과적입니다.' },
             attributes: { align: 'left' },
           },
@@ -111,13 +111,13 @@ const templateCategories: TemplateCategory[] = [
         blocks: [
           {
             id: 'block-1',
-            type: 'core/heading',
+            type: 'o4o/heading',
             content: { text: '이번 주 주요 소식', level: 1 },
             attributes: { level: 1, align: 'center' },
           },
           {
             id: 'block-2',
-            type: 'core/paragraph',
+            type: 'o4o/paragraph',
             content: { text: '구독자 여러분, 안녕하세요! 이번 주 가장 중요한 소식을 모아서 전해드립니다.' },
             attributes: { align: 'center' },
           },
@@ -145,19 +145,19 @@ const templateCategories: TemplateCategory[] = [
         blocks: [
           {
             id: 'block-1',
-            type: 'core/heading',
+            type: 'o4o/heading',
             content: { text: '당신의 비즈니스를 성공으로 이끌어드립니다', level: 1 },
             attributes: { level: 1, align: 'center' },
           },
           {
             id: 'block-2',
-            type: 'core/paragraph',
+            type: 'o4o/paragraph',
             content: { text: '전문적인 솔루션으로 더 나은 결과를 만들어보세요. 지금 바로 시작하세요!' },
             attributes: { align: 'center' },
           },
           {
             id: 'block-3',
-            type: 'core/button',
+            type: 'o4o/button',
             content: { text: '무료로 시작하기' },
             attributes: { align: 'center' },
           },
@@ -184,13 +184,13 @@ const templateCategories: TemplateCategory[] = [
         blocks: [
           {
             id: 'block-1',
-            type: 'core/heading',
+            type: 'o4o/heading',
             content: { text: '우리의 서비스', level: 1 },
             attributes: { level: 1, align: 'center' },
           },
           {
             id: 'block-2',
-            type: 'core/paragraph',
+            type: 'o4o/paragraph',
             content: { text: '고객의 니즈에 맞춘 전문적인 서비스를 제공합니다.' },
             attributes: { align: 'center' },
           },
@@ -218,7 +218,7 @@ const templateCategories: TemplateCategory[] = [
         blocks: [
           {
             id: 'block-1',
-            type: 'core/heading',
+            type: 'o4o/heading',
             content: { text: '프로젝트 소개', level: 1 },
             attributes: { level: 1, align: 'center' },
           },
@@ -245,7 +245,7 @@ const templateCategories: TemplateCategory[] = [
         blocks: [
           {
             id: 'block-1',
-            type: 'core/paragraph',
+            type: 'o4o/paragraph',
             content: { text: '오늘은 여러분과 함께 흥미로운 주제에 대해 이야기해보려고 합니다.' },
             attributes: { align: 'left' },
           },
@@ -666,7 +666,7 @@ export const DesignLibraryModal: React.FC<DesignLibraryModalProps> = ({
                           <div className="space-y-6">
                             {selectedTemplate.blocks.map((block, index) => (
                               <div key={`preview-${index}`} className="block-preview">
-                                {block.type === 'core/heading' && (
+                                {block.type === 'o4o/heading' && (
                                   <div
                                     className={cn(
                                       'font-bold text-gray-900',
@@ -680,7 +680,7 @@ export const DesignLibraryModal: React.FC<DesignLibraryModalProps> = ({
                                     {block.content?.text}
                                   </div>
                                 )}
-                                {block.type === 'core/paragraph' && (
+                                {block.type === 'o4o/paragraph' && (
                                   <p
                                     className={cn(
                                       'text-gray-700 leading-relaxed text-lg',
@@ -691,7 +691,7 @@ export const DesignLibraryModal: React.FC<DesignLibraryModalProps> = ({
                                     {block.content?.text}
                                   </p>
                                 )}
-                                {block.type === 'core/list' && (
+                                {block.type === 'o4o/list' && (
                                   <div className="ml-4">
                                     {block.content?.style === 'ordered' ? (
                                       <ol className="list-decimal space-y-2 text-gray-700">
@@ -708,7 +708,7 @@ export const DesignLibraryModal: React.FC<DesignLibraryModalProps> = ({
                                     )}
                                   </div>
                                 )}
-                                {block.type === 'core/button' && (
+                                {block.type === 'o4o/button' && (
                                   <div className={cn(
                                     'flex my-6',
                                     block.attributes?.align === 'center' && 'justify-center',

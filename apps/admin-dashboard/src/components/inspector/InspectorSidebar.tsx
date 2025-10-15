@@ -111,11 +111,11 @@ const BlockInspector: React.FC<BlockInspectorProps> = ({ block, onUpdate }) => {
   const getBlockSettingsComponent = () => {
     // Map block types to settings components
     const settingsMap: Record<string, React.ComponentType<any>> = {
-      'core/paragraph': React.lazy(() => import('./block-settings/ParagraphSettings').then(m => ({ default: m.ParagraphSettings }))),
-      'core/heading': React.lazy(() => import('./block-settings/HeadingSettings').then(m => ({ default: m.HeadingSettings }))),
-      'core/image': React.lazy(() => import('./block-settings/ImageSettings').then(m => ({ default: m.ImageSettings }))),
-      'core/button': React.lazy(() => import('./block-settings/ButtonSettings').then(m => ({ default: m.ButtonSettings }))),
-      'core/list': React.lazy(() => import('./block-settings/ListSettings').then(m => ({ default: m.ListSettings }))),
+      'o4o/paragraph': React.lazy(() => import('./block-settings/ParagraphSettings').then(m => ({ default: m.ParagraphSettings }))),
+      'o4o/heading': React.lazy(() => import('./block-settings/HeadingSettings').then(m => ({ default: m.HeadingSettings }))),
+      'o4o/image': React.lazy(() => import('./block-settings/ImageSettings').then(m => ({ default: m.ImageSettings }))),
+      'o4o/button': React.lazy(() => import('./block-settings/ButtonSettings').then(m => ({ default: m.ButtonSettings }))),
+      'o4o/list': React.lazy(() => import('./block-settings/ListSettings').then(m => ({ default: m.ListSettings }))),
     };
 
     return settingsMap[block.type] || null;
