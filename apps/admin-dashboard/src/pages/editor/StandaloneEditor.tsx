@@ -27,7 +27,6 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
-import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaListWordPress from '@/pages/media/MediaListWordPress';
 import ContentTemplates from '@/components/editor/ContentTemplates';
 import { SimpleAIModal } from '@/components/ai/SimpleAIModal';
@@ -105,8 +104,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true); // Changed to true for better UX and permalink access
-  const [activeTab] = useState<'document' | 'block'>('document');
-  const [selectedBlock, setSelectedBlock] = useState<any>(null);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -640,24 +637,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   };
 
   const handleMediaSelect = (media: any) => {
-    // Handle both single item and array
-    const items = Array.isArray(media) ? media : [media];
-    
-    if (items.length > 0 && selectedBlock) {
-      const updatedBlock = {
-        ...selectedBlock,
-        content: {
-          ...selectedBlock.content,
-          url: items[0].url,
-          alt: items[0].alt
-        }
-      };
-      
-      setBlocks(blocks.map(block => 
-        block.id === selectedBlock.id ? updatedBlock : block
-      ));
-      setIsDirty(true);
-    }
+    // Media selection is now handled by GutenbergBlockEditor internally
+    // Just close the modal
     setShowMediaLibrary(false);
   };
 
@@ -1020,6 +1001,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               slug={postSettings.slug || ''}
               postSettings={postSettings}
               mode={mode}
+              hideHeader={true}
               onPostSettingsChange={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 postSettingsRef.current = { ...postSettingsRef.current, ...settings }; // Update ref
@@ -1052,66 +1034,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             />
           </div>
         </div>
-        
-        {/* Settings Sidebar */}
-        {sidebarOpen && (
-          <div className={cn(
-            "bg-white border-l overflow-y-auto editor-transition",
-            "editor-sidebar-enter",
-            isMobile ? "fixed inset-0 z-50 w-full" : "w-80"
-          )}>
-            {/* 모바일 헤더 */}
-            {isMobile && (
-              <div className="flex items-center justify-between p-3 border-b">
-                <h2 className="font-semibold">Settings</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-            <GutenbergSidebar
-              activeTab={activeTab}
-              postSettings={postSettings}
-              blockSettings={selectedBlock}
-              mode={mode}
-              onPostSettingsChange={(settings: any) => {
-                
-                // Clear slug error when slug is changed
-                if (settings.slug !== undefined && postSettings.slugError) {
-                  settings.slugError = false;
-                }
-                setPostSettings(prev => {
-                  const newSettings = { ...prev, ...settings };
-                  
-                  
-                  // Update ref
-                  postSettingsRef.current = newSettings;
-                  
-                  return newSettings;
-                });
-                setIsDirty(true);
-              }}
-              onBlockSettingsChange={(settings: any) => {
-                if (selectedBlock) {
-                  const updated = { ...selectedBlock, ...settings };
-                  const newBlocks = blocks.map(block => 
-                    block.id === selectedBlock.id ? updated : block
-                  );
-                  setBlocks(newBlocks);
-                  blocksRef.current = newBlocks; // Update ref
-                  setSelectedBlock(updated);
-                  setIsDirty(true);
-                }
-              }}
-              onClose={() => setSidebarOpen(false)}
-            />
-          </div>
-        )}
       </div>
       
       {/* Media Library Modal */}
