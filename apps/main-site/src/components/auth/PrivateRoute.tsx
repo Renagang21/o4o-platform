@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuth } from '../../contexts/AuthContext';
 import { UserType } from '../../types/user';
 
 interface PrivateRouteProps {
@@ -9,7 +9,7 @@ interface PrivateRouteProps {
 }
 
 export default function PrivateRoute({ children, allowedUserTypes }: PrivateRouteProps) {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
   // 개발 모드에서 VITE_USE_MOCK이 true인 경우 인증 체크 우회

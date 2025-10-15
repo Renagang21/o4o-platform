@@ -3,6 +3,7 @@ import { Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../entities/Menu';
 import { MenuItem, MenuItemType } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
+import { generateSlug } from '../utils/slug';
 
 class MenuService {
   private menuRepository: Repository<Menu>;
@@ -460,10 +461,23 @@ class MenuService {
       return null;
     }
 
-    // Create new menu
+    // Prepare unique slug for duplicate
+    const sourceSlug = sourceMenu.slug || generateSlug(sourceMenu.name);
+    const requestedSlug = newSlug || `${sourceSlug}-copy`;
+    const baseSlug = generateSlug(requestedSlug || newName);
+
+    let finalSlug = baseSlug;
+    let counter = 2;
+
+    while (await this.menuRepository.findOne({ where: { slug: finalSlug } })) {
+      finalSlug = `${baseSlug}-${counter}`;
+      counter += 1;
+    }
+
+    // Create new menu using unique slug
     const newMenu = await this.createMenu({
       name: newName,
-      slug: newSlug,
+      slug: finalSlug,
       location: null,
       description: sourceMenu.description,
       is_active: false,

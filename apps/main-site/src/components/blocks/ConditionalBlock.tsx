@@ -6,7 +6,7 @@
 import { FC, ReactNode, useMemo } from 'react';
 import type { ConditionalBlockData, EvaluationContext } from '../../types/conditional-block.types';
 import { evaluateConditions, createEvaluationContext } from '../../utils/evaluateConditions';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuth } from '../../contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
 
 interface ConditionalBlockProps {
@@ -25,7 +25,7 @@ const ConditionalBlock: FC<ConditionalBlockProps> = ({
   children,
   context: externalContext,
 }) => {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuth();
   const location = useLocation();
 
   // 평가 컨텍스트 생성

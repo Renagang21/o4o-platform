@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cartService, Cart, CartItem } from '../services/cartService';
-import { useAuthStore } from '../stores/authStore';
+import { useAuth } from '../contexts/AuthContext';
 
 interface UseCartReturn {
   cart: Cart | null;
@@ -16,7 +16,7 @@ interface UseCartReturn {
 }
 
 export const useCart = (): UseCartReturn => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuth();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
 import { Card, CardContent } from '@o4o/ui';
 import { Button } from '@o4o/ui';
@@ -30,8 +30,8 @@ export const OAuthCallback: FC = () => {
   const navigate = useNavigate();
   const { provider } = useParams<{ provider: OAuthProvider }>();
   const [searchParams] = useSearchParams();
-  const { setUser, checkAuth } = useAuthStore();
-  
+  const { updateUser, checkAuthStatus, user: currentUser } = useAuth();
+
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
@@ -92,11 +92,11 @@ export const OAuthCallback: FC = () => {
 
       if (response.data.success && response.data.user) {
         // 사용자 정보 저장
-        setUser(response.data.user);
-        
+        updateUser(response.data.user);
+
         // 인증 상태 체크
-        await checkAuth();
-        
+        await checkAuthStatus();
+
         setStatus('success');
       } else {
         setError(response.data.message || '로그인에 실패했습니다.');
@@ -155,15 +155,13 @@ export const OAuthCallback: FC = () => {
   };
 
   const navigateToDestination = () => {
-    const user = useAuthStore.getState().user;
-    
-    if (!user) {
+    if (!currentUser) {
       navigate('/');
       return;
     }
 
     // 사용자 역할에 따른 리다이렉트
-    switch (user.role) {
+    switch (currentUser.role) {
       case 'admin':
         navigate('/admin/dashboard');
         break;

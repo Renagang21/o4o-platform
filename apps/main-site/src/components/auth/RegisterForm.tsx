@@ -3,12 +3,11 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Loader2, AlertCircle } from 'lucide-react';
 import { RegisterFormData, AuthErrorCode } from '@/types/auth';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@o4o/ui';
+import { apiClient } from '@/services/api';
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,35 +34,43 @@ export const RegisterForm = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    
+
     try {
-      const response = await registerUser(data);
-      
-      if (response.success) {
+      const response = await apiClient.post('/auth/register', data);
+
+      if (response.data.success) {
         navigate('/auth/verify-email/pending?email=' + encodeURIComponent(data.email));
       } else {
         // Handle specific error codes
-        switch (response.error?.code) {
+        const errorCode = response.data.error?.code;
+        switch (errorCode) {
           case AuthErrorCode.EMAIL_ALREADY_EXISTS:
-            setError('email', { 
-              message: '이미 등록된 이메일입니다' 
+            setError('email', {
+              message: '이미 등록된 이메일입니다'
             });
             break;
           case AuthErrorCode.WEAK_PASSWORD:
-            setError('password', { 
-              message: response.message || '비밀번호가 보안 요구사항을 충족하지 않습니다' 
+            setError('password', {
+              message: response.data.message || '비밀번호가 보안 요구사항을 충족하지 않습니다'
             });
             break;
           default:
-            setError('email', { 
-              message: response.message || '회원가입 중 오류가 발생했습니다' 
+            setError('email', {
+              message: response.data.message || '회원가입 중 오류가 발생했습니다'
             });
         }
       }
-    } catch (error) {
-      setError('email', { 
-        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.' 
-      });
+    } catch (error: any) {
+      const errorCode = error.response?.data?.error?.code;
+      if (errorCode === AuthErrorCode.EMAIL_ALREADY_EXISTS) {
+        setError('email', {
+          message: '이미 등록된 이메일입니다'
+        });
+      } else {
+        setError('email', {
+          message: error.response?.data?.message || '네트워크 오류가 발생했습니다. 다시 시도해주세요.'
+        });
+      }
     } finally {
       setIsLoading(false);
     }

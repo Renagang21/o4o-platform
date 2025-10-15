@@ -8,7 +8,7 @@ import {
   Search,
   Plus
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AdminHeader: FC = () => {
   const { user, logout } = useAuth();

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
-import { useAuthStore } from './stores/authStore';
+import { useAuth } from './contexts/AuthContext';
 import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
@@ -39,15 +39,15 @@ const PageLoader: FC = () => (
 );
 
 const App: FC = () => {
-  const { checkAuth } = useAuthStore();
+  const { checkAuthStatus } = useAuth();
 
   useEffect(() => {
     // Initialize auth interceptor
     initializeAuthInterceptor();
-    
+
     // Check auth status on app start
-    checkAuth();
-  }, []);
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   return (
     <ErrorBoundary>
