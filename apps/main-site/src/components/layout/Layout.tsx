@@ -78,19 +78,21 @@ const Layout: FC<LayoutProps> = ({
         )}
 
         {/* Main Content Area */}
-        <main className="flex-1 main-content mx-auto" style={{
-          maxWidth: `${currentWidth}px`,
-          paddingLeft: `${currentPadding.left}px`,
-          paddingRight: `${currentPadding.right}px`,
-        }}>
+        <main className="flex-1 main-content w-full">
           {/* Breadcrumbs - Above Content */}
           {breadcrumbsSettings.position === 'above-content' && (
-            <Breadcrumbs
-              settings={breadcrumbsSettings}
-              items={breadcrumbItems}
-            />
+            <div className="mx-auto" style={{
+              maxWidth: `${currentWidth}px`,
+              paddingLeft: `${currentPadding.left}px`,
+              paddingRight: `${currentPadding.right}px`,
+            }}>
+              <Breadcrumbs
+                settings={breadcrumbsSettings}
+                items={breadcrumbItems}
+              />
+            </div>
           )}
-          
+
           {children}
         </main>
 
