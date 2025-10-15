@@ -6,6 +6,7 @@ import './styles/wordpress-blocks.css';
 import './styles/markdown-reader.css';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './contexts/AuthContext';
 import { initializeIframeContext } from './utils/iframe-context';
 import App from './App';
 
@@ -24,7 +25,9 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>
 ); 

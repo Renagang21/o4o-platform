@@ -165,6 +165,101 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
+  // Custom toolbar content
+  const customToolbarContent = isSelected && url ? (
+    <div className="flex gap-1">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowMediaSelector(true);
+        }}
+        title="Replace markdown file"
+        className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+      >
+        <FolderOpen className="w-4 h-4" />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleRemoveFile();
+        }}
+        title="Remove file"
+        className="p-1.5 hover:bg-gray-100 rounded transition-colors text-red-600 hover:bg-red-50"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  ) : null;
+
+  // Custom sidebar content
+  const customSidebarContent = isSelected ? (
+    <div className="space-y-4">
+      {/* File Information */}
+      {url && (
+        <div className="pb-4 border-b border-gray-200">
+          <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">File Information</h4>
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-900 truncate" title={fileName}>
+                  {fileName || 'Markdown File'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {fileSize ? formatFileSize(fileSize) : 'Unknown size'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Theme Settings */}
+      <div className="pb-4 border-b border-gray-200">
+        <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">Theme</h4>
+        <select
+          value={theme}
+          onChange={(e) => {
+            const updatedAttributes = { ...attributes, theme: e.target.value };
+            if (setAttributes) {
+              setAttributes(updatedAttributes);
+            } else if (onChange) {
+              onChange(null, updatedAttributes);
+            }
+          }}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="github">GitHub</option>
+          <option value="monokai">Monokai</option>
+          <option value="solarized">Solarized</option>
+        </select>
+      </div>
+
+      {/* Font Size */}
+      <div>
+        <h4 className="text-xs font-semibold text-gray-700 uppercase mb-3">Font Size</h4>
+        <div className="flex items-center gap-2">
+          <input
+            type="range"
+            min="12"
+            max="24"
+            value={fontSize}
+            onChange={(e) => {
+              const updatedAttributes = { ...attributes, fontSize: parseInt(e.target.value) };
+              if (setAttributes) {
+                setAttributes(updatedAttributes);
+              } else if (onChange) {
+                onChange(null, updatedAttributes);
+              }
+            }}
+            className="flex-1"
+          />
+          <span className="text-sm text-gray-600 w-12 text-right">{fontSize}px</span>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <EnhancedBlockWrapper
       id={id}
@@ -176,16 +271,12 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
       onMoveUp={onMoveUp || (() => {})}
       onMoveDown={onMoveDown || (() => {})}
       onAddBlock={onAddBlock}
-      className="markdown-reader-block"
+      className="wp-block-markdown-reader"
+      customToolbarContent={customToolbarContent}
+      customSidebarContent={customSidebarContent}
     >
-      <div className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <FileCode className="w-5 h-5 text-gray-600" />
-          <h3 className="font-semibold text-gray-700">Markdown Reader</h3>
-        </div>
-
       {!url ? (
-        <div className="text-center py-8 bg-gray-50 rounded border-2 border-dashed border-gray-300">
+        <div className="text-center py-12 bg-gray-50 rounded border-2 border-dashed border-gray-300">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500 mb-4">Select a Markdown file from Media Library</p>
 
@@ -202,7 +293,7 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
-              setLoadError(null); // Clear error when opening selector
+              setLoadError(null);
               setShowMediaSelector(true);
             }}
             className="gap-2"
@@ -212,80 +303,41 @@ const MarkdownReaderBlock: React.FC<MarkdownReaderBlockProps> = ({
           </Button>
           <p className="text-xs text-gray-400 mt-2">Supported: .md, .markdown files only</p>
         </div>
-      ) : (
-        <div>
-          {/* Selected File Info */}
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1">
-                <FileText className="w-8 h-8 text-blue-500" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-gray-900 truncate">
-                    {fileName || 'Markdown File'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {fileSize ? formatFileSize(fileSize) : 'Unknown size'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMediaSelector(true);
-                  }}
-                  className="gap-2"
-                >
-                  <FolderOpen className="w-4 h-4" />
-                  Change File
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveFile();
-                  }}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Markdown Content Preview */}
-          <div
-            className={`markdown-content p-4 bg-white rounded border theme-${theme}`}
-            style={{ fontSize: `${fontSize}px` }}
-          >
-            {loadError ? (
-              <div className="flex items-start gap-2 text-red-600 bg-red-50 p-4 rounded">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">Failed to load markdown file</p>
-                  <p className="text-sm mt-1">{loadError}</p>
-                </div>
-              </div>
-            ) : isLoading ? (
-              <div className="flex items-center justify-center gap-2 text-gray-500 py-8">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                <p>Loading markdown content...</p>
-              </div>
-            ) : markdownContent ? (
-              <div
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: markdownContent }}
-              />
-            ) : (
-              <p className="text-gray-400 italic">Waiting to load content from {url}...</p>
-            )}
+      ) : loadError ? (
+        <div className="flex items-start gap-2 text-red-600 bg-red-50 p-4 rounded">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium">Failed to load markdown file</p>
+            <p className="text-sm mt-1">{loadError}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMediaSelector(true);
+              }}
+              className="mt-3"
+            >
+              Try Different File
+            </Button>
           </div>
         </div>
+      ) : isLoading ? (
+        <div className="flex items-center justify-center gap-2 text-gray-500 py-12">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+          <p>Loading markdown content...</p>
+        </div>
+      ) : markdownContent ? (
+        <div
+          className={`prose prose-sm max-w-none markdown-theme-${theme}`}
+          style={{ fontSize: `${fontSize}px` }}
+          dangerouslySetInnerHTML={{ __html: markdownContent }}
+        />
+      ) : (
+        <div className="text-center py-12 text-gray-400 italic">
+          <p>Waiting to load content...</p>
+        </div>
       )}
-      </div>
 
       {/* File Selector Modal */}
       {showMediaSelector && (

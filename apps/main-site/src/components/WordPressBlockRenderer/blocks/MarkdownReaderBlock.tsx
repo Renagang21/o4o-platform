@@ -24,6 +24,7 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
   // Build class names following WordPress/Gutenberg conventions
   const classNames = [
     'wp-block-markdown-reader',
+    'prose prose-sm max-w-none',
     `markdown-theme-${theme}`,
   ].filter(Boolean).join(' ');
 
