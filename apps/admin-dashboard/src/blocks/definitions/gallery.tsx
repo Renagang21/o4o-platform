@@ -9,7 +9,7 @@ import EnhancedGalleryBlock from '@/components/editor/blocks/EnhancedGalleryBloc
 import { BlockComponent } from '../registry/types';
 
 export const galleryBlockDefinition: BlockDefinition = {
-  name: 'core/gallery',
+  name: 'o4o/gallery',
   title: 'Gallery',
   category: 'media',
   icon: <Images className="w-5 h-5" />,

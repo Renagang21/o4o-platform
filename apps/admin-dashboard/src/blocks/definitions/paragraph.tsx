@@ -9,7 +9,7 @@ import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
 import { BlockComponent } from '../registry/types';
 
 export const paragraphBlockDefinition: BlockDefinition = {
-  name: 'core/paragraph',
+  name: 'o4o/paragraph',
   title: 'Paragraph',
   category: 'text',
   icon: <Type className="w-5 h-5" />,

@@ -9,7 +9,7 @@ import { BlockDefinition, BlockComponent } from '../registry/types';
 import GroupBlock from '@/components/editor/blocks/GroupBlock';
 
 export const groupBlockDefinition: BlockDefinition = {
-  name: 'core/group',
+  name: 'o4o/group',
   title: 'Group',
   category: 'layout',
   icon: <Box className="w-5 h-5" />,

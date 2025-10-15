@@ -9,7 +9,7 @@ import EnhancedHeadingBlock from '@/components/editor/blocks/EnhancedHeadingBloc
 import { BlockComponent } from '../registry/types';
 
 export const headingBlockDefinition: BlockDefinition = {
-  name: 'core/heading',
+  name: 'o4o/heading',
   title: 'Heading',
   category: 'text',
   icon: <HeadingIcon className="w-5 h-5" />,

@@ -9,7 +9,7 @@ import SocialIconsBlock from '@/components/editor/blocks/SocialIconsBlock';
 import { BlockComponent } from '../registry/types';
 
 export const socialBlockDefinition: BlockDefinition = {
-  name: 'core/social-links',
+  name: 'o4o/social-links',
   title: 'Social Icons',
   category: 'widgets',
   icon: <Share2 className="w-5 h-5" />,

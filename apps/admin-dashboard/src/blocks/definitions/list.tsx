@@ -9,7 +9,7 @@ import ListBlock from '@/components/editor/blocks/ListBlock';
 import { BlockComponent } from '../registry/types';
 
 export const listBlockDefinition: BlockDefinition = {
-  name: 'core/list',
+  name: 'o4o/list',
   title: 'List',
   category: 'text',
   icon: <List className="w-5 h-5" />,

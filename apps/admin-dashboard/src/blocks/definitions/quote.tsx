@@ -9,7 +9,7 @@ import EnhancedQuoteBlock from '@/components/editor/blocks/EnhancedQuoteBlock';
 import { BlockComponent } from '../registry/types';
 
 export const quoteBlockDefinition: BlockDefinition = {
-  name: 'core/quote',
+  name: 'o4o/quote',
   title: 'Quote',
   category: 'text',
   icon: <Quote className="w-5 h-5" />,

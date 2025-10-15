@@ -9,7 +9,7 @@ import FileBlock from '@/components/editor/blocks/FileBlock';
 import { BlockComponent } from '../registry/types';
 
 export const fileBlockDefinition: BlockDefinition = {
-  name: 'core/file',
+  name: 'o4o/file',
   title: 'File',
   category: 'media',
   icon: <File className="w-5 h-5" />,

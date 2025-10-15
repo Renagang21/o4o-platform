@@ -9,7 +9,7 @@ import ShortcodeBlock from '@/components/editor/blocks/ShortcodeBlock';
 import { BlockComponent } from '../registry/types';
 
 export const shortcodeBlockDefinition: BlockDefinition = {
-  name: 'core/shortcode',
+  name: 'o4o/shortcode',
   title: 'Shortcode',
   category: 'widgets',
   icon: <Brackets className="w-5 h-5" />,

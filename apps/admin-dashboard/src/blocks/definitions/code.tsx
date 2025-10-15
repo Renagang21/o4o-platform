@@ -9,7 +9,7 @@ import CodeBlock from '@/components/editor/blocks/CodeBlock';
 import { BlockComponent } from '../registry/types';
 
 export const codeBlockDefinition: BlockDefinition = {
-  name: 'core/code',
+  name: 'o4o/code',
   title: 'Code',
   category: 'text',
   icon: <Code className="w-5 h-5" />,

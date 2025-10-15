@@ -9,7 +9,7 @@ import ButtonBlock from '@/components/editor/blocks/ButtonBlock';
 import { BlockComponent } from '../registry/types';
 
 export const buttonBlockDefinition: BlockDefinition = {
-  name: 'core/button',
+  name: 'o4o/button',
   title: 'Button',
   category: 'design',
   icon: <MousePointer2 className="w-5 h-5" />,

@@ -9,7 +9,7 @@ import EnhancedCoverBlock from '@/components/editor/blocks/EnhancedCoverBlock';
 import { BlockComponent } from '../registry/types';
 
 export const coverBlockDefinition: BlockDefinition = {
-  name: 'core/cover',
+  name: 'o4o/cover',
   title: 'Cover',
   category: 'media',
   icon: <Layers className="w-5 h-5" />,

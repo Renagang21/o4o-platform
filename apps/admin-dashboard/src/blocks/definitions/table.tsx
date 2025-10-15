@@ -9,7 +9,7 @@ import TableBlock from '@/components/editor/blocks/TableBlock';
 import { BlockComponent } from '../registry/types';
 
 export const tableBlockDefinition: BlockDefinition = {
-  name: 'core/table',
+  name: 'o4o/table',
   title: 'Table',
   category: 'text',
   icon: <Table className="w-5 h-5" />,

@@ -9,7 +9,7 @@ import StandardVideoBlock from '@/components/editor/blocks/media/StandardVideoBl
 import { BlockComponent } from '../registry/types';
 
 export const videoBlockDefinition: BlockDefinition = {
-  name: 'core/video',
+  name: 'o4o/video',
   title: 'Video',
   category: 'media',
   icon: <Video className="w-5 h-5" />,

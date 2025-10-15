@@ -9,7 +9,7 @@ import ColumnsBlockNew from '@/components/editor/blocks/ColumnsBlockNew';
 import { BlockComponent } from '../registry/types';
 
 export const columnsBlockDefinition: BlockDefinition = {
-  name: 'core/columns',
+  name: 'o4o/columns',
   title: 'Columns',
   category: 'layout',
   icon: <Columns className="w-5 h-5" />,

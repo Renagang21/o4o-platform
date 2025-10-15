@@ -9,7 +9,7 @@ import EnhancedImageBlock from '@/components/editor/blocks/EnhancedImageBlock';
 import { BlockComponent } from '../registry/types';
 
 export const imageBlockDefinition: BlockDefinition = {
-  name: 'core/image',
+  name: 'o4o/image',
   title: 'Image',
   category: 'media',
   icon: <Image className="w-5 h-5" />,

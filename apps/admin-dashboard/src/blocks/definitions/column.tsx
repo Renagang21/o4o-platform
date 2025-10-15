@@ -9,7 +9,7 @@ import { BlockDefinition, BlockComponent } from '../registry/types';
 import ColumnBlock from '@/components/editor/blocks/ColumnBlock';
 
 export const columnBlockDefinition: BlockDefinition = {
-  name: 'core/column',
+  name: 'o4o/column',
   title: 'Column',
   category: 'layout',
   icon: <Square className="w-5 h-5" />,
