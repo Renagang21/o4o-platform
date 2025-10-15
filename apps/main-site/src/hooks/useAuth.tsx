@@ -1,13 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  AuthState, 
-  AuthResponse, 
-  LoginFormData, 
+import {
+  AuthState,
+  AuthResponse,
+  LoginFormData,
   RegisterFormData,
   AuthUser
 } from '@/types/auth';
-import { apiClient } from '@/lib/api-client';
+import { apiClient } from '@/services/api';
 
 interface AuthContextType extends AuthState {
   login: (data: LoginFormData) => Promise<AuthResponse>;

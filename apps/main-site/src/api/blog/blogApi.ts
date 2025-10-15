@@ -3,7 +3,7 @@
  * Handles all blog-related API calls
  */
 
-import apiClient from '../client';
+import { apiClient } from '@/services/api';
 import { PostItem, BlogSettings } from '@/types/customizer-types';
 
 // API Response Types

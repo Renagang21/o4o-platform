@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import apiClient from '../api/client';
+import { apiClient } from '../services/api';
 import PageRenderer from '../components/PageRenderer';
 import Layout from '../components/layout/Layout';
 
@@ -37,23 +37,11 @@ const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
-  const url = `${baseUrl}/pages/${pageId}`;
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status} at ${url}`);
-  }
-
-  const json = await response.json();
-  const page = (json && (json.data || json)) as Page;
+  const response = await apiClient.get(`/pages/${pageId}`);
+  const page = (response.data && (response.data.data || response.data)) as Page;
 
   if (!page || !page.id) {
-    throw new Error(`Invalid page data received from ${url}`);
+    throw new Error(`Invalid page data received for page ID: ${pageId}`);
   }
 
   return page;

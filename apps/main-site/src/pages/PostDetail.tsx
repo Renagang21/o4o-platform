@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from '../api/config/axios';
+import { apiClient } from '../services/api';
 import { WordPressBlockRenderer } from '../components/WordPressBlockRenderer';
 
 type PostData = {
@@ -42,10 +42,10 @@ export default function PostDetail() {
         for (const mode of tryOrder) {
           try {
             if (mode === 'slug') {
-              const res = await axios.get(`/public/posts/post/${encodeURIComponent(slugOrId)}`);
+              const res = await apiClient.get(`/public/posts/post/${encodeURIComponent(slugOrId)}`);
               fetched = res.data?.data || res.data;
             } else {
-              const res = await axios.get(`/posts/${encodeURIComponent(slugOrId)}`);
+              const res = await apiClient.get(`/posts/${encodeURIComponent(slugOrId)}`);
               fetched = res.data?.data || res.data;
             }
             if (fetched) break;

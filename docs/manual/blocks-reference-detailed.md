@@ -1,6 +1,6 @@
 # 블록 레퍼런스 상세 가이드 (개발자/사용자용)
 
-> 마지막 업데이트: 2025-10-12
+> 마지막 업데이트: 2025-10-15
 > AI용 간단 버전은 [blocks-reference.md](./blocks-reference.md) 참조
 
 ## 개요
@@ -25,6 +25,11 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
 **블록명:** `core/paragraph`
 
 **설명:** 모든 콘텐츠의 기본 블록
+
+**2025-10 개선 사항:**
+- `EnhancedBlockWrapper` 기반 인라인 툴바 추가: 좌·우·가운데·양쪽 정렬 버튼, Bold/Italic, 링크 삽입을 즉시 제어할 수 있습니다.
+- 드롭캡, 폰트 크기(px), 줄간격, 텍스트/배경 색상 조합이 사이드바뿐 아니라 툴바에서 즉시 반영됩니다.
+- 키보드 단축키: `Cmd/Ctrl + B`, `Cmd/Ctrl + I`, `Cmd/Ctrl + K`가 툴바 버튼과 연동됩니다.
 
 **속성:**
 - `content` (string): HTML 콘텐츠
@@ -142,6 +147,11 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
 - `verticalAlignment` (string): 세로 정렬
 - `gap` (number): 컬럼 간격
 
+**2025-10 개선 사항:**
+- `ColumnsBlockNew` 구현으로 툴바의 **Add Column** 버튼으로 컬럼을 추가/삭제하면 모든 컬럼 폭이 자동 재분배됩니다.
+- 상단 툴바에서 Top/Center/Bottom 세로 정렬을 즉시 전환할 수 있으며, 배경색·패딩·모바일 스택 여부를 실시간 미리보기로 확인할 수 있습니다.
+- 빈 컬럼에는 “Add blocks…” 플레이스홀더가 노출되어 드롭 영역이 명확하게 표시됩니다.
+
 **사용 예시:**
 ```html
 <div class="wp-block-columns">
@@ -149,6 +159,12 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
   <div class="wp-block-column">오른쪽 컬럼</div>
 </div>
 ```
+
+#### Column (개별 컬럼)
+
+- 툴바에 폭 표시 배지(%)와 Vertical Alignment 토글이 추가되었습니다.
+- 컬럼을 삭제하면 남은 컬럼의 폭이 균등하게 재계산됩니다.
+- 드래그 시 점선 보더와 하이라이트 배경이 표시되어 위치를 명확히 파악할 수 있습니다.
 
 ---
 
@@ -171,6 +187,11 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
   <!-- 내부 블록들 -->
 </div>
 ```
+
+**2025-10 개선 사항:**
+- 툴바에서 Flow / Flex / Grid 레이아웃을 즉시 전환할 수 있으며, 선택 상태에서 아이콘으로 현재 모드를 확인할 수 있습니다.
+- Flex 모드는 방향(Flex Direction) 및 정렬(Justify/Align) 설정이 사이드바와 연동되어 실시간으로 적용됩니다.
+- Grid 모드에서는 열/행 갯수, 갭, 아이템 정렬을 설정하면 미리보기에서 즉시 레이아웃을 확인할 수 있습니다.
 
 ---
 
@@ -366,6 +387,65 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
 
 ---
 
+### Enhanced Cover (히어로)
+
+**블록명:** `o4o/enhanced-cover`
+
+**설명:** 배경 이미지·비디오·그라디언트를 지원하는 히어로 섹션 블록
+
+**핵심 속성:**
+- `backgroundType`: `image` \| `video` \| `gradient`
+- `backgroundImage` / `backgroundVideo`: 미디어 객체 및 focalPoint 좌표
+- `overlay`: 색상, 불투명도, 블렌드 모드 설정
+- `aspectRatio`, `minHeight`, `padding`, `layout`
+- `tagName`: section, header 등 시맨틱 태그
+
+**2025-10 개선 사항:**
+- 배경 미디어 교체/삭제, 오버레이 불투명도 슬라이더, 기기별 프레임(Desktop/Tablet/Mobile) 미리보기를 지원합니다.
+- 커버 높이를 드래그 핸들로 조절할 수 있고, 사이드바에서 패딩·앵커 ID·커스텀 클래스를 즉시 적용할 수 있습니다.
+- 내부에 버튼/헤딩을 배치하면 `CoverContentNew`가 자동으로 중앙 정렬 및 반응형 타이포그래피를 적용합니다.
+
+---
+
+### Enhanced Gallery (갤러리)
+
+**블록명:** `o4o/enhanced-gallery`
+
+**설명:** 그리드, 매슨리, 슬라이더, 라이트박스를 지원하는 고급 이미지 갤러리
+
+**핵심 속성:**
+- `layout`: `grid` \| `masonry` \| `slider`
+- `columns`, `gap`, `aspectRatio`
+- `showCaptions`, `captionPosition`
+- `enableLightbox`, `lightboxAnimation`
+- `hoverEffect`, `randomOrder`, `borderRadius`
+
+**2025-10 개선 사항:**
+- 드래그&드롭으로 이미지 순서를 변경하고, 라이트박스에서 키보드 및 스와이프 네비게이션을 지원합니다.
+- 슬라이더 모드에서 자동 재생, 방향 버튼, 인디케이터 점을 설정할 수 있으며, 매슨리 모드는 동적 높이 계산을 제공합니다.
+- 미디어 라이브러리/로컬 업로드를 동시에 지원하고, 이미지별 캡션·링크·Alt 텍스트를 개별로 수정할 수 있습니다.
+
+---
+
+### Markdown Reader (마크다운 뷰어)
+
+**블록명:** `o4o/markdown-reader`
+
+**설명:** 미디어 라이브러리에 저장된 `.md` 파일을 불러와 HTML로 렌더링하는 뷰어
+
+**핵심 속성:**
+- `url`: 선택한 마크다운 파일 경로
+- `markdownContent`: 변환된 HTML 캐시
+- `theme`: `github`, `monokai`, `solarized`
+- `fontSize`: 표시 폰트 크기 (px)
+
+**사용 방법:**
+1. 블록 추가 후 **Select Markdown** 버튼으로 미디어 라이브러리에서 `.md` 파일을 선택합니다.
+2. 파일을 교체하거나 다운로드 링크로 연결할 수 있으며, 로드 실패 시 재시도 버튼이 노출됩니다.
+3. 테마와 글자 크기를 사이드바에서 조절하면 미리보기 즉시 반영됩니다.
+
+---
+
 ## 🎯 인터랙티브 블록 상세
 
 ### Button (버튼)
@@ -375,12 +455,20 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
 **속성:**
 - `text` (string): 버튼 텍스트
 - `url` (string): 링크 URL
-- `linkTarget` (string): _blank 등
+- `linkTarget` (string): `_blank` 등
 - `rel` (string): rel 속성
-- `style` (string): fill, outline
+- `variant` (string): `primary`, `outline`, `ghost`, `link`
+- `size` (string): `sm`, `md`, `lg`
+- `icon` (string): 좌측 아이콘(lucide id)
+- `align` (string): left, center, right, wide, full
 - `backgroundColor` (string): 배경색
 - `textColor` (string): 텍스트 색상
 - `width` (number): 너비
+
+**2025-10 개선 사항:**
+- 버튼 툴바에서 Variant/Size를 즉시 전환할 수 있고, 아이콘 피커로 50+ 아이콘을 추가할 수 있습니다.
+- `Full width` 토글과 둥근 모서리, 그림자 옵션이 사이드바에 추가되었습니다.
+- `Cmd/Ctrl + D` 복제 시 링크 속성까지 그대로 복사되며, 프론트엔드와 동일한 미리보기를 제공합니다.
 
 **사용 예시:**
 ```html
@@ -399,6 +487,25 @@ O4O 플랫폼의 블록은 4개의 플러그인으로 구성:
   </a>
 </div>
 ```
+
+### Social Icons (소셜 링크)
+
+**블록명:** `o4o/social-icons`
+
+**설명:** 여러 소셜 플랫폼 아이콘과 링크를 한 번에 배치하는 블록
+
+**속성:**
+- `items` (array): `{ service: 'facebook', url: 'https://...' }` 구조
+- `shape` (string): circle, rounded, square
+- `size` (string): small, medium, large
+- `alignment` (string): left, center, right
+- `colorMode` (string): brand, custom, monochrome
+- `gap` (number): 아이콘 간 간격(px)
+
+**2025-10 개선 사항:**
+- 드래그&드롭으로 아이콘 순서를 변경하고 검색으로 30개 이상의 서비스를 빠르게 추가할 수 있습니다.
+- 커스텀 색상 모드에서 사용자 지정 HEX 값을 적용하거나 테마 색상을 자동으로 따를 수 있습니다.
+- 서비스별 새 창 열기, `rel="nofollow"` 등 SEO 옵션을 개별로 제어할 수 있습니다.
 
 ---
 
