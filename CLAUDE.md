@@ -10,7 +10,9 @@
 ### 2. 배포 전 커밋/푸시 필수
 - **사용자는 자동 배포된 버전만 테스트 가능**
 - 변경사항은 반드시 `git commit && git push` 완료
-- GitHub Actions 자동 배포 완료 대기 필요
+- ⚠️ **GitHub Actions가 자주 실패함 - 수동 배포 스크립트 사용 필수**
+- 수동 배포: `./scripts/deploy-admin-manual.sh` 실행
+- 배포 확인: `curl -s https://admin.neture.co.kr/version.json` 으로 버전 확인
 - 로컬 빌드만으로는 사용자 테스트 불가능
 
 ### 3. 디버깅 작업 절차
@@ -224,3 +226,96 @@ VITE_API_URL=https://api.neture.co.kr/api/v1
 
 *최종 업데이트: 2025-10-15 17:55 KST*
 *상태: ✅ 수동 배포 완료 / ⚠️ GitHub Actions 자동 배포 원인 조사 중*
+
+---
+
+## 2025-10-16: GitHub Actions 배포 문제 근본 해결
+
+### 문제: GitHub Actions workflow가 지속적으로 트리거되지 않음
+**증상**:
+- `apps/admin-dashboard/**` 경로 변경에도 workflow 실행 안 됨
+- 빈 커밋(`--allow-empty`)도 트리거하지 못함
+- 사용자 보고: 배포 실패가 자주 발생
+
+**조사 내용**:
+1. ✅ Workflow YAML 문법 - 정상
+2. ✅ `paths` 필터 설정 - 정상 (apps/admin-dashboard/** 포함)
+3. ✅ Repository secrets - 정상 (WEB_HOST, WEB_USER, WEB_SSH_KEY)
+4. ✅ pnpm-lock.yaml sync - 정상
+5. ❌ **paths 필터가 GitHub Actions에서 제대로 작동하지 않음**
+
+### 해결책
+
+#### 1. GitHub Actions Workflow 수정 (`deploy-admin.yml`)
+**변경사항**:
+- `paths` 필터 **완전 제거** - 모든 main 브랜치 푸시에 트리거
+- 대신 workflow 내부에서 변경 파일 확인 후 배포 여부 결정
+- 각 단계에 조건부 실행 추가 (`if: steps.changes.outputs.should_deploy == 'true'`)
+
+**장점**:
+- Workflow는 항상 실행되므로 로그 확인 가능
+- 불필요한 배포는 내부 로직으로 skip
+- 디버깅 용이
+
+**파일**: `.github/workflows/deploy-admin.yml`
+
+#### 2. 수동 배포 스크립트 생성
+**위치**: `scripts/deploy-admin-manual.sh`
+
+**기능**:
+- 자동화된 빌드 + 배포 프로세스
+- Git 상태 체크
+- 패키지 빌드 → Admin 빌드 → Tarball 생성
+- 웹서버로 업로드 및 자동 배포
+- 백업, 검증, 권한 설정 자동화
+
+**사용법**:
+```bash
+cd /home/dev/o4o-platform
+./scripts/deploy-admin-manual.sh
+```
+
+#### 3. 배포 절차 표준화
+
+**자동 배포 시도 (권장)**:
+1. 코드 변경 후 `git commit && git push`
+2. 3분 대기
+3. `curl -s https://admin.neture.co.kr/version.json` 으로 버전 확인
+4. 버전이 업데이트되지 않았다면 → 수동 배포
+
+**수동 배포 (GitHub Actions 실패 시)**:
+```bash
+# 1. 코드 커밋
+git add .
+git commit -m "..."
+git push origin main
+
+# 2. 수동 배포 실행
+./scripts/deploy-admin-manual.sh
+
+# 3. 배포 확인
+curl -s https://admin.neture.co.kr/version.json | jq
+```
+
+### 수정된 파일
+1. `.github/workflows/deploy-admin.yml` - paths 필터 제거, 내부 체크 추가
+2. `scripts/deploy-admin-manual.sh` - 새로운 수동 배포 스크립트
+3. `CLAUDE.md` - 배포 절차 및 문제 해결 가이드 업데이트
+
+### 배포 체크리스트
+- [ ] 코드 변경사항 커밋
+- [ ] `git push origin main`
+- [ ] 3분 대기 후 version.json 확인
+- [ ] 자동 배포 실패 시 `./scripts/deploy-admin-manual.sh` 실행
+- [ ] https://admin.neture.co.kr 에서 변경사항 확인
+
+### 알려진 제한사항
+- GitHub Actions paths 필터 동작 불안정
+- GitHub CLI (`gh`) 인증 불가 (로컬 환경)
+- Workflow run 로그 직접 확인 불가
+- **따라서 수동 배포 스크립트를 primary 방법으로 사용 권장**
+
+---
+
+*최종 업데이트: 2025-10-16 10:50 KST*
+*상태: ✅ 수동 배포 스크립트 완성 / ✅ Workflow 개선 완료 / ⚠️ GitHub Actions 신뢰성 낮음*
