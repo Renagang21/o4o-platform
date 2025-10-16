@@ -122,8 +122,11 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       );
       if (focusableElement instanceof HTMLElement) {
         // CRITICAL: Focus and create selection for cursor visibility
-        // Use small delay to avoid conflict with RichText UNCONTROLLED initialization
+        // Wait for RichText UNCONTROLLED initialization and DOM rendering
         setTimeout(() => {
+          // Double-check element still exists after delay
+          if (!focusableElement.isConnected) return;
+
           focusableElement.focus();
 
           // For contentEditable, explicitly create selection for cursor visibility
@@ -131,7 +134,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
             const selection = window.getSelection();
             if (selection) {
               try {
-                // Create a collapsed range at the start to show cursor
+                // Create a collapsed range at the end to show cursor
                 const range = document.createRange();
                 range.selectNodeContents(focusableElement);
                 range.collapse(false); // false = end of content
@@ -143,7 +146,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
               }
             }
           }
-        }, 10); // 10ms delay to let RichText initialize first
+        }, 50); // 50ms delay for new blocks to fully render
       }
     }
   }, [isSelected]);
