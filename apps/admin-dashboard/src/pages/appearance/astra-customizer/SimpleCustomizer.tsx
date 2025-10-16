@@ -45,7 +45,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     if (!initialSettings) {
       return getDefaultSettings();
     }
-    // Ensure header.builder exists by merging with defaults
+    // Ensure header.builder and footer.widgets exist by merging with defaults
     const defaults = getDefaultSettings();
     return {
       ...defaults,
@@ -57,7 +57,15 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       },
       footer: {
         ...defaults.footer,
-        ...initialSettings.footer
+        ...initialSettings.footer,
+        widgets: {
+          ...defaults.footer.widgets,
+          ...initialSettings.footer?.widgets
+        },
+        bottomBar: {
+          ...defaults.footer.bottomBar,
+          ...initialSettings.footer?.bottomBar
+        }
       }
     };
   });
