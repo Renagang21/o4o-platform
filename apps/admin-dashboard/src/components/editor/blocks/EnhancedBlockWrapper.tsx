@@ -127,16 +127,23 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
           // Double-check element still exists after delay
           if (!focusableElement.isConnected) return;
 
-          focusableElement.focus();
+          // Only focus if not already focused - prevents disrupting existing cursor
+          if (document.activeElement !== focusableElement) {
+            focusableElement.focus();
+          }
 
-          // For contentEditable, create selection ONLY if none exists
-          // This preserves user's cursor position when clicking within text
+          // For contentEditable, create selection ONLY if truly necessary
           if (focusableElement.contentEditable === 'true') {
             const selection = window.getSelection();
             if (selection) {
+              // Check if we need to create a selection
+              const needsSelection =
+                selection.rangeCount === 0 || // No selection at all
+                !focusableElement.contains(selection.anchorNode) || // Selection outside this element
+                (selection.rangeCount > 0 && selection.anchorNode === focusableElement && focusableElement.childNodes.length === 0); // Empty block
+
               // Only create selection if user hasn't set one
-              // (e.g., new block creation, or initial selection)
-              if (selection.rangeCount === 0 || !focusableElement.contains(selection.anchorNode)) {
+              if (needsSelection) {
                 try {
                   // Create a collapsed range at the end for new blocks
                   const range = document.createRange();
@@ -149,7 +156,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                   console.debug('Selection creation error (non-critical):', error);
                 }
               }
-              // else: preserve existing selection (user clicked within text)
+              // else: preserve existing selection (user clicked within text or dragged to select)
             }
           }
         }, 50); // 50ms delay for new blocks to fully render
@@ -240,9 +247,24 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        // Always select block when clicked
-        // Browser will handle cursor positioning in contentEditable
-        onSelect();
+        const target = e.target as HTMLElement;
+
+        // Check if click was inside contentEditable element
+        const isContentEditableClick =
+          target.contentEditable === 'true' ||
+          target.closest('[contenteditable="true"]');
+
+        if (isContentEditableClick) {
+          // Trust browser's default behavior for text selection
+          // Only select block if it's not already selected
+          if (!isSelected) {
+            onSelect();
+          }
+          // Don't call onSelect() if already selected - preserves cursor/selection
+        } else {
+          // Click outside contentEditable - always select block
+          onSelect();
+        }
       }}
     >
       {/* Left side drag handle - removed from here, now in toolbar */}

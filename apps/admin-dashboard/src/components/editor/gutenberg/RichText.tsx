@@ -582,7 +582,24 @@ export const RichText: FC<RichTextProps> = ({
           initialOpenInNewTab={currentLinkOpenInNewTab}
           onSave={handleSaveLink}
           onRemove={currentLinkUrl ? handleRemoveLink : undefined}
-          onClose={() => setShowLinkPopover(false)}
+          onClose={() => {
+            setShowLinkPopover(false);
+            // Restore saved selection when closing without saving
+            if (savedRangeRef.current && editorRef.current) {
+              setTimeout(() => {
+                const selection = window.getSelection();
+                if (selection) {
+                  try {
+                    selection.removeAllRanges();
+                    selection.addRange(savedRangeRef.current!);
+                    editorRef.current?.focus();
+                  } catch (error) {
+                    console.debug('Selection restoration error:', error);
+                  }
+                }
+              }, 10); // Small delay to ensure popover is closed
+            }
+          }}
           position={linkPopoverPosition}
         />
       )}
