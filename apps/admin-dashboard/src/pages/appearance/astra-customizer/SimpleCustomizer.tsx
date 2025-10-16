@@ -41,9 +41,26 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   initialSettings,
 }) => {
   // Enhanced state management for full Astra functionality
-  const [settings, setSettings] = useState<AstraCustomizerSettings>(() =>
-    initialSettings || getDefaultSettings()
-  );
+  const [settings, setSettings] = useState<AstraCustomizerSettings>(() => {
+    if (!initialSettings) {
+      return getDefaultSettings();
+    }
+    // Ensure header.builder exists by merging with defaults
+    const defaults = getDefaultSettings();
+    return {
+      ...defaults,
+      ...initialSettings,
+      header: {
+        ...defaults.header,
+        ...initialSettings.header,
+        builder: initialSettings.header?.builder || defaults.header.builder
+      },
+      footer: {
+        ...defaults.footer,
+        ...initialSettings.footer
+      }
+    };
+  });
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
