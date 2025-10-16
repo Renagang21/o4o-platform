@@ -585,9 +585,9 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                     layout={{
                       widgets: {
                         enabled: settings.footer.widgets?.enabled ?? true,
-                        columns: typeof settings.footer.widgets?.columns === 'object'
+                        columns: (typeof settings.footer.widgets?.columns === 'object'
                           ? (settings.footer.widgets.columns.desktop ?? 4)
-                          : (settings.footer.widgets?.columns ?? 4),
+                          : (settings.footer.widgets?.columns ?? 4)) as 1 | 2 | 3 | 4 | 5,
                         layout: [], // TODO: Map from settings.footer.widgets
                         settings: {
                           background: settings.footer.widgets?.background ?? '#333333',
