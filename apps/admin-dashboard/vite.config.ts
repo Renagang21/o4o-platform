@@ -67,7 +67,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react-dom',
       'react/jsx-runtime',
       '@tanstack/react-query',
-      '@tanstack/react-query/devtools',
       '@o4o/utils',
       '@o4o/ui',
       '@o4o/auth-client',

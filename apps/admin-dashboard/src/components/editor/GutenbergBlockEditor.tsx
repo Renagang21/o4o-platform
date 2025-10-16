@@ -3,7 +3,7 @@
  * Enhanced WordPress Gutenberg-like editor with 3-column layout
  */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditorHeader } from './EditorHeader';
 import '../../styles/editor.css';
@@ -1326,70 +1326,158 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     [updateBlocks, showToast]
   );
 
+  // Keep a stable ref to blocks for callback closures
+  const blocksRef = useRef(blocks);
+  useEffect(() => {
+    blocksRef.current = blocks;
+  }, [blocks]);
+
+  // Create stable callback factories that don't depend on blocks state
+  // This prevents re-renders when blocks change
+  const createOnChange = useCallback((blockId: string) =>
+    (content: any, attributes?: any) => handleBlockUpdate(blockId, content, attributes),
+    [handleBlockUpdate]
+  );
+
+  const createOnDelete = useCallback((blockId: string) =>
+    () => handleBlockDelete(blockId),
+    [handleBlockDelete]
+  );
+
+  const createOnDuplicate = useCallback((blockId: string) =>
+    () => handleDuplicate(blockId),
+    [handleDuplicate]
+  );
+
+  const createOnMoveUp = useCallback((blockId: string) =>
+    () => handleMoveUp(blockId),
+    [handleMoveUp]
+  );
+
+  const createOnMoveDown = useCallback((blockId: string) =>
+    () => handleMoveDown(blockId),
+    [handleMoveDown]
+  );
+
+  const createOnAddBlock = useCallback((blockId: string) =>
+    (position: 'before' | 'after', type?: string) => handleAddBlock(blockId, position, type),
+    [handleAddBlock]
+  );
+
+  const createOnSelect = useCallback((blockId: string) =>
+    () => setSelectedBlockId(blockId),
+    []
+  );
+
+  const createOnDragStart = useCallback((blockId: string) =>
+    (e: React.DragEvent) => handleDragStart(blockId, e),
+    [handleDragStart]
+  );
+
+  const createOnDragOver = useCallback((blockId: string) =>
+    (e: React.DragEvent) => handleDragOver(blockId, e),
+    [handleDragOver]
+  );
+
+  const createOnDrop = useCallback((blockId: string) =>
+    (e: React.DragEvent) => {
+      const draggedId = e.dataTransfer.getData('application/block-id') || e.dataTransfer.getData('text/plain');
+      handleDrop(blockId, draggedId, e);
+    },
+    [handleDrop]
+  );
+
+  const createOnDragEnd = useCallback((blockId: string) =>
+    (e: React.DragEvent) => handleDragEnd(blockId, e),
+    [handleDragEnd]
+  );
+
+  const createOnCopy = useCallback((blockId: string) =>
+    () => handleBlockCopy(blockId),
+    [handleBlockCopy]
+  );
+
+  const createOnPaste = useCallback((blockId: string) =>
+    () => handleBlockPaste(blockId),
+    [handleBlockPaste]
+  );
+
+  const createOnChangeType = useCallback((blockId: string) =>
+    (newType: string) => handleBlockTypeChange(blockId, newType),
+    [handleBlockTypeChange]
+  );
+
+  const createOnUpdate = useCallback((blockId: string) =>
+    (updates: any) => {
+      const newBlocks = blocksRef.current.map(b =>
+        b.id === blockId ? { ...b, ...updates } : b
+      );
+      updateBlocks(newBlocks);
+    },
+    [updateBlocks]
+  );
+
+  const createOnInnerBlocksChange = useCallback((blockId: string) =>
+    (newInnerBlocks: Block[]) => {
+      const newBlocks = blocksRef.current.map(b =>
+        b.id === blockId ? { ...b, innerBlocks: newInnerBlocks } : b
+      );
+      updateBlocks(newBlocks);
+    },
+    [updateBlocks]
+  );
+
+  // Memoize callback map per block ID
+  const callbacksMapRef = useRef<Map<string, any>>(new Map());
+
+  const getBlockCallbacks = useCallback((blockId: string) => {
+    if (!callbacksMapRef.current.has(blockId)) {
+      callbacksMapRef.current.set(blockId, {
+        onChange: createOnChange(blockId),
+        onDelete: createOnDelete(blockId),
+        onDuplicate: createOnDuplicate(blockId),
+        onMoveUp: createOnMoveUp(blockId),
+        onMoveDown: createOnMoveDown(blockId),
+        onAddBlock: createOnAddBlock(blockId),
+        onSelect: createOnSelect(blockId),
+        onDragStart: createOnDragStart(blockId),
+        onDragOver: createOnDragOver(blockId),
+        onDrop: createOnDrop(blockId),
+        onDragEnd: createOnDragEnd(blockId),
+        onCopy: createOnCopy(blockId),
+        onPaste: createOnPaste(blockId),
+        onChangeType: createOnChangeType(blockId),
+        onUpdate: createOnUpdate(blockId),
+        onInnerBlocksChange: createOnInnerBlocksChange(blockId),
+      });
+    }
+    return callbacksMapRef.current.get(blockId);
+  }, [createOnChange, createOnDelete, createOnDuplicate, createOnMoveUp, createOnMoveDown, createOnAddBlock, createOnSelect, createOnDragStart, createOnDragOver, createOnDrop, createOnDragEnd, createOnCopy, createOnPaste, createOnChangeType, createOnUpdate, createOnInnerBlocksChange]);
+
+  // Clean up stale callbacks when blocks are removed
+  useEffect(() => {
+    const currentBlockIds = new Set(blocks.map(b => b.id));
+    const cachedBlockIds = Array.from(callbacksMapRef.current.keys());
+
+    cachedBlockIds.forEach(id => {
+      if (!currentBlockIds.has(id)) {
+        callbacksMapRef.current.delete(id);
+      }
+    });
+  }, [blocks]);
+
   // Render block component
   const renderBlock = (block: Block) => {
+    const blockIndex = blocks.findIndex((b) => b.id === block.id);
+    const callbacks = getBlockCallbacks(block.id);
+
     const commonProps = {
       id: block.id,
       content: typeof block.content === 'string' ? block.content : block.content?.text || '',
-      onChange: (content: any, attributes?: any) =>
-        handleBlockUpdate(block.id, content, attributes),
-      onDelete: () => handleBlockDelete(block.id),
-      onDuplicate: () => {
-        const newBlock = { ...block, id: `block-${Date.now()}` };
-        const index = blocks.findIndex((b) => b.id === block.id);
-        const newBlocks = [...blocks];
-        newBlocks.splice(index + 1, 0, newBlock);
-        updateBlocks(newBlocks);
-      },
-      onMoveUp: () => {
-        const index = blocks.findIndex((b) => b.id === block.id);
-        if (index > 0) {
-          const newBlocks = [...blocks];
-          [newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]];
-          updateBlocks(newBlocks);
-        }
-      },
-      onMoveDown: () => {
-        const index = blocks.findIndex((b) => b.id === block.id);
-        if (index < blocks.length - 1) {
-          const newBlocks = [...blocks];
-          [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
-          updateBlocks(newBlocks);
-        }
-      },
-      onAddBlock: (position: 'before' | 'after', type?: string) =>
-        handleAddBlock(block.id, position, type),
+      ...callbacks,
       isSelected: selectedBlockId === block.id,
-      onSelect: () => setSelectedBlockId(block.id),
       attributes: block.attributes || {},
       isDragging: draggedBlockId === block.id,
-      onDragStart: (e: React.DragEvent) => handleDragStart(block.id, e),
-      onDragOver: (e: React.DragEvent) => handleDragOver(block.id, e),
-      onDrop: (e: React.DragEvent) => {
-        const draggedId = e.dataTransfer.getData('application/block-id') || e.dataTransfer.getData('text/plain');
-        handleDrop(block.id, draggedId, e);
-      },
-      onDragEnd: (e: React.DragEvent) => handleDragEnd(block.id, e),
-      onCopy: () => handleBlockCopy(block.id),
-      onPaste: () => handleBlockPaste(block.id),
-      onChangeType: (newType: string) => handleBlockTypeChange(block.id, newType),
-      onUpdate: (updates: any) => {
-        const newBlocks = blocks.map(b =>
-          b.id === block.id ? { ...b, ...updates } : b
-        );
-        updateBlocks(newBlocks);
-      },
-      onInnerBlocksChange: (newInnerBlocks: Block[]) => {
-        const newBlocks = blocks.map(b =>
-          b.id === block.id ? { ...b, innerBlocks: newInnerBlocks } : b
-        );
-        updateBlocks(newBlocks);
-      },
-    };
-
-    const blockIndex = blocks.findIndex((b) => b.id === block.id);
-    const enhancedProps = {
-      ...commonProps,
       canMoveUp: blockIndex > 0,
       canMoveDown: blockIndex < blocks.length - 1,
     };
@@ -1407,7 +1495,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       <DynamicRenderer
         key={block.id}
         block={normalizedBlock}
-        {...enhancedProps}
+        {...commonProps}
       />
     );
   };
