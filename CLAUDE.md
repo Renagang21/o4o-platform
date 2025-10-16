@@ -319,3 +319,148 @@ curl -s https://admin.neture.co.kr/version.json | jq
 
 *최종 업데이트: 2025-10-16 10:50 KST*
 *상태: ✅ 수동 배포 스크립트 완성 / ✅ Workflow 개선 완료 / ⚠️ GitHub Actions 신뢰성 낮음*
+
+---
+
+## 2025-10-16: Paragraph 블록 커서/입력 버그 수정 ⭐⭐⭐
+
+### 문제: Paragraph 블록 클릭 시 커서가 나타나지 않고 입력이 안 됨
+**증상**:
+- Paragraph 블록을 클릭해도 입력 커서가 표시되지 않음
+- 키보드 입력이 전혀 작동하지 않음
+- 브라우저 콘솔에 에러 없음
+- 다른 블록들은 정상 작동
+
+**조사 과정** (여러 차례 실패):
+1. ❌ React.memo 및 useCallback 최적화 → 해결 안 됨
+2. ❌ EnhancedBlockWrapper onClick 핸들러 수정 → 해결 안 됨
+3. ❌ GutenbergBlockEditor.tsx 인라인 함수 메모이제이션 → 해결 안 됨
+4. ⚠️ 배포 문제로 중단 (GitHub Actions 트리거 안 됨)
+5. ✅ 배포 문제 해결 후 재조사 시작
+
+**근본 원인 발견**:
+`RichText.tsx` 컴포넌트의 `useEffect`가 `value` prop이 변경될 때마다 `innerHTML`을 업데이트하고 있었음.
+
+**문제 연쇄**:
+1. `ParagraphBlock.tsx` (62-64행): `content` prop 변경 시 `localContent` 업데이트
+2. `ParagraphBlock.tsx` (88행): `localContent`를 `RichText`의 `value` prop으로 전달
+3. `RichText.tsx` (68-87행): `value` 변경 시 `useEffect` 트리거
+4. `RichText.tsx` (80행): `editorRef.current.innerHTML = stringValue` 실행
+5. **결과**: DOM이 완전히 재구성되어 focus와 cursor가 소실됨
+
+### 해결책
+
+#### 1. RichText.tsx - hasFocus 체크 추가 ✅
+**파일**: `apps/admin-dashboard/src/components/editor/gutenberg/RichText.tsx:68-87`
+
+**변경 내용**:
+```typescript
+// 초기값 및 외부 value 변경 처리
+useEffect(() => {
+  if (editorRef.current && !isUpdatingRef.current) {
+    const currentContent = editorRef.current.innerHTML;
+    const normalizedCurrent = currentContent.replace(/<br\s*\/?>/gi, '').trim();
+    const stringValue = typeof value === 'string' ? value : String(value || '');
+    const normalizedValue = stringValue.replace(/<br\s*\/?>/gi, '').trim();
+
+    // CRITICAL FIX: Don't update innerHTML if this editor currently has focus
+    // This prevents cursor loss when user is actively editing
+    const hasFocus = document.activeElement === editorRef.current;
+
+    if (normalizedCurrent !== normalizedValue && !hasFocus) {
+      // 내용 업데이트 (focus가 없을 때만)
+      editorRef.current.innerHTML = stringValue;
+    }
+  }
+
+  setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
+}, [value]);
+```
+
+**핵심**:
+- `const hasFocus = document.activeElement === editorRef.current;` 체크 추가
+- `if (... && !hasFocus)` 조건으로 focus가 있을 때 innerHTML 업데이트 방지
+- 사용자가 입력 중일 때는 DOM을 건드리지 않음
+- 다른 블록 선택 시에만 외부 value로 업데이트
+
+**커밋**: `fix(editor): CRITICAL FIX - Prevent innerHTML update when editor has focus` (f75894ea)
+
+#### 2. EnhancedBlockWrapper.tsx - 코드 간소화 ✅
+**파일**: `apps/admin-dashboard/src/components/editor/blocks/EnhancedBlockWrapper.tsx:236-246`
+
+이전 수정 과정에서 복잡해진 onClick 핸들러를 다시 간소화:
+
+**변경 내용**:
+```typescript
+onClick={(e) => {
+  // Select block on click (focus handled by useEffect)
+  onSelect();
+
+  // Stop propagation for non-content clicks to prevent event bubbling
+  const target = e.target as HTMLElement;
+  const isContentEditable = target.isContentEditable || target.closest('[contenteditable]');
+  if (!isContentEditable) {
+    e.stopPropagation();
+  }
+}}
+```
+
+**이유**:
+- 41줄이었던 복잡한 onClick을 10줄로 단순화
+- Focus 처리는 이미 useEffect (118-152행)에서 담당
+- 중복 로직 제거
+
+**커밋**: `refactor(editor): Simplify EnhancedBlockWrapper onClick handler` (daecffec)
+
+### 기술적 교훈
+
+**innerHTML 업데이트의 위험성**:
+- `innerHTML` 할당은 전체 DOM 트리를 파괴하고 재구성함
+- 이 과정에서 `focus`, `selection`, event listener 등 모든 상태가 소실됨
+- contentEditable 요소에서는 특히 치명적
+
+**올바른 패턴**:
+```typescript
+// BAD: Always update innerHTML on value change
+useEffect(() => {
+  editorRef.current.innerHTML = value;
+}, [value]);
+
+// GOOD: Skip update when user is editing
+useEffect(() => {
+  const hasFocus = document.activeElement === editorRef.current;
+  if (!hasFocus) {
+    editorRef.current.innerHTML = value;
+  }
+}, [value]);
+```
+
+**디버깅 과정의 중요성**:
+1. 증상이 명확해도 원인은 여러 곳에 있을 수 있음
+2. 사용자의 "해결되지 않았다" 피드백을 신뢰해야 함
+3. 브라우저 콘솔 에러가 없어도 로직 버그일 수 있음
+4. DOM 업데이트 타이밍 문제는 추적이 어려움
+
+### 배포 정보
+- **배포 버전**: `2025.10.16-0230` (GitHub Actions)
+- **배포 시간**: 2025-10-16 11:30 KST
+- **Workflow**: Deploy Admin Dashboard
+- **커밋**:
+  - `f75894ea` - CRITICAL FIX (hasFocus 체크)
+  - `daecffec` - 코드 간소화
+
+### 테스트 체크리스트
+- [ ] Paragraph 블록 클릭 시 커서 표시되는지 확인
+- [ ] 텍스트 입력이 정상적으로 되는지 확인
+- [ ] 블록 간 이동 시 커서가 유지되는지 확인
+- [ ] 다른 블록 타입(Heading, List 등)도 정상 작동하는지 확인
+
+### 참고 파일
+1. `apps/admin-dashboard/src/components/editor/gutenberg/RichText.tsx` - 핵심 수정
+2. `apps/admin-dashboard/src/components/editor/blocks/EnhancedBlockWrapper.tsx` - 간소화
+3. `apps/admin-dashboard/src/components/editor/blocks/ParagraphBlock.tsx` - 문제 발생 지점 (변경 없음)
+
+---
+
+*최종 업데이트: 2025-10-16 11:30 KST*
+*상태: ✅ Paragraph 블록 커서/입력 버그 수정 완료 / 🧪 사용자 테스트 대기 중*

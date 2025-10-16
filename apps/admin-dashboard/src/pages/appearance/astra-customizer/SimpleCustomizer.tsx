@@ -323,8 +323,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   };
 
   return (
-    <CustomizerProvider 
-      initialSettings={settings}
+    <CustomizerProvider
+      initialSettings={settings as any}
       previewUrl={previewUrl}
       eventHandlers={{
         onSave: handleSaveWrapper,

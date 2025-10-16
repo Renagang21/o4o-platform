@@ -37,8 +37,15 @@ const Customize: React.FC = () => {
         const response = await authClient.api.get('/settings/customizer');
 
         if (response.data?.success && response.data?.data) {
-          const payload = response.data.data?.settings ?? response.data.data;
-          setInitialSettings(normalizeCustomizerSettings(payload));
+          // API 응답 구조 정규화:
+          // Case 1: { success: true, data: { settings: {...} } }
+          // Case 2: { success: true, data: {...} }
+          const rawData = response.data.data;
+          const settingsData = rawData.settings || rawData;
+
+          // normalize 함수가 AstraCustomizerSettings 반환
+          const normalized = normalizeCustomizerSettings(settingsData);
+          setInitialSettings(normalized);
         } else {
           // 설정이 없으면 기본값 사용
           setInitialSettings(normalizeCustomizerSettings(null));

@@ -221,7 +221,7 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
       return initialSettings as AstraCustomizerSettings;
     }
     // Otherwise merge with defaults
-    return deepMerge(defaultSettings, initialSettings as any);
+    return deepMerge(defaultSettings, initialSettings as any) as AstraCustomizerSettings;
   }, [defaultSettings, initialSettings]);
 
   const [state, dispatch] = useReducer(customizerReducer, {
