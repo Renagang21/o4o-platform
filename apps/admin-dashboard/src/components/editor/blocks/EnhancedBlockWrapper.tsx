@@ -234,12 +234,39 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        // Select block on click (focus handled by useEffect)
-        onSelect();
-
-        // Stop propagation for non-content clicks to prevent event bubbling
         const target = e.target as HTMLElement;
         const isContentEditable = target.isContentEditable || target.closest('[contenteditable]');
+
+        // Always select the block when clicked
+        onSelect();
+
+        // CRITICAL: Always focus contentEditable on click, even if already selected
+        // This fixes the issue where clicking a selected block doesn't show cursor
+        if (blockRef.current) {
+          const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
+          if (editableElement) {
+            // Focus immediately for direct contentEditable clicks
+            if (isContentEditable) {
+              editableElement.focus();
+              // Let browser handle cursor positioning for direct clicks
+            } else {
+              // For wrapper clicks, focus and position cursor at end
+              setTimeout(() => {
+                editableElement.focus();
+                const selection = window.getSelection();
+                if (selection) {
+                  const range = document.createRange();
+                  range.selectNodeContents(editableElement);
+                  range.collapse(false);
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                }
+              }, 0);
+            }
+          }
+        }
+
+        // Stop propagation for non-contentEditable clicks
         if (!isContentEditable) {
           e.stopPropagation();
         }
