@@ -52,7 +52,6 @@ export const RichText: FC<RichTextProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isEmpty, setIsEmpty] = useState(!value || value === '');
-  const isUpdatingRef = useRef(false);
 
   // Link editing state
   const [showLinkPopover, setShowLinkPopover] = useState(false);
@@ -64,27 +63,16 @@ export const RichText: FC<RichTextProps> = ({
   // Current active formats state
   const [currentFormats, setCurrentFormats] = useState<Set<string>>(new Set());
 
-  // 초기값 및 외부 value 변경 처리 - 텍스트 역순 문제 해결
+  // 초기값 설정만 - 입력 중에는 동기화하지 않음
   useEffect(() => {
-    if (editorRef.current && !isUpdatingRef.current) {
-      const currentContent = editorRef.current.innerHTML;
-      const normalizedCurrent = currentContent.replace(/<br\s*\/?>/gi, '').trim();
-      // Ensure value is a string before calling replace
+    if (editorRef.current && !value && !editorRef.current.textContent) {
+      // 초기 빈 상태에서만 설정
       const stringValue = typeof value === 'string' ? value : String(value || '');
-      const normalizedValue = stringValue.replace(/<br\s*\/?>/gi, '').trim();
-
-      // CRITICAL FIX: Don't update innerHTML if this editor currently has focus
-      // This prevents cursor loss when user is actively editing
-      const hasFocus = document.activeElement === editorRef.current;
-
-      if (normalizedCurrent !== normalizedValue && !hasFocus) {
-        // 내용 업데이트 (focus가 없을 때만)
-        editorRef.current.innerHTML = stringValue;
-      }
+      editorRef.current.innerHTML = stringValue;
     }
 
     setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
-  }, [value]);
+  }, []); // 🔴 의존성 배열을 비움 - 마운트 시에만 실행
 
   // Helper function to detect active formats at current selection
   const detectActiveFormats = (): Set<string> => {
@@ -255,12 +243,10 @@ export const RichText: FC<RichTextProps> = ({
     }
 
     if (editorRef.current) {
-      isUpdatingRef.current = true;
       onChange?.(editorRef.current.innerHTML);
 
       // Focus restoration: restore focus only if we lost it
       // EnhancedBlockWrapper already handles focus, so only restore if needed
-      setTimeout(() => {
         // Only restore focus if editor is not already focused
         if (editorRef.current && linkElement && document.activeElement !== editorRef.current) {
           editorRef.current.focus();
@@ -280,8 +266,6 @@ export const RichText: FC<RichTextProps> = ({
           }
         }
 
-        isUpdatingRef.current = false;
-      }, 0);
     }
 
     savedRangeRef.current = null;
@@ -313,11 +297,9 @@ export const RichText: FC<RichTextProps> = ({
       linkElement.replaceWith(textNode);
 
       if (editorRef.current) {
-        isUpdatingRef.current = true;
         onChange?.(editorRef.current.innerHTML);
 
         // Focus restoration: restore focus only if we lost it
-        setTimeout(() => {
           // Only restore focus if editor is not already focused
           if (editorRef.current && document.activeElement !== editorRef.current) {
             editorRef.current.focus();
@@ -337,8 +319,6 @@ export const RichText: FC<RichTextProps> = ({
             }
           }
 
-          isUpdatingRef.current = false;
-        }, 0);
       }
     }
 
@@ -411,11 +391,7 @@ export const RichText: FC<RichTextProps> = ({
         }
 
         if (editorRef.current) {
-          isUpdatingRef.current = true;
           onChange?.(editorRef.current.innerHTML);
-          setTimeout(() => {
-            isUpdatingRef.current = false;
-          }, 0);
         }
       }
     } catch (error) {
@@ -486,11 +462,7 @@ export const RichText: FC<RichTextProps> = ({
           }
 
           if (editorRef.current) {
-            isUpdatingRef.current = true;
             onChange?.(editorRef.current.innerHTML);
-            setTimeout(() => {
-              isUpdatingRef.current = false;
-            }, 0);
           }
         }
       } else {
@@ -522,19 +494,14 @@ export const RichText: FC<RichTextProps> = ({
     }
   };
 
-  // 입력 처리 - 텍스트 역순 문제 방지
+  // 입력 처리 - 단순화
   const handleInput = () => {
-    if (editorRef.current && !isUpdatingRef.current) {
-      isUpdatingRef.current = true;
+    if (editorRef.current) {
       const newValue = editorRef.current.innerHTML;
       // 빈 콘텐츠를 정리
       const cleanValue = newValue === '<br>' || newValue === '<div><br></div>' ? '' : newValue;
       onChange?.(cleanValue);
       setIsEmpty(!cleanValue || cleanValue === '' || cleanValue === '<br>');
-
-      setTimeout(() => {
-        isUpdatingRef.current = false;
-      }, 0);
     }
   };
 
@@ -575,11 +542,7 @@ export const RichText: FC<RichTextProps> = ({
     }
 
     if (editorRef.current) {
-      isUpdatingRef.current = true;
       onChange?.(editorRef.current.innerHTML);
-      setTimeout(() => {
-        isUpdatingRef.current = false;
-      }, 0);
     }
   };
 
