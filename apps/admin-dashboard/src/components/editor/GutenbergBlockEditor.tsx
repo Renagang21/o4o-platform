@@ -863,6 +863,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     const [block] = newBlocks.splice(blockIndex, 1);
     newBlocks.splice(blockIndex - 1, 0, block);
     updateBlocks(newBlocks);
+
+    // Re-trigger selection to restore focus after DOM update
+    setSelectedBlockId(null);
+    setTimeout(() => {
+      setSelectedBlockId(blockId);
+    }, 0);
   }, [blocks, updateBlocks]);
 
   // Handle block move down
@@ -874,6 +880,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     const [block] = newBlocks.splice(blockIndex, 1);
     newBlocks.splice(blockIndex + 1, 0, block);
     updateBlocks(newBlocks);
+
+    // Re-trigger selection to restore focus after DOM update
+    setSelectedBlockId(null);
+    setTimeout(() => {
+      setSelectedBlockId(blockId);
+    }, 0);
   }, [blocks, updateBlocks]);
 
   // Handle preview

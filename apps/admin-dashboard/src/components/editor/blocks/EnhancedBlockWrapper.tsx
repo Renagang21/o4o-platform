@@ -129,21 +129,27 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 
           focusableElement.focus();
 
-          // For contentEditable, explicitly create selection for cursor visibility
+          // For contentEditable, create selection ONLY if none exists
+          // This preserves user's cursor position when clicking within text
           if (focusableElement.contentEditable === 'true') {
             const selection = window.getSelection();
             if (selection) {
-              try {
-                // Create a collapsed range at the end to show cursor
-                const range = document.createRange();
-                range.selectNodeContents(focusableElement);
-                range.collapse(false); // false = end of content
-                selection.removeAllRanges();
-                selection.addRange(range);
-              } catch (error) {
-                // Ignore errors - cursor will appear on first keystroke
-                console.debug('Selection creation error (non-critical):', error);
+              // Only create selection if user hasn't set one
+              // (e.g., new block creation, or initial selection)
+              if (selection.rangeCount === 0 || !focusableElement.contains(selection.anchorNode)) {
+                try {
+                  // Create a collapsed range at the end for new blocks
+                  const range = document.createRange();
+                  range.selectNodeContents(focusableElement);
+                  range.collapse(false); // false = end of content
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                } catch (error) {
+                  // Ignore errors - cursor will appear on first keystroke
+                  console.debug('Selection creation error (non-critical):', error);
+                }
               }
+              // else: preserve existing selection (user clicked within text)
             }
           }
         }, 50); // 50ms delay for new blocks to fully render
@@ -234,11 +240,15 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        // Select block first - this will trigger useEffect focus
-        onSelect();
+        // Don't intercept clicks on contentEditable elements
+        // This allows text selection and cursor positioning
+        const target = e.target as HTMLElement;
+        if (target.contentEditable === 'true' || target.closest('[contenteditable="true"]')) {
+          return;
+        }
 
-        // Let useEffect handle all focus/cursor logic
-        // Don't duplicate focus operations here
+        // Select block for non-contentEditable clicks
+        onSelect();
       }}
     >
       {/* Left side drag handle - removed from here, now in toolbar */}
