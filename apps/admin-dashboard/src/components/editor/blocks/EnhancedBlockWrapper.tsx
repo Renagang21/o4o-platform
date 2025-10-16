@@ -242,25 +242,35 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         if (blockRef.current) {
           const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
           if (editableElement) {
-            // Use setTimeout to ensure focus happens after state update
-            setTimeout(() => {
-              editableElement.focus();
+            // IMMEDIATE focus first
+            editableElement.focus();
 
-              // Position cursor at the end if clicking wrapper (not directly on text)
-              const target = e.target as HTMLElement;
-              const clickedOnText = target.isContentEditable || target.closest('[contenteditable]');
+            // Then position cursor with slight delay
+            const target = e.target as HTMLElement;
+            const clickedOnText = target.isContentEditable || target.closest('[contenteditable]');
 
-              if (!clickedOnText) {
-                const selection = window.getSelection();
-                if (selection && editableElement.childNodes.length > 0) {
-                  const range = document.createRange();
-                  range.selectNodeContents(editableElement);
-                  range.collapse(false); // Move to end
-                  selection.removeAllRanges();
-                  selection.addRange(range);
+            if (!clickedOnText) {
+              // Only set cursor position if clicking wrapper
+              setTimeout(() => {
+                try {
+                  const selection = window.getSelection();
+                  if (selection && editableElement.isConnected && document.body.contains(editableElement)) {
+                    const range = document.createRange();
+                    if (editableElement.childNodes.length > 0) {
+                      range.selectNodeContents(editableElement);
+                      range.collapse(false); // Move to end
+                    } else {
+                      range.setStart(editableElement, 0);
+                      range.collapse(true);
+                    }
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                  }
+                } catch (error) {
+                  // Silently ignore range errors
                 }
-              }
-            }, 10); // Slightly longer delay to ensure DOM is ready
+              }, 0);
+            }
           }
         }
       }}
