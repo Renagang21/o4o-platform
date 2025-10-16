@@ -5,7 +5,6 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EditorHeader } from './EditorHeader';
 import '../../styles/editor.css';
 import '../../styles/inspector-sidebar.css';
 import { postApi } from '@/services/api/postApi';
@@ -1502,33 +1501,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   return (
     <div className="h-full w-full bg-transparent flex flex-col">
-      {/* Header - Hidden when used within StandaloneEditor */}
-      {!hideHeader && (
-        <EditorHeader
-          onSave={handleSave}
-          onPublish={handlePublish}
-          onBack={handleNavigation}
-          canUndo={historyIndex > 0}
-          canRedo={historyIndex < history.length - 1}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          isFullscreen={isFullscreen}
-          onToggleFullscreen={handleToggleFullscreen}
-          isDirty={isDirty}
-          onToggleListView={() => {}}
-          onToggleCodeView={handleToggleCodeView}
-          isCodeView={isCodeView}
-          onPreview={handlePreview}
-          onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
-          onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
-          onToggleInspector={() => setSidebarOpen(!sidebarOpen)}
-          isInspectorOpen={sidebarOpen}
-          viewportMode={viewportMode}
-          onViewportModeChange={switchViewport}
-          containerWidth={containerSettings.width}
-        />
-      )}
-
       {/* Main Layout */}
       <div className="flex-1 flex relative">
         {/* Block Inserter */}
