@@ -138,6 +138,7 @@ export default function MinimalEditor() {
 }
 
 // Direct Paragraph Block Test (without any wrappers)
+// CRITICAL: contentEditable must be UNCONTROLLED (no children from state)
 function DirectParagraphTest() {
   const [content, setContent] = useState('');
 
@@ -153,9 +154,7 @@ function DirectParagraphTest() {
         className="outline-none min-h-[60px] p-2 rounded border border-gray-200 focus:border-purple-500"
         data-placeholder="Type here (direct paragraph, no wrapper)"
         suppressContentEditableWarning
-      >
-        {content}
-      </div>
+      />
       <p className="mt-2 text-sm">
         <strong>Content:</strong> {content || '(empty)'}
       </p>

@@ -63,25 +63,15 @@ export const RichText: FC<RichTextProps> = ({
   // Current active formats state
   const [currentFormats, setCurrentFormats] = useState<Set<string>>(new Set());
 
-  // 초기값 및 외부 value 변경 처리
-  // CRITICAL: Only update innerHTML when user is NOT actively editing
+  // 초기값 설정 - 마운트 시에만 실행
+  // CRITICAL: contentEditable must be UNCONTROLLED to prevent IME composition issues
   useEffect(() => {
-    if (editorRef.current) {
-      const currentContent = editorRef.current.innerHTML;
+    if (editorRef.current && value) {
       const stringValue = typeof value === 'string' ? value : String(value || '');
-
-      // CRITICAL FIX: Don't update innerHTML if this editor currently has focus
-      // This prevents cursor loss and input interruption when user is actively editing
-      const hasFocus = document.activeElement === editorRef.current;
-
-      // Only update DOM if content differs AND user is not editing
-      if (currentContent !== stringValue && !hasFocus) {
-        editorRef.current.innerHTML = stringValue;
-      }
+      editorRef.current.innerHTML = stringValue;
     }
-
-    setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
-  }, [value]); // Re-run when value changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - mount only
 
   // Helper function to detect active formats at current selection
   const detectActiveFormats = (): Set<string> => {
@@ -509,8 +499,12 @@ export const RichText: FC<RichTextProps> = ({
       const newValue = editorRef.current.innerHTML;
       // 빈 콘텐츠를 정리
       const cleanValue = newValue === '<br>' || newValue === '<div><br></div>' ? '' : newValue;
-      onChange?.(cleanValue);
+
+      // Update isEmpty state based on current content
       setIsEmpty(!cleanValue || cleanValue === '' || cleanValue === '<br>');
+
+      // Notify parent of change
+      onChange?.(cleanValue);
     }
   };
 
