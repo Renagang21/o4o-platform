@@ -63,16 +63,25 @@ export const RichText: FC<RichTextProps> = ({
   // Current active formats state
   const [currentFormats, setCurrentFormats] = useState<Set<string>>(new Set());
 
-  // 초기값 설정만 - 입력 중에는 동기화하지 않음
+  // 초기값 및 외부 value 변경 처리
+  // CRITICAL: Only update innerHTML when user is NOT actively editing
   useEffect(() => {
-    if (editorRef.current && !value && !editorRef.current.textContent) {
-      // 초기 빈 상태에서만 설정
+    if (editorRef.current) {
+      const currentContent = editorRef.current.innerHTML;
       const stringValue = typeof value === 'string' ? value : String(value || '');
-      editorRef.current.innerHTML = stringValue;
+
+      // CRITICAL FIX: Don't update innerHTML if this editor currently has focus
+      // This prevents cursor loss and input interruption when user is actively editing
+      const hasFocus = document.activeElement === editorRef.current;
+
+      // Only update DOM if content differs AND user is not editing
+      if (currentContent !== stringValue && !hasFocus) {
+        editorRef.current.innerHTML = stringValue;
+      }
     }
 
     setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
-  }, []); // 🔴 의존성 배열을 비움 - 마운트 시에만 실행
+  }, [value]); // Re-run when value changes
 
   // Helper function to detect active formats at current selection
   const detectActiveFormats = (): Set<string> => {

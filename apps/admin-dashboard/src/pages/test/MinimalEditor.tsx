@@ -34,10 +34,10 @@ export default function MinimalEditor() {
               console.log('Test 1 input:', text);
             }}
             className="border-2 border-blue-300 p-4 rounded min-h-[100px] focus:outline-none focus:border-blue-500"
+            data-placeholder="Type here directly (raw contentEditable)"
             suppressContentEditableWarning
-          >
-            Type here directly (raw contentEditable)
-          </div>
+          />
+
           <p className="mt-2 text-sm">
             <strong>Captured value:</strong> {simpleText || '(empty)'}
           </p>
