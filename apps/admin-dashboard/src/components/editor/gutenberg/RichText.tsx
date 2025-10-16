@@ -73,53 +73,13 @@ export const RichText: FC<RichTextProps> = ({
       const stringValue = typeof value === 'string' ? value : String(value || '');
       const normalizedValue = stringValue.replace(/<br\s*\/?>/gi, '').trim();
 
-      if (normalizedCurrent !== normalizedValue) {
-        // 현재 포커스 상태 저장
-        const wasActive = document.activeElement === editorRef.current;
-        let cursorPosition = 0;
+      // CRITICAL FIX: Don't update innerHTML if this editor currently has focus
+      // This prevents cursor loss when user is actively editing
+      const hasFocus = document.activeElement === editorRef.current;
 
-        if (wasActive) {
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            cursorPosition = range.startOffset;
-          }
-        }
-
-        // 내용 업데이트
+      if (normalizedCurrent !== normalizedValue && !hasFocus) {
+        // 내용 업데이트 (focus가 없을 때만)
         editorRef.current.innerHTML = stringValue;
-
-        // 포커스 상태였다면 커서 위치 복원
-        if (wasActive) {
-          editorRef.current.focus();
-
-          // 커서 위치 복원
-          setTimeout(() => {
-            try {
-              const selection = window.getSelection();
-              if (selection && editorRef.current) {
-                const textNode = editorRef.current.firstChild;
-                if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-                  const range = document.createRange();
-                  const maxOffset = textNode.textContent?.length || 0;
-                  range.setStart(textNode, Math.min(cursorPosition, maxOffset));
-                  range.collapse(true);
-                  selection.removeAllRanges();
-                  selection.addRange(range);
-                } else {
-                  // 텍스트 노드가 없으면 끝으로 이동
-                  const range = document.createRange();
-                  range.selectNodeContents(editorRef.current);
-                  range.collapse(false);
-                  selection.removeAllRanges();
-                  selection.addRange(range);
-                }
-              }
-            } catch (e) {
-              // 커서 복원 실패 시 무시
-            }
-          }, 0);
-        }
       }
     }
 

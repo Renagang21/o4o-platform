@@ -240,24 +240,40 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         // Always select the block when clicked
         onSelect();
 
-        // If NOT clicking on contentEditable, manually focus it
-        if (!isContentEditable && blockRef.current) {
+        // Always ensure contentEditable has focus when block is clicked
+        if (blockRef.current) {
           const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
           if (editableElement) {
             // Use setTimeout to ensure focus happens after state updates
             setTimeout(() => {
-              editableElement.focus();
-              // Position cursor at the end
-              const selection = window.getSelection();
-              if (selection) {
-                const range = document.createRange();
-                range.selectNodeContents(editableElement);
-                range.collapse(false);  // false = end of content
-                selection.removeAllRanges();
-                selection.addRange(range);
+              // Only focus if not already focused
+              if (document.activeElement !== editableElement) {
+                editableElement.focus();
+
+                // Position cursor only if we just gave focus
+                const selection = window.getSelection();
+                if (selection) {
+                  const range = document.createRange();
+
+                  // If clicking on contentEditable directly, try to position at click point
+                  if (isContentEditable) {
+                    // Let browser handle cursor positioning for direct clicks
+                    // This preserves natural click-to-cursor behavior
+                  } else {
+                    // For wrapper clicks, position at end
+                    range.selectNodeContents(editableElement);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                  }
+                }
               }
             }, 0);
           }
+        }
+
+        // Stop propagation for non-contentEditable clicks
+        if (!isContentEditable) {
           e.stopPropagation();
         }
       }}
