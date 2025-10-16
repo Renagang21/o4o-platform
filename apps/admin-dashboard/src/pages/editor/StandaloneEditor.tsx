@@ -716,12 +716,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </Tooltip>
           </TooltipProvider>
 
-          {/* WordPress Logo - 모바일에서 숨김 */}
-          {!isMobile && (
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">W</span>
-            </div>
-          )}
+          {/* WordPress Logo - Always visible */}
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center">
+            <span className="text-white font-bold text-sm">W</span>
+          </div>
 
           {/* Title Input - Hidden because GutenbergBlockEditor has its own title field */}
           <div className="flex-1 max-w-2xl" style={{ display: 'none' }}>
@@ -881,26 +879,24 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </TooltipProvider>
           )}
 
-          {/* Customizer Button - 모바일에서 숨김 */}
-          {!isMobile && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9"
-                    onClick={() => navigate('/appearance/customize')}
-                  >
-                    <Palette className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>사용자 정의하기</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
+          {/* Customizer Button - Always visible */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={isMobile ? "h-8 w-8" : "h-9 w-9"}
+                  onClick={() => navigate('/appearance/customize')}
+                >
+                  <Palette className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>사용자 정의하기</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {/* Preview Toggle - 모바일에서 숨김 */}
           {!isMobile && (
