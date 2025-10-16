@@ -571,15 +571,9 @@ export const RichText: FC<RichTextProps> = ({
     'aria-multiline': !!multiline,
   };
 
-  // For specific tags that need special handling
-  const EditorElement = () => {
-    // Always use the specified tagName
-    return React.createElement(tagName || 'div', commonProps);
-  };
-
   return (
     <>
-      <EditorElement />
+      {React.createElement(tagName || 'div', commonProps)}
 
       {/* Link Popover */}
       {showLinkPopover && (
