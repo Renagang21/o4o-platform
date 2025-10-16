@@ -211,13 +211,19 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
   eventHandlers,
 }) => {
   const defaultSettings = useMemo(() => getDefaultSettings(), []);
-  const mergedSettings = useMemo(() => 
-    initialSettings 
-      ? deepMerge(defaultSettings, initialSettings as any)
-      : defaultSettings,
-    [defaultSettings, initialSettings]
-  );
-  
+  const mergedSettings = useMemo(() => {
+    if (!initialSettings) {
+      return defaultSettings;
+    }
+    // Ensure initialSettings is a complete AstraCustomizerSettings object
+    if ('siteIdentity' in initialSettings && 'header' in initialSettings) {
+      // It's already a full settings object, use it directly
+      return initialSettings as AstraCustomizerSettings;
+    }
+    // Otherwise merge with defaults
+    return deepMerge(defaultSettings, initialSettings as any);
+  }, [defaultSettings, initialSettings]);
+
   const [state, dispatch] = useReducer(customizerReducer, {
     settings: mergedSettings,
     previewDevice: 'desktop',
