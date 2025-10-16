@@ -131,9 +131,19 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     if (!isSelected) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isContentEditableTarget = target.isContentEditable || target.closest('[contenteditable]');
+
+      // Text formatting shortcuts (Ctrl+B/I/K) - delegate to RichText for contentEditable elements
+      if (isContentEditableTarget && (e.ctrlKey || e.metaKey)) {
+        if (['b', 'i', 'k'].includes(e.key)) {
+          // Let RichText handle these shortcuts
+          return;
+        }
+      }
+
       // Delete key - remove block
       if (e.key === 'Delete' && !e.shiftKey && !e.ctrlKey) {
-        const target = e.target as HTMLElement;
         // Only delete if not editing text
         if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
           e.preventDefault();
@@ -144,6 +154,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       // Ctrl/Cmd + C - copy block
       if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.shiftKey) {
         const selection = window.getSelection();
+        // Only intercept if no text is selected (to avoid interfering with text copy)
         if (!selection?.toString()) {
           e.preventDefault();
           onCopy?.();
@@ -152,7 +163,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 
       // Ctrl/Cmd + V - paste block
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !e.shiftKey) {
-        const target = e.target as HTMLElement;
+        // Only intercept if not in contentEditable element
         if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
           e.preventDefault();
           onPaste?.();

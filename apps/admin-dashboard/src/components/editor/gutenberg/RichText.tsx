@@ -25,7 +25,12 @@ interface RichTextProps {
   style?: React.CSSProperties;
   multiline?: boolean | string;
   // Expose simple formatting API to parents (no execCommand usage outside)
-  exposeApi?: (api: { applyFormat: (format: string) => void }) => void;
+  exposeApi?: (api: {
+    applyFormat: (format: string) => void;
+    getCurrentFormats: () => Set<string>;
+  }) => void;
+  // Callback when active formats change (for toolbar button states)
+  onFormatChange?: (formats: Set<string>) => void;
 }
 
 export const RichText: FC<RichTextProps> = ({
@@ -43,6 +48,7 @@ export const RichText: FC<RichTextProps> = ({
   style,
   multiline = false,
   exposeApi,
+  onFormatChange,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isEmpty, setIsEmpty] = useState(!value || value === '');
@@ -54,6 +60,9 @@ export const RichText: FC<RichTextProps> = ({
   const [currentLinkUrl, setCurrentLinkUrl] = useState('');
   const [currentLinkOpenInNewTab, setCurrentLinkOpenInNewTab] = useState(false);
   const savedRangeRef = useRef<Range | null>(null);
+
+  // Current active formats state
+  const [currentFormats, setCurrentFormats] = useState<Set<string>>(new Set());
 
   // 초기값 및 외부 value 변경 처리 - 텍스트 역순 문제 해결
   useEffect(() => {
@@ -117,6 +126,88 @@ export const RichText: FC<RichTextProps> = ({
     setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
   }, [value]);
 
+  // Helper function to detect active formats at current selection
+  const detectActiveFormats = (): Set<string> => {
+    const formats = new Set<string>();
+    const selection = window.getSelection();
+
+    if (!selection || selection.rangeCount === 0) {
+      return formats;
+    }
+
+    const range = selection.getRangeAt(0);
+    const container = range.commonAncestorContainer;
+
+    // Get the element node (if text node, get parent)
+    let element: HTMLElement | null = container.nodeType === Node.TEXT_NODE
+      ? container.parentElement
+      : container as HTMLElement;
+
+    // Traverse up the DOM tree until we reach the editor root
+    while (element && element !== editorRef.current && editorRef.current?.contains(element)) {
+      const tagName = element.tagName;
+
+      // Check for bold
+      if (tagName === 'STRONG' || tagName === 'B') {
+        formats.add('bold');
+      }
+
+      // Check for italic
+      if (tagName === 'EM' || tagName === 'I') {
+        formats.add('italic');
+      }
+
+      // Check for link
+      if (tagName === 'A') {
+        formats.add('link');
+      }
+
+      // Check for strikethrough
+      if (tagName === 'S' || tagName === 'STRIKE' || tagName === 'DEL') {
+        formats.add('strikethrough');
+      }
+
+      // Check for code
+      if (tagName === 'CODE') {
+        formats.add('code');
+      }
+
+      element = element.parentElement;
+    }
+
+    return formats;
+  };
+
+  // Get current formats (for API exposure)
+  const getCurrentFormats = (): Set<string> => {
+    return currentFormats;
+  };
+
+  // Handle selection change to update active formats
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      // Only update if this editor is focused
+      if (document.activeElement !== editorRef.current) {
+        return;
+      }
+
+      const formats = detectActiveFormats();
+
+      // Only update if formats actually changed
+      const formatsChanged =
+        formats.size !== currentFormats.size ||
+        ![...formats].every(f => currentFormats.has(f));
+
+      if (formatsChanged) {
+        setCurrentFormats(formats);
+        onFormatChange?.(formats);
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+  }, [currentFormats, onFormatChange]);
+
   // 링크 편집 팝업 열기
   const openLinkPopover = () => {
     const selection = window.getSelection();
@@ -169,30 +260,49 @@ export const RichText: FC<RichTextProps> = ({
     const ancestor = range.commonAncestorContainer;
     const existingLink = (ancestor.nodeType === Node.TEXT_NODE ? ancestor.parentElement : ancestor) as HTMLElement;
 
+    let linkElement: HTMLAnchorElement | null = null;
+
     // 기존 링크 업데이트 또는 새 링크 생성
     if (existingLink && existingLink.tagName === 'A') {
-      (existingLink as HTMLAnchorElement).href = url;
-      (existingLink as HTMLAnchorElement).target = openInNewTab ? '_blank' : '';
+      linkElement = existingLink as HTMLAnchorElement;
+      linkElement.href = url;
+      linkElement.target = openInNewTab ? '_blank' : '';
       if (openInNewTab) {
-        (existingLink as HTMLAnchorElement).rel = 'noopener noreferrer';
+        linkElement.rel = 'noopener noreferrer';
       }
     } else {
-      const link = document.createElement('a');
-      link.href = url;
+      linkElement = document.createElement('a');
+      linkElement.href = url;
       if (openInNewTab) {
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
+        linkElement.target = '_blank';
+        linkElement.rel = 'noopener noreferrer';
       }
 
       const contents = range.extractContents();
-      link.appendChild(contents);
-      range.insertNode(link);
+      linkElement.appendChild(contents);
+      range.insertNode(linkElement);
     }
 
     if (editorRef.current) {
       isUpdatingRef.current = true;
       onChange?.(editorRef.current.innerHTML);
+
+      // Focus restoration: restore focus to editor and position cursor after link
       setTimeout(() => {
+        if (editorRef.current && linkElement) {
+          editorRef.current.focus();
+
+          // Position cursor at the end of the link
+          const selection = window.getSelection();
+          if (selection) {
+            const range = document.createRange();
+            range.setStartAfter(linkElement);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        }
+
         isUpdatingRef.current = false;
       }, 0);
     }
@@ -222,7 +332,23 @@ export const RichText: FC<RichTextProps> = ({
       if (editorRef.current) {
         isUpdatingRef.current = true;
         onChange?.(editorRef.current.innerHTML);
+
+        // Focus restoration: restore focus to editor and position cursor after removed link text
         setTimeout(() => {
+          if (editorRef.current) {
+            editorRef.current.focus();
+
+            // Position cursor at the end of the replaced text
+            const selection = window.getSelection();
+            if (selection && textNode) {
+              const range = document.createRange();
+              range.setStartAfter(textNode);
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+          }
+
           isUpdatingRef.current = false;
         }, 0);
       }
@@ -307,7 +433,7 @@ export const RichText: FC<RichTextProps> = ({
 
   // Expose API to parent once mounted
   useEffect(() => {
-    exposeApi?.({ applyFormat });
+    exposeApi?.({ applyFormat, getCurrentFormats });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exposeApi]);
 

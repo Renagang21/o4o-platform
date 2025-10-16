@@ -23,19 +23,23 @@ export const paragraphBlockDefinition: BlockDefinition = {
     },
     align: {
       type: 'string',
+      default: 'left',
     },
     dropCap: {
       type: 'boolean',
       default: false,
     },
     fontSize: {
-      type: 'string',
+      type: 'number',
+      default: 16,
     },
     textColor: {
       type: 'string',
+      default: '#1e293b',
     },
     backgroundColor: {
       type: 'string',
+      default: '',
     },
   },
   supports: {

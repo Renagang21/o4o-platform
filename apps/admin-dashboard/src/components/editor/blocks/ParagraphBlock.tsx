@@ -53,7 +53,10 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   } = attributes;
 
   const [localContent, setLocalContent] = useState(content);
-  const richApiRef = useRef<{ applyFormat: (format: string) => void } | null>(null);
+  const richApiRef = useRef<{ applyFormat: (format: string) => void; getCurrentFormats: () => Set<string> } | null>(null);
+
+  // Track active formats for toolbar button states
+  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
 
   // Sync content
   useEffect(() => {
@@ -114,6 +117,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onToggleBold={() => richApiRef.current?.applyFormat('core/bold')}
       onToggleItalic={() => richApiRef.current?.applyFormat('core/italic')}
       onToggleLink={() => richApiRef.current?.applyFormat('core/link')}
+      // Active format states for toolbar buttons
+      isBold={activeFormats.has('bold')}
+      isItalic={activeFormats.has('italic')}
       // Sidebar settings
       customSidebarContent={
         <ParagraphBlockSettings
@@ -139,6 +145,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           'core/link',
         ]}
         exposeApi={(api) => { richApiRef.current = api; }}
+        onFormatChange={(formats) => setActiveFormats(formats)}
         className={cn(
           'paragraph-content min-h-[1.5em]',
           getAlignmentClass(),
