@@ -851,33 +851,31 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             />
           )}
 
-          {/* Theme Preview Mode Toggle - 모바일에서 숨김 */}
-          {!isMobile && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-9 w-9",
-                      isThemePreviewMode && "bg-blue-100 text-blue-600"
-                    )}
-                    onClick={() => setIsThemePreviewMode(!isThemePreviewMode)}
-                  >
-                    {isThemePreviewMode ? (
-                      <Monitor className="h-4 w-4" />
-                    ) : (
-                      <MonitorOff className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isThemePreviewMode ? 'Disable' : 'Enable'} theme width preview</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
+          {/* Theme Preview Mode Toggle - Always visible */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    isMobile ? "h-8 w-8" : "h-9 w-9",
+                    isThemePreviewMode && "bg-blue-100 text-blue-600"
+                  )}
+                  onClick={() => setIsThemePreviewMode(!isThemePreviewMode)}
+                >
+                  {isThemePreviewMode ? (
+                    <Monitor className="h-4 w-4" />
+                  ) : (
+                    <MonitorOff className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isThemePreviewMode ? 'Disable' : 'Enable'} theme width preview</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {/* Customizer Button - Always visible */}
           <TooltipProvider>
