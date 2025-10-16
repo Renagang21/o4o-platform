@@ -522,9 +522,9 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                 </div>
                 <div className="h-[calc(100%-44px)] overflow-y-auto">
                   <HeaderBuilder
-                    layout={settings.header.layout as any}
+                    layout={settings.header.builder}
                     onChange={(newLayout) => {
-                      updateSetting('header', { ...settings.header, layout: newLayout });
+                      updateSetting('header', { ...settings.header, builder: newLayout });
                     }}
                     device={previewDevice}
                   />
@@ -557,9 +557,64 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                 </div>
                 <div className="h-[calc(100%-44px)] overflow-y-auto">
                   <FooterBuilder
-                    layout={settings.footer.builder}
+                    layout={{
+                      widgets: {
+                        enabled: settings.footer.widgets?.enabled ?? true,
+                        columns: settings.footer.widgets?.columns?.desktop ?? 4,
+                        layout: [], // TODO: Map from settings.footer.widgets
+                        settings: {
+                          background: settings.footer.widgets?.background ?? '#333333',
+                          textColor: settings.footer.widgets?.textColor ?? '#ffffff',
+                          linkColor: settings.footer.widgets?.linkColor ?? { normal: '#ffffff', hover: '#0073aa' },
+                          padding: settings.footer.widgets?.padding ?? {
+                            desktop: { top: 60, bottom: 60 },
+                            tablet: { top: 50, bottom: 50 },
+                            mobile: { top: 40, bottom: 40 }
+                          }
+                        }
+                      },
+                      bar: {
+                        enabled: settings.footer.bottomBar?.enabled ?? true,
+                        left: [], // TODO: Parse from bottomBar.section1
+                        right: [], // TODO: Parse from bottomBar.section2
+                        settings: {
+                          background: settings.footer.bottomBar?.background ?? '#1a1a1a',
+                          textColor: settings.footer.bottomBar?.textColor ?? '#999999',
+                          linkColor: settings.footer.bottomBar?.linkColor ?? { normal: '#999999', hover: '#ffffff' },
+                          padding: settings.footer.bottomBar?.padding ?? {
+                            desktop: { top: 20, bottom: 20 },
+                            tablet: { top: 20, bottom: 20 },
+                            mobile: { top: 15, bottom: 15 }
+                          }
+                        }
+                      }
+                    }}
                     onChange={(newLayout) => {
-                      updateSetting('footer', newLayout, ['builder']);
+                      // Map FooterBuilderLayout back to footer settings structure
+                      updateSetting('footer', {
+                        ...settings.footer,
+                        widgets: {
+                          ...settings.footer.widgets,
+                          enabled: newLayout.widgets.enabled,
+                          columns: {
+                            desktop: newLayout.widgets.columns,
+                            tablet: Math.min(newLayout.widgets.columns, 2),
+                            mobile: 1
+                          },
+                          background: newLayout.widgets.settings.background,
+                          textColor: newLayout.widgets.settings.textColor,
+                          linkColor: newLayout.widgets.settings.linkColor,
+                          padding: newLayout.widgets.settings.padding
+                        },
+                        bottomBar: {
+                          ...settings.footer.bottomBar,
+                          enabled: newLayout.bar.enabled,
+                          background: newLayout.bar.settings.background,
+                          textColor: newLayout.bar.settings.textColor,
+                          linkColor: newLayout.bar.settings.linkColor,
+                          padding: newLayout.bar.settings.padding
+                        }
+                      });
                     }}
                     device={previewDevice}
                   />
