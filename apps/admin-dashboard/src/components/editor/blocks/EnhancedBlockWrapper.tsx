@@ -239,45 +239,11 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        // Select block first
+        // Select block first - this will trigger useEffect focus
         onSelect();
 
-        // Always focus on contentEditable element when block is clicked
-        // This is critical for paragraph block input to work
-        if (blockRef.current) {
-          const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
-          if (editableElement) {
-            // IMMEDIATE focus first
-            editableElement.focus();
-
-            // Then position cursor with slight delay
-            const target = e.target as HTMLElement;
-            const clickedOnText = target.isContentEditable || target.closest('[contenteditable]');
-
-            if (!clickedOnText) {
-              // Only set cursor position if clicking wrapper
-              setTimeout(() => {
-                try {
-                  const selection = window.getSelection();
-                  if (selection && editableElement.isConnected && document.body.contains(editableElement)) {
-                    const range = document.createRange();
-                    if (editableElement.childNodes.length > 0) {
-                      range.selectNodeContents(editableElement);
-                      range.collapse(false); // Move to end
-                    } else {
-                      range.setStart(editableElement, 0);
-                      range.collapse(true);
-                    }
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                  }
-                } catch (error) {
-                  // Silently ignore range errors
-                }
-              }, 0);
-            }
-          }
-        }
+        // Let useEffect handle all focus/cursor logic
+        // Don't duplicate focus operations here
       }}
     >
       {/* Left side drag handle - removed from here, now in toolbar */}
