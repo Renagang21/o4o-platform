@@ -114,14 +114,39 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     setShowToolbar(isSelected || isHovered);
   }, [isSelected, isHovered]);
 
-  // Auto-focus block when selected
+  // Auto-focus block when selected with proper cursor positioning
   useEffect(() => {
     if (isSelected && blockRef.current) {
       const focusableElement = blockRef.current.querySelector(
         '[contenteditable], input, textarea'
       );
       if (focusableElement instanceof HTMLElement) {
-        focusableElement.focus();
+        // Use setTimeout to ensure focus happens after React state updates
+        setTimeout(() => {
+          focusableElement.focus();
+
+          // Position cursor only for contentEditable elements
+          if (focusableElement.contentEditable === 'true') {
+            const selection = window.getSelection();
+            if (selection) {
+              const range = document.createRange();
+
+              // Check if element has content
+              if (focusableElement.childNodes.length > 0) {
+                // Position at the end of existing content
+                range.selectNodeContents(focusableElement);
+                range.collapse(false);  // false = end of content
+              } else {
+                // Empty element, position at start
+                range.setStart(focusableElement, 0);
+                range.collapse(true);
+              }
+
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+          }
+        }, 0);
       }
     }
   }, [isSelected]);
