@@ -218,8 +218,14 @@ export const RichText: FC<RichTextProps> = ({
     if (!selection) return;
 
     // 저장된 range 복원
-    selection.removeAllRanges();
-    selection.addRange(savedRangeRef.current);
+    try {
+      selection.removeAllRanges();
+      selection.addRange(savedRangeRef.current);
+    } catch (error) {
+      console.debug('Range restoration error:', error);
+      setShowLinkPopover(false);
+      return;
+    }
 
     const range = savedRangeRef.current;
     const ancestor = range.commonAncestorContainer;
@@ -262,11 +268,15 @@ export const RichText: FC<RichTextProps> = ({
           // Position cursor at the end of the link
           const selection = window.getSelection();
           if (selection) {
-            const range = document.createRange();
-            range.setStartAfter(linkElement);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
+            try {
+              const range = document.createRange();
+              range.setStartAfter(linkElement);
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            } catch (error) {
+              console.debug('Cursor positioning error:', error);
+            }
           }
         }
 
@@ -284,8 +294,14 @@ export const RichText: FC<RichTextProps> = ({
     const selection = window.getSelection();
     if (!selection) return;
 
-    selection.removeAllRanges();
-    selection.addRange(savedRangeRef.current);
+    try {
+      selection.removeAllRanges();
+      selection.addRange(savedRangeRef.current);
+    } catch (error) {
+      console.debug('Range restoration error in removeLink:', error);
+      setShowLinkPopover(false);
+      return;
+    }
 
     const range = savedRangeRef.current;
     const ancestor = range.commonAncestorContainer;
@@ -309,11 +325,15 @@ export const RichText: FC<RichTextProps> = ({
             // Position cursor at the end of the replaced text
             const selection = window.getSelection();
             if (selection && textNode) {
-              const range = document.createRange();
-              range.setStartAfter(textNode);
-              range.collapse(true);
-              selection.removeAllRanges();
-              selection.addRange(range);
+              try {
+                const range = document.createRange();
+                range.setStartAfter(textNode);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+              } catch (error) {
+                console.debug('Cursor positioning error after link removal:', error);
+              }
             }
           }
 
@@ -380,10 +400,14 @@ export const RichText: FC<RichTextProps> = ({
           range.insertNode(element);
 
           // 선택 영역 복원
-          selection.removeAllRanges();
-          const newRange = document.createRange();
-          newRange.selectNodeContents(element);
-          selection.addRange(newRange);
+          try {
+            selection.removeAllRanges();
+            const newRange = document.createRange();
+            newRange.selectNodeContents(element);
+            selection.addRange(newRange);
+          } catch (error) {
+            console.debug('Range restoration error after format:', error);
+          }
         }
 
         if (editorRef.current) {
@@ -450,10 +474,15 @@ export const RichText: FC<RichTextProps> = ({
             range.insertNode(br);
 
             // 커서를 br 다음으로 이동
-            range.setStartAfter(br);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
+            try {
+              range.setStartAfter(br);
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            } catch (error) {
+              // Silently handle range errors - browser will place cursor automatically
+              console.debug('Range positioning error (non-critical):', error);
+            }
           }
 
           if (editorRef.current) {
@@ -535,10 +564,14 @@ export const RichText: FC<RichTextProps> = ({
       range.insertNode(textNode);
 
       // 커서를 삽입한 텍스트 끝으로 이동
-      range.setStartAfter(textNode);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
+      try {
+        range.setStartAfter(textNode);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } catch (error) {
+        console.debug('Cursor positioning error after paste:', error);
+      }
     }
 
     if (editorRef.current) {
