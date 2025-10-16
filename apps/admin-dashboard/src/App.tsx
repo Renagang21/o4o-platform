@@ -99,13 +99,9 @@ const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
 // Dropshipping Pages
 const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
-// const GutenbergPage = lazy(() => 
-//   import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPageWrapped')
-// );
-// Test pages removed for production
-// const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
-// const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
-// const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
+
+// Test Page - Minimal Editor
+const MinimalEditor = lazy(() => import('@/pages/test/MinimalEditor'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -604,6 +600,13 @@ function App() {
                           <UIShowcase />
                         </Suspense>
                       </AdminProtectedRoute>
+                    } />
+
+                    {/* Test - Minimal Editor */}
+                    <Route path="/test/minimal-editor" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <MinimalEditor />
+                      </Suspense>
                     } />
                     
                     {/* System Monitoring */}
