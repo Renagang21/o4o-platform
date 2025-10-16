@@ -234,41 +234,34 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        const target = e.target as HTMLElement;
-        const isContentEditable = target.isContentEditable || target.closest('[contenteditable]');
-
-        // Always select the block when clicked
+        // Select block first
         onSelect();
 
-        // CRITICAL: Always focus contentEditable on click, even if already selected
-        // This fixes the issue where clicking a selected block doesn't show cursor
+        // Always focus on contentEditable element when block is clicked
+        // This is critical for paragraph block input to work
         if (blockRef.current) {
           const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
           if (editableElement) {
-            // Focus immediately for direct contentEditable clicks
-            if (isContentEditable) {
+            // Use setTimeout to ensure focus happens after state update
+            setTimeout(() => {
               editableElement.focus();
-              // Let browser handle cursor positioning for direct clicks
-            } else {
-              // For wrapper clicks, focus and position cursor at end
-              setTimeout(() => {
-                editableElement.focus();
+
+              // Position cursor at the end if clicking wrapper (not directly on text)
+              const target = e.target as HTMLElement;
+              const clickedOnText = target.isContentEditable || target.closest('[contenteditable]');
+
+              if (!clickedOnText) {
                 const selection = window.getSelection();
-                if (selection) {
+                if (selection && editableElement.childNodes.length > 0) {
                   const range = document.createRange();
                   range.selectNodeContents(editableElement);
-                  range.collapse(false);
+                  range.collapse(false); // Move to end
                   selection.removeAllRanges();
                   selection.addRange(range);
                 }
-              }, 0);
-            }
+              }
+            }, 10); // Slightly longer delay to ensure DOM is ready
           }
-        }
-
-        // Stop propagation for non-contentEditable clicks
-        if (!isContentEditable) {
-          e.stopPropagation();
         }
       }}
     >
