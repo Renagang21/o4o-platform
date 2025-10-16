@@ -690,7 +690,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       {/* Editor Header */}
       <div className={cn(
-        "bg-white border-b flex items-center justify-between overflow-x-auto",
+        "bg-white border-b flex items-center justify-between overflow-x-auto relative z-40",
         isMobile ? "px-2 py-2" : "px-3 py-2"
       )}>
         <div className={cn(
