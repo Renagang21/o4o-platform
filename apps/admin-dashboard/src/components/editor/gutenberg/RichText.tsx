@@ -63,15 +63,19 @@ export const RichText: FC<RichTextProps> = ({
   // Current active formats state
   const [currentFormats, setCurrentFormats] = useState<Set<string>>(new Set());
 
-  // 초기값 설정 - 마운트 시에만 실행
+  // 초기값 설정 - 마운트 시 단 한 번만 실행
   // CRITICAL: contentEditable must be UNCONTROLLED to prevent IME composition issues
+  // Use ref flag to ensure innerHTML is NEVER updated after initial mount
+  const initialValueSet = useRef(false);
   useEffect(() => {
-    if (editorRef.current && value) {
+    if (editorRef.current && !initialValueSet.current) {
       const stringValue = typeof value === 'string' ? value : String(value || '');
       editorRef.current.innerHTML = stringValue;
+      initialValueSet.current = true;
+      setIsEmpty(!stringValue || stringValue === '' || stringValue === '<p></p>' || stringValue === '<br>');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - mount only
+  }, []); // Empty deps - mount only, ref ensures single execution
 
   // Helper function to detect active formats at current selection
   const detectActiveFormats = (): Set<string> => {
