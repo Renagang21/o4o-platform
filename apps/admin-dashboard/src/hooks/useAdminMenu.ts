@@ -23,25 +23,31 @@ export const useAdminMenu = () => {
         setPermissionsLoading(false);
         return;
       }
-      
+
       try {
-        // Fetch user permissions from API with authentication
+        // Fetch user permissions from API with authentication (authClient handles baseURL)
         const response = await apiClient.get(`/users/${user.id}/permissions`);
         if (response.data?.success) {
-          setUserPermissions(response.data.data.permissions || []);
+          setUserPermissions(response.data.data?.permissions || []);
         } else {
-          // Fallback to user's permissions property if API fails
+          // Fallback to user's permissions property if API response is not successful
           setUserPermissions(user.permissions || []);
         }
       } catch (error) {
         console.error('Failed to fetch user permissions:', error);
+
         // Use user's permissions property as fallback
-        setUserPermissions(user.permissions || []);
+        // If user has no permissions, grant content.view by default to show basic menus
+        const fallbackPermissions = user.permissions?.length
+          ? user.permissions
+          : ['content.view', 'dashboard:view'];
+
+        setUserPermissions(fallbackPermissions);
       } finally {
         setPermissionsLoading(false);
       }
     };
-    
+
     fetchPermissions();
   }, [user]);
   
@@ -54,28 +60,47 @@ export const useAdminMenu = () => {
   // Filter menu items based on permissions
   const filterMenuItems = (items: any[]): any[] => {
     return items.filter(item => {
+      // Skip separators - always show
+      if (item.separator) {
+        return true;
+      }
+
+      // Skip collapse menu - always show
+      if (item.id === 'collapse') {
+        return true;
+      }
+
       // Check if user has permission for this menu item
       const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id || item.key);
-      
+
+      // Debug logging for menu filtering (can be removed in production)
+      if (!hasAccess && process.env.NODE_ENV === 'development') {
+        console.debug(`[Menu Filter] Hidden: ${item.id} - User roles:`, userRoles, 'Permissions:', userPermissions);
+      }
+
       if (!hasAccess) {
         return false;
       }
-      
+
       // Recursively filter children
       if (item.children && item.children.length > 0) {
         const filteredChildren = filterMenuItems(item.children);
-        if (filteredChildren.length > 0) {
-          item.children = filteredChildren;
-          return true;
-        }
-        return false;
+        // Keep parent menu even if no children are accessible
+        // This allows showing the menu structure
+        item.children = filteredChildren;
+        return true;
       }
-      
+
       return true;
     });
   };
-  
+
   const filteredMenuItems = filterMenuItems([...allMenuItems]);
+
+  // Debug log final menu count
+  if (process.env.NODE_ENV === 'development') {
+    console.debug(`[Menu] Showing ${filteredMenuItems.length}/${allMenuItems.length} menu items`);
+  }
   
   return {
     menuItems: filteredMenuItems,

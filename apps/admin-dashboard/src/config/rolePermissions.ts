@@ -66,145 +66,23 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['users.view']
   },
   
-  // Seller Management
-  {
-    menuId: 'sellers',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'sellers-list',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'sellers-add',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'sellers-analytics',
-    permissions: ['content.view']
-  },
-  
-  // E-commerce
-  {
-    menuId: 'ecommerce',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'products',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'orders',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'categories',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'inventory',
-    permissions: ['content.view']
-  },
-  
-  // Finance
-  {
-    menuId: 'finance',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'payments',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'invoices',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'transactions',
-    permissions: ['content.view']
-  },
-  
-  // Marketing
-  {
-    menuId: 'marketing',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'campaigns',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'promotions',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'coupons',
-    permissions: ['content.view']
-  },
-  
-  // Support
-  {
-    menuId: 'support',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'tickets',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'faq',
-    permissions: ['content.view']
-  },
-  
-  // Forum
-  {
-    menuId: 'forum',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'forum-categories',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'forum-topics',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'forum-moderation',
-    permissions: ['content.view']
-  },
-  
-  // Crowdfunding
-  {
-    menuId: 'crowdfunding',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'projects',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'backers',
-    permissions: ['content.view']
-  },
-  
-  // CMS
-  {
-    menuId: 'cms',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'pages',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'posts',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'media',
-    permissions: ['content.view']
-  },
+  // Seller Management - No restriction (allow all)
+  // These menus are visible to all authenticated users
+
+  // E-commerce - No restriction (allow all)
+
+  // Finance - No restriction (allow all)
+
+  // Marketing - No restriction (allow all)
+
+  // Support - No restriction (allow all)
+
+  // Forum - No restriction (allow all)
+
+  // Crowdfunding - No restriction (allow all)
+
+  // CMS - No restriction (allow all)
+  // Posts, Pages, Media - All users can view
   
   // Reports & Analytics
   {
@@ -238,27 +116,7 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['admin.settings']
   },
   
-  // Appearance
-  {
-    menuId: 'appearance',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'themes',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'widgets',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'menus',
-    permissions: ['content.view']
-  },
-  {
-    menuId: 'customizer',
-    permissions: ['content.view']
-  },
+  // Appearance - No restriction (allow all)
   
   // Tools
   {
@@ -313,9 +171,10 @@ export function hasMenuPermission(
 ): boolean {
   const menuConfig = menuPermissions.find(m => m.menuId === menuId);
 
+  // POLICY: ALLOW BY DEFAULT (Whitelist approach)
+  // Menu not found in configuration - allow by default for backward compatibility
+  // This allows all menus to be visible unless explicitly restricted
   if (!menuConfig) {
-    // Menu not found in configuration - allow by default for backward compatibility
-    // This allows all menus to be visible unless explicitly restricted
     return true;
   }
 
@@ -327,11 +186,19 @@ export function hasMenuPermission(
   // Check role-based access
   if (menuConfig.roles?.length) {
     const hasRole = menuConfig.roles.some(role => userRoles.includes(role));
+    // If user has required role, grant access immediately
     if (hasRole) return true;
+
+    // If roles are specified but user doesn't have them, check if permissions are also specified
+    // If only roles specified (no permissions), deny access
+    if (!menuConfig.permissions?.length) {
+      return false;
+    }
   }
 
   // Check permission-based access
   if (menuConfig.permissions?.length) {
+    // Special handling: if permissions array is not empty, check them
     if (menuConfig.requireAll) {
       // Requires all permissions
       return menuConfig.permissions.every(permission =>
@@ -339,13 +206,20 @@ export function hasMenuPermission(
       );
     } else {
       // Requires at least one permission
-      return menuConfig.permissions.some(permission =>
+      const hasPermission = menuConfig.permissions.some(permission =>
         userPermissions.includes(permission)
       );
+
+      // If user has required permission, grant access
+      if (hasPermission) return true;
+
+      // If permissions are specified but user doesn't have any, deny access
+      return false;
     }
   }
 
-  return false;
+  // Fallback: if we reach here, allow access (should not happen with current logic)
+  return true;
 }
 
 /**
