@@ -240,14 +240,8 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        // Don't intercept clicks on contentEditable elements
-        // This allows text selection and cursor positioning
-        const target = e.target as HTMLElement;
-        if (target.contentEditable === 'true' || target.closest('[contenteditable="true"]')) {
-          return;
-        }
-
-        // Select block for non-contentEditable clicks
+        // Always select block when clicked
+        // Browser will handle cursor positioning in contentEditable
         onSelect();
       }}
     >
