@@ -69,7 +69,9 @@ interface CachedData {
 }
 
 export const useCustomizerSettings = () => {
-  const [settings, setSettings] = useState<CustomizerSettings | null>(null);
+  const [settings, setSettings] = useState<CustomizerSettings>({
+    container: DEFAULT_CONTAINER_SETTINGS,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [viewportMode, setViewportMode] = useState<ViewportMode>(() => {
