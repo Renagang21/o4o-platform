@@ -5,7 +5,7 @@ import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { SimpleCustomizer } from './astra-customizer/SimpleCustomizer';
 import { AstraCustomizerSettings } from './astra-customizer/types/customizer-types';
-import { getDefaultSettings } from './astra-customizer/utils/default-settings';
+import { normalizeCustomizerSettings } from './astra-customizer/utils/normalize-settings';
 import { errorHandler, ErrorLevel } from './astra-customizer/utils/error-handler';
 
 const Customize: React.FC = () => {
@@ -37,14 +37,15 @@ const Customize: React.FC = () => {
         const response = await authClient.api.get('/settings/customizer');
 
         if (response.data?.success && response.data?.data) {
-          setInitialSettings(response.data.data);
+          const payload = response.data.data?.settings ?? response.data.data;
+          setInitialSettings(normalizeCustomizerSettings(payload));
         } else {
           // 설정이 없으면 기본값 사용
-          setInitialSettings(getDefaultSettings());
+          setInitialSettings(normalizeCustomizerSettings(null));
         }
       } catch (error: any) {
         // 에러 시 기본값 사용
-        setInitialSettings(getDefaultSettings());
+        setInitialSettings(normalizeCustomizerSettings(null));
         errorHandler.handleApiError(error, 'Settings Load');
       } finally {
         setIsLoading(false);
