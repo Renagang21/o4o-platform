@@ -209,14 +209,17 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        // Don't interfere with contentEditable elements
         const target = e.target as HTMLElement;
-        // Check if target itself or any parent is contentEditable
-        if (target.isContentEditable || target.closest('[contenteditable]')) {
-          return;
-        }
-        e.stopPropagation();
+        const isContentEditable = target.isContentEditable || target.closest('[contenteditable]');
+
+        // Always select the block when clicked
         onSelect();
+
+        // Only stop propagation if NOT clicking on contentEditable
+        // This allows contentEditable to receive the click and get focus
+        if (!isContentEditable) {
+          e.stopPropagation();
+        }
       }}
     >
       {/* Left side drag handle - removed from here, now in toolbar */}
