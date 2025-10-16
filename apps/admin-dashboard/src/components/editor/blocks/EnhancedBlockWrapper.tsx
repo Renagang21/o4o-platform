@@ -234,45 +234,12 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        const target = e.target as HTMLElement;
-        const isContentEditable = target.isContentEditable || target.closest('[contenteditable]');
-
-        // Always select the block when clicked
+        // Select block on click (focus handled by useEffect)
         onSelect();
 
-        // Always ensure contentEditable has focus when block is clicked
-        if (blockRef.current) {
-          const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
-          if (editableElement) {
-            // Use setTimeout to ensure focus happens after state updates
-            setTimeout(() => {
-              // Only focus if not already focused
-              if (document.activeElement !== editableElement) {
-                editableElement.focus();
-
-                // Position cursor only if we just gave focus
-                const selection = window.getSelection();
-                if (selection) {
-                  const range = document.createRange();
-
-                  // If clicking on contentEditable directly, try to position at click point
-                  if (isContentEditable) {
-                    // Let browser handle cursor positioning for direct clicks
-                    // This preserves natural click-to-cursor behavior
-                  } else {
-                    // For wrapper clicks, position at end
-                    range.selectNodeContents(editableElement);
-                    range.collapse(false);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                  }
-                }
-              }
-            }, 0);
-          }
-        }
-
-        // Stop propagation for non-contentEditable clicks
+        // Stop propagation for non-content clicks to prevent event bubbling
+        const target = e.target as HTMLElement;
+        const isContentEditable = target.isContentEditable || target.closest('[contenteditable]');
         if (!isContentEditable) {
           e.stopPropagation();
         }
