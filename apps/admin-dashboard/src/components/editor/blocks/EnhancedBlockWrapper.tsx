@@ -215,9 +215,24 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         // Always select the block when clicked
         onSelect();
 
-        // Only stop propagation if NOT clicking on contentEditable
-        // This allows contentEditable to receive the click and get focus
-        if (!isContentEditable) {
+        // If NOT clicking on contentEditable, manually focus it
+        if (!isContentEditable && blockRef.current) {
+          const editableElement = blockRef.current.querySelector('[contenteditable]') as HTMLElement;
+          if (editableElement) {
+            // Use setTimeout to ensure focus happens after state updates
+            setTimeout(() => {
+              editableElement.focus();
+              // Position cursor at the end
+              const selection = window.getSelection();
+              if (selection) {
+                const range = document.createRange();
+                range.selectNodeContents(editableElement);
+                range.collapse(false);  // false = end of content
+                selection.removeAllRanges();
+                selection.addRange(range);
+              }
+            }, 0);
+          }
           e.stopPropagation();
         }
       }}
