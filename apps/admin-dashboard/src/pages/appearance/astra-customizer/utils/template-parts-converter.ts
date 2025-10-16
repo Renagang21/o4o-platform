@@ -124,9 +124,16 @@ function convertModuleToBlock(module: ModuleConfig): any {
   const block = blockMap[module.type];
   if (!block) return null;
 
+  // Add visibility information to block data for responsive CSS handling
+  const visibility = module.settings?.visibility || { desktop: true, tablet: true, mobile: true };
+
   return {
     id: module.id,
-    ...block
+    ...block,
+    data: {
+      ...block.data,
+      visibility
+    }
   };
 }
 
@@ -144,9 +151,9 @@ export function convertSettingsToHeaderTemplatePart(
     // Above Header Section
     if (builder.above.settings.enabled) {
       const aboveModules = [
-        ...builder.above.left.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock),
-        ...builder.above.center.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock),
-        ...builder.above.right.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock)
+        ...builder.above.left.map(convertModuleToBlock),
+        ...builder.above.center.map(convertModuleToBlock),
+        ...builder.above.right.map(convertModuleToBlock)
       ].filter(Boolean);
 
       if (aboveModules.length > 0) {
@@ -169,9 +176,9 @@ export function convertSettingsToHeaderTemplatePart(
 
     // Primary Header Section
     const primaryModules = {
-      left: builder.primary.left.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock).filter(Boolean),
-      center: builder.primary.center.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock).filter(Boolean),
-      right: builder.primary.right.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock).filter(Boolean)
+      left: builder.primary.left.map(convertModuleToBlock).filter(Boolean),
+      center: builder.primary.center.map(convertModuleToBlock).filter(Boolean),
+      right: builder.primary.right.map(convertModuleToBlock).filter(Boolean)
     };
 
     sections.push({
@@ -216,9 +223,9 @@ export function convertSettingsToHeaderTemplatePart(
     // Below Header Section
     if (builder.below.settings.enabled) {
       const belowModules = [
-        ...builder.below.left.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock),
-        ...builder.below.center.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock),
-        ...builder.below.right.filter(m => m.settings?.visibility?.desktop !== false).map(convertModuleToBlock)
+        ...builder.below.left.map(convertModuleToBlock),
+        ...builder.below.center.map(convertModuleToBlock),
+        ...builder.below.right.map(convertModuleToBlock)
       ].filter(Boolean);
 
       if (belowModules.length > 0) {
