@@ -205,6 +205,7 @@ function App() {
                 <PostPreview />
               </Suspense>
             } />
+
             
             {/* 독립형 편집기 라우트 - 관리자 레이아웃 밖에서 실행 */}
             <Route path="/editor/*" element={
@@ -602,12 +603,13 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
-                    {/* Test - Minimal Editor */}
-                    <Route path="/test/minimal-editor" element={
+                    {/* Test - Minimal Editor (inside AdminLayout, requires login) */}
+                    <Route path="/admin/test/minimal-editor" element={
                       <Suspense fallback={<PageLoader />}>
                         <MinimalEditor />
                       </Suspense>
                     } />
+
                     
                     {/* System Monitoring */}
                     <Route path="/monitoring" element={
