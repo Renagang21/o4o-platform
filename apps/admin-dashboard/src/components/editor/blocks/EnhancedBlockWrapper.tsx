@@ -121,36 +121,12 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         '[contenteditable], input, textarea'
       );
       if (focusableElement instanceof HTMLElement) {
-        // Use setTimeout to ensure focus happens after React state updates
+        // CRITICAL: Only focus, don't manipulate cursor position
+        // RichText component is now UNCONTROLLED and manages its own DOM
+        // Cursor positioning here conflicts with UNCONTROLLED mode initialization
         setTimeout(() => {
           focusableElement.focus();
-
-          // Position cursor only for contentEditable elements
-          if (focusableElement.contentEditable === 'true') {
-            const selection = window.getSelection();
-            if (selection) {
-              const range = document.createRange();
-
-              // Check if element has content
-              if (focusableElement.childNodes.length > 0) {
-                // Position at the end of existing content
-                range.selectNodeContents(focusableElement);
-                range.collapse(false);  // false = end of content
-              } else {
-                // Empty element, position at start
-                range.setStart(focusableElement, 0);
-                range.collapse(true);
-              }
-
-              try {
-                selection.removeAllRanges();
-                selection.addRange(range);
-              } catch (error) {
-                // Silently handle range errors - browser will place cursor automatically
-                console.debug('Range positioning error in EnhancedBlockWrapper:', error);
-              }
-            }
-          }
+          // Let browser handle cursor positioning naturally
         }, 0);
       }
     }
