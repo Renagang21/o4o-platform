@@ -193,20 +193,25 @@ export const RichText: FC<RichTextProps> = ({
 
       const formats = detectActiveFormats();
 
-      // Only update if formats actually changed
-      const formatsChanged =
-        formats.size !== currentFormats.size ||
-        ![...formats].every(f => currentFormats.has(f));
+      // Use functional update to avoid dependency on currentFormats
+      setCurrentFormats(prev => {
+        // Only update if formats actually changed
+        const formatsChanged =
+          formats.size !== prev.size ||
+          ![...formats].every(f => prev.has(f));
 
-      if (formatsChanged) {
-        setCurrentFormats(formats);
-        onFormatChange?.(formats);
-      }
+        if (formatsChanged) {
+          // Call callback with new formats
+          onFormatChange?.(formats);
+          return formats;
+        }
+        return prev;
+      });
     };
 
     document.addEventListener('selectionchange', handleSelectionChange);
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
-  }, [currentFormats, onFormatChange]);
+  }, [onFormatChange]); // Only depend on onFormatChange (now memoized in parent)
 
   // 링크 편집 팝업 열기
   const openLinkPopover = () => {
@@ -287,9 +292,11 @@ export const RichText: FC<RichTextProps> = ({
       isUpdatingRef.current = true;
       onChange?.(editorRef.current.innerHTML);
 
-      // Focus restoration: restore focus to editor and position cursor after link
+      // Focus restoration: restore focus only if we lost it
+      // EnhancedBlockWrapper already handles focus, so only restore if needed
       setTimeout(() => {
-        if (editorRef.current && linkElement) {
+        // Only restore focus if editor is not already focused
+        if (editorRef.current && linkElement && document.activeElement !== editorRef.current) {
           editorRef.current.focus();
 
           // Position cursor at the end of the link
@@ -333,9 +340,10 @@ export const RichText: FC<RichTextProps> = ({
         isUpdatingRef.current = true;
         onChange?.(editorRef.current.innerHTML);
 
-        // Focus restoration: restore focus to editor and position cursor after removed link text
+        // Focus restoration: restore focus only if we lost it
         setTimeout(() => {
-          if (editorRef.current) {
+          // Only restore focus if editor is not already focused
+          if (editorRef.current && document.activeElement !== editorRef.current) {
             editorRef.current.focus();
 
             // Position cursor at the end of the replaced text

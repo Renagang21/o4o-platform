@@ -5,7 +5,7 @@
  * Auto-deploy test
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, memo } from 'react';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
@@ -62,6 +62,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   useEffect(() => {
     setLocalContent(content);
   }, [content]);
+
+  // Memoize format change handler to prevent selectionchange listener re-registration
+  const handleFormatChange = useCallback((formats: Set<string>) => {
+    setActiveFormats(formats);
+  }, []);
 
   // Update attribute
   const updateAttribute = useCallback((key: string, value: any) => {
@@ -145,7 +150,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           'core/link',
         ]}
         exposeApi={(api) => { richApiRef.current = api; }}
-        onFormatChange={(formats) => setActiveFormats(formats)}
+        onFormatChange={handleFormatChange}
         className={cn(
           'paragraph-content min-h-[1.5em]',
           getAlignmentClass(),
@@ -161,4 +166,4 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   );
 };
 
-export default ParagraphBlock;
+export default memo(ParagraphBlock);
