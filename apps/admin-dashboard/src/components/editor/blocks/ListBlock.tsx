@@ -110,11 +110,15 @@ const ListBlock: React.FC<ListBlockProps> = ({
       
       // Select all text
       if (element) {
-        const range = document.createRange();
-        range.selectNodeContents(element);
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
+        try {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        } catch (error) {
+          console.debug('Range positioning error in ListBlock:', error);
+        }
       }
     }
   }, [editingItemId]);

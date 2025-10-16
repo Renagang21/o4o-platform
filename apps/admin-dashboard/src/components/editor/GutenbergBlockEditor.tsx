@@ -1170,12 +1170,16 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 if (editableElement) {
                   editableElement.focus();
                   // Move cursor to end
-                  const range = document.createRange();
-                  const sel = window.getSelection();
-                  range.selectNodeContents(editableElement);
-                  range.collapse(false);
-                  sel?.removeAllRanges();
-                  sel?.addRange(range);
+                  try {
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(editableElement);
+                    range.collapse(false);
+                    sel?.removeAllRanges();
+                    sel?.addRange(range);
+                  } catch (error) {
+                    console.debug('Range positioning error in GutenbergBlockEditor:', error);
+                  }
                 }
               }
             } else if (blocks.length > 1) {

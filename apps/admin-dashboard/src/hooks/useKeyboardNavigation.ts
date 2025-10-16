@@ -220,9 +220,13 @@ export function useBlockArrowNavigation() {
               newRange.setStart(textNode, 0);
               newRange.collapse(true);
             }
-            
-            selection.removeAllRanges();
-            selection.addRange(newRange);
+
+            try {
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            } catch (error) {
+              console.debug('Range positioning error in useKeyboardNavigation:', error);
+            }
           }
         }
       }

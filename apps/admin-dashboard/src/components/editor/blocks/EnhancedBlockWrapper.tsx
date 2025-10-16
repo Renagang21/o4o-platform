@@ -142,8 +142,13 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                 range.collapse(true);
               }
 
-              selection.removeAllRanges();
-              selection.addRange(range);
+              try {
+                selection.removeAllRanges();
+                selection.addRange(range);
+              } catch (error) {
+                // Silently handle range errors - browser will place cursor automatically
+                console.debug('Range positioning error in EnhancedBlockWrapper:', error);
+              }
             }
           }
         }, 0);
