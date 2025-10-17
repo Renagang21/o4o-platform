@@ -19,7 +19,7 @@ import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
 import SlashCommandMenu from './SlashCommandMenu';
-import PlaceholderBlock from './blocks/PlaceholderBlock';
+import DefaultBlockAppender from './DefaultBlockAppender';
 // Toast 기능을 직접 구현
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -174,12 +174,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [slashTriggerBlockId, setSlashTriggerBlockId] = useState<string | null>(null);
   const [recentBlocks, setRecentBlocks] = useState<string[]>([]);
   const slashMenuRef = useRef<{ query: string; blockId: string | null }>({ query: '', blockId: null });
-
-  // Pending placeholder state (for Enter key behavior)
-  const [pendingPlaceholder, setPendingPlaceholder] = useState<{
-    afterBlockId: string | null;
-    position: 'before' | 'after';
-  } | null>(null);
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -590,9 +584,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     (blockType: string) => {
       const triggerBlockId = slashTriggerBlockId || selectedBlockId;
 
-      // Check if triggered from placeholder
-      if (triggerBlockId === 'placeholder' || triggerBlockId === 'placeholder-end' ||
-          triggerBlockId?.startsWith('pending-')) {
+      // Check if triggered from DefaultBlockAppender
+      if (triggerBlockId === 'appender-start' || triggerBlockId === 'appender-end') {
         // Create new block
         const newBlock: Block = {
           id: `block-${Date.now()}`,
@@ -601,20 +594,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           attributes: {},
         };
 
-        if (triggerBlockId === 'placeholder') {
+        if (triggerBlockId === 'appender-start') {
           // At beginning (no blocks)
           updateBlocks([newBlock]);
-        } else if (triggerBlockId === 'placeholder-end') {
+        } else {
           // At end (after existing blocks)
           updateBlocks([...blocks, newBlock]);
-        } else if (triggerBlockId.startsWith('pending-')) {
-          // From pending placeholder
-          const afterBlockId = triggerBlockId.replace('pending-', '');
-          const blockIndex = blocks.findIndex(b => b.id === afterBlockId);
-          const newBlocks = [...blocks];
-          newBlocks.splice(blockIndex + 1, 0, newBlock);
-          updateBlocks(newBlocks);
-          setPendingPlaceholder(null);
         }
 
         setSelectedBlockId(newBlock.id);
@@ -1090,48 +1075,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           return;
         }
 
-        // Shift+Enter: Create PlaceholderBlock after current block
-        if (e.shiftKey) {
-          e.preventDefault();
-          if (selectedBlockId) {
-            setPendingPlaceholder({
-              afterBlockId: selectedBlockId,
-              position: 'after'
-            });
-          }
-          return;
-        }
-
-        // Regular Enter: Smart block-specific behavior
-        if (!e.shiftKey) {
-          // If in contentEditable, check if content is empty
-          if (target.isContentEditable) {
-            const block = blocks.find(b => b.id === selectedBlockId);
-            if (block) {
-              const isEmpty = !block.content ||
-                             (typeof block.content === 'string' && !block.content.trim()) ||
-                             (typeof block.content === 'object' && 'text' in block.content && !block.content.text?.trim());
-
-              if (isEmpty) {
-                e.preventDefault();
-                // Show PlaceholderBlock after current block
-                setPendingPlaceholder({
-                  afterBlockId: selectedBlockId,
-                  position: 'after'
-                });
-              }
-            }
-          } else {
-            // Outside contentEditable: show PlaceholderBlock
-            e.preventDefault();
-            if (selectedBlockId) {
-              setPendingPlaceholder({
-                afterBlockId: selectedBlockId,
-                position: 'after'
-              });
-            }
-          }
-        }
+        // Enter key handling is now delegated to individual block components
+        // (e.g., ParagraphBlock handles Enter to create new blocks via onAddBlock)
+        // This global handler is kept for blocks that don't handle Enter themselves
       }
       // Backspace to delete empty selected block
       if (e.key === 'Backspace' && selectedBlockId) {
@@ -1593,128 +1539,70 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             ) : (
               <div className="blocks-container">
-                {/* Show PlaceholderBlock at the beginning if no blocks */}
+                {/* DefaultBlockAppender at the beginning if no blocks */}
                 {blocks.length === 0 && (
-                  <PlaceholderBlock
+                  <DefaultBlockAppender
                     autoFocus={true}
-                    onConvertToParagraph={(initialContent) => {
+                    onInsertBlock={(initialContent) => {
                       const newBlock: Block = {
                         id: `block-${Date.now()}`,
                         type: 'o4o/paragraph',
-                        content: { text: initialContent },
+                        content: { text: initialContent || '' },
                         attributes: {},
                       };
                       updateBlocks([newBlock]);
                       setSelectedBlockId(newBlock.id);
                     }}
-                    onTriggerSlashMenu={(position) => {
+                    onShowSlashMenu={(position) => {
                       setSlashMenuPosition(position);
                       setSlashQuery('');
                       setIsSlashMenuOpen(true);
-                      setSlashTriggerBlockId('placeholder');
+                      setSlashTriggerBlockId('appender-start');
                     }}
                   />
                 )}
 
-                {/* Render actual blocks with pending placeholders */}
+                {/* Render actual blocks */}
                 {blocks.map((block, index) => (
-                  <React.Fragment key={block.id}>
-                    {/* Render pending placeholder before this block if needed */}
-                    {pendingPlaceholder?.afterBlockId === (index > 0 ? blocks[index - 1].id : null) &&
-                     pendingPlaceholder?.position === 'after' && (
-                      <PlaceholderBlock
-                        autoFocus={true}
-                        onConvertToParagraph={(initialContent) => {
-                          const blockIndex = blocks.findIndex(b => b.id === pendingPlaceholder.afterBlockId);
-                          const newBlock: Block = {
-                            id: `block-${Date.now()}`,
-                            type: 'o4o/paragraph',
-                            content: { text: initialContent },
-                            attributes: {},
-                          };
-                          const newBlocks = [...blocks];
-                          newBlocks.splice(blockIndex + 1, 0, newBlock);
-                          updateBlocks(newBlocks);
-                          setSelectedBlockId(newBlock.id);
-                          setPendingPlaceholder(null);
-                        }}
-                        onTriggerSlashMenu={(position) => {
-                          setSlashMenuPosition(position);
-                          setSlashQuery('');
-                          setIsSlashMenuOpen(true);
-                          setSlashTriggerBlockId(`pending-${pendingPlaceholder.afterBlockId}`);
-                        }}
-                      />
-                    )}
-
-                    {/* Render the actual block */}
-                    <BlockWrapper
-                      blockId={block.id}
-                      blockType={block.type}
-                      isSelected={selectedBlockId === block.id}
-                      onSelect={setSelectedBlockId}
-                      onDragStart={handleDragStart}
-                      onDragEnd={handleDragEnd}
-                      onDragOver={handleDragOver}
-                      onDrop={handleDrop}
-                      onDuplicate={handleDuplicate}
-                      onDelete={handleBlockDelete}
-                      onMoveUp={handleMoveUp}
-                      onMoveDown={handleMoveDown}
-                      canMoveUp={index > 0}
-                      canMoveDown={index < blocks.length - 1}
-                    >
-                      {renderBlock(block)}
-                    </BlockWrapper>
-
-                    {/* Render pending placeholder after this block if needed */}
-                    {pendingPlaceholder?.afterBlockId === block.id &&
-                     pendingPlaceholder?.position === 'after' && (
-                      <PlaceholderBlock
-                        autoFocus={true}
-                        onConvertToParagraph={(initialContent) => {
-                          const blockIndex = blocks.findIndex(b => b.id === block.id);
-                          const newBlock: Block = {
-                            id: `block-${Date.now()}`,
-                            type: 'o4o/paragraph',
-                            content: { text: initialContent },
-                            attributes: {},
-                          };
-                          const newBlocks = [...blocks];
-                          newBlocks.splice(blockIndex + 1, 0, newBlock);
-                          updateBlocks(newBlocks);
-                          setSelectedBlockId(newBlock.id);
-                          setPendingPlaceholder(null);
-                        }}
-                        onTriggerSlashMenu={(position) => {
-                          setSlashMenuPosition(position);
-                          setSlashQuery('');
-                          setIsSlashMenuOpen(true);
-                          setSlashTriggerBlockId(`pending-${block.id}`);
-                        }}
-                      />
-                    )}
-                  </React.Fragment>
+                  <BlockWrapper
+                    key={block.id}
+                    blockId={block.id}
+                    blockType={block.type}
+                    isSelected={selectedBlockId === block.id}
+                    onSelect={setSelectedBlockId}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    onDuplicate={handleDuplicate}
+                    onDelete={handleBlockDelete}
+                    onMoveUp={handleMoveUp}
+                    onMoveDown={handleMoveDown}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < blocks.length - 1}
+                  >
+                    {renderBlock(block)}
+                  </BlockWrapper>
                 ))}
 
-                {/* Show PlaceholderBlock at the end if blocks exist */}
+                {/* DefaultBlockAppender at the end if blocks exist */}
                 {blocks.length > 0 && (
-                  <PlaceholderBlock
-                    onConvertToParagraph={(initialContent) => {
+                  <DefaultBlockAppender
+                    onInsertBlock={(initialContent) => {
                       const newBlock: Block = {
                         id: `block-${Date.now()}`,
                         type: 'o4o/paragraph',
-                        content: { text: initialContent },
+                        content: { text: initialContent || '' },
                         attributes: {},
                       };
                       updateBlocks([...blocks, newBlock]);
                       setSelectedBlockId(newBlock.id);
                     }}
-                    onTriggerSlashMenu={(position) => {
+                    onShowSlashMenu={(position) => {
                       setSlashMenuPosition(position);
                       setSlashQuery('');
                       setIsSlashMenuOpen(true);
-                      setSlashTriggerBlockId('placeholder-end');
+                      setSlashTriggerBlockId('appender-end');
                     }}
                   />
                 )}
