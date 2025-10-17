@@ -1,32 +1,9 @@
 import { useState, FC, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  ArrowLeft,
-  Save,
-  Eye,
-  MoreVertical,
-  Settings2,
-  X,
-  Undo2,
-  Redo2,
-  Plus,
-  List,
-  Info,
-  Library,
-  Sparkles
-} from 'lucide-react';
 import type { Post } from '@/types/post.types';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { EditorHeader } from '@/components/editor/header/EditorHeader';
 import { initializeWordPress } from '@/utils/wordpress-initializer';
 import { clearEditorSession } from '@/utils/history-manager';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
@@ -37,18 +14,10 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import toast from 'react-hot-toast';
 import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
-import { ViewportSwitcher } from '@/components/editor/ViewportSwitcher';
-import { Monitor, MonitorOff, Palette } from 'lucide-react';
 
 interface StandaloneEditorProps {
   mode?: 'post' | 'page' | 'template' | 'pattern';
@@ -689,357 +658,37 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       )}
       
       {/* Editor Header */}
-      <div className={cn(
-        "bg-white border-b flex items-center justify-between overflow-x-auto relative z-40 pointer-events-auto",
-        isMobile ? "px-2 py-2" : "px-3 py-2"
-      )}
-      style={{ isolation: 'isolate' }}>
-        <div className={cn(
-          "flex items-center",
-          isMobile ? "gap-1 flex-1" : "gap-2"
-        )}>
-          {/* Back to Admin */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={isMobile ? "h-8 w-8" : "h-9 w-9"}
-                  onClick={handleBack}
-                >
-                  <ArrowLeft className={isMobile ? "h-4 w-4" : "h-5 w-5"} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Back to dashboard</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          {/* WordPress Logo - Always visible */}
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">W</span>
-          </div>
-
-          {/* Title Input - Hidden because GutenbergBlockEditor has its own title field */}
-          <div className="flex-1 max-w-2xl" style={{ display: 'none' }}>
-            <input
-              type="text"
-              placeholder=""
-              value={postTitle || ''}
-              onChange={(e) => {
-                setPostTitle(e.target.value);
-                setIsDirty(true);
-              }}
-              className={cn(
-                "w-full px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400 text-gray-900",
-                isMobile ? "text-base" : "text-xl"
-              )}
-            />
-          </div>
-
-          {/* Status Badge - 모바일에서 숨김 */}
-          {!isMobile && (
-            <Badge 
-              variant={postSettings.status === 'publish' ? 'default' : 'secondary'}
-              className="capitalize"
-            >
-              {postSettings.status}
-            </Badge>
-          )}
-          
-          {/* Saved Indicator - 모바일에서 숨김 */}
-          {!isMobile && lastSaved && (
-            <span className="text-sm text-gray-500">
-              Saved {lastSaved.toLocaleTimeString()}
-            </span>
-          )}
-          {!isMobile && isDirty && !isSaving && (
-            <span className="text-sm text-orange-500">Unsaved changes</span>
-          )}
-        </div>
-        
-        {/* Right Actions */}
-        <div className={cn(
-          "flex items-center flex-shrink-0",
-          isMobile ? "gap-0" : isTablet ? "gap-0.5" : "gap-1"
-        )}>
-          {/* Undo/Redo - 모바일에서 숨김 */}
-          {!isMobile && (
-            <div className="flex items-center mr-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9">
-                      <Undo2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Undo</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9">
-                      <Redo2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Redo</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          )}
-
-          {/* Design Library - 모바일/태블릿에서 숨김 */}
-          {!isMobile && !isTablet && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowTemplates(true)}
-              className="h-8 px-3 hover:bg-gray-100 border border-gray-300"
-            >
-              <Library className="h-4 w-4 mr-1" />
-              디자인 라이브러리
-            </Button>
-          )}
-
-          {/* AI Generator - 모바일/태블릿에서 숨김 */}
-          {!isMobile && !isTablet && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowAIGenerator(true)}
-              className="h-8 px-3 hover:bg-gray-100 border border-gray-300 text-purple-600 hover:text-purple-700"
-            >
-              <Sparkles className="h-4 w-4 mr-1" />
-              AI 페이지 생성
-            </Button>
-          )}
-
-          {/* View Options - 모바일에서 숨김 */}
-          {!isMobile && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9"
-                    onClick={() => setShowListView(!showListView)}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>List view</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-
-          {/* Viewport Switcher - 모바일에서 숨김 */}
-          {!isMobile && (
-            <ViewportSwitcher
-              currentMode={viewportMode}
-              onModeChange={switchViewport}
-              containerWidth={containerSettings.width}
-            />
-          )}
-
-          {/* Theme Preview Mode Toggle - Always visible */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    isMobile ? "h-8 w-8" : "h-9 w-9",
-                    isThemePreviewMode && "bg-blue-100 text-blue-600"
-                  )}
-                  onClick={() => setIsThemePreviewMode(!isThemePreviewMode)}
-                >
-                  {isThemePreviewMode ? (
-                    <Monitor className="h-4 w-4" />
-                  ) : (
-                    <MonitorOff className="h-4 w-4" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isThemePreviewMode ? 'Disable' : 'Enable'} theme width preview</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          {/* Customizer Button - Always visible */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={isMobile ? "h-8 w-8" : "h-9 w-9"}
-                  onClick={() => navigate('/appearance/customize')}
-                >
-                  <Palette className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>사용자 정의하기</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          {/* Preview Toggle - 모바일에서 숨김 */}
-          {!isMobile && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9"
-                    onClick={handlePreview}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Preview</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          
-          {/* Save Draft - 모바일에서 간소화 */}
-          {!isMobile ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleSave(false)}
-              disabled={isSaving || !isDirty}
-            >
-              {isSaving ? (
-                <>
-                  <div className="animate-spin h-3 w-3 border-2 border-gray-500 border-t-transparent rounded-full mr-2" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-3 w-3 mr-2" />
-                  Save draft
-                </>
-              )}
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => handleSave(false)}
-              disabled={isSaving || !isDirty}
-            >
-              {isSaving ? (
-                <div className="animate-spin h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-            </Button>
-          )}
-          
-          {/* Publish/Update */}
-          <Button
-            size="sm"
-            onClick={() => handleSave(true)}
-            disabled={isSaving}
-          >
-            {postSettings.status === 'publish' ? 'Update' : 'Publish'}
-          </Button>
-          
-          {/* Settings */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={isMobile ? "h-8 w-8" : "h-9 w-9"}
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  disabled={!isPostDataLoaded && !isNewPost}
-                >
-                  {sidebarOpen ? (
-                    <X className="h-4 w-4" />
-                  ) : (
-                    <Settings2 className="h-4 w-4" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{sidebarOpen ? 'Close settings' : 'Settings'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          {/* More Options */}
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost" size="icon" className={isMobile ? "h-8 w-8" : "h-9 w-9"}>
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {isMobile && (
-                <>
-                  <DropdownMenuItem onClick={handlePreview}>
-                    <Eye className="h-4 w-4 mr-2" />Preview
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              {/* 태블릿/모바일에서는 More 메뉴에 표시 */}
-              {(isMobile || isTablet) && (
-                <>
-                  <DropdownMenuItem onClick={() => setShowTemplates(true)}>
-                    <Library className="h-4 w-4 mr-2" />
-                    디자인 라이브러리
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowAIGenerator(true)}>
-                    <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
-                    AI 페이지 생성
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuItem onClick={() => setShowTemplates(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add template
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowMediaLibrary(true)}>
-                Add media
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Copy all blocks</DropdownMenuItem>
-              <DropdownMenuItem>Export</DropdownMenuItem>
-              {!isMobile && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Info className="h-4 w-4 mr-2" />
-                    Keyboard shortcuts
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      <EditorHeader
+        postTitle={postTitle}
+        postStatus={postSettings.status}
+        isSaving={isSaving}
+        isDirty={isDirty}
+        lastSaved={lastSaved}
+        isMobile={isMobile}
+        isTablet={isTablet}
+        onTitleChange={(newTitle) => {
+          setPostTitle(newTitle);
+          setIsDirty(true);
+        }}
+        onBack={handleBack}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        onPreview={handlePreview}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        sidebarOpen={sidebarOpen}
+        onOpenDesignLibrary={() => setShowTemplates(true)}
+        onOpenAIGenerator={() => setShowAIGenerator(true)}
+        onToggleListView={() => setShowListView(!showListView)}
+        showListView={showListView}
+        viewportMode={viewportMode}
+        onViewportChange={switchViewport}
+        containerWidth={containerSettings.width}
+        isThemePreviewMode={isThemePreviewMode}
+        onToggleThemePreview={() => setIsThemePreviewMode(!isThemePreviewMode)}
+        onOpenCustomizer={() => navigate('/appearance/customize')}
+        isPostDataLoaded={isPostDataLoaded}
+        isNewPost={isNewPost}
+      />
       
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
