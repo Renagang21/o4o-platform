@@ -36,7 +36,10 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className={isMobile ? 'h-8 w-8' : 'h-9 w-9'}
+              className={cn(
+                isMobile ? 'h-8 w-8' : 'h-9 w-9',
+                'text-gray-700'
+              )}
               onClick={onBack}
             >
               <ArrowLeft className={isMobile ? 'h-4 w-4' : 'h-5 w-5'} />
@@ -59,7 +62,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
           variant="ghost"
           size="sm"
           onClick={onOpenDesignLibrary}
-          className="h-8 px-3 hover:bg-gray-100 border border-gray-300"
+          className="h-8 px-3 text-gray-700 hover:bg-gray-100 border border-gray-300"
         >
           <Library className="h-4 w-4 mr-1.5" />
           디자인 라이브러리

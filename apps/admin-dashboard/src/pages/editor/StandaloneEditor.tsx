@@ -32,12 +32,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     initialPostId === 'new' ? undefined : initialPostId
   );
 
-  // 모바일/태블릿 감지
+  // 모바일/태블릿 감지 (Tailwind CSS 표준 breakpoints 사용)
   useEffect(() => {
     const checkResponsive = () => {
       const width = window.innerWidth;
-      setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1280);
+      setIsMobile(width < 640);  // sm breakpoint (Tailwind standard)
+      setIsTablet(width >= 640 && width < 1024);  // lg breakpoint (Tailwind standard)
     };
 
     checkResponsive();
