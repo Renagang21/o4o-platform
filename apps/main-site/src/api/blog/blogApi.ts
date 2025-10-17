@@ -76,7 +76,7 @@ export interface UpdatePostData extends Partial<CreatePostData> {
 export const blogAPI = {
   // Get blog posts with filtering and pagination
   getPosts: (params?: BlogPostsParams) =>
-    apiClient.get<BlogPostsResponse>('/v1/blog/posts', { params }),
+    apiClient.get<BlogPostsResponse>('/blog/posts', { params }),
 
   // Get a single blog post by ID or slug
   getPost: (identifier: string) =>
@@ -84,15 +84,15 @@ export const blogAPI = {
 
   // Get blog customizer settings
   getSettings: () =>
-    apiClient.get<BlogSettingsResponse>('/v1/blog/settings'),
+    apiClient.get<BlogSettingsResponse>('/blog/settings'),
 
   // Update blog customizer settings (admin only)
   updateSettings: (settings: BlogSettings) =>
-    apiClient.put<BlogSettingsResponse>('/v1/blog/settings', { settings }),
+    apiClient.put<BlogSettingsResponse>('/blog/settings', { settings }),
 
   // Create a new blog post (admin only)
   createPost: (data: CreatePostData) =>
-    apiClient.post<BlogPostResponse>('/v1/blog/posts', data),
+    apiClient.post<BlogPostResponse>('/blog/posts', data),
 
   // Update an existing blog post (admin only)
   updatePost: (data: UpdatePostData) =>
@@ -104,21 +104,21 @@ export const blogAPI = {
 
   // Get blog categories
   getCategories: () =>
-    apiClient.get('/v1/blog/categories'),
+    apiClient.get('/blog/categories'),
 
   // Get blog tags
   getTags: () =>
-    apiClient.get('/v1/blog/tags'),
+    apiClient.get('/blog/tags'),
 
   // Get popular posts
   getPopularPosts: (limit: number = 5) =>
-    apiClient.get<BlogPostsResponse>('/v1/blog/posts/popular', { 
+    apiClient.get<BlogPostsResponse>('/blog/posts/popular', { 
       params: { limit } 
     }),
 
   // Get recent posts
   getRecentPosts: (limit: number = 5) =>
-    apiClient.get<BlogPostsResponse>('/v1/blog/posts/recent', { 
+    apiClient.get<BlogPostsResponse>('/blog/posts/recent', { 
       params: { limit } 
     }),
 
@@ -130,7 +130,7 @@ export const blogAPI = {
 
   // Search posts
   searchPosts: (query: string, params?: Omit<BlogPostsParams, 'search'>) =>
-    apiClient.get<BlogPostsResponse>('/v1/blog/posts/search', { 
+    apiClient.get<BlogPostsResponse>('/blog/posts/search', { 
       params: { search: query, ...params } 
     }),
 
@@ -158,11 +158,11 @@ export const blogAPI = {
 
   // Get blog archive data (posts grouped by date)
   getArchive: () =>
-    apiClient.get('/v1/blog/archive'),
+    apiClient.get('/blog/archive'),
 
   // Get blog statistics (admin only)
   getStats: () =>
-    apiClient.get('/v1/blog/stats')
+    apiClient.get('/blog/stats')
 };
 
 // Export default
