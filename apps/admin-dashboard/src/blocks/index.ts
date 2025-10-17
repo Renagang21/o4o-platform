@@ -34,7 +34,6 @@ import conditionalBlockDefinition from './definitions/conditional';
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
 import shortcodeBlockDefinition from './definitions/shortcode';
-import markdownReaderBlockDefinition from './definitions/markdown-reader';
 
 // Embed blocks
 import youtubeBlockDefinition from './definitions/youtube';
@@ -77,7 +76,6 @@ export function registerAllBlocks(): void {
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
   blockRegistry.register(shortcodeBlockDefinition);
-  blockRegistry.register(markdownReaderBlockDefinition);
 
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);
