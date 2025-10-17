@@ -1,5 +1,12 @@
 import { FC } from 'react';
+import { marked } from 'marked';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
+
+// Configure marked for better rendering
+marked.setOptions({
+  breaks: true, // Convert \n to <br>
+  gfm: true, // GitHub Flavored Markdown
+});
 
 interface Page {
   id: string;
@@ -113,6 +120,21 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
               const text = block.content?.text ?? block.innerHTML ?? '';
               const citation = block.attributes?.citation || '';
               return text !== undefined ? `<blockquote>${text}${citation ? `<cite>${citation}</cite>` : ''}</blockquote>` : '';
+            }
+
+            // Markdown block - convert markdown to HTML
+            if (block.type === 'o4o/markdown') {
+              const markdown = block.attributes?.markdown || block.content || '';
+              if (markdown) {
+                try {
+                  const html = marked.parse(markdown);
+                  return `<div class="prose prose-sm max-w-none">${html}</div>`;
+                } catch (error) {
+                  console.error('Failed to parse markdown:', error);
+                  return `<div>${markdown}</div>`;
+                }
+              }
+              return '';
             }
 
             // Fallback for other block types
