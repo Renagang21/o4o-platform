@@ -167,9 +167,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
 
           // 나머지 node_modules
           if (id.includes('node_modules')) {
-            if (id.includes('@tiptap')) {
-              return 'vendor-tiptap';
-            }
             if (id.includes('socket.io')) {
               return 'vendor-socket';
             }
