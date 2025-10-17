@@ -213,14 +213,24 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       // Shift+Enter - line break within same block
       // Allow Slate's withParagraphs plugin to handle insertBreak
 
-      // Backspace at start of empty block
+      // Backspace at start of empty/whitespace-only block
       if (event.key === 'Backspace') {
         const { selection } = editor;
-        if (selection) {
-          const text = Editor.string(editor, [0]);
-          const [start] = Range.edges(selection);
+        // Get text content from entire editor
+        const text = Editor.string(editor, []);
+        const isEmpty = !text || text.trim() === '';
 
-          if (text === '' || (start.offset === 0 && text.trim() === '')) {
+        // If block is empty or selection is at start with only whitespace, delete the block
+        if (isEmpty) {
+          event.preventDefault();
+          onDelete();
+          return;
+        }
+
+        // If at start of non-empty block, still allow Backspace (Slate will handle merge)
+        if (selection && Range.isCollapsed(selection)) {
+          const [start] = Range.edges(selection);
+          if (start.offset === 0 && text.trim() === '') {
             event.preventDefault();
             onDelete();
           }
