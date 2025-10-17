@@ -360,7 +360,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           <Editable
             renderElement={renderElement}
             renderLeaf={renderLeaf}
-            placeholder="Start writing or type / to choose a block"
+            placeholder=""
             onKeyDown={handleKeyDown}
             style={{
               outline: 'none',

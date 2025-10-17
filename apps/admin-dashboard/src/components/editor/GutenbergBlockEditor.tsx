@@ -1609,17 +1609,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             )}
 
-            {/* Add block button */}
-            {!isCodeView && (
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => setIsBlockInserterOpen(true)}
-                  className="px-6 py-3 border-2 border-dashed border-gray-300 rounded hover:border-gray-400 hover:bg-gray-50 text-gray-600 text-sm transition-colors"
-                >
-                  + Add Block
-                </button>
-              </div>
-            )}
+            {/* Add block button - hidden when DefaultBlockAppender is shown */}
           </div>
         </div>
 
