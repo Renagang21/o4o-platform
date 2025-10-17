@@ -3,17 +3,23 @@ import { Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../entities/Menu';
 import { MenuItem, MenuItemType } from '../entities/MenuItem';
 import { MenuLocation } from '../entities/MenuLocation';
+import { Post } from '../entities/Post';
+import { CustomPostType } from '../entities/CustomPostType';
 import { generateSlug } from '../utils/slug';
 
 class MenuService {
   private menuRepository: Repository<Menu>;
   private menuItemRepository: TreeRepository<MenuItem>;
   private menuLocationRepository: Repository<MenuLocation>;
+  private postRepository: Repository<Post>;
+  private customPostTypeRepository: Repository<CustomPostType>;
 
   constructor() {
     this.menuRepository = AppDataSource.getRepository(Menu);
     this.menuItemRepository = AppDataSource.getTreeRepository(MenuItem);
     this.menuLocationRepository = AppDataSource.getRepository(MenuLocation);
+    this.postRepository = AppDataSource.getRepository(Post);
+    this.customPostTypeRepository = AppDataSource.getRepository(CustomPostType);
   }
 
   // Menu CRUD Operations
@@ -34,7 +40,7 @@ class MenuService {
     return query.orderBy('menu.created_at', 'DESC').getMany();
   }
 
-  async findMenuById(id: string): Promise<Menu | null> {
+  async findMenuById(id: string, expandCPT: boolean = true): Promise<Menu | null> {
     const menu = await this.menuRepository.findOne({
       where: { id },
       relations: ['items']
@@ -53,9 +59,14 @@ class MenuService {
       .getMany();
 
     // Load tree for each root item
-    const itemsWithChildren = await Promise.all(
+    let itemsWithChildren = await Promise.all(
       rootItems.map(item => this.menuItemRepository.findDescendantsTree(item))
     );
+
+    // Expand CPT menu items if requested
+    if (expandCPT) {
+      itemsWithChildren = await this.expandCPTMenuItems(itemsWithChildren);
+    }
 
     menu.items = itemsWithChildren;
     return menu;
@@ -521,8 +532,8 @@ class MenuService {
 
   // Role-based menu filtering
   async getFilteredMenuItems(
-    menuId: string, 
-    userRole?: string, 
+    menuId: string,
+    userRole?: string,
     isLoggedIn: boolean = false
   ): Promise<MenuItem[]> {
     const menu = await this.findMenuById(menuId);
@@ -534,8 +545,8 @@ class MenuService {
   }
 
   private filterMenuItemsByRole(
-    items: MenuItem[], 
-    userRole?: string, 
+    items: MenuItem[],
+    userRole?: string,
     isLoggedIn: boolean = false
   ): MenuItem[] {
     return items
@@ -547,8 +558,8 @@ class MenuService {
   }
 
   private shouldShowMenuItem(
-    item: MenuItem, 
-    userRole?: string, 
+    item: MenuItem,
+    userRole?: string,
     isLoggedIn: boolean = false
   ): boolean {
     // If display mode is hide, don't show
@@ -579,6 +590,116 @@ class MenuService {
 
     // Hide by default if none of the conditions match
     return false;
+  }
+
+  // CPT menu expansion
+  /**
+   * Expand CPT menu items to actual posts
+   * @param items Menu items to expand
+   * @returns Expanded menu items with CPT posts as children
+   */
+  private async expandCPTMenuItems(items: MenuItem[]): Promise<MenuItem[]> {
+    const expandedItems: MenuItem[] = [];
+
+    for (const item of items) {
+      if (item.type === MenuItemType.CPT || item.type === MenuItemType.CPT_ARCHIVE) {
+        // CPT menu item - expand to posts
+        const cptSlug = item.reference_id;
+        if (!cptSlug) {
+          // No CPT reference, keep original item
+          expandedItems.push(item);
+          continue;
+        }
+
+        // Load CPT posts
+        const expandedItem = await this.expandCPTMenuItem(item, cptSlug);
+        expandedItems.push(expandedItem);
+      } else {
+        // Regular menu item
+        const expandedItem = { ...item };
+        if (item.children && item.children.length > 0) {
+          expandedItem.children = await this.expandCPTMenuItems(item.children);
+        }
+        expandedItems.push(expandedItem);
+      }
+    }
+
+    return expandedItems;
+  }
+
+  /**
+   * Expand single CPT menu item
+   * @param item Original menu item
+   * @param cptSlug CPT slug to load posts from
+   * @returns Menu item with CPT posts as children
+   */
+  private async expandCPTMenuItem(item: MenuItem, cptSlug: string): Promise<MenuItem> {
+    try {
+      // Check if CPT exists
+      const cpt = await this.customPostTypeRepository.findOne({
+        where: { slug: cptSlug }
+      });
+
+      if (!cpt) {
+        // CPT not found, return original item
+        return item;
+      }
+
+      if (item.type === MenuItemType.CPT_ARCHIVE) {
+        // Archive link - point to CPT archive page
+        return {
+          ...item,
+          url: item.url || `/cpt/${cptSlug}`,
+          children: []
+        };
+      }
+
+      // Load posts for this CPT
+      const metadata = item.metadata || {};
+      const limit = metadata.limit || 10; // Default 10 posts
+      const status = metadata.status || 'publish'; // Default published only
+      const orderBy = metadata.orderBy || 'created_at'; // Default by creation date
+      const order = metadata.order || 'DESC'; // Default newest first
+
+      const queryBuilder = this.postRepository
+        .createQueryBuilder('post')
+        .where('post.type = :type', { type: cptSlug })
+        .andWhere('post.status = :status', { status })
+        .orderBy(`post.${orderBy}`, order as 'ASC' | 'DESC')
+        .take(limit);
+
+      const posts = await queryBuilder.getMany();
+
+      // Convert posts to menu items
+      const postMenuItems: MenuItem[] = posts.map((post, index) => ({
+        id: `cpt-${post.id}`,
+        menu_id: item.menu_id,
+        title: post.title,
+        url: `/cpt/${cptSlug}/${post.slug}`,
+        type: MenuItemType.POST,
+        target: item.target,
+        icon: item.icon,
+        css_class: item.css_class,
+        order_num: index,
+        reference_id: post.id,
+        metadata: { post_id: post.id, cpt_slug: cptSlug },
+        display_mode: item.display_mode,
+        target_audience: item.target_audience,
+        children: [],
+        parent: null,
+        menu: null,
+        created_at: new Date(),
+        updated_at: new Date()
+      } as MenuItem));
+
+      return {
+        ...item,
+        children: postMenuItems
+      };
+    } catch (error) {
+      console.error(`Error expanding CPT menu item: ${error}`);
+      return item;
+    }
   }
 }
 

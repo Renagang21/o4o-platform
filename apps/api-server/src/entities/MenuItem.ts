@@ -18,7 +18,9 @@ export enum MenuItemType {
   CUSTOM = 'custom',
   CATEGORY = 'category',
   ARCHIVE = 'archive',
-  POST = 'post'
+  POST = 'post',
+  CPT = 'cpt',              // Custom Post Type single post
+  CPT_ARCHIVE = 'cpt_archive' // Custom Post Type archive page
 }
 
 export enum MenuItemTarget {
