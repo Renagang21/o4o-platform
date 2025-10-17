@@ -255,32 +255,26 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
-      case 'o4o/markdown-reader':
-        const markdownUrl = attributes?.url || '';
-        const markdownContent = attributes?.markdownContent || '';
-        const fileName = attributes?.fileName || 'Markdown File';
-
-        if (!markdownUrl && !markdownContent) {
-          return (
-            <div key={block.id} className="p-6 mb-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-sm text-gray-500 text-center">No markdown file selected</p>
-            </div>
-          );
-        }
-
+      case 'o4o/markdown':
+      case 'markdown':
+        const markdownContent = attributes?.markdown || blockContent;
+        // Simple markdown rendering (basic HTML conversion)
+        const renderBasicMarkdown = (md: string) => {
+          return md
+            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+            .replace(/\n/g, '<br>');
+        };
         return (
-          <div key={block.id} className="mb-6 p-6 bg-white rounded-lg border border-gray-200">
-            <div className="prose prose-gray max-w-none">
-              {markdownContent ? (
-                <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
-              ) : (
-                <div className="text-gray-500 italic">
-                  <p className="text-sm font-medium text-gray-700 mb-2">{fileName}</p>
-                  <p className="text-xs">Loading markdown from: {markdownUrl}</p>
-                </div>
-              )}
-            </div>
-          </div>
+          <div
+            key={block.id}
+            className="prose prose-sm max-w-none mb-4"
+            dangerouslySetInnerHTML={{ __html: renderBasicMarkdown(markdownContent) }}
+          />
         );
 
       case 'o4o/table':

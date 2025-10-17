@@ -107,12 +107,50 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState<'top' | 'bottom'>('top');
   const blockRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Show toolbar when selected or hovered
   useEffect(() => {
     setShowToolbar(isSelected || isHovered);
   }, [isSelected, isHovered]);
+
+  // Smart toolbar positioning: avoid screen edges
+  useEffect(() => {
+    if (!showToolbar || !blockRef.current) return;
+
+    const updateToolbarPosition = () => {
+      const blockRect = blockRef.current?.getBoundingClientRect();
+      if (!blockRect) return;
+
+      const TOOLBAR_HEIGHT = 45; // Approximate toolbar height
+      const SPACING = 8; // Spacing from block edge
+      const HEADER_HEIGHT = 60; // Editor header height
+
+      // Check if there's enough space above the block
+      const spaceAbove = blockRect.top - HEADER_HEIGHT;
+      const spaceBelow = window.innerHeight - blockRect.bottom;
+
+      // Position toolbar below if not enough space above
+      if (spaceAbove < TOOLBAR_HEIGHT + SPACING) {
+        setToolbarPosition('bottom');
+      } else {
+        setToolbarPosition('top');
+      }
+    };
+
+    updateToolbarPosition();
+
+    // Update on scroll and resize
+    window.addEventListener('scroll', updateToolbarPosition, true);
+    window.addEventListener('resize', updateToolbarPosition);
+
+    return () => {
+      window.removeEventListener('scroll', updateToolbarPosition, true);
+      window.removeEventListener('resize', updateToolbarPosition);
+    };
+  }, [showToolbar]);
 
   // Auto-focus block when selected with proper cursor positioning
   useEffect(() => {
@@ -242,6 +280,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       data-block-type={type}
       className={cn(
         'block-wrapper group relative transition-all duration-200',
+        'mb-6', // Add margin between blocks
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -269,10 +308,22 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     >
       {/* Left side drag handle - removed from here, now in toolbar */}
 
-      {/* Block toolbar - integrated design with better positioning */}
+      {/* Block toolbar - intelligent floating design */}
       {showToolbar && isSelected && (
-        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2 mb-4" style={{ top: '-100px' }}>
-          <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full">
+        <div
+          ref={toolbarRef}
+          className={cn(
+            'absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2',
+            'transition-all duration-200 ease-out',
+            toolbarPosition === 'top' ? '-translate-y-2' : 'translate-y-2'
+          )}
+          style={{
+            [toolbarPosition === 'top' ? 'bottom' : 'top']: '100%',
+            marginBottom: toolbarPosition === 'top' ? '8px' : undefined,
+            marginTop: toolbarPosition === 'bottom' ? '8px' : undefined,
+          }}
+        >
+          <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full touch-pan-x">
             {/* Drag handle - now in toolbar */}
             <div
               className="cursor-move p-0.5 sm:p-1 hover:bg-gray-100 rounded flex items-center flex-shrink-0"
@@ -613,26 +664,25 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       {/* Add block button - top */}
       {isHovered && !isSelected && (
         <button
-          className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all z-40"
+          className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all duration-200 z-40 shadow-md hover:shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
             onAddBlock?.('before');
           }}
           title="Add block before"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         </button>
       )}
 
       {/* Block content with selection state */}
-      <div 
+      <div
         className={cn(
           'block-content relative rounded-sm transition-all duration-200',
-          'before:content-[""] before:absolute before:inset-0 before:pointer-events-none',
-          'before:border-2 before:rounded-sm before:transition-all',
-          !isSelected && !isHovered && 'before:border-transparent',
-          isHovered && !isSelected && 'before:border-gray-200 hover:bg-gray-50',
-          isSelected && 'before:border-blue-500 before:shadow-md bg-blue-50/30',
+          'outline outline-2 outline-offset-0',
+          !isSelected && !isHovered && 'outline-transparent',
+          isHovered && !isSelected && 'outline-gray-200 bg-gray-50/50',
+          isSelected && 'outline-blue-500 shadow-md bg-blue-50/30',
           isDragging && 'opacity-50'
         )}
       >
@@ -642,14 +692,14 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       {/* Add block button - bottom */}
       {isHovered && !isSelected && (
         <button
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all z-40"
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all duration-200 z-40 shadow-md hover:shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
             onAddBlock?.('after');
           }}
           title="Add block after"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         </button>
       )}
     </div>

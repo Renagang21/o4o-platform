@@ -141,7 +141,7 @@ function normalizeBlockType(type: string): string {
     // O4O custom blocks
     'slide': 'o4o/slide',
     'youtube': 'o4o/youtube',
-    'markdown-reader': 'o4o/markdown-reader',
+    'markdown': 'o4o/markdown',
   };
 
   // Return mapped type or add 'core/' prefix as default

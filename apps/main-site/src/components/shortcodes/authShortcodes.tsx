@@ -20,8 +20,8 @@ interface OAuthProviders {
   naver?: OAuthProvider;
 }
 
-// Social Login Component
-const SocialLoginComponent: React.FC<{
+// Social Login Component (exported for use in pages)
+export const SocialLoginComponent: React.FC<{
   redirectUrl?: string;
   showEmailLogin?: boolean;
   title?: string;

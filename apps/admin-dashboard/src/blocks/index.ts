@@ -10,6 +10,7 @@ import paragraphBlockDefinition from './definitions/paragraph';
 import headingBlockDefinition from './definitions/heading';
 import quoteBlockDefinition from './definitions/quote';
 import codeBlockDefinition from './definitions/code';
+import markdownBlockDefinition from './definitions/markdown';
 import listBlockDefinition from './definitions/list';
 import tableBlockDefinition from './definitions/table';
 
@@ -34,7 +35,6 @@ import conditionalBlockDefinition from './definitions/conditional';
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
 import shortcodeBlockDefinition from './definitions/shortcode';
-import markdownReaderBlockDefinition from './definitions/markdown-reader';
 
 // Embed blocks
 import youtubeBlockDefinition from './definitions/youtube';
@@ -53,6 +53,7 @@ export function registerAllBlocks(): void {
   blockRegistry.register(headingBlockDefinition);
   blockRegistry.register(quoteBlockDefinition);
   blockRegistry.register(codeBlockDefinition);
+  blockRegistry.register(markdownBlockDefinition);
   blockRegistry.register(listBlockDefinition);
   blockRegistry.register(tableBlockDefinition);
 
@@ -77,7 +78,6 @@ export function registerAllBlocks(): void {
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
   blockRegistry.register(shortcodeBlockDefinition);
-  blockRegistry.register(markdownReaderBlockDefinition);
 
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);

@@ -4,7 +4,27 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Palette } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Color presets for text and background
+const COLOR_PRESETS = [
+  { label: 'Black', value: '#000000' },
+  { label: 'Dark Gray', value: '#1e293b' },
+  { label: 'Gray', value: '#64748b' },
+  { label: 'Light Gray', value: '#cbd5e1' },
+  { label: 'White', value: '#ffffff' },
+  { label: 'Red', value: '#ef4444' },
+  { label: 'Orange', value: '#f97316' },
+  { label: 'Yellow', value: '#fbbf24' },
+  { label: 'Green', value: '#22c55e' },
+  { label: 'Blue', value: '#3b82f6' },
+  { label: 'Purple', value: '#a855f7' },
+  { label: 'Pink', value: '#ec4899' },
+];
+
+// Font size presets
+const FONT_SIZE_PRESETS = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
 
 // Lazy load block-specific settings components
 const ImageBlockSettings = lazy(() => import('./ImageBlockSettings'));
@@ -175,47 +195,148 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
 
       case 'paragraph':
         return (
-          <div className="border-b pb-4">
-            <h3 className="text-sm font-medium mb-3">Typography</h3>
-            <div className="space-y-4">
-              <div>
-                <Label className="text-xs">Drop Cap</Label>
-                <input
-                  type="checkbox"
-                  checked={block.attributes?.dropCap || false}
-                  onChange={(e) => 
-                    onBlockSettingsChange?.({
-                      attributes: { ...block.attributes, dropCap: e.target.checked }
-                    })
-                  }
-                  className="ml-2"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Alignment</Label>
-                <div className="flex gap-1">
-                  {['left', 'center', 'right', 'justify'].map((align) => (
-                    <Button
-                      key={align}
-                      variant={block.attributes?.align === align ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => 
-                        onBlockSettingsChange?.({
-                          attributes: { ...block.attributes, align }
-                        })
-                      }
-                      title={align}
-                    >
-                      {align === 'left' && <AlignLeft className="h-4 w-4" />}
-                      {align === 'center' && <AlignCenter className="h-4 w-4" />}
-                      {align === 'right' && <AlignRight className="h-4 w-4" />}
-                      {align === 'justify' && <AlignJustify className="h-4 w-4" />}
-                    </Button>
-                  ))}
+          <>
+            {/* Color Settings Panel */}
+            <PanelBody title="Color">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-xs mb-2 block">Text Color</Label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {COLOR_PRESETS.map((color) => (
+                      <button
+                        key={color.value}
+                        className={cn(
+                          "w-8 h-8 rounded border-2 hover:scale-110 transition-transform",
+                          block.attributes?.textColor === color.value ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-300"
+                        )}
+                        style={{ backgroundColor: color.value }}
+                        onClick={() =>
+                          onBlockSettingsChange?.({
+                            attributes: { ...block.attributes, textColor: color.value }
+                          })
+                        }
+                        title={color.label}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={() =>
+                      onBlockSettingsChange?.({
+                        attributes: { ...block.attributes, textColor: undefined }
+                      })
+                    }
+                  >
+                    Reset Text Color
+                  </Button>
+                </div>
+
+                <div>
+                  <Label className="text-xs mb-2 block">Background Color</Label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {COLOR_PRESETS.map((color) => (
+                      <button
+                        key={color.value}
+                        className={cn(
+                          "w-8 h-8 rounded border-2 hover:scale-110 transition-transform",
+                          block.attributes?.backgroundColor === color.value ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-300"
+                        )}
+                        style={{ backgroundColor: color.value }}
+                        onClick={() =>
+                          onBlockSettingsChange?.({
+                            attributes: { ...block.attributes, backgroundColor: color.value }
+                          })
+                        }
+                        title={color.label}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={() =>
+                      onBlockSettingsChange?.({
+                        attributes: { ...block.attributes, backgroundColor: undefined }
+                      })
+                    }
+                  >
+                    Reset Background Color
+                  </Button>
                 </div>
               </div>
-            </div>
-          </div>
+            </PanelBody>
+
+            {/* Typography Panel */}
+            <PanelBody title="Typography">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-xs">Font Size</Label>
+                  <Select
+                    value={String(block.attributes?.fontSize || 16)}
+                    onValueChange={(value: string) =>
+                      onBlockSettingsChange?.({
+                        attributes: { ...block.attributes, fontSize: parseInt(value) }
+                      })
+                    }
+                  >
+                    <SelectTrigger className="w-full mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_SIZE_PRESETS.map((size) => (
+                        <SelectItem key={size} value={String(size)}>
+                          {size}px
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-xs">Alignment</Label>
+                  <div className="flex gap-1 mt-1">
+                    {['left', 'center', 'right', 'justify'].map((align) => (
+                      <Button
+                        key={align}
+                        variant={block.attributes?.align === align ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() =>
+                          onBlockSettingsChange?.({
+                            attributes: { ...block.attributes, align }
+                          })
+                        }
+                        title={align}
+                      >
+                        {align === 'left' && <AlignLeft className="h-4 w-4" />}
+                        {align === 'center' && <AlignCenter className="h-4 w-4" />}
+                        {align === 'right' && <AlignRight className="h-4 w-4" />}
+                        {align === 'justify' && <AlignJustify className="h-4 w-4" />}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-xs flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={block.attributes?.dropCap || false}
+                      onChange={(e) =>
+                        onBlockSettingsChange?.({
+                          attributes: { ...block.attributes, dropCap: e.target.checked }
+                        })
+                      }
+                      className="rounded"
+                    />
+                    Drop Cap
+                  </Label>
+                </div>
+              </div>
+            </PanelBody>
+          </>
         );
 
       case 'list':

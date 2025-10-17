@@ -1,5 +1,7 @@
 /**
  * Paragraph Block Definition
+ *
+ * Slate.js-based implementation for rich text editing
  */
 
 import React from 'react';

@@ -7,6 +7,7 @@ import { useAuth } from './contexts/AuthContext';
 import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
+import Login from './pages/auth/Login';
 import { OAuthCallback } from './pages/auth/OAuthCallback';
 import { EmailVerificationPending } from './pages/auth/EmailVerificationPending';
 import { EmailVerificationSuccess } from './pages/auth/EmailVerificationSuccess';
@@ -27,6 +28,7 @@ import { lazy, Suspense } from 'react';
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const PageEditor = lazy(() => import('./pages/PageEditor'));
 const PageViewer = lazy(() => import('./pages/PageViewer'));
+const PublicPage = lazy(() => import('./pages/PublicPage'));
 
 // Loading component
 const PageLoader: FC = () => (
@@ -77,6 +79,7 @@ const App: FC = () => {
           } />
           
           {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           <Route path="/auth/verify-email/pending" element={
@@ -122,7 +125,14 @@ const App: FC = () => {
               </Suspense>
             </PrivateRoute>
           } />
-          
+
+          {/* WordPress-style: Direct page slug access (must be before 404) */}
+          <Route path="/:slug" element={
+            <Suspense fallback={<PageLoader />}>
+              <PublicPage />
+            </Suspense>
+          } />
+
           {/* 404 Fallback */}
           <Route path="*" element={
             <Layout>

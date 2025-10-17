@@ -54,7 +54,7 @@ export const ViewportSwitcher: React.FC<ViewportSwitcherProps> = ({
             size="icon"
             onClick={() => onModeChange(mode)}
             className={cn(
-              'h-8 w-8 hover:bg-gray-100',
+              'h-8 w-8 text-gray-700 hover:bg-gray-100',
               mode !== 'desktop' && 'border-l',
               mode === 'desktop' && 'rounded-r-none',
               mode === 'tablet' && 'rounded-none',
