@@ -7,6 +7,7 @@ import { useAuth } from './contexts/AuthContext';
 import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
+import Login from './pages/auth/Login';
 import { OAuthCallback } from './pages/auth/OAuthCallback';
 import { EmailVerificationPending } from './pages/auth/EmailVerificationPending';
 import { EmailVerificationSuccess } from './pages/auth/EmailVerificationSuccess';
@@ -77,6 +78,7 @@ const App: FC = () => {
           } />
           
           {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           <Route path="/auth/verify-email/pending" element={
