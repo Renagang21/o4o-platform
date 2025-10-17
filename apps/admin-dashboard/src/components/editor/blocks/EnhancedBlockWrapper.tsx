@@ -28,9 +28,7 @@ import {
   Heading3,
   Heading4,
   Heading5,
-  Heading6,
-  Palette,
-  Type as TextSize
+  Heading6
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,25 +38,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-// Color presets for text and background
-const COLOR_PRESETS = [
-  { label: 'Black', value: '#000000' },
-  { label: 'Dark Gray', value: '#1e293b' },
-  { label: 'Gray', value: '#64748b' },
-  { label: 'Light Gray', value: '#cbd5e1' },
-  { label: 'White', value: '#ffffff' },
-  { label: 'Red', value: '#ef4444' },
-  { label: 'Orange', value: '#f97316' },
-  { label: 'Yellow', value: '#fbbf24' },
-  { label: 'Green', value: '#22c55e' },
-  { label: 'Blue', value: '#3b82f6' },
-  { label: 'Purple', value: '#a855f7' },
-  { label: 'Pink', value: '#ec4899' },
-];
-
-// Font size presets
-const FONT_SIZE_PRESETS = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
 
 interface EnhancedBlockWrapperProps {
   id: string;
@@ -92,13 +71,6 @@ interface EnhancedBlockWrapperProps {
   currentType?: string;
   isBold?: boolean;
   isItalic?: boolean;
-  // Color and font size controls
-  onTextColorChange?: (color: string) => void;
-  onBackgroundColorChange?: (color: string) => void;
-  onFontSizeChange?: (size: number) => void;
-  currentTextColor?: string;
-  currentBackgroundColor?: string;
-  currentFontSize?: number;
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -131,13 +103,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   onChangeType,
   currentType,
   isBold = false,
-  isItalic = false,
-  onTextColorChange,
-  onBackgroundColorChange,
-  onFontSizeChange,
-  currentTextColor,
-  currentBackgroundColor,
-  currentFontSize
+  isItalic = false
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -511,141 +477,6 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
                       <span>양쪽 정렬</span>
                       {currentAlign === 'justify' && <Check className="h-4 w-4 ml-auto" />}
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
-              </>
-            )}
-
-            {/* Text Color Dropdown */}
-            {onTextColorChange && (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 sm:h-7 px-1 sm:px-1.5 gap-0.5 hover:bg-gray-100 flex-shrink-0"
-                      title="Text Color"
-                    >
-                      <Palette className="h-3 w-3 sm:h-4 sm:w-4" />
-                      {currentTextColor && (
-                        <div
-                          className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm border border-gray-300"
-                          style={{ backgroundColor: currentTextColor }}
-                        />
-                      )}
-                      <ChevronDownIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-500" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-44">
-                    <div className="p-2 grid grid-cols-4 gap-2">
-                      {COLOR_PRESETS.map((color) => (
-                        <button
-                          key={color.value}
-                          className={cn(
-                            "w-8 h-8 rounded border-2 hover:scale-110 transition-transform",
-                            currentTextColor === color.value ? "border-blue-500" : "border-gray-300"
-                          )}
-                          style={{ backgroundColor: color.value }}
-                          onClick={() => onTextColorChange(color.value)}
-                          title={color.label}
-                        />
-                      ))}
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onTextColorChange('')}
-                      className="gap-2 cursor-pointer"
-                    >
-                      <span>Reset to default</span>
-                      {!currentTextColor && <Check className="h-4 w-4 ml-auto" />}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
-
-            {/* Background Color Dropdown */}
-            {onBackgroundColorChange && (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 sm:h-7 px-1 sm:px-1.5 gap-0.5 hover:bg-gray-100 flex-shrink-0"
-                      title="Background Color"
-                    >
-                      <div className="relative">
-                        <Palette className="h-3 w-3 sm:h-4 sm:w-4" />
-                        {currentBackgroundColor && (
-                          <div
-                            className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-sm border border-gray-300"
-                            style={{ backgroundColor: currentBackgroundColor }}
-                          />
-                        )}
-                      </div>
-                      <ChevronDownIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-500" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-44">
-                    <div className="p-2 grid grid-cols-4 gap-2">
-                      {COLOR_PRESETS.map((color) => (
-                        <button
-                          key={color.value}
-                          className={cn(
-                            "w-8 h-8 rounded border-2 hover:scale-110 transition-transform",
-                            currentBackgroundColor === color.value ? "border-blue-500" : "border-gray-300"
-                          )}
-                          style={{ backgroundColor: color.value }}
-                          onClick={() => onBackgroundColorChange(color.value)}
-                          title={color.label}
-                        />
-                      ))}
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onBackgroundColorChange('')}
-                      className="gap-2 cursor-pointer"
-                    >
-                      <span>Reset to default</span>
-                      {!currentBackgroundColor && <Check className="h-4 w-4 ml-auto" />}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
-
-            {/* Font Size Dropdown */}
-            {onFontSizeChange && (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 sm:h-7 px-1 sm:px-1.5 gap-0.5 hover:bg-gray-100 flex-shrink-0"
-                      title="Font Size"
-                    >
-                      <TextSize className="h-3 w-3 sm:h-4 sm:w-4" />
-                      {currentFontSize && (
-                        <span className="text-[10px] sm:text-xs font-medium">{currentFontSize}</span>
-                      )}
-                      <ChevronDownIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-500" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-32">
-                    {FONT_SIZE_PRESETS.map((size) => (
-                      <DropdownMenuItem
-                        key={size}
-                        onClick={() => onFontSizeChange(size)}
-                        className="gap-2 cursor-pointer justify-between"
-                      >
-                        <span>{size}px</span>
-                        {currentFontSize === size && <Check className="h-4 w-4" />}
-                      </DropdownMenuItem>
-                    ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="w-px h-4 sm:h-5 bg-gray-200 flex-shrink-0" />
