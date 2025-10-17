@@ -121,8 +121,37 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
 
   // Handle key events
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Enter key - allow line break within heading
-    // Users can use DefaultBlockAppender to add new blocks
+    // Enter key handling
+    if (e.key === 'Enter') {
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        // Shift+Enter or Ctrl+Enter: line break within heading
+        // Allow default behavior
+      } else {
+        // Plain Enter: finish editing, move to DefaultBlockAppender
+        e.preventDefault();
+
+        // Save current content
+        if (editorRef.current) {
+          const currentContent = editorRef.current.textContent || '';
+          onChange(currentContent, attributes);
+        }
+
+        // Blur current editor
+        if (editorRef.current) {
+          editorRef.current.blur();
+        }
+
+        // Focus DefaultBlockAppender
+        setTimeout(() => {
+          const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
+          if (appender) {
+            appender.focus();
+          }
+        }, 50);
+
+        return;
+      }
+    }
 
     // Backspace on empty - delete block
     if (e.key === 'Backspace' && localContent === '') {

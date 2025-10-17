@@ -198,8 +198,35 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }
       }
 
-      // Enter key - just create line break within same block
-      // Slate's withParagraphs plugin handles insertBreak for both Enter and Shift+Enter
+      // Enter key handling
+      if (event.key === 'Enter') {
+        if (event.shiftKey || event.ctrlKey || event.metaKey) {
+          // Shift+Enter or Ctrl+Enter: line break within block
+          // Let Slate's withParagraphs plugin handle it
+        } else {
+          // Plain Enter: finish editing, move to DefaultBlockAppender
+          event.preventDefault();
+
+          // Save current content
+          const currentHtml = serialize(editor.children);
+          onChange(currentHtml, attributes);
+
+          // Blur current editor
+          if (event.currentTarget instanceof HTMLElement) {
+            event.currentTarget.blur();
+          }
+
+          // Focus DefaultBlockAppender
+          setTimeout(() => {
+            const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
+            if (appender) {
+              appender.focus();
+            }
+          }, 50);
+
+          return;
+        }
+      }
 
       // Backspace at start of empty/whitespace-only block
       if (event.key === 'Backspace') {

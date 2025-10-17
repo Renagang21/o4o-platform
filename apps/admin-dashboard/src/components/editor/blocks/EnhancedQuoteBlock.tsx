@@ -165,12 +165,28 @@ const EnhancedQuoteBlock: React.FC<EnhancedQuoteBlockProps> = ({
 
   // Handle key events
   const handleQuoteKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (localCitation === '') {
-        citationRef.current?.focus();
+    if (e.key === 'Enter') {
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        // Shift+Enter or Ctrl+Enter: line break within quote
+        // Allow default behavior
+      } else {
+        // Plain Enter: move to citation or finish
+        e.preventDefault();
+        if (localCitation === '') {
+          citationRef.current?.focus();
+        } else {
+          // Both quote and citation filled, finish editing
+          quoteRef.current?.blur();
+
+          // Focus DefaultBlockAppender
+          setTimeout(() => {
+            const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
+            if (appender) {
+              appender.focus();
+            }
+          }, 50);
+        }
       }
-      // Enter key - allow line break, users can use DefaultBlockAppender for new blocks
     }
 
     if (e.key === 'Backspace' && localQuote === '' && localCitation === '') {
@@ -180,7 +196,25 @@ const EnhancedQuoteBlock: React.FC<EnhancedQuoteBlockProps> = ({
   };
 
   const handleCitationKeyDown = (e: React.KeyboardEvent) => {
-    // Enter key - allow line break, users can use DefaultBlockAppender for new blocks
+    if (e.key === 'Enter') {
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        // Shift+Enter or Ctrl+Enter: line break within citation
+        // Allow default behavior
+      } else {
+        // Plain Enter: finish editing, move to DefaultBlockAppender
+        e.preventDefault();
+
+        citationRef.current?.blur();
+
+        // Focus DefaultBlockAppender
+        setTimeout(() => {
+          const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
+          if (appender) {
+            appender.focus();
+          }
+        }, 50);
+      }
+    }
 
     if (e.key === 'Backspace' && localCitation === '') {
       e.preventDefault();
