@@ -1,0 +1,842 @@
+[
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/PLATFORM_INVESTIGATION_REPORT.md",
+    "relativePath": "PLATFORM_INVESTIGATION_REPORT.md",
+    "category": "root",
+    "filename": "PLATFORM_INVESTIGATION_REPORT.md",
+    "title": "O4O 플랫폼 구조 조사 보고서",
+    "size": 36156
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/QUICK_START.md",
+    "relativePath": "QUICK_START.md",
+    "category": "root",
+    "filename": "QUICK_START.md",
+    "title": "🚀 O4O Platform 빠른 시작 가이드",
+    "size": 2604
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/README.md",
+    "relativePath": "README.md",
+    "category": "root",
+    "filename": "README.md",
+    "title": "O4O Platform Documentation",
+    "size": 9498
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/admin/appearance-upgrade-plan.md",
+    "relativePath": "admin/appearance-upgrade-plan.md",
+    "category": "admin",
+    "filename": "appearance-upgrade-plan.md",
+    "title": "o4o-platform 관리자 Appearance 모듈 업그레이드 계획",
+    "size": 11561
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/api-analysis/API_DOCUMENTATION.md",
+    "relativePath": "api-analysis/API_DOCUMENTATION.md",
+    "category": "api-analysis",
+    "filename": "API_DOCUMENTATION.md",
+    "title": "O4O Platform API Documentation",
+    "size": 4988
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/api-analysis/API_ERROR_ANALYSIS_REPORT.md",
+    "relativePath": "api-analysis/API_ERROR_ANALYSIS_REPORT.md",
+    "category": "api-analysis",
+    "filename": "API_ERROR_ANALYSIS_REPORT.md",
+    "title": "API 에러 분석 보고서 - O4O Platform",
+    "size": 10852
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/api-analysis/API_SERVER_FIX_INSTRUCTIONS.md",
+    "relativePath": "api-analysis/API_SERVER_FIX_INSTRUCTIONS.md",
+    "category": "api-analysis",
+    "filename": "API_SERVER_FIX_INSTRUCTIONS.md",
+    "title": "API 서버 긴급 수정 지시서",
+    "size": 11440
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/ADMIN_MENU_GUIDE.md",
+    "relativePath": "apps/ADMIN_MENU_GUIDE.md",
+    "category": "apps",
+    "filename": "ADMIN_MENU_GUIDE.md",
+    "title": "Admin Menu System Guide",
+    "size": 4520
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/API_SAFETY_GUIDE.md",
+    "relativePath": "apps/API_SAFETY_GUIDE.md",
+    "category": "apps",
+    "filename": "API_SAFETY_GUIDE.md",
+    "title": "API Response Safety Guide",
+    "size": 5144
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/GALLERY_BLOCK_API_REQUIREMENTS.md",
+    "relativePath": "apps/GALLERY_BLOCK_API_REQUIREMENTS.md",
+    "category": "apps",
+    "filename": "GALLERY_BLOCK_API_REQUIREMENTS.md",
+    "title": "Gallery Block API Server Integration Requirements",
+    "size": 6494
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/README.md",
+    "relativePath": "apps/README.md",
+    "category": "apps",
+    "filename": "README.md",
+    "title": "O4O Admin Dashboard",
+    "size": 4489
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/ROUTING_GUIDE.md",
+    "relativePath": "apps/ROUTING_GUIDE.md",
+    "category": "apps",
+    "filename": "ROUTING_GUIDE.md",
+    "title": "Admin Dashboard Routing Guide",
+    "size": 3617
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/SCREEN_OPTIONS_GUIDE.md",
+    "relativePath": "apps/SCREEN_OPTIONS_GUIDE.md",
+    "category": "apps",
+    "filename": "SCREEN_OPTIONS_GUIDE.md",
+    "title": "WordPress Screen Options Implementation Guide",
+    "size": 2722
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/apps/USER_MANUAL_KO.md",
+    "relativePath": "apps/USER_MANUAL_KO.md",
+    "category": "apps",
+    "filename": "USER_MANUAL_KO.md",
+    "title": "O4O Platform 관리자 대시보드 사용자 매뉴얼",
+    "size": 11711
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/AI_BLOCK_REFERENCE_SYSTEM.md",
+    "relativePath": "architecture/AI_BLOCK_REFERENCE_SYSTEM.md",
+    "category": "architecture",
+    "filename": "AI_BLOCK_REFERENCE_SYSTEM.md",
+    "title": "AI 블록/숏코드 참조 시스템",
+    "size": 7412
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/AI_DYNAMIC_REFERENCE_SUMMARY.md",
+    "relativePath": "architecture/AI_DYNAMIC_REFERENCE_SUMMARY.md",
+    "category": "architecture",
+    "filename": "AI_DYNAMIC_REFERENCE_SUMMARY.md",
+    "title": "AI 동적 참조 시스템 요약",
+    "size": 8868
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/API_SERVER_REQUIREMENTS.md",
+    "relativePath": "architecture/API_SERVER_REQUIREMENTS.md",
+    "category": "architecture",
+    "filename": "API_SERVER_REQUIREMENTS.md",
+    "title": "API Server 작업 요구사항 문서",
+    "size": 12423
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/BLOCK_BUNDLE_OPTIMIZATION_STRATEGY.md",
+    "relativePath": "architecture/BLOCK_BUNDLE_OPTIMIZATION_STRATEGY.md",
+    "category": "architecture",
+    "filename": "BLOCK_BUNDLE_OPTIMIZATION_STRATEGY.md",
+    "title": "📦 블록 번들 사이즈 최적화 전략",
+    "size": 9652
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/BLOCK_IMPLEMENTATION_STATUS.md",
+    "relativePath": "architecture/BLOCK_IMPLEMENTATION_STATUS.md",
+    "category": "architecture",
+    "filename": "BLOCK_IMPLEMENTATION_STATUS.md",
+    "title": "📋 블록 구현 현황 상세 매트릭스",
+    "size": 3780
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/BLOCK_PLUGIN_ARCHITECTURE.md",
+    "relativePath": "architecture/BLOCK_PLUGIN_ARCHITECTURE.md",
+    "category": "architecture",
+    "filename": "BLOCK_PLUGIN_ARCHITECTURE.md",
+    "title": "📦 O4O Platform 블록 플러그인 아키텍처 문서",
+    "size": 10595
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/BLOCK_PLUGIN_MIGRATION_ROADMAP.md",
+    "relativePath": "architecture/BLOCK_PLUGIN_MIGRATION_ROADMAP.md",
+    "category": "architecture",
+    "filename": "BLOCK_PLUGIN_MIGRATION_ROADMAP.md",
+    "title": "🗺️ 블록 플러그인 마이그레이션 로드맵",
+    "size": 7380
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/BLOCK_SYSTEM_AUDIT_REPORT.md",
+    "relativePath": "architecture/BLOCK_SYSTEM_AUDIT_REPORT.md",
+    "category": "architecture",
+    "filename": "BLOCK_SYSTEM_AUDIT_REPORT.md",
+    "title": "📊 블록 시스템 전체 현황 조사 리포트",
+    "size": 10239
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/EDITOR_DATA_STORAGE_ANALYSIS.md",
+    "relativePath": "architecture/EDITOR_DATA_STORAGE_ANALYSIS.md",
+    "category": "architecture",
+    "filename": "EDITOR_DATA_STORAGE_ANALYSIS.md",
+    "title": "로컬 Claude Code 데이터 저장 구조 조사 보고서",
+    "size": 11222
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/PAGE_MANAGEMENT_IMPLEMENTATION_GUIDE.md",
+    "relativePath": "architecture/PAGE_MANAGEMENT_IMPLEMENTATION_GUIDE.md",
+    "category": "architecture",
+    "filename": "PAGE_MANAGEMENT_IMPLEMENTATION_GUIDE.md",
+    "title": "페이지 관리 기능 구현 가이드",
+    "size": 7839
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/SHORTCODE_REFERENCE.md",
+    "relativePath": "architecture/SHORTCODE_REFERENCE.md",
+    "category": "architecture",
+    "filename": "SHORTCODE_REFERENCE.md",
+    "title": "Shortcode Reference Guide",
+    "size": 13713
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/SHORTCODE_USAGE_GUIDE.md",
+    "relativePath": "architecture/SHORTCODE_USAGE_GUIDE.md",
+    "category": "architecture",
+    "filename": "SHORTCODE_USAGE_GUIDE.md",
+    "title": "🚀 Dropshipping Partner Portal Shortcode 사용 가이드",
+    "size": 6822
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/WORDPRESS_THEME_ANALYSIS_REPORT.md",
+    "relativePath": "architecture/WORDPRESS_THEME_ANALYSIS_REPORT.md",
+    "category": "architecture",
+    "filename": "WORDPRESS_THEME_ANALYSIS_REPORT.md",
+    "title": "WordPress 테마 분석 보고서",
+    "size": 6311
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/architecture/ZONE_SYSTEM_INVESTIGATION_REPORT.md",
+    "relativePath": "architecture/ZONE_SYSTEM_INVESTIGATION_REPORT.md",
+    "category": "architecture",
+    "filename": "ZONE_SYSTEM_INVESTIGATION_REPORT.md",
+    "title": "🔍 Zone System 추가 조사 보고서",
+    "size": 7061
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/archive/DEPLOY_NOW.md",
+    "relativePath": "archive/DEPLOY_NOW.md",
+    "category": "archive",
+    "filename": "DEPLOY_NOW.md",
+    "title": "웹서버 긴급 배포 가이드",
+    "size": 589
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/archive/POST_EDITOR_INVESTIGATION_REPORT.md",
+    "relativePath": "archive/POST_EDITOR_INVESTIGATION_REPORT.md",
+    "category": "archive",
+    "filename": "POST_EDITOR_INVESTIGATION_REPORT.md",
+    "title": "📋 글 편집기 문제 조사 보고서",
+    "size": 4566
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/archive/REACT_ROUTER_NAVIGATION_INVESTIGATION.md",
+    "relativePath": "archive/REACT_ROUTER_NAVIGATION_INVESTIGATION.md",
+    "category": "archive",
+    "filename": "REACT_ROUTER_NAVIGATION_INVESTIGATION.md",
+    "title": "📋 React Router 네비게이션 전환 조사 보고서",
+    "size": 4299
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/README.md",
+    "relativePath": "authentication/README.md",
+    "category": "authentication",
+    "filename": "README.md",
+    "title": "🔐 O4O Platform 인증 시스템 문서",
+    "size": 7542
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/authentication-integration.md",
+    "relativePath": "authentication/authentication-integration.md",
+    "category": "authentication",
+    "filename": "authentication-integration.md",
+    "title": "Authentication System Integration Guide",
+    "size": 6611
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/cross-app-session-sync.md",
+    "relativePath": "authentication/cross-app-session-sync.md",
+    "category": "authentication",
+    "filename": "cross-app-session-sync.md",
+    "title": "Cross-App Session Synchronization",
+    "size": 6181
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/login-security-implementation.md",
+    "relativePath": "authentication/login-security-implementation.md",
+    "category": "authentication",
+    "filename": "login-security-implementation.md",
+    "title": "Login Security Implementation Guide",
+    "size": 7414
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/oauth-integration-guide.md",
+    "relativePath": "authentication/oauth-integration-guide.md",
+    "category": "authentication",
+    "filename": "oauth-integration-guide.md",
+    "title": "OAuth Integration Guide",
+    "size": 5336
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/password-reset-implementation.md",
+    "relativePath": "authentication/password-reset-implementation.md",
+    "category": "authentication",
+    "filename": "password-reset-implementation.md",
+    "title": "Password Reset Implementation Guide",
+    "size": 4904
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/refresh-token-implementation.md",
+    "relativePath": "authentication/refresh-token-implementation.md",
+    "category": "authentication",
+    "filename": "refresh-token-implementation.md",
+    "title": "Refresh Token Implementation Guide",
+    "size": 5886
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/authentication/session-management-implementation.md",
+    "relativePath": "authentication/session-management-implementation.md",
+    "category": "authentication",
+    "filename": "session-management-implementation.md",
+    "title": "Session Management Implementation Guide",
+    "size": 6436
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/blocks-inventory.md",
+    "relativePath": "blocks-inventory.md",
+    "category": "root",
+    "filename": "blocks-inventory.md",
+    "title": "O4O Platform 블록 인벤토리 (정리본)",
+    "size": 6224
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/DATABASE_SETUP_GUIDE.md",
+    "relativePath": "deployment/DATABASE_SETUP_GUIDE.md",
+    "category": "deployment",
+    "filename": "DATABASE_SETUP_GUIDE.md",
+    "title": "Database Setup Guide - 서버 작업 안내서",
+    "size": 6629
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/DEPLOYMENT_CHECKLIST.md",
+    "relativePath": "deployment/DEPLOYMENT_CHECKLIST.md",
+    "category": "deployment",
+    "filename": "DEPLOYMENT_CHECKLIST.md",
+    "title": "O4O Platform 배포 체크리스트",
+    "size": 3175
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/DNS_CONFIGURATION_GUIDE.md",
+    "relativePath": "deployment/DNS_CONFIGURATION_GUIDE.md",
+    "category": "deployment",
+    "filename": "DNS_CONFIGURATION_GUIDE.md",
+    "title": "🌐 DNS 설정 가이드 - O4O Platform",
+    "size": 2311
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/ENV_SETUP.md",
+    "relativePath": "deployment/ENV_SETUP.md",
+    "category": "deployment",
+    "filename": "ENV_SETUP.md",
+    "title": "Environment Variables Setup Guide",
+    "size": 3552
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/GITHUB_ACTIONS_SETUP.md",
+    "relativePath": "deployment/GITHUB_ACTIONS_SETUP.md",
+    "category": "deployment",
+    "filename": "GITHUB_ACTIONS_SETUP.md",
+    "title": "GitHub Actions Setup Guide",
+    "size": 2015
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/POST_DEPLOY_VERIFICATION_CHECKLIST.md",
+    "relativePath": "deployment/POST_DEPLOY_VERIFICATION_CHECKLIST.md",
+    "category": "deployment",
+    "filename": "POST_DEPLOY_VERIFICATION_CHECKLIST.md",
+    "title": "Post-Deploy Verification Checklist",
+    "size": 1916
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/README.md",
+    "relativePath": "deployment/README.md",
+    "category": "deployment",
+    "filename": "README.md",
+    "title": "🚀 O4O Platform 배포 가이드",
+    "size": 9908
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/SERVER_SETUP_GUIDE.md",
+    "relativePath": "deployment/SERVER_SETUP_GUIDE.md",
+    "category": "deployment",
+    "filename": "SERVER_SETUP_GUIDE.md",
+    "title": "O4O API Server 설정 가이드 🚀",
+    "size": 4176
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/SETUP_AUTO_DEPLOY.md",
+    "relativePath": "deployment/SETUP_AUTO_DEPLOY.md",
+    "category": "deployment",
+    "filename": "SETUP_AUTO_DEPLOY.md",
+    "title": "🚀 원클릭 자동 배포 설정 가이드",
+    "size": 1260
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/legacy/DEPLOYMENT_FIX.md",
+    "relativePath": "deployment/legacy/DEPLOYMENT_FIX.md",
+    "category": "deployment/legacy",
+    "filename": "DEPLOYMENT_FIX.md",
+    "title": "SSH 및 배포 권한 문제 해결 가이드",
+    "size": 3498
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/legacy/DEPLOY_MANUAL.md",
+    "relativePath": "deployment/legacy/DEPLOY_MANUAL.md",
+    "category": "deployment/legacy",
+    "filename": "DEPLOY_MANUAL.md",
+    "title": "🚨 수동 배포 가이드 - Admin Dashboard",
+    "size": 2478
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/legacy/deployment-checklist.md",
+    "relativePath": "deployment/legacy/deployment-checklist.md",
+    "category": "deployment/legacy",
+    "filename": "deployment-checklist.md",
+    "title": "O4O Platform 배포 체크리스트",
+    "size": 3411
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/legacy/deployment-overview.md",
+    "relativePath": "deployment/legacy/deployment-overview.md",
+    "category": "deployment/legacy",
+    "filename": "deployment-overview.md",
+    "title": "O4O Platform Deployment Guide",
+    "size": 4193
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/legacy/pre-deployment-checklist.md",
+    "relativePath": "deployment/legacy/pre-deployment-checklist.md",
+    "category": "deployment/legacy",
+    "filename": "pre-deployment-checklist.md",
+    "title": "배포 전 최종 체크리스트",
+    "size": 2725
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/legacy/step-by-step-deployment.md",
+    "relativePath": "deployment/legacy/step-by-step-deployment.md",
+    "category": "deployment/legacy",
+    "filename": "step-by-step-deployment.md",
+    "title": "🚀 O4O API 서버 단계별 배포 가이드",
+    "size": 4318
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/nginx-setup.md",
+    "relativePath": "deployment/nginx-setup.md",
+    "category": "deployment",
+    "filename": "nginx-setup.md",
+    "title": "Nginx Configuration for O4O Platform",
+    "size": 3754
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/deployment/server-prerequisites.md",
+    "relativePath": "deployment/server-prerequisites.md",
+    "category": "deployment",
+    "filename": "server-prerequisites.md",
+    "title": "Server Prerequisites for O4O Platform Deployment",
+    "size": 3287
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development/DEPENDENCY_FIX_SUMMARY.md",
+    "relativePath": "development/DEPENDENCY_FIX_SUMMARY.md",
+    "category": "development",
+    "filename": "DEPENDENCY_FIX_SUMMARY.md",
+    "title": "O4O Platform Dependency Fix Summary",
+    "size": 2255
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development/DEVELOPMENT_GUIDELINES.md",
+    "relativePath": "development/DEVELOPMENT_GUIDELINES.md",
+    "category": "development",
+    "filename": "DEVELOPMENT_GUIDELINES.md",
+    "title": "Repository Guidelines",
+    "size": 2359
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development/LOCAL_DEV_COMMANDS.md",
+    "relativePath": "development/LOCAL_DEV_COMMANDS.md",
+    "category": "development",
+    "filename": "LOCAL_DEV_COMMANDS.md",
+    "title": "로컬 개발 환경 명령어 가이드",
+    "size": 3942
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development/LOCAL_SETUP_GUIDE.md",
+    "relativePath": "development/LOCAL_SETUP_GUIDE.md",
+    "category": "development",
+    "filename": "LOCAL_SETUP_GUIDE.md",
+    "title": "🚀 로컬 환경 설정 가이드",
+    "size": 7820
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development/NPM_SCRIPTS_GUIDE.md",
+    "relativePath": "development/NPM_SCRIPTS_GUIDE.md",
+    "category": "development",
+    "filename": "NPM_SCRIPTS_GUIDE.md",
+    "title": "PNPM Scripts Guide",
+    "size": 6126
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development-reference/ARCHITECTURE_DECISIONS.md",
+    "relativePath": "development-reference/ARCHITECTURE_DECISIONS.md",
+    "category": "development-reference",
+    "filename": "ARCHITECTURE_DECISIONS.md",
+    "title": "Architecture Decisions and Design Patterns",
+    "size": 19868
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development-reference/DEVELOPMENT_PROCESS_COMPLETE.md",
+    "relativePath": "development-reference/DEVELOPMENT_PROCESS_COMPLETE.md",
+    "category": "development-reference",
+    "filename": "DEVELOPMENT_PROCESS_COMPLETE.md",
+    "title": "O4O Platform Development Process - Complete Documentation",
+    "size": 15500
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development-reference/IMPLEMENTATION_CHALLENGES.md",
+    "relativePath": "development-reference/IMPLEMENTATION_CHALLENGES.md",
+    "category": "development-reference",
+    "filename": "IMPLEMENTATION_CHALLENGES.md",
+    "title": "Implementation Challenges and Solutions",
+    "size": 25767
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/development-reference/README.md",
+    "relativePath": "development-reference/README.md",
+    "category": "development-reference",
+    "filename": "README.md",
+    "title": "O4O Platform Development Reference Documentation",
+    "size": 8469
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/guide/ADD_NEW_SHORTCODE.md",
+    "relativePath": "guide/ADD_NEW_SHORTCODE.md",
+    "category": "guide",
+    "filename": "ADD_NEW_SHORTCODE.md",
+    "title": "새 숏코드 추가하기",
+    "size": 8910
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/README.md",
+    "relativePath": "manual/README.md",
+    "category": "manual",
+    "filename": "README.md",
+    "title": "사용자 매뉴얼",
+    "size": 6452
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/admin-manual.md",
+    "relativePath": "manual/admin-manual.md",
+    "category": "manual",
+    "filename": "admin-manual.md",
+    "title": "O4O Platform 관리자 매뉴얼",
+    "size": 35319
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/ai-page-generation.md",
+    "relativePath": "manual/ai-page-generation.md",
+    "category": "manual",
+    "filename": "ai-page-generation.md",
+    "title": "AI 페이지 자동 생성 기능 매뉴얼",
+    "size": 12404
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/appearance-customize.md",
+    "relativePath": "manual/appearance-customize.md",
+    "category": "manual",
+    "filename": "appearance-customize.md",
+    "title": "외모 → 사용자 정의하기 매뉴얼",
+    "size": 6235
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/appearance-menus.md",
+    "relativePath": "manual/appearance-menus.md",
+    "category": "manual",
+    "filename": "appearance-menus.md",
+    "title": "외모 → 메뉴 매뉴얼",
+    "size": 12439
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/appearance-template-parts.md",
+    "relativePath": "manual/appearance-template-parts.md",
+    "category": "manual",
+    "filename": "appearance-template-parts.md",
+    "title": "외모 → 템플릿 파트 매뉴얼",
+    "size": 10530
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/blocks-reference-detailed.md",
+    "relativePath": "manual/blocks-reference-detailed.md",
+    "category": "manual",
+    "filename": "blocks-reference-detailed.md",
+    "title": "블록 레퍼런스 상세 가이드 (개발자/사용자용)",
+    "size": 17881
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/blocks-reference.md",
+    "relativePath": "manual/blocks-reference.md",
+    "category": "manual",
+    "filename": "blocks-reference.md",
+    "title": "블록 레퍼런스 (AI용)",
+    "size": 7534
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/editor-usage-manual.md",
+    "relativePath": "manual/editor-usage-manual.md",
+    "category": "manual",
+    "filename": "editor-usage-manual.md",
+    "title": "O4O Platform 편집기 사용 매뉴얼",
+    "size": 10799
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/manual/shortcode-reference.md",
+    "relativePath": "manual/shortcode-reference.md",
+    "category": "manual",
+    "filename": "shortcode-reference.md",
+    "title": "숏코드 레퍼런스",
+    "size": 12278
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/operations/PRODUCT_IMPORT_GUIDE.md",
+    "relativePath": "operations/PRODUCT_IMPORT_GUIDE.md",
+    "category": "operations",
+    "filename": "PRODUCT_IMPORT_GUIDE.md",
+    "title": "📦 상품 일괄 등록 가이드 (Product Import Guide)",
+    "size": 7294
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/operations/SERVER_ACCESS.md",
+    "relativePath": "operations/SERVER_ACCESS.md",
+    "category": "operations",
+    "filename": "SERVER_ACCESS.md",
+    "title": "O4O Platform 서버 접속 정보",
+    "size": 1599
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/operations/WEBSERVER_NO_BUILD_GUIDE.md",
+    "relativePath": "operations/WEBSERVER_NO_BUILD_GUIDE.md",
+    "category": "operations",
+    "filename": "WEBSERVER_NO_BUILD_GUIDE.md",
+    "title": "웹서버 빌드 중지 가이드",
+    "size": 1707
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/API_SERVER_ENV_REQUIREMENTS.md",
+    "relativePath": "setup/API_SERVER_ENV_REQUIREMENTS.md",
+    "category": "setup",
+    "filename": "API_SERVER_ENV_REQUIREMENTS.md",
+    "title": "📋 API서버 필수 환경변수 목록",
+    "size": 2831
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/API_SERVER_SETUP_GUIDE.md",
+    "relativePath": "setup/API_SERVER_SETUP_GUIDE.md",
+    "category": "setup",
+    "filename": "API_SERVER_SETUP_GUIDE.md",
+    "title": "API 서버 최적화 설정 가이드",
+    "size": 7094
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/ENV_VARIABLES_DESIGN.md",
+    "relativePath": "setup/ENV_VARIABLES_DESIGN.md",
+    "category": "setup",
+    "filename": "ENV_VARIABLES_DESIGN.md",
+    "title": "📋 O4O Platform 환경변수 설계 문서",
+    "size": 4647
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/HEADER_SETUP_GUIDE.md",
+    "relativePath": "setup/HEADER_SETUP_GUIDE.md",
+    "category": "setup",
+    "filename": "HEADER_SETUP_GUIDE.md",
+    "title": "헤더 설정 가이드",
+    "size": 2812
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/PM2_AUTOSTART_SETUP-webserver.md",
+    "relativePath": "setup/PM2_AUTOSTART_SETUP-webserver.md",
+    "category": "setup",
+    "filename": "PM2_AUTOSTART_SETUP-webserver.md",
+    "title": "PM2 자동시작 설정 보고서 - Webserver",
+    "size": 3619
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/SETUP_GITHUB_SECRETS.md",
+    "relativePath": "setup/SETUP_GITHUB_SECRETS.md",
+    "category": "setup",
+    "filename": "SETUP_GITHUB_SECRETS.md",
+    "title": "GitHub Secrets 설정 가이드",
+    "size": 2174
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/setup/WEBSERVER_ENV_REQUIREMENTS.md",
+    "relativePath": "setup/WEBSERVER_ENV_REQUIREMENTS.md",
+    "category": "setup",
+    "filename": "WEBSERVER_ENV_REQUIREMENTS.md",
+    "title": "🌐 웹서버 필수 환경변수 목록",
+    "size": 2706
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/status/API_SERVER_STATUS.md",
+    "relativePath": "status/API_SERVER_STATUS.md",
+    "category": "status",
+    "filename": "API_SERVER_STATUS.md",
+    "title": "API Server Status & Documentation",
+    "size": 6940
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/status/NGINX_VERIFICATION_REPORT.md",
+    "relativePath": "status/NGINX_VERIFICATION_REPORT.md",
+    "category": "status",
+    "filename": "NGINX_VERIFICATION_REPORT.md",
+    "title": "Nginx 설정 검증 보고서",
+    "size": 6088
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/status/admin-dashboard-ts-status.md",
+    "relativePath": "status/admin-dashboard-ts-status.md",
+    "category": "status",
+    "filename": "admin-dashboard-ts-status.md",
+    "title": "관리자 대시보드 TypeScript 정합 작업 현황",
+    "size": 2633
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/testing/DROPSHIPPING_TEST_CHECKLIST.md",
+    "relativePath": "testing/DROPSHIPPING_TEST_CHECKLIST.md",
+    "category": "testing",
+    "filename": "DROPSHIPPING_TEST_CHECKLIST.md",
+    "title": "드롭쉬핑 CPT 시스템 테스트 체크리스트",
+    "size": 4230
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/testing/TEST_GUIDE.md",
+    "relativePath": "testing/TEST_GUIDE.md",
+    "category": "testing",
+    "filename": "TEST_GUIDE.md",
+    "title": "🚀 O4O Platform 실전 테스트 가이드",
+    "size": 3016
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md",
+    "relativePath": "troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md",
+    "category": "troubleshooting",
+    "filename": "502-BAD-GATEWAY-SOLUTIONS.md",
+    "title": "502 Bad Gateway 문제 해결 가이드",
+    "size": 2382
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/API_CORS_FIX_GUIDE.md",
+    "relativePath": "troubleshooting/API_CORS_FIX_GUIDE.md",
+    "category": "troubleshooting",
+    "filename": "API_CORS_FIX_GUIDE.md",
+    "title": "API 서버 CORS 문제 해결 가이드",
+    "size": 4937
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/API_SERVER_RECOVERY_PLAN.md",
+    "relativePath": "troubleshooting/API_SERVER_RECOVERY_PLAN.md",
+    "category": "troubleshooting",
+    "filename": "API_SERVER_RECOVERY_PLAN.md",
+    "title": "API 서버 복구 계획",
+    "size": 3443
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/BACKUP_RECOVERY.md",
+    "relativePath": "troubleshooting/BACKUP_RECOVERY.md",
+    "category": "troubleshooting",
+    "filename": "BACKUP_RECOVERY.md",
+    "title": "O4O Platform 백업 및 복구 시스템",
+    "size": 5261
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/DISASTER_RECOVERY_RUNBOOK.md",
+    "relativePath": "troubleshooting/DISASTER_RECOVERY_RUNBOOK.md",
+    "category": "troubleshooting",
+    "filename": "DISASTER_RECOVERY_RUNBOOK.md",
+    "title": "O4O Platform 재해 복구 실행 계획 (Runbook)",
+    "size": 7780
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/README.md",
+    "relativePath": "troubleshooting/README.md",
+    "category": "troubleshooting",
+    "filename": "README.md",
+    "title": "O4O Platform Troubleshooting Guide",
+    "size": 4688
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/troubleshooting/RECOVERY_PROCEDURES.md",
+    "relativePath": "troubleshooting/RECOVERY_PROCEDURES.md",
+    "category": "troubleshooting",
+    "filename": "RECOVERY_PROCEDURES.md",
+    "title": "🚨 복구 절차 문서",
+    "size": 6613
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/v/ADMIN_UI_IMPLEMENTATION.md",
+    "relativePath": "v/ADMIN_UI_IMPLEMENTATION.md",
+    "category": "v",
+    "filename": "ADMIN_UI_IMPLEMENTATION.md",
+    "title": "Admin Dashboard - 메뉴/템플릿 관리 UI 구현 완료",
+    "size": 15200
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/v/AI-Page-Builder_Node-Research_2025-10-11.md",
+    "relativePath": "v/AI-Page-Builder_Node-Research_2025-10-11.md",
+    "category": "v",
+    "filename": "AI-Page-Builder_Node-Research_2025-10-11.md",
+    "title": "AI-Page-Builder_Node-Research_2025-10-11",
+    "size": 16707
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/v/AUTH_MIDDLEWARE_MIGRATION_REPORT.md",
+    "relativePath": "v/AUTH_MIDDLEWARE_MIGRATION_REPORT.md",
+    "category": "v",
+    "filename": "AUTH_MIDDLEWARE_MIGRATION_REPORT.md",
+    "title": "Authentication Middleware Migration Report",
+    "size": 7745
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/v/FRONTEND_IMPLEMENTATION.md",
+    "relativePath": "v/FRONTEND_IMPLEMENTATION.md",
+    "category": "v",
+    "filename": "FRONTEND_IMPLEMENTATION.md",
+    "title": "Frontend 서브도메인/경로별 메뉴/테마 시스템 구현 완료",
+    "size": 11250
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/v/INTEGRATION_TEST_REPORT.md",
+    "relativePath": "v/INTEGRATION_TEST_REPORT.md",
+    "category": "v",
+    "filename": "INTEGRATION_TEST_REPORT.md",
+    "title": "🧪 통합 테스트 및 검증 리포트",
+    "size": 11479
+  },
+  {
+    "fullPath": "/home/sohae21/o4o-platform/docs/v/MENU_API_INTEGRATION.md",
+    "relativePath": "v/MENU_API_INTEGRATION.md",
+    "category": "v",
+    "filename": "MENU_API_INTEGRATION.md",
+    "title": "Menu CRUD API 연동 완료",
+    "size": 13770
+  }
+]
