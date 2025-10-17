@@ -28,6 +28,7 @@ import { lazy, Suspense } from 'react';
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const PageEditor = lazy(() => import('./pages/PageEditor'));
 const PageViewer = lazy(() => import('./pages/PageViewer'));
+const PublicPage = lazy(() => import('./pages/PublicPage'));
 
 // Loading component
 const PageLoader: FC = () => (
@@ -127,11 +128,9 @@ const App: FC = () => {
 
           {/* WordPress-style: Direct page slug access (must be before 404) */}
           <Route path="/:slug" element={
-            <Layout>
-              <Suspense fallback={<PageLoader />}>
-                <PageViewer />
-              </Suspense>
-            </Layout>
+            <Suspense fallback={<PageLoader />}>
+              <PublicPage />
+            </Suspense>
           } />
 
           {/* 404 Fallback */}
