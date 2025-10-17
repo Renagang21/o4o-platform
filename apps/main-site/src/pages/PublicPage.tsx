@@ -36,7 +36,7 @@ interface PageResponse {
 
 // Fetch page by slug from Post entity (type='page')
 const fetchPageBySlug = async (slug: string): Promise<PageData> => {
-  const response = await apiClient.get(`/api/pages/slug/${slug}`);
+  const response = await apiClient.get(`/v1/pages/slug/${slug}`);
 
   // API returns page directly without wrapping in response object
   return response.data as PageData;
