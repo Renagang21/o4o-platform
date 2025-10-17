@@ -664,14 +664,14 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       {/* Add block button - top */}
       {isHovered && !isSelected && (
         <button
-          className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all z-40"
+          className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all duration-200 z-40 shadow-md hover:shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
             onAddBlock?.('before');
           }}
           title="Add block before"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         </button>
       )}
 
@@ -692,14 +692,14 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       {/* Add block button - bottom */}
       {isHovered && !isSelected && (
         <button
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all z-40"
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-all duration-200 z-40 shadow-md hover:shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
             onAddBlock?.('after');
           }}
           title="Add block after"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         </button>
       )}
     </div>
