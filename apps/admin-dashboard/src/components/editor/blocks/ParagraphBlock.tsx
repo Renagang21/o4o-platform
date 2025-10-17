@@ -177,6 +177,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             toggleMark(editor, 'italic');
             break;
           }
+          case 'u': {
+            event.preventDefault();
+            toggleMark(editor, 'underline');
+            break;
+          }
           case 'k': {
             event.preventDefault();
             // Toggle link
@@ -290,6 +295,10 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
     if (leaf.italic) {
       children = <em>{children}</em>;
+    }
+
+    if (leaf.underline) {
+      children = <u>{children}</u>;
     }
 
     if (leaf.strikethrough) {

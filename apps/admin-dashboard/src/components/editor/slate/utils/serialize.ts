@@ -60,6 +60,10 @@ const serializeText = (text: CustomText): string => {
     string = `<em>${string}</em>`;
   }
 
+  if (text.underline) {
+    string = `<u>${string}</u>`;
+  }
+
   if (text.strikethrough) {
     string = `<s>${string}</s>`;
   }
@@ -171,6 +175,11 @@ const deserializeElement = (el: HTMLElement): Descendant | null => {
         text: el.textContent || '',
         italic: true,
       };
+    case 'u':
+      return {
+        text: el.textContent || '',
+        underline: true,
+      };
     case 's':
     case 'del':
     case 'strike':
@@ -210,6 +219,10 @@ const deserializeTextWithFormat = (textNode: ChildNode, parent: HTMLElement): Cu
 
   if (parentTag === 'em' || parentTag === 'i') {
     formattedText.italic = true;
+  }
+
+  if (parentTag === 'u') {
+    formattedText.underline = true;
   }
 
   if (parentTag === 's' || parentTag === 'del' || parentTag === 'strike') {

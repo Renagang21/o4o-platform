@@ -43,10 +43,10 @@ export type FormattedText = {
   text: string;
   bold?: true;
   italic?: true;
+  underline?: true;
   strikethrough?: true;
   code?: true;
   // Future marks:
-  // underline?: true;
   // color?: string;
   // backgroundColor?: string;
 };
