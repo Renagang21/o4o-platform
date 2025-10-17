@@ -201,6 +201,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       // Enter key - create new block after current (Gutenberg standard)
       if (event.key === 'Enter' && !event.shiftKey && !isModKey) {
         event.preventDefault();
+
+        // CRITICAL: Save current content before creating new block
+        const currentHtml = serialize(editor.children);
+        onChange(currentHtml, attributes);
+
         onAddBlock?.('after', 'o4o/paragraph');
         return;
       }
