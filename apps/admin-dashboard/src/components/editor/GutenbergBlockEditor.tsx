@@ -19,6 +19,7 @@ import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
 import SlashCommandMenu from './SlashCommandMenu';
+import PlaceholderBlock from './blocks/PlaceholderBlock';
 // Toast 기능을 직접 구현
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -173,6 +174,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [slashTriggerBlockId, setSlashTriggerBlockId] = useState<string | null>(null);
   const [recentBlocks, setRecentBlocks] = useState<string[]>([]);
   const slashMenuRef = useRef<{ query: string; blockId: string | null }>({ query: '', blockId: null });
+
+  // Pending placeholder state (for Enter key behavior)
+  const [pendingPlaceholder, setPendingPlaceholder] = useState<{
+    afterBlockId: string | null;
+    position: 'before' | 'after';
+  } | null>(null);
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -582,6 +589,62 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const handleSlashCommandSelect = useCallback(
     (blockType: string) => {
       const triggerBlockId = slashTriggerBlockId || selectedBlockId;
+
+      // Check if triggered from placeholder
+      if (triggerBlockId === 'placeholder' || triggerBlockId === 'placeholder-end' ||
+          triggerBlockId?.startsWith('pending-')) {
+        // Create new block
+        const newBlock: Block = {
+          id: `block-${Date.now()}`,
+          type: blockType,
+          content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
+          attributes: {},
+        };
+
+        if (triggerBlockId === 'placeholder') {
+          // At beginning (no blocks)
+          updateBlocks([newBlock]);
+        } else if (triggerBlockId === 'placeholder-end') {
+          // At end (after existing blocks)
+          updateBlocks([...blocks, newBlock]);
+        } else if (triggerBlockId.startsWith('pending-')) {
+          // From pending placeholder
+          const afterBlockId = triggerBlockId.replace('pending-', '');
+          const blockIndex = blocks.findIndex(b => b.id === afterBlockId);
+          const newBlocks = [...blocks];
+          newBlocks.splice(blockIndex + 1, 0, newBlock);
+          updateBlocks(newBlocks);
+          setPendingPlaceholder(null);
+        }
+
+        setSelectedBlockId(newBlock.id);
+
+        // Update recent blocks
+        setRecentBlocks(prev => {
+          const updated = [blockType, ...prev.filter(t => t !== blockType)];
+          return updated.slice(0, 5);
+        });
+
+        // Close slash menu
+        setIsSlashMenuOpen(false);
+        setSlashQuery('');
+        setSlashTriggerBlockId(null);
+
+        // Focus new block
+        setTimeout(() => {
+          const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+          if (newBlockElement) {
+            const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+            if (editableElement) {
+              editableElement.focus();
+            }
+          }
+        }, 50);
+
+        return;
+      }
+
+      // Handle regular block slash command (existing logic)
       if (!triggerBlockId) return;
 
       // Find the block that triggered slash command
@@ -1027,33 +1090,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           return;
         }
 
-        // Shift+Enter: Always create new block (works in contentEditable too)
+        // Shift+Enter: Create PlaceholderBlock after current block
         if (e.shiftKey) {
           e.preventDefault();
           if (selectedBlockId) {
-            const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
-            const newBlock: Block = {
-              id: `block-${Date.now()}`,
-              type: 'o4o/paragraph',
-              content: { text: '' },
-              attributes: {},
-            };
-            const newBlocks = [...blocks];
-            newBlocks.splice(currentIndex + 1, 0, newBlock);
-            updateBlocks(newBlocks);
-            setSelectedBlockId(newBlock.id);
-            setIsDirty(true);
-
-            // Focus the new block
-            setTimeout(() => {
-              const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-              if (newBlockElement) {
-                const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-                if (editableElement) {
-                  editableElement.focus();
-                }
-              }
-            }, 50);
+            setPendingPlaceholder({
+              afterBlockId: selectedBlockId,
+              position: 'after'
+            });
           }
           return;
         }
@@ -1070,68 +1114,21 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
               if (isEmpty) {
                 e.preventDefault();
-                const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
-
-                // Smart behavior based on block type
-                let newBlockType = 'o4o/paragraph';
-
-                // Heading → always Paragraph
-                if (block.type === 'o4o/heading') {
-                  newBlockType = 'o4o/paragraph';
-                }
-                // Quote → always Paragraph
-                else if (block.type === 'o4o/quote') {
-                  newBlockType = 'o4o/paragraph';
-                }
-                // List → exit list (create Paragraph)
-                else if (block.type === 'o4o/list') {
-                  newBlockType = 'o4o/paragraph';
-                }
-                // Other blocks → Paragraph
-                else {
-                  newBlockType = 'o4o/paragraph';
-                }
-
-                const newBlock: Block = {
-                  id: `block-${Date.now()}`,
-                  type: newBlockType,
-                  content: { text: '' },
-                  attributes: {},
-                };
-                const newBlocks = [...blocks];
-                newBlocks.splice(currentIndex + 1, 0, newBlock);
-                updateBlocks(newBlocks);
-                setSelectedBlockId(newBlock.id);
-                setIsDirty(true);
-
-                // Focus the new block
-                setTimeout(() => {
-                  const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-                  if (newBlockElement) {
-                    const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-                    if (editableElement) {
-                      editableElement.focus();
-                    }
-                  }
-                }, 50);
+                // Show PlaceholderBlock after current block
+                setPendingPlaceholder({
+                  afterBlockId: selectedBlockId,
+                  position: 'after'
+                });
               }
             }
           } else {
-            // Outside contentEditable: works as before
+            // Outside contentEditable: show PlaceholderBlock
             e.preventDefault();
             if (selectedBlockId) {
-              const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
-              const newBlock: Block = {
-                id: `block-${Date.now()}`,
-                type: 'o4o/paragraph',
-                content: { text: '' },
-                attributes: {},
-              };
-              const newBlocks = [...blocks];
-              newBlocks.splice(currentIndex + 1, 0, newBlock);
-              updateBlocks(newBlocks);
-              setSelectedBlockId(newBlock.id);
-              setIsDirty(true);
+              setPendingPlaceholder({
+                afterBlockId: selectedBlockId,
+                position: 'after'
+              });
             }
           }
         }
@@ -1596,27 +1593,131 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             ) : (
               <div className="blocks-container">
+                {/* Show PlaceholderBlock at the beginning if no blocks */}
+                {blocks.length === 0 && (
+                  <PlaceholderBlock
+                    autoFocus={true}
+                    onConvertToParagraph={(initialContent) => {
+                      const newBlock: Block = {
+                        id: `block-${Date.now()}`,
+                        type: 'o4o/paragraph',
+                        content: { text: initialContent },
+                        attributes: {},
+                      };
+                      updateBlocks([newBlock]);
+                      setSelectedBlockId(newBlock.id);
+                    }}
+                    onTriggerSlashMenu={(position) => {
+                      setSlashMenuPosition(position);
+                      setSlashQuery('');
+                      setIsSlashMenuOpen(true);
+                      setSlashTriggerBlockId('placeholder');
+                    }}
+                  />
+                )}
+
+                {/* Render actual blocks with pending placeholders */}
                 {blocks.map((block, index) => (
-                  <BlockWrapper
-                    key={block.id}
-                    blockId={block.id}
-                    blockType={block.type}
-                    isSelected={selectedBlockId === block.id}
-                    onSelect={setSelectedBlockId}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    onDuplicate={handleDuplicate}
-                    onDelete={handleBlockDelete}
-                    onMoveUp={handleMoveUp}
-                    onMoveDown={handleMoveDown}
-                    canMoveUp={index > 0}
-                    canMoveDown={index < blocks.length - 1}
-                  >
-                    {renderBlock(block)}
-                  </BlockWrapper>
+                  <React.Fragment key={block.id}>
+                    {/* Render pending placeholder before this block if needed */}
+                    {pendingPlaceholder?.afterBlockId === (index > 0 ? blocks[index - 1].id : null) &&
+                     pendingPlaceholder?.position === 'after' && (
+                      <PlaceholderBlock
+                        autoFocus={true}
+                        onConvertToParagraph={(initialContent) => {
+                          const blockIndex = blocks.findIndex(b => b.id === pendingPlaceholder.afterBlockId);
+                          const newBlock: Block = {
+                            id: `block-${Date.now()}`,
+                            type: 'o4o/paragraph',
+                            content: { text: initialContent },
+                            attributes: {},
+                          };
+                          const newBlocks = [...blocks];
+                          newBlocks.splice(blockIndex + 1, 0, newBlock);
+                          updateBlocks(newBlocks);
+                          setSelectedBlockId(newBlock.id);
+                          setPendingPlaceholder(null);
+                        }}
+                        onTriggerSlashMenu={(position) => {
+                          setSlashMenuPosition(position);
+                          setSlashQuery('');
+                          setIsSlashMenuOpen(true);
+                          setSlashTriggerBlockId(`pending-${pendingPlaceholder.afterBlockId}`);
+                        }}
+                      />
+                    )}
+
+                    {/* Render the actual block */}
+                    <BlockWrapper
+                      blockId={block.id}
+                      blockType={block.type}
+                      isSelected={selectedBlockId === block.id}
+                      onSelect={setSelectedBlockId}
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                      onDuplicate={handleDuplicate}
+                      onDelete={handleBlockDelete}
+                      onMoveUp={handleMoveUp}
+                      onMoveDown={handleMoveDown}
+                      canMoveUp={index > 0}
+                      canMoveDown={index < blocks.length - 1}
+                    >
+                      {renderBlock(block)}
+                    </BlockWrapper>
+
+                    {/* Render pending placeholder after this block if needed */}
+                    {pendingPlaceholder?.afterBlockId === block.id &&
+                     pendingPlaceholder?.position === 'after' && (
+                      <PlaceholderBlock
+                        autoFocus={true}
+                        onConvertToParagraph={(initialContent) => {
+                          const blockIndex = blocks.findIndex(b => b.id === block.id);
+                          const newBlock: Block = {
+                            id: `block-${Date.now()}`,
+                            type: 'o4o/paragraph',
+                            content: { text: initialContent },
+                            attributes: {},
+                          };
+                          const newBlocks = [...blocks];
+                          newBlocks.splice(blockIndex + 1, 0, newBlock);
+                          updateBlocks(newBlocks);
+                          setSelectedBlockId(newBlock.id);
+                          setPendingPlaceholder(null);
+                        }}
+                        onTriggerSlashMenu={(position) => {
+                          setSlashMenuPosition(position);
+                          setSlashQuery('');
+                          setIsSlashMenuOpen(true);
+                          setSlashTriggerBlockId(`pending-${block.id}`);
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
                 ))}
+
+                {/* Show PlaceholderBlock at the end if blocks exist */}
+                {blocks.length > 0 && (
+                  <PlaceholderBlock
+                    onConvertToParagraph={(initialContent) => {
+                      const newBlock: Block = {
+                        id: `block-${Date.now()}`,
+                        type: 'o4o/paragraph',
+                        content: { text: initialContent },
+                        attributes: {},
+                      };
+                      updateBlocks([...blocks, newBlock]);
+                      setSelectedBlockId(newBlock.id);
+                    }}
+                    onTriggerSlashMenu={(position) => {
+                      setSlashMenuPosition(position);
+                      setSlashQuery('');
+                      setIsSlashMenuOpen(true);
+                      setSlashTriggerBlockId('placeholder-end');
+                    }}
+                  />
+                )}
               </div>
             )}
 
