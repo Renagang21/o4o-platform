@@ -98,6 +98,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isBlockListOpen, setIsBlockListOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([createHistoryEntry(blocks)]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
@@ -1430,8 +1431,100 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   return (
     <div className="h-full w-full bg-transparent flex flex-col">
+      {/* Top Toolbar */}
+      <div className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center px-4 z-50">
+        <div className="flex items-center gap-2">
+          {/* Block List Toggle Button */}
+          <button
+            onClick={() => setIsBlockListOpen(!isBlockListOpen)}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            title="Toggle block list"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <span>{isBlockListOpen ? 'Hide' : 'Show'} List</span>
+          </button>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-sm text-gray-500">
+            {blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}
+          </span>
+        </div>
+      </div>
+
       {/* Main Layout */}
-      <div className="flex-1 flex relative">
+      <div className="flex-1 flex relative" style={{ marginTop: '56px' }}>
+        {/* Block List Sidebar */}
+        {isBlockListOpen && (
+          <div className="fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 shadow-lg">
+            <div className="p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
+                Block List
+              </h3>
+              {blocks.length === 0 ? (
+                <p className="text-sm text-gray-500 italic">No blocks yet</p>
+              ) : (
+                <div className="space-y-1">
+                  {blocks.map((block, index) => {
+                    const blockType = block.type.replace('o4o/', '');
+                    const blockContent = typeof block.content === 'string'
+                      ? block.content
+                      : block.content?.text || '';
+                    const preview = blockContent.replace(/<[^>]*>/g, '').substring(0, 50);
+
+                    return (
+                      <button
+                        key={block.id}
+                        onClick={() => {
+                          setSelectedBlockId(block.id);
+                          // Scroll to block
+                          const blockElement = document.querySelector(`[data-block-id="${block.id}"]`);
+                          if (blockElement) {
+                            blockElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
+                          selectedBlockId === block.id
+                            ? 'bg-blue-50 border border-blue-200'
+                            : 'hover:bg-gray-100 border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs font-mono text-gray-400 mt-0.5">
+                            {index + 1}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-semibold text-gray-700 capitalize">
+                              {blockType}
+                            </div>
+                            {preview && (
+                              <div className="text-xs text-gray-500 truncate mt-0.5">
+                                {preview}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Block Inserter */}
         <GutenbergBlockInserter
           isOpen={isBlockInserterOpen}
@@ -1442,11 +1535,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         {/* Editor Canvas */}
         <div
           className={`flex-1 transition-all duration-300 overflow-y-auto bg-gray-100 ${
-            isBlockInserterOpen ? 'ml-80' : 'ml-0'
+            isBlockListOpen ? 'ml-64' : 'ml-0'
+          } ${
+            isBlockInserterOpen ? 'ml-80' : ''
           } ${
             sidebarOpen ? 'mr-80' : 'mr-0'
           }`}
-          style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 60px)' }}
+          style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 70px)' }}
         >
           <div
             className="mx-auto p-8 bg-white shadow-md transition-all duration-300 ease-in-out"
