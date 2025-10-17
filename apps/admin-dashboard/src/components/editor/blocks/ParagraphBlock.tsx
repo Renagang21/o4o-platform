@@ -198,22 +198,15 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }
       }
 
-      // Enter key - create new block after current
+      // Enter key - create new block after current (Gutenberg standard)
       if (event.key === 'Enter' && !event.shiftKey && !isModKey) {
-        const { selection } = editor;
-        if (!selection) return;
-
-        // Check if we're at the end of the paragraph
-        const [node] = Editor.node(editor, selection);
-        const text = Editor.string(editor, [0]);
-
-        if (text === '') {
-          // Empty paragraph - create new block
-          event.preventDefault();
-          onAddBlock?.('after', 'o4o/paragraph');
-        }
-        // Otherwise let Slate's withParagraphs plugin handle it
+        event.preventDefault();
+        onAddBlock?.('after', 'o4o/paragraph');
+        return;
       }
+
+      // Shift+Enter - line break within same block
+      // Allow Slate's withParagraphs plugin to handle insertBreak
 
       // Backspace at start of empty block
       if (event.key === 'Backspace') {
