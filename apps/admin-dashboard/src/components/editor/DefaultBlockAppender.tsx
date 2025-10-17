@@ -1,24 +1,21 @@
 /**
  * DefaultBlockAppender Component
  *
- * Gutenberg-style default block appender.
- * Shows placeholder "Type / to choose a block" and converts to a paragraph block on typing.
+ * Simplified input area that converts to paragraph block on Enter.
+ * No slash menu, no block selection - just simple text input.
  *
  * Key Behaviors:
- * - No toolbar or block controls (provisional state)
- * - Clicking or typing converts to paragraph block
- * - "/" triggers slash command menu
- * - ENTER/SPACE also activates
+ * - Click to focus and type directly
+ * - Enter key converts to paragraph block
+ * - Blur with content also converts to paragraph block
  */
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface DefaultBlockAppenderProps {
-  /** Callback to insert default paragraph block */
-  onInsertBlock: (initialContent?: string) => void;
-  /** Callback to show slash command menu */
-  onShowSlashMenu?: (position: { top: number; left: number }) => void;
+  /** Callback to insert paragraph block with content */
+  onInsertBlock: (content: string) => void;
   /** Auto focus on mount */
   autoFocus?: boolean;
   /** Custom placeholder text */
@@ -29,69 +26,61 @@ interface DefaultBlockAppenderProps {
 
 export const DefaultBlockAppender: React.FC<DefaultBlockAppenderProps> = ({
   onInsertBlock,
-  onShowSlashMenu,
   autoFocus = false,
-  placeholder = 'Type / to choose a block',
+  placeholder = 'Start writing...',
   className = '',
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isProcessingRef = useRef(false);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [isEmpty, setIsEmpty] = useState(true);
 
   // Focus on mount if autoFocus is true
   React.useEffect(() => {
-    if (autoFocus && containerRef.current) {
-      containerRef.current.focus();
+    if (autoFocus && editorRef.current) {
+      editorRef.current.focus();
     }
   }, [autoFocus]);
 
-  // Handle click - convert to paragraph block
-  const handleClick = useCallback(() => {
-    if (isProcessingRef.current) return;
-    isProcessingRef.current = true;
-    onInsertBlock();
-  }, [onInsertBlock]);
+  // Handle input changes
+  const handleInput = useCallback(() => {
+    if (!editorRef.current) return;
+    const text = editorRef.current.textContent || '';
+    setIsEmpty(text.trim() === '');
+  }, []);
 
-  // Handle keyboard activation (ENTER or SPACE)
+  // Handle Enter key - convert to paragraph block
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (isProcessingRef.current) return;
-
-      // ENTER or SPACE - convert to paragraph block
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Enter') {
         e.preventDefault();
-        isProcessingRef.current = true;
-        onInsertBlock();
-        return;
-      }
-
-      // "/" - show slash menu
-      if (e.key === '/' && onShowSlashMenu && containerRef.current) {
-        e.preventDefault();
-        const rect = containerRef.current.getBoundingClientRect();
-        onShowSlashMenu({
-          top: rect.bottom + window.scrollY + 4,
-          left: rect.left + window.scrollX,
-        });
-        return;
-      }
-
-      // Any other printable character - convert to paragraph with initial content
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        e.preventDefault();
-        isProcessingRef.current = true;
-        onInsertBlock(e.key);
+        const content = editorRef.current?.innerHTML || '';
+        if (content.trim()) {
+          onInsertBlock(content);
+          // Clear the editor
+          if (editorRef.current) {
+            editorRef.current.innerHTML = '';
+            setIsEmpty(true);
+          }
+        }
       }
     },
-    [onInsertBlock, onShowSlashMenu]
+    [onInsertBlock]
   );
+
+  // Handle blur - convert to paragraph if has content
+  const handleBlur = useCallback(() => {
+    const content = editorRef.current?.innerHTML || '';
+    if (content.trim()) {
+      onInsertBlock(content);
+      // Clear the editor
+      if (editorRef.current) {
+        editorRef.current.innerHTML = '';
+        setIsEmpty(true);
+      }
+    }
+  }, [onInsertBlock]);
 
   return (
     <div
-      ref={containerRef}
-      role="button"
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
       className={cn(
         'default-block-appender',
         'group',
@@ -100,28 +89,48 @@ export const DefaultBlockAppender: React.FC<DefaultBlockAppenderProps> = ({
         'cursor-text',
         'border border-transparent rounded-md',
         'hover:border-gray-200 hover:bg-gray-50/50',
-        'focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500',
+        'focus-within:outline-none focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500',
         'transition-all duration-200',
+        'relative',
         className
       )}
-      aria-label="Add block"
-      data-default-block-appender="true"
+      onClick={() => editorRef.current?.focus()}
     >
-      <p
+      {isEmpty && (
+        <div
+          className={cn(
+            'absolute inset-0 px-4 py-3',
+            'text-base text-gray-400',
+            'pointer-events-none',
+            'select-none',
+            'leading-relaxed'
+          )}
+          style={{
+            fontSize: '16px',
+            lineHeight: '1.5',
+          }}
+        >
+          {placeholder}
+        </div>
+      )}
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         className={cn(
-          'text-base text-gray-400',
-          'pointer-events-none',
-          'select-none',
-          'm-0 p-0',
+          'min-h-[1.5em]',
+          'outline-none',
+          'text-base',
           'leading-relaxed'
         )}
         style={{
           fontSize: '16px',
           lineHeight: '1.5',
         }}
-      >
-        {placeholder}
-      </p>
+        data-default-block-appender="true"
+      />
     </div>
   );
 };

@@ -599,52 +599,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     (blockType: string) => {
       const triggerBlockId = slashTriggerBlockId || selectedBlockId;
 
-      // Check if triggered from DefaultBlockAppender
-      if (triggerBlockId === 'appender-start' || triggerBlockId === 'appender-end') {
-        // Create new block
-        const newBlock: Block = {
-          id: `block-${Date.now()}`,
-          type: blockType,
-          content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
-          attributes: {},
-        };
-
-        if (triggerBlockId === 'appender-start') {
-          // At beginning (no blocks)
-          updateBlocks([newBlock]);
-        } else {
-          // At end (after existing blocks)
-          updateBlocks([...blocks, newBlock]);
-        }
-
-        setSelectedBlockId(newBlock.id);
-
-        // Update recent blocks
-        setRecentBlocks(prev => {
-          const updated = [blockType, ...prev.filter(t => t !== blockType)];
-          return updated.slice(0, 5);
-        });
-
-        // Close slash menu
-        setIsSlashMenuOpen(false);
-        setSlashQuery('');
-        setSlashTriggerBlockId(null);
-
-        // Focus new block
-        setTimeout(() => {
-          const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-          if (newBlockElement) {
-            const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-            if (editableElement) {
-              editableElement.focus();
-            }
-          }
-        }, 50);
-
-        return;
-      }
-
-      // Handle regular block slash command (existing logic)
+      // Handle regular block slash command
       if (!triggerBlockId) return;
 
       // Find the block that triggered slash command
@@ -1558,21 +1513,27 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 {blocks.length === 0 && (
                   <DefaultBlockAppender
                     autoFocus={true}
-                    onInsertBlock={(initialContent) => {
+                    placeholder="Start writing..."
+                    onInsertBlock={(content) => {
                       const newBlock: Block = {
                         id: `block-${Date.now()}`,
                         type: 'o4o/paragraph',
-                        content: { text: initialContent || '' },
+                        content: { text: content },
                         attributes: {},
                       };
                       updateBlocks([newBlock]);
                       setSelectedBlockId(newBlock.id);
-                    }}
-                    onShowSlashMenu={(position) => {
-                      setSlashMenuPosition(position);
-                      setSlashQuery('');
-                      setIsSlashMenuOpen(true);
-                      setSlashTriggerBlockId('appender-start');
+
+                      // Focus new block
+                      setTimeout(() => {
+                        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+                        if (newBlockElement) {
+                          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+                          if (editableElement) {
+                            editableElement.focus();
+                          }
+                        }
+                      }, 50);
                     }}
                   />
                 )}
@@ -1603,21 +1564,27 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 {/* DefaultBlockAppender at the end if blocks exist */}
                 {blocks.length > 0 && (
                   <DefaultBlockAppender
-                    onInsertBlock={(initialContent) => {
+                    placeholder="Start writing..."
+                    onInsertBlock={(content) => {
                       const newBlock: Block = {
                         id: `block-${Date.now()}`,
                         type: 'o4o/paragraph',
-                        content: { text: initialContent || '' },
+                        content: { text: content },
                         attributes: {},
                       };
                       updateBlocks([...blocks, newBlock]);
                       setSelectedBlockId(newBlock.id);
-                    }}
-                    onShowSlashMenu={(position) => {
-                      setSlashMenuPosition(position);
-                      setSlashQuery('');
-                      setIsSlashMenuOpen(true);
-                      setSlashTriggerBlockId('appender-end');
+
+                      // Focus new block
+                      setTimeout(() => {
+                        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+                        if (newBlockElement) {
+                          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+                          if (editableElement) {
+                            editableElement.focus();
+                          }
+                        }
+                      }, 50);
                     }}
                   />
                 )}
