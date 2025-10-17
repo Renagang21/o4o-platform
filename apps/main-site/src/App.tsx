@@ -124,7 +124,16 @@ const App: FC = () => {
               </Suspense>
             </PrivateRoute>
           } />
-          
+
+          {/* WordPress-style: Direct page slug access (must be before 404) */}
+          <Route path="/:slug" element={
+            <Layout>
+              <Suspense fallback={<PageLoader />}>
+                <PageViewer />
+              </Suspense>
+            </Layout>
+          } />
+
           {/* 404 Fallback */}
           <Route path="*" element={
             <Layout>
