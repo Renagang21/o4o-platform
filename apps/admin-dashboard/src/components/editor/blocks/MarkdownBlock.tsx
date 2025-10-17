@@ -12,7 +12,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { Eye, Code2, Bold, Italic, Link2, FileText, Check } from 'lucide-react';
+import { Eye, Code2, Bold, Italic, Link2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FileSelector, { FileItem } from './shared/FileSelector';
 import toast from 'react-hot-toast';
@@ -164,6 +164,15 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
       e.preventDefault();
       onDelete();
     }
+
+    // Escape key: Exit edit mode to preview mode
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setMode('preview');
+      // Blur the textarea
+      const textarea = e.target as HTMLTextAreaElement;
+      textarea.blur();
+    }
   };
 
   // Insert markdown syntax
@@ -274,24 +283,6 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
                 Preview
               </Button>
             </div>
-
-            {/* Done Button - complete editing and create new block */}
-            <div className="h-5 w-px bg-gray-300" />
-            <Button
-              variant="default"
-              size="sm"
-              className="h-7 px-3 text-xs bg-green-600 hover:bg-green-700 text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                // Content is already saved via onChange
-                // Create new block after current
-                onAddBlock?.('after', 'o4o/paragraph');
-              }}
-              title="완료하고 다음 블록으로"
-            >
-              <Check className="h-3 w-3 mr-1" />
-              완료
-            </Button>
 
             {/* Markdown Helper Buttons (only in edit mode) */}
             {mode === 'edit' && (
