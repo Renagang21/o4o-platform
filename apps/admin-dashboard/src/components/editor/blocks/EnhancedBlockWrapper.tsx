@@ -107,12 +107,50 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState<'top' | 'bottom'>('top');
   const blockRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Show toolbar when selected or hovered
   useEffect(() => {
     setShowToolbar(isSelected || isHovered);
   }, [isSelected, isHovered]);
+
+  // Smart toolbar positioning: avoid screen edges
+  useEffect(() => {
+    if (!showToolbar || !blockRef.current) return;
+
+    const updateToolbarPosition = () => {
+      const blockRect = blockRef.current?.getBoundingClientRect();
+      if (!blockRect) return;
+
+      const TOOLBAR_HEIGHT = 45; // Approximate toolbar height
+      const SPACING = 8; // Spacing from block edge
+      const HEADER_HEIGHT = 60; // Editor header height
+
+      // Check if there's enough space above the block
+      const spaceAbove = blockRect.top - HEADER_HEIGHT;
+      const spaceBelow = window.innerHeight - blockRect.bottom;
+
+      // Position toolbar below if not enough space above
+      if (spaceAbove < TOOLBAR_HEIGHT + SPACING) {
+        setToolbarPosition('bottom');
+      } else {
+        setToolbarPosition('top');
+      }
+    };
+
+    updateToolbarPosition();
+
+    // Update on scroll and resize
+    window.addEventListener('scroll', updateToolbarPosition, true);
+    window.addEventListener('resize', updateToolbarPosition);
+
+    return () => {
+      window.removeEventListener('scroll', updateToolbarPosition, true);
+      window.removeEventListener('resize', updateToolbarPosition);
+    };
+  }, [showToolbar]);
 
   // Auto-focus block when selected with proper cursor positioning
   useEffect(() => {
@@ -270,10 +308,22 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     >
       {/* Left side drag handle - removed from here, now in toolbar */}
 
-      {/* Block toolbar - integrated design with better positioning */}
+      {/* Block toolbar - intelligent floating design */}
       {showToolbar && isSelected && (
-        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2 mb-4" style={{ top: '-52px' }}>
-          <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full">
+        <div
+          ref={toolbarRef}
+          className={cn(
+            'absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2',
+            'transition-all duration-200 ease-out',
+            toolbarPosition === 'top' ? '-translate-y-2' : 'translate-y-2'
+          )}
+          style={{
+            [toolbarPosition === 'top' ? 'bottom' : 'top']: '100%',
+            marginBottom: toolbarPosition === 'top' ? '8px' : undefined,
+            marginTop: toolbarPosition === 'bottom' ? '8px' : undefined,
+          }}
+        >
+          <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full touch-pan-x">
             {/* Drag handle - now in toolbar */}
             <div
               className="cursor-move p-0.5 sm:p-1 hover:bg-gray-100 rounded flex items-center flex-shrink-0"
