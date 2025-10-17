@@ -22,6 +22,7 @@ export class PostController {
         page = 1,
         limit = 10,
         status,
+        type,
         search,
         authorId,
         categoryId,
@@ -37,6 +38,11 @@ export class PostController {
         .leftJoinAndSelect('post.categories', 'categories')
         .leftJoinAndSelect('post.tags', 'tags')
         .leftJoinAndSelect('post.lastModifier', 'lastModifier');
+
+      // Type filter
+      if (type) {
+        queryBuilder.andWhere('post.type = :type', { type });
+      }
 
       // Status filter
       if (status) {
