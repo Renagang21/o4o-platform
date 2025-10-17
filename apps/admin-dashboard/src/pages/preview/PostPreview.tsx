@@ -255,6 +255,28 @@ const PostPreview: React.FC = () => {
           </div>
         );
 
+      case 'o4o/markdown':
+      case 'markdown':
+        const markdownContent = attributes?.markdown || blockContent;
+        // Simple markdown rendering (basic HTML conversion)
+        const renderBasicMarkdown = (md: string) => {
+          return md
+            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+            .replace(/\n/g, '<br>');
+        };
+        return (
+          <div
+            key={block.id}
+            className="prose prose-sm max-w-none mb-4"
+            dangerouslySetInnerHTML={{ __html: renderBasicMarkdown(markdownContent) }}
+          />
+        );
+
       case 'o4o/table':
         const tableContent = content?.tableData || attributes?.tableData || [];
         return (
