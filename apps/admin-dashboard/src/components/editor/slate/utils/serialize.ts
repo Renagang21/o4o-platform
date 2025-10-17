@@ -9,8 +9,8 @@
  * https://docs.slatejs.org/concepts/10-serializing
  */
 
-import { Descendant, Text } from 'slate';
-import type { CustomElement, CustomText, ParagraphElement } from '../types/slate-types';
+import { Descendant, Text, Element as SlateElement } from 'slate';
+import type { CustomElement, CustomText, ParagraphElement, LinkElement } from '../types/slate-types';
 
 /**
  * Serialize Slate value to HTML
@@ -34,7 +34,9 @@ const serializeNode = (node: Descendant): string => {
 
   switch (element.type) {
     case 'paragraph':
-      return serializeParagraph(element, children);
+      return serializeParagraph(element as ParagraphElement, children);
+    case 'link':
+      return serializeLink(element as LinkElement, children);
     default:
       return children;
   }
@@ -46,12 +48,20 @@ const serializeNode = (node: Descendant): string => {
 const serializeText = (text: CustomText): string => {
   let string = escapeHtml(text.text);
 
+  if (text.code) {
+    string = `<code>${string}</code>`;
+  }
+
   if (text.bold) {
     string = `<strong>${string}</strong>`;
   }
 
   if (text.italic) {
     string = `<em>${string}</em>`;
+  }
+
+  if (text.strikethrough) {
+    string = `<s>${string}</s>`;
   }
 
   return string;
@@ -66,6 +76,13 @@ const serializeParagraph = (element: ParagraphElement, children: string): string
     : '';
 
   return `<p${style}>${children || '<br>'}</p>`;
+};
+
+/**
+ * Serialize link element
+ */
+const serializeLink = (element: LinkElement, children: string): string => {
+  return `<a href="${escapeHtml(element.url)}">${children}</a>`;
 };
 
 /**
@@ -128,9 +145,17 @@ const deserializeElement = (el: HTMLElement): Descendant | null => {
       const paragraph: ParagraphElement = {
         type: 'paragraph',
         ...(align && { align }),
-        children: children as CustomText[],
+        children: children as (CustomText | LinkElement)[],
       };
       return paragraph;
+    }
+    case 'a': {
+      const link: LinkElement = {
+        type: 'link',
+        url: el.getAttribute('href') || '',
+        children: children as CustomText[],
+      };
+      return link;
     }
     case 'br':
       return { text: '\n' };
@@ -146,12 +171,24 @@ const deserializeElement = (el: HTMLElement): Descendant | null => {
         text: el.textContent || '',
         italic: true,
       };
+    case 's':
+    case 'del':
+    case 'strike':
+      return {
+        text: el.textContent || '',
+        strikethrough: true,
+      };
+    case 'code':
+      return {
+        text: el.textContent || '',
+        code: true,
+      };
     default:
       // For unknown tags, just return the text content
       if (children.length > 0) {
         return {
           type: 'paragraph',
-          children: children as CustomText[],
+          children: children as (CustomText | LinkElement)[],
         } as ParagraphElement;
       }
       return null;
@@ -173,6 +210,14 @@ const deserializeTextWithFormat = (textNode: ChildNode, parent: HTMLElement): Cu
 
   if (parentTag === 'em' || parentTag === 'i') {
     formattedText.italic = true;
+  }
+
+  if (parentTag === 's' || parentTag === 'del' || parentTag === 'strike') {
+    formattedText.strikethrough = true;
+  }
+
+  if (parentTag === 'code') {
+    formattedText.code = true;
   }
 
   return formattedText;

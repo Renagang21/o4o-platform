@@ -5,7 +5,8 @@
  * Replaces the old contentEditable-based implementation.
  *
  * Features:
- * - Slate.js editor with Bold, Italic formatting
+ * - Slate.js editor with Bold, Italic, Strikethrough, Code formatting
+ * - Link support (Ctrl+K)
  * - Enter key for block split
  * - Backspace key for block merge
  * - HTML serialization for Gutenberg compatibility
@@ -13,15 +14,16 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement } from 'slate';
-import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps } from 'slate-react';
+import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range } from 'slate';
+import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { withDeleteKey } from '../slate/plugins/withDeleteKey';
+import { withLinks, isLinkActive, unwrapLink, wrapLink } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
-import type { CustomText, ParagraphElement } from '../slate/types/slate-types';
+import type { CustomText, ParagraphElement, LinkElement } from '../slate/types/slate-types';
 
 interface ParagraphBlockProps {
   id: string;
@@ -66,7 +68,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
   // Create Slate editor with plugins
   const editor = useMemo(
-    () => withDeleteKey(withParagraphs(withHistory(withReact(createEditor())))),
+    () => withLinks(withDeleteKey(withParagraphs(withHistory(withReact(createEditor()))))),
     []
   );
 
@@ -175,6 +177,19 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             toggleMark(editor, 'italic');
             break;
           }
+          case 'k': {
+            event.preventDefault();
+            // Toggle link
+            if (isLinkActive(editor)) {
+              unwrapLink(editor);
+            } else {
+              const url = window.prompt('Enter URL:');
+              if (url) {
+                wrapLink(editor, url);
+              }
+            }
+            break;
+          }
         }
       }
 
@@ -212,26 +227,62 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     [editor, onAddBlock, onDelete]
   );
 
-  // Render element (paragraph)
+  // Render element (paragraph or link)
   const renderElement = useCallback((props: RenderElementProps) => {
-    const element = props.element as ParagraphElement;
-    return (
-      <p
-        {...props.attributes}
-        style={{
-          textAlign: element.align || 'left',
-          margin: 0,
-        }}
-      >
-        {props.children}
-      </p>
-    );
-  }, []);
+    const element = props.element as ParagraphElement | LinkElement;
+
+    switch (element.type) {
+      case 'link':
+        return (
+          <a
+            {...props.attributes}
+            href={(element as LinkElement).url}
+            className="text-blue-600 hover:text-blue-800 underline"
+            onClick={(e) => {
+              e.preventDefault();
+              // In edit mode, allow editing the link
+              const url = window.prompt('Edit URL:', (element as LinkElement).url);
+              if (url !== null && url !== (element as LinkElement).url) {
+                const path = ReactEditor.findPath(editor, element);
+                Transforms.setNodes(
+                  editor,
+                  { url } as Partial<LinkElement>,
+                  { at: path }
+                );
+              }
+            }}
+          >
+            {props.children}
+          </a>
+        );
+      case 'paragraph':
+      default:
+        return (
+          <p
+            {...props.attributes}
+            style={{
+              textAlign: (element as ParagraphElement).align || 'left',
+              margin: 0,
+            }}
+          >
+            {props.children}
+          </p>
+        );
+    }
+  }, [editor]);
 
   // Render leaf (text with formatting)
   const renderLeaf = useCallback((props: RenderLeafProps) => {
     let children = props.children;
     const leaf = props.leaf as CustomText;
+
+    if (leaf.code) {
+      children = (
+        <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">
+          {children}
+        </code>
+      );
+    }
 
     if (leaf.bold) {
       children = <strong>{children}</strong>;
@@ -239,6 +290,10 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
     if (leaf.italic) {
       children = <em>{children}</em>;
+    }
+
+    if (leaf.strikethrough) {
+      children = <s>{children}</s>;
     }
 
     return <span {...props.attributes}>{children}</span>;
@@ -306,8 +361,5 @@ const toggleMark = (editor: Editor, format: keyof CustomText): void => {
     Editor.addMark(editor, format, true);
   }
 };
-
-// Import Range for backspace handling
-import { Range } from 'slate';
 
 export default ParagraphBlock;

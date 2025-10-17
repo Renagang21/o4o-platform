@@ -18,11 +18,20 @@ import { HistoryEditor } from 'slate-history';
 export type ParagraphElement = {
   type: 'paragraph';
   align?: 'left' | 'center' | 'right' | 'justify';
+  children: (CustomText | LinkElement)[];
+};
+
+/**
+ * Link Element (inline element)
+ */
+export type LinkElement = {
+  type: 'link';
+  url: string;
   children: CustomText[];
 };
 
 // Union type for all element types (will expand as we add more blocks)
-export type CustomElement = ParagraphElement;
+export type CustomElement = ParagraphElement | LinkElement;
 
 /**
  * Custom Text Types
@@ -34,10 +43,10 @@ export type FormattedText = {
   text: string;
   bold?: true;
   italic?: true;
-  // Future marks will be added here:
+  strikethrough?: true;
+  code?: true;
+  // Future marks:
   // underline?: true;
-  // strikethrough?: true;
-  // code?: true;
   // color?: string;
   // backgroundColor?: string;
 };
@@ -77,5 +86,10 @@ export const isParagraphElement = (element: any): element is ParagraphElement =>
 
 // Check if text has formatting
 export const isFormattedText = (leaf: CustomText): boolean => {
-  return Boolean(leaf.bold || leaf.italic);
+  return Boolean(leaf.bold || leaf.italic || leaf.strikethrough || leaf.code);
+};
+
+// Check if element is a link
+export const isLinkElement = (element: any): element is LinkElement => {
+  return element && element.type === 'link';
 };
