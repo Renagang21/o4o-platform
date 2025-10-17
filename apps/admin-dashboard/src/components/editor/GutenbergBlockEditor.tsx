@@ -1431,43 +1431,45 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   return (
     <div className="h-full w-full bg-transparent flex flex-col">
-      {/* Top Toolbar */}
-      <div className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center px-4 z-50">
-        <div className="flex items-center gap-2">
-          {/* Block List Toggle Button */}
-          <button
-            onClick={() => setIsBlockListOpen(!isBlockListOpen)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            title="Toggle block list"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      {/* Top Toolbar - only show when not embedded (hideHeader=false) */}
+      {!hideHeader && (
+        <div className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex items-center px-4 z-50">
+          <div className="flex items-center gap-2">
+            {/* Block List Toggle Button */}
+            <button
+              onClick={() => setIsBlockListOpen(!isBlockListOpen)}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              title="Toggle block list"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-            <span>{isBlockListOpen ? 'Hide' : 'Show'} List</span>
-          </button>
-        </div>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+              <span>{isBlockListOpen ? 'Hide' : 'Show'} List</span>
+            </button>
+          </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-sm text-gray-500">
-            {blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-sm text-gray-500">
+              {blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Layout */}
-      <div className="flex-1 flex relative" style={{ marginTop: '56px' }}>
+      <div className="flex-1 flex relative" style={{ marginTop: hideHeader ? '0' : '56px' }}>
         {/* Block List Sidebar */}
-        {isBlockListOpen && (
+        {!hideHeader && isBlockListOpen && (
           <div className="fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 shadow-lg">
             <div className="p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
@@ -1535,13 +1537,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         {/* Editor Canvas */}
         <div
           className={`flex-1 transition-all duration-300 overflow-y-auto bg-gray-100 ${
-            isBlockListOpen ? 'ml-64' : 'ml-0'
+            !hideHeader && isBlockListOpen ? 'ml-64' : 'ml-0'
           } ${
             isBlockInserterOpen ? 'ml-80' : ''
           } ${
             sidebarOpen ? 'mr-80' : 'mr-0'
           }`}
-          style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 70px)' }}
+          style={{ paddingTop: '10px', maxHeight: hideHeader ? 'calc(100vh - 10px)' : 'calc(100vh - 70px)' }}
         >
           <div
             className="mx-auto p-8 bg-white shadow-md transition-all duration-300 ease-in-out"
