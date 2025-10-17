@@ -335,6 +335,7 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
       };
 
     // Custom blocks
+    case 'o4o/markdown':
     case 'o4o/markdown-reader':
       const markdownData = (wpBlock as any).data || wpBlock.attributes;
       return {
@@ -348,6 +349,10 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
           theme: markdownData?.theme || 'github',
           markdownContent: markdownData?.markdownContent,
           lastFetched: markdownData?.lastFetched,
+        },
+        attributes: {
+          markdown: markdownData?.markdown,
+          filename: markdownData?.filename,
         }
       };
 
