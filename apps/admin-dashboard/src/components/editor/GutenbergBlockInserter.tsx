@@ -98,6 +98,21 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
     return () => unsubscribe?.();
   }, [isOpen]);
 
+  // Handle Escape key to close inserter
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Filter blocks based on search and category
   const filteredBlocks = useMemo(() => {
     let result = blocks;
@@ -160,9 +175,12 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
     const updated = [blockName, ...mostUsedBlocks.filter(b => b !== blockName)].slice(0, 6);
     setMostUsedBlocks(updated);
     localStorage.setItem('gutenberg_most_used_blocks', JSON.stringify(updated));
-    
+
     // Trigger selection
     onSelect(blockName);
+
+    // Close inserter after selection
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -198,6 +216,12 @@ const GutenbergBlockInserter: React.FC<GutenbergBlockInserterProps> = ({
             placeholder="Search blocks"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && filteredBlocks.length > 0) {
+                e.preventDefault();
+                handleBlockSelect(filteredBlocks[0].name);
+              }
+            }}
             className="pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-gray-50 border-gray-200 focus:bg-white"
             autoFocus
           />
