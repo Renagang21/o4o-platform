@@ -58,7 +58,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   return (
     <div
       className={cn(
-        'bg-white border-b border-gray-200 flex items-center justify-between overflow-x-auto relative z-40',
+        'bg-white border-b border-gray-200 flex items-center justify-between overflow-hidden relative z-40',
         'h-[55px]', // Gutenberg standard height
         isMobile ? 'px-2 py-2' : 'px-3 py-2' // Responsive padding
       )}

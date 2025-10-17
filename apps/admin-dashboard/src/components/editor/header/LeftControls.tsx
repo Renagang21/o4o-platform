@@ -26,7 +26,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
     <div
       className={cn(
         'flex items-center',
-        isMobile ? 'gap-1 flex-1' : 'gap-2'
+        isMobile ? 'gap-1' : 'gap-2'
       )}
     >
       {/* Back to Dashboard */}
@@ -36,13 +36,10 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className={cn(
-                isMobile ? 'h-8 w-8' : 'h-9 w-9',
-                'text-gray-700'
-              )}
+              className="h-8 w-8 text-gray-700"
               onClick={onBack}
             >
-              <ArrowLeft className={isMobile ? 'h-4 w-4' : 'h-5 w-5'} />
+              <ArrowLeft className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -51,10 +48,24 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
         </Tooltip>
       </TooltipProvider>
 
-      {/* WordPress Logo */}
-      <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center">
-        <span className="text-white font-bold text-sm">W</span>
-      </div>
+      {/* WordPress Logo - Now clickable for back navigation */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center hover:from-blue-700 hover:to-blue-800 p-0"
+              onClick={onBack}
+            >
+              <span className="text-white font-bold text-sm">W</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Back to dashboard</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       {/* Design Library - Hidden on mobile/tablet */}
       {!isMobile && !isTablet && (

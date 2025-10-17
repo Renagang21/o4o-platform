@@ -74,7 +74,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-gray-700"
+                className="h-8 w-8 text-gray-700"
                 onClick={onToggleListView}
               >
                 <List className="h-4 w-4" />
@@ -105,8 +105,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  isMobile ? 'h-8 w-8' : 'h-9 w-9',
-                  'text-gray-700',
+                  'h-8 w-8 text-gray-700',
                   isThemePreviewMode && 'bg-blue-100 text-blue-600'
                 )}
                 onClick={onToggleThemePreview}
@@ -133,10 +132,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn(
-                  isMobile ? 'h-8 w-8' : 'h-9 w-9',
-                  'text-gray-700'
-                )}
+                className="h-8 w-8 text-gray-700"
                 onClick={onOpenCustomizer}
               >
                 <Palette className="h-4 w-4" />
@@ -157,7 +153,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-gray-700"
+                className="h-8 w-8 text-gray-700"
                 onClick={onPreview}
               >
                 <Eye className="h-4 w-4" />
@@ -223,10 +219,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className={cn(
-                isMobile ? 'h-8 w-8' : 'h-9 w-9',
-                'text-gray-700'
-              )}
+              className="h-8 w-8 text-gray-700"
               onClick={onToggleSidebar}
               disabled={!isPostDataLoaded && !isNewPost}
             >
@@ -249,10 +242,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className={cn(
-              isMobile ? 'h-8 w-8' : 'h-9 w-9',
-              'text-gray-700'
-            )}
+            className="h-8 w-8 text-gray-700"
           >
             <MoreVertical className="h-4 w-4" />
           </Button>

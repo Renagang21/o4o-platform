@@ -18,8 +18,8 @@ export const CenterControls: React.FC<CenterControlsProps> = ({
 }) => {
   return (
     <div className={cn(
-      'flex items-center gap-3',
-      isMobile ? 'flex-1 min-w-0' : 'flex-1 max-w-md min-w-0'
+      'flex items-center gap-2',
+      isMobile ? 'flex-1 min-w-0' : 'flex-1 max-w-xs min-w-0'
     )}>
       {/* Document Title Display - Hidden on mobile (title is in GutenbergBlockEditor) */}
       {!isMobile && postTitle && (
