@@ -242,6 +242,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       data-block-type={type}
       className={cn(
         'block-wrapper group relative transition-all duration-200',
+        'mb-6', // Add margin between blocks
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -271,7 +272,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
 
       {/* Block toolbar - integrated design with better positioning */}
       {showToolbar && isSelected && (
-        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2 mb-4" style={{ top: '-100px' }}>
+        <div className="absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2 mb-4" style={{ top: '-52px' }}>
           <div className="flex items-center gap-0.5 sm:gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-0.5 sm:px-1 py-0.5 sm:py-1 overflow-x-auto max-w-full">
             {/* Drag handle - now in toolbar */}
             <div
@@ -625,14 +626,13 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       )}
 
       {/* Block content with selection state */}
-      <div 
+      <div
         className={cn(
           'block-content relative rounded-sm transition-all duration-200',
-          'before:content-[""] before:absolute before:inset-0 before:pointer-events-none',
-          'before:border-2 before:rounded-sm before:transition-all',
-          !isSelected && !isHovered && 'before:border-transparent',
-          isHovered && !isSelected && 'before:border-gray-200 hover:bg-gray-50',
-          isSelected && 'before:border-blue-500 before:shadow-md bg-blue-50/30',
+          'outline outline-2 outline-offset-0',
+          !isSelected && !isHovered && 'outline-transparent',
+          isHovered && !isSelected && 'outline-gray-200 bg-gray-50/50',
+          isSelected && 'outline-blue-500 shadow-md bg-blue-50/30',
           isDragging && 'opacity-50'
         )}
       >
