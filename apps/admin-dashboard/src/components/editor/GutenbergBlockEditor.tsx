@@ -1688,17 +1688,31 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             )}
 
-            {/* Add block button - hidden when DefaultBlockAppender is shown */}
+            {/* Add block button - shown when blocks exist */}
+            {!isCodeView && blocks.length > 0 && (
+              <div className="mt-6 mb-4 text-center">
+                <button
+                  onClick={() => setIsBlockInserterOpen(true)}
+                  className="px-6 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors"
+                >
+                  + Add Block
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* GutenbergSidebar - Right Sidebar */}
         {sidebarOpen && (
           <div className={cn(
-            "fixed right-0 top-[60px] bg-white border-l overflow-y-auto transition-all duration-300 z-30",
+            "fixed right-0 bg-white border-l overflow-y-auto transition-all duration-300 z-30",
             "shadow-lg"
           )}
-               style={{ height: 'calc(100vh - 60px)', width: '280px' }}>
+               style={{
+                 top: hideHeader ? '55px' : '60px',
+                 height: hideHeader ? 'calc(100vh - 55px)' : 'calc(100vh - 60px)',
+                 width: '280px'
+               }}>
             <GutenbergSidebar
               activeTab={activeTab}
               postSettings={postSettings}
