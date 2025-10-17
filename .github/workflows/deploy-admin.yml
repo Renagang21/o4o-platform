@@ -18,34 +18,73 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Print deployment info
+    - name: Check if deployment needed
+      id: check_changes
       run: |
-        echo "🚀 Deploying Admin Dashboard"
-        echo "📅 Timestamp: $(date)"
+        echo "🔍 Analyzing changed files..."
         echo "📝 Commit: ${{ github.sha }}"
         echo "👤 Author: ${{ github.actor }}"
+        echo ""
+
+        # Get list of changed files
+        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} 2>/dev/null || echo "")
+
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "⚠️  Cannot determine changed files (possibly first commit)"
+          echo "deploy=true" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
         echo "📋 Changed files:"
-        git diff --name-only ${{ github.event.before }} ${{ github.sha }} || echo "Cannot determine changed files"
+        echo "$CHANGED_FILES"
+        echo ""
+
+        # Check if any admin-dashboard related files changed
+        NEEDS_DEPLOY=false
+
+        while IFS= read -r file; do
+          if [[ "$file" == apps/admin-dashboard/* ]] || \
+             [[ "$file" == packages/* ]] || \
+             [[ "$file" == .github/workflows/deploy-admin.yml ]] || \
+             [[ "$file" == nginx-configs/admin.neture.co.kr.conf ]]; then
+            NEEDS_DEPLOY=true
+            echo "✅ Found relevant file: $file"
+          fi
+        done <<< "$CHANGED_FILES"
+
+        echo ""
+        if [ "$NEEDS_DEPLOY" = true ]; then
+          echo "🚀 Deployment REQUIRED - Admin Dashboard files changed"
+          echo "deploy=true" >> $GITHUB_OUTPUT
+        else
+          echo "⏭️  Deployment SKIPPED - Only documentation/other files changed"
+          echo "deploy=false" >> $GITHUB_OUTPUT
+        fi
 
     - name: Setup Node.js
+      if: steps.check_changes.outputs.deploy == 'true'
       uses: actions/setup-node@v4
       with:
         node-version: '22.18.0'
 
     - name: Install pnpm
+      if: steps.check_changes.outputs.deploy == 'true'
       run: npm install -g pnpm
 
     - name: Install dependencies
+      if: steps.check_changes.outputs.deploy == 'true'
       run: |
         echo "📦 Installing dependencies..."
         pnpm install --frozen-lockfile
 
     - name: Build packages
+      if: steps.check_changes.outputs.deploy == 'true'
       run: |
         echo "🔨 Building packages..."
         pnpm run build:packages
 
     - name: Build admin dashboard
+      if: steps.check_changes.outputs.deploy == 'true'
       run: |
         echo "🔨 Building admin dashboard..."
         cd apps/admin-dashboard
@@ -62,11 +101,13 @@ jobs:
         cat dist/version.json
 
     - name: Prepare Nginx config for deployment
+      if: steps.check_changes.outputs.deploy == 'true'
       run: |
         mkdir -p apps/admin-dashboard/dist/nginx-config
         cp nginx-configs/admin.neture.co.kr.conf apps/admin-dashboard/dist/nginx-config/
 
     - name: Deploy to web server
+      if: steps.check_changes.outputs.deploy == 'true'
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.WEB_HOST }}
@@ -89,6 +130,7 @@ jobs:
           echo "✅ Preparation complete"
 
     - name: Copy build files
+      if: steps.check_changes.outputs.deploy == 'true'
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.WEB_HOST }}
@@ -99,6 +141,7 @@ jobs:
         strip_components: 3
 
     - name: Move files to web directory
+      if: steps.check_changes.outputs.deploy == 'true'
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.WEB_HOST }}
