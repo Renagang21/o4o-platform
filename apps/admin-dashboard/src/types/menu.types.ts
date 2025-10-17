@@ -65,7 +65,7 @@ export interface MenuLocationConfig {
 export type MenuLocations = Record<MenuLocationKey, MenuLocationConfig>;
 
 // Menu item types (matching backend enum)
-export type MenuItemType = 'custom' | 'page' | 'post' | 'category' | 'tag' | 'archive';
+export type MenuItemType = 'custom' | 'page' | 'post' | 'category' | 'tag' | 'archive' | 'cpt' | 'cpt_archive';
 export type MenuItemTarget = '_self' | '_blank' | '_parent' | '_top';
 
 // API response types

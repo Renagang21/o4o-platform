@@ -24,13 +24,14 @@ export interface AvailableItemsProps {
   onAdd: (item: Partial<MenuItemFlat>) => void;
 }
 
-type TabType = 'pages' | 'posts' | 'categories' | 'tags' | 'custom';
+type TabType = 'pages' | 'posts' | 'categories' | 'tags' | 'cpt' | 'custom';
 
 interface ContentItem {
   id: string;
   title: string;
-  type: 'page' | 'post' | 'category' | 'tag';
+  type: 'page' | 'post' | 'category' | 'tag' | 'cpt';
   url: string;
+  slug?: string;
 }
 
 /**
@@ -48,6 +49,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
   const [posts, setPosts] = useState<ContentItem[]>([]);
   const [categories, setCategories] = useState<ContentItem[]>([]);
   const [tags, setTags] = useState<ContentItem[]>([]);
+  const [cpts, setCpts] = useState<ContentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Custom link state
@@ -61,11 +63,12 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         setIsLoading(true);
         const apiClient = unifiedApi as unknown as UnifiedApiClient;
 
-        const [pagesResponse, postsResponse, categoriesResponse, tagsResponse] = await Promise.all([
+        const [pagesResponse, postsResponse, categoriesResponse, tagsResponse, cptsResponse] = await Promise.all([
           apiClient.raw.get<ApiResponse<Page[]>>('/v1/content/pages?limit=100'),
           apiClient.raw.get<ApiResponse<Post[]>>('/v1/content/posts?limit=100'),
           apiClient.raw.get<ApiResponse<Category[]>>('/v1/content/categories?limit=100'),
-          apiClient.raw.get<ApiResponse<TagItem[]>>('/v1/content/tags?limit=100')
+          apiClient.raw.get<ApiResponse<TagItem[]>>('/v1/content/tags?limit=100'),
+          apiClient.raw.get<any>('/v1/custom-post-types')
         ]);
 
         // Process pages
@@ -115,6 +118,19 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
             }))
           );
         }
+
+        // Process CPTs
+        if (cptsResponse.data?.status === 'success' && Array.isArray(cptsResponse.data?.data)) {
+          setCpts(
+            cptsResponse.data.data.map((cpt: any) => ({
+              id: cpt.id,
+              title: cpt.name,
+              type: 'cpt' as const,
+              url: `/cpt/${cpt.slug}`,
+              slug: cpt.slug
+            }))
+          );
+        }
       } catch (error) {
         toast.error('콘텐츠 목록을 불러오는데 실패했습니다');
         console.error('Failed to load content items:', error);
@@ -133,6 +149,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
       posts,
       categories,
       tags,
+      cpt: cpts,
       custom: []
     };
     return itemsMap[activeTab];
@@ -182,7 +199,8 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         url: item.url,
         type: item.type,
         originalId: item.id,
-        target: '_self'
+        target: '_self',
+        metadata: item.type === 'cpt' && item.slug ? { cptSlug: item.slug } : undefined
       });
     });
 
@@ -214,6 +232,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
     { key: 'posts', label: '글', icon: FileText },
     { key: 'categories', label: '카테고리', icon: Folder },
     { key: 'tags', label: '태그', icon: TagIcon },
+    { key: 'cpt', label: 'CPT', icon: Folder },
     { key: 'custom', label: '커스텀 링크', icon: Link2 }
   ];
 
