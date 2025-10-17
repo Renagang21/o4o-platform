@@ -326,6 +326,12 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onToggleItalic={() => toggleMark(editor, 'italic')}
       isBold={isMarkActive(editor, 'bold')}
       isItalic={isMarkActive(editor, 'italic')}
+      onTextColorChange={(color) => updateAttribute('textColor', color)}
+      onBackgroundColorChange={(color) => updateAttribute('backgroundColor', color)}
+      onFontSizeChange={(size) => updateAttribute('fontSize', size)}
+      currentTextColor={textColor}
+      currentBackgroundColor={backgroundColor}
+      currentFontSize={fontSize}
     >
       <div
         className={cn(
