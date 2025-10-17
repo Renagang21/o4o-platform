@@ -114,13 +114,28 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
     const storedSession = loadEditorSession();
     if (storedSession && storedSession.history.length > 0) {
-      // Restore session
-      setHistory(storedSession.history);
-      setHistoryIndex(storedSession.historyIndex);
-      setBlocks(storedSession.history[storedSession.historyIndex].blocks);
-      setDocumentTitle(storedSession.documentTitle);
-      setSessionRestored(true);
-      showToast('편집 내역이 복원되었습니다', 'info');
+      // Filter out empty blocks from restored session
+      const restoredBlocks = storedSession.history[storedSession.historyIndex].blocks;
+      const nonEmptyBlocks = restoredBlocks.filter(block => {
+        if (typeof block.content === 'string') {
+          return block.content.trim().length > 0;
+        }
+        if (typeof block.content === 'object' && block.content !== null) {
+          const text = (block.content as any).text || '';
+          return text.trim().length > 0;
+        }
+        return false;
+      });
+
+      // Only restore if there are non-empty blocks
+      if (nonEmptyBlocks.length > 0) {
+        setHistory(storedSession.history);
+        setHistoryIndex(storedSession.historyIndex);
+        setBlocks(nonEmptyBlocks);
+        setDocumentTitle(storedSession.documentTitle);
+        setSessionRestored(true);
+        showToast('편집 내역이 복원되었습니다', 'info');
+      }
     }
   }, [disableSessionRestore, sessionRestored, initialBlocks.length]);
 
