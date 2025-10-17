@@ -121,18 +121,9 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
 
   // Handle key events
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Enter key - create new paragraph
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      // Save current content
-      if (editorRef.current) {
-        const currentContent = editorRef.current.textContent || '';
-        onChange(currentContent, attributes);
-      }
-      // Add new paragraph block after
-      onAddBlock?.('after', 'o4o/paragraph');
-    }
-    
+    // Enter key - allow line break within heading
+    // Users can use DefaultBlockAppender to add new blocks
+
     // Backspace on empty - delete block
     if (e.key === 'Backspace' && localContent === '') {
       e.preventDefault();

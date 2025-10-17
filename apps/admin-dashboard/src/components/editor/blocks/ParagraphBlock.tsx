@@ -198,20 +198,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }
       }
 
-      // Enter key - create new block after current (Gutenberg standard)
-      if (event.key === 'Enter' && !event.shiftKey && !isModKey) {
-        event.preventDefault();
-
-        // CRITICAL: Save current content before creating new block
-        const currentHtml = serialize(editor.children);
-        onChange(currentHtml, attributes);
-
-        onAddBlock?.('after', 'o4o/paragraph');
-        return;
-      }
-
-      // Shift+Enter - line break within same block
-      // Allow Slate's withParagraphs plugin to handle insertBreak
+      // Enter key - just create line break within same block
+      // Slate's withParagraphs plugin handles insertBreak for both Enter and Shift+Enter
 
       // Backspace at start of empty/whitespace-only block
       if (event.key === 'Backspace') {
