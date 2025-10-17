@@ -324,6 +324,16 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       currentAlign={align}
       onToggleBold={() => toggleMark(editor, 'bold')}
       onToggleItalic={() => toggleMark(editor, 'italic')}
+      onToggleLink={() => {
+        if (isLinkActive(editor)) {
+          unwrapLink(editor);
+        } else {
+          const url = window.prompt('Enter URL:');
+          if (url) {
+            wrapLink(editor, url);
+          }
+        }
+      }}
       isBold={isMarkActive(editor, 'bold')}
       isItalic={isMarkActive(editor, 'italic')}
     >
