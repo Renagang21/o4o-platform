@@ -12,8 +12,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { Eye, Code2, Bold, Italic, Link2 } from 'lucide-react';
+import { Eye, Code2, Bold, Italic, Link2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import FileSelector, { FileItem } from './shared/FileSelector';
+import toast from 'react-hot-toast';
 
 interface MarkdownBlockProps {
   id: string;
@@ -67,6 +69,7 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
   const { markdown: initialMarkdown } = attributes;
   const [localMarkdown, setLocalMarkdown] = useState(initialMarkdown || content || '');
   const [mode, setMode] = useState<'edit' | 'preview'>('edit');
+  const [showFileSelector, setShowFileSelector] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Configure marked options
@@ -202,6 +205,29 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     }
   };
 
+  // Handle file selection and load content
+  const handleFileSelect = async (file: FileItem | FileItem[]) => {
+    const selectedFile = Array.isArray(file) ? file[0] : file;
+
+    if (!selectedFile) return;
+
+    try {
+      // Fetch the file content from URL
+      const response = await fetch(selectedFile.url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch file');
+      }
+
+      const text = await response.text();
+      handleMarkdownChange(text);
+      toast.success(`${selectedFile.title} 파일을 불러왔습니다.`);
+      setShowFileSelector(false);
+    } catch (error) {
+      console.error('Failed to load markdown file:', error);
+      toast.error('파일을 불러오는데 실패했습니다.');
+    }
+  };
+
   return (
     <EnhancedBlockWrapper
       id={id}
@@ -252,6 +278,16 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
             {/* Markdown Helper Buttons (only in edit mode) */}
             {mode === 'edit' && (
               <>
+                <div className="h-5 w-px bg-gray-300" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setShowFileSelector(true)}
+                  title="파일에서 불러오기"
+                >
+                  <FileText className="h-3 w-3" />
+                </Button>
                 <div className="h-5 w-px bg-gray-300" />
                 <Button
                   variant="ghost"
@@ -335,6 +371,18 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
           />
         </div>
       )}
+
+      {/* File Selector Modal */}
+      <FileSelector
+        isOpen={showFileSelector}
+        onClose={() => setShowFileSelector(false)}
+        onSelect={handleFileSelect}
+        multiple={false}
+        acceptedTypes={['document']}
+        acceptedMimeTypes={['text/markdown', 'text/plain']}
+        acceptedExtensions={['.md', '.markdown', '.txt']}
+        title="마크다운 파일 선택"
+      />
     </EnhancedBlockWrapper>
   );
 };
