@@ -1589,10 +1589,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
-                    onDuplicate={handleDuplicate}
-                    onDelete={handleBlockDelete}
-                    onMoveUp={handleMoveUp}
-                    onMoveDown={handleMoveDown}
+                    onDuplicate={() => handleDuplicate(block.id)}
+                    onDelete={() => handleBlockDelete(block.id)}
+                    onMoveUp={() => handleMoveUp(block.id)}
+                    onMoveDown={() => handleMoveDown(block.id)}
                     canMoveUp={index > 0}
                     canMoveDown={index < blocks.length - 1}
                   >
