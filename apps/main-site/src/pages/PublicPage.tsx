@@ -34,15 +34,12 @@ interface PageResponse {
   data: PageData;
 }
 
-// Fetch page by slug
+// Fetch page by slug from Post entity (type='page')
 const fetchPageBySlug = async (slug: string): Promise<PageData> => {
-  const response = await apiClient.get<PageResponse>(`/public/pages/${slug}`);
+  const response = await apiClient.get(`/api/pages/slug/${slug}`);
 
-  if (!response.data.success) {
-    throw new Error('Failed to fetch page');
-  }
-
-  return response.data.data;
+  // API returns page directly without wrapping in response object
+  return response.data as PageData;
 };
 
 const PublicPage: FC = () => {
@@ -115,12 +112,12 @@ const PublicPage: FC = () => {
     }
   }
 
-  // Transform API response to PageRenderer format
+  // Transform API response (Post entity) to PageRenderer format
   const pageForRenderer = {
     id: pageData.id,
     title: pageData.title,
     slug: pageData.slug,
-    content: pageData.blocks || pageData.content,
+    content: pageData.content, // Post entity uses 'content' field directly
     featuredImage: pageData.metadata?.featuredImage,
   };
 

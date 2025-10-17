@@ -133,6 +133,37 @@ router.get('/hierarchy', async (req: Request, res: Response) => {
   }
 })
 
+// Get page by slug (public endpoint - must be before /:id route)
+router.get('/slug/:slug', async (req: Request, res: Response) => {
+  try {
+    const postRepository = AppDataSource.getRepository(Post)
+    const { slug } = req.params
+
+    // 공개 엔드포인트이므로 publish 상태의 페이지만 허용
+    const page = await postRepository.findOne({
+      where: {
+        slug,
+        type: 'page',
+        status: 'publish'
+      },
+      relations: ['author']
+    })
+
+    if (!page) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found or not published' } })
+    }
+
+    res.json(page)
+  } catch (error) {
+    logger.error('Error fetching page by slug:', {
+      slug: req.params.slug,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch page' } })
+  }
+})
+
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const postRepository = AppDataSource.getRepository(Post)
