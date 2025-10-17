@@ -1,18 +1,19 @@
 /**
  * MarkdownBlock Component
  *
- * Gutenberg-style Markdown block with Edit/Preview tabs
- * - Edit mode: Markdown source editor (textarea)
- * - Preview mode: Rendered HTML using marked library
- * - Toolbar: Edit/Preview toggle, markdown helpers
- * - Follows Gutenberg UI patterns
+ * Read-only markdown preview block with automatic TOC
+ * - Loads markdown files from media library
+ * - Renders HTML using marked library
+ * - Auto-generates table of contents for 3+ headings
+ * - Displays filename with read-only indicator
+ * - No editing to maintain file sync integrity
  */
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { marked } from 'marked';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { Eye, Code2, Bold, Italic, Link2, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FileSelector, { FileItem } from './shared/FileSelector';
 import toast from 'react-hot-toast';
@@ -37,6 +38,7 @@ interface MarkdownBlockProps {
   onSelect: () => void;
   attributes?: {
     markdown?: string;
+    filename?: string;
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -73,12 +75,11 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
   onPaste,
   onChangeType,
 }) => {
-  const { markdown: initialMarkdown } = attributes;
+  const { markdown: initialMarkdown, filename: initialFilename } = attributes;
   const [localMarkdown, setLocalMarkdown] = useState(initialMarkdown || content || '');
-  const [mode, setMode] = useState<'edit' | 'preview'>('edit');
+  const [filename, setFilename] = useState(initialFilename || '');
   const [showFileSelector, setShowFileSelector] = useState(false);
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Configure marked options with heading IDs
@@ -125,121 +126,12 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     }
   }, [content, initialMarkdown]);
 
-  // Auto-resize textarea
+  // Sync filename
   useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = Math.max(200, textarea.scrollHeight) + 'px';
+    if (initialFilename !== undefined) {
+      setFilename(initialFilename);
     }
-  }, [localMarkdown]);
-
-  // Handle markdown change
-  const handleMarkdownChange = (newMarkdown: string) => {
-    setLocalMarkdown(newMarkdown);
-    onChange(newMarkdown, { ...attributes, markdown: newMarkdown });
-  };
-
-  // Handle key events
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Tab key: Insert 2 spaces
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const textarea = e.target as HTMLTextAreaElement;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const spaces = '  '; // 2 spaces
-
-      const newValue = localMarkdown.substring(0, start) + spaces + localMarkdown.substring(end);
-      handleMarkdownChange(newValue);
-
-      // Set cursor position after the inserted spaces
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + spaces.length;
-      }, 0);
-    }
-
-    // Enter key: Maintain indentation
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const textarea = e.target as HTMLTextAreaElement;
-      const start = textarea.selectionStart;
-      const lines = localMarkdown.substring(0, start).split('\n');
-      const currentLine = lines[lines.length - 1];
-
-      // Calculate indentation
-      const indent = currentLine.match(/^(\s*)/)?.[1] || '';
-
-      // Check for list continuation
-      const listMatch = currentLine.match(/^(\s*)([-*+]|\d+\.)\s/);
-      if (listMatch) {
-        const listIndent = listMatch[1];
-        const listMarker = listMatch[2];
-        const continuation = listMarker.match(/^\d+$/)
-          ? `${parseInt(listMarker) + 1}.`
-          : listMarker;
-        const newValue = localMarkdown.substring(0, start) + '\n' + listIndent + continuation + ' ' + localMarkdown.substring(start);
-        handleMarkdownChange(newValue);
-        setTimeout(() => {
-          textarea.selectionStart = textarea.selectionEnd = start + 1 + listIndent.length + continuation.length + 1;
-        }, 0);
-        return;
-      }
-
-      const newValue = localMarkdown.substring(0, start) + '\n' + indent + localMarkdown.substring(start);
-      handleMarkdownChange(newValue);
-
-      // Set cursor position after the indentation
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + 1 + indent.length;
-      }, 0);
-    }
-
-    // Backspace on empty markdown block
-    if (e.key === 'Backspace' && localMarkdown.trim() === '') {
-      e.preventDefault();
-      onDelete();
-    }
-
-    // Escape key: Exit edit mode to preview mode
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      setMode('preview');
-      // Blur the textarea
-      const textarea = e.target as HTMLTextAreaElement;
-      textarea.blur();
-    }
-  };
-
-  // Insert markdown syntax
-  const insertMarkdownSyntax = (prefix: string, suffix: string = '') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = localMarkdown.substring(start, end);
-
-    const newValue =
-      localMarkdown.substring(0, start) +
-      prefix +
-      selectedText +
-      suffix +
-      localMarkdown.substring(end);
-
-    handleMarkdownChange(newValue);
-
-    // Set cursor position
-    setTimeout(() => {
-      if (selectedText) {
-        textarea.selectionStart = start + prefix.length;
-        textarea.selectionEnd = end + prefix.length;
-      } else {
-        textarea.selectionStart = textarea.selectionEnd = start + prefix.length;
-      }
-      textarea.focus();
-    }, 0);
-  };
+  }, [initialFilename]);
 
   // Scroll to heading
   const scrollToHeading = useCallback((id: string) => {
@@ -253,7 +145,7 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
 
   // Track active heading on scroll (Intersection Observer)
   useEffect(() => {
-    if (!previewRef.current || !showTOC || mode !== 'preview') return;
+    if (!previewRef.current || !showTOC) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -277,7 +169,7 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     headingElements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [showTOC, mode, localMarkdown]);
+  }, [showTOC, localMarkdown]);
 
   // Render markdown as HTML
   const renderMarkdown = () => {
@@ -302,7 +194,12 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
       }
 
       const text = await response.text();
-      handleMarkdownChange(text);
+      setLocalMarkdown(text);
+      setFilename(selectedFile.title);
+
+      // Save to attributes
+      onChange(text, { markdown: text, filename: selectedFile.title });
+
       toast.success(`${selectedFile.title} 파일을 불러왔습니다.`);
       setShowFileSelector(false);
     } catch (error) {
@@ -336,108 +233,34 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
       customToolbarContent={
         isSelected ? (
           <div className="flex items-center gap-2">
-            {/* Edit/Preview Toggle */}
-            <div className="flex items-center bg-gray-100 rounded-md p-0.5">
-              <Button
-                variant={mode === 'edit' ? 'default' : 'ghost'}
-                size="sm"
-                className="h-7 px-3 text-xs"
-                onClick={() => setMode('edit')}
-              >
-                <Code2 className="h-3 w-3 mr-1" />
-                Edit
-              </Button>
-              <Button
-                variant={mode === 'preview' ? 'default' : 'ghost'}
-                size="sm"
-                className="h-7 px-3 text-xs"
-                onClick={() => setMode('preview')}
-              >
-                <Eye className="h-3 w-3 mr-1" />
-                Preview
-              </Button>
-            </div>
-
-            {/* Markdown Helper Buttons (only in edit mode) */}
-            {mode === 'edit' && (
-              <>
-                <div className="h-5 w-px bg-gray-300" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setShowFileSelector(true)}
-                  title="파일에서 불러오기"
-                >
-                  <FileText className="h-3 w-3" />
-                </Button>
-                <div className="h-5 w-px bg-gray-300" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => insertMarkdownSyntax('**', '**')}
-                  title="Bold (Ctrl+B)"
-                >
-                  <Bold className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => insertMarkdownSyntax('*', '*')}
-                  title="Italic (Ctrl+I)"
-                >
-                  <Italic className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => insertMarkdownSyntax('[', '](url)')}
-                  title="Link (Ctrl+K)"
-                >
-                  <Link2 className="h-3 w-3" />
-                </Button>
-              </>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-3 text-xs"
+              onClick={() => setShowFileSelector(true)}
+              title="마크다운 파일 불러오기"
+            >
+              <FileText className="h-3 w-3 mr-1" />
+              파일 불러오기
+            </Button>
           </div>
         ) : null
       }
     >
       <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden">
-        {/* Edit Mode */}
-        {mode === 'edit' && (
-          <textarea
-            ref={textareaRef}
-            value={localMarkdown}
-            onChange={(e) => handleMarkdownChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className={cn(
-              'w-full p-4 bg-transparent border-0 outline-none resize-none',
-              'font-mono text-sm text-gray-800 leading-relaxed',
-              'placeholder:text-gray-400',
-              'scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300'
-            )}
-            placeholder="Enter markdown here...
-
-## Example Heading
-- List item 1
-- List item 2
-
-**Bold text** and *italic text*
-[Link text](https://example.com)"
-            spellCheck={false}
-            style={{
-              minHeight: '200px',
-              tabSize: 2,
-              whiteSpace: 'pre-wrap'
-            }}
-          />
+        {/* Filename Header */}
+        {filename && (
+          <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <FileText className="h-4 w-4" />
+              <span className="font-medium">{filename}</span>
+              <span className="text-xs text-gray-400">(읽기 전용)</span>
+            </div>
+          </div>
         )}
 
-        {/* Preview Mode */}
-        {mode === 'preview' && (
+        {/* Preview Content */}
+        {localMarkdown ? (
           <div className="flex">
             {/* Table of Contents Sidebar */}
             {showTOC && (
@@ -478,6 +301,14 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
               className="prose prose-sm max-w-none p-4 flex-1 overflow-y-auto"
               dangerouslySetInnerHTML={{ __html: renderMarkdown() }}
             />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center p-12 text-gray-400">
+            <div className="text-center">
+              <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">마크다운 파일을 불러와주세요</p>
+              <p className="text-xs mt-1">상단의 "파일 불러오기" 버튼을 클릭하세요</p>
+            </div>
           </div>
         )}
       </div>
