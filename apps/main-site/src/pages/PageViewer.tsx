@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, ArrowLeft } from 'lucide-react';
 import { loadPageContent, PageContent } from '@/utils/pageSystem';
 import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
 
 // 사용자 권한 확인
@@ -154,7 +155,7 @@ const PageViewer: FC = () => {
           {/* 페이지 콘텐츠 */}
           <div className="px-8 py-8">
             <div
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(pageContent.content) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked(pageContent.content) as string) }}
             />
           </div>
 
