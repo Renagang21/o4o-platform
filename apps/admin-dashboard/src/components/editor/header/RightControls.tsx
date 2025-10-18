@@ -96,6 +96,77 @@ export const RightControls: React.FC<RightControlsProps> = ({
         />
       )}
 
+      {/* -- Publishing Actions -- */}
+
+      {/* Save Draft */}
+      {!isMobile ? (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onSave(false)}
+          disabled={isSaving || !isDirty}
+        >
+          {isSaving ? (
+            <>
+              <div className="animate-spin h-3 w-3 border-2 border-gray-500 border-t-transparent rounded-full mr-2" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-3 w-3 mr-2" />
+              Save draft
+            </>
+          )}
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => onSave(false)}
+          disabled={isSaving || !isDirty}
+        >
+          {isSaving ? (
+            <div className="animate-spin h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+        </Button>
+      )}
+
+      {/* Preview - Hidden on mobile */}
+      {!isMobile && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-700"
+                onClick={onPreview}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Preview</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
+      {/* Publish/Update Button - PRIMARY ACTION */}
+      <Button
+        size="sm"
+        onClick={() => onSave(true)}
+        disabled={isSaving}
+        className="font-medium"
+      >
+        {postStatus === 'publish' ? 'Update' : 'Publish'}
+      </Button>
+
+      {/* -- Theme and Customization -- */}
+
       {/* Theme Preview Mode Toggle */}
       {onToggleThemePreview && (
         <TooltipProvider>
@@ -145,72 +216,7 @@ export const RightControls: React.FC<RightControlsProps> = ({
         </TooltipProvider>
       )}
 
-      {/* Preview - Hidden on mobile */}
-      {!isMobile && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-gray-700"
-                onClick={onPreview}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Preview</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-
-      {/* Save Draft */}
-      {!isMobile ? (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onSave(false)}
-          disabled={isSaving || !isDirty}
-        >
-          {isSaving ? (
-            <>
-              <div className="animate-spin h-3 w-3 border-2 border-gray-500 border-t-transparent rounded-full mr-2" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="h-3 w-3 mr-2" />
-              Save draft
-            </>
-          )}
-        </Button>
-      ) : (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => onSave(false)}
-          disabled={isSaving || !isDirty}
-        >
-          {isSaving ? (
-            <div className="animate-spin h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-        </Button>
-      )}
-
-      {/* Publish/Update Button - PRIMARY ACTION */}
-      <Button
-        size="sm"
-        onClick={() => onSave(true)}
-        disabled={isSaving}
-        className="font-medium"
-      >
-        {postStatus === 'publish' ? 'Update' : 'Publish'}
-      </Button>
+      {/* -- Settings and More -- */}
 
       {/* Settings Toggle */}
       <TooltipProvider>

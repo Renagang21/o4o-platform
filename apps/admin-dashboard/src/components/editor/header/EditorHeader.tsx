@@ -58,54 +58,60 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   return (
     <div
       className={cn(
-        'bg-white border-b border-gray-200 flex items-center justify-between overflow-hidden relative z-40',
+        'bg-white border-b border-gray-200 flex items-center overflow-hidden relative z-40',
         'h-[55px]', // Gutenberg standard height
         isMobile ? 'px-2 py-2' : 'px-3 py-2' // Responsive padding
       )}
       style={{ isolation: 'isolate' }}
     >
-      {/* Left Section: Navigation and Primary Tools */}
-      <LeftControls
-        isMobile={isMobile}
-        isTablet={isTablet}
-        onBack={onBack}
-        onOpenDesignLibrary={onOpenDesignLibrary}
-        onOpenAIGenerator={onOpenAIGenerator}
-      />
+      {/* Left Section: Fixed size */}
+      <div className="flex-shrink-0">
+        <LeftControls
+          isMobile={isMobile}
+          isTablet={isTablet}
+          onBack={onBack}
+          onOpenDesignLibrary={onOpenDesignLibrary}
+          onOpenAIGenerator={onOpenAIGenerator}
+        />
+      </div>
 
-      {/* Center Section: Document Info and Status */}
-      <CenterControls
-        postTitle={postTitle}
-        postStatus={postStatus}
-        isSaving={isSaving}
-        isDirty={isDirty}
-        lastSaved={lastSaved}
-        isMobile={isMobile}
-      />
+      {/* Center Section: Flexible and truncates */}
+      <div className="flex-1 min-w-0 px-4">
+        <CenterControls
+          postTitle={postTitle}
+          postStatus={postStatus}
+          isSaving={isSaving}
+          isDirty={isDirty}
+          lastSaved={lastSaved}
+          isMobile={isMobile}
+        />
+      </div>
 
-      {/* Right Section: Actions and Settings */}
-      <RightControls
-        isMobile={isMobile}
-        isTablet={isTablet}
-        isSaving={isSaving}
-        isDirty={isDirty}
-        sidebarOpen={sidebarOpen}
-        showListView={showListView}
-        postStatus={postStatus}
-        viewportMode={viewportMode}
-        onViewportChange={onViewportChange}
-        containerWidth={containerWidth}
-        isThemePreviewMode={isThemePreviewMode}
-        onToggleThemePreview={onToggleThemePreview}
-        onOpenCustomizer={onOpenCustomizer}
-        onSave={onSave}
-        onPublish={onPublish}
-        onPreview={onPreview}
-        onToggleSidebar={onToggleSidebar}
-        onToggleListView={onToggleListView}
-        isPostDataLoaded={isPostDataLoaded}
-        isNewPost={isNewPost}
-      />
+      {/* Right Section: Fixed size */}
+      <div className="flex-shrink-0">
+        <RightControls
+          isMobile={isMobile}
+          isTablet={isTablet}
+          isSaving={isSaving}
+          isDirty={isDirty}
+          sidebarOpen={sidebarOpen}
+          showListView={showListView}
+          postStatus={postStatus}
+          viewportMode={viewportMode}
+          onViewportChange={onViewportChange}
+          containerWidth={containerWidth}
+          isThemePreviewMode={isThemePreviewMode}
+          onToggleThemePreview={onToggleThemePreview}
+          onOpenCustomizer={onOpenCustomizer}
+          onSave={onSave}
+          onPublish={onPublish}
+          onPreview={onPreview}
+          onToggleSidebar={onToggleSidebar}
+          onToggleListView={onToggleListView}
+          isPostDataLoaded={isPostDataLoaded}
+          isNewPost={isNewPost}
+        />
+      </div>
     </div>
   );
 };
