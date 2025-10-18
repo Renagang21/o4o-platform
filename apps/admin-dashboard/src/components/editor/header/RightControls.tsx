@@ -1,24 +1,22 @@
 /**
  * RightControls Component
- * Right section of the editor header containing actions and settings
+ * Right section of the editor header containing actions and settings.
+ * REFINED: On mobile and tablet, most controls are moved into the 'More' menu.
  */
 
 import React from 'react';
 import {
-  Eye,
   Save,
-  Settings2,
-  X,
-  List,
-  Monitor,
-  MonitorOff,
+  Visibility,
+  Settings,
+  Close,
+  DesktopWindows,
+  DesktopMac,
   Palette,
-  MoreVertical,
-  Library,
-  Sparkles,
-  Plus,
+  MoreVert,
   Info,
-} from 'lucide-react';
+  LibraryBooks,
+} from '@mui/icons-material';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -36,6 +34,7 @@ import {
 import { cn } from '@/lib/utils';
 import { ViewportSwitcher } from '@/components/editor/ViewportSwitcher';
 import type { RightControlsProps } from './types';
+import { Sparkles } from 'lucide-react';
 
 export const RightControls: React.FC<RightControlsProps> = ({
   isMobile,
@@ -43,7 +42,6 @@ export const RightControls: React.FC<RightControlsProps> = ({
   isSaving,
   isDirty,
   sidebarOpen,
-  showListView,
   postStatus,
   viewportMode,
   onViewportChange,
@@ -51,111 +49,74 @@ export const RightControls: React.FC<RightControlsProps> = ({
   isThemePreviewMode,
   onToggleThemePreview,
   onOpenCustomizer,
+  onOpenDesignLibrary,
+  onOpenAIGenerator,
   onSave,
-  onPublish,
   onPreview,
   onToggleSidebar,
-  onToggleListView,
   isPostDataLoaded,
   isNewPost,
 }) => {
+  const isSmallScreen = isMobile || isTablet;
+
   return (
-    <div
-      className={cn(
-        'flex items-center flex-shrink-0',
-        isMobile ? 'gap-0' : isTablet ? 'gap-0.5' : 'gap-1'
-      )}
-    >
-      {/* List View - Hidden on mobile */}
-      {!isMobile && onToggleListView && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-gray-700"
-                onClick={onToggleListView}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>List view</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-
-      {/* Viewport Switcher - Hidden on mobile */}
-      {!isMobile && viewportMode && onViewportChange && containerWidth !== undefined && (
-        <ViewportSwitcher
-          currentMode={viewportMode}
-          onModeChange={onViewportChange}
-          containerWidth={containerWidth}
-        />
-      )}
-
-      {/* -- Publishing Actions -- */}
-
-      {/* Save Draft */}
-      {!isMobile ? (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onSave(false)}
-          disabled={isSaving || !isDirty}
-        >
-          {isSaving ? (
-            <>
-              <div className="animate-spin h-3 w-3 border-2 border-gray-500 border-t-transparent rounded-full mr-2" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="h-3 w-3 mr-2" />
-              Save draft
-            </>
+    <div className="flex items-center flex-shrink-0 gap-1">
+      {/* --- DESKTOP-ONLY CONTROLS --- */}
+      {!isSmallScreen && (
+        <>
+          {/* Viewport Switcher */}
+          {viewportMode && onViewportChange && containerWidth !== undefined && (
+            <ViewportSwitcher
+              currentMode={viewportMode}
+              onModeChange={onViewportChange}
+              containerWidth={containerWidth}
+            />
           )}
-        </Button>
-      ) : (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => onSave(false)}
-          disabled={isSaving || !isDirty}
-        >
-          {isSaving ? (
-            <div className="animate-spin h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-        </Button>
+
+          {/* Save Draft */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onSave(false)}
+            disabled={isSaving || !isDirty}
+          >
+            {isSaving ? (
+              <>
+                <div className="animate-spin h-3 w-3 border-2 border-gray-500 border-t-transparent rounded-full mr-2" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save sx={{ fontSize: 14, marginRight: '8px' }} />
+                Save draft
+              </>
+            )}
+          </Button>
+
+          {/* Preview */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-gray-700"
+                  onClick={onPreview}
+                >
+                  <Visibility sx={{ fontSize: 18 }} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Preview</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </>
       )}
 
-      {/* Preview - Hidden on mobile */}
-      {!isMobile && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-gray-700"
-                onClick={onPreview}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Preview</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
+      {/* --- ALWAYS VISIBLE (Primary Actions) --- */}
 
-      {/* Publish/Update Button - PRIMARY ACTION */}
+      {/* Publish/Update Button */}
       <Button
         size="sm"
         onClick={() => onSave(true)}
@@ -164,59 +125,6 @@ export const RightControls: React.FC<RightControlsProps> = ({
       >
         {postStatus === 'publish' ? 'Update' : 'Publish'}
       </Button>
-
-      {/* -- Theme and Customization -- */}
-
-      {/* Theme Preview Mode Toggle */}
-      {onToggleThemePreview && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  'h-8 w-8 text-gray-700',
-                  isThemePreviewMode && 'bg-blue-100 text-blue-600'
-                )}
-                onClick={onToggleThemePreview}
-              >
-                {isThemePreviewMode ? (
-                  <Monitor className="h-4 w-4" />
-                ) : (
-                  <MonitorOff className="h-4 w-4" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{isThemePreviewMode ? 'Disable' : 'Enable'} theme width preview</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-
-      {/* Customizer Button */}
-      {onOpenCustomizer && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-gray-700"
-                onClick={onOpenCustomizer}
-              >
-                <Palette className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>사용자 정의하기</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-
-      {/* -- Settings and More -- */}
 
       {/* Settings Toggle */}
       <TooltipProvider>
@@ -230,9 +138,9 @@ export const RightControls: React.FC<RightControlsProps> = ({
               disabled={!isPostDataLoaded && !isNewPost}
             >
               {sidebarOpen ? (
-                <X className="h-4 w-4" />
+                <Close sx={{ fontSize: 20 }} />
               ) : (
-                <Settings2 className="h-4 w-4" />
+                <Settings sx={{ fontSize: 20 }} />
               )}
             </Button>
           </TooltipTrigger>
@@ -242,62 +150,66 @@ export const RightControls: React.FC<RightControlsProps> = ({
         </Tooltip>
       </TooltipProvider>
 
-      {/* More Options Menu */}
+      {/* --- MORE OPTIONS MENU --- */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-700"
-          >
-            <MoreVertical className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
+            <MoreVert sx={{ fontSize: 20 }} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {/* Mobile-only: Show Preview in menu */}
-          {isMobile && (
+          {/* --- SMALL SCREEN ITEMS --- */}
+          {isSmallScreen && (
             <>
+              <DropdownMenuItem onClick={() => onSave(false)} disabled={isSaving || !isDirty}>
+                  <Save sx={{ fontSize: 16, marginRight: '8px' }} />
+                  Save draft
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={onPreview}>
-                <Eye className="h-4 w-4 mr-2" />
+                <Visibility sx={{ fontSize: 16, marginRight: '8px' }} />
                 Preview
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-            </>
-          )}
-
-          {/* Tablet/Mobile: Show Design Library and AI Generator in menu */}
-          {(isMobile || isTablet) && (
-            <>
-              <DropdownMenuItem onClick={() => {/* onOpenDesignLibrary will be passed from parent */}}>
-                <Library className="h-4 w-4 mr-2" />
-                디자인 라이브러리
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {/* onOpenAIGenerator will be passed from parent */}}>
-                <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
-                AI 페이지 생성
-              </DropdownMenuItem>
+              {onOpenDesignLibrary && (
+                  <DropdownMenuItem onClick={onOpenDesignLibrary}>
+                      <LibraryBooks sx={{ fontSize: 16, marginRight: '8px' }} />
+                      Design Library
+                  </DropdownMenuItem>
+              )}
+              {onOpenAIGenerator && (
+                   <DropdownMenuItem onClick={onOpenAIGenerator}>
+                      <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                      AI Page Generator
+                  </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
             </>
           )}
+          
+          {/* --- DESKTOP & SMALL SCREEN ITEMS --- */}
 
-          <DropdownMenuItem>
-            <Plus className="h-4 w-4 mr-2" />
-            Add template
-          </DropdownMenuItem>
-          <DropdownMenuItem>Add media</DropdownMenuItem>
+          {onToggleThemePreview && (
+            <DropdownMenuItem onClick={onToggleThemePreview}>
+                 {isThemePreviewMode ? <DesktopMac sx={{ fontSize: 16, marginRight: '8px' }}/> : <DesktopWindows sx={{ fontSize: 16, marginRight: '8px' }}/>}
+                {isThemePreviewMode ? 'Disable Theme Preview' : 'Enable Theme Preview'}
+            </DropdownMenuItem>
+          )}
+
+          {onOpenCustomizer && (
+            <DropdownMenuItem onClick={onOpenCustomizer}>
+                <Palette sx={{ fontSize: 16, marginRight: '8px' }} />
+                Customizer
+            </DropdownMenuItem>
+          )}
+          
           <DropdownMenuSeparator />
           <DropdownMenuItem>Copy all blocks</DropdownMenuItem>
-          <DropdownMenuItem>Export</DropdownMenuItem>
-
-          {!isMobile && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Info className="h-4 w-4 mr-2" />
-                Keyboard shortcuts
-              </DropdownMenuItem>
-            </>
-          )}
+          
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <Info sx={{ fontSize: 16, marginRight: '8px' }} />
+            Keyboard shortcuts
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

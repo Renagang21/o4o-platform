@@ -4,7 +4,6 @@
  *
  * Layout: [LeftControls] [CenterControls] [RightControls]
  * Height: 55px (Gutenberg standard)
- * Padding: 12px 16px (8px vertical, 16px horizontal)
  */
 
 import React from 'react';
@@ -13,6 +12,7 @@ import { LeftControls } from './LeftControls';
 import { CenterControls } from './CenterControls';
 import { RightControls } from './RightControls';
 import type { EditorHeaderProps } from './types';
+import { PostTitle } from './PostTitle'; // Import the PostTitle component
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
   // Document state
@@ -30,7 +30,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onTitleChange,
   onBack,
   onSave,
-  onPublish,
   onPreview,
   onToggleSidebar,
   sidebarOpen,
@@ -60,7 +59,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
       className={cn(
         'bg-white border-b border-gray-200 flex items-center overflow-hidden relative z-40',
         'h-[55px]', // Gutenberg standard height
-        isMobile ? 'px-2 py-2' : 'px-3 py-2' // Responsive padding
+        isMobile ? 'px-2 py-2' : 'px-4 py-2' // Adjusted padding
       )}
       style={{ isolation: 'isolate' }}
     >
@@ -75,16 +74,22 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         />
       </div>
 
-      {/* Center Section: Flexible and truncates */}
-      <div className="flex-1 min-w-0 px-4">
+      {/* Center Section: Flexible, contains title and secondary controls */}
+      {/* FIXED: Removed redundant padding that was causing layout squeeze */}
+      <div className="flex-1 min-w-0">
         <CenterControls
-          postTitle={postTitle}
           postStatus={postStatus}
           isSaving={isSaving}
           isDirty={isDirty}
           lastSaved={lastSaved}
           isMobile={isMobile}
-        />
+          isTablet={isTablet}
+          onToggleListView={onToggleListView}
+          showListView={showListView}
+        >
+          {/* The actual PostTitle input is passed as a child */}
+          <PostTitle value={postTitle} onChange={onTitleChange} />
+        </CenterControls>
       </div>
 
       {/* Right Section: Fixed size */}
@@ -95,7 +100,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           isSaving={isSaving}
           isDirty={isDirty}
           sidebarOpen={sidebarOpen}
-          showListView={showListView}
           postStatus={postStatus}
           viewportMode={viewportMode}
           onViewportChange={onViewportChange}
@@ -103,11 +107,11 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           isThemePreviewMode={isThemePreviewMode}
           onToggleThemePreview={onToggleThemePreview}
           onOpenCustomizer={onOpenCustomizer}
+          onOpenDesignLibrary={onOpenDesignLibrary}
+          onOpenAIGenerator={onOpenAIGenerator}
           onSave={onSave}
-          onPublish={onPublish}
           onPreview={onPreview}
           onToggleSidebar={onToggleSidebar}
-          onToggleListView={onToggleListView}
           isPostDataLoaded={isPostDataLoaded}
           isNewPost={isNewPost}
         />

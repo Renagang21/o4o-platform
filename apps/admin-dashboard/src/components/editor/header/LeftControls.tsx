@@ -4,7 +4,15 @@
  */
 
 import React from 'react';
-import { ArrowLeft, Library, Sparkles } from 'lucide-react';
+// UPDATED: Using Material-UI icons, which are already in the project dependencies
+import {
+  ArrowBack,
+  Add,
+  Undo,
+  Redo,
+  CollectionsBookmark,
+  AutoAwesome,
+} from '@mui/icons-material';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -15,6 +23,8 @@ import {
 import { cn } from '@/lib/utils';
 import type { LeftControlsProps } from './types';
 
+// TODO: Extend props to include onAddBlock, onUndo, onRedo from the editor's core
+
 export const LeftControls: React.FC<LeftControlsProps> = ({
   isMobile,
   isTablet,
@@ -23,12 +33,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
   onOpenAIGenerator,
 }) => {
   return (
-    <div
-      className={cn(
-        'flex items-center',
-        isMobile ? 'gap-1' : 'gap-2'
-      )}
-    >
+    <div className={cn('flex items-center', isMobile ? 'gap-0' : 'gap-1')}>
       {/* Back to Dashboard */}
       <TooltipProvider>
         <Tooltip>
@@ -39,7 +44,8 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
               className="h-8 w-8 text-gray-700"
               onClick={onBack}
             >
-              <ArrowLeft className="h-4 w-4" />
+              {/* FIXED: Replaced lucide-react icon with MUI icon */}
+              <ArrowBack sx={{ fontSize: 18 }} />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -48,7 +54,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
         </Tooltip>
       </TooltipProvider>
 
-      {/* WordPress Logo - Now clickable for back navigation */}
+      {/* WordPress Logo - Clickable for back navigation */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -67,6 +73,62 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
         </Tooltip>
       </TooltipProvider>
 
+      {/* Separator */}
+      <div className="w-[1px] h-6 bg-gray-200 mx-2" />
+
+      {/* --- ADDED: Core Gutenberg Controls --- */}
+      <div className="flex items-center gap-1">
+        {/* Add Block */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* TODO: Wire up onClick to editor's block inserter */}
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
+                <Add sx={{ fontSize: 20 }} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Add block</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        {/* Undo */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* TODO: Wire up onClick and disabled state to editor's history */}
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
+                <Undo sx={{ fontSize: 20 }} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Undo</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        {/* Redo */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* TODO: Wire up onClick and disabled state to editor's history */}
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
+                <Redo sx={{ fontSize: 20 }} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Redo</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      
+      {/* Separator - only show if custom buttons are visible */}
+      {!isMobile && !isTablet && <div className="w-[1px] h-6 bg-gray-200 mx-2" />}
+
+      {/* --- Custom Controls --- */}
+      
       {/* Design Library - Hidden on mobile/tablet */}
       {!isMobile && !isTablet && (
         <Button
@@ -75,7 +137,8 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
           onClick={onOpenDesignLibrary}
           className="h-8 px-3 text-gray-700 hover:bg-gray-100 border border-gray-300"
         >
-          <Library className="h-4 w-4 mr-1.5" />
+          {/* FIXED: Replaced lucide-react icon */}
+          <CollectionsBookmark sx={{ fontSize: 16, marginRight: '6px' }} />
           디자인 라이브러리
         </Button>
       )}
@@ -88,7 +151,8 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
           onClick={onOpenAIGenerator}
           className="h-8 px-3 hover:bg-gray-100 border border-gray-300 text-purple-600 hover:text-purple-700"
         >
-          <Sparkles className="h-4 w-4 mr-1.5" />
+          {/* FIXED: Replaced lucide-react icon */}
+          <AutoAwesome sx={{ fontSize: 16, marginRight: '6px' }} />
           AI 페이지 생성
         </Button>
       )}

@@ -5,7 +5,12 @@
  */
 
 import React from 'react';
-import { Monitor, Tablet, Smartphone } from 'lucide-react';
+// FIXED: Replaced lucide-react with already installed @mui/icons-material
+import {
+  DesktopWindows,
+  TabletAndroid,
+  PhoneIphone,
+} from '@mui/icons-material';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ViewportMode } from '@/hooks/useCustomizerSettings';
@@ -20,10 +25,11 @@ interface ViewportSwitcherProps {
   };
 }
 
+// FIXED: Swapped icon components to Material-UI icons
 const VIEWPORT_ICONS = {
-  desktop: Monitor,
-  tablet: Tablet,
-  mobile: Smartphone,
+  desktop: DesktopWindows,
+  tablet: TabletAndroid,
+  mobile: PhoneIphone,
 };
 
 const VIEWPORT_LABELS = {
@@ -63,7 +69,8 @@ export const ViewportSwitcher: React.FC<ViewportSwitcherProps> = ({
             )}
             title={width ? `${label} (${width}px)` : label}
           >
-            <Icon className="h-4 w-4" />
+            {/* Icon size is now controlled by sx prop for better consistency */}
+            <Icon sx={{ fontSize: 18 }} />
           </Button>
         );
       })}
