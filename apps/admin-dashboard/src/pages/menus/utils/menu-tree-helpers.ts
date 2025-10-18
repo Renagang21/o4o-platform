@@ -7,7 +7,7 @@ export interface MenuItemFlat {
   id: string;
   title: string;
   url?: string;
-  type: 'page' | 'post' | 'custom' | 'category' | 'tag';
+  type: 'page' | 'post' | 'custom' | 'category' | 'tag' | 'cpt';
   target?: '_blank' | '_self';
   cssClass?: string;
   description?: string;
@@ -19,6 +19,9 @@ export interface MenuItemFlat {
   target_audience?: {
     roles: string[];
     user_ids?: string[];
+  };
+  metadata?: {
+    cptSlug?: string;
   };
 }
 

@@ -82,13 +82,11 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Configure marked options with heading IDs
+  // Configure marked options
   useEffect(() => {
     marked.setOptions({
       breaks: true,
       gfm: true,
-      headerIds: true,
-      mangle: false,
     });
   }, []);
 

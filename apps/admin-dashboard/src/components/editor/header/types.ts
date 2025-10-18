@@ -2,6 +2,8 @@
  * TypeScript interfaces for EditorHeader components
  */
 
+import type { ViewportMode } from '@/hooks/useCustomizerSettings';
+
 /**
  * Main EditorHeader component props
  */
@@ -37,9 +39,13 @@ export interface EditorHeaderProps {
   showListView?: boolean;
 
   // Viewport/Theme preview (passed through to RightControls)
-  viewportMode?: string;
-  onViewportChange?: (mode: string) => void;
-  containerWidth?: number;
+  viewportMode?: ViewportMode;
+  onViewportChange?: (mode: ViewportMode) => void;
+  containerWidth?: {
+    desktop: number;
+    tablet: number;
+    mobile: number;
+  };
   isThemePreviewMode?: boolean;
   onToggleThemePreview?: () => void;
   onOpenCustomizer?: () => void;
@@ -64,12 +70,15 @@ export interface LeftControlsProps {
  * CenterControls component props
  */
 export interface CenterControlsProps {
-  postTitle: string;
   postStatus: 'draft' | 'publish' | 'pending' | 'private' | 'scheduled';
   isSaving: boolean;
   isDirty: boolean;
   lastSaved: Date | null;
   isMobile: boolean;
+  isTablet: boolean;
+  onToggleListView?: () => void;
+  showListView?: boolean;
+  children?: React.ReactNode;
 }
 
 /**
@@ -85,18 +94,26 @@ export interface RightControlsProps {
 
   // Handlers
   onSave: (publish?: boolean) => Promise<void>;
-  onPublish: () => Promise<void>;
+  onPublish?: () => Promise<void>;
   onPreview: () => Promise<void>;
   onToggleSidebar: () => void;
   onToggleListView?: () => void;
+
+  // Project-specific features
+  onOpenDesignLibrary?: () => void;
+  onOpenAIGenerator?: () => void;
 
   // Publish button label
   postStatus: 'draft' | 'publish' | 'pending' | 'private' | 'scheduled';
 
   // Viewport/Theme preview
-  viewportMode?: string;
-  onViewportChange?: (mode: string) => void;
-  containerWidth?: number;
+  viewportMode?: ViewportMode;
+  onViewportChange?: (mode: ViewportMode) => void;
+  containerWidth?: {
+    desktop: number;
+    tablet: number;
+    mobile: number;
+  };
   isThemePreviewMode?: boolean;
   onToggleThemePreview?: () => void;
   onOpenCustomizer?: () => void;

@@ -671,7 +671,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           setIsDirty(true);
         }}
         onBack={handleBack}
-        onSave={handleSave}
+        onSave={async (publish) => { await handleSave(publish); }}
         onPublish={handlePublish}
         onPreview={handlePreview}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -744,7 +744,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   setIsDirty(true);
                 }
               }}
-              onSave={handleSave}
+              onSave={async () => { await handleSave(); }}
               onPublish={handlePublish}
             />
           </div>

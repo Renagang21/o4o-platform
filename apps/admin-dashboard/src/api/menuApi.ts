@@ -63,7 +63,7 @@ export interface CreateMenuItemDto {
   title: string;
   url?: string;
   target?: '_self' | '_blank' | '_parent' | '_top';
-  type?: 'custom' | 'page' | 'post' | 'category' | 'tag' | 'archive';
+  type?: 'custom' | 'page' | 'post' | 'category' | 'tag' | 'archive' | 'cpt' | 'cpt_archive';
   object_id?: string;
   object_type?: string;
   description?: string;
