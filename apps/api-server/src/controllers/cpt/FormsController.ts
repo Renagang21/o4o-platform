@@ -60,8 +60,25 @@ export class FormsController {
           }
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching forms:', error);
+
+      // If table doesn't exist, return empty array instead of error
+      if (error?.code === '42P01') {
+        return res.json({
+          success: true,
+          data: {
+            forms: [],
+            pagination: {
+              page: Number(page),
+              limit: Number(limit),
+              total: 0,
+              totalPages: 0
+            }
+          }
+        });
+      }
+
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch forms' }
