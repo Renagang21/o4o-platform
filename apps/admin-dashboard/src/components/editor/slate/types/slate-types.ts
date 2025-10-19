@@ -40,8 +40,24 @@ export type LinkElement = {
   children: CustomText[];
 };
 
+/**
+ * List Element (block-level element)
+ */
+export type ListElement = {
+  type: 'ordered-list' | 'unordered-list';
+  children: ListItemElement[];
+};
+
+/**
+ * List Item Element (block-level element)
+ */
+export type ListItemElement = {
+  type: 'list-item';
+  children: (CustomText | LinkElement | ListElement)[];
+};
+
 // Union type for all element types (will expand as we add more blocks)
-export type CustomElement = ParagraphElement | HeadingElement | LinkElement;
+export type CustomElement = ParagraphElement | HeadingElement | LinkElement | ListElement | ListItemElement;
 
 /**
  * Custom Text Types
@@ -114,4 +130,25 @@ export const createEmptyHeading = (level: 1 | 2 | 3 | 4 | 5 | 6 = 2): HeadingEle
   type: 'heading',
   level,
   children: [{ text: '' }],
+});
+
+// Check if element is a list
+export const isListElement = (element: any): element is ListElement => {
+  return element && (element.type === 'ordered-list' || element.type === 'unordered-list');
+};
+
+// Check if element is a list item
+export const isListItemElement = (element: any): element is ListItemElement => {
+  return element && element.type === 'list-item';
+};
+
+// Create empty list helper
+export const createEmptyList = (type: 'ordered' | 'unordered' = 'unordered'): ListElement => ({
+  type: type === 'ordered' ? 'ordered-list' : 'unordered-list',
+  children: [
+    {
+      type: 'list-item',
+      children: [{ text: '' }],
+    },
+  ],
 });

@@ -13,45 +13,27 @@ export const listBlockDefinition: BlockDefinition = {
   title: 'List',
   category: 'text',
   icon: <List className="w-5 h-5" />,
-  description: 'Create a bulleted or numbered list.',
-  keywords: ['list', 'bullet', 'numbered', 'ordered', 'unordered'],
+  description: 'Create a bulleted or numbered list with rich text formatting.',
+  keywords: ['list', 'bullet', 'numbered', 'ordered', 'unordered', 'ul', 'ol'],
   component: ListBlock as unknown as BlockComponent,
   attributes: {
-    items: {
-      type: 'array',
-      default: [],
+    content: {
+      type: 'string',
+      default: '',
     },
     type: {
       type: 'string',
       default: 'unordered',
     },
-    style: {
-      type: 'string',
-      default: 'disc',
-    },
-    numbering: {
-      type: 'string',
-      default: 'decimal',
-    },
-    startNumber: {
-      type: 'number',
-      default: 1,
-    },
     align: {
       type: 'string',
       default: 'left',
     },
-    color: {
-      type: 'string',
-      default: 'default',
-    },
   },
   supports: {
+    align: true,
     anchor: true,
     className: true,
-    color: {
-      text: true,
-    },
   },
 };
 

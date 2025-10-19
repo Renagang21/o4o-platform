@@ -10,7 +10,8 @@
  */
 
 import { Descendant, Text, Element as SlateElement } from 'slate';
-import type { CustomElement, CustomText, ParagraphElement, HeadingElement, LinkElement } from '../types/slate-types';
+import type { CustomElement, CustomText, ParagraphElement, HeadingElement, LinkElement, ListElement, ListItemElement } from '../types/slate-types';
+import { isListItemElement } from '../types/slate-types';
 
 /**
  * Serialize Slate value to HTML
@@ -39,6 +40,12 @@ const serializeNode = (node: Descendant): string => {
       return serializeHeading(element as HeadingElement, children);
     case 'link':
       return serializeLink(element as LinkElement, children);
+    case 'ordered-list':
+      return serializeOrderedList(element as ListElement, children);
+    case 'unordered-list':
+      return serializeUnorderedList(element as ListElement, children);
+    case 'list-item':
+      return serializeListItem(element as ListItemElement, children);
     default:
       return children;
   }
@@ -100,6 +107,27 @@ const serializeHeading = (element: HeadingElement, children: string): string => 
  */
 const serializeLink = (element: LinkElement, children: string): string => {
   return `<a href="${escapeHtml(element.url)}">${children}</a>`;
+};
+
+/**
+ * Serialize ordered list element
+ */
+const serializeOrderedList = (element: ListElement, children: string): string => {
+  return `<ol>${children}</ol>`;
+};
+
+/**
+ * Serialize unordered list element
+ */
+const serializeUnorderedList = (element: ListElement, children: string): string => {
+  return `<ul>${children}</ul>`;
+};
+
+/**
+ * Serialize list item element
+ */
+const serializeListItem = (element: ListItemElement, children: string): string => {
+  return `<li>${children || '<br>'}</li>`;
 };
 
 /**
@@ -189,6 +217,45 @@ const deserializeElement = (el: HTMLElement): Descendant | null => {
         children: children as CustomText[],
       };
       return link;
+    }
+    case 'ul': {
+      const list: ListElement = {
+        type: 'unordered-list',
+        children: children.filter(isListItemElement) as ListItemElement[],
+      };
+      // Ensure at least one list item
+      if (list.children.length === 0) {
+        list.children.push({
+          type: 'list-item',
+          children: [{ text: '' }],
+        });
+      }
+      return list;
+    }
+    case 'ol': {
+      const list: ListElement = {
+        type: 'ordered-list',
+        children: children.filter(isListItemElement) as ListItemElement[],
+      };
+      // Ensure at least one list item
+      if (list.children.length === 0) {
+        list.children.push({
+          type: 'list-item',
+          children: [{ text: '' }],
+        });
+      }
+      return list;
+    }
+    case 'li': {
+      const listItem: ListItemElement = {
+        type: 'list-item',
+        children: children as (CustomText | LinkElement | ListElement)[],
+      };
+      // Ensure at least one child
+      if (listItem.children.length === 0) {
+        listItem.children.push({ text: '' });
+      }
+      return listItem;
     }
     case 'br':
       return { text: '\n' };
