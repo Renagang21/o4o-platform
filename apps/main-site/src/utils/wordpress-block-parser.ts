@@ -391,31 +391,33 @@ function extractTextContent(block: WordPressBlock): string {
   // Support both attributes and data properties
   const blockData = (block as any).data || block.attributes;
 
-  if (blockData && blockData.text) {
-    return blockData.text;
-  }
-
+  // 1. Check data.content (new format - plain text with inline HTML)
   if (blockData && blockData.content) {
     return blockData.content;
   }
 
+  // 2. Check attributes.content (standard WordPress format)
   if (block.attributes && block.attributes.content) {
     return block.attributes.content;
   }
 
-  if (block.innerHTML) {
-    // Strip HTML tags for plain text
-    const div = document.createElement('div');
-    div.innerHTML = block.innerHTML;
-    return div.textContent || '';
+  // 3. Check data.text (legacy format)
+  if (blockData && blockData.text) {
+    return blockData.text;
   }
-  
+
+  // 4. Check innerHTML (preserve HTML tags for links, formatting)
+  if (block.innerHTML) {
+    return block.innerHTML;
+  }
+
+  // 5. Check innerContent (array format)
   if (block.innerContent && block.innerContent.length > 0) {
     return block.innerContent
       .filter((content): content is string => typeof content === 'string')
       .join('');
   }
-  
+
   return '';
 }
 
