@@ -19,7 +19,9 @@ export const useDynamicCPTMenu = () => {
       // Use public endpoint for menu items (doesn't require auth)
       const response = await authClient.api.get('/public/cpt/types');
       // API returns { success: true, data: [...] }
-      return response.data?.data || response.data || [];
+      const result = response.data?.data || response.data || [];
+      // Ensure we always return an array
+      return Array.isArray(result) ? result : [];
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
     gcTime: 10 * 60 * 1000,
@@ -27,7 +29,7 @@ export const useDynamicCPTMenu = () => {
     refetchOnWindowFocus: false
   });
 
-  const cptTypes = cptTypesResponse || [];
+  const cptTypes = Array.isArray(cptTypesResponse) ? cptTypesResponse : [];
 
   // CPT를 메뉴 아이템으로 변환
   const generateCPTMenuItems = (): MenuItem[] => {
