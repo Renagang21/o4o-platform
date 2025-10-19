@@ -4,7 +4,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +50,7 @@ import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { CustomPost, CustomPostType, PostStatus, CPTListOptions } from '@/features/cpt-acf/types/cpt.types';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { authClient } from '@o4o/auth-client';
 
 interface CPTContentListProps {
   selectedType?: string | null;
@@ -65,6 +66,25 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addNotice } = useAdminNotices();
+  const { cptSlug } = useParams<{ cptSlug: string }>();
+
+  // Use URL parameter if selectedType prop is not provided
+  const effectiveType = selectedType || cptSlug || null;
+
+  // Load CPT types if not provided via props
+  const { data: loadedCPTTypes } = useQuery({
+    queryKey: ['cpt-types'],
+    queryFn: async () => {
+      const response = await authClient.api.get('/public/cpt/types');
+      const result = response.data?.data || response.data || [];
+      return Array.isArray(result) ? result : [];
+    },
+    enabled: !cptTypes, // Only load if not provided via props
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Use provided cptTypes or loaded ones
+  const effectiveCPTTypes = cptTypes || loadedCPTTypes || [];
 
   // State
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
@@ -74,7 +94,7 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
   const [itemsPerPage] = useState(20);
 
   // Current CPT type
-  const currentCPT = cptTypes?.find(cpt => cpt.slug === selectedType);
+  const currentCPT = effectiveCPTTypes?.find((cpt: CustomPostType) => cpt.slug === effectiveType);
 
   // Query options
   const queryOptions: CPTListOptions = useMemo(() => ({
@@ -88,13 +108,13 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
 
   // Fetch posts
   const { data: postsResponse, isLoading, refetch } = useQuery({
-    queryKey: ['cpt-posts', selectedType, queryOptions],
+    queryKey: ['cpt-posts', effectiveType, queryOptions],
     queryFn: async () => {
-      if (!selectedType) return null;
-      const response = await cptPostApi.getPostsByType(selectedType, queryOptions);
+      if (!effectiveType) return null;
+      const response = await cptPostApi.getPostsByType(effectiveType, queryOptions);
       return response.data;
     },
-    enabled: !!selectedType
+    enabled: !!effectiveType
   });
 
   const posts = postsResponse || [];
@@ -202,7 +222,7 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
     return variants[status] || { label: status, variant: 'secondary' as const };
   };
 
-  if (!selectedType) {
+  if (!effectiveType) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center h-96 text-center">
@@ -211,12 +231,18 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
           <p className="text-muted-foreground mb-4">
             관리할 콘텐츠 타입을 선택하세요
           </p>
-          <Select value="" onValueChange={onTypeSelect}>
+          <Select value="" onValueChange={(slug) => {
+            if (onTypeSelect) {
+              onTypeSelect(slug);
+            } else {
+              navigate(`/cpt-engine/content/${slug}`);
+            }
+          }}>
             <SelectTrigger className="w-64">
               <SelectValue placeholder="콘텐츠 타입 선택..." />
             </SelectTrigger>
             <SelectContent>
-              {cptTypes?.map(cpt => (
+              {effectiveCPTTypes?.map((cpt: CustomPostType) => (
                 <SelectItem key={cpt.slug} value={cpt.slug}>
                   {cpt.label}
                 </SelectItem>
@@ -235,13 +261,13 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{currentCPT?.label || selectedType} 콘텐츠</CardTitle>
+              <CardTitle>{currentCPT?.label || effectiveType} 콘텐츠</CardTitle>
               <CardDescription>
-                {currentCPT?.description || `${selectedType} 타입의 모든 콘텐츠를 관리합니다`}
+                {currentCPT?.description || `${effectiveType} 타입의 모든 콘텐츠를 관리합니다`}
               </CardDescription>
             </div>
             <Button
-              onClick={() => navigate(`/cpt-engine/content/${selectedType}/new`)}
+              onClick={() => navigate(`/cpt-engine/content/${effectiveType}/new`)}
             >
               <Plus className="h-4 w-4 mr-2" />
               새 {currentCPT?.singularLabel || '콘텐츠'}
@@ -284,19 +310,27 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
               </SelectContent>
             </Select>
 
-            {/* CPT Type Selector */}
-            <Select value={selectedType} onValueChange={onTypeSelect}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {cptTypes?.map(cpt => (
-                  <SelectItem key={cpt.slug} value={cpt.slug}>
-                    {cpt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* CPT Type Selector - only show when onTypeSelect callback is provided */}
+            {onTypeSelect && (
+              <Select value={effectiveType || ''} onValueChange={(slug) => {
+                if (onTypeSelect) {
+                  onTypeSelect(slug);
+                } else {
+                  navigate(`/cpt-engine/content/${slug}`);
+                }
+              }}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {effectiveCPTTypes?.map((cpt: CustomPostType) => (
+                    <SelectItem key={cpt.slug} value={cpt.slug}>
+                      {cpt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Bulk Actions */}

@@ -47,24 +47,33 @@ export const useDynamicCPTMenu = () => {
         const cptName = cpt.name || cpt.labels?.singular || cpt.slug;
         const singularName = cpt.labels?.singular || cpt.name || cpt.slug;
 
+        // Build children menu items
+        const children: MenuItem[] = [
+          {
+            id: `cpt-${cpt.slug}-all`,
+            label: `모든 ${cptName}`,
+            icon: <FileText className="w-4 h-4" />,
+            path: `/cpt-engine/content/${cpt.slug}`
+          },
+          {
+            id: `cpt-${cpt.slug}-new`,
+            label: `새 ${singularName} 추가`,
+            icon: <FileText className="w-4 h-4" />,
+            path: `/cpt-engine/content/${cpt.slug}/new`
+          },
+          {
+            id: `cpt-${cpt.slug}-categories`,
+            label: '카테고리',
+            icon: <FileText className="w-4 h-4" />,
+            path: `/cpt-engine/taxonomies?cpt=${cpt.slug}`
+          }
+        ];
+
         return {
           id: `cpt-${cpt.slug}`,
           label: cptName,
           icon: <IconComponent className="w-5 h-5" />,
-          children: [
-            {
-              id: `cpt-${cpt.slug}-all`,
-              label: `모든 ${cptName}`,
-              icon: <FileText className="w-4 h-4" />,
-              path: `/cpt-engine/content/${cpt.slug}`
-            },
-            {
-              id: `cpt-${cpt.slug}-new`,
-              label: `새 ${singularName} 추가`,
-              icon: <FileText className="w-4 h-4" />,
-              path: `/cpt-engine/content/${cpt.slug}/new`
-            }
-          ]
+          children
         };
       });
 
