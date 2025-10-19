@@ -1,11 +1,13 @@
 /**
  * Heading Block Definition
+ *
+ * New Slate.js-based heading block with rich text editing.
  */
 
 import React from 'react';
 import { Heading as HeadingIcon } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import EnhancedHeadingBlock from '@/components/editor/blocks/EnhancedHeadingBlock';
+import HeadingBlock from '@/components/editor/blocks/HeadingBlock';
 import { BlockComponent } from '../registry/types';
 
 export const headingBlockDefinition: BlockDefinition = {
@@ -13,9 +15,9 @@ export const headingBlockDefinition: BlockDefinition = {
   title: 'Heading',
   category: 'text',
   icon: <HeadingIcon className="w-5 h-5" />,
-  description: 'Introduce new sections and organize content.',
-  keywords: ['title', 'subtitle', 'h1', 'h2', 'h3'],
-  component: EnhancedHeadingBlock as unknown as BlockComponent,
+  description: 'Introduce new sections with formatted text and links.',
+  keywords: ['title', 'subtitle', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  component: HeadingBlock as unknown as BlockComponent,
   attributes: {
     content: {
       type: 'string',
@@ -27,8 +29,15 @@ export const headingBlockDefinition: BlockDefinition = {
     },
     align: {
       type: 'string',
+      default: 'left',
+    },
+    fontSize: {
+      type: 'number',
     },
     textColor: {
+      type: 'string',
+    },
+    backgroundColor: {
       type: 'string',
     },
   },
@@ -38,6 +47,10 @@ export const headingBlockDefinition: BlockDefinition = {
     className: true,
     color: {
       text: true,
+      background: true,
+    },
+    typography: {
+      fontSize: true,
     },
   },
 };

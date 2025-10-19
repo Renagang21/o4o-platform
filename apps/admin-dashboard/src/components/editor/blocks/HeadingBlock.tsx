@@ -1,0 +1,453 @@
+/**
+ * HeadingBlock Component (Slate.js-based)
+ *
+ * New Slate.js-based heading block implementation following ParagraphBlock pattern.
+ * Replaces the old EnhancedHeadingBlock.
+ *
+ * Features:
+ * - Slate.js editor with Bold, Italic, Strikethrough, Code formatting
+ * - Link support (Ctrl+K)
+ * - Heading level selection (H1-H6)
+ * - Text alignment
+ * - HTML serialization for Gutenberg compatibility
+ * - Undo/Redo support
+ */
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range } from 'slate';
+import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
+import { withHistory } from 'slate-history';
+import { cn } from '@/lib/utils';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import { withParagraphs } from '../slate/plugins/withParagraphs';
+import { withDeleteKey } from '../slate/plugins/withDeleteKey';
+import { withLinks, isLinkActive, unwrapLink, wrapLink } from '../slate/plugins/withLinks';
+import { serialize, deserialize } from '../slate/utils/serialize';
+import type { CustomText, HeadingElement, LinkElement } from '../slate/types/slate-types';
+
+interface HeadingBlockProps {
+  id: string;
+  content: string; // HTML string
+  onChange: (content: string, attributes?: any) => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onAddBlock?: (position: 'before' | 'after', type?: string) => void;
+  isSelected: boolean;
+  onSelect: () => void;
+  attributes?: {
+    level?: 1 | 2 | 3 | 4 | 5 | 6;
+    align?: 'left' | 'center' | 'right' | 'justify';
+    fontSize?: number;
+    textColor?: string;
+    backgroundColor?: string;
+  };
+}
+
+const HeadingBlock: React.FC<HeadingBlockProps> = ({
+  id,
+  content,
+  onChange,
+  onDelete,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
+  onAddBlock,
+  isSelected,
+  onSelect,
+  attributes = {}
+}) => {
+  const {
+    level = 2,
+    align = 'left',
+    fontSize,
+    textColor = '#1e293b',
+    backgroundColor = '',
+  } = attributes;
+
+  // Create Slate editor with plugins
+  const editor = useMemo(
+    () => withLinks(withDeleteKey(withParagraphs(withHistory(withReact(createEditor()))))),
+    []
+  );
+
+  // Convert HTML content to Slate value
+  const initialValue = useMemo(() => {
+    if (!content || content === '') {
+      return [
+        {
+          type: 'heading',
+          level,
+          align,
+          children: [{ text: '' }],
+        } as HeadingElement,
+      ];
+    }
+
+    try {
+      const deserialized = deserialize(content);
+      // Ensure we have at least one heading
+      if (deserialized.length === 0) {
+        return [
+          {
+            type: 'heading',
+            level,
+            align,
+            children: [{ text: '' }],
+          } as HeadingElement,
+        ];
+      }
+      // Apply level and alignment to deserialized headings
+      return deserialized.map(node => {
+        if (SlateElement.isElement(node) && node.type === 'heading') {
+          return { ...node, level, align } as HeadingElement;
+        }
+        // If content was a paragraph, convert to heading
+        if (SlateElement.isElement(node) && node.type === 'paragraph') {
+          return {
+            type: 'heading',
+            level,
+            align,
+            children: node.children,
+          } as HeadingElement;
+        }
+        return node;
+      });
+    } catch (error) {
+      console.error('Failed to deserialize heading content:', error);
+      return [
+        {
+          type: 'heading',
+          level,
+          align,
+          children: [{ text: content }],
+        } as HeadingElement,
+      ];
+    }
+  }, []); // Only run once on mount
+
+  const [value, setValue] = useState<Descendant[]>(initialValue);
+
+  // Update editor when level or alignment changes
+  useEffect(() => {
+    if (value.length > 0) {
+      const firstNode = value[0];
+      if (SlateElement.isElement(firstNode) && firstNode.type === 'heading') {
+        const currentHeading = firstNode as HeadingElement;
+        if (currentHeading.level !== level || currentHeading.align !== align) {
+          // Update level and alignment without triggering onChange
+          Transforms.setNodes(
+            editor,
+            { level, align } as Partial<HeadingElement>,
+            { at: [0] }
+          );
+        }
+      }
+    }
+  }, [level, align, editor, value]);
+
+  // Handle value changes
+  const handleChange = useCallback(
+    (newValue: Descendant[]) => {
+      setValue(newValue);
+
+      // Check if content actually changed (not just selection)
+      const isAstChange = editor.operations.some(
+        (op) => op.type !== 'set_selection'
+      );
+
+      if (isAstChange) {
+        // Serialize to HTML and notify parent
+        const html = serialize(newValue);
+        onChange(html, attributes);
+      }
+    },
+    [editor, onChange, attributes]
+  );
+
+  // Update attribute
+  const updateAttribute = useCallback((key: string, value: any) => {
+    const html = serialize(editor.children);
+    onChange(html, { ...attributes, [key]: value });
+  }, [onChange, attributes, editor]);
+
+  // Handle Enter key - create new block after current
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      const isModKey = event.ctrlKey || event.metaKey;
+
+      // Format shortcuts
+      if (isModKey) {
+        switch (event.key) {
+          case 'b': {
+            event.preventDefault();
+            toggleMark(editor, 'bold');
+            break;
+          }
+          case 'i': {
+            event.preventDefault();
+            toggleMark(editor, 'italic');
+            break;
+          }
+          case 'u': {
+            event.preventDefault();
+            toggleMark(editor, 'underline');
+            break;
+          }
+          case 'k': {
+            event.preventDefault();
+            // Toggle link
+            if (isLinkActive(editor)) {
+              unwrapLink(editor);
+            } else {
+              const url = window.prompt('Enter URL:');
+              if (url) {
+                wrapLink(editor, url);
+              }
+            }
+            break;
+          }
+        }
+      }
+
+      // Enter key handling
+      if (event.key === 'Enter') {
+        if (event.shiftKey || event.ctrlKey || event.metaKey) {
+          // Shift+Enter or Ctrl+Enter: line break within heading
+          // Let Slate's withParagraphs plugin handle it
+        } else {
+          // Plain Enter: finish editing, move to DefaultBlockAppender
+          event.preventDefault();
+
+          // Save current content
+          const currentHtml = serialize(editor.children);
+          onChange(currentHtml, attributes);
+
+          // Blur current editor
+          if (event.currentTarget instanceof HTMLElement) {
+            event.currentTarget.blur();
+          }
+
+          // Focus DefaultBlockAppender
+          setTimeout(() => {
+            const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
+            if (appender) {
+              appender.focus();
+            }
+          }, 50);
+
+          return;
+        }
+      }
+
+      // Backspace at start of empty/whitespace-only block
+      if (event.key === 'Backspace') {
+        const { selection } = editor;
+        // Get text content from entire editor
+        const text = Editor.string(editor, []);
+        const isEmpty = !text || text.trim() === '';
+
+        // If block is empty or selection is at start with only whitespace, delete the block
+        if (isEmpty) {
+          event.preventDefault();
+          onDelete();
+          return;
+        }
+
+        // If at start of non-empty block, still allow Backspace (Slate will handle merge)
+        if (selection && Range.isCollapsed(selection)) {
+          const [start] = Range.edges(selection);
+          if (start.offset === 0 && text.trim() === '') {
+            event.preventDefault();
+            onDelete();
+          }
+        }
+      }
+    },
+    [editor, onAddBlock, onDelete]
+  );
+
+  // Render element (heading or link)
+  const renderElement = useCallback((props: RenderElementProps) => {
+    const element = props.element as HeadingElement | LinkElement;
+
+    switch (element.type) {
+      case 'link':
+        return (
+          <a
+            {...props.attributes}
+            href={(element as LinkElement).url}
+            className="text-blue-600 hover:text-blue-800 underline"
+            onClick={(e) => {
+              e.preventDefault();
+              // In edit mode, allow editing the link
+              const url = window.prompt('Edit URL:', (element as LinkElement).url);
+              if (url !== null && url !== (element as LinkElement).url) {
+                const path = ReactEditor.findPath(editor, element);
+                Transforms.setNodes(
+                  editor,
+                  { url } as Partial<LinkElement>,
+                  { at: path }
+                );
+              }
+            }}
+          >
+            {props.children}
+          </a>
+        );
+      case 'heading':
+      default: {
+        const headingElement = element as HeadingElement;
+        const HeadingTag = `h${headingElement.level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
+        return (
+          <HeadingTag
+            {...props.attributes}
+            style={{
+              textAlign: headingElement.align || 'left',
+              margin: 0,
+            }}
+          >
+            {props.children}
+          </HeadingTag>
+        );
+      }
+    }
+  }, [editor]);
+
+  // Render leaf (text with formatting)
+  const renderLeaf = useCallback((props: RenderLeafProps) => {
+    let children = props.children;
+    const leaf = props.leaf as CustomText;
+
+    if (leaf.code) {
+      children = (
+        <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">
+          {children}
+        </code>
+      );
+    }
+
+    if (leaf.bold) {
+      children = <strong>{children}</strong>;
+    }
+
+    if (leaf.italic) {
+      children = <em>{children}</em>;
+    }
+
+    if (leaf.underline) {
+      children = <u>{children}</u>;
+    }
+
+    if (leaf.strikethrough) {
+      children = <s>{children}</s>;
+    }
+
+    return <span {...props.attributes}>{children}</span>;
+  }, []);
+
+  // Size classes for different heading levels
+  const sizeClasses = {
+    1: 'text-4xl font-bold',
+    2: 'text-3xl font-bold',
+    3: 'text-2xl font-semibold',
+    4: 'text-xl font-semibold',
+    5: 'text-lg font-medium',
+    6: 'text-base font-medium',
+  };
+
+  // Custom toolbar content for heading block (level selector)
+  const customToolbarContent = isSelected ? (
+    <div className="flex items-center gap-2 mr-2">
+      <select
+        value={level.toString()}
+        onChange={(e) => updateAttribute('level', parseInt(e.target.value) as 1 | 2 | 3 | 4 | 5 | 6)}
+        className="h-7 px-2 text-sm border border-gray-200 rounded hover:border-gray-300 focus:outline-none focus:border-blue-500"
+      >
+        <option value="1">H1</option>
+        <option value="2">H2</option>
+        <option value="3">H3</option>
+        <option value="4">H4</option>
+        <option value="5">H5</option>
+        <option value="6">H6</option>
+      </select>
+    </div>
+  ) : null;
+
+  return (
+    <EnhancedBlockWrapper
+      id={id}
+      type="heading"
+      isSelected={isSelected}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
+      className="wp-block-heading"
+      customToolbarContent={customToolbarContent}
+      onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
+      currentAlign={align}
+      onToggleBold={() => toggleMark(editor, 'bold')}
+      onToggleItalic={() => toggleMark(editor, 'italic')}
+      onToggleLink={() => {
+        if (isLinkActive(editor)) {
+          unwrapLink(editor);
+        } else {
+          const url = window.prompt('Enter URL:');
+          if (url) {
+            wrapLink(editor, url);
+          }
+        }
+      }}
+      isBold={isMarkActive(editor, 'bold')}
+      isItalic={isMarkActive(editor, 'italic')}
+    >
+      <div
+        className={cn(
+          'heading-content min-h-[1.5em]',
+          sizeClasses[level]
+        )}
+        style={{
+          fontSize: fontSize ? `${fontSize}px` : undefined,
+          color: textColor || undefined,
+          backgroundColor: backgroundColor || undefined,
+        }}
+      >
+        <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
+          <Editable
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+            placeholder={`Heading ${level}`}
+            onKeyDown={handleKeyDown}
+            style={{
+              outline: 'none',
+              minHeight: '1.5em',
+            }}
+          />
+        </Slate>
+      </div>
+    </EnhancedBlockWrapper>
+  );
+};
+
+// Helper functions
+const isMarkActive = (editor: Editor, format: keyof CustomText): boolean => {
+  const marks = Editor.marks(editor) as CustomText | null;
+  return marks ? marks[format] === true : false;
+};
+
+const toggleMark = (editor: Editor, format: keyof CustomText): void => {
+  const isActive = isMarkActive(editor, format);
+
+  if (isActive) {
+    Editor.removeMark(editor, format);
+  } else {
+    Editor.addMark(editor, format, true);
+  }
+};
+
+export default HeadingBlock;

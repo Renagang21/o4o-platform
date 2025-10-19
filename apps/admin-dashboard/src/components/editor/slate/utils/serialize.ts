@@ -10,7 +10,7 @@
  */
 
 import { Descendant, Text, Element as SlateElement } from 'slate';
-import type { CustomElement, CustomText, ParagraphElement, LinkElement } from '../types/slate-types';
+import type { CustomElement, CustomText, ParagraphElement, HeadingElement, LinkElement } from '../types/slate-types';
 
 /**
  * Serialize Slate value to HTML
@@ -35,6 +35,8 @@ const serializeNode = (node: Descendant): string => {
   switch (element.type) {
     case 'paragraph':
       return serializeParagraph(element as ParagraphElement, children);
+    case 'heading':
+      return serializeHeading(element as HeadingElement, children);
     case 'link':
       return serializeLink(element as LinkElement, children);
     default:
@@ -80,6 +82,17 @@ const serializeParagraph = (element: ParagraphElement, children: string): string
     : '';
 
   return `<p${style}>${children || '<br>'}</p>`;
+};
+
+/**
+ * Serialize heading element
+ */
+const serializeHeading = (element: HeadingElement, children: string): string => {
+  const style = element.align && element.align !== 'left'
+    ? ` style="text-align: ${element.align}"`
+    : '';
+
+  return `<h${element.level}${style}>${children || '<br>'}</h${element.level}>`;
 };
 
 /**
@@ -152,6 +165,22 @@ const deserializeElement = (el: HTMLElement): Descendant | null => {
         children: children as (CustomText | LinkElement)[],
       };
       return paragraph;
+    }
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6': {
+      const level = parseInt(tagName.charAt(1)) as 1 | 2 | 3 | 4 | 5 | 6;
+      const align = getAlignment(el);
+      const heading: HeadingElement = {
+        type: 'heading',
+        level,
+        ...(align && { align }),
+        children: children as (CustomText | LinkElement)[],
+      };
+      return heading;
     }
     case 'a': {
       const link: LinkElement = {

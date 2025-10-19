@@ -22,6 +22,16 @@ export type ParagraphElement = {
 };
 
 /**
+ * Heading Element (block-level element)
+ */
+export type HeadingElement = {
+  type: 'heading';
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+  align?: 'left' | 'center' | 'right' | 'justify';
+  children: (CustomText | LinkElement)[];
+};
+
+/**
  * Link Element (inline element)
  */
 export type LinkElement = {
@@ -31,7 +41,7 @@ export type LinkElement = {
 };
 
 // Union type for all element types (will expand as we add more blocks)
-export type CustomElement = ParagraphElement | LinkElement;
+export type CustomElement = ParagraphElement | HeadingElement | LinkElement;
 
 /**
  * Custom Text Types
@@ -93,3 +103,15 @@ export const isFormattedText = (leaf: CustomText): boolean => {
 export const isLinkElement = (element: any): element is LinkElement => {
   return element && element.type === 'link';
 };
+
+// Check if element is a heading
+export const isHeadingElement = (element: any): element is HeadingElement => {
+  return element && element.type === 'heading';
+};
+
+// Create empty heading helper
+export const createEmptyHeading = (level: 1 | 2 | 3 | 4 | 5 | 6 = 2): HeadingElement => ({
+  type: 'heading',
+  level,
+  children: [{ text: '' }],
+});
