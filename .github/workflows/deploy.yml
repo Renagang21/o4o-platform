@@ -35,10 +35,10 @@ jobs:
   deploy-web:
     name: Deploy Admin Dashboard
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Deploy to Web Server
         uses: appleboy/ssh-action@v0.1.5
         with:
@@ -48,6 +48,12 @@ jobs:
           script: |
             cd /home/ubuntu/o4o-platform
             git pull origin main
-            npm install
-            npm run build:packages
-            npm run build:admin
+
+            # Install pnpm if not available
+            if ! command -v pnpm &> /dev/null; then
+              npm install -g pnpm@latest
+            fi
+
+            pnpm install --frozen-lockfile
+            pnpm run build:packages
+            pnpm run build:admin

@@ -77,11 +77,17 @@ jobs:
         echo "📦 Installing dependencies..."
         pnpm install --frozen-lockfile
 
-    - name: Build packages
+    - name: Build packages (required before building apps)
       if: steps.check_changes.outputs.deploy == 'true'
       run: |
-        echo "🔨 Building packages..."
-        pnpm run build:packages
+        echo "🔨 Building shared packages..."
+        pnpm run build:types
+        pnpm run build:utils
+        pnpm run build:ui
+        pnpm run build:auth-client
+        pnpm run build:auth-context
+        pnpm run build:shortcodes
+        echo "✅ All packages built successfully"
 
     - name: Build admin dashboard
       if: steps.check_changes.outputs.deploy == 'true'
