@@ -530,12 +530,34 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
 
 // Helper functions
 
-function findItemById(items: MenuItemTreeType[], id: string): MenuItemTreeType | null {
+/**
+ * Local findItemById - used internally to avoid conflicts
+ */
+function findItemByIdLocal(items: MenuItemTreeType[], id: string): MenuItemTreeType | null {
+  if (!Array.isArray(items)) return null;
+
   for (const item of items) {
     if (item.id === id) {
       return item;
     }
-    if (item.children && item.children.length > 0) {
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+      const found = findItemByIdLocal(item.children, id);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
+}
+
+function findItemById(items: MenuItemTreeType[], id: string): MenuItemTreeType | null {
+  if (!Array.isArray(items)) return null;
+
+  for (const item of items) {
+    if (item.id === id) {
+      return item;
+    }
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
       const found = findItemById(item.children, id);
       if (found) {
         return found;
@@ -550,8 +572,10 @@ function reorderItems(
   activeId: string,
   overId: string
 ): MenuItemTreeType[] {
-  // Find active and over items
-  const activeItem = findItemById(items, activeId);
+  if (!Array.isArray(items)) return [];
+
+  // Find active and over items - 로컬 함수 사용
+  const activeItem = findItemByIdLocal(items, activeId);
   if (!activeItem) return items;
 
   // Remove active item from tree
@@ -562,10 +586,15 @@ function reorderItems(
 }
 
 function removeItem(items: MenuItemTreeType[], id: string): MenuItemTreeType[] {
+  if (!Array.isArray(items)) {
+    console.error('removeItem: items is not an array', items);
+    return [];
+  }
+
   return items
     .filter((item) => item.id !== id)
     .map((item) => {
-      if (item.children && item.children.length > 0) {
+      if (item.children && Array.isArray(item.children) && item.children.length > 0) {
         return {
           ...item,
           children: removeItem(item.children, id)
@@ -580,6 +609,11 @@ function insertItemNear(
   activeItem: MenuItemTreeType,
   overId: string
 ): MenuItemTreeType[] {
+  if (!Array.isArray(items)) {
+    console.error('insertItemNear: items is not an array', items);
+    return [];
+  }
+
   const result: MenuItemTreeType[] = [];
 
   for (let i = 0; i < items.length; i++) {
@@ -593,8 +627,8 @@ function insertItemNear(
     }
 
     // Check children
-    if (item.children && item.children.length > 0) {
-      const hasOverInChildren = findItemById(item.children, overId);
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+      const hasOverInChildren = findItemByIdLocal(item.children, overId);
       if (hasOverInChildren) {
         result.push({
           ...item,
@@ -611,11 +645,13 @@ function insertItemNear(
 }
 
 function toggleInTree(items: MenuItemTreeType[], id: string): MenuItemTreeType[] {
+  if (!Array.isArray(items)) return [];
+
   return items.map((item) => {
     if (item.id === id) {
       return { ...item, isOpen: !item.isOpen };
     }
-    if (item.children && item.children.length > 0) {
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
       return { ...item, children: toggleInTree(item.children, id) };
     }
     return item;
@@ -623,18 +659,22 @@ function toggleInTree(items: MenuItemTreeType[], id: string): MenuItemTreeType[]
 }
 
 function expandInTree(items: MenuItemTreeType[]): MenuItemTreeType[] {
+  if (!Array.isArray(items)) return [];
+
   return items.map((item) => ({
     ...item,
     isOpen: true,
-    children: item.children ? expandInTree(item.children) : undefined
+    children: (item.children && Array.isArray(item.children)) ? expandInTree(item.children) : []
   }));
 }
 
 function collapseInTree(items: MenuItemTreeType[]): MenuItemTreeType[] {
+  if (!Array.isArray(items)) return [];
+
   return items.map((item) => ({
     ...item,
     isOpen: false,
-    children: item.children ? collapseInTree(item.children) : undefined
+    children: (item.children && Array.isArray(item.children)) ? collapseInTree(item.children) : []
   }));
 }
 
@@ -644,11 +684,13 @@ function collapseInTree(items: MenuItemTreeType[]): MenuItemTreeType[] {
  * 항목의 현재 깊이 계산
  */
 function getItemDepth(items: MenuItemTreeType[], itemId: string, currentDepth = 0): number {
+  if (!Array.isArray(items)) return -1;
+
   for (const item of items) {
     if (item.id === itemId) {
       return currentDepth;
     }
-    if (item.children && item.children.length > 0) {
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
       const foundDepth = getItemDepth(item.children, itemId, currentDepth + 1);
       if (foundDepth !== -1) {
         return foundDepth;
@@ -666,8 +708,8 @@ function makeChildOf(
   childId: string,
   parentId: string
 ): MenuItemTreeType[] {
-  // 자식 항목 찾기 및 제거
-  const childItem = findItemById(items, childId);
+  // 자식 항목 찾기 및 제거 - 로컬 함수 사용
+  const childItem = findItemByIdLocal(items, childId);
   if (!childItem) return items;
 
   const withoutChild = removeItem(items, childId);
@@ -675,13 +717,14 @@ function makeChildOf(
   // 부모에 자식 추가
   return withoutChild.map(item => {
     if (item.id === parentId) {
+      const currentChildren = Array.isArray(item.children) ? item.children : [];
       return {
         ...item,
         isOpen: true, // 자식이 추가되면 자동으로 펼치기
-        children: [...(item.children || []), childItem]
+        children: [...currentChildren, { ...childItem, children: childItem.children || [] }]
       };
     }
-    if (item.children && item.children.length > 0) {
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
       return {
         ...item,
         children: makeChildOf(item.children, childId, parentId)
@@ -699,9 +742,27 @@ function makeSiblingOf(
   itemId: string,
   siblingId: string
 ): MenuItemTreeType[] {
-  const item = findItemById(items, itemId);
+  const item = findItemByIdLocal(items, itemId);
   if (!item) return items;
 
   const withoutItem = removeItem(items, itemId);
   return insertItemNear(withoutItem, item, siblingId);
+}
+
+/**
+ * Local findItemById to avoid conflicts
+ */
+function findItemByIdLocal(items: MenuItemTreeType[], id: string): MenuItemTreeType | null {
+  for (const item of items) {
+    if (item.id === id) {
+      return item;
+    }
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+      const found = findItemByIdLocal(item.children, id);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
 }
