@@ -748,21 +748,3 @@ function makeSiblingOf(
   const withoutItem = removeItem(items, itemId);
   return insertItemNear(withoutItem, item, siblingId);
 }
-
-/**
- * Local findItemById to avoid conflicts
- */
-function findItemByIdLocal(items: MenuItemTreeType[], id: string): MenuItemTreeType | null {
-  for (const item of items) {
-    if (item.id === id) {
-      return item;
-    }
-    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
-      const found = findItemByIdLocal(item.children, id);
-      if (found) {
-        return found;
-      }
-    }
-  }
-  return null;
-}
