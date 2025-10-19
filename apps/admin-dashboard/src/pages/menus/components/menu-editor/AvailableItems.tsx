@@ -68,7 +68,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
           apiClient.raw.get<ApiResponse<Post[]>>('/v1/content/posts?limit=100'),
           apiClient.raw.get<ApiResponse<Category[]>>('/v1/content/categories?limit=100'),
           apiClient.raw.get<ApiResponse<TagItem[]>>('/v1/content/tags?limit=100'),
-          apiClient.raw.get<any>('/v1/custom-post-types')
+          apiClient.raw.get<any>('/v1/platform/custom-post-types')
         ]);
 
         // Process pages
