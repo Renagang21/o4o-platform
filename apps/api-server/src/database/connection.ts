@@ -48,6 +48,8 @@ import { EmailLog } from '../entities/EmailLog';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 import { CustomPost } from '../entities/CustomPost';
 import { CustomPostType } from '../entities/CustomPostType';
+// Taxonomy System entities
+import { Taxonomy, Term, TermRelationship } from '../entities/Taxonomy';
 // Menu System entities
 import { Menu } from '../entities/Menu';
 import { MenuItem } from '../entities/MenuItem';
@@ -182,6 +184,10 @@ export const AppDataSource = new DataSource({
     CustomFieldValue,
     CustomPost,
     CustomPostType,
+    // Taxonomy System entities
+    Taxonomy,
+    Term,
+    TermRelationship,
     // Menu System entities
     Menu,
     MenuItem,
