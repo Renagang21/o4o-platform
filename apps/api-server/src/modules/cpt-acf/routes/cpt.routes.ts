@@ -23,11 +23,13 @@ router.delete('/:slug/posts/:postId', authenticate, CPTController.deletePost);
 router.post('/initialize', authenticate, requireAdmin, CPTController.initializeDefaults);
 
 // Taxonomies routes (placeholder - to be implemented)
+// IMPORTANT: Must be before /:slug route to prevent taxonomies being treated as a slug
 router.get('/taxonomies', authenticate, (req, res) => {
   res.json({ success: true, data: [], total: 0 });
 });
 
 // Backward compatibility aliases
+// IMPORTANT: This must be last as it's a catch-all route
 router.get('/:slug', authenticate, CPTController.getCPT);
 
 export default router;
