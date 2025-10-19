@@ -18,7 +18,8 @@ export const useDynamicCPTMenu = () => {
     queryFn: async () => {
       // Use public endpoint for menu items (doesn't require auth)
       const response = await authClient.api.get('/public/cpt/types');
-      return response.data?.data || [];
+      // API returns { success: true, data: [...] }
+      return response.data?.data || response.data || [];
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
     gcTime: 10 * 60 * 1000,
@@ -32,30 +33,32 @@ export const useDynamicCPTMenu = () => {
   const generateCPTMenuItems = (): MenuItem[] => {
     const menuItems: MenuItem[] = [];
 
-    // showInMenu가 true인 CPT만 필터링
+    // showInMenu가 true인 CPT만 필터링 (active 필드 사용)
     const menuCPTs = (cptTypes || [])
-      .filter(cpt => cpt?.showInMenu && cpt?.isActive)
+      .filter(cpt => cpt?.showInMenu && cpt?.active)
       .sort((a, b) => (a.menuPosition || 50) - (b.menuPosition || 50));
 
     if (menuCPTs.length > 0) {
       // "자체 글" 그룹 메뉴 생성
       const cptChildren: MenuItem[] = menuCPTs.map(cpt => {
         const IconComponent = getIconForCPT(cpt.icon);
+        const cptName = cpt.name || cpt.labels?.singular || cpt.slug;
+        const singularName = cpt.labels?.singular || cpt.name || cpt.slug;
 
         return {
           id: `cpt-${cpt.slug}`,
-          label: cpt.label || cpt.singularLabel || cpt.slug,
+          label: cptName,
           icon: <IconComponent className="w-5 h-5" />,
           children: [
             {
               id: `cpt-${cpt.slug}-all`,
-              label: `모든 ${cpt.label}`,
+              label: `모든 ${cptName}`,
               icon: <FileText className="w-4 h-4" />,
               path: `/cpt-engine/content/${cpt.slug}`
             },
             {
               id: `cpt-${cpt.slug}-new`,
-              label: `새 ${cpt.singularLabel} 추가`,
+              label: `새 ${singularName} 추가`,
               icon: <FileText className="w-4 h-4" />,
               path: `/cpt-engine/content/${cpt.slug}/new`
             }
