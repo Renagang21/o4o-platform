@@ -19,6 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   ChevronRight,
   ChevronDown,
+  ChevronLeft,
   GripVertical,
   MoreVertical,
   Copy,
@@ -26,7 +27,9 @@ import {
   FileText,
   Link2,
   Folder,
-  Tag as TagIcon
+  Tag as TagIcon,
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import type { MenuItemTree as MenuItemTreeType } from '../../utils/menu-tree-helpers';
 import {
@@ -47,6 +50,8 @@ export interface MenuItemTreeProps {
   onReorder: (items: MenuItemTreeType[]) => void;
   onDuplicate?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onIndent?: (id: string) => void;
+  onOutdent?: (id: string) => void;
 }
 
 interface SortableMenuItemProps {
@@ -54,10 +59,14 @@ interface SortableMenuItemProps {
   depth: number;
   selectedId: string | null;
   dropIndicator: DropIndicator | null;
+  allItems: MenuItemTreeType[];  // 전체 트리 (부모 찾기용)
+  index: number;  // 형제 중 인덱스
   onSelect: (id: string) => void;
   onToggle: (id: string) => void;
   onDuplicate?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onIndent?: (id: string) => void;
+  onOutdent?: (id: string) => void;
 }
 
 /**
@@ -89,14 +98,22 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
   depth,
   selectedId,
   dropIndicator,
+  allItems,
+  index,
   onSelect,
   onToggle,
   onDuplicate,
-  onDelete
+  onDelete,
+  onIndent,
+  onOutdent
 }) => {
   const [showActions, setShowActions] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
   const isSelected = item.id === selectedId;
+
+  // 들여쓰기/내어쓰기 가능 여부 계산
+  const canIndent = index > 0 && depth < MAX_DEPTH - 1;  // 첫 항목이 아니고 최대 깊이 미만
+  const canOutdent = depth > 0;  // 최상위가 아님
 
   // Drop indicator 계산
   const isDropTarget = dropIndicator?.overId === item.id;
@@ -217,6 +234,56 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
         {/* Actions */}
         {showActions && (
           <div className="flex items-center gap-1">
+            {/* 내어쓰기 버튼 */}
+            {onOutdent && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (canOutdent) {
+                    onOutdent(item.id);
+                  }
+                }}
+                disabled={!canOutdent}
+                className={`p-1.5 rounded transition-colors ${
+                  canOutdent
+                    ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer'
+                    : 'text-gray-300 cursor-not-allowed'
+                }`}
+                title={canOutdent ? "내어쓰기 (레벨 올리기)" : "내어쓰기 불가 (최상위 레벨)"}
+                aria-label={`${item.title} 내어쓰기`}
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+            )}
+
+            {/* 들여쓰기 버튼 */}
+            {onIndent && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (canIndent) {
+                    onIndent(item.id);
+                  }
+                }}
+                disabled={!canIndent}
+                className={`p-1.5 rounded transition-colors ${
+                  canIndent
+                    ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer'
+                    : 'text-gray-300 cursor-not-allowed'
+                }`}
+                title={
+                  !canIndent && index === 0
+                    ? "들여쓰기 불가 (첫 번째 항목)"
+                    : !canIndent && depth >= MAX_DEPTH - 1
+                    ? `들여쓰기 불가 (최대 ${MAX_DEPTH}단계)`
+                    : "들여쓰기 (하위 항목으로)"
+                }
+                aria-label={`${item.title} 들여쓰기`}
+              >
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+
             {onDuplicate && (
               <button
                 onClick={(e) => {
@@ -257,17 +324,21 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
       {/* Children */}
       {hasChildren && item.isOpen && (
         <div className="mt-1">
-          {item.children!.map((child) => (
+          {item.children!.map((child, childIndex) => (
             <SortableMenuItem
               key={child.id}
               item={child}
               depth={depth + 1}
               selectedId={selectedId}
               dropIndicator={dropIndicator}
+              allItems={allItems}
+              index={childIndex}
               onSelect={onSelect}
               onToggle={onToggle}
               onDuplicate={onDuplicate}
               onDelete={onDelete}
+              onIndent={onIndent}
+              onOutdent={onOutdent}
             />
           ))}
         </div>
@@ -295,7 +366,9 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
   onSelect,
   onReorder,
   onDuplicate,
-  onDelete
+  onDelete,
+  onIndent,
+  onOutdent
 }) => {
   const [localItems, setLocalItems] = useState(items);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -432,6 +505,86 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
     onReorder(newItems);
   }, [localItems, onReorder]);
 
+  // Handle indent - 항목을 이전 형제의 자식으로 만들기
+  const handleIndent = useCallback((id: string) => {
+    // 부모에서 전달된 onIndent가 있으면 사용
+    if (onIndent) {
+      onIndent(id);
+      return;
+    }
+
+    // Find the item and determine its siblings and index
+    const findItemContext = (
+      items: MenuItemTreeType[],
+      targetId: string
+    ): { item: MenuItemTreeType | null; siblings: MenuItemTreeType[]; index: number } | null => {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].id === targetId) {
+          return { item: items[i], siblings: items, index: i };
+        }
+        if (items[i].children && items[i].children!.length > 0) {
+          const result = findItemContext(items[i].children!, targetId);
+          if (result) return result;
+        }
+      }
+      return null;
+    };
+
+    const context = findItemContext(localItems, id);
+
+    if (!context || context.index === 0) {
+      // 첫 번째 항목이거나 찾을 수 없음
+      return;
+    }
+
+    const { item, siblings, index } = context;
+    const previousSibling = siblings[index - 1];
+
+    // Check depth limit
+    const currentDepth = getItemDepth(localItems, id);
+    const itemTreeDepth = getTreeDepth([item]);
+
+    if (currentDepth + itemTreeDepth >= MAX_DEPTH) {
+      console.warn(`최대 ${MAX_DEPTH}단계까지만 지원합니다`);
+      return;
+    }
+
+    // Move item to be child of previous sibling
+    const newItems = makeChildOf(localItems, id, previousSibling.id);
+    setLocalItems(newItems);
+    onReorder(newItems);
+  }, [localItems, onReorder, onIndent]);
+
+  // Handle outdent - 항목을 부모와 같은 레벨로 올리기
+  const handleOutdent = useCallback((id: string) => {
+    // 부모에서 전달된 onOutdent가 있으면 사용
+    if (onOutdent) {
+      onOutdent(id);
+      return;
+    }
+
+    // Find parent
+    const parent = findParentById(localItems, id);
+
+    if (!parent) {
+      // Already at root level
+      return;
+    }
+
+    // Move item to be sibling of parent (right after parent)
+    const item = findItemByIdHelper(localItems, id);
+    if (!item) return;
+
+    // Remove from current location
+    const withoutItem = removeItem(localItems, id);
+
+    // Insert after parent
+    const newItems = insertItemNear(withoutItem, item, parent.id);
+
+    setLocalItems(newItems);
+    onReorder(newItems);
+  }, [localItems, onReorder, onOutdent]);
+
   // Sync with props
   if (JSON.stringify(items) !== JSON.stringify(localItems)) {
     setLocalItems(items);
@@ -486,17 +639,21 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
           ) : (
             <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
               <div role="tree" aria-label="메뉴 항목 트리" className="space-y-1">
-                {items.map((item) => (
+                {items.map((item, index) => (
                   <SortableMenuItem
                     key={item.id}
                     item={item}
                     depth={0}
                     selectedId={selected || null}
                     dropIndicator={dropIndicator}
+                    allItems={items}
+                    index={index}
                     onSelect={onSelect}
                     onToggle={handleToggle}
                     onDuplicate={onDuplicate}
                     onDelete={onDelete}
+                    onIndent={handleIndent}
+                    onOutdent={handleOutdent}
                   />
                 ))}
               </div>
