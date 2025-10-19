@@ -19,7 +19,6 @@ export class CreateCustomPostTables1760836251604 implements MigrationInterface {
                 ALTER TABLE "custom_posts"
                 ADD COLUMN "fields" jsonb DEFAULT '{}'
             `);
-            console.log('Added fields column to custom_posts table');
         }
     }
 
