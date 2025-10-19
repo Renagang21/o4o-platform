@@ -59,6 +59,17 @@ export const isLinkActive = (editor: Editor): boolean => {
 };
 
 /**
+ * Get active link element at current selection
+ */
+export const getActiveLinkElement = (editor: Editor): LinkElement | null => {
+  const [link] = Editor.nodes(editor, {
+    match: (n) =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === 'link',
+  });
+  return link ? (link[0] as LinkElement) : null;
+};
+
+/**
  * Unwrap (remove) link at current selection
  */
 export const unwrapLink = (editor: Editor): void => {
@@ -71,7 +82,7 @@ export const unwrapLink = (editor: Editor): void => {
 /**
  * Wrap selected text in a link
  */
-export const wrapLink = (editor: Editor, url: string): void => {
+export const wrapLink = (editor: Editor, url: string, target?: '_blank' | '_self'): void => {
   if (isLinkActive(editor)) {
     unwrapLink(editor);
   }
@@ -82,6 +93,7 @@ export const wrapLink = (editor: Editor, url: string): void => {
   const link: LinkElement = {
     type: 'link',
     url,
+    ...(target && { target }),
     children: isCollapsed ? [{ text: url }] : [],
   };
 

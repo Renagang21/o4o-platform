@@ -13,7 +13,7 @@
  * - Undo/Redo support
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range } from 'slate';
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
@@ -21,8 +21,9 @@ import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { withDeleteKey } from '../slate/plugins/withDeleteKey';
-import { withLinks, isLinkActive, unwrapLink, wrapLink } from '../slate/plugins/withLinks';
+import { withLinks, isLinkActive, unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
+import LinkInlineEditor from '../slate/components/LinkInlineEditor';
 import type { CustomText, HeadingElement, LinkElement } from '../slate/types/slate-types';
 
 interface HeadingBlockProps {
@@ -128,6 +129,9 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
   }, []); // Only run once on mount
 
   const [value, setValue] = useState<Descendant[]>(initialValue);
+  const [linkEditorOpen, setLinkEditorOpen] = useState(false);
+  const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   // Update editor when level or alignment changes
   useEffect(() => {
@@ -172,6 +176,35 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     onChange(html, { ...attributes, [key]: value });
   }, [onChange, attributes, editor]);
 
+  // Toggle link editor
+  const toggleLinkEditor = useCallback(() => {
+    const { selection } = editor;
+    if (!selection || Range.isCollapsed(selection)) {
+      setLinkEditorOpen(false);
+      return;
+    }
+
+    // Calculate position near selection
+    try {
+      const domSelection = window.getSelection();
+      if (domSelection && domSelection.rangeCount > 0) {
+        const range = domSelection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const editorRect = editorRef.current?.getBoundingClientRect();
+
+        if (editorRect) {
+          setLinkEditorPosition({
+            top: rect.bottom - editorRect.top + 5,
+            left: rect.left - editorRect.left,
+          });
+          setLinkEditorOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to position link editor:', error);
+    }
+  }, [editor]);
+
   // Handle Enter key - create new block after current
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -197,15 +230,8 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           }
           case 'k': {
             event.preventDefault();
-            // Toggle link
-            if (isLinkActive(editor)) {
-              unwrapLink(editor);
-            } else {
-              const url = window.prompt('Enter URL:');
-              if (url) {
-                wrapLink(editor, url);
-              }
-            }
+            // Show link editor
+            toggleLinkEditor();
             break;
           }
         }
@@ -265,7 +291,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
         }
       }
     },
-    [editor, onAddBlock, onDelete]
+    [editor, onAddBlock, onDelete, toggleLinkEditor]
   );
 
   // Render element (heading or link)
@@ -393,22 +419,14 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       currentAlign={align}
       onToggleBold={() => toggleMark(editor, 'bold')}
       onToggleItalic={() => toggleMark(editor, 'italic')}
-      onToggleLink={() => {
-        if (isLinkActive(editor)) {
-          unwrapLink(editor);
-        } else {
-          const url = window.prompt('Enter URL:');
-          if (url) {
-            wrapLink(editor, url);
-          }
-        }
-      }}
+      onToggleLink={toggleLinkEditor}
       isBold={isMarkActive(editor, 'bold')}
       isItalic={isMarkActive(editor, 'italic')}
     >
       <div
+        ref={editorRef}
         className={cn(
-          'heading-content min-h-[1.5em]',
+          'heading-content min-h-[1.5em] relative',
           sizeClasses[level]
         )}
         style={{
@@ -429,6 +447,24 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
             }}
           />
         </Slate>
+
+        {/* Link Inline Editor */}
+        {linkEditorOpen && (
+          <LinkInlineEditor
+            onApply={(url, target) => {
+              wrapLink(editor, url, target);
+            }}
+            onRemove={() => {
+              unwrapLink(editor);
+            }}
+            onClose={() => {
+              setLinkEditorOpen(false);
+            }}
+            initialUrl={getActiveLinkElement(editor)?.url || ''}
+            initialTarget={getActiveLinkElement(editor)?.target}
+            position={linkEditorPosition}
+          />
+        )}
       </div>
     </EnhancedBlockWrapper>
   );

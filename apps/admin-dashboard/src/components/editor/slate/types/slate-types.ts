@@ -37,6 +37,7 @@ export type HeadingElement = {
 export type LinkElement = {
   type: 'link';
   url: string;
+  target?: '_blank' | '_self';
   children: CustomText[];
 };
 

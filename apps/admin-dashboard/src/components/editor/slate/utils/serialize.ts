@@ -106,7 +106,9 @@ const serializeHeading = (element: HeadingElement, children: string): string => 
  * Serialize link element
  */
 const serializeLink = (element: LinkElement, children: string): string => {
-  return `<a href="${escapeHtml(element.url)}">${children}</a>`;
+  const target = element.target ? ` target="${element.target}"` : '';
+  const rel = element.target === '_blank' ? ' rel="noopener noreferrer"' : '';
+  return `<a href="${escapeHtml(element.url)}"${target}${rel}>${children}</a>`;
 };
 
 /**
@@ -211,9 +213,11 @@ const deserializeElement = (el: HTMLElement): Descendant | null => {
       return heading;
     }
     case 'a': {
+      const target = el.getAttribute('target');
       const link: LinkElement = {
         type: 'link',
         url: el.getAttribute('href') || '',
+        ...(target && { target: target as '_blank' | '_self' }),
         children: children as CustomText[],
       };
       return link;
