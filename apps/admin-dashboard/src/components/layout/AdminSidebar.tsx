@@ -43,7 +43,8 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
     }
   }
 
-  const renderMenuItem = (item: MenuItem) => {
+  // Recursive menu item renderer with depth tracking
+  const renderMenuItem = (item: MenuItem, depth: number = 0): JSX.Element | null => {
     if (item.separator) {
       return <div key={item.id} className="my-2 border-t border-[#444]" />
     }
@@ -81,32 +82,17 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
               {item.icon}
               {!isCollapsed && <span>{item.label}</span>}
             </div>
-            <ChevronDown 
+            <ChevronDown
               className={clsx(
                 'w-4 h-4 transition-transform duration-200',
                 isExpanded && 'rotate-180'
               )}
             />
           </button>
-          
+
           {isExpanded && item.children && !isCollapsed && (
             <div className="ml-6 mt-1 space-y-1">
-              {item.children?.map((child: any) => (
-                <Link
-                  key={child.id}
-                  to={child.path!}
-                  className={clsx(
-                    'admin-sidebar-item relative',
-                    isActive(child.path!) && 'active'
-                  )}
-                  onClick={onClose}
-                >
-                  <div className="flex items-center gap-3">
-                    {child.icon}
-                    <span>{child.label}</span>
-                  </div>
-                </Link>
-              ))}
+              {item.children.map((child: any) => renderMenuItem(child, depth + 1))}
             </div>
           )}
         </div>
