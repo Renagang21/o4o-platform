@@ -86,7 +86,8 @@ export default function TaxonomiesList() {
     queryFn: async () => {
       try {
         const response = await taxonomyApi.getAll();
-        return response.data || [];
+        // API returns { data: { taxonomies: [], pagination: {...} } }
+        return response.data?.taxonomies || [];
       } catch (error) {
         console.warn('Taxonomies API not yet implemented:', error);
         return [];
