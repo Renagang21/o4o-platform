@@ -22,6 +22,11 @@ router.delete('/:slug/posts/:postId', authenticate, CPTController.deletePost);
 // Initialize defaults
 router.post('/initialize', authenticate, requireAdmin, CPTController.initializeDefaults);
 
+// Taxonomies routes (placeholder - to be implemented)
+router.get('/taxonomies', authenticate, (req, res) => {
+  res.json({ success: true, data: [], total: 0 });
+});
+
 // Backward compatibility aliases
 router.get('/:slug', authenticate, CPTController.getCPT);
 
