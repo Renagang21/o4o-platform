@@ -59,15 +59,15 @@ export const useAdminMenu = () => {
   
   // Filter menu items based on permissions
   const filterMenuItems = (items: any[]): any[] => {
-    return items.filter(item => {
+    return items.map(item => {
       // Skip separators - always show
       if (item.separator) {
-        return true;
+        return item;
       }
 
       // Skip collapse menu - always show
       if (item.id === 'collapse') {
-        return true;
+        return item;
       }
 
       // Check if user has permission for this menu item
@@ -79,20 +79,21 @@ export const useAdminMenu = () => {
       }
 
       if (!hasAccess) {
-        return false;
+        return null;
       }
 
-      // Recursively filter children
+      // Recursively filter children - create new object to avoid mutating original
       if (item.children && item.children.length > 0) {
-        const filteredChildren = filterMenuItems(item.children);
-        // Keep parent menu even if no children are accessible
-        // This allows showing the menu structure
-        item.children = filteredChildren;
-        return true;
+        const filteredChildren = filterMenuItems(item.children).filter(Boolean);
+        // Return new object with filtered children
+        return {
+          ...item,
+          children: filteredChildren
+        };
       }
 
-      return true;
-    });
+      return item;
+    }).filter(Boolean);
   };
 
   const filteredMenuItems = filterMenuItems([...allMenuItems]);
