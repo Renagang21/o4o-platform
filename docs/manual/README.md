@@ -35,17 +35,42 @@ npm run update:shortcode-docs
 
 ---
 
-### 2. [AI 페이지 생성 매뉴얼](./ai-page-generation.md)
+### 2. AI 페이지 자동 생성 매뉴얼
 
-**대상:** 콘텐츠 편집자, 마케터
+#### a) [AI 사용자 가이드](./ai-user-guide.md) 👥
+
+**대상:** 콘텐츠 편집자, 마케터, 일반 사용자
 
 **내용:**
 - AI 페이지 자동 생성 기능 사용법
-- 지원하는 AI 모델
-- 템플릿 유형 (Landing, About, Product, Blog)
-- 사용 가능한 블록 및 숏코드 레퍼런스
+- 사전 준비 (API 키 설정)
+- 지원하는 AI 모델 (GPT-5, Gemini 2.5, Claude 4.5)
+- 템플릿 가이드 (Landing, About, Product, Blog)
+- 프롬프트 작성 팁 및 베스트 프랙티스
+- 문제 해결 가이드
 
-**업데이트:** 블록/숏코드 변경 시 자동 업데이트 가능
+**특징:**
+- 비기술자도 쉽게 이해 가능
+- 실전 예시 중심
+- 단계별 상세 설명
+
+#### b) [AI 기술 가이드](./ai-technical-guide.md) 🛠️
+
+**대상:** 개발자, 시스템 관리자
+
+**내용:**
+- 시스템 아키텍처 및 작동 원리
+- 데이터베이스 (블록/숏코드 레지스트리)
+- 참조 데이터 시스템 (서버 우선 전략)
+- API 엔드포인트 레퍼런스
+- 개발자 가이드 (새 블록/숏코드 추가)
+- 확장 및 커스터마이징 방법
+- 보안 및 성능 최적화
+
+**특징:**
+- 전체 시스템 플로우 다이어그램
+- 코드 예제 포함
+- API 명세 및 에러 처리
 
 ---
 
@@ -214,7 +239,9 @@ npm run update:shortcode-docs
 | 문서 | 상태 | 마지막 업데이트 | 자동 생성 |
 |------|------|----------------|-----------|
 | shortcode-reference.md | ✅ | 2025-10-05 | ✅ |
-| ai-page-generation.md | ✅ | 2025-10-05 | ⚠️ 부분 |
+| ai-user-guide.md | ✅ | 2025-10-19 | ❌ |
+| ai-technical-guide.md | ✅ | 2025-10-19 | ❌ |
+| ~~ai-page-generation.md~~ | 🗑️ Deprecated | 2025-10-05 | ⚠️ |
 | blocks-reference.md (AI용) | ✅ | 2025-10-12 | ❌ |
 | blocks-reference-detailed.md | ✅ | 2025-10-12 | ❌ |
 | appearance-customize.md | ✅ | - | ❌ |
@@ -223,6 +250,7 @@ npm run update:shortcode-docs
 
 **범례:**
 - ✅: 최신 상태
+- 🗑️: Deprecated (더 이상 사용하지 않음)
 - ⚠️: 부분적으로 자동 생성
 - ❌: 수동 관리
 
