@@ -44,6 +44,12 @@ node_modules/
 .vite/
 dist/
 
+# TypeScript build cache
+*.tsbuildinfo
+
+# Build metadata
+**/version.json
+
 # Optional npm cache directory
 .npm
 
