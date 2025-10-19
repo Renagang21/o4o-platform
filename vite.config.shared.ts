@@ -52,12 +52,14 @@ export const sharedViteConfig: UserConfig = {
           }
           
           if (id.includes('node_modules')) {
-            // React 관련 - lucide-react와 @radix-ui도 React에 의존하므로 함께 번들링
+            // React 관련 - lucide-react, @radix-ui, recharts도 React에 의존하므로 함께 번들링
+            // recharts를 React와 함께 로드하여 initialization 문제 해결
             if (id.includes('/react/') ||
                 id.includes('/react-dom/') ||
                 id.includes('@tanstack/react-query') ||
                 id.includes('lucide-react') ||
-                id.includes('@radix-ui')) {
+                id.includes('@radix-ui') ||
+                id.includes('recharts')) {
               return 'vendor-react';
             }
             // 기타 UI 라이브러리 (React 의존성 없음)
@@ -70,7 +72,7 @@ export const sharedViteConfig: UserConfig = {
               return 'vendor-forms';
             }
             // 유틸리티
-            if (id.includes('date-fns') || id.includes('axios') || 
+            if (id.includes('date-fns') || id.includes('axios') ||
                 id.includes('js-cookie')) {
               return 'vendor-utils';
             }
@@ -78,8 +80,8 @@ export const sharedViteConfig: UserConfig = {
             if (id.includes('socket.io')) {
               return 'vendor-socket';
             }
-            // 차트 라이브러리
-            if (id.includes('recharts') || id.includes('d3')) {
+            // D3 차트 라이브러리 (recharts와 분리)
+            if (id.includes('d3')) {
               return 'vendor-charts';
             }
           }
