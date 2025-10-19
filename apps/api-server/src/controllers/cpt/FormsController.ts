@@ -65,6 +65,7 @@ export class FormsController {
 
       // If table doesn't exist, return empty array instead of error
       if (error?.code === '42P01') {
+        const { page = 1, limit = 20 } = req.query;
         return res.json({
           success: true,
           data: {
