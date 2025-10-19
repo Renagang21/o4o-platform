@@ -82,11 +82,13 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Configure marked options
+  // Configure marked options with heading IDs
   useEffect(() => {
     marked.setOptions({
       breaks: true,
       gfm: true,
+      headerIds: true,
+      mangle: false,
     });
   }, []);
 
@@ -112,8 +114,8 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     return results;
   }, [localMarkdown]);
 
-  // Show TOC if 3 or more headings
-  const showTOC = headings.length >= 3;
+  // Show TOC if 1 or more headings
+  const showTOC = headings.length >= 1;
 
   // Sync with external content changes
   useEffect(() => {

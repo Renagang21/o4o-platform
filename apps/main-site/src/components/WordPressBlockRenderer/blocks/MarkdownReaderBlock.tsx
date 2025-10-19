@@ -60,8 +60,8 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
     return results;
   }, [markdown]);
 
-  // Show TOC if 3 or more headings
-  const showTOC = headings.length >= 3;
+  // Show TOC if 1 or more headings
+  const showTOC = headings.length >= 1;
 
   // Scroll to heading
   const scrollToHeading = useCallback((id: string) => {
