@@ -14,7 +14,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range } from 'slate';
+import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range, Text } from 'slate';
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
@@ -99,6 +99,20 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           } as HeadingElement,
         ];
       }
+
+      // If deserialized content is just text nodes (plain text), wrap in heading
+      const hasOnlyTextNodes = deserialized.every(node => Text.isText(node));
+      if (hasOnlyTextNodes) {
+        return [
+          {
+            type: 'heading',
+            level,
+            align,
+            children: deserialized as CustomText[],
+          } as HeadingElement,
+        ];
+      }
+
       // Apply level and alignment to deserialized headings
       return deserialized.map(node => {
         if (SlateElement.isElement(node) && node.type === 'heading') {

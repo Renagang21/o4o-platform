@@ -14,7 +14,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range } from 'slate';
+import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range, Text } from 'slate';
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
@@ -97,6 +97,19 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           } as ParagraphElement,
         ];
       }
+
+      // If deserialized content is just text nodes (plain text), wrap in paragraph
+      const hasOnlyTextNodes = deserialized.every(node => Text.isText(node));
+      if (hasOnlyTextNodes) {
+        return [
+          {
+            type: 'paragraph',
+            align,
+            children: deserialized as CustomText[],
+          } as ParagraphElement,
+        ];
+      }
+
       // Apply alignment to deserialized paragraphs
       return deserialized.map(node => {
         if (SlateElement.isElement(node) && node.type === 'paragraph') {

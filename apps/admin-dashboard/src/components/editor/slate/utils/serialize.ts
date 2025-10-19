@@ -82,24 +82,24 @@ const serializeText = (text: CustomText): string => {
 
 /**
  * Serialize paragraph element
+ *
+ * Note: Returns only the inner content without <p> wrapper.
+ * The <p> tag is the block wrapper and will be added by the frontend renderer.
  */
 const serializeParagraph = (element: ParagraphElement, children: string): string => {
-  const style = element.align && element.align !== 'left'
-    ? ` style="text-align: ${element.align}"`
-    : '';
-
-  return `<p${style}>${children || '<br>'}</p>`;
+  // Return only inner content, no <p> wrapper
+  return children || '';
 };
 
 /**
  * Serialize heading element
+ *
+ * Note: Returns only the inner content without <h1>-<h6> wrapper.
+ * The heading tag is the block wrapper and will be added by the frontend renderer.
  */
 const serializeHeading = (element: HeadingElement, children: string): string => {
-  const style = element.align && element.align !== 'left'
-    ? ` style="text-align: ${element.align}"`
-    : '';
-
-  return `<h${element.level}${style}>${children || '<br>'}</h${element.level}>`;
+  // Return only inner content, no <h*> wrapper
+  return children || '';
 };
 
 /**
@@ -135,9 +135,16 @@ const serializeListItem = (element: ListItemElement, children: string): string =
 /**
  * Deserialize HTML to Slate value
  *
- * Converts HTML string from Gutenberg to Slate JSON
+ * Converts HTML string from Gutenberg to Slate JSON.
+ * Also handles plain text content (for new Paragraph/Heading blocks).
  */
 export const deserialize = (html: string): Descendant[] => {
+  // If content doesn't contain HTML tags, treat as plain text
+  if (!html.trim().startsWith('<')) {
+    // Plain text content - wrap in text node
+    return [{ text: html }];
+  }
+
   const document = new DOMParser().parseFromString(html, 'text/html');
   return Array.from(document.body.childNodes)
     .map((node) => deserializeNode(node))
