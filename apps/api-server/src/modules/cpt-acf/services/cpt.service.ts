@@ -146,7 +146,7 @@ export class CPTService {
       }
 
       // Delete all posts of this type
-      await this.postRepository.delete({ postTypeSlug: slug });
+      await this.postRepository.delete({ cptSlug: slug });
 
       // Delete the CPT
       await this.cptRepository.remove(cpt);
@@ -184,7 +184,7 @@ export class CPTService {
 
       const queryBuilder = this.postRepository.createQueryBuilder('post');
 
-      queryBuilder.where('post.postTypeSlug = :postTypeSlug', { postTypeSlug: slug });
+      queryBuilder.where('post.cptSlug = :cptSlug', { cptSlug: slug });
 
       if (status) {
         queryBuilder.andWhere('post.status = :status', { status });
@@ -238,6 +238,7 @@ export class CPTService {
 
       const post = this.postRepository.create({
         ...data,
+        cptSlug: slug,
         postTypeSlug: slug,
         authorId: userId
       });

@@ -18,7 +18,7 @@ export enum PostStatus {
 }
 
 @Entity('custom_posts')
-@Index(['postTypeSlug', 'status'])
+@Index(['cptSlug', 'status'])
 @Index(['slug'])
 export class CustomPost {
   @PrimaryGeneratedColumn('uuid')
@@ -31,7 +31,10 @@ export class CustomPost {
   slug!: string;
 
   @Column({ type: 'varchar', length: 50, name: 'cpt_slug' })
-  postTypeSlug!: string;
+  cptSlug!: string;
+
+  @Column({ type: 'varchar', length: 50, name: 'posttypeslug', nullable: true })
+  postTypeSlug?: string;
 
   @Column({
     type: 'enum',
@@ -58,23 +61,23 @@ export class CustomPost {
     tags?: string[];
   };
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'authorid' })
   authorId?: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, name: 'viewcount' })
   viewCount!: number;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'publishedat' })
   publishedAt?: Date;
 
   @ManyToOne(() => CustomPostType, cpt => cpt.posts)
-  @JoinColumn({ name: 'postTypeSlug', referencedColumnName: 'slug' })
+  @JoinColumn({ name: 'posttypeslug', referencedColumnName: 'slug' })
   postType!: CustomPostType;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Helper method to get field value with type safety
