@@ -39,8 +39,8 @@ import {
   getTreeDepth
 } from '../../utils/menu-tree-helpers';
 
-// 최대 메뉴 깊이 제한
-const MAX_DEPTH = 3;
+// 최대 메뉴 깊이 제한 (1단계 = 루트, 2단계 = 서브메뉴)
+const MAX_DEPTH = 2;
 const INDENT_WIDTH = 40; // 들여쓰기 픽셀 너비
 
 export interface MenuItemTreeProps {
