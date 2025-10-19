@@ -13,16 +13,8 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 echo "🚀 Starting CI build process..."
 echo "📊 Node memory limit: 4GB"
 
-# Function to build packages first
-build_packages() {
-    echo "📦 Building packages..."
-    # Ensure pnpm is available
-    if ! command -v pnpm &> /dev/null; then
-        echo "📥 Installing pnpm..."
-        npm install -g pnpm@latest
-    fi
-    pnpm run build:packages
-}
+# NOTE: Packages are now built by the workflow before calling this script
+# See .github/workflows/main.yml
 
 # Function to build specific app
 build_app() {
@@ -88,11 +80,9 @@ build_app() {
 # Main execution
 if [ -z "$APP_NAME" ]; then
     echo "⚠️ No app specified. Building all apps..."
-    build_packages
     build_app "all"
 else
     echo "📱 Building specific app: $APP_NAME"
-    build_packages
     build_app "$APP_NAME"
 fi
 

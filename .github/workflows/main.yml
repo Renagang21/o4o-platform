@@ -89,11 +89,11 @@ jobs:
         cache-dependency-path: '**/pnpm-lock.yaml'
     
     - name: Install dependencies
-      run: bash scripts/ci-install-fixed.sh
-    
-    - name: Complete CI Setup
-      run: bash scripts/ci-complete-setup.sh
-    
+      run: pnpm install --frozen-lockfile
+
+    - name: Build packages
+      run: pnpm run build:packages
+
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
     
