@@ -38,19 +38,11 @@ export const useDynamicCPTMenu = () => {
       .sort((a, b) => (a.menuPosition || 50) - (b.menuPosition || 50));
 
     if (menuCPTs.length > 0) {
-      // CPT 섹션 구분선 추가
-      menuItems.push({
-        id: 'separator-cpt',
-        label: '',
-        icon: <></>,
-        separator: true
-      });
-
-      // 각 CPT를 메뉴 아이템으로 추가
-      menuCPTs.forEach(cpt => {
+      // "자체 글" 그룹 메뉴 생성
+      const cptChildren: MenuItem[] = menuCPTs.map(cpt => {
         const IconComponent = getIconForCPT(cpt.icon);
-        
-        menuItems.push({
+
+        return {
           id: `cpt-${cpt.slug}`,
           label: cpt.label || cpt.singularLabel || cpt.slug,
           icon: <IconComponent className="w-5 h-5" />,
@@ -68,7 +60,15 @@ export const useDynamicCPTMenu = () => {
               path: `/cpt-engine/content/${cpt.slug}/new`
             }
           ]
-        });
+        };
+      });
+
+      // "자체 글" 부모 메뉴 추가
+      menuItems.push({
+        id: 'custom-posts',
+        label: '자체 글',
+        icon: <Package className="w-5 h-5" />,
+        children: cptChildren
       });
     }
 
