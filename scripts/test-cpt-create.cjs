@@ -2,10 +2,8 @@
 
 const https = require('https');
 
-const API_BASE_URL = 'https://api.neture.co.kr';
-
-async function apiRequest(method, path, data = null, token = null) {
-  const url = new URL(path, API_BASE_URL);
+async function apiRequest(method, apiPath, data = null, token = null) {
+  const url = new URL(apiPath, 'https://api.neture.co.kr');
 
   return new Promise((resolve, reject) => {
     const options = {
@@ -31,6 +29,8 @@ async function apiRequest(method, path, data = null, token = null) {
       });
 
       res.on('end', () => {
+        console.log(`Status: ${res.statusCode}`);
+        console.log(`Response: ${responseData}`);
         try {
           const parsed = JSON.parse(responseData);
           if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -57,23 +57,32 @@ async function apiRequest(method, path, data = null, token = null) {
 async function main() {
   try {
     console.log('🔐 로그인 중...');
-
     const loginResult = await apiRequest('POST', '/api/v1/auth/login', {
-      email: process.env.ADMIN_EMAIL || 'admin@neture.co.kr',
-      password: process.env.ADMIN_PASSWORD || 'Test@1234'
+      email: 'admin@neture.co.kr',
+      password: 'Test@1234'
     });
 
     const token = loginResult.token;
     console.log('✅ 로그인 성공\n');
 
-    console.log('📊 최신 Post 10개 조회 중...\n');
+    // 가장 단순한 데이터로 테스트
+    console.log('📝 테스트 포스트 생성 중...\n');
+    const postData = {
+      title: 'Test Document',
+      slug: `test-doc-${Date.now()}`,
+      status: 'draft'
+    };
 
-    const result = await apiRequest('GET', '/api/posts?limit=10&includeDrafts=true&type=docs', null, token);
+    console.log('Sending data:', JSON.stringify(postData, null, 2));
 
-    console.log('API 응답:', JSON.stringify(result, null, 2));
+    const createResult = await apiRequest('POST', '/api/v1/cpt/docs/posts', postData, token);
+
+    console.log('\n✅ 성공!');
+    console.log(JSON.stringify(createResult, null, 2));
 
   } catch (error) {
-    console.error('❌ 오류 발생:', error.message);
+    console.error('\n❌ 오류:', error.message);
+    process.exit(1);
   }
 }
 

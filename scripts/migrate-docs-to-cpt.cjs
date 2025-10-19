@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * docs 폴더의 마크다운 파일들을 'docs' CPT로 변환하는 스크립트
+ * docs 폴더의 마크다운 파일들을 'docs' CPT로 마이그레이션하는 스크립트
+ * - docs CPT Type이 이미 생성되어 있어야 함
  * - 폴더 이름 → 카테고리
- * - 마크다운 첫 # 제목 → Post 제목
  * - 마크다운 내용 → o4o/markdown 블록
+ * - CPT Post로 저장: POST /api/v1/cpt/docs/posts
  */
 
 const https = require('https');
@@ -64,37 +65,6 @@ async function apiRequest(method, apiPath, data = null, token = null) {
   });
 }
 
-// 카테고리 생성 또는 가져오기
-async function getOrCreateCategory(categoryName, token) {
-  try {
-    // 먼저 존재하는지 확인
-    const existingResult = await apiRequest('GET', `/api/categories?search=${encodeURIComponent(categoryName)}`, null, token);
-
-    const existing = existingResult.data?.categories?.find(c => c.name === categoryName);
-    if (existing) {
-      return existing.id;
-    }
-
-    // 없으면 생성
-    const slug = categoryName
-      .toLowerCase()
-      .replace(/\//g, '-')
-      .replace(/[^a-z0-9가-힣]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-
-    const createResult = await apiRequest('POST', '/api/categories', {
-      name: categoryName,
-      slug,
-      description: `${categoryName} 관련 문서`
-    }, token);
-
-    return createResult.data?.category?.id || createResult.data?.id;
-  } catch (error) {
-    console.error(`  ⚠️  카테고리 생성 실패: ${categoryName}`, error.message);
-    return null;
-  }
-}
-
 // 마크다운을 Gutenberg 블록으로 변환
 function convertMarkdownToBlocks(markdown) {
   return [{
@@ -123,38 +93,24 @@ async function main() {
 
     // docs-files.json 읽기
     const docsFilesPath = path.join(__dirname, 'docs-files.json');
-    const docsFiles = JSON.parse(fs.readFileSync(docsFilesPath, 'utf-8'));
+    const allDocsFiles = JSON.parse(fs.readFileSync(docsFilesPath, 'utf-8'));
 
-    console.log(`📄 총 ${docsFiles.length}개의 문서 파일 발견\n`);
+    // 테스트: 처음 2개만
+    const docsFiles = process.env.TEST_MODE ? allDocsFiles.slice(0, 2) : allDocsFiles;
 
-    // 카테고리별로 그룹화
-    const byCategory = {};
-    docsFiles.forEach(file => {
-      if (!byCategory[file.category]) {
-        byCategory[file.category] = [];
-      }
-      byCategory[file.category].push(file);
-    });
-
-    // 카테고리 먼저 생성
-    console.log('📁 카테고리 생성 중...');
-    const categoryMap = {};
-    for (const categoryName of Object.keys(byCategory)) {
-      const displayName = categoryName === 'root' ? '기본 문서' : categoryName;
-      const categoryId = await getOrCreateCategory(displayName, token);
-      if (categoryId) {
-        categoryMap[categoryName] = categoryId;
-        console.log(`  ✅ ${displayName} (ID: ${categoryId})`);
-      }
-    }
-
-    console.log(`\n📝 ${docsFiles.length}개의 문서를 Post로 변환 중...\n`);
+    console.log(`📄 총 ${docsFiles.length}개의 문서 파일 발견${process.env.TEST_MODE ? ' (테스트 모드)' : ''}\n`);
+    console.log(`📝 ${docsFiles.length}개의 문서를 CPT Post로 변환 중...\n`);
 
     const createdPosts = [];
     const failedPosts = [];
 
+    // 요청 간 delay 함수
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     for (const file of docsFiles) {
       try {
+        // Rate limit 방지를 위한 delay (100ms)
+        await delay(100);
         // 마크다운 내용 읽기
         const content = fs.readFileSync(file.fullPath, 'utf-8');
 
@@ -169,28 +125,27 @@ async function main() {
         // Gutenberg 블록으로 변환
         const blocks = convertMarkdownToBlocks(content);
 
-        // 카테고리 ID 가져오기
-        const categoryIds = categoryMap[file.category] ? [categoryMap[file.category]] : [];
-
-        // Post 생성
+        // CPT Post 생성
         const postData = {
           title: file.title,
           slug,
           content: JSON.stringify(blocks),
           status: 'publish', // 문서는 바로 공개
-          type: 'docs', // CPT type
-          excerpt: `${file.category} 카테고리의 기술 문서`,
-          categoryIds,
-          featuredImageId: null
+          meta: {
+            original_path: file.fullPath,
+            category_name: file.category,
+            excerpt: `${file.category} 카테고리의 기술 문서`
+          }
         };
 
-        const createResult = await apiRequest('POST', '/api/posts', postData, token);
+        // CPT API로 생성: POST /api/v1/cpt/docs/posts
+        const createResult = await apiRequest('POST', '/api/v1/cpt/docs/posts', postData, token);
 
-        const post = createResult.data?.post || createResult.post || createResult.data;
+        const post = createResult.data?.post || createResult.data;
 
         createdPosts.push({
           title: file.title,
-          slug: post.slug,
+          slug: post.slug || slug,
           category: file.category,
           id: post.id
         });
@@ -211,21 +166,11 @@ async function main() {
     console.log(`❌ 실패: ${failedPosts.length}개\n`);
 
     if (failedPosts.length > 0) {
-      console.log('실패한 문서:');
-      failedPosts.forEach(f => {
+      console.log('\n실패한 문서 (처음 10개):');
+      failedPosts.slice(0, 10).forEach(f => {
         console.log(`  - [${f.category}] ${f.title}: ${f.error}`);
       });
     }
-
-    // 카테고리별 통계
-    console.log('\n📊 카테고리별 생성 통계:');
-    const statsByCategory = {};
-    createdPosts.forEach(post => {
-      statsByCategory[post.category] = (statsByCategory[post.category] || 0) + 1;
-    });
-    Object.keys(statsByCategory).sort().forEach(cat => {
-      console.log(`  ${cat}: ${statsByCategory[cat]}개`);
-    });
 
   } catch (error) {
     console.error('❌ 오류 발생:', error.message);
