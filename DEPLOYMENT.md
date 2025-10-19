@@ -1,123 +1,167 @@
 # O4O Platform 배포 가이드
 
-> **빠른 시작**: 코드 수정 → `git push origin main` → 2-3분 대기 → 자동 배포 완료
+> **빠른 시작**: `git push origin main` → GitHub Actions 자동 배포 → 2-3분 대기
 
 ---
 
 ## 📑 목차
 
-1. [빠른 시작](#-빠른-시작)
+1. [배포 방식](#-배포-방식)
 2. [자동 배포 (GitHub Actions)](#-자동-배포-github-actions)
-3. [배포 확인](#-배포-확인)
-4. [문제 해결](#-문제-해결)
-5. [수동 배포](#-수동-배포-긴급-상황)
-6. [고급 설정](#-고급-설정)
+3. [수동 배포 (긴급 상황)](#-수동-배포-긴급-상황)
+4. [배포 확인](#-배포-확인)
+5. [문제 해결](#-문제-해결)
+6. [롤백](#-롤백)
+7. [서버 정보](#-서버-정보)
 
 ---
 
-## 🚀 빠른 시작
+## 🚀 배포 방식
 
-### 일반적인 배포 흐름
+### 주요 배포 방법
 
-```bash
-# 1. 코드 수정 후 커밋
-git add .
-git commit -m "fix: your changes"
+| 방법 | 사용 시기 | 소요 시간 |
+|------|----------|----------|
+| **GitHub Actions** (권장) | 일반적인 모든 배포 | 2-3분 |
+| **수동 스크립트** | GitHub Actions 실패 시 | 1-2분 |
 
-# 2. main 브랜치에 푸시
-git push origin main
+### 배포 흐름
 
-# 3. 2-3분 대기 (GitHub Actions 자동 실행)
-
-# 4. 배포 확인
-./scripts/check-deployment.sh
 ```
-
-### 어느 앱이 배포되나?
-
-| 변경 파일 | 배포 대상 | 예상 시간 |
-|----------|----------|----------|
-| `apps/admin-dashboard/**` | Admin Dashboard | 2-3분 |
-| `apps/main-site/**` | Main Site | 2-3분 |
-| `apps/api-server/**` | API Server | 3-5분 |
-| `packages/**` | 영향받는 모든 앱 | 앱 개수에 따라 |
+코드 수정 → git push → GitHub Actions 트리거
+            ↓
+       CI 빌드 (패키지 + 앱)
+            ↓
+       서버 배포 (SCP)
+            ↓
+       Nginx 재시작
+```
 
 ---
 
 ## 🤖 자동 배포 (GitHub Actions)
 
-### 배포 트리거 조건
+### 1. Admin Dashboard
 
-#### 1. Admin Dashboard (`deploy-admin.yml`)
-```yaml
-paths:
-  - 'apps/admin-dashboard/**'
-  - 'packages/**'
-  - '.github/workflows/deploy-admin.yml'
-  - 'nginx-configs/admin.neture.co.kr.conf'
-```
+**트리거 조건**:
+- `apps/admin-dashboard/**` 수정
+- `packages/**` 수정
+- `nginx-configs/admin.neture.co.kr.conf` 수정
+
+**배포 워크플로우**: `.github/workflows/deploy-admin.yml`
 
 **배포 URL**: https://admin.neture.co.kr
 
-#### 2. Main Site (`deploy-main-site.yml`)
-```yaml
-paths:
-  - 'apps/main-site/**'
-  - 'packages/**'
-  - '.github/workflows/deploy-main-site.yml'
-  - 'nginx-configs/neture.co.kr.conf'
+**실행 방법**:
+```bash
+# 1. 코드 커밋 & 푸시
+git add .
+git commit -m "feat: your changes"
+git push origin main
+
+# 2. GitHub Actions 자동 실행 (2-3분)
+
+# 3. 배포 확인
+curl -s https://admin.neture.co.kr/version.json
 ```
+
+### 2. Main Site
+
+**트리거 조건**:
+- `apps/main-site/**` 수정
+- `packages/**` 수정
+
+**배포 워크플로우**: `.github/workflows/deploy-main-site.yml`
 
 **배포 URL**: https://neture.co.kr
 
-#### 3. API Server (`deploy-api.yml`)
-```yaml
-paths:
-  - 'apps/api-server/**'
-  - 'packages/**'
-  - '.github/workflows/deploy-api.yml'
-```
+### 3. API Server
 
-**배포 URL**: https://api.neture.co.kr
+**배포 방법**: 로컬 배포 (서버에서 직접 실행)
+
+**이유**:
+- 빌드 시간이 김 (TypeORM 마이그레이션 등)
+- 환경변수가 많음
+- PM2 프로세스 관리 필요
+
+**배포 스크립트**: `./scripts/deploy-api-local.sh`
+
+**실행 위치**: API 서버 (43.202.242.215)
+
+```bash
+# API 서버 접속
+ssh o4o-api
+
+# 배포 실행
+cd /home/ubuntu/o4o-platform
+./scripts/deploy-api-local.sh
+```
 
 ### GitHub Actions 확인
 
 **URL**: https://github.com/Renagang21/o4o-platform/actions
 
-**상태 색상**:
+**상태**:
 - 🟢 초록색 체크: 배포 성공
-- 🟡 노란색 동그라미: 실행 중
-- 🔴 빨간색 X: 배포 실패
+- 🟡 노란색 원: 진행 중
+- 🔴 빨간색 X: 실패
 
-### 수동 트리거
+### 수동 트리거 (GitHub UI)
 
-자동 배포가 실행되지 않을 때:
+자동 배포가 안 될 때:
 
-1. GitHub → **Actions** 탭
-2. 배포할 workflow 선택 (예: Deploy Admin Dashboard)
+1. https://github.com/Renagang21/o4o-platform/actions
+2. 원하는 워크플로우 선택 (예: Deploy Admin Dashboard)
 3. **Run workflow** 버튼 클릭
 4. Branch: `main` 선택 → **Run workflow**
 
 ---
 
-## 🔍 배포 확인
+## 🆘 수동 배포 (긴급 상황)
 
-### 방법 1: 자동 체크 스크립트 (권장)
+### 언제 사용하나?
+
+- GitHub Actions가 반복적으로 실패
+- 긴급 핫픽스 필요
+- GitHub 서비스 장애
+
+### Admin Dashboard 수동 배포
 
 ```bash
-./scripts/check-deployment.sh
+# 1. 로컬에서 빌드
+pnpm install --frozen-lockfile
+pnpm run build:packages
+pnpm run build:admin
+
+# 2. 수동 배포 스크립트 실행
+./scripts/deploy-admin-manual.sh
 ```
 
-**출력 예시**:
-```
-🖥️  Admin Dashboard (admin.neture.co.kr)
-----------------------------
-📦 Remote: 2025.10.16-2137
-💻 Local:  2025.10.16-2137
-✅ Versions match!
+**스크립트 내용**:
+- 빌드 파일 존재 확인
+- SSH 연결 테스트
+- 서버 백업 생성
+- SCP로 파일 전송
+- Nginx 설정 업데이트
+- 권한 설정 및 재시작
+
+### Main Site 수동 배포
+
+```bash
+# 빌드 후
+pnpm run build:main-site
+
+# 배포 (deploy-admin-manual.sh 수정하여 사용)
+# 또는 rsync로 직접 전송
+rsync -avz --delete apps/main-site/dist/ \
+  ubuntu@13.125.144.8:/tmp/main-build/
 ```
 
-### 방법 2: 직접 확인
+---
+
+## 🔍 배포 확인
+
+### 방법 1: Version JSON 확인 (권장)
 
 ```bash
 # Admin Dashboard
@@ -126,213 +170,157 @@ curl -s https://admin.neture.co.kr/version.json
 # Main Site
 curl -s https://neture.co.kr/version.json
 
-# API Server
-curl -s https://api.neture.co.kr/api/health
+# 예상 출력:
+# {
+#   "version": "2025.10.19-1459",
+#   "buildDate": "2025-10-19T05:59:23.799Z",
+#   "environment": "production",
+#   "timestamp": 1760853563799
+# }
 ```
 
-### 방법 3: 브라우저에서 확인
+### 방법 2: 브라우저 확인
 
 ```
 https://admin.neture.co.kr/version.json
 ```
 
-**버전 비교**:
-- `version`: 빌드 시각 (예: 2025.10.16-2137)
-- `buildDate`: ISO 8601 형식
-- `timestamp`: Unix timestamp
+**주의**: 브라우저 캐시 때문에 이전 버전이 보일 수 있음
+- Ctrl + Shift + R (강력한 새로고침)
+- 시크릿 모드에서 확인
+
+### 방법 3: API 헬스체크
+
+```bash
+curl -s https://api.neture.co.kr/api/health
+```
 
 ---
 
 ## 🛠️ 문제 해결
 
-### 문제 1: "Workflow가 트리거되지 않음"
+### 문제 1: "패키지 dist 디렉토리가 없음"
 
-**증상**: 코드 푸시했는데 GitHub Actions에 workflow가 안 보임
-
-**원인**: 변경된 파일이 `paths` 필터에 해당하지 않음
-
-**해결**:
-
-```bash
-# 1. 변경된 파일 확인
-git diff --name-only HEAD~1 HEAD
-
-# 2. workflow 파일 자체를 수정해서 강제 트리거
-touch .github/workflows/deploy-admin.yml
-git add .github/workflows/deploy-admin.yml
-git commit -m "chore: trigger deployment"
-git push
-
-# 3. 또는 수동 실행 (위 "수동 트리거" 참조)
+**증상**:
+```
+Error: Cannot find module '@o4o/auth-client/dist/index.js'
 ```
 
----
+**원인**: TypeScript composite 프로젝트는 `tsc --build` 필요
 
-### 문제 2: "배포는 성공했는데 반영이 안됨"
+**해결**:
+```bash
+# 모든 패키지 빌드 스크립트 확인
+grep '"build":' packages/*/package.json
 
-**증상**: GitHub Actions는 성공했는데 실제 사이트는 이전 버전
+# 올바른 형식: "build": "npx tsc --build"
+# 잘못된 형식: "build": "npx tsc"
+```
+
+**수정됨**: commit 478cd7d2에서 수정 완료
+
+### 문제 2: "version.json git pull 충돌"
+
+**증상**:
+```
+error: Your local changes to the following files would be overwritten by merge:
+    apps/admin-dashboard/public/version.json
+```
+
+**원인**: version.json이 Git에 추적되었음
+
+**해결**:
+```bash
+# .gitignore에 추가됨 (commit 3b7a3723)
+*.tsbuildinfo
+**/version.json
+```
+
+**서버에서 충돌 발생 시**:
+```bash
+ssh o4o-web
+cd /home/ubuntu/o4o-platform
+git fetch origin
+git reset --hard origin/main
+```
+
+### 문제 3: "GitHub Actions 빌드 실패"
+
+**확인 순서**:
+
+1. **Actions 로그 확인**
+   - https://github.com/Renagang21/o4o-platform/actions
+   - 실패한 step 클릭하여 에러 메시지 확인
+
+2. **로컬 빌드 테스트**
+   ```bash
+   pnpm install --frozen-lockfile
+   pnpm run build:packages
+   pnpm run build:admin
+   ```
+
+3. **common errors**:
+   - `pnpm install --frozen-lockfile` 실패 → lockfile 재생성 필요
+   - TypeScript 에러 → `pnpm run type-check:frontend`
+   - ESLint 에러 → `pnpm run lint`
+
+### 문제 4: "배포는 성공했는데 반영 안됨"
 
 **원인**: 브라우저 캐시
 
 **해결**:
-
 ```bash
 # 1. 강력한 새로고침
 Ctrl + Shift + R (Windows/Linux)
 Cmd + Shift + R (Mac)
 
-# 2. 시크릿 모드에서 확인
-Ctrl + Shift + N (Chrome)
+# 2. 시크릿 모드 확인
 
-# 3. 캐시 완전 삭제
-개발자 도구 → Application → Clear site data
-```
-
-**서버 측 확인**:
-```bash
-# 실제 배포된 버전 확인
+# 3. 서버 측 확인
 curl -s https://admin.neture.co.kr/version.json
-
-# 로컬 빌드 버전 확인
-cat apps/admin-dashboard/dist/version.json
 ```
 
----
+### 문제 5: "Nginx 502 Bad Gateway"
 
-### 문제 3: "빌드는 성공했는데 배포 실패"
-
-**증상**: Build 단계는 성공, Deploy 단계에서 실패
-
-**원인**: SSH 연결 또는 서버 권한 문제
-
-**해결**:
-
-1. **GitHub Actions 로그 확인**
-   - Actions → 실패한 workflow 클릭
-   - "Move files to web directory" step 확인
-   - 에러 메시지 읽기
-
-2. **Secrets 설정 확인**
-   ```
-   Settings → Secrets and variables → Actions
-
-   필요한 Secrets:
-   - WEB_HOST: 웹서버 IP 주소
-   - WEB_USER: SSH 사용자명
-   - WEB_SSH_KEY: SSH private key
-   - API_HOST: API 서버 IP 주소
-   - API_USER: SSH 사용자명
-   - API_SSH_KEY: SSH private key
-   ```
-
-3. **SSH 연결 테스트**
-   ```bash
-   # 로컬에서 테스트
-   ssh $WEB_USER@$WEB_HOST "echo 'SSH OK'"
-   ```
-
----
-
-### 문제 4: "pnpm install --frozen-lockfile 실패"
-
-**증상**: `pnpm install` 단계에서 lockfile 에러
-
-**원인**: `pnpm-lock.yaml`이 `package.json`과 동기화되지 않음
-
-**해결**:
-
+**API 서버 확인**:
 ```bash
-# 로컬에서 lockfile 재생성
-pnpm install
-
-# 변경사항 커밋
-git add pnpm-lock.yaml
-git commit -m "chore: update lockfile"
-git push
+ssh o4o-api
+pm2 status
+pm2 logs o4o-api-server --lines 50
 ```
 
----
-
-### 문제 5: "GitHub Actions 로그에서 디버깅"
-
-**로그 찾는 방법**:
-
-1. https://github.com/Renagang21/o4o-platform/actions
-2. 실패한 workflow 클릭
-3. 실패한 job 클릭
-4. 각 step 확장해서 에러 메시지 확인
-
-**주요 step**:
-- `Install dependencies`: pnpm install 관련
-- `Build admin dashboard`: 빌드 에러
-- `Copy build files`: SCP 전송 문제
-- `Move files to web directory`: 서버 측 문제
-
----
-
-## 🆘 수동 배포 (긴급 상황)
-
-### 언제 사용하나?
-
-- GitHub Actions가 계속 실패할 때
-- 긴급 핫픽스가 필요할 때
-- 네트워크 문제로 자동 배포가 안될 때
-
-### 사전 조건
-
+**Nginx 확인**:
 ```bash
-# 1. SSH 설정 확인
-cat ~/.ssh/config | grep "o4o-web"
-
-# 2. 로컬 빌드 완료
-pnpm run build:admin  # 또는 build:main-site
+ssh o4o-web
+sudo nginx -t
+sudo systemctl status nginx
+sudo tail -f /var/log/nginx/error.log
 ```
-
-### 수동 배포 실행
-
-```bash
-# 대화형 메뉴
-./scripts/deploy-manual.sh
-
-# 메뉴 선택:
-# 1) Main Site (neture.co.kr)
-# 2) Admin Dashboard (admin.neture.co.kr)
-# 3) Both (Main + Admin)
-```
-
-### 수동 배포 흐름
-
-1. 빌드 파일 존재 확인
-2. SSH 연결 테스트
-3. 서버에 백업 생성
-4. 빌드 파일 전송 (SCP)
-5. 파일 이동 및 권한 설정
-6. Nginx 재시작
 
 ---
 
-## 🔄 롤백 (Rollback)
+## 🔄 롤백
 
 ### 자동 백업
 
-모든 배포 시 자동으로 백업 생성:
+모든 배포 시 자동 백업 생성:
 ```
-/var/www/admin.neture.co.kr.backup.20251016_143000
+/var/www/admin.neture.co.kr.backup.20251019_143000
 ```
 
-### 롤백 방법
+### 롤백 절차
 
 ```bash
-# 1. 서버 접속
-ssh ubuntu@13.125.144.8
+# 1. 웹서버 접속
+ssh o4o-web
 
 # 2. 백업 목록 확인
-ls -lt /var/www/admin.neture.co.kr.backup.*
+ls -lt /var/www/admin.neture.co.kr.backup.* | head -5
 
-# 3. 복구
+# 3. 이전 버전 복구
+BACKUP_DIR="/var/www/admin.neture.co.kr.backup.20251019_143000"
 sudo rm -rf /var/www/admin.neture.co.kr/*
-sudo cp -r /var/www/admin.neture.co.kr.backup.20251016_143000/* \
-  /var/www/admin.neture.co.kr/
+sudo cp -r $BACKUP_DIR/* /var/www/admin.neture.co.kr/
 
 # 4. 권한 설정
 sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
@@ -340,87 +328,79 @@ sudo chmod -R 755 /var/www/admin.neture.co.kr/
 
 # 5. Nginx 재시작
 sudo systemctl reload nginx
+
+# 6. 확인
+curl -s https://admin.neture.co.kr/version.json
 ```
 
 ---
 
-## 🔧 고급 설정
+## 🖥️ 서버 정보
 
-### CI/CD Workflow 수정
+### 인프라 구조
 
-**파일 위치**: `.github/workflows/`
-
-**주요 설정**:
-
-```yaml
-# 배포 타이밍 조정
-concurrency:
-  group: deploy-admin-${{ github.ref }}
-  cancel-in-progress: false  # true로 변경 시 이전 배포 취소
-
-# Node.js 버전
-node-version: '22.18.0'
-
-# 빌드 메모리 제한
-NODE_OPTIONS: '--max-old-space-size=4096'
-
-# 환경 변수
-VITE_API_URL: https://api.neture.co.kr/api/v1
+```
+DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
+웹서버: Nginx 프록시 → API 서버 (43.202.242.215:4000)
 ```
 
-### Nginx 캐시 설정
+### 서버 상세
 
-배포 시 Nginx 설정도 함께 업데이트:
+| 서버 | IP | SSH Alias | 역할 | 프로세스 |
+|------|-----|-----------|------|----------|
+| 웹서버 | 13.125.144.8 | `o4o-web` | Nginx 프록시<br/>정적 파일 호스팅 | Nginx |
+| API 서버 | 43.202.242.215 | `o4o-api` | Node.js 백엔드<br/>PostgreSQL | PM2: `o4o-api-server` |
 
+### 배포 경로
+
+| 서비스 | 배포 경로 |
+|--------|----------|
+| Admin Dashboard | `/var/www/admin.neture.co.kr/` |
+| Main Site | `/var/www/neture.co.kr/` |
+| API Server | `/home/ubuntu/o4o-platform/apps/api-server/` |
+| 소스 코드 (Web) | `/home/ubuntu/o4o-platform/` |
+
+### 환경변수
+
+| 파일 | 위치 | 설명 |
+|------|------|------|
+| `.env` | API 서버 | API 서버 환경변수 |
+| Vite 빌드 시 | GitHub Actions | 빌드 타임 환경변수 주입 |
+
+**Admin Dashboard 빌드 환경변수**:
 ```bash
-# 파일 위치
-nginx-configs/admin.neture.co.kr.conf
-
-# 수정 후 자동 배포됨 (paths 필터에 포함)
-```
-
-### 배포 알림 설정
-
-GitHub Actions에 Slack/Discord 알림 추가 가능:
-
-```yaml
-- name: Notify deployment
-  if: success()
-  uses: slackapi/slack-github-action@v1
-  with:
-    webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-    payload: |
-      {
-        "text": "✅ Admin Dashboard deployed successfully!"
-      }
+VITE_API_URL=https://api.neture.co.kr/api/v1
+VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr
+GENERATE_SOURCEMAP=false
+NODE_OPTIONS='--max-old-space-size=4096'
 ```
 
 ---
 
-## 📊 배포 모니터링
+## 📊 배포 체크리스트
 
-### 실시간 확인
+### 배포 전
 
-```bash
-# 10초마다 배포 상태 확인
-watch -n 10 ./scripts/check-deployment.sh
-```
+- [ ] 로컬 빌드 성공 (`pnpm run build`)
+- [ ] TypeScript 체크 통과 (`pnpm run type-check:frontend`)
+- [ ] ESLint 통과 (`pnpm run lint`)
+- [ ] console.log 제거 확인
+- [ ] Git 커밋 & 푸시
 
-### 로그 확인
+### 배포 후
 
-```bash
-# GitHub Actions 로그
-https://github.com/Renagang21/o4o-platform/actions
+- [ ] GitHub Actions 성공 확인
+- [ ] version.json 업데이트 확인
+- [ ] 주요 기능 동작 확인
+- [ ] 브라우저 콘솔 에러 없음
+- [ ] API 응답 정상
 
-# 서버 로그 (API Server)
-ssh ubuntu@43.202.242.215
-pm2 logs o4o-api-server
+### 긴급 배포 시
 
-# Nginx 로그 (Web Server)
-ssh ubuntu@13.125.144.8
-sudo tail -f /var/log/nginx/access.log
-sudo tail -f /var/log/nginx/error.log
-```
+- [ ] 변경 사항 최소화
+- [ ] 롤백 계획 수립
+- [ ] 백업 확인
+- [ ] 모니터링 강화
 
 ---
 
@@ -428,50 +408,56 @@ sudo tail -f /var/log/nginx/error.log
 
 ### 명령어
 
-| 작업 | 명령어 |
-|------|--------|
-| 배포 상태 확인 | `./scripts/check-deployment.sh` |
-| 전체 빌드 | `pnpm run build` |
-| Admin만 빌드 | `pnpm run build:admin` |
-| Main Site만 빌드 | `pnpm run build:main-site` |
-| 수동 배포 | `./scripts/deploy-manual.sh` |
+```bash
+# 배포 확인
+curl -s https://admin.neture.co.kr/version.json
+
+# 로컬 빌드
+pnpm run build:packages && pnpm run build:admin
+
+# 수동 배포
+./scripts/deploy-admin-manual.sh
+
+# API 서버 배포 (서버에서)
+ssh o4o-api
+cd /home/ubuntu/o4o-platform
+./scripts/deploy-api-local.sh
+
+# PM2 상태 확인
+ssh o4o-api
+pm2 status
+pm2 logs o4o-api-server
+```
 
 ### URL
 
-| 서비스 | URL |
-|--------|-----|
-| Admin Dashboard | https://admin.neture.co.kr |
-| Main Site | https://neture.co.kr |
-| API Server | https://api.neture.co.kr |
-| GitHub Actions | https://github.com/Renagang21/o4o-platform/actions |
-
-### 서버 정보
-
-| 서버 | IP | 용도 |
-|------|-----|-----|
-| Web Server | 13.125.144.8 | Admin + Main Site (Nginx) |
-| API Server | 43.202.242.215 | Backend API (Node.js + PM2) |
+| 서비스 | Production | Version Check |
+|--------|-----------|---------------|
+| Admin | https://admin.neture.co.kr | /version.json |
+| Main Site | https://neture.co.kr | /version.json |
+| API | https://api.neture.co.kr | /api/health |
+| GitHub Actions | https://github.com/Renagang21/o4o-platform/actions | - |
 
 ---
 
-## 📞 지원
+## 📚 추가 문서
 
-### 문제 발생 시 체크리스트
+### 초기 설정 (한 번만)
 
-- [ ] `./scripts/check-deployment.sh` 실행
-- [ ] GitHub Actions 로그 확인
-- [ ] `git diff --name-only HEAD~1 HEAD` 실행
-- [ ] 브라우저 캐시 삭제 (Ctrl + Shift + R)
-- [ ] 시크릿 모드에서 확인
-- [ ] SSH 연결 테스트
-- [ ] 서버 디스크 용량 확인
+- [서버 초기 설정](docs/deployment/SERVER_SETUP_GUIDE.md)
+- [GitHub Actions 설정](docs/deployment/GITHUB_ACTIONS_SETUP.md)
+- [환경변수 설정](docs/deployment/ENV_SETUP.md)
+- [데이터베이스 설정](docs/deployment/DATABASE_SETUP_GUIDE.md)
+- [DNS 설정](docs/deployment/DNS_CONFIGURATION_GUIDE.md)
+- [Nginx 설정](docs/deployment/nginx-setup.md)
 
-### 추가 문서
+### 참고
 
-- **CI/CD 상세**: `.github/workflows/README-CI-CD.md`
-- **스크립트 가이드**: `scripts/README-DEPLOYMENT.md` (있다면)
+- [CI/CD 워크플로우](.github/workflows/)
+- [배포 스크립트](scripts/)
 
 ---
 
-**마지막 업데이트**: 2025-10-16
-**버전**: 3.0
+**마지막 업데이트**: 2025-10-19
+**버전**: 4.0
+**주요 변경**: GitHub Actions 중심 배포, 패키지 빌드 수정 반영
