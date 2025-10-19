@@ -81,13 +81,14 @@ export default function TaxonomiesList() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
   // Fetch taxonomies
-  const { data: taxonomies = [], isLoading: taxonomiesLoading, refetch } = useQuery({
+  const { data: taxonomies = [], isLoading: taxonomiesLoading, refetch } = useQuery<Taxonomy[]>({
     queryKey: ['taxonomies'],
     queryFn: async () => {
       try {
         const response = await taxonomyApi.getAll();
         // API returns { data: { taxonomies: [], pagination: {...} } }
-        return response.data?.taxonomies || [];
+        const result = response.data as any;
+        return result?.taxonomies || [];
       } catch (error) {
         console.warn('Taxonomies API not yet implemented:', error);
         return [];
