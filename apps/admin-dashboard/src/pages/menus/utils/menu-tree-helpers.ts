@@ -65,7 +65,7 @@ export function buildTree(items: MenuItemFlat[]): MenuItemTree[] {
   const sortItems = (items: MenuItemTree[]) => {
     items.sort((a, b) => a.order_num - b.order_num);
     items.forEach(item => {
-      if (item.children && item.children.length > 0) {
+      if (Array.isArray(item.children) && item.children.length > 0) {
         sortItems(item.children);
       }
     });
@@ -91,7 +91,7 @@ export function flattenTree(items: MenuItemTree[], parentId?: string): MenuItemF
         order_num: orderNum++
       });
 
-      if (children && children.length > 0) {
+      if (Array.isArray(children) && children.length > 0) {
         processItems(children, item.id);
       }
     });
@@ -109,7 +109,7 @@ export function findItemById(items: MenuItemTree[], id: string): MenuItemTree | 
     if (item.id === id) {
       return item;
     }
-    if (item.children && item.children.length > 0) {
+    if (Array.isArray(item.children) && item.children.length > 0) {
       const found = findItemById(item.children, id);
       if (found) {
         return found;
@@ -127,7 +127,7 @@ export function findParentById(items: MenuItemTree[], childId: string, parent: M
     if (item.id === childId) {
       return parent;
     }
-    if (item.children && item.children.length > 0) {
+    if (Array.isArray(item.children) && item.children.length > 0) {
       const found = findParentById(item.children, childId, item);
       if (found) {
         return found;
@@ -150,7 +150,7 @@ export function updateItemInTree(
       const finalUpdates = typeof updates === 'function' ? updates(item) : updates;
       return { ...item, ...finalUpdates };
     }
-    if (item.children && item.children.length > 0) {
+    if (Array.isArray(item.children) && item.children.length > 0) {
       return {
         ...item,
         children: updateItemInTree(item.children, id, updates)
@@ -167,7 +167,7 @@ export function deleteItemFromTree(items: MenuItemTree[], id: string): MenuItemT
   return items
     .filter(item => item.id !== id)
     .map(item => {
-      if (item.children && item.children.length > 0) {
+      if (Array.isArray(item.children) && item.children.length > 0) {
         return {
           ...item,
           children: deleteItemFromTree(item.children, id)
@@ -228,7 +228,7 @@ export function getAllItemIds(items: MenuItemTree[]): string[] {
   const collectIds = (items: MenuItemTree[]) => {
     items.forEach(item => {
       ids.push(item.id);
-      if (item.children && item.children.length > 0) {
+      if (Array.isArray(item.children) && item.children.length > 0) {
         collectIds(item.children);
       }
     });
@@ -248,7 +248,7 @@ export function getTreeDepth(items: MenuItemTree[], currentDepth = 0): number {
 
   let maxDepth = currentDepth;
   items.forEach(item => {
-    if (item.children && item.children.length > 0) {
+    if (Array.isArray(item.children) && item.children.length > 0) {
       const childDepth = getTreeDepth(item.children, currentDepth + 1);
       maxDepth = Math.max(maxDepth, childDepth);
     }
@@ -279,7 +279,7 @@ export function validateTree(items: MenuItemTree[]): { valid: boolean; errors: s
     }
 
     // Validate children
-    if (item.children && item.children.length > 0) {
+    if (Array.isArray(item.children) && item.children.length > 0) {
       const newAncestors = new Set(ancestors);
       newAncestors.add(item.id);
       item.children.forEach(child => validateItem(child, newAncestors));
@@ -300,6 +300,6 @@ export function validateTree(items: MenuItemTree[]): { valid: boolean; errors: s
 export function cloneTree(items: MenuItemTree[]): MenuItemTree[] {
   return items.map(item => ({
     ...item,
-    children: item.children ? cloneTree(item.children) : undefined
+    children: Array.isArray(item.children) ? cloneTree(item.children) : undefined
   }));
 }

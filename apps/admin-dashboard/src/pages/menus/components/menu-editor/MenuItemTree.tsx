@@ -108,7 +108,7 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
   onOutdent
 }) => {
   const [showActions, setShowActions] = useState(false);
-  const hasChildren = item.children && item.children.length > 0;
+  const hasChildren = Array.isArray(item.children) && item.children.length > 0;
   const isSelected = item.id === selectedId;
 
   // 들여쓰기/내어쓰기 가능 여부 계산
@@ -322,9 +322,9 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
       </div>
 
       {/* Children */}
-      {hasChildren && item.isOpen && (
+      {hasChildren && item.isOpen && Array.isArray(item.children) && (
         <div className="mt-1">
-          {item.children!.map((child, childIndex) => (
+          {item.children.map((child, childIndex) => (
             <SortableMenuItem
               key={child.id}
               item={child}
@@ -522,7 +522,7 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
         if (items[i].id === targetId) {
           return { item: items[i], siblings: items, index: i };
         }
-        if (items[i].children && items[i].children!.length > 0) {
+        if (Array.isArray(items[i].children) && items[i].children!.length > 0) {
           const result = findItemContext(items[i].children!, targetId);
           if (result) return result;
         }
