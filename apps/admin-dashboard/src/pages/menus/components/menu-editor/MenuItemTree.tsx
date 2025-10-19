@@ -4,6 +4,7 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  DragOverEvent,
   PointerSensor,
   useSensor,
   useSensors,
@@ -28,7 +29,16 @@ import {
   Tag as TagIcon
 } from 'lucide-react';
 import type { MenuItemTree as MenuItemTreeType } from '../../utils/menu-tree-helpers';
-import { getAllItemIds } from '../../utils/menu-tree-helpers';
+import {
+  getAllItemIds,
+  findItemById as findItemByIdHelper,
+  findParentById,
+  getTreeDepth
+} from '../../utils/menu-tree-helpers';
+
+// 최대 메뉴 깊이 제한
+const MAX_DEPTH = 3;
+const INDENT_WIDTH = 40; // 들여쓰기 픽셀 너비
 
 export interface MenuItemTreeProps {
   items: MenuItemTreeType[];
@@ -43,6 +53,7 @@ interface SortableMenuItemProps {
   item: MenuItemTreeType;
   depth: number;
   selectedId: string | null;
+  dropIndicator: DropIndicator | null;
   onSelect: (id: string) => void;
   onToggle: (id: string) => void;
   onDuplicate?: (id: string) => void;
@@ -77,6 +88,7 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
   item,
   depth,
   selectedId,
+  dropIndicator,
   onSelect,
   onToggle,
   onDuplicate,
@@ -85,6 +97,11 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
   const [showActions, setShowActions] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
   const isSelected = item.id === selectedId;
+
+  // Drop indicator 계산
+  const isDropTarget = dropIndicator?.overId === item.id;
+  const dropDepth = dropIndicator?.depth || 0;
+  const dropPosition = dropIndicator?.position || 'after';
 
   const {
     attributes,
@@ -103,6 +120,20 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
 
   return (
     <div ref={setNodeRef} style={style} className="relative">
+      {/* Drop Indicator - Before */}
+      {isDropTarget && dropPosition === 'before' && (
+        <div
+          className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 z-10"
+          style={{ marginLeft: `${(depth + dropDepth) * 24}px` }}
+        >
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full -ml-1" />
+        </div>
+      )}
+
+      {/* Drop Indicator - Inside (자식으로) */}
+      {isDropTarget && dropDepth === 1 && (
+        <div className="absolute inset-0 bg-blue-100 border-2 border-blue-400 rounded-lg pointer-events-none z-10" />
+      )}
       {/* Item Row */}
       <div
         role="treeitem"
@@ -232,6 +263,7 @@ const SortableMenuItem = memo<SortableMenuItemProps>(({
               item={child}
               depth={depth + 1}
               selectedId={selectedId}
+              dropIndicator={dropIndicator}
               onSelect={onSelect}
               onToggle={onToggle}
               onDuplicate={onDuplicate}
@@ -250,6 +282,13 @@ SortableMenuItem.displayName = 'SortableMenuItem';
  * Menu Item Tree Component
  * Displays hierarchical menu structure with drag-and-drop support
  */
+// Drop indicator 상태 타입
+interface DropIndicator {
+  overId: string;
+  depth: number; // 0 = same level, 1 = child, -1 = parent
+  position: 'before' | 'after' | 'inside';
+}
+
 export const MenuItemTree: FC<MenuItemTreeProps> = ({
   items,
   selected,
@@ -260,6 +299,7 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
 }) => {
   const [localItems, setLocalItems] = useState(items);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [dropIndicator, setDropIndicator] = useState<DropIndicator | null>(null);
 
   // Setup sensors for drag detection
   const sensors = useSensors(
@@ -275,28 +315,101 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
     setActiveId(event.active.id as string);
   }, []);
 
+  // Handle drag over - 실시간 드롭 위치 표시
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { active, over, delta } = event;
+
+    if (!over || active.id === over.id) {
+      setDropIndicator(null);
+      return;
+    }
+
+    // 마우스 X축 이동량으로 들여쓰기 레벨 계산
+    const indentLevel = Math.floor(delta.x / INDENT_WIDTH);
+    const clampedIndent = Math.max(-1, Math.min(1, indentLevel)); // -1, 0, 1로 제한
+
+    // Drop 위치 계산
+    let position: 'before' | 'after' | 'inside' = 'after';
+
+    if (clampedIndent === 1) {
+      // 오른쪽으로 드래그 -> 자식으로 만들기
+      position = 'inside';
+    } else if (delta.y < 0) {
+      position = 'before';
+    }
+
+    setDropIndicator({
+      overId: over.id as string,
+      depth: clampedIndent,
+      position
+    });
+  }, []);
+
   // Handle drag end
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
     if (!over || active.id === over.id) {
+      setDropIndicator(null);
       return;
     }
 
     // Find active and over items
-    const activeItem = findItemById(localItems, active.id as string);
-    const overItem = findItemById(localItems, over.id as string);
+    const activeItem = findItemByIdHelper(localItems, active.id as string);
+    const overItem = findItemByIdHelper(localItems, over.id as string);
 
     if (!activeItem || !overItem) {
+      setDropIndicator(null);
       return;
     }
 
-    // Simple reordering logic - move active item next to over item
-    const newItems = reorderItems(localItems, active.id as string, over.id as string);
-    setLocalItems(newItems);
-    onReorder(newItems);
-  }, [localItems, onReorder]);
+    // 계층 구조 변경 로직
+    let newItems = [...localItems];
+    let success = true;
+
+    if (dropIndicator) {
+      const { depth, position } = dropIndicator;
+
+      if (position === 'inside' && depth === 1) {
+        // 자식으로 만들기
+        const overDepth = getItemDepth(localItems, over.id as string);
+        const activeDepth = getItemDepth(localItems, active.id as string);
+
+        // 최대 깊이 검증: over의 깊이 + active의 하위 깊이 확인
+        const activeTreeDepth = getTreeDepth([activeItem]);
+
+        if (overDepth + activeTreeDepth + 1 > MAX_DEPTH) {
+          console.warn(`최대 ${MAX_DEPTH}단계까지만 지원합니다`);
+          success = false;
+        } else {
+          newItems = makeChildOf(localItems, active.id as string, over.id as string);
+        }
+      } else if (depth === -1) {
+        // 부모 레벨로 올리기
+        const parent = findParentById(localItems, over.id as string);
+        if (parent) {
+          newItems = makeSiblingOf(localItems, active.id as string, parent.id);
+        } else {
+          // 이미 최상위 레벨
+          newItems = reorderItems(localItems, active.id as string, over.id as string);
+        }
+      } else {
+        // 같은 레벨에서 순서 변경
+        newItems = reorderItems(localItems, active.id as string, over.id as string);
+      }
+    } else {
+      // 기본: 같은 레벨 순서 변경
+      newItems = reorderItems(localItems, active.id as string, over.id as string);
+    }
+
+    setDropIndicator(null);
+
+    if (success) {
+      setLocalItems(newItems);
+      onReorder(newItems);
+    }
+  }, [localItems, onReorder, dropIndicator]);
 
   // Handle toggle open/closed
   const handleToggle = useCallback((id: string) => {
@@ -335,6 +448,7 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -378,6 +492,7 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
                     item={item}
                     depth={0}
                     selectedId={selected || null}
+                    dropIndicator={dropIndicator}
                     onSelect={onSelect}
                     onToggle={handleToggle}
                     onDuplicate={onDuplicate}
@@ -521,4 +636,72 @@ function collapseInTree(items: MenuItemTreeType[]): MenuItemTreeType[] {
     isOpen: false,
     children: item.children ? collapseInTree(item.children) : undefined
   }));
+}
+
+// 계층 구조 변경을 위한 헬퍼 함수들
+
+/**
+ * 항목의 현재 깊이 계산
+ */
+function getItemDepth(items: MenuItemTreeType[], itemId: string, currentDepth = 0): number {
+  for (const item of items) {
+    if (item.id === itemId) {
+      return currentDepth;
+    }
+    if (item.children && item.children.length > 0) {
+      const foundDepth = getItemDepth(item.children, itemId, currentDepth + 1);
+      if (foundDepth !== -1) {
+        return foundDepth;
+      }
+    }
+  }
+  return -1;
+}
+
+/**
+ * 항목을 다른 항목의 자식으로 만들기
+ */
+function makeChildOf(
+  items: MenuItemTreeType[],
+  childId: string,
+  parentId: string
+): MenuItemTreeType[] {
+  // 자식 항목 찾기 및 제거
+  const childItem = findItemById(items, childId);
+  if (!childItem) return items;
+
+  const withoutChild = removeItem(items, childId);
+
+  // 부모에 자식 추가
+  return withoutChild.map(item => {
+    if (item.id === parentId) {
+      return {
+        ...item,
+        isOpen: true, // 자식이 추가되면 자동으로 펼치기
+        children: [...(item.children || []), childItem]
+      };
+    }
+    if (item.children && item.children.length > 0) {
+      return {
+        ...item,
+        children: makeChildOf(item.children, childId, parentId)
+      };
+    }
+    return item;
+  });
+}
+
+/**
+ * 항목을 다른 항목의 형제로 만들기
+ */
+function makeSiblingOf(
+  items: MenuItemTreeType[],
+  itemId: string,
+  siblingId: string
+): MenuItemTreeType[] {
+  const item = findItemById(items, itemId);
+  if (!item) return items;
+
+  const withoutItem = removeItem(items, itemId);
+  return insertItemNear(withoutItem, item, siblingId);
 }
