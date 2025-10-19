@@ -92,7 +92,14 @@ jobs:
       run: pnpm install --frozen-lockfile
 
     - name: Build packages
-      run: pnpm run build:packages
+      run: |
+        echo "📦 Building shared packages..."
+        pnpm run build:packages
+        echo ""
+        echo "✅ Packages built. Verifying dist directories..."
+        ls -la packages/auth-client/dist/ || echo "❌ auth-client/dist not found!"
+        ls -la packages/ui/dist/ || echo "❌ ui/dist not found!"
+        ls -la packages/types/dist/ || echo "❌ types/dist not found!"
 
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
