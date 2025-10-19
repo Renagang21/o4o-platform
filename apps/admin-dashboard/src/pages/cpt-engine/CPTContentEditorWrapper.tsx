@@ -1,26 +1,36 @@
 /**
  * CPT Content Editor Wrapper
- * Handles route parameters and passes them to the editor
+ * Uses Gutenberg Block Editor for CPT content (same as Posts/Pages)
  */
 
-import { useParams, useNavigate } from 'react-router-dom';
-import CPTContentEditor from './components/CPTContentEditor';
+import { FC, useMemo } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import StandaloneEditor from '@/pages/editor/StandaloneEditor';
 
-const CPTContentEditorWrapper = () => {
+const CPTContentEditorWrapper: FC = () => {
   const { cptSlug, postId } = useParams<{ cptSlug: string; postId?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
 
+  // Redirect if no cptSlug
   if (!cptSlug) {
     navigate('/cpt-engine');
     return null;
   }
 
+  // Generate unique key for component remounting (same pattern as EditorRouteWrapper)
+  const componentKey = useMemo(
+    () => postId ? `cpt-${cptSlug}-${postId}` : `cpt-${cptSlug}-new-${location.key}`,
+    [cptSlug, postId, location.key]
+  );
+
+  // Use StandaloneEditor with 'post' mode for CPT content
+  // This gives CPT the same Gutenberg editing experience as Posts
   return (
-    <CPTContentEditor
-      cptSlug={cptSlug}
+    <StandaloneEditor
+      key={componentKey}
+      mode="post"
       postId={postId}
-      onSave={() => navigate(`/cpt-engine/content/${cptSlug}`)}
-      onCancel={() => navigate(`/cpt-engine`)}
     />
   );
 };
