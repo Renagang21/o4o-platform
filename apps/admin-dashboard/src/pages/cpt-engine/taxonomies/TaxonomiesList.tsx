@@ -84,9 +84,15 @@ export default function TaxonomiesList() {
   const { data: taxonomies = [], isLoading: taxonomiesLoading, refetch } = useQuery({
     queryKey: ['taxonomies'],
     queryFn: async () => {
-      const response = await taxonomyApi.getAll();
-      return response.data || [];
-    }
+      try {
+        const response = await taxonomyApi.getAll();
+        return response.data || [];
+      } catch (error) {
+        console.warn('Taxonomies API not yet implemented:', error);
+        return [];
+      }
+    },
+    retry: false
   });
 
   // Fetch CPT types for filter
