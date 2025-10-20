@@ -78,7 +78,6 @@ export interface CenterControlsProps {
   isTablet: boolean;
   onToggleListView?: () => void;
   showListView?: boolean;
-  children?: React.ReactNode;
 }
 
 /**

@@ -7,9 +7,6 @@ import React from 'react';
 // UPDATED: Using Material-UI icons, which are already in the project dependencies
 import {
   ArrowBack,
-  Add,
-  Undo,
-  Redo,
   CollectionsBookmark,
   AutoAwesome,
 } from '@mui/icons-material';
@@ -76,54 +73,6 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
       {/* Separator */}
       <div className="w-[1px] h-6 bg-gray-200 mx-2" />
 
-      {/* --- ADDED: Core Gutenberg Controls --- */}
-      <div className="flex items-center gap-1">
-        {/* Add Block */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {/* TODO: Wire up onClick to editor's block inserter */}
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
-                <Add sx={{ fontSize: 20 }} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Add block</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        {/* Undo */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {/* TODO: Wire up onClick and disabled state to editor's history */}
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
-                <Undo sx={{ fontSize: 20 }} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Undo</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        {/* Redo */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {/* TODO: Wire up onClick and disabled state to editor's history */}
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-700">
-                <Redo sx={{ fontSize: 20 }} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Redo</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      
       {/* Separator - only show if custom buttons are visible */}
       {!isMobile && !isTablet && <div className="w-[1px] h-6 bg-gray-200 mx-2" />}
 

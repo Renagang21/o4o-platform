@@ -1,8 +1,7 @@
 /**
  * CenterControls Component
- * Center section of the editor header showing document info and status.
- * This component now includes the List View toggle and the main PostTitle.
- * REFINED: On mobile and tablet, only the PostTitle is shown for a cleaner UI.
+ * Center section of the editor header showing document status and list view toggle.
+ * REFINED: On mobile and tablet, most controls are hidden for a cleaner UI.
  */
 
 import React from 'react';
@@ -27,7 +26,6 @@ export const CenterControls: React.FC<CenterControlsProps> = ({
   isTablet, // Added prop for tablet detection
   onToggleListView,
   showListView,
-  children,
 }) => {
   const isSmallScreen = isMobile || isTablet;
 
@@ -62,34 +60,27 @@ export const CenterControls: React.FC<CenterControlsProps> = ({
         </TooltipProvider>
       )}
 
-      {/* --- Document Title and Status --- */}
+      {/* --- Document Status --- */}
       <div className="flex-1 flex items-center justify-center min-w-0">
-        <div className="flex flex-col items-center justify-center max-w-full">
-          {/* Document Title (passed as children) - Now visible on all screen sizes */}
-          <div className="w-full max-w-xs md:max-w-sm lg:max-w-md">
-             {children}
+        {/* Save Status Indicator - Hidden on mobile and tablet */}
+        {!isSmallScreen && (
+          <div className="text-xs h-4">
+            {isSaving ? (
+              <span className="text-gray-500 flex items-center gap-1">
+                <div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />
+                Saving...
+              </span>
+            ) : isDirty ? (
+              <span className="text-orange-600">Unsaved changes</span>
+            ) : lastSaved ? (
+              <span className="text-gray-500">
+                Saved
+              </span>
+            ) : (
+              <span /> // Empty space to prevent layout shift
+            )}
           </div>
-          
-          {/* Save Status Indicator - Hidden on mobile and tablet */}
-          {!isSmallScreen && (
-            <div className="text-xs h-4 mt-0.5">
-              {isSaving ? (
-                <span className="text-gray-500 flex items-center gap-1">
-                  <div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full" />
-                  Saving...
-                </span>
-              ) : isDirty ? (
-                <span className="text-orange-600">Unsaved changes</span>
-              ) : lastSaved ? (
-                <span className="text-gray-500">
-                  Saved
-                </span>
-              ) : (
-                <span /> // Empty space to prevent layout shift
-              )}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Status Badge - Hidden on mobile and tablet */}

@@ -12,7 +12,6 @@ import { LeftControls } from './LeftControls';
 import { CenterControls } from './CenterControls';
 import { RightControls } from './RightControls';
 import type { EditorHeaderProps } from './types';
-import { PostTitle } from './PostTitle'; // Import the PostTitle component
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
   // Document state
@@ -74,7 +73,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
         />
       </div>
 
-      {/* Center Section: Flexible, contains title and secondary controls */}
+      {/* Center Section: Flexible, contains secondary controls */}
       {/* FIXED: Removed redundant padding that was causing layout squeeze */}
       <div className="flex-1 min-w-0">
         <CenterControls
@@ -86,10 +85,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           isTablet={isTablet}
           onToggleListView={onToggleListView}
           showListView={showListView}
-        >
-          {/* The actual PostTitle input is passed as a child */}
-          <PostTitle value={postTitle} onChange={onTitleChange} />
-        </CenterControls>
+        />
       </div>
 
       {/* Right Section: Fixed size */}
