@@ -43,6 +43,12 @@ import shortcodeBlockDefinition from './definitions/shortcode';
 import youtubeBlockDefinition from './definitions/youtube';
 import fileBlockDefinition from './definitions/file';
 
+// Form blocks
+import postFormBlockDefinition from './definitions/post-form';
+import cptFormBlockDefinition from './definitions/cpt-form';
+import formFieldBlockDefinition from './definitions/form-field';
+import formSubmitBlockDefinition from './definitions/form-submit';
+
 // Type declaration is in wordpress-runtime-setup.ts
 
 // Custom block types are dynamically loaded via lazy.ts to improve performance
@@ -88,6 +94,12 @@ export function registerAllBlocks(): void {
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);
   blockRegistry.register(fileBlockDefinition);
+
+  // Register form blocks
+  blockRegistry.register(postFormBlockDefinition);
+  blockRegistry.register(cptFormBlockDefinition);
+  blockRegistry.register(formFieldBlockDefinition);
+  blockRegistry.register(formSubmitBlockDefinition);
 }
 
 // Export registry for external use
@@ -160,6 +172,20 @@ const blockStyles = `
     border-color: #007cba;
     color: #007cba;
     background-color: rgba(0, 124, 186, 0.04);
+  }
+
+  /* Form Block Styles */
+  .o4o-post-form-block,
+  .o4o-cpt-form-block {
+    position: relative;
+  }
+
+  .o4o-form-field-block {
+    margin-bottom: 1rem;
+  }
+
+  .o4o-form-submit-block {
+    margin-top: 1.5rem;
   }
 `;
 
