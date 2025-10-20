@@ -20,7 +20,9 @@ import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
 import SlashCommandMenu from './SlashCommandMenu';
 import DefaultBlockAppender from './DefaultBlockAppender';
-// Toast 기능을 직접 구현
+// Toast components
+import { useToast } from './hooks/useToast';
+import { Toast } from './components/Toast';
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -226,7 +228,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const { toast, showToast } = useToast();
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
 
@@ -292,12 +294,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlock(null);
     }
   }, [selectedBlockId, blocks]);
-  
-  // Simple toast function
-  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  }, []);
 
   // Update blocks and history
   const updateBlocks = useCallback(
@@ -637,24 +633,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       const newBlocks = [...blocks];
       const insertIndex = position === 'after' ? index + 1 : index;
-
-      console.log('[handleAddBlock]', {
-        blockId,
-        position,
-        blockType,
-        currentIndex: index,
-        insertIndex,
-        totalBlocks: blocks.length,
-        blocksBefore: blocks.map(b => ({ id: b.id, type: b.type }))
-      });
-
       newBlocks.splice(insertIndex, 0, newBlock);
       updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
-
-      console.log('[handleAddBlock] After insert:', {
-        blocksAfter: newBlocks.map(b => ({ id: b.id, type: b.type }))
-      });
     },
     [blocks, updateBlocks]
   );
@@ -1077,12 +1058,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle block type change
   const handleBlockTypeChange = useCallback(
     (blockId: string, newType: string) => {
-      console.log('[handleBlockTypeChange]', {
-        blockId,
-        newType,
-        currentBlocks: blocks.map(b => ({ id: b.id, type: b.type }))
-      });
-
       const newBlocks = blocks.map((block) => {
         if (block.id === blockId) {
           // Convert heading types
@@ -1097,7 +1072,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           }
           // Convert to paragraph
           if (newType === 'o4o/paragraph') {
-            console.log('[handleBlockTypeChange] Converting BlockAppender to Paragraph');
             return {
               ...block,
               type: 'o4o/paragraph',
@@ -1109,10 +1083,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return block;
       });
       updateBlocks(newBlocks);
-
-      console.log('[handleBlockTypeChange] After conversion:', {
-        newBlocks: newBlocks.map(b => ({ id: b.id, type: b.type }))
-      });
     },
     [blocks, updateBlocks]
   );
@@ -1843,22 +1813,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         )}
       </div>
-      
-      {/* Simple Toast */}
-      {toast && (
-        <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
-          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg bg-white ${
-            toast.type === 'success' ? 'border-green-200' :
-            toast.type === 'error' ? 'border-red-200' :
-            'border-blue-200'
-          }`}>
-            {toast.type === 'success' && <CheckCircle className="h-5 w-5 text-green-500" />}
-            {toast.type === 'error' && <XCircle className="h-5 w-5 text-red-500" />}
-            {toast.type === 'info' && <Info className="h-5 w-5 text-blue-500" />}
-            <p className="text-sm font-medium text-gray-900">{toast.message}</p>
-          </div>
-        </div>
-      )}
+
+      {/* Toast Notifications */}
+      {toast && <Toast toast={toast} />}
 
       {/* Design Library Modal */}
       <DesignLibraryModalImproved
