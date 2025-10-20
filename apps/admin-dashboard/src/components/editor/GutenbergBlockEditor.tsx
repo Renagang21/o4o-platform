@@ -605,6 +605,45 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       // Handle regular block slash command
       if (!triggerBlockId) return;
 
+      // Special handling for BlockAppender
+      if (triggerBlockId.startsWith('block-appender')) {
+        // Create new block at the end of blocks array
+        const newBlock: Block = {
+          id: `block-${Date.now()}`,
+          type: blockType,
+          content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
+          attributes: {},
+        };
+
+        const newBlocks = [...blocks, newBlock];
+        updateBlocks(newBlocks);
+        setSelectedBlockId(newBlock.id);
+
+        // Update recent blocks
+        setRecentBlocks(prev => {
+          const updated = [blockType, ...prev.filter(t => t !== blockType)];
+          return updated.slice(0, 5);
+        });
+
+        // Close slash menu
+        setIsSlashMenuOpen(false);
+        setSlashQuery('');
+        setSlashTriggerBlockId(null);
+
+        // Focus new block
+        setTimeout(() => {
+          const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+          if (newBlockElement) {
+            const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+            if (editableElement) {
+              editableElement.focus();
+            }
+          }
+        }, 50);
+
+        return;
+      }
+
       // Find the block that triggered slash command
       const blockIndex = blocks.findIndex(b => b.id === triggerBlockId);
       if (blockIndex === -1) return;

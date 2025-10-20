@@ -259,7 +259,13 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           setTimeout(() => {
             const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
             if (appender) {
-              appender.focus();
+              // Find the editable element inside BlockAppender
+              const editableElement = appender.querySelector('[contenteditable="true"]') as HTMLElement;
+              if (editableElement) {
+                editableElement.focus();
+                // Scroll into view
+                editableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
             }
           }, 50);
 

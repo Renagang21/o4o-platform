@@ -254,8 +254,8 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
         ref={editorRef}
         className={cn(
           'block-appender-content',
-          'min-h-[3em]',
-          'px-4 py-3',
+          'min-h-[2em]',
+          'px-4 py-2',
           'border-2 border-dashed border-gray-300 rounded-md',
           'hover:border-gray-400 focus-within:border-blue-400',
           'transition-colors duration-200',
