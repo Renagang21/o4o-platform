@@ -85,14 +85,29 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   hideHeader = false,
   disableSessionRestore = false,
 }) => {
-  // Initialize with empty state
-  // Don't create any blocks automatically - user should add blocks manually
+  // Initialize with empty state or BlockAppender
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialBlocks.length > 0) {
-      return initialBlocks;
+      // When loading existing content, add BlockAppender at the end
+      return [
+        ...initialBlocks,
+        {
+          id: `block-appender-${Date.now()}`,
+          type: 'o4o/block-appender',
+          content: { text: '' },
+          attributes: {},
+        }
+      ];
     }
-    // Start with completely empty editor
-    return [];
+    // Start with one BlockAppender for empty editor
+    return [
+      {
+        id: `block-appender-${Date.now()}`,
+        type: 'o4o/block-appender',
+        content: { text: '' },
+        attributes: {},
+      }
+    ];
   });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
@@ -130,9 +145,19 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       // Only restore if there are non-empty blocks
       if (nonEmptyBlocks.length > 0) {
+        // Add BlockAppender at the end when restoring
+        const blocksWithAppender = [
+          ...nonEmptyBlocks,
+          {
+            id: `block-appender-${Date.now()}`,
+            type: 'o4o/block-appender',
+            content: { text: '' },
+            attributes: {},
+          }
+        ];
         setHistory(storedSession.history);
         setHistoryIndex(storedSession.historyIndex);
-        setBlocks(nonEmptyBlocks);
+        setBlocks(blocksWithAppender);
         setDocumentTitle(storedSession.documentTitle);
         setSessionRestored(true);
         showToast('편집 내역이 복원되었습니다', 'info');
@@ -143,8 +168,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Sync blocks with initialBlocks prop changes
   useEffect(() => {
     if (initialBlocks && initialBlocks.length > 0 && !sessionRestored) {
-      setBlocks(initialBlocks);
-      setHistory([createHistoryEntry(initialBlocks)]);
+      // Add BlockAppender at the end when syncing
+      const blocksWithAppender = [
+        ...initialBlocks,
+        {
+          id: `block-appender-${Date.now()}`,
+          type: 'o4o/block-appender',
+          content: { text: '' },
+          attributes: {},
+        }
+      ];
+      setBlocks(blocksWithAppender);
+      setHistory([createHistoryEntry(blocksWithAppender)]);
       setHistoryIndex(0);
       setIsDirty(false);
     }
@@ -1653,15 +1688,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             ) : (
               <div className="blocks-container">
-                {/* BlockAppender at the beginning if no blocks */}
-                {blocks.length === 0 && renderBlock({
-                  id: 'block-appender-top',
-                  type: 'o4o/block-appender',
-                  content: { text: '' },
-                  attributes: {},
-                })}
-
-                {/* Render actual blocks */}
+                {/* Render all blocks */}
                 {blocks.map((block, index) => (
                   <BlockWrapper
                     key={block.id}
@@ -1683,14 +1710,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     {renderBlock(block)}
                   </BlockWrapper>
                 ))}
-
-                {/* BlockAppender at the end if blocks exist */}
-                {blocks.length > 0 && renderBlock({
-                  id: 'block-appender-bottom',
-                  type: 'o4o/block-appender',
-                  content: { text: '' },
-                  attributes: {},
-                })}
               </div>
             )}
 

@@ -257,31 +257,15 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           // Shift+Enter or Ctrl+Enter: line break within heading
           // Let Slate's withParagraphs plugin handle it
         } else {
-          // Plain Enter: finish editing, move to DefaultBlockAppender
+          // Plain Enter: create new BlockAppender below this block
           event.preventDefault();
 
           // Save current content
           const currentHtml = serialize(editor.children);
           onChange(currentHtml, attributes);
 
-          // Blur current editor
-          if (event.currentTarget instanceof HTMLElement) {
-            event.currentTarget.blur();
-          }
-
-          // Focus DefaultBlockAppender
-          setTimeout(() => {
-            const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
-            if (appender) {
-              // Find the editable element inside BlockAppender
-              const editableElement = appender.querySelector('[contenteditable="true"]') as HTMLElement;
-              if (editableElement) {
-                editableElement.focus();
-                // Scroll into view
-                editableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }
-            }
-          }, 50);
+          // Create new BlockAppender after this block
+          onAddBlock?.('after', 'o4o/block-appender');
 
           return;
         }

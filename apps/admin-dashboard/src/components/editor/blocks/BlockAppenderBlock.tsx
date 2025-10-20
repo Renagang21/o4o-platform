@@ -242,13 +242,12 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
       type="block-appender"
       isSelected={isSelected}
       onSelect={onSelect}
-      onDelete={() => {}} // Disable delete
+      onDelete={onDelete} // Enable delete
       onDuplicate={() => {}} // Disable duplicate
       onMoveUp={() => {}} // Disable move up
       onMoveDown={() => {}} // Disable move down
       onAddBlock={onAddBlock}
       className="wp-block-appender"
-      hideToolbar={true} // Hide toolbar for cleaner look
     >
       <div
         ref={editorRef}
