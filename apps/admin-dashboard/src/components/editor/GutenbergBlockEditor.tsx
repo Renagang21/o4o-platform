@@ -130,9 +130,15 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
     const storedSession = loadEditorSession();
     if (storedSession && storedSession.history.length > 0) {
-      // Filter out empty blocks from restored session
+      // Filter out empty blocks from restored session, but preserve BlockAppender
       const restoredBlocks = storedSession.history[storedSession.historyIndex].blocks;
       const nonEmptyBlocks = restoredBlocks.filter(block => {
+        // Always keep BlockAppender blocks (they're meant to be empty)
+        if (block.type === 'o4o/block-appender') {
+          return true;
+        }
+
+        // Filter other blocks based on content
         if (typeof block.content === 'string') {
           return block.content.trim().length > 0;
         }
@@ -143,18 +149,24 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return false;
       });
 
-      // Only restore if there are non-empty blocks
+      // Only restore if there are blocks
       if (nonEmptyBlocks.length > 0) {
-        // Add BlockAppender at the end when restoring
-        const blocksWithAppender = [
-          ...nonEmptyBlocks,
-          {
-            id: `block-appender-${Date.now()}`,
-            type: 'o4o/block-appender',
-            content: { text: '' },
-            attributes: {},
-          }
-        ];
+        // Check if BlockAppender already exists
+        const hasBlockAppender = nonEmptyBlocks.some(b => b.type === 'o4o/block-appender');
+
+        // Add BlockAppender at the end if not present
+        const blocksWithAppender = hasBlockAppender
+          ? nonEmptyBlocks
+          : [
+              ...nonEmptyBlocks,
+              {
+                id: `block-appender-${Date.now()}`,
+                type: 'o4o/block-appender',
+                content: { text: '' },
+                attributes: {},
+              }
+            ];
+
         setHistory(storedSession.history);
         setHistoryIndex(storedSession.historyIndex);
         setBlocks(blocksWithAppender);

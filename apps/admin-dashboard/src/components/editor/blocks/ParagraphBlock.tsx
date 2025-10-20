@@ -24,6 +24,7 @@ import { withDeleteKey } from '../slate/plugins/withDeleteKey';
 import { withLinks, isLinkActive, unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
+import { createBlockEnterHandler } from '../utils/handleBlockEnter';
 import type { CustomText, ParagraphElement, LinkElement } from '../slate/types/slate-types';
 
 interface ParagraphBlockProps {
@@ -205,7 +206,18 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [editor]);
 
-  // Handle Enter key - create new block after current
+  // Common Enter key handler
+  const handleEnterKey = useMemo(
+    () => createBlockEnterHandler({
+      editor,
+      onChange,
+      onAddBlock,
+      attributes,
+    }),
+    [editor, onChange, onAddBlock, attributes]
+  );
+
+  // Handle keyboard shortcuts and special keys
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       const isModKey = event.ctrlKey || event.metaKey;
@@ -237,24 +249,10 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }
       }
 
-      // Enter key handling
+      // Enter key handling - use common handler
       if (event.key === 'Enter') {
-        if (event.shiftKey || event.ctrlKey || event.metaKey) {
-          // Shift+Enter or Ctrl+Enter: line break within block
-          // Let Slate's withParagraphs plugin handle it
-        } else {
-          // Plain Enter: create new BlockAppender below this block
-          event.preventDefault();
-
-          // Save current content
-          const currentHtml = serialize(editor.children);
-          onChange(currentHtml, attributes);
-
-          // Create new BlockAppender after this block
-          onAddBlock?.('after', 'o4o/block-appender');
-
-          return;
-        }
+        handleEnterKey(event);
+        return;
       }
 
       // Backspace at start of empty/whitespace-only block
@@ -281,7 +279,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }
       }
     },
-    [editor, onAddBlock, onDelete, toggleLinkEditor]
+    [editor, handleEnterKey, onDelete, toggleLinkEditor]
   );
 
   // Render element (paragraph or link)
