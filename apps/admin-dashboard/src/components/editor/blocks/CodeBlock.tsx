@@ -148,20 +148,28 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
       }, 0);
     }
 
-    // Enter key: Maintain indentation
+    // Enter key: Cmd/Ctrl+Enter to exit block, plain Enter to maintain indentation
     if (e.key === 'Enter') {
+      // Cmd/Ctrl+Enter: Exit block and add new paragraph
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        onAddBlock?.('after', 'o4o/paragraph');
+        return;
+      }
+
+      // Plain Enter: Maintain indentation
       e.preventDefault();
       const textarea = e.target as HTMLTextAreaElement;
       const start = textarea.selectionStart;
       const lines = localCode.substring(0, start).split('\n');
       const currentLine = lines[lines.length - 1];
-      
+
       // Calculate indentation
       const indent = currentLine.match(/^(\s*)/)?.[1] || '';
       const newValue = localCode.substring(0, start) + '\n' + indent + localCode.substring(start);
-      
+
       handleCodeChange(newValue);
-      
+
       // Set cursor position after the indentation
       setTimeout(() => {
         textarea.selectionStart = textarea.selectionEnd = start + 1 + indent.length;

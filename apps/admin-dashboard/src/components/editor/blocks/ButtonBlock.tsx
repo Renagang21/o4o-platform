@@ -171,6 +171,20 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
     updateAttribute('text', plainText);
   };
 
+  // Handle Enter key - end block and add new paragraph
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        // Modifier + Enter: allow line break (though buttons usually single-line)
+        return;
+      }
+
+      // Plain Enter: end block and add new paragraph
+      e.preventDefault();
+      onAddBlock?.('after', 'o4o/paragraph');
+    }
+  };
+
   // Generate gradient CSS
   const generateGradientCSS = (): string => {
     if (!gradientEnabled || !gradientStops || gradientStops.length < 2) {
@@ -409,6 +423,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
                 tagName="span"
                 value={localText}
                 onChange={handleTextChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Add text..."
                 className="outline-none"
                 allowedFormats={['core/bold', 'core/italic']}

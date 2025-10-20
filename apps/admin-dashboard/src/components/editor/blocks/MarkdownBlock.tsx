@@ -208,6 +208,14 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     }
   };
 
+  // Handle Enter key - end block and add new paragraph
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onAddBlock?.('after', 'o4o/paragraph');
+    }
+  }, [onAddBlock]);
+
   return (
     <EnhancedBlockWrapper
       id={id}
@@ -247,7 +255,11 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
         ) : null
       }
     >
-      <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div
+        className="relative bg-white border border-gray-200 rounded-lg overflow-hidden outline-none focus:ring-2 focus:ring-blue-500"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+      >
         {/* Filename Header */}
         {filename && (
           <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
