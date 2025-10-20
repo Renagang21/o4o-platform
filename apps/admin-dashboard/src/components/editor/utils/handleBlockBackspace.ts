@@ -1,15 +1,18 @@
 /**
- * Common Backspace Key Handler for Block Components
+ * Common Backspace Key Handler for Content Blocks
  *
- * Provides standardized Backspace key behavior across text-based blocks:
+ * Provides standardized Backspace key behavior for content blocks
+ * (ParagraphBlock, HeadingBlock, etc.):
  * - Delete empty blocks
- * - Prevent deletion for special blocks (e.g., BlockAppender)
  * - Handle cursor position at start of block
+ *
+ * Note: UI control blocks (like BlockAppenderBlock) should NOT use this handler
+ * as they have different semantics and should not be deleted.
  *
  * Usage:
  * ```typescript
- * const handleBackspace = useCallback(
- *   createBlockBackspaceHandler({
+ * const handleBackspace = useMemo(
+ *   () => createBlockBackspaceHandler({
  *     editor,
  *     onDelete,
  *   }),
@@ -17,7 +20,10 @@
  * );
  *
  * // In keyDown handler:
- * handleBackspace(event);
+ * if (event.key === 'Backspace') {
+ *   handleBackspace(event);
+ *   return;
+ * }
  * ```
  */
 
@@ -26,20 +32,18 @@ import { Editor, Range } from 'slate';
 export interface BlockBackspaceHandlerOptions {
   /** Slate editor instance */
   editor: Editor;
-  /** Block deletion handler (optional - omit for blocks that shouldn't be deleted) */
-  onDelete?: () => void;
-  /** If true, only prevent default without deleting (for special blocks like BlockAppender) */
-  preventDefaultOnly?: boolean;
+  /** Block deletion handler */
+  onDelete: () => void;
 }
 
 /**
- * Creates a standardized Backspace key handler for blocks
+ * Creates a standardized Backspace key handler for content blocks
  *
  * @param options - Configuration options
  * @returns KeyDown event handler function
  */
 export function createBlockBackspaceHandler(options: BlockBackspaceHandlerOptions) {
-  const { editor, onDelete, preventDefaultOnly = false } = options;
+  const { editor, onDelete } = options;
 
   return (event: React.KeyboardEvent) => {
     // Only handle Backspace key
@@ -51,12 +55,10 @@ export function createBlockBackspaceHandler(options: BlockBackspaceHandlerOption
     const text = Editor.string(editor, []);
     const isEmpty = !text || text.trim() === '';
 
-    // If block is empty, delete it (or prevent default for special blocks)
+    // If block is empty, delete it
     if (isEmpty) {
       event.preventDefault();
-      if (!preventDefaultOnly && onDelete) {
-        onDelete();
-      }
+      onDelete();
       return;
     }
 
@@ -66,9 +68,7 @@ export function createBlockBackspaceHandler(options: BlockBackspaceHandlerOption
       const [start] = Range.edges(selection);
       if (start.offset === 0 && text.trim() === '') {
         event.preventDefault();
-        if (!preventDefaultOnly && onDelete) {
-          onDelete();
-        }
+        onDelete();
       }
     }
   };
