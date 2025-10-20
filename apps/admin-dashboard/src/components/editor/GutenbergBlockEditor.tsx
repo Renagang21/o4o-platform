@@ -637,9 +637,24 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       const newBlocks = [...blocks];
       const insertIndex = position === 'after' ? index + 1 : index;
+
+      console.log('[handleAddBlock]', {
+        blockId,
+        position,
+        blockType,
+        currentIndex: index,
+        insertIndex,
+        totalBlocks: blocks.length,
+        blocksBefore: blocks.map(b => ({ id: b.id, type: b.type }))
+      });
+
       newBlocks.splice(insertIndex, 0, newBlock);
       updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
+
+      console.log('[handleAddBlock] After insert:', {
+        blocksAfter: newBlocks.map(b => ({ id: b.id, type: b.type }))
+      });
     },
     [blocks, updateBlocks]
   );
@@ -1062,6 +1077,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle block type change
   const handleBlockTypeChange = useCallback(
     (blockId: string, newType: string) => {
+      console.log('[handleBlockTypeChange]', {
+        blockId,
+        newType,
+        currentBlocks: blocks.map(b => ({ id: b.id, type: b.type }))
+      });
+
       const newBlocks = blocks.map((block) => {
         if (block.id === blockId) {
           // Convert heading types
@@ -1076,6 +1097,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           }
           // Convert to paragraph
           if (newType === 'o4o/paragraph') {
+            console.log('[handleBlockTypeChange] Converting BlockAppender to Paragraph');
             return {
               ...block,
               type: 'o4o/paragraph',
@@ -1087,6 +1109,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return block;
       });
       updateBlocks(newBlocks);
+
+      console.log('[handleBlockTypeChange] After conversion:', {
+        newBlocks: newBlocks.map(b => ({ id: b.id, type: b.type }))
+      });
     },
     [blocks, updateBlocks]
   );

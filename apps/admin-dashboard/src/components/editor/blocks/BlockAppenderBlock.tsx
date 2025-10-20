@@ -158,15 +158,25 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
           // Get current content
           const currentHtml = serialize(editor.children);
 
+          console.log('[BlockAppender] Enter key pressed:', {
+            hasContent: !!currentHtml.trim(),
+            onChangeType: typeof onChangeType,
+            onAddBlock: typeof onAddBlock,
+            id
+          });
+
           // If there's content, convert this BlockAppender to Paragraph
           if (currentHtml.trim()) {
             // Convert this BlockAppender to Paragraph
+            console.log('[BlockAppender] Converting to paragraph with onChangeType');
             onChangeType?.('o4o/paragraph');
 
             // Add new BlockAppender after
+            console.log('[BlockAppender] Adding new BlockAppender after');
             onAddBlock?.('after', 'o4o/block-appender');
           } else {
             // No content, just add new BlockAppender after
+            console.log('[BlockAppender] No content, adding new BlockAppender after');
             onAddBlock?.('after', 'o4o/block-appender');
           }
 

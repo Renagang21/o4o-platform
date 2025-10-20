@@ -56,9 +56,11 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
 
     // Save current content by serializing editor state
     const currentHtml = serialize(editor.children);
+    console.log('[createBlockEnterHandler] Enter pressed, saving content and adding BlockAppender');
     onChange(currentHtml, attributes);
 
     // Create new BlockAppender after this block
+    console.log('[createBlockEnterHandler] Calling onAddBlock(after, o4o/block-appender)');
     onAddBlock?.('after', 'o4o/block-appender');
   };
 }
