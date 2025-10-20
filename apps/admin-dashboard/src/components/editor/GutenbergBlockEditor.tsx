@@ -654,7 +654,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       // Special handling for BlockAppender
       if (triggerBlockId.startsWith('block-appender')) {
-        // Create new block at the end of blocks array
+        // Find BlockAppender index
+        const blockAppenderIndex = blocks.findIndex(b => b.id === triggerBlockId);
+
+        // Create new block to replace BlockAppender
         const newBlock: Block = {
           id: `block-${Date.now()}`,
           type: blockType,
@@ -662,7 +665,26 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           attributes: {},
         };
 
-        const newBlocks = [...blocks, newBlock];
+        // Create new BlockAppender to add after the new block
+        const newBlockAppender: Block = {
+          id: `block-appender-${Date.now()}`,
+          type: 'o4o/block-appender',
+          content: { text: '' },
+          attributes: {},
+        };
+
+        // Replace BlockAppender with new block and add new BlockAppender after
+        const newBlocks = [...blocks];
+        if (blockAppenderIndex !== -1) {
+          // Replace BlockAppender at its position with new block
+          newBlocks[blockAppenderIndex] = newBlock;
+          // Add new BlockAppender right after the new block
+          newBlocks.splice(blockAppenderIndex + 1, 0, newBlockAppender);
+        } else {
+          // Fallback: if BlockAppender not found, add at end
+          newBlocks.push(newBlock, newBlockAppender);
+        }
+
         updateBlocks(newBlocks);
         setSelectedBlockId(newBlock.id);
 
