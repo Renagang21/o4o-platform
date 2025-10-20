@@ -25,6 +25,8 @@ import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
 // Clipboard utilities
 import { copyBlockToClipboard, pasteBlockFromClipboard } from './utils/clipboard-utils';
+// Drag and drop hook
+import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -227,10 +229,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     }
   }, [propPostSettings]);
   const [isCodeView, setIsCodeView] = useState(false);
-  const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
-  const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
   const { toast, showToast } = useToast();
+  const { draggedBlockId, dragOverBlockId, handleDragStart, handleDragOver, handleDrop, handleDragEnd } = useDragAndDrop({ blocks, updateBlocks });
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
 
@@ -744,54 +745,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const handleToggleCodeView = useCallback(() => {
     setIsCodeView(!isCodeView);
   }, [isCodeView]);
-
-  // Handle drag start
-  const handleDragStart = useCallback((blockId: string, e: React.DragEvent) => {
-    setDraggedBlockId(blockId);
-  }, []);
-
-  // Handle drag over
-  const handleDragOver = useCallback((blockId: string, e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOverBlockId(blockId);
-  }, []);
-
-  // Handle drop
-  const handleDrop = useCallback((targetBlockId: string, draggedBlockId: string, e: React.DragEvent) => {
-    e.preventDefault();
-
-    if (!draggedBlockId || draggedBlockId === targetBlockId) {
-      setDraggedBlockId(null);
-      setDragOverBlockId(null);
-      return;
-    }
-
-    const draggedIndex = blocks.findIndex(b => b.id === draggedBlockId);
-    const targetIndex = blocks.findIndex(b => b.id === targetBlockId);
-
-    if (draggedIndex === -1 || targetIndex === -1) {
-      setDraggedBlockId(null);
-      setDragOverBlockId(null);
-      return;
-    }
-
-    const newBlocks = [...blocks];
-    const [draggedBlock] = newBlocks.splice(draggedIndex, 1);
-
-    // Insert at the correct position
-    const insertIndex = draggedIndex < targetIndex ? targetIndex : targetIndex;
-    newBlocks.splice(insertIndex, 0, draggedBlock);
-
-    updateBlocks(newBlocks);
-    setDraggedBlockId(null);
-    setDragOverBlockId(null);
-  }, [blocks, updateBlocks]);
-
-  // Handle drag end
-  const handleDragEnd = useCallback((blockId: string, e: React.DragEvent) => {
-    setDraggedBlockId(null);
-    setDragOverBlockId(null);
-  }, []);
 
   // Handle block duplication
   const handleDuplicate = useCallback((blockId: string) => {
