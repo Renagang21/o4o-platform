@@ -7,6 +7,7 @@ import React from 'react';
 // UPDATED: Using Material-UI icons, which are already in the project dependencies
 import {
   ArrowBack,
+  Add,
   CollectionsBookmark,
   AutoAwesome,
 } from '@mui/icons-material';
@@ -28,6 +29,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
   onBack,
   onOpenDesignLibrary,
   onOpenAIGenerator,
+  onOpenBlockInserter,
 }) => {
   return (
     <div className={cn('flex items-center', isMobile ? 'gap-0' : 'gap-1')}>
@@ -72,6 +74,32 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
 
       {/* Separator */}
       <div className="w-[1px] h-6 bg-gray-200 mx-2" />
+
+      {/* Add Block Button */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-700"
+              onClick={() => {
+                if (onOpenBlockInserter) {
+                  onOpenBlockInserter();
+                } else {
+                  // Fallback: dispatch custom event for GutenbergBlockEditor to listen
+                  window.dispatchEvent(new CustomEvent('open-block-inserter'));
+                }
+              }}
+            >
+              <Add sx={{ fontSize: 20 }} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Add block</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       {/* Separator - only show if custom buttons are visible */}
       {!isMobile && !isTablet && <div className="w-[1px] h-6 bg-gray-200 mx-2" />}

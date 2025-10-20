@@ -33,6 +33,7 @@ export interface EditorHeaderProps {
   // Project-specific features (O4O)
   onOpenDesignLibrary: () => void;
   onOpenAIGenerator: () => void;
+  onOpenBlockInserter?: () => void;
 
   // Additional features
   onToggleListView?: () => void;
@@ -64,6 +65,7 @@ export interface LeftControlsProps {
   onBack: () => void;
   onOpenDesignLibrary: () => void;
   onOpenAIGenerator: () => void;
+  onOpenBlockInserter?: () => void;
 }
 
 /**

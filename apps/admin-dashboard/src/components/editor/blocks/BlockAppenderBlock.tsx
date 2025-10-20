@@ -31,6 +31,7 @@ interface BlockAppenderBlockProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onAddBlock?: (position: 'before' | 'after', type?: string) => void;
+  onChangeType?: (newType: string) => void;
   isSelected: boolean;
   onSelect: () => void;
   attributes?: Record<string, any>;
@@ -45,6 +46,7 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
   onMoveUp,
   onMoveDown,
   onAddBlock,
+  onChangeType,
   isSelected,
   onSelect,
   attributes = {}
@@ -142,7 +144,7 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
     });
   }, [editor, onChange, attributes]);
 
-  // Handle Enter key - create new block
+  // Handle Enter key - create new BlockAppender
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (event.key === 'Enter') {
@@ -150,43 +152,24 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
           // Shift+Enter or Ctrl+Enter: line break within block
           // Let Slate's withParagraphs plugin handle it
         } else {
-          // Plain Enter: create new Paragraph block
+          // Plain Enter: Always create new BlockAppender
           event.preventDefault();
 
           // Get current content
           const currentHtml = serialize(editor.children);
 
-          // Only create new block if there's content
+          // If there's content, convert this BlockAppender to Paragraph
           if (currentHtml.trim()) {
-            // Create new Paragraph block after this BlockAppender with the entered content
-            onAddBlock?.('after', 'o4o/paragraph', { text: currentHtml });
+            // Convert this BlockAppender to Paragraph
+            onChangeType?.('o4o/paragraph');
 
-            // Clear this BlockAppender
-            clearContent();
-
-            // Return focus to BlockAppender after new block is created
-            setTimeout(() => {
-              if (editorRef.current) {
-                const editableElement = editorRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
-                if (editableElement) {
-                  editableElement.focus();
-                  // Move cursor to start
-                  try {
-                    const range = document.createRange();
-                    const sel = window.getSelection();
-                    range.setStart(editableElement, 0);
-                    range.collapse(true);
-                    sel?.removeAllRanges();
-                    sel?.addRange(range);
-                  } catch (error) {
-                    // Ignore range errors
-                  }
-                }
-              }
-            }, 50);
+            // Add new BlockAppender after
+            onAddBlock?.('after', 'o4o/block-appender');
+          } else {
+            // No content, just add new BlockAppender after
+            onAddBlock?.('after', 'o4o/block-appender');
           }
 
-          // Focus stays on BlockAppender
           return;
         }
       }
@@ -203,7 +186,7 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
         }
       }
     },
-    [editor, onAddBlock, clearContent]
+    [editor, onAddBlock, onChangeType]
   );
 
   // Render element (paragraph only)

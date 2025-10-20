@@ -36,6 +36,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   // Project-specific features
   onOpenDesignLibrary,
   onOpenAIGenerator,
+  onOpenBlockInserter,
 
   // Additional features
   onToggleListView,
@@ -70,6 +71,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           onBack={onBack}
           onOpenDesignLibrary={onOpenDesignLibrary}
           onOpenAIGenerator={onOpenAIGenerator}
+          onOpenBlockInserter={onOpenBlockInserter}
         />
       </div>
 

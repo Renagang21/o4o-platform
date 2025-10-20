@@ -782,6 +782,16 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     [blocks, selectedBlockId, slashTriggerBlockId, updateBlocks]
   );
 
+  // Listen for custom "open-block-inserter" event from EditorHeader
+  useEffect(() => {
+    const handleOpenBlockInserter = () => {
+      setIsBlockInserterOpen(true);
+    };
+
+    window.addEventListener('open-block-inserter', handleOpenBlockInserter);
+    return () => window.removeEventListener('open-block-inserter', handleOpenBlockInserter);
+  }, []);
+
   // Detect "/" input in contentEditable elements
   useEffect(() => {
     const handleInput = (e: Event) => {
