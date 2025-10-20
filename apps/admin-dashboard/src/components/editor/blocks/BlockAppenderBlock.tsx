@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { serialize, deserialize } from '../slate/utils/serialize';
+import { createBlockBackspaceHandler } from '../utils/handleBlockBackspace';
 import type { CustomText, ParagraphElement } from '../slate/types/slate-types';
 
 interface BlockAppenderBlockProps {
@@ -144,6 +145,15 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
     });
   }, [editor, onChange, attributes]);
 
+  // Common Backspace key handler (prevent deletion for BlockAppender)
+  const handleBackspaceKey = useMemo(
+    () => createBlockBackspaceHandler({
+      editor,
+      preventDefaultOnly: true, // Don't delete BlockAppender, just prevent default
+    }),
+    [editor]
+  );
+
   // Handle Enter key - create new BlockAppender
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -174,19 +184,13 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
         }
       }
 
-      // Backspace at start of empty block - do nothing (keep BlockAppender)
+      // Backspace key handling - use common handler (prevents deletion)
       if (event.key === 'Backspace') {
-        const { selection } = editor;
-        const text = Editor.string(editor, []);
-        const isEmpty = !text || text.trim() === '';
-
-        if (isEmpty) {
-          event.preventDefault();
-          return; // Don't delete BlockAppender
-        }
+        handleBackspaceKey(event);
+        return;
       }
     },
-    [editor, onAddBlock, onChangeType]
+    [editor, onAddBlock, onChangeType, handleBackspaceKey]
   );
 
   // Render element (paragraph only)

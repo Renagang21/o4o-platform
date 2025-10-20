@@ -25,6 +25,7 @@ import { withLinks, isLinkActive, unwrapLink, wrapLink, getActiveLinkElement } f
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
 import { createBlockEnterHandler } from '../utils/handleBlockEnter';
+import { createBlockBackspaceHandler } from '../utils/handleBlockBackspace';
 import type { CustomText, ParagraphElement, LinkElement } from '../slate/types/slate-types';
 
 interface ParagraphBlockProps {
@@ -217,6 +218,15 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     [editor, onChange, onAddBlock, attributes]
   );
 
+  // Common Backspace key handler
+  const handleBackspaceKey = useMemo(
+    () => createBlockBackspaceHandler({
+      editor,
+      onDelete,
+    }),
+    [editor, onDelete]
+  );
+
   // Handle keyboard shortcuts and special keys
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -255,31 +265,13 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         return;
       }
 
-      // Backspace at start of empty/whitespace-only block
+      // Backspace key handling - use common handler
       if (event.key === 'Backspace') {
-        const { selection } = editor;
-        // Get text content from entire editor
-        const text = Editor.string(editor, []);
-        const isEmpty = !text || text.trim() === '';
-
-        // If block is empty or selection is at start with only whitespace, delete the block
-        if (isEmpty) {
-          event.preventDefault();
-          onDelete();
-          return;
-        }
-
-        // If at start of non-empty block, still allow Backspace (Slate will handle merge)
-        if (selection && Range.isCollapsed(selection)) {
-          const [start] = Range.edges(selection);
-          if (start.offset === 0 && text.trim() === '') {
-            event.preventDefault();
-            onDelete();
-          }
-        }
+        handleBackspaceKey(event);
+        return;
       }
     },
-    [editor, handleEnterKey, onDelete, toggleLinkEditor]
+    [editor, handleEnterKey, handleBackspaceKey, toggleLinkEditor]
   );
 
   // Render element (paragraph or link)
