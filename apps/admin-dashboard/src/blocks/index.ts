@@ -5,6 +5,9 @@
 
 import { blockRegistry } from './registry/BlockRegistry';
 
+// Special blocks
+import blockAppenderDefinition from './definitions/block-appender';
+
 // Core text blocks
 import paragraphBlockDefinition from './definitions/paragraph';
 import headingBlockDefinition from './definitions/heading';
@@ -48,6 +51,9 @@ import fileBlockDefinition from './definitions/file';
  * Register all blocks with the new registry system
  */
 export function registerAllBlocks(): void {
+  // Register special blocks first
+  blockRegistry.register(blockAppenderDefinition);
+
   // Register core text blocks
   blockRegistry.register(paragraphBlockDefinition);
   blockRegistry.register(headingBlockDefinition);

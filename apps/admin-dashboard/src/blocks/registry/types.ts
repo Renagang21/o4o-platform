@@ -233,6 +233,17 @@ export interface BlockDefinition {
       transform?: (attributes: unknown) => unknown;
     }[];
   };
+
+  /**
+   * Transient block flag (not saved to database)
+   * Used for special blocks like BlockAppender
+   */
+  isTransient?: boolean;
+
+  /**
+   * Exclude from HTML export
+   */
+  excludeFromExport?: boolean;
 }
 
 /**

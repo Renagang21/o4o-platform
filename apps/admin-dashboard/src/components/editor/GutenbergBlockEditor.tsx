@@ -271,8 +271,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       saveEditorSession(trimmedHistory, trimmedHistory.length - 1, documentTitle);
 
       // Notify parent (unless skipped for initialization)
+      // Filter out transient blocks (e.g., BlockAppender) before notifying parent
       if (!skipOnChange) {
-        onChange?.(newBlocks);
+        const blocksToNotify = newBlocks.filter(block => block.type !== 'o4o/block-appender');
+        onChange?.(blocksToNotify);
       }
     },
     [history, historyIndex, documentTitle, onChange]
@@ -577,12 +579,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Handle add block at position
   const handleAddBlock = useCallback(
-    (blockId: string, position: 'before' | 'after', blockType = 'o4o/paragraph') => {
+    (blockId: string, position: 'before' | 'after', blockType = 'o4o/paragraph', initialContent?: any) => {
       const index = blocks.findIndex((b) => b.id === blockId);
       const newBlock: Block = {
         id: `block-${Date.now()}`,
         type: blockType,
-        content: { text: '' },
+        content: initialContent || { text: '' },
         attributes: {},
       };
 
@@ -733,6 +735,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle save
   const handleSave = useCallback(async () => {
     try {
+      // Filter out transient blocks (e.g., BlockAppender)
+      const blocksToSave = blocks.filter(block => block.type !== 'o4o/block-appender');
+
       // If parent provided handler, delegate to avoid duplicate creates
       if (onSave) {
         await onSave();
@@ -748,7 +753,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       showToast('Saving draft...', 'info');
       const response = await postApi.saveDraft({
         title: documentTitle,
-        content: blocks,
+        content: blocksToSave,
         status: 'draft',
       });
       if (response.success) {
@@ -765,6 +770,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle publish
   const handlePublish = useCallback(async () => {
     try {
+      // Filter out transient blocks (e.g., BlockAppender)
+      const blocksToSave = blocks.filter(block => block.type !== 'o4o/block-appender');
+
       if (onPublish) {
         await onPublish();
         setIsDirty(false);
@@ -779,7 +787,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       showToast('Publishing post...', 'info');
       const response = await postApi.create({
         title: documentTitle,
-        content: blocks,
+        content: blocksToSave,
         status: 'published',
       });
       if (response.success && response.data) {
@@ -1606,34 +1614,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               </div>
             ) : (
               <div className="blocks-container">
-                {/* DefaultBlockAppender at the beginning if no blocks */}
-                {blocks.length === 0 && (
-                  <DefaultBlockAppender
-                    autoFocus={true}
-                    placeholder="Start writing..."
-                    onInsertBlock={(content) => {
-                      const newBlock: Block = {
-                        id: `block-${Date.now()}`,
-                        type: 'o4o/paragraph',
-                        content: { text: content },
-                        attributes: {},
-                      };
-                      updateBlocks([newBlock]);
-                      setSelectedBlockId(newBlock.id);
-
-                      // Focus new block
-                      setTimeout(() => {
-                        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-                        if (newBlockElement) {
-                          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-                          if (editableElement) {
-                            editableElement.focus();
-                          }
-                        }
-                      }, 50);
-                    }}
-                  />
-                )}
+                {/* BlockAppender at the beginning if no blocks */}
+                {blocks.length === 0 && renderBlock({
+                  id: 'block-appender-top',
+                  type: 'o4o/block-appender',
+                  content: { text: '' },
+                  attributes: {},
+                })}
 
                 {/* Render actual blocks */}
                 {blocks.map((block, index) => (
@@ -1658,33 +1645,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                   </BlockWrapper>
                 ))}
 
-                {/* DefaultBlockAppender at the end if blocks exist */}
-                {blocks.length > 0 && (
-                  <DefaultBlockAppender
-                    placeholder="Start writing..."
-                    onInsertBlock={(content) => {
-                      const newBlock: Block = {
-                        id: `block-${Date.now()}`,
-                        type: 'o4o/paragraph',
-                        content: { text: content },
-                        attributes: {},
-                      };
-                      updateBlocks([...blocks, newBlock]);
-                      setSelectedBlockId(newBlock.id);
-
-                      // Focus new block
-                      setTimeout(() => {
-                        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-                        if (newBlockElement) {
-                          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-                          if (editableElement) {
-                            editableElement.focus();
-                          }
-                        }
-                      }, 50);
-                    }}
-                  />
-                )}
+                {/* BlockAppender at the end if blocks exist */}
+                {blocks.length > 0 && renderBlock({
+                  id: 'block-appender-bottom',
+                  type: 'o4o/block-appender',
+                  content: { text: '' },
+                  attributes: {},
+                })}
               </div>
             )}
 
