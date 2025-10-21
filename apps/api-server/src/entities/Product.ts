@@ -154,28 +154,28 @@ export class Product {
   allowBackorder!: boolean;
 
   // Product Media
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   images?: ProductImages;
 
   @Column({ type: 'simple-array', nullable: true })
   tags?: string[];
 
   // Product Variants (사이즈, 색상 등)
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   variants?: ProductVariant[];
 
   @Column({ type: 'boolean', default: false })
   hasVariants!: boolean;
 
   // Physical Product Information
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   dimensions?: ProductDimensions;
 
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   shipping?: ShippingInfo;
 
   // SEO and Marketing
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   seo?: ProductSEO;
 
   @Column({ type: 'simple-array', nullable: true })
@@ -185,7 +185,7 @@ export class Product {
   specifications?: string;
 
   // Supplier Tier Pricing (문서 #66: 판매자 등급별 공급가)
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   tierPricing?: {
     bronze?: number;
     silver?: number;
@@ -203,7 +203,7 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   warranty?: string;
 
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
   // Timestamps
