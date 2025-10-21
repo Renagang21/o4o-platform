@@ -13,8 +13,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * 3. Optimize existing indexes
  * 4. Create materialized view for product listings
  */
-export class OptimizeProductsWithJsonb1800000000000 implements MigrationInterface {
-  name = 'OptimizeProductsWithJsonb1800000000000';
+export class OptimizeProductsWithJsonb1800000000001 implements MigrationInterface {
+  name = 'OptimizeProductsWithJsonb1800000000001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Step 1: Convert JSON columns to JSONB
