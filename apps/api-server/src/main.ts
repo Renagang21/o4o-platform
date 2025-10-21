@@ -58,6 +58,7 @@ import logger from './utils/logger';
 // Database connection
 import { AppDataSource, checkDatabaseHealth } from './database/connection';
 import { DatabaseChecker } from './utils/database-checker';
+import { MaterializedViewScheduler } from './services/MaterializedViewScheduler';
 import { Post } from './entities/Post';
 import { Page } from './entities/Page';
 import { SessionSyncService } from './services/sessionSyncService';
@@ -1101,6 +1102,17 @@ const startServer = async () => {
         }
       }
 
+      // Initialize Materialized View Scheduler
+      if (AppDataSource.isInitialized) {
+        try {
+          // Refresh every 5 minutes in production, 10 minutes in development
+          const refreshInterval = env.isProduction() ? '*/5 * * * *' : '*/10 * * * *';
+          MaterializedViewScheduler.start(refreshInterval);
+        } catch (schedulerError) {
+          logger.warn('Materialized View Scheduler initialization failed (non-critical):', schedulerError);
+        }
+      }
+
       // Initialize tracking updater job
       try {
         logger.info('Tracking updater job started');
@@ -1226,6 +1238,24 @@ const startServer = async () => {
 startServer().catch((error) => {
   logger.error('Failed to start server:', error);
   process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM signal received: closing HTTP server');
+  MaterializedViewScheduler.stop();
+  httpServer.close(() => {
+    logger.info('HTTP server closed');
+  });
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT signal received: closing HTTP server');
+  MaterializedViewScheduler.stop();
+  httpServer.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
 });
 
 // Export services for other modules
