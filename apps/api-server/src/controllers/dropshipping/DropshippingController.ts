@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../database/connection';
 import { Supplier, SupplierStatus, SupplierTier } from '../../entities/Supplier';
 import { Partner, PartnerStatus, PartnerTier } from '../../entities/Partner';
 import { PartnerCommission } from '../../entities/PartnerCommission';
@@ -12,7 +12,7 @@ export class DropshippingController {
   // Commission Policies
   getCommissionPolicies = async (req: Request, res: Response): Promise<void> => {
     try {
-      const supplierRepo = getRepository(Supplier);
+      const supplierRepo = AppDataSource.getRepository(Supplier);
       
       // Get suppliers with their commission policies
       const suppliers = await supplierRepo.find({
@@ -48,7 +48,7 @@ export class DropshippingController {
   // Approvals
   getApprovals = async (req: Request, res: Response): Promise<void> => {
     try {
-      const approvalLogRepo = getRepository(ApprovalLog);
+      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
       
       const approvals = await approvalLogRepo.find({
         relations: ['user', 'admin'],
@@ -94,7 +94,7 @@ export class DropshippingController {
         return;
       }
 
-      const approvalLogRepo = getRepository(ApprovalLog);
+      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
       
       const approval = await approvalLogRepo.findOne({
         where: { id },
@@ -142,7 +142,7 @@ export class DropshippingController {
         return;
       }
 
-      const approvalLogRepo = getRepository(ApprovalLog);
+      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
       
       const approval = await approvalLogRepo.findOne({
         where: { id },
@@ -180,10 +180,10 @@ export class DropshippingController {
   // System Status
   getSystemStatus = async (req: Request, res: Response): Promise<void> => {
     try {
-      const supplierRepo = getRepository(Supplier);
-      const partnerRepo = getRepository(Partner);
-      const productRepo = getRepository(Product);
-      const commissionRepo = getRepository(PartnerCommission);
+      const supplierRepo = AppDataSource.getRepository(Supplier);
+      const partnerRepo = AppDataSource.getRepository(Partner);
+      const productRepo = AppDataSource.getRepository(Product);
+      const commissionRepo = AppDataSource.getRepository(PartnerCommission);
 
       const [suppliersCount, partnersCount, productsCount, commissionsCount] = await Promise.all([
         supplierRepo.count(),
@@ -245,9 +245,9 @@ export class DropshippingController {
   // Create Sample Data
   createSampleData = async (req: Request, res: Response): Promise<void> => {
     try {
-      const userRepo = getRepository(User);
-      const supplierRepo = getRepository(Supplier);
-      const partnerRepo = getRepository(Partner);
+      const userRepo = AppDataSource.getRepository(User);
+      const supplierRepo = AppDataSource.getRepository(Supplier);
+      const partnerRepo = AppDataSource.getRepository(Partner);
 
       // Create sample suppliers
       const sampleSuppliers = [];
@@ -331,7 +331,7 @@ export class DropshippingController {
         return;
       }
 
-      const productRepo = getRepository(Product);
+      const productRepo = AppDataSource.getRepository(Product);
       const results = {
         success: 0,
         failed: 0,
