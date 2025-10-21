@@ -343,9 +343,9 @@ export class DropshippingController {
           const productData = products[i];
 
           // Validate required fields
-          if (!productData.title || !productData.acf?.cost_price || !productData.acf?.selling_price) {
+          if (!productData.title || !productData.acf?.cost_price || !productData.acf?.selling_price || !productData.acf?.supplier) {
             results.failed++;
-            results.errors.push(`Row ${i + 1}: Missing required fields (title, cost_price, selling_price)`);
+            results.errors.push(`Row ${i + 1}: Missing required fields (title, cost_price, selling_price, supplier)`);
             continue;
           }
 
@@ -374,7 +374,7 @@ export class DropshippingController {
             allowBackorder: false,
             hasVariants: false,
             partnerCommissionRate: 0,
-            supplierId: productData.acf.supplier || null
+            supplierId: productData.acf.supplier // Now guaranteed to exist by validation
           });
 
           await productRepo.save(product);
