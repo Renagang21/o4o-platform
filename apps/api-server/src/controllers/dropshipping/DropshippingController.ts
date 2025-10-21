@@ -349,19 +349,32 @@ export class DropshippingController {
             continue;
           }
 
-          // Create new product using CPT structure
+          // Create slug from title
+          const slug = productData.title
+            .toLowerCase()
+            .replace(/[^a-z0-9가-힣\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim() + `-${Date.now()}-${i}`;
+
+          // Create new product using proper Product entity structure
           const product = productRepo.create({
             name: productData.title,
             description: productData.content || '',
             sku: productData.acf.supplier_sku || `AUTO-${Date.now()}-${i}`,
-            price: productData.acf.selling_price,
-            costPrice: productData.acf.cost_price,
-            stock: 0,
-            category: 'dropshipping',
-            status: 'active',
-            supplierId: productData.acf.supplier || null,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            slug: slug,
+            type: 'physical',
+            status: 'draft', // Start as draft for review
+            isActive: false,
+            supplierPrice: parseFloat(productData.acf.cost_price),
+            recommendedPrice: parseFloat(productData.acf.selling_price),
+            currency: 'KRW',
+            inventory: 0,
+            trackInventory: true,
+            allowBackorder: false,
+            hasVariants: false,
+            partnerCommissionRate: 0,
+            supplierId: productData.acf.supplier || null
           });
 
           await productRepo.save(product);
