@@ -9,11 +9,13 @@ import SuppliersList from './SuppliersList';
 import Approvals from './Approvals';
 import Commissions from './Commissions';
 import SystemSetup from './SystemSetup';
+import BulkProductImport from './BulkProductImport';
 
 const DropshippingRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="products" element={<Products />} />
+      <Route path="products/bulk-import" element={<BulkProductImport />} />
       <Route path="orders" element={<Orders />} />
       <Route path="settlements" element={<Settlements />} />
       <Route path="sellers" element={<SellersList />} />

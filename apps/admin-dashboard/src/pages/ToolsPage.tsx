@@ -63,10 +63,6 @@ const ToolsPage = () => {
                 <p className="text-sm text-modern-text-secondary">CSV 또는 Excel 형식으로 내보내기</p>
               </button>
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
-                <h3 className="font-medium text-modern-text-primary mb-1">상품 일괄 가져오기</h3>
-                <p className="text-sm text-modern-text-secondary">CSV 파일로 상품 대량 등록</p>
-              </button>
-              <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <h3 className="font-medium text-modern-text-primary mb-1">주문 내역 내보내기</h3>
                 <p className="text-sm text-modern-text-secondary">주문 데이터 다운로드</p>
               </button>

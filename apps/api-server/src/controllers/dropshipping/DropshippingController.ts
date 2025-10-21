@@ -317,4 +317,71 @@ export class DropshippingController {
       });
     }
   };
+
+  // Bulk Import Products from CSV
+  bulkImportProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const products = req.body;
+
+      if (!Array.isArray(products) || products.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid request body. Expected an array of products.'
+        });
+        return;
+      }
+
+      const productRepo = getRepository(Product);
+      const results = {
+        success: 0,
+        failed: 0,
+        errors: [] as string[]
+      };
+
+      for (let i = 0; i < products.length; i++) {
+        try {
+          const productData = products[i];
+
+          // Validate required fields
+          if (!productData.title || !productData.acf?.cost_price || !productData.acf?.selling_price) {
+            results.failed++;
+            results.errors.push(`Row ${i + 1}: Missing required fields (title, cost_price, selling_price)`);
+            continue;
+          }
+
+          // Create new product using CPT structure
+          const product = productRepo.create({
+            name: productData.title,
+            description: productData.content || '',
+            sku: productData.acf.supplier_sku || `AUTO-${Date.now()}-${i}`,
+            price: productData.acf.selling_price,
+            costPrice: productData.acf.cost_price,
+            stock: 0,
+            category: 'dropshipping',
+            status: 'active',
+            supplierId: productData.acf.supplier || null,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+
+          await productRepo.save(product);
+          results.success++;
+        } catch (error: any) {
+          results.failed++;
+          results.errors.push(`Row ${i + 1}: ${error.message || 'Unknown error'}`);
+        }
+      }
+
+      res.json({
+        success: true,
+        data: results
+      });
+    } catch (error) {
+      console.error('Error bulk importing products:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to bulk import products'
+      });
+    }
+  };
 }

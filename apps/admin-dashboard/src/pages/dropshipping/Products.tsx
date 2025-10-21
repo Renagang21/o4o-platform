@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, DollarSign, TrendingUp, Package, BarChart } from 'lucide-react';
+import { Plus, Edit2, Trash2, DollarSign, TrendingUp, Package, BarChart, Upload } from 'lucide-react';
 import { dropshippingAPI } from '../../api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 import ProductEditor from './ProductEditor';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   id: string;
@@ -35,6 +36,7 @@ interface Product {
 }
 
 const Products: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -174,12 +176,21 @@ const Products: React.FC = () => {
       {/* WordPress Admin Style Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-normal text-gray-900">상품</h1>
-        <button
-          onClick={handleCreate}
-          className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition"
-        >
-          새로 추가
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate('/dropshipping/products/bulk-import')}
+            className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200 transition flex items-center gap-1"
+          >
+            <Upload className="h-4 w-4" />
+            CSV 일괄 가져오기
+          </button>
+          <button
+            onClick={handleCreate}
+            className="px-3 py-1 bg-wordpress-blue text-white text-sm rounded hover:bg-wordpress-blue-hover transition"
+          >
+            새로 추가
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
