@@ -220,13 +220,15 @@ export class CreatePaymentTables1830000000000 implements MigrationInterface {
     }));
 
     // Create foreign key to orders table
-    await queryRunner.createForeignKey('payments', new TableForeignKey({
-      columnNames: ['orderId'],
-      referencedTableName: 'orders',
-      referencedColumnNames: ['id'],
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE'
-    }));
+    // NOTE: Temporarily commented out due to orders table dependency
+    // This should be added manually or in a separate migration after orders table is confirmed
+    // await queryRunner.createForeignKey('payments', new TableForeignKey({
+    //   columnNames: ['orderId'],
+    //   referencedTableName: 'orders',
+    //   referencedColumnNames: ['id'],
+    //   onDelete: 'CASCADE',
+    //   onUpdate: 'CASCADE'
+    // }));
 
     // 2. Create payment_settlements table
     await queryRunner.createTable(
