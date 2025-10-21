@@ -340,11 +340,153 @@ export class PaymentService {
    * 정산 생성
    */
   private async createSettlements(paymentId: string): Promise<void> {
-    // TODO: 실제 정산 로직 구현
-    // - 공급자 정산
-    // - 파트너 커미션
-    // - 플랫폼 수수료
-    logger.info(`Creating settlements for payment: ${paymentId}`);
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Payment 조회
+      const payment = await this.paymentRepository.findOne({
+        where: { id: paymentId },
+        relations: ['order']
+      });
+
+      if (!payment || !payment.order) {
+        logger.error(`Payment or Order not found for settlement: ${paymentId}`);
+        return;
+      }
+
+      const order = payment.order;
+      const settlements: PaymentSettlement[] = [];
+
+      // 1. 공급자별 정산 생성
+      const supplierSettlements = this.calculateSupplierSettlements(order, payment);
+      settlements.push(...supplierSettlements);
+
+      // 2. 파트너 커미션 정산 (referralCode가 있는 경우)
+      if (order.items?.[0]) {
+        const partnerSettlement = this.calculatePartnerSettlement(order, payment);
+        if (partnerSettlement) {
+          settlements.push(partnerSettlement);
+        }
+      }
+
+      // 3. 플랫폼 수수료 정산
+      const platformSettlement = this.calculatePlatformSettlement(order, payment);
+      settlements.push(platformSettlement);
+
+      // 정산 저장
+      await queryRunner.manager.save(PaymentSettlement, settlements);
+      await queryRunner.commitTransaction();
+
+      logger.info(`Created ${settlements.length} settlements for payment: ${paymentId}`);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      logger.error('Error creating settlements:', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   * 공급자별 정산 계산
+   */
+  private calculateSupplierSettlements(order: any, payment: Payment): PaymentSettlement[] {
+    const settlements: PaymentSettlement[] = [];
+    const supplierMap = new Map<string, { totalAmount: number; name: string }>();
+
+    // OrderItem에서 공급자별 금액 집계
+    order.items?.forEach((item: any) => {
+      const supplierId = item.supplierId;
+      const supplierName = item.supplierName;
+      const amount = item.unitPrice * item.quantity; // 공급가 기준
+
+      if (supplierMap.has(supplierId)) {
+        const existing = supplierMap.get(supplierId)!;
+        existing.totalAmount += amount;
+      } else {
+        supplierMap.set(supplierId, { totalAmount: amount, name: supplierName });
+      }
+    });
+
+    // 공급자별 정산 생성
+    const now = new Date();
+    const settlementDate = new Date(now);
+    settlementDate.setDate(settlementDate.getDate() + 3); // D+3
+
+    supplierMap.forEach((supplierData, supplierId) => {
+      const settlement = new PaymentSettlement();
+      settlement.paymentId = payment.id;
+      settlement.recipientType = RecipientType.SUPPLIER;
+      settlement.recipientId = supplierId;
+      settlement.recipientName = supplierData.name;
+      settlement.amount = supplierData.totalAmount;
+      settlement.fee = 0; // 공급자 수수료 없음
+      settlement.tax = 0;
+      settlement.netAmount = supplierData.totalAmount;
+      settlement.status = SettlementStatus.SCHEDULED;
+      settlement.scheduledAt = settlementDate;
+
+      settlements.push(settlement);
+    });
+
+    return settlements;
+  }
+
+  /**
+   * 파트너 커미션 정산 계산
+   */
+  private calculatePartnerSettlement(order: any, payment: Payment): PaymentSettlement | null {
+    // 파트너 정보가 있는 경우에만 커미션 정산
+    // TODO: Order에 partnerId, partnerName 필드 추가 필요
+    // 임시로 null 반환
+
+    // 실제 구현 예시:
+    // const commissionRate = 0.1; // 10% 커미션
+    // const commissionAmount = order.summary.total * commissionRate;
+    //
+    // const settlement = new PaymentSettlement();
+    // settlement.paymentId = payment.id;
+    // settlement.recipientType = RecipientType.PARTNER;
+    // settlement.recipientId = order.partnerId;
+    // settlement.recipientName = order.partnerName;
+    // settlement.amount = commissionAmount;
+    // settlement.fee = 0;
+    // settlement.tax = 0;
+    // settlement.netAmount = commissionAmount;
+    // settlement.status = SettlementStatus.SCHEDULED;
+    //
+    // const settlementDate = new Date();
+    // settlementDate.setDate(settlementDate.getDate() + 7); // D+7
+    // settlement.scheduledAt = settlementDate;
+    //
+    // return settlement;
+
+    return null;
+  }
+
+  /**
+   * 플랫폼 수수료 정산 계산
+   */
+  private calculatePlatformSettlement(order: any, payment: Payment): PaymentSettlement {
+    const platformFeeRate = 0.05; // 5% 플랫폼 수수료
+    const platformFee = order.summary?.total * platformFeeRate || payment.amount * platformFeeRate;
+
+    const settlement = new PaymentSettlement();
+    settlement.paymentId = payment.id;
+    settlement.recipientType = RecipientType.PLATFORM;
+    settlement.recipientId = '00000000-0000-0000-0000-000000000000'; // 플랫폼 고정 ID
+    settlement.recipientName = 'O4O Platform';
+    settlement.amount = platformFee;
+    settlement.fee = 0;
+    settlement.tax = 0;
+    settlement.netAmount = platformFee;
+    settlement.status = SettlementStatus.COMPLETED; // 플랫폼 수수료는 즉시 완료
+    settlement.scheduledAt = new Date();
+    settlement.completedAt = new Date();
+
+    return settlement;
   }
 
   /**
