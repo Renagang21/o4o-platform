@@ -213,9 +213,9 @@ export const AppDataSource = new DataSource({
   ],
   
   // 마이그레이션 설정
-  migrations: NODE_ENV === 'production' 
-    ? ['dist/database/migrations/*.js'] 
-    : [__dirname + '/migrations/*.js'],
+  migrations: NODE_ENV === 'production'
+    ? ['dist/database/migrations/*.js']
+    : [__dirname + '/migrations/*.ts', __dirname + '/migrations/*.js'],
   migrationsTableName: 'typeorm_migrations',
   migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
   
