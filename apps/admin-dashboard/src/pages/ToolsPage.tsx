@@ -1,6 +1,9 @@
 import { Wrench, Database, Upload, Download, Shield, Code, RefreshCw, FileSearch, Settings, Terminal } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ToolsPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -61,6 +64,13 @@ const ToolsPage = () => {
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <h3 className="font-medium text-modern-text-primary mb-1">사용자 데이터 내보내기</h3>
                 <p className="text-sm text-modern-text-secondary">CSV 또는 Excel 형식으로 내보내기</p>
+              </button>
+              <button
+                onClick={() => navigate('/dropshipping/products/bulk-import')}
+                className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors cursor-pointer"
+              >
+                <h3 className="font-medium text-modern-text-primary mb-1">상품 일괄 가져오기</h3>
+                <p className="text-sm text-modern-text-secondary">CSV 파일로 드롭셀링 상품 대량 등록</p>
               </button>
               <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
                 <h3 className="font-medium text-modern-text-primary mb-1">주문 내역 내보내기</h3>
