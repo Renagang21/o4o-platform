@@ -23,6 +23,9 @@ import DefaultBlockAppender from './DefaultBlockAppender';
 // Toast components
 import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
+// AI Chat Panel
+import { AIChatPanel } from './AIChatPanel';
+import { EditorContext, AIAction } from '@/services/ai/ConversationalAI';
 // Clipboard utilities
 import { copyBlockToClipboard, pasteBlockFromClipboard } from './utils/clipboard-utils';
 // Drag and drop hook
@@ -236,6 +239,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const { draggedBlockId, dragOverBlockId, handleDragStart, handleDragOver, handleDrop, handleDragEnd } = useDragAndDrop({ blocks, updateBlocks });
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   // Slash command menu states
   const [isSlashMenuOpen, setIsSlashMenuOpen] = useState(false);
@@ -274,6 +278,93 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Viewport mode hook
   const { viewportMode, currentConfig, switchViewport, containerSettings } = useCustomizerSettings();
+
+  // ⭐ AI Chat - EditorContext 생성
+  const editorContext: EditorContext = useMemo(() => ({
+    selectedBlockId,
+    selectedBlock: blocks.find(b => b.id === selectedBlockId) || null,
+    allBlocks: blocks.filter(b => b.type !== 'o4o/block-appender'), // BlockAppender 제외
+    documentTitle,
+    blockCount: blocks.filter(b => b.type !== 'o4o/block-appender').length,
+  }), [selectedBlockId, blocks, documentTitle]);
+
+  // ⭐ AI Chat - 액션 실행
+  const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
+    actions.forEach(action => {
+      switch (action.action) {
+        case 'insert':
+          if (action.blockType) {
+            const newBlock: Block = {
+              id: `block-${Date.now()}`,
+              type: action.blockType,
+              content: action.content || { text: '' },
+              attributes: action.attributes || {},
+            };
+
+            const newBlocks = [...blocks];
+            if (action.position === 'before' && action.targetBlockId) {
+              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
+              newBlocks.splice(idx, 0, newBlock);
+            } else if (action.position === 'after' && action.targetBlockId) {
+              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
+              newBlocks.splice(idx + 1, 0, newBlock);
+            } else if (typeof action.position === 'number') {
+              newBlocks.splice(action.position, 0, newBlock);
+            } else {
+              newBlocks.push(newBlock);
+            }
+
+            updateBlocks(newBlocks);
+            setSelectedBlockId(newBlock.id);
+            showToast('블록이 추가되었습니다', 'success');
+          }
+          break;
+
+        case 'update':
+          if (action.targetBlockId) {
+            handleBlockUpdate(action.targetBlockId, action.content, action.attributes);
+            showToast('블록이 업데이트되었습니다', 'success');
+          }
+          break;
+
+        case 'delete':
+          if (action.targetBlockId) {
+            handleBlockDelete(action.targetBlockId);
+            showToast('블록이 삭제되었습니다', 'success');
+          }
+          break;
+
+        case 'replace':
+          if (action.blocks) {
+            updateBlocks(action.blocks);
+            showToast(`${action.blocks.length}개 블록으로 교체되었습니다`, 'success');
+          }
+          break;
+
+        case 'move':
+          if (action.targetBlockId && typeof action.position === 'number') {
+            const blockIndex = blocks.findIndex(b => b.id === action.targetBlockId);
+            if (blockIndex !== -1) {
+              const newBlocks = [...blocks];
+              const [block] = newBlocks.splice(blockIndex, 1);
+              newBlocks.splice(action.position, 0, block);
+              updateBlocks(newBlocks);
+              showToast('블록이 이동되었습니다', 'success');
+            }
+          }
+          break;
+
+        case 'duplicate':
+          if (action.targetBlockId) {
+            handleDuplicate(action.targetBlockId);
+          }
+          break;
+
+        default:
+          console.warn('Unknown action:', action);
+      }
+    });
+  }, [blocks, updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
 
   // Initialize WordPress on mount
   useEffect(() => {
@@ -1090,8 +1181,34 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            {/* ⭐ AI Chat Toggle Button */}
+            <button
+              onClick={() => setIsAIChatOpen(!isAIChatOpen)}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                isAIChatOpen
+                  ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              title="AI 어시스턴트"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+              <span>AI Chat</span>
+            </button>
+
             <span className="text-sm text-gray-500">
-              {blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}
+              {blocks.filter(b => b.type !== 'o4o/block-appender').length} blocks
             </span>
           </div>
         </div>
@@ -1348,6 +1465,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           showToast('AI 페이지가 생성되었습니다!', 'success');
         }}
       />
+
+      {/* ⭐ AI Chat Panel - 대화형 편집기 */}
+      {isAIChatOpen && (
+        <div className="fixed right-0 top-14 bottom-0 w-96 bg-white border-l shadow-xl z-50">
+          <AIChatPanel
+            editorContext={editorContext}
+            onExecuteActions={handleExecuteAIActions}
+            config={{ provider: 'gemini', model: 'gemini-2.5-flash' }}
+          />
+        </div>
+      )}
 
       {/* Slash Command Menu */}
       {isSlashMenuOpen && (

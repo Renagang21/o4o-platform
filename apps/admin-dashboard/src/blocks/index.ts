@@ -46,6 +46,7 @@ import fileBlockDefinition from './definitions/file';
 // Form blocks
 import postFormBlockDefinition from './definitions/post-form';
 import cptFormBlockDefinition from './definitions/cpt-form';
+import universalFormBlockDefinition from './definitions/universal-form';
 import formFieldBlockDefinition from './definitions/form-field';
 import formSubmitBlockDefinition from './definitions/form-submit';
 
@@ -98,6 +99,7 @@ export function registerAllBlocks(): void {
   // Register form blocks
   blockRegistry.register(postFormBlockDefinition);
   blockRegistry.register(cptFormBlockDefinition);
+  blockRegistry.register(universalFormBlockDefinition); // ⭐ New unified form block
   blockRegistry.register(formFieldBlockDefinition);
   blockRegistry.register(formSubmitBlockDefinition);
 }

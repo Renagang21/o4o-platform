@@ -5,13 +5,14 @@
  * Updated: 2025-09-30 - Fixed React 18.2.0 compatibility
  */
 
-import React, { 
+import React, {
   createElement, createContext, useContext, useState, useEffect,
   useCallback, useMemo, useRef, Component, Fragment, Children,
   forwardRef, memo, lazy, Suspense, StrictMode, PureComponent,
   cloneElement, isValidElement
 } from 'react';
 import ReactDOM, { createPortal, render, unmountComponentAtNode } from 'react-dom';
+import { getBlockManager } from '@/utils/block-manager';
 import '../styles/wordpress-dashboard.css';
 
 // Initialize WordPress polyfills only when needed
@@ -500,7 +501,6 @@ export async function initializeWordPress() {
   }
 
   // Load block manager for optimized block loading
-  const { getBlockManager } = await import('@/utils/block-manager');
   const blockManager = getBlockManager();
 
   // Load only essential blocks initially

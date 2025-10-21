@@ -6,7 +6,9 @@
 import React from 'react';
 import { Square } from 'lucide-react';
 import { BlockDefinition, BlockComponent } from '../registry/types';
-import ColumnBlock from '@/components/editor/blocks/ColumnBlock';
+
+// Use lazy loading to avoid static/dynamic import conflict
+const ColumnBlock = React.lazy(() => import('@/components/editor/blocks/ColumnBlock'));
 
 export const columnBlockDefinition: BlockDefinition = {
   name: 'o4o/column',

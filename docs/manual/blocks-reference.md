@@ -80,6 +80,74 @@
 |--------|------|----------|--------|---------------|
 | `o4o/cpt-acf-loop` | 커스텀 포스트 루프 | postType, postsPerPage, orderBy, taxonomy | CPT 목록/카테고리 랜딩 | 카테고리·태그 기반 필터, 카드/리스트 뷰 스위치 |
 
+## 폼 블록 (2025-10 신규)
+
+### Universal Form Block ⭐ 신규
+
+**블록명**: `o4o/universal-form`
+
+**설명**: Post와 모든 Custom Post Type을 단일 블록으로 처리하는 통합 폼 블록
+
+**주요 속성**:
+- `postType` (string): 'post' 또는 CPT slug (ds_product, ds_booking 등)
+- `formAction` (string): 'create' | 'edit'
+- `postId` (string): 편집 모드 시 대상 Post/CPT ID
+- `defaultStatus` (string): 'draft' | 'published'
+- `redirectUrl` (string): 제출 후 리다이렉트 URL
+- `successMessage` (string): 성공 메시지
+- `resetOnSubmit` (boolean): 제출 후 폼 초기화
+
+**InnerBlocks**:
+- `o4o/form-field` - 폼 필드
+- `o4o/form-submit` - 제출 버튼
+
+**사용 예시**:
+
+```json
+{
+  "type": "o4o/universal-form",
+  "attributes": {
+    "postType": "ds_product",
+    "formAction": "create",
+    "defaultStatus": "draft"
+  },
+  "innerBlocks": [
+    {
+      "type": "o4o/form-field",
+      "attributes": {
+        "name": "title",
+        "label": "상품명",
+        "fieldType": "text",
+        "required": true,
+        "mapToField": "title"
+      }
+    },
+    {
+      "type": "o4o/form-field",
+      "attributes": {
+        "name": "price",
+        "label": "가격",
+        "fieldType": "number",
+        "required": true,
+        "acfFieldKey": "field_price"
+      }
+    },
+    {
+      "type": "o4o/form-submit",
+      "attributes": {
+        "text": "상품 등록"
+      }
+    }
+  ]
+}
+```
+
+**장점**:
+- ✅ 1개 블록으로 Post + 모든 CPT 처리
+- ✅ 새 CPT 추가 시 자동 지원
+- ✅ ACF 필드 통합 지원
+- ✅ 코드 중복 없음 (기존 PostFormBlock, CptFormBlock 통합)
+
 
 ## 숏코드 블록
 
@@ -146,5 +214,63 @@
 
 ---
 
-**버전:** 0.6.0
-**마지막 업데이트:** 2025-10-15
+## 🤖 AI 기능 (2025-10 신규)
+
+### 대화형 편집기 ⭐ 신규
+
+**기능**: AI 어시스턴트와 자연어로 대화하며 블록 편집
+
+**사용법**:
+1. 편집기 상단 "AI Chat" 버튼 클릭
+2. 자연어 명령 입력
+3. AI 응답 확인
+4. "액션 실행" 버튼 클릭
+
+**지원 명령**:
+- "제목 블록 추가해줘"
+- "선택된 블록 삭제해줘"
+- "이미지 블록을 맨 위에 추가"
+- "이 블록을 버튼으로 바꿔줘"
+- "맨 아래에 단락 블록 추가"
+
+**AI 액션 타입**:
+- `insert` - 블록 삽입
+- `update` - 블록 업데이트
+- `delete` - 블록 삭제
+- `replace` - 블록 교체
+- `move` - 블록 이동
+- `duplicate` - 블록 복제
+
+**예시 대화**:
+
+```
+User: "제목 추가해줘"
+AI: {
+  "actions": [{
+    "action": "insert",
+    "position": "after",
+    "targetBlockId": "selected-block-id",
+    "blockType": "o4o/heading",
+    "content": { "text": "새 제목", "level": 2 }
+  }]
+}
+```
+
+### CPT 자동 인식
+
+AI가 이제 다음을 자동으로 인식합니다:
+
+**사용 가능한 Custom Post Types**:
+- `ds_product` (드롭쉬핑 상품)
+  - Form 블록 사용: `{"type": "o4o/universal-form", "attributes": {"postType": "ds_product"}}`
+  - 사용 가능한 필드: price, stock, featured_image, gallery
+- `ds_booking` (예약)
+  - Form 블록 사용: `{"type": "o4o/universal-form", "attributes": {"postType": "ds_booking"}}`
+  - 사용 가능한 필드: start_date, end_date, customer_name, phone
+
+**중요**: Universal Form Block을 사용하면 Post와 모든 CPT를 단일 블록으로 처리 가능!
+
+---
+
+**버전:** 0.7.0
+**마지막 업데이트:** 2025-10-21

@@ -69,13 +69,14 @@ class ReferenceFetcherService {
    */
   async fetchCompleteReference(): Promise<string> {
     try {
-      // 1단계: 서버에서 데이터 가져오기 시도
-      const [blocksRef, shortcodesRef] = await Promise.all([
+      // 1단계: 서버에서 데이터 가져오기 시도 (CPT 포함)
+      const [blocksRef, shortcodesRef, cptRef] = await Promise.all([
         this.fetchFromServer('/api/ai/blocks/reference', 'blocks'),
-        this.fetchFromServer('/api/ai/shortcodes/reference', 'shortcodes')
+        this.fetchFromServer('/api/ai/shortcodes/reference', 'shortcodes'),
+        this.fetchCptReference().catch(() => null) // CPT 실패해도 계속 진행
       ]);
 
-      const reference = this.formatServerReference(blocksRef, shortcodesRef);
+      const reference = this.formatServerReference(blocksRef, shortcodesRef, cptRef);
 
       // 서버 참조 데이터 로드 성공
       this.hasWarnedFallback = false;
@@ -94,6 +95,47 @@ class ReferenceFetcherService {
       }
 
       return this.fetchLocalFallback();
+    }
+  }
+
+  /**
+   * CPT 참조 데이터 가져오기
+   */
+  private async fetchCptReference(): Promise<any> {
+    try {
+      const url = `${this.API_BASE}/cpt/types?active=true`;
+      const token = this.getAuthToken();
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        headers,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`CPT 데이터 로드 실패: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        return {
+          success: true,
+          cptTypes: result.data
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.warn('CPT 참조 데이터 로드 실패:', error);
+      return null;
     }
   }
 
@@ -184,7 +226,7 @@ class ReferenceFetcherService {
   /**
    * 서버 응답을 AI 프롬프트 형식으로 포맷
    */
-  private formatServerReference(blocksData: ServerResponse, shortcodesData: ServerResponse): string {
+  private formatServerReference(blocksData: ServerResponse, shortcodesData: ServerResponse, cptData: any): string {
     let reference = '';
 
     // 블록 레퍼런스
@@ -233,6 +275,36 @@ class ReferenceFetcherService {
 
       reference += '숏코드는 core/shortcode 블록으로 삽입:\n';
       reference += '{"type": "core/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}\n';
+    }
+
+    // ⭐ CPT 참조 데이터 추가
+    if (cptData?.success && cptData.cptTypes?.length > 0) {
+      reference += '\n=== 사용 가능한 Custom Post Types ===\n\n';
+      reference += '다음 CPT들을 Universal Form으로 생성/편집 가능:\n\n';
+
+      cptData.cptTypes.forEach((cpt: any) => {
+        reference += `${cpt.slug} (${cpt.label || cpt.name}):\n`;
+        reference += `- 설명: ${cpt.description || 'Custom Post Type'}\n`;
+
+        // Form 블록 사용 예시
+        reference += `- Form 블록 사용:\n`;
+        reference += `  {"type": "o4o/universal-form", "attributes": {"postType": "${cpt.slug}"}, "innerBlocks": [...]}\n`;
+
+        // ACF 필드가 있다면 표시
+        if (cpt.fields && cpt.fields.length > 0) {
+          reference += `- 사용 가능한 필드:\n`;
+          cpt.fields.slice(0, 5).forEach((field: any) => {
+            reference += `  * ${field.name} (${field.type})\n`;
+          });
+          if (cpt.fields.length > 5) {
+            reference += `  ... 외 ${cpt.fields.length - 5}개\n`;
+          }
+        }
+
+        reference += '\n';
+      });
+
+      reference += '중요: Universal Form Block을 사용하면 Post와 모든 CPT를 단일 블록으로 처리 가능!\n';
     }
 
     return reference;
