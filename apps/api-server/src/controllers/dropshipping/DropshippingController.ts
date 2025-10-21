@@ -358,24 +358,23 @@ export class DropshippingController {
             .trim() + `-${Date.now()}-${i}`;
 
           // Create new product using proper Product entity structure
-          const product = productRepo.create({
-            name: productData.title,
-            description: productData.content || '',
-            sku: productData.acf.supplier_sku || `AUTO-${Date.now()}-${i}`,
-            slug: slug,
-            type: 'physical',
-            status: 'draft', // Start as draft for review
-            isActive: false,
-            supplierPrice: parseFloat(productData.acf.cost_price),
-            recommendedPrice: parseFloat(productData.acf.selling_price),
-            currency: 'KRW',
-            inventory: 0,
-            trackInventory: true,
-            allowBackorder: false,
-            hasVariants: false,
-            partnerCommissionRate: 0,
-            supplierId: productData.acf.supplier // Now guaranteed to exist by validation
-          });
+          const product = new Product();
+          product.name = productData.title;
+          product.description = productData.content || '';
+          product.sku = productData.acf.supplier_sku || `AUTO-${Date.now()}-${i}`;
+          product.slug = slug;
+          product.type = 'physical' as any;
+          product.status = 'draft' as any;
+          product.isActive = false;
+          product.supplierPrice = parseFloat(productData.acf.cost_price) as any;
+          product.recommendedPrice = parseFloat(productData.acf.selling_price) as any;
+          product.currency = 'KRW';
+          product.inventory = 0;
+          product.trackInventory = true;
+          product.allowBackorder = false;
+          product.hasVariants = false;
+          product.partnerCommissionRate = 0;
+          product.supplierId = productData.acf.supplier;
 
           await productRepo.save(product);
           results.success++;
