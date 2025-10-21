@@ -67,25 +67,25 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
 
     await queryRunner.query(`
       -- Index for searching within images
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_images_gin
+      CREATE INDEX IF NOT EXISTS idx_products_images_gin
       ON products USING GIN (images);
     `);
 
     await queryRunner.query(`
       -- Index for variant searches
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_variants_gin
+      CREATE INDEX IF NOT EXISTS idx_products_variants_gin
       ON products USING GIN (variants);
     `);
 
     await queryRunner.query(`
       -- Index for SEO searches
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_seo_gin
+      CREATE INDEX IF NOT EXISTS idx_products_seo_gin
       ON products USING GIN (seo);
     `);
 
     await queryRunner.query(`
       -- Index for metadata searches
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_metadata_gin
+      CREATE INDEX IF NOT EXISTS idx_products_metadata_gin
       ON products USING GIN (metadata);
     `);
 
@@ -94,19 +94,19 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
 
     await queryRunner.query(`
       -- Index for main image URL (commonly accessed)
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_images_main
+      CREATE INDEX IF NOT EXISTS idx_products_images_main
       ON products ((images->'main'));
     `);
 
     await queryRunner.query(`
       -- Index for SEO slug (used in URLs)
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_seo_slug
+      CREATE INDEX IF NOT EXISTS idx_products_seo_slug
       ON products ((seo->>'slug'));
     `);
 
     await queryRunner.query(`
       -- Index for brand (common filter)
-      CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_products_brand_lower
+      CREATE INDEX IF NOT EXISTS idx_products_brand_lower
       ON products (LOWER(brand));
     `);
 
