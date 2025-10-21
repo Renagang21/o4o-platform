@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from 'typeorm';
 
 export class CreatePaymentTables1830000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -201,32 +201,32 @@ export class CreatePaymentTables1830000000000 implements MigrationInterface {
     );
 
     // Create indexes for payments table
-    await queryRunner.createIndex('payments', {
+    await queryRunner.createIndex('payments', new TableIndex({
       name: 'IDX_payments_orderId',
       columnNames: ['orderId']
-    } as any);
-    await queryRunner.createIndex('payments', {
+    }));
+    await queryRunner.createIndex('payments', new TableIndex({
       name: 'IDX_payments_paymentKey',
       columnNames: ['paymentKey'],
       isUnique: true
-    } as any);
-    await queryRunner.createIndex('payments', {
+    }));
+    await queryRunner.createIndex('payments', new TableIndex({
       name: 'IDX_payments_status',
       columnNames: ['status']
-    } as any);
-    await queryRunner.createIndex('payments', {
+    }));
+    await queryRunner.createIndex('payments', new TableIndex({
       name: 'IDX_payments_requestedAt',
       columnNames: ['requestedAt']
-    } as any);
+    }));
 
     // Create foreign key to orders table
-    await queryRunner.createForeignKey('payments', {
+    await queryRunner.createForeignKey('payments', new TableForeignKey({
       columnNames: ['orderId'],
       referencedTableName: 'orders',
       referencedColumnNames: ['id'],
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE'
-    } as any);
+    }));
 
     // 2. Create payment_settlements table
     await queryRunner.createTable(
@@ -381,31 +381,31 @@ export class CreatePaymentTables1830000000000 implements MigrationInterface {
     );
 
     // Create indexes for payment_settlements table
-    await queryRunner.createIndex('payment_settlements', {
+    await queryRunner.createIndex('payment_settlements', new TableIndex({
       name: 'IDX_payment_settlements_paymentId',
       columnNames: ['paymentId']
-    } as any);
-    await queryRunner.createIndex('payment_settlements', {
+    }));
+    await queryRunner.createIndex('payment_settlements', new TableIndex({
       name: 'IDX_payment_settlements_recipientType_recipientId',
       columnNames: ['recipientType', 'recipientId']
-    } as any);
-    await queryRunner.createIndex('payment_settlements', {
+    }));
+    await queryRunner.createIndex('payment_settlements', new TableIndex({
       name: 'IDX_payment_settlements_status',
       columnNames: ['status']
-    } as any);
-    await queryRunner.createIndex('payment_settlements', {
+    }));
+    await queryRunner.createIndex('payment_settlements', new TableIndex({
       name: 'IDX_payment_settlements_scheduledAt',
       columnNames: ['scheduledAt']
-    } as any);
+    }));
 
     // Create foreign key to payments table
-    await queryRunner.createForeignKey('payment_settlements', {
+    await queryRunner.createForeignKey('payment_settlements', new TableForeignKey({
       columnNames: ['paymentId'],
       referencedTableName: 'payments',
       referencedColumnNames: ['id'],
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE'
-    } as any);
+    }));
 
     // 3. Create payment_webhooks table
     await queryRunner.createTable(
@@ -545,30 +545,30 @@ export class CreatePaymentTables1830000000000 implements MigrationInterface {
     );
 
     // Create indexes for payment_webhooks table
-    await queryRunner.createIndex('payment_webhooks', {
+    await queryRunner.createIndex('payment_webhooks', new TableIndex({
       name: 'IDX_payment_webhooks_paymentKey',
       columnNames: ['paymentKey']
-    } as any);
-    await queryRunner.createIndex('payment_webhooks', {
+    }));
+    await queryRunner.createIndex('payment_webhooks', new TableIndex({
       name: 'IDX_payment_webhooks_orderId',
       columnNames: ['orderId']
-    } as any);
-    await queryRunner.createIndex('payment_webhooks', {
+    }));
+    await queryRunner.createIndex('payment_webhooks', new TableIndex({
       name: 'IDX_payment_webhooks_eventType',
       columnNames: ['eventType']
-    } as any);
-    await queryRunner.createIndex('payment_webhooks', {
+    }));
+    await queryRunner.createIndex('payment_webhooks', new TableIndex({
       name: 'IDX_payment_webhooks_status',
       columnNames: ['status']
-    } as any);
-    await queryRunner.createIndex('payment_webhooks', {
+    }));
+    await queryRunner.createIndex('payment_webhooks', new TableIndex({
       name: 'IDX_payment_webhooks_processed',
       columnNames: ['processed']
-    } as any);
-    await queryRunner.createIndex('payment_webhooks', {
+    }));
+    await queryRunner.createIndex('payment_webhooks', new TableIndex({
       name: 'IDX_payment_webhooks_createdAt',
       columnNames: ['createdAt']
-    } as any);
+    }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
