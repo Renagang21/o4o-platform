@@ -135,6 +135,7 @@ import previewRoutes from './routes/preview';
 import approvalV1Routes from './routes/v1/approval.routes';
 import aiSettingsRoutes from './routes/v1/ai-settings.routes';
 import orderRoutes from './routes/orders.routes';
+import paymentRoutes from './routes/payments.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -906,6 +907,9 @@ app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versionin
 
 // Order management routes
 app.use('/api/orders', orderRoutes); // Order management API
+
+// Payment routes
+app.use('/api/v1/payments', paymentRoutes); // Payment management API
 
 // Dropshipping admin routes
 import dropshippingAdminRoutes from './routes/admin/dropshipping.routes';
