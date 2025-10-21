@@ -147,14 +147,10 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
           WHEN p."trackInventory" = true THEN p.inventory > 0
           ELSE true
         END as in_stock,
-        -- Supplier info (denormalized for performance)
-        s.name as supplier_name,
-        s."isVerified" as supplier_verified,
         -- Category info (denormalized)
         c.name as category_name,
         c.slug as category_slug
       FROM products p
-      LEFT JOIN suppliers s ON p."supplierId" = s.id
       LEFT JOIN categories c ON p."categoryId" = c.id
       WHERE p.status IN ('active', 'out_of_stock')
         AND p."isActive" = true;
