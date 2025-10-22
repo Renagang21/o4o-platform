@@ -22,13 +22,9 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // 에러 로깅
-    // Error logging - use proper error handler
-    
-    // 개발 환경에서 상세 정보 표시
-    if (import.meta.env.DEV) {
-    // Error logging - use proper error handler
-    }
+    // 에러 로깅 - 프로덕션에서도 콘솔에 출력
+    console.error('ErrorBoundary caught an error:', error);
+    console.error('Component stack:', errorInfo.componentStack);
 
     this.setState({
       error,
@@ -59,7 +55,7 @@ class ErrorBoundary extends Component<Props, State> {
                 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
               </p>
               
-              {import.meta.env.DEV && this.state.error && (
+              {this.state.error && (
                 <div className="mt-4 text-left bg-red-50 p-4 rounded-md">
                   <p className="text-sm font-mono text-red-800">
                     {this.state.error.toString() as any}
