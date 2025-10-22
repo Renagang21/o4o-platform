@@ -107,9 +107,23 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
-    // 최적화 설정 - esbuild 사용 (더 빠름)
-    minify: process.env.VITE_BUILD_MINIFY || (process.env.NODE_ENV === 'production' ? 'esbuild' : false),
-    // esbuild minify 옵션
+    // Use terser for safer minification (prevents TDZ errors)
+    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
+    // terser minify 옵션
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+        drop_debugger: process.env.NODE_ENV === 'production',
+        pure_funcs: process.env.NODE_ENV === 'production' ? ['console.log', 'console.info'] : [],
+      },
+      mangle: {
+        // Preserve class names to avoid minification issues
+        keep_classnames: false,
+        // Safari 10 compatibility
+        safari10: true,
+      },
+    },
+    // esbuild minify 옵션 (terser 사용 시 무시됨)
     esbuildOptions: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
       // Use array concatenation to avoid grep detection
