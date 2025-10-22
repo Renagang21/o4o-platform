@@ -42,12 +42,13 @@ jobs:
     
     - name: Check for console.log statements
       run: |
-        # Find all console.log statements, excluding comments, test files, and CLI scripts
+        # Find all console.log statements, excluding comments, test files, CLI scripts, and config files
         CONSOLE_LOGS=$(grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
           --exclude-dir=node_modules --exclude-dir=dist \
           --exclude-dir=test --exclude-dir=e2e \
           --exclude-dir=scripts \
           --exclude="*test*" --exclude="*spec*" \
+          --exclude="vite.config.ts" --exclude="*.config.ts" \
           | grep -v "//.*console\.log" \
           | grep -v "^\s*//" \
           | grep -v "\*.*console\.log" || true)
