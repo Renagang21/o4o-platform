@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../../packages/types/dist/ecommerce.js"],
-  "sourcesContent": ["// =============================================================================\n// E-COMMERCE CORE TYPES\n// =============================================================================\n// 통합된 전자상거래 타입 정의 - O4O 플랫폼용\n// 역할 기반 가격 정책과 다중 비즈니스 모델 지원\nexport var ReviewStatus;\n(function (ReviewStatus) {\n    ReviewStatus[\"PENDING\"] = \"pending\";\n    ReviewStatus[\"APPROVED\"] = \"approved\";\n    ReviewStatus[\"REJECTED\"] = \"rejected\";\n    ReviewStatus[\"HIDDEN\"] = \"hidden\";\n})(ReviewStatus || (ReviewStatus = {}));\n// Export specific types if needed\n"],
-  "mappings": ";;;AAKO,IAAI;AAAA,CACV,SAAUA,eAAc;AACrB,EAAAA,cAAa,SAAS,IAAI;AAC1B,EAAAA,cAAa,UAAU,IAAI;AAC3B,EAAAA,cAAa,UAAU,IAAI;AAC3B,EAAAA,cAAa,QAAQ,IAAI;AAC7B,GAAG,iBAAiB,eAAe,CAAC,EAAE;",
-  "names": ["ReviewStatus"]
-}
