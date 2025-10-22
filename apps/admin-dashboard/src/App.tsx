@@ -49,9 +49,9 @@ const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 const MailManagement = lazy(() => import('@/pages/mail/MailManagement'));
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
-const Media = lazy(() => import('@/pages/media/Media'));
+const MediaPage = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
-// const ReusableBlocksPage = lazy(() => 
+// const ReusableBlocksPage = lazy(() =>
 //   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
 // ); // Removed - content directory deleted
 const Posts = lazy(() => import('@/pages/posts/Posts'));
@@ -60,7 +60,7 @@ const CategoryEdit = lazy(() => import('@/pages/posts/CategoryEdit'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
-const Menus = lazy(() => import('@/pages/menus/Menus'));
+const MenusPage = lazy(() => import('@/pages/menus/Menus'));
 // const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
 
@@ -425,7 +425,7 @@ function App() {
                     <Route path="/appearance/menus/*" element={
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Menus />
+                          <MenusPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -458,7 +458,7 @@ function App() {
                     <Route path="/media/*" element={
                       <AdminProtectedRoute requiredPermissions={['media:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Media />
+                          <MediaPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
