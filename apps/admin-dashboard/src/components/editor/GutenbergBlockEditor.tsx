@@ -287,84 +287,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     blockCount: blocks.filter(b => b.type !== 'o4o/block-appender').length,
   }), [selectedBlockId, blocks, documentTitle]);
 
-  // ⭐ AI Chat - 액션 실행
-  const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
-    actions.forEach(action => {
-      switch (action.action) {
-        case 'insert':
-          if (action.blockType) {
-            const newBlock: Block = {
-              id: `block-${Date.now()}`,
-              type: action.blockType,
-              content: action.content || { text: '' },
-              attributes: action.attributes || {},
-            };
-
-            const newBlocks = [...blocks];
-            if (action.position === 'before' && action.targetBlockId) {
-              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
-              newBlocks.splice(idx, 0, newBlock);
-            } else if (action.position === 'after' && action.targetBlockId) {
-              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
-              newBlocks.splice(idx + 1, 0, newBlock);
-            } else if (typeof action.position === 'number') {
-              newBlocks.splice(action.position, 0, newBlock);
-            } else {
-              newBlocks.push(newBlock);
-            }
-
-            updateBlocks(newBlocks);
-            setSelectedBlockId(newBlock.id);
-            showToast('블록이 추가되었습니다', 'success');
-          }
-          break;
-
-        case 'update':
-          if (action.targetBlockId) {
-            handleBlockUpdate(action.targetBlockId, action.content, action.attributes);
-            showToast('블록이 업데이트되었습니다', 'success');
-          }
-          break;
-
-        case 'delete':
-          if (action.targetBlockId) {
-            handleBlockDelete(action.targetBlockId);
-            showToast('블록이 삭제되었습니다', 'success');
-          }
-          break;
-
-        case 'replace':
-          if (action.blocks) {
-            updateBlocks(action.blocks);
-            showToast(`${action.blocks.length}개 블록으로 교체되었습니다`, 'success');
-          }
-          break;
-
-        case 'move':
-          if (action.targetBlockId && typeof action.position === 'number') {
-            const blockIndex = blocks.findIndex(b => b.id === action.targetBlockId);
-            if (blockIndex !== -1) {
-              const newBlocks = [...blocks];
-              const [block] = newBlocks.splice(blockIndex, 1);
-              newBlocks.splice(action.position, 0, block);
-              updateBlocks(newBlocks);
-              showToast('블록이 이동되었습니다', 'success');
-            }
-          }
-          break;
-
-        case 'duplicate':
-          if (action.targetBlockId) {
-            handleDuplicate(action.targetBlockId);
-          }
-          break;
-
-        default:
-          console.warn('Unknown action:', action);
-      }
-    });
-  }, [blocks, updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
-
   // Initialize WordPress on mount
   useEffect(() => {
     initializeWordPress().catch(error => {
@@ -891,6 +813,84 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlockId(blockId);
     }, 0);
   }, [blocks, updateBlocks]);
+
+  // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
+  const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
+    actions.forEach(action => {
+      switch (action.action) {
+        case 'insert':
+          if (action.blockType) {
+            const newBlock: Block = {
+              id: `block-${Date.now()}`,
+              type: action.blockType,
+              content: action.content || { text: '' },
+              attributes: action.attributes || {},
+            };
+
+            const newBlocks = [...blocks];
+            if (action.position === 'before' && action.targetBlockId) {
+              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
+              newBlocks.splice(idx, 0, newBlock);
+            } else if (action.position === 'after' && action.targetBlockId) {
+              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
+              newBlocks.splice(idx + 1, 0, newBlock);
+            } else if (typeof action.position === 'number') {
+              newBlocks.splice(action.position, 0, newBlock);
+            } else {
+              newBlocks.push(newBlock);
+            }
+
+            updateBlocks(newBlocks);
+            setSelectedBlockId(newBlock.id);
+            showToast('블록이 추가되었습니다', 'success');
+          }
+          break;
+
+        case 'update':
+          if (action.targetBlockId) {
+            handleBlockUpdate(action.targetBlockId, action.content, action.attributes);
+            showToast('블록이 업데이트되었습니다', 'success');
+          }
+          break;
+
+        case 'delete':
+          if (action.targetBlockId) {
+            handleBlockDelete(action.targetBlockId);
+            showToast('블록이 삭제되었습니다', 'success');
+          }
+          break;
+
+        case 'replace':
+          if (action.blocks) {
+            updateBlocks(action.blocks);
+            showToast(`${action.blocks.length}개 블록으로 교체되었습니다`, 'success');
+          }
+          break;
+
+        case 'move':
+          if (action.targetBlockId && typeof action.position === 'number') {
+            const blockIndex = blocks.findIndex(b => b.id === action.targetBlockId);
+            if (blockIndex !== -1) {
+              const newBlocks = [...blocks];
+              const [block] = newBlocks.splice(blockIndex, 1);
+              newBlocks.splice(action.position, 0, block);
+              updateBlocks(newBlocks);
+              showToast('블록이 이동되었습니다', 'success');
+            }
+          }
+          break;
+
+        case 'duplicate':
+          if (action.targetBlockId) {
+            handleDuplicate(action.targetBlockId);
+          }
+          break;
+
+        default:
+          console.warn('Unknown action:', action);
+      }
+    });
+  }, [blocks, updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
 
   // Handle preview
   const handlePreview = useCallback(() => {
