@@ -1,5 +1,6 @@
 import * as cron from 'node-cron';
 import { AppDataSource } from '../database/connection';
+import logger from '../utils/logger';
 
 /**
  * Materialized View Refresh Scheduler
@@ -24,11 +25,11 @@ export class MaterializedViewScheduler {
    */
   static start(cronExpression: string = '*/5 * * * *'): void {
     if (this.refreshTask) {
-      console.log('⚠️ Materialized view scheduler is already running');
+      logger.warn('Materialized view scheduler is already running');
       return;
     }
 
-    console.log(`🔄 Starting materialized view refresh scheduler (${cronExpression})`);
+    logger.info(`Starting materialized view refresh scheduler (${cronExpression})`);
 
     this.refreshTask = cron.schedule(cronExpression, async () => {
       await this.refreshMaterializedViews();
@@ -39,7 +40,7 @@ export class MaterializedViewScheduler {
       this.refreshMaterializedViews();
     }, 5000); // Wait 5 seconds for database to be ready
 
-    console.log('✅ Materialized view scheduler started');
+    logger.info('Materialized view scheduler started');
   }
 
   /**
@@ -49,7 +50,7 @@ export class MaterializedViewScheduler {
     if (this.refreshTask) {
       this.refreshTask.stop();
       this.refreshTask = null;
-      console.log('🛑 Materialized view scheduler stopped');
+      logger.info('Materialized view scheduler stopped');
     }
   }
 
@@ -58,12 +59,12 @@ export class MaterializedViewScheduler {
    */
   static async refreshMaterializedViews(): Promise<void> {
     if (this.isRefreshing) {
-      console.log('⏩ Skipping refresh - already in progress');
+      logger.debug('Skipping refresh - already in progress');
       return;
     }
 
     if (!AppDataSource.isInitialized) {
-      console.log('⚠️ Database not initialized, skipping materialized view refresh');
+      logger.warn('Database not initialized, skipping materialized view refresh');
       return;
     }
 
@@ -71,7 +72,7 @@ export class MaterializedViewScheduler {
     const startTime = Date.now();
 
     try {
-      console.log('🔄 Refreshing materialized view: mv_product_listings...');
+      logger.info('Refreshing materialized view: mv_product_listings...');
 
       // Use the refresh function created by migration
       await AppDataSource.query('SELECT refresh_product_listings()');
@@ -80,21 +81,21 @@ export class MaterializedViewScheduler {
       this.lastRefreshTime = new Date();
       this.refreshCount++;
 
-      console.log(`✅ Materialized view refreshed successfully in ${duration}ms`);
-      console.log(`📊 Stats: ${this.refreshCount} successful refreshes, ${this.errorCount} errors`);
+      logger.info(`Materialized view refreshed successfully in ${duration}ms`);
+      logger.debug(`Stats: ${this.refreshCount} successful refreshes, ${this.errorCount} errors`);
     } catch (error: any) {
       this.errorCount++;
       const duration = Date.now() - startTime;
-      console.error(`❌ Failed to refresh materialized view after ${duration}ms:`, error.message);
+      logger.error(`Failed to refresh materialized view after ${duration}ms:`, error.message);
 
       // If CONCURRENTLY refresh fails, try regular refresh as fallback
       if (error.message?.includes('CONCURRENTLY')) {
         try {
-          console.log('🔄 Attempting non-concurrent refresh...');
+          logger.info('Attempting non-concurrent refresh...');
           await AppDataSource.query('REFRESH MATERIALIZED VIEW mv_product_listings');
-          console.log('✅ Non-concurrent refresh succeeded');
+          logger.info('Non-concurrent refresh succeeded');
         } catch (fallbackError: any) {
-          console.error('❌ Fallback refresh also failed:', fallbackError.message);
+          logger.error('Fallback refresh also failed:', fallbackError.message);
         }
       }
     } finally {

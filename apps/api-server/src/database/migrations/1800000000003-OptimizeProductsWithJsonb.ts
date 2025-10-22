@@ -18,7 +18,6 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Step 1: Convert JSON columns to JSONB
-    console.log('Converting JSON columns to JSONB...');
 
     await queryRunner.query(`
       -- Convert images column
@@ -63,7 +62,6 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     `);
 
     // Step 2: Add GIN indexes for JSONB fields
-    console.log('Creating GIN indexes for JSONB fields...');
 
     await queryRunner.query(`
       -- Index for searching within images
@@ -90,7 +88,6 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     `);
 
     // Step 3: Add specific JSONB path indexes for common queries
-    console.log('Creating JSONB path indexes...');
 
     await queryRunner.query(`
       -- Index for main image URL (commonly accessed)
@@ -111,7 +108,6 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     `);
 
     // Step 4: Create materialized view for product listings
-    console.log('Creating materialized view for product listings...');
 
     await queryRunner.query(`
       CREATE MATERIALIZED VIEW IF NOT EXISTS mv_product_listings AS
@@ -157,7 +153,6 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     `);
 
     // Step 5: Create indexes on materialized view
-    console.log('Creating indexes on materialized view...');
 
     await queryRunner.query(`
       CREATE UNIQUE INDEX IF NOT EXISTS mv_product_listings_id_idx
@@ -191,7 +186,6 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     `);
 
     // Step 6: Create function to refresh materialized view
-    console.log('Creating refresh function...');
 
     await queryRunner.query(`
       CREATE OR REPLACE FUNCTION refresh_product_listings()
@@ -203,14 +197,10 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     `);
 
     // Step 7: Analyze tables for query planner
-    console.log('Analyzing tables...');
-
     await queryRunner.query(`
       ANALYZE products;
       ANALYZE mv_product_listings;
     `);
-
-    console.log('✅ JSONB optimization completed successfully!');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -235,7 +225,5 @@ export class OptimizeProductsWithJsonb1800000000003 implements MigrationInterfac
     await queryRunner.query(`ALTER TABLE products ALTER COLUMN seo TYPE json USING seo::json;`);
     await queryRunner.query(`ALTER TABLE products ALTER COLUMN "tierPricing" TYPE json USING "tierPricing"::json;`);
     await queryRunner.query(`ALTER TABLE products ALTER COLUMN metadata TYPE json USING metadata::json;`);
-
-    console.log('✅ Rollback completed');
   }
 }
