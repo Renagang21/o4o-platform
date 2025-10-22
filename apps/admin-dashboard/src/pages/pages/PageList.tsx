@@ -234,17 +234,15 @@ const PageList = () => {
   const handlePermanentDelete = async (id: string) => {
     if (confirm('이 페이지를 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
       try {
-        await authClient.api.delete(`/posts/${id}`);
+        const result = await authClient.api.delete(`/posts/${id}?force=true`);
+        console.log('Delete result:', result);
 
-        if (true) {
-          setPages(prevPages => prevPages.filter(p => p.id !== id));
-          sessionStorage.removeItem('pages-data');
-          toast.success('Page deleted permanently');
-        } else {
-          toast.error('Failed to delete page');
-        }
+        setPages(prevPages => prevPages.filter(p => p.id !== id));
+        sessionStorage.removeItem('pages-data');
+        toast.success('Page deleted permanently');
       } catch (error) {
-        toast.error('Failed to delete page');
+        console.error('Failed to delete page:', error);
+        toast.error(`Failed to delete page: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
   };
@@ -277,12 +275,12 @@ const PageList = () => {
       alert('Please select an action.');
       return;
     }
-    
+
     if (selectedPages.size === 0) {
       alert('No pages selected.');
       return;
     }
-    
+
     if (selectedBulkAction === 'trash') {
       if (confirm(`선택한 ${selectedPages.size}개의 페이지를 휴지통으로 이동하시겠습니까?`)) {
         try {
@@ -293,7 +291,7 @@ const PageList = () => {
           await Promise.all(promises);
 
           if (true) {
-            setPages(prevPages => prevPages.map(p => 
+            setPages(prevPages => prevPages.map(p =>
               selectedPages.has(p.id) ? { ...p, status: 'trash' as const } : p
             ));
             setSelectedPages(new Set());
@@ -304,6 +302,26 @@ const PageList = () => {
           }
         } catch (error) {
           toast.error('Failed to move pages to trash');
+        }
+      }
+    } else if (selectedBulkAction === 'delete') {
+      if (confirm(`선택한 ${selectedPages.size}개의 페이지를 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.`)) {
+        try {
+          const promises = Array.from(selectedPages).map(id =>
+            authClient.api.delete(`/posts/${id}?force=true`)
+          );
+
+          const results = await Promise.all(promises);
+          console.log('Delete results:', results);
+
+          setPages(prevPages => prevPages.filter(p => !selectedPages.has(p.id)));
+          setSelectedPages(new Set());
+          setSelectedBulkAction('');
+          sessionStorage.removeItem('pages-data');
+          toast.success('Pages deleted permanently');
+        } catch (error) {
+          console.error('Failed to delete pages:', error);
+          toast.error(`Failed to delete pages: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
     }
@@ -543,29 +561,31 @@ const PageList = () => {
                 onClick={() => setShowBulkActions(!showBulkActions)}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
               >
-                {selectedBulkAction === 'trash' ? 'Move to Trash' : selectedBulkAction === 'edit' ? 'Edit' : 'Bulk Actions'}
+                {selectedBulkAction === 'trash' ? (activeTab === 'trash' ? 'Delete Permanently' : 'Move to Trash') : selectedBulkAction === 'delete' ? 'Delete Permanently' : selectedBulkAction === 'edit' ? 'Edit' : 'Bulk Actions'}
                 <ChevronDown className="w-3 h-3" />
               </button>
-              
+
               {showBulkActions && (
                 <div className="absolute left-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg z-20">
+                  {activeTab !== 'trash' && (
+                    <button
+                      onClick={() => {
+                        setSelectedBulkAction('edit');
+                        setShowBulkActions(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                    >
+                      Edit
+                    </button>
+                  )}
                   <button
                     onClick={() => {
-                      setSelectedBulkAction('edit');
+                      setSelectedBulkAction(activeTab === 'trash' ? 'delete' : 'trash');
                       setShowBulkActions(false);
                     }}
                     className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                   >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedBulkAction('trash');
-                      setShowBulkActions(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                  >
-                    Move to Trash
+                    {activeTab === 'trash' ? 'Delete Permanently' : 'Move to Trash'}
                   </button>
                 </div>
               )}

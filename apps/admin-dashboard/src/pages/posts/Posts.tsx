@@ -258,6 +258,7 @@ const PostsRefactored = () => {
             setSelectedAction={setSelectedBulkAction}
             onApply={handleApplyBulkAction}
             disabled={!selectedBulkAction || selectedPosts.size === 0}
+            isTrashView={activeTab === 'trash'}
           />
 
           {/* Search */}
@@ -381,6 +382,7 @@ const PostsRefactored = () => {
             setSelectedAction={setSelectedBulkAction}
             onApply={handleApplyBulkAction}
             disabled={!selectedBulkAction || selectedPosts.size === 0}
+            isTrashView={activeTab === 'trash'}
           />
           
           <div className="text-sm text-gray-600">
