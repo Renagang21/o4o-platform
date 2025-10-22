@@ -49,7 +49,7 @@ const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 const MailManagement = lazy(() => import('@/pages/mail/MailManagement'));
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
-const MediaPage = lazy(() => import('@/pages/media/Media'));
+const AdminMediaLibrary = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 // const ReusableBlocksPage = lazy(() =>
 //   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
@@ -60,7 +60,7 @@ const CategoryEdit = lazy(() => import('@/pages/posts/CategoryEdit'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
-const MenusPage = lazy(() => import('@/pages/menus/Menus'));
+const NavigationMenusPage = lazy(() => import('@/pages/menus/Menus'));
 // const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
 
@@ -85,7 +85,7 @@ const CrowdfundingRouter = lazy(() => import('@/pages/crowdfunding/CrowdfundingR
 
 // App Pages
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
-const MediaFileReplace = lazy(() => import('@/pages/tools/MediaFileReplace'));
+const ToolsMediaReplace = lazy(() => import('@/pages/tools/MediaFileReplace'));
 
 
 // UI Showcase
@@ -425,7 +425,7 @@ function App() {
                     <Route path="/appearance/menus/*" element={
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MenusPage />
+                          <NavigationMenusPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -458,7 +458,7 @@ function App() {
                     <Route path="/media/*" element={
                       <AdminProtectedRoute requiredPermissions={['media:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MediaPage />
+                          <AdminMediaLibrary />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -569,7 +569,7 @@ function App() {
                     <Route path="/tools/media-replace" element={
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MediaFileReplace />
+                          <ToolsMediaReplace />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
