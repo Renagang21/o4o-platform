@@ -236,7 +236,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isCodeView, setIsCodeView] = useState(false);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
   const { toast, showToast } = useToast();
-  const { draggedBlockId, dragOverBlockId, handleDragStart, handleDragOver, handleDrop, handleDragEnd } = useDragAndDrop({ blocks, updateBlocks });
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
@@ -418,6 +417,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     },
     [history, historyIndex, documentTitle, onChange]
   );
+
+  // Drag and drop hook - must be after updateBlocks is defined
+  const { draggedBlockId, dragOverBlockId, handleDragStart, handleDragOver, handleDrop, handleDragEnd } = useDragAndDrop({ blocks, updateBlocks });
 
   // Undo
   const handleUndo = useCallback(() => {
