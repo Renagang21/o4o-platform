@@ -234,14 +234,12 @@ const PageList = () => {
   const handlePermanentDelete = async (id: string) => {
     if (confirm('이 페이지를 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
       try {
-        const result = await authClient.api.delete(`/posts/${id}?force=true`);
-        console.log('Delete result:', result);
+        await authClient.api.delete(`/posts/${id}?force=true`);
 
         setPages(prevPages => prevPages.filter(p => p.id !== id));
         sessionStorage.removeItem('pages-data');
         toast.success('Page deleted permanently');
       } catch (error) {
-        console.error('Failed to delete page:', error);
         toast.error(`Failed to delete page: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
@@ -311,8 +309,7 @@ const PageList = () => {
             authClient.api.delete(`/posts/${id}?force=true`)
           );
 
-          const results = await Promise.all(promises);
-          console.log('Delete results:', results);
+          await Promise.all(promises);
 
           setPages(prevPages => prevPages.filter(p => !selectedPages.has(p.id)));
           setSelectedPages(new Set());
@@ -320,7 +317,6 @@ const PageList = () => {
           sessionStorage.removeItem('pages-data');
           toast.success('Pages deleted permanently');
         } catch (error) {
-          console.error('Failed to delete pages:', error);
           toast.error(`Failed to delete pages: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
