@@ -107,8 +107,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
-    // Use terser for safer minification (prevents TDZ errors)
-    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
+    // Temporarily disable minification to debug TDZ errors
+    minify: false,
     // terser minify 옵션
     terserOptions: {
       compress: {
