@@ -47,9 +47,9 @@ const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
-const MailManagement = lazy(() => import('@/pages/mail/MailManagement'));
+const EmailSettings = lazy(() => import('@/pages/mail/MailManagement'));
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
-const MediaPage = lazy(() => import('@/pages/media/Media'));
+const MediaLibrary = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 // const ReusableBlocksPage = lazy(() =>
 //   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
@@ -60,7 +60,7 @@ const CategoryEdit = lazy(() => import('@/pages/posts/CategoryEdit'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
-const MenusPage = lazy(() => import('@/pages/menus/Menus'));
+const NavigationMenus = lazy(() => import('@/pages/menus/Menus'));
 // const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
 
@@ -85,7 +85,7 @@ const CrowdfundingRouter = lazy(() => import('@/pages/crowdfunding/CrowdfundingR
 
 // App Pages
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
-const MediaFileReplace = lazy(() => import('@/pages/tools/MediaFileReplace'));
+const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 
 
 // UI Showcase
@@ -101,7 +101,7 @@ const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 
 // Test Page - Minimal Editor
-const MinimalEditor = lazy(() => import('@/pages/test/MinimalEditor'));
+const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -425,7 +425,7 @@ function App() {
                     <Route path="/appearance/menus/*" element={
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MenusPage />
+                          <NavigationMenus />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -458,7 +458,7 @@ function App() {
                     <Route path="/media/*" element={
                       <AdminProtectedRoute requiredPermissions={['media:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MediaPage />
+                          <MediaLibrary />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -526,7 +526,7 @@ function App() {
                     <Route path="/mail/*" element={
                       <AdminProtectedRoute requiredPermissions={['settings:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MailManagement />
+                          <EmailSettings />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -569,7 +569,7 @@ function App() {
                     <Route path="/tools/media-replace" element={
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <MediaFileReplace />
+                          <FileReplaceTools />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -606,7 +606,7 @@ function App() {
                     {/* Test - Minimal Editor (inside AdminLayout, requires login) */}
                     <Route path="/admin/test/minimal-editor" element={
                       <Suspense fallback={<PageLoader />}>
-                        <MinimalEditor />
+                        <EditorTest />
                       </Suspense>
                     } />
 
