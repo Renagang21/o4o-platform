@@ -288,16 +288,16 @@ export class ProductController {
   getSupplierProductStats = async (req: Request, res: Response): Promise<void> => {
     try {
       const { supplierId } = req.params;
-      
+
       // 요청자가 해당 공급자이거나 관리자인지 확인
-      if (!req.user?.hasRole('admin') && 
+      if (!req.user?.hasRole('admin') &&
           (!req.user?.hasRole('supplier') || req.user.supplier?.id !== supplierId)) {
         res.status(403).json({ error: 'Not authorized to view these stats' });
         return;
       }
 
       const stats = await this.productService.getSupplierProductStats(supplierId);
-      
+
       res.json({
         success: true,
         data: stats
@@ -308,6 +308,56 @@ export class ProductController {
       res.status(500).json({
         success: false,
         error: 'Failed to fetch supplier product stats'
+      });
+    }
+  };
+
+  // POST /api/products/bulk-import - CSV 일괄 가져오기
+  bulkImportProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { products } = req.body;
+
+      // 요청자가 공급자인지 확인
+      if (!req.user?.hasRole('supplier')) {
+        res.status(403).json({ error: 'Only suppliers can import products' });
+        return;
+      }
+
+      const supplierId = req.user.supplier?.id;
+      if (!supplierId) {
+        res.status(400).json({ error: 'Supplier ID not found' });
+        return;
+      }
+
+      // 입력 검증
+      if (!Array.isArray(products) || products.length === 0) {
+        res.status(400).json({ error: 'Products array is required and must not be empty' });
+        return;
+      }
+
+      if (products.length > 1000) {
+        res.status(400).json({ error: 'Maximum 1000 products per import' });
+        return;
+      }
+
+      // 각 제품에 supplierId 할당
+      const productsWithSupplier = products.map(p => ({
+        ...p,
+        supplierId
+      }));
+
+      const result = await this.productService.bulkImportProducts(productsWithSupplier);
+
+      res.status(201).json({
+        success: true,
+        data: result
+      });
+
+    } catch (error) {
+      logger.error('Error in bulkImportProducts:', error);
+      res.status(400).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to import products'
       });
     }
   };
