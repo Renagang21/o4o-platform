@@ -23,4 +23,7 @@ router.get('/system-status', dropshippingController.getSystemStatus);
 router.post('/initialize', dropshippingController.initializeSystem);
 router.post('/seed', dropshippingController.createSampleData);
 
+// Bulk Import Products
+router.post('/products/bulk-import', dropshippingController.bulkImportProducts);
+
 export default router;

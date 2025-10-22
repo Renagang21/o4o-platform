@@ -58,6 +58,7 @@ import logger from './utils/logger';
 // Database connection
 import { AppDataSource, checkDatabaseHealth } from './database/connection';
 import { DatabaseChecker } from './utils/database-checker';
+import { MaterializedViewScheduler } from './services/MaterializedViewScheduler';
 import { Post } from './entities/Post';
 import { Page } from './entities/Page';
 import { SessionSyncService } from './services/sessionSyncService';
@@ -134,6 +135,7 @@ import previewRoutes from './routes/preview';
 import approvalV1Routes from './routes/v1/approval.routes';
 import aiSettingsRoutes from './routes/v1/ai-settings.routes';
 import orderRoutes from './routes/orders.routes';
+import paymentRoutes from './routes/payments.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -906,6 +908,9 @@ app.use('/api/v1/admin', adminV1Routes); // V1 admin routes with clear versionin
 // Order management routes
 app.use('/api/orders', orderRoutes); // Order management API
 
+// Payment routes
+app.use('/api/v1/payments', paymentRoutes); // Payment management API
+
 // Dropshipping admin routes
 import dropshippingAdminRoutes from './routes/admin/dropshipping.routes';
 app.use('/api/admin/dropshipping', limiter, dropshippingAdminRoutes);
@@ -1101,6 +1106,17 @@ const startServer = async () => {
         }
       }
 
+      // Initialize Materialized View Scheduler
+      if (AppDataSource.isInitialized) {
+        try {
+          // Refresh every 5 minutes in production, 10 minutes in development
+          const refreshInterval = env.isProduction() ? '*/5 * * * *' : '*/10 * * * *';
+          MaterializedViewScheduler.start(refreshInterval);
+        } catch (schedulerError) {
+          logger.warn('Materialized View Scheduler initialization failed (non-critical):', schedulerError);
+        }
+      }
+
       // Initialize tracking updater job
       try {
         logger.info('Tracking updater job started');
@@ -1226,6 +1242,24 @@ const startServer = async () => {
 startServer().catch((error) => {
   logger.error('Failed to start server:', error);
   process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM signal received: closing HTTP server');
+  MaterializedViewScheduler.stop();
+  httpServer.close(() => {
+    logger.info('HTTP server closed');
+  });
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT signal received: closing HTTP server');
+  MaterializedViewScheduler.stop();
+  httpServer.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
 });
 
 // Export services for other modules

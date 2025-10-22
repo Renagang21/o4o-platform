@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../database/connection';
 import { Supplier, SupplierStatus, SupplierTier } from '../../entities/Supplier';
 import { Partner, PartnerStatus, PartnerTier } from '../../entities/Partner';
 import { PartnerCommission } from '../../entities/PartnerCommission';
@@ -12,7 +12,7 @@ export class DropshippingController {
   // Commission Policies
   getCommissionPolicies = async (req: Request, res: Response): Promise<void> => {
     try {
-      const supplierRepo = getRepository(Supplier);
+      const supplierRepo = AppDataSource.getRepository(Supplier);
       
       // Get suppliers with their commission policies
       const suppliers = await supplierRepo.find({
@@ -48,7 +48,7 @@ export class DropshippingController {
   // Approvals
   getApprovals = async (req: Request, res: Response): Promise<void> => {
     try {
-      const approvalLogRepo = getRepository(ApprovalLog);
+      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
       
       const approvals = await approvalLogRepo.find({
         relations: ['user', 'admin'],
@@ -94,7 +94,7 @@ export class DropshippingController {
         return;
       }
 
-      const approvalLogRepo = getRepository(ApprovalLog);
+      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
       
       const approval = await approvalLogRepo.findOne({
         where: { id },
@@ -142,7 +142,7 @@ export class DropshippingController {
         return;
       }
 
-      const approvalLogRepo = getRepository(ApprovalLog);
+      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
       
       const approval = await approvalLogRepo.findOne({
         where: { id },
@@ -180,10 +180,10 @@ export class DropshippingController {
   // System Status
   getSystemStatus = async (req: Request, res: Response): Promise<void> => {
     try {
-      const supplierRepo = getRepository(Supplier);
-      const partnerRepo = getRepository(Partner);
-      const productRepo = getRepository(Product);
-      const commissionRepo = getRepository(PartnerCommission);
+      const supplierRepo = AppDataSource.getRepository(Supplier);
+      const partnerRepo = AppDataSource.getRepository(Partner);
+      const productRepo = AppDataSource.getRepository(Product);
+      const commissionRepo = AppDataSource.getRepository(PartnerCommission);
 
       const [suppliersCount, partnersCount, productsCount, commissionsCount] = await Promise.all([
         supplierRepo.count(),
@@ -245,9 +245,9 @@ export class DropshippingController {
   // Create Sample Data
   createSampleData = async (req: Request, res: Response): Promise<void> => {
     try {
-      const userRepo = getRepository(User);
-      const supplierRepo = getRepository(Supplier);
-      const partnerRepo = getRepository(Partner);
+      const userRepo = AppDataSource.getRepository(User);
+      const supplierRepo = AppDataSource.getRepository(Supplier);
+      const partnerRepo = AppDataSource.getRepository(Partner);
 
       // Create sample suppliers
       const sampleSuppliers = [];
@@ -314,6 +314,85 @@ export class DropshippingController {
       res.status(500).json({
         success: false,
         error: 'Failed to create sample data'
+      });
+    }
+  };
+
+  // Bulk Import Products from CSV
+  bulkImportProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const products = req.body;
+
+      if (!Array.isArray(products) || products.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid request body. Expected an array of products.'
+        });
+        return;
+      }
+
+      const productRepo = AppDataSource.getRepository(Product);
+      const results = {
+        success: 0,
+        failed: 0,
+        errors: [] as string[]
+      };
+
+      for (let i = 0; i < products.length; i++) {
+        try {
+          const productData = products[i];
+
+          // Validate required fields
+          if (!productData.title || !productData.acf?.cost_price || !productData.acf?.selling_price || !productData.acf?.supplier) {
+            results.failed++;
+            results.errors.push(`Row ${i + 1}: Missing required fields (title, cost_price, selling_price, supplier)`);
+            continue;
+          }
+
+          // Create slug from title
+          const slug = productData.title
+            .toLowerCase()
+            .replace(/[^a-z0-9가-힣\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim() + `-${Date.now()}-${i}`;
+
+          // Create new product using proper Product entity structure
+          const product = new Product();
+          product.name = productData.title;
+          product.description = productData.content || '';
+          product.sku = productData.acf.supplier_sku || `AUTO-${Date.now()}-${i}`;
+          product.slug = slug;
+          product.type = 'physical' as any;
+          product.status = 'draft' as any;
+          product.isActive = false;
+          product.supplierPrice = parseFloat(productData.acf.cost_price) as any;
+          product.recommendedPrice = parseFloat(productData.acf.selling_price) as any;
+          product.currency = 'KRW';
+          product.inventory = 0;
+          product.trackInventory = true;
+          product.allowBackorder = false;
+          product.hasVariants = false;
+          product.partnerCommissionRate = 0;
+          product.supplierId = productData.acf.supplier;
+
+          await productRepo.save(product);
+          results.success++;
+        } catch (error: any) {
+          results.failed++;
+          results.errors.push(`Row ${i + 1}: ${error.message || 'Unknown error'}`);
+        }
+      }
+
+      res.json({
+        success: true,
+        data: results
+      });
+    } catch (error) {
+      console.error('Error bulk importing products:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to bulk import products'
       });
     }
   };
