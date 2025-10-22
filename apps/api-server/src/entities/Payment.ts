@@ -199,6 +199,15 @@ export class Payment {
   @Column({ type: 'text', nullable: true })
   failUrl?: string;
 
+  // 멱등성 키 (중복 요청 방지)
+  @Column({ nullable: true })
+  @Index()
+  confirmIdempotencyKey?: string; // 결제 승인 멱등성 키
+
+  @Column({ nullable: true })
+  @Index()
+  cancelIdempotencyKey?: string; // 결제 취소 멱등성 키
+
   // Relations
   @OneToMany(() => PaymentSettlement, settlement => settlement.payment)
   settlements!: PaymentSettlement[];

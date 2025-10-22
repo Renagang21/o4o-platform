@@ -6,6 +6,7 @@ import { PaymentWebhook, WebhookEventType } from '../entities/PaymentWebhook';
 import { Order } from '../entities/Order';
 import logger from '../utils/logger';
 import axios, { AxiosInstance } from 'axios';
+import * as crypto from 'crypto';
 
 export interface PreparePaymentRequest {
   orderId: string;
@@ -22,12 +23,14 @@ export interface ConfirmPaymentRequest {
   paymentKey: string;
   orderId: string;
   amount: number;
+  idempotencyKey?: string; // 멱등성 키 (선택사항, 없으면 자동 생성)
 }
 
 export interface CancelPaymentRequest {
   paymentKey: string;
   cancelReason: string;
   cancelAmount?: number; // 부분 취소 금액 (없으면 전액)
+  idempotencyKey?: string; // 멱등성 키 (선택사항, 없으면 자동 생성)
 }
 
 export interface TossPaymentsConfig {
@@ -137,6 +140,33 @@ export class PaymentService {
    * 결제 승인 - 토스페이먼츠 API 호출
    */
   async confirmPayment(request: ConfirmPaymentRequest): Promise<Payment> {
+    // 멱등성 키 생성 (없으면 orderId + paymentKey 조합)
+    const idempotencyKey = request.idempotencyKey || `confirm_${request.orderId}_${request.paymentKey}`;
+
+    // 멱등성 체크: 동일한 키로 이미 처리된 요청이 있는지 확인
+    const existingPayment = await this.paymentRepository.findOne({
+      where: { confirmIdempotencyKey: idempotencyKey }
+    });
+
+    if (existingPayment) {
+      logger.info(`Idempotent request detected for confirmPayment: ${idempotencyKey}`);
+
+      // 이미 성공적으로 처리된 경우 기존 결과 반환
+      if (existingPayment.status === PaymentStatus.DONE) {
+        logger.info(`Returning existing confirmed payment: ${existingPayment.id}`);
+        return existingPayment;
+      }
+
+      // 진행 중이거나 실패한 경우 에러 반환
+      if (existingPayment.status === PaymentStatus.IN_PROGRESS) {
+        throw new Error('Payment confirmation already in progress');
+      }
+
+      if (existingPayment.status === PaymentStatus.ABORTED) {
+        throw new Error(`Payment confirmation previously failed: ${existingPayment.failureMessage}`);
+      }
+    }
+
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -155,6 +185,11 @@ export class PaymentService {
       if (Math.abs(payment.amount - request.amount) > 0.01) {
         throw new Error('Amount mismatch during confirmation');
       }
+
+      // 멱등성 키 저장
+      payment.confirmIdempotencyKey = idempotencyKey;
+      payment.status = PaymentStatus.IN_PROGRESS; // 처리 중 상태로 변경
+      await queryRunner.manager.save(Payment, payment);
 
       // 토스페이먼츠 API 호출
       const response = await this.tossClient.post('/payments/confirm', {
@@ -224,6 +259,27 @@ export class PaymentService {
    * 결제 취소/환불
    */
   async cancelPayment(request: CancelPaymentRequest): Promise<Payment> {
+    // 멱등성 키 생성 (없으면 paymentKey + cancelReason 조합)
+    const cancelAmount = request.cancelAmount || 0;
+    const idempotencyKey = request.idempotencyKey ||
+      `cancel_${request.paymentKey}_${cancelAmount}_${Date.now()}`;
+
+    // 멱등성 체크: 동일한 키로 이미 처리된 요청이 있는지 확인
+    const existingPayment = await this.paymentRepository.findOne({
+      where: { cancelIdempotencyKey: idempotencyKey }
+    });
+
+    if (existingPayment) {
+      logger.info(`Idempotent request detected for cancelPayment: ${idempotencyKey}`);
+
+      // 이미 취소된 경우 기존 결과 반환
+      if (existingPayment.status === PaymentStatus.CANCELED ||
+          existingPayment.status === PaymentStatus.PARTIAL_CANCELED) {
+        logger.info(`Returning existing canceled payment: ${existingPayment.id}`);
+        return existingPayment;
+      }
+    }
+
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -240,6 +296,9 @@ export class PaymentService {
       if (!payment.canBeCanceled()) {
         throw new Error('Payment cannot be canceled');
       }
+
+      // 멱등성 키 저장
+      payment.cancelIdempotencyKey = idempotencyKey;
 
       // 취소 금액 결정 (없으면 전액)
       const cancelAmount = request.cancelAmount || payment.balanceAmount;
@@ -295,14 +354,77 @@ export class PaymentService {
   }
 
   /**
+   * 웹훅 서명 검증
+   * @param payload 웹훅 페이로드 (JSON 문자열)
+   * @param headers HTTP 헤더
+   * @returns 검증 성공 여부
+   */
+  private verifyWebhookSignature(payload: string, headers: any): boolean {
+    try {
+      const signature = headers['tosspayments-signature'];
+      const transmissionTime = headers['tosspayments-webhook-transmission-time'];
+
+      if (!signature || !transmissionTime) {
+        logger.warn('Missing webhook signature or transmission time');
+        return false;
+      }
+
+      // 서명 형식: "v1:signature1,signature2,..."
+      if (!signature.startsWith('v1:')) {
+        logger.warn('Invalid signature format');
+        return false;
+      }
+
+      // "v1:" 제거 후 서명들 분리
+      const signatures = signature.substring(3).split(',');
+
+      // 검증할 데이터: {payload}:{transmissionTime}
+      const dataToVerify = `${payload}:${transmissionTime}`;
+
+      // HMAC-SHA256으로 해시 생성
+      const expectedHash = crypto
+        .createHmac('sha256', this.config.secretKey)
+        .update(dataToVerify)
+        .digest('base64');
+
+      // 제공된 서명 중 하나와 일치하는지 확인
+      const isValid = signatures.some(sig => {
+        try {
+          // base64 디코드된 서명과 비교
+          const decodedSig = Buffer.from(sig, 'base64').toString('base64');
+          return decodedSig === expectedHash;
+        } catch (error) {
+          return false;
+        }
+      });
+
+      if (!isValid) {
+        logger.error('Webhook signature verification failed', {
+          receivedSignatures: signatures,
+          expectedHash
+        });
+      }
+
+      return isValid;
+    } catch (error) {
+      logger.error('Error verifying webhook signature:', error);
+      return false;
+    }
+  }
+
+  /**
    * 웹훅 처리
    */
-  async handleWebhook(eventType: WebhookEventType, payload: any, headers: any): Promise<PaymentWebhook> {
+  async handleWebhook(eventType: WebhookEventType, payload: any, headers: any, rawBody?: string): Promise<PaymentWebhook> {
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      // 웹훅 서명 검증
+      const payloadString = rawBody || JSON.stringify(payload);
+      const isSignatureValid = this.verifyWebhookSignature(payloadString, headers);
+
       // 웹훅 로그 생성
       const webhook = new PaymentWebhook();
       webhook.eventType = eventType;
@@ -311,9 +433,26 @@ export class PaymentService {
       webhook.transactionKey = payload.transactionKey;
       webhook.payload = payload;
       webhook.headers = headers;
-      webhook.signature = headers['toss-signature'];
+      webhook.signature = headers['tosspayments-signature'];
+      webhook.signatureVerified = isSignatureValid;
 
       const savedWebhook = await queryRunner.manager.save(PaymentWebhook, webhook);
+
+      // 서명 검증 실패 시 처리 중단
+      if (!isSignatureValid) {
+        const error = new Error('Invalid webhook signature');
+        savedWebhook.markAsFailed(error);
+        await queryRunner.manager.save(PaymentWebhook, savedWebhook);
+        await queryRunner.commitTransaction();
+
+        logger.error('Webhook signature verification failed', {
+          eventType,
+          orderId: payload.orderId,
+          paymentKey: payload.paymentKey
+        });
+
+        throw error;
+      }
 
       // 웹훅 처리
       try {

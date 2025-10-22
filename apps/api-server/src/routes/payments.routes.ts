@@ -1,10 +1,32 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { body, param } from 'express-validator';
+import express from 'express';
 import paymentController from '../controllers/PaymentController';
 import { authenticate } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error-handler';
 
 const router: Router = Router();
+
+// Middleware to capture raw body for webhook signature verification
+const captureRawBody = (req: Request, res: Response, next: NextFunction) => {
+  const chunks: Buffer[] = [];
+
+  req.on('data', (chunk: Buffer) => {
+    chunks.push(chunk);
+  });
+
+  req.on('end', () => {
+    (req as any).rawBody = Buffer.concat(chunks).toString('utf8');
+    next();
+  });
+};
+
+// Express JSON parser that preserves rawBody for webhooks
+const webhookBodyParser = express.json({
+  verify: (req: any, res, buf) => {
+    req.rawBody = buf.toString('utf8');
+  }
+});
 
 // Validation middleware
 const validatePreparePayment = [
@@ -76,9 +98,11 @@ router.post(
  * @route   POST /api/v1/payments/webhook
  * @desc    토스페이먼츠 웹훅 수신
  * @access  Public (토스페이먼츠에서 직접 호출)
+ * @note    rawBody를 사용하므로 별도의 body parser 적용
  */
 router.post(
   '/webhook',
+  webhookBodyParser,
   asyncHandler(paymentController.handleWebhook)
 );
 

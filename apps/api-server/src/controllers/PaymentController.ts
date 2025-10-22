@@ -188,15 +188,16 @@ export class PaymentController {
       const payload = req.body;
       const headers = req.headers;
 
-      // 웹훅 서명 검증은 나중에 구현
-      // TODO: Verify webhook signature
+      // rawBody는 express.json()의 verify 옵션으로 저장됨
+      const rawBody = (req as any).rawBody;
 
-      const webhook = await paymentService.handleWebhook(eventType, payload, headers);
+      const webhook = await paymentService.handleWebhook(eventType, payload, headers, rawBody);
 
       // 웹훅은 항상 200 응답 (토스페이먼츠 요구사항)
       res.status(200).json({
         success: true,
-        webhookId: webhook.id
+        webhookId: webhook.id,
+        verified: webhook.signatureVerified
       });
 
     } catch (error) {

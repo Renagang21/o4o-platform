@@ -59,6 +59,7 @@ import logger from './utils/logger';
 import { AppDataSource, checkDatabaseHealth } from './database/connection';
 import { DatabaseChecker } from './utils/database-checker';
 import { MaterializedViewScheduler } from './services/MaterializedViewScheduler';
+import settlementScheduler from './services/SettlementScheduler';
 import { Post } from './entities/Post';
 import { Page } from './entities/Page';
 import { SessionSyncService } from './services/sessionSyncService';
@@ -1117,6 +1118,17 @@ const startServer = async () => {
         }
       }
 
+      // Initialize Settlement Scheduler
+      if (AppDataSource.isInitialized) {
+        try {
+          // Run every day at midnight (00:00)
+          settlementScheduler.start('0 0 * * *');
+          logger.info('Settlement Scheduler initialized successfully');
+        } catch (schedulerError) {
+          logger.warn('Settlement Scheduler initialization failed (non-critical):', schedulerError);
+        }
+      }
+
       // Initialize tracking updater job
       try {
         logger.info('Tracking updater job started');
@@ -1248,6 +1260,7 @@ startServer().catch((error) => {
 process.on('SIGTERM', () => {
   logger.info('SIGTERM signal received: closing HTTP server');
   MaterializedViewScheduler.stop();
+  settlementScheduler.stop();
   httpServer.close(() => {
     logger.info('HTTP server closed');
   });
@@ -1256,6 +1269,7 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   logger.info('SIGINT signal received: closing HTTP server');
   MaterializedViewScheduler.stop();
+  settlementScheduler.stop();
   httpServer.close(() => {
     logger.info('HTTP server closed');
     process.exit(0);
