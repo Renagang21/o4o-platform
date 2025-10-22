@@ -143,8 +143,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         inlineDynamicImports: false,
         // Fix exports not defined error
         format: 'es',
-        // Allow hoisting for better module initialization
-        hoistTransitiveImports: true,
+        // Disable hoisting to prevent module initialization order issues (TDZ errors)
+        hoistTransitiveImports: false,
         // Fix ES Module initialization order
         exports: 'named',
         interop: 'auto',
