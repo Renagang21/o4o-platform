@@ -747,6 +747,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               }}
               onSave={async () => { await handleSave(); }}
               onPublish={handlePublish}
+              showListView={showListView}
+              onToggleListView={() => setShowListView(!showListView)}
             />
           </div>
         </div>

@@ -80,6 +80,9 @@ interface GutenbergBlockEditorProps {
   hideHeader?: boolean; // Hide header when embedded in another editor
   // Skip restoring previous local session (used when editing an existing post)
   disableSessionRestore?: boolean;
+  // External control of list view (for EditorHeader integration)
+  showListView?: boolean;
+  onToggleListView?: () => void;
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
@@ -95,6 +98,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   mode = 'post',
   hideHeader = false,
   disableSessionRestore = false,
+  showListView: externalShowListView,
+  onToggleListView: externalOnToggleListView,
 }) => {
   // Initialize with empty state or BlockAppender
   const [blocks, setBlocks] = useState<Block[]>(() => {
@@ -311,6 +316,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlock(null);
     }
   }, [selectedBlockId, blocks]);
+
+  // Sync list view state with external prop
+  useEffect(() => {
+    if (externalShowListView !== undefined) {
+      setIsBlockListOpen(externalShowListView);
+    }
+  }, [externalShowListView]);
 
   // Update blocks and history
   const updateBlocks = useCallback(
