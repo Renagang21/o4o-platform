@@ -20,6 +20,7 @@ import type { CustomElement, CustomText, ParagraphElement } from './types/slate-
 import { Toolbar } from './components/Toolbar';
 import { withParagraphs } from './plugins/withParagraphs';
 import { withDeleteKey } from './plugins/withDeleteKey';
+import { toggleMark } from './utils/marks';
 
 /**
  * Props for the SlateEditor component
@@ -224,29 +225,9 @@ const Leaf: React.FC<RenderLeafProps> = ({ attributes, children, leaf }) => {
 };
 
 /**
- * Export helper functions for external use
+ * Re-export helper functions for backward compatibility
  */
-
-/**
- * Check if a mark is active in the current selection
- */
-export const isMarkActive = (editor: Editor, format: keyof CustomText): boolean => {
-  const marks = Editor.marks(editor) as CustomText | null;
-  return marks ? marks[format] === true : false;
-};
-
-/**
- * Toggle a mark on the current selection
- */
-export const toggleMark = (editor: Editor, format: keyof CustomText): void => {
-  const isActive = isMarkActive(editor, format);
-
-  if (isActive) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
-};
+export { isMarkActive, toggleMark } from './utils/marks';
 
 /**
  * Check if a block type is active

@@ -19,7 +19,7 @@ import {
   AlignRight,
   Sparkles
 } from 'lucide-react';
-import { Slide } from './SlideBlock';
+import { Slide } from './types';
 
 interface AdvancedSlideEditorProps {
   slide: Slide;

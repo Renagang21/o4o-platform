@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Slide } from './SlideBlock';
+import { Slide } from './types';
 
 interface SlideViewerProps {
   slide: Slide;

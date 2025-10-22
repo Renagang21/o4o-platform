@@ -17,7 +17,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { Slide } from './SlideBlock';
+import { Slide } from './types';
 
 interface BulkEditPanelProps {
   slides: Slide[];

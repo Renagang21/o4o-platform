@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { useSlate } from 'slate-react';
-import { isMarkActive, toggleMark } from '../SlateEditor';
+import { isMarkActive, toggleMark } from '../utils/marks';
 import type { CustomText } from '../types/slate-types';
 
 /**

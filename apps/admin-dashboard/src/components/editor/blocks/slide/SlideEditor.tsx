@@ -10,7 +10,7 @@ import {
   Upload,
   X
 } from 'lucide-react';
-import { Slide } from './SlideBlock';
+import { Slide } from './types';
 
 interface SlideEditorProps {
   slide: Slide;

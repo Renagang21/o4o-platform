@@ -36,7 +36,7 @@ import {
   Type,
   Layers
 } from 'lucide-react';
-import { Slide } from './SlideBlock';
+import { Slide } from './types';
 
 interface SlideSortableListProps {
   slides: Slide[];
