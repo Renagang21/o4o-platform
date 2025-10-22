@@ -22,6 +22,7 @@ export interface EditorHeaderProps {
   // Document handlers
   onTitleChange: (title: string) => void;
   onBack: () => void;
+  onGoToHome?: () => void;
   onSave: (publish?: boolean) => Promise<void>;
   onPublish: () => Promise<void>;
   onPreview: () => Promise<void>;
@@ -63,6 +64,7 @@ export interface LeftControlsProps {
   isMobile: boolean;
   isTablet: boolean;
   onBack: () => void;
+  onGoToHome?: () => void;
   onOpenDesignLibrary: () => void;
   onOpenAIGenerator: () => void;
   onOpenBlockInserter?: () => void;

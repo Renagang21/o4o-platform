@@ -671,6 +671,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           setIsDirty(true);
         }}
         onBack={handleBack}
+        onGoToHome={() => navigate('/admin')}
         onSave={async (publish) => { await handleSave(publish); }}
         onPublish={handlePublish}
         onPreview={handlePreview}

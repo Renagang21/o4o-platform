@@ -28,6 +28,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   // Handlers
   onTitleChange,
   onBack,
+  onGoToHome,
   onSave,
   onPreview,
   onToggleSidebar,
@@ -69,6 +70,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           isMobile={isMobile}
           isTablet={isTablet}
           onBack={onBack}
+          onGoToHome={onGoToHome}
           onOpenDesignLibrary={onOpenDesignLibrary}
           onOpenAIGenerator={onOpenAIGenerator}
           onOpenBlockInserter={onOpenBlockInserter}

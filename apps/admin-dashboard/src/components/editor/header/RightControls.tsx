@@ -126,6 +126,52 @@ export const RightControls: React.FC<RightControlsProps> = ({
         {postStatus === 'publish' ? 'Update' : 'Publish'}
       </Button>
 
+      {/* Theme Preview Toggle (Desktop only) */}
+      {!isSmallScreen && onToggleThemePreview && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-700"
+                onClick={onToggleThemePreview}
+              >
+                {isThemePreviewMode ? (
+                  <DesktopMac sx={{ fontSize: 20 }} />
+                ) : (
+                  <DesktopWindows sx={{ fontSize: 20 }} />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{isThemePreviewMode ? 'Disable Theme Preview' : 'Enable Theme Preview'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
+      {/* Customizer (Desktop only) */}
+      {!isSmallScreen && onOpenCustomizer && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-700"
+                onClick={onOpenCustomizer}
+              >
+                <Palette sx={{ fontSize: 20 }} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Customizer</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
       {/* Settings Toggle */}
       <TooltipProvider>
         <Tooltip>
@@ -182,25 +228,23 @@ export const RightControls: React.FC<RightControlsProps> = ({
                       AI Page Generator
                   </DropdownMenuItem>
               )}
+              {onToggleThemePreview && (
+                <DropdownMenuItem onClick={onToggleThemePreview}>
+                     {isThemePreviewMode ? <DesktopMac sx={{ fontSize: 16, marginRight: '8px' }}/> : <DesktopWindows sx={{ fontSize: 16, marginRight: '8px' }}/>}
+                    {isThemePreviewMode ? 'Disable Theme Preview' : 'Enable Theme Preview'}
+                </DropdownMenuItem>
+              )}
+              {onOpenCustomizer && (
+                <DropdownMenuItem onClick={onOpenCustomizer}>
+                    <Palette sx={{ fontSize: 16, marginRight: '8px' }} />
+                    Customizer
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
             </>
           )}
-          
+
           {/* --- DESKTOP & SMALL SCREEN ITEMS --- */}
-
-          {onToggleThemePreview && (
-            <DropdownMenuItem onClick={onToggleThemePreview}>
-                 {isThemePreviewMode ? <DesktopMac sx={{ fontSize: 16, marginRight: '8px' }}/> : <DesktopWindows sx={{ fontSize: 16, marginRight: '8px' }}/>}
-                {isThemePreviewMode ? 'Disable Theme Preview' : 'Enable Theme Preview'}
-            </DropdownMenuItem>
-          )}
-
-          {onOpenCustomizer && (
-            <DropdownMenuItem onClick={onOpenCustomizer}>
-                <Palette sx={{ fontSize: 16, marginRight: '8px' }} />
-                Customizer
-            </DropdownMenuItem>
-          )}
           
           <DropdownMenuSeparator />
           <DropdownMenuItem>Copy all blocks</DropdownMenuItem>

@@ -27,6 +27,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
   isMobile,
   isTablet,
   onBack,
+  onGoToHome,
   onOpenDesignLibrary,
   onOpenAIGenerator,
   onOpenBlockInserter,
@@ -53,7 +54,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
         </Tooltip>
       </TooltipProvider>
 
-      {/* WordPress Logo - Clickable for back navigation */}
+      {/* WordPress Logo - Go to Admin Home */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -61,13 +62,13 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
               variant="ghost"
               size="icon"
               className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center hover:from-blue-700 hover:to-blue-800 p-0"
-              onClick={onBack}
+              onClick={onGoToHome || onBack}
             >
               <span className="text-white font-bold text-sm">W</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Back to dashboard</p>
+            <p>Go to admin home</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
