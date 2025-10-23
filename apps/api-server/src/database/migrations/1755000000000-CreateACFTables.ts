@@ -128,12 +128,12 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
 
     await queryRunner.createIndex('acf_field_groups', new TableIndex({
       name: 'IDX_acf_field_groups_is_active',
-      columnNames: ['isActive']
+      columnNames: ['isactive']
     }));
 
     await queryRunner.createIndex('acf_field_groups', new TableIndex({
       name: 'IDX_acf_field_groups_menu_order',
-      columnNames: ['menuOrder']
+      columnNames: ['menuorder']
     }));
 
     // Create ACF Fields table
@@ -480,7 +480,7 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
         ],
         foreignKeys: [
           {
-            columnNames: ['fieldGroupId'],
+            columnNames: ['fieldgroupid'],
             referencedTableName: 'acf_field_groups',
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE'
@@ -493,7 +493,7 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
     // Create indexes for fields
     await queryRunner.createIndex('acf_fields', new TableIndex({
       name: 'IDX_acf_fields_field_group_id_order',
-      columnNames: ['fieldGroupId', 'order']
+      columnNames: ['fieldgroupid', 'order']
     }));
 
     await queryRunner.createIndex('acf_fields', new TableIndex({
