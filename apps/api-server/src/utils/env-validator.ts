@@ -179,5 +179,23 @@ class EnvironmentValidator {
   }
 }
 
-// Singleton instance
-export const env = new EnvironmentValidator();
+// Lazy singleton instance - delays validation until first access
+// This ensures dotenv.config() runs before validation
+let envInstance: EnvironmentValidator | null = null;
+
+function getEnvInstance(): EnvironmentValidator {
+  if (!envInstance) {
+    envInstance = new EnvironmentValidator();
+  }
+  return envInstance;
+}
+
+// Export a proxy that creates the instance on first access
+export const env = new Proxy({} as EnvironmentValidator, {
+  get(target, prop: string) {
+    const instance = getEnvInstance();
+    const value = (instance as any)[prop];
+    // Bind methods to the instance
+    return typeof value === 'function' ? value.bind(instance) : value;
+  }
+});
