@@ -10,7 +10,7 @@ import * as path from 'path';
  * - docs/manual/blocks-reference.md -> blocks reference
  * - docs/ai/shortcode-registry.md -> shortcodes reference
  */
-export class SeedInitialAIReferences1830000000001 implements MigrationInterface {
+export class SeedInitialAIReferences1835000000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const aiReferenceRepository = queryRunner.manager.getRepository(AIReference);
 

@@ -10,7 +10,7 @@ import { MigrationInterface, QueryRunner, Table } from 'typeorm';
  * - Current: blocks, shortcodes
  * - Future: image-prompts, video-prompts, audio-prompts, style-guides, etc.
  */
-export class CreateAIReferencesTable1830000000000 implements MigrationInterface {
+export class CreateAIReferencesTable1835000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
