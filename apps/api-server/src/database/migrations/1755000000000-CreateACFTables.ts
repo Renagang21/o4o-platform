@@ -127,13 +127,13 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
     }));
 
     await queryRunner.createIndex('acf_field_groups', new TableIndex({
-      name: 'IDX_acf_field_groups_isActive',
-      columnNames: ['isActive']
+      name: 'IDX_acf_field_groups_is_active',
+      columnNames: ['is_active']
     }));
 
     await queryRunner.createIndex('acf_field_groups', new TableIndex({
-      name: 'IDX_acf_field_groups_menuOrder',
-      columnNames: ['menuOrder']
+      name: 'IDX_acf_field_groups_menu_order',
+      columnNames: ['menu_order']
     }));
 
     // Create ACF Fields table
@@ -480,7 +480,7 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
         ],
         foreignKeys: [
           {
-            columnNames: ['fieldGroupId'],
+            columnNames: ['field_group_id'],
             referencedTableName: 'acf_field_groups',
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE'
@@ -492,8 +492,8 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
 
     // Create indexes for fields
     await queryRunner.createIndex('acf_fields', new TableIndex({
-      name: 'IDX_acf_fields_fieldGroupId_order',
-      columnNames: ['fieldGroupId', 'order']
+      name: 'IDX_acf_fields_field_group_id_order',
+      columnNames: ['field_group_id', 'order']
     }));
 
     await queryRunner.createIndex('acf_fields', new TableIndex({
@@ -518,10 +518,10 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
     await queryRunner.dropIndex('acf_fields', 'IDX_acf_fields_type');
     await queryRunner.dropIndex('acf_fields', 'IDX_acf_fields_name');
     await queryRunner.dropIndex('acf_fields', 'IDX_acf_fields_key');
-    await queryRunner.dropIndex('acf_fields', 'IDX_acf_fields_fieldGroupId_order');
-    
-    await queryRunner.dropIndex('acf_field_groups', 'IDX_acf_field_groups_menuOrder');
-    await queryRunner.dropIndex('acf_field_groups', 'IDX_acf_field_groups_isActive');
+    await queryRunner.dropIndex('acf_fields', 'IDX_acf_fields_field_group_id_order');
+
+    await queryRunner.dropIndex('acf_field_groups', 'IDX_acf_field_groups_menu_order');
+    await queryRunner.dropIndex('acf_field_groups', 'IDX_acf_field_groups_is_active');
     await queryRunner.dropIndex('acf_field_groups', 'IDX_acf_field_groups_key');
 
     // Drop tables
