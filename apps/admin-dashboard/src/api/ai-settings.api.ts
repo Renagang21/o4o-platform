@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+import { authClient } from '@o4o/auth-client';
 
 export interface AISettingData {
   provider: string;
@@ -16,31 +16,11 @@ export interface AISettingsResponse {
 }
 
 class AISettingsApi {
-  private baseUrl = `${API_BASE_URL}/api/v1/ai-settings`;
-
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    const token = localStorage.getItem('authToken');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
-  }
-
   // Get all AI settings
   async getSettings(): Promise<AISettingsResponse> {
     try {
-      const response = await fetch(this.baseUrl, {
-        method: 'GET',
-        headers: await this.getAuthHeaders(),
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch AI settings');
-      }
-
-      const result = await response.json();
-      return result.data || {};
+      const response = await authClient.api.get('/ai-settings');
+      return response.data || {};
     } catch (error) {
       // Error fetching AI settings
       return {};
@@ -50,17 +30,7 @@ class AISettingsApi {
   // Save AI setting for a specific provider
   async saveSetting(data: AISettingData): Promise<boolean> {
     try {
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: await this.getAuthHeaders(),
-        credentials: 'include',
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save AI setting');
-      }
-
+      await authClient.api.post('/ai-settings', data);
       return true;
     } catch (error) {
       // Error saving AI setting
@@ -71,21 +41,10 @@ class AISettingsApi {
   // Test API key
   async testApiKey(provider: string, apiKey: string): Promise<{ valid: boolean; message: string }> {
     try {
-      const response = await fetch(`${this.baseUrl}/test`, {
-        method: 'POST',
-        headers: await this.getAuthHeaders(),
-        credentials: 'include',
-        body: JSON.stringify({ provider, apiKey })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to test API key');
-      }
-
-      const result = await response.json();
+      const response = await authClient.api.post('/ai-settings/test', { provider, apiKey });
       return {
-        valid: result.valid || false,
-        message: result.message || 'Unknown error'
+        valid: response.data.valid || false,
+        message: response.data.message || 'Unknown error'
       };
     } catch (error) {
       // Error testing API key
@@ -99,16 +58,7 @@ class AISettingsApi {
   // Delete AI setting
   async deleteSetting(provider: string): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/${provider}`, {
-        method: 'DELETE',
-        headers: await this.getAuthHeaders(),
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete AI setting');
-      }
-
+      await authClient.api.delete(`/ai-settings/${provider}`);
       return true;
     } catch (error) {
       // Error deleting AI setting
