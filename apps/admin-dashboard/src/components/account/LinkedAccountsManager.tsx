@@ -240,45 +240,52 @@ export const LinkedAccountsManager: React.FC = () => {
 
       <AlertDialog open={unlinkDialog.open} onOpenChange={(open: boolean) => setUnlinkDialog({ open })}>
         <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>계정 연결 해제</AlertDialogTitle>
-            <AlertDialogDescription>
-              {unlinkDialog.account && (
-                <>
-                  <span className="font-medium">{unlinkDialog.account.email}</span> 계정의 연결을 해제하시겠습니까?
-                  <br />
-                  보안을 위해 비밀번호를 입력해주세요.
-                </>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="my-4">
-            <Label htmlFor="password">비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="비밀번호를 입력하세요"
-            />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setPassword('')}>취소</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleUnlink}
-              disabled={!password || unlinking}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {unlinking ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  연결 해제 중...
-                </>
-              ) : (
-                '연결 해제'
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleUnlink();
+            }}
+          >
+            <AlertDialogHeader>
+              <AlertDialogTitle>계정 연결 해제</AlertDialogTitle>
+              <AlertDialogDescription>
+                {unlinkDialog.account && (
+                  <>
+                    <span className="font-medium">{unlinkDialog.account.email}</span> 계정의 연결을 해제하시겠습니까?
+                    <br />
+                    보안을 위해 비밀번호를 입력해주세요.
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="my-4">
+              <Label htmlFor="password">비밀번호</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="비밀번호를 입력하세요"
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel type="button" onClick={() => setPassword('')}>취소</AlertDialogCancel>
+              <AlertDialogAction
+                type="submit"
+                disabled={!password || unlinking}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {unlinking ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    연결 해제 중...
+                  </>
+                ) : (
+                  '연결 해제'
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
         </AlertDialogContent>
       </AlertDialog>
     </>
