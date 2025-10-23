@@ -353,6 +353,8 @@ ${availableBlocks}
    * 블록 검증 및 ID 추가
    * core/ prefix를 o4o/ prefix로 자동 변환
    * AI가 잘못된 형식을 보낼 경우 올바른 형태로 자동 변환
+   *
+   * AI는 content 객체에 데이터를 넣지만, 편집기는 attributes에서 데이터를 읽음
    */
   private validateBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
@@ -369,43 +371,79 @@ ${availableBlocks}
       let content = block.content || {};
       let attributes = block.attributes || {};
 
-      // heading 블록: content가 문자열이면 객체로 변환, attributes.level을 content로 이동
+      // heading 블록: content.text → attributes.content, content.level → attributes.level
       if (blockType === 'o4o/heading') {
         if (typeof content === 'string') {
-          // 잘못된 형식: content가 문자열
-          const level = attributes.level || 2;
-          content = { text: content, level };
-          delete attributes.level;
-        } else if (typeof content === 'object') {
-          // 올바른 형식이거나 수정 필요
-          if (!content.text && !content.level) {
-            // 빈 객체
-            content = { text: '', level: attributes.level || 2 };
-            delete attributes.level;
-          } else if (attributes.level && !content.level) {
-            // level이 attributes에만 있는 경우
-            content = { ...content, level: attributes.level };
-            delete attributes.level;
-          } else if (!content.level) {
-            // level이 아예 없는 경우
-            content = { ...content, level: 2 };
-          }
+          // content가 문자열인 경우
+          attributes = {
+            ...attributes,
+            content: content,
+            level: attributes.level || 2
+          };
+          content = {};
+        } else if (typeof content === 'object' && (content.text || content.level)) {
+          // AI가 content에 text, level을 넣은 경우 → attributes로 이동
+          attributes = {
+            ...attributes,
+            content: content.text || '',
+            level: content.level || attributes.level || 2
+          };
+          content = {};
+        } else if (!attributes.content) {
+          // attributes에 content가 없는 경우
+          attributes = {
+            ...attributes,
+            content: '',
+            level: attributes.level || 2
+          };
+          content = {};
         }
       }
 
-      // paragraph 블록: content가 문자열이면 객체로 변환
+      // paragraph 블록: content.text → attributes.content
       if (blockType === 'o4o/paragraph') {
         if (typeof content === 'string') {
-          content = { text: content };
-        } else if (typeof content === 'object' && !content.text) {
-          content = { text: '' };
+          // content가 문자열인 경우
+          attributes = {
+            ...attributes,
+            content: content
+          };
+          content = {};
+        } else if (typeof content === 'object' && content.text) {
+          // AI가 content에 text를 넣은 경우 → attributes로 이동
+          attributes = {
+            ...attributes,
+            content: content.text
+          };
+          content = {};
+        } else if (!attributes.content) {
+          // attributes에 content가 없는 경우
+          attributes = {
+            ...attributes,
+            content: ''
+          };
+          content = {};
         }
       }
 
-      // list 블록: content가 올바른 형식인지 확인
+      // list 블록: content.items → attributes로 이동
       if (blockType === 'o4o/list') {
-        if (typeof content !== 'object' || !Array.isArray(content.items)) {
-          content = { items: [], ordered: false };
+        if (typeof content === 'object' && Array.isArray(content.items)) {
+          // AI가 content에 items를 넣은 경우 → attributes로 이동
+          attributes = {
+            ...attributes,
+            items: content.items,
+            ordered: content.ordered || false
+          };
+          content = {};
+        } else if (!attributes.items) {
+          // attributes에 items가 없는 경우
+          attributes = {
+            ...attributes,
+            items: [],
+            ordered: false
+          };
+          content = {};
         }
       }
 
