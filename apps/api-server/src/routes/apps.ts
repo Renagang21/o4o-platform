@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { appsController } from '../controllers/apps.controller';
 
-const router = Router();
+const router: Router = Router();
 
 // Get all apps
 router.get('/', appsController.getAll.bind(appsController));
