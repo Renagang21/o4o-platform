@@ -398,8 +398,8 @@ class AIProxyService {
     const apiKey = await this.getApiKey('gemini');
     const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 32000, topP = 0.95, topK = 40 } = request;
 
-    // Determine API version (Gemini 2.5+ uses v1 for structured output)
-    const apiVersion = model.includes('2.5') ? 'v1' : 'v1beta';
+    // Determine API version (v1beta for structured output support)
+    const apiVersion = model.includes('2.5') ? 'v1beta' : 'v1beta';
     const useStructuredOutput = model.includes('2.5');
 
     const controller = new AbortController();
@@ -414,41 +414,28 @@ class AIProxyService {
         maxOutputTokens: maxTokens,
       };
 
-      // Add structured output for Gemini 2.5+
+      // Add structured output for Gemini 2.5+ (use v1beta for full support)
       if (useStructuredOutput) {
-        generationConfig.response_mime_type = 'application/json';
-        generationConfig.response_schema = {
-          type: 'object',
+        generationConfig.responseMimeType = 'application/json';
+        generationConfig.responseSchema = {
+          type: 'OBJECT',
           properties: {
             blocks: {
-              type: 'array',
+              type: 'ARRAY',
               description: 'Array of content blocks',
               items: {
-                type: 'object',
+                type: 'OBJECT',
                 properties: {
                   type: {
-                    type: 'string',
-                    description: 'Block type with o4o/ prefix',
-                    enum: [
-                      'o4o/heading',
-                      'o4o/paragraph',
-                      'o4o/image',
-                      'o4o/button',
-                      'o4o/list',
-                      'o4o/columns',
-                      'o4o/cover',
-                      'o4o/gallery',
-                      'o4o/spacer',
-                      'o4o/separator',
-                      'o4o/quote'
-                    ]
+                    type: 'STRING',
+                    description: 'Block type with o4o/ prefix'
                   },
                   content: {
-                    type: 'object',
+                    type: 'OBJECT',
                     description: 'Content object (usually empty, data goes in attributes)'
                   },
                   attributes: {
-                    type: 'object',
+                    type: 'OBJECT',
                     description: 'Block attributes containing the actual data'
                   }
                 },
