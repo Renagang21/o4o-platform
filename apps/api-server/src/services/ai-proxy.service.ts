@@ -380,22 +380,86 @@ class AIProxyService {
   }
 
   /**
-   * Call Gemini API
+   * Call Gemini API with Structured Output (Gemini 2.5+)
+   *
+   * Uses response_schema to enforce JSON structure and prevent:
+   * - Truncated responses
+   * - Markdown-wrapped JSON
+   * - Inconsistent output formats
+   *
+   * References:
+   * - https://ai.google.dev/gemini-api/docs/structured-output
+   * - https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/control-generated-output
    */
   private async callGemini(
     request: AIGenerateRequest,
     requestId: string
   ): Promise<AIGenerateResponse> {
     const apiKey = await this.getApiKey('gemini');
-    const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 8192, topP = 0.95, topK = 40 } = request;
+    const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 32000, topP = 0.95, topK = 40 } = request;
 
-    // Determine API version
+    // Determine API version (Gemini 2.5+ uses v1 for structured output)
     const apiVersion = model.includes('2.5') ? 'v1' : 'v1beta';
+    const useStructuredOutput = model.includes('2.5');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.DEFAULT_TIMEOUT);
 
     try {
+      // Build generation config
+      const generationConfig: any = {
+        temperature,
+        topK,
+        topP,
+        maxOutputTokens: maxTokens,
+      };
+
+      // Add structured output for Gemini 2.5+
+      if (useStructuredOutput) {
+        generationConfig.response_mime_type = 'application/json';
+        generationConfig.response_schema = {
+          type: 'object',
+          properties: {
+            blocks: {
+              type: 'array',
+              description: 'Array of content blocks',
+              items: {
+                type: 'object',
+                properties: {
+                  type: {
+                    type: 'string',
+                    description: 'Block type with o4o/ prefix',
+                    enum: [
+                      'o4o/heading',
+                      'o4o/paragraph',
+                      'o4o/image',
+                      'o4o/button',
+                      'o4o/list',
+                      'o4o/columns',
+                      'o4o/cover',
+                      'o4o/gallery',
+                      'o4o/spacer',
+                      'o4o/separator',
+                      'o4o/quote'
+                    ]
+                  },
+                  content: {
+                    type: 'object',
+                    description: 'Content object (usually empty, data goes in attributes)'
+                  },
+                  attributes: {
+                    type: 'object',
+                    description: 'Block attributes containing the actual data'
+                  }
+                },
+                required: ['type', 'content', 'attributes']
+              }
+            }
+          },
+          required: ['blocks']
+        };
+      }
+
       const response = await fetch(
         `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`,
         {
@@ -406,12 +470,7 @@ class AIProxyService {
               role: 'user',
               parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
             }],
-            generationConfig: {
-              temperature,
-              topK,
-              topP,
-              maxOutputTokens: maxTokens,
-            },
+            generationConfig,
           }),
           signal: controller.signal,
         }
@@ -440,11 +499,31 @@ class AIProxyService {
         throw this.createError('PROVIDER_ERROR', 'No response from Gemini', false);
       }
 
-      // Extract JSON from response
-      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
-      const jsonContent = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
-
-      const parsed = JSON.parse(jsonContent);
+      // With structured output, response is guaranteed to be valid JSON
+      let parsed: any;
+      try {
+        if (useStructuredOutput) {
+          // Direct parse - no regex needed with structured output
+          parsed = JSON.parse(content);
+        } else {
+          // Fallback for older models - extract JSON from markdown
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
+          const jsonContent = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
+          parsed = JSON.parse(jsonContent);
+        }
+      } catch (parseError: any) {
+        logger.error('Failed to parse Gemini response', {
+          requestId,
+          model,
+          content: content.substring(0, 500),
+          error: parseError.message,
+        });
+        throw this.createError(
+          'PROVIDER_ERROR',
+          `Invalid JSON response from Gemini: ${parseError.message}`,
+          false
+        );
+      }
 
       return {
         success: true,
