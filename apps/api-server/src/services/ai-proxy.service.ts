@@ -415,29 +415,10 @@ class AIProxyService {
       };
 
       // Add structured output for Gemini 2.5+ (use v1beta for full support)
-      // Simplified schema - only enforce top-level structure, not nested objects
+      // Only use responseMimeType to enforce JSON format
+      // Don't use responseSchema - it's too restrictive and causes empty content
       if (useStructuredOutput) {
         generationConfig.responseMimeType = 'application/json';
-        generationConfig.responseSchema = {
-          type: 'OBJECT',
-          properties: {
-            blocks: {
-              type: 'ARRAY',
-              description: 'Array of content blocks',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  type: {
-                    type: 'STRING',
-                    description: 'Block type with o4o/ prefix (e.g., o4o/heading, o4o/paragraph)'
-                  }
-                },
-                required: ['type']
-              }
-            }
-          },
-          required: ['blocks']
-        };
       }
 
       const response = await fetch(
