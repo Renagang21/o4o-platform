@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Mail, BookOpen, Key, FileText, MessageSquare, Shield, Link as LinkIcon, Edit, Sparkles, Package } from 'lucide-react'
+import { Settings as SettingsIcon, Mail, BookOpen, Key, MessageSquare, Shield, Link as LinkIcon, Edit, Package } from 'lucide-react'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
@@ -8,7 +8,6 @@ import EmailSettings from './EmailSettings'
 import PermalinkSettings from './PermalinkSettings'
 import WritingSettings from './WritingSettings'
 import PrivacySettings from './PrivacySettings'
-import AISettings from './AISettings'
 import AppServices from './AppServices'
 
 const UserSettings: FC = () => (
@@ -41,7 +40,6 @@ const settingsTabs = [
   { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: '/settings/privacy' },
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
   { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
-  { id: 'ai', label: 'AI API', icon: <Sparkles className="w-4 h-4" />, path: '/settings/ai' },
   { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' }
 ]
 
@@ -90,7 +88,6 @@ const Settings: FC = () => {
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />
         <Route path="email" element={<EmailSettings />} />
-        <Route path="ai" element={<AISettings />} />
         <Route path="app-services" element={<AppServices />} />
         <Route path="integrations" element={<IntegrationSettings />} />
         <Route path="*" element={<Navigate to="" replace />} />

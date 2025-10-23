@@ -125,8 +125,11 @@ class AppSystemApi {
         params: { businessId }
       });
       return response.data?.data || null;
-    } catch (error) {
-      console.error(`Error fetching instance for ${slug}:`, error);
+    } catch (error: any) {
+      // Don't log 404 errors - app just isn't installed yet (expected)
+      if (error.response?.status !== 404) {
+        console.error(`Error fetching instance for ${slug}:`, error);
+      }
       return null;
     }
   }

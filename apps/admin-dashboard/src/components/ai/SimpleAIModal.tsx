@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { simpleAIGenerator, AI_MODELS, type AIModel, type Block } from '@/services/ai/SimpleAIGenerator';
-import { AIApiKeyService } from '@/pages/settings/AISettings';
+import { AppSystemKeyService } from '@/services/app-system-keys.service';
 
 interface SimpleAIModalProps {
   isOpen: boolean;
@@ -29,7 +29,6 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 }) => {
   const [prompt, setPrompt] = useState('');
   const [template, setTemplate] = useState<'landing' | 'about' | 'product' | 'blog'>('landing');
-  const [provider, setProvider] = useState<'openai' | 'gemini' | 'claude'>('gemini');
   const [model, setModel] = useState<AIModel>('gemini-2.5-flash');
   const [apiKey, setApiKey] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -37,22 +36,29 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   const [progressMessage, setProgressMessage] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
 
-  // 모달이 열릴 때 저장된 API 키 자동 로드
+  // 모달이 열릴 때 저장된 API 키 자동 로드 (App System에서)
   useEffect(() => {
     const loadSavedSettings = async () => {
       if (isOpen) {
         try {
-          // 현재 선택된 프로바이더의 API 키와 모델 로드
-          const savedApiKey = await AIApiKeyService.getKey(provider);
-          const savedModel = await AIApiKeyService.getDefaultModel(provider);
-          
-          if (savedApiKey) {
-            setApiKey(savedApiKey);
-          }
-          
-          if (savedModel) {
-            setModel(savedModel as AIModel);
+          // Check if Gemini app is installed
+          const installed = await AppSystemKeyService.isGeminiInstalled();
+          setIsAppInstalled(installed);
+
+          if (installed) {
+            // Load API key and model from App System
+            const savedApiKey = await AppSystemKeyService.getGeminiKey();
+            const savedModel = await AppSystemKeyService.getGeminiModel();
+
+            if (savedApiKey) {
+              setApiKey(savedApiKey);
+            }
+
+            if (savedModel) {
+              setModel(savedModel as AIModel);
+            }
           }
         } catch (error) {
           // API 키 로드 실패 시 무시 (사용자가 직접 입력 가능)
@@ -62,51 +68,10 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     };
 
     loadSavedSettings();
-  }, [isOpen, provider]);
+  }, [isOpen]);
 
-  // 프로바이더별 모델 필터링
-  const getModelsForProvider = (selectedProvider: string) => {
-    return Object.entries(AI_MODELS).filter(([key]) => {
-      switch (selectedProvider) {
-        case 'openai':
-          return key.startsWith('gpt-');
-        case 'gemini':
-          return key.startsWith('gemini-');
-        case 'claude':
-          return key.startsWith('claude-');
-        default:
-          return false;
-      }
-    });
-  };
-
-  // 프로바이더 변경 시 첫 번째 모델로 자동 선택 및 API 키 로드
-  const handleProviderChange = async (newProvider: 'openai' | 'gemini' | 'claude') => {
-    setProvider(newProvider);
-    const models = getModelsForProvider(newProvider);
-    if (models.length > 0) {
-      setModel(models[0][0] as AIModel);
-    }
-    
-    // 선택된 프로바이더의 저장된 API 키 로드
-    try {
-      const savedApiKey = await AIApiKeyService.getKey(newProvider);
-      const savedModel = await AIApiKeyService.getDefaultModel(newProvider);
-      
-      if (savedApiKey) {
-        setApiKey(savedApiKey);
-      } else {
-        setApiKey(''); // 저장된 키가 없으면 초기화
-      }
-      
-      if (savedModel) {
-        setModel(savedModel as AIModel);
-      }
-    } catch (error) {
-      // API 키 로드 실패 시 초기화
-      setApiKey('');
-    }
-  };
+  // Gemini 모델만 필터링
+  const geminiModels = Object.entries(AI_MODELS).filter(([key]) => key.startsWith('gemini-'));
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -137,7 +102,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         prompt,
         template,
         config: {
-          provider,
+          provider: 'gemini',
           model
         },
         onProgress: (progress, message) => {
@@ -171,11 +136,6 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     { key: 'blog', name: '블로그 포스트', description: '블로그 형식의 글' },
   ];
 
-  const providers = [
-    { key: 'gemini', name: 'Google Gemini (권장)', description: '빠르고 정확한 최신 모델' },
-    { key: 'openai', name: 'OpenAI GPT', description: 'GPT-5 시리즈 지원' },
-    { key: 'claude', name: 'Anthropic Claude', description: 'Claude 4 시리즈 지원' },
-  ];
 
   const examplePrompts = {
     landing: '혁신적인 AI 기반 웹사이트 빌더를 소개하는 랜딩 페이지를 만들어주세요.',
@@ -237,35 +197,30 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               </Select>
             </div>
 
-            {/* AI 프로바이더 선택 */}
-            <div className="space-y-2">
-              <Label>AI 서비스</Label>
-              <Select value={provider} onValueChange={(value) => handleProviderChange(value as 'openai' | 'gemini' | 'claude')}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {providers.map((p) => (
-                    <SelectItem key={p.key} value={p.key}>
-                      <div>
-                        <div className="font-medium">{p.name}</div>
-                        <div className="text-xs text-gray-500">{p.description}</div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* AI 서비스 정보 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Sparkles className="w-4 h-4 text-blue-600" />
+                <span className="font-medium text-blue-900">Google Gemini AI 사용</span>
+              </div>
+              {!isAppInstalled && (
+                <p className="text-xs text-blue-700 mt-1">
+                  💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                    AI Services 설정
+                  </a>에서 Gemini 앱을 먼저 설치하세요.
+                </p>
+              )}
             </div>
-            
+
             {/* 모델 선택 */}
             <div className="space-y-2">
-              <Label>모델</Label>
+              <Label>Gemini 모델</Label>
               <Select value={model} onValueChange={(v) => setModel(v as AIModel)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {getModelsForProvider(provider).map(([key, name]) => (
+                  {geminiModels.map(([key, name]) => (
                     <SelectItem key={key} value={key}>
                       <div className="text-sm">
                         <div className="font-medium">{key}</div>
@@ -279,25 +234,21 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
             {/* API 키 */}
             <div className="space-y-2">
-              <Label>API 키</Label>
+              <Label>Google Gemini API 키</Label>
               <input
                 type="password"
                 className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
-                placeholder={`${provider === 'openai' ? 'sk-...' : provider === 'claude' ? 'sk-ant-...' : 'AIza...'}`}
+                placeholder="AIza..."
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
               />
               <div className="text-xs text-gray-500 space-y-1">
-                <p>
-                  {provider === 'openai' && 'OpenAI API 키를 입력하세요'}
-                  {provider === 'gemini' && 'Google AI Studio에서 발급받은 API 키를 입력하세요'}
-                  {provider === 'claude' && 'Anthropic Console에서 발급받은 API 키를 입력하세요'}
-                </p>
+                <p>Google AI Studio에서 발급받은 API 키를 입력하세요</p>
                 {!apiKey && (
                   <p className="text-blue-600">
-                    💡 <a href="/admin/settings" target="_blank" className="underline hover:no-underline">
-                      설정 페이지에서 API 키를 미리 저장
-                    </a>하면 자동으로 입력됩니다.
+                    💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                      AI Services 설정
+                    </a>에서 API 키를 미리 저장하면 자동으로 입력됩니다.
                   </p>
                 )}
               </div>
