@@ -314,38 +314,45 @@ ${availableBlocks}
   "blocks": [
     {
       "type": "o4o/heading",
-      "content": "제목 텍스트",
-      "attributes": {"level": 1}
+      "content": {"text": "제목 텍스트", "level": 1},
+      "attributes": {}
     },
     {
       "type": "o4o/paragraph",
-      "content": "문단 내용",
+      "content": {"text": "문단 내용"},
       "attributes": {}
     },
     {
       "type": "o4o/image",
-      "content": "",
-      "attributes": {"alt": "이미지 설명"}
+      "content": {},
+      "attributes": {"url": "", "alt": "이미지 설명"}
     },
     {
       "type": "o4o/button",
-      "content": "",
+      "content": {},
       "attributes": {"text": "버튼 텍스트", "url": "#"}
+    },
+    {
+      "type": "o4o/list",
+      "content": {"items": ["항목1", "항목2"], "ordered": false},
+      "attributes": {}
     }
   ]
 }
 
 중요 규칙:
 1. 모든 블록 타입은 "o4o/" prefix를 사용하세요 (core/ 사용 금지)
-2. heading/paragraph 블록: content는 문자열입니다
-3. button/image 블록: content는 빈 문자열, 데이터는 attributes에 넣으세요
-4. 이미지 src/url은 절대 포함하지 말고, alt 텍스트만 사용하세요`;
+2. heading 블록: content는 {"text": "...", "level": 1-6} 객체입니다
+3. paragraph 블록: content는 {"text": "..."} 객체입니다
+4. list 블록: content는 {"items": [...], "ordered": true/false} 객체입니다
+5. button/image 블록: content는 빈 객체 {}, 데이터는 attributes에 넣으세요
+6. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;
   }
 
   /**
    * 블록 검증 및 ID 추가
    * core/ prefix를 o4o/ prefix로 자동 변환
-   * AI가 보낸 잘못된 구조를 올바른 형태로 변환
+   * AI가 잘못된 형식을 보낼 경우 올바른 형태로 자동 변환
    */
   private validateBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
@@ -359,36 +366,75 @@ ${availableBlocks}
         blockType = blockType.replace('core/', 'o4o/');
       }
 
-      let content = block.content || { text: '' };
+      let content = block.content || {};
       let attributes = block.attributes || {};
 
-      // heading 블록: content.text를 content로 평탄화, content.level을 attributes.level로 이동
-      if (blockType === 'o4o/heading' && typeof content === 'object') {
-        if (content.text) {
-          const textContent = content.text;
-          const level = content.level || attributes.level || 2;
-          content = textContent;
-          attributes = { ...attributes, level };
+      // heading 블록: content가 문자열이면 객체로 변환, attributes.level을 content로 이동
+      if (blockType === 'o4o/heading') {
+        if (typeof content === 'string') {
+          // 잘못된 형식: content가 문자열
+          const level = attributes.level || 2;
+          content = { text: content, level };
+          delete attributes.level;
+        } else if (typeof content === 'object') {
+          // 올바른 형식이거나 수정 필요
+          if (!content.text && !content.level) {
+            // 빈 객체
+            content = { text: '', level: attributes.level || 2 };
+            delete attributes.level;
+          } else if (attributes.level && !content.level) {
+            // level이 attributes에만 있는 경우
+            content = { ...content, level: attributes.level };
+            delete attributes.level;
+          } else if (!content.level) {
+            // level이 아예 없는 경우
+            content = { ...content, level: 2 };
+          }
         }
       }
 
-      // paragraph 블록: content.text를 content로 평탄화
-      if (blockType === 'o4o/paragraph' && typeof content === 'object' && content.text) {
-        content = content.text;
-      }
-
-      // button 블록: content.text와 content.url을 attributes로 이동
-      if (blockType === 'o4o/button' && typeof content === 'object') {
-        if (content.text) {
-          attributes = { ...attributes, text: content.text, url: content.url || '#' };
-          content = '';
+      // paragraph 블록: content가 문자열이면 객체로 변환
+      if (blockType === 'o4o/paragraph') {
+        if (typeof content === 'string') {
+          content = { text: content };
+        } else if (typeof content === 'object' && !content.text) {
+          content = { text: '' };
         }
       }
 
-      // image 블록: content.alt를 attributes.alt로 이동
-      if (blockType === 'o4o/image' && typeof content === 'object' && content.alt) {
-        attributes = { ...attributes, alt: content.alt };
-        content = '';
+      // list 블록: content가 올바른 형식인지 확인
+      if (blockType === 'o4o/list') {
+        if (typeof content !== 'object' || !Array.isArray(content.items)) {
+          content = { items: [], ordered: false };
+        }
+      }
+
+      // button 블록: content는 빈 객체, 데이터는 attributes에
+      if (blockType === 'o4o/button') {
+        if (typeof content === 'object' && content.text) {
+          // 잘못된 형식: content에 데이터가 있음
+          attributes = {
+            ...attributes,
+            text: content.text,
+            url: content.url || '#'
+          };
+        }
+        // content는 항상 빈 객체
+        content = {};
+      }
+
+      // image 블록: content는 빈 객체, 데이터는 attributes에
+      if (blockType === 'o4o/image') {
+        if (typeof content === 'object' && (content.url || content.alt)) {
+          // 잘못된 형식: content에 데이터가 있음
+          attributes = {
+            ...attributes,
+            url: content.url || '',
+            alt: content.alt || ''
+          };
+        }
+        // content는 항상 빈 객체
+        content = {};
       }
 
       return {
