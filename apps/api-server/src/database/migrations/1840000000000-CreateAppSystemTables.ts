@@ -70,7 +70,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             default: "'active'"
           },
           {
-            name: 'is_system',
+            name: 'isSystem',
             type: 'boolean',
             default: false
           },
@@ -81,18 +81,18 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'repository_url',
+            name: 'repositoryUrl',
             type: 'varchar',
             length: '255',
             isNullable: true
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updated_at',
+            name: 'updatedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -114,11 +114,11 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             default: 'uuid_generate_v4()'
           },
           {
-            name: 'app_id',
+            name: 'appId',
             type: 'uuid'
           },
           {
-            name: 'business_id',
+            name: 'businessId',
             type: 'uuid',
             isNullable: true
           },
@@ -134,17 +134,17 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'usage_count',
+            name: 'usageCount',
             type: 'integer',
             default: 0
           },
           {
-            name: 'installed_at',
+            name: 'installedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updated_at',
+            name: 'updatedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -152,7 +152,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
         foreignKeys: [
           {
             name: 'FK_app_instances_app',
-            columnNames: ['app_id'],
+            columnNames: ['appId'],
             referencedTableName: 'apps',
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE'
@@ -175,16 +175,16 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             default: 'uuid_generate_v4()'
           },
           {
-            name: 'app_id',
+            name: 'appId',
             type: 'uuid'
           },
           {
-            name: 'user_id',
+            name: 'userId',
             type: 'uuid',
             isNullable: true
           },
           {
-            name: 'business_id',
+            name: 'businessId',
             type: 'uuid',
             isNullable: true
           },
@@ -194,17 +194,17 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             length: '100'
           },
           {
-            name: 'input_tokens',
+            name: 'inputTokens',
             type: 'integer',
             isNullable: true
           },
           {
-            name: 'output_tokens',
+            name: 'outputTokens',
             type: 'integer',
             isNullable: true
           },
           {
-            name: 'duration_ms',
+            name: 'durationMs',
             type: 'integer',
             isNullable: true
           },
@@ -215,18 +215,18 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             default: "'success'"
           },
           {
-            name: 'error_type',
+            name: 'errorType',
             type: 'varchar',
             length: '50',
             isNullable: true
           },
           {
-            name: 'error_message',
+            name: 'errorMessage',
             type: 'text',
             isNullable: true
           },
           {
-            name: 'request_id',
+            name: 'requestId',
             type: 'varchar',
             length: '100',
             isNullable: true
@@ -243,7 +243,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -251,7 +251,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
         foreignKeys: [
           {
             name: 'FK_app_usage_logs_app',
-            columnNames: ['app_id'],
+            columnNames: ['appId'],
             referencedTableName: 'apps',
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE'
@@ -282,7 +282,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
       'app_instances',
       new TableIndex({
         name: 'IDX_app_instances_app_business',
-        columnNames: ['app_id', 'business_id']
+        columnNames: ['appId', 'businessId']
       })
     );
 
@@ -290,7 +290,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
       'app_usage_logs',
       new TableIndex({
         name: 'IDX_app_usage_logs_app_created',
-        columnNames: ['app_id', 'created_at']
+        columnNames: ['appId', 'createdAt']
       })
     );
 
@@ -298,7 +298,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
       'app_usage_logs',
       new TableIndex({
         name: 'IDX_app_usage_logs_business_created',
-        columnNames: ['business_id', 'created_at']
+        columnNames: ['businessId', 'createdAt']
       })
     );
 
@@ -306,7 +306,7 @@ export class CreateAppSystemTables1840000000000 implements MigrationInterface {
       'app_usage_logs',
       new TableIndex({
         name: 'IDX_app_usage_logs_user_created',
-        columnNames: ['user_id', 'created_at']
+        columnNames: ['userId', 'createdAt']
       })
     );
   }
