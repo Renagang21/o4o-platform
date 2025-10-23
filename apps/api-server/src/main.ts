@@ -672,16 +672,16 @@ app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management routes
 
 // AI Shortcodes API (public access for AI page generation)
-app.use('/api/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
+app.use('/api/v1/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
 
 // AI Blocks API (SSOT for AI page generation)
-app.use('/api/ai/blocks', publicLimiter, aiBlocksRoutes);
+app.use('/api/v1/ai/blocks', publicLimiter, aiBlocksRoutes);
 
 // AI Schema API (JSON Schema for AI output validation)
-app.use('/api/ai/schema', publicLimiter, aiSchemaRoutes);
+app.use('/api/v1/ai/schema', publicLimiter, aiSchemaRoutes);
 
 // AI Proxy API (server-side LLM proxy with security)
-app.use('/api/ai', limiter, aiProxyRoutes);
+app.use('/api/v1/ai', limiter, aiProxyRoutes);
 
 // AI Settings API (admin only)
 app.use('/api/v1/ai-settings', limiter, aiSettingsRoutes);
