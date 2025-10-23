@@ -57,6 +57,10 @@ import { MenuLocation } from '../entities/MenuLocation';
 // AI Settings entity
 import { AISetting } from '../entities/AISetting';
 import { AiSettings } from '../entities/AiSettings';
+// App System entities
+import { App } from '../entities/App';
+import { AppInstance } from '../entities/AppInstance';
+import { AppUsageLog } from '../entities/AppUsageLog';
 // Cart and Order entities
 import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
@@ -195,6 +199,10 @@ export const AppDataSource = new DataSource({
     // AI Settings
     AISetting,
     AiSettings,
+    // App System entities
+    App,
+    AppInstance,
+    AppUsageLog,
     // Cart and Order entities
     Cart,
     CartItem,
