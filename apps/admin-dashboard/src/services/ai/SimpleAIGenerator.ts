@@ -309,38 +309,43 @@ ${availableBlocks}
   private buildUserPrompt(prompt: string): string {
     return `다음 요구사항으로 페이지를 정확히 생성하세요: ${prompt}
 
-블록 형식 예시:
+블록 형식 예시 (반드시 이 구조를 따르세요):
 {
   "blocks": [
     {
       "type": "o4o/heading",
-      "content": {"text": "제목"},
+      "content": "제목 텍스트",
       "attributes": {"level": 1}
     },
     {
       "type": "o4o/paragraph",
-      "content": {"text": "내용"},
+      "content": "문단 내용",
       "attributes": {}
     },
     {
       "type": "o4o/image",
-      "content": {"alt": "이미지 설명"},
-      "attributes": {}
+      "content": "",
+      "attributes": {"alt": "이미지 설명"}
     },
     {
       "type": "o4o/button",
-      "content": {"text": "버튼 텍스트", "url": "#"},
-      "attributes": {}
+      "content": "",
+      "attributes": {"text": "버튼 텍스트", "url": "#"}
     }
   ]
 }
 
-중요: 이미지 src는 절대 포함하지 말고, alt 텍스트만 사용하세요. 외부 URL 사용 금지.`;
+중요 규칙:
+1. 모든 블록 타입은 "o4o/" prefix를 사용하세요 (core/ 사용 금지)
+2. heading/paragraph 블록: content는 문자열입니다
+3. button/image 블록: content는 빈 문자열, 데이터는 attributes에 넣으세요
+4. 이미지 src/url은 절대 포함하지 말고, alt 텍스트만 사용하세요`;
   }
 
   /**
    * 블록 검증 및 ID 추가
    * core/ prefix를 o4o/ prefix로 자동 변환
+   * AI가 보낸 잘못된 구조를 올바른 형태로 변환
    */
   private validateBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
@@ -354,11 +359,43 @@ ${availableBlocks}
         blockType = blockType.replace('core/', 'o4o/');
       }
 
+      let content = block.content || { text: '' };
+      let attributes = block.attributes || {};
+
+      // heading 블록: content.text를 content로 평탄화, content.level을 attributes.level로 이동
+      if (blockType === 'o4o/heading' && typeof content === 'object') {
+        if (content.text) {
+          const textContent = content.text;
+          const level = content.level || attributes.level || 2;
+          content = textContent;
+          attributes = { ...attributes, level };
+        }
+      }
+
+      // paragraph 블록: content.text를 content로 평탄화
+      if (blockType === 'o4o/paragraph' && typeof content === 'object' && content.text) {
+        content = content.text;
+      }
+
+      // button 블록: content.text와 content.url을 attributes로 이동
+      if (blockType === 'o4o/button' && typeof content === 'object') {
+        if (content.text) {
+          attributes = { ...attributes, text: content.text, url: content.url || '#' };
+          content = '';
+        }
+      }
+
+      // image 블록: content.alt를 attributes.alt로 이동
+      if (blockType === 'o4o/image' && typeof content === 'object' && content.alt) {
+        attributes = { ...attributes, alt: content.alt };
+        content = '';
+      }
+
       return {
         id: `block-${Date.now()}-${index}`,
         type: blockType,
-        content: block.content || { text: '' },
-        attributes: block.attributes || {}
+        content,
+        attributes
       };
     });
   }
