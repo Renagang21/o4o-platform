@@ -20,7 +20,7 @@ export class AppInstance {
   appId!: string;
 
   @ManyToOne(() => App, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'app_id' })
+  @JoinColumn({ name: 'appId' })
   app!: App;
 
   @Column({ type: 'uuid', nullable: true })
