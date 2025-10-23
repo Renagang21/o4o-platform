@@ -54,7 +54,7 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
           },
           {
             name: 'hideOnScreen',
-            type: 'simple-array',
+            type: 'text',
             isNullable: true
           },
           {
@@ -325,7 +325,7 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
           },
           {
             name: 'mimeTypes',
-            type: 'simple-array',
+            type: 'text',
             isNullable: true
           },
           {
@@ -366,12 +366,12 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
           },
           {
             name: 'postTypes',
-            type: 'simple-array',
+            type: 'text',
             isNullable: true
           },
           {
             name: 'taxonomies',
-            type: 'simple-array',
+            type: 'text',
             isNullable: true
           },
           {
@@ -424,7 +424,7 @@ export class CreateACFTables1755000000000 implements MigrationInterface {
           },
           {
             name: 'cloneFields',
-            type: 'simple-array',
+            type: 'text',
             isNullable: true
           },
           {
