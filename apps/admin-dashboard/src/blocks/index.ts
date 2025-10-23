@@ -14,6 +14,7 @@ import headingBlockDefinition from './definitions/heading';
 import quoteBlockDefinition from './definitions/quote';
 import codeBlockDefinition from './definitions/code';
 import markdownBlockDefinition from './definitions/markdown';
+import markdownReaderBlockDefinition from './definitions/markdown-reader';
 import listBlockDefinition from './definitions/list';
 import tableBlockDefinition from './definitions/table';
 
@@ -67,6 +68,7 @@ export function registerAllBlocks(): void {
   blockRegistry.register(quoteBlockDefinition);
   blockRegistry.register(codeBlockDefinition);
   blockRegistry.register(markdownBlockDefinition);
+  blockRegistry.register(markdownReaderBlockDefinition);
   blockRegistry.register(listBlockDefinition);
   blockRegistry.register(tableBlockDefinition);
 
