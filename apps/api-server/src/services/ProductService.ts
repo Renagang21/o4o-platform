@@ -460,6 +460,39 @@ export class ProductService {
     }
   }
 
+  // CSV 일괄 가져오기
+  async bulkImportProducts(products: CreateProductRequest[]): Promise<{
+    imported: number;
+    failed: number;
+    errors: Array<{ row: number; sku?: string; error: string }>;
+  }> {
+    const results = {
+      imported: 0,
+      failed: 0,
+      errors: [] as Array<{ row: number; sku?: string; error: string }>
+    };
+
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+      try {
+        await this.createProduct(product);
+        results.imported++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          row: i + 1,
+          sku: product.sku,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        logger.warn(`Failed to import product at row ${i + 1}: ${product.sku}`, error);
+      }
+    }
+
+    logger.info(`Bulk import completed: ${results.imported} imported, ${results.failed} failed`);
+
+    return results;
+  }
+
   // 유틸리티: Slug 생성
   private generateSlug(name: string): string {
     return name
