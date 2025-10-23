@@ -27,14 +27,11 @@ import {
   GeminiResponse,
   ClaudeResponse,
 } from '../types/ai-proxy.types';
+import { AppDataSource } from '../database/connection';
+import { AiSettings } from '../entities/AiSettings';
 
 class AIProxyService {
   private static instance: AIProxyService;
-
-  // API Keys from environment
-  private readonly OPENAI_API_KEY: string;
-  private readonly GEMINI_API_KEY: string;
-  private readonly CLAUDE_API_KEY: string;
 
   // Timeout and retry configuration
   private readonly DEFAULT_TIMEOUT = 15000; // 15 seconds
@@ -44,17 +41,51 @@ class AIProxyService {
   private readonly RETRY_FACTOR = 2;
 
   private constructor() {
-    // Load API keys from environment
-    this.OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-    this.GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-    this.CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || '';
+    // API keys are now loaded from database per-request
+  }
 
-    // Warn if keys are missing in production
-    if (process.env.NODE_ENV === 'production') {
-      if (!this.OPENAI_API_KEY) logger.warn('⚠️ OPENAI_API_KEY not configured');
-      if (!this.GEMINI_API_KEY) logger.warn('⚠️ GEMINI_API_KEY not configured');
-      if (!this.CLAUDE_API_KEY) logger.warn('⚠️ CLAUDE_API_KEY not configured');
+  /**
+   * Get API key for provider
+   * 1. Check database (user-configured keys)
+   * 2. Fallback to environment variables
+   * 3. Throw error if not found
+   */
+  private async getApiKey(provider: AIProvider): Promise<string> {
+    try {
+      // Try to load from database first
+      if (AppDataSource.isInitialized) {
+        const aiSettingsRepo = AppDataSource.getRepository(AiSettings);
+        const setting = await aiSettingsRepo.findOne({
+          where: { provider, isActive: true }
+        });
+
+        if (setting?.apiKey) {
+          logger.debug(`Using database API key for ${provider}`);
+          return setting.apiKey;
+        }
+      }
+    } catch (error) {
+      logger.warn(`Failed to load API key from database for ${provider}:`, error);
     }
+
+    // Fallback to environment variables
+    const envKey = provider === 'openai'
+      ? process.env.OPENAI_API_KEY
+      : provider === 'gemini'
+      ? process.env.GEMINI_API_KEY
+      : process.env.CLAUDE_API_KEY;
+
+    if (envKey) {
+      logger.debug(`Using environment API key for ${provider}`);
+      return envKey;
+    }
+
+    // No key found
+    throw this.createError(
+      'AUTH_ERROR',
+      `${provider} API key not configured. Please add it in Settings → AI API.`,
+      false
+    );
   }
 
   static getInstance(): AIProxyService {
@@ -259,10 +290,7 @@ class AIProxyService {
     request: AIGenerateRequest,
     requestId: string
   ): Promise<AIGenerateResponse> {
-    if (!this.OPENAI_API_KEY) {
-      throw this.createError('AUTH_ERROR', 'OpenAI API key not configured', false);
-    }
-
+    const apiKey = await this.getApiKey('openai');
     const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 4000 } = request;
 
     // Sprint 3: Start tracing span for LLM call
@@ -277,7 +305,7 @@ class AIProxyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.OPENAI_API_KEY}`,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model,
@@ -358,10 +386,7 @@ class AIProxyService {
     request: AIGenerateRequest,
     requestId: string
   ): Promise<AIGenerateResponse> {
-    if (!this.GEMINI_API_KEY) {
-      throw this.createError('AUTH_ERROR', 'Gemini API key not configured', false);
-    }
-
+    const apiKey = await this.getApiKey('gemini');
     const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 8192, topP = 0.95, topK = 40 } = request;
 
     // Determine API version
@@ -372,7 +397,7 @@ class AIProxyService {
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${this.GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -452,10 +477,7 @@ class AIProxyService {
     request: AIGenerateRequest,
     requestId: string
   ): Promise<AIGenerateResponse> {
-    if (!this.CLAUDE_API_KEY) {
-      throw this.createError('AUTH_ERROR', 'Claude API key not configured', false);
-    }
-
+    const apiKey = await this.getApiKey('claude');
     const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 4000 } = request;
 
     const controller = new AbortController();
@@ -466,7 +488,7 @@ class AIProxyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': this.CLAUDE_API_KEY,
+          'x-api-key': apiKey,
           'anthropic-version': '2025-01-01',
         },
         body: JSON.stringify({
