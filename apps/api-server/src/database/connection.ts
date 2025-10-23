@@ -77,30 +77,28 @@ import { BusinessInfo } from '../entities/BusinessInfo';
 import { Form } from '../entities/Form';
 import { FormSubmission } from '../entities/FormSubmission';
 
-import { env } from '../utils/env-validator';
-
-// 환경변수는 env-validator를 통해 가져옴
-const DB_TYPE = env.getString('DB_TYPE', 'postgres');
-const NODE_ENV = env.getString('NODE_ENV', 'development');
+// 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
+const DB_TYPE = process.env.DB_TYPE || 'postgres';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // SQLite 또는 PostgreSQL 설정
 let dataSourceConfig: any;
 
 if (DB_TYPE === 'sqlite') {
-  const DB_DATABASE = env.getString('DB_DATABASE', './data/o4o_dev.sqlite');
-  
+  const DB_DATABASE = process.env.DB_DATABASE || './data/o4o_dev.sqlite';
+
   dataSourceConfig = {
     type: 'sqlite',
     database: DB_DATABASE,
   };
 } else {
   // PostgreSQL 설정
-  const DB_HOST = env.getString('DB_HOST');
-  const DB_PORT = env.getNumber('DB_PORT');
-  const DB_USERNAME = env.getString('DB_USERNAME');
-  const DB_PASSWORD = env.getString('DB_PASSWORD');
-  const DB_NAME = env.getString('DB_NAME');
-  
+  const DB_HOST = process.env.DB_HOST;
+  const DB_PORT = parseInt(process.env.DB_PORT || '5432', 10);
+  const DB_USERNAME = process.env.DB_USERNAME;
+  const DB_PASSWORD = process.env.DB_PASSWORD;
+  const DB_NAME = process.env.DB_NAME;
+
   dataSourceConfig = {
     type: 'postgres',
     host: DB_HOST,
