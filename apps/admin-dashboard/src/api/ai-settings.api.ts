@@ -20,7 +20,8 @@ class AISettingsApi {
   async getSettings(): Promise<AISettingsResponse> {
     try {
       const response = await authClient.api.get('/ai-settings');
-      return response.data || {};
+      // Backend returns { status: 'success', data: {...} }
+      return response.data?.data || {};
     } catch (error) {
       // Error fetching AI settings
       return {};
@@ -42,9 +43,10 @@ class AISettingsApi {
   async testApiKey(provider: string, apiKey: string): Promise<{ valid: boolean; message: string }> {
     try {
       const response = await authClient.api.post('/ai-settings/test', { provider, apiKey });
+      // Backend returns { status: 'success', valid: true, message: '...' }
       return {
-        valid: response.data.valid || false,
-        message: response.data.message || 'Unknown error'
+        valid: response.data?.valid || false,
+        message: response.data?.message || 'Unknown error'
       };
     } catch (error) {
       // Error testing API key
