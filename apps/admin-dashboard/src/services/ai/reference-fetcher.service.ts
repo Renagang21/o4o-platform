@@ -191,8 +191,8 @@ class ReferenceFetcherService {
         reference += '\n';
       });
 
-      reference += '숏코드는 core/shortcode 블록으로 삽입:\n';
-      reference += '{"type": "core/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}\n';
+      reference += '숏코드는 o4o/shortcode 블록으로 삽입:\n';
+      reference += '{"type": "o4o/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}\n';
     }
 
     // ⭐ CPT 참조 데이터 추가

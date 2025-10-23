@@ -313,22 +313,22 @@ ${availableBlocks}
 {
   "blocks": [
     {
-      "type": "core/heading",
+      "type": "o4o/heading",
       "content": {"text": "제목"},
       "attributes": {"level": 1}
     },
     {
-      "type": "core/paragraph",
+      "type": "o4o/paragraph",
       "content": {"text": "내용"},
       "attributes": {}
     },
     {
-      "type": "core/image",
+      "type": "o4o/image",
       "content": {"alt": "이미지 설명"},
       "attributes": {}
     },
     {
-      "type": "core/button",
+      "type": "o4o/button",
       "content": {"text": "버튼 텍스트", "url": "#"},
       "attributes": {}
     }
@@ -340,18 +340,27 @@ ${availableBlocks}
 
   /**
    * 블록 검증 및 ID 추가
+   * core/ prefix를 o4o/ prefix로 자동 변환
    */
   private validateBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
       throw new Error('유효하지 않은 블록 형식입니다');
     }
 
-    return blocks.map((block, index) => ({
-      id: `block-${Date.now()}-${index}`,
-      type: block.type || 'o4o/paragraph',
-      content: block.content || { text: '' },
-      attributes: block.attributes || {}
-    }));
+    return blocks.map((block, index) => {
+      // core/ prefix를 o4o/ prefix로 자동 변환
+      let blockType = block.type || 'o4o/paragraph';
+      if (blockType.startsWith('core/')) {
+        blockType = blockType.replace('core/', 'o4o/');
+      }
+
+      return {
+        id: `block-${Date.now()}-${index}`,
+        type: blockType,
+        content: block.content || { text: '' },
+        attributes: block.attributes || {}
+      };
+    });
   }
 }
 
