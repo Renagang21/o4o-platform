@@ -113,9 +113,13 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
       clearInterval(intervalId);
 
+      if (!blocks || blocks.length === 0) {
+        throw new Error('생성된 블록이 없습니다. AI 응답을 확인하세요.');
+      }
+
       onGenerate(blocks);
       onClose();
-      
+
       // 성공 후 초기화
       setPrompt('');
       setProgress(0);

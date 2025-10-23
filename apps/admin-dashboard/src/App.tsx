@@ -102,6 +102,7 @@ const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 
 // Test Page - Minimal Editor
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
+const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -607,6 +608,12 @@ function App() {
                     <Route path="/admin/test/minimal-editor" element={
                       <Suspense fallback={<PageLoader />}>
                         <EditorTest />
+                      </Suspense>
+                    } />
+                    {/* Test - AI Page Generator */}
+                    <Route path="/admin/test/ai-generator" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AIPageGeneratorTest />
                       </Suspense>
                     } />
 
