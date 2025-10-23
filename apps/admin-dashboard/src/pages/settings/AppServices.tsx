@@ -164,7 +164,13 @@ const AppServices: React.FC = () => {
         </div>
 
         {/* Configuration Form */}
-        <div className="space-y-4">
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave(app);
+          }}
+        >
           {Object.entries(settingsSchema).map(([key, schema]: [string, any]) => (
             <div key={key}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -219,7 +225,7 @@ const AppServices: React.FC = () => {
 
           {/* Save Button */}
           <button
-            onClick={() => handleSave(app)}
+            type="submit"
             disabled={isSaving}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
@@ -235,7 +241,7 @@ const AppServices: React.FC = () => {
               </>
             )}
           </button>
-        </div>
+        </form>
       </div>
     );
   };
