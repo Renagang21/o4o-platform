@@ -35,6 +35,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   // 모달이 열릴 때 저장된 API 키 자동 로드
@@ -122,6 +123,14 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     setError(null);
     setProgress(0);
     setProgressMessage('준비 중...');
+    setElapsedTime(0);
+
+    // Start elapsed time counter
+    const startTime = Date.now();
+    const intervalId = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setElapsedTime(elapsed);
+    }, 1000);
 
     try {
       const blocks = await simpleAIGenerator.generatePage({
@@ -137,6 +146,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         }
       });
 
+      clearInterval(intervalId);
+
       onGenerate(blocks);
       onClose();
       
@@ -144,7 +155,9 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
       setPrompt('');
       setProgress(0);
       setProgressMessage('');
+      setElapsedTime(0);
     } catch (err: any) {
+      clearInterval(intervalId);
       setError(err.message || 'AI 생성 중 오류가 발생했습니다.');
     } finally {
       setIsGenerating(false);
@@ -191,15 +204,14 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-500" />
               <p className="text-sm font-medium">{progressMessage}</p>
             </div>
-            
+
             <div className="space-y-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <p className="text-center text-sm text-gray-600">{progress}%</p>
+              <p className="text-center text-lg font-mono text-gray-700">
+                {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+              </p>
+              <p className="text-center text-xs text-gray-500">
+                {elapsedTime < 30 ? 'AI 응답 생성 중...' : '조금만 더 기다려주세요...'}
+              </p>
             </div>
           </div>
         ) : (

@@ -34,7 +34,7 @@ class AIProxyService {
   private static instance: AIProxyService;
 
   // Timeout and retry configuration
-  private readonly DEFAULT_TIMEOUT = 15000; // 15 seconds
+  private readonly DEFAULT_TIMEOUT = 60000; // 60 seconds
   private readonly MAX_RETRIES = 3;
   private readonly BASE_DELAY = 1000; // 1 second
   private readonly MAX_DELAY = 20000; // 20 seconds
@@ -372,7 +372,7 @@ class AIProxyService {
       endSpanError(span, error);
 
       if (error.name === 'AbortError') {
-        throw this.createError('TIMEOUT_ERROR', 'OpenAI request timeout (15s)', true);
+        throw this.createError('TIMEOUT_ERROR', 'OpenAI request timeout (60s)', true);
       }
 
       throw error;
@@ -463,7 +463,7 @@ class AIProxyService {
       clearTimeout(timeoutId);
 
       if (error.name === 'AbortError') {
-        throw this.createError('TIMEOUT_ERROR', 'Gemini request timeout (15s)', true);
+        throw this.createError('TIMEOUT_ERROR', 'Gemini request timeout (60s)', true);
       }
 
       throw error;
@@ -546,7 +546,7 @@ class AIProxyService {
       clearTimeout(timeoutId);
 
       if (error.name === 'AbortError') {
-        throw this.createError('TIMEOUT_ERROR', 'Claude request timeout (15s)', true);
+        throw this.createError('TIMEOUT_ERROR', 'Claude request timeout (60s)', true);
       }
 
       throw error;
