@@ -38,6 +38,7 @@ import reusableBlocksRoutes from '../routes/reusable-blocks.routes';
 import blockPatternsRoutes from '../routes/block-patterns.routes';
 import aiShortcodesRoutes from '../routes/ai-shortcodes';
 import aiBlocksRoutes from '../routes/ai-blocks';
+import aiReferencesRoutes from '../routes/ai-references';
 import aiProxyRoutes from '../routes/ai-proxy';
 import aiSchemaRoutes from '../routes/ai-schema';
 import templatePartsRoutes from '../routes/template-parts.routes';
@@ -238,6 +239,7 @@ export function setupRoutes(app: Application): void {
   // AI Routes
   app.use('/api/v1/ai/shortcodes', publicLimiter, aiShortcodesRoutes);
   app.use('/api/v1/ai/blocks', publicLimiter, aiBlocksRoutes);
+  app.use('/api/v1/ai/references', standardLimiter, aiReferencesRoutes); // NEW: AI Reference Management
   app.use('/api/v1/ai/schema', publicLimiter, aiSchemaRoutes);
   app.use('/api/v1/ai', standardLimiter, aiProxyRoutes);
   app.use('/api/v1/ai-settings', standardLimiter, aiSettingsRoutes);

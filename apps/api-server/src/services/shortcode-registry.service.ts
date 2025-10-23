@@ -1,14 +1,21 @@
 /**
  * Shortcode Registry Service
  * AI 페이지 생성을 위한 shortcode 관리 시스템
+ *
+ * V2: Database-driven registry
+ * - Reads from ai_references table (type='shortcodes')
+ * - Fallback to built-in shortcodes if DB fails
+ * - Returns markdown reference directly to AI
  */
 
-import { 
-  ShortcodeInfo, 
-  ShortcodeCategory, 
-  ShortcodeAIReference, 
-  ShortcodeRegistryResponse 
+import {
+  ShortcodeInfo,
+  ShortcodeCategory,
+  ShortcodeAIReference,
+  ShortcodeRegistryResponse
 } from '../types/shortcode.types';
+import { AppDataSource } from '../database/connection';
+import { AIReference } from '../entities/AIReference';
 import logger from '../utils/logger';
 
 class ShortcodeRegistryService {
@@ -362,9 +369,43 @@ class ShortcodeRegistryService {
   }
 
   /**
-   * AI를 위한 포맷된 참조 데이터 생성
+   * AI를 위한 포맷된 참조 데이터 생성 (V2: Database-driven)
+   *
+   * Tries to load from database first, falls back to built-in shortcodes
    */
-  public getAIReference(): ShortcodeRegistryResponse {
+  public async getAIReference(): Promise<ShortcodeRegistryResponse> {
+    try {
+      // Try to load from database
+      if (AppDataSource.isInitialized) {
+        const repository = AppDataSource.getRepository(AIReference);
+        const dbReference = await repository.findOne({
+          where: { type: 'shortcodes', status: 'active' },
+          order: { updatedAt: 'DESC' }
+        });
+
+        if (dbReference && dbReference.content) {
+          logger.info('✅ Shortcode reference loaded from database');
+
+          // Return markdown reference directly for AI consumption
+          return {
+            total: 0, // Not applicable for markdown format
+            categories: Array.from(this.categories.values()).sort((a, b) => a.priority - b.priority),
+            shortcodes: [], // Not applicable for markdown format
+            schemaVersion: dbReference.schemaVersion || this.schemaVersion,
+            lastUpdated: dbReference.updatedAt.toISOString(),
+            // NEW: Include raw markdown content for AI
+            markdownContent: dbReference.content,
+            format: 'markdown',
+            version: dbReference.version || '1.0.0'
+          };
+        }
+      }
+    } catch (error) {
+      logger.warn('⚠️  Failed to load shortcodes from database, using built-in fallback:', error);
+    }
+
+    // Fallback to built-in shortcodes
+    logger.info('Using built-in shortcode registry (fallback)');
     const shortcodes = this.getAll();
     const categories = Array.from(this.categories.values())
       .sort((a, b) => a.priority - b.priority);
@@ -385,7 +426,8 @@ class ShortcodeRegistryService {
       categories,
       shortcodes: aiShortcodes,
       schemaVersion: this.schemaVersion,
-      lastUpdated: this.lastUpdated.toISOString()
+      lastUpdated: this.lastUpdated.toISOString(),
+      format: 'structured'
     };
   }
 

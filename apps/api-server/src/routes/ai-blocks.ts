@@ -34,7 +34,7 @@ router.get('/reference', authenticate, aiReadRateLimit, async (req: Request, res
   const startTime = Date.now();
 
   try {
-    const reference = blockRegistry.getAIReference();
+    const reference = await blockRegistry.getAIReference(); // V2: Now async
     const etag = `"${Buffer.from(reference.lastUpdated).toString('base64')}"`;
 
     // ETag 검증 (304 Not Modified)
@@ -77,6 +77,7 @@ router.get('/reference', authenticate, aiReadRateLimit, async (req: Request, res
       status: 200,
       etag: etag,
       schemaVersion: reference.schemaVersion,
+      format: reference.format || 'structured', // V2: Log format
       totalBlocks: reference.total,
       duration: `${duration}ms`,
       timestamp: new Date().toISOString()
@@ -86,7 +87,7 @@ router.get('/reference', authenticate, aiReadRateLimit, async (req: Request, res
       success: true,
       data: reference,
       meta: {
-        version: '1.0.0',
+        version: '2.0.0', // V2: Database-driven
         generatedAt: new Date().toISOString()
       }
     });

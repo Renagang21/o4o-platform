@@ -1,6 +1,11 @@
 /**
  * Block Registry Service
  * AI 페이지 생성을 위한 블록 관리 시스템 (SSOT)
+ *
+ * V2: Database-driven registry
+ * - Reads from ai_references table (type='blocks')
+ * - Fallback to built-in blocks if DB fails
+ * - Returns markdown reference directly to AI
  */
 
 import {
@@ -9,6 +14,8 @@ import {
   BlockAIReference,
   BlockRegistryResponse
 } from '../types/block.types';
+import { AppDataSource } from '../database/connection';
+import { AIReference } from '../entities/AIReference';
 import logger from '../utils/logger';
 
 class BlockRegistryService {
@@ -344,9 +351,43 @@ class BlockRegistryService {
   }
 
   /**
-   * AI를 위한 포맷된 참조 데이터 생성
+   * AI를 위한 포맷된 참조 데이터 생성 (V2: Database-driven)
+   *
+   * Tries to load from database first, falls back to built-in blocks
    */
-  public getAIReference(): BlockRegistryResponse {
+  public async getAIReference(): Promise<BlockRegistryResponse> {
+    try {
+      // Try to load from database
+      if (AppDataSource.isInitialized) {
+        const repository = AppDataSource.getRepository(AIReference);
+        const dbReference = await repository.findOne({
+          where: { type: 'blocks', status: 'active' },
+          order: { updatedAt: 'DESC' }
+        });
+
+        if (dbReference && dbReference.content) {
+          logger.info('✅ Block reference loaded from database');
+
+          // Return markdown reference directly for AI consumption
+          return {
+            total: 0, // Not applicable for markdown format
+            categories: Array.from(this.categories.values()).sort((a, b) => a.priority - b.priority),
+            blocks: [], // Not applicable for markdown format
+            schemaVersion: dbReference.schemaVersion || this.schemaVersion,
+            lastUpdated: dbReference.updatedAt.toISOString(),
+            // NEW: Include raw markdown content for AI
+            markdownContent: dbReference.content,
+            format: 'markdown',
+            version: dbReference.version || '1.0.0'
+          };
+        }
+      }
+    } catch (error) {
+      logger.warn('⚠️  Failed to load blocks from database, using built-in fallback:', error);
+    }
+
+    // Fallback to built-in blocks
+    logger.info('Using built-in block registry (fallback)');
     const blocks = this.getAll();
     const categories = Array.from(this.categories.values())
       .sort((a, b) => a.priority - b.priority);
@@ -370,7 +411,8 @@ class BlockRegistryService {
       categories,
       blocks: aiBlocks,
       schemaVersion: this.schemaVersion,
-      lastUpdated: this.lastUpdated.toISOString()
+      lastUpdated: this.lastUpdated.toISOString(),
+      format: 'structured'
     };
   }
 

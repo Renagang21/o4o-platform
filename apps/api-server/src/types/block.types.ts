@@ -71,4 +71,8 @@ export interface BlockRegistryResponse {
   blocks: BlockAIReference[];
   schemaVersion: string; // 레지스트리 스키마 버전
   lastUpdated: string;
+  // V2: Database-driven fields
+  markdownContent?: string; // Raw markdown content from database
+  format?: 'structured' | 'markdown'; // Response format
+  version?: string; // Content version
 }
