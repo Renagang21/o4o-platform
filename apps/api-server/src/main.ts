@@ -137,6 +137,7 @@ import approvalV1Routes from './routes/v1/approval.routes';
 import aiSettingsRoutes from './routes/v1/ai-settings.routes';
 import orderRoutes from './routes/orders.routes';
 import paymentRoutes from './routes/payments.routes';
+import appsRoutes from './routes/apps';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -686,6 +687,9 @@ app.use('/api/v1/ai', limiter, aiProxyRoutes);
 // AI Settings API (admin only)
 app.use('/api/v1/ai-settings', limiter, aiSettingsRoutes);
 
+// App System API (Google AI, future OpenAI, Naver, etc.)
+app.use('/api/v1/apps', limiter, appsRoutes);
+
 // Categories routes (public access) - moved to avoid duplication
 
 // Gutenberg Content Management Routes
@@ -1126,6 +1130,20 @@ const startServer = async () => {
           logger.info('Settlement Scheduler initialized successfully');
         } catch (schedulerError) {
           logger.warn('Settlement Scheduler initialization failed (non-critical):', schedulerError);
+        }
+      }
+
+      // Initialize App Registry Service
+      if (AppDataSource.isInitialized) {
+        try {
+          const { appRegistry } = await import('./services/app-registry.service');
+          const { googleAI } = await import('./services/google-ai.service');
+
+          appRegistry.initialize(AppDataSource);
+          await googleAI.initializeApps();
+          logger.info('✅ App system initialized (Google AI ready)');
+        } catch (appError) {
+          logger.error('Failed to initialize App system:', appError);
         }
       }
 
