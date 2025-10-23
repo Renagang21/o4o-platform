@@ -36,9 +36,6 @@ export class SeedInitialAIReferences1830000000001 implements MigrationInterface 
         });
 
         await aiReferenceRepository.save(blocksRef);
-        console.log('✅ Seeded: blocks-reference');
-      } else {
-        console.warn('⚠️  Blocks reference not found at:', blocksRefPath);
       }
 
       // 2. Shortcode Registry
@@ -59,14 +56,8 @@ export class SeedInitialAIReferences1830000000001 implements MigrationInterface 
         });
 
         await aiReferenceRepository.save(shortcodeRef);
-        console.log('✅ Seeded: shortcode-registry');
-      } else {
-        console.warn('⚠️  Shortcode registry not found at:', shortcodeRefPath);
       }
-
-      console.log('✅ Initial AI references seeded successfully');
     } catch (error) {
-      console.error('❌ Error seeding AI references:', error);
       // Don't throw - allow migration to continue even if seeding fails
       // This is useful in production where docs folder might not be available
     }
