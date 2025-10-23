@@ -176,7 +176,13 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
           </div>
         ) : (
           // 입력 화면
-          <div className="space-y-4 py-4">
+          <form
+            className="space-y-4 py-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleGenerate();
+            }}
+          >
             {/* 템플릿 선택 */}
             <div className="space-y-2">
               <Label>템플릿</Label>
@@ -259,6 +265,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               <div className="flex justify-between items-center">
                 <Label>페이지 내용 설명</Label>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setPrompt(examplePrompts[template])}
@@ -285,15 +292,18 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-          </div>
+
+            {/* Submit handler - hidden */}
+            <button type="submit" className="hidden" />
+          </form>
         )}
 
         {!isGenerating && (
           <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose}>
               취소
             </Button>
-            <Button onClick={handleGenerate} disabled={!prompt.trim() || !apiKey.trim()}>
+            <Button type="button" onClick={handleGenerate} disabled={!prompt.trim() || !apiKey.trim()}>
               <Sparkles className="mr-2 h-4 w-4" />
               페이지 생성
             </Button>
