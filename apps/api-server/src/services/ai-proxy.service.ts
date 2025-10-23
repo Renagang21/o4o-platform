@@ -415,6 +415,7 @@ class AIProxyService {
       };
 
       // Add structured output for Gemini 2.5+ (use v1beta for full support)
+      // Simplified schema - only enforce top-level structure, not nested objects
       if (useStructuredOutput) {
         generationConfig.responseMimeType = 'application/json';
         generationConfig.responseSchema = {
@@ -428,18 +429,10 @@ class AIProxyService {
                 properties: {
                   type: {
                     type: 'STRING',
-                    description: 'Block type with o4o/ prefix'
-                  },
-                  content: {
-                    type: 'OBJECT',
-                    description: 'Content object (usually empty, data goes in attributes)'
-                  },
-                  attributes: {
-                    type: 'OBJECT',
-                    description: 'Block attributes containing the actual data'
+                    description: 'Block type with o4o/ prefix (e.g., o4o/heading, o4o/paragraph)'
                   }
                 },
-                required: ['type', 'content', 'attributes']
+                required: ['type']
               }
             }
           },
