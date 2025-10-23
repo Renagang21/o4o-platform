@@ -40,7 +40,7 @@ const aiProxyRateLimit = rateLimitMiddleware({
   message: 'AI generation rate limit exceeded. Please try again later.',
   keyGenerator: (req) => {
     const authReq = req as AuthRequest;
-    return `ai:proxy:${authReq.user?.userId || req.ip || 'anonymous'}`;
+    return `ai:proxy:${authReq.user?.id || req.ip || 'anonymous'}`;
   }
 });
 
@@ -68,7 +68,7 @@ router.post('/generate',
     const startTime = Date.now();
 
     try {
-      const userId = authReq.user?.userId;
+      const userId = authReq.user?.id;
 
       if (!userId) {
         return res.status(401).json({
@@ -134,7 +134,7 @@ router.post('/generate',
 
         logger.error('AI proxy request failed', {
           requestId,
-          userId: authReq.user?.userId,
+          userId: authReq.user?.id,
           userEmail: authReq.user?.email,
           type: aiError.type,
           error: aiError.message,
@@ -167,7 +167,7 @@ router.post('/generate',
       // Handle unexpected errors
       logger.error('AI proxy unexpected error', {
         requestId,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
         stack: error.stack,
         duration: `${duration}ms`,
@@ -207,7 +207,7 @@ router.post('/generate/async',
     const requestId = uuidv4();
 
     try {
-      const userId = authReq.user?.userId;
+      const userId = authReq.user?.id;
       const userEmail = authReq.user?.email;
 
       if (!userId) {
@@ -267,7 +267,7 @@ router.post('/generate/async',
     } catch (error: any) {
       logger.error('Failed to enqueue AI job', {
         error: error.message,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         requestId,
       });
 
@@ -303,7 +303,7 @@ router.get('/jobs/:jobId',
       }
 
       // Verify user owns this job
-      if (status.data?.userId !== authReq.user?.userId) {
+      if (status.data?.userId !== authReq.user?.id) {
         return res.status(403).json({
           success: false,
           error: 'Access denied',
@@ -319,7 +319,7 @@ router.get('/jobs/:jobId',
       logger.error('Failed to get job status', {
         jobId,
         error: error.message,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
       });
 
       res.status(500).json({
@@ -354,7 +354,7 @@ router.delete('/jobs/:jobId',
       }
 
       // Verify user owns this job
-      if (status.data?.userId !== authReq.user?.userId) {
+      if (status.data?.userId !== authReq.user?.id) {
         return res.status(403).json({
           success: false,
           error: 'Access denied',
@@ -373,7 +373,7 @@ router.delete('/jobs/:jobId',
 
       logger.info('AI job cancelled via API', {
         jobId,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
       });
 
       res.json({
@@ -385,7 +385,7 @@ router.delete('/jobs/:jobId',
       logger.error('Failed to cancel job', {
         jobId,
         error: error.message,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
       });
 
       res.status(500).json({
@@ -420,7 +420,7 @@ router.get('/stream/:jobId',
       }
 
       // Verify user owns this job
-      if (status.data?.userId !== authReq.user?.userId) {
+      if (status.data?.userId !== authReq.user?.id) {
         return res.status(403).json({
           success: false,
           error: 'Access denied',
@@ -487,7 +487,7 @@ router.get('/stream/:jobId',
       logger.error('SSE streaming error', {
         jobId,
         error: error.message,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
       });
 
       if (!res.headersSent) {
@@ -537,7 +537,7 @@ router.get('/jobs/metrics',
       const metrics = await aiMetrics.collectMetrics(timeRangeMs);
 
       logger.info('AI metrics collected', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         timeRangeHours,
         totalJobs: metrics.totalJobs,
       });
@@ -553,7 +553,7 @@ router.get('/jobs/metrics',
 
     } catch (error: any) {
       logger.error('Failed to collect AI metrics', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -589,7 +589,7 @@ router.get('/jobs/history',
 
     } catch (error: any) {
       logger.error('Failed to get job history', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -627,7 +627,7 @@ router.post('/jobs/:jobId/retry',
       }
 
       // Verify user owns this job
-      if (originalJob.data?.userId !== authReq.user?.userId) {
+      if (originalJob.data?.userId !== authReq.user?.id) {
         return res.status(403).json({
           success: false,
           error: 'Access denied',
@@ -647,7 +647,7 @@ router.post('/jobs/:jobId/retry',
       logger.info('AI job re-run enqueued', {
         originalJobId: jobId,
         newJobId,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         provider: jobData.provider,
         model: jobData.model,
         rerun: true,
@@ -668,7 +668,7 @@ router.post('/jobs/:jobId/retry',
     } catch (error: any) {
       logger.error('Failed to re-run job', {
         jobId,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -708,7 +708,7 @@ router.get('/dlq',
 
     } catch (error: any) {
       logger.error('Failed to get DLQ entries', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -739,7 +739,7 @@ router.get('/dlq/stats',
 
     } catch (error: any) {
       logger.error('Failed to get DLQ stats', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -776,7 +776,7 @@ router.post('/dlq/:dlqJobId/retry',
       logger.info('Job retried from DLQ', {
         dlqJobId,
         newJobId,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
       });
 
       res.json({
@@ -790,7 +790,7 @@ router.post('/dlq/:dlqJobId/retry',
     } catch (error: any) {
       logger.error('Failed to retry job from DLQ', {
         dlqJobId,
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -862,7 +862,7 @@ router.get('/usage/report',
       }
 
       logger.info('Usage report generated', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         format,
@@ -872,7 +872,7 @@ router.get('/usage/report',
 
     } catch (error: any) {
       logger.error('Failed to generate usage report', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -902,14 +902,14 @@ router.get('/usage/current-month',
       });
 
       logger.info('Current month usage report generated', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         totalJobs: report.totalJobs,
         totalCost: report.totalEstimatedCost,
       });
 
     } catch (error: any) {
       logger.error('Failed to generate current month report', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
@@ -951,7 +951,7 @@ router.get('/usage/last-n-days',
       });
 
       logger.info('Last N days usage report generated', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         days,
         totalJobs: report.totalJobs,
         totalCost: report.totalEstimatedCost,
@@ -959,7 +959,7 @@ router.get('/usage/last-n-days',
 
     } catch (error: any) {
       logger.error('Failed to generate last N days report', {
-        userId: authReq.user?.userId,
+        userId: authReq.user?.id,
         error: error.message,
       });
 
