@@ -5,6 +5,7 @@
  * Phase 4: Context-Aware Conversational Editor
  */
 
+import { authClient } from '@o4o/auth-client';
 import { Block } from '@/types/post.types';
 import { simpleAIGenerator, AIConfig } from './SimpleAIGenerator';
 
@@ -58,44 +59,6 @@ export interface AIResponse {
  * Conversational AI 클래스
  */
 export class ConversationalAI {
-  private readonly API_BASE: string;
-
-  constructor() {
-    this.API_BASE = this.getApiBaseUrl();
-  }
-
-  /**
-   * Get API base URL
-   */
-  private getApiBaseUrl(): string {
-    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL as string;
-    }
-
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      if (hostname === 'admin.neture.co.kr') {
-        return 'https://api.neture.co.kr';
-      }
-    }
-
-    return 'http://localhost:3002';
-  }
-
-  /**
-   * Get authentication token
-   */
-  private getAuthToken(): string | null {
-    const cookies = document.cookie.split(';');
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'accessToken') {
-        return value;
-      }
-    }
-    return localStorage.getItem('accessToken') || localStorage.getItem('authToken');
-  }
-
   /**
    * 대화 - AI가 편집기를 조작
    *
@@ -109,42 +72,22 @@ export class ConversationalAI {
     config: AIConfig
   ): Promise<AIResponse> {
     try {
-      const token = this.getAuthToken();
-
-      if (!token) {
-        throw new Error('로그인이 필요합니다.');
-      }
-
       // 시스템 프롬프트: AI에게 편집기 API 설명
       const systemPrompt = this.buildSystemPrompt(context);
 
       // 사용자 프롬프트: 현재 상태 + 명령
       const userPrompt = this.buildUserPrompt(userInput, context);
 
-      const url = `${this.API_BASE}/api/ai/generate`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          provider: config.provider,
-          model: config.model,
-          systemPrompt,
-          userPrompt,
-          temperature: 0.3,  // 낮은 temperature (정확성 우선)
-          maxTokens: 2000,
-        }),
+      const response = await authClient.api.post('/ai/generate', {
+        provider: config.provider,
+        model: config.model,
+        systemPrompt,
+        userPrompt,
+        temperature: 0.3,  // 낮은 temperature (정확성 우선)
+        maxTokens: 2000,
       });
 
-      if (!response.ok) {
-        throw new Error(`AI 응답 실패: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       if (!data.success) {
         throw new Error(data.error || 'AI 응답 오류');

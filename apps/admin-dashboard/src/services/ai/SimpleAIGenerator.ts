@@ -8,6 +8,7 @@
  * - Server handles authentication, rate limiting, and key injection
  */
 
+import { authClient } from '@o4o/auth-client';
 import { referenceFetcher } from './reference-fetcher.service';
 
 // 2025년 최신 AI 모델 목록
@@ -91,51 +92,6 @@ interface AIProxyResponse {
  * - 표준화된 에러 처리
  */
 export class SimpleAIGenerator {
-  private readonly API_BASE: string;
-
-  constructor() {
-    // Determine API base URL
-    this.API_BASE = this.getApiBaseUrl();
-  }
-
-  /**
-   * Get API base URL
-   */
-  private getApiBaseUrl(): string {
-    // Vite environment variable
-    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL as string;
-    }
-
-    // Production environment
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      if (hostname === 'admin.neture.co.kr') {
-        return 'https://api.neture.co.kr';
-      }
-    }
-
-    // Development default
-    return 'http://localhost:3002';
-  }
-
-  /**
-   * Get authentication token
-   */
-  private getAuthToken(): string | null {
-    // Cookie (priority)
-    const cookies = document.cookie.split(';');
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'accessToken') {
-        return value;
-      }
-    }
-
-    // localStorage (fallback)
-    return localStorage.getItem('accessToken') || localStorage.getItem('authToken');
-  }
-
   /**
    * 메인 생성 메서드
    */
@@ -202,67 +158,55 @@ export class SimpleAIGenerator {
     signal?: AbortSignal,
     updateProgress?: (progress: number, message: string) => void
   ): Promise<Block[]> {
-    const token = this.getAuthToken();
-
-    if (!token) {
-      throw new Error('로그인이 필요합니다. 다시 로그인해 주세요.');
-    }
-
-    const url = `${this.API_BASE}/api/ai/generate`;
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      credentials: 'include',
-      body: JSON.stringify({
+    try {
+      const response = await authClient.api.post('/ai/generate', {
         provider: config.provider,
         model: config.model,
         systemPrompt,
         userPrompt,
         temperature: 0.7,
         maxTokens: config.provider === 'gemini' ? 8192 : 4000,
-      }),
-      signal,
-    });
+      });
 
-    // Handle rate limit
-    if (response.status === 429) {
-      const retryAfter = response.headers.get('Retry-After');
-      const waitTime = retryAfter ? `${retryAfter}초` : '잠시';
-      throw new Error(`요청 한도를 초과했습니다. ${waitTime} 후 다시 시도해 주세요.`);
+      const data: AIProxyResponse | AIProxyError = response.data;
+
+      // Handle error response
+      if (!data.success) {
+        const errorData = data as AIProxyError;
+        throw errorData;
+      }
+
+      // Success response
+      const successData = data as AIProxyResponse;
+
+      // Update progress with usage info
+      if (updateProgress && successData.usage?.totalTokens) {
+        updateProgress(70, `AI 응답 수신 완료 (토큰: ${successData.usage.totalTokens})`);
+      }
+
+      return successData.result.blocks || [];
+    } catch (error: any) {
+      // Handle authClient errors
+      if (error.response) {
+        const status = error.response.status;
+
+        if (status === 429) {
+          const retryAfter = error.response.headers?.['retry-after'];
+          const waitTime = retryAfter ? `${retryAfter}초` : '잠시';
+          throw new Error(`요청 한도를 초과했습니다. ${waitTime} 후 다시 시도해 주세요.`);
+        }
+
+        if (status === 401) {
+          throw new Error('인증이 만료되었습니다. 다시 로그인해 주세요.');
+        }
+
+        if (status === 504) {
+          throw new Error('요청 시간이 초과되었습니다. 프롬프트를 간단히 하거나 다시 시도해 주세요.');
+        }
+      }
+
+      throw error;
     }
-
-    // Handle authentication errors
-    if (response.status === 401) {
-      throw new Error('인증이 만료되었습니다. 다시 로그인해 주세요.');
-    }
-
-    // Handle timeout
-    if (response.status === 504) {
-      throw new Error('요청 시간이 초과되었습니다. 프롬프트를 간단히 하거나 다시 시도해 주세요.');
-    }
-
-    // Parse response
-    const data: AIProxyResponse | AIProxyError = await response.json();
-
-    // Handle error response
-    if (!data.success) {
-      const errorData = data as AIProxyError;
-      throw errorData;
-    }
-
-    // Success response
-    const successData = data as AIProxyResponse;
-
-    // Update progress with usage info
-    if (updateProgress && successData.usage?.totalTokens) {
-      updateProgress(70, `AI 응답 수신 완료 (토큰: ${successData.usage.totalTokens})`);
-    }
-
-    return successData.result.blocks || [];
   }
 
   /**
