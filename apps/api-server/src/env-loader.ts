@@ -27,7 +27,7 @@ for (const envPath of possiblePaths) {
   try {
     const result = dotenv.config({ path: envPath });
     if (!result.error) {
-      console.log(`✅ Loaded env from: ${envPath}`);
+      // Environment loaded successfully from envPath
       envLoaded = true;
       break;
     }
@@ -37,7 +37,8 @@ for (const envPath of possiblePaths) {
 }
 
 if (!envLoaded && NODE_ENV === 'production') {
-  console.warn('⚠️ No .env file loaded in production mode');
+  // Warning: No .env file loaded in production mode
+  // This is expected if environment variables are set by the system
 }
 
 // Export a marker to ensure this module is imported
