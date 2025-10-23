@@ -163,6 +163,7 @@ export const AccountLinkingCard: React.FC<AccountLinkingCardProps> = ({ onSucces
               <Input
                 id="link-password"
                 type="password"
+                autoComplete="current-password"
                 placeholder="비밀번호"
                 value={emailForm.password}
                 onChange={(e) => setEmailForm({ ...emailForm, password: e.target.value })}

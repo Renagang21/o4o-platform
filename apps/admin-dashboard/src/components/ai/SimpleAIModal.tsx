@@ -243,6 +243,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               <Label>Google Gemini API 키</Label>
               <input
                 type="password"
+                autoComplete="off"
                 className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
                 placeholder="AIza..."
                 value={apiKey}

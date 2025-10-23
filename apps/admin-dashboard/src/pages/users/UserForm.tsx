@@ -222,6 +222,7 @@ export default function UserForm() {
                   <Input
                     id="password"
                     type="password"
+                    autoComplete={isEdit ? 'new-password' : 'new-password'}
                     {...register('password')}
                     placeholder={isEdit ? 'Leave blank to keep current' : 'Enter password'}
                   />

@@ -197,6 +197,7 @@ const AppServices: React.FC = () => {
                     value={config[key] || ''}
                     onChange={(e) => handleConfigChange(app.slug, key, e.target.value)}
                     placeholder={`${key}를 입력하세요`}
+                    autoComplete="off"
                     className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <button
