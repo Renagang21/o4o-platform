@@ -1,3 +1,6 @@
+// MUST be first: Load environment variables before anything else
+import './env-loader';
+
 // Initialize OpenTelemetry before any other imports
 import { initTelemetry } from './utils/telemetry';
 const telemetrySDK = initTelemetry();
@@ -7,7 +10,6 @@ import express, { Application } from 'express';
 import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import dotenv from 'dotenv';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -17,29 +19,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
 
-// Load environment variables
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : process.env.NODE_ENV === 'development' ? '.env.development' : '.env';
-
-const possiblePaths = [
-  path.resolve(__dirname, '..', envFile),
-  path.resolve(__dirname, '..', '.env'),
-  path.resolve(process.cwd(), envFile),
-  path.resolve(process.cwd(), '.env'),
-];
-
-let envLoaded = false;
-for (const envPath of possiblePaths) {
-  try {
-    const result = dotenv.config({ path: envPath });
-    if (!result.error) {
-      envLoaded = true;
-      break;
-    }
-  } catch (error) {
-    // Continue to next path
-  }
-}
-
+// Environment variables are loaded by env-loader (imported first)
 // Environment validation
 import { env } from './utils/env-validator';
 import logger from './utils/logger';
