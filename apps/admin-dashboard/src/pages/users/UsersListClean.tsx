@@ -16,6 +16,7 @@ import {
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
+import { Pagination } from '@/components/common/Pagination';
 
 interface User {
   id: string;
@@ -81,6 +82,8 @@ const UsersListClean = () => {
     return saved ? parseInt(saved) : 20;
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Fetch users from API
   useEffect(() => {
     const fetchUsers = async () => {
@@ -143,6 +146,11 @@ const UsersListClean = () => {
     };
   }, []);
 
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery, itemsPerPage]);
+
   // Filter users based on activeTab and searchQuery
   const filteredUsers = users.filter(user => {
     // Filter by role
@@ -164,21 +172,24 @@ const UsersListClean = () => {
   // Sort users
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     if (!sortField) return 0;
-    
+
     let aVal = a[sortField];
     let bVal = b[sortField];
-    
+
     if (typeof aVal === 'string' && typeof bVal === 'string') {
-      return sortOrder === 'asc' 
+      return sortOrder === 'asc'
         ? aVal.localeCompare(bVal)
         : bVal.localeCompare(aVal);
     }
-    
+
     return 0;
   });
 
   // Paginate users
-  const paginatedUsers = sortedUsers.slice(0, itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = sortedUsers.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
 
   // Count users by role
   const getCounts = () => {
@@ -352,21 +363,79 @@ const UsersListClean = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b px-8 py-3">
-        <AdminBreadcrumb 
-          items={[
-            { label: 'Dashboard', path: '/' },
-            { label: 'Users', path: '/users' }
-          ]} 
-        />
+        <div className="flex items-center justify-between">
+          <AdminBreadcrumb
+            items={[
+              { label: 'Dashboard', path: '/' },
+              { label: 'Users', path: '/users' }
+            ]}
+          />
+
+          {/* Screen Options Button */}
+          <button
+            onClick={() => setShowScreenOptions(!showScreenOptions)}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
+          >
+            <Settings className="w-4 h-4" />
+            Screen Options
+          </button>
+        </div>
+
+        {/* Screen Options Panel */}
+        {showScreenOptions && (
+          <div className="absolute right-8 mt-2 p-4 bg-white border rounded-lg shadow-xl w-80 z-50">
+            <h3 className="font-medium mb-3">Screen Options</h3>
+
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2">Columns</h4>
+              <div className="space-y-2">
+                {Object.entries({
+                  username: 'Username',
+                  name: 'Name',
+                  email: 'Email',
+                  role: 'Role',
+                  posts: 'Posts',
+                  registeredDate: 'Date'
+                }).map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={visibleColumns[key as keyof typeof visibleColumns]}
+                      onChange={(e) => setVisibleColumns({
+                        ...visibleColumns,
+                        [key]: e.target.checked
+                      })}
+                      className="rounded border-gray-300"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium mb-2">Pagination</h4>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Number of items per page:</span>
+                <input
+                  type="number"
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(parseInt(e.target.value) || 20)}
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="px-8 py-6">
         {/* Title and Add New */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 mb-4">
           <h1 className="text-2xl font-normal">Users</h1>
           <button
             onClick={() => navigate('/users/new')}
-            className="px-3 py-1 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50"
+            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
           >
             Add New User
           </button>
@@ -709,13 +778,19 @@ const UsersListClean = () => {
           </table>
         </div>
 
-        {/* Pagination Info */}
-        <div className="mt-4 text-sm text-gray-600">
-          {paginatedUsers.length} of {filteredUsers.length} items
+        {/* Pagination */}
+        <div className="mt-4 bg-white border rounded-lg overflow-hidden">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={sortedUsers.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
         </div>
 
-        {/* Screen Options */}
-        <div className="fixed bottom-4 right-4">
+        {/* Screen Options - Moved to header */}
+        <div className="hidden">
           <button
             onClick={() => setShowScreenOptions(!showScreenOptions)}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-lg hover:bg-gray-50"

@@ -25,6 +25,7 @@ interface UsePostsDataProps {
   sortField: SortField;
   sortOrder: SortOrder;
   itemsPerPage: number;
+  currentPage: number;
 }
 
 export const usePostsData = ({
@@ -32,7 +33,8 @@ export const usePostsData = ({
   searchQuery,
   sortField,
   sortOrder,
-  itemsPerPage
+  itemsPerPage,
+  currentPage
 }: UsePostsDataProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,9 +95,9 @@ export const usePostsData = ({
   }, []);
 
   // Filter and sort posts
-  const getFilteredPosts = () => {
+  const getFilteredAndSortedPosts = () => {
     let filtered = posts;
-    
+
     // Filter by tab
     if (activeTab === 'published') {
       filtered = filtered.filter(p => (p.status as any) === 'published' || (p.status as any) === 'publish');
@@ -106,20 +108,20 @@ export const usePostsData = ({
     } else if (activeTab === 'all') {
       filtered = filtered.filter(p => p.status !== 'trash');
     }
-    
+
     // Filter by search
     if (searchQuery) {
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.author.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     // Sort
     if (sortField) {
       filtered = [...filtered].sort((a, b) => {
         if (sortField === 'title') {
-          return sortOrder === 'asc' 
+          return sortOrder === 'asc'
             ? a.title.localeCompare(b.title)
             : b.title.localeCompare(a.title);
         } else if (sortField === 'date') {
@@ -131,13 +133,21 @@ export const usePostsData = ({
       });
     } else {
       // Default sort by date desc
-      filtered = [...filtered].sort((a, b) => 
+      filtered = [...filtered].sort((a, b) =>
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
     }
-    
-    // Apply pagination limit
-    return filtered.slice(0, itemsPerPage);
+
+    return filtered;
+  };
+
+  const getAllFilteredPosts = () => getFilteredAndSortedPosts();
+
+  const getPagedPosts = () => {
+    const allFiltered = getFilteredAndSortedPosts();
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return allFiltered.slice(startIndex, endIndex);
   };
 
   // Get status counts
@@ -149,12 +159,15 @@ export const usePostsData = ({
     return { all, published, draft, trash };
   };
 
+  const allFilteredPosts = getAllFilteredPosts();
+
   return {
     posts,
     setPosts,
     loading,
     error,
-    filteredPosts: getFilteredPosts(),
+    filteredPosts: getPagedPosts(),
+    totalFilteredItems: allFilteredPosts.length,
     counts: getStatusCounts()
   };
 };

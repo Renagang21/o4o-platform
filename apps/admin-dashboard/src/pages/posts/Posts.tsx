@@ -13,6 +13,7 @@ import { PostsBulkActions } from '@/components/posts/PostsBulkActions';
 import { PostsScreenOptions } from '@/components/posts/PostsScreenOptions';
 import { QuickEditRow } from '@/components/posts/QuickEditRow';
 import { PostRow } from '@/components/posts/PostRow';
+import { Pagination } from '@/components/common/Pagination';
 
 const PostsRefactored = () => {
   const navigate = useNavigate();
@@ -63,20 +64,24 @@ const PostsRefactored = () => {
     return saved ? parseInt(saved) : 20;
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Custom hooks
-  const { 
-    posts, 
-    setPosts, 
-    loading, 
-    error, 
-    filteredPosts, 
-    counts 
+  const {
+    posts,
+    setPosts,
+    loading,
+    error,
+    filteredPosts,
+    totalFilteredItems,
+    counts
   } = usePostsData({
     activeTab,
     searchQuery,
     sortField,
     sortOrder,
-    itemsPerPage
+    itemsPerPage,
+    currentPage
   });
 
   const {
@@ -99,6 +104,11 @@ const PostsRefactored = () => {
   useEffect(() => {
     localStorage.setItem('posts-items-per-page', itemsPerPage.toString());
   }, [itemsPerPage]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery, itemsPerPage]);
 
   // Handlers
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -384,10 +394,17 @@ const PostsRefactored = () => {
             disabled={!selectedBulkAction || selectedPosts.size === 0}
             isTrashView={activeTab === 'trash'}
           />
-          
-          <div className="text-sm text-gray-600">
-            {filteredPosts.length} items
-          </div>
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-4 bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalFilteredItems / itemsPerPage)}
+            totalItems={totalFilteredItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
     </div>
