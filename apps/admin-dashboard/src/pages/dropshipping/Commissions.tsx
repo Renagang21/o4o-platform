@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, DollarSign, Users, Calendar, TrendingUp, Settings, Award } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { authClient } from '@o4o/auth-client';
 
 interface CommissionPolicy {
   id: string;
@@ -29,15 +30,8 @@ const Commissions: React.FC = () => {
   const fetchCommissionPolicies = async () => {
     try {
       setLoading(true);
-      // Fetch from API - replace with actual endpoint
-      const response = await fetch('/api/admin/dropshipping/commission-policies');
-      if (response.ok) {
-        const data = await response.json();
-        setPolicies(data.policies || []);
-      } else {
-        console.error('Failed to fetch commission policies');
-        toast.error('Failed to load commission policies');
-      }
+      const response = await authClient.api.get('/admin/dropshipping/commission-policies');
+      setPolicies(response.data.policies || []);
     } catch (error) {
       console.error('Error fetching commission policies:', error);
       toast.error('Error loading commission policies');
