@@ -114,25 +114,14 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     try {
       let finalPrompt = prompt;
 
-      // For edit mode, prepend current content to prompt
-      if (mode === 'edit' && currentBlocks.length > 0) {
-        const currentContent = currentBlocks
-          .map(block => {
-            if (block.attributes?.content) return block.attributes.content;
-            if (block.content?.text) return block.content.text;
-            return '';
-          })
-          .filter(Boolean)
-          .join('\n\n');
-
-        const editModePrompts = {
-          enhance: `다음 기존 내용을 보완하고 개선해주세요:\n\n${currentContent}\n\n추가 요청사항: ${prompt}`,
-          rewrite: `다음 기존 내용을 완전히 새롭게 재작성해주세요:\n\n${currentContent}\n\n방향성: ${prompt}`,
-          summarize: `다음 기존 내용을 요약해주세요:\n\n${currentContent}\n\n추가 요청사항: ${prompt}`,
-          translate: `다음 기존 내용을 번역해주세요:\n\n${currentContent}\n\n번역 언어/방향: ${prompt}`
-        };
-
-        finalPrompt = editModePrompts[editMode];
+      // 편집 모드와 신규 모드를 완전히 다르게 처리
+      if (mode === 'edit') {
+        // 편집 모드: 사용자의 요청만 사용 (기존 내용 포함하지 않음)
+        // 예: "상단에 제목으로 '테스트' 추가해줘" → AI가 해당 블록만 생성
+        finalPrompt = prompt;
+      } else {
+        // 신규 모드: 프롬프트를 그대로 사용하여 전체 페이지 생성
+        finalPrompt = prompt;
       }
 
       // 프롬프트 길이 체크 및 차단
@@ -205,12 +194,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     blog: '2025년 AI와 웹 개발의 미래 트렌드에 대한 블로그 포스트를 작성해주세요.',
   };
 
-  const editExamplePrompts = {
-    enhance: '더 전문적이고 설득력 있게 보완해주세요',
-    rewrite: '더 친근하고 읽기 쉬운 톤으로 재작성해주세요',
-    summarize: '핵심 내용만 간결하게 요약해주세요',
-    translate: '영어로 번역해주세요',
-  };
+  // 편집 모드 예시 - 위치 기반 블록 추가/수정 요청
+  const editExamplePrompt = '상단에 제목으로 "환영합니다" 추가하고, 그 아래에 소개 문구 단락을 추가해주세요';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -253,8 +238,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               handleGenerate();
             }}
           >
-            {/* 템플릿 또는 편집 모드 선택 */}
-            {mode === 'new' ? (
+            {/* 신규 모드에서만 템플릿 선택 표시 */}
+            {mode === 'new' && (
               <div className="space-y-2">
                 <Label>템플릿</Label>
                 <Select value={template} onValueChange={(v: any) => setTemplate(v)}>
@@ -267,25 +252,6 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                         <div>
                           <div className="font-medium">{t.name}</div>
                           <div className="text-xs text-gray-500">{t.description}</div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label>편집 모드</Label>
-                <Select value={editMode} onValueChange={(v: any) => setEditMode(v)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {editModes.map((m) => (
-                      <SelectItem key={m.key} value={m.key}>
-                        <div>
-                          <div className="font-medium">{m.name}</div>
-                          <div className="text-xs text-gray-500">{m.description}</div>
                         </div>
                       </SelectItem>
                     ))}
@@ -360,7 +326,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => setPrompt(mode === 'new' ? examplePrompts[template] : editExamplePrompts[editMode])}
+                  onClick={() => setPrompt(mode === 'new' ? examplePrompts[template] : editExamplePrompt)}
                 >
                   예시 사용
                 </Button>
