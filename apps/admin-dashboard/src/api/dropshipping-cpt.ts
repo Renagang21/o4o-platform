@@ -1,10 +1,10 @@
-import api from './client';
+import { authClient } from '@o4o/auth-client';
 
 // Product API
 export const dropshippingAPI = {
   // Get all products
   getProducts: async () => {
-    const response = await api.get('/api/products');
+    const response = await authClient.api.get('/products');
     return { success: true, data: response.data.data || [] };
   },
 
@@ -36,7 +36,7 @@ export const dropshippingAPI = {
       category: 'general',
       status: 'active'
     };
-    const response = await api.post('/api/products', newData);
+    const response = await authClient.api.post('/products', newData);
     return { success: true, data: response.data };
   },
 
@@ -65,19 +65,19 @@ export const dropshippingAPI = {
     if (data.acf?.supplier_sku) updateData.sku = data.acf.supplier_sku;
     if (data.acf?.supplier) updateData.supplierId = data.acf.supplier;
 
-    const response = await api.put(`/api/products/${id}`, updateData);
+    const response = await authClient.api.put(`/products/${id}`, updateData);
     return { success: true, data: response.data };
   },
 
   // Delete product
   deleteProduct: async (id: string) => {
-    const response = await api.delete(`/api/products/${id}`);
+    const response = await authClient.api.delete(`/products/${id}`);
     return { success: true, data: response.data };
   },
 
   // Calculate margin
   calculateMargin: async (cost_price: number, selling_price: number) => {
-    const response = await api.post('/api/v1/dropshipping/calculate-margin', {
+    const response = await authClient.api.post('/admin/dropshipping/calculate-margin', {
       cost_price,
       selling_price
     });
@@ -86,13 +86,13 @@ export const dropshippingAPI = {
 
   // Initialize CPTs and ACF
   initializeCPTs: async () => {
-    const response = await api.post('/api/v1/dropshipping/initialize');
+    const response = await authClient.api.post('/admin/dropshipping/initialize');
     return response.data;
   },
 
   // Partner API
   getPartners: async () => {
-    const response = await api.get('/api/partners');
+    const response = await authClient.api.get('/partners');
     return { success: true, data: response.data.data || [] };
   },
 
@@ -114,7 +114,7 @@ export const dropshippingAPI = {
       commissionRate: data.acf?.partner_commission_rate || 5,
       status: 'active'
     };
-    const response = await api.post('/api/partners', newData);
+    const response = await authClient.api.post('/partners', newData);
     return { success: true, data: response.data };
   },
 
@@ -135,18 +135,18 @@ export const dropshippingAPI = {
     if (data.acf?.partner_grade) updateData.tier = data.acf.partner_grade;
     if (data.acf?.partner_commission_rate) updateData.commissionRate = data.acf.partner_commission_rate;
 
-    const response = await api.put(`/api/partners/${id}`, updateData);
+    const response = await authClient.api.put(`/partners/${id}`, updateData);
     return { success: true, data: response.data };
   },
 
   deletePartner: async (id: string) => {
-    const response = await api.delete(`/api/partners/${id}`);
+    const response = await authClient.api.delete(`/partners/${id}`);
     return { success: true, data: response.data };
   },
 
   // Supplier API
   getSuppliers: async () => {
-    const response = await api.get('/api/v1/dropshipping/suppliers');
+    const response = await authClient.api.get('/admin/dropshipping/suppliers');
     return response.data;
   },
 
@@ -161,7 +161,7 @@ export const dropshippingAPI = {
       supplier_api_endpoint?: string;
     };
   }) => {
-    const response = await api.post('/api/v1/dropshipping/suppliers', data);
+    const response = await authClient.api.post('/admin/dropshipping/suppliers', data);
     return response.data;
   },
 
@@ -176,24 +176,24 @@ export const dropshippingAPI = {
       supplier_api_endpoint?: string;
     };
   }) => {
-    const response = await api.put(`/api/v1/dropshipping/suppliers/${id}`, data);
+    const response = await authClient.api.put(`/admin/dropshipping/suppliers/${id}`, data);
     return response.data;
   },
 
   deleteSupplier: async (id: string) => {
-    const response = await api.delete(`/api/v1/dropshipping/suppliers/${id}`);
+    const response = await authClient.api.delete(`/admin/dropshipping/suppliers/${id}`);
     return response.data;
   },
 
   // Order API
   getOrders: async (status?: string) => {
     const params = status ? `?status=${status}` : '';
-    const response = await api.get(`/api/orders${params}`);
+    const response = await authClient.api.get(`/orders${params}`);
     return { success: true, data: response.data.data || [] };
   },
 
   getOrder: async (id: string) => {
-    const response = await api.get(`/api/orders/${id}`);
+    const response = await authClient.api.get(`/orders/${id}`);
     return { success: true, data: response.data };
   },
 
@@ -242,17 +242,17 @@ export const dropshippingAPI = {
         country: data.shipping_address.country
       } : undefined
     };
-    const response = await api.post('/api/orders', newData);
+    const response = await authClient.api.post('/orders', newData);
     return { success: true, data: response.data };
   },
 
   updateOrderStatus: async (id: string, status: string) => {
-    const response = await api.patch(`/api/orders/${id}/status`, { status });
+    const response = await authClient.api.patch(`/orders/${id}/status`, { status });
     return { success: true, data: response.data };
   },
 
   deleteOrder: async (id: string) => {
-    const response = await api.delete(`/api/orders/${id}`);
+    const response = await authClient.api.delete(`/orders/${id}`);
     return { success: true, data: response.data };
   },
 
@@ -262,22 +262,22 @@ export const dropshippingAPI = {
     if (status) params.append('status', status);
     if (type) params.append('type', type);
     const queryString = params.toString();
-    const response = await api.get(`/api/v1/dropshipping/settlements${queryString ? `?${queryString}` : ''}`);
+    const response = await authClient.api.get(`/admin/dropshipping/settlements${queryString ? `?${queryString}` : ''}`);
     return response.data;
   },
 
   getSettlement: async (id: string) => {
-    const response = await api.get(`/api/v1/dropshipping/settlements/${id}`);
+    const response = await authClient.api.get(`/admin/dropshipping/settlements/${id}`);
     return response.data;
   },
 
   updateSettlementStatus: async (id: string, status: string) => {
-    const response = await api.patch(`/api/v1/dropshipping/settlements/${id}/status`, { status });
+    const response = await authClient.api.patch(`/admin/dropshipping/settlements/${id}/status`, { status });
     return response.data;
   },
 
   processSettlement: async (id: string) => {
-    const response = await api.post(`/api/v1/dropshipping/settlements/${id}/process`);
+    const response = await authClient.api.post(`/admin/dropshipping/settlements/${id}/process`);
     return response.data;
   },
 
@@ -291,7 +291,7 @@ export const dropshippingAPI = {
     account_number: string;
     account_holder: string;
   }) => {
-    const response = await api.post('/api/v1/dropshipping/settlements', data);
+    const response = await authClient.api.post('/admin/dropshipping/settlements', data);
     return response.data;
   }
 };
