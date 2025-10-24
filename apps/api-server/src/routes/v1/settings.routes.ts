@@ -695,6 +695,132 @@ router.post('/customizer', authenticate, requireAdmin, updateCustomizerSettings)
 router.put('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
 
 /**
+ * @route   GET /api/v1/settings/permalink
+ * @desc    Get permalink settings
+ * @access  Public
+ */
+router.get('/permalink', async (req: Request, res: Response) => {
+  try {
+    const settings = await permalinkService.getPermalinkSettings();
+
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    logger.error('Failed to get permalink settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get permalink settings'
+    });
+  }
+});
+
+/**
+ * @route   PUT /api/v1/settings/permalink
+ * @desc    Update permalink settings
+ * @access  Private (Admin only)
+ */
+router.put('/permalink',
+  authenticate,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const settings: PermalinkSettings = req.body;
+
+      // 설정 저장
+      const result = await permalinkService.savePermalinkSettings(settings);
+
+      if (!result.success) {
+        return res.status(400).json({
+          success: false,
+          errors: result.errors,
+          message: 'Invalid permalink settings'
+        });
+      }
+
+      // 업데이트된 설정 반환
+      const updatedSettings = await permalinkService.getPermalinkSettings();
+
+      res.json({
+        success: true,
+        data: updatedSettings,
+        message: 'Permalink settings updated successfully'
+      });
+    } catch (error) {
+      logger.error('Failed to update permalink settings:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update permalink settings'
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/v1/settings/permalink/preview
+ * @desc    Generate URL previews for permalink structure
+ * @access  Private (Admin only)
+ */
+router.post('/permalink/preview',
+  authenticate,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { structure } = req.body;
+
+      if (!structure) {
+        return res.status(400).json({
+          success: false,
+          error: 'Structure parameter is required'
+        });
+      }
+
+      const previews = await permalinkService.generateUrlPreviews(structure);
+
+      res.json({
+        success: true,
+        data: previews
+      });
+    } catch (error) {
+      logger.error('Failed to generate URL previews:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate URL previews'
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/v1/settings/permalink/validate
+ * @desc    Validate permalink settings
+ * @access  Private (Admin only)
+ */
+router.post('/permalink/validate',
+  authenticate,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const settings: PermalinkSettings = req.body;
+
+      const validation = await (permalinkService as any).validatePermalinkSettings(settings);
+
+      res.json({
+        success: true,
+        data: validation
+      });
+    } catch (error) {
+      logger.error('Failed to validate permalink settings:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to validate permalink settings'
+      });
+    }
+  }
+);
+
+/**
  * @route   PUT /api/v1/settings/:section
  * @desc    Update settings for a specific section
  * @access  Private (Admin only)
@@ -818,132 +944,6 @@ router.post('/reset/:section',
       res.status(500).json({
         success: false,
         error: 'Failed to reset settings'
-      });
-    }
-  }
-);
-
-/**
- * @route   GET /api/v1/settings/permalink
- * @desc    Get permalink settings
- * @access  Public
- */
-router.get('/permalink', async (req: Request, res: Response) => {
-  try {
-    const settings = await permalinkService.getPermalinkSettings();
-    
-    res.json({
-      success: true,
-      data: settings
-    });
-  } catch (error) {
-    logger.error('Failed to get permalink settings:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get permalink settings'
-    });
-  }
-});
-
-/**
- * @route   PUT /api/v1/settings/permalink
- * @desc    Update permalink settings
- * @access  Private (Admin only)
- */
-router.put('/permalink',
-  authenticate,
-  requireAdmin,
-  async (req: Request, res: Response) => {
-    try {
-      const settings: PermalinkSettings = req.body;
-      
-      // 설정 저장
-      const result = await permalinkService.savePermalinkSettings(settings);
-      
-      if (!result.success) {
-        return res.status(400).json({
-          success: false,
-          errors: result.errors,
-          message: 'Invalid permalink settings'
-        });
-      }
-      
-      // 업데이트된 설정 반환
-      const updatedSettings = await permalinkService.getPermalinkSettings();
-      
-      res.json({
-        success: true,
-        data: updatedSettings,
-        message: 'Permalink settings updated successfully'
-      });
-    } catch (error) {
-      logger.error('Failed to update permalink settings:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to update permalink settings'
-      });
-    }
-  }
-);
-
-/**
- * @route   POST /api/v1/settings/permalink/preview
- * @desc    Generate URL previews for permalink structure
- * @access  Private (Admin only)
- */
-router.post('/permalink/preview',
-  authenticate,
-  requireAdmin,
-  async (req: Request, res: Response) => {
-    try {
-      const { structure } = req.body;
-      
-      if (!structure) {
-        return res.status(400).json({
-          success: false,
-          error: 'Structure parameter is required'
-        });
-      }
-      
-      const previews = await permalinkService.generateUrlPreviews(structure);
-      
-      res.json({
-        success: true,
-        data: previews
-      });
-    } catch (error) {
-      logger.error('Failed to generate URL previews:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to generate URL previews'
-      });
-    }
-  }
-);
-
-/**
- * @route   POST /api/v1/settings/permalink/validate
- * @desc    Validate permalink settings
- * @access  Private (Admin only)
- */
-router.post('/permalink/validate',
-  authenticate,
-  requireAdmin,
-  async (req: Request, res: Response) => {
-    try {
-      const settings: PermalinkSettings = req.body;
-      
-      const validation = await (permalinkService as any).validatePermalinkSettings(settings);
-      
-      res.json({
-        success: true,
-        data: validation
-      });
-    } catch (error) {
-      logger.error('Failed to validate permalink settings:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to validate permalink settings'
       });
     }
   }
