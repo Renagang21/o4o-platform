@@ -542,6 +542,12 @@ class AIProxyService {
           })),
           totalBlocks: parsed.blocks.length,
         });
+
+        // DEBUG: Save full AI response to file for debugging
+        const fs = require('fs');
+        const debugPath = `/tmp/ai-response-${requestId}.json`;
+        fs.writeFileSync(debugPath, JSON.stringify(parsed.blocks, null, 2));
+        logger.info('AI response saved to file', { requestId, debugPath });
       } else if (Array.isArray(parsed)) {
         // Case 2: [...] 형식 (배열을 blocks로 감싸기)
         normalizedResult = { blocks: parsed };
