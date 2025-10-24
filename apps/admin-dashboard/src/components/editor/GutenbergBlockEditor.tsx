@@ -481,6 +481,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       newBlocks.splice(insertIndex, 0, newBlock);
       updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
+
+      // Auto-scroll to new block after DOM update
+      setTimeout(() => {
+        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+        if (newBlockElement) {
+          newBlockElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center', // Center the block in viewport
+          });
+        }
+      }, 100);
     },
     [blocks, updateBlocks]
   );
