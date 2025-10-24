@@ -611,7 +611,7 @@ function App() {
                       </Suspense>
                     } />
                     {/* Test - AI Page Generator */}
-                    <Route path="/admin/test/ai-generator" element={
+                    <Route path="/admin/test/ai-page-generator-test" element={
                       <Suspense fallback={<PageLoader />}>
                         <AIPageGeneratorTest />
                       </Suspense>
