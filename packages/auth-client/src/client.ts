@@ -11,6 +11,7 @@ export class AuthClient {
     this.baseURL = baseURL;
     this.api = axios.create({
       baseURL: this.baseURL,
+      timeout: 120000, // 120 seconds for AI generation
       headers: {
         'Content-Type': 'application/json',
       },

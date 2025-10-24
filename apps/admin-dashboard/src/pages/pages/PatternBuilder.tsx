@@ -2,14 +2,14 @@ import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import PatternPageBuilder from '@/components/editor/PatternPageBuilder';
-import { api } from '@/api/base';
+import { authClient } from '@o4o/auth-client';
 
 const PatternBuilder: FC = () => {
   const navigate = useNavigate();
 
   const handleSave = async (title: string, content: string, blocks: any[]) => {
     try {
-      const response = await api.post('/admin/pages', {
+      const response = await authClient.api.post('/admin/pages', {
         title,
         content,
         blocks,

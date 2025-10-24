@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/client';
+import { authClient } from '@o4o/auth-client';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 interface GeneralSettingsData {
@@ -76,7 +76,7 @@ export default function GeneralSettings() {
   const { isLoading } = useQuery({
     queryKey: ['settings', 'general'],
     queryFn: async () => {
-      const response = await apiClient.get('/settings/general');
+      const response = await authClient.api.get('/settings/general');
       const data = response.data.data;
       if (data) {
         setSettings(data);
@@ -88,7 +88,7 @@ export default function GeneralSettings() {
   // Save settings mutation
   const saveMutation = useMutation({
     mutationFn: async (data: GeneralSettingsData) => {
-      return apiClient.put('/settings/general', data);
+      return authClient.api.put('/settings/general', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'general'] });

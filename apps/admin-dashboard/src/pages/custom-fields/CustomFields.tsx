@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { Plus, Settings, Trash2, Edit, Copy, Search } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { api } from '@/api/base';
+import { authClient } from '@o4o/auth-client';
 
 interface CustomFieldGroup {
   id: string;
@@ -48,9 +48,9 @@ const CustomFields: FC = () => {
   const { data: fieldGroups, isLoading } = useQuery({
     queryKey: ['custom-field-groups'],
     queryFn: async () => {
-      const response = await api.get('/admin/custom-field-groups');
+      const response = await authClient.api.get('/admin/custom-field-groups');
       // Ensure we always return an array
-      return Array.isArray(response.data) ? response.data : 
+      return Array.isArray(response.data) ? response.data :
              (response.data?.groups || response.data?.data || []);
     }
   });
@@ -58,7 +58,7 @@ const CustomFields: FC = () => {
   // 필드 그룹 생성
   const createGroupMutation = useMutation({
     mutationFn: async (data: Partial<CustomFieldGroup>) => {
-      const response = await api.post('/admin/custom-field-groups', data);
+      const response = await authClient.api.post('/admin/custom-field-groups', data);
       return response.data;
     },
     onSuccess: () => {
@@ -74,7 +74,7 @@ const CustomFields: FC = () => {
   // 필드 그룹 삭제
   const deleteGroupMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/admin/custom-field-groups/${id}`);
+      await authClient.api.delete(`/admin/custom-field-groups/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom-field-groups'] });

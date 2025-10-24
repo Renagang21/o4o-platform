@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/client';
+import { authClient } from '@o4o/auth-client';
 import { ContentApi } from '@/api/contentApi';
 import toast from 'react-hot-toast';
 import { 
@@ -76,7 +76,7 @@ export default function ReadingSettings() {
     queryKey: ['pages', 'published'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/posts', {
+        const response = await authClient.api.get('/posts', {
           params: {
             type: 'page',
             status: 'publish',
@@ -96,7 +96,7 @@ export default function ReadingSettings() {
     queryKey: ['settings', 'reading'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/settings/reading');
+        const response = await authClient.api.get('/settings/reading');
         const data = response.data.data;
         if (data) {
           // Preserve homepageId even if it comes as undefined from API
@@ -132,7 +132,7 @@ export default function ReadingSettings() {
           ...data,
           homepageId: data.homepageType === 'static_page' ? data.homepageId : undefined
         };
-        const response = await apiClient.put('/settings/reading', payload);
+        const response = await authClient.api.put('/settings/reading', payload);
         return response;
       } catch (apiError: any) {
         // 구체적인 에러 상황별 메시지 처리

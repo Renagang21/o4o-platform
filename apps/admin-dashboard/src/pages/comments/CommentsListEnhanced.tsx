@@ -8,7 +8,7 @@ import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { formatDate } from '@/lib/utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/client';
+import { authClient } from '@o4o/auth-client';
 
 interface Comment {
   id: string;
@@ -69,12 +69,12 @@ export default function CommentsListEnhanced() {
         page: page.toString() as any,
         limit: itemsPerPage.toString() as any,
       });
-      
+
       if (search) params.append('search', search);
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (postFilter) params.append('post', postFilter);
 
-      const response = await apiClient.get(`/comments?${params}`);
+      const response = await authClient.api.get(`/comments?${params}`);
       return response.data;
     }
   });
@@ -82,7 +82,7 @@ export default function CommentsListEnhanced() {
   // Update comment status
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      await apiClient.patch(`/comments/${id}`, { status });
+      await authClient.api.patch(`/comments/${id}`, { status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments'] });
@@ -96,7 +96,7 @@ export default function CommentsListEnhanced() {
   // Delete comment
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiClient.delete(`/comments/${id}`);
+      await authClient.api.delete(`/comments/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments'] });

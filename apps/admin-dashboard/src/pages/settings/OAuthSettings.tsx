@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/client';
+import { authClient } from '@o4o/auth-client';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { 
   OAuthProvider, 
@@ -54,7 +54,7 @@ const OAuthSettings = () => {
   const { data: settings, isLoading } = useQuery<OAuthSettingsResponse>({
     queryKey: ['oauth-settings'],
     queryFn: async () => {
-      const response = await apiClient.get('/settings/oauth');
+      const response = await authClient.api.get('/settings/oauth');
       return response.data;
     }
   });
@@ -75,7 +75,7 @@ const OAuthSettings = () => {
   // Update OAuth settings mutation
   const updateMutation = useMutation<OAuthUpdateResponse, Error, OAuthUpdateRequest>({
     mutationFn: async (data: OAuthUpdateRequest) => {
-      const response = await apiClient.put('/settings/oauth', data);
+      const response = await authClient.api.put('/settings/oauth', data);
       return response.data;
     },
     onMutate: async (newData) => {
@@ -129,7 +129,7 @@ const OAuthSettings = () => {
   // Test OAuth connection mutation
   const testMutation = useMutation<OAuthTestResponse, Error, OAuthTestRequest>({
     mutationFn: async (data: OAuthTestRequest) => {
-      const response = await apiClient.post('/settings/oauth/test', data);
+      const response = await authClient.api.post('/settings/oauth/test', data);
       return response.data;
     },
     onSuccess: (data, _variables) => {
