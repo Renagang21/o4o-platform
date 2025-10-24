@@ -89,7 +89,7 @@ const PermalinkSettings: FC = () => {
     queryKey: ['permalink-settings'],
     queryFn: async () => {
       try {
-        const response = await authClient.api.get('/public/permalink-settings');
+        const response = await authClient.api.get('/settings/permalink');
         return response.data?.data || response.data as PermalinkSettings;
       } catch (error) {
         // Return default settings if API fails
