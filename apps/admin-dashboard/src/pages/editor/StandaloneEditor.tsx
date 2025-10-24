@@ -90,8 +90,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [isDirty, setIsDirty] = useState(false);
   const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [blocksBackup, setBlocksBackup] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // Add refs to track latest state values for save operations
   const blocksRef = useRef<any[]>([]);
   
@@ -774,13 +775,32 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       {/* AI Generator Modal */}
       <SimpleAIModal
         isOpen={showAIGenerator}
-        onClose={() => setShowAIGenerator(false)}
+        mode={isNewPost ? 'new' : 'edit'}
+        currentBlocks={blocks}
+        onClose={() => {
+          setShowAIGenerator(false);
+          // Clear backup on close
+          setBlocksBackup([]);
+        }}
         onGenerate={(generatedBlocks) => {
           // Replace existing blocks with AI generated blocks (or merge if preferred)
           setBlocks(generatedBlocks);
           blocksRef.current = generatedBlocks;
           setIsDirty(true);
-          toast.success('AI 페이지가 성공적으로 생성되었습니다!');
+          toast.success(isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!');
+        }}
+        onBackup={() => {
+          // Backup current blocks before AI generation
+          setBlocksBackup([...blocks]);
+        }}
+        onRestore={() => {
+          // Restore from backup
+          if (blocksBackup.length > 0) {
+            setBlocks(blocksBackup);
+            blocksRef.current = blocksBackup;
+            setBlocksBackup([]);
+            toast.success('원본으로 복원되었습니다');
+          }
         }}
       />
     </div>

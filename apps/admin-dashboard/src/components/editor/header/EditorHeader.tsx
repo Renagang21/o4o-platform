@@ -74,6 +74,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           onOpenDesignLibrary={onOpenDesignLibrary}
           onOpenAIGenerator={onOpenAIGenerator}
           onOpenBlockInserter={onOpenBlockInserter}
+          isNewPost={isNewPost}
         />
       </div>
 

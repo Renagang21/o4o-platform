@@ -68,6 +68,7 @@ export interface LeftControlsProps {
   onOpenDesignLibrary: () => void;
   onOpenAIGenerator: () => void;
   onOpenBlockInserter?: () => void;
+  isNewPost?: boolean;
 }
 
 /**

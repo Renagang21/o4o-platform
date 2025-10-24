@@ -31,6 +31,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
   onOpenDesignLibrary,
   onOpenAIGenerator,
   onOpenBlockInserter,
+  isNewPost = true,
 }) => {
   return (
     <div className={cn('flex items-center', isMobile ? 'gap-0' : 'gap-1')}>
@@ -131,7 +132,7 @@ export const LeftControls: React.FC<LeftControlsProps> = ({
         >
           {/* FIXED: Replaced lucide-react icon */}
           <AutoAwesome sx={{ fontSize: 16, marginRight: '6px' }} />
-          AI 페이지 생성
+          {isNewPost ? 'AI 페이지 제작' : 'AI 페이지 편집'}
         </Button>
       )}
     </div>

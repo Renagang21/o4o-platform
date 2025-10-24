@@ -18,17 +18,26 @@ import { AppSystemKeyService } from '@/services/app-system-keys.service';
 
 interface SimpleAIModalProps {
   isOpen: boolean;
+  mode?: 'new' | 'edit';
+  currentBlocks?: Block[];
   onClose: () => void;
   onGenerate: (blocks: Block[]) => void;
+  onBackup?: () => void;
+  onRestore?: () => void;
 }
 
 export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   isOpen,
+  mode = 'new',
+  currentBlocks = [],
   onClose,
   onGenerate,
+  onBackup,
+  onRestore,
 }) => {
   const [prompt, setPrompt] = useState('');
   const [template, setTemplate] = useState<'landing' | 'about' | 'product' | 'blog'>('landing');
+  const [editMode, setEditMode] = useState<'enhance' | 'rewrite' | 'summarize' | 'translate'>('enhance');
   const [model, setModel] = useState<AIModel>('gemini-2.5-flash');
   const [apiKey, setApiKey] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -75,13 +84,18 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      setError('페이지 내용을 입력해주세요.');
+      setError(mode === 'new' ? '페이지 내용을 입력해주세요.' : '편집 요청 사항을 입력해주세요.');
       return;
     }
 
     if (!apiKey.trim()) {
       setError('API 키를 입력해주세요.');
       return;
+    }
+
+    // Backup current blocks before editing
+    if (mode === 'edit' && onBackup) {
+      onBackup();
     }
 
     setIsGenerating(true);
@@ -98,9 +112,32 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     }, 1000);
 
     try {
+      let finalPrompt = prompt;
+
+      // For edit mode, prepend current content to prompt
+      if (mode === 'edit' && currentBlocks.length > 0) {
+        const currentContent = currentBlocks
+          .map(block => {
+            if (block.attributes?.content) return block.attributes.content;
+            if (block.content?.text) return block.content.text;
+            return '';
+          })
+          .filter(Boolean)
+          .join('\n\n');
+
+        const editModePrompts = {
+          enhance: `다음 기존 내용을 보완하고 개선해주세요:\n\n${currentContent}\n\n추가 요청사항: ${prompt}`,
+          rewrite: `다음 기존 내용을 완전히 새롭게 재작성해주세요:\n\n${currentContent}\n\n방향성: ${prompt}`,
+          summarize: `다음 기존 내용을 요약해주세요:\n\n${currentContent}\n\n추가 요청사항: ${prompt}`,
+          translate: `다음 기존 내용을 번역해주세요:\n\n${currentContent}\n\n번역 언어/방향: ${prompt}`
+        };
+
+        finalPrompt = editModePrompts[editMode];
+      }
+
       const blocks = await simpleAIGenerator.generatePage({
-        prompt,
-        template,
+        prompt: finalPrompt,
+        template: mode === 'new' ? template : 'blog', // Use blog template for edit mode
         config: {
           provider: 'gemini',
           model
@@ -140,6 +177,12 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     { key: 'blog', name: '블로그 포스트', description: '블로그 형식의 글' },
   ];
 
+  const editModes = [
+    { key: 'enhance', name: '내용 보완', description: '기존 내용을 유지하면서 보완하고 개선' },
+    { key: 'rewrite', name: '전체 재작성', description: '기존 내용을 완전히 새롭게 작성' },
+    { key: 'summarize', name: '요약', description: '기존 내용을 간결하게 요약' },
+    { key: 'translate', name: '번역', description: '다른 언어로 번역' },
+  ];
 
   const examplePrompts = {
     landing: '혁신적인 AI 기반 웹사이트 빌더를 소개하는 랜딩 페이지를 만들어주세요.',
@@ -148,16 +191,25 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
     blog: '2025년 AI와 웹 개발의 미래 트렌드에 대한 블로그 포스트를 작성해주세요.',
   };
 
+  const editExamplePrompts = {
+    enhance: '더 전문적이고 설득력 있게 보완해주세요',
+    rewrite: '더 친근하고 읽기 쉬운 톤으로 재작성해주세요',
+    summarize: '핵심 내용만 간결하게 요약해주세요',
+    translate: '영어로 번역해주세요',
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
-            AI 페이지 생성 (2025)
+            {mode === 'new' ? 'AI 페이지 제작 (2025)' : 'AI 페이지 편집 (2025)'}
           </DialogTitle>
           <DialogDescription>
-            최신 AI 모델로 자동으로 페이지 콘텐츠를 생성합니다.
+            {mode === 'new'
+              ? '최신 AI 모델로 자동으로 페이지 콘텐츠를 생성합니다.'
+              : '최신 AI 모델로 기존 페이지를 편집합니다. 원본은 자동으로 백업됩니다.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -187,25 +239,46 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               handleGenerate();
             }}
           >
-            {/* 템플릿 선택 */}
-            <div className="space-y-2">
-              <Label>템플릿</Label>
-              <Select value={template} onValueChange={(v: any) => setTemplate(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((t) => (
-                    <SelectItem key={t.key} value={t.key}>
-                      <div>
-                        <div className="font-medium">{t.name}</div>
-                        <div className="text-xs text-gray-500">{t.description}</div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* 템플릿 또는 편집 모드 선택 */}
+            {mode === 'new' ? (
+              <div className="space-y-2">
+                <Label>템플릿</Label>
+                <Select value={template} onValueChange={(v: any) => setTemplate(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map((t) => (
+                      <SelectItem key={t.key} value={t.key}>
+                        <div>
+                          <div className="font-medium">{t.name}</div>
+                          <div className="text-xs text-gray-500">{t.description}</div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>편집 모드</Label>
+                <Select value={editMode} onValueChange={(v: any) => setEditMode(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {editModes.map((m) => (
+                      <SelectItem key={m.key} value={m.key}>
+                        <div>
+                          <div className="font-medium">{m.name}</div>
+                          <div className="text-xs text-gray-500">{m.description}</div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* AI 서비스 정보 */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -268,25 +341,29 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
             {/* 프롬프트 입력 */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label>페이지 내용 설명</Label>
+                <Label>{mode === 'new' ? '페이지 내용 설명' : '편집 요청 사항'}</Label>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => setPrompt(examplePrompts[template])}
+                  onClick={() => setPrompt(mode === 'new' ? examplePrompts[template] : editExamplePrompts[editMode])}
                 >
                   예시 사용
                 </Button>
               </div>
               <Textarea
-                placeholder="어떤 페이지를 만들까요? 자세히 설명해주세요..."
+                placeholder={mode === 'new'
+                  ? '어떤 페이지를 만들까요? 자세히 설명해주세요...'
+                  : '어떻게 편집할까요? 구체적으로 설명해주세요...'}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={4}
                 className="resize-none"
               />
               <p className="text-xs text-gray-500">
-                페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.
+                {mode === 'new'
+                  ? '페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.'
+                  : '편집 방향을 구체적으로 설명하면 더 정확한 결과를 얻을 수 있습니다.'}
               </p>
             </div>
 
@@ -305,12 +382,17 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
         {!isGenerating && (
           <DialogFooter>
+            {mode === 'edit' && onRestore && (
+              <Button type="button" variant="outline" onClick={onRestore} className="mr-auto">
+                원본 복원
+              </Button>
+            )}
             <Button type="button" variant="outline" onClick={onClose}>
               취소
             </Button>
             <Button type="button" onClick={handleGenerate} disabled={!prompt.trim() || !apiKey.trim()}>
               <Sparkles className="mr-2 h-4 w-4" />
-              페이지 생성
+              {mode === 'new' ? '페이지 생성' : '편집 적용'}
             </Button>
           </DialogFooter>
         )}
