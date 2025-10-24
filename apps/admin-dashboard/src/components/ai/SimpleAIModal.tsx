@@ -88,10 +88,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
       return;
     }
 
-    if (!apiKey.trim()) {
-      setError('API 키를 입력해주세요.');
-      return;
-    }
+    // Sprint 2: API key check removed - server proxy handles authentication
+    // API key is optional and only used for App System settings
 
     // Backup current blocks before editing
     if (mode === 'edit' && onBackup) {
@@ -126,7 +124,6 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
       // 프롬프트 길이 체크 및 차단
       if (finalPrompt.length > 5000) {
-        console.error(`❌ 프롬프트 길이 초과: ${finalPrompt.length}자`);
         clearInterval(intervalId);
         setIsGenerating(false);
         setError(
