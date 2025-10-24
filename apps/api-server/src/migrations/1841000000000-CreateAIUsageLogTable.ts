@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateAIUsageLogTable1761287100000 implements MigrationInterface {
-    name = 'CreateAIUsageLogTable1761287100000'
+export class CreateAIUsageLogTable1841000000000 implements MigrationInterface {
+    name = 'CreateAIUsageLogTable1841000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Create enum types
