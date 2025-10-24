@@ -429,34 +429,49 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           backgroundColor: backgroundColor || undefined,
         }}
       >
-        <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            placeholder={`Heading ${level}`}
-            onKeyDown={handleKeyDown}
+        {isSelected ? (
+          // Edit mode: Show Slate editor
+          <>
+            <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
+              <Editable
+                renderElement={renderElement}
+                renderLeaf={renderLeaf}
+                placeholder={`Heading ${level}`}
+                onKeyDown={handleKeyDown}
+                style={{
+                  outline: 'none',
+                  minHeight: '1.5em',
+                }}
+              />
+            </Slate>
+
+            {/* Link Inline Editor */}
+            {linkEditorOpen && (
+              <LinkInlineEditor
+                onApply={(url, target) => {
+                  wrapLink(editor, url, target);
+                }}
+                onRemove={() => {
+                  unwrapLink(editor);
+                }}
+                onClose={() => {
+                  setLinkEditorOpen(false);
+                }}
+                initialUrl={getActiveLinkElement(editor)?.url || ''}
+                initialTarget={getActiveLinkElement(editor)?.target}
+                position={linkEditorPosition}
+              />
+            )}
+          </>
+        ) : (
+          // View mode: Render HTML content directly
+          <div
+            className="view-mode-content"
             style={{
-              outline: 'none',
+              textAlign: align,
               minHeight: '1.5em',
             }}
-          />
-        </Slate>
-
-        {/* Link Inline Editor */}
-        {linkEditorOpen && (
-          <LinkInlineEditor
-            onApply={(url, target) => {
-              wrapLink(editor, url, target);
-            }}
-            onRemove={() => {
-              unwrapLink(editor);
-            }}
-            onClose={() => {
-              setLinkEditorOpen(false);
-            }}
-            initialUrl={getActiveLinkElement(editor)?.url || ''}
-            initialTarget={getActiveLinkElement(editor)?.target}
-            position={linkEditorPosition}
+            dangerouslySetInnerHTML={{ __html: content || `<h${level}><br></h${level}>` }}
           />
         )}
       </div>
