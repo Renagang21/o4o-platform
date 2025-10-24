@@ -19,6 +19,7 @@ import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactE
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import SlateBlockWrapper from './shared/SlateBlockWrapper';
 import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { withDeleteKey } from '../slate/plugins/withDeleteKey';
 import { withLinks, isLinkActive, unwrapLink, wrapLink } from '../slate/plugins/withLinks';
@@ -373,18 +374,24 @@ const ListBlock: React.FC<ListBlockProps> = ({
       isItalic={isMarkActive(editor, 'italic')}
     >
       <div className="list-content min-h-[1.5em]">
-        <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            placeholder="List"
-            onKeyDown={handleKeyDown}
-            style={{
-              outline: 'none',
-              minHeight: '1.5em',
-            }}
-          />
-        </Slate>
+        <SlateBlockWrapper
+          isSelected={isSelected}
+          content={content}
+          emptyPlaceholder={type === 'ordered' ? '<ol><li><br></li></ol>' : '<ul><li><br></li></ul>'}
+        >
+          <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
+            <Editable
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              placeholder="List"
+              onKeyDown={handleKeyDown}
+              style={{
+                outline: 'none',
+                minHeight: '1.5em',
+              }}
+            />
+          </Slate>
+        </SlateBlockWrapper>
       </div>
     </EnhancedBlockWrapper>
   );
