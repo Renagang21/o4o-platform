@@ -143,7 +143,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         config: {
           provider: 'gemini',
           model,
-          maxTokens: 8192 // Increased to allow complete JSON generation for complex pages
+          // Don't specify maxTokens here - let SimpleAIGenerator use its defaults
+          // (16384 for Gemini, 8192 for others)
         },
         onProgress: (progress, message) => {
           setProgress(progress);
