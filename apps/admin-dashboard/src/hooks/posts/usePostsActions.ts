@@ -174,6 +174,30 @@ export const usePostsActions = ({ posts, setPosts }: UsePostsActionsProps) => {
           return false;
         }
       }
+    } else if (action === 'delete') {
+      if (confirm(`선택한 ${selectedIds.size}개의 글을 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.`)) {
+        try {
+          const promises = Array.from(selectedIds).map(id =>
+            postApi.delete(id)
+          );
+
+          const results = await Promise.all(promises);
+          const allSuccessful = results.every(r => r.success);
+
+          if (allSuccessful) {
+            setPosts(posts.filter(p => !selectedIds.has(p.id)));
+            sessionStorage.removeItem('posts-data');
+            toast.success(`${selectedIds.size}개의 글이 영구 삭제되었습니다.`);
+            return true;
+          } else {
+            toast.error('일부 글을 삭제하는데 실패했습니다.');
+            return false;
+          }
+        } catch (error) {
+          toast.error('삭제 중 오류가 발생했습니다.');
+          return false;
+        }
+      }
     } else if (action === 'edit') {
       alert('Bulk edit feature coming soon');
     }
