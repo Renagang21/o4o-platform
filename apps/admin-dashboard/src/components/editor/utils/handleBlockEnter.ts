@@ -2,7 +2,7 @@
  * Common Enter Key Handler for Block Components
  *
  * Provides standardized Enter key behavior across all text-based blocks:
- * 1. Plain Enter: Save current block content and create new BlockAppender below
+ * 1. Plain Enter: Save current block content and render (no new block creation)
  * 2. Shift+Enter or Ctrl+Enter: Create line break within the block (handled by Slate)
  *
  * Usage:
@@ -51,15 +51,14 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
       return;
     }
 
-    // Plain Enter: create new BlockAppender below this block
+    // Plain Enter: save and render only (no new BlockAppender)
     event.preventDefault();
 
     // Save current content by serializing editor state
     const currentHtml = serialize(editor.children);
     onChange(currentHtml, attributes);
 
-    // Create new BlockAppender after this block
-    onAddBlock?.('after', 'o4o/block-appender');
+    // Just render the content, no new block creation
   };
 }
 

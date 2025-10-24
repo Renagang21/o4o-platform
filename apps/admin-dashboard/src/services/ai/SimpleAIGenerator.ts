@@ -384,6 +384,7 @@ ${availableBlocks}
    * AI는 content 객체에 데이터를 넣지만, 편집기는 attributes에서 데이터를 읽음
    *
    * ⭐ Shortcode 블록 자동 제거 (품질 저하 방지)
+   * ⭐ innerBlocks 재귀 처리 (columns, column 등 컨테이너 블록)
    */
   private validateBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
@@ -510,11 +511,19 @@ ${availableBlocks}
         content = {};
       }
 
+      // innerBlocks 재귀 처리 (columns, column 등 컨테이너 블록)
+      let innerBlocks: Block[] | undefined = undefined;
+      if (block.innerBlocks && Array.isArray(block.innerBlocks)) {
+        // 재귀적으로 innerBlocks 검증
+        innerBlocks = this.validateBlocks(block.innerBlocks);
+      }
+
       return {
         id: `block-${Date.now()}-${index}`,
         type: blockType,
         content,
-        attributes
+        attributes,
+        ...(innerBlocks && innerBlocks.length > 0 ? { innerBlocks } : {})
       };
     });
   }
