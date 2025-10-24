@@ -388,7 +388,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       >
         <SlateBlockWrapper
           isSelected={isSelected}
-          content={content}
+          value={value}
+          serialize={serialize}
           viewModeStyle={{
             textAlign: align,
           }}

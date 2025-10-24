@@ -376,7 +376,8 @@ const ListBlock: React.FC<ListBlockProps> = ({
       <div className="list-content min-h-[1.5em]" data-handles-enter="true">
         <SlateBlockWrapper
           isSelected={isSelected}
-          content={content}
+          value={value}
+          serialize={serialize}
           emptyPlaceholder={type === 'ordered' ? '<ol><li><br></li></ol>' : '<ul><li><br></li></ul>'}
         >
           <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>

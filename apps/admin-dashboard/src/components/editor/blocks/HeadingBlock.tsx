@@ -433,7 +433,8 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       >
         <SlateBlockWrapper
           isSelected={isSelected}
-          content={content}
+          value={value}
+          serialize={serialize}
           viewModeStyle={{
             textAlign: align,
           }}
