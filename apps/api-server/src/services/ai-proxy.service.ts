@@ -512,6 +512,40 @@ class AIProxyService {
         );
       }
 
+      // Debug logging - AI 응답 형식 확인
+      logger.info('Gemini AI Response Format Debug', {
+        requestId,
+        model,
+        hasBlocksField: !!parsed.blocks,
+        isArray: Array.isArray(parsed),
+        parsedType: typeof parsed,
+        parsedKeys: typeof parsed === 'object' && !Array.isArray(parsed) ? Object.keys(parsed) : null,
+        blocksLength: parsed.blocks?.length || (Array.isArray(parsed) ? parsed.length : 0),
+      });
+
+      // 안전한 응답 형식 정규화
+      let normalizedResult: { blocks: any[] };
+
+      if (parsed.blocks && Array.isArray(parsed.blocks)) {
+        // Case 1: {blocks: [...]} 형식 (정상)
+        normalizedResult = { blocks: parsed.blocks };
+      } else if (Array.isArray(parsed)) {
+        // Case 2: [...] 형식 (배열을 blocks로 감싸기)
+        normalizedResult = { blocks: parsed };
+      } else {
+        // Case 3: 그 외 형식 - 에러 발생
+        logger.error('Invalid Gemini response format', {
+          requestId,
+          model,
+          parsed: JSON.stringify(parsed).substring(0, 500),
+        });
+        throw this.createError(
+          'PROVIDER_ERROR',
+          'Invalid response format: expected {blocks: [...]} or [...], but got ' + typeof parsed,
+          false
+        );
+      }
+
       return {
         success: true,
         provider: 'gemini',
@@ -521,7 +555,7 @@ class AIProxyService {
           completionTokens: data.usageMetadata?.candidatesTokenCount,
           totalTokens: data.usageMetadata?.totalTokenCount,
         },
-        result: parsed.blocks ? { blocks: parsed.blocks } : (Array.isArray(parsed) ? { blocks: parsed } : parsed),
+        result: normalizedResult,
         requestId,
       };
 
