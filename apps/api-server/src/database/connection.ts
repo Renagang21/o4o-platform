@@ -57,6 +57,7 @@ import { MenuLocation } from '../entities/MenuLocation';
 // AI Settings entity
 import { AISetting } from '../entities/AISetting';
 import { AiSettings } from '../entities/AiSettings';
+import { AIUsageLog } from '../entities/AIUsageLog';
 // App System entities
 import { App } from '../entities/App';
 import { AppInstance } from '../entities/AppInstance';
@@ -197,6 +198,7 @@ export const AppDataSource = new DataSource({
     // AI Settings
     AISetting,
     AiSettings,
+    AIUsageLog,
     // App System entities
     App,
     AppInstance,
