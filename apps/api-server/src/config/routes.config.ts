@@ -316,7 +316,13 @@ export function setupRoutes(app: Application): void {
   app.use('/api', tagRoutes);
   app.use('/api/acf', acfRoutes);
 
-  // Admin sub-routes
+  // Admin sub-routes (v1)
+  app.use('/api/v1/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
+  app.use('/api/v1/admin/forum', standardLimiter, forumAdminRoutes);
+  app.use('/api/v1/admin/users', standardLimiter, userAdminRoutes);
+  app.use('/api/v1/admin/suppliers', standardLimiter, supplierAdminRoutes);
+
+  // Admin sub-routes (legacy)
   app.use('/api/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
   app.use('/api/admin/forum', standardLimiter, forumAdminRoutes);
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
