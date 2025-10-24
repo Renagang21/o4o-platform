@@ -30,9 +30,9 @@ export const MODEL_WHITELIST = {
 // Parameter Limits
 export const PARAMETER_LIMITS = {
   maxTokens: {
-    openai: 4000,
-    gemini: 8192,
-    claude: 4000,
+    openai: 8192,
+    gemini: 32768,
+    claude: 8192,
   },
   temperature: {
     min: 0,
