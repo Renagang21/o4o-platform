@@ -529,6 +529,19 @@ class AIProxyService {
       if (parsed.blocks && Array.isArray(parsed.blocks)) {
         // Case 1: {blocks: [...]} 형식 (정상)
         normalizedResult = { blocks: parsed.blocks };
+
+        // DEBUG: Log first 3 blocks to see what AI generated
+        logger.info('Gemini AI Generated Blocks (first 3)', {
+          requestId,
+          blocks: parsed.blocks.slice(0, 3).map((b: any) => ({
+            type: b.type,
+            hasContent: !!b.content,
+            contentKeys: typeof b.content === 'object' ? Object.keys(b.content) : null,
+            hasAttributes: !!b.attributes,
+            attributeKeys: typeof b.attributes === 'object' ? Object.keys(b.attributes) : null,
+          })),
+          totalBlocks: parsed.blocks.length,
+        });
       } else if (Array.isArray(parsed)) {
         // Case 2: [...] 형식 (배열을 blocks로 감싸기)
         normalizedResult = { blocks: parsed };
