@@ -29,6 +29,7 @@ import {
 } from '../types/ai-proxy.types';
 import { AppDataSource } from '../database/connection';
 import { AiSettings } from '../entities/AiSettings';
+import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog';
 
 class AIProxyService {
   private static instance: AIProxyService;
@@ -137,6 +138,19 @@ class AIProxyService {
         usage: response.usage,
       });
 
+      // Save usage log to database
+      await this.saveUsageLog({
+        userId,
+        provider: request.provider as UsageProvider,
+        model: request.model,
+        requestId,
+        promptTokens: response.usage?.promptTokens || 0,
+        completionTokens: response.usage?.completionTokens || 0,
+        totalTokens: response.usage?.totalTokens || 0,
+        durationMs: duration,
+        status: AIUsageStatus.SUCCESS,
+      });
+
       return response;
 
     } catch (error: any) {
@@ -149,6 +163,18 @@ class AIProxyService {
         model: request.model,
         error: error.message,
         duration: `${duration}ms`,
+      });
+
+      // Save error log to database
+      await this.saveUsageLog({
+        userId,
+        provider: request.provider as UsageProvider,
+        model: request.model,
+        requestId,
+        durationMs: duration,
+        status: AIUsageStatus.ERROR,
+        errorMessage: error.message || 'Unknown error',
+        errorType: error.type || 'UNKNOWN_ERROR',
       });
 
       throw error;
@@ -655,6 +681,36 @@ class AIProxyService {
       retryable,
       retryAfter,
     };
+  }
+
+  /**
+   * Save usage log to database
+   * Handles both success and error logs
+   */
+  private async saveUsageLog(logData: Partial<AIUsageLog>): Promise<void> {
+    try {
+      if (!AppDataSource.isInitialized) {
+        logger.warn('Database not initialized, skipping usage log save');
+        return;
+      }
+
+      const usageLogRepo = AppDataSource.getRepository(AIUsageLog);
+      const log = usageLogRepo.create(logData);
+      await usageLogRepo.save(log);
+
+      logger.debug('AI usage log saved', {
+        userId: logData.userId,
+        provider: logData.provider,
+        status: logData.status,
+        tokens: logData.totalTokens,
+      });
+    } catch (error: any) {
+      // Don't throw - usage logging failure shouldn't break AI generation
+      logger.error('Failed to save AI usage log', {
+        error: error.message,
+        userId: logData.userId,
+      });
+    }
   }
 }
 
