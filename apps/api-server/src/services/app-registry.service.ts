@@ -343,7 +343,7 @@ class AppRegistryService {
 
     // Map app slug to AI provider
     const aiProviderMap: Record<string, AIProvider> = {
-      'google-gemini': AIProvider.GEMINI,
+      'google-gemini-text': AIProvider.GEMINI,
       'openai': AIProvider.OPENAI,
       'anthropic-claude': AIProvider.CLAUDE,
     };
