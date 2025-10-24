@@ -116,13 +116,39 @@ export class SimpleAIGenerator {
       updateProgress(30, 'AI 응답 생성 중...');
 
       // Sprint 2 - P1: Use server-side proxy (single call)
-      const blocks = await this.generateWithProxy(
-        systemPrompt,
-        userPrompt,
-        config,
-        signal,
-        updateProgress
-      );
+      // Sprint 3: Pro→Flash 자동 폴백 (500 에러 및 타임아웃 대응)
+      let blocks: Block[];
+      try {
+        blocks = await this.generateWithProxy(
+          systemPrompt,
+          userPrompt,
+          config,
+          signal,
+          updateProgress
+        );
+      } catch (error: any) {
+        // Pro 모델에서 500 에러나 타임아웃 발생 시 Flash로 자동 폴백
+        const shouldFallback =
+          config.model === 'gemini-2.5-pro' &&
+          (error.response?.status === 500 ||
+           error.type === 'TIMEOUT_ERROR' ||
+           error.message?.includes('timeout'));
+
+        if (shouldFallback) {
+          updateProgress(40, 'Flash 모델로 재시도 중...');
+          console.warn('⚠️ Pro 모델 실패, Flash로 폴백:', error.message);
+
+          blocks = await this.generateWithProxy(
+            systemPrompt,
+            userPrompt,
+            { ...config, model: 'gemini-2.5-flash' },
+            signal,
+            updateProgress
+          );
+        } else {
+          throw error;
+        }
+      }
 
       updateProgress(80, '응답 처리 중...');
 
@@ -248,7 +274,9 @@ export class SimpleAIGenerator {
 3. 이미지 블록에는 alt 텍스트만 포함하고 src는 비워두세요
 4. 버튼은 실제 링크 대신 "#" 사용
 5. 한국어로 작성하세요
-6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
+6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요
+7. **절대 금지: shortcode, [tag] 형태, {{ }} 형태 출력 금지**
+8. shortcode는 수작업으로만 추가 가능합니다`;
 
     const prompts = {
       landing: `${baseRules}
@@ -260,8 +288,7 @@ ${availableBlocks}
 - 부제목 설명 (H2)
 - 주요 기능/장점 3개 (단락)
 - CTA 버튼
-- 이미지는 alt 텍스트만 (src 없음)
-- 필요시 숏코드 활용 (예: 상품 그리드, 문의 폼 등)`,
+- 이미지는 alt 텍스트만 (src 없음)`,
 
       about: `${baseRules}
 
@@ -272,7 +299,7 @@ ${availableBlocks}
 - 회사 비전/미션
 - 핵심 가치 3-4개 (리스트 사용)
 - 팀 소개 섹션
-- 연락처 정보 (필요시 [form] 숏코드 활용)`,
+- 연락처 정보`,
 
       product: `${baseRules}
 
@@ -283,8 +310,8 @@ ${availableBlocks}
 - 주요 기능 소개 (리스트 활용)
 - 제품 장점 3-5개
 - 사용법/활용 사례
-- 가격 정보 (있다면 [product] 숏코드 활용 가능)
-- CTA 버튼 또는 [add_to_cart] 숏코드`,
+- 가격 정보
+- CTA 버튼`,
 
       blog: `${baseRules}
 
@@ -296,8 +323,7 @@ ${availableBlocks}
 - 본문 3-4개 섹션 (H2 제목 + 단락)
 - 인용구나 코드 블록 활용 가능
 - 실용적인 팁이나 해결책 (리스트 활용)
-- 결론 및 요약
-- 관련 글: [recent_posts] 숏코드 활용 가능`
+- 결론 및 요약`
     };
 
     return prompts[template as keyof typeof prompts] || prompts.landing;
@@ -355,13 +381,21 @@ ${availableBlocks}
    * AI가 잘못된 형식을 보낼 경우 올바른 형태로 자동 변환
    *
    * AI는 content 객체에 데이터를 넣지만, 편집기는 attributes에서 데이터를 읽음
+   *
+   * ⭐ Shortcode 블록 자동 제거 (품질 저하 방지)
    */
   private validateBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
       throw new Error('유효하지 않은 블록 형식입니다');
     }
 
-    return blocks.map((block, index) => {
+    // Shortcode 블록 필터링
+    const filteredBlocks = blocks.filter(block => {
+      const blockType = block.type || '';
+      return !blockType.includes('shortcode');
+    });
+
+    return filteredBlocks.map((block, index) => {
       // core/ prefix를 o4o/ prefix로 자동 변환
       let blockType = block.type || 'o4o/paragraph';
       if (blockType.startsWith('core/')) {
