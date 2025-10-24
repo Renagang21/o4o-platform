@@ -366,17 +366,17 @@ router.get('/customizer',
     try {
       // Get customizer settings from database
       const settingsRepository = AppDataSource.getRepository(Settings);
-      const dbSettings = await settingsRepository.findOne({ 
-        where: { key: 'customizer', type: 'customizer' } 
+      const dbSettings = await settingsRepository.findOne({
+        where: { key: 'customizer', type: 'customizer' }
       });
-      
+
       if (dbSettings && dbSettings.value) {
         return res.json({
           success: true,
           data: dbSettings.value
         });
       }
-      
+
       // Fallback to default customizer settings
       const defaultSettings = {
         logo: null,
@@ -400,7 +400,7 @@ router.get('/customizer',
           containerWidth: 'wide'
         }
       };
-      
+
       res.json({
         success: true,
         data: defaultSettings
@@ -414,6 +414,28 @@ router.get('/customizer',
     }
   }
 );
+
+/**
+ * @route   GET /api/v1/settings/permalink
+ * @desc    Get permalink settings
+ * @access  Public
+ */
+router.get('/permalink', async (req: Request, res: Response) => {
+  try {
+    const settings = await permalinkService.getPermalinkSettings();
+
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    logger.error('Failed to get permalink settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get permalink settings'
+    });
+  }
+});
 
 /**
  * @route   GET /api/v1/settings/:section
@@ -693,28 +715,6 @@ router.post('/customizer', authenticate, requireAdmin, updateCustomizerSettings)
  * @access  Private (Admin only)
  */
 router.put('/customizer', authenticate, requireAdmin, updateCustomizerSettings);
-
-/**
- * @route   GET /api/v1/settings/permalink
- * @desc    Get permalink settings
- * @access  Public
- */
-router.get('/permalink', async (req: Request, res: Response) => {
-  try {
-    const settings = await permalinkService.getPermalinkSettings();
-
-    res.json({
-      success: true,
-      data: settings
-    });
-  } catch (error) {
-    logger.error('Failed to get permalink settings:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get permalink settings'
-    });
-  }
-});
 
 /**
  * @route   PUT /api/v1/settings/permalink
