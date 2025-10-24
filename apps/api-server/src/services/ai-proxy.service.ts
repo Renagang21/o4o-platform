@@ -291,7 +291,7 @@ class AIProxyService {
     requestId: string
   ): Promise<AIGenerateResponse> {
     const apiKey = await this.getApiKey('openai');
-    const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 4000 } = request;
+    const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 8192 } = request;
 
     // Sprint 3: Start tracing span for LLM call
     const span = startLLMCallSpan('openai', model, requestId);
@@ -518,7 +518,7 @@ class AIProxyService {
     requestId: string
   ): Promise<AIGenerateResponse> {
     const apiKey = await this.getApiKey('claude');
-    const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 4000 } = request;
+    const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 8192 } = request;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.DEFAULT_TIMEOUT);

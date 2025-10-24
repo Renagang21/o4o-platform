@@ -192,7 +192,7 @@ export class SimpleAIGenerator {
         systemPrompt,
         userPrompt,
         temperature: 0.7,
-        maxTokens: config.maxTokens || (config.provider === 'gemini' ? 4096 : 4000),
+        maxTokens: config.maxTokens || (config.provider === 'gemini' ? 16384 : 8192),
       });
 
       const data: AIProxyResponse | AIProxyError = response.data;
