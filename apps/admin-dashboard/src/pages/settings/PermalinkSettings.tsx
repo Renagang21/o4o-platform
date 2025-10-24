@@ -84,25 +84,12 @@ const PermalinkSettings: FC = () => {
     }
   ];
 
-  // 설정 조회
+  // 설정 조회 (백엔드에서 DB 또는 기본값 반환)
   const { data: settings, isLoading } = useQuery<PermalinkSettings>({
     queryKey: ['permalink-settings'],
     queryFn: async () => {
-      try {
-        const response = await authClient.api.get('/settings/permalink');
-        return response.data?.data || response.data as PermalinkSettings;
-      } catch (error) {
-        // Return default settings if API fails
-        return {
-          structure: '/%postname%/',
-          categoryBase: 'category',
-          tagBase: 'tag',
-          removeStopWords: false,
-          maxUrlLength: 75,
-          autoFlushRules: true,
-          enableSeoWarnings: true
-        };
-      }
+      const response = await authClient.api.get('/settings/permalink');
+      return response.data?.data || response.data as PermalinkSettings;
     }
   });
 
