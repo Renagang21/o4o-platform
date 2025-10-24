@@ -310,6 +310,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             style={{
               textAlign: (element as ParagraphElement).align || 'left',
               margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
             }}
           >
             {props.children}
