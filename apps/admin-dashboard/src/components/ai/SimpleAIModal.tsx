@@ -135,10 +135,17 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         finalPrompt = editModePrompts[editMode];
       }
 
-      // 프롬프트 길이 체크 및 경고
+      // 프롬프트 길이 체크 및 차단
       if (finalPrompt.length > 5000) {
-        console.warn(`⚠️ 긴 프롬프트 감지: ${finalPrompt.length}자. 응답이 잘릴 수 있습니다.`);
-        setError(`경고: 프롬프트가 너무 길어서 (${finalPrompt.length}자) AI 응답이 잘릴 수 있습니다. 더 짧게 요청해주세요.`);
+        console.error(`❌ 프롬프트 길이 초과: ${finalPrompt.length}자`);
+        clearInterval(intervalId);
+        setIsGenerating(false);
+        setError(
+          mode === 'edit'
+            ? `편집할 내용이 너무 많습니다 (${finalPrompt.length}자). 페이지를 나누거나 일부 내용을 먼저 삭제한 후 다시 시도해주세요.`
+            : `프롬프트가 너무 깁니다 (${finalPrompt.length}자). 더 짧게 요청해주세요.`
+        );
+        return;
       }
 
       const blocks = await simpleAIGenerator.generatePage({
