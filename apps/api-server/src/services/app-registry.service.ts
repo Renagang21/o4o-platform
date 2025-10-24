@@ -7,6 +7,7 @@ import { Repository, DataSource } from 'typeorm';
 import { App } from '../entities/App';
 import { AppInstance } from '../entities/AppInstance';
 import { AppUsageLog } from '../entities/AppUsageLog';
+import { AIUsageLog, AIProvider } from '../entities/AIUsageLog';
 import { googleAI } from './google-ai.service';
 import logger from '../utils/logger';
 
@@ -37,6 +38,7 @@ class AppRegistryService {
   private appRepository!: Repository<App>;
   private instanceRepository!: Repository<AppInstance>;
   private usageLogRepository!: Repository<AppUsageLog>;
+  private aiUsageLogRepository!: Repository<AIUsageLog>;
   private dataSource!: DataSource;
 
   private constructor() {}
@@ -56,6 +58,7 @@ class AppRegistryService {
     this.appRepository = dataSource.getRepository(App);
     this.instanceRepository = dataSource.getRepository(AppInstance);
     this.usageLogRepository = dataSource.getRepository(AppUsageLog);
+    this.aiUsageLogRepository = dataSource.getRepository(AIUsageLog);
     logger.info('✅ App Registry Service initialized');
   }
 
@@ -300,6 +303,7 @@ class AppRegistryService {
 
   /**
    * Get usage statistics
+   * Combines both AppUsageLog (for app execute actions) and AIUsageLog (for direct AI generation)
    */
   async getUsageStats(options: {
     appSlug?: string;
@@ -308,6 +312,7 @@ class AppRegistryService {
     startDate?: Date;
     endDate?: Date;
   }): Promise<any> {
+    // Query AppUsageLog (app system logs)
     const queryBuilder = this.usageLogRepository.createQueryBuilder('log')
       .leftJoinAndSelect('log.app', 'app');
 
@@ -331,23 +336,73 @@ class AppRegistryService {
       queryBuilder.andWhere('log.createdAt <= :endDate', { endDate: options.endDate });
     }
 
-    const logs = await queryBuilder.getMany();
+    const appLogs = await queryBuilder.getMany();
 
-    // Calculate statistics
-    const totalCalls = logs.length;
-    const successCalls = logs.filter(log => log.status === 'success').length;
-    const errorCalls = logs.filter(log => log.status === 'error').length;
-    const totalInputTokens = logs.reduce((sum, log) => sum + (log.inputTokens || 0), 0);
-    const totalOutputTokens = logs.reduce((sum, log) => sum + (log.outputTokens || 0), 0);
-    const avgDuration = logs.length > 0
-      ? logs.reduce((sum, log) => sum + (log.durationMs || 0), 0) / logs.length
+    // Also query AIUsageLog (AI Proxy logs) for AI apps
+    let aiLogs: AIUsageLog[] = [];
+
+    // Map app slug to AI provider
+    const aiProviderMap: Record<string, AIProvider> = {
+      'google-gemini': AIProvider.GEMINI,
+      'openai': AIProvider.OPENAI,
+      'anthropic-claude': AIProvider.CLAUDE,
+    };
+
+    const aiProvider = options.appSlug ? aiProviderMap[options.appSlug] : undefined;
+
+    if (aiProvider || !options.appSlug) {
+      const aiQueryBuilder = this.aiUsageLogRepository.createQueryBuilder('log');
+
+      if (aiProvider) {
+        aiQueryBuilder.andWhere('log.provider = :provider', { provider: aiProvider });
+      }
+
+      if (options.userId) {
+        aiQueryBuilder.andWhere('log.userId = :userId', { userId: options.userId });
+      }
+
+      if (options.startDate) {
+        aiQueryBuilder.andWhere('log.createdAt >= :startDate', { startDate: options.startDate });
+      }
+
+      if (options.endDate) {
+        aiQueryBuilder.andWhere('log.createdAt <= :endDate', { endDate: options.endDate });
+      }
+
+      aiLogs = await aiQueryBuilder.getMany();
+    }
+
+    // Combine statistics from both sources
+    const appTotalCalls = appLogs.length;
+    const appSuccessCalls = appLogs.filter(log => log.status === 'success').length;
+    const appErrorCalls = appLogs.filter(log => log.status === 'error').length;
+    const appInputTokens = appLogs.reduce((sum, log) => sum + (log.inputTokens || 0), 0);
+    const appOutputTokens = appLogs.reduce((sum, log) => sum + (log.outputTokens || 0), 0);
+    const appDurations = appLogs.map(log => log.durationMs || 0);
+
+    const aiTotalCalls = aiLogs.length;
+    const aiSuccessCalls = aiLogs.filter(log => log.status === 'success').length;
+    const aiErrorCalls = aiLogs.filter(log => log.status === 'error').length;
+    const aiInputTokens = aiLogs.reduce((sum, log) => sum + (log.promptTokens || 0), 0);
+    const aiOutputTokens = aiLogs.reduce((sum, log) => sum + (log.completionTokens || 0), 0);
+    const aiDurations = aiLogs.map(log => log.durationMs || 0);
+
+    const totalCalls = appTotalCalls + aiTotalCalls;
+    const successCalls = appSuccessCalls + aiSuccessCalls;
+    const errorCalls = appErrorCalls + aiErrorCalls;
+    const totalInputTokens = appInputTokens + aiInputTokens;
+    const totalOutputTokens = appOutputTokens + aiOutputTokens;
+
+    const allDurations = [...appDurations, ...aiDurations];
+    const avgDuration = allDurations.length > 0
+      ? allDurations.reduce((sum, d) => sum + d, 0) / allDurations.length
       : 0;
 
     return {
       totalCalls,
       successCalls,
       errorCalls,
-      successRate: totalCalls > 0 ? (successCalls / totalCalls * 100).toFixed(2) : 0,
+      successRate: totalCalls > 0 ? ((successCalls / totalCalls) * 100).toFixed(2) : '0.00',
       totalInputTokens,
       totalOutputTokens,
       avgDuration: Math.round(avgDuration)
