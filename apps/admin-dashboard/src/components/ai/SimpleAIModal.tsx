@@ -135,12 +135,19 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         finalPrompt = editModePrompts[editMode];
       }
 
+      // 프롬프트 길이 체크 및 경고
+      if (finalPrompt.length > 5000) {
+        console.warn(`⚠️ 긴 프롬프트 감지: ${finalPrompt.length}자. 응답이 잘릴 수 있습니다.`);
+        setError(`경고: 프롬프트가 너무 길어서 (${finalPrompt.length}자) AI 응답이 잘릴 수 있습니다. 더 짧게 요청해주세요.`);
+      }
+
       const blocks = await simpleAIGenerator.generatePage({
         prompt: finalPrompt,
         template: mode === 'new' ? template : 'blog', // Use blog template for edit mode
         config: {
           provider: 'gemini',
-          model
+          model,
+          maxTokens: 4096 // Reduced from 8192 to prevent JSON truncation
         },
         onProgress: (progress, message) => {
           setProgress(progress);

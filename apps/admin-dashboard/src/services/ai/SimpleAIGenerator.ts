@@ -46,6 +46,7 @@ export interface Block {
 export interface AIConfig {
   provider: 'openai' | 'gemini' | 'claude';
   model: AIModel;
+  maxTokens?: number;
 }
 
 export interface GenerateRequest {
@@ -191,7 +192,7 @@ export class SimpleAIGenerator {
         systemPrompt,
         userPrompt,
         temperature: 0.7,
-        maxTokens: config.provider === 'gemini' ? 8192 : 4000,
+        maxTokens: config.maxTokens || (config.provider === 'gemini' ? 4096 : 4000),
       });
 
       const data: AIProxyResponse | AIProxyError = response.data;
