@@ -1,23 +1,26 @@
 /**
  * BlockAppenderBlock Component (Slate.js-based)
  *
- * Special block for adding new blocks to the editor.
- * Always present and allows users to create new blocks seamlessly.
+ * Simplified block appender following Gutenberg's DefaultBlockAppender pattern.
+ * This is NOT a full block - it's a simple one-line input without toolbar.
+ *
+ * Key Differences from Regular Blocks:
+ * - NO EnhancedBlockWrapper (no toolbar)
+ * - NO move/delete/duplicate buttons (use Block List sidebar instead)
+ * - Minimal styling - just a simple input line
+ * - Matches Gutenberg's minimal placeholder pattern
  *
  * Features:
- * - Slate.js editor for rich text input
- * - Enter key creates new Paragraph block and clears itself
- * - Slash command support
- * - Minimal toolbar (hidden by default)
- * - Focus retention after block creation
+ * - Simple Slate.js input
+ * - Enter key converts to Paragraph block
+ * - Slash command support (future)
  */
 
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range, Text } from 'slate';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
+import { createEditor, Descendant, Editor, Transforms, Text } from 'slate';
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
-import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import type { CustomText, ParagraphElement } from '../slate/types/slate-types';
@@ -218,47 +221,39 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
   }, []);
 
   return (
-    <EnhancedBlockWrapper
-      id={id}
-      type="block-appender"
-      isSelected={isSelected}
-      onSelect={onSelect}
-      onDelete={onDelete} // Enable delete
-      onDuplicate={() => {}} // Disable duplicate
-      onMoveUp={() => {}} // Disable move up
-      onMoveDown={() => {}} // Disable move down
-      onAddBlock={onAddBlock}
-      className="wp-block-appender"
+    <div
+      ref={editorRef}
+      className={cn(
+        'block-appender',
+        'min-h-[2.5em]',
+        'px-2 py-1',
+        'rounded',
+        'hover:bg-gray-50/50',
+        'transition-colors duration-150',
+        isSelected && 'bg-gray-50/50'
+      )}
+      data-block-id={id}
+      data-block-appender="true"
+      data-default-block-appender="true"
+      onClick={onSelect}
     >
-      <div
-        ref={editorRef}
-        className={cn(
-          'block-appender-content',
-          'min-h-[2em]',
-          'px-4 py-2',
-          'border-2 border-dashed border-gray-300 rounded-md',
-          'hover:border-gray-400 focus-within:border-blue-400',
-          'transition-colors duration-200',
-          'bg-gray-50/50 hover:bg-white focus-within:bg-white'
-        )}
-        data-block-appender="true"
-        data-default-block-appender="true"
-      >
-        <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            placeholder="Start writing or press '/' for commands..."
-            onKeyDown={handleKeyDown}
-            style={{
-              outline: 'none',
-              minHeight: '1.5em',
-            }}
-            className="text-gray-600 placeholder:text-gray-400"
-          />
-        </Slate>
-      </div>
-    </EnhancedBlockWrapper>
+      <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
+        <Editable
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          placeholder="Type / to choose a block"
+          onKeyDown={handleKeyDown}
+          style={{
+            outline: 'none',
+            minHeight: '1.5em',
+          }}
+          className={cn(
+            'text-gray-700 placeholder:text-gray-400',
+            'text-base leading-relaxed'
+          )}
+        />
+      </Slate>
+    </div>
   );
 };
 
