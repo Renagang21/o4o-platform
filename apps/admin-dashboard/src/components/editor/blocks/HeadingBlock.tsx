@@ -429,6 +429,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           color: textColor || undefined,
           backgroundColor: backgroundColor || undefined,
         }}
+        data-handles-enter="true"
       >
         <SlateBlockWrapper
           isSelected={isSelected}

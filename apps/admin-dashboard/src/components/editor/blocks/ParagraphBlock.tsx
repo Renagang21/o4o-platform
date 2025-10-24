@@ -384,6 +384,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           color: textColor || undefined,
           backgroundColor: backgroundColor || undefined,
         }}
+        data-handles-enter="true"
       >
         <SlateBlockWrapper
           isSelected={isSelected}

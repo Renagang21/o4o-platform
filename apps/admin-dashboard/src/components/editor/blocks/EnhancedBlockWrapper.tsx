@@ -267,11 +267,24 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       if (e.key === 'Tab') {
         // This will be handled by parent component for block navigation
       }
+
+      // Enter key - create new block after (default behavior for blocks without custom Enter handling)
+      if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+        // Check if block has its own Enter handler (e.g., Slate blocks)
+        // Slate blocks and other blocks with custom Enter handling should set data-handles-enter="true"
+        const hasCustomHandler = target.closest('[data-handles-enter="true"]');
+
+        if (!hasCustomHandler && onAddBlock) {
+          // Default behavior: create new paragraph block after
+          e.preventDefault();
+          onAddBlock('after', 'o4o/paragraph');
+        }
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isSelected, onDelete, onCopy, onPaste, onDuplicate, onMoveUp, onMoveDown, canMoveUp, canMoveDown]);
+  }, [isSelected, onDelete, onCopy, onPaste, onDuplicate, onMoveUp, onMoveDown, canMoveUp, canMoveDown, onAddBlock]);
 
   return (
     <div
