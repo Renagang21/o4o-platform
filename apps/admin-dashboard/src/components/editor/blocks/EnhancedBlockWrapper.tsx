@@ -188,14 +188,10 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         />
       )}
 
-      {/* Block content with selection state */}
+      {/* Block content */}
       <div
         className={cn(
-          'block-content relative rounded-sm transition-all duration-200',
-          'outline outline-2 outline-offset-0',
-          !isSelected && !isHovered && 'outline-transparent',
-          isHovered && !isSelected && 'outline-gray-200 bg-gray-50/50',
-          isSelected && 'outline-blue-500 shadow-md bg-blue-50/30',
+          'block-content relative',
           isDragging && 'opacity-50'
         )}
       >
