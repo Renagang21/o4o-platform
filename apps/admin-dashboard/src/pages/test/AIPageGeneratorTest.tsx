@@ -92,6 +92,16 @@ export default function AIPageGeneratorTest() {
                         </pre>
                       </div>
 
+                      {/* innerBlocks 표시 */}
+                      {block.innerBlocks && block.innerBlocks.length > 0 && (
+                        <div>
+                          <span className="font-semibold">InnerBlocks ({block.innerBlocks.length}개):</span>
+                          <pre className="mt-1 p-2 bg-white rounded text-xs overflow-auto max-h-32">
+                            {JSON.stringify(block.innerBlocks, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+
                       {/* 블록 검증 */}
                       <div className="mt-2 pt-2 border-t">
                         <span className="font-semibold">검증:</span>
