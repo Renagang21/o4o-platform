@@ -24,10 +24,10 @@ interface EnhancedBlockWrapperProps {
   children: ReactNode;
   isSelected: boolean;
   onSelect: () => void;
-  onDelete: () => void;
-  onDuplicate: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
+  onDelete?: () => void;
+  onDuplicate?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   onAddBlock?: (position: 'before' | 'after') => void;
   onCopy?: () => void;
   onPaste?: () => void;
@@ -50,6 +50,12 @@ interface EnhancedBlockWrapperProps {
   currentType?: string;
   isBold?: boolean;
   isItalic?: boolean;
+
+  // Optional: Simple mode configuration
+  variant?: 'simple' | 'enhanced'; // Default: 'enhanced'
+  showToolbar?: boolean;           // Default: true (enhanced), false (simple)
+  showAddButtons?: boolean;        // Default: true (enhanced), false (simple)
+  enableKeyboardShortcuts?: boolean; // Default: true (enhanced), false (simple)
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -82,8 +88,17 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   onChangeType,
   currentType,
   isBold = false,
-  isItalic = false
+  isItalic = false,
+  variant = 'enhanced',
+  showToolbar: showToolbarProp,
+  showAddButtons: showAddButtonsProp,
+  enableKeyboardShortcuts: enableKeyboardShortcutsProp
 }) => {
+  // Determine feature flags based on variant
+  const isSimpleMode = variant === 'simple';
+  const showToolbar = showToolbarProp !== undefined ? showToolbarProp : !isSimpleMode;
+  const showAddButtons = showAddButtonsProp !== undefined ? showAddButtonsProp : !isSimpleMode;
+  const enableKeyboardShortcuts = enableKeyboardShortcutsProp !== undefined ? enableKeyboardShortcutsProp : !isSimpleMode;
   const [isHovered, setIsHovered] = useState(false);
   const blockRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -101,9 +116,9 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     isSelected,
   });
 
-  // Use keyboard shortcuts hook
+  // Use keyboard shortcuts hook (only if enabled)
   useBlockKeyboard({
-    isSelected,
+    isSelected: enableKeyboardShortcuts ? isSelected : false,
     onDelete,
     onCopy,
     onPaste,
@@ -167,7 +182,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       )}
 
       {/* Add block button - top */}
-      {onAddBlock && (
+      {showAddButtons && onAddBlock && (
         <BlockAddButton
           position="top"
           onAddBlock={onAddBlock}
@@ -186,7 +201,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       </div>
 
       {/* Add block button - bottom */}
-      {onAddBlock && (
+      {showAddButtons && onAddBlock && (
         <BlockAddButton
           position="bottom"
           onAddBlock={onAddBlock}

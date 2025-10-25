@@ -1,6 +1,17 @@
 /**
  * SimpleBlockWrapper Component
  *
+ * @deprecated This component is deprecated. Use EnhancedBlockWrapper with variant="simple" instead.
+ *
+ * Migration example:
+ * ```tsx
+ * // Old:
+ * <SimpleBlockWrapper id={id} isSelected={isSelected} onSelect={onSelect}>
+ *
+ * // New:
+ * <EnhancedBlockWrapper id={id} type="paragraph" isSelected={isSelected} onSelect={onSelect} variant="simple">
+ * ```
+ *
  * Minimal block wrapper - 구텐베르크 스타일의 깔끔한 블록
  * 툴바와 외곽선 없이 입력창만 표시
  *

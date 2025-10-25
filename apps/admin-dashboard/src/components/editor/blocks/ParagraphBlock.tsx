@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } from 'slate';
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
-import SimpleBlockWrapper from './SimpleBlockWrapper';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
@@ -285,11 +285,13 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
 
   return (
-    <SimpleBlockWrapper
+    <EnhancedBlockWrapper
       id={id}
+      type="paragraph"
       isSelected={isSelected}
       onSelect={onSelect}
       className="wp-block-paragraph"
+      variant="simple"
     >
       <div
         ref={editorRef}
@@ -338,7 +340,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           />
         )}
       </div>
-    </SimpleBlockWrapper>
+    </EnhancedBlockWrapper>
   );
 };
 
