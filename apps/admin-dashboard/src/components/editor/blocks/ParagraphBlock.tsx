@@ -386,7 +386,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           emptyPlaceholder="<p><br></p>"
         >
           <Slate
-            key={`${id}-${isSelected}`}
+            key={`${id}-${typeof content === 'string' ? content : JSON.stringify(content)}`}
             editor={editor}
             initialValue={initialValue}
             onValueChange={handleChange}
