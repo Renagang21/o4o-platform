@@ -17,7 +17,7 @@
  * ```
  */
 
-import { Editor, Transforms, Range, Point, Element as SlateElement } from 'slate';
+import { Editor } from 'slate';
 import { serialize } from '../slate/utils/serialize';
 
 export interface BlockEnterHandlerOptions {
@@ -60,35 +60,14 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
     // Enter 키 기본 동작 방지
     event.preventDefault();
 
-    // 커서가 블록 끝에 있는지 확인
-    const isCollapsed = Range.isCollapsed(selection);
-    const end = Editor.end(editor, selection.anchor.path);
-    const isAtEnd = isCollapsed && Point.equals(selection.anchor, end);
-
-    if (isAtEnd) {
-      // ✅ 블록 끝: 새 paragraph 블록 추가
-      onAddBlock?.('after', 'o4o/paragraph');
-    } else {
-      // 🪓 블록 중간: 블록 분할
-
-      // 1. 현재 위치에서 블록 분할
-      Transforms.splitNodes(editor, { always: true });
-
-      // 2. 분할된 새 블록을 paragraph 타입으로 변환
-      //    (예: Heading 중간에서 Enter → 위는 Heading, 아래는 Paragraph)
-      Transforms.setNodes(
-        editor,
-        { type: 'paragraph' },
-        {
-          match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
-          mode: 'lowest' // 가장 가까운 블록만 변환
-        }
-      );
-    }
-
-    // 변경사항 저장
+    // 현재 블록 내용 저장
     const currentHtml = serialize(editor.children);
     onChange(currentHtml, attributes);
+
+    // 새 paragraph 블록 추가
+    // (블록 중간이든 끝이든 상관없이 새 블록 생성)
+    console.log('[handleBlockEnter] Adding new paragraph block');
+    onAddBlock?.('after', 'o4o/paragraph');
   };
 }
 
