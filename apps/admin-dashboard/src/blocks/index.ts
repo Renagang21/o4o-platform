@@ -5,9 +5,6 @@
 
 import { blockRegistry } from './registry/BlockRegistry';
 
-// Special blocks
-import blockAppenderDefinition from './definitions/block-appender';
-
 // Core text blocks
 import paragraphBlockDefinition from './definitions/paragraph';
 import headingBlockDefinition from './definitions/heading';
@@ -57,9 +54,6 @@ import formSubmitBlockDefinition from './definitions/form-submit';
  * Register all blocks with the new registry system
  */
 export function registerAllBlocks(): void {
-  // Register special blocks first
-  blockRegistry.register(blockAppenderDefinition);
-
   // Register core text blocks
   blockRegistry.register(paragraphBlockDefinition);
   blockRegistry.register(headingBlockDefinition);
@@ -149,29 +143,9 @@ const blockStyles = `
   .block-editor-inner-blocks {
     height: 100%;
   }
-  
+
   .block-editor-inner-blocks .block-editor-block-list__layout {
     height: 100%;
-  }
-  
-  /* Block Appender Styles */
-  .block-list-appender {
-    margin-top: 20px;
-  }
-  
-  .block-editor-button-block-appender {
-    width: 100%;
-    justify-content: center;
-    padding: 12px;
-    border: 2px dashed #ddd;
-    color: #555;
-    transition: all 0.2s ease;
-  }
-  
-  .block-editor-button-block-appender:hover {
-    border-color: #007cba;
-    color: #007cba;
-    background-color: rgba(0, 124, 186, 0.04);
   }
 
   /* Form Block Styles */

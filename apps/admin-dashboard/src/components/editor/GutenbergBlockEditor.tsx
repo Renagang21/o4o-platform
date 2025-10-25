@@ -19,7 +19,6 @@ import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
 import SlashCommandMenu from './SlashCommandMenu';
-import DefaultBlockAppender from './DefaultBlockAppender';
 // Toast components
 import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
@@ -101,29 +100,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   showListView: externalShowListView,
   onToggleListView: externalOnToggleListView,
 }) => {
-  // Initialize with empty state or BlockAppender
+  // Initialize with empty state or initial blocks
   const [blocks, setBlocks] = useState<Block[]>(() => {
     if (initialBlocks.length > 0) {
-      // When loading existing content, add BlockAppender at the end
-      return [
-        ...initialBlocks,
-        {
-          id: `block-appender-${Date.now()}`,
-          type: 'o4o/block-appender',
-          content: { text: '' },
-          attributes: {},
-        }
-      ];
+      return initialBlocks;
     }
-    // Start with one BlockAppender for empty editor
-    return [
-      {
-        id: `block-appender-${Date.now()}`,
-        type: 'o4o/block-appender',
-        content: { text: '' },
-        attributes: {},
-      }
-    ];
+    // Start with empty editor
+    return [];
   });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
@@ -146,15 +129,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
     const storedSession = loadEditorSession();
     if (storedSession && storedSession.history.length > 0) {
-      // Filter out empty blocks from restored session, but preserve BlockAppender
+      // Filter out empty blocks from restored session
       const restoredBlocks = storedSession.history[storedSession.historyIndex].blocks;
       const nonEmptyBlocks = restoredBlocks.filter(block => {
-        // Always keep BlockAppender blocks (they're meant to be empty)
-        if (block.type === 'o4o/block-appender') {
-          return true;
-        }
-
-        // Filter other blocks based on content
+        // Filter blocks based on content
         if (typeof block.content === 'string') {
           return block.content.trim().length > 0;
         }
@@ -167,25 +145,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       // Only restore if there are blocks
       if (nonEmptyBlocks.length > 0) {
-        // Check if BlockAppender already exists
-        const hasBlockAppender = nonEmptyBlocks.some(b => b.type === 'o4o/block-appender');
-
-        // Add BlockAppender at the end if not present
-        const blocksWithAppender = hasBlockAppender
-          ? nonEmptyBlocks
-          : [
-              ...nonEmptyBlocks,
-              {
-                id: `block-appender-${Date.now()}`,
-                type: 'o4o/block-appender',
-                content: { text: '' },
-                attributes: {},
-              }
-            ];
-
         setHistory(storedSession.history);
         setHistoryIndex(storedSession.historyIndex);
-        setBlocks(blocksWithAppender);
+        setBlocks(nonEmptyBlocks);
         setDocumentTitle(storedSession.documentTitle);
         setSessionRestored(true);
         showToast('편집 내역이 복원되었습니다', 'info');
@@ -196,18 +158,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Sync blocks with initialBlocks prop changes
   useEffect(() => {
     if (initialBlocks && initialBlocks.length > 0 && !sessionRestored) {
-      // Add BlockAppender at the end when syncing
-      const blocksWithAppender = [
-        ...initialBlocks,
-        {
-          id: `block-appender-${Date.now()}`,
-          type: 'o4o/block-appender',
-          content: { text: '' },
-          attributes: {},
-        }
-      ];
-      setBlocks(blocksWithAppender);
-      setHistory([createHistoryEntry(blocksWithAppender)]);
+      setBlocks(initialBlocks);
+      setHistory([createHistoryEntry(initialBlocks)]);
       setHistoryIndex(0);
       setIsDirty(false);
     }
@@ -287,9 +239,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const editorContext: EditorContext = useMemo(() => ({
     selectedBlockId,
     selectedBlock: blocks.find(b => b.id === selectedBlockId) || null,
-    allBlocks: blocks.filter(b => b.type !== 'o4o/block-appender'), // BlockAppender 제외
+    allBlocks: blocks,
     documentTitle,
-    blockCount: blocks.filter(b => b.type !== 'o4o/block-appender').length,
+    blockCount: blocks.length,
   }), [selectedBlockId, blocks, documentTitle]);
 
   // Initialize WordPress on mount
@@ -343,10 +295,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       saveEditorSession(trimmedHistory, trimmedHistory.length - 1, documentTitle);
 
       // Notify parent (unless skipped for initialization)
-      // Filter out transient blocks (e.g., BlockAppender) before notifying parent
       if (!skipOnChange) {
-        const blocksToNotify = newBlocks.filter(block => block.type !== 'o4o/block-appender');
-        onChange?.(blocksToNotify);
+        onChange?.(newBlocks);
       }
     },
     [history, historyIndex, documentTitle, onChange]
@@ -452,9 +402,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         attributes: {},
       };
 
-      // Add Block 버튼은 항상 맨 끝(BlockAppender 앞)에 삽입
-      const blockAppenderIndex = blocks.findIndex((b) => b.type === 'o4o/block-appender');
-      const insertIndex = blockAppenderIndex !== -1 ? blockAppenderIndex : blocks.length;
+      // Add Block 버튼은 항상 맨 끝에 삽입
+      const insertIndex = blocks.length;
 
       const newBlocks = [...blocks];
       newBlocks.splice(insertIndex, 0, newBlock);
@@ -503,67 +452,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       // Handle regular block slash command
       if (!triggerBlockId) return;
-
-      // Special handling for BlockAppender
-      if (triggerBlockId.startsWith('block-appender')) {
-        // Find BlockAppender index
-        const blockAppenderIndex = blocks.findIndex(b => b.id === triggerBlockId);
-
-        // Create new block to replace BlockAppender
-        const newBlock: Block = {
-          id: `block-${Date.now()}`,
-          type: blockType,
-          content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
-          attributes: {},
-        };
-
-        // Create new BlockAppender to add after the new block
-        const newBlockAppender: Block = {
-          id: `block-appender-${Date.now()}`,
-          type: 'o4o/block-appender',
-          content: { text: '' },
-          attributes: {},
-        };
-
-        // Replace BlockAppender with new block and add new BlockAppender after
-        const newBlocks = [...blocks];
-        if (blockAppenderIndex !== -1) {
-          // Replace BlockAppender at its position with new block
-          newBlocks[blockAppenderIndex] = newBlock;
-          // Add new BlockAppender right after the new block
-          newBlocks.splice(blockAppenderIndex + 1, 0, newBlockAppender);
-        } else {
-          // Fallback: if BlockAppender not found, add at end
-          newBlocks.push(newBlock, newBlockAppender);
-        }
-
-        updateBlocks(newBlocks);
-        setSelectedBlockId(newBlock.id);
-
-        // Update recent blocks
-        setRecentBlocks(prev => {
-          const updated = [blockType, ...prev.filter(t => t !== blockType)];
-          return updated.slice(0, 5);
-        });
-
-        // Close slash menu
-        setIsSlashMenuOpen(false);
-        setSlashQuery('');
-        setSlashTriggerBlockId(null);
-
-        // Focus new block
-        setTimeout(() => {
-          const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-          if (newBlockElement) {
-            const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-            if (editableElement) {
-              editableElement.focus();
-            }
-          }
-        }, 50);
-
-        return;
-      }
 
       // Find the block that triggered slash command
       const blockIndex = blocks.findIndex(b => b.id === triggerBlockId);
@@ -705,9 +593,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle save
   const handleSave = useCallback(async () => {
     try {
-      // Filter out transient blocks (e.g., BlockAppender)
-      const blocksToSave = blocks.filter(block => block.type !== 'o4o/block-appender');
-
       // If parent provided handler, delegate to avoid duplicate creates
       if (onSave) {
         await onSave();
@@ -723,7 +608,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       showToast('Saving draft...', 'info');
       const response = await postApi.saveDraft({
         title: documentTitle,
-        content: blocksToSave,
+        content: blocks,
         status: 'draft',
       });
       if (response.success) {
@@ -740,9 +625,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle publish
   const handlePublish = useCallback(async () => {
     try {
-      // Filter out transient blocks (e.g., BlockAppender)
-      const blocksToSave = blocks.filter(block => block.type !== 'o4o/block-appender');
-
       if (onPublish) {
         await onPublish();
         setIsDirty(false);
@@ -757,7 +639,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       showToast('Publishing post...', 'info');
       const response = await postApi.create({
         title: documentTitle,
-        content: blocksToSave,
+        content: blocks,
         status: 'published',
       });
       if (response.success && response.data) {
@@ -1235,7 +1117,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             </button>
 
             <span className="text-sm text-gray-500">
-              {blocks.filter(b => b.type !== 'o4o/block-appender').length} blocks
+              {blocks.length} blocks
             </span>
           </div>
         </div>

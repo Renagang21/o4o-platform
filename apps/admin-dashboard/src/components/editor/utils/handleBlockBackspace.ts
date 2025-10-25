@@ -6,9 +6,6 @@
  * - Delete empty blocks
  * - Handle cursor position at start of block
  *
- * Note: UI control blocks (like BlockAppenderBlock) should NOT use this handler
- * as they have different semantics and should not be deleted.
- *
  * Usage:
  * ```typescript
  * const handleBackspace = useMemo(
