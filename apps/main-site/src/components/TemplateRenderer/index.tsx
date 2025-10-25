@@ -28,6 +28,14 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   spacer: SpacerBlock,
   shortcode: ShortcodeBlock,
 
+  // O4O blocks (AI-generated blocks with o4o/ prefix)
+  'o4o/paragraph': ParagraphBlock,
+  'o4o/heading': HeadingBlock,
+  'o4o/image': ImageBlock,
+  'o4o/button': ButtonBlock,
+  'o4o/columns': ColumnsBlock,
+  'o4o/spacer': SpacerBlock,
+
   // Spectra blocks
   'uagb/call-to-action': CTABlock,
   'uagb/pricing-table': PricingTableBlock,
@@ -78,11 +86,13 @@ const TemplateRenderer: FC<TemplateRendererProps> = ({ blocks, className = '' })
 
         // Handle both block.content and block.data for compatibility
         const blockData = block.content || block.data || {};
-        
+
         return (
           <BlockComponent
             key={block.id || `block-${index}`}
             {...blockData}
+            {...(block.attributes || {})}
+            innerBlocks={block.innerBlocks}
             settings={block.settings}
           />
         );

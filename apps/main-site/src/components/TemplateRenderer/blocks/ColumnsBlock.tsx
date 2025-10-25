@@ -3,18 +3,20 @@ import TemplateRenderer from '../index';
 import { TemplateBlock } from '../../../api/content/contentApi';
 
 interface ColumnsBlockProps {
-  columns: Array<{
+  columns?: Array<{
     width?: string;
     blocks: TemplateBlock[];
   }>;
+  innerBlocks?: TemplateBlock[]; // AI-generated structure
   settings?: {
     gap?: string;
     stackOnMobile?: boolean;
   };
 }
 
-const ColumnsBlock: FC<ColumnsBlockProps> = ({ 
+const ColumnsBlock: FC<ColumnsBlockProps> = ({
   columns = [],
+  innerBlocks = [],
   settings = {}
 }) => {
   const {
@@ -22,18 +24,26 @@ const ColumnsBlock: FC<ColumnsBlockProps> = ({
     stackOnMobile = true
   } = settings;
 
+  // Handle both old structure (columns) and new AI-generated structure (innerBlocks)
+  const columnsData = innerBlocks.length > 0
+    ? innerBlocks.map(block => ({
+        width: block.attributes?.width || '1fr',
+        blocks: block.innerBlocks || []
+      }))
+    : columns;
+
   const containerStyle: CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: stackOnMobile 
+    gridTemplateColumns: stackOnMobile
       ? `repeat(auto-fit, minmax(300px, 1fr))`
-      : columns.map((col: any) => col.width || '1fr').join(' '),
+      : columnsData.map((col: any) => col.width || '1fr').join(' '),
     gap: gap,
     marginBottom: '2rem',
   };
 
   return (
     <div className="columns-block" style={containerStyle}>
-      {columns.map((column, index) => (
+      {columnsData.map((column, index) => (
         <div key={index} className="column">
           <TemplateRenderer blocks={column.blocks} />
         </div>

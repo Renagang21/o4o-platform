@@ -147,7 +147,7 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
     });
   }, [editor, onChange, attributes]);
 
-  // Handle Enter key - create new BlockAppender
+  // Handle Enter key - save and render only
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (event.key === 'Enter') {
@@ -155,7 +155,7 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
           // Shift+Enter or Ctrl+Enter: line break within block
           // Let Slate's withParagraphs plugin handle it
         } else {
-          // Plain Enter: Always create new BlockAppender
+          // Plain Enter: save and render only (no new BlockAppender)
           event.preventDefault();
 
           // Get current content
@@ -163,15 +163,11 @@ const BlockAppenderBlock: React.FC<BlockAppenderBlockProps> = ({
 
           // If there's content, convert this BlockAppender to Paragraph
           if (currentHtml.trim()) {
-            // Convert this BlockAppender to Paragraph
+            // Convert this BlockAppender to Paragraph and render
             onChangeType?.('o4o/paragraph');
-
-            // Add new BlockAppender after
-            onAddBlock?.('after', 'o4o/block-appender');
-          } else {
-            // No content, just add new BlockAppender after
-            onAddBlock?.('after', 'o4o/block-appender');
           }
+
+          // Just render the content, no new block creation
 
           return;
         }
