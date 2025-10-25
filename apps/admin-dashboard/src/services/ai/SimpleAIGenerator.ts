@@ -416,15 +416,18 @@ ${availableBlocks}
             content: content,
             level: attributes.level || 2
           };
-          content = {};
+          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
+          content = `<h${attributes.level}>${content}</h${attributes.level}>`;
         } else if (typeof content === 'object' && (content.text || content.level)) {
           // AI가 content에 text, level을 넣은 경우 → attributes로 이동
+          const level = content.level || attributes.level || 2;
           attributes = {
             ...attributes,
             content: content.text || '',
-            level: content.level || attributes.level || 2
+            level
           };
-          content = {};
+          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
+          content = attributes.content ? `<h${level}>${attributes.content}</h${level}>` : '';
         } else if (!attributes.content) {
           // attributes에 content가 없는 경우
           attributes = {
@@ -432,7 +435,10 @@ ${availableBlocks}
             content: '',
             level: attributes.level || 2
           };
-          content = {};
+          content = '';
+        } else {
+          // attributes.content가 이미 있는 경우 HTML로 변환
+          content = attributes.content ? `<h${attributes.level || 2}>${attributes.content}</h${attributes.level || 2}>` : '';
         }
       }
 
@@ -444,21 +450,26 @@ ${availableBlocks}
             ...attributes,
             content: content
           };
-          content = {};
+          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
+          content = `<p>${content}</p>`;
         } else if (typeof content === 'object' && content.text) {
           // AI가 content에 text를 넣은 경우 → attributes로 이동
           attributes = {
             ...attributes,
             content: content.text
           };
-          content = {};
+          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
+          content = `<p>${content.text}</p>`;
         } else if (!attributes.content) {
           // attributes에 content가 없는 경우
           attributes = {
             ...attributes,
             content: ''
           };
-          content = {};
+          content = '';
+        } else {
+          // attributes.content가 이미 있는 경우 HTML로 변환
+          content = attributes.content ? `<p>${attributes.content}</p>` : '';
         }
       }
 
@@ -466,20 +477,33 @@ ${availableBlocks}
       if (blockType === 'o4o/list') {
         if (typeof content === 'object' && Array.isArray(content.items)) {
           // AI가 content에 items를 넣은 경우 → attributes로 이동
+          const ordered = content.ordered || false;
           attributes = {
             ...attributes,
             items: content.items,
-            ordered: content.ordered || false
+            ordered,
+            type: ordered ? 'ordered' : 'unordered'
           };
-          content = {};
+          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
+          const tag = ordered ? 'ol' : 'ul';
+          const itemsHtml = content.items.map((item: string) => `<li>${item}</li>`).join('');
+          content = `<${tag}>${itemsHtml}</${tag}>`;
         } else if (!attributes.items) {
           // attributes에 items가 없는 경우
           attributes = {
             ...attributes,
             items: [],
-            ordered: false
+            ordered: false,
+            type: 'unordered'
           };
-          content = {};
+          content = '';
+        } else {
+          // attributes.items가 이미 있는 경우 HTML로 변환
+          const ordered = attributes.ordered || false;
+          const tag = ordered ? 'ol' : 'ul';
+          const items = attributes.items || [];
+          const itemsHtml = items.map((item: string) => `<li>${item}</li>`).join('');
+          content = items.length > 0 ? `<${tag}>${itemsHtml}</${tag}>` : '';
         }
       }
 
