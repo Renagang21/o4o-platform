@@ -18,7 +18,7 @@ import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, 
 import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
-import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import SimpleBlockWrapper from './SimpleBlockWrapper';
 import SlateBlockWrapper from './shared/SlateBlockWrapper';
 import { withDeleteKey } from '../slate/plugins/withDeleteKey';
 import { withLinks, isLinkActive, unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
@@ -357,24 +357,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   }, []);
 
   return (
-    <EnhancedBlockWrapper
+    <SimpleBlockWrapper
       id={id}
-      type="paragraph"
       isSelected={isSelected}
       onSelect={onSelect}
-      onDelete={onDelete}
-      onDuplicate={onDuplicate}
-      onMoveUp={onMoveUp}
-      onMoveDown={onMoveDown}
-      onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
-      currentAlign={align}
-      onToggleBold={() => toggleMark(editor, 'bold')}
-      onToggleItalic={() => toggleMark(editor, 'italic')}
-      onToggleLink={toggleLinkEditor}
-      isBold={isMarkActive(editor, 'bold')}
-      isItalic={isMarkActive(editor, 'italic')}
     >
       <div
         ref={editorRef}
@@ -429,7 +416,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           )}
         </SlateBlockWrapper>
       </div>
-    </EnhancedBlockWrapper>
+    </SimpleBlockWrapper>
   );
 };
 
