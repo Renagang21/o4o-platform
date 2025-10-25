@@ -170,21 +170,13 @@ const EnhancedQuoteBlock: React.FC<EnhancedQuoteBlockProps> = ({
         // Shift+Enter or Ctrl+Enter: line break within quote
         // Allow default behavior
       } else {
-        // Plain Enter: move to citation or finish
+        // Plain Enter: move to citation or add new block
         e.preventDefault();
         if (localCitation === '') {
           citationRef.current?.focus();
         } else {
-          // Both quote and citation filled, finish editing
-          quoteRef.current?.blur();
-
-          // Focus DefaultBlockAppender
-          setTimeout(() => {
-            const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
-            if (appender) {
-              appender.focus();
-            }
-          }, 50);
+          // Both quote and citation filled, add new paragraph block
+          onAddBlock?.('after', 'o4o/paragraph');
         }
       }
     }
@@ -201,18 +193,9 @@ const EnhancedQuoteBlock: React.FC<EnhancedQuoteBlockProps> = ({
         // Shift+Enter or Ctrl+Enter: line break within citation
         // Allow default behavior
       } else {
-        // Plain Enter: finish editing, move to DefaultBlockAppender
+        // Plain Enter: add new paragraph block
         e.preventDefault();
-
-        citationRef.current?.blur();
-
-        // Focus DefaultBlockAppender
-        setTimeout(() => {
-          const appender = document.querySelector('[data-default-block-appender="true"]') as HTMLElement;
-          if (appender) {
-            appender.focus();
-          }
-        }, 50);
+        onAddBlock?.('after', 'o4o/paragraph');
       }
     }
 

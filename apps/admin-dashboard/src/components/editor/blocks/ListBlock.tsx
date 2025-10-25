@@ -20,7 +20,6 @@ import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import SlateBlockWrapper from './shared/SlateBlockWrapper';
-import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { withDeleteKey } from '../slate/plugins/withDeleteKey';
 import { withLinks, isLinkActive, unwrapLink, wrapLink } from '../slate/plugins/withLinks';
 import { withLists, indentListItem, outdentListItem } from '../slate/plugins/withLists';
@@ -63,9 +62,9 @@ const ListBlock: React.FC<ListBlockProps> = ({
     align = 'left',
   } = attributes;
 
-  // Create Slate editor with plugins
+  // Create Slate editor with plugins (withParagraphs removed - handled by handleBlockEnter)
   const editor = useMemo(
-    () => withLists(withLinks(withDeleteKey(withParagraphs(withHistory(withReact(createEditor())))))),
+    () => withLists(withLinks(withDeleteKey(withHistory(withReact(createEditor()))))),
     []
   );
 

@@ -20,7 +20,6 @@ import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import SlateBlockWrapper from './shared/SlateBlockWrapper';
-import { withParagraphs } from '../slate/plugins/withParagraphs';
 import { withDeleteKey } from '../slate/plugins/withDeleteKey';
 import { withLinks, isLinkActive, unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
@@ -71,9 +70,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     backgroundColor = '',
   } = attributes;
 
-  // Create Slate editor with plugins
+  // Create Slate editor with plugins (withParagraphs removed - handled by handleBlockEnter)
   const editor = useMemo(
-    () => withLinks(withDeleteKey(withParagraphs(withHistory(withReact(createEditor()))))),
+    () => withLinks(withDeleteKey(withHistory(withReact(createEditor())))),
     []
   );
 

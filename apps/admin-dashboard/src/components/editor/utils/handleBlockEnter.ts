@@ -1,9 +1,10 @@
 /**
  * Common Enter Key Handler for Block Components
  *
- * Provides standardized Enter key behavior across all text-based blocks:
- * 1. Plain Enter: Save current block content and render (no new block creation)
- * 2. Shift+Enter or Ctrl+Enter: Create line break within the block (handled by Slate)
+ * Provides standardized Enter key behavior following WordPress Gutenberg:
+ * 1. 블록 끝에서 Enter: 새 블록 생성 (New Block Insertion)
+ * 2. 블록 중간에서 Enter: 블록 분할 (Block Splitting)
+ * 3. Shift+Enter: 줄바꿈 (Line break within block)
  *
  * Usage:
  * ```typescript
@@ -16,7 +17,7 @@
  * ```
  */
 
-import { Editor } from 'slate';
+import { Editor, Transforms, Range, Point, Element as SlateElement } from 'slate';
 import { serialize } from '../slate/utils/serialize';
 
 export interface BlockEnterHandlerOptions {
@@ -45,20 +46,51 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
       return;
     }
 
-    // Shift+Enter or Ctrl+Enter: line break within block
-    // Let Slate's withParagraphs plugin handle it
-    if (event.shiftKey || event.ctrlKey || event.metaKey) {
+    // Shift+Enter: 줄바꿈 (Slate의 기본 동작)
+    if (event.shiftKey) {
       return;
     }
 
-    // Plain Enter: save and render only (no new BlockAppender)
+    // Selection 확인
+    const { selection } = editor;
+    if (!selection) {
+      return;
+    }
+
+    // Enter 키 기본 동작 방지
     event.preventDefault();
 
-    // Save current content by serializing editor state
+    // 커서가 블록 끝에 있는지 확인
+    const isCollapsed = Range.isCollapsed(selection);
+    const end = Editor.end(editor, selection.anchor.path);
+    const isAtEnd = isCollapsed && Point.equals(selection.anchor, end);
+
+    if (isAtEnd) {
+      // ✅ 블록 끝: 새 paragraph 블록 추가
+      console.log('[handleBlockEnter] At block end - adding new paragraph');
+      onAddBlock?.('after', 'o4o/paragraph');
+    } else {
+      // 🪓 블록 중간: 블록 분할
+      console.log('[handleBlockEnter] In block middle - splitting block');
+
+      // 1. 현재 위치에서 블록 분할
+      Transforms.splitNodes(editor, { always: true });
+
+      // 2. 분할된 새 블록을 paragraph 타입으로 변환
+      //    (예: Heading 중간에서 Enter → 위는 Heading, 아래는 Paragraph)
+      Transforms.setNodes(
+        editor,
+        { type: 'paragraph' },
+        {
+          match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+          mode: 'lowest' // 가장 가까운 블록만 변환
+        }
+      );
+    }
+
+    // 변경사항 저장
     const currentHtml = serialize(editor.children);
     onChange(currentHtml, attributes);
-
-    // Just render the content, no new block creation
   };
 }
 
