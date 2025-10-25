@@ -17,7 +17,7 @@
  * ```
  */
 
-import { Editor } from 'slate';
+import { Editor, Transforms, Range, Point, Node } from 'slate';
 import { serialize } from '../slate/utils/serialize';
 
 export interface BlockEnterHandlerOptions {
@@ -60,13 +60,40 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
     // Enter 키 기본 동작 방지
     event.preventDefault();
 
-    // 현재 블록 내용 저장
-    const currentHtml = serialize(editor.children);
-    onChange(currentHtml, attributes);
+    // 블록 끝 위치 확인
+    const end = Editor.end(editor, []);
+    const isAtEnd = Point.equals(selection.anchor, end);
 
-    // 새 paragraph 블록 추가
-    // (블록 중간이든 끝이든 상관없이 새 블록 생성)
-    onAddBlock?.('after', 'o4o/paragraph');
+    if (isAtEnd) {
+      // 커서가 블록 끝에 있음 → 현재 내용 저장하고 빈 블록 추가
+      const currentHtml = serialize(editor.children);
+      onChange(currentHtml, attributes);
+      onAddBlock?.('after', 'o4o/paragraph');
+    } else {
+      // 커서가 블록 중간에 있음 → 블록 분할
+
+      // 커서 이후 범위 정의
+      const afterRange = {
+        anchor: selection.anchor,
+        focus: end
+      };
+
+      // 커서 이후 fragment 추출 (formatting 유지)
+      const afterFragment = Node.fragment(editor, afterRange);
+
+      // 커서 이후 내용 삭제
+      Transforms.delete(editor, { at: afterRange });
+
+      // 현재 블록(커서 이전 부분) 저장
+      const beforeHtml = serialize(editor.children);
+      onChange(beforeHtml, attributes);
+
+      // 커서 이후 fragment를 HTML로 변환
+      const afterHtml = serialize(afterFragment);
+
+      // 커서 이후 내용으로 새 블록 생성
+      onAddBlock?.('after', 'o4o/paragraph', { text: afterHtml });
+    }
   };
 }
 

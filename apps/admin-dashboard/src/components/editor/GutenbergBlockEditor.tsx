@@ -452,9 +452,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         attributes: {},
       };
 
-      const insertIndex = selectedBlockId
-        ? blocks.findIndex((b) => b.id === selectedBlockId) + 1
-        : blocks.length;
+      // Add Block 버튼은 항상 맨 끝(BlockAppender 앞)에 삽입
+      const blockAppenderIndex = blocks.findIndex((b) => b.type === 'o4o/block-appender');
+      const insertIndex = blockAppenderIndex !== -1 ? blockAppenderIndex : blocks.length;
 
       const newBlocks = [...blocks];
       newBlocks.splice(insertIndex, 0, newBlock);
@@ -462,7 +462,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlockId(newBlock.id);
       setIsBlockInserterOpen(false);
     },
-    [blocks, selectedBlockId, updateBlocks]
+    [blocks, updateBlocks]
   );
 
   // Handle add block at position
