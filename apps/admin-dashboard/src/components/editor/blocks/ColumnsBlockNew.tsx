@@ -7,6 +7,7 @@ import React, { useCallback } from 'react';
 import { Block } from '@/types/post.types';
 import { BlockProps } from '@/blocks/registry/types';
 import { Plus, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd } from 'lucide-react';
+import ColumnBlock from './ColumnBlock';
 
 interface ColumnsBlockProps extends BlockProps {
   attributes?: {
@@ -236,68 +237,63 @@ const ColumnsBlockNew: React.FC<ColumnsBlockProps> = ({
           width: '100%',
         }}
       >
-        {innerBlocks.map((column, index) => {
-          const ColumnComponent = React.lazy(() => import('./ColumnBlock'));
-
-          return (
-            <React.Suspense key={column.clientId || column.id} fallback={<div>Loading...</div>}>
-              <div
-                className="column-wrapper"
-                style={{
-                  flex: `0 0 ${column.attributes?.width || 100 / innerBlocks.length}%`,
-                  maxWidth: `${column.attributes?.width || 100 / innerBlocks.length}%`,
-                  position: 'relative',
+        {innerBlocks.map((column, index) => (
+          <div
+            key={column.clientId || column.id}
+            className="column-wrapper"
+            style={{
+              flex: `0 0 ${column.attributes?.width || 100 / innerBlocks.length}%`,
+              maxWidth: `${column.attributes?.width || 100 / innerBlocks.length}%`,
+              position: 'relative',
+            }}
+          >
+            {/* Column remove button */}
+            {isSelected && innerBlocks.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveColumn(column.id);
                 }}
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  right: '4px',
+                  zIndex: 10,
+                  padding: '4px 8px',
+                  background: '#cc1818',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '2px',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                }}
+                title="Remove Column"
               >
-                {/* Column remove button */}
-                {isSelected && innerBlocks.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveColumn(column.id);
-                    }}
-                    style={{
-                      position: 'absolute',
-                      top: '4px',
-                      right: '4px',
-                      zIndex: 10,
-                      padding: '4px 8px',
-                      background: '#cc1818',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '2px',
-                      fontSize: '11px',
-                      cursor: 'pointer',
-                    }}
-                    title="Remove Column"
-                  >
-                    Remove
-                  </button>
-                )}
+                Remove
+              </button>
+            )}
 
-                <ColumnComponent
-                  {...column}
-                  id={column.id}
-                  content={column.content}
-                  attributes={column.attributes}
-                  innerBlocks={column.innerBlocks}
-                  onInnerBlocksChange={(newInnerBlocks) => {
-                    const updatedColumns = innerBlocks.map(col =>
-                      col.id === column.id
-                        ? { ...col, innerBlocks: newInnerBlocks as Block[] }
-                        : col
-                    );
-                    if (onInnerBlocksChange) {
-                      onInnerBlocksChange(updatedColumns);
-                    }
-                  }}
-                  isSelected={isSelected}
-                  onSelect={onSelect}
-                />
-              </div>
-            </React.Suspense>
-          );
-        })}
+            <ColumnBlock
+              {...column}
+              id={column.id}
+              content={column.content}
+              attributes={column.attributes}
+              innerBlocks={column.innerBlocks}
+              onInnerBlocksChange={(newInnerBlocks) => {
+                const updatedColumns = innerBlocks.map(col =>
+                  col.id === column.id
+                    ? { ...col, innerBlocks: newInnerBlocks as Block[] }
+                    : col
+                );
+                if (onInnerBlocksChange) {
+                  onInnerBlocksChange(updatedColumns);
+                }
+              }}
+              isSelected={isSelected}
+              onSelect={onSelect}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Empty state */}

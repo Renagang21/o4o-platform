@@ -234,6 +234,10 @@ export const InnerBlocks: React.FC<InnerBlocksProps> = ({
         >
           <DynamicRenderer
             block={block}
+            id={block.id}
+            content={typeof block.content === 'string' ? block.content : block.content?.text || ''}
+            attributes={block.attributes || {}}
+            innerBlocks={block.innerBlocks || []}
             onChange={(content, attributes) => handleBlockUpdate(block.id, { content, attributes })}
             onDelete={() => handleBlockDelete(block.id)}
             onDuplicate={() => handleBlockDuplicate(block.id)}
