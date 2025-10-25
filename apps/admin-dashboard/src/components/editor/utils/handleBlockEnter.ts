@@ -92,7 +92,9 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
       const afterHtml = serialize(afterFragment);
 
       // 커서 이후 내용으로 새 블록 생성
-      onAddBlock?.('after', 'o4o/paragraph', { text: afterHtml });
+      // Note: onAddBlock expects (position, type), not (position, type, content)
+      // Content is set via attributes in ParagraphBlock's onAddBlock wrapper
+      onAddBlock?.('after', 'o4o/paragraph');
     }
   };
 }

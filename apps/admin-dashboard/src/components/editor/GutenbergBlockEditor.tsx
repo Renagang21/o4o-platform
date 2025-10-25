@@ -25,11 +25,11 @@ import { Toast } from './components/Toast';
 // AI Chat Panel
 import { AIChatPanel } from './AIChatPanel';
 import { EditorContext, AIAction } from '@/services/ai/ConversationalAI';
-// Clipboard utilities
-import { copyBlockToClipboard, pasteBlockFromClipboard } from './utils/clipboard-utils';
-// Drag and drop hook
+// Custom hooks
+import { useBlockManagement } from './hooks/useBlockManagement';
+import { useBlockHistory } from './hooks/useBlockHistory';
+import { useSlashCommands } from './hooks/useSlashCommands';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
-// Keyboard shortcuts hook
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -113,11 +113,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isBlockListOpen, setIsBlockListOpen] = useState(false);
-  const [history, setHistory] = useState<HistoryEntry[]>([createHistoryEntry(blocks)]);
-  const [historyIndex, setHistoryIndex] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
   const [sessionRestored, setSessionRestored] = useState(false);
-  
+
+  // Toast notifications
+  const { toast, showToast } = useToast();
+
+  // ✨ Block History Hook
+  const blockHistory = useBlockHistory({
+    initialBlocks: blocks,
+    documentTitle,
+  });
+
   // Initialize block registry
   useEffect(() => {
     registerAllBlocks();
@@ -145,25 +152,23 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
       // Only restore if there are blocks
       if (nonEmptyBlocks.length > 0) {
-        setHistory(storedSession.history);
-        setHistoryIndex(storedSession.historyIndex);
+        blockHistory.setHistoryState(storedSession.history, storedSession.historyIndex);
         setBlocks(nonEmptyBlocks);
         setDocumentTitle(storedSession.documentTitle);
         setSessionRestored(true);
         showToast('편집 내역이 복원되었습니다', 'info');
       }
     }
-  }, [disableSessionRestore, sessionRestored, initialBlocks.length]);
+  }, [disableSessionRestore, sessionRestored, initialBlocks.length, blockHistory, showToast]);
 
   // Sync blocks with initialBlocks prop changes
   useEffect(() => {
     if (initialBlocks && initialBlocks.length > 0 && !sessionRestored) {
       setBlocks(initialBlocks);
-      setHistory([createHistoryEntry(initialBlocks)]);
-      setHistoryIndex(0);
+      blockHistory.resetHistory(initialBlocks);
       setIsDirty(false);
     }
-  }, [initialBlocks, sessionRestored]);
+  }, [initialBlocks, sessionRestored, blockHistory]);
   
   // Sync title with prop changes
   useEffect(() => {
@@ -173,16 +178,16 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Save session on page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      saveEditorSession(history, historyIndex, documentTitle);
+      saveEditorSession(blockHistory.history, blockHistory.historyIndex, documentTitle);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       // Final save on unmount
-      saveEditorSession(history, historyIndex, documentTitle);
+      saveEditorSession(blockHistory.history, blockHistory.historyIndex, documentTitle);
     };
-  }, [history, historyIndex, documentTitle]);
+  }, [blockHistory.history, blockHistory.historyIndex, documentTitle]);
   
   // Sync post settings with prop changes
   useEffect(() => {
@@ -190,20 +195,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setPostSettings(prev => ({ ...prev, ...propPostSettings }));
     }
   }, [propPostSettings]);
+
   const [isCodeView, setIsCodeView] = useState(false);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
-  const { toast, showToast } = useToast();
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
-
-  // Slash command menu states
-  const [isSlashMenuOpen, setIsSlashMenuOpen] = useState(false);
-  const [slashQuery, setSlashQuery] = useState('');
-  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
-  const [slashTriggerBlockId, setSlashTriggerBlockId] = useState<string | null>(null);
-  const [recentBlocks, setRecentBlocks] = useState<string[]>([]);
-  const slashMenuRef = useRef<{ query: string; blockId: string | null }>({ query: '', blockId: null });
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -276,251 +273,85 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     }
   }, [externalShowListView]);
 
-  // Update blocks and history
+  // ✨ Update blocks and history
   const updateBlocks = useCallback(
     (newBlocks: Block[], skipOnChange = false) => {
       setBlocks(newBlocks);
       setIsDirty(true);
 
-      // Add to history with optimization
-      const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(createHistoryEntry(newBlocks));
-
-      // Trim history to max size
-      const trimmedHistory = trimHistory(newHistory);
-      setHistory(trimmedHistory);
-      setHistoryIndex(trimmedHistory.length - 1);
-
-      // Save to session storage
-      saveEditorSession(trimmedHistory, trimmedHistory.length - 1, documentTitle);
+      // Add to history
+      blockHistory.addToHistory(newBlocks);
 
       // Notify parent (unless skipped for initialization)
       if (!skipOnChange) {
         onChange?.(newBlocks);
       }
     },
-    [history, historyIndex, documentTitle, onChange]
+    [blockHistory, onChange]
   );
+
+  // ✨ Block Management Hook
+  const blockManagement = useBlockManagement({
+    updateBlocks,
+    setSelectedBlockId,
+    setIsDirty,
+  });
+
+  // Sync blocksRef with current blocks
+  useEffect(() => {
+    blockManagement.setBlocksRef(blocks);
+  }, [blocks, blockManagement]);
+
+  // ✨ Slash Commands Hook
+  const slashCommands = useSlashCommands({
+    blocksRef: blockManagement.blocksRef,
+    updateBlocks,
+    selectedBlockId,
+    setSelectedBlockId,
+  });
 
   // Drag and drop hook - must be after updateBlocks is defined
   const { draggedBlockId, dragOverBlockId, handleDragStart, handleDragOver, handleDrop, handleDragEnd } = useDragAndDrop({ blocks, updateBlocks });
 
-  // Undo
+  // ✨ Undo
   const handleUndo = useCallback(() => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setBlocks(history[newIndex].blocks);
-
-      // Update session storage
-      saveEditorSession(history, newIndex, documentTitle);
+    const newBlocks = blockHistory.handleUndo();
+    if (newBlocks) {
+      setBlocks(newBlocks);
     }
-  }, [history, historyIndex, documentTitle]);
+  }, [blockHistory]);
 
-  // Redo
+  // ✨ Redo
   const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setBlocks(history[newIndex].blocks);
-
-      // Update session storage
-      saveEditorSession(history, newIndex, documentTitle);
+    const newBlocks = blockHistory.handleRedo();
+    if (newBlocks) {
+      setBlocks(newBlocks);
     }
-  }, [history, historyIndex, documentTitle]);
+  }, [blockHistory]);
 
-  // Handle block update
-  const handleBlockUpdate = useCallback(
-    (blockId: string, content: any, attributes?: any) => {
-      const newBlocks = blocksRef.current.map((block) =>
-        block.id === blockId
-          ? {
-              ...block,
-              content: typeof content === 'string' ? { text: content } : content,
-              attributes: attributes || block.attributes,
-            }
-          : block
-      );
-      updateBlocks(newBlocks);
-    },
-    [updateBlocks]
-  );
+  // ✨ Block CRUD handlers - wrappers around blockManagement hook
+  const handleBlockUpdate = blockManagement.handleBlockUpdate;
+  const handleBlockDelete = blockManagement.handleBlockDelete;
 
-  // Handle block deletion
-  const handleBlockDelete = useCallback(
-    (blockId: string) => {
-      const newBlocks = blocksRef.current.filter((block) => block.id !== blockId);
-      // Allow completely empty editor - don't auto-create blocks
-      updateBlocks(newBlocks);
-      setSelectedBlockId(null);
-    },
-    [updateBlocks]
-  );
-
-  // Handle block copy with HTML + JSON clipboard support
   const handleBlockCopy = useCallback(
-    async (blockId: string) => {
-      const block = blocksRef.current.find((b) => b.id === blockId);
-      if (!block) return;
-
-      await copyBlockToClipboard(block, setCopiedBlock);
-    },
-    []
+    async (blockId: string) => blockManagement.handleBlockCopy(blockId, setCopiedBlock),
+    [blockManagement]
   );
 
-  // Handle block paste with clipboard reading support
   const handleBlockPaste = useCallback(
-    async (afterBlockId?: string) => {
-      const newBlock = await pasteBlockFromClipboard(copiedBlock);
-
-      // Insert the block
-      if (newBlock) {
-        if (afterBlockId) {
-          const index = blocksRef.current.findIndex((b) => b.id === afterBlockId);
-          const newBlocks = [...blocksRef.current];
-          newBlocks.splice(index + 1, 0, newBlock);
-          updateBlocks(newBlocks);
-        } else {
-          // 마지막에 추가
-          updateBlocks([...blocksRef.current, newBlock]);
-        }
-
-        setSelectedBlockId(newBlock.id);
-        setIsDirty(true);
-      }
-    },
-    [copiedBlock, updateBlocks]
+    async (afterBlockId?: string) => blockManagement.handleBlockPaste(copiedBlock, afterBlockId),
+    [blockManagement, copiedBlock]
   );
 
-  // Handle block insertion
   const handleInsertBlock = useCallback(
-    (blockType: string) => {
-      const newBlock: Block = {
-        id: `block-${Date.now()}`,
-        type: blockType,
-        content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
-        attributes: {},
-      };
-
-      // Add Block 버튼은 항상 맨 끝에 삽입
-      const insertIndex = blocksRef.current.length;
-
-      const newBlocks = [...blocksRef.current];
-      newBlocks.splice(insertIndex, 0, newBlock);
-      updateBlocks(newBlocks);
-      setSelectedBlockId(newBlock.id);
-      setIsBlockInserterOpen(false);
-    },
-    [updateBlocks]
+    (blockType: string) => blockManagement.handleInsertBlock(blockType, setIsBlockInserterOpen),
+    [blockManagement]
   );
 
-  // Handle add block at position
-  const handleAddBlock = useCallback(
-    (blockId: string, position: 'before' | 'after', blockType = 'o4o/paragraph', initialContent?: any) => {
-      const index = blocksRef.current.findIndex((b) => b.id === blockId);
-      const newBlock: Block = {
-        id: `block-${Date.now()}`,
-        type: blockType,
-        content: initialContent || { text: '' },
-        attributes: {},
-      };
+  const handleAddBlock = blockManagement.handleAddBlock;
 
-      const newBlocks = [...blocksRef.current];
-      const insertIndex = position === 'after' ? index + 1 : index;
-      newBlocks.splice(insertIndex, 0, newBlock);
-      updateBlocks(newBlocks);
-      setSelectedBlockId(newBlock.id);
-
-      // Auto-scroll to new block after DOM update
-      setTimeout(() => {
-        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-        if (newBlockElement) {
-          newBlockElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center', // Center the block in viewport
-          });
-        }
-      }, 100);
-    },
-    [updateBlocks]
-  );
-
-  // Handle slash command block selection
-  const handleSlashCommandSelect = useCallback(
-    (blockType: string) => {
-      const triggerBlockId = slashTriggerBlockId || selectedBlockId;
-
-      // Handle regular block slash command
-      if (!triggerBlockId) return;
-
-      // Find the block that triggered slash command
-      const blockIndex = blocksRef.current.findIndex(b => b.id === triggerBlockId);
-      if (blockIndex === -1) return;
-
-      const triggerBlock = blocksRef.current[blockIndex];
-
-      // Remove "/" and query text from the trigger block
-      let cleanedText = '';
-      if (triggerBlock.content && typeof triggerBlock.content === 'object' && 'text' in triggerBlock.content) {
-        const text = triggerBlock.content.text as string || '';
-        // Find and remove the "/" and everything after it
-        const slashIndex = text.lastIndexOf('/');
-        if (slashIndex !== -1) {
-          cleanedText = text.substring(0, slashIndex);
-        } else {
-          cleanedText = text;
-        }
-      }
-
-      // Create new block
-      const newBlock: Block = {
-        id: `block-${Date.now()}`,
-        type: blockType,
-        content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
-        attributes: {},
-      };
-
-      const newBlocks = [...blocksRef.current];
-
-      // If trigger block is empty (only had "/"), replace it
-      if (!cleanedText.trim()) {
-        newBlocks[blockIndex] = newBlock;
-      } else {
-        // Update trigger block and insert new block after
-        newBlocks[blockIndex] = {
-          ...triggerBlock,
-          content: { ...triggerBlock.content, text: cleanedText }
-        };
-        newBlocks.splice(blockIndex + 1, 0, newBlock);
-      }
-
-      updateBlocks(newBlocks);
-      setSelectedBlockId(newBlock.id);
-
-      // Update recent blocks
-      setRecentBlocks(prev => {
-        const updated = [blockType, ...prev.filter(t => t !== blockType)];
-        return updated.slice(0, 5); // Keep only 5 most recent
-      });
-
-      // Close slash menu
-      setIsSlashMenuOpen(false);
-      setSlashQuery('');
-      setSlashTriggerBlockId(null);
-
-      // Focus new block
-      setTimeout(() => {
-        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
-        if (newBlockElement) {
-          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
-          if (editableElement) {
-            editableElement.focus();
-          }
-        }
-      }, 50);
-    },
-    [selectedBlockId, slashTriggerBlockId, updateBlocks]
-  );
+  // ✨ Slash command handler - from slashCommands hook
+  const handleSlashCommandSelect = slashCommands.handleSlashCommandSelect;
 
   // Listen for custom "open-block-inserter" event from EditorHeader
   useEffect(() => {
@@ -564,31 +395,27 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             const range = selection.getRangeAt(0);
             const rect = range.getBoundingClientRect();
 
-            setSlashMenuPosition({
+            const position = {
               top: rect.bottom + window.scrollY + 4,
               left: rect.left + window.scrollX
-            });
-          }
+            };
 
-          setSlashQuery(query);
-          setSlashTriggerBlockId(blockId);
-          setIsSlashMenuOpen(true);
-          slashMenuRef.current = { query, blockId };
+            slashCommands.openSlashMenu(query, blockId, position);
+            slashCommands.slashMenuRef.current = { query, blockId };
+          }
           return;
         }
       }
 
       // Close menu if "/" was removed
-      if (isSlashMenuOpen && !text.includes('/')) {
-        setIsSlashMenuOpen(false);
-        setSlashQuery('');
-        setSlashTriggerBlockId(null);
+      if (slashCommands.isSlashMenuOpen && !text.includes('/')) {
+        slashCommands.closeSlashMenu();
       }
     };
 
     document.addEventListener('input', handleInput);
     return () => document.removeEventListener('input', handleInput);
-  }, [isSlashMenuOpen]);
+  }, [slashCommands]);
 
   // Handle save
   const handleSave = useCallback(async () => {
@@ -668,56 +495,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     setIsCodeView(!isCodeView);
   }, [isCodeView]);
 
-  // Handle block duplication
-  const handleDuplicate = useCallback((blockId: string) => {
-    const blockIndex = blocksRef.current.findIndex((b) => b.id === blockId);
-    if (blockIndex === -1) return;
-
-    const blockToDuplicate = blocksRef.current[blockIndex];
-    const duplicatedBlock: Block = {
-      ...blockToDuplicate,
-      id: `block-${Date.now()}`,
-    };
-
-    const newBlocks = [...blocksRef.current];
-    newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
-    updateBlocks(newBlocks);
-    setSelectedBlockId(duplicatedBlock.id);
-  }, [updateBlocks]);
-
-  // Handle block move up
-  const handleMoveUp = useCallback((blockId: string) => {
-    const blockIndex = blocksRef.current.findIndex((b) => b.id === blockId);
-    if (blockIndex <= 0) return;
-
-    const newBlocks = [...blocksRef.current];
-    const [block] = newBlocks.splice(blockIndex, 1);
-    newBlocks.splice(blockIndex - 1, 0, block);
-    updateBlocks(newBlocks);
-
-    // Re-trigger selection to restore focus after DOM update
-    setSelectedBlockId(null);
-    setTimeout(() => {
-      setSelectedBlockId(blockId);
-    }, 0);
-  }, [updateBlocks]);
-
-  // Handle block move down
-  const handleMoveDown = useCallback((blockId: string) => {
-    const blockIndex = blocksRef.current.findIndex((b) => b.id === blockId);
-    if (blockIndex === -1 || blockIndex >= blocksRef.current.length - 1) return;
-
-    const newBlocks = [...blocksRef.current];
-    const [block] = newBlocks.splice(blockIndex, 1);
-    newBlocks.splice(blockIndex + 1, 0, block);
-    updateBlocks(newBlocks);
-
-    // Re-trigger selection to restore focus after DOM update
-    setSelectedBlockId(null);
-    setTimeout(() => {
-      setSelectedBlockId(blockId);
-    }, 0);
-  }, [updateBlocks]);
+  // ✨ Block movement handlers - from blockManagement hook
+  const handleDuplicate = blockManagement.handleDuplicate;
+  const handleMoveUp = blockManagement.handleMoveUp;
+  const handleMoveDown = blockManagement.handleMoveDown;
 
   // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
   const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
@@ -732,12 +513,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               attributes: action.attributes || {},
             };
 
-            const newBlocks = [...blocksRef.current];
+            const newBlocks = [...blockManagement.blocksRef.current!];
             if (action.position === 'before' && action.targetBlockId) {
-              const idx = blocksRef.current.findIndex(b => b.id === action.targetBlockId);
+              const idx = blockManagement.blocksRef.current!.findIndex(b => b.id === action.targetBlockId);
               newBlocks.splice(idx, 0, newBlock);
             } else if (action.position === 'after' && action.targetBlockId) {
-              const idx = blocksRef.current.findIndex(b => b.id === action.targetBlockId);
+              const idx = blockManagement.blocksRef.current!.findIndex(b => b.id === action.targetBlockId);
               newBlocks.splice(idx + 1, 0, newBlock);
             } else if (typeof action.position === 'number') {
               newBlocks.splice(action.position, 0, newBlock);
@@ -774,9 +555,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
         case 'move':
           if (action.targetBlockId && typeof action.position === 'number') {
-            const blockIndex = blocksRef.current.findIndex(b => b.id === action.targetBlockId);
+            const blockIndex = blockManagement.blocksRef.current!.findIndex(b => b.id === action.targetBlockId);
             if (blockIndex !== -1) {
-              const newBlocks = [...blocksRef.current];
+              const newBlocks = [...blockManagement.blocksRef.current!];
               const [block] = newBlocks.splice(blockIndex, 1);
               newBlocks.splice(action.position, 0, block);
               updateBlocks(newBlocks);
@@ -795,7 +576,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           console.warn('Unknown action:', action);
       }
     });
-  }, [updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
+  }, [blockManagement, updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
 
   // Handle preview
   const handlePreview = useCallback(() => {
@@ -823,37 +604,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     navigate('/admin');
   }, [isDirty, navigate]);
 
-  // Handle block type change
-  const handleBlockTypeChange = useCallback(
-    (blockId: string, newType: string) => {
-      const newBlocks = blocksRef.current.map((block) => {
-        if (block.id === blockId) {
-          // Convert heading types
-          if (newType.startsWith('o4o/heading-')) {
-            const level = parseInt(newType.replace('o4o/heading-h', ''));
-            return {
-              ...block,
-              type: 'o4o/heading',
-              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '', level },
-              attributes: block.attributes || {},
-            };
-          }
-          // Convert to paragraph
-          if (newType === 'o4o/paragraph') {
-            return {
-              ...block,
-              type: 'o4o/paragraph',
-              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '' },
-              attributes: block.attributes || {},
-            };
-          }
-        }
-        return block;
-      });
-      updateBlocks(newBlocks);
-    },
-    [updateBlocks]
-  );
+  // ✨ Handle block type change - from blockManagement hook
+  const handleBlockTypeChange = blockManagement.handleBlockTypeChange;
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -884,11 +636,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     [updateBlocks, showToast]
   );
 
-  // Keep a stable ref to blocks for callback closures
-  const blocksRef = useRef(blocks);
-  useEffect(() => {
-    blocksRef.current = blocks;
-  }, [blocks]);
+  // ✨ blocksRef is now managed by blockManagement hook
 
   // Create stable callback factories that don't depend on blocks state
   // This prevents re-renders when blocks change
@@ -967,22 +715,22 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   const createOnUpdate = useCallback((blockId: string) =>
     (updates: any) => {
-      const newBlocks = blocksRef.current.map(b =>
+      const newBlocks = blockManagement.blocksRef.current!.map(b =>
         b.id === blockId ? { ...b, ...updates } : b
       );
       updateBlocks(newBlocks);
     },
-    [updateBlocks]
+    [blockManagement, updateBlocks]
   );
 
   const createOnInnerBlocksChange = useCallback((blockId: string) =>
     (newInnerBlocks: Block[]) => {
-      const newBlocks = blocksRef.current.map(b =>
+      const newBlocks = blockManagement.blocksRef.current!.map(b =>
         b.id === blockId ? { ...b, innerBlocks: newInnerBlocks } : b
       );
       updateBlocks(newBlocks);
     },
-    [updateBlocks]
+    [blockManagement, updateBlocks]
   );
 
   // Memoize callback map per block ID
@@ -1383,17 +1131,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       )}
 
       {/* Slash Command Menu */}
-      {isSlashMenuOpen && (
+      {slashCommands.isSlashMenuOpen && (
         <SlashCommandMenu
-          query={slashQuery}
+          query={slashCommands.slashQuery}
           onSelectBlock={handleSlashCommandSelect}
-          onClose={() => {
-            setIsSlashMenuOpen(false);
-            setSlashQuery('');
-            setSlashTriggerBlockId(null);
-          }}
-          position={slashMenuPosition}
-          recentBlocks={recentBlocks}
+          onClose={slashCommands.closeSlashMenu}
+          position={slashCommands.slashMenuPosition}
+          recentBlocks={slashCommands.recentBlocks}
         />
       )}
     </div>
