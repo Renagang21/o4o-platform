@@ -14,18 +14,20 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { createEditor, Descendant, Editor, Transforms, Element as SlateElement, Range, Text } from 'slate';
-import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, ReactEditor } from 'slate-react';
-import { withHistory } from 'slate-history';
+import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } from 'slate';
+import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
 import SimpleBlockWrapper from './SimpleBlockWrapper';
 import SlateBlockWrapper from './shared/SlateBlockWrapper';
-import { withDeleteKey } from '../slate/plugins/withDeleteKey';
-import { withLinks, isLinkActive, unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
+import { unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
 import { createBlockEnterHandler } from '../utils/handleBlockEnter';
 import { createBlockBackspaceHandler } from '../utils/handleBlockBackspace';
+import { createTextEditor } from '../utils/slate-editor-factory';
+import { isMarkActive, toggleMark } from '../utils/slate-helpers';
+import { DefaultLeafRenderer } from '../slate/renderers/DefaultLeafRenderer';
+import { useSlateKeyboard } from '../hooks/useSlateKeyboard';
 import type { CustomText, ParagraphElement, LinkElement } from '../slate/types/slate-types';
 
 interface ParagraphBlockProps {
@@ -71,10 +73,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   } = attributes;
 
   // Create Slate editor with plugins (withParagraphs removed - handled by handleBlockEnter)
-  const editor = useMemo(
-    () => withLinks(withDeleteKey(withHistory(withReact(createEditor())))),
-    []
-  );
+  const editor = useMemo(() => createTextEditor(), []);
 
   // Convert HTML content to Slate value
   const initialValue = useMemo(() => {
@@ -232,51 +231,12 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   );
 
   // Handle keyboard shortcuts and special keys
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      const isModKey = event.ctrlKey || event.metaKey;
-
-      // Format shortcuts
-      if (isModKey) {
-        switch (event.key) {
-          case 'b': {
-            event.preventDefault();
-            toggleMark(editor, 'bold');
-            break;
-          }
-          case 'i': {
-            event.preventDefault();
-            toggleMark(editor, 'italic');
-            break;
-          }
-          case 'u': {
-            event.preventDefault();
-            toggleMark(editor, 'underline');
-            break;
-          }
-          case 'k': {
-            event.preventDefault();
-            // Show link editor
-            toggleLinkEditor();
-            break;
-          }
-        }
-      }
-
-      // Enter key handling - use common handler
-      if (event.key === 'Enter') {
-        handleEnterKey(event);
-        return;
-      }
-
-      // Backspace key handling - use common handler
-      if (event.key === 'Backspace') {
-        handleBackspaceKey(event);
-        return;
-      }
-    },
-    [editor, handleEnterKey, handleBackspaceKey, toggleLinkEditor]
-  );
+  const handleKeyDown = useSlateKeyboard({
+    editor,
+    handleEnterKey,
+    handleBackspaceKey,
+    onToggleLink: toggleLinkEditor,
+  });
 
   // Render element (paragraph or link)
   const renderElement = useCallback((props: RenderElementProps) => {
@@ -324,37 +284,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [editor]);
 
-  // Render leaf (text with formatting)
-  const renderLeaf = useCallback((props: RenderLeafProps) => {
-    let children = props.children;
-    const leaf = props.leaf as CustomText;
-
-    if (leaf.code) {
-      children = (
-        <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">
-          {children}
-        </code>
-      );
-    }
-
-    if (leaf.bold) {
-      children = <strong>{children}</strong>;
-    }
-
-    if (leaf.italic) {
-      children = <em>{children}</em>;
-    }
-
-    if (leaf.underline) {
-      children = <u>{children}</u>;
-    }
-
-    if (leaf.strikethrough) {
-      children = <s>{children}</s>;
-    }
-
-    return <span {...props.attributes}>{children}</span>;
-  }, []);
 
   return (
     <SimpleBlockWrapper
@@ -392,7 +321,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           >
             <Editable
               renderElement={renderElement}
-              renderLeaf={renderLeaf}
+              renderLeaf={DefaultLeafRenderer}
               placeholder=""
               onKeyDown={handleKeyDown}
               style={{
@@ -422,22 +351,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       </div>
     </SimpleBlockWrapper>
   );
-};
-
-// Helper functions
-const isMarkActive = (editor: Editor, format: keyof CustomText): boolean => {
-  const marks = Editor.marks(editor) as CustomText | null;
-  return marks ? marks[format] === true : false;
-};
-
-const toggleMark = (editor: Editor, format: keyof CustomText): void => {
-  const isActive = isMarkActive(editor, format);
-
-  if (isActive) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
 };
 
 export default ParagraphBlock;
