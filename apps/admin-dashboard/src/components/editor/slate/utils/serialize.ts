@@ -83,23 +83,22 @@ const serializeText = (text: CustomText): string => {
 /**
  * Serialize paragraph element
  *
- * Note: Returns only the inner content without <p> wrapper.
- * The <p> tag is the block wrapper and will be added by the frontend renderer.
+ * Returns complete HTML with <p> wrapper for proper rendering.
  */
 const serializeParagraph = (element: ParagraphElement, children: string): string => {
-  // Return only inner content, no <p> wrapper
-  return children || '';
+  // Return complete HTML with <p> tag
+  return `<p>${children || '<br>'}</p>`;
 };
 
 /**
  * Serialize heading element
  *
- * Note: Returns only the inner content without <h1>-<h6> wrapper.
- * The heading tag is the block wrapper and will be added by the frontend renderer.
+ * Returns complete HTML with <h1>-<h6> wrapper for proper rendering.
  */
 const serializeHeading = (element: HeadingElement, children: string): string => {
-  // Return only inner content, no <h*> wrapper
-  return children || '';
+  // Return complete HTML with heading tag
+  const level = element.level || 2;
+  return `<h${level}>${children || '<br>'}</h${level}>`;
 };
 
 /**

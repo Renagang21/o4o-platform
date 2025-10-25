@@ -78,8 +78,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
   // Convert HTML content to Slate value
   const initialValue = useMemo(() => {
-    // AI-generated blocks: use attributes.content if available
-    const textContent = attributes.content || (typeof content === 'string' ? content : '');
+    // Prioritize content (HTML from AI) over attributes.content (plain text)
+    const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
 
     if (!textContent || textContent === '') {
       return [
