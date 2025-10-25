@@ -1153,6 +1153,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       ...callbacks,
       isSelected: selectedBlockId === block.id,
       attributes: block.attributes || {},
+      innerBlocks: block.innerBlocks || [], // Pass innerBlocks for columns/column and other container blocks
       isDragging: draggedBlockId === block.id,
       canMoveUp: blockIndex > 0,
       canMoveDown: blockIndex < blocks.length - 1,
@@ -1164,6 +1165,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       content: typeof block.content === 'string'
         ? block.content
         : block.content?.text || '',
+      innerBlocks: block.innerBlocks || [], // Preserve innerBlocks in normalized block
     };
 
     // Use DynamicRenderer for all blocks
