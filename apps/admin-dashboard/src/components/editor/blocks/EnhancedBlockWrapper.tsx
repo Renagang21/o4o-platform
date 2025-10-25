@@ -104,7 +104,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Use toolbar positioning hook
-  const { showToolbar, toolbarPosition } = useBlockToolbar({
+  const { showToolbar: shouldShowToolbar, toolbarPosition } = useBlockToolbar({
     blockRef,
     isSelected,
     isHovered,
@@ -151,7 +151,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       }}
     >
       {/* Block toolbar */}
-      {showToolbar && isSelected && (
+      {showToolbar && shouldShowToolbar && isSelected && (
         <BlockToolbar
           ref={toolbarRef}
           id={id}
