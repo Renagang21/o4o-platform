@@ -66,7 +66,6 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
 
     // 새 paragraph 블록 추가
     // (블록 중간이든 끝이든 상관없이 새 블록 생성)
-    console.log('[handleBlockEnter] Adding new paragraph block');
     onAddBlock?.('after', 'o4o/paragraph');
   };
 }
