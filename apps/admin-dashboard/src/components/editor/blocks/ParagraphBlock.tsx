@@ -18,7 +18,6 @@ import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } 
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
 import SimpleBlockWrapper from './SimpleBlockWrapper';
-import SlateBlockWrapper from './shared/SlateBlockWrapper';
 import { unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
@@ -305,49 +304,39 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }}
         data-handles-enter="true"
       >
-        <SlateBlockWrapper
-          isSelected={isSelected}
-          value={value}
-          serialize={serialize}
-          viewModeStyle={{
-            textAlign: align,
-          }}
-          emptyPlaceholder="<p><br></p>"
+        <Slate
+          editor={editor}
+          initialValue={initialValue}
+          onValueChange={handleChange}
         >
-          <Slate
-            editor={editor}
-            initialValue={initialValue}
-            onValueChange={handleChange}
-          >
-            <Editable
-              renderElement={renderElement}
-              renderLeaf={DefaultLeafRenderer}
-              placeholder=""
-              onKeyDown={handleKeyDown}
-              style={{
-                outline: 'none',
-                minHeight: '1.5em',
-              }}
-            />
-          </Slate>
+          <Editable
+            renderElement={renderElement}
+            renderLeaf={DefaultLeafRenderer}
+            placeholder=""
+            onKeyDown={handleKeyDown}
+            style={{
+              outline: 'none',
+              minHeight: '1.5em',
+            }}
+          />
+        </Slate>
 
-          {linkEditorOpen && (
-            <LinkInlineEditor
-              onApply={(url, target) => {
-                wrapLink(editor, url, target);
-              }}
-              onRemove={() => {
-                unwrapLink(editor);
-              }}
-              onClose={() => {
-                setLinkEditorOpen(false);
-              }}
-              initialUrl={getActiveLinkElement(editor)?.url || ''}
-              initialTarget={getActiveLinkElement(editor)?.target}
-              position={linkEditorPosition}
-            />
-          )}
-        </SlateBlockWrapper>
+        {linkEditorOpen && (
+          <LinkInlineEditor
+            onApply={(url, target) => {
+              wrapLink(editor, url, target);
+            }}
+            onRemove={() => {
+              unwrapLink(editor);
+            }}
+            onClose={() => {
+              setLinkEditorOpen(false);
+            }}
+            initialUrl={getActiveLinkElement(editor)?.url || ''}
+            initialTarget={getActiveLinkElement(editor)?.target}
+            position={linkEditorPosition}
+          />
+        )}
       </div>
     </SimpleBlockWrapper>
   );
