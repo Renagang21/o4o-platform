@@ -31,7 +31,7 @@ import type { CustomText, HeadingElement, LinkElement } from '../slate/types/sla
 
 interface HeadingBlockProps {
   id: string;
-  content: string; // HTML string
+  content?: string | object; // HTML string or empty object (AI-generated)
   onChange: (content: string, attributes?: any) => void;
   onDelete: () => void;
   onDuplicate: () => void;
@@ -41,6 +41,7 @@ interface HeadingBlockProps {
   isSelected: boolean;
   onSelect: () => void;
   attributes?: {
+    content?: string; // AI-generated blocks store text here
     level?: 1 | 2 | 3 | 4 | 5 | 6;
     align?: 'left' | 'center' | 'right' | 'justify';
     fontSize?: number;
@@ -78,7 +79,10 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
 
   // Convert HTML content to Slate value
   const initialValue = useMemo(() => {
-    if (!content || content === '') {
+    // AI-generated blocks: use attributes.content if available
+    const textContent = attributes.content || (typeof content === 'string' ? content : '');
+
+    if (!textContent || textContent === '') {
       return [
         {
           type: 'heading',
@@ -90,7 +94,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     }
 
     try {
-      const deserialized = deserialize(content);
+      const deserialized = deserialize(textContent);
       // Ensure we have at least one heading
       if (deserialized.length === 0) {
         return [
@@ -139,7 +143,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           type: 'heading',
           level,
           align,
-          children: [{ text: content }],
+          children: [{ text: textContent }],
         } as HeadingElement,
       ];
     }

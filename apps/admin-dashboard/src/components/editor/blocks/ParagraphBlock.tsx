@@ -31,7 +31,7 @@ import type { CustomText, ParagraphElement, LinkElement } from '../slate/types/s
 
 interface ParagraphBlockProps {
   id: string;
-  content: string; // HTML string
+  content?: string | object; // HTML string or empty object (AI-generated)
   onChange: (content: string, attributes?: any) => void;
   onDelete: () => void;
   onDuplicate: () => void;
@@ -41,6 +41,7 @@ interface ParagraphBlockProps {
   isSelected: boolean;
   onSelect: () => void;
   attributes?: {
+    content?: string; // AI-generated blocks store text here
     align?: 'left' | 'center' | 'right' | 'justify';
     dropCap?: boolean;
     fontSize?: number;
@@ -78,7 +79,10 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
 
   // Convert HTML content to Slate value
   const initialValue = useMemo(() => {
-    if (!content || content === '') {
+    // AI-generated blocks: use attributes.content if available
+    const textContent = attributes.content || (typeof content === 'string' ? content : '');
+
+    if (!textContent || textContent === '') {
       return [
         {
           type: 'paragraph',
@@ -89,7 +93,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
 
     try {
-      const deserialized = deserialize(content);
+      const deserialized = deserialize(textContent);
       // Ensure we have at least one paragraph
       if (deserialized.length === 0) {
         return [
@@ -126,7 +130,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         {
           type: 'paragraph',
           align,
-          children: [{ text: content }],
+          children: [{ text: textContent }],
         } as ParagraphElement,
       ];
     }
