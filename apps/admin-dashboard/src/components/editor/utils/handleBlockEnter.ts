@@ -67,11 +67,9 @@ export function createBlockEnterHandler(options: BlockEnterHandlerOptions) {
 
     if (isAtEnd) {
       // ✅ 블록 끝: 새 paragraph 블록 추가
-      console.log('[handleBlockEnter] At block end - adding new paragraph');
       onAddBlock?.('after', 'o4o/paragraph');
     } else {
       // 🪓 블록 중간: 블록 분할
-      console.log('[handleBlockEnter] In block middle - splitting block');
 
       // 1. 현재 위치에서 블록 분할
       Transforms.splitNodes(editor, { always: true });

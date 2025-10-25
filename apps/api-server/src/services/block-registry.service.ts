@@ -166,7 +166,7 @@ class BlockRegistryService {
         language: { type: 'string', description: '프로그래밍 언어' }
       },
       example: {
-        json: JSON.stringify({ type: 'o4o/code', attributes: { content: 'console.log("Hello");', language: 'javascript' } }, null, 2),
+        json: JSON.stringify({ type: 'o4o/code', attributes: { content: 'const message = "Hello World";', language: 'javascript' } }, null, 2),
         text: '코드 블록'
       },
       version: '1.0.0',
