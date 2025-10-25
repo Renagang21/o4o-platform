@@ -385,7 +385,12 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           }}
           emptyPlaceholder="<p><br></p>"
         >
-          <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
+          <Slate
+            key={`${id}-${isSelected}`}
+            editor={editor}
+            initialValue={initialValue}
+            onValueChange={handleChange}
+          >
             <Editable
               renderElement={renderElement}
               renderLeaf={renderLeaf}
