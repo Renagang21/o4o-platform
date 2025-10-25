@@ -1483,12 +1483,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         onClose={() => setIsAIGeneratorOpen(false)}
         onGenerate={(generatedBlocks) => {
           // Replace existing blocks with AI generated blocks
-          // Convert AI blocks to ensure they have required content property
-          const convertedBlocks = generatedBlocks.map(block => ({
-            ...block,
-            content: block.content || {}
-          }));
-          updateBlocks(convertedBlocks);
+          // No conversion needed - use blocks as-is from SimpleAIGenerator
+          updateBlocks(generatedBlocks);
           showToast('AI 페이지가 생성되었습니다!', 'success');
         }}
       />
