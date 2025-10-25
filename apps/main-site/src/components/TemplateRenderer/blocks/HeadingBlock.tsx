@@ -1,8 +1,9 @@
 import { CSSProperties, FC } from 'react';
 
 interface HeadingBlockProps {
-  text: string;
-  level: 1 | 2 | 3 | 4 | 5 | 6;
+  text?: string;
+  content?: string; // AI-generated blocks use "content"
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
   alignment?: 'left' | 'center' | 'right';
   settings?: {
     color?: string;
@@ -11,14 +12,17 @@ interface HeadingBlockProps {
   };
 }
 
-const HeadingBlock: FC<HeadingBlockProps> = ({ 
-  text, 
+const HeadingBlock: FC<HeadingBlockProps> = ({
+  text,
+  content,
   level = 2,
   alignment = 'left',
   settings = {}
 }) => {
+  // Support both "text" and "content" props
+  const headingText = content || text || '';
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
-  
+
   const style: CSSProperties = {
     textAlign: alignment,
     color: settings.color || 'inherit',
@@ -27,11 +31,11 @@ const HeadingBlock: FC<HeadingBlockProps> = ({
   };
 
   return (
-    <Tag 
+    <Tag
       className={`heading-block heading-h${level}`}
       style={style}
     >
-      {text}
+      {headingText}
     </Tag>
   );
 };

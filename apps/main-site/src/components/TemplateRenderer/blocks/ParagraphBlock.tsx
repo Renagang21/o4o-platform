@@ -3,7 +3,8 @@ import DOMPurify from 'dompurify';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 
 interface ParagraphBlockProps {
-  text: string;
+  text?: string;
+  content?: string; // AI-generated blocks use "content"
   alignment?: 'left' | 'center' | 'right';
   settings?: {
     fontSize?: string;
@@ -13,11 +14,14 @@ interface ParagraphBlockProps {
   };
 }
 
-const ParagraphBlock: FC<ParagraphBlockProps> = ({ 
-  text, 
+const ParagraphBlock: FC<ParagraphBlockProps> = ({
+  text,
+  content,
   alignment = 'left',
   settings = {}
 }) => {
+  // Support both "text" and "content" props
+  const paragraphText = content || text || '';
   const style: CSSProperties = {
     textAlign: alignment,
     fontSize: settings.fontSize || '1rem',
@@ -27,9 +31,9 @@ const ParagraphBlock: FC<ParagraphBlockProps> = ({
 
   // Process shortcodes if enabled
   if (settings.processShortcodes !== false) {
-    const parsedContent = shortcodeParser.parseAsElement(text);
+    const parsedContent = shortcodeParser.parseAsElement(paragraphText);
     return (
-      <div 
+      <div
         className="paragraph-block"
         style={style}
       >
@@ -39,10 +43,10 @@ const ParagraphBlock: FC<ParagraphBlockProps> = ({
   }
 
   return (
-    <p 
+    <p
       className="paragraph-block"
       style={style}
-      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(paragraphText) }}
     />
   );
 };
