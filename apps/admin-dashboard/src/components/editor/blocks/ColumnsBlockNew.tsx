@@ -151,9 +151,11 @@ const ColumnsBlockNew: React.FC<ColumnsBlockProps> = ({
         backgroundColor: backgroundColor || undefined,
         padding: padding ? `${padding}px` : undefined,
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect?.();
+      onClick={() => {
+        // Performance: simple click handler
+        if (!isSelected) {
+          onSelect?.();
+        }
       }}
     >
       {/* Toolbar when selected */}

@@ -136,17 +136,19 @@ const ColumnBlock: React.FC<ColumnBlockProps> = ({
         }}
       >
         {/* InnerBlocks - 이 컬럼 안에 다른 블록들이 들어감 */}
-        <InnerBlocks
-          parentBlockId={id || 'column'}
-          blocks={innerBlocks}
-          onBlocksChange={handleInnerBlocksChange}
-          selectedBlockId={isSelected ? id : null}
-          placeholder="Add blocks to this column..."
-          renderAppender={true}
-          orientation="vertical"
-          className="column-inner-blocks w-full"
-          currentDepth={2}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <InnerBlocks
+            parentBlockId={id || 'column'}
+            blocks={innerBlocks}
+            onBlocksChange={handleInnerBlocksChange}
+            selectedBlockId={isSelected ? id : null}
+            placeholder="Add blocks to this column..."
+            renderAppender={true}
+            orientation="vertical"
+            className="column-inner-blocks w-full"
+            currentDepth={2}
+          />
+        </div>
       </div>
     </EnhancedBlockWrapper>
   );

@@ -128,22 +128,9 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
-        const target = e.target as HTMLElement;
-
-        // Check if click was inside contentEditable element
-        const isContentEditableClick =
-          target.contentEditable === 'true' ||
-          target.closest('[contenteditable="true"]');
-
-        if (isContentEditableClick) {
-          // Trust browser's default behavior for text selection
-          // Only select block if it's not already selected
-          if (!isSelected) {
-            onSelect();
-          }
-          // Don't call onSelect() if already selected - preserves cursor/selection
-        } else {
-          // Click outside contentEditable - always select block
+        // Performance optimization: avoid expensive DOM traversal
+        // Only select if not already selected
+        if (!isSelected) {
           onSelect();
         }
       }}
