@@ -40,22 +40,32 @@ const ColumnsBlockNew: React.FC<ColumnsBlockProps> = ({
     padding = 0,
   } = attributes;
 
-  // Initialize columns if empty
+  // Initialize columns if empty (only for manually created blocks, not AI-generated)
+  const hasInitializedRef = React.useRef(false);
+
   React.useEffect(() => {
-    if (innerBlocks.length === 0 && onInnerBlocksChange) {
-      const initialColumns: Block[] = Array.from({ length: columnCount }, (_, i) => ({
-        id: `column-${Date.now()}-${i}`,
-        clientId: `client-column-${Date.now()}-${i}`,
-        type: 'o4o/column',
-        content: {},
-        attributes: {
-          width: 100 / columnCount,
-        },
-        innerBlocks: [],
-      }));
-      onInnerBlocksChange(initialColumns);
+    // Skip initialization if:
+    // 1. Already initialized
+    // 2. innerBlocks already exist (AI-generated or loaded from saved content)
+    // 3. No onInnerBlocksChange callback
+    if (hasInitializedRef.current || innerBlocks.length > 0 || !onInnerBlocksChange) {
+      return;
     }
-  }, []);
+
+    // Only initialize empty columns for new, manually created columns blocks
+    hasInitializedRef.current = true;
+    const initialColumns: Block[] = Array.from({ length: columnCount }, (_, i) => ({
+      id: `column-${Date.now()}-${i}`,
+      clientId: `client-column-${Date.now()}-${i}`,
+      type: 'o4o/column',
+      content: {},
+      attributes: {
+        width: 100 / columnCount,
+      },
+      innerBlocks: [],
+    }));
+    onInnerBlocksChange(initialColumns);
+  }, [innerBlocks.length, columnCount, onInnerBlocksChange]);
 
   // Handle adding a new column
   const handleAddColumn = useCallback(() => {
