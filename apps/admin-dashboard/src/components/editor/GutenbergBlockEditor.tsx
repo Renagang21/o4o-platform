@@ -332,7 +332,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle block update
   const handleBlockUpdate = useCallback(
     (blockId: string, content: any, attributes?: any) => {
-      const newBlocks = blocks.map((block) =>
+      const newBlocks = blocksRef.current.map((block) =>
         block.id === blockId
           ? {
               ...block,
@@ -343,29 +343,29 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       );
       updateBlocks(newBlocks);
     },
-    [blocks, updateBlocks]
+    [updateBlocks]
   );
 
   // Handle block deletion
   const handleBlockDelete = useCallback(
     (blockId: string) => {
-      const newBlocks = blocks.filter((block) => block.id !== blockId);
+      const newBlocks = blocksRef.current.filter((block) => block.id !== blockId);
       // Allow completely empty editor - don't auto-create blocks
       updateBlocks(newBlocks);
       setSelectedBlockId(null);
     },
-    [blocks, updateBlocks]
+    [updateBlocks]
   );
 
   // Handle block copy with HTML + JSON clipboard support
   const handleBlockCopy = useCallback(
     async (blockId: string) => {
-      const block = blocks.find((b) => b.id === blockId);
+      const block = blocksRef.current.find((b) => b.id === blockId);
       if (!block) return;
 
       await copyBlockToClipboard(block, setCopiedBlock);
     },
-    [blocks]
+    []
   );
 
   // Handle block paste with clipboard reading support
@@ -376,20 +376,20 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       // Insert the block
       if (newBlock) {
         if (afterBlockId) {
-          const index = blocks.findIndex((b) => b.id === afterBlockId);
-          const newBlocks = [...blocks];
+          const index = blocksRef.current.findIndex((b) => b.id === afterBlockId);
+          const newBlocks = [...blocksRef.current];
           newBlocks.splice(index + 1, 0, newBlock);
           updateBlocks(newBlocks);
         } else {
           // 마지막에 추가
-          updateBlocks([...blocks, newBlock]);
+          updateBlocks([...blocksRef.current, newBlock]);
         }
 
         setSelectedBlockId(newBlock.id);
         setIsDirty(true);
       }
     },
-    [blocks, copiedBlock, updateBlocks]
+    [copiedBlock, updateBlocks]
   );
 
   // Handle block insertion
@@ -403,21 +403,21 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       };
 
       // Add Block 버튼은 항상 맨 끝에 삽입
-      const insertIndex = blocks.length;
+      const insertIndex = blocksRef.current.length;
 
-      const newBlocks = [...blocks];
+      const newBlocks = [...blocksRef.current];
       newBlocks.splice(insertIndex, 0, newBlock);
       updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
       setIsBlockInserterOpen(false);
     },
-    [blocks, updateBlocks]
+    [updateBlocks]
   );
 
   // Handle add block at position
   const handleAddBlock = useCallback(
     (blockId: string, position: 'before' | 'after', blockType = 'o4o/paragraph', initialContent?: any) => {
-      const index = blocks.findIndex((b) => b.id === blockId);
+      const index = blocksRef.current.findIndex((b) => b.id === blockId);
       const newBlock: Block = {
         id: `block-${Date.now()}`,
         type: blockType,
@@ -425,7 +425,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         attributes: {},
       };
 
-      const newBlocks = [...blocks];
+      const newBlocks = [...blocksRef.current];
       const insertIndex = position === 'after' ? index + 1 : index;
       newBlocks.splice(insertIndex, 0, newBlock);
       updateBlocks(newBlocks);
@@ -442,7 +442,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         }
       }, 100);
     },
-    [blocks, updateBlocks]
+    [updateBlocks]
   );
 
   // Handle slash command block selection
@@ -454,10 +454,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       if (!triggerBlockId) return;
 
       // Find the block that triggered slash command
-      const blockIndex = blocks.findIndex(b => b.id === triggerBlockId);
+      const blockIndex = blocksRef.current.findIndex(b => b.id === triggerBlockId);
       if (blockIndex === -1) return;
 
-      const triggerBlock = blocks[blockIndex];
+      const triggerBlock = blocksRef.current[blockIndex];
 
       // Remove "/" and query text from the trigger block
       let cleanedText = '';
@@ -480,7 +480,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         attributes: {},
       };
 
-      const newBlocks = [...blocks];
+      const newBlocks = [...blocksRef.current];
 
       // If trigger block is empty (only had "/"), replace it
       if (!cleanedText.trim()) {
@@ -519,7 +519,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         }
       }, 50);
     },
-    [blocks, selectedBlockId, slashTriggerBlockId, updateBlocks]
+    [selectedBlockId, slashTriggerBlockId, updateBlocks]
   );
 
   // Listen for custom "open-block-inserter" event from EditorHeader
@@ -670,27 +670,27 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Handle block duplication
   const handleDuplicate = useCallback((blockId: string) => {
-    const blockIndex = blocks.findIndex((b) => b.id === blockId);
+    const blockIndex = blocksRef.current.findIndex((b) => b.id === blockId);
     if (blockIndex === -1) return;
 
-    const blockToDuplicate = blocks[blockIndex];
+    const blockToDuplicate = blocksRef.current[blockIndex];
     const duplicatedBlock: Block = {
       ...blockToDuplicate,
       id: `block-${Date.now()}`,
     };
 
-    const newBlocks = [...blocks];
+    const newBlocks = [...blocksRef.current];
     newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
     updateBlocks(newBlocks);
     setSelectedBlockId(duplicatedBlock.id);
-  }, [blocks, updateBlocks]);
+  }, [updateBlocks]);
 
   // Handle block move up
   const handleMoveUp = useCallback((blockId: string) => {
-    const blockIndex = blocks.findIndex((b) => b.id === blockId);
+    const blockIndex = blocksRef.current.findIndex((b) => b.id === blockId);
     if (blockIndex <= 0) return;
 
-    const newBlocks = [...blocks];
+    const newBlocks = [...blocksRef.current];
     const [block] = newBlocks.splice(blockIndex, 1);
     newBlocks.splice(blockIndex - 1, 0, block);
     updateBlocks(newBlocks);
@@ -700,14 +700,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     setTimeout(() => {
       setSelectedBlockId(blockId);
     }, 0);
-  }, [blocks, updateBlocks]);
+  }, [updateBlocks]);
 
   // Handle block move down
   const handleMoveDown = useCallback((blockId: string) => {
-    const blockIndex = blocks.findIndex((b) => b.id === blockId);
-    if (blockIndex === -1 || blockIndex >= blocks.length - 1) return;
+    const blockIndex = blocksRef.current.findIndex((b) => b.id === blockId);
+    if (blockIndex === -1 || blockIndex >= blocksRef.current.length - 1) return;
 
-    const newBlocks = [...blocks];
+    const newBlocks = [...blocksRef.current];
     const [block] = newBlocks.splice(blockIndex, 1);
     newBlocks.splice(blockIndex + 1, 0, block);
     updateBlocks(newBlocks);
@@ -717,7 +717,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     setTimeout(() => {
       setSelectedBlockId(blockId);
     }, 0);
-  }, [blocks, updateBlocks]);
+  }, [updateBlocks]);
 
   // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
   const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
@@ -732,12 +732,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               attributes: action.attributes || {},
             };
 
-            const newBlocks = [...blocks];
+            const newBlocks = [...blocksRef.current];
             if (action.position === 'before' && action.targetBlockId) {
-              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
+              const idx = blocksRef.current.findIndex(b => b.id === action.targetBlockId);
               newBlocks.splice(idx, 0, newBlock);
             } else if (action.position === 'after' && action.targetBlockId) {
-              const idx = blocks.findIndex(b => b.id === action.targetBlockId);
+              const idx = blocksRef.current.findIndex(b => b.id === action.targetBlockId);
               newBlocks.splice(idx + 1, 0, newBlock);
             } else if (typeof action.position === 'number') {
               newBlocks.splice(action.position, 0, newBlock);
@@ -774,9 +774,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
         case 'move':
           if (action.targetBlockId && typeof action.position === 'number') {
-            const blockIndex = blocks.findIndex(b => b.id === action.targetBlockId);
+            const blockIndex = blocksRef.current.findIndex(b => b.id === action.targetBlockId);
             if (blockIndex !== -1) {
-              const newBlocks = [...blocks];
+              const newBlocks = [...blocksRef.current];
               const [block] = newBlocks.splice(blockIndex, 1);
               newBlocks.splice(action.position, 0, block);
               updateBlocks(newBlocks);
@@ -795,7 +795,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           console.warn('Unknown action:', action);
       }
     });
-  }, [blocks, updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
+  }, [updateBlocks, handleBlockUpdate, handleBlockDelete, handleDuplicate, showToast]);
 
   // Handle preview
   const handlePreview = useCallback(() => {
@@ -826,7 +826,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle block type change
   const handleBlockTypeChange = useCallback(
     (blockId: string, newType: string) => {
-      const newBlocks = blocks.map((block) => {
+      const newBlocks = blocksRef.current.map((block) => {
         if (block.id === blockId) {
           // Convert heading types
           if (newType.startsWith('o4o/heading-')) {
@@ -852,7 +852,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       });
       updateBlocks(newBlocks);
     },
-    [blocks, updateBlocks]
+    [updateBlocks]
   );
 
   // Keyboard shortcuts
