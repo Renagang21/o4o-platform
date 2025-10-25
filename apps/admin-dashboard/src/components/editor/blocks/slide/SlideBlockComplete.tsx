@@ -1,6 +1,12 @@
 /**
+ * @deprecated This file is deprecated and kept for backward compatibility only.
+ * Use SlideBlock.tsx instead, which now includes all Phase 1-4 features.
+ *
  * SlideBlockComplete - Complete integration of Phase 1-4 features
  * Main component for advanced slide presentation system
+ *
+ * DEPRECATED: SlideBlock and SlideBlockComplete have been unified.
+ * This file will be removed in a future version.
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';

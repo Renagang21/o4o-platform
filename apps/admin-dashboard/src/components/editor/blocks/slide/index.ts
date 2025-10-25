@@ -5,7 +5,6 @@
 
 // Core Components
 export { default as SlideBlock } from './SlideBlock';
-export { default as SlideBlockComplete } from './SlideBlockComplete';
 export { default as SlideEditor } from './SlideEditor';
 export { default as AdvancedSlideEditor } from './AdvancedSlideEditor';
 export { default as SlideViewer } from './SlideViewer';
@@ -49,8 +48,9 @@ export { default as useMouseInteractions } from './useMouseInteractions';
 // Types
 export * from './types';
 
-// Import the complete implementation
-import SlideBlockComplete from './SlideBlockComplete';
+// Import the unified implementation (includes all Phase 1-4 features)
+import SlideBlock from './SlideBlock';
 
-// Convenience export for the complete implementation
-export const SlidePresentation = SlideBlockComplete;
+// Convenience export (SlideBlock now includes all features)
+export const SlidePresentation = SlideBlock;
+export const SlideBlockComplete = SlideBlock; // Backward compatibility alias
