@@ -348,6 +348,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       onToggleLink={toggleLinkEditor}
       isBold={isMarkActive(editor, 'bold')}
       isItalic={isMarkActive(editor, 'italic')}
+      disableAutoFocus={true}
     >
       <div
         ref={editorRef}

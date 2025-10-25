@@ -292,6 +292,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onSelect={onSelect}
       className="wp-block-paragraph"
       variant="simple"
+      disableAutoFocus={true}
     >
       <div
         ref={editorRef}

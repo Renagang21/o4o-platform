@@ -56,6 +56,7 @@ interface EnhancedBlockWrapperProps {
   showToolbar?: boolean;           // Default: true (enhanced), false (simple)
   showAddButtons?: boolean;        // Default: true (enhanced), false (simple)
   enableKeyboardShortcuts?: boolean; // Default: true (enhanced), false (simple)
+  disableAutoFocus?: boolean;      // Disable auto-focus (for Slate.js blocks)
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -92,7 +93,8 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   variant = 'enhanced',
   showToolbar: showToolbarProp,
   showAddButtons: showAddButtonsProp,
-  enableKeyboardShortcuts: enableKeyboardShortcutsProp
+  enableKeyboardShortcuts: enableKeyboardShortcutsProp,
+  disableAutoFocus = false
 }) => {
   // Determine feature flags based on variant
   const isSimpleMode = variant === 'simple';
@@ -110,10 +112,10 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     isHovered,
   });
 
-  // Use auto-focus hook
+  // Use auto-focus hook (disabled for Slate.js blocks)
   useBlockFocus({
     blockRef,
-    isSelected,
+    isSelected: disableAutoFocus ? false : isSelected,
   });
 
   // Use keyboard shortcuts hook (only if enabled)
