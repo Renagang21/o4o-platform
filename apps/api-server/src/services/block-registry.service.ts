@@ -562,55 +562,35 @@ class BlockRegistryService {
     // 폼 블록 (Form Blocks - Dynamic)
     // ============================================
 
-    this.register('o4o/post-form', {
-      name: 'o4o/post-form',
-      title: '포스트 폼',
-      description: '포스트 생성/편집 폼',
-      category: 'dynamic',
-      attributes: {
-        postType: { type: 'string', default: 'post' }
-      },
-      example: {
-        json: JSON.stringify({ type: 'o4o/post-form', attributes: { postType: 'post' }, innerBlocks: [] }, null, 2),
-        text: '포스트 폼'
-      },
-      version: '1.0.0',
-      tags: ['폼', 'form', 'post'],
-      aiPrompts: ['포스트 생성 폼이 필요할 때']
-    });
-
-    this.register('o4o/cpt-form', {
-      name: 'o4o/cpt-form',
-      title: 'CPT 폼',
-      description: 'Custom Post Type 폼',
-      category: 'dynamic',
-      attributes: {
-        postType: { type: 'string' }
-      },
-      example: {
-        json: JSON.stringify({ type: 'o4o/cpt-form', attributes: { postType: 'product' }, innerBlocks: [] }, null, 2),
-        text: 'CPT 폼'
-      },
-      version: '1.0.0',
-      tags: ['폼', 'cpt', 'custom'],
-      aiPrompts: ['커스텀 포스트 타입 폼이 필요할 때']
-    });
-
     this.register('o4o/universal-form', {
       name: 'o4o/universal-form',
       title: '범용 폼',
-      description: 'Post와 모든 CPT를 처리하는 통합 폼',
+      description: 'Post와 모든 CPT를 처리하는 통합 폼 (post, product, event 등)',
       category: 'dynamic',
       attributes: {
-        postType: { type: 'string', default: 'post' }
+        postType: { type: 'string', default: 'post', description: 'Post type (post, product, event 등)' }
       },
       example: {
-        json: JSON.stringify({ type: 'o4o/universal-form', attributes: { postType: 'post' }, innerBlocks: [] }, null, 2),
-        text: '범용 폼'
+        json: JSON.stringify({
+          type: 'o4o/universal-form',
+          attributes: { postType: 'product' },
+          innerBlocks: [
+            { type: 'o4o/form-field', attributes: { name: 'title', label: '제품명', fieldType: 'text' } },
+            { type: 'o4o/form-field', attributes: { name: 'content', label: '설명', fieldType: 'textarea' } },
+            { type: 'o4o/form-submit', attributes: { text: '등록' } }
+          ]
+        }, null, 2),
+        text: 'Product 등록 폼 예시'
       },
       version: '1.0.0',
-      tags: ['폼', 'form', 'universal'],
-      aiPrompts: ['Post나 CPT 생성/편집 폼이 필요할 때']
+      tags: ['폼', 'form', 'universal', 'post', 'cpt'],
+      aiPrompts: [
+        '사용자가 블로그 포스트를 작성할 수 있는 폼 → postType="post"',
+        '사용자가 상품을 등록할 수 있는 폼 → postType="product"',
+        '사용자가 이벤트를 등록할 수 있는 폼 → postType="event"',
+        'Post나 CPT의 생성/편집 폼이 필요할 때',
+        'innerBlocks로 form-field와 form-submit 포함 필수'
+      ]
     });
 
     this.register('o4o/form-field', {
