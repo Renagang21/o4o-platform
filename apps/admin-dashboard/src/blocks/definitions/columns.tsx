@@ -1,11 +1,12 @@
 /**
  * Columns Block Definition
+ * WordPress Gutenberg 완전 모방
  */
 
 import React from 'react';
 import { Columns } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import ColumnsBlockNew from '@/components/editor/blocks/ColumnsBlockNew';
+import GutenbergColumnsBlock from '@/components/editor/blocks/GutenbergColumnsBlock';
 import { BlockComponent } from '../registry/types';
 
 export const columnsBlockDefinition: BlockDefinition = {
@@ -15,15 +16,8 @@ export const columnsBlockDefinition: BlockDefinition = {
   icon: <Columns className="w-5 h-5" />,
   description: 'Display content in multiple columns, with blocks added to each column.',
   keywords: ['columns', 'layout', 'grid', 'split'],
-  component: ColumnsBlockNew as unknown as BlockComponent,
+  component: GutenbergColumnsBlock as unknown as BlockComponent,
   attributes: {
-    columns: {
-      type: 'array',
-      default: [
-        { id: '1', width: 50, content: [] },
-        { id: '2', width: 50, content: [] }
-      ],
-    },
     columnCount: {
       type: 'number',
       default: 2,
@@ -36,22 +30,6 @@ export const columnsBlockDefinition: BlockDefinition = {
       type: 'boolean',
       default: true,
     },
-    gap: {
-      type: 'number',
-      default: 20,
-    },
-    minHeight: {
-      type: 'number',
-      default: 0,
-    },
-    backgroundColor: {
-      type: 'string',
-      default: '',
-    },
-    padding: {
-      type: 'number',
-      default: 0,
-    },
   },
   supports: {
     align: ['wide', 'full'],
@@ -59,10 +37,16 @@ export const columnsBlockDefinition: BlockDefinition = {
     className: true,
     color: {
       background: true,
+      text: true,
     },
     spacing: {
       padding: true,
       margin: true,
+      blockGap: true,
+    },
+    typography: {
+      fontSize: true,
+      lineHeight: true,
     },
   },
 };

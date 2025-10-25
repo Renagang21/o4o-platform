@@ -1,5 +1,6 @@
 /**
  * Column Block Definition
+ * WordPress Gutenberg 완전 모방
  * Single column within a Columns block
  */
 
@@ -8,7 +9,7 @@ import { Square } from 'lucide-react';
 import { BlockDefinition, BlockComponent } from '../registry/types';
 
 // Use lazy loading to avoid static/dynamic import conflict
-const ColumnBlock = React.lazy(() => import('@/components/editor/blocks/ColumnBlock'));
+const GutenbergColumnBlock = React.lazy(() => import('@/components/editor/blocks/GutenbergColumnBlock'));
 
 export const columnBlockDefinition: BlockDefinition = {
   name: 'o4o/column',
@@ -17,7 +18,7 @@ export const columnBlockDefinition: BlockDefinition = {
   icon: <Square className="w-5 h-5" />,
   description: 'A single column within a columns block.',
   keywords: ['column', 'layout'],
-  component: ColumnBlock as unknown as BlockComponent,
+  component: GutenbergColumnBlock as unknown as BlockComponent,
   attributes: {
     width: {
       type: 'number',
@@ -27,23 +28,17 @@ export const columnBlockDefinition: BlockDefinition = {
       type: 'string',
       default: 'top',
     },
-    backgroundColor: {
-      type: 'string',
-      default: '',
-    },
-    padding: {
-      type: 'number',
-      default: 16,
-    },
   },
   supports: {
     anchor: true,
     className: true,
     color: {
       background: true,
+      text: true,
     },
     spacing: {
       padding: true,
+      margin: true,
     },
   },
   // Column can only exist within Columns block
