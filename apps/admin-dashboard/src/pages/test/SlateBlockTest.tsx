@@ -1,312 +1,468 @@
 /**
- * Slate Block Test Page
+ * Slate Block Input Test Page
  *
- * Purpose: Isolate Slate.js ParagraphBlock input issue
- * Tests in order of complexity to identify exact failure point
+ * Purpose: 단계별로 문제 격리 - "커서가 잠깐 보였다가 사라지는" 문제 디버깅
+ *
+ * Test 순서:
+ * 1. Pure Slate (no wrappers)
+ * 2. Slate + onClick wrapper
+ * 3. Slate + tabIndex wrapper
+ * 4. Slate + SimpleBlockWrapper auto-focus
+ * 5. Slate + useBlockFocus (selection.removeAllRanges)
+ * 6. Actual ParagraphBlock (full integration)
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { createEditor, Descendant } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
+import { cn } from '@/lib/utils';
 import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
 
 export default function SlateBlockTest() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h1 className="text-3xl font-bold mb-2">Slate Block Input Test</h1>
-          <p className="text-gray-600">
-            Testing paragraph block input issue - 커서가 잠깐 보였다가 사라지는 문제
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-lg shadow-lg">
+          <h1 className="text-4xl font-bold mb-3">🔬 Slate Block Input Debugger</h1>
+          <p className="text-lg opacity-90">
+            단계별 테스트로 "커서가 잠깐 보였다가 사라지는" 문제 원인 파악
           </p>
         </div>
 
-        {/* Test 1: Pure Slate (no wrappers) */}
-        <Test1PureSlate />
-
-        {/* Test 2: Slate with onClick wrapper */}
-        <Test2SlateWithOnClick />
-
-        {/* Test 3: Slate with tabIndex wrapper */}
-        <Test3SlateWithTabIndex />
-
-        {/* Test 4: Slate with selection manipulation */}
-        <Test4SlateWithSelection />
-
-        {/* Test 5: Actual ParagraphBlock */}
-        <Test5ActualParagraphBlock />
-
         {/* Instructions */}
         <div className="bg-blue-50 border-2 border-blue-300 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-3 text-blue-900">테스트 방법</h2>
-          <ol className="list-decimal list-inside space-y-2 text-blue-800">
-            <li>각 테스트 박스를 클릭하고 타이핑 시도</li>
-            <li>커서가 보이는지, 입력이 되는지 확인</li>
-            <li>브라우저 개발자 도구 콘솔에서 로그 확인</li>
-            <li>어느 테스트부터 실패하는지 파악</li>
+          <h2 className="text-xl font-bold mb-3 text-blue-900 flex items-center gap-2">
+            📋 테스트 방법
+          </h2>
+          <ol className="list-decimal list-inside space-y-2 text-blue-800 leading-relaxed">
+            <li><strong>각 테스트 박스를 순서대로 클릭</strong></li>
+            <li><strong>타이핑을 시도</strong>하고 커서가 보이는지, 입력이 되는지 확인</li>
+            <li><strong>F12 (개발자 도구) → Console 탭</strong>에서 로그 확인</li>
+            <li><strong>어느 테스트부터 실패하는지 파악</strong> (1→2→3→4→5→6 순서)</li>
+            <li>실패한 테스트 번호를 기억하고 보고</li>
           </ol>
+        </div>
+
+        {/* Test 1: Pure Slate */}
+        <Test1PureSlate />
+
+        {/* Test 2: Slate + onClick */}
+        <Test2SlateWithOnClick />
+
+        {/* Test 3: Slate + tabIndex */}
+        <Test3SlateWithTabIndex />
+
+        {/* Test 4: Slate + SimpleBlockWrapper auto-focus */}
+        <Test4SlateWithAutoFocus />
+
+        {/* Test 5: Slate + useBlockFocus selection manipulation */}
+        <Test5SlateWithSelectionManipulation />
+
+        {/* Test 6: Actual ParagraphBlock */}
+        <Test6ActualParagraphBlock />
+
+        {/* Results Guide */}
+        <div className="bg-amber-50 border-2 border-amber-300 p-6 rounded-lg">
+          <h2 className="text-xl font-bold mb-3 text-amber-900">🎯 결과 해석 가이드</h2>
+          <div className="space-y-3 text-amber-900">
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">✅ 1-6 모두 성공:</span>
+              <span>문제 없음 (다른 곳에 버그)</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">❌ Test 1 실패:</span>
+              <span>Slate.js 라이브러리 자체 문제</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">❌ Test 2 실패:</span>
+              <span>onClick 이벤트 버블링 문제</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">❌ Test 3 실패:</span>
+              <span>tabIndex focus 충돌 문제</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">❌ Test 4 실패:</span>
+              <span>Auto-focus 타이밍 문제</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold text-red-600">❌ Test 5 실패:</span>
+              <span className="font-bold text-red-600">selection.removeAllRanges() 문제 확정!</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">❌ Test 6만 실패:</span>
+              <span>ParagraphBlock 특정 로직 문제</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// Test 1: 순수 Slate (wrapper 없음)
+// Test 1: Pure Slate (no wrappers)
 function Test1PureSlate() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [value, setValue] = useState<Descendant[]>([
-    {
-      type: 'paragraph',
-      children: [{ text: '' }],
-    } as any,
+    { type: 'paragraph', children: [{ text: '' }] } as any,
   ]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-3">Test 1: 순수 Slate (no wrappers)</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        가장 기본적인 Slate editor. 이게 안 되면 Slate 자체 문제.
-      </p>
-      <div className="border-2 border-green-300 p-4 rounded">
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-gray-200">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-green-600">Test 1</div>
+        <div>
+          <h2 className="text-xl font-semibold">순수 Slate (no wrappers)</h2>
+          <p className="text-sm text-gray-600">가장 기본적인 Slate editor. 이게 실패하면 Slate 자체 문제.</p>
+        </div>
+      </div>
+
+      <div className="border-4 border-green-300 p-4 rounded-lg bg-green-50">
         <Slate
           editor={editor}
           initialValue={value}
           onValueChange={(newValue) => {
-            console.log('Test 1 - value changed:', newValue);
+            console.log('✅ Test 1 - value changed:', newValue);
             setValue(newValue);
           }}
         >
           <Editable
-            placeholder="여기 클릭해서 입력..."
-            style={{ outline: 'none', minHeight: '60px' }}
-            onFocus={() => console.log('Test 1 - Editable focused')}
-            onBlur={() => console.log('Test 1 - Editable blurred')}
+            placeholder="👉 여기 클릭해서 타이핑..."
+            className="outline-none min-h-[80px] text-lg"
+            onFocus={() => console.log('✅ Test 1 - Editable focused')}
+            onBlur={() => console.log('❌ Test 1 - Editable blurred')}
           />
         </Slate>
       </div>
-      <p className="mt-2 text-xs text-gray-500">
-        ✓ 이 테스트가 성공하면 Slate는 정상 작동
-      </p>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Current value: {JSON.stringify(value[0])}
+      </div>
     </div>
   );
 }
 
-// Test 2: onClick wrapper 추가
+// Test 2: Slate + onClick wrapper
 function Test2SlateWithOnClick() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [value, setValue] = useState<Descendant[]>([
-    {
-      type: 'paragraph',
-      children: [{ text: '' }],
-    } as any,
+    { type: 'paragraph', children: [{ text: '' }] } as any,
   ]);
   const [isSelected, setIsSelected] = useState(false);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-3">Test 2: onClick Wrapper</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        onClick 핸들러가 있는 wrapper. SimpleBlockWrapper 모방.
-      </p>
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-gray-200">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-yellow-600">Test 2</div>
+        <div>
+          <h2 className="text-xl font-semibold">Slate + onClick Wrapper</h2>
+          <p className="text-sm text-gray-600">SimpleBlockWrapper의 onClick 핸들러 모방. 이게 실패하면 onClick 충돌.</p>
+        </div>
+      </div>
+
       <div
         onClick={() => {
-          console.log('Test 2 - Wrapper clicked');
+          console.log('🟡 Test 2 - Wrapper clicked');
           setIsSelected(true);
         }}
-        className={`border-2 p-4 rounded cursor-text ${
-          isSelected ? 'border-blue-500 bg-blue-50' : 'border-yellow-300'
-        }`}
+        className={cn(
+          'border-4 p-4 rounded-lg cursor-text transition-all',
+          isSelected ? 'border-yellow-500 bg-yellow-50' : 'border-yellow-300 bg-yellow-50/50'
+        )}
       >
         <Slate
           editor={editor}
           initialValue={value}
           onValueChange={(newValue) => {
-            console.log('Test 2 - value changed:', newValue);
+            console.log('✅ Test 2 - value changed:', newValue);
             setValue(newValue);
           }}
         >
           <Editable
-            placeholder="여기 클릭해서 입력..."
-            style={{ outline: 'none', minHeight: '60px' }}
-            onFocus={() => console.log('Test 2 - Editable focused')}
-            onBlur={() => console.log('Test 2 - Editable blurred')}
-            onClick={(e) => console.log('Test 2 - Editable clicked')}
+            placeholder="👉 여기 클릭해서 타이핑..."
+            className="outline-none min-h-[80px] text-lg"
+            onFocus={() => console.log('✅ Test 2 - Editable focused')}
+            onBlur={() => console.log('❌ Test 2 - Editable blurred')}
+            onClick={() => console.log('🟡 Test 2 - Editable clicked')}
           />
         </Slate>
       </div>
-      <p className="mt-2 text-xs text-gray-500">
-        Selected: {isSelected ? 'Yes' : 'No'} |
-        ✓ 이 테스트가 실패하면 onClick 이벤트 버블링 문제
-      </p>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Value: {JSON.stringify(value[0])}
+      </div>
     </div>
   );
 }
 
-// Test 3: tabIndex wrapper 추가
+// Test 3: Slate + tabIndex wrapper
 function Test3SlateWithTabIndex() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [value, setValue] = useState<Descendant[]>([
-    {
-      type: 'paragraph',
-      children: [{ text: '' }],
-    } as any,
+    { type: 'paragraph', children: [{ text: '' }] } as any,
   ]);
   const [isSelected, setIsSelected] = useState(false);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-3">Test 3: tabIndex Wrapper</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        tabIndex=0 추가. BlockWrapper 모방.
-      </p>
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-gray-200">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-orange-600">Test 3</div>
+        <div>
+          <h2 className="text-xl font-semibold">Slate + tabIndex Wrapper</h2>
+          <p className="text-sm text-gray-600">BlockWrapper의 tabIndex=0 모방. 이게 실패하면 tabIndex focus 충돌.</p>
+        </div>
+      </div>
+
       <div
         onClick={() => {
-          console.log('Test 3 - Wrapper clicked');
+          console.log('🟠 Test 3 - Wrapper clicked');
           setIsSelected(true);
         }}
         tabIndex={isSelected ? 0 : -1}
-        className={`border-2 p-4 rounded cursor-text ${
-          isSelected ? 'border-orange-500 bg-orange-50' : 'border-orange-300'
-        }`}
-        onFocus={() => console.log('Test 3 - Wrapper focused')}
-        onBlur={() => console.log('Test 3 - Wrapper blurred')}
+        className={cn(
+          'border-4 p-4 rounded-lg cursor-text transition-all',
+          isSelected ? 'border-orange-500 bg-orange-50' : 'border-orange-300 bg-orange-50/50'
+        )}
+        onFocus={() => console.log('🟠 Test 3 - Wrapper focused')}
+        onBlur={() => console.log('🟠 Test 3 - Wrapper blurred')}
       >
         <Slate
           editor={editor}
           initialValue={value}
           onValueChange={(newValue) => {
-            console.log('Test 3 - value changed:', newValue);
+            console.log('✅ Test 3 - value changed:', newValue);
             setValue(newValue);
           }}
         >
           <Editable
-            placeholder="여기 클릭해서 입력..."
-            style={{ outline: 'none', minHeight: '60px' }}
-            onFocus={() => console.log('Test 3 - Editable focused')}
-            onBlur={() => console.log('Test 3 - Editable blurred')}
+            placeholder="👉 여기 클릭해서 타이핑..."
+            className="outline-none min-h-[80px] text-lg"
+            onFocus={() => console.log('✅ Test 3 - Editable focused')}
+            onBlur={() => console.log('❌ Test 3 - Editable blurred')}
           />
         </Slate>
       </div>
-      <p className="mt-2 text-xs text-gray-500">
-        Selected: {isSelected ? 'Yes' : 'No'} |
-        ✓ 이 테스트가 실패하면 tabIndex focus 충돌 문제
-      </p>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Value: {JSON.stringify(value[0])}
+      </div>
     </div>
   );
 }
 
-// Test 4: Selection 조작 추가
-function Test4SlateWithSelection() {
+// Test 4: Slate + SimpleBlockWrapper auto-focus
+function Test4SlateWithAutoFocus() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [value, setValue] = useState<Descendant[]>([
-    {
-      type: 'paragraph',
-      children: [{ text: '' }],
-    } as any,
+    { type: 'paragraph', children: [{ text: '' }] } as any,
   ]);
   const [isSelected, setIsSelected] = useState(false);
+  const blockRef = useRef<HTMLDivElement>(null);
 
-  const handleWrapperClick = useCallback(() => {
-    console.log('Test 4 - Wrapper clicked');
-    setIsSelected(true);
+  // SimpleBlockWrapper auto-focus logic
+  useEffect(() => {
+    if (isSelected && blockRef.current) {
+      const editableElement = blockRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+      if (editableElement) {
+        setTimeout(() => {
+          if (editableElement.isConnected && document.activeElement !== editableElement) {
+            console.log('🔵 Test 4 - Auto-focusing editable');
+            editableElement.focus();
+          }
+        }, 50);
+      }
+    }
+  }, [isSelected]);
 
-    // useBlockFocus 로직 모방
-    setTimeout(() => {
-      const editableElement = document.querySelector('[data-test-4-editable="true"]') as HTMLElement;
-      if (editableElement && editableElement.contentEditable === 'true') {
-        console.log('Test 4 - Auto-focusing editable');
-        editableElement.focus();
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-gray-200">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-blue-600">Test 4</div>
+        <div>
+          <h2 className="text-xl font-semibold">Slate + Auto-Focus (50ms delay)</h2>
+          <p className="text-sm text-gray-600">SimpleBlockWrapper의 auto-focus 로직. 이게 실패하면 타이밍 문제.</p>
+        </div>
+      </div>
 
+      <div
+        ref={blockRef}
+        onClick={() => {
+          console.log('🔵 Test 4 - Wrapper clicked');
+          setIsSelected(true);
+        }}
+        className={cn(
+          'border-4 p-4 rounded-lg cursor-text transition-all',
+          isSelected ? 'border-blue-500 bg-blue-50' : 'border-blue-300 bg-blue-50/50'
+        )}
+      >
+        <Slate
+          editor={editor}
+          initialValue={value}
+          onValueChange={(newValue) => {
+            console.log('✅ Test 4 - value changed:', newValue);
+            setValue(newValue);
+          }}
+        >
+          <Editable
+            placeholder="👉 여기 클릭해서 타이핑..."
+            className="outline-none min-h-[80px] text-lg"
+            onFocus={() => console.log('✅ Test 4 - Editable focused')}
+            onBlur={() => console.log('❌ Test 4 - Editable blurred')}
+          />
+        </Slate>
+      </div>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Value: {JSON.stringify(value[0])}
+      </div>
+    </div>
+  );
+}
+
+// Test 5: Slate + useBlockFocus selection manipulation
+function Test5SlateWithSelectionManipulation() {
+  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const [value, setValue] = useState<Descendant[]>([
+    { type: 'paragraph', children: [{ text: '' }] } as any,
+  ]);
+  const [isSelected, setIsSelected] = useState(false);
+  const blockRef = useRef<HTMLDivElement>(null);
+
+  // useBlockFocus logic with selection manipulation
+  useEffect(() => {
+    if (!isSelected || !blockRef.current) return;
+
+    const focusableElement = blockRef.current.querySelector('[contenteditable]');
+    if (!(focusableElement instanceof HTMLElement)) return;
+
+    const timeoutId = setTimeout(() => {
+      if (!focusableElement.isConnected) return;
+
+      if (document.activeElement !== focusableElement) {
+        console.log('🔴 Test 5 - Focusing editable');
+        focusableElement.focus();
+      }
+
+      // CRITICAL: Selection manipulation (this is the suspected bug!)
+      if (focusableElement.contentEditable === 'true') {
         const selection = window.getSelection();
-        if (selection) {
-          console.log('Test 4 - Manipulating selection');
+        if (!selection) return;
+
+        const needsSelection =
+          selection.rangeCount === 0 ||
+          !focusableElement.contains(selection.anchorNode) ||
+          (selection.rangeCount > 0 &&
+            selection.anchorNode === focusableElement &&
+            focusableElement.childNodes.length === 0);
+
+        if (needsSelection) {
           try {
+            console.log('🔴 Test 5 - Manipulating selection (removeAllRanges)');
             const range = document.createRange();
-            range.selectNodeContents(editableElement);
+            range.selectNodeContents(focusableElement);
             range.collapse(false);
-            selection.removeAllRanges(); // ← 이게 문제!
+            selection.removeAllRanges(); // ← 이게 문제의 원인!
             selection.addRange(range);
-            console.log('Test 4 - Selection manipulation succeeded');
+            console.log('✅ Test 5 - Selection manipulation succeeded');
           } catch (error) {
-            console.error('Test 4 - Selection manipulation failed:', error);
+            console.error('❌ Test 5 - Selection manipulation failed:', error);
           }
         }
       }
     }, 50);
-  }, []);
+
+    return () => clearTimeout(timeoutId);
+  }, [isSelected]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-3">Test 4: Selection 조작 (removeAllRanges)</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        useBlockFocus의 selection.removeAllRanges() 로직 모방.
-      </p>
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-red-300">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-red-600">Test 5</div>
+        <div>
+          <h2 className="text-xl font-semibold text-red-700">Slate + Selection Manipulation (removeAllRanges)</h2>
+          <p className="text-sm text-red-600 font-semibold">
+            ⚠️ useBlockFocus의 selection.removeAllRanges() 로직. 이게 실패하면 문제 확정!
+          </p>
+        </div>
+      </div>
+
       <div
-        onClick={handleWrapperClick}
-        className={`border-2 p-4 rounded cursor-text ${
-          isSelected ? 'border-red-500 bg-red-50' : 'border-red-300'
-        }`}
+        ref={blockRef}
+        onClick={() => {
+          console.log('🔴 Test 5 - Wrapper clicked');
+          setIsSelected(true);
+        }}
+        className={cn(
+          'border-4 p-4 rounded-lg cursor-text transition-all',
+          isSelected ? 'border-red-600 bg-red-50' : 'border-red-400 bg-red-50/50'
+        )}
       >
         <Slate
           editor={editor}
           initialValue={value}
           onValueChange={(newValue) => {
-            console.log('Test 4 - value changed:', newValue);
+            console.log('✅ Test 5 - value changed:', newValue);
             setValue(newValue);
           }}
         >
           <Editable
-            data-test-4-editable="true"
-            placeholder="여기 클릭해서 입력..."
-            style={{ outline: 'none', minHeight: '60px' }}
-            onFocus={() => console.log('Test 4 - Editable focused')}
-            onBlur={() => console.log('Test 4 - Editable blurred')}
+            placeholder="👉 여기 클릭해서 타이핑... (이 테스트에서 실패하면 selection.removeAllRanges가 원인!)"
+            className="outline-none min-h-[80px] text-lg"
+            onFocus={() => console.log('✅ Test 5 - Editable focused')}
+            onBlur={() => console.log('❌ Test 5 - Editable blurred')}
           />
         </Slate>
       </div>
-      <p className="mt-2 text-xs text-gray-500">
-        Selected: {isSelected ? 'Yes' : 'No'} |
-        ⚠️ 이 테스트가 실패하면 selection.removeAllRanges() 문제 확정!
-      </p>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Value: {JSON.stringify(value[0])}
+      </div>
     </div>
   );
 }
 
-// Test 5: 실제 ParagraphBlock
-function Test5ActualParagraphBlock() {
+// Test 6: Actual ParagraphBlock
+function Test6ActualParagraphBlock() {
   const [isSelected, setIsSelected] = useState(false);
   const [content, setContent] = useState('');
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-3">Test 5: 실제 ParagraphBlock</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        실제 ParagraphBlock 컴포넌트. 모든 wrapper와 로직 포함.
-      </p>
-      <div className="border-2 border-purple-300 p-4 rounded">
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-purple-300">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-purple-600">Test 6</div>
+        <div>
+          <h2 className="text-xl font-semibold text-purple-700">실제 ParagraphBlock (Full Integration)</h2>
+          <p className="text-sm text-purple-600">
+            실제 ParagraphBlock 컴포넌트. EnhancedBlockWrapper + 모든 로직 포함.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-4 border-purple-300 p-4 rounded-lg bg-purple-50">
         <ParagraphBlock
           id="test-paragraph"
           content={content}
           onChange={(newContent) => {
-            console.log('Test 5 - ParagraphBlock changed:', newContent);
+            console.log('🟣 Test 6 - ParagraphBlock changed:', newContent);
             setContent(newContent as string);
           }}
-          onDelete={() => console.log('Test 5 - Delete')}
-          onDuplicate={() => console.log('Test 5 - Duplicate')}
-          onMoveUp={() => console.log('Test 5 - Move up')}
-          onMoveDown={() => console.log('Test 5 - Move down')}
+          onDelete={() => console.log('🟣 Test 6 - Delete')}
+          onDuplicate={() => console.log('🟣 Test 6 - Duplicate')}
+          onMoveUp={() => console.log('🟣 Test 6 - Move up')}
+          onMoveDown={() => console.log('🟣 Test 6 - Move down')}
           isSelected={isSelected}
           onSelect={() => {
-            console.log('Test 5 - Block selected');
+            console.log('🟣 Test 6 - Block selected');
             setIsSelected(true);
           }}
         />
       </div>
-      <p className="mt-2 text-xs text-gray-500">
-        Selected: {isSelected ? 'Yes' : 'No'} | Content: {content || '(empty)'}
-      </p>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Content length: {content.length}
+      </div>
     </div>
   );
 }
