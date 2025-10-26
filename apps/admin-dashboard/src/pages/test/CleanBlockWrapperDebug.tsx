@@ -47,6 +47,10 @@ export const CleanBlockWrapperDebug: React.FC<CleanBlockWrapperDebugProps> = ({
       fractionalSecondDigits: 3
     });
 
+    // Also log to console for easier debugging
+    // eslint-disable-next-line no-console
+    console.log(`[${id}:${type}] ${stage}:`, detail);
+
     if (onDebugEvent) {
       onDebugEvent({ timestamp, stage, detail });
     }
