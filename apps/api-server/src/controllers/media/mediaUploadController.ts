@@ -24,13 +24,20 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
     'image/gif',
     'image/svg+xml',
     'image/x-icon',
-    'image/webp'
+    'image/webp',
+    'text/markdown',           // ✨ Added: Markdown files
+    'text/plain',              // ✨ Added: Plain text files (.md may be detected as text/plain)
+    'application/octet-stream' // ✨ Added: Binary files (some .md files)
   ];
 
-  if (allowedMimes.includes(file.mimetype)) {
+  // Also allow by file extension for markdown
+  const fileExt = path.extname(file.originalname).toLowerCase();
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.webp', '.md'];
+
+  if (allowedMimes.includes(file.mimetype) || allowedExts.includes(fileExt)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only images are allowed.'), false);
+    cb(new Error(`Invalid file type. Allowed: images and markdown files. Got: ${file.mimetype}, ext: ${fileExt}`), false);
   }
 };
 
@@ -38,7 +45,7 @@ export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB max
+    fileSize: 10 * 1024 * 1024 // 10MB max (increased for markdown files)
   }
 });
 
@@ -66,11 +73,20 @@ export class MediaUploadController {
       const uploadDir = path.join(process.cwd(), 'uploads', type);
       await fs.mkdir(uploadDir, { recursive: true });
 
-      // Process image based on type
+      // Process file based on type
       let processedBuffer: Buffer = file.buffer;
       let metadata: any = {};
 
-      if (type === 'logo') {
+      // Check if file is markdown
+      const isMarkdown = ext.toLowerCase() === '.md' || file.mimetype === 'text/markdown' || file.mimetype === 'text/plain';
+
+      if (isMarkdown) {
+        // Skip image processing for markdown files
+        metadata = {
+          fileType: 'markdown',
+          size: file.size
+        };
+      } else if (type === 'logo') {
         // Resize logo to reasonable dimensions
         const processed = await sharp(file.buffer)
           .resize(400, 200, {
