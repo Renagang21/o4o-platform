@@ -198,8 +198,8 @@ router.get('/posts/post/:slug', async (req, res) => {
     const post = await postRepository.findOne({
       where: {
         slug,
-        status: 'publish',
-        type: 'post'
+        status: 'publish'
+        // Allow all post types (post, docs, etc.)
       },
       relations: ['author', 'categories', 'tags']
     });
