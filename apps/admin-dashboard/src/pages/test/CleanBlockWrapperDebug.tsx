@@ -57,7 +57,13 @@ export const CleanBlockWrapperDebug: React.FC<CleanBlockWrapperDebugProps> = ({
     logDebug('useEffect START', `isSelected: ${isSelected}, hasRef: ${!!blockRef.current}`);
 
     if (isSelected && blockRef.current) {
-      const editable = blockRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+      // Try multiple selectors: Slate's contenteditable, textarea, or input
+      const editable = (
+        blockRef.current.querySelector('[contenteditable="true"]') ||
+        blockRef.current.querySelector('textarea') ||
+        blockRef.current.querySelector('input[type="text"]')
+      ) as HTMLElement;
+
       const activeElementBefore = document.activeElement;
 
       logDebug('querySelector', `Found editable: ${!!editable} (${editable?.tagName || 'none'}), activeElement: ${activeElementBefore?.tagName}`);

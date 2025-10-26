@@ -35,7 +35,13 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
   // Auto-focus when block becomes selected (like EnhancedBlockWrapper's useBlockFocus)
   useEffect(() => {
     if (isSelected && blockRef.current) {
-      const editable = blockRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+      // Try multiple selectors: Slate's contenteditable, textarea, or input
+      const editable = (
+        blockRef.current.querySelector('[contenteditable="true"]') ||
+        blockRef.current.querySelector('textarea') ||
+        blockRef.current.querySelector('input[type="text"]')
+      ) as HTMLElement;
+
       if (editable) {
         // Use setTimeout to ensure focus happens after React finishes rendering
         setTimeout(() => {
