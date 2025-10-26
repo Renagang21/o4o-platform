@@ -109,3 +109,4 @@ storybook-static
 # OS-specific files
 .DS_Store
 Thumbs.db
+apps/admin-dashboard/.vite-cache/
