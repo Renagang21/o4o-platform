@@ -14,7 +14,7 @@ import React, { useCallback } from 'react';
 import { Block } from '@/types/post.types';
 import { BlockProps } from '@/blocks/registry/types';
 import { cn } from '@/lib/utils';
-import { CleanBlockWrapper } from './CleanBlockWrapper';
+import EnhancedBlockWrapper from '../EnhancedBlockWrapper';
 import { BlockToolbar } from './BlockToolbar';
 import { AlignStartVertical, AlignCenterVertical, AlignEndVertical } from 'lucide-react';
 
@@ -66,7 +66,7 @@ export const GutenbergColumnBlock: React.FC<GutenbergColumnBlockProps> = ({
   };
 
   return (
-    <CleanBlockWrapper
+    <EnhancedBlockWrapper
       id={id}
       type="column"
       isSelected={isSelected}
@@ -159,7 +159,7 @@ export const GutenbergColumnBlock: React.FC<GutenbergColumnBlockProps> = ({
           </div>
         )}
       </div>
-    </CleanBlockWrapper>
+    </EnhancedBlockWrapper>
   );
 };
 
