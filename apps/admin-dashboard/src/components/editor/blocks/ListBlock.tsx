@@ -371,6 +371,7 @@ const ListBlock: React.FC<ListBlockProps> = ({
       }}
       isBold={isMarkActive(editor, 'bold')}
       isItalic={isMarkActive(editor, 'italic')}
+      slateEditor={editor}
     >
       <div className="list-content min-h-[1.5em]" data-handles-enter="true">
         <SlateBlockWrapper
