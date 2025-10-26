@@ -27,6 +27,8 @@ interface GutenbergHeadingBlockProps {
   content?: string | object;
   onChange: (content: string, attributes?: any) => void;
   onDelete: () => void;
+  onDuplicate?: () => void;
+  onCopy?: () => void;
   onAddBlock?: (position: 'before' | 'after', type?: string) => void;
   isSelected: boolean;
   onSelect: () => void;
@@ -45,6 +47,8 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
   content,
   onChange,
   onDelete,
+  onDuplicate,
+  onCopy,
   onAddBlock,
   isSelected,
   onSelect,

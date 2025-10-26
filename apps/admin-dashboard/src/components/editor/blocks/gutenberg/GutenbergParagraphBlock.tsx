@@ -27,6 +27,8 @@ interface GutenbergParagraphBlockProps {
   content?: string | object;
   onChange: (content: string, attributes?: any) => void;
   onDelete: () => void;
+  onDuplicate?: () => void;
+  onCopy?: () => void;
   onAddBlock?: (position: 'before' | 'after', type?: string) => void;
   isSelected: boolean;
   onSelect: () => void;
@@ -44,6 +46,8 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
   content,
   onChange,
   onDelete,
+  onDuplicate,
+  onCopy,
   onAddBlock,
   isSelected,
   onSelect,
