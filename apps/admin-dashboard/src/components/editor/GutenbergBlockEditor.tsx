@@ -25,6 +25,8 @@ import { Toast } from './components/Toast';
 // AI Chat Panel
 import { AIChatPanel } from './AIChatPanel';
 import { EditorContext, AIAction } from '@/services/ai/ConversationalAI';
+// Debug Panel
+import { KeyboardDebugPanel } from './debug/KeyboardDebugPanel';
 // Custom hooks
 import { useBlockManagement } from './hooks/useBlockManagement';
 import { useBlockHistory } from './hooks/useBlockHistory';
@@ -1140,6 +1142,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           recentBlocks={slashCommands.recentBlocks}
         />
       )}
+
+      {/* Keyboard Debug Panel */}
+      <KeyboardDebugPanel />
     </div>
   );
 };

@@ -21,6 +21,7 @@ import { useSlateKeyboard } from '../../hooks/useSlateKeyboard';
 import { createBlockEnterHandler } from '../../utils/handleBlockEnter';
 import { createBlockBackspaceHandler } from '../../utils/handleBlockBackspace';
 import type { ParagraphElement, CustomText } from '../../slate/types/slate-types';
+import { logKeyboardEvent } from '../../debug/KeyboardDebugPanel';
 
 interface GutenbergParagraphBlockProps {
   id: string;
@@ -177,10 +178,9 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
 
   // DEBUG: Log key events
   const handleKeyDownDebug = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    console.log('[GutenbergParagraph] KeyDown:', {
+    logKeyboardEvent('GutenbergParagraph KeyDown', {
       key: event.key,
-      target: event.target,
-      currentTarget: event.currentTarget,
+      target: (event.target as HTMLElement).tagName,
       defaultPrevented: event.defaultPrevented,
       isSelected,
       editorSelection: editor.selection,
@@ -252,8 +252,8 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
             placeholder="Type / to choose a block"
             onKeyDown={handleKeyDownDebug}
             onClick={(e) => {
-              console.log('[GutenbergParagraph] Click:', {
-                target: e.target,
+              logKeyboardEvent('GutenbergParagraph Click', {
+                target: (e.target as HTMLElement).tagName,
                 isSelected,
                 editorSelection: editor.selection,
               });

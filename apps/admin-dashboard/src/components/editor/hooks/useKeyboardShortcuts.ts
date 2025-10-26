@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import { Block } from '@/types/post.types';
+import { logKeyboardEvent } from '../debug/KeyboardDebugPanel';
 
 export interface KeyboardShortcutsOptions {
   handleSave: () => void;
@@ -46,7 +47,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      console.log('[useKeyboardShortcuts] Global KeyDown:', {
+      logKeyboardEvent('useKeyboardShortcuts Global', {
         key: e.key,
         target: target.tagName,
         isContentEditable: target.isContentEditable,
