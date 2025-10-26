@@ -21,12 +21,48 @@ interface Heading {
 export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => {
   const { data, attributes } = block;
 
-  // Get markdown from attributes (new format) or data (old format)
-  const markdown = (attributes?.markdown || data?.markdownContent || '') as string;
+  // Get markdown URL or content
+  const url = (attributes?.url || data?.url || '') as string;
+  const markdownContent = (attributes?.markdown || data?.markdownContent || '') as string;
   const filename = (attributes?.filename || data?.filename || '') as string;
 
+  const [markdown, setMarkdown] = useState<string>(markdownContent);
+  const [loading, setLoading] = useState<boolean>(!!url && !markdownContent);
+  const [error, setError] = useState<string>('');
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Fetch markdown from URL if provided
+  useEffect(() => {
+    if (!url || markdownContent) return;
+
+    const fetchMarkdown = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        // Construct full URL - if url starts with /, prepend API base URL
+        const fullUrl = url.startsWith('http')
+          ? url
+          : `${import.meta.env.VITE_API_URL || 'https://api.neture.co.kr'}${url}`;
+
+        const response = await fetch(fullUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch markdown: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        setMarkdown(text);
+      } catch (err) {
+        console.error('Error fetching markdown:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load markdown');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMarkdown();
+  }, [url, markdownContent]);
 
   // Configure marked options with heading IDs
   useEffect(() => {
@@ -110,6 +146,31 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
     }
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden my-6 p-8">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600">마크다운 파일 로딩 중...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="relative bg-red-50 border border-red-200 rounded-lg overflow-hidden my-6 p-4">
+        <div className="flex items-center gap-2 text-red-700">
+          <FileText className="h-5 w-5" />
+          <span className="font-medium">마크다운 로딩 실패: {error}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
   if (!markdown) {
     return null;
   }
