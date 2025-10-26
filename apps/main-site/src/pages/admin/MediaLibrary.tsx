@@ -171,7 +171,6 @@ const MediaLibrary: FC = () => {
           }));
 
           setFiles(transformedFiles);
-          console.log('Loaded', transformedFiles.length, 'files from API');
         }
       } catch (error) {
         console.error('Failed to fetch media:', error);
