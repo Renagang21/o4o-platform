@@ -202,7 +202,9 @@ export class MenuController {
       });
     } catch (error: any) {
       logger.error('Error updating menu:', error);
-      
+      logger.error('Error stack:', error.stack);
+      logger.error('Request body:', JSON.stringify(req.body, null, 2));
+
       if (error.message?.includes('already exists')) {
         res.status(400).json({
           success: false,
@@ -211,7 +213,8 @@ export class MenuController {
       } else {
         res.status(500).json({
           success: false,
-          error: 'Failed to update menu'
+          error: 'Failed to update menu',
+          details: error.message
         });
       }
     }
