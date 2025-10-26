@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiClient } from '../services/api';
 import { WordPressBlockRenderer } from '../components/WordPressBlockRenderer';
+import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
 
 type PostData = {
   id: string;
@@ -20,6 +21,7 @@ function isLikelyId(value: string): boolean {
 
 export default function PostDetail() {
   const { slugOrId = '' } = useParams();
+  const { currentWidth, currentPadding } = useCustomizerSettings();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [post, setPost] = useState<PostData | null>(null);
@@ -110,7 +112,14 @@ export default function PostDetail() {
   };
 
   return (
-    <article className="py-10">
+    <article
+      className="py-10 mx-auto"
+      style={{
+        maxWidth: `${currentWidth}px`,
+        paddingLeft: `${currentPadding.left}px`,
+        paddingRight: `${currentPadding.right}px`,
+      }}
+    >
       <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
       {post.excerpt && (
         <p className="text-gray-600 mb-6">{post.excerpt}</p>
