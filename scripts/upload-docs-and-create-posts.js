@@ -24,13 +24,23 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
   console.error('⚠️  Warning: Using default credentials. Set ADMIN_EMAIL and ADMIN_PASSWORD environment variables.');
 }
 
-// Markdown files to upload
+// Markdown files to upload (all files in docs/manual/)
 const MARKDOWN_FILES = [
+  'admin-manual.md',
+  'ai-page-generation.md',
+  'ai-technical-guide.md',
+  'ai-user-guide.md',
+  'appearance-customize.md',
+  'appearance-menus.md',
+  'appearance-template-parts.md',
   'blocks-reference.md',
   'blocks-reference-detailed.md',
-  'supplier-manual.md',
-  'seller-manual.md',
+  'dropshipping-user-manual.md',
+  'editor-usage-manual.md',
   'platform-features.md',
+  'seller-manual.md',
+  'shortcodes-reference.md',
+  'supplier-manual.md',
 ];
 
 let authToken = null;
