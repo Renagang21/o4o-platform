@@ -175,6 +175,19 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
     onToggleLink: () => {}, // TODO: Link editor
   });
 
+  // DEBUG: Log key events
+  const handleKeyDownDebug = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    console.log('[GutenbergParagraph] KeyDown:', {
+      key: event.key,
+      target: event.target,
+      currentTarget: event.currentTarget,
+      defaultPrevented: event.defaultPrevented,
+      isSelected,
+      editorSelection: editor.selection,
+    });
+    handleKeyDown(event);
+  };
+
   // Render element (paragraph)
   const renderElement = useCallback((props: RenderElementProps) => {
     const element = props.element as ParagraphElement;
@@ -200,23 +213,6 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
       isSelected={isSelected}
       className="gutenberg-paragraph-block"
     >
-      {/* DEBUG: Visual indicator that NEW GutenbergParagraphBlock is being used */}
-      <div style={{
-        position: 'absolute',
-        top: '-20px',
-        left: '0',
-        fontSize: '10px',
-        color: '#10b981',
-        fontWeight: 'bold',
-        zIndex: 1000,
-        backgroundColor: '#dcfce7',
-        padding: '2px 6px',
-        borderRadius: '3px',
-        border: '1px solid #10b981'
-      }}>
-        ✨ NEW Gutenberg Paragraph
-      </div>
-
       {/* Gutenberg-style Block Toolbar */}
       {isSelected && (
         <BlockToolbar
@@ -254,8 +250,15 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
             renderElement={renderElement}
             renderLeaf={DefaultLeafRenderer}
             placeholder="Type / to choose a block"
-            onKeyDown={handleKeyDown}
-            onClick={onSelect} // Simple: just select on click
+            onKeyDown={handleKeyDownDebug}
+            onClick={(e) => {
+              console.log('[GutenbergParagraph] Click:', {
+                target: e.target,
+                isSelected,
+                editorSelection: editor.selection,
+              });
+              onSelect();
+            }}
             style={{
               outline: 'none',
               minHeight: '1.5em',

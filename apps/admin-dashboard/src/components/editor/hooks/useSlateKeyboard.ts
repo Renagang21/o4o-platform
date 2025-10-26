@@ -57,6 +57,13 @@ export function useSlateKeyboard({
 }: SlateKeyboardOptions) {
   return useCallback(
     (event: React.KeyboardEvent) => {
+      console.log('[useSlateKeyboard] Event received:', {
+        key: event.key,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        defaultPrevented: event.defaultPrevented,
+      });
+
       const isModKey = event.ctrlKey || event.metaKey;
 
       // Format shortcuts (Cmd/Ctrl + key)

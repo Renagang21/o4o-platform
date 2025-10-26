@@ -45,6 +45,15 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      console.log('[useKeyboardShortcuts] Global KeyDown:', {
+        key: e.key,
+        target: target.tagName,
+        isContentEditable: target.isContentEditable,
+        activeElement: document.activeElement?.tagName,
+        defaultPrevented: e.defaultPrevented,
+      });
+
       // Save: Ctrl/Cmd + S
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -204,7 +213,6 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
 
       // Text formatting shortcuts (Cmd+B/I/U/K/Shift+X)
       // Only work in contentEditable elements (text blocks)
-      const target = e.target as HTMLElement;
       if (target.isContentEditable || target.getAttribute('contenteditable') === 'true') {
         // Cmd+B for Bold
         if ((e.ctrlKey || e.metaKey) && e.key === 'b' && !e.shiftKey) {
