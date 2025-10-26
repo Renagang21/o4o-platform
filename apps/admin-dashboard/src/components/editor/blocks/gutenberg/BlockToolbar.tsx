@@ -7,7 +7,7 @@
  * Inspired by WordPress BlockControls component.
  */
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
   AlignLeft,
@@ -18,6 +18,17 @@ import {
   Italic,
   Link,
   Type,
+  MoreVertical,
+  Copy,
+  CopyPlus,
+  ChevronUp,
+  ChevronDown,
+  Code,
+  Lock,
+  Bookmark,
+  Group,
+  Trash2,
+  Settings,
 } from 'lucide-react';
 
 interface BlockToolbarProps {
@@ -36,6 +47,18 @@ interface BlockToolbarProps {
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   onHeadingLevelChange?: (level: 1 | 2 | 3 | 4 | 5 | 6) => void;
 
+  // More options menu actions
+  onCopy?: () => void;
+  onDuplicate?: () => void;
+  onInsertBefore?: () => void;
+  onInsertAfter?: () => void;
+  onEditAsHTML?: () => void;
+  onLock?: () => void;
+  onCreateReusable?: () => void;
+  onGroup?: () => void;
+  onRemove?: () => void;
+  onToggleSettings?: () => void;
+
   // Custom content
   children?: React.ReactNode;
 }
@@ -50,8 +73,35 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
   onToggleLink,
   headingLevel,
   onHeadingLevelChange,
+  onCopy,
+  onDuplicate,
+  onInsertBefore,
+  onInsertAfter,
+  onEditAsHTML,
+  onLock,
+  onCreateReusable,
+  onGroup,
+  onRemove,
+  onToggleSettings,
   children,
 }) => {
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setIsMoreMenuOpen(false);
+      }
+    };
+
+    if (isMoreMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isMoreMenuOpen]);
+
   return (
     <div
       className={cn(
@@ -174,6 +224,187 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
 
       {/* Custom content */}
       {children}
+
+      {/* More Options Menu (Three Dots) */}
+      <div className="relative ml-2 pl-2 border-l border-gray-300" ref={moreMenuRef}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsMoreMenuOpen(!isMoreMenuOpen);
+          }}
+          className={cn(
+            'p-1.5 rounded hover:bg-gray-100 transition-colors',
+            isMoreMenuOpen && 'bg-gray-200'
+          )}
+          title="More options"
+        >
+          <MoreVertical className="w-4 h-4" />
+        </button>
+
+        {/* Dropdown Menu */}
+        {isMoreMenuOpen && (
+          <div
+            className={cn(
+              'absolute top-full right-0 mt-1',
+              'w-56 bg-white border border-gray-300 rounded shadow-lg',
+              'py-1',
+              'z-[60]'
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Hide and Show More Settings */}
+            {onToggleSettings && (
+              <>
+                <button
+                  onClick={() => {
+                    onToggleSettings();
+                    setIsMoreMenuOpen(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Show/Hide Settings</span>
+                </button>
+                <div className="border-t border-gray-200 my-1" />
+              </>
+            )}
+
+            {/* Copy */}
+            {onCopy && (
+              <button
+                onClick={() => {
+                  onCopy();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <Copy className="w-4 h-4" />
+                <span>Copy</span>
+              </button>
+            )}
+
+            {/* Duplicate */}
+            {onDuplicate && (
+              <button
+                onClick={() => {
+                  onDuplicate();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <CopyPlus className="w-4 h-4" />
+                <span>Duplicate</span>
+              </button>
+            )}
+
+            {/* Insert Before */}
+            {onInsertBefore && (
+              <button
+                onClick={() => {
+                  onInsertBefore();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <ChevronUp className="w-4 h-4" />
+                <span>Insert Before</span>
+              </button>
+            )}
+
+            {/* Insert After */}
+            {onInsertAfter && (
+              <button
+                onClick={() => {
+                  onInsertAfter();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <ChevronDown className="w-4 h-4" />
+                <span>Insert After</span>
+              </button>
+            )}
+
+            {(onCopy || onDuplicate || onInsertBefore || onInsertAfter) && (
+              <div className="border-t border-gray-200 my-1" />
+            )}
+
+            {/* Edit as HTML */}
+            {onEditAsHTML && (
+              <button
+                onClick={() => {
+                  onEditAsHTML();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <Code className="w-4 h-4" />
+                <span>Edit as HTML</span>
+              </button>
+            )}
+
+            {/* Create Reusable Block */}
+            {onCreateReusable && (
+              <button
+                onClick={() => {
+                  onCreateReusable();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <Bookmark className="w-4 h-4" />
+                <span>Create Reusable Block</span>
+              </button>
+            )}
+
+            {/* Group */}
+            {onGroup && (
+              <button
+                onClick={() => {
+                  onGroup();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <Group className="w-4 h-4" />
+                <span>Group</span>
+              </button>
+            )}
+
+            {/* Lock */}
+            {onLock && (
+              <button
+                onClick={() => {
+                  onLock();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Lock</span>
+              </button>
+            )}
+
+            {(onEditAsHTML || onCreateReusable || onGroup || onLock) && (
+              <div className="border-t border-gray-200 my-1" />
+            )}
+
+            {/* Remove Block */}
+            {onRemove && (
+              <button
+                onClick={() => {
+                  onRemove();
+                  setIsMoreMenuOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3 text-red-600"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Remove Block</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
