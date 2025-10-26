@@ -64,15 +64,15 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         const apiClient = unifiedApi as unknown as UnifiedApiClient;
 
         const [pagesResponse, postsResponse, categoriesResponse, tagsResponse, cptsResponse] = await Promise.all([
-          apiClient.raw.get<ApiResponse<Page[]>>('/v1/content/pages?limit=100'),
-          apiClient.raw.get<ApiResponse<Post[]>>('/v1/content/posts?limit=100'),
-          apiClient.raw.get<ApiResponse<Category[]>>('/v1/content/categories?limit=100'),
-          apiClient.raw.get<ApiResponse<TagItem[]>>('/v1/content/tags?limit=100'),
-          apiClient.raw.get<any>('/v1/platform/custom-post-types')
+          apiClient.raw.get<ApiResponse<Page[]>>('/pages?limit=100'),
+          apiClient.raw.get<ApiResponse<Post[]>>('/posts?limit=100'),
+          apiClient.raw.get<ApiResponse<Category[]>>('/categories?limit=100'),
+          apiClient.raw.get<ApiResponse<TagItem[]>>('/tags?limit=100'),
+          apiClient.raw.get<any>('/platform/custom-post-types')
         ]);
 
         // Process pages
-        if (pagesResponse.data?.status === 'success' && Array.isArray(pagesResponse.data?.data)) {
+        if (Array.isArray(pagesResponse.data?.data)) {
           setPages(
             pagesResponse.data.data.map((page) => ({
               id: page.id,
@@ -84,7 +84,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         }
 
         // Process posts
-        if (postsResponse.data?.status === 'success' && Array.isArray(postsResponse.data?.data)) {
+        if (Array.isArray(postsResponse.data?.data)) {
           setPosts(
             postsResponse.data.data.map((post) => ({
               id: post.id,
@@ -96,7 +96,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         }
 
         // Process categories
-        if (categoriesResponse.data?.status === 'success' && Array.isArray(categoriesResponse.data?.data)) {
+        if (Array.isArray(categoriesResponse.data?.data)) {
           setCategories(
             categoriesResponse.data.data.map((cat) => ({
               id: cat.id,
@@ -108,7 +108,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         }
 
         // Process tags
-        if (tagsResponse.data?.status === 'success' && Array.isArray(tagsResponse.data?.data)) {
+        if (Array.isArray(tagsResponse.data?.data)) {
           setTags(
             tagsResponse.data.data.map((tag) => ({
               id: tag.id,
@@ -120,7 +120,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         }
 
         // Process CPTs
-        if (cptsResponse.data?.status === 'success' && Array.isArray(cptsResponse.data?.data)) {
+        if (Array.isArray(cptsResponse.data?.data)) {
           setCpts(
             cptsResponse.data.data.map((cpt: any) => ({
               id: cpt.id,
