@@ -55,6 +55,24 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
         if (onSelect) onSelect();
       }}
     >
+      {/* DEBUG: Visual indicator for isSelected */}
+      {isSelected && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '-20px',
+            left: '0',
+            background: 'green',
+            color: 'white',
+            padding: '2px 8px',
+            fontSize: '11px',
+            borderRadius: '3px',
+            zIndex: 9999,
+          }}
+        >
+          SELECTED ✓
+        </div>
+      )}
       {children}
     </div>
   );
