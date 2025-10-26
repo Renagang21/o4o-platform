@@ -71,7 +71,12 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
         handleRedo();
       }
       // Toggle block inserter: /
-      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+      // Only trigger if NOT in contentEditable, INPUT, or TEXTAREA
+      if (e.key === '/' &&
+          !target.isContentEditable &&
+          target.getAttribute('contenteditable') !== 'true' &&
+          document.activeElement?.tagName !== 'INPUT' &&
+          document.activeElement?.tagName !== 'TEXTAREA') {
         e.preventDefault();
         setIsBlockInserterOpen(!isBlockInserterOpen);
       }
