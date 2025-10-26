@@ -257,7 +257,6 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
             renderLeaf={DefaultLeafRenderer}
             placeholder={`Heading ${level}`}
             onKeyDown={handleKeyDown}
-            onClick={onSelect} // Simple: just select on click
             style={{
               outline: 'none',
               minHeight: '1.5em',

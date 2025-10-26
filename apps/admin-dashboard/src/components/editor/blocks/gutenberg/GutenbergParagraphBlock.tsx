@@ -239,7 +239,6 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
             renderLeaf={DefaultLeafRenderer}
             placeholder="Type / to choose a block"
             onKeyDown={handleKeyDown}
-            onClick={onSelect}
             style={{
               outline: 'none',
               minHeight: '1.5em',
