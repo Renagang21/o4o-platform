@@ -53,9 +53,6 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
   onSelect,
   attributes = {},
 }) => {
-  // DEBUG: Log when component renders
-  console.log('🟢 GutenbergParagraphBlock rendered:', { id, isSelected });
-
   const {
     align = 'left',
     fontSize = 16,
@@ -203,6 +200,23 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
       isSelected={isSelected}
       className="gutenberg-paragraph-block"
     >
+      {/* DEBUG: Visual indicator that NEW GutenbergParagraphBlock is being used */}
+      <div style={{
+        position: 'absolute',
+        top: '-20px',
+        left: '0',
+        fontSize: '10px',
+        color: '#10b981',
+        fontWeight: 'bold',
+        zIndex: 1000,
+        backgroundColor: '#dcfce7',
+        padding: '2px 6px',
+        borderRadius: '3px',
+        border: '1px solid #10b981'
+      }}>
+        ✨ NEW Gutenberg Paragraph
+      </div>
+
       {/* Gutenberg-style Block Toolbar */}
       {isSelected && (
         <BlockToolbar
