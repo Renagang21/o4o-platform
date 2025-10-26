@@ -189,18 +189,19 @@ router.get('/templates/:type', async (req, res) => {
   }
 });
 
-// Get regular post by slug
-router.get('/posts/post/:slug', async (req, res) => {
+// Get regular post by slug or ID
+router.get('/posts/post/:slugOrId', async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { slugOrId } = req.params;
     const postRepository = AppDataSource.getRepository(Post);
 
+    // Check if parameter is UUID format
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+
     const post = await postRepository.findOne({
-      where: {
-        slug,
-        status: 'publish'
-        // Allow all post types (post, docs, etc.)
-      },
+      where: isUUID
+        ? { id: slugOrId, status: 'publish' }
+        : { slug: slugOrId, status: 'publish' },
       relations: ['author', 'categories', 'tags']
     });
 
