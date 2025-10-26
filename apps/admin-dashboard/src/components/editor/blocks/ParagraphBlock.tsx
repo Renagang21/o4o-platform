@@ -1,8 +1,8 @@
 /**
- * ParagraphBlock Component (Slate.js-based)
+ * ParagraphBlock Component (Slate.js-based) - REWRITTEN
  *
- * New implementation using Slate.js for rich text editing.
- * Replaces the old contentEditable-based implementation.
+ * Completely rewritten based on working HeadingBlock structure.
+ * Uses EnhancedBlockWrapper in enhanced mode (not simple mode).
  *
  * Features:
  * - Slate.js editor with Bold, Italic, Strikethrough, Code formatting
@@ -71,7 +71,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     backgroundColor = '',
   } = attributes;
 
-  // Create Slate editor with plugins (withParagraphs removed - handled by handleBlockEnter)
+  // Create Slate editor with plugins
   const editor = useMemo(() => createTextEditor(), []);
 
   // Convert HTML content to Slate value
@@ -283,15 +283,25 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [editor]);
 
-
   return (
     <EnhancedBlockWrapper
       id={id}
       type="paragraph"
       isSelected={isSelected}
       onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      variant="simple"
+      onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
+      currentAlign={align}
+      onToggleBold={() => toggleMark(editor, 'bold')}
+      onToggleItalic={() => toggleMark(editor, 'italic')}
+      onToggleLink={toggleLinkEditor}
+      isBold={isMarkActive(editor, 'bold')}
+      isItalic={isMarkActive(editor, 'italic')}
       disableAutoFocus={true}
     >
       <div
@@ -306,14 +316,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           backgroundColor: backgroundColor || undefined,
         }}
         data-handles-enter="true"
-        onClick={(e) => {
-          // Prevent event from bubbling to BlockWrapper
-          // This stops BlockWrapper's onClick from triggering
-          // which would cause setSelectedBlockId → re-render → focus loss
-          e.stopPropagation();
-          // But still select the block
-          onSelect();
-        }}
       >
         <Slate
           editor={editor}
