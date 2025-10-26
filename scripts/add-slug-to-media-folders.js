@@ -25,26 +25,36 @@ async function addSlugColumn() {
     await client.connect();
     console.log('✅ Connected\n');
 
-    // Check if slug column exists
-    console.log('🔍 Checking if slug column exists...');
-    const checkResult = await client.query(`
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_name = 'media_folders' AND column_name = 'slug'
-    `);
+    // Check and add all missing columns
+    console.log('🔍 Checking media_folders columns...');
 
-    if (checkResult.rows.length > 0) {
-      console.log('✅ slug column already exists!');
-    } else {
-      console.log('❌ slug column does not exist');
-      console.log('📝 Adding slug column...');
+    const columnsToAdd = [
+      { name: 'slug', type: 'VARCHAR(255) UNIQUE', description: 'URL-friendly folder identifier' },
+      { name: 'parentId', type: 'UUID', description: 'Parent folder reference' },
+      { name: 'fileCount', type: 'INTEGER DEFAULT 0', description: 'Number of files in folder' },
+      { name: 'totalSize', type: 'BIGINT DEFAULT 0', description: 'Total size of files in bytes' }
+    ];
 
-      await client.query(`
-        ALTER TABLE media_folders
-        ADD COLUMN slug VARCHAR(255) UNIQUE
-      `);
+    for (const column of columnsToAdd) {
+      const checkResult = await client.query(`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'media_folders' AND column_name = $1
+      `, [column.name]);
 
-      console.log('✅ slug column added successfully!');
+      if (checkResult.rows.length > 0) {
+        console.log(`✅ ${column.name} column already exists`);
+      } else {
+        console.log(`❌ ${column.name} column does not exist`);
+        console.log(`📝 Adding ${column.name} column (${column.description})...`);
+
+        await client.query(`
+          ALTER TABLE media_folders
+          ADD COLUMN "${column.name}" ${column.type}
+        `);
+
+        console.log(`✅ ${column.name} column added successfully!`);
+      }
     }
 
     await client.end();
