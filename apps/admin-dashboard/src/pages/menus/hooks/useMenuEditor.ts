@@ -237,11 +237,26 @@ export function useMenuEditor(options: UseMenuEditorOptions = {}): UseMenuEditor
           }
         }
 
-        // Create all items
-        for (const item of flatItems) {
-          await MenuApi.createMenuItem({
+        // Create all items (parents first, then children)
+        // Map old IDs to new IDs
+        const idMap = new Map<string, string>();
+
+        // Sort items: parents first (no parent_id), then children
+        const sortedItems = [...flatItems].sort((a, b) => {
+          if (!a.parent_id && b.parent_id) return -1;
+          if (a.parent_id && !b.parent_id) return 1;
+          return 0;
+        });
+
+        for (const item of sortedItems) {
+          // Map parent_id to new ID if it was remapped
+          const mappedParentId = item.parent_id && idMap.has(item.parent_id)
+            ? idMap.get(item.parent_id)
+            : item.parent_id;
+
+          const created = await MenuApi.createMenuItem({
             menu_id: savedMenuId,
-            parent_id: item.parent_id,
+            parent_id: mappedParentId || null,
             title: item.title,
             url: item.url,
             target: item.target,
@@ -252,6 +267,11 @@ export function useMenuEditor(options: UseMenuEditorOptions = {}): UseMenuEditor
             order_num: item.order_num,
             is_active: true
           });
+
+          // Remember the mapping from old ID to new ID
+          if (item.id && created.data?.id) {
+            idMap.set(item.id, created.data.id);
+          }
         }
       }
 
