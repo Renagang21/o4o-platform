@@ -145,8 +145,12 @@ class MenuService {
       metadata: Record<string, any>;
     }>
   ): Promise<Menu | null> {
-    const menu = await this.findMenuById(id);
-    
+    // Use menuRepository.findOne instead of findMenuById to avoid loading items tree
+    // Loading items causes TypeORM save issues with nested tree structures
+    const menu = await this.menuRepository.findOne({
+      where: { id }
+    });
+
     if (!menu) {
       return null;
     }
