@@ -225,15 +225,26 @@ export function useMenuEditor(options: UseMenuEditorOptions = {}): UseMenuEditor
 
       // Save all items
       if (savedMenuId) {
-        // Delete all existing items first
+        // Delete all existing items first (but wait for deletion to complete)
         if (menuId && menuId !== 'new') {
-          const existingMenu = await MenuApi.getMenu(menuId);
-          if (existingMenu.data?.items) {
-            await Promise.all(
-              existingMenu.data.items.map((item: MenuItemType) =>
-                MenuApi.deleteMenuItem(item.id)
-              )
-            );
+          try {
+            const existingMenu = await MenuApi.getMenu(menuId);
+            if (existingMenu.data?.items) {
+              // Delete all items sequentially to avoid race conditions
+              for (const item of existingMenu.data.items) {
+                try {
+                  await MenuApi.deleteMenuItem(item.id);
+                } catch (deleteError) {
+                  console.warn(`Failed to delete item ${item.id}:`, deleteError);
+                  // Continue with other items
+                }
+              }
+              // Wait a bit to ensure deletions are committed
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+          } catch (loadError) {
+            console.error('Failed to load existing menu items for deletion:', loadError);
+            // Continue anyway
           }
         }
 
@@ -249,28 +260,33 @@ export function useMenuEditor(options: UseMenuEditorOptions = {}): UseMenuEditor
         });
 
         for (const item of sortedItems) {
-          // Map parent_id to new ID if it was remapped
-          const mappedParentId = item.parent_id && idMap.has(item.parent_id)
-            ? idMap.get(item.parent_id)
-            : item.parent_id;
+          try {
+            // Map parent_id to new ID if it was remapped
+            const mappedParentId = item.parent_id && idMap.has(item.parent_id)
+              ? idMap.get(item.parent_id)
+              : item.parent_id;
 
-          const created = await MenuApi.createMenuItem({
-            menu_id: savedMenuId,
-            parent_id: mappedParentId || null,
-            title: item.title,
-            url: item.url,
-            target: item.target,
-            type: item.type,
-            object_id: item.originalId,
-            css_classes: item.cssClass,
-            description: item.description,
-            order_num: item.order_num,
-            is_active: true
-          });
+            const created = await MenuApi.createMenuItem({
+              menu_id: savedMenuId,
+              parent_id: mappedParentId || null,
+              title: item.title,
+              url: item.url,
+              target: item.target,
+              type: item.type,
+              object_id: item.originalId,
+              css_classes: item.cssClass,
+              description: item.description,
+              order_num: item.order_num,
+              is_active: true
+            });
 
-          // Remember the mapping from old ID to new ID
-          if (item.id && created.data?.id) {
-            idMap.set(item.id, created.data.id);
+            // Remember the mapping from old ID to new ID
+            if (item.id && created.data?.id) {
+              idMap.set(item.id, created.data.id);
+            }
+          } catch (itemError) {
+            console.error(`Failed to create menu item "${item.title}":`, itemError);
+            throw new Error(`메뉴 항목 "${item.title}" 생성 실패: ${(itemError as Error).message}`);
           }
         }
       }
