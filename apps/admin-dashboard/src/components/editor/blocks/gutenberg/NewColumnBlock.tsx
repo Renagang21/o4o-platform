@@ -284,12 +284,6 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
         )}
       </div>
 
-      {/* Debug info (remove later) */}
-      {isSelected && (
-        <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-600">
-          <strong>Column:</strong> {width.toFixed(0)}% wide, {innerBlocks.length} blocks
-        </div>
-      )}
     </div>
   );
 };
