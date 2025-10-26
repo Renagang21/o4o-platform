@@ -377,6 +377,16 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
             renderLeaf={DefaultLeafRenderer}
             placeholder={`Heading ${level}`}
             onKeyDown={handleKeyDown}
+            onClick={(e) => {
+              // Critical: Stop propagation at Editable level
+              // Prevents all parent onClick handlers from firing
+              e.stopPropagation();
+              onSelect();
+            }}
+            onMouseDown={(e) => {
+              // Also stop mousedown to prevent focus issues
+              e.stopPropagation();
+            }}
             style={{
               outline: 'none',
               minHeight: '1.5em',
