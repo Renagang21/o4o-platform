@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { AppDataSource } from '../database/connection';
 import { Template } from '../entities/Template';
 import { Page } from '../entities/Page';
+import { Post } from '../entities/Post';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
 import logger from '../utils/logger';
 
@@ -184,6 +185,65 @@ router.get('/templates/:type', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch template'
+    });
+  }
+});
+
+// Get regular post by slug
+router.get('/posts/post/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const postRepository = AppDataSource.getRepository(Post);
+
+    const post = await postRepository.findOne({
+      where: {
+        slug,
+        status: 'publish',
+        type: 'post'
+      },
+      relations: ['author', 'categories', 'tags']
+    });
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        error: 'Post not found or not published'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        content: post.content || '',
+        excerpt: post.excerpt || '',
+        metadata: {
+          excerpt: post.excerpt,
+          featuredImage: post.featured_media || post.meta?.featuredImage || null,
+          author: post.author ? {
+            id: post.author.id,
+            name: post.author.fullName || post.author.email,
+            email: post.author.email
+          } : null,
+          categories: post.categories || [],
+          tags: post.tags || [],
+          seo: {
+            metaTitle: post.seo?.title || post.title,
+            metaDescription: post.seo?.description || post.excerpt,
+            metaKeywords: post.seo?.keywords?.join(', ') || ''
+          },
+          publishedAt: post.published_at,
+          updatedAt: post.updated_at
+        }
+      }
+    });
+  } catch (error: any) {
+    logger.error('Failed to fetch post:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch post'
     });
   }
 });
