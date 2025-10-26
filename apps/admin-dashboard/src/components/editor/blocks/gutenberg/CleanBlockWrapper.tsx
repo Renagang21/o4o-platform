@@ -34,16 +34,37 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
 
   // Auto-focus when block becomes selected (like EnhancedBlockWrapper's useBlockFocus)
   useEffect(() => {
+    console.log('[CleanBlockWrapper] useEffect triggered', {
+      id,
+      type,
+      isSelected,
+      hasBlockRef: !!blockRef.current
+    });
+
     if (isSelected && blockRef.current) {
       const editable = blockRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+      console.log('[CleanBlockWrapper] Found editable?', {
+        id,
+        type,
+        hasEditable: !!editable,
+        editableTag: editable?.tagName,
+        activeElementBefore: document.activeElement?.tagName
+      });
+
       if (editable) {
         // Use setTimeout to ensure focus happens after React finishes rendering
         setTimeout(() => {
           editable.focus();
+          console.log('[CleanBlockWrapper] After focus()', {
+            id,
+            type,
+            activeElement: document.activeElement?.tagName,
+            isFocused: document.activeElement === editable
+          });
         }, 0);
       }
     }
-  }, [isSelected]);
+  }, [isSelected, id, type]);
 
   return (
     <div
