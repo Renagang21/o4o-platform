@@ -10,8 +10,9 @@
  * - data-block-id for queries
  */
 
-import React, { ReactNode, useRef, useEffect } from 'react';
+import React, { ReactNode, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useBlockFocus } from '@/components/editor/hooks/useBlockFocus';
 
 interface CleanBlockWrapperProps {
   id: string;
@@ -32,24 +33,9 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
 }) => {
   const blockRef = useRef<HTMLDivElement>(null);
 
-  // Auto-focus when block becomes selected (like EnhancedBlockWrapper's useBlockFocus)
-  useEffect(() => {
-    if (isSelected && blockRef.current) {
-      // Try multiple selectors: Slate's contenteditable, textarea, or input
-      const editable = (
-        blockRef.current.querySelector('[contenteditable="true"]') ||
-        blockRef.current.querySelector('textarea') ||
-        blockRef.current.querySelector('input[type="text"]')
-      ) as HTMLElement;
-
-      if (editable) {
-        // Use setTimeout to ensure focus happens after React finishes rendering
-        setTimeout(() => {
-          editable.focus();
-        }, 0);
-      }
-    }
-  }, [isSelected]);
+  // Use the proven focus restoration logic from EnhancedBlockWrapper
+  // This handles: focus() + selection creation + proper timing (50ms) + isConnected check
+  useBlockFocus({ blockRef, isSelected });
 
   return (
     <div
