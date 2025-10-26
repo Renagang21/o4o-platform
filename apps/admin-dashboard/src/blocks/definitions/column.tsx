@@ -1,15 +1,13 @@
 /**
  * Column Block Definition
- * WordPress Gutenberg 완전 모방
+ * NEW: Gutenberg-style implementation with CleanBlockWrapper
  * Single column within a Columns block
  */
 
 import React from 'react';
 import { Square } from 'lucide-react';
 import { BlockDefinition, BlockComponent } from '../registry/types';
-
-// Use lazy loading to avoid static/dynamic import conflict
-const GutenbergColumnBlock = React.lazy(() => import('@/components/editor/blocks/GutenbergColumnBlock'));
+import { GutenbergColumnBlock } from '@/components/editor/blocks/gutenberg/GutenbergColumnBlock';
 
 export const columnBlockDefinition: BlockDefinition = {
   name: 'o4o/column',

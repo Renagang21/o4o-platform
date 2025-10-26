@@ -1,12 +1,12 @@
 /**
  * Columns Block Definition
- * WordPress Gutenberg 완전 모방
+ * NEW: Gutenberg-style implementation with CleanBlockWrapper
  */
 
 import React from 'react';
 import { Columns } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import GutenbergColumnsBlock from '@/components/editor/blocks/GutenbergColumnsBlock';
+import { GutenbergColumnsBlock } from '@/components/editor/blocks/gutenberg/GutenbergColumnsBlock';
 import { BlockComponent } from '../registry/types';
 
 export const columnsBlockDefinition: BlockDefinition = {
