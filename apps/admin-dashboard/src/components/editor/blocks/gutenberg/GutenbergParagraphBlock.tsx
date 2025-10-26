@@ -53,6 +53,9 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
   onSelect,
   attributes = {},
 }) => {
+  // DEBUG: Log when component renders
+  console.log('🟢 GutenbergParagraphBlock rendered:', { id, isSelected });
+
   const {
     align = 'left',
     fontSize = 16,
