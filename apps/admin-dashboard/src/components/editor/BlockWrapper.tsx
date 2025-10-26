@@ -138,7 +138,8 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
       <div
         ref={blockRef}
         className={classNames}
-        onClick={handleClick}
+        // REMOVED onClick - blocks handle their own selection now
+        // onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onDragOver={handleDragOver}
@@ -146,7 +147,8 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
         onDrop={handleDrop}
         data-block-id={blockId}
         data-block-type={blockType}
-        tabIndex={isSelected ? 0 : -1}
+        // REMOVED tabIndex - prevents focus stealing from Slate
+        // tabIndex={isSelected ? 0 : -1}
         role="article"
         aria-label={`${blockType.replace('core/', '').replace('o4o/', '')} block${isSelected ? ', selected' : ''}`}
         aria-selected={isSelected}
