@@ -332,6 +332,10 @@ ${availableBlocks}
 
   /**
    * 사용자 프롬프트 구성
+   *
+   * UPDATED 2025-10-26: Upgraded block structure
+   * - Heading/Paragraph blocks now use Slate.js: content={}, data in attributes
+   * - Columns/Column blocks support innerBlocks
    */
   private buildUserPrompt(prompt: string): string {
     return `다음 요구사항으로 페이지를 정확히 생성하세요: ${prompt}
@@ -341,13 +345,13 @@ ${availableBlocks}
   "blocks": [
     {
       "type": "o4o/heading",
-      "content": {"text": "제목 텍스트", "level": 1},
-      "attributes": {}
+      "content": {},
+      "attributes": {"content": "제목 텍스트", "level": 2}
     },
     {
       "type": "o4o/paragraph",
-      "content": {"text": "문단 내용"},
-      "attributes": {}
+      "content": {},
+      "attributes": {"content": "문단 내용"}
     },
     {
       "type": "o4o/image",
@@ -361,19 +365,52 @@ ${availableBlocks}
     },
     {
       "type": "o4o/list",
-      "content": {"items": ["항목1", "항목2"], "ordered": false},
-      "attributes": {}
+      "content": {},
+      "attributes": {"items": ["항목1", "항목2"], "ordered": false, "type": "unordered"}
+    },
+    {
+      "type": "o4o/columns",
+      "content": {},
+      "attributes": {"columnCount": 2},
+      "innerBlocks": [
+        {
+          "type": "o4o/column",
+          "content": {},
+          "attributes": {"width": 50},
+          "innerBlocks": [
+            {
+              "type": "o4o/paragraph",
+              "content": {},
+              "attributes": {"content": "왼쪽 열 내용"}
+            }
+          ]
+        },
+        {
+          "type": "o4o/column",
+          "content": {},
+          "attributes": {"width": 50},
+          "innerBlocks": [
+            {
+              "type": "o4o/paragraph",
+              "content": {},
+              "attributes": {"content": "오른쪽 열 내용"}
+            }
+          ]
+        }
+      ]
     }
   ]
 }
 
-중요 규칙:
+중요 규칙 (⚠️ 2025-10-26 업데이트됨):
 1. 모든 블록 타입은 "o4o/" prefix를 사용하세요 (core/ 사용 금지)
-2. heading 블록: content는 {"text": "...", "level": 1-6} 객체입니다
-3. paragraph 블록: content는 {"text": "..."} 객체입니다
-4. list 블록: content는 {"items": [...], "ordered": true/false} 객체입니다
+2. ✨ heading 블록: content는 빈 객체 {}, attributes에 {"content": "텍스트", "level": 2}
+3. ✨ paragraph 블록: content는 빈 객체 {}, attributes에 {"content": "텍스트"}
+4. ✨ list 블록: content는 빈 객체 {}, attributes에 {"items": [...], "ordered": false, "type": "unordered"}
 5. button/image 블록: content는 빈 객체 {}, 데이터는 attributes에 넣으세요
-6. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;
+6. ✨ columns 블록: innerBlocks 배열에 column 블록들을 넣으세요
+7. ✨ column 블록: innerBlocks 배열에 다른 블록들을 넣을 수 있습니다
+8. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;
   }
 
   /**
@@ -469,7 +506,7 @@ ${availableBlocks}
         }
       }
 
-      // list 블록: content.items → attributes로 이동
+      // list 블록: content.items → attributes로 이동 (✨ UPDATED 2025-10-26)
       if (blockType === 'o4o/list') {
         if (typeof content === 'object' && Array.isArray(content.items)) {
           // AI가 content에 items를 넣은 경우 → attributes로 이동
@@ -480,9 +517,9 @@ ${availableBlocks}
             ordered,
             type: ordered ? 'ordered' : 'unordered'
           };
-          content = {}; // 객체 구조 유지
+          content = {}; // 빈 객체로 변환
         } else if (!attributes.items) {
-          // attributes에 items가 없는 경우
+          // attributes에 items가 없는 경우 - 기본값 설정
           attributes = {
             ...attributes,
             items: [],
@@ -491,7 +528,11 @@ ${availableBlocks}
           };
           content = {};
         } else {
-          // attributes.items가 이미 있는 경우
+          // attributes.items가 이미 있는 경우 - content만 빈 객체로
+          // type 속성 자동 추가
+          if (!attributes.type) {
+            attributes.type = attributes.ordered ? 'ordered' : 'unordered';
+          }
           content = {};
         }
       }
@@ -521,6 +562,37 @@ ${availableBlocks}
           };
         }
         // content는 항상 빈 객체
+        content = {};
+      }
+
+      // ✨ UPDATED 2025-10-26: columns 블록 처리
+      if (blockType === 'o4o/columns') {
+        // columnCount 기본값 설정
+        if (!attributes.columnCount) {
+          // innerBlocks에서 column 개수 추론
+          const columnCount = block.innerBlocks?.length || 2;
+          attributes.columnCount = columnCount;
+        }
+        // 기본 설정값
+        if (!attributes.verticalAlignment) {
+          attributes.verticalAlignment = 'top';
+        }
+        if (attributes.isStackedOnMobile === undefined) {
+          attributes.isStackedOnMobile = true;
+        }
+        content = {};
+      }
+
+      // ✨ UPDATED 2025-10-26: column 블록 처리
+      if (blockType === 'o4o/column') {
+        // width 기본값 설정
+        if (!attributes.width) {
+          // 부모 columns에서 균등 분할
+          attributes.width = 50; // 기본 2열 레이아웃
+        }
+        if (!attributes.verticalAlignment) {
+          attributes.verticalAlignment = 'top';
+        }
         content = {};
       }
 

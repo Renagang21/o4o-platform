@@ -89,17 +89,36 @@ function generateBlockExample(block: any): string {
 
 /**
  * 블록 타입별 예제 콘텐츠
+ *
+ * UPDATED 2025-10-26: Upgraded blocks with Slate.js and innerBlocks support
+ * - o4o/heading: Now uses Slate.js editor with enhanced formatting
+ * - o4o/paragraph: Now uses Slate.js editor with inline formatting
+ * - o4o/columns: Refactored with proper innerBlocks rendering (uses NewColumnsBlock)
+ * - o4o/column: Refactored with proper innerBlocks rendering (uses NewColumnBlock)
+ * - o4o/list: Enhanced list block with better UX
+ * - o4o/quote: Improved quote block with Slate.js
  */
 function getExampleContent(blockName: string): any {
   const examples: Record<string, any> = {
-    'o4o/paragraph': { text: '단락 텍스트 내용' },
-    'o4o/heading': { text: '제목', level: 2 },
+    // ✨ UPGRADED: Slate.js 기반 블록 (Heading, Paragraph)
+    // content는 빈 객체로, 실제 데이터는 attributes에 저장
+    'o4o/paragraph': {},
+    'o4o/heading': {},
+
+    // ✨ UPGRADED: InnerBlocks 지원 레이아웃 블록
+    'o4o/columns': {
+      innerBlocks: [] // columns 블록은 column 블록들을 innerBlocks로 가짐
+    },
+    'o4o/column': {
+      innerBlocks: [] // column 블록은 다른 블록들을 innerBlocks로 가질 수 있음
+    },
+
+    // 기존 블록들
     'o4o/list': { items: ['항목 1', '항목 2'], ordered: false },
     'o4o/image': { alt: '이미지 설명', caption: '캡션' },
     'o4o/button': { text: '버튼 텍스트', url: '#' },
     'o4o/quote': { text: '인용문', citation: '출처' },
     'o4o/code': { code: 'function greet() { return "Hello"; }', language: 'javascript' },
-    'o4o/columns': { columns: [] },
     'o4o/separator': {},
     'o4o/spacer': { height: 50 },
     'o4o/gallery': { images: [] },
