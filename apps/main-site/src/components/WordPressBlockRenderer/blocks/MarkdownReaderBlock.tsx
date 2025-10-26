@@ -26,6 +26,17 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
   const markdownContent = (attributes?.markdown || data?.markdownContent || '') as string;
   const filename = (attributes?.filename || data?.filename || '') as string;
 
+  // Debug: Log block data
+  console.log('[MarkdownReaderBlock] Block data:', {
+    hasAttributes: !!attributes,
+    hasData: !!data,
+    url,
+    markdownContentLength: markdownContent?.length || 0,
+    filename,
+    attributesKeys: attributes ? Object.keys(attributes) : [],
+    dataKeys: data ? Object.keys(data) : []
+  });
+
   const [markdown, setMarkdown] = useState<string>(markdownContent);
   const [loading, setLoading] = useState<boolean>(!!url && !markdownContent);
   const [error, setError] = useState<string>('');
