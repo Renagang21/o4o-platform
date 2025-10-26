@@ -36,8 +36,8 @@ export const CenterControls: React.FC<CenterControlsProps> = ({
       )}
     >
       {/* --- List View Toggle --- */}
-      {/* Hidden on mobile AND tablet for a simpler interface */}
-      {!isSmallScreen && onToggleListView && (
+      {/* Always show on all screen sizes */}
+      {onToggleListView && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

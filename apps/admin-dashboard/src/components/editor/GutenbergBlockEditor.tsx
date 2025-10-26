@@ -116,6 +116,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isDirty, setIsDirty] = useState(false);
   const [sessionRestored, setSessionRestored] = useState(false);
 
+  // List View state - use external control if provided, otherwise internal state
+  const [internalShowListView, setInternalShowListView] = useState(false);
+  const showListView = externalShowListView !== undefined ? externalShowListView : internalShowListView;
+  const toggleListView = externalOnToggleListView || (() => setInternalShowListView(!internalShowListView));
+
   // Toast notifications
   const { toast, showToast } = useToast();
 
