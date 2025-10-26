@@ -10,7 +10,7 @@
  * - data-block-id for queries
  */
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface CleanBlockWrapperProps {
@@ -30,8 +30,24 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
   children,
   className,
 }) => {
+  const blockRef = useRef<HTMLDivElement>(null);
+
+  // Auto-focus when block becomes selected (like EnhancedBlockWrapper's useBlockFocus)
+  useEffect(() => {
+    if (isSelected && blockRef.current) {
+      const editable = blockRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+      if (editable) {
+        // Use setTimeout to ensure focus happens after React finishes rendering
+        setTimeout(() => {
+          editable.focus();
+        }, 0);
+      }
+    }
+  }, [isSelected]);
+
   return (
     <div
+      ref={blockRef}
       data-block-id={id}
       data-block-type={type}
       className={cn(
@@ -42,15 +58,9 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
         isSelected && 'is-selected',
         className
       )}
-      onClick={(e) => {
-        // Selection + auto-focus (like EnhancedBlockWrapper's useBlockFocus)
+      onClick={() => {
+        // Simple selection - focus will be handled by useEffect
         if (onSelect) onSelect();
-
-        // Auto-focus the Slate Editable when clicking anywhere in the block
-        const editable = (e.currentTarget as HTMLElement).querySelector('[contenteditable="true"]');
-        if (editable instanceof HTMLElement) {
-          editable.focus();
-        }
       }}
     >
       {children}
