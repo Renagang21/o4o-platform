@@ -134,8 +134,13 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
         isSelected && 'border-blue-500 bg-blue-50/30'
       )}
       onClick={(e) => {
-        e.stopPropagation();
-        onSelect?.();
+        // Only select Column if clicking on empty area (not on nested blocks)
+        if ((e.target as HTMLElement).classList.contains('empty-column') ||
+            (e.target as HTMLElement).classList.contains('new-column-block') ||
+            (e.target as HTMLElement).classList.contains('column-content')) {
+          e.stopPropagation();
+          onSelect?.();
+        }
       }}
     >
       {/* Column Content */}
