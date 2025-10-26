@@ -214,6 +214,7 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
       id={id}
       type="heading"
       isSelected={isSelected}
+      onSelect={onSelect}
       className="gutenberg-heading-block"
     >
       {/* Gutenberg-style Block Toolbar */}

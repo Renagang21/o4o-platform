@@ -22,6 +22,7 @@ interface CleanBlockWrapperProps {
   id: string;
   type: string;
   isSelected: boolean;
+  onSelect?: () => void;
   children: ReactNode;
   className?: string;
 }
@@ -30,6 +31,7 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
   id,
   type,
   isSelected,
+  onSelect,
   children,
   className,
 }) => {
@@ -45,7 +47,13 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
         isSelected && 'is-selected',
         className
       )}
-      // NO onClick, NO onMouseEnter, NO event handlers
+      onClick={(e) => {
+        // Only select if clicking the wrapper itself, not child elements
+        // This prevents interfering with Slate's internal click handling
+        if (e.target === e.currentTarget && onSelect) {
+          onSelect();
+        }
+      }}
     >
       {children}
     </div>

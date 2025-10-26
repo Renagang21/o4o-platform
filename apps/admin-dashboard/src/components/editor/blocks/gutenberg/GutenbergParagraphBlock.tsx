@@ -198,6 +198,7 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
       id={id}
       type="paragraph"
       isSelected={isSelected}
+      onSelect={onSelect}
       className="gutenberg-paragraph-block"
     >
       {/* Gutenberg-style Block Toolbar */}
