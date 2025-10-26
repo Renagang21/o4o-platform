@@ -105,6 +105,7 @@ const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
 const SlateBlockTest = lazy(() => import('@/pages/test/SlateBlockTest'));
 const FocusDebugTest = lazy(() => import('@/pages/test/FocusDebugTest'));
+const FocusRestorationTest = lazy(() => import('@/pages/test/FocusRestorationTest'));
 const AIBlockDebug = lazy(() => import('@/pages/test/AIBlockDebug'));
 
 // Removed Apps Manager - using WordPress style menu
@@ -629,6 +630,12 @@ function App() {
                     <Route path="/admin/test/focus-debug" element={
                       <Suspense fallback={<PageLoader />}>
                         <FocusDebugTest />
+                      </Suspense>
+                    } />
+                    {/* Test - Focus Restoration */}
+                    <Route path="/admin/test/focus-restoration" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <FocusRestorationTest />
                       </Suspense>
                     } />
                     {/* Test - AI Block Debug */}
