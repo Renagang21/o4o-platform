@@ -64,11 +64,11 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
         const apiClient = unifiedApi as unknown as UnifiedApiClient;
 
         const [pagesResponse, postsResponse, categoriesResponse, tagsResponse, cptsResponse] = await Promise.all([
-          apiClient.raw.get<ApiResponse<Page[]>>('/pages?limit=100'),
-          apiClient.raw.get<ApiResponse<Post[]>>('/posts?limit=100'),
-          apiClient.raw.get<ApiResponse<Category[]>>('/categories?limit=100'),
-          apiClient.raw.get<ApiResponse<TagItem[]>>('/tags?limit=100'),
-          apiClient.raw.get<any>('/platform/custom-post-types')
+          apiClient.raw.get<ApiResponse<Page[]>>('/v1/pages?limit=100'),
+          apiClient.raw.get<ApiResponse<Post[]>>('/v1/posts?limit=100'),
+          apiClient.raw.get<ApiResponse<Category[]>>('/v1/categories?limit=100'),
+          apiClient.raw.get<ApiResponse<TagItem[]>>('/v1/tags?limit=100'),
+          apiClient.raw.get<any>('/v1/platform/custom-post-types')
         ]);
 
         // Process pages
