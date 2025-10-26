@@ -116,19 +116,28 @@ export const getAllPosts = async (req: Request, res: Response) => {
 export const getPost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    
+
     // Check if database is connected
     if (!AppDataSource.isInitialized) {
       console.error('Database not initialized')
-      return res.status(503).json({ 
-        error: { code: 'DB_NOT_READY', message: 'Database connection not available' } 
+      return res.status(503).json({
+        error: { code: 'DB_NOT_READY', message: 'Database connection not available' }
       })
     }
-    
-    const post = await postRepository.findOne({
+
+    // Try to find by ID first, then by slug
+    let post = await postRepository.findOne({
       where: { id },
       relations: ['author', 'categories', 'tags']
     })
+
+    // If not found by ID, try slug
+    if (!post) {
+      post = await postRepository.findOne({
+        where: { slug: id },
+        relations: ['author', 'categories', 'tags']
+      })
+    }
 
     if (!post) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
