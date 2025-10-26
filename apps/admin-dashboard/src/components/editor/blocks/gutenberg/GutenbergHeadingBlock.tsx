@@ -11,7 +11,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Descendant, Element as SlateElement, Text } from 'slate';
 import { Slate, Editable, RenderElementProps } from 'slate-react';
 import { cn } from '@/lib/utils';
-import { CleanBlockWrapper } from './CleanBlockWrapper';
+import EnhancedBlockWrapper from '../EnhancedBlockWrapper';
 import { BlockToolbar } from './BlockToolbar';
 import { serialize, deserialize } from '../../slate/utils/serialize';
 import { createTextEditor } from '../../utils/slate-editor-factory';
@@ -210,11 +210,15 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
   };
 
   return (
-    <CleanBlockWrapper
+    <EnhancedBlockWrapper
       id={id}
       type="heading"
       isSelected={isSelected}
       onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onCopy={onCopy}
+      onAddBlock={onAddBlock}
       className="gutenberg-heading-block"
     >
       {/* Gutenberg-style Block Toolbar */}
@@ -264,7 +268,7 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
           />
         </Slate>
       </div>
-    </CleanBlockWrapper>
+    </EnhancedBlockWrapper>
   );
 };
 
