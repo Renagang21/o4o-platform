@@ -72,6 +72,11 @@ const App: FC = () => {
           
           {/* Archive Routes */}
           <Route path="/blog" element={<BlogArchivePage />} />
+          <Route path="/blog/:slugOrId" element={
+            <Layout>
+              <PostDetail />
+            </Layout>
+          } />
           <Route path="/archive/:postType" element={
             <Layout>
               <CPTArchive />

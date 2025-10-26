@@ -28,6 +28,9 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
 const MARKDOWN_FILES = [
   'blocks-reference.md',
   'blocks-reference-detailed.md',
+  'supplier-manual.md',
+  'seller-manual.md',
+  'platform-features.md',
 ];
 
 let authToken = null;
@@ -204,6 +207,9 @@ function getPostTitle(filename) {
   const titles = {
     'blocks-reference.md': '블록 레퍼런스 (AI용)',
     'blocks-reference-detailed.md': '블록 레퍼런스 상세 가이드',
+    'supplier-manual.md': '공급자 매뉴얼',
+    'seller-manual.md': '판매자 매뉴얼',
+    'platform-features.md': 'O4O 플랫폼 기능 소개',
     'admin-manual.md': '관리자 매뉴얼',
     'ai-page-generation.md': 'AI 페이지 생성 가이드',
     'ai-technical-guide.md': 'AI 기술 가이드',
