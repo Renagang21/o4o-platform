@@ -148,29 +148,30 @@ const MediaLibrary: FC = () => {
     const fetchMedia = async () => {
       try {
         setIsLoading(true);
-        const response = await authClient.api.get('/media');
+        const response = await authClient.api.get('/media?limit=100');
 
-        if (response.data.success && response.data.data) {
+        if (response.data.success && response.data.data?.media) {
           // Transform API data to match MediaFile interface
-          const transformedFiles = response.data.data.map((file: any) => ({
+          const transformedFiles = response.data.data.media.map((file: any) => ({
             id: file.id,
             name: file.filename,
-            originalName: file.originalName || file.filename,
+            originalName: file.originalFilename || file.filename,
             type: getMediaType(file.mimeType),
             mimeType: file.mimeType,
             size: parseInt(file.size) || 0,
             url: file.url,
-            thumbnailUrl: file.url,
-            folder: file.folderId || 'all',
+            thumbnailUrl: file.thumbnailUrl || file.url,
+            folder: file.folderPath || 'all',
             tags: [],
             altText: file.altText,
             description: file.description,
-            uploadedAt: file.uploadedAt,
-            uploadedBy: file.uploader?.name || 'Unknown',
+            uploadedAt: file.createdAt,
+            uploadedBy: file.uploadedBy?.name || 'Unknown',
             dimensions: file.width && file.height ? { width: file.width, height: file.height } : undefined
           }));
 
           setFiles(transformedFiles);
+          console.log('Loaded', transformedFiles.length, 'files from API');
         }
       } catch (error) {
         console.error('Failed to fetch media:', error);
