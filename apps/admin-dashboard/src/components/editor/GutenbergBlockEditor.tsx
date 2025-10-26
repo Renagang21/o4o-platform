@@ -30,7 +30,7 @@ import { useBlockManagement } from './hooks/useBlockManagement';
 import { useBlockHistory } from './hooks/useBlockHistory';
 import { useSlashCommands } from './hooks/useSlashCommands';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useKeyboardShortcuts } from './hooks/keyboard';
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
