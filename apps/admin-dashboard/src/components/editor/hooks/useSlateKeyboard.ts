@@ -8,7 +8,6 @@
 import { useCallback } from 'react';
 import { Editor } from 'slate';
 import { toggleMark } from '../utils/slate-helpers';
-import { logKeyboardEvent } from '../debug/KeyboardDebugPanel';
 
 export interface SlateKeyboardOptions {
   /** Slate editor instance */
@@ -58,13 +57,6 @@ export function useSlateKeyboard({
 }: SlateKeyboardOptions) {
   return useCallback(
     (event: React.KeyboardEvent) => {
-      logKeyboardEvent('useSlateKeyboard', {
-        key: event.key,
-        ctrlKey: event.ctrlKey,
-        metaKey: event.metaKey,
-        defaultPrevented: event.defaultPrevented,
-      });
-
       const isModKey = event.ctrlKey || event.metaKey;
 
       // Format shortcuts (Cmd/Ctrl + key)
