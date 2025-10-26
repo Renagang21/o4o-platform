@@ -21,6 +21,8 @@ import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
 import { BlockWrapper } from '@/components/editor/BlockWrapper';
 import { DynamicRenderer } from '@/blocks/registry/DynamicRenderer';
 import type { Block } from '@/types/post.types';
+import { GutenbergParagraphBlock } from '@/components/editor/blocks/gutenberg/GutenbergParagraphBlock';
+import { GutenbergHeadingBlock } from '@/components/editor/blocks/gutenberg/GutenbergHeadingBlock';
 
 export default function SlateBlockTest() {
   return (
@@ -69,6 +71,15 @@ export default function SlateBlockTest() {
 
         {/* Test 7: BlockWrapper + ParagraphBlock */}
         <Test7BlockWrapperWithParagraph />
+
+        {/* Test 8: NEW Gutenberg ParagraphBlock (직접) */}
+        <Test8GutenbergParagraphDirect />
+
+        {/* Test 9: BlockWrapper + NEW Gutenberg ParagraphBlock */}
+        <Test9BlockWrapperWithGutenbergParagraph />
+
+        {/* Test 10: NEW Gutenberg HeadingBlock (직접) */}
+        <Test10GutenbergHeadingDirect />
 
         {/* Results Guide */}
         <div className="bg-amber-50 border-2 border-amber-300 p-6 rounded-lg">
@@ -548,6 +559,171 @@ function Test7BlockWrapperWithParagraph() {
         <strong>⚠️ 주의:</strong> 이 테스트는 실제 GutenbergBlockEditor의 구조를 재현합니다.
         <br />
         BlockWrapper의 tabIndex={'{'}isSelected ? 0 : -1{'}'} + onClick이 포커스를 가로챌 수 있습니다.
+      </div>
+    </div>
+  );
+}
+
+// Test 8: NEW Gutenberg ParagraphBlock (직접 사용, wrapper 없음)
+function Test8GutenbergParagraphDirect() {
+  const [isSelected, setIsSelected] = useState(false);
+  const [content, setContent] = useState('');
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg border-4 border-green-500">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-green-600">Test 8</div>
+        <div>
+          <h2 className="text-xl font-semibold text-green-700">
+            ✨ NEW Gutenberg ParagraphBlock (직접)
+          </h2>
+          <p className="text-sm text-green-600">
+            새로운 GutenbergParagraphBlock + CleanBlockWrapper. wrapper 없이 직접 렌더링.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-4 border-green-300 p-4 rounded-lg bg-green-50/30">
+        <GutenbergParagraphBlock
+          id="test-gutenberg-paragraph"
+          content={content}
+          onChange={(newContent) => {
+            console.log('🟢 Test 8 - GutenbergParagraphBlock changed:', newContent);
+            setContent(newContent as string);
+          }}
+          onDelete={() => console.log('🟢 Test 8 - Delete')}
+          onSelect={() => {
+            console.log('🟢 Test 8 - Selected');
+            setIsSelected(true);
+          }}
+          isSelected={isSelected}
+          attributes={{}}
+        />
+      </div>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Content length: {content.length}
+      </div>
+
+      <div className="mt-2 p-3 bg-green-100 border border-green-300 rounded text-sm text-green-800">
+        <strong>✨ NEW:</strong> Gutenberg-style 블록. CleanBlockWrapper + BlockToolbar 패턴.
+      </div>
+    </div>
+  );
+}
+
+// Test 9: BlockWrapper + NEW Gutenberg ParagraphBlock
+function Test9BlockWrapperWithGutenbergParagraph() {
+  const [isSelected, setIsSelected] = useState(false);
+  const [content, setContent] = useState('');
+
+  const block: Block = useMemo(() => ({
+    id: 'test-9-gutenberg-block',
+    type: 'o4o/paragraph',
+    content: content,
+    attributes: {},
+  }), [content]);
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg border-4 border-indigo-500">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-indigo-600">Test 9</div>
+        <div>
+          <h2 className="text-xl font-semibold text-indigo-700">
+            🎯 BlockWrapper + NEW Gutenberg ParagraphBlock
+          </h2>
+          <p className="text-sm text-indigo-600 font-bold">
+            실제 배포된 구조! 이 테스트가 사용자가 보는 것과 동일합니다!
+          </p>
+        </div>
+      </div>
+
+      <div className="border-4 border-indigo-300 p-4 rounded-lg bg-indigo-50/30">
+        <BlockWrapper
+          blockId={block.id}
+          blockType={block.type}
+          isSelected={isSelected}
+          onSelect={(blockId) => {
+            console.log('🔵 Test 9 - BlockWrapper selected:', blockId);
+            setIsSelected(true);
+          }}
+        >
+          <DynamicRenderer
+            block={block}
+            onChange={(newContent) => {
+              console.log('🔵 Test 9 - Content changed:', newContent);
+              setContent(newContent as string);
+            }}
+            onDelete={() => console.log('🔵 Test 9 - Delete')}
+            isSelected={isSelected}
+            onSelect={() => {
+              console.log('🔵 Test 9 - DynamicRenderer selected');
+              setIsSelected(true);
+            }}
+            attributes={block.attributes || {}}
+            innerBlocks={[]}
+            canMoveUp={false}
+            canMoveDown={false}
+          />
+        </BlockWrapper>
+      </div>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Content length: {content.length}
+      </div>
+
+      <div className="mt-2 p-3 bg-indigo-100 border border-indigo-300 rounded text-sm text-indigo-800">
+        <strong>🎯 핵심 테스트:</strong> 이것이 실제 에디터 구조입니다!
+        <br />
+        BlockWrapper → DynamicRenderer → GutenbergParagraphBlock → CleanBlockWrapper
+      </div>
+    </div>
+  );
+}
+
+// Test 10: NEW Gutenberg HeadingBlock (직접)
+function Test10GutenbergHeadingDirect() {
+  const [isSelected, setIsSelected] = useState(false);
+  const [content, setContent] = useState('');
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg border-4 border-pink-500">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-pink-600">Test 10</div>
+        <div>
+          <h2 className="text-xl font-semibold text-pink-700">
+            ✨ NEW Gutenberg HeadingBlock (직접)
+          </h2>
+          <p className="text-sm text-pink-600">
+            새로운 GutenbergHeadingBlock도 동일한 문제가 있는지 확인.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-4 border-pink-300 p-4 rounded-lg bg-pink-50/30">
+        <GutenbergHeadingBlock
+          id="test-gutenberg-heading"
+          content={content}
+          onChange={(newContent) => {
+            console.log('🌸 Test 10 - GutenbergHeadingBlock changed:', newContent);
+            setContent(newContent as string);
+          }}
+          onDelete={() => console.log('🌸 Test 10 - Delete')}
+          onSelect={() => {
+            console.log('🌸 Test 10 - Selected');
+            setIsSelected(true);
+          }}
+          isSelected={isSelected}
+          attributes={{ level: 2 }}
+        />
+      </div>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Content length: {content.length}
+      </div>
+
+      <div className="mt-2 p-3 bg-pink-100 border border-pink-300 rounded text-sm text-pink-800">
+        <strong>✨ NEW:</strong> Heading 블록도 같은 패턴 (CleanBlockWrapper + BlockToolbar).
       </div>
     </div>
   );
