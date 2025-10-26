@@ -206,6 +206,12 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
           onToggleBold={() => toggleMark(editor, 'bold')}
           onToggleItalic={() => toggleMark(editor, 'italic')}
           onToggleLink={() => {}} // TODO: Link editor
+          // Three-dot menu actions
+          onCopy={onCopy}
+          onDuplicate={onDuplicate}
+          onInsertBefore={() => onAddBlock?.('before')}
+          onInsertAfter={() => onAddBlock?.('after')}
+          onRemove={onDelete}
         />
       )}
 

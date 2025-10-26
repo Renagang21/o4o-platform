@@ -224,6 +224,12 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
           onToggleBold={() => toggleMark(editor, 'bold')}
           onToggleItalic={() => toggleMark(editor, 'italic')}
           onToggleLink={() => {}} // TODO: Link editor
+          // Three-dot menu actions
+          onCopy={onCopy}
+          onDuplicate={onDuplicate}
+          onInsertBefore={() => onAddBlock?.('before')}
+          onInsertAfter={() => onAddBlock?.('after')}
+          onRemove={onDelete}
         />
       )}
 
