@@ -63,11 +63,13 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   };
 
   const handleMouseEnter = () => {
-    setIsHovered(true);
+    // DISABLED: setState causes re-render which loses Slate focus
+    // setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
+    // DISABLED: setState causes re-render which loses Slate focus
+    // setIsHovered(false);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
