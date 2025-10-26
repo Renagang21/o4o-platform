@@ -176,6 +176,7 @@ async function createPost(title, markdownUrl, mediaId) {
 
     const postData = {
       title: title,
+      slug: mediaId.replace('media_', 'doc-'),
       content: JSON.stringify(blocks),
       status: 'publish',
       type: 'post',
