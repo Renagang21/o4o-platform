@@ -116,16 +116,6 @@ const PostPreview: React.FC = () => {
   const renderBlock = (block: Block) => {
     const { type, content, attributes } = block;
 
-    // 🔍 DEBUG: Log block data to console
-    console.log('🔍 Rendering block:', {
-      type,
-      content,
-      attributes,
-      contentType: typeof content,
-      hasAttributesContent: !!attributes?.content,
-      hasContentText: !!(content as any)?.text,
-    });
-
     switch (type) {
       case 'o4o/paragraph':
       case 'paragraph':
