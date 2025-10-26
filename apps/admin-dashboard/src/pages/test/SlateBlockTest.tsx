@@ -18,6 +18,9 @@ import { Slate, Editable, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { cn } from '@/lib/utils';
 import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
+import { BlockWrapper } from '@/components/editor/BlockWrapper';
+import { DynamicRenderer } from '@/blocks/registry/DynamicRenderer';
+import type { Block } from '@/types/post.types';
 
 export default function SlateBlockTest() {
   return (
@@ -40,8 +43,9 @@ export default function SlateBlockTest() {
             <li><strong>각 테스트 박스를 순서대로 클릭</strong></li>
             <li><strong>타이핑을 시도</strong>하고 커서가 보이는지, 입력이 되는지 확인</li>
             <li><strong>F12 (개발자 도구) → Console 탭</strong>에서 로그 확인</li>
-            <li><strong>어느 테스트부터 실패하는지 파악</strong> (1→2→3→4→5→6 순서)</li>
+            <li><strong>어느 테스트부터 실패하는지 파악</strong> (1→2→3→4→5→6→7 순서)</li>
             <li>실패한 테스트 번호를 기억하고 보고</li>
+            <li><strong className="text-red-600">⚠️ Test 7이 핵심</strong> - BlockWrapper 포함 (실제 에디터 구조)</li>
           </ol>
         </div>
 
@@ -63,13 +67,20 @@ export default function SlateBlockTest() {
         {/* Test 6: Actual ParagraphBlock */}
         <Test6ActualParagraphBlock />
 
+        {/* Test 7: BlockWrapper + ParagraphBlock */}
+        <Test7BlockWrapperWithParagraph />
+
         {/* Results Guide */}
         <div className="bg-amber-50 border-2 border-amber-300 p-6 rounded-lg">
           <h2 className="text-xl font-bold mb-3 text-amber-900">🎯 결과 해석 가이드</h2>
           <div className="space-y-3 text-amber-900">
             <div className="flex gap-3">
-              <span className="font-mono font-bold">✅ 1-6 모두 성공:</span>
-              <span>문제 없음 (다른 곳에 버그)</span>
+              <span className="font-mono font-bold">✅ 1-6 성공, ❌ 7 실패:</span>
+              <span>BlockWrapper의 tabIndex/onClick 문제 (예상 시나리오)</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="font-mono font-bold">✅ 1-7 모두 성공:</span>
+              <span>다른 곳에 버그 (전역 이벤트 리스너 등)</span>
             </div>
             <div className="flex gap-3">
               <span className="font-mono font-bold">❌ Test 1 실패:</span>
@@ -462,6 +473,81 @@ function Test6ActualParagraphBlock() {
 
       <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
         Selected: {isSelected ? '✅ Yes' : '❌ No'} | Content length: {content.length}
+      </div>
+    </div>
+  );
+}
+
+// Test 7: BlockWrapper + ParagraphBlock (실제 에디터 구조 재현)
+function Test7BlockWrapperWithParagraph() {
+  const [isSelected, setIsSelected] = useState(false);
+  const [content, setContent] = useState('');
+
+  // 실제 에디터처럼 Block 구조 사용
+  const block: Block = useMemo(() => ({
+    id: 'test-7-block',
+    type: 'o4o/paragraph',
+    content: content,
+    attributes: {},
+  }), [content]);
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-red-400">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-2xl font-bold text-red-600">Test 7</div>
+        <div>
+          <h2 className="text-xl font-semibold text-red-700">
+            BlockWrapper + ParagraphBlock ⚠️ 실제 에디터 구조
+          </h2>
+          <p className="text-sm text-red-600 font-bold">
+            🎯 이 테스트가 실패하면 BlockWrapper의 tabIndex/onClick이 원인!
+          </p>
+        </div>
+      </div>
+
+      <div className="border-4 border-red-300 p-4 rounded-lg bg-red-50/30">
+        <BlockWrapper
+          blockId={block.id}
+          blockType={block.type}
+          isSelected={isSelected}
+          onSelect={(blockId) => {
+            console.log('🔴 Test 7 - BlockWrapper selected:', blockId);
+            setIsSelected(true);
+          }}
+        >
+          <DynamicRenderer
+            block={block}
+            id={block.id}
+            content={content}
+            onChange={(newContent) => {
+              console.log('🔴 Test 7 - Content changed:', newContent);
+              setContent(newContent as string);
+            }}
+            onDelete={() => console.log('🔴 Test 7 - Delete')}
+            onDuplicate={() => console.log('🔴 Test 7 - Duplicate')}
+            onMoveUp={() => console.log('🔴 Test 7 - Move up')}
+            onMoveDown={() => console.log('🔴 Test 7 - Move down')}
+            isSelected={isSelected}
+            onSelect={() => {
+              console.log('🔴 Test 7 - DynamicRenderer selected');
+              setIsSelected(true);
+            }}
+            attributes={block.attributes || {}}
+            innerBlocks={[]}
+            canMoveUp={false}
+            canMoveDown={false}
+          />
+        </BlockWrapper>
+      </div>
+
+      <div className="mt-3 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        Selected: {isSelected ? '✅ Yes' : '❌ No'} | Content length: {content.length}
+      </div>
+
+      <div className="mt-2 p-3 bg-red-100 border border-red-300 rounded text-sm text-red-800">
+        <strong>⚠️ 주의:</strong> 이 테스트는 실제 GutenbergBlockEditor의 구조를 재현합니다.
+        <br />
+        BlockWrapper의 tabIndex={'{'}isSelected ? 0 : -1{'}'} + onClick이 포커스를 가로챌 수 있습니다.
       </div>
     </div>
   );

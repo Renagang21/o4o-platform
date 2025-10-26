@@ -416,8 +416,7 @@ ${availableBlocks}
             content: content,
             level: attributes.level || 2
           };
-          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
-          content = `<h${attributes.level}>${content}</h${attributes.level}>`;
+          content = {}; // 객체 구조 유지
         } else if (typeof content === 'object' && (content.text || content.level)) {
           // AI가 content에 text, level을 넣은 경우 → attributes로 이동
           const level = content.level || attributes.level || 2;
@@ -426,8 +425,7 @@ ${availableBlocks}
             content: content.text || '',
             level
           };
-          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
-          content = attributes.content ? `<h${level}>${attributes.content}</h${level}>` : '';
+          content = {}; // 객체 구조 유지
         } else if (!attributes.content) {
           // attributes에 content가 없는 경우
           attributes = {
@@ -435,10 +433,10 @@ ${availableBlocks}
             content: '',
             level: attributes.level || 2
           };
-          content = '';
+          content = {};
         } else {
-          // attributes.content가 이미 있는 경우 HTML로 변환
-          content = attributes.content ? `<h${attributes.level || 2}>${attributes.content}</h${attributes.level || 2}>` : '';
+          // attributes.content가 이미 있는 경우
+          content = {};
         }
       }
 
@@ -450,26 +448,24 @@ ${availableBlocks}
             ...attributes,
             content: content
           };
-          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
-          content = `<p>${content}</p>`;
+          content = {}; // 객체 구조 유지
         } else if (typeof content === 'object' && content.text) {
           // AI가 content에 text를 넣은 경우 → attributes로 이동
           attributes = {
             ...attributes,
             content: content.text
           };
-          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
-          content = `<p>${content.text}</p>`;
+          content = {}; // 객체 구조 유지
         } else if (!attributes.content) {
           // attributes에 content가 없는 경우
           attributes = {
             ...attributes,
             content: ''
           };
-          content = '';
+          content = {};
         } else {
-          // attributes.content가 이미 있는 경우 HTML로 변환
-          content = attributes.content ? `<p>${attributes.content}</p>` : '';
+          // attributes.content가 이미 있는 경우
+          content = {};
         }
       }
 
@@ -484,10 +480,7 @@ ${availableBlocks}
             ordered,
             type: ordered ? 'ordered' : 'unordered'
           };
-          // HTML 형식으로 변환하여 즉시 렌더링 가능하도록
-          const tag = ordered ? 'ol' : 'ul';
-          const itemsHtml = content.items.map((item: string) => `<li>${item}</li>`).join('');
-          content = `<${tag}>${itemsHtml}</${tag}>`;
+          content = {}; // 객체 구조 유지
         } else if (!attributes.items) {
           // attributes에 items가 없는 경우
           attributes = {
@@ -496,14 +489,10 @@ ${availableBlocks}
             ordered: false,
             type: 'unordered'
           };
-          content = '';
+          content = {};
         } else {
-          // attributes.items가 이미 있는 경우 HTML로 변환
-          const ordered = attributes.ordered || false;
-          const tag = ordered ? 'ol' : 'ul';
-          const items = attributes.items || [];
-          const itemsHtml = items.map((item: string) => `<li>${item}</li>`).join('');
-          content = items.length > 0 ? `<${tag}>${itemsHtml}</${tag}>` : '';
+          // attributes.items가 이미 있는 경우
+          content = {};
         }
       }
 

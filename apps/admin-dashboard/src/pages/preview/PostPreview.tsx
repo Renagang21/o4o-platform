@@ -103,16 +103,27 @@ const PostPreview: React.FC = () => {
     loadContent();
   }, [id]);
 
+  // Helper: Extract text from content (handles legacy HTML strings)
+  const extractText = (content: any, fallback: string = ''): string => {
+    if (typeof content === 'string') {
+      // Legacy: HTML string - strip tags safely
+      return content.replace(/<[^>]*>/g, '').trim() || fallback;
+    }
+    if (content?.text) return content.text;
+    return fallback;
+  };
+
   const renderBlock = (block: Block) => {
     const { type, content, attributes } = block;
-    const blockContent = typeof content === 'string' ? content : content?.text || '';
 
     switch (type) {
       case 'o4o/paragraph':
       case 'paragraph':
+        // Priority: attributes.content > content.text > content (legacy HTML string)
+        const paragraphText = attributes?.content || content?.text || extractText(content);
         return (
-          <p 
-            key={block.id} 
+          <p
+            key={block.id}
             className="mb-4 text-gray-700 leading-relaxed"
             style={{
               textAlign: attributes?.align || 'left',
@@ -120,13 +131,16 @@ const PostPreview: React.FC = () => {
               color: attributes?.textColor || '#374151',
             }}
           >
-            {blockContent}
+            {paragraphText}
           </p>
         );
 
       case 'o4o/heading':
       case 'heading':
-        const HeadingTag = `h${content?.level || 2}` as 'h1'|'h2'|'h3'|'h4'|'h5'|'h6';
+        // Priority: attributes.content/level > content.text/level > legacy
+        const headingText = attributes?.content || content?.text || extractText(content);
+        const headingLevel = attributes?.level || content?.level || 2;
+        const HeadingTag = `h${headingLevel}` as 'h1'|'h2'|'h3'|'h4'|'h5'|'h6';
         const headingClasses = {
           h1: 'text-4xl font-bold mb-6 text-gray-900',
           h2: 'text-3xl font-semibold mb-5 text-gray-800',
@@ -136,26 +150,29 @@ const PostPreview: React.FC = () => {
           h6: 'text-base font-medium mb-2 text-gray-600',
         };
         return (
-          <HeadingTag 
-            key={block.id} 
+          <HeadingTag
+            key={block.id}
             className={headingClasses[HeadingTag]}
             style={{
               textAlign: attributes?.align || 'left',
               color: attributes?.textColor,
             }}
           >
-            {blockContent}
+            {headingText}
           </HeadingTag>
         );
 
       case 'o4o/list':
       case 'list':
-        const ListTag = attributes?.ordered ? 'ol' : 'ul';
-        const listItems = content?.items || [blockContent];
+        // Priority: attributes.items > content.items > legacy
+        const listItems = attributes?.items || content?.items || [];
+        const isOrdered = attributes?.ordered || content?.ordered || false;
+        const ListTag = isOrdered ? 'ol' : 'ul';
+
         return (
-          <ListTag 
-            key={block.id} 
-            className={`mb-4 ${attributes?.ordered ? 'list-decimal' : 'list-disc'} list-inside text-gray-700`}
+          <ListTag
+            key={block.id}
+            className={`mb-4 ${isOrdered ? 'list-decimal' : 'list-disc'} list-inside text-gray-700`}
           >
             {listItems.map((item: string, index: number) => (
               <li key={index} className="mb-1">{item}</li>
