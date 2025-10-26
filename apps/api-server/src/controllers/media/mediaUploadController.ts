@@ -69,8 +69,8 @@ export class MediaUploadController {
       const ext = path.extname(file.originalname);
       const filename = `${type}_${timestamp}_${hash}${ext}`;
 
-      // Define upload directory
-      const uploadDir = path.join(process.cwd(), 'uploads', type);
+      // Define upload directory - use public/uploads to match static file serving
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', type);
       await fs.mkdir(uploadDir, { recursive: true });
 
       // Process file based on type
