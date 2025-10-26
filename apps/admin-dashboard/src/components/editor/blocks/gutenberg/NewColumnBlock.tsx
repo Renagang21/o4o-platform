@@ -14,7 +14,6 @@ import { Block } from '@/types/post.types';
 import { BlockProps } from '@/blocks/registry/types';
 import { cn } from '@/lib/utils';
 import { DynamicRenderer } from '@/blocks/registry/DynamicRenderer';
-import { Plus, X } from 'lucide-react';
 
 interface NewColumnBlockProps extends BlockProps {
   attributes?: {
@@ -41,19 +40,8 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
     verticalAlignment = 'top',
   } = attributes;
 
-  const [showBlockPicker, setShowBlockPicker] = useState(false);
   const [selectedNestedBlockId, setSelectedNestedBlockId] = useState<string | null>(null);
-
-  // Available block types
-  const blockTypes = [
-    { type: 'o4o/paragraph', label: 'Paragraph', icon: '¶' },
-    { type: 'o4o/heading', label: 'Heading', icon: 'H' },
-    { type: 'o4o/list', label: 'List', icon: '≡' },
-    { type: 'o4o/quote', label: 'Quote', icon: '"' },
-    { type: 'o4o/image', label: 'Image', icon: '🖼' },
-    { type: 'o4o/button', label: 'Button', icon: '⊡' },
-    { type: 'o4o/code', label: 'Code', icon: '</>' },
-  ];
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Handle nested block change
   const handleNestedBlockChange = useCallback(
@@ -105,20 +93,38 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
     [innerBlocks, onInnerBlocksChange]
   );
 
-  // Handle adding block inside column
-  const handleAddBlockInside = useCallback((blockType: string) => {
+  // Handle drop - when a block is dragged into this column
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
     if (!onInnerBlocksChange) return;
 
-    const newBlock: Block = {
-      id: `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      type: blockType,
-      content: '',
-      attributes: {},
-    };
+    // Get the dragged block data
+    const blockData = e.dataTransfer.getData('application/json');
+    if (!blockData) return;
 
-    onInnerBlocksChange([...innerBlocks, newBlock]);
-    setShowBlockPicker(false);
+    try {
+      const droppedBlock = JSON.parse(blockData) as Block;
+      // Add to innerBlocks
+      onInnerBlocksChange([...innerBlocks, droppedBlock]);
+    } catch (error) {
+      console.error('Failed to parse dropped block:', error);
+    }
   }, [innerBlocks, onInnerBlocksChange]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  }, []);
 
   const alignmentClasses = {
     top: 'justify-start',
@@ -131,17 +137,12 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
       className={cn(
         'new-column-block',
         'min-h-[100px] p-2 border border-gray-200 rounded',
-        isSelected && 'border-blue-500 bg-blue-50/30'
+        isSelected && 'border-blue-500 bg-blue-50/30',
+        isDragOver && 'border-blue-500 bg-blue-50 border-2'
       )}
-      onClick={(e) => {
-        // Only select Column if clicking on empty area (not on nested blocks)
-        if ((e.target as HTMLElement).classList.contains('empty-column') ||
-            (e.target as HTMLElement).classList.contains('new-column-block') ||
-            (e.target as HTMLElement).classList.contains('column-content')) {
-          e.stopPropagation();
-          onSelect?.();
-        }
-      }}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
       {/* Column Content */}
       <div
@@ -151,54 +152,11 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
         )}
       >
         {innerBlocks.length === 0 ? (
-          // Empty state
-          <div className="empty-column p-8 text-center border-2 border-dashed border-gray-300 rounded relative">
-            <p className="text-sm text-gray-500 mb-3">
-              Empty column
+          // Empty state - simple drop zone
+          <div className="empty-column p-8 text-center border-2 border-dashed border-gray-300 rounded">
+            <p className="text-sm text-gray-500">
+              {isDragOver ? '↓ Drop block here' : 'Drag blocks here from the + menu'}
             </p>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowBlockPicker(true);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add block
-            </button>
-
-            {/* Block Picker Modal */}
-            {showBlockPicker && (
-              <div className="absolute top-0 left-0 right-0 bg-white border border-gray-300 rounded shadow-lg p-4 z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold">Choose block type</h3>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowBlockPicker(false);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {blockTypes.map((blockType) => (
-                    <button
-                      key={blockType.type}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddBlockInside(blockType.type);
-                      }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-left border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                    >
-                      <span className="text-lg">{blockType.icon}</span>
-                      <span>{blockType.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           // Render nested blocks
@@ -234,52 +192,6 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
               </div>
             ))}
 
-            {/* Add block button at the end */}
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowBlockPicker(true);
-                }}
-                className="w-full p-2 text-sm text-gray-500 border border-dashed border-gray-300 rounded hover:border-blue-500 hover:text-blue-600 transition-colors"
-              >
-                <Plus className="w-4 h-4 inline mr-1" />
-                Add block
-              </button>
-
-              {/* Block Picker Modal */}
-              {showBlockPicker && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-300 rounded shadow-lg p-4 z-10">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold">Choose block type</h3>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowBlockPicker(false);
-                      }}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {blockTypes.map((blockType) => (
-                      <button
-                        key={blockType.type}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddBlockInside(blockType.type);
-                        }}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-left border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                      >
-                        <span className="text-lg">{blockType.icon}</span>
-                        <span>{blockType.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         )}
       </div>
