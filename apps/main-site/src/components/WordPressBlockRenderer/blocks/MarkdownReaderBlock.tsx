@@ -26,21 +26,8 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
   const markdownContent = (attributes?.markdown || data?.markdownContent || '') as string;
   const filename = (attributes?.filename || data?.filename || '') as string;
 
-  // Debug: Log block data (development only)
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.log('[MarkdownReaderBlock] Block data:', {
-      hasAttributes: !!attributes,
-      hasData: !!data,
-      url,
-      markdownContentLength: markdownContent?.length || 0,
-      filename,
-      attributesKeys: attributes ? Object.keys(attributes) : [],
-      dataKeys: data ? Object.keys(data) : []
-    });
-  }
-
   const [markdown, setMarkdown] = useState<string>(markdownContent);
+  const [showDebug, setShowDebug] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(!!url && !markdownContent);
   const [error, setError] = useState<string>('');
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
@@ -191,6 +178,33 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
 
   return (
     <div className="relative bg-white border border-gray-200 rounded-lg overflow-hidden my-6">
+      {/* Debug Panel (dev only) */}
+      {import.meta.env.DEV && (
+        <div className="border-b border-yellow-200 bg-yellow-50 px-4 py-2">
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className="text-xs text-yellow-800 font-mono hover:underline"
+          >
+            🐛 Debug Block Data {showDebug ? '▼' : '▶'}
+          </button>
+          {showDebug && (
+            <pre className="mt-2 text-xs text-left overflow-auto max-h-60 bg-white p-2 rounded border border-yellow-300">
+              {JSON.stringify({
+                hasAttributes: !!attributes,
+                hasData: !!data,
+                url,
+                markdownContentLength: markdownContent?.length || 0,
+                filename,
+                attributesKeys: attributes ? Object.keys(attributes) : [],
+                dataKeys: data ? Object.keys(data) : [],
+                attributes,
+                data
+              }, null, 2)}
+            </pre>
+          )}
+        </div>
+      )}
+
       {/* Filename Header */}
       {filename && (
         <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
