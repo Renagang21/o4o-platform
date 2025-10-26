@@ -42,6 +42,7 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
   } = attributes;
 
   const [showBlockPicker, setShowBlockPicker] = useState(false);
+  const [selectedNestedBlockId, setSelectedNestedBlockId] = useState<string | null>(null);
 
   // Available block types
   const blockTypes = [
@@ -222,7 +223,8 @@ export const NewColumnBlock: React.FC<NewColumnBlockProps> = ({
                     newBlocks.splice(insertIndex, 0, newBlock);
                     onInnerBlocksChange(newBlocks);
                   }}
-                  isSelected={false} // Individual blocks inside column
+                  isSelected={selectedNestedBlockId === block.id}
+                  onSelect={() => setSelectedNestedBlockId(block.id)}
                 />
               </div>
             ))}
