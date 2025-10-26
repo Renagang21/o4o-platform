@@ -220,6 +220,7 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
       onCopy={onCopy}
       onAddBlock={onAddBlock}
       className="gutenberg-heading-block"
+      slateEditor={editor}
     >
       {/* Gutenberg-style Block Toolbar */}
       {isSelected && (

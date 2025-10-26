@@ -17,6 +17,8 @@ import { useBlockFocus } from '../hooks/useBlockFocus';
 import { useBlockKeyboard } from '../hooks/useBlockKeyboard';
 import { BlockToolbar } from './shared/BlockToolbar';
 import { BlockAddButton } from './shared/BlockAddButton';
+import type { BaseEditor } from 'slate';
+import type { ReactEditor } from 'slate-react';
 
 interface EnhancedBlockWrapperProps {
   id: string;
@@ -57,6 +59,9 @@ interface EnhancedBlockWrapperProps {
   showAddButtons?: boolean;        // Default: true (enhanced), false (simple)
   enableKeyboardShortcuts?: boolean; // Default: true (enhanced), false (simple)
   disableAutoFocus?: boolean;      // Disable auto-focus (for Slate.js blocks)
+
+  // Slate.js editor support
+  slateEditor?: BaseEditor & ReactEditor; // Pass Slate editor for proper focus handling
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -94,7 +99,8 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   showToolbar: showToolbarProp,
   showAddButtons: showAddButtonsProp,
   enableKeyboardShortcuts: enableKeyboardShortcutsProp,
-  disableAutoFocus = false
+  disableAutoFocus = false,
+  slateEditor
 }) => {
   // Determine feature flags based on variant
   const isSimpleMode = variant === 'simple';
@@ -112,10 +118,11 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
     isHovered,
   });
 
-  // Use auto-focus hook (disabled for Slate.js blocks)
+  // Use auto-focus hook (supports both DOM and Slate editors)
   useBlockFocus({
     blockRef,
     isSelected: disableAutoFocus ? false : isSelected,
+    slateEditor,
   });
 
   // Use keyboard shortcuts hook (only if enabled)

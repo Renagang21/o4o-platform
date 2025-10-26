@@ -3,15 +3,22 @@
  *
  * Manages automatic focus when block is selected
  * Extracted from EnhancedBlockWrapper to reduce complexity
+ *
+ * Supports both regular DOM elements (textarea, input) and Slate.js editors
  */
 
 import { useEffect, RefObject } from 'react';
+import { ReactEditor } from 'slate-react';
+import { Transforms, Editor as SlateEditor } from 'slate';
+import type { BaseEditor } from 'slate';
 
 export interface UseBlockFocusOptions {
   /** Block element reference */
   blockRef: RefObject<HTMLElement>;
   /** Whether block is selected */
   isSelected: boolean;
+  /** Optional Slate editor instance (for Slate-based blocks) */
+  slateEditor?: BaseEditor & ReactEditor;
 }
 
 /**
@@ -34,58 +41,67 @@ export interface UseBlockFocusOptions {
 export function useBlockFocus({
   blockRef,
   isSelected,
+  slateEditor,
 }: UseBlockFocusOptions): void {
   useEffect(() => {
     if (!isSelected || !blockRef.current) return;
 
-    const focusableElement = blockRef.current.querySelector(
-      '[contenteditable], input, textarea'
-    );
-
-    if (!(focusableElement instanceof HTMLElement)) return;
-
-    // CRITICAL: Focus and create selection for cursor visibility
-    // Wait for RichText UNCONTROLLED initialization and DOM rendering
     const timeoutId = setTimeout(() => {
-      // Double-check element still exists after delay
-      if (!focusableElement.isConnected) return;
+      if (!blockRef.current) return;
 
-      // Only focus if not already focused - prevents disrupting existing cursor
+      // Slate editor branch: Use ReactEditor.focus() API
+      if (slateEditor) {
+        try {
+          // Check if editor already has focus
+          if (!ReactEditor.isFocused(slateEditor)) {
+            ReactEditor.focus(slateEditor);
+            // Move cursor to end of content
+            Transforms.select(slateEditor, SlateEditor.end(slateEditor, []));
+          }
+        } catch (error) {
+          console.debug('Slate focus error (non-critical):', error);
+        }
+        return;
+      }
+
+      // Regular DOM elements (textarea, input) branch
+      const focusableElement = blockRef.current.querySelector(
+        '[contenteditable], input, textarea'
+      );
+
+      if (!(focusableElement instanceof HTMLElement)) return;
+
+      // Only focus if not already focused
       if (document.activeElement !== focusableElement) {
         focusableElement.focus();
       }
 
-      // For contentEditable, create selection ONLY if truly necessary
+      // For contentEditable (non-Slate), create selection if necessary
       if (focusableElement.contentEditable === 'true') {
         const selection = window.getSelection();
         if (!selection) return;
 
-        // Check if we need to create a selection
         const needsSelection =
-          selection.rangeCount === 0 || // No selection at all
-          !focusableElement.contains(selection.anchorNode) || // Selection outside this element
+          selection.rangeCount === 0 ||
+          !focusableElement.contains(selection.anchorNode) ||
           (selection.rangeCount > 0 &&
             selection.anchorNode === focusableElement &&
-            focusableElement.childNodes.length === 0); // Empty block
+            focusableElement.childNodes.length === 0);
 
-        // Only create selection if user hasn't set one
         if (needsSelection) {
           try {
-            // Create a collapsed range at the end for new blocks
             const range = document.createRange();
             range.selectNodeContents(focusableElement);
-            range.collapse(false); // false = end of content
+            range.collapse(false);
             selection.removeAllRanges();
             selection.addRange(range);
           } catch (error) {
-            // Ignore errors - cursor will appear on first keystroke
             console.debug('Selection creation error (non-critical):', error);
           }
         }
-        // else: preserve existing selection (user clicked within text or dragged to select)
       }
-    }, 50); // 50ms delay for new blocks to fully render
+    }, 50);
 
     return () => clearTimeout(timeoutId);
-  }, [isSelected, blockRef]);
+  }, [isSelected, blockRef, slateEditor]);
 }

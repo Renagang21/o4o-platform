@@ -204,6 +204,7 @@ export const GutenbergParagraphBlock: React.FC<GutenbergParagraphBlockProps> = (
       onCopy={onCopy}
       onAddBlock={onAddBlock}
       className="gutenberg-paragraph-block"
+      slateEditor={editor}
     >
       {/* Gutenberg-style Block Toolbar */}
       {isSelected && (
