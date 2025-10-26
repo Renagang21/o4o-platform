@@ -31,6 +31,8 @@ const ImageBlockSettings = lazy(() => import('./ImageBlockSettings'));
 const ButtonBlockSettings = lazy(() => import('./ButtonBlockSettings'));
 const GalleryBlockSettings = lazy(() => import('./GalleryBlockSettings'));
 const CoverBlockSettings = lazy(() => import('./CoverBlockSettings'));
+const ColumnsBlockSettings = lazy(() => import('./ColumnsBlockSettings'));
+const ColumnBlockSettings = lazy(() => import('./ColumnBlockSettings'));
 
 interface BlockSettingsRendererProps {
   block: any;
@@ -131,7 +133,27 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
       case 'cover':
         return (
           <Suspense fallback={<div>Loading settings...</div>}>
-            <CoverBlockSettings 
+            <CoverBlockSettings
+              settings={block.attributes || {}}
+              onChange={(settings) => onBlockSettingsChange?.({ attributes: settings })}
+            />
+          </Suspense>
+        );
+
+      case 'columns':
+        return (
+          <Suspense fallback={<div>Loading settings...</div>}>
+            <ColumnsBlockSettings
+              settings={block.attributes || {}}
+              onChange={(settings) => onBlockSettingsChange?.({ attributes: settings })}
+            />
+          </Suspense>
+        );
+
+      case 'column':
+        return (
+          <Suspense fallback={<div>Loading settings...</div>}>
+            <ColumnBlockSettings
               settings={block.attributes || {}}
               onChange={(settings) => onBlockSettingsChange?.({ attributes: settings })}
             />

@@ -65,6 +65,53 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
     }
   }, [innerBlocks.length, columnCount, verticalAlignment, id, onInnerBlocksChange]);
 
+  // Adjust columns when columnCount changes
+  useEffect(() => {
+    if (!onInnerBlocksChange || innerBlocks.length === 0) return;
+
+    const currentCount = innerBlocks.length;
+
+    if (currentCount !== columnCount) {
+      if (currentCount < columnCount) {
+        // Add new columns
+        const newColumns = [...innerBlocks];
+        for (let i = currentCount; i < columnCount; i++) {
+          newColumns.push({
+            id: `${id}-column-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            type: 'o4o/column',
+            content: '',
+            attributes: {
+              width: 100 / columnCount,
+              verticalAlignment: verticalAlignment,
+            },
+            innerBlocks: [],
+          });
+        }
+        // Adjust widths of all columns
+        const adjustedColumns = newColumns.map(col => ({
+          ...col,
+          attributes: {
+            ...col.attributes,
+            width: 100 / columnCount,
+          },
+        }));
+        onInnerBlocksChange(adjustedColumns);
+      } else if (currentCount > columnCount) {
+        // Remove extra columns (from the end)
+        const reducedColumns = innerBlocks.slice(0, columnCount);
+        // Adjust widths of remaining columns
+        const adjustedColumns = reducedColumns.map(col => ({
+          ...col,
+          attributes: {
+            ...col.attributes,
+            width: 100 / columnCount,
+          },
+        }));
+        onInnerBlocksChange(adjustedColumns);
+      }
+    }
+  }, [columnCount, innerBlocks, id, verticalAlignment, onInnerBlocksChange]);
+
   // Handle inner block change
   const handleInnerBlockChange = useCallback(
     (blockId: string, content: unknown, blockAttributes?: unknown) => {
