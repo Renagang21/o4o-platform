@@ -1,36 +1,53 @@
 # 블록 레퍼런스 (AI용)
 
 > **버전**: v0.5.9 (O4O v1.0.0, Blocks v0.7.0)
-> **마지막 업데이트**: 2025-10-22
+> **마지막 업데이트**: 2025-10-26
 
-## ✨ 2025-10 업그레이드 하이라이트
+## 목차
 
-- **향상된 레이아웃 블록**: Columns/Column/Group 블록이 동적 컬럼 추가, 세로 정렬, 레이아웃 토글(Flow/Flex/Grid) 등 고급 툴바를 제공합니다.
-- **텍스트 블록 툴바 강화**: Paragraph 블록에서 정렬·볼드·이탤릭·링크 삽입을 인라인 툴바로 제어할 수 있습니다.
+- [✨ 2025-10 업그레이드 하이라이트](#2025-10-upgrade-highlights)
+- [텍스트 블록](#text-blocks)
+- [레이아웃 블록](#layout-blocks)
+  - [Conditional 블록 상세](#conditional-block-details)
+- [미디어/히어로 블록](#media-hero-blocks)
+- [인터랙티브 & 소셜 블록](#interactive-social-blocks)
+- [동적 블록](#dynamic-blocks)
+- [폼 블록](#form-blocks)
+- [숏코드 블록](#shortcode-blocks)
+- [블록 구조 규칙](#block-structure-rules)
+- [🤖 AI 기능](#ai-features)
+
+---
+
+## ✨ 2025-10 업그레이드 하이라이트 {#2025-10-upgrade-highlights}
+
+- **Slate.js 기반 텍스트 블록**: Heading/Paragraph 블록이 Slate.js 리치 텍스트 에디터로 업그레이드되어 인라인 포매팅, 링크, 포커스 관리가 향상되었습니다.
+- **향상된 레이아웃 블록**: Columns/Column 블록이 InnerBlocks를 제대로 렌더링하도록 리팩토링되어 중첩된 블록 구조를 완벽히 지원합니다.
 - **리치 미디어 지원 확대**: Enhanced Cover는 이미지/비디오/그라디언트, Aspect Ratio, Overlay, 드래그 리사이즈를 지원하며 Gallery는 슬라이더·매슨리·라이트박스 등 새 레이아웃을 제공합니다.
 - **신규 유틸리티 블록**: Markdown Reader, Social Icons와 같은 특수 블록이 기본 제공됩니다.
+- **통합 폼 블록**: Universal Form Block으로 Post와 모든 Custom Post Type을 단일 블록으로 처리합니다.
 
-## 텍스트 블록
+## 텍스트 블록 {#text-blocks}
 
 | 블록명 | 설명 | 주요 속성 | 새 기능 포인트 | 예시 |
 |--------|------|----------|---------------|------|
-| `core/paragraph` | 문단 텍스트 | content, align, textColor, backgroundColor, fontSize, dropCap | 인라인 툴바(정렬, 볼드·이탤릭, 링크), 드롭캡 | `{"type": "core/paragraph", "attributes": {"align": "center"}, "content": {"text": "본문"}}` |
-| `core/heading` | 제목 (H1-H6) | content, level(1-6), align, textColor | 퀵 타입 전환(H1~H6), Outline 동기화 | `{"type": "core/heading", "content": {"text": "섹션", "level": 2}}` |
-| `core/list` | 목록 | items[], ordered(boolean), start | 라인별 재정렬, 순서/불릿 토글 | `{"type": "core/list", "content": {"items": ["항목"], "ordered": true}}` |
+| `o4o/paragraph` | 문단 텍스트 (✨ Slate.js) | content, align, textColor, backgroundColor, fontSize, dropCap | Slate.js 에디터, 인라인 포매팅, 포커스 관리 | `{"type": "o4o/paragraph", "attributes": {"content": "본문", "align": "center"}, "content": {}}` |
+| `o4o/heading` | 제목 (H1-H6) (✨ Slate.js) | content, level(1-6), align, textColor | Slate.js 에디터, 레벨 전환, 리치 포매팅 | `{"type": "o4o/heading", "attributes": {"content": "섹션", "level": 2}, "content": {}}` |
+| `o4o/list` | 목록 | items[], ordered(boolean), type | 라인별 재정렬, 순서/불릿 토글 | `{"type": "o4o/list", "attributes": {"items": ["항목"], "ordered": true, "type": "ordered"}, "content": {}}` |
 | `core/quote` | 인용문 | text, citation, style | 스타일 프리셋(표준/큰 인용) | `{"type": "core/quote", "content": {"text": "인용", "citation": "출처"}}` |
 | `core/code` | 코드 | code, language, lineNumbers | 다크/라이트 테마 토글 | `{"type": "core/code", "attributes": {"language": "js"}, "content": {"code": "const x=1;"}}` |
 | `o4o/markdown-reader` | 마크다운 뷰어 | url, markdownContent, theme, fontSize | 미디어 라이브러리에서 `.md` 선택, GitHub/Monokai 테마 | `{"type": "o4o/markdown-reader", "attributes": {"url": "/media/guide.md"}}` |
 
-## 레이아웃 블록
+## 레이아웃 블록 {#layout-blocks}
 
 | 블록명 | 설명 | 주요 속성 | 새 기능 포인트 | 예시 |
 |--------|------|----------|---------------|------|
-| `core/columns` | 다단 컨테이너 | columnCount, verticalAlignment, gap, backgroundColor, padding | 툴바에서 컬럼 추가/삭제, 세로 정렬, 모바일 스택, 전체 폭 지원 | `{"type": "core/columns", "innerBlocks": [{"type": "core/column"}]}` |
-| `core/column` | 개별 컬럼 | width, verticalAlignment | 툴바에서 폭(%), 세로 정렬 토글, 자동 재분배 | columns 내부 전용 |
-| `core/group` | 그룹 래퍼 | layout(flow/flex/grid), gap, justifyContent | 툴바 레이아웃 전환, Flex/그리드 옵션, 방향 전환 | `{"type": "core/group", "attributes": {"layout": "grid"}}` |
+| `o4o/columns` | 다단 컨테이너 (✨ 리팩토링) | columnCount, verticalAlignment, gap, backgroundColor, padding | InnerBlocks 완벽 지원, 자동 컬럼 폭 재분배 | `{"type": "o4o/columns", "attributes": {"columnCount": 2}, "innerBlocks": [{"type": "o4o/column"}], "content": {}}` |
+| `o4o/column` | 개별 컬럼 (✨ 리팩토링) | width, verticalAlignment | InnerBlocks 중첩 지원, 드래그 리사이즈 | `{"type": "o4o/column", "attributes": {"width": 50}, "innerBlocks": [], "content": {}}` |
+| `o4o/group` | 그룹 래퍼 | layout(flow/flex/grid), gap, justifyContent | 툴바 레이아웃 전환, Flex/그리드 옵션, 방향 전환 | `{"type": "o4o/group", "attributes": {"layout": "grid"}}` |
 | `o4o/conditional` | 조건부 영역 | conditions[], logicOperator, showWhenMet | 14종 조건 + 미리보기 시각화 | 아래 상세 참조 |
 
-### Conditional 블록 상세
+### Conditional 블록 상세 {#conditional-block-details}
 
 **조건 타입 (14가지):**
 - **User:** user_logged_in, user_role, user_id
@@ -54,7 +71,7 @@
 }
 ```
 
-## 미디어/히어로 블록
+## 미디어/히어로 블록 {#media-hero-blocks}
 
 | 블록명 | 설명 | 주요 속성 | 새 기능 포인트 | 예시 |
 |--------|------|----------|---------------|------|
@@ -66,7 +83,7 @@
 
 > 기존 `core/gallery` 호출은 내부적으로 `o4o/enhanced-gallery`로 매핑됩니다.
 
-## 인터랙티브 & 소셜 블록
+## 인터랙티브 & 소셜 블록 {#interactive-social-blocks}
 
 | 블록명 | 설명 | 주요 속성 | 새 기능 포인트 | 예시 |
 |--------|------|----------|---------------|------|
@@ -75,13 +92,13 @@
 | `o4o/social-icons` | 소셜 링크 | items[{service,url}], shape, size, alignment | 드래그 재정렬, 커스텀 색상, 아이콘 라이브러리 | `{"type": "o4o/social-icons", "attributes": {"items": [{"service": "facebook", "url": "https://fb.com"}]}}` |
 | `o4o/shortcode` | 숏코드 래퍼 | shortcode | UI 입력 지원, 최근 숏코드 목록 | `{"type": "o4o/shortcode", "content": {"shortcode": "[product id=123]"}}` |
 
-## 동적 블록
+## 동적 블록 {#dynamic-blocks}
 
 | 블록명 | 설명 | 주요 속성 | 사용처 | 새 기능 포인트 |
 |--------|------|----------|--------|---------------|
 | `o4o/cpt-acf-loop` | 커스텀 포스트 루프 | postType, postsPerPage, orderBy, taxonomy | CPT 목록/카테고리 랜딩 | 카테고리·태그 기반 필터, 카드/리스트 뷰 스위치 |
 
-## 폼 블록 (2025-10 신규)
+## 폼 블록 {#form-blocks}
 
 ### Universal Form Block ⭐ 신규
 
@@ -150,12 +167,12 @@
 - ✅ 코드 중복 없음 (기존 PostFormBlock, CptFormBlock 통합)
 
 
-## 숏코드 블록
+## 숏코드 블록 {#shortcode-blocks}
 
-숏코드는 `core/shortcode` 블록으로 삽입:
+숏코드는 `o4o/shortcode` 블록으로 삽입:
 ```json
 {
-  "type": "core/shortcode",
+  "type": "o4o/shortcode",
   "content": {
     "shortcode": "[product id=\"123\"]"
   }
@@ -177,7 +194,7 @@
 - `[contact_form]` - 연락 폼
 - `[spectra_form id="1"]` - Spectra 폼
 
-## 블록 구조 규칙
+## 블록 구조 규칙 {#block-structure-rules}
 
 1. **기본 구조:**
 ```json
@@ -215,7 +232,7 @@
 
 ---
 
-## 🤖 AI 기능 (2025-10 신규)
+## 🤖 AI 기능 {#ai-features}
 
 ### 대화형 편집기 ⭐ 신규
 
@@ -273,5 +290,19 @@ AI가 이제 다음을 자동으로 인식합니다:
 
 ---
 
-**버전:** 0.7.0
-**마지막 업데이트:** 2025-10-21
+**버전:** 0.7.1
+**마지막 업데이트:** 2025-10-26
+
+---
+
+## 변경 이력
+
+### v0.7.1 (2025-10-26)
+- ✨ Heading/Paragraph 블록 Slate.js 업그레이드
+- ✨ Columns/Column 블록 InnerBlocks 리팩토링
+- ✨ List 블록에 type 속성 추가
+- 📝 목차 및 앵커 추가
+- 📝 최신 블록 타입으로 예시 업데이트
+
+### v0.7.0 (2025-10-22)
+- 초기 버전 작성
