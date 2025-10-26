@@ -362,6 +362,14 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           backgroundColor: backgroundColor || undefined,
         }}
         data-handles-enter="true"
+        onClick={(e) => {
+          // Prevent event from bubbling to BlockWrapper
+          // This stops BlockWrapper's onClick from triggering
+          // which would cause setSelectedBlockId → re-render → focus loss
+          e.stopPropagation();
+          // But still select the block
+          onSelect();
+        }}
       >
         <Slate editor={editor} initialValue={initialValue} onValueChange={handleChange}>
           <Editable
