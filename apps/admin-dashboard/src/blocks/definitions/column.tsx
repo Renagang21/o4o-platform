@@ -1,13 +1,13 @@
 /**
  * Column Block Definition
- * NEW: Gutenberg-style implementation with CleanBlockWrapper
+ * REFACTORED: Simplified implementation with proper innerBlocks rendering
  * Single column within a Columns block
  */
 
 import React from 'react';
 import { Square } from 'lucide-react';
 import { BlockDefinition, BlockComponent } from '../registry/types';
-import { GutenbergColumnBlock } from '@/components/editor/blocks/gutenberg/GutenbergColumnBlock';
+import { NewColumnBlock } from '@/components/editor/blocks/gutenberg/NewColumnBlock';
 
 export const columnBlockDefinition: BlockDefinition = {
   name: 'o4o/column',
@@ -16,7 +16,7 @@ export const columnBlockDefinition: BlockDefinition = {
   icon: <Square className="w-5 h-5" />,
   description: 'A single column within a columns block.',
   keywords: ['column', 'layout'],
-  component: GutenbergColumnBlock as unknown as BlockComponent,
+  component: NewColumnBlock as unknown as BlockComponent,
   attributes: {
     width: {
       type: 'number',

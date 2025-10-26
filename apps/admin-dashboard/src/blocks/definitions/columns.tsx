@@ -1,12 +1,12 @@
 /**
  * Columns Block Definition
- * NEW: Gutenberg-style implementation with CleanBlockWrapper
+ * REFACTORED: Simplified implementation with proper innerBlocks rendering
  */
 
 import React from 'react';
 import { Columns } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import { GutenbergColumnsBlock } from '@/components/editor/blocks/gutenberg/GutenbergColumnsBlock';
+import { NewColumnsBlock } from '@/components/editor/blocks/gutenberg/NewColumnsBlock';
 import { BlockComponent } from '../registry/types';
 
 export const columnsBlockDefinition: BlockDefinition = {
@@ -16,7 +16,7 @@ export const columnsBlockDefinition: BlockDefinition = {
   icon: <Columns className="w-5 h-5" />,
   description: 'Display content in multiple columns, with blocks added to each column.',
   keywords: ['columns', 'layout', 'grid', 'split'],
-  component: GutenbergColumnsBlock as unknown as BlockComponent,
+  component: NewColumnsBlock as unknown as BlockComponent,
   attributes: {
     columnCount: {
       type: 'number',
