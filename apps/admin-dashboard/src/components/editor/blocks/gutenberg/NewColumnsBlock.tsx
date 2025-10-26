@@ -9,7 +9,7 @@
  * - Clean, minimal UI
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Block } from '@/types/post.types';
 import { BlockProps } from '@/blocks/registry/types';
 import { cn } from '@/lib/utils';
@@ -44,6 +44,26 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
     verticalAlignment = 'top',
     isStackedOnMobile = true,
   } = attributes;
+
+  // Auto-create initial columns if empty
+  useEffect(() => {
+    if (innerBlocks.length === 0 && onInnerBlocksChange && columnCount > 0) {
+      const newColumns: Block[] = [];
+      for (let i = 0; i < columnCount; i++) {
+        newColumns.push({
+          id: `${id}-column-${i}-${Date.now()}`,
+          type: 'o4o/column',
+          content: '',
+          attributes: {
+            width: 100 / columnCount,
+            verticalAlignment: verticalAlignment,
+          },
+          innerBlocks: [],
+        });
+      }
+      onInnerBlocksChange(newColumns);
+    }
+  }, [innerBlocks.length, columnCount, verticalAlignment, id, onInnerBlocksChange]);
 
   // Handle inner block change
   const handleInnerBlockChange = useCallback(
