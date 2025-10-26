@@ -107,6 +107,17 @@ export function useBlockManagement({
       updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
       setIsBlockInserterOpen(false);
+
+      // Focus on new block after DOM update
+      setTimeout(() => {
+        const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
+        if (newBlockElement) {
+          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+          if (editableElement) {
+            editableElement.focus();
+          }
+        }
+      }, 100);
     },
     [getBlocks, updateBlocks, setSelectedBlockId]
   );
@@ -128,7 +139,7 @@ export function useBlockManagement({
       updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
 
-      // Auto-scroll to new block after DOM update
+      // Auto-scroll and focus on new block after DOM update
       setTimeout(() => {
         const newBlockElement = document.querySelector(`[data-block-id="${newBlock.id}"]`);
         if (newBlockElement) {
@@ -136,6 +147,12 @@ export function useBlockManagement({
             behavior: 'smooth',
             block: 'center',
           });
+
+          // Focus on the contentEditable element (Slate editor) inside the new block
+          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+          if (editableElement) {
+            editableElement.focus();
+          }
         }
       }, 100);
     },
@@ -158,6 +175,17 @@ export function useBlockManagement({
       newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
       updateBlocks(newBlocks);
       setSelectedBlockId(duplicatedBlock.id);
+
+      // Focus on duplicated block after DOM update
+      setTimeout(() => {
+        const newBlockElement = document.querySelector(`[data-block-id="${duplicatedBlock.id}"]`);
+        if (newBlockElement) {
+          const editableElement = newBlockElement.querySelector('[contenteditable="true"]') as HTMLElement;
+          if (editableElement) {
+            editableElement.focus();
+          }
+        }
+      }, 100);
     },
     [getBlocks, updateBlocks, setSelectedBlockId]
   );
