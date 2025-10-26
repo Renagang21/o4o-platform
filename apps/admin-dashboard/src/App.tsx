@@ -104,6 +104,7 @@ const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
 const SlateBlockTest = lazy(() => import('@/pages/test/SlateBlockTest'));
+const FocusDebugTest = lazy(() => import('@/pages/test/FocusDebugTest'));
 const AIBlockDebug = lazy(() => import('@/pages/test/AIBlockDebug'));
 
 // Removed Apps Manager - using WordPress style menu
@@ -622,6 +623,12 @@ function App() {
                     <Route path="/admin/test/slate-block" element={
                       <Suspense fallback={<PageLoader />}>
                         <SlateBlockTest />
+                      </Suspense>
+                    } />
+                    {/* Test - Focus Debug */}
+                    <Route path="/admin/test/focus-debug" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <FocusDebugTest />
                       </Suspense>
                     } />
                     {/* Test - AI Block Debug */}
