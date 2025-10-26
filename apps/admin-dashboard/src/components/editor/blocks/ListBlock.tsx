@@ -371,7 +371,6 @@ const ListBlock: React.FC<ListBlockProps> = ({
       }}
       isBold={isMarkActive(editor, 'bold')}
       isItalic={isMarkActive(editor, 'italic')}
-      disableAutoFocus={true}
     >
       <div className="list-content min-h-[1.5em]" data-handles-enter="true">
         <SlateBlockWrapper

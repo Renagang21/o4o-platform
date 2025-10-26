@@ -42,9 +42,15 @@ export const CleanBlockWrapper: React.FC<CleanBlockWrapperProps> = ({
         isSelected && 'is-selected',
         className
       )}
-      onClick={() => {
-        // Simple selection - same as EnhancedBlockWrapper
+      onClick={(e) => {
+        // Selection + auto-focus (like EnhancedBlockWrapper's useBlockFocus)
         if (onSelect) onSelect();
+
+        // Auto-focus the Slate Editable when clicking anywhere in the block
+        const editable = (e.currentTarget as HTMLElement).querySelector('[contenteditable="true"]');
+        if (editable instanceof HTMLElement) {
+          editable.focus();
+        }
       }}
     >
       {children}
