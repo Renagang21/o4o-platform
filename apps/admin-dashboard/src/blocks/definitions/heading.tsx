@@ -1,13 +1,13 @@
 /**
  * Heading Block Definition
  *
- * New Slate.js-based heading block with rich text editing.
+ * NEW: Gutenberg-style implementation with CleanBlockWrapper + BlockToolbar
  */
 
 import React from 'react';
 import { Heading as HeadingIcon } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import HeadingBlock from '@/components/editor/blocks/HeadingBlock';
+import { GutenbergHeadingBlock } from '@/components/editor/blocks/gutenberg/GutenbergHeadingBlock';
 import { BlockComponent } from '../registry/types';
 
 export const headingBlockDefinition: BlockDefinition = {
@@ -17,7 +17,7 @@ export const headingBlockDefinition: BlockDefinition = {
   icon: <HeadingIcon className="w-5 h-5" />,
   description: 'Introduce new sections with formatted text and links.',
   keywords: ['title', 'subtitle', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-  component: HeadingBlock as unknown as BlockComponent,
+  component: GutenbergHeadingBlock as unknown as BlockComponent,
   attributes: {
     content: {
       type: 'string',
