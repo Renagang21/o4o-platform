@@ -11,8 +11,9 @@
   position: relative;
   margin: 28px 0;
   transition: all 0.1s ease;
-  outline: 1px solid transparent;
-  outline-offset: -1px;
+  /* REMOVED: outline 제거 - 내용 가림 문제 해결 */
+  /* outline: 1px solid transparent; */
+  /* outline-offset: -1px; */
 }
 
 .block-editor-block:first-child {
@@ -29,7 +30,8 @@
 
 /* Hover state */
 .block-editor-block.is-hovered {
-  outline-color: rgba(0, 115, 170, 0.25);
+  /* REMOVED: outline 제거 */
+  /* outline-color: rgba(0, 115, 170, 0.25); */
   cursor: pointer;
 }
 
@@ -39,8 +41,9 @@
 
 /* Selected state */
 .block-editor-block.is-selected {
-  outline-color: #007cba;
-  outline-width: 1px;
+  /* REMOVED: outline 제거 */
+  /* outline-color: #007cba; */
+  /* outline-width: 1px; */
   z-index: 60;
 }
 
@@ -50,20 +53,23 @@
 
 /* Multi-selected state */
 .block-editor-block.is-multi-selected {
-  outline-color: rgba(0, 115, 170, 0.4);
+  /* REMOVED: outline 제거 */
+  /* outline-color: rgba(0, 115, 170, 0.4); */
   background: rgba(0, 115, 170, 0.05);
 }
 
 /* Focus state (keyboard navigation) */
 .block-editor-block:focus-within {
-  outline-color: #007cba;
-  outline-width: 2px;
+  /* REMOVED: outline 제거 */
+  /* outline-color: #007cba; */
+  /* outline-width: 2px; */
 }
 
 /* Dragging state */
 .block-editor-block.is-dragging {
   opacity: 0.5;
-  outline-color: #949494;
+  /* REMOVED: outline 제거 */
+  /* outline-color: #949494; */
   cursor: move;
 }
 
@@ -73,9 +79,10 @@
 
 /* Drop target */
 .block-editor-block.is-drop-target {
-  outline-color: #00a32a;
-  outline-width: 2px;
-  outline-style: dashed;
+  /* REMOVED: outline 제거 */
+  /* outline-color: #00a32a; */
+  /* outline-width: 2px; */
+  /* outline-style: dashed; */
 }
 
 .block-editor-block.is-drop-target::before {
