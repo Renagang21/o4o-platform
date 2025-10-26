@@ -22,6 +22,7 @@ import {
   X,
   MoreVertical
 } from 'lucide-react';
+import { authClient } from '@o4o/auth-client';
 
 interface MediaFile {
   id: string;
@@ -139,7 +140,56 @@ const MediaLibrary: FC = () => {
   const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
   const [showFileDetails, setShowFileDetails] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch media files from API
+  useEffect(() => {
+    const fetchMedia = async () => {
+      try {
+        setIsLoading(true);
+        const response = await authClient.api.get('/media');
+
+        if (response.data.success && response.data.data) {
+          // Transform API data to match MediaFile interface
+          const transformedFiles = response.data.data.map((file: any) => ({
+            id: file.id,
+            name: file.filename,
+            originalName: file.originalName || file.filename,
+            type: getMediaType(file.mimeType),
+            mimeType: file.mimeType,
+            size: parseInt(file.size) || 0,
+            url: file.url,
+            thumbnailUrl: file.url,
+            folder: file.folderId || 'all',
+            tags: [],
+            altText: file.altText,
+            description: file.description,
+            uploadedAt: file.uploadedAt,
+            uploadedBy: file.uploader?.name || 'Unknown',
+            dimensions: file.width && file.height ? { width: file.width, height: file.height } : undefined
+          }));
+
+          setFiles(transformedFiles);
+        }
+      } catch (error) {
+        console.error('Failed to fetch media:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMedia();
+  }, []);
+
+  // Helper function to determine media type from MIME type
+  const getMediaType = (mimeType: string): 'image' | 'video' | 'audio' | 'document' | 'other' => {
+    if (mimeType?.startsWith('image/')) return 'image';
+    if (mimeType?.startsWith('video/')) return 'video';
+    if (mimeType?.startsWith('audio/')) return 'audio';
+    if (mimeType?.includes('pdf') || mimeType?.includes('document') || mimeType?.includes('text')) return 'document';
+    return 'other';
+  };
 
   // 필터링된 파일 목록
   const filteredFiles = files.filter((file: any) => {
