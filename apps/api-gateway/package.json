@@ -32,7 +32,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "6.6.4",
+    "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
@@ -40,12 +40,12 @@
     "@types/node": "^22.10.2",
     "@types/response-time": "^2.3.8",
     "@vitejs/plugin-react": "5.0.0",
-    "@vitest/ui": "^3.2.4",
+    "@vitest/ui": "^4.0.3",
     "jsdom": "26.1.0",
     "nodemon": "^3.1.10",
     "typescript": "5.4.5",
     "vite": "5.4.19",
-    "vitest": "3.2.4"
+    "vitest": "4.0.3"
   },
   "engines": {
     "node": ">=20.0.0",
