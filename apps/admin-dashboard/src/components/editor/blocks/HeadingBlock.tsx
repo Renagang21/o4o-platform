@@ -18,6 +18,7 @@ import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } 
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import { BlockToolbar } from './gutenberg/BlockToolbar';
 import { unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
@@ -150,6 +151,27 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
   const [linkEditorOpen, setLinkEditorOpen] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+
+  // Check if block has content (for conditional toolbar visibility)
+  const hasContent = useMemo(() => {
+    if (!value || value.length === 0) return false;
+
+    // Check all nodes for any text content
+    return value.some(node => {
+      if (Text.isText(node)) {
+        return node.text.trim() !== '';
+      }
+      if (SlateElement.isElement(node) && node.children) {
+        return node.children.some((child: any) => {
+          if (Text.isText(child)) {
+            return child.text.trim() !== '';
+          }
+          return false;
+        });
+      }
+      return false;
+    });
+  }, [value]);
 
   // Update editor when level or alignment changes
   useEffect(() => {
@@ -310,24 +332,6 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     6: 'text-base font-medium',
   };
 
-  // Custom toolbar content for heading block (level selector)
-  const customToolbarContent = isSelected ? (
-    <div className="flex items-center gap-2 mr-2">
-      <select
-        value={level.toString()}
-        onChange={(e) => updateAttribute('level', parseInt(e.target.value) as 1 | 2 | 3 | 4 | 5 | 6)}
-        className="h-7 px-2 text-sm border border-gray-200 rounded hover:border-gray-300 focus:outline-none focus:border-blue-500"
-      >
-        <option value="1">H1</option>
-        <option value="2">H2</option>
-        <option value="3">H3</option>
-        <option value="4">H4</option>
-        <option value="5">H5</option>
-        <option value="6">H6</option>
-      </select>
-    </div>
-  ) : null;
-
   return (
     <EnhancedBlockWrapper
       id={id}
@@ -336,20 +340,30 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       onSelect={onSelect}
       onDelete={onDelete}
       onDuplicate={onDuplicate}
-      onMoveUp={onMoveUp}
-      onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-heading"
-      customToolbarContent={customToolbarContent}
-      onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
-      currentAlign={align}
-      onToggleBold={() => toggleMark(editor, 'bold')}
-      onToggleItalic={() => toggleMark(editor, 'italic')}
-      onToggleLink={toggleLinkEditor}
-      isBold={isMarkActive(editor, 'bold')}
-      isItalic={isMarkActive(editor, 'italic')}
-      disableAutoFocus={true}
+      slateEditor={editor}
+      showToolbar={false}
     >
+      {/* Gutenberg-style Block Toolbar (only when selected and has content) */}
+      {isSelected && hasContent && (
+        <BlockToolbar
+          align={align}
+          onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
+          headingLevel={level}
+          onHeadingLevelChange={(newLevel) => updateAttribute('level', newLevel)}
+          isBold={isMarkActive(editor, 'bold')}
+          isItalic={isMarkActive(editor, 'italic')}
+          onToggleBold={() => toggleMark(editor, 'bold')}
+          onToggleItalic={() => toggleMark(editor, 'italic')}
+          onToggleLink={toggleLinkEditor}
+          onDuplicate={onDuplicate}
+          onInsertBefore={() => onAddBlock?.('before')}
+          onInsertAfter={() => onAddBlock?.('after')}
+          onRemove={onDelete}
+        />
+      )}
+
       <div
         ref={editorRef}
         className={cn(
