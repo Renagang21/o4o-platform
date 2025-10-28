@@ -126,6 +126,27 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
 
   const [value, setValue] = useState<Descendant[]>(initialValue);
 
+  // Check if block has content (for conditional toolbar visibility)
+  const hasContent = useMemo(() => {
+    if (!value || value.length === 0) return false;
+
+    // Check all nodes for any text content
+    return value.some(node => {
+      if (Text.isText(node)) {
+        return node.text.trim() !== '';
+      }
+      if (SlateElement.isElement(node) && node.children) {
+        return node.children.some((child: any) => {
+          if (Text.isText(child)) {
+            return child.text.trim() !== '';
+          }
+          return false;
+        });
+      }
+      return false;
+    });
+  }, [value]);
+
   // Handle value changes
   const handleChange = useCallback(
     (newValue: Descendant[]) => {
@@ -221,9 +242,10 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
       onAddBlock={onAddBlock}
       className="gutenberg-heading-block"
       slateEditor={editor}
+      showToolbar={false}
     >
-      {/* Gutenberg-style Block Toolbar */}
-      {isSelected && (
+      {/* Gutenberg-style Block Toolbar (only when selected and has content) */}
+      {isSelected && hasContent && (
         <BlockToolbar
           headingLevel={level}
           onHeadingLevelChange={(newLevel) => updateAttribute('level', newLevel)}
