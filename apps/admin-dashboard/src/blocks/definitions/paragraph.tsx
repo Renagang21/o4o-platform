@@ -1,13 +1,13 @@
 /**
  * Paragraph Block Definition
  *
- * NEW: Gutenberg-style implementation with CleanBlockWrapper + BlockToolbar
+ * Uses ParagraphBlock with EnhancedBlockWrapper + Slate editor
  */
 
 import React from 'react';
 import { Type } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
-import { GutenbergParagraphBlock } from '@/components/editor/blocks/gutenberg/GutenbergParagraphBlock';
+import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
 import { BlockComponent } from '../registry/types';
 
 export const paragraphBlockDefinition: BlockDefinition = {
@@ -17,7 +17,7 @@ export const paragraphBlockDefinition: BlockDefinition = {
   icon: <Type className="w-5 h-5" />,
   description: 'Start with the basic building block of all narrative.',
   keywords: ['text', 'paragraph', 'content'],
-  component: GutenbergParagraphBlock as unknown as BlockComponent,
+  component: ParagraphBlock as unknown as BlockComponent,
   attributes: {
     content: {
       type: 'string',
