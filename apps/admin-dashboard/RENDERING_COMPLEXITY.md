@@ -227,9 +227,30 @@ npm run dev
 - ✅ Added proper Markdown support to Preview
 - ✅ Documented remaining complexity hotspots
 
-### Future Phases (Proposed)
-- Phase 2: Consolidate state management in GutenbergBlockEditor
-- Phase 3: Simplify data transformation pipeline
+### 2025-10-28: Phase 2 & 3 Completion
+**Phase 3 (Data Transformation) - Completed**:
+- ✅ Removed unnecessary `o4o/markdown` → `o4o/markdown-reader` type conversion
+- ✅ Fixed `o4o/` prefix blocks being marked as 'unknown'
+- ✅ All custom blocks now pass through without transformation
+- ✅ Reduced transformation complexity in `wordpress-block-parser.ts`
+- ✅ Frontend components now check both `data` and `attributes` for compatibility
+
+**Phase 2 (State Management) - Analysis Completed**:
+- ✅ Analyzed GutenbergBlockEditor's 19 useState hooks
+- ✅ Found that code is already well-optimized with custom hooks
+- ✅ Most useState are independent UI toggles (safe architecture)
+- ✅ Added comprehensive documentation to component
+- ⚠️ **Decision**: Full refactoring deemed too risky for minimal benefit
+- 📝 Current structure is maintainable and debuggable
+
+**Key Improvements**:
+1. **Simplified Data Flow**: Custom blocks no longer undergo unnecessary transformations
+2. **Better Compatibility**: Frontend handles multiple data formats gracefully
+3. **Improved Documentation**: GutenbergBlockEditor now has clear state management docs
+4. **Risk Mitigation**: Avoided dangerous full refactoring
+
+### Future Phases (Deferred)
+- Phase 2-Full: Complete state consolidation (only if performance issues arise)
 - Phase 4: Consider alternatives to Slate.js for rich text editing
 
 ## References

@@ -338,9 +338,11 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
     case 'o4o/markdown':
     case 'o4o/markdown-reader':
       const markdownData = (wpBlock as any).data || wpBlock.attributes;
+      // Keep original type instead of forcing 'o4o/markdown-reader'
+      // Frontend BlockRenderer handles both types
       return {
         ...block,
-        type: 'o4o/markdown-reader',
+        type: (wpBlock as any).type || wpBlock.name || 'o4o/markdown-reader',
         data: {
           mediaId: markdownData?.mediaId,
           mediaUrl: markdownData?.mediaUrl,
@@ -349,6 +351,9 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
           theme: markdownData?.theme || 'github',
           markdownContent: markdownData?.markdownContent,
           lastFetched: markdownData?.lastFetched,
+          // Include markdown and filename in data for compatibility
+          markdown: markdownData?.markdown,
+          filename: markdownData?.filename,
         },
         attributes: {
           markdown: markdownData?.markdown,
@@ -358,7 +363,20 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
 
     // Default case for unknown blocks
     default:
-    // Removed console.warn
+      // If it's an o4o/ block, keep it as-is (our custom blocks)
+      if (blockName && blockName.startsWith('o4o/')) {
+        const blockData = (wpBlock as any).data || wpBlock.attributes;
+        return {
+          ...block,
+          type: blockName, // Keep original o4o/ type
+          data: blockData,
+          attributes: wpBlock.attributes,
+          content: (wpBlock as any).content,
+          innerBlocks: transformInnerBlocks(wpBlock.innerBlocks)
+        };
+      }
+
+      // Truly unknown block
       return {
         ...block,
         type: 'unknown',

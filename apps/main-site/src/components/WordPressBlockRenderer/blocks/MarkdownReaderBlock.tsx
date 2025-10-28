@@ -22,8 +22,9 @@ export const MarkdownReaderBlock: FC<MarkdownReaderBlockProps> = ({ block }) => 
   const { data, attributes } = block;
 
   // Get markdown URL or content
+  // Check both data and attributes for maximum compatibility
   const url = (attributes?.url || data?.url || '') as string;
-  const markdownContent = (attributes?.markdown || data?.markdownContent || '') as string;
+  const markdownContent = (attributes?.markdown || data?.markdown || data?.markdownContent || '') as string;
   const filename = (attributes?.filename || data?.filename || '') as string;
 
   const [markdown, setMarkdown] = useState<string>(markdownContent);

@@ -1,6 +1,22 @@
 /**
  * GutenbergBlockEditor Component
  * Enhanced WordPress Gutenberg-like editor with 3-column layout
+ *
+ * State Management:
+ * - Block state: blocks, selectedBlockId, copiedBlock
+ * - UI state: 9 modal/panel toggles (isBlockInserterOpen, isFullscreen, etc.)
+ * - Document state: documentTitle, postSettings, isDirty
+ * - Session state: sessionRestored
+ *
+ * Optimization patterns:
+ * - Custom hooks: useBlockManagement, useBlockHistory, useDragAndDrop
+ * - useMemo: editorContext to prevent unnecessary re-renders
+ * - useEffect: Synchronizes selectedBlock with selectedBlockId
+ *
+ * Why many useState hooks?
+ * - Most are independent UI toggles (safe to separate)
+ * - Consolidating would require complex reducer (higher risk)
+ * - Current structure is maintainable and debuggable
  */
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
