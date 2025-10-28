@@ -4,15 +4,14 @@
  */
 
 import axios, { AxiosRequestConfig } from 'axios';
-import {
-  CreatePostRequest,
-  UpdatePostRequest,
-  PostResponse,
+import { 
+  CreatePostRequest, 
+  UpdatePostRequest, 
+  PostResponse, 
   PostListResponse,
   MediaUploadResponse,
-  Media
+  Media 
 } from '@/types/post.types';
-import { unifiedApi } from '@/api/unified-client';
 
 // API 기본 URL (환경변수에서 가져오기)
 // Production: admin.neture.co.kr에서는 api.neture.co.kr 사용
@@ -272,56 +271,94 @@ const cancelPendingRequest = (key: string) => {
  */
 
 export const postApi = {
-  // 게시글 생성 (unifiedApi 사용)
+  // 게시글 생성 (/api/posts 사용: 중복 시 409)
   create: async (data: CreatePostRequest): Promise<PostResponse> => {
+    // Cancel any pending request with same data
+    const requestKey = createRequestKey('POST', '/posts', data);
+    cancelPendingRequest(requestKey);
+    
+    // Create new abort controller
+    const abortController = new AbortController();
+    pendingRequests.set(requestKey, abortController);
+    
     try {
       // Remove _requestId from actual request
       const requestData = { ...data };
       delete (requestData as any)._requestId;
+      
+      const response = await apiClient.post('/posts', requestData, {
+        signal: abortController.signal
+      } as AxiosRequestConfig);
 
-      const response = await unifiedApi.content.posts.create(requestData);
+      pendingRequests.delete(requestKey);
 
       const payload = response?.data?.data ?? response.data;
       return { success: true, data: payload };
     } catch (error: any) {
-      return {
-        success: false,
-        error: error.response?.data?.message || `Failed to create post (${error.response?.status})`
+      pendingRequests.delete(requestKey);
+      
+      // Don't report aborted requests as errors
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+        return { success: false, error: 'Request canceled' };
+      }
+      
+      return { 
+        success: false, 
+        error: error.response?.data?.message || `Failed to create post (${error.response?.status})` 
       };
     }
   },
 
-  // 게시글 조회 (unifiedApi 사용)
+  // 게시글 조회 (/api/posts)
   get: async (id: string): Promise<PostResponse> => {
     try {
-      const response = await unifiedApi.content.posts.get(id);
+      const response = await apiClient.get(`/posts/${id}`);
       const payload = response?.data?.data ?? response.data;
       return { success: true, data: payload };
     } catch (error: any) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Failed to get post'
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Failed to get post' 
       };
     }
   },
 
-  // 게시글 수정 (unifiedApi 사용)
+  // 게시글 수정 (/api/posts)
   update: async (data: UpdatePostRequest): Promise<PostResponse> => {
     const { id, ...updateData } = data;
-
+    
+    // Cancel any pending request with same data
+    const requestKey = createRequestKey('PUT', `/posts/${id}`, updateData);
+    cancelPendingRequest(requestKey);
+    
+    // Create new abort controller
+    const abortController = new AbortController();
+    pendingRequests.set(requestKey, abortController);
+    
     try {
       // Remove _requestId from actual request
       const requestData = { ...updateData };
       delete (requestData as any)._requestId;
+      
+      const response = await apiClient.put(`/posts/${id}`, requestData, {
+        signal: abortController.signal
+      } as AxiosRequestConfig);
 
-      const response = await unifiedApi.content.posts.update(id, requestData);
+      pendingRequests.delete(requestKey);
 
       const payload = response?.data?.data ?? response.data;
       return { success: true, data: payload };
     } catch (error: any) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Failed to update post'
+      pendingRequests.delete(requestKey);
+      
+      // Don't report aborted requests as errors
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+        return { success: false, error: 'Request canceled' };
+      }
+      
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Failed to update post' 
       };
     }
   },
