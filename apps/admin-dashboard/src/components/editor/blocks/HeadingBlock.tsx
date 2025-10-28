@@ -283,20 +283,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
           <a
             {...props.attributes}
             href={(element as LinkElement).url}
-            className="text-blue-600 hover:text-blue-800 underline"
-            onClick={(e) => {
-              e.preventDefault();
-              // In edit mode, allow editing the link
-              const url = window.prompt('Edit URL:', (element as LinkElement).url);
-              if (url !== null && url !== (element as LinkElement).url) {
-                const path = ReactEditor.findPath(editor, element);
-                Transforms.setNodes(
-                  editor,
-                  { url } as Partial<LinkElement>,
-                  { at: path }
-                );
-              }
-            }}
+            className="text-blue-600 hover:text-blue-800 underline cursor-text"
           >
             {props.children}
           </a>
