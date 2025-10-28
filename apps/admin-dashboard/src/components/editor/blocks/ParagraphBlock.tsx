@@ -307,7 +307,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       <div
         ref={editorRef}
         className={cn(
-          'paragraph-content min-h-[1.5em] relative',
+          'paragraph-content min-h-[1em] relative',
           dropCap && 'first-letter:text-7xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:leading-none'
         )}
         style={{

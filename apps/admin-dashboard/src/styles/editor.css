@@ -88,7 +88,7 @@
 
 .block-wrapper.is-selected::before {
   border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.05);
+  /* background removed for cleaner editing experience */
 }
 
 /* Add block button styles */

@@ -146,7 +146,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       data-block-type={type}
       className={cn(
         'block-wrapper group relative transition-all duration-200',
-        'mb-4', // Add margin between blocks (16px for optimal readability)
+        'mb-2', // Reduced margin between blocks for compact editing
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
