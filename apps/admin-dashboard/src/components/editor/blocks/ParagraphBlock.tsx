@@ -334,14 +334,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           backgroundColor: backgroundColor || undefined,
         }}
         data-handles-enter="true"
-        onClick={(e) => {
-          // Prevent event from bubbling to BlockWrapper
-          // This stops BlockWrapper's onClick from triggering
-          // which would cause setSelectedBlockId → re-render → focus loss
-          e.stopPropagation();
-          // But still select the block
-          onSelect();
-        }}
       >
         <Slate
           editor={editor}
@@ -353,16 +345,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
             renderLeaf={DefaultLeafRenderer}
             placeholder=""
             onKeyDown={handleKeyDown}
-            onClick={(e) => {
-              // Critical: Stop propagation at Editable level
-              // Prevents all parent onClick handlers from firing
-              e.stopPropagation();
-              onSelect();
-            }}
-            onMouseDown={(e) => {
-              // Also stop mousedown to prevent focus issues
-              e.stopPropagation();
-            }}
             style={{
               outline: 'none',
               minHeight: '1.5em',
