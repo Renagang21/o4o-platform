@@ -103,8 +103,6 @@ const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 // Test Page - Minimal Editor
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
-const SlateBlockTest = lazy(() => import('@/pages/test/SlateBlockTest'));
-const FocusDebugTest = lazy(() => import('@/pages/test/FocusDebugTest'));
 const FocusRestorationTest = lazy(() => import('@/pages/test/FocusRestorationTest'));
 const AIBlockDebug = lazy(() => import('@/pages/test/AIBlockDebug'));
 
@@ -618,18 +616,6 @@ function App() {
                     <Route path="/admin/test/ai-page-generator-test" element={
                       <Suspense fallback={<PageLoader />}>
                         <AIPageGeneratorTest />
-                      </Suspense>
-                    } />
-                    {/* Test - Slate Block Input */}
-                    <Route path="/admin/test/slate-block" element={
-                      <Suspense fallback={<PageLoader />}>
-                        <SlateBlockTest />
-                      </Suspense>
-                    } />
-                    {/* Test - Focus Debug */}
-                    <Route path="/admin/test/focus-debug" element={
-                      <Suspense fallback={<PageLoader />}>
-                        <FocusDebugTest />
                       </Suspense>
                     } />
                     {/* Test - Focus Restoration */}
