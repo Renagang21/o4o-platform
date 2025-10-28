@@ -342,6 +342,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           backgroundColor: backgroundColor || undefined,
         }}
         data-handles-enter="true"
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent EnhancedBlockWrapper's onClick
+        }}
       >
         <Slate
           key={slateKey}

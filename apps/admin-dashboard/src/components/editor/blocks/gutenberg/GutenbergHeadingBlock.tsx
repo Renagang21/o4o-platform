@@ -281,6 +281,9 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
           color: textColor || undefined,
           backgroundColor: backgroundColor || undefined,
         }}
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent EnhancedBlockWrapper's onClick
+        }}
       >
         <Slate
           key={slateKey}
