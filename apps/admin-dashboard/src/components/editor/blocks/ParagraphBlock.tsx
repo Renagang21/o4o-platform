@@ -139,6 +139,13 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
+  // Generate content-based key for Slate remounting when content changes
+  const slateKey = useMemo(() => {
+    const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
+    const contentHash = textContent.substring(0, 50);
+    return `${id}-${contentHash}`;
+  }, [id, content, attributes.content]);
+
   // Check if block has content (for conditional toolbar visibility)
   const hasContent = useMemo(() => {
     if (!value || value.length === 0) return false;
@@ -303,6 +310,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
       slateEditor={editor}
+      disableAutoFocus={true}
       showToolbar={false}
     >
       {/* Gutenberg-style Block Toolbar (only when selected and has content) */}
@@ -336,6 +344,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         data-handles-enter="true"
       >
         <Slate
+          key={slateKey}
           editor={editor}
           initialValue={initialValue}
           onValueChange={handleChange}

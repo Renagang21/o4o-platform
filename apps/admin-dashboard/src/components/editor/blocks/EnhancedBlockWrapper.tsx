@@ -195,7 +195,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         <BlockAddButton
           position="top"
           onAddBlock={onAddBlock}
-          show={isHovered && !isSelected}
+          show={isHovered}
         />
       )}
 
@@ -214,7 +214,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         <BlockAddButton
           position="bottom"
           onAddBlock={onAddBlock}
-          show={isHovered && !isSelected}
+          show={isHovered}
         />
       )}
     </div>
