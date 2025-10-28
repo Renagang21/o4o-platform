@@ -92,26 +92,39 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     });
   }, []);
 
-  // Extract headings from markdown
+  // Extract headings from rendered HTML (to match marked's actual IDs)
+  // This is the SAME approach as MarkdownReaderBlock to ensure ID consistency
   const headings = useMemo((): Heading[] => {
-    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-    const results: Heading[] = [];
-    let match;
+    if (!localMarkdown) return [];
 
-    while ((match = headingRegex.exec(localMarkdown)) !== null) {
-      const level = match[1].length;
-      const text = match[2].trim();
-      // Generate ID similar to marked's headerIds
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+    try {
+      // First render the markdown to HTML
+      const html = marked.parse(localMarkdown) as string;
 
-      results.push({ id, level, text });
+      // Create a temporary DOM element to parse the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+
+      // Extract all heading elements with their actual IDs
+      const headingElements = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      const results: Heading[] = [];
+
+      headingElements.forEach((el) => {
+        const tagName = el.tagName.toLowerCase();
+        const level = parseInt(tagName.charAt(1), 10);
+        const text = el.textContent || '';
+        const id = el.id || '';
+
+        if (id) {
+          results.push({ id, level, text });
+        }
+      });
+
+      return results;
+    } catch (error) {
+      console.error('Error extracting headings:', error);
+      return [];
     }
-
-    return results;
   }, [localMarkdown]);
 
   // Show TOC if 1 or more headings
@@ -133,13 +146,21 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     }
   }, [initialFilename]);
 
-  // Scroll to heading
+  // Scroll to heading (with CSS.escape for special characters)
   const scrollToHeading = useCallback((id: string) => {
     if (!previewRef.current) return;
 
-    const element = previewRef.current.querySelector(`#${id}`);
+    // Use CSS.escape to safely handle IDs with special characters
+    const escapedId = CSS.escape(id);
+    const element = previewRef.current.querySelector(`#${escapedId}`);
+
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Update URL hash without triggering navigation
+      window.history.replaceState(null, '', `#${id}`);
+    } else {
+      console.warn(`Element with id "${id}" not found`);
     }
   }, []);
 
@@ -170,6 +191,29 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
 
     return () => observer.disconnect();
   }, [showTOC, localMarkdown]);
+
+  // Handle internal anchor link clicks in markdown content
+  useEffect(() => {
+    if (!previewRef.current) return;
+
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+
+      if (link && link.hash && link.origin === window.location.origin) {
+        e.preventDefault();
+        const id = link.hash.slice(1); // Remove '#'
+        scrollToHeading(id);
+      }
+    };
+
+    const previewElement = previewRef.current;
+    previewElement.addEventListener('click', handleLinkClick);
+
+    return () => {
+      previewElement.removeEventListener('click', handleLinkClick);
+    };
+  }, [scrollToHeading]);
 
   // Render markdown as HTML
   const renderMarkdown = () => {

@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Block } from '@/types/post.types';
 import { ArrowLeft, ExternalLink, Eye, Monitor, Tablet, Smartphone } from 'lucide-react';
 import { postApi } from '@/services/api/postApi';
+import { marked } from 'marked';
 import './preview-styles.css';
 
 interface PreviewContent {
@@ -271,24 +272,25 @@ const PostPreview: React.FC = () => {
         );
 
       case 'o4o/markdown':
+      case 'o4o/markdown-reader':
       case 'markdown':
-        const markdownContent = attributes?.markdown || blockContent;
-        // Simple markdown rendering (basic HTML conversion)
-        const renderBasicMarkdown = (md: string) => {
-          return md
-            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
-            .replace(/\n/g, '<br>');
-        };
+        // Use marked library for proper markdown rendering (same as editor and frontend)
+        const markdownContent = attributes?.markdown || blockContent || '';
+        if (!markdownContent) return null;
+
+        let markdownHTML = '';
+        try {
+          markdownHTML = marked.parse(markdownContent) as string;
+        } catch (error) {
+          console.error('Markdown parsing error:', error);
+          markdownHTML = `<pre>${markdownContent}</pre>`;
+        }
+
         return (
           <div
             key={block.id}
-            className="prose prose-sm max-w-none mb-4"
-            dangerouslySetInnerHTML={{ __html: renderBasicMarkdown(markdownContent) }}
+            className="prose prose-sm max-w-none mb-4 border border-gray-200 rounded-lg p-4"
+            dangerouslySetInnerHTML={{ __html: markdownHTML }}
           />
         );
 
