@@ -13,7 +13,7 @@
  * - Undo/Redo support
  */
 
-import React, { useCallback, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useRef, memo } from 'react';
 import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } from 'slate';
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
@@ -75,7 +75,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   // Create Slate editor with plugins
   const editor = useMemo(() => createTextEditor(), []);
 
-  // Convert HTML content to Slate value
+  // Convert HTML content to Slate value - ONLY used on initial mount
+  // Note: Dependency array is empty - this truly represents "initialValue"
+  // If external content changes (e.g., AI generation), parent should remount this component
   const initialValue = useMemo(() => {
     // Prioritize content (HTML from AI) over attributes.content (plain text)
     const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
@@ -132,14 +134,16 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         } as ParagraphElement,
       ];
     }
-  }, [content, attributes.content, align]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - truly initial value only
 
   const [linkEditorOpen, setLinkEditorOpen] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Check if block has content (for conditional toolbar visibility)
-  const hasContent = useMemo(() => {
+  // Note: Not using useMemo because editor.children is mutable
+  const getHasContent = useCallback(() => {
     const currentValue = editor.children;
     if (!currentValue || currentValue.length === 0) return false;
 
@@ -158,7 +162,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       }
       return false;
     });
-  }, [editor.children]);
+  }, [editor]);
+
+  const hasContent = getHasContent();
 
   // Handle value changes
   const handleChange = useCallback(
@@ -317,22 +323,13 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }}
         data-handles-enter="true"
       >
-        <Slate
+        <MemoizedSlateEditor
           editor={editor}
           initialValue={initialValue}
-          onValueChange={handleChange}
-        >
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={DefaultLeafRenderer}
-            placeholder=""
-            onKeyDown={handleKeyDown}
-            style={{
-              outline: 'none',
-              minHeight: '1.5em',
-            }}
-          />
-        </Slate>
+          handleChange={handleChange}
+          renderElement={renderElement}
+          handleKeyDown={handleKeyDown}
+        />
 
         {linkEditorOpen && (
           <LinkInlineEditor
@@ -354,5 +351,47 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     </EnhancedBlockWrapper>
   );
 };
+
+// Memoized Slate Editor to prevent re-renders from affecting focus
+interface MemoizedSlateEditorProps {
+  editor: Editor;
+  initialValue: Descendant[];
+  handleChange: (newValue: Descendant[]) => void;
+  renderElement: (props: RenderElementProps) => JSX.Element;
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+}
+
+const MemoizedSlateEditor = memo<MemoizedSlateEditorProps>(({
+  editor,
+  initialValue,
+  handleChange,
+  renderElement,
+  handleKeyDown
+}) => {
+  return (
+    <Slate
+      editor={editor}
+      initialValue={initialValue}
+      onValueChange={handleChange}
+    >
+      <Editable
+        renderElement={renderElement}
+        renderLeaf={DefaultLeafRenderer}
+        placeholder=""
+        onKeyDown={handleKeyDown}
+        style={{
+          outline: 'none',
+          minHeight: '1.5em',
+        }}
+      />
+    </Slate>
+  );
+}, (prevProps, nextProps) => {
+  // Only re-render if editor instance changes (which should never happen)
+  // Don't re-render on handleChange, renderElement, or handleKeyDown changes
+  return prevProps.editor === nextProps.editor;
+});
+
+MemoizedSlateEditor.displayName = 'MemoizedSlateEditor';
 
 export default ParagraphBlock;

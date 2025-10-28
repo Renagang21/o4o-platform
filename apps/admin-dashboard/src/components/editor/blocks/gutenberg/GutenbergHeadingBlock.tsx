@@ -7,7 +7,7 @@
  * NO event conflicts, NO focus issues, NO wrapper onClick problems.
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import { Descendant, Element as SlateElement, Text } from 'slate';
 import { Slate, Editable, RenderElementProps } from 'slate-react';
 import { cn } from '@/lib/utils';
@@ -65,7 +65,8 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
   // Create Slate editor
   const editor = useMemo(() => createTextEditor(), []);
 
-  // Convert HTML content to Slate value
+  // Convert HTML content to Slate value - ONLY used on initial mount
+  // Note: Dependency array is empty - this truly represents "initialValue"
   const initialValue = useMemo(() => {
     const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
 
@@ -122,10 +123,12 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
         } as HeadingElement,
       ];
     }
-  }, [content, attributes.content, level, align]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - truly initial value only
 
   // Check if block has content (for conditional toolbar visibility)
-  const hasContent = useMemo(() => {
+  // Note: Not using useMemo because editor.children is mutable
+  const getHasContent = useCallback(() => {
     const currentValue = editor.children;
     if (!currentValue || currentValue.length === 0) return false;
 
@@ -144,7 +147,9 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
       }
       return false;
     });
-  }, [editor.children]);
+  }, [editor]);
+
+  const hasContent = getHasContent();
 
   // Handle value changes
   const handleChange = useCallback(
@@ -272,25 +277,60 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
           backgroundColor: backgroundColor || undefined,
         }}
       >
-        <Slate
+        <MemoizedSlateEditor
           editor={editor}
           initialValue={initialValue}
-          onValueChange={handleChange}
-        >
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={DefaultLeafRenderer}
-            placeholder={`Heading ${level}`}
-            onKeyDown={handleKeyDown}
-            style={{
-              outline: 'none',
-              minHeight: '1.5em',
-            }}
-          />
-        </Slate>
+          handleChange={handleChange}
+          renderElement={renderElement}
+          handleKeyDown={handleKeyDown}
+          placeholder={`Heading ${level}`}
+        />
       </div>
     </EnhancedBlockWrapper>
   );
 };
+
+// Memoized Slate Editor to prevent re-renders from affecting focus
+interface MemoizedSlateEditorProps {
+  editor: any;
+  initialValue: Descendant[];
+  handleChange: (newValue: Descendant[]) => void;
+  renderElement: (props: RenderElementProps) => JSX.Element;
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+  placeholder: string;
+}
+
+const MemoizedSlateEditor = memo<MemoizedSlateEditorProps>(({
+  editor,
+  initialValue,
+  handleChange,
+  renderElement,
+  handleKeyDown,
+  placeholder
+}) => {
+  return (
+    <Slate
+      editor={editor}
+      initialValue={initialValue}
+      onValueChange={handleChange}
+    >
+      <Editable
+        renderElement={renderElement}
+        renderLeaf={DefaultLeafRenderer}
+        placeholder={placeholder}
+        onKeyDown={handleKeyDown}
+        style={{
+          outline: 'none',
+          minHeight: '1.5em',
+        }}
+      />
+    </Slate>
+  );
+}, (prevProps, nextProps) => {
+  // Only re-render if editor instance changes (which should never happen)
+  return prevProps.editor === nextProps.editor;
+});
+
+MemoizedSlateEditor.displayName = 'MemoizedSlateEditor';
 
 export default GutenbergHeadingBlock;
