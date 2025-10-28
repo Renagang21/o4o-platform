@@ -18,7 +18,6 @@ import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } 
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
-import { BlockToolbar } from './gutenberg/BlockToolbar';
 import { unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
@@ -317,26 +316,16 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
+      onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
+      currentAlign={align}
+      onToggleBold={() => toggleMark(editor, 'bold')}
+      onToggleItalic={() => toggleMark(editor, 'italic')}
+      onToggleLink={toggleLinkEditor}
+      isBold={isMarkActive(editor, 'bold')}
+      isItalic={isMarkActive(editor, 'italic')}
       slateEditor={editor}
-      showToolbar={false}
+      showToolbar={hasContent}
     >
-      {/* Gutenberg-style Block Toolbar (only when selected and has content) */}
-      {isSelected && hasContent && (
-        <BlockToolbar
-          align={align}
-          onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
-          isBold={isMarkActive(editor, 'bold')}
-          isItalic={isMarkActive(editor, 'italic')}
-          onToggleBold={() => toggleMark(editor, 'bold')}
-          onToggleItalic={() => toggleMark(editor, 'italic')}
-          onToggleLink={toggleLinkEditor}
-          onDuplicate={onDuplicate}
-          onInsertBefore={() => onAddBlock?.('before')}
-          onInsertAfter={() => onAddBlock?.('after')}
-          onRemove={onDelete}
-        />
-      )}
-
       <div
         ref={editorRef}
         className={cn(
