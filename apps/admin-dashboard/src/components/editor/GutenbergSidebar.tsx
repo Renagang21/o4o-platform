@@ -320,7 +320,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 {postSettings.slug && (
                   <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
                     <Globe className="h-3 w-3 inline mr-1" />
-                    Preview: /posts/{postSettings.slug}
+                    Preview: /{postSettings.slug}
                   </div>
                 )}
               </div>
