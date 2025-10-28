@@ -122,16 +122,9 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
         } as HeadingElement,
       ];
     }
-  }, []); // Only run once on mount
+  }, [content, attributes.content, level, align]);
 
   const [value, setValue] = useState<Descendant[]>(initialValue);
-
-  // Generate content-based key for Slate remounting when content changes
-  const slateKey = useMemo(() => {
-    const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
-    const contentHash = textContent.substring(0, 50);
-    return `${id}-${contentHash}`;
-  }, [id, content, attributes.content]);
 
   // Check if block has content (for conditional toolbar visibility)
   const hasContent = useMemo(() => {
@@ -283,7 +276,6 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
         }}
       >
         <Slate
-          key={slateKey}
           editor={editor}
           initialValue={initialValue}
           onValueChange={handleChange}

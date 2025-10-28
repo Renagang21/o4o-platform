@@ -132,19 +132,12 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         } as ParagraphElement,
       ];
     }
-  }, []); // Only run once on mount
+  }, [content, attributes.content, align]);
 
   const [value, setValue] = useState<Descendant[]>(initialValue);
   const [linkEditorOpen, setLinkEditorOpen] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-
-  // Generate content-based key for Slate remounting when content changes
-  const slateKey = useMemo(() => {
-    const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
-    const contentHash = textContent.substring(0, 50);
-    return `${id}-${contentHash}`;
-  }, [id, content, attributes.content]);
 
   // Check if block has content (for conditional toolbar visibility)
   const hasContent = useMemo(() => {
@@ -344,7 +337,6 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         data-handles-enter="true"
       >
         <Slate
-          key={slateKey}
           editor={editor}
           initialValue={initialValue}
           onValueChange={handleChange}

@@ -151,12 +151,9 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={(e) => {
-        // Performance optimization: avoid expensive DOM traversal
-        // Only select if not already selected
-        if (!isSelected) {
-          onSelect();
-        }
+      onClick={() => {
+        // Always call onSelect to ensure state can recover from any abnormal state
+        onSelect();
       }}
     >
       {/* Block toolbar */}
