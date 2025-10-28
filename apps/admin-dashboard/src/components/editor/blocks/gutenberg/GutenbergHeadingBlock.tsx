@@ -7,7 +7,7 @@
  * NO event conflicts, NO focus issues, NO wrapper onClick problems.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Descendant, Element as SlateElement, Text } from 'slate';
 import { Slate, Editable, RenderElementProps } from 'slate-react';
 import { cn } from '@/lib/utils';
@@ -124,14 +124,13 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
     }
   }, [content, attributes.content, level, align]);
 
-  const [value, setValue] = useState<Descendant[]>(initialValue);
-
   // Check if block has content (for conditional toolbar visibility)
   const hasContent = useMemo(() => {
-    if (!value || value.length === 0) return false;
+    const currentValue = editor.children;
+    if (!currentValue || currentValue.length === 0) return false;
 
     // Check all nodes for any text content
-    return value.some(node => {
+    return currentValue.some(node => {
       if (Text.isText(node)) {
         return node.text.trim() !== '';
       }
@@ -145,13 +144,11 @@ export const GutenbergHeadingBlock: React.FC<GutenbergHeadingBlockProps> = ({
       }
       return false;
     });
-  }, [value]);
+  }, [editor.children]);
 
   // Handle value changes
   const handleChange = useCallback(
     (newValue: Descendant[]) => {
-      setValue(newValue);
-
       // Check if content actually changed (not just selection)
       const isAstChange = editor.operations.some(
         (op) => op.type !== 'set_selection'

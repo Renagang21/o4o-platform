@@ -13,7 +13,7 @@
  * - Undo/Redo support
  */
 
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } from 'slate';
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
@@ -134,17 +134,17 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     }
   }, [content, attributes.content, align]);
 
-  const [value, setValue] = useState<Descendant[]>(initialValue);
   const [linkEditorOpen, setLinkEditorOpen] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Check if block has content (for conditional toolbar visibility)
   const hasContent = useMemo(() => {
-    if (!value || value.length === 0) return false;
+    const currentValue = editor.children;
+    if (!currentValue || currentValue.length === 0) return false;
 
     // Check all nodes for any text content
-    return value.some(node => {
+    return currentValue.some(node => {
       if (Text.isText(node)) {
         return node.text.trim() !== '';
       }
@@ -158,30 +158,11 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       }
       return false;
     });
-  }, [value]);
-
-  // Update editor when alignment changes
-  useEffect(() => {
-    if (value.length > 0) {
-      const firstNode = value[0];
-      if (SlateElement.isElement(firstNode) && firstNode.type === 'paragraph') {
-        if ((firstNode as ParagraphElement).align !== align) {
-          // Update alignment without triggering onChange
-          Transforms.setNodes(
-            editor,
-            { align } as Partial<ParagraphElement>,
-            { at: [0] }
-          );
-        }
-      }
-    }
-  }, [align, editor, value]);
+  }, [editor.children]);
 
   // Handle value changes
   const handleChange = useCallback(
     (newValue: Descendant[]) => {
-      setValue(newValue);
-
       // Check if content actually changed (not just selection)
       const isAstChange = editor.operations.some(
         (op) => op.type !== 'set_selection'
