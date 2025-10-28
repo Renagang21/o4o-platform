@@ -643,8 +643,21 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // ✨ blocksRef is now managed by blockManagement hook
 
-  // Create stable callback factories that don't depend on blocks state
-  // This prevents re-renders when blocks change
+  /**
+   * Callback Factory Pattern
+   *
+   * These factories create stable callbacks that:
+   * 1. Don't depend on blocks state (use blockManagement.blocksRef instead)
+   * 2. Are cached per block ID in callbacksMapRef
+   * 3. Prevent re-renders when blocks array changes
+   *
+   * This is necessary because:
+   * - DynamicRenderer receives these callbacks as props
+   * - If callbacks change, child components (ParagraphBlock, HeadingBlock) re-render
+   * - Re-renders can cause Slate to lose focus
+   *
+   * Similar to the ref pattern used in NewColumnBlock and NewColumnsBlock
+   */
   const createOnChange = useCallback((blockId: string) =>
     (content: any, attributes?: any) => handleBlockUpdate(blockId, content, attributes),
     [handleBlockUpdate]

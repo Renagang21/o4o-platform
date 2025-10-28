@@ -9,7 +9,7 @@
  * - Clean, minimal UI
  */
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Block } from '@/types/post.types';
 import { BlockProps } from '@/blocks/registry/types';
 import { cn } from '@/lib/utils';
@@ -45,13 +45,23 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
     isStackedOnMobile = true,
   } = attributes;
 
-  // Auto-create initial columns if empty
+  // Use ref to avoid recreating callbacks when innerBlocks changes
+  // Similar pattern to NewColumnBlock optimization
+  const innerBlocksRef = useRef(innerBlocks);
+  innerBlocksRef.current = innerBlocks;
+
+  // Unified column management: create initial columns or adjust when columnCount changes
   useEffect(() => {
-    if (innerBlocks.length === 0 && onInnerBlocksChange && columnCount > 0) {
+    if (!onInnerBlocksChange || columnCount <= 0) return;
+
+    const currentCount = innerBlocks.length;
+
+    // Case 1: Empty - create initial columns
+    if (currentCount === 0) {
       const newColumns: Block[] = [];
       for (let i = 0; i < columnCount; i++) {
         newColumns.push({
-          id: `${id}-column-${i}-${Date.now()}`,
+          id: `${id}-column-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'o4o/column',
           content: '',
           attributes: {
@@ -62,21 +72,17 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
         });
       }
       onInnerBlocksChange(newColumns);
+      return;
     }
-  }, [innerBlocks.length, columnCount, verticalAlignment, id, onInnerBlocksChange]);
 
-  // Adjust columns when columnCount changes
-  useEffect(() => {
-    if (!onInnerBlocksChange || innerBlocks.length === 0) return;
-
-    const currentCount = innerBlocks.length;
-
+    // Case 2: Column count mismatch - adjust columns
     if (currentCount !== columnCount) {
+      let adjustedColumns = [...innerBlocks];
+
       if (currentCount < columnCount) {
         // Add new columns
-        const newColumns = [...innerBlocks];
         for (let i = currentCount; i < columnCount; i++) {
-          newColumns.push({
+          adjustedColumns.push({
             id: `${id}-column-${i}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type: 'o4o/column',
             content: '',
@@ -87,37 +93,30 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
             innerBlocks: [],
           });
         }
-        // Adjust widths of all columns
-        const adjustedColumns = newColumns.map(col => ({
-          ...col,
-          attributes: {
-            ...col.attributes,
-            width: 100 / columnCount,
-          },
-        }));
-        onInnerBlocksChange(adjustedColumns);
-      } else if (currentCount > columnCount) {
+      } else {
         // Remove extra columns (from the end)
-        const reducedColumns = innerBlocks.slice(0, columnCount);
-        // Adjust widths of remaining columns
-        const adjustedColumns = reducedColumns.map(col => ({
-          ...col,
-          attributes: {
-            ...col.attributes,
-            width: 100 / columnCount,
-          },
-        }));
-        onInnerBlocksChange(adjustedColumns);
+        adjustedColumns = adjustedColumns.slice(0, columnCount);
       }
-    }
-  }, [columnCount, innerBlocks, id, verticalAlignment, onInnerBlocksChange]);
 
-  // Handle inner block change
+      // Redistribute widths for all columns
+      adjustedColumns = adjustedColumns.map(col => ({
+        ...col,
+        attributes: {
+          ...col.attributes,
+          width: 100 / columnCount,
+        },
+      }));
+
+      onInnerBlocksChange(adjustedColumns);
+    }
+  }, [columnCount, innerBlocks.length, id, verticalAlignment, onInnerBlocksChange]);
+
+  // Handle inner block change (optimized with ref)
   const handleInnerBlockChange = useCallback(
     (blockId: string, content: unknown, blockAttributes?: unknown) => {
       if (!onInnerBlocksChange) return;
 
-      const updatedBlocks = innerBlocks.map((block) =>
+      const updatedBlocks = innerBlocksRef.current.map((block) =>
         block.id === blockId
           ? {
               ...block,
@@ -129,24 +128,24 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
 
       onInnerBlocksChange(updatedBlocks);
     },
-    [innerBlocks, onInnerBlocksChange]
+    [onInnerBlocksChange]
   );
 
-  // Handle inner block delete
+  // Handle inner block delete (optimized with ref)
   const handleInnerBlockDelete = useCallback(
     (blockId: string) => {
       if (!onInnerBlocksChange) return;
-      onInnerBlocksChange(innerBlocks.filter((block) => block.id !== blockId));
+      onInnerBlocksChange(innerBlocksRef.current.filter((block) => block.id !== blockId));
     },
-    [innerBlocks, onInnerBlocksChange]
+    [onInnerBlocksChange]
   );
 
-  // Handle inner block's inner blocks change (Column -> nested blocks)
+  // Handle inner block's inner blocks change (Column -> nested blocks) (optimized with ref)
   const handleColumnInnerBlocksChange = useCallback(
     (columnId: string, newInnerBlocks: Block[]) => {
       if (!onInnerBlocksChange) return;
 
-      const updatedBlocks = innerBlocks.map((block) =>
+      const updatedBlocks = innerBlocksRef.current.map((block) =>
         block.id === columnId
           ? { ...block, innerBlocks: newInnerBlocks }
           : block
@@ -154,7 +153,7 @@ export const NewColumnsBlock: React.FC<NewColumnsBlockProps> = ({
 
       onInnerBlocksChange(updatedBlocks);
     },
-    [innerBlocks, onInnerBlocksChange]
+    [onInnerBlocksChange]
   );
 
   const alignmentClasses = {
