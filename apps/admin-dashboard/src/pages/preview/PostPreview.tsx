@@ -119,8 +119,8 @@ const PostPreview: React.FC = () => {
     switch (type) {
       case 'o4o/paragraph':
       case 'paragraph':
-        // Priority: attributes.content > content.text > content (legacy HTML string)
-        const paragraphText = attributes?.content || content?.text || extractText(content);
+        // Priority: content (HTML string from Slate serializer) > attributes.content > content.text
+        const paragraphHTML = (typeof content === 'string' && content) || attributes?.content || content?.text || '';
         return (
           <p
             key={block.id}
@@ -130,15 +130,14 @@ const PostPreview: React.FC = () => {
               fontSize: attributes?.fontSize || '16px',
               color: attributes?.textColor || '#374151',
             }}
-          >
-            {paragraphText}
-          </p>
+            dangerouslySetInnerHTML={{ __html: paragraphHTML }}
+          />
         );
 
       case 'o4o/heading':
       case 'heading':
-        // Priority: attributes.content/level > content.text/level > legacy
-        const headingText = attributes?.content || content?.text || extractText(content);
+        // Priority: content (HTML string from Slate serializer) > attributes.content > content.text
+        const headingHTML = (typeof content === 'string' && content) || attributes?.content || content?.text || '';
         const headingLevel = attributes?.level || content?.level || 2;
         const HeadingTag = `h${headingLevel}` as 'h1'|'h2'|'h3'|'h4'|'h5'|'h6';
         const headingClasses = {
@@ -157,9 +156,8 @@ const PostPreview: React.FC = () => {
               textAlign: attributes?.align || 'left',
               color: attributes?.textColor,
             }}
-          >
-            {headingText}
-          </HeadingTag>
+            dangerouslySetInnerHTML={{ __html: headingHTML }}
+          />
         );
 
       case 'o4o/list':
