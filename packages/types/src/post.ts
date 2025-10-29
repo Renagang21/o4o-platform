@@ -1,6 +1,6 @@
 // Post and Page types for CMS functionality
 
-import type { Tag } from './common';
+import type { Tag } from './common.js';
 
 // Define PostCategory for posts (different from ecommerce Category)
 export interface PostCategory {

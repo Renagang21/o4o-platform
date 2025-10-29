@@ -187,7 +187,7 @@ export interface ACFValidation {
 }
 
 // Import types from custom-post-type
-import type { CustomField, CustomFieldGroup } from './custom-post-type';
+import type { CustomField, CustomFieldGroup } from './custom-post-type.js';
 
 // Re-export for convenience
-export type { CustomField, CustomFieldGroup } from './custom-post-type';
+export type { CustomField, CustomFieldGroup } from './custom-post-type.js';

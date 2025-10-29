@@ -3,8 +3,8 @@
  * 공급자-판매자-관리자 간의 마켓플레이스 생태계
  */
 
-import { BaseEntity } from './common';
-import { Product as BaseProduct, Order, OrderItem as BaseOrderItem } from './ecommerce';
+import { BaseEntity } from './common.js';
+import { Product as BaseProduct, Order, OrderItem as BaseOrderItem } from './ecommerce.js';
 
 /**
  * 제품 승인 상태
