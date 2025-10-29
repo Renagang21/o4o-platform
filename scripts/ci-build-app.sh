@@ -16,6 +16,23 @@ echo "📊 Node memory limit: 4GB"
 # NOTE: Packages are now built by the workflow before calling this script
 # See .github/workflows/main.yml
 
+# Verify that critical packages have been built
+echo "🔍 Verifying package builds..."
+if [ ! -d "packages/shortcodes/dist" ]; then
+    echo "❌ ERROR: packages/shortcodes/dist not found!"
+    echo "Packages must be built before running app builds."
+    echo "Run: pnpm run build:packages"
+    exit 1
+fi
+
+if [ ! -d "packages/auth-client/dist" ]; then
+    echo "❌ ERROR: packages/auth-client/dist not found!"
+    exit 1
+fi
+
+echo "✅ Package dist directories verified"
+echo ""
+
 # Function to build specific app
 build_app() {
     local app=$1
