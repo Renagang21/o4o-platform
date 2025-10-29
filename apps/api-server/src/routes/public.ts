@@ -5,6 +5,7 @@ import { Page } from '../entities/Page';
 import { Post } from '../entities/Post';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
 import logger from '../utils/logger';
+import { checkPostAccess, getAccessDeniedResponse } from '../utils/accessControl';
 
 const router: Router = Router();
 
@@ -53,6 +54,21 @@ router.get('/content/slug/:slug', async (req, res) => {
     });
 
     if (page) {
+      // Check access control for page (page is stored in Post table with type='page')
+      const postRepository = AppDataSource.getRepository(Post);
+      const pagePost = await postRepository.findOne({
+        where: { id: page.id, type: 'page' }
+      });
+
+      if (pagePost) {
+        const user = (req as any).user;
+        const accessCheck = checkPostAccess(pagePost, user);
+
+        if (!accessCheck.allowed) {
+          return res.status(403).json(getAccessDeniedResponse(accessCheck));
+        }
+      }
+
       // Get template if page has one
       let templateContent = null;
       if (page.template) {
@@ -96,6 +112,14 @@ router.get('/content/slug/:slug', async (req, res) => {
     });
 
     if (post) {
+      // Check access control for post
+      const user = (req as any).user;
+      const accessCheck = checkPostAccess(post, user);
+
+      if (!accessCheck.allowed) {
+        return res.status(403).json(getAccessDeniedResponse(accessCheck));
+      }
+
       return res.json({
         success: true,
         data: {
@@ -253,6 +277,21 @@ router.get('/pages/:idOrSlug', async (req, res) => {
       });
     }
 
+    // Check access control for page (page is stored in Post table with type='page')
+    const postRepository = AppDataSource.getRepository(Post);
+    const pagePost = await postRepository.findOne({
+      where: { id: page.id, type: 'page' }
+    });
+
+    if (pagePost) {
+      const user = (req as any).user;
+      const accessCheck = checkPostAccess(pagePost, user);
+
+      if (!accessCheck.allowed) {
+        return res.status(403).json(getAccessDeniedResponse(accessCheck));
+      }
+    }
+
     // Get template if page has one
     let templateContent = null;
     if (page.template) {
@@ -359,6 +398,14 @@ router.get('/posts/post/:slugOrId', async (req, res) => {
         success: false,
         error: 'Post not found or not published'
       });
+    }
+
+    // Check access control for post
+    const user = (req as any).user;
+    const accessCheck = checkPostAccess(post, user);
+
+    if (!accessCheck.allowed) {
+      return res.status(403).json(getAccessDeniedResponse(accessCheck));
     }
 
     res.json({

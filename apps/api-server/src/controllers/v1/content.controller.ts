@@ -6,6 +6,7 @@ import { Category } from '../../entities/Category';
 import { User, UserStatus } from '../../entities/User';
 import { MediaFile } from '../../entities/MediaFile';
 import { Tag } from '../../entities/Tag';
+import { checkPostAccess, getAccessDeniedResponse } from '../../utils/accessControl';
 
 export class ContentController {
   private postRepository = AppDataSource.getRepository(Post);
@@ -70,7 +71,7 @@ export class ContentController {
   getPost = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      
+
       if (!AppDataSource.isInitialized) {
         return res.status(503).json({
           status: "error",
@@ -88,6 +89,14 @@ export class ContentController {
           status: 'error',
           message: 'Post not found'
         });
+      }
+
+      // Check access control
+      const user = (req as any).user;
+      const accessCheck = checkPostAccess(post, user);
+
+      if (!accessCheck.allowed) {
+        return res.status(403).json(getAccessDeniedResponse(accessCheck));
       }
 
       return res.json({
@@ -940,15 +949,47 @@ export class ContentController {
   };
 
   getPage = async (req: Request, res: Response) => {
-    return res.json({
-      status: 'success',
-      data: {
-        id: req.params.id,
-        title: 'Sample Page',
-        slug: 'sample-page',
-        content: { type: 'doc', content: [] }
+    try {
+      const { id } = req.params;
+
+      if (!AppDataSource.isInitialized) {
+        return res.status(503).json({
+          status: "error",
+          message: "Database connection not initialized"
+        });
       }
-    });
+
+      // Pages are stored as Posts with type='page'
+      const page = await this.postRepository.findOne({
+        where: { id, type: 'page' },
+        relations: ['author', 'categories', 'tags']
+      });
+
+      if (!page) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Page not found'
+        });
+      }
+
+      // Check access control
+      const user = (req as any).user;
+      const accessCheck = checkPostAccess(page, user);
+
+      if (!accessCheck.allowed) {
+        return res.status(403).json(getAccessDeniedResponse(accessCheck));
+      }
+
+      return res.json({
+        status: 'success',
+        data: page
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch page'
+      });
+    }
   };
 
   createPage = async (req: Request, res: Response) => {
