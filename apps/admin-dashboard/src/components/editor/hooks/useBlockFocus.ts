@@ -53,9 +53,14 @@ export function useBlockFocus({
       if (slateEditor) {
         try {
           // Check if editor already has focus
-          if (!ReactEditor.isFocused(slateEditor)) {
+          const alreadyFocused = ReactEditor.isFocused(slateEditor);
+
+          if (!alreadyFocused) {
             ReactEditor.focus(slateEditor);
-            // Move cursor to end of content
+          }
+
+          // Only move selection when the editor has no selection yet
+          if (!slateEditor.selection) {
             Transforms.select(slateEditor, SlateEditor.end(slateEditor, []));
           }
         } catch (error) {

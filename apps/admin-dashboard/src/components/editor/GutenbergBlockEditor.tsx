@@ -1,6 +1,22 @@
 /**
  * GutenbergBlockEditor Component
  * Enhanced WordPress Gutenberg-like editor with 3-column layout
+ *
+ * State Management:
+ * - Block state: blocks, selectedBlockId, copiedBlock
+ * - UI state: 9 modal/panel toggles (isBlockInserterOpen, isFullscreen, etc.)
+ * - Document state: documentTitle, postSettings, isDirty
+ * - Session state: sessionRestored
+ *
+ * Optimization patterns:
+ * - Custom hooks: useBlockManagement, useBlockHistory, useDragAndDrop
+ * - useMemo: editorContext to prevent unnecessary re-renders
+ * - useEffect: Synchronizes selectedBlock with selectedBlockId
+ *
+ * Why many useState hooks?
+ * - Most are independent UI toggles (safe to separate)
+ * - Consolidating would require complex reducer (higher risk)
+ * - Current structure is maintainable and debuggable
  */
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -643,8 +659,21 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // ✨ blocksRef is now managed by blockManagement hook
 
-  // Create stable callback factories that don't depend on blocks state
-  // This prevents re-renders when blocks change
+  /**
+   * Callback Factory Pattern
+   *
+   * These factories create stable callbacks that:
+   * 1. Don't depend on blocks state (use blockManagement.blocksRef instead)
+   * 2. Are cached per block ID in callbacksMapRef
+   * 3. Prevent re-renders when blocks array changes
+   *
+   * This is necessary because:
+   * - DynamicRenderer receives these callbacks as props
+   * - If callbacks change, child components (ParagraphBlock, HeadingBlock) re-render
+   * - Re-renders can cause Slate to lose focus
+   *
+   * Similar to the ref pattern used in NewColumnBlock and NewColumnsBlock
+   */
   const createOnChange = useCallback((blockId: string) =>
     (content: any, attributes?: any) => handleBlockUpdate(blockId, content, attributes),
     [handleBlockUpdate]

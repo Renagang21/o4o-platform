@@ -22,6 +22,24 @@
   float: left;
 }
 
+/* Link styles for paragraph and heading blocks */
+.wp-block-paragraph a,
+.wp-block-heading a {
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.wp-block-paragraph a:hover,
+.wp-block-heading a:hover {
+  color: #1d4ed8;
+}
+
+.wp-block-paragraph a:visited,
+.wp-block-heading a:visited {
+  color: #7c3aed;
+}
+
 .wp-block-heading {
   margin-top: 2rem;
   margin-bottom: 1rem;

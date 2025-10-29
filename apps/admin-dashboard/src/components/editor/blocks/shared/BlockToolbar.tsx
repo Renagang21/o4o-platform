@@ -157,11 +157,11 @@ export const BlockToolbar = forwardRef<HTMLDivElement, BlockToolbarProps>(
         className={cn(
           'absolute left-0 right-0 flex flex-col sm:flex-row items-start sm:items-center justify-between z-50 gap-2',
           'transition-all duration-200 ease-out',
-          position === 'top' ? '-translate-y-2' : 'translate-y-2'
+          position === 'top' ? '-translate-y-4' : 'translate-y-2'
         )}
         style={{
           [position === 'top' ? 'bottom' : 'top']: '100%',
-          marginBottom: position === 'top' ? '8px' : undefined,
+          marginBottom: position === 'top' ? '16px' : undefined,
           marginTop: position === 'bottom' ? '8px' : undefined,
         }}
       >

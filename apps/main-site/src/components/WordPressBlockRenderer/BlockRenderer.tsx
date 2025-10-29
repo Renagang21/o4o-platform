@@ -95,6 +95,7 @@ export const BlockRenderer: FC<BlockRendererProps> = ({ block }) => {
 
     // Custom blocks
     case 'o4o/markdown-reader':
+    case 'o4o/markdown':
       return <MarkdownReaderBlock block={block} />;
 
     // Unknown block fallback

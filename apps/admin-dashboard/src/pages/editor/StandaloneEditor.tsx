@@ -187,10 +187,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                           (parsed?.blocks || []);
           } catch {
             // Plain text - create paragraph block
-            parsedBlocks = [{ 
-              id: 'block-1', 
-              type: 'o4o/paragraph', 
-              attributes: { content: data.content }
+            // IMPORTANT: Use 'content' field, NOT 'attributes.content'
+            // ParagraphBlock expects HTML content in the 'content' prop
+            parsedBlocks = [{
+              id: 'block-1',
+              type: 'o4o/paragraph',
+              content: data.content,
+              attributes: {}
             }];
           }
         } else if (Array.isArray(data.content)) {
@@ -200,9 +203,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         }
       }
       
+      // DEBUG: Store parsed blocks for inspection
+      if (typeof window !== 'undefined') {
+        (window as any).__PARSED_BLOCKS = parsedBlocks;
+        (window as any).__PARSED_BLOCKS_TIME = new Date().toISOString();
+      }
+
       setBlocks(parsedBlocks);
       blocksRef.current = parsedBlocks; // Update ref
-      
+
       // Set post settings - ensure slug is preserved
       setPostSettings(prev => {
         const mapStatus = (s: any) => {

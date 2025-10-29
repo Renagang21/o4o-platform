@@ -90,7 +90,7 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
               id: post.id,
               title: post.title,
               type: 'post' as const,
-              url: `/blog/${post.slug}`
+              url: `/${post.slug}`
             }))
           );
         }

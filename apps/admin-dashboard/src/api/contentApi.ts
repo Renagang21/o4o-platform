@@ -282,6 +282,25 @@ export class ContentApi {
     return response.data
   }
 
+  static async updateMediaFileContent(id: string, content: string, filename: string): Promise<ApiResponse<MediaFile>> {
+    // Convert markdown text to File object
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const file = new File([blob], filename, { type: 'text/markdown' });
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Send to API
+    const response = await unifiedApi.raw.put(`/v1/content/media/${id}/content`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    } as any);
+
+    return response.data;
+  }
+
   static async deleteMediaFile(id: string): Promise<ApiResponse<void>> {
     const response = await unifiedApi.content.media.delete(id)
     return response.data

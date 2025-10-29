@@ -146,14 +146,13 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       data-block-type={type}
       className={cn(
         'block-wrapper group relative transition-all duration-200',
-        'mb-4', // Add margin between blocks (16px for optimal readability)
+        'mb-2', // Reduced margin between blocks for compact editing
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={(e) => {
-        // Performance optimization: avoid expensive DOM traversal
-        // Only select if not already selected
+      onClick={() => {
+        // Only select if not already selected to prevent unnecessary re-renders
         if (!isSelected) {
           onSelect();
         }
@@ -195,7 +194,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         <BlockAddButton
           position="top"
           onAddBlock={onAddBlock}
-          show={isHovered && !isSelected}
+          show={isHovered}
         />
       )}
 
@@ -214,7 +213,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         <BlockAddButton
           position="bottom"
           onAddBlock={onAddBlock}
-          show={isHovered && !isSelected}
+          show={isHovered}
         />
       )}
     </div>

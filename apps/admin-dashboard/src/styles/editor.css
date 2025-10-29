@@ -88,7 +88,15 @@
 
 .block-wrapper.is-selected::before {
   border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.05);
+  /* background removed for cleaner editing experience */
+}
+
+/* Paragraph blocks: no border, just clean input area */
+.wp-block-paragraph.block-wrapper::before,
+.wp-block-paragraph.block-wrapper:hover::before,
+.wp-block-paragraph.block-wrapper.is-selected::before {
+  border: none;
+  background: none;
 }
 
 /* Add block button styles */

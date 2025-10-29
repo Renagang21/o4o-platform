@@ -35,6 +35,7 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   'o4o/button': ButtonBlock,
   'o4o/columns': ColumnsBlock,
   'o4o/spacer': SpacerBlock,
+  'o4o/shortcode': ShortcodeBlock,
 
   // Spectra blocks
   'uagb/call-to-action': CTABlock,

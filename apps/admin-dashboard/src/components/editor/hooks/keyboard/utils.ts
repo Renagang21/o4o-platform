@@ -6,9 +6,17 @@
 
 /**
  * Check if target is a contentEditable element
+ * Fixed: Now checks parent elements too (for Slate.js inner spans)
  */
 export function isEditableTarget(target: HTMLElement): boolean {
-  return target.isContentEditable || target.getAttribute('contenteditable') === 'true';
+  // Check if target itself is contentEditable
+  if (target.isContentEditable || target.getAttribute('contenteditable') === 'true') {
+    return true;
+  }
+
+  // Check if target is inside a contentEditable parent (for Slate.js spans)
+  const editableParent = target.closest('[contenteditable="true"]');
+  return editableParent !== null;
 }
 
 /**

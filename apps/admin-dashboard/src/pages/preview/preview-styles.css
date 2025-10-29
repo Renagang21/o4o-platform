@@ -82,6 +82,20 @@
   margin: 0.5rem 0;
 }
 
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.prose a:hover {
+  color: #1d4ed8;
+}
+
+.prose a:visited {
+  color: #7c3aed;
+}
+
 /* Device frame styles */
 .device-frame {
   position: relative;

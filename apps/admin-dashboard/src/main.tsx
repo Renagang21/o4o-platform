@@ -47,13 +47,13 @@ initVersionCheck();
 // Register all blocks before rendering
 registerAllBlocks();
 
+// Note: StrictMode disabled for Slate.js compatibility
+// Slate's focus management conflicts with React's double-rendering in development mode
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-        <Toaster position="top-center" reverseOrder={false} />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </StrictMode>,
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <App />
+      <Toaster position="top-center" reverseOrder={false} />
+    </BrowserRouter>
+  </QueryClientProvider>,
 )

@@ -13,11 +13,12 @@
  * - Undo/Redo support
  */
 
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useRef, memo } from 'react';
 import { Descendant, Editor, Transforms, Element as SlateElement, Text, Range } from 'slate';
 import { Slate, Editable, RenderElementProps, ReactEditor } from 'slate-react';
 import { cn } from '@/lib/utils';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
+import { BlockToolbar } from './gutenberg/BlockToolbar';
 import { unwrapLink, wrapLink, getActiveLinkElement } from '../slate/plugins/withLinks';
 import { serialize, deserialize } from '../slate/utils/serialize';
 import LinkInlineEditor from '../slate/components/LinkInlineEditor';
@@ -74,7 +75,9 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   // Create Slate editor with plugins
   const editor = useMemo(() => createTextEditor(), []);
 
-  // Convert HTML content to Slate value
+  // Convert HTML content to Slate value - ONLY used on initial mount
+  // Note: Dependency array is empty - this truly represents "initialValue"
+  // If external content changes (e.g., AI generation), parent should remount this component
   const initialValue = useMemo(() => {
     // Prioritize content (HTML from AI) over attributes.content (plain text)
     const textContent = (typeof content === 'string' && content ? content : '') || attributes.content || '';
@@ -131,35 +134,41 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         } as ParagraphElement,
       ];
     }
-  }, []); // Only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - truly initial value only
 
-  const [value, setValue] = useState<Descendant[]>(initialValue);
   const [linkEditorOpen, setLinkEditorOpen] = useState(false);
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Update editor when alignment changes
-  useEffect(() => {
-    if (value.length > 0) {
-      const firstNode = value[0];
-      if (SlateElement.isElement(firstNode) && firstNode.type === 'paragraph') {
-        if ((firstNode as ParagraphElement).align !== align) {
-          // Update alignment without triggering onChange
-          Transforms.setNodes(
-            editor,
-            { align } as Partial<ParagraphElement>,
-            { at: [0] }
-          );
-        }
+  // Check if block has content (for conditional toolbar visibility)
+  // Note: Not using useMemo because editor.children is mutable
+  const getHasContent = useCallback(() => {
+    const currentValue = editor.children;
+    if (!currentValue || currentValue.length === 0) return false;
+
+    // Check all nodes for any text content
+    return currentValue.some(node => {
+      if (Text.isText(node)) {
+        return node.text.trim() !== '';
       }
-    }
-  }, [align, editor, value]);
+      if (SlateElement.isElement(node) && node.children) {
+        return node.children.some((child: any) => {
+          if (Text.isText(child)) {
+            return child.text.trim() !== '';
+          }
+          return false;
+        });
+      }
+      return false;
+    });
+  }, [editor]);
+
+  const hasContent = getHasContent();
 
   // Handle value changes
   const handleChange = useCallback(
     (newValue: Descendant[]) => {
-      setValue(newValue);
-
       // Check if content actually changed (not just selection)
       const isAstChange = editor.operations.some(
         (op) => op.type !== 'set_selection'
@@ -247,20 +256,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           <a
             {...props.attributes}
             href={(element as LinkElement).url}
-            className="text-blue-600 hover:text-blue-800 underline"
-            onClick={(e) => {
-              e.preventDefault();
-              // In edit mode, allow editing the link
-              const url = window.prompt('Edit URL:', (element as LinkElement).url);
-              if (url !== null && url !== (element as LinkElement).url) {
-                const path = ReactEditor.findPath(editor, element);
-                Transforms.setNodes(
-                  editor,
-                  { url } as Partial<LinkElement>,
-                  { at: path }
-                );
-              }
-            }}
+            className="text-blue-600 hover:text-blue-800 underline cursor-text"
           >
             {props.children}
           </a>
@@ -291,23 +287,33 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       onSelect={onSelect}
       onDelete={onDelete}
       onDuplicate={onDuplicate}
-      onMoveUp={onMoveUp}
-      onMoveDown={onMoveDown}
       onAddBlock={onAddBlock}
       className="wp-block-paragraph"
-      onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
-      currentAlign={align}
-      onToggleBold={() => toggleMark(editor, 'bold')}
-      onToggleItalic={() => toggleMark(editor, 'italic')}
-      onToggleLink={toggleLinkEditor}
-      isBold={isMarkActive(editor, 'bold')}
-      isItalic={isMarkActive(editor, 'italic')}
+      slateEditor={editor}
       disableAutoFocus={true}
+      showToolbar={false}
     >
+      {/* Gutenberg-style Block Toolbar (only when selected and has content) */}
+      {isSelected && hasContent && (
+        <BlockToolbar
+          align={align}
+          onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
+          isBold={isMarkActive(editor, 'bold')}
+          isItalic={isMarkActive(editor, 'italic')}
+          onToggleBold={() => toggleMark(editor, 'bold')}
+          onToggleItalic={() => toggleMark(editor, 'italic')}
+          onToggleLink={toggleLinkEditor}
+          onDuplicate={onDuplicate}
+          onInsertBefore={() => onAddBlock?.('before')}
+          onInsertAfter={() => onAddBlock?.('after')}
+          onRemove={onDelete}
+        />
+      )}
+
       <div
         ref={editorRef}
         className={cn(
-          'paragraph-content min-h-[1.5em] relative',
+          'paragraph-content min-h-[1em] relative',
           dropCap && 'first-letter:text-7xl first-letter:font-bold first-letter:float-left first-letter:mr-2 first-letter:leading-none'
         )}
         style={{
@@ -317,32 +323,13 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         }}
         data-handles-enter="true"
       >
-        <Slate
+        <MemoizedSlateEditor
           editor={editor}
           initialValue={initialValue}
-          onValueChange={handleChange}
-        >
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={DefaultLeafRenderer}
-            placeholder=""
-            onKeyDown={handleKeyDown}
-            onClick={(e) => {
-              // Critical: Stop propagation at Editable level
-              // Prevents all parent onClick handlers from firing
-              e.stopPropagation();
-              onSelect();
-            }}
-            onMouseDown={(e) => {
-              // Also stop mousedown to prevent focus issues
-              e.stopPropagation();
-            }}
-            style={{
-              outline: 'none',
-              minHeight: '1.5em',
-            }}
-          />
-        </Slate>
+          handleChange={handleChange}
+          renderElement={renderElement}
+          handleKeyDown={handleKeyDown}
+        />
 
         {linkEditorOpen && (
           <LinkInlineEditor
@@ -364,5 +351,47 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     </EnhancedBlockWrapper>
   );
 };
+
+// Memoized Slate Editor to prevent re-renders from affecting focus
+interface MemoizedSlateEditorProps {
+  editor: Editor;
+  initialValue: Descendant[];
+  handleChange: (newValue: Descendant[]) => void;
+  renderElement: (props: RenderElementProps) => JSX.Element;
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+}
+
+const MemoizedSlateEditor = memo<MemoizedSlateEditorProps>(({
+  editor,
+  initialValue,
+  handleChange,
+  renderElement,
+  handleKeyDown
+}) => {
+  return (
+    <Slate
+      editor={editor}
+      initialValue={initialValue}
+      onValueChange={handleChange}
+    >
+      <Editable
+        renderElement={renderElement}
+        renderLeaf={DefaultLeafRenderer}
+        placeholder=""
+        onKeyDown={handleKeyDown}
+        style={{
+          outline: 'none',
+          minHeight: '1.5em',
+        }}
+      />
+    </Slate>
+  );
+}, (prevProps, nextProps) => {
+  // Only re-render if editor instance changes (which should never happen)
+  // Don't re-render on handleChange, renderElement, or handleKeyDown changes
+  return prevProps.editor === nextProps.editor;
+});
+
+MemoizedSlateEditor.displayName = 'MemoizedSlateEditor';
 
 export default ParagraphBlock;
