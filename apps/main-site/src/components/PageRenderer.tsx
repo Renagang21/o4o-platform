@@ -124,7 +124,11 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
 
             // Markdown block - convert markdown to HTML
             if (block.type === 'o4o/markdown') {
-              const markdown = block.attributes?.markdown || block.content || '';
+              // Check multiple possible locations for markdown content (Gutenberg block format)
+              const markdown = block.attributes?.markdown ||
+                               block.content?.text ||
+                               block.data?.text ||
+                               block.content || '';
               if (markdown) {
                 try {
                   const html = marked.parse(markdown);
