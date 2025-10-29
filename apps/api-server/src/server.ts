@@ -163,7 +163,7 @@ async function startServer() {
     logger.info('✅ Database connected successfully');
 
     // Start scheduled jobs
-    const { cleanupLoginAttemptsJob } = await import('./jobs/cleanupLoginAttempts');
+    const { cleanupLoginAttemptsJob } = await import('./jobs/cleanupLoginAttempts.js');
     cleanupLoginAttemptsJob.start();
 
     // 서버 시작

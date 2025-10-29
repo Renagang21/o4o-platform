@@ -754,8 +754,8 @@ export class DropshippingCPTController {
   // Initialize CPTs and ACF fields
   async initializeCPTs(req: Request, res: Response) {
     try {
-      const { registerDropshippingCPTs } = await import('../../services/cpt/dropshipping-cpts');
-      const { registerDropshippingACFFields } = await import('../../services/acf/dropshipping-fields');
+      const { registerDropshippingCPTs } = await import('../../services/cpt/dropshipping-cpts.js');
+      const { registerDropshippingACFFields } = await import('../../services/acf/dropshipping-fields.js');
 
       await registerDropshippingCPTs();
       await registerDropshippingACFFields();

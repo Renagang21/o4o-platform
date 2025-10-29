@@ -125,8 +125,8 @@ export class StartupService {
     }
 
     try {
-      const { appRegistry } = await import('./app-registry.service');
-      const { googleAI } = await import('./google-ai.service');
+      const { appRegistry } = await import('./app-registry.service.js');
+      const { googleAI } = await import('./google-ai.service.js');
 
       appRegistry.initialize(AppDataSource);
       await googleAI.initializeApps();
@@ -183,7 +183,7 @@ export class StartupService {
    */
   private async initializeUploadDirectories(): Promise<void> {
     try {
-      const { ensureUploadDirectories } = await import('../middleware/upload.middleware');
+      const { ensureUploadDirectories } = await import('../middleware/upload.middleware.js');
       ensureUploadDirectories();
       logger.info('✅ Upload directories initialized');
     } catch (uploadError) {
@@ -197,7 +197,7 @@ export class StartupService {
    */
   private async initializeEmailService(): Promise<void> {
     try {
-      const { emailService } = await import('./email.service');
+      const { emailService } = await import('./email.service.js');
       await emailService.initialize();
       const status = emailService.getServiceStatus();
       if (status.available) {
@@ -219,7 +219,7 @@ export class StartupService {
    */
   private async initializeWorkers(): Promise<void> {
     try {
-      await import('../workers/ai-job.worker');
+      await import('../workers/ai-job.worker.js');
       logger.info('✅ AI job worker started (BullMQ)');
     } catch (workerError) {
       logger.error('Failed to start AI job worker:', workerError);
@@ -232,7 +232,7 @@ export class StartupService {
    */
   private async initializeImageProcessing(): Promise<void> {
     try {
-      const { imageProcessingService } = await import('./image-processing.service');
+      const { imageProcessingService } = await import('./image-processing.service.js');
       await imageProcessingService.initializeFolders();
       logger.info('✅ Image processing folders initialized');
     } catch (folderError) {

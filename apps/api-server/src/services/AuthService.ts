@@ -403,8 +403,8 @@ let authServiceInstance: AuthService | null = null;
 
 export const getAuthService = async (): Promise<AuthService> => {
   if (!authServiceInstance) {
-    const { AppDataSource } = await import('../database/connection');
-    const { User } = await import('../entities/User');
+    const { AppDataSource } = await import('../database/connection.js');
+    const { User } = await import('../entities/User.js');
     const userRepository = AppDataSource.getRepository(User);
     authServiceInstance = new AuthService(userRepository);
   }

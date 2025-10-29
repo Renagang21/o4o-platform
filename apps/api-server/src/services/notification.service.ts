@@ -406,7 +406,7 @@ export class NotificationService extends EventEmitter {
 
   private async getCustomerDetails(customerId: string): Promise<any> {
     try {
-      const { AppDataSource } = await import('../database/connection');
+      const { AppDataSource } = await import('../database/connection.js');
       const userRepository = AppDataSource.getRepository('User');
       
       return await userRepository.findOne({
@@ -421,7 +421,7 @@ export class NotificationService extends EventEmitter {
 
   private async getVendorDetails(vendorId: string): Promise<any> {
     try {
-      const { AppDataSource } = await import('../database/connection');
+      const { AppDataSource } = await import('../database/connection.js');
       const vendorRepository = AppDataSource.getRepository('VendorInfo');
       
       const vendor = await vendorRepository.findOne({
@@ -445,7 +445,7 @@ export class NotificationService extends EventEmitter {
 
   private async getSupplierDetails(supplierId: string): Promise<any> {
     try {
-      const { AppDataSource } = await import('../database/connection');
+      const { AppDataSource } = await import('../database/connection.js');
       const supplierRepository = AppDataSource.getRepository('Supplier');
       
       const supplier = await supplierRepository.findOne({
@@ -469,7 +469,7 @@ export class NotificationService extends EventEmitter {
 
   private async getAdminUsers(): Promise<any[]> {
     try {
-      const { AppDataSource } = await import('../database/connection');
+      const { AppDataSource } = await import('../database/connection.js');
       const userRepository = AppDataSource.getRepository('User');
       
       const adminUsers = await userRepository.find({

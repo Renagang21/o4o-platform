@@ -507,7 +507,7 @@ router.get('/stream/:jobId',
 router.get('/models',
   authenticate,
   async (req: Request, res: Response) => {
-    const { MODEL_WHITELIST, PARAMETER_LIMITS } = await import('../types/ai-proxy.types');
+    const { MODEL_WHITELIST, PARAMETER_LIMITS } = await import('../types/ai-proxy.types.js');
 
     res.json({
       success: true,

@@ -662,7 +662,7 @@ export class ForecastingService {
 
   private async getInventoryHistoricalData(filters?: any): Promise<any[]> {
     try {
-      const { AppDataSource } = await import('../database/connection');
+      const { AppDataSource } = await import('../database/connection.js');
       const inventoryRepository = AppDataSource.getRepository('Inventory');
       const stockMovementRepository = AppDataSource.getRepository('StockMovement');
       

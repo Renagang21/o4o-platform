@@ -243,7 +243,7 @@ export const setupProductionMiddleware = (app: Express) => {
 // Health check functions
 async function checkDatabaseHealth() {
   try {
-    const { AppDataSource } = await import('../database/connection');
+    const { AppDataSource } = await import('../database/connection.js');
     if (!AppDataSource.isInitialized) {
       return { status: 'unhealthy', message: 'Database not initialized' };
     }
@@ -315,7 +315,7 @@ export const setupGracefulShutdown = (server: any) => {
 
       try {
         // Close database connection
-        const { AppDataSource } = await import('../database/connection');
+        const { AppDataSource } = await import('../database/connection.js');
         if (AppDataSource.isInitialized) {
           await AppDataSource.destroy();
           logger.info('Database connection closed');

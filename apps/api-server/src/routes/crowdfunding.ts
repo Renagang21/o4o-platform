@@ -34,7 +34,7 @@ router.patch(
   requireAdmin,
   async (req, res) => {
     try {
-      const projectService = new (await import('../services/crowdfunding/FundingProjectService')).FundingProjectService();
+      const projectService = new (await import('../services/crowdfunding/FundingProjectService.js')).FundingProjectService();
       await projectService.updateProjectStatus(req.params.id, req.body.status);
       res.json({ success: true });
     } catch (error: any) {

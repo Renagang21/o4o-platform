@@ -504,8 +504,8 @@ router.get('/posts/:type/:slug', async (req, res) => {
 router.get('/cpt/types', async (req, res) => {
   try {
     // Import CPT service
-    const { cptService } = await import('../modules/cpt-acf/services/cpt.service');
-    
+    const { cptService } = await import('../modules/cpt-acf/services/cpt.service.js');
+
     const result = await cptService.getAllCPTs(true);
     
     if (!result.success) {
@@ -526,8 +526,8 @@ router.get('/cpt/types', async (req, res) => {
 // Get template parts (public) - for admin dashboard
 router.get('/template-parts', async (req, res) => {
   try {
-    const { AppDataSource } = await import('../database/connection');
-    const { TemplatePart } = await import('../entities/TemplatePart');
+    const { AppDataSource } = await import('../database/connection.js');
+    const { TemplatePart } = await import('../entities/TemplatePart.js');
 
     const repository = AppDataSource.getRepository(TemplatePart);
     const queryBuilder = repository.createQueryBuilder('templatePart');
