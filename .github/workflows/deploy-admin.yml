@@ -54,6 +54,7 @@ jobs:
         pnpm run build:auth-client
         pnpm run build:auth-context
         pnpm run build:shortcodes
+        pnpm run build:block-renderer
         echo "✅ All packages built successfully"
 
     - name: Build admin dashboard
