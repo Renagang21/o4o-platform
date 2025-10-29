@@ -81,7 +81,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@wordpress/i18n'
     ],
     exclude: [
-      '@o4o/types' // ES Module import 순서 문제 방지
+      '@o4o/types', // ES Module import 순서 문제 방지
+      '@o4o/shortcodes', // Workspace package - pre-bundling 방지
+      '@o4o/block-renderer', // Workspace package - pre-bundling 방지
+      '@o4o/slide-app' // Workspace package - pre-bundling 방지
     ],
     esbuildOptions: {
       define: {
