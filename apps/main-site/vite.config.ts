@@ -13,6 +13,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     dedupe: ['react', 'react-dom'],
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
       '@o4o/types': path.resolve(__dirname, '../../packages/types/dist'),
       '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist'),
       '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist'),
@@ -22,7 +23,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
   },
   optimizeDeps: {
-    exclude: ['@o4o/supplier-connector', '@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']
+    exclude: ['@o4o/supplier-connector', '@o4o/block-renderer', '@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']
   },
   server: {
     host: '0.0.0.0',

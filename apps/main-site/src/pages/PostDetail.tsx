@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiClient } from '../services/api';
-import { WordPressBlockRenderer } from '../components/WordPressBlockRenderer';
+import { BlockRenderer } from '@o4o/block-renderer';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
 import AccessDeniedMessage from '../components/common/AccessDeniedMessage';
 
@@ -93,9 +93,9 @@ export default function PostDetail() {
     const c = post.content;
     if (!c) return null;
 
-    // Use WordPressBlockRenderer for all block-based content
+    // Use BlockRenderer for all block-based content
     // Note: Don't wrap with prose - each block has its own typography styles
-    return <WordPressBlockRenderer blocks={c} />;
+    return <BlockRenderer blocks={c} />;
   };
 
   return (
