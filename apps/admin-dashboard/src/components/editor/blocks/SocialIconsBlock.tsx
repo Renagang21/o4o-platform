@@ -19,6 +19,7 @@ import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { URLInput } from '@/components/common';
 import PLATFORM_INFO, { PlatformType } from './social/PlatformIcons';
 import { LayoutSelector } from './social/LayoutSelector';
 import { StyleSelector } from './social/StyleSelector';
@@ -249,12 +250,13 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
               <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded border">
                 <IconComponent size={16} color={platformInfo.color} />
                 <span className="text-xs font-medium w-16 truncate">{platformInfo.name}</span>
-                <Input
-                  type="url"
-                  placeholder="URL"
+                <URLInput
+                  placeholder="URL or /path"
                   value={link.url}
                   onChange={(e) => updateLink(index, { url: e.target.value })}
                   className="flex-1 h-7 text-xs"
+                  variant="compact"
+                  showIcon
                 />
                 <Button
                   variant="ghost"

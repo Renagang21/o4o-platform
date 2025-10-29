@@ -4,9 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { 
-  ExternalLink, 
-  Link2, 
+import {
+  ExternalLink,
+  Link2,
   MousePointer,
   Target,
   BarChart3,
@@ -14,6 +14,7 @@ import {
   Check,
   X
 } from 'lucide-react';
+import { URLInput } from '@/components/common';
 
 export interface LinkConfig {
   url: string;
@@ -278,12 +279,13 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
     <div className="link-editor link-editor--editing">
       <div className="form-group">
         <label>URL</label>
-        <input
-          type="url"
+        <URLInput
           value={tempLink.url}
           onChange={(e) => setTempLink({ ...tempLink, url: e.target.value })}
-          placeholder="https://example.com"
+          placeholder="Enter URL or /path for relative links"
           className="form-input"
+          variant="default"
+          showIcon
         />
       </div>
 

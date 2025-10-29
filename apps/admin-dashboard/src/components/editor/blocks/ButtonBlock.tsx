@@ -22,10 +22,10 @@ import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
 import { BlockToolbar } from './gutenberg/BlockToolbar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { URLInput, normalizeURL } from '@/components/common';
 
 interface ButtonBlockProps {
   id: string;
@@ -129,7 +129,8 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
 
   // Handle URL save
   const handleUrlSave = () => {
-    updateAttribute('url', localUrl);
+    const normalizedUrl = normalizeURL(localUrl);
+    updateAttribute('url', normalizedUrl);
     updateAttribute('linkTarget', localTarget);
     setShowURLPopover(false);
   };
@@ -288,11 +289,11 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
           <div className="space-y-3">
             <div>
               <Label className="text-xs">URL</Label>
-              <Input
-                type="url"
+              <URLInput
                 value={localUrl}
                 onChange={(e) => setLocalUrl(e.target.value)}
-                placeholder="https://example.com"
+                variant="default"
+                showIcon
                 className="mt-1"
               />
             </div>

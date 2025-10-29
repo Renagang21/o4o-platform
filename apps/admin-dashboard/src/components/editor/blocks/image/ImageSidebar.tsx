@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { URLInput } from '@/components/common';
 
 interface DynamicSource {
   image?: string;
@@ -169,11 +170,13 @@ const ImageSidebar: React.FC<ImageSidebarProps> = ({
 
           <div>
             <Label htmlFor="image-link" className="text-sm font-medium">Link URL</Label>
-            <Input
+            <URLInput
               id="image-link"
               value={linkUrl}
               onChange={(e) => onLinkChange(e.target.value)}
-              placeholder="https://example.com"
+              placeholder="Enter URL or /path for relative links"
+              showIcon
+              variant="default"
               className="mt-1"
             />
           </div>

@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { URLInput } from '@/components/common';
 import {
   CoverLayoutSettings,
   TagName,
@@ -466,14 +467,16 @@ const CoverSettings: React.FC<CoverSettingsProps> = ({
 
         <div>
           <Label className="text-xs text-gray-600 mb-1 block">Fallback Image URL</Label>
-          <Input
+          <URLInput
             value={dynamicBackground?.fallback || ''}
             onChange={(e) => onDynamicBackgroundChange?.({
               ...dynamicBackground,
               fallback: e.target.value
             })}
-            placeholder="https://example.com/fallback.jpg"
+            placeholder="Enter URL or /path for relative links"
             className="text-sm"
+            variant="default"
+            showIcon
           />
           <p className="text-xs text-gray-500 mt-1">
             Used when ACF field is empty

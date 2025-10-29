@@ -3,7 +3,7 @@
  *
  * Gutenberg-style inline link editor that appears near the selected text.
  * Allows users to:
- * - Enter URL
+ * - Enter URL (absolute or relative)
  * - Toggle "Open in new tab" (target="_blank")
  * - Apply or remove link
  */
@@ -12,7 +12,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Editor, Range } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { cn } from '@/lib/utils';
-import { Link as LinkIcon, ExternalLink, X } from 'lucide-react';
+import { ExternalLink, X } from 'lucide-react';
+import { URLInput, normalizeURL } from '@/components/common';
 
 interface LinkInlineEditorProps {
   onApply: (url: string, target?: '_blank' | '_self') => void;
@@ -60,7 +61,8 @@ const LinkInlineEditor: React.FC<LinkInlineEditorProps> = ({
     e.preventDefault();
     if (url.trim()) {
       const target = openInNewTab ? '_blank' : '_self';
-      onApply(url.trim(), target);
+      const normalizedUrl = normalizeURL(url);
+      onApply(normalizedUrl, target);
     }
     onClose();
   };
@@ -85,18 +87,15 @@ const LinkInlineEditor: React.FC<LinkInlineEditorProps> = ({
       onKeyDown={handleKeyDown}
     >
       <form onSubmit={handleSubmit} className="space-y-3">
-        {/* URL Input */}
-        <div className="flex items-center gap-2">
-          <LinkIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste URL or type (/path for relative links)"
-            className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-500"
-          />
-        </div>
+        {/* URL Input - Using common URLInput component */}
+        <URLInput
+          ref={inputRef}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          variant="inline"
+          showIcon
+          iconPosition="left"
+        />
 
         {/* New Tab Checkbox */}
         <div className="flex items-center gap-2">
