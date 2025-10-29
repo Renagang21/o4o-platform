@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "o4o/slide",
+  "title": "Slide Carousel",
+  "category": "media",
+  "description": "Create interactive slide presentations with autoplay, navigation, and accessibility features. Built on Embla Carousel.",
+  "keywords": ["slide", "carousel", "slideshow", "presentation", "gallery", "embla"],
+  "version": "2.0.0",
+  "textdomain": "o4o-slide",
+  "attributes": {
+    "slides": {
+      "type": "array",
+      "default": []
+    },
+    "autoplay": {
+      "type": "object",
+      "default": {
+        "enabled": false,
+        "delay": 3000,
+        "pauseOnInteraction": true
+      }
+    },
+    "loop": {
+      "type": "boolean",
+      "default": true
+    },
+    "navigation": {
+      "type": "boolean",
+      "default": true
+    },
+    "pagination": {
+      "type": "string",
+      "enum": ["none", "dots", "numbers", "progress"],
+      "default": "dots"
+    },
+    "aspectRatio": {
+      "type": "string",
+      "enum": ["16/9", "4/3", "1/1", "auto"],
+      "default": "16/9"
+    },
+    "a11y": {
+      "type": "object",
+      "default": {
+        "prevLabel": "Previous slide",
+        "nextLabel": "Next slide",
+        "roledescription": "carousel"
+      }
+    }
+  },
+  "supports": {
+    "align": ["wide", "full"],
+    "anchor": true,
+    "className": true,
+    "html": false,
+    "multiple": true,
+    "reusable": true
+  },
+  "editorScript": "file:./SlideBlock.tsx",
+  "example": {
+    "attributes": {
+      "slides": [
+        {
+          "id": "example-1",
+          "type": "text",
+          "title": "Welcome to SlideApp",
+          "subtitle": "Modern carousel for o4o platform",
+          "backgroundColor": "#3b82f6",
+          "textColor": "#ffffff"
+        }
+      ],
+      "pagination": "dots",
+      "navigation": true
+    }
+  }
+}

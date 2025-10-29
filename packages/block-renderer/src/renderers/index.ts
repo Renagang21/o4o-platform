@@ -17,6 +17,7 @@ import { ImageBlock } from './media/ImageBlock';
 import { VideoBlock } from './media/VideoBlock';
 import { GalleryBlock } from './media/GalleryBlock';
 import { AudioBlock } from './media/AudioBlock';
+import { SlideBlock } from './media/SlideBlock';
 
 // Layout blocks
 import { ColumnsBlock } from './layout/ColumnsBlock';
@@ -77,6 +78,10 @@ export function registerAllBlocks() {
     'audio': AudioBlock,
     'core/audio': AudioBlock,
     'o4o/audio': AudioBlock,
+
+    'slide': SlideBlock,
+    'core/slide': SlideBlock,
+    'o4o/slide': SlideBlock,
 
     // Layout blocks
     'columns': ColumnsBlock,
@@ -144,6 +149,7 @@ export * from './media/ImageBlock';
 export * from './media/VideoBlock';
 export * from './media/GalleryBlock';
 export * from './media/AudioBlock';
+export * from './media/SlideBlock';
 
 export * from './layout/ColumnsBlock';
 export * from './layout/ColumnBlock';

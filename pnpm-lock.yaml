@@ -261,6 +261,9 @@ importers:
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
         version: link:../../packages/shortcodes
+      '@o4o/slide-app':
+        specifier: file:../../packages/slide-app
+        version: link:../../packages/slide-app
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1160,6 +1163,9 @@ importers:
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
         version: link:../../packages/shortcodes
+      '@o4o/slide-app':
+        specifier: file:../../packages/slide-app
+        version: link:../../packages/slide-app
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1622,6 +1628,9 @@ importers:
 
   packages/block-renderer:
     dependencies:
+      '@o4o/slide-app':
+        specifier: workspace:*
+        version: link:../slide-app
       '@o4o/types':
         specifier: workspace:*
         version: link:../types
@@ -1701,6 +1710,34 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.2.25
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  packages/slide-app:
+    dependencies:
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      embla-carousel-autoplay:
+        specifier: ^8.6.0
+        version: 8.6.0(embla-carousel@8.6.0)
+      embla-carousel-react:
+        specifier: ^8.6.0
+        version: 8.6.0(react@18.2.0)
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.24
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.7(@types/react@18.3.24)
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -6595,6 +6632,24 @@ packages:
 
   electron-to-chromium@1.5.222:
     resolution: {integrity: sha512-gA7psSwSwQRE60CEoLz6JBCQPIxNeuzB2nL8vE03GK/OHxlvykbLyeiumQy1iH5C2f3YbRAZpGCMT12a/9ih9w==}
+
+  embla-carousel-autoplay@8.6.0:
+    resolution: {integrity: sha512-OBu5G3nwaSXkZCo1A6LTaFMZ8EpkYbwIaH+bPqdBnDGQ2fh4+NbzjXjs2SktoPNKCtflfVMc75njaDHOYXcrsA==}
+    peerDependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel-react@8.6.0:
+    resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+
+  embla-carousel-reactive-utils@8.6.0:
+    resolution: {integrity: sha512-fMVUDUEx0/uIEDM0Mz3dHznDhfX+znCCDCeIophYb1QGVM7YThSWX+wz11zlYwWFOr74b4QLGg0hrGPJeG2s4A==}
+    peerDependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel@8.6.0:
+    resolution: {integrity: sha512-SjWyZBHJPbqxHOzckOfo8lHisEaJWmwd23XppYFYVh10bU66/Pn5tkVkbkCMZVdbUE5eTCI2nD8OyIP4Z+uwkA==}
 
   emittery@0.13.1:
     resolution: {integrity: sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==}
@@ -12017,6 +12072,7 @@ snapshots:
 
   '@o4o/block-renderer@file:packages/block-renderer(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
+      '@o4o/slide-app': link:packages/slide-app
       '@o4o/types': link:packages/types
       clsx: 2.1.1
       dompurify: 3.2.6
@@ -16456,6 +16512,22 @@ snapshots:
   ee-first@1.1.1: {}
 
   electron-to-chromium@1.5.222: {}
+
+  embla-carousel-autoplay@8.6.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel-react@8.6.0(react@18.2.0):
+    dependencies:
+      embla-carousel: 8.6.0
+      embla-carousel-reactive-utils: 8.6.0(embla-carousel@8.6.0)
+      react: 18.2.0
+
+  embla-carousel-reactive-utils@8.6.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+
+  embla-carousel@8.6.0: {}
 
   emittery@0.13.1: {}
 
