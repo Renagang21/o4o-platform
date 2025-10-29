@@ -64,9 +64,9 @@ export function checkAccess(
   }
 
   // Check if user has any of the allowed roles
-  if (isAuthenticated && userRoles.some(role => accessControl.allowedRoles.includes(role))) {
+  if (isAuthenticated && userRoles.some((role: string) => accessControl.allowedRoles.includes(role))) {
     // Check denied roles (explicit deny overrides allow)
-    if (accessControl.deniedRoles && accessControl.deniedRoles.some(role => userRoles.includes(role))) {
+    if (accessControl.deniedRoles && accessControl.deniedRoles.some((role: string) => userRoles.includes(role))) {
       return {
         allowed: false,
         message: accessControl.customMessage || defaultMessage || '이 콘텐츠에 접근할 권한이 없습니다.',
