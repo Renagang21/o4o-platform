@@ -29,6 +29,7 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@o4o/auth-client": "workspace:*",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
     "typescript": "5.4.5"
@@ -36,6 +37,11 @@
   "peerDependencies": {
     "react": "18.2.0",
     "react-dom": "18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@o4o/auth-client": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=20.0.0",

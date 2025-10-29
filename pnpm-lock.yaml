@@ -260,7 +260,7 @@ importers:
         version: file:packages/block-renderer(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
-        version: link:../../packages/shortcodes
+        version: file:packages/shortcodes(@o4o/auth-client@file:packages/auth-client)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@o4o/slide-app':
         specifier: file:../../packages/slide-app
         version: link:../../packages/slide-app
@@ -501,7 +501,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@18.3.1)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: file:packages/utils
@@ -559,7 +559,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/compression':
         specifier: ^1.7.5
         version: 1.8.1
@@ -607,7 +607,7 @@ importers:
         version: link:../../packages/crowdfunding-types
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@18.3.1)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: file:packages/utils
@@ -824,7 +824,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/bcryptjs':
         specifier: 2.4.6
         version: 2.4.6
@@ -944,7 +944,7 @@ importers:
         version: link:../../packages/auth-context
       '@o4o/crowdfunding-types':
         specifier: file:../../packages/crowdfunding-types
-        version: file:packages/crowdfunding-types(react@18.2.0)
+        version: link:../../packages/crowdfunding-types
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1162,7 +1162,7 @@ importers:
         version: link:../../packages/auth-context
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
-        version: link:../../packages/shortcodes
+        version: file:packages/shortcodes(@o4o/auth-client@file:packages/auth-client)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@o4o/slide-app':
         specifier: file:../../packages/slide-app
         version: link:../../packages/slide-app
@@ -1259,7 +1259,7 @@ importers:
         version: link:../../packages/auth-context
       '@o4o/forum-types':
         specifier: file:../../packages/forum-types
-        version: file:packages/forum-types(react@18.2.0)
+        version: link:../../packages/forum-types
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1670,7 +1670,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../types
-        version: file:packages/types(react@18.3.1)
+        version: link:../types
     devDependencies:
       tsup:
         specifier: ^8.0.1
@@ -1683,7 +1683,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../types
-        version: file:packages/types(react@18.3.1)
+        version: link:../types
     devDependencies:
       '@types/node':
         specifier: 24.2.1
@@ -1704,6 +1704,9 @@ importers:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
       '@types/react':
         specifier: ^18.2.79
         version: 18.2.79
@@ -3148,6 +3151,10 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
+  '@o4o/auth-client@file:packages/auth-client':
+    resolution: {directory: packages/auth-client, type: directory}
+    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
+
   '@o4o/block-renderer@file:packages/block-renderer':
     resolution: {directory: packages/block-renderer, type: directory}
     engines: {node: '>=20.0.0', npm: '>=10.0.0'}
@@ -3155,19 +3162,16 @@ packages:
       react: ^18.0.0
       react-dom: ^18.0.0
 
-  '@o4o/crowdfunding-types@file:packages/crowdfunding-types':
-    resolution: {directory: packages/crowdfunding-types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/forum-types@file:packages/forum-types':
-    resolution: {directory: packages/forum-types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/types@file:packages/types':
-    resolution: {directory: packages/types, type: directory}
+  '@o4o/shortcodes@file:packages/shortcodes':
+    resolution: {directory: packages/shortcodes, type: directory}
     engines: {node: '>=20.0.0', npm: '>=10.0.0'}
     peerDependencies:
+      '@o4o/auth-client': '*'
       react: 18.2.0
+      react-dom: 18.2.0
+    peerDependenciesMeta:
+      '@o4o/auth-client':
+        optional: true
 
   '@o4o/utils@file:packages/utils':
     resolution: {directory: packages/utils, type: directory}
@@ -12070,6 +12074,14 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
+  '@o4o/auth-client@file:packages/auth-client':
+    dependencies:
+      axios: 1.11.0
+      js-cookie: 3.0.5
+    transitivePeerDependencies:
+      - debug
+    optional: true
+
   '@o4o/block-renderer@file:packages/block-renderer(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@o4o/slide-app': link:packages/slide-app
@@ -12080,25 +12092,12 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  '@o4o/crowdfunding-types@file:packages/crowdfunding-types(react@18.2.0)':
-    dependencies:
-      '@o4o/types': file:packages/types(react@18.2.0)
-    transitivePeerDependencies:
-      - react
-
-  '@o4o/forum-types@file:packages/forum-types(react@18.2.0)':
-    dependencies:
-      '@o4o/types': file:packages/types(react@18.2.0)
-    transitivePeerDependencies:
-      - react
-
-  '@o4o/types@file:packages/types(react@18.2.0)':
+  '@o4o/shortcodes@file:packages/shortcodes(@o4o/auth-client@file:packages/auth-client)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       react: 18.2.0
-
-  '@o4o/types@file:packages/types(react@18.3.1)':
-    dependencies:
-      react: 18.3.1
+      react-dom: 18.2.0(react@18.2.0)
+    optionalDependencies:
+      '@o4o/auth-client': file:packages/auth-client
 
   '@o4o/utils@file:packages/utils':
     dependencies:
@@ -13993,12 +13992,12 @@ snapshots:
       '@types/react': 18.2.79
       '@types/react-dom': 18.2.25
 
-  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@testing-library/dom': 10.4.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     optionalDependencies:
       '@types/react': 18.3.24
       '@types/react-dom': 18.3.7(@types/react@18.3.24)
