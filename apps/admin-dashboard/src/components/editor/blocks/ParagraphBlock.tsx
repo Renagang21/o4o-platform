@@ -141,21 +141,30 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Track if editor has active selection (for toolbar visibility)
-  const [hasSelection, setHasSelection] = useState(false);
+  // Track if editor has content or active selection (for toolbar visibility)
+  const [hasContentOrSelection, setHasContentOrSelection] = useState(false);
 
-  // Check if editor has active selection
-  const updateSelectionState = useCallback(() => {
+  // Check if editor has content or active selection
+  const updateContentState = useCallback(() => {
     const { selection } = editor;
     const hasActiveSelection = selection && !Range.isCollapsed(selection);
-    setHasSelection(!!hasActiveSelection);
+
+    // Check if editor has any text content
+    const hasText = editor.children.some(node => {
+      if (SlateElement.isElement(node)) {
+        return node.children.some(child => Text.isText(child) && child.text.trim().length > 0);
+      }
+      return false;
+    });
+
+    setHasContentOrSelection(hasActiveSelection || hasText);
   }, [editor]);
 
   // Handle value changes
   const handleChange = useCallback(
     (newValue: Descendant[]) => {
-      // Update selection state for toolbar visibility
-      updateSelectionState();
+      // Update content state for toolbar visibility
+      updateContentState();
 
       // Check if content actually changed (not just selection)
       const isAstChange = editor.operations.some(
@@ -168,11 +177,23 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         onChange(html, attributes);
       }
     },
-    [editor, onChange, attributes, updateSelectionState]
+    [editor, onChange, attributes, updateContentState]
   );
 
   // Update attribute
   const updateAttribute = useCallback((key: string, value: any) => {
+    // Special handling for alignment - update editor nodes
+    if (key === 'align') {
+      // Update all paragraph nodes with new alignment
+      Transforms.setNodes(
+        editor,
+        { align: value } as Partial<ParagraphElement>,
+        {
+          match: n => SlateElement.isElement(n) && n.type === 'paragraph',
+        }
+      );
+    }
+
     const html = serialize(editor.children);
     onChange(html, { ...attributes, [key]: value });
   }, [onChange, attributes, editor]);
@@ -282,8 +303,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       disableAutoFocus={true}
       showToolbar={false}
     >
-      {/* Gutenberg-style Block Toolbar (only when selected and has active text selection) */}
-      {isSelected && hasSelection && (
+      {/* Gutenberg-style Block Toolbar (only when selected and has content or selection) */}
+      {isSelected && hasContentOrSelection && (
         <BlockToolbar
           align={align}
           onAlignChange={(newAlign) => updateAttribute('align', newAlign)}
