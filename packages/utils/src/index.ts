@@ -1,9 +1,9 @@
 // @o4o/utils - Shared Utility Functions
 // Export all utility functions here
 
-export * from './helpers';
-export * from './validators';
-export * from './accessControl';
+export * from './helpers.js';
+export * from './validators.js';
+export * from './accessControl.js';
 
 // Export pricing functions (excluding format functions that conflict with format.ts)
 export {
@@ -23,7 +23,7 @@ export {
   calculateUnitPrice,
   validatePrice,
   calculateCartTotal
-} from './pricing';
+} from './pricing.js';
 
 // Export formatting functions from format.ts
 export {
@@ -36,15 +36,15 @@ export {
   // formatRelativeTime,  // Removed - may cause issues
   formatDateFromNow,  // Re-exported for consumers expecting it
   formatPhoneNumber
-} from './format';
+} from './format.js';
 
 // Export cn utility
-export { cn } from './cn';
+export { cn } from './cn.js';
 
 // Export specific string utilities to avoid conflicts
-export { 
+export {
   generateSlug,
   truncate,
   toTitleCase,
   randomString
-} from './string';
+} from './string.js';
