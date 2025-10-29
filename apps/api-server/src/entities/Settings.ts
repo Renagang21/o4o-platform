@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { AccessControlSettings } from '@o4o/types';
 
 @Entity('settings')
 export class Settings {
@@ -6,7 +7,7 @@ export class Settings {
   key!: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  value: GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | Record<string, unknown> | null;
+  value: GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | AccessControlSettings | Record<string, unknown> | null;
 
   @Column({ type: 'varchar', length: 50 })
   type!: string; // 'general', 'reading', 'theme', 'email', etc.

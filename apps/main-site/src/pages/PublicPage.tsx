@@ -10,6 +10,7 @@ import { apiClient } from '../services/api';
 import PageRenderer from '../components/PageRenderer';
 import Layout from '../components/layout/Layout';
 import { ArrowLeft } from 'lucide-react';
+import AccessDeniedMessage from '../components/common/AccessDeniedMessage';
 
 interface PageData {
   contentType?: 'page' | 'post' | 'custom-post';
@@ -89,6 +90,23 @@ const PublicPage: FC = () => {
 
   // Error state
   if (error || !pageData) {
+    // Check if this is an access denied error (403)
+    const isAccessDenied = (error as any)?.response?.status === 403;
+    const accessDeniedData = (error as any)?.response?.data;
+
+    if (isAccessDenied && accessDeniedData?.code === 'ACCESS_DENIED') {
+      return (
+        <Layout>
+          <AccessDeniedMessage
+            message={accessDeniedData.message}
+            redirectUrl={accessDeniedData.redirectUrl}
+            requiresAuth={accessDeniedData.requiresAuth}
+          />
+        </Layout>
+      );
+    }
+
+    // Default 404 error
     return (
       <Layout>
         <div className="min-h-[50vh] flex items-center justify-center">

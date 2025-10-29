@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { apiClient } from '../services/api';
 import { WordPressBlockRenderer } from '../components/WordPressBlockRenderer';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
+import AccessDeniedMessage from '../components/common/AccessDeniedMessage';
 
 type PostData = {
   id: string;
@@ -18,6 +19,7 @@ export default function PostDetail() {
   const { currentWidth, currentPadding } = useCustomizerSettings();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accessDenied, setAccessDenied] = useState<any>(null);
   const [post, setPost] = useState<PostData | null>(null);
 
   useEffect(() => {
@@ -42,7 +44,13 @@ export default function PostDetail() {
         });
       } catch (e: any) {
         if (!active) return;
-        setError(e?.message || 'Failed to load post');
+
+        // Check for access denied error (403)
+        if (e?.response?.status === 403 && e?.response?.data?.code === 'ACCESS_DENIED') {
+          setAccessDenied(e.response.data);
+        } else {
+          setError(e?.message || 'Failed to load post');
+        }
         setPost(null);
       } finally {
         if (active) setLoading(false);
@@ -59,6 +67,17 @@ export default function PostDetail() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">Loading post...</div>
       </div>
+    );
+  }
+
+  // Access denied state
+  if (accessDenied) {
+    return (
+      <AccessDeniedMessage
+        message={accessDenied.message}
+        redirectUrl={accessDenied.redirectUrl}
+        requiresAuth={accessDenied.requiresAuth}
+      />
     );
   }
 
