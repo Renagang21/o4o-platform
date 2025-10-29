@@ -59,8 +59,11 @@ const customizerReducer = (state: CustomizerState, action: CustomizerAction): Cu
   switch (action.type) {
     case 'UPDATE_SETTING': {
       const updatedSettings = { ...state.settings };
-      
-      if (action.path && action.path.length > 0) {
+
+      // Special case: customCSS is a top-level string property
+      if (action.section === 'customCSS' as any) {
+        (updatedSettings as any).customCSS = action.value;
+      } else if (action.path && action.path.length > 0) {
         // Navigate to nested property
         let target: any = updatedSettings[action.section];
         for (let i = 0; i < action.path.length - 1; i++) {
@@ -74,13 +77,13 @@ const customizerReducer = (state: CustomizerState, action: CustomizerAction): Cu
           action.value as any
         ) as any;
       }
-      
+
       updatedSettings._meta = {
         ...updatedSettings._meta,
         lastModified: new Date().toISOString(),
         isDirty: true,
       };
-      
+
       return {
         ...state,
         settings: updatedSettings,

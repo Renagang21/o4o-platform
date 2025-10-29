@@ -8,14 +8,13 @@ import { useCustomizer } from '../../context/CustomizerContext';
 import { AlertCircle } from 'lucide-react';
 
 export const CustomCSSSection: React.FC = () => {
-  const { state, setSettings } = useCustomizer();
+  const { state, updateSetting } = useCustomizer();
 
   const handleCSSChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newCSS = e.target.value;
-    setSettings({
-      ...state.settings,
-      customCSS: newCSS
-    });
+    // Use updateSetting to properly mark as dirty
+    // 'customCSS' is treated as a section for update purposes
+    updateSetting('customCSS' as any, newCSS);
   };
 
   return (
