@@ -4,6 +4,7 @@
   "description": "Shortcode system for O4O Platform",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
@@ -12,10 +13,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./dynamic": {
       "types": "./dist/dynamic/index.d.ts",
+      "import": "./dist/dynamic/index.js",
+      "require": "./dist/dynamic/index.js",
       "default": "./dist/dynamic/index.js"
     }
   },
