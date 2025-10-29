@@ -199,6 +199,112 @@ npm run update:shortcode-docs
 
 ---
 
+### 9. [드롭쉬핑 사용자 매뉴얼](./dropshipping-user-manual.md) 📦
+
+**대상:** 공급자, 판매자, 시스템 관리자
+
+**내용:**
+- 드롭쉬핑 플랫폼 개요
+- 공급자/판매자 매뉴얼 (각 역할별)
+- 상품 등록 및 관리
+- 주문 처리 흐름
+
+---
+
+### 10. [판매자 매뉴얼](./seller-manual.md) 🛍️
+
+**대상:** 판매자
+
+**내용:**
+- 판매자 계정 관리
+- 상품 목록 및 주문 관리
+- 정산 및 수수료 안내
+
+---
+
+### 11. [공급자 매뉴얼](./supplier-manual.md) 📋
+
+**대상:** 공급자
+
+**내용:**
+- 공급자 계정 관리
+- 상품 등록 및 재고 관리
+- 주문 처리 및 배송
+
+---
+
+### 12. 플랫폼 기능 가이드
+
+#### a) [플랫폼 기능 개요](./platform-features.md) 🚀
+
+**대상:** 관리자, 시스템 운영자
+
+**내용:**
+- O4O 플랫폼 전체 기능 개요
+- 각 모듈별 핵심 기능 설명
+- 통합 시스템 구조
+
+---
+
+## 🔧 개발 문서 (Technical Documentation)
+
+### 13. [SlideApp 마이그레이션 가이드](./slide-app-migration.md) 📊
+
+**대상:** 개발자, 시스템 아키텍트
+
+**내용:**
+- M1~M6 단계별 마이그레이션 이력
+- 레거시 슬라이드 블록 → Embla Carousel 기반 SlideApp 전환
+- 아키텍처 변경사항 및 Breaking Changes
+- API 스키마 확정 (AspectRatio, Autoplay, Slide fields)
+- 삭제된 레거시 목록 (33 files, -11,321 lines)
+- 향후 확장 계획 (M7~M10)
+
+**버전:** v1.6.0 (2025-10-29)
+
+**주요 성과:**
+- 코드베이스 80% 간소화
+- WCAG 2.2 준수 (Lighthouse Accessibility ≥ 95점)
+- 6KB 경량화 (gzip)
+- TypeScript strict mode 완전 준수
+
+---
+
+### 14. [M5 SlideApp QA 체크리스트](./M5-SLIDEAPP-QA-CHECKLIST.md) ✅
+
+**대상:** QA 엔지니어, 테스터
+
+**내용:**
+- 기능 검증 체크리스트 (admin-dashboard, main-site, ecommerce)
+- 성능 측정 가이드 (Chrome DevTools + Lighthouse)
+- 접근성 검증 (키보드, 스크린리더, ARIA)
+- 모바일 터치 테스트
+- 회귀 테스트 시나리오
+- Edge cases (빈 데이터, 단일 슬라이드, 대량 슬라이드)
+
+**DoD 기준:**
+- 60fps, CPU < 15%, CLS < 0.1
+- Lighthouse Accessibility ≥ 95점
+- 0 console errors
+
+---
+
+### 15. [CHANGELOG](./CHANGELOG.md) 📝
+
+**대상:** 전체 팀
+
+**내용:**
+- 프로젝트 전체 변경 이력
+- 버전별 Added/Changed/Removed 항목
+- Breaking Changes 및 Migration Notes
+
+**최신 버전:** v1.6.0 (2025-10-29)
+- SlideApp 패키지 추가
+- 레거시 슬라이드/슬라이더 블록 제거 (31 files)
+- ProductCarousel 통합
+
+---
+
 ## 📝 문서 사용 방법
 
 ### 방법 1: 마크다운 파일 직접 읽기
@@ -304,7 +410,7 @@ npm run update:shortcode-docs
 
 | 문서 | 상태 | 마지막 업데이트 | 자동 생성 |
 |------|------|----------------|-----------|
-| README.md | ✅ | 2025-10-22 | ❌ |
+| README.md | ✅ | 2025-10-29 | ❌ |
 | admin-manual.md | 🔄 | 2025-10-22 | ❌ |
 | editor-usage-manual.md | ✅ | 2025-10-21 | ❌ |
 | shortcode-reference.md | ✅ | 2025-10-05 | ✅ |
@@ -316,6 +422,13 @@ npm run update:shortcode-docs
 | appearance-customize.md | ✅ | 2025-10-05 | ❌ |
 | appearance-menus.md | ✅ | 2025-10-05 | ❌ |
 | appearance-template-parts.md | ✅ | 2025-10-01 | ❌ |
+| dropshipping-user-manual.md | ✅ | 2025-10-24 | ❌ |
+| seller-manual.md | ✅ | 2025-10-28 | ❌ |
+| supplier-manual.md | ✅ | 2025-10-28 | ❌ |
+| platform-features.md | ✅ | 2025-10-28 | ❌ |
+| **slide-app-migration.md** | ✅ | **2025-10-29** | ❌ |
+| **M5-SLIDEAPP-QA-CHECKLIST.md** | ✅ | **2025-10-29** | ❌ |
+| **CHANGELOG.md** | ✅ | **2025-10-29** | ❌ |
 
 **범례:**
 - ✅: 최신 상태
