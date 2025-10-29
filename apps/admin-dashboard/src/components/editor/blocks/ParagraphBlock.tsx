@@ -141,34 +141,22 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   const [linkEditorPosition, setLinkEditorPosition] = useState<{ top: number; left: number } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Check if block has content (for conditional toolbar visibility)
-  // Note: Not using useMemo because editor.children is mutable
-  const getHasContent = useCallback(() => {
-    const currentValue = editor.children;
-    if (!currentValue || currentValue.length === 0) return false;
+  // Track if editor has active selection (for toolbar visibility)
+  const [hasSelection, setHasSelection] = useState(false);
 
-    // Check all nodes for any text content
-    return currentValue.some(node => {
-      if (Text.isText(node)) {
-        return node.text.trim() !== '';
-      }
-      if (SlateElement.isElement(node) && node.children) {
-        return node.children.some((child: any) => {
-          if (Text.isText(child)) {
-            return child.text.trim() !== '';
-          }
-          return false;
-        });
-      }
-      return false;
-    });
+  // Check if editor has active selection
+  const updateSelectionState = useCallback(() => {
+    const { selection } = editor;
+    const hasActiveSelection = selection && !Range.isCollapsed(selection);
+    setHasSelection(!!hasActiveSelection);
   }, [editor]);
-
-  const hasContent = getHasContent();
 
   // Handle value changes
   const handleChange = useCallback(
     (newValue: Descendant[]) => {
+      // Update selection state for toolbar visibility
+      updateSelectionState();
+
       // Check if content actually changed (not just selection)
       const isAstChange = editor.operations.some(
         (op) => op.type !== 'set_selection'
@@ -180,7 +168,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         onChange(html, attributes);
       }
     },
-    [editor, onChange, attributes]
+    [editor, onChange, attributes, updateSelectionState]
   );
 
   // Update attribute
@@ -247,6 +235,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
   });
 
   // Render element (paragraph or link)
+  // Include 'align' in dependencies to re-render when alignment changes
   const renderElement = useCallback((props: RenderElementProps) => {
     const element = props.element as ParagraphElement | LinkElement;
 
@@ -267,7 +256,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           <p
             {...props.attributes}
             style={{
-              textAlign: (element as ParagraphElement).align || 'left',
+              textAlign: align,
               margin: 0,
               whiteSpace: 'pre-wrap',
               wordWrap: 'break-word',
@@ -277,7 +266,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           </p>
         );
     }
-  }, [editor]);
+  }, [align]);
 
   return (
     <EnhancedBlockWrapper
@@ -293,8 +282,8 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
       disableAutoFocus={true}
       showToolbar={false}
     >
-      {/* Gutenberg-style Block Toolbar (only when selected and has content) */}
-      {isSelected && hasContent && (
+      {/* Gutenberg-style Block Toolbar (only when selected and has active text selection) */}
+      {isSelected && hasSelection && (
         <BlockToolbar
           align={align}
           onAlignChange={(newAlign) => updateAttribute('align', newAlign)}

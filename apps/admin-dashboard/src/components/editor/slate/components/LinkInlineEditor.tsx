@@ -90,10 +90,10 @@ const LinkInlineEditor: React.FC<LinkInlineEditorProps> = ({
           <LinkIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
           <input
             ref={inputRef}
-            type="url"
+            type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste URL or type to search"
+            placeholder="Paste URL or type (/path for relative links)"
             className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-500"
           />
         </div>
