@@ -95,16 +95,50 @@ jobs:
     - name: Build packages
       run: |
         echo "📦 Building shared packages..."
-        pnpm run build:packages
+        pnpm run build:packages || { echo "❌ Package build failed!"; exit 1; }
         echo ""
         echo "✅ Packages built. Verifying dist directories..."
-        ls -la packages/auth-client/dist/ || echo "❌ auth-client/dist not found!"
-        ls -la packages/ui/dist/ || echo "❌ ui/dist not found!"
-        ls -la packages/types/dist/ || echo "❌ types/dist not found!"
-        ls -la packages/shortcodes/dist/ || echo "❌ shortcodes/dist not found!"
+
+        # Verify critical dist directories exist
+        MISSING_DIST=0
+
+        if [ ! -d "packages/auth-client/dist" ]; then
+          echo "❌ auth-client/dist not found!"
+          MISSING_DIST=1
+        else
+          echo "✅ auth-client/dist exists"
+        fi
+
+        if [ ! -d "packages/ui/dist" ]; then
+          echo "❌ ui/dist not found!"
+          MISSING_DIST=1
+        else
+          echo "✅ ui/dist exists"
+        fi
+
+        if [ ! -d "packages/types/dist" ]; then
+          echo "❌ types/dist not found!"
+          MISSING_DIST=1
+        else
+          echo "✅ types/dist exists"
+        fi
+
+        if [ ! -d "packages/shortcodes/dist" ]; then
+          echo "❌ shortcodes/dist not found!"
+          MISSING_DIST=1
+        else
+          echo "✅ shortcodes/dist exists"
+          ls -la packages/shortcodes/dist/
+        fi
+
+        if [ $MISSING_DIST -eq 1 ]; then
+          echo "❌ Some dist directories are missing. Cannot proceed with app builds."
+          exit 1
+        fi
+
         echo ""
         echo "🔍 Verifying shortcodes package.json..."
-        cat packages/shortcodes/package.json | grep -A5 '"exports"'
+        cat packages/shortcodes/package.json | grep -A10 '"main"'
 
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
