@@ -1,12 +1,6 @@
 import { FC } from 'react';
-import { marked } from 'marked';
+import { BlockRenderer } from '@o4o/block-renderer';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
-
-// Configure marked for better rendering
-marked.setOptions({
-  breaks: true, // Convert \n to <br>
-  gfm: true, // GitHub Flavored Markdown
-});
 
 interface Page {
   id: string;
@@ -25,12 +19,12 @@ interface PageRendererProps {
 const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   const { currentWidth, currentPadding } = useCustomizerSettings();
 
-  // Simple rendering logic - prioritize displaying content
-  const renderContent = () => {
+  // Prepare content for BlockRenderer
+  const getContentForRenderer = () => {
     // Check blocks field first (from API response)
     // If blocks is empty array, use content instead
     let contentToRender = (page.blocks && page.blocks.length > 0) ? page.blocks : page.content;
-    
+
     // Parse JSON string if needed (content might be stored as JSON string in DB)
     if (typeof contentToRender === 'string') {
       // Check if it's a JSON array string
@@ -39,7 +33,6 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
         try {
           contentToRender = JSON.parse(contentToRender);
         } catch (e) {
-          // If parsing fails, keep as string
           console.error('[PageRenderer] Failed to parse JSON:', e);
         }
       }
@@ -48,112 +41,25 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
         try {
           contentToRender = JSON.parse(contentToRender);
         } catch (e) {
-          // If parsing fails, keep as string
           console.error('[PageRenderer] Failed to parse JSON:', e);
         }
       }
     }
 
-    // If content is a string, render as HTML
-    if (contentToRender && typeof contentToRender === 'string') {
-      return <div dangerouslySetInnerHTML={{ __html: contentToRender }} />;
+    return contentToRender;
+  };
+
+  const renderContent = () => {
+    const content = getContentForRenderer();
+
+    // If content is a string (HTML), render as HTML
+    if (content && typeof content === 'string') {
+      return <div dangerouslySetInnerHTML={{ __html: content }} />;
     }
 
-    // If content is JSON (TipTap or other format), convert to string
-    if (contentToRender && typeof contentToRender === 'object') {
-      // Try to extract text content from TipTap format
-      if (contentToRender.type === 'doc' && contentToRender.content) {
-        // Simple extraction of text from TipTap nodes
-        const extractText = (nodes: any[]): string => {
-          return nodes.map(node => {
-            if (node.type === 'text') return node.text;
-            if (node.type === 'paragraph' && node.content) {
-              return `<p>${extractText(node.content)}</p>`;
-            }
-            if (node.type === 'heading' && node.content) {
-              const level = node.attrs?.level || 2;
-              return `<h${level}>${extractText(node.content)}</h${level}>`;
-            }
-            if (node.content) return extractText(node.content);
-            return '';
-          }).join('');
-        };
-
-        const htmlContent = extractText(contentToRender.content);
-        if (htmlContent) {
-          return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
-        }
-      }
-
-      // If it's WordPress blocks format, render each block
-      if (Array.isArray(contentToRender)) {
-        const htmlContent = contentToRender
-          .map(block => {
-            // Handle different block types
-            if (block.type === 'core/paragraph') {
-              const text = block.content?.text ?? block.innerHTML ?? '';
-              // Render even empty paragraphs for proper spacing
-              return `<p>${text}</p>`;
-            }
-
-            if (block.type === 'core/heading') {
-              const level = block.attributes?.level || 2;
-              const text = block.content?.text ?? block.innerHTML ?? '';
-              // Render heading even if text is empty (for spacing/structure)
-              return `<h${level}>${text}</h${level}>`;
-            }
-
-            if (block.type === 'core/list') {
-              const items = block.content?.items || [];
-              const tag = block.attributes?.ordered ? 'ol' : 'ul';
-              const listItems = items.map((item: string) => `<li>${item}</li>`).join('');
-              return listItems ? `<${tag}>${listItems}</${tag}>` : '';
-            }
-
-            if (block.type === 'core/image') {
-              const src = block.attributes?.url || block.content?.url || '';
-              const alt = block.attributes?.alt || block.content?.alt || '';
-              return src ? `<img src="${src}" alt="${alt}" class="w-full h-auto rounded-lg" />` : '';
-            }
-
-            if (block.type === 'core/quote') {
-              const text = block.content?.text ?? block.innerHTML ?? '';
-              const citation = block.attributes?.citation || '';
-              return text !== undefined ? `<blockquote>${text}${citation ? `<cite>${citation}</cite>` : ''}</blockquote>` : '';
-            }
-
-            // Markdown block - convert markdown to HTML
-            if (block.type === 'o4o/markdown') {
-              // Check multiple possible locations for markdown content (Gutenberg block format)
-              const markdown = block.attributes?.markdown ||
-                               block.content?.text ||
-                               block.data?.text ||
-                               block.content || '';
-              if (markdown) {
-                try {
-                  const html = marked.parse(markdown);
-                  return `<div class="prose prose-sm max-w-none">${html}</div>`;
-                } catch (error) {
-                  console.error('Failed to parse markdown:', error);
-                  return `<div>${markdown}</div>`;
-                }
-              }
-              return '';
-            }
-
-            // Fallback for other block types
-            if (block.innerHTML !== undefined) return block.innerHTML;
-            if (block.attributes?.content !== undefined) return block.attributes.content;
-            if (block.content?.text !== undefined) return `<div>${block.content.text}</div>`;
-
-            return '';
-          })
-          .filter(html => html !== '')
-          .join('');
-
-        // Always render the container, even if empty
-        return <div dangerouslySetInnerHTML={{ __html: htmlContent || '' }} />;
-      }
+    // If content is an array of blocks or a single block object, use BlockRenderer
+    if (content && typeof content === 'object') {
+      return <BlockRenderer blocks={content} />;
     }
 
     return <p className="text-gray-500">콘텐츠가 없습니다.</p>;

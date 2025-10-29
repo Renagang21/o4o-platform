@@ -33,6 +33,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist/index.js'),
       '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/dist/index.js'),
       '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist/index.js'),
+      '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist/index.js'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),

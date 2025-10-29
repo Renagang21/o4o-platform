@@ -2,10 +2,10 @@
  * PostPreview Component
  * Renders a preview of the post content from the Gutenberg editor
  *
- * Simplified architecture:
- * - Uses modular block renderers from @/components/preview-renderers
+ * Unified architecture:
+ * - Uses @o4o/block-renderer package shared across main-site and admin-dashboard
  * - No massive switch-case - clean and maintainable
- * - Consistent with Frontend's BlockRenderer approach
+ * - Single source of truth for all block rendering
  */
 
 import React, { useEffect, useState } from 'react';
@@ -13,7 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Block } from '@/types/post.types';
 import { ArrowLeft, ExternalLink, Eye, Monitor, Tablet, Smartphone } from 'lucide-react';
 import { postApi } from '@/services/api/postApi';
-import { renderBlock } from '@/components/preview-renderers';
+import { BlockRenderer } from '@o4o/block-renderer';
 import './preview-styles.css';
 
 interface PreviewContent {
@@ -108,9 +108,6 @@ const PostPreview: React.FC = () => {
 
     loadContent();
   }, [id]);
-
-  // Removed the massive 400+ line renderBlock function
-  // Now using modular renderers from @/components/preview-renderers
 
   const getDeviceClasses = () => {
     switch (deviceType) {
@@ -235,7 +232,7 @@ const PostPreview: React.FC = () => {
 
             {/* Post Content */}
             <div className="prose prose-lg max-w-none">
-              {content.blocks.map((block) => renderBlock(block))}
+              <BlockRenderer blocks={content.blocks} />
             </div>
 
             {/* Empty State */}

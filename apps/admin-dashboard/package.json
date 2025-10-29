@@ -35,6 +35,7 @@
     "@mui/material": "7.3.1",
     "@o4o/auth-client": "file:../../packages/auth-client",
     "@o4o/auth-context": "file:../../packages/auth-context",
+    "@o4o/block-renderer": "file:../../packages/block-renderer",
     "@o4o/shortcodes": "file:../../packages/shortcodes",
     "@o4o/types": "file:../../packages/types",
     "@o4o/utils": "file:../../packages/utils",
