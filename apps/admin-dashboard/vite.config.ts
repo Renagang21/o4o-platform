@@ -28,15 +28,16 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@/types': path.resolve(__dirname, './src/types'),
       '@/api': path.resolve(__dirname, './src/api'),
       '@/styles': path.resolve(__dirname, './src/styles'),
-      // Workspace packages - must use app-relative paths
-      '@o4o/types': path.resolve(__dirname, '../../packages/types/dist/index.js'),
-      '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist/index.js'),
-      '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist/index.js'),
-      '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/dist/index.js'),
-      '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist/index.js'),
-      '@o4o/shortcodes': path.resolve(__dirname, '../../packages/shortcodes/dist/index.js'),
-      '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist/index.js'),
-      '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist/index.js'),
+      // Workspace packages - map to dist directory, not index.js file
+      // This allows subpath imports like '@o4o/shortcodes/dynamic'
+      '@o4o/types': path.resolve(__dirname, '../../packages/types/dist'),
+      '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist'),
+      '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist'),
+      '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/dist'),
+      '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist'),
+      '@o4o/shortcodes': path.resolve(__dirname, '../../packages/shortcodes/dist'),
+      '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
+      '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
