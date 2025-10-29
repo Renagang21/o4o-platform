@@ -28,7 +28,7 @@ const FONT_SIZE_PRESETS = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
 
 // Lazy load block-specific settings components
 const ImageBlockSettings = lazy(() => import('./ImageBlockSettings'));
-const ButtonBlockSettings = lazy(() => import('./ButtonBlockSettings'));
+const ButtonInspectorControls = lazy(() => import('./blocks/button/ButtonInspectorControls'));
 const GalleryBlockSettings = lazy(() => import('./GalleryBlockSettings'));
 const CoverBlockSettings = lazy(() => import('./CoverBlockSettings'));
 const ColumnsBlockSettings = lazy(() => import('./ColumnsBlockSettings'));
@@ -113,9 +113,13 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
       case 'button':
         return (
           <Suspense fallback={<div>Loading settings...</div>}>
-            <ButtonBlockSettings 
-              settings={block.attributes || {}}
-              onChange={(settings) => onBlockSettingsChange?.({ attributes: settings })}
+            <ButtonInspectorControls
+              attributes={block.attributes || {}}
+              updateAttribute={(key: string, value: any) =>
+                onBlockSettingsChange?.({
+                  attributes: { ...block.attributes, [key]: value }
+                })
+              }
             />
           </Suspense>
         );
