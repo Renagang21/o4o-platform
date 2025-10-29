@@ -37,7 +37,7 @@ const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  const response = await apiClient.get(`/pages/${pageId}`);
+  const response = await apiClient.get(`/public/pages/${pageId}`);
   const page = (response.data && (response.data.data || response.data)) as Page;
 
   if (!page || !page.id) {
