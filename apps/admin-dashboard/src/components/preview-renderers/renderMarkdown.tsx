@@ -3,7 +3,7 @@
  * Handles markdown rendering with TOC sidebar (consistent with MarkdownBlock and MarkdownReaderBlock)
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { marked } from 'marked';
 import { Block } from '@/types/post.types';
 import { FileText } from 'lucide-react';
@@ -23,6 +23,40 @@ marked.setOptions({
   mangle: false,
 });
 
+// Extract headings from markdown content
+const extractHeadings = (markdownContent: string): Heading[] => {
+  if (!markdownContent) return [];
+
+  try {
+    // First render the markdown to HTML
+    const html = marked.parse(markdownContent) as string;
+
+    // Create a temporary DOM element to parse the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    // Extract all heading elements with their actual IDs
+    const headingElements = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const results: Heading[] = [];
+
+    headingElements.forEach((el) => {
+      const tagName = el.tagName.toLowerCase();
+      const level = parseInt(tagName.charAt(1), 10);
+      const text = el.textContent || '';
+      const id = el.id || '';
+
+      if (id) {
+        results.push({ id, level, text });
+      }
+    });
+
+    return results;
+  } catch (error) {
+    console.error('Error extracting headings:', error);
+    return [];
+  }
+};
+
 export const renderMarkdown = (block: Block) => {
   const { content, attributes } = block;
 
@@ -33,38 +67,7 @@ export const renderMarkdown = (block: Block) => {
   if (!markdownContent) return null;
 
   // Extract headings from rendered HTML (to match marked's actual IDs)
-  const headings = useMemo((): Heading[] => {
-    if (!markdownContent) return [];
-
-    try {
-      // First render the markdown to HTML
-      const html = marked.parse(markdownContent) as string;
-
-      // Create a temporary DOM element to parse the HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
-
-      // Extract all heading elements with their actual IDs
-      const headingElements = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      const results: Heading[] = [];
-
-      headingElements.forEach((el) => {
-        const tagName = el.tagName.toLowerCase();
-        const level = parseInt(tagName.charAt(1), 10);
-        const text = el.textContent || '';
-        const id = el.id || '';
-
-        if (id) {
-          results.push({ id, level, text });
-        }
-      });
-
-      return results;
-    } catch (error) {
-      console.error('Error extracting headings:', error);
-      return [];
-    }
-  }, [markdownContent]);
+  const headings = extractHeadings(markdownContent);
 
   // Show TOC if 1 or more headings
   const showTOC = headings.length >= 1;
