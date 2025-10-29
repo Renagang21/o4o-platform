@@ -982,9 +982,8 @@ async function updateCustomizerSettings(req: Request, res: Response) {
       });
 
       if (dbSettings) {
-        // Merge with existing settings
-        const existingSettings = dbSettings.value || {};
-        dbSettings.value = { ...existingSettings, ...customizerSettings };
+        // Direct replacement instead of merge to avoid [object Object] issues
+        dbSettings.value = customizerSettings;
         dbSettings.updatedAt = new Date();
       } else {
         dbSettings = settingsRepository.create({
