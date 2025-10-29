@@ -263,7 +263,7 @@ importers:
         version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.12(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -498,7 +498,7 @@ importers:
         version: file:packages/types(react@18.3.1)
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       axios:
         specifier: ^1.10.0
         version: 1.11.0
@@ -604,7 +604,7 @@ importers:
         version: file:packages/types(react@18.3.1)
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -947,7 +947,7 @@ importers:
         version: link:../../packages/ui
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@tanstack/react-query':
         specifier: ^5.78.2
         version: 5.87.1(react@18.2.0)
@@ -1053,7 +1053,7 @@ importers:
         version: link:../../packages/ui
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@tanstack/react-query':
         specifier: ^5.78.2
         version: 5.87.1(react@18.2.0)
@@ -1165,7 +1165,7 @@ importers:
         version: link:../../packages/ui
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@tanstack/react-query':
         specifier: ^5.78.2
         version: 5.87.1(react@18.2.0)
@@ -1259,7 +1259,7 @@ importers:
         version: link:../../packages/ui
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@tanstack/react-query':
         specifier: ^5.78.2
         version: 5.87.1(react@18.2.0)
@@ -1356,7 +1356,7 @@ importers:
         version: link:../../packages/ui
       '@o4o/utils':
         specifier: file:../../packages/utils
-        version: link:../../packages/utils
+        version: file:packages/utils
       '@tanstack/react-query':
         specifier: ^5.78.2
         version: 5.87.1(react@18.2.0)
@@ -1705,6 +1705,9 @@ importers:
 
   packages/utils:
     dependencies:
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -3081,6 +3084,10 @@ packages:
     engines: {node: '>=20.0.0', npm: '>=10.0.0'}
     peerDependencies:
       react: 18.2.0
+
+  '@o4o/utils@file:packages/utils':
+    resolution: {directory: packages/utils, type: directory}
+    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
 
   '@open-draft/deferred-promise@2.2.0':
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
@@ -11936,6 +11943,12 @@ snapshots:
   '@o4o/types@file:packages/types(react@18.3.1)':
     dependencies:
       react: 18.3.1
+
+  '@o4o/utils@file:packages/utils':
+    dependencies:
+      '@o4o/types': link:packages/types
+      clsx: 2.1.1
+      tailwind-merge: 2.6.0
 
   '@open-draft/deferred-promise@2.2.0': {}
 
