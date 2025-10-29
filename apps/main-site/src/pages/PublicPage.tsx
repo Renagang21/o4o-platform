@@ -51,8 +51,9 @@ const fetchPageBySlug = async (slug: string): Promise<PageData> => {
   // apiClient baseURL is /api, and public routes are at /api/public
   const response = await apiClient.get(`/public/content/slug/${slug}`);
 
-  // API returns unified response with contentType and data
-  return response.data as PageData;
+  // API returns {success: true, data: {...}} format
+  const apiResponse = response.data as PageResponse;
+  return apiResponse.data;
 };
 
 const PublicPage: FC = () => {
