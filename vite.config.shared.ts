@@ -22,6 +22,15 @@ export const sharedViteConfig: UserConfig = {
   ],
   resolve: {
     alias: {
+      // Workspace packages - 모든 앱에서 dist 폴더를 직접 참조
+      '@o4o/types': path.resolve(__dirname, 'packages/types/dist/index.js'),
+      '@o4o/utils': path.resolve(__dirname, 'packages/utils/dist/index.js'),
+      '@o4o/ui': path.resolve(__dirname, 'packages/ui/dist/index.js'),
+      '@o4o/auth-client': path.resolve(__dirname, 'packages/auth-client/dist/index.js'),
+      '@o4o/auth-context': path.resolve(__dirname, 'packages/auth-context/dist/index.js'),
+      '@o4o/shortcodes': path.resolve(__dirname, 'packages/shortcodes/dist/index.js'),
+      '@o4o/block-renderer': path.resolve(__dirname, 'packages/block-renderer/dist/index.js'),
+      '@o4o/slide-app': path.resolve(__dirname, 'packages/slide-app/dist/index.js'),
       // React 18.2.0 호환성을 위한 alias - 모든 React imports가 동일한 인스턴스를 사용하도록
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
