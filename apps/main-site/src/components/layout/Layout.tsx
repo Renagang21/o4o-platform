@@ -64,7 +64,8 @@ const Layout: FC<LayoutProps> = ({
 
         {/* Breadcrumbs - Below Header */}
         {breadcrumbsSettings.position === 'below-header' && (
-          <div className="breadcrumbs-container" style={{
+          <div className="breadcrumbs-container mx-auto" style={{
+            maxWidth: `${currentWidth}px`,
             paddingLeft: `${currentPadding.left}px`,
             paddingRight: `${currentPadding.right}px`
           }}>
