@@ -21,6 +21,7 @@ router.use(authenticate);
  * GET    /api/media                     - 미디어 목록
  * GET    /api/media/:id                 - 미디어 상세
  * PUT    /api/media/:id                 - 미디어 정보 수정
+ * PUT    /api/media/:id/content         - 미디어 파일 내용 덮어쓰기
  * DELETE /api/media/:id                 - 미디어 삭제
  */
 
@@ -44,6 +45,15 @@ router.get('/',
 router.get('/:id', 
   roleGuard(['contributor', 'author', 'editor', 'admin']),
   mediaController.getMediaById
+);
+
+// PUT /api/media/:id/content - 미디어 파일 내용 덮어쓰기
+// Requires: author (own media), editor (all media), or admin
+// NOTE: This route must come BEFORE PUT /:id to avoid route conflicts
+router.put('/:id/content', 
+  roleGuard(['author', 'editor', 'admin']),
+  uploadMiddleware('file', 1), // Single file upload
+  mediaController.updateMediaContent
 );
 
 // PUT /api/media/:id - 미디어 정보 수정

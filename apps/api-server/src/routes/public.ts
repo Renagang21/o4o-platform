@@ -31,6 +31,155 @@ router.get('/permalink-settings', async (req, res) => {
   }
 });
 
+// ========== WordPress-Standard Unified Slug Resolution ==========
+// Searches all content types by slug (Pages -> Posts -> Custom Posts)
+// This follows WordPress query hierarchy for menu system compatibility
+router.get('/content/slug/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    if (!AppDataSource.isInitialized) {
+      return res.status(503).json({
+        success: false,
+        error: 'Database not initialized',
+        code: 'DB_NOT_INITIALIZED'
+      });
+    }
+
+    // 1. Try Pages first (highest priority in WordPress)
+    const pageRepository = AppDataSource.getRepository(Page);
+    const page = await pageRepository.findOne({
+      where: { slug, status: 'publish' }
+    });
+
+    if (page) {
+      // Get template if page has one
+      let templateContent = null;
+      if (page.template) {
+        const templateRepository = AppDataSource.getRepository(Template);
+        const template = await templateRepository.findOne({
+          where: { slug: page.template }
+        });
+        if (template) {
+          templateContent = template.content;
+        }
+      }
+
+      return res.json({
+        success: true,
+        data: {
+          contentType: 'page',
+          id: page.id,
+          title: page.title,
+          slug: page.slug,
+          content: page.content,
+          blocks: templateContent || page.content || null,
+          metadata: {
+            excerpt: page.excerpt,
+            featuredImage: page.customFields?.featuredImage || null,
+            seo: {
+              metaTitle: page.seo?.title || page.title,
+              metaDescription: page.seo?.description || page.excerpt,
+              metaKeywords: page.seo?.keywords?.join(', ') || ''
+            },
+            updatedAt: page.updatedAt
+          }
+        }
+      });
+    }
+
+    // 2. Try Posts (second priority)
+    const postRepository = AppDataSource.getRepository(Post);
+    const post = await postRepository.findOne({
+      where: { slug, status: 'publish' },
+      relations: ['author', 'categories', 'tags']
+    });
+
+    if (post) {
+      return res.json({
+        success: true,
+        data: {
+          contentType: 'post',
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          content: post.content || '',
+          blocks: post.content || null,
+          excerpt: post.excerpt || '',
+          metadata: {
+            excerpt: post.excerpt,
+            featuredImage: post.featured_media || post.meta?.featuredImage || null,
+            author: post.author ? {
+              id: post.author.id,
+              name: post.author.fullName || post.author.email,
+              email: post.author.email
+            } : null,
+            categories: post.categories || [],
+            tags: post.tags || [],
+            seo: {
+              metaTitle: post.seo?.title || post.title,
+              metaDescription: post.seo?.description || post.excerpt,
+              metaKeywords: post.seo?.keywords?.join(', ') || ''
+            },
+            publishedAt: post.published_at,
+            updatedAt: post.updated_at
+          }
+        }
+      });
+    }
+
+    // 3. Try Custom Posts (lowest priority)
+    const customPostRepository = AppDataSource.getRepository(CustomPost);
+    const customPost = await customPostRepository.findOne({
+      where: { 
+        slug,
+        status: PostStatus.PUBLISHED
+      },
+      relations: ['postType']
+    });
+
+    if (customPost) {
+      return res.json({
+        success: true,
+        data: {
+          contentType: 'custom-post',
+          postType: customPost.postType.slug,
+          id: customPost.id,
+          title: customPost.title,
+          slug: customPost.slug,
+          content: customPost.content || '',
+          blocks: customPost.content || null,
+          customFields: customPost.fields || {},
+          metadata: {
+            excerpt: customPost.meta?.seoDescription || '',
+            featuredImage: customPost.meta?.thumbnail || null,
+            seo: {
+              metaTitle: customPost.meta?.seoTitle || customPost.title,
+              metaDescription: customPost.meta?.seoDescription || '',
+              metaKeywords: customPost.meta?.tags?.join(', ') || ''
+            },
+            updatedAt: customPost.updatedAt
+          }
+        }
+      });
+    }
+
+    // 4. Not found
+    return res.status(404).json({
+      success: false,
+      error: 'Content not found',
+      message: `No published content found with slug: ${slug}`
+    });
+
+  } catch (error: any) {
+    logger.error('Failed to fetch content by slug:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch content'
+    });
+  }
+});
+
 // Get homepage template
 router.get('/templates/homepage', async (req, res) => {
   try {

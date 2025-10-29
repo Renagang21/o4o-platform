@@ -461,6 +461,93 @@ export class MediaController {
     }
   };
 
+  // PUT /api/media/:id/content - 미디어 파일 내용 덮어쓰기
+  updateMediaContent = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+        return;
+      }
+
+      // Get uploaded file
+      const file = req.file as Express.Multer.File;
+
+      if (!file) {
+        res.status(400).json({
+          success: false,
+          error: 'No file uploaded'
+        });
+        return;
+      }
+
+      // Get existing media record
+      const media = await this.mediaRepository.findOne({ where: { id } });
+
+      if (!media) {
+        res.status(404).json({
+          success: false,
+          error: 'Media not found'
+        });
+        return;
+      }
+
+      // Build file path (keep original filename and location)
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', media.folderPath?.substring(1) || '');
+      const filePath = path.join(uploadDir, media.filename);
+
+      // Ensure directory exists
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      // Overwrite the existing file
+      fs.writeFileSync(filePath, file.buffer);
+
+      // Get updated file stats
+      const stats = fs.statSync(filePath);
+      let width, height;
+
+      // Update dimensions for images
+      if (file.mimetype.startsWith('image/')) {
+        try {
+          const metadata = await sharp(filePath).metadata();
+          width = metadata.width;
+          height = metadata.height;
+        } catch (sharpError) {
+          logger.error('Error processing image:', sharpError);
+        }
+      }
+
+      // Update media record
+      media.size = stats.size;
+      if (width !== undefined) media.width = width;
+      if (height !== undefined) media.height = height;
+      media.updatedAt = new Date();
+
+      const savedMedia = await this.mediaRepository.save(media);
+
+      res.json({
+        success: true,
+        data: {
+          media: this.formatMediaResponse(savedMedia)
+        }
+      });
+
+    } catch (error) {
+      logger.error('Error updating media content:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update media content'
+      });
+    }
+  };
+
   // Private helper methods
 
   private getFileCategory(mimeType: string): string {
