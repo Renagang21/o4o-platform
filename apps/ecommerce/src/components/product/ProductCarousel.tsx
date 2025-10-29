@@ -5,7 +5,6 @@
 
 import { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package } from 'lucide-react';
 import { Product } from '@o4o/types';
 import { formatCurrency } from '@o4o/utils';
 import { cn } from '@o4o/utils';

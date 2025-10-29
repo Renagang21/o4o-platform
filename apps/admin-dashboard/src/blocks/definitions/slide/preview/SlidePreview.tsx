@@ -1,12 +1,12 @@
 /**
  * SlidePreview Component
  * M3: Editor preview using SlideApp
+ * M6: Mock data removed - shows empty state when no slides
  */
 
 import React from 'react';
 import { SlideApp } from '@o4o/slide-app';
 import type { SlideAppProps } from '@o4o/slide-app';
-import { mockSlides } from './SlideMockData';
 
 export interface SlidePreviewProps extends SlideAppProps {
   className?: string;
@@ -14,14 +14,10 @@ export interface SlidePreviewProps extends SlideAppProps {
 
 /**
  * Preview component for Gutenberg editor
- * Uses mockSlides as fallback when slides array is empty
  * Autoplay is always disabled in editor for UX reasons
  */
 export const SlidePreview: React.FC<SlidePreviewProps> = (props) => {
   const { slides, autoplay, ...restProps } = props;
-
-  // Use mock slides if no real slides provided
-  const displaySlides = slides && slides.length > 0 ? slides : mockSlides;
 
   // Always disable autoplay in editor
   const editorAutoplay = {
@@ -31,7 +27,7 @@ export const SlidePreview: React.FC<SlidePreviewProps> = (props) => {
 
   return (
     <div className="slide-preview-wrapper" style={{ padding: '16px', background: '#f0f0f0', borderRadius: '8px' }}>
-      {displaySlides.length === 0 && (
+      {!slides || slides.length === 0 ? (
         <div
           className="slide-preview-empty"
           style={{
@@ -49,23 +45,12 @@ export const SlidePreview: React.FC<SlidePreviewProps> = (props) => {
             Use the sidebar panel to add and configure slides
           </p>
         </div>
-      )}
-
-      {displaySlides.length > 0 && (
+      ) : (
         <SlideApp
           {...restProps}
-          slides={displaySlides}
+          slides={slides}
           autoplay={editorAutoplay}
         />
-      )}
-
-      {/* Editor hint */}
-      {slides && slides.length === 0 && mockSlides.length > 0 && (
-        <div style={{ marginTop: '12px', padding: '8px', background: '#fef3c7', borderRadius: '4px' }}>
-          <p style={{ fontSize: '12px', color: '#92400e', margin: 0 }}>
-            <strong>Preview Mode:</strong> Showing example slides. Add your own slides using the block controls.
-          </p>
-        </div>
       )}
     </div>
   );
