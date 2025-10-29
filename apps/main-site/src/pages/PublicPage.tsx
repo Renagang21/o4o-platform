@@ -12,6 +12,8 @@ import Layout from '../components/layout/Layout';
 import { ArrowLeft } from 'lucide-react';
 
 interface PageData {
+  contentType?: 'page' | 'post' | 'custom-post';
+  postType?: string; // For custom posts
   id: string;
   title: string;
   slug: string;
@@ -20,11 +22,19 @@ interface PageData {
   metadata?: {
     excerpt?: string;
     featuredImage?: string;
+    author?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    categories?: any[];
+    tags?: any[];
     seo?: {
       metaTitle?: string;
       metaDescription?: string;
       metaKeywords?: string;
     };
+    publishedAt?: string;
     updatedAt?: string;
   };
 }
@@ -34,12 +44,14 @@ interface PageResponse {
   data: PageData;
 }
 
-// Fetch page by slug from Post entity (type='page')
+// WordPress-standard unified content fetch by slug
+// Searches Pages -> Posts -> Custom Posts (same hierarchy as WordPress)
 const fetchPageBySlug = async (slug: string): Promise<PageData> => {
-  // baseURL already includes /api/v1, so don't add /v1 again
-  const response = await apiClient.get(`/pages/slug/${slug}`);
+  // Use new unified slug endpoint that searches all content types
+  // apiClient baseURL is /api, and public routes are at /api/public
+  const response = await apiClient.get(`/public/content/slug/${slug}`);
 
-  // API returns page directly without wrapping in response object
+  // API returns unified response with contentType and data
   return response.data as PageData;
 };
 
