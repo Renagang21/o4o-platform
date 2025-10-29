@@ -397,9 +397,9 @@ const MemoizedSlateEditor = memo<MemoizedSlateEditorProps>(({
     </Slate>
   );
 }, (prevProps, nextProps) => {
-  // Only re-render if editor instance changes (which should never happen)
-  // Don't re-render on handleChange, renderElement, or handleKeyDown changes
-  return prevProps.editor === nextProps.editor;
+  // Re-render if editor or renderElement changes
+  // renderElement changes when alignment changes, so we need to re-render
+  return prevProps.editor === nextProps.editor && prevProps.renderElement === nextProps.renderElement;
 });
 
 MemoizedSlateEditor.displayName = 'MemoizedSlateEditor';
