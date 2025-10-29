@@ -19,8 +19,6 @@ import imageBlockDefinition from './definitions/image';
 import coverBlockDefinition from './definitions/cover';
 import galleryBlockDefinition from './definitions/gallery';
 import slideBlockDefinition from './definitions/slide';
-import sliderBlockDefinition from './definitions/slider';
-import sliderSlideBlockDefinition from './definitions/slider-slide';
 import videoBlockDefinition from './definitions/video';
 
 // Design blocks
@@ -67,8 +65,6 @@ export function registerAllBlocks(): void {
   blockRegistry.register(coverBlockDefinition);
   blockRegistry.register(galleryBlockDefinition);
   blockRegistry.register(slideBlockDefinition);
-  blockRegistry.register(sliderBlockDefinition);
-  blockRegistry.register(sliderSlideBlockDefinition);
   blockRegistry.register(videoBlockDefinition);
 
   // Register design blocks
