@@ -1,6 +1,7 @@
 /**
  * ShortcodeBlock Component
- * WordPress-compatible shortcode block with regex parsing and custom builder
+ * WordPress-compatible shortcode block with unified parser and live preview
+ * ENHANCED: Now uses @o4o/shortcodes for parsing and rendering
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -23,6 +24,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  defaultParser,
+  globalRegistry,
+  ShortcodeRenderer,
+  ParsedShortcode,
+  dynamicShortcodeTemplates
+} from '@o4o/shortcodes';
 
 interface ShortcodeBlockProps {
   id: string;
@@ -54,12 +62,7 @@ interface ShortcodeBlockProps {
   onChangeType?: (newType: string) => void;
 }
 
-interface ShortcodeMatch {
-  tag: string;
-  attributes: Record<string, string>;
-  content?: string;
-  selfClosing: boolean;
-}
+// Use ParsedShortcode from @o4o/shortcodes instead of custom interface
 
 interface ShortcodeParameter {
   name: string;
@@ -79,59 +82,52 @@ interface ShortcodeTemplate {
 }
 
 /**
- * Common shortcodes with their parameter definitions
+ * Convert dynamic shortcode templates from package to ShortcodeTemplate format
  */
-const SHORTCODE_TEMPLATES: ShortcodeTemplate[] = [
-  // Dynamic Data Shortcodes
-  {
-    name: 'cpt_list',
-    description: 'CPT 게시물 목록 표시',
-    template: '[cpt_list type="ds_product" count="6" template="grid" columns="3"]',
-    parameters: [
-      { name: 'type', required: true, description: 'CPT slug (예: ds_product, ds_supplier)', type: 'text' },
-      { name: 'count', required: false, description: '표시할 개수', type: 'number', default: '10' },
-      { name: 'template', required: false, description: '템플릿 스타일', type: 'select', options: ['default', 'grid', 'list', 'card'], default: 'default' },
-      { name: 'columns', required: false, description: '그리드 컬럼 수', type: 'number', default: '3' },
-      { name: 'orderby', required: false, description: '정렬 기준', type: 'select', options: ['date', 'title', 'menu_order', 'rand'], default: 'date' },
-      { name: 'order', required: false, description: '정렬 순서', type: 'select', options: ['ASC', 'DESC'], default: 'DESC' }
-    ]
-  },
-  {
-    name: 'cpt_field',
-    description: 'CPT 필드 값 표시',
-    template: '[cpt_field field="title"]',
-    parameters: [
-      { name: 'field', required: true, description: '필드명 (title, content, price 등)', type: 'text' },
-      { name: 'post_type', required: false, description: 'CPT slug', type: 'text' },
-      { name: 'post_id', required: false, description: '특정 포스트 ID', type: 'text' },
-      { name: 'format', required: false, description: '출력 포맷', type: 'select', options: ['default', 'currency', 'date', 'excerpt'], default: 'default' },
-      { name: 'default', required: false, description: '기본값', type: 'text' }
-    ]
-  },
-  {
-    name: 'acf_field',
-    description: 'ACF 커스텀 필드 표시',
-    template: '[acf_field name="custom_price" format="currency"]',
-    parameters: [
-      { name: 'name', required: true, description: 'ACF 필드명', type: 'text' },
-      { name: 'post_id', required: false, description: '포스트 ID', type: 'text' },
-      { name: 'format', required: false, description: '출력 포맷', type: 'select', options: ['raw', 'formatted', 'html'], default: 'formatted' },
-      { name: 'type', required: false, description: '필드 타입', type: 'text' },
-      { name: 'default', required: false, description: '기본값', type: 'text' }
-    ]
-  },
-  {
-    name: 'meta_field',
-    description: '메타 필드 값 표시',
-    template: '[meta_field key="_stock_status" default="재고 확인 중"]',
-    parameters: [
-      { name: 'key', required: true, description: '메타 키', type: 'text' },
-      { name: 'post_id', required: false, description: '포스트 ID', type: 'text' },
-      { name: 'format', required: false, description: '출력 포맷', type: 'text' },
-      { name: 'default', required: false, description: '기본값', type: 'text' }
-    ]
-  },
-  // Original shortcodes
+function convertDynamicTemplates(): ShortcodeTemplate[] {
+  const templates: ShortcodeTemplate[] = [];
+
+  dynamicShortcodeTemplates.forEach(category => {
+    category.templates.forEach(template => {
+      // Extract shortcode name from template string
+      const match = template.shortcode.match(/\[(\w+)/);
+      const name = match ? match[1] : '';
+
+      if (!name) return;
+
+      // Parse attributes from shortcode to determine parameters
+      const parsed = defaultParser.parseOne(template.shortcode);
+      const parameters: ShortcodeParameter[] = [];
+
+      if (parsed && parsed.attributes) {
+        Object.entries(parsed.attributes).forEach(([key, value]) => {
+          parameters.push({
+            name: key,
+            required: false,
+            description: `${key} 속성`,
+            type: typeof value === 'number' ? 'number' : 'text',
+            default: String(value)
+          });
+        });
+      }
+
+      templates.push({
+        name,
+        description: template.description,
+        template: template.shortcode,
+        parameters,
+        hasContent: template.shortcode.includes('[/')
+      });
+    });
+  });
+
+  return templates;
+}
+
+/**
+ * Static shortcode templates (non-dynamic)
+ */
+const STATIC_TEMPLATES: ShortcodeTemplate[] = [
   {
     name: 'gallery',
     description: 'Display image gallery',
@@ -181,50 +177,15 @@ const SHORTCODE_TEMPLATES: ShortcodeTemplate[] = [
 ];
 
 /**
- * Regex pattern for parsing WordPress shortcodes
+ * Merged template list: dynamic templates + static templates
  */
-const SHORTCODE_REGEX = /\[(\w+)([^\]]*?)\](?:([^[]*(?:\[[^\]]*\][^[]*)*)?\[\/\1\])?/g;
+const SHORTCODE_TEMPLATES: ShortcodeTemplate[] = [
+  ...convertDynamicTemplates(),
+  ...STATIC_TEMPLATES
+];
 
 /**
- * Parse shortcode attributes from string
- */
-function parseShortcodeAttributes(attrString: string): Record<string, string> {
-  const attributes: Record<string, string> = {};
-
-  // Handle various attribute formats: name="value", name='value', name=value
-  const attrRegex = /(\w+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s]+)))?/g;
-
-  let match;
-  while ((match = attrRegex.exec(attrString)) !== null) {
-    const [, name, doubleQuoted, singleQuoted, unquoted] = match;
-    attributes[name] = doubleQuoted || singleQuoted || unquoted || '';
-  }
-
-  return attributes;
-}
-
-/**
- * Parse shortcode string into structured data
- */
-function parseShortcode(shortcodeString: string): ShortcodeMatch | null {
-  const match = SHORTCODE_REGEX.exec(shortcodeString);
-  SHORTCODE_REGEX.lastIndex = 0; // Reset regex
-
-  if (!match) return null;
-
-  const [fullMatch, tag, attributeString, content] = match;
-  const attributes = parseShortcodeAttributes(attributeString);
-
-  return {
-    tag,
-    attributes,
-    content: content?.trim(),
-    selfClosing: !content
-  };
-}
-
-/**
- * Validate shortcode structure
+ * Validate shortcode structure using unified parser
  */
 function validateShortcode(shortcodeString: string): { valid: boolean; error?: string } {
   if (!shortcodeString.trim()) {
@@ -239,13 +200,16 @@ function validateShortcode(shortcodeString: string): { valid: boolean; error?: s
     return { valid: false, error: 'Mismatched brackets' };
   }
 
-  // Try to parse the shortcode
-  const parsed = parseShortcode(shortcodeString);
-  if (!parsed) {
-    return { valid: false, error: 'Invalid shortcode syntax' };
+  // Try to parse the shortcode using unified parser
+  try {
+    const parsed = defaultParser.parseOne(shortcodeString);
+    if (!parsed) {
+      return { valid: false, error: 'Invalid shortcode syntax' };
+    }
+    return { valid: true };
+  } catch (error) {
+    return { valid: false, error: 'Parse error' };
   }
-
-  return { valid: true };
 }
 
 /**
@@ -319,12 +283,12 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
     }
   }, [content, initialShortcode]);
 
-  // Validate shortcode when it changes
+  // Validate shortcode when it changes (using unified parser)
   useEffect(() => {
     const validation = validateShortcode(localShortcode);
 
     if (validation.valid !== valid || validation.error !== errorMessage) {
-      const parsed = parseShortcode(localShortcode);
+      const parsed = defaultParser.parseOne(localShortcode);
       onChange(localShortcode, {
         ...attributes,
         shortcode: localShortcode,
@@ -384,8 +348,11 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
     }
   };
 
-  // Parse current shortcode for display
-  const parsedShortcode = parseShortcode(localShortcode);
+  // Parse current shortcode for display (using unified parser)
+  const parsedShortcode = defaultParser.parseOne(localShortcode);
+
+  // State for preview toggle
+  const [showPreview, setShowPreview] = useState(false);
 
   return (
     <EnhancedBlockWrapper
@@ -439,6 +406,17 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
                   Copy
                 </>
               )}
+            </Button>
+
+            <Button
+              variant={showPreview ? "default" : "ghost"}
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setShowPreview(!showPreview)}
+              disabled={!valid}
+            >
+              <Eye className="h-3 w-3 mr-1" />
+              Preview
             </Button>
 
             {/* Validation status */}
@@ -617,6 +595,46 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
           </div>
         )}
 
+        {/* Live Preview Section */}
+        {showPreview && valid && localShortcode && (
+          <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <Label className="text-sm font-medium text-gray-700">Live Preview</Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPreview(false)}
+                className="h-6 w-6 p-0"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+            <div className="bg-white border border-gray-300 rounded p-4 min-h-[100px]">
+              <ShortcodeRenderer
+                content={localShortcode}
+                ErrorComponent={({ error }) => (
+                  <div className="text-red-600 text-sm">
+                    <AlertTriangle className="h-4 w-4 inline mr-2" />
+                    Preview Error: {error.message}
+                  </div>
+                )}
+                LoadingComponent={() => (
+                  <div className="text-gray-500 text-sm">Loading preview...</div>
+                )}
+                UnknownShortcodeComponent={({ shortcode }) => (
+                  <div className="text-yellow-600 text-sm bg-yellow-50 border border-yellow-200 rounded p-2">
+                    <Info className="h-4 w-4 inline mr-2" />
+                    Shortcode [{shortcode.name}] not registered. It will be rendered on the frontend.
+                  </div>
+                )}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              This is a live preview. Dynamic shortcodes may show placeholder data in the editor.
+            </p>
+          </div>
+        )}
+
         {/* Help section when empty */}
         {!localShortcode && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -626,16 +644,20 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
             </div>
             <div className="space-y-2 text-sm text-blue-700">
               <div>
+                <code className="bg-blue-100 px-1 rounded">[cpt_list type="ds_product" count="6" template="grid"]</code>
+                <span className="ml-2">- CPT 게시물 목록</span>
+              </div>
+              <div>
+                <code className="bg-blue-100 px-1 rounded">[cpt_field field="title"]</code>
+                <span className="ml-2">- CPT 필드 값</span>
+              </div>
+              <div>
                 <code className="bg-blue-100 px-1 rounded">[gallery ids="1,2,3" columns="3"]</code>
                 <span className="ml-2">- Display image gallery</span>
               </div>
               <div>
                 <code className="bg-blue-100 px-1 rounded">[button url="#"]Click me[/button]</code>
                 <span className="ml-2">- Button with content</span>
-              </div>
-              <div>
-                <code className="bg-blue-100 px-1 rounded">[contact-form id="1"]</code>
-                <span className="ml-2">- Contact form</span>
               </div>
             </div>
 
