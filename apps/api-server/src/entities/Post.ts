@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { User } from './User'
 import { Category } from './Category'
 import { Tag } from './Tag'
+import { AccessControl } from '@o4o/types'
 
 export interface Block {
   id: string
@@ -121,6 +122,17 @@ export class Post {
 
   @Column({ type: 'json', nullable: true })
   seo!: SEOMetadata
+
+  // Role-based access control
+  @Column({
+    type: 'jsonb',
+    default: () => "'{\"enabled\": false, \"allowedRoles\": [\"everyone\"], \"requireLogin\": false}'"
+  })
+  accessControl!: AccessControl
+
+  // Hide from search engines (useful for restricted content)
+  @Column({ type: 'boolean', default: false })
+  hideFromSearchEngines!: boolean
 
   @Column({ type: 'uuid' })
   author_id!: string

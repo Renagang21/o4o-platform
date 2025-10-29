@@ -3,6 +3,7 @@
 
 export * from './helpers';
 export * from './validators';
+export * from './accessControl';
 
 // Export pricing functions (excluding format functions that conflict with format.ts)
 export {
