@@ -28,6 +28,9 @@ export interface CPTListShortcodeAttributes {
   cache?: boolean;        // 캐싱 여부
 }
 
+// Alias for API service
+export type CPTQueryParams = CPTListShortcodeAttributes;
+
 export interface CPTFieldShortcodeAttributes {
   post_type?: string;     // CPT slug
   post_id?: string;       // 특정 포스트 ID (없으면 현재 포스트)

@@ -3,7 +3,7 @@ import { ShortcodeParser, ParsedShortcode, ShortcodeAttributes } from './types';
 /**
  * 숏코드 파서 구현
  * WordPress 스타일의 숏코드를 파싱합니다.
- * 
+ *
  * 지원 형식:
  * - [shortcode]
  * - [shortcode attr="value"]
@@ -27,7 +27,7 @@ export class DefaultShortcodeParser implements ShortcodeParser {
     // 모든 매칭 찾기
     while ((match = this.shortcodeRegex.exec(content)) !== null) {
       const [fullMatch, name, attributesString, innerContent] = match;
-      
+
       matches.push({
         fullMatch,
         name,
@@ -49,12 +49,20 @@ export class DefaultShortcodeParser implements ShortcodeParser {
   }
 
   /**
+   * 특정 태그만 파싱 (Main Site/Admin Dashboard 호환용)
+   */
+  parseByTag(content: string, tag: string): ParsedShortcode[] {
+    const allShortcodes = this.parse(content);
+    return allShortcodes.filter(s => s.name === tag);
+  }
+
+  /**
    * 속성 문자열을 파싱하여 객체로 변환
    * 예: 'id="123" title="Hello World" enabled' => { id: "123", title: "Hello World", enabled: true }
    */
   private parseAttributes(attributesString: string): ShortcodeAttributes {
     const attributes: ShortcodeAttributes = {};
-    
+
     if (!attributesString || !attributesString.trim()) {
       return attributes;
     }
@@ -88,6 +96,40 @@ export class DefaultShortcodeParser implements ShortcodeParser {
 
     return attributes;
   }
+}
+
+/**
+ * 텍스트에 특정 숏코드가 포함되어 있는지 확인
+ */
+export function hasShortcode(content: string, tag: string): boolean {
+  const regex = new RegExp(`\\[${tag}[^\\]]*\\]`, 'i');
+  return regex.test(content);
+}
+
+/**
+ * 텍스트에서 모든 숏코드 제거
+ */
+export function stripShortcodes(content: string): string {
+  // Enclosing shortcodes: [shortcode]content[/shortcode]
+  let result = content.replace(/\[[\w-]+[^\]]*\][\s\S]*?\[\/[\w-]+\]/g, '');
+  // Self-closing shortcodes: [shortcode]
+  result = result.replace(/\[[\w-]+[^\]]*\]/g, '');
+  return result;
+}
+
+/**
+ * 텍스트에서 모든 숏코드 추출
+ */
+export function extractShortcodes(content: string): ParsedShortcode[] {
+  return defaultParser.parse(content);
+}
+
+/**
+ * 숏코드 속성을 파싱하는 헬퍼 함수
+ */
+export function parseShortcodeAttributes(attrString: string): ShortcodeAttributes {
+  const parser = new DefaultShortcodeParser();
+  return (parser as any).parseAttributes(attrString);
 }
 
 // 기본 파서 인스턴스 export

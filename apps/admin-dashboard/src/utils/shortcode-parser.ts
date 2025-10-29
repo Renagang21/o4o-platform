@@ -1,8 +1,23 @@
 /**
- * WordPress-style Shortcode Parser
- * Parses shortcodes in the format: [shortcode_name attr="value" attr2="value2"]
+ * Admin Dashboard Shortcode Parser
+ * MIGRATED TO USE @o4o/shortcodes package
+ *
+ * This file now acts as a compatibility wrapper for the Admin Dashboard.
  */
 
+import {
+  defaultParser,
+  parseShortcodeAttributes as parseAttrs,
+  hasShortcode as hasShortcodeInContent,
+  stripShortcodes as stripAllShortcodes,
+  extractShortcodes as extractAllShortcodes,
+  ParsedShortcode,
+  ShortcodeAttributes
+} from '@o4o/shortcodes';
+
+/**
+ * Legacy ShortcodeMatch interface (for backward compatibility)
+ */
 export interface ShortcodeMatch {
   tag: string;
   attributes: Record<string, string>;
@@ -14,68 +29,54 @@ export interface ShortcodeMatch {
 /**
  * Parse attributes from shortcode string
  * Example: 'id="123" slug="contact" show_title="true"'
+ *
+ * @deprecated Use parseShortcodeAttributes from @o4o/shortcodes instead
  */
 export function parseShortcodeAttributes(attrString: string): Record<string, string> {
-  const attributes: Record<string, string> = {};
-
-  // Match attribute="value" or attribute='value' or attribute=value
-  const attrRegex = /(\w+)=["']?([^"'\s]+)["']?/g;
-  let match;
-
-  while ((match = attrRegex.exec(attrString)) !== null) {
-    attributes[match[1]] = match[2];
-  }
-
-  return attributes;
+  const attrs = parseAttrs(attrString);
+  // Convert to string-only Record for backward compatibility
+  const result: Record<string, string> = {};
+  Object.entries(attrs).forEach(([key, value]) => {
+    result[key] = String(value);
+  });
+  return result;
 }
 
 /**
- * Parse a shortcode string
+ * Parse a shortcode string for a specific tag
  * Supports both self-closing [shortcode] and enclosing [shortcode]content[/shortcode]
+ *
+ * Uses @o4o/shortcodes parser internally
  */
 export function parseShortcode(text: string, tag: string): ShortcodeMatch[] {
-  const matches: ShortcodeMatch[] = [];
+  // Use the official parser
+  const allShortcodes = defaultParser.parse(text);
 
-  // Self-closing shortcode: [tag attr="value"]
-  const selfClosingRegex = new RegExp(
-    `\\[${tag}([^\\]]*)\\]`,
-    'gi'
-  );
+  // Filter by tag and convert to legacy format
+  return allShortcodes
+    .filter(s => s.name === tag)
+    .map((s, idx) => {
+      const index = text.indexOf(s.fullMatch);
+      return {
+        tag: s.name,
+        attributes: convertToStringRecord(s.attributes),
+        content: s.content,
+        fullMatch: s.fullMatch,
+        index: index !== -1 ? index : 0,
+      };
+    })
+    .sort((a, b) => a.index - b.index);
+}
 
-  // Enclosing shortcode: [tag attr="value"]content[/tag]
-  const enclosingRegex = new RegExp(
-    `\\[${tag}([^\\]]*)\\]([\\s\\S]*?)\\[\\/${tag}\\]`,
-    'gi'
-  );
-
-  // Try enclosing format first
-  let match;
-  while ((match = enclosingRegex.exec(text)) !== null) {
-    matches.push({
-      tag,
-      attributes: parseShortcodeAttributes(match[1]),
-      content: match[2].trim(),
-      fullMatch: match[0],
-      index: match.index,
-    });
-  }
-
-  // Then try self-closing format (only if no enclosing matches found at that position)
-  while ((match = selfClosingRegex.exec(text)) !== null) {
-    // Skip if already matched by enclosing regex
-    const alreadyMatched = matches.some(m => m.index === match.index);
-    if (!alreadyMatched) {
-      matches.push({
-        tag,
-        attributes: parseShortcodeAttributes(match[1]),
-        fullMatch: match[0],
-        index: match.index,
-      });
-    }
-  }
-
-  // Sort by index
-  return matches.sort((a, b) => a.index - b.index);
+/**
+ * Convert ShortcodeAttributes to string-only Record
+ */
+function convertToStringRecord(attrs: ShortcodeAttributes): Record<string, string> {
+  const result: Record<string, string> = {};
+  Object.entries(attrs).forEach(([key, value]) => {
+    result[key] = String(value);
+  });
+  return result;
 }
 
 /**
@@ -120,18 +121,14 @@ export function replaceShortcodes(
  * Check if text contains a specific shortcode
  */
 export function hasShortcode(text: string, tag: string): boolean {
-  const regex = new RegExp(`\\[${tag}[^\\]]*\\]`, 'i');
-  return regex.test(text);
+  return hasShortcodeInContent(text, tag);
 }
 
 /**
  * Remove all shortcodes from text
  */
 export function stripShortcodes(text: string): string {
-  // Remove all [shortcode] and [shortcode]content[/shortcode] patterns
-  return text
-    .replace(/\[[\w-]+[^\]]*\][\s\S]*?\[\/[\w-]+\]/g, '') // Enclosing
-    .replace(/\[[\w-]+[^\]]*\]/g, ''); // Self-closing
+  return stripAllShortcodes(text);
 }
 
 /**
@@ -142,23 +139,12 @@ export function extractShortcodes(text: string): Array<{
   attributes: Record<string, string>;
   content?: string;
 }> {
-  const shortcodes: Array<{
-    tag: string;
-    attributes: Record<string, string>;
-    content?: string;
-  }> = [];
+  const shortcodes = extractAllShortcodes(text);
 
-  // Find all shortcodes (both self-closing and enclosing)
-  const regex = /\[([\w-]+)([^\]]*)\](?:([^[]*)\[\/\1\])?/g;
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-    shortcodes.push({
-      tag: match[1],
-      attributes: parseShortcodeAttributes(match[2]),
-      content: match[3] ? match[3].trim() : undefined,
-    });
-  }
-
-  return shortcodes;
+  // Convert to legacy format
+  return shortcodes.map(s => ({
+    tag: s.name,
+    attributes: convertToStringRecord(s.attributes),
+    content: s.content,
+  }));
 }

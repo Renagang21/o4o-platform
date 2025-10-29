@@ -1,117 +1,125 @@
-import { FC, cloneElement, ReactNode, ReactElement } from 'react';
+/**
+ * Main Site Shortcode Parser
+ * MIGRATED TO USE @o4o/shortcodes package
+ *
+ * This file now acts as a compatibility layer and configuration hub
+ * for the Main Site shortcode system.
+ */
+
+import { FC, ReactElement, cloneElement, Fragment, createElement } from 'react';
 import DOMPurify from 'dompurify';
+import {
+  defaultParser,
+  globalRegistry,
+  registerShortcode,
+  ShortcodeDefinition,
+  ShortcodeProps,
+  ParsedShortcode,
+  ShortcodeAttributes,
+  parseShortcodeAttributes
+} from '@o4o/shortcodes';
 
-// Shortcode type definitions
-export interface ShortcodeAttributes {
-  [key: string]: string | number | boolean;
-}
+// Re-export for backward compatibility
+export { parseShortcodeAttributes, ShortcodeAttributes };
 
+/**
+ * Legacy ShortcodeHandler interface (for backward compatibility)
+ * New code should use ShortcodeDefinition from @o4o/shortcodes
+ */
 export interface ShortcodeHandler {
   name: string;
   render: (attrs: ShortcodeAttributes, content?: string) => ReactElement | null;
 }
 
-// Parse attributes from shortcode string
-export function parseShortcodeAttributes(attrString: string): ShortcodeAttributes {
-  const attrs: ShortcodeAttributes = {};
-  
-  // Match attribute patterns: key="value" or key='value' or key=value
-  const regex = /(\w+)=(?:"([^"]*)"|'([^']*)'|([^\s]+))/g;
-  let match;
-  
-  while ((match = regex.exec(attrString)) !== null) {
-    const key = match[1];
-    const value = match[2] || match[3] || match[4];
-    
-    // Try to parse as number or boolean
-    if (value === 'true') {
-      attrs[key] = true;
-    } else if (value === 'false') {
-      attrs[key] = false;
-    } else if (!isNaN(Number(value))) {
-      attrs[key] = Number(value);
-    } else {
-      attrs[key] = value;
-    }
-  }
-  
-  return attrs;
-}
-
-// Main shortcode parser class
+/**
+ * Legacy ShortcodeParser class (for backward compatibility)
+ * Uses @o4o/shortcodes internally
+ */
 export class ShortcodeParser {
-  private handlers: Map<string, ShortcodeHandler> = new Map();
-
-  // Register a shortcode handler
+  /**
+   * Register a legacy handler (converts to new format)
+   */
   register(handler: ShortcodeHandler) {
-    this.handlers.set(handler.name, handler);
+    const definition: ShortcodeDefinition = {
+      name: handler.name,
+      component: ({ attributes, content }: ShortcodeProps) => {
+        return handler.render(attributes, content);
+      },
+    };
+    registerShortcode(definition);
   }
 
-  // Register multiple handlers
+  /**
+   * Register multiple handlers
+   */
   registerMany(handlers: ShortcodeHandler[]) {
     handlers.forEach((handler: any) => this.register(handler));
   }
 
-  // Parse content and replace shortcodes with React components
-  parse(content: string): ReactNode[] {
-    const elements: ReactNode[] = [];
-    
-    // Regex to match shortcodes: [name attr="value"] or [name attr="value"]content[/name]
-    const shortcodeRegex = /\[(\w+)([^\]]*)\](?:([^[]*)\[\/\1\])?/g;
-    
+  /**
+   * Parse content and replace shortcodes with React components
+   */
+  parse(content: string): React.ReactNode[] {
+    const elements: React.ReactNode[] = [];
+
+    // Use @o4o/shortcodes parser
+    const shortcodes = defaultParser.parse(content);
+
     let lastIndex = 0;
-    let match;
     let keyIndex = 0;
 
-    while ((match = shortcodeRegex.exec(content)) !== null) {
-      const [fullMatch, shortcodeName, attributes, innerContent] = match;
-      const matchIndex = match.index;
+    shortcodes.forEach((shortcode) => {
+      const matchIndex = content.indexOf(shortcode.fullMatch, lastIndex);
 
       // Add any text before the shortcode
       if (matchIndex > lastIndex) {
         const textContent = content.slice(lastIndex, matchIndex);
         if (textContent.trim()) {
           elements.push(
-            <span 
-              key={`text-${keyIndex++}`} 
-              dangerouslySetInnerHTML={{ 
-                __html: DOMPurify.sanitize(textContent) 
-              }} 
+            <span
+              key={`text-${keyIndex++}`}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(textContent)
+              }}
             />
           );
         }
       }
 
       // Process the shortcode
-      const handler = this.handlers.get(shortcodeName);
-      if (handler) {
-        const attrs = parseShortcodeAttributes(attributes || '');
-        const element = handler.render(attrs, innerContent);
-        if (element) {
-          elements.push(cloneElement(element, { key: `shortcode-${keyIndex++}` }));
-        }
+      const definition = globalRegistry.get(shortcode.name);
+      if (definition) {
+        const Component = definition.component;
+        const element = (
+          <Component
+            key={`shortcode-${keyIndex++}`}
+            attributes={shortcode.attributes}
+            content={shortcode.content}
+          />
+        );
+        elements.push(element);
       } else {
         // If no handler found, just show the shortcode as text
         elements.push(
           <span key={`unknown-${keyIndex++}`} className="text-gray-500">
-            {fullMatch}
+            {shortcode.fullMatch}
           </span>
         );
       }
 
-      lastIndex = matchIndex + fullMatch.length;
-    }
+      lastIndex = matchIndex + shortcode.fullMatch.length;
+    });
 
     // Add any remaining text after the last shortcode
     if (lastIndex < content.length) {
       const textContent = content.slice(lastIndex);
       if (textContent.trim()) {
         elements.push(
-          <span 
-            key={`text-${keyIndex++}`} 
-            dangerouslySetInnerHTML={{ 
-              __html: DOMPurify.sanitize(textContent) 
-            }} 
+          <span
+            key={`text-${keyIndex++}`}
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(textContent)
+            }}
           />
         );
       }
@@ -120,27 +128,35 @@ export class ShortcodeParser {
     return elements;
   }
 
-  // Parse content and return as a single React element
+  /**
+   * Parse content and return as a single React element
+   */
   parseAsElement(content: string): ReactElement {
     const nodes = this.parse(content);
     return <>{nodes}</>;
   }
 
-  // Get list of registered shortcodes
+  /**
+   * Get list of registered shortcodes
+   */
   getRegisteredShortcodes(): string[] {
-    return Array.from(this.handlers.keys());
+    return Array.from(globalRegistry.getAll().keys());
   }
 
-  // Check if a shortcode is registered
+  /**
+   * Check if a shortcode is registered
+   */
   hasShortcode(name: string): boolean {
-    return this.handlers.has(name);
+    return globalRegistry.has(name);
   }
 }
 
-// Create a singleton instance
+// Create a singleton instance (for backward compatibility)
 export const shortcodeParser = new ShortcodeParser();
 
-// Helper component to render parsed content
+/**
+ * Helper component to render parsed content
+ */
 export const ShortcodeContent: FC<{ content: string }> = ({ content }) => {
   const parsed = shortcodeParser.parseAsElement(content);
   return <div className="shortcode-content">{parsed}</div>;

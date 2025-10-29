@@ -5,6 +5,14 @@
 
 export * from './types';
 
+// Export API Service
+export {
+  DynamicShortcodeAPIService,
+  CachedDynamicAPIService,
+  dynamicAPI,
+  cachedDynamicAPI
+} from './api-service';
+
 // Import all dynamic shortcode components
 export { CPTListShortcode, cptListShortcodeDefinition } from './cpt-list';
 export { CPTFieldShortcode, cptFieldShortcodeDefinition } from './cpt-field';

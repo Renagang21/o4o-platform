@@ -2,16 +2,23 @@
 export * from './types';
 
 // 파서 export
-export { DefaultShortcodeParser, defaultParser } from './parser';
+export {
+  DefaultShortcodeParser,
+  defaultParser,
+  hasShortcode,
+  stripShortcodes,
+  extractShortcodes,
+  parseShortcodeAttributes
+} from './parser';
 
 // 레지스트리 export
-export { 
-  DefaultShortcodeRegistry, 
+export {
+  DefaultShortcodeRegistry,
   globalRegistry,
   registerShortcode,
   unregisterShortcode,
   getShortcode,
-  hasShortcode
+  hasShortcode as hasShortcodeRegistered
 } from './registry';
 
 // 렌더러 export
@@ -33,6 +40,14 @@ export const renderShortcodes = (content: string, context?: any) => {
 
 // Provider export
 export { ShortcodeProvider, useShortcodeContext, ShortcodeContent } from './provider';
+
+// Renderer Component export
+export {
+  ShortcodeRenderer,
+  DefaultLoadingComponent,
+  DefaultErrorComponent,
+  DefaultUnknownShortcodeComponent
+} from './components/ShortcodeRenderer';
 
 // Dropshipping shortcodes
 export { registerDropshippingShortcodes } from './dropshipping';
