@@ -107,6 +107,11 @@ export class MenuItem {
   @TreeParent()
   parent: MenuItem;
 
+  // Explicitly expose parentId for JSON serialization
+  // TypeORM Tree creates this column automatically but doesn't expose it
+  @Column({ type: 'uuid', nullable: true })
+  parentId: string;
+
   @CreateDateColumn()
   created_at: Date;
 

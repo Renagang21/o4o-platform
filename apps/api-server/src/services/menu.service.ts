@@ -692,6 +692,7 @@ class MenuService {
         target_audience: item.target_audience,
         children: [],
         parent: null,
+        parentId: item.id, // Set parent as the CPT menu item
         menu: null,
         created_at: new Date(),
         updated_at: new Date()

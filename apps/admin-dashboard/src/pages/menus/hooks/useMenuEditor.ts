@@ -97,7 +97,7 @@ export function useMenuEditor(options: UseMenuEditorOptions = {}): UseMenuEditor
               target: item.target as '_blank' | '_self',
               cssClass: item.css_classes,
               description: item.description,
-              parent_id: item.parent?.id,
+              parent_id: (item as any).parentId, // Use parentId from API response
               order_num: item.order_num,
               originalId: item.object_id,
               menu_id: item.menu_id,
