@@ -5,6 +5,7 @@ import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
 import { authAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+import { trackRoleSwitch } from '../../utils/analytics';
 
 interface RoleSwitcherProps {
   data?: {
@@ -76,6 +77,8 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const handleRoleSwitch = async (newRole: string) => {
     if (isSwitching) return;
 
+    const previousRole = currentRole;
+
     try {
       setIsSwitching(true);
 
@@ -89,6 +92,9 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
           defaultRole: response.data.data.defaultRole,
           roles: response.data.data.availableRoles
         });
+
+        // 분석 이벤트 추적
+        trackRoleSwitch(previousRole, newRole);
 
         // SPA 라우팅
         const targetPath = roleOptions[newRole]?.path || '/';
