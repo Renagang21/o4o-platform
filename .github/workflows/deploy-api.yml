@@ -60,9 +60,24 @@ jobs:
           
           # Install dependencies
           pnpm install --frozen-lockfile
-          
+
+          # ESM import validation (회귀 방지 5/7)
+          echo "🔍 Validating ESM imports..."
+          if git ls-files 'packages/{auth-client,types,utils,shortcodes}/src/**/*.{ts,tsx}' | xargs grep -nE "from ['\"]\\./[^'\"]+['\"]" | grep -v "\\.js['\"]"; then
+            echo "❌ Found relative imports without .js extension"
+            exit 1
+          fi
+          echo "✅ All ESM imports valid"
+
           # Build packages
           pnpm run build:packages
+
+          # Build smoke test (회귀 방지 6/7)
+          echo "🧪 Running build smoke tests..."
+          node -e "import('./packages/auth-client/dist/index.js').then(() => console.log('✅ auth-client OK'))"
+          node -e "import('./packages/types/dist/index.js').then(() => console.log('✅ types OK'))"
+          node -e "import('./packages/utils/dist/index.js').then(() => console.log('✅ utils OK'))"
+          node -e "import('./packages/shortcodes/dist/index.js').then(() => console.log('✅ shortcodes OK'))"
           
           # Build API server
           cd apps/api-server

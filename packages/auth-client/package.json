@@ -8,9 +8,10 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
+  "sideEffects": false,
   "scripts": {
     "build": "npx tsc --build",
     "type-check": "tsc --noEmit"
