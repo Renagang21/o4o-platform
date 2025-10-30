@@ -59,16 +59,35 @@ class MenuService {
 
     // Manually build tree structure from parentId
     // This is more reliable than findDescendantsTree when closure table is not properly maintained
-    const buildTree = (items: MenuItem[], parentId: string | null = null): MenuItem[] => {
-      return items
-        .filter(item => item.parentId === parentId)
-        .map(item => ({
-          ...item,
-          children: buildTree(items, item.id)
-        }));
-    };
+    const itemMap = new Map<string, MenuItem>();
+    const rootItems: MenuItem[] = [];
 
-    let itemsWithChildren = buildTree(allItems, null);
+    // First pass: create map
+    allItems.forEach(item => {
+      itemMap.set(item.id, { ...item, children: [] });
+    });
+
+    // Second pass: build tree
+    allItems.forEach(item => {
+      const treeItem = itemMap.get(item.id)!;
+
+      if (item.parentId) {
+        const parent = itemMap.get(item.parentId);
+        if (parent) {
+          if (!parent.children) {
+            parent.children = [];
+          }
+          parent.children.push(treeItem);
+        } else {
+          // Parent not found (orphaned item), treat as root
+          rootItems.push(treeItem);
+        }
+      } else {
+        rootItems.push(treeItem);
+      }
+    });
+
+    let itemsWithChildren = rootItems;
 
     // Expand CPT menu items if requested
     if (expandCPT) {
