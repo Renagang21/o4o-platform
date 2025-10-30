@@ -1,5 +1,5 @@
 import { AppDataSource } from '../database/connection.js';
-import { Repository, TreeRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Menu } from '../entities/Menu.js';
 import { MenuItem, MenuItemType } from '../entities/MenuItem.js';
 import { MenuLocation } from '../entities/MenuLocation.js';
@@ -9,14 +9,14 @@ import { generateSlug } from '../utils/slug.js';
 
 class MenuService {
   private menuRepository: Repository<Menu>;
-  private menuItemRepository: TreeRepository<MenuItem>;
+  private menuItemRepository: Repository<MenuItem>;
   private menuLocationRepository: Repository<MenuLocation>;
   private postRepository: Repository<Post>;
   private customPostTypeRepository: Repository<CustomPostType>;
 
   constructor() {
     this.menuRepository = AppDataSource.getRepository(Menu);
-    this.menuItemRepository = AppDataSource.getTreeRepository(MenuItem);
+    this.menuItemRepository = AppDataSource.getRepository(MenuItem);
     this.menuLocationRepository = AppDataSource.getRepository(MenuLocation);
     this.postRepository = AppDataSource.getRepository(Post);
     this.customPostTypeRepository = AppDataSource.getRepository(CustomPostType);
@@ -226,6 +226,16 @@ class MenuService {
       return null;
     }
 
+    // Validate parent_id if provided
+    if (data.parent_id) {
+      const parent = await this.menuItemRepository.findOne({
+        where: { id: data.parent_id, menu_id: data.menu_id }
+      });
+      if (!parent) {
+        throw new Error(`Parent menu item with ID ${data.parent_id} not found`);
+      }
+    }
+
     const menuItem = this.menuItemRepository.create({
       menu_id: data.menu_id,
       title: data.title,
@@ -237,19 +247,9 @@ class MenuService {
       order_num: data.order_num,
       reference_id: data.reference_id,
       metadata: data.metadata,
+      parentId: data.parent_id || null, // Set parentId directly
       menu: menu
     });
-
-    if (data.parent_id) {
-      const parent = await this.menuItemRepository.findOne({
-        where: { id: data.parent_id, menu_id: data.menu_id }
-      });
-      if (!parent) {
-        throw new Error(`Parent menu item with ID ${data.parent_id} not found`);
-      }
-      menuItem.parent = parent;
-      menuItem.parentId = data.parent_id; // Explicitly set parentId for tree structure
-    }
 
     return this.menuItemRepository.save(menuItem);
   }
@@ -302,7 +302,7 @@ class MenuService {
     }>
   ): Promise<MenuItem[]> {
     const menu = await this.findMenuById(menuId);
-    
+
     if (!menu) {
       throw new Error(`Menu with ID ${menuId} not found`);
     }
@@ -314,6 +314,20 @@ class MenuService {
     try {
       const updatedItems: MenuItem[] = [];
 
+      // Validate all parent_ids first
+      const parentIds = items.map(item => item.parent_id).filter(Boolean) as string[];
+      if (parentIds.length > 0) {
+        const parents = await queryRunner.manager.find(MenuItem, {
+          where: parentIds.map(parentId => ({ id: parentId, menu_id: menuId }))
+        });
+        const parentIdSet = new Set(parents.map(p => p.id));
+        const invalidParentId = parentIds.find(id => !parentIdSet.has(id));
+        if (invalidParentId) {
+          throw new Error(`Parent menu item with ID ${invalidParentId} not found`);
+        }
+      }
+
+      // Update all items
       for (const item of items) {
         const menuItem = await queryRunner.manager.findOne(MenuItem, {
           where: { id: item.id, menu_id: menuId }
@@ -325,20 +339,9 @@ class MenuService {
 
         menuItem.order_num = item.order_num;
 
+        // Update parentId directly (no need for parent relation)
         if (item.parent_id !== undefined) {
-          if (item.parent_id) {
-            const parent = await queryRunner.manager.findOne(MenuItem, {
-              where: { id: item.parent_id, menu_id: menuId }
-            });
-            if (!parent) {
-              throw new Error(`Parent menu item with ID ${item.parent_id} not found`);
-            }
-            menuItem.parent = parent;
-            menuItem.parentId = item.parent_id; // Explicitly set parentId for tree structure
-          } else {
-            menuItem.parent = null;
-            menuItem.parentId = null; // Clear parentId for root items
-          }
+          menuItem.parentId = item.parent_id || null;
         }
 
         const updated = await queryRunner.manager.save(menuItem);
@@ -719,7 +722,6 @@ class MenuService {
         display_mode: item.display_mode,
         target_audience: item.target_audience,
         children: [],
-        parent: null,
         parentId: item.id, // Set parent as the CPT menu item
         menu: null,
         created_at: new Date(),

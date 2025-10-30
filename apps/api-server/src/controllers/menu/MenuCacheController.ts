@@ -291,10 +291,13 @@ export class MenuCacheController {
     // Second pass: build tree
     items.forEach(item => {
       const mappedItem = itemMap.get(item.id);
-      if (item.parent?.id) {
-        const parent = itemMap.get(item.parent.id);
+      if (item.parentId) {
+        const parent = itemMap.get(item.parentId);
         if (parent) {
           parent.children.push(mappedItem);
+        } else {
+          // Parent not found (orphaned), treat as root
+          rootItems.push(mappedItem);
         }
       } else {
         rootItems.push(mappedItem);

@@ -6,9 +6,6 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  Tree,
-  TreeChildren,
-  TreeParent,
   Index
 } from 'typeorm';
 import type { Menu } from './Menu.js';
@@ -36,7 +33,6 @@ export enum MenuItemDisplayMode {
 }
 
 @Entity('menu_items')
-@Tree('closure-table')
 export class MenuItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -92,7 +88,7 @@ export class MenuItem {
   })
   display_mode: MenuItemDisplayMode;
 
-  @Column({ 
+  @Column({
     type: 'jsonb',
     default: () => "'{\"roles\": [\"everyone\"]}'"
   })
@@ -101,16 +97,15 @@ export class MenuItem {
     user_ids?: string[]; // Optional: specific user IDs
   };
 
-  @TreeChildren()
-  children: MenuItem[];
-
-  @TreeParent()
-  parent: MenuItem;
-
-  // Explicitly expose parentId for JSON serialization
-  // TypeORM Tree creates this column automatically but doesn't expose it
+  // Self-referencing relationship for tree structure
+  // This replaces TypeORM Tree decorators (@TreeChildren, @TreeParent)
   @Column({ type: 'uuid', nullable: true })
+  @Index()
   parentId: string;
+
+  // Note: children array is built dynamically in service layer
+  // This is more reliable than TypeORM's closure table approach
+  children?: MenuItem[];
 
   @CreateDateColumn()
   created_at: Date;
