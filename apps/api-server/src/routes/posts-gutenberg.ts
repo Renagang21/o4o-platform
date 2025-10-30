@@ -371,8 +371,8 @@ router.put('/:id',
 );
 
 // GET routes (reuse from existing posts.ts)
-router.get('/', require('./posts').default);
-router.get('/:id', require('./posts').default);
-router.delete('/:id', require('./posts').default);
+router.get('/', require('./posts.js').default);
+router.get('/:id', require('./posts.js').default);
+router.delete('/:id', require('./posts.js').default);
 
 export default router;

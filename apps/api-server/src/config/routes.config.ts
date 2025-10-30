@@ -210,7 +210,7 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // Public roles endpoint
   app.get('/api/v1/users/roles', (req, res) => {
-    const { UserRoleController } = require('../controllers/v1/userRole.controller');
+    const { UserRoleController } = require('../controllers/v1/userRole.controller.js');
     return UserRoleController.getRoles(req, res);
   });
 
