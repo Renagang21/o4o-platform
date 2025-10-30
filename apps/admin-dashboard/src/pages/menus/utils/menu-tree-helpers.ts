@@ -303,3 +303,42 @@ export function cloneTree(items: MenuItemTree[]): MenuItemTree[] {
     children: Array.isArray(item.children) ? cloneTree(item.children) : undefined
   }));
 }
+
+/**
+ * Convert API response (nested tree structure) to flat array
+ * API returns items with children arrays, but we need flat array with parent_id
+ */
+export function treeToFlat(items: any[], parentId?: string): MenuItemFlat[] {
+  const result: MenuItemFlat[] = [];
+
+  items.forEach(item => {
+    // Extract children before creating flat item
+    const { children, ...itemData } = item;
+
+    // Add current item
+    result.push({
+      id: itemData.id,
+      title: itemData.title,
+      url: itemData.url,
+      type: itemData.type as 'page' | 'post' | 'custom' | 'category' | 'tag' | 'cpt',
+      target: itemData.target as '_blank' | '_self',
+      cssClass: itemData.css_classes || itemData.cssClass,
+      description: itemData.description,
+      parent_id: parentId,
+      order_num: itemData.order_num || 0,
+      originalId: itemData.object_id || itemData.originalId,
+      menu_id: itemData.menu_id,
+      isOpen: true,
+      target_audience: itemData.target_audience,
+      metadata: itemData.metadata
+    });
+
+    // Recursively process children
+    if (Array.isArray(children) && children.length > 0) {
+      const childrenFlat = treeToFlat(children, itemData.id);
+      result.push(...childrenFlat);
+    }
+  });
+
+  return result;
+}

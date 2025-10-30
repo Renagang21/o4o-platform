@@ -8,6 +8,7 @@ import {
   updateItemInTree,
   deleteItemFromTree,
   findItemById,
+  treeToFlat,
   type MenuItemTree,
   type MenuItemFlat
 } from '../utils/menu-tree-helpers';
@@ -87,24 +88,11 @@ export function useMenuEditor(options: UseMenuEditorOptions = {}): UseMenuEditor
           const menuData = response.data;
           setMenu(menuData);
 
-          // Convert API items to tree structure
+          // Convert API items (nested tree) to tree structure for editor
           if (menuData.items && menuData.items.length > 0) {
-            const flatItems: MenuItemFlat[] = menuData.items.map((item: MenuItemType) => ({
-              id: item.id,
-              title: item.title,
-              url: item.url,
-              type: item.type as 'page' | 'post' | 'custom' | 'category' | 'tag',
-              target: item.target as '_blank' | '_self',
-              cssClass: item.css_classes,
-              description: item.description,
-              parent_id: (item as any).parentId, // Use parentId from API response
-              order_num: item.order_num,
-              originalId: item.object_id,
-              menu_id: item.menu_id,
-              isOpen: true,
-              target_audience: undefined // Will be added when we have role system
-            }));
-
+            // API returns nested tree with children arrays
+            // First convert to flat array with parent_id, then rebuild tree
+            const flatItems = treeToFlat(menuData.items);
             const tree = buildTree(flatItems);
             setItems(tree);
             setOriginalData({ menu: menuData, items: tree });
