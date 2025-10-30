@@ -1,8 +1,8 @@
 import { createContext, FC, ReactElement, ReactNode, useContext } from 'react';
-import { ShortcodeParser, ShortcodeRegistry } from './types';
-import { defaultParser } from './parser';
-import { globalRegistry } from './registry';
-import { useShortcodes } from './renderer';
+import { ShortcodeParser, ShortcodeRegistry } from './types.js';
+import { defaultParser } from './parser.js';
+import { globalRegistry } from './registry.js';
+import { useShortcodes } from './renderer.js';
 
 /**
  * Shortcode Context

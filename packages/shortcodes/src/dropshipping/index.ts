@@ -3,19 +3,19 @@
  * Register all dropshipping-related shortcodes
  */
 
-import { registerShortcode } from '../registry';
-import { SellerDashboard } from './SellerDashboard';
-import { SupplierDashboard } from './SupplierDashboard';
-import { AffiliateDashboard } from './AffiliateDashboard';
+import { registerShortcode } from '../registry.js';
+import { SellerDashboard } from './SellerDashboard.js';
+import { SupplierDashboard } from './SupplierDashboard.js';
+import { AffiliateDashboard } from './AffiliateDashboard.js';
 
 // Import additional components (to be created)
-// import { SellerOrders } from './SellerOrders';
-// import { SellerInventory } from './SellerInventory';
-// import { SellerAnalytics } from './SellerAnalytics';
-// import { SupplierOrders } from './SupplierOrders';
-// import { SupplierCatalog } from './SupplierCatalog';
-// import { AffiliateLinks } from './AffiliateLinks';
-// import { AffiliateCommissions } from './AffiliateCommissions';
+// import { SellerOrders } from './SellerOrders.js';
+// import { SellerInventory } from './SellerInventory.js';
+// import { SellerAnalytics } from './SellerAnalytics.js';
+// import { SupplierOrders } from './SupplierOrders.js';
+// import { SupplierCatalog } from './SupplierCatalog.js';
+// import { AffiliateLinks } from './AffiliateLinks.js';
+// import { AffiliateCommissions } from './AffiliateCommissions.js';
 
 /**
  * Register all dropshipping shortcodes
@@ -46,6 +46,6 @@ export function registerDropshippingShortcodes() {
 }
 
 // Export components for direct use
-export { SellerDashboard } from './SellerDashboard';
-export { SupplierDashboard } from './SupplierDashboard';
-export { AffiliateDashboard } from './AffiliateDashboard';
+export { SellerDashboard } from './SellerDashboard.js';
+export { SupplierDashboard } from './SupplierDashboard.js';
+export { AffiliateDashboard } from './AffiliateDashboard.js';

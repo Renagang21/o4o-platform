@@ -5,7 +5,7 @@ import {
   ShortcodeParser, 
   ShortcodeRegistry,
   ShortcodeProps
-} from './types';
+} from './types.js';
 
 /**
  * 숏코드 렌더러 구현

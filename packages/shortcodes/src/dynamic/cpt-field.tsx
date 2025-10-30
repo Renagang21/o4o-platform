@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useState, createElement } from 'react';
-import { CPTFieldShortcodeAttributes, DynamicShortcodeContext } from './types';
-import { ShortcodeProps } from '../types';
+import { CPTFieldShortcodeAttributes, DynamicShortcodeContext } from './types.js';
+import { ShortcodeProps } from '../types.js';
 
 // Field formatters
 const formatters: Record<string, (value: any, format?: string) => string> = {

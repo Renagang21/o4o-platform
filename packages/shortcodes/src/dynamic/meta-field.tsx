@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useState, createElement } from 'react';
-import { MetaFieldShortcodeAttributes, DynamicShortcodeContext } from './types';
-import { ShortcodeProps } from '../types';
+import { MetaFieldShortcodeAttributes, DynamicShortcodeContext } from './types.js';
+import { ShortcodeProps } from '../types.js';
 
 // Common meta field formatters
 const formatMetaValue = (value: any, key: string, format?: string): string => {

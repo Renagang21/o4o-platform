@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useState, createElement } from 'react';
-import { ACFFieldShortcodeAttributes, ACFFieldValue, DynamicShortcodeContext } from './types';
-import { ShortcodeProps } from '../types';
+import { ACFFieldShortcodeAttributes, ACFFieldValue, DynamicShortcodeContext } from './types.js';
+import { ShortcodeProps } from '../types.js';
 
 // ACF field type formatters
 const formatACFValue = (value: any, type?: string, format?: string, attributes?: ACFFieldShortcodeAttributes): React.ReactNode => {

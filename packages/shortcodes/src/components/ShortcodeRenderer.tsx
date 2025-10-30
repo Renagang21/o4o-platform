@@ -4,7 +4,7 @@
  */
 
 import { FC, useState, useEffect, ReactNode } from 'react';
-import { globalRegistry, defaultParser, ParsedShortcode } from '../index';
+import { globalRegistry, defaultParser, ParsedShortcode } from '../index.js';
 
 export interface ShortcodeRendererProps {
   content: string;

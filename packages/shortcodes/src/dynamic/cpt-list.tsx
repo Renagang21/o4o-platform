@@ -4,10 +4,10 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { CPTListShortcodeAttributes, CPTPost } from './types';
-import { ShortcodeProps } from '../types';
-import { shortcodeCache, CACHE_CONFIG } from './cache';
-import { ErrorMessage, Placeholder } from './components';
+import { CPTListShortcodeAttributes, CPTPost } from './types.js';
+import { ShortcodeProps } from '../types.js';
+import { shortcodeCache, CACHE_CONFIG } from './cache.js';
+import { ErrorMessage, Placeholder } from './components.js';
 
 // Default templates for different layouts
 const DefaultTemplate: React.FC<{ posts: CPTPost[]; attributes: CPTListShortcodeAttributes }> = ({ posts, attributes }) => (

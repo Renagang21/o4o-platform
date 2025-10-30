@@ -4,7 +4,7 @@
  * Uses @o4o/auth-client for authenticated requests
  */
 
-import type { CPTQueryParams, CPTPost, ACFFieldValue } from './types';
+import type { CPTQueryParams, CPTPost, ACFFieldValue } from './types.js';
 
 /**
  * Dynamic Shortcode API Service Class
@@ -172,8 +172,8 @@ export class DynamicShortcodeAPIService {
 
     try {
       // Dynamic import to avoid SSR issues
-      const { authClient } = await import('@o4o/auth-client');
-      return authClient;
+      const authClientModule = await import('@o4o/auth-client') as any;
+      return authClientModule.authClient || null;
     } catch (error) {
       // auth-client not available, use plain fetch
       return null;

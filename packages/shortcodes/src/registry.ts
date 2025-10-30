@@ -1,4 +1,4 @@
-import { ShortcodeRegistry, ShortcodeDefinition } from './types';
+import { ShortcodeRegistry, ShortcodeDefinition } from './types.js';
 
 /**
  * 숏코드 레지스트리 구현

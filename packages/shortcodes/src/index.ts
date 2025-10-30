@@ -1,5 +1,5 @@
 // 타입 export
-export * from './types';
+export * from './types.js';
 
 // 파서 export
 export {
@@ -9,7 +9,7 @@ export {
   stripShortcodes,
   extractShortcodes,
   parseShortcodeAttributes
-} from './parser';
+} from './parser.js';
 
 // 레지스트리 export
 export {
@@ -19,15 +19,15 @@ export {
   unregisterShortcode,
   getShortcode,
   hasShortcode as hasShortcodeRegistered
-} from './registry';
+} from './registry.js';
 
 // 렌더러 export
-export { DefaultShortcodeRenderer, useShortcodes } from './renderer';
+export { DefaultShortcodeRenderer, useShortcodes } from './renderer.js';
 
 // 편의를 위한 기본 인스턴스들
-import { defaultParser } from './parser';
-import { globalRegistry } from './registry';
-import { DefaultShortcodeRenderer } from './renderer';
+import { defaultParser } from './parser.js';
+import { globalRegistry } from './registry.js';
+import { DefaultShortcodeRenderer } from './renderer.js';
 
 export const defaultRenderer = new DefaultShortcodeRenderer(defaultParser, globalRegistry);
 
@@ -39,7 +39,7 @@ export const renderShortcodes = (content: string, context?: any) => {
 };
 
 // Provider export
-export { ShortcodeProvider, useShortcodeContext, ShortcodeContent } from './provider';
+export { ShortcodeProvider, useShortcodeContext, ShortcodeContent } from './provider.js';
 
 // Renderer Component export
 export {
@@ -47,18 +47,18 @@ export {
   DefaultLoadingComponent,
   DefaultErrorComponent,
   DefaultUnknownShortcodeComponent
-} from './components/ShortcodeRenderer';
+} from './components/ShortcodeRenderer.js';
 
 // Dropshipping shortcodes
-export { registerDropshippingShortcodes } from './dropshipping';
-export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropshipping';
+export { registerDropshippingShortcodes } from './dropshipping/index.js';
+export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropshipping/index.js';
 
 // Auth shortcodes
-export { registerAuthShortcodes } from './auth';
-export { SocialLogin } from './auth';
+export { registerAuthShortcodes } from './auth/index.js';
+export { SocialLogin } from './auth/index.js';
 
 // Dynamic shortcodes
-export { 
+export {
   CPTListShortcode,
   cptListShortcodeDefinition,
   CPTFieldShortcode,
@@ -70,4 +70,4 @@ export {
   registerDynamicShortcodes,
   getDynamicShortcodeDefinitions,
   dynamicShortcodeTemplates
-} from './dynamic';
+} from './dynamic/index.js';

@@ -3,7 +3,7 @@
  * Export all dynamic shortcodes and register them
  */
 
-export * from './types';
+export * from './types.js';
 
 // Export API Service
 export {
@@ -11,32 +11,32 @@ export {
   CachedDynamicAPIService,
   dynamicAPI,
   cachedDynamicAPI
-} from './api-service';
+} from './api-service.js';
 
 // Import all dynamic shortcode components
-export { CPTListShortcode, cptListShortcodeDefinition } from './cpt-list';
-export { CPTFieldShortcode, cptFieldShortcodeDefinition } from './cpt-field';
-export { ACFFieldShortcode, acfFieldShortcodeDefinition } from './acf-field';
-export { MetaFieldShortcode, metaFieldShortcodeDefinition } from './meta-field';
+export { CPTListShortcode, cptListShortcodeDefinition } from './cpt-list.js';
+export { CPTFieldShortcode, cptFieldShortcodeDefinition } from './cpt-field.js';
+export { ACFFieldShortcode, acfFieldShortcodeDefinition } from './acf-field.js';
+export { MetaFieldShortcode, metaFieldShortcodeDefinition } from './meta-field.js';
 
 // Import registry and renderer from parent
-import { ShortcodeRegistry } from '../types';
+import { ShortcodeRegistry } from '../types.js';
 
 /**
  * Register all dynamic shortcodes
  */
 export function registerDynamicShortcodes(registry: ShortcodeRegistry): void {
   // Import definitions
-  import('./cpt-list').then(({ cptListShortcodeDefinition }) => {
+  import('./cpt-list.js').then(({ cptListShortcodeDefinition }) => {
     registry.register(cptListShortcodeDefinition);
   });
-  import('./cpt-field').then(({ cptFieldShortcodeDefinition }) => {
+  import('./cpt-field.js').then(({ cptFieldShortcodeDefinition }) => {
     registry.register(cptFieldShortcodeDefinition);
   });
-  import('./acf-field').then(({ acfFieldShortcodeDefinition }) => {
+  import('./acf-field.js').then(({ acfFieldShortcodeDefinition }) => {
     registry.register(acfFieldShortcodeDefinition);
   });
-  import('./meta-field').then(({ metaFieldShortcodeDefinition }) => {
+  import('./meta-field.js').then(({ metaFieldShortcodeDefinition }) => {
     registry.register(metaFieldShortcodeDefinition);
   });
 
@@ -49,10 +49,10 @@ export function registerDynamicShortcodes(registry: ShortcodeRegistry): void {
  */
 export async function getDynamicShortcodeDefinitions() {
   const [cptList, cptField, acfField, metaField] = await Promise.all([
-    import('./cpt-list'),
-    import('./cpt-field'),
-    import('./acf-field'),
-    import('./meta-field'),
+    import('./cpt-list.js'),
+    import('./cpt-field.js'),
+    import('./acf-field.js'),
+    import('./meta-field.js'),
   ]);
 
   return [

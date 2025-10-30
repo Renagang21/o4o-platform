@@ -3,8 +3,8 @@
  * Register all authentication-related shortcodes
  */
 
-import { registerShortcode } from '../registry';
-import SocialLogin from './SocialLogin';
+import { registerShortcode } from '../registry.js';
+import SocialLogin from './SocialLogin.js';
 
 /**
  * Register all auth shortcodes
@@ -33,4 +33,4 @@ export function registerAuthShortcodes() {
 }
 
 // Export components for direct use
-export { default as SocialLogin } from './SocialLogin';
+export { default as SocialLogin } from './SocialLogin.js';

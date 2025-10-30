@@ -1,4 +1,4 @@
-import { ShortcodeParser, ParsedShortcode, ShortcodeAttributes } from './types';
+import { ShortcodeParser, ParsedShortcode, ShortcodeAttributes } from './types.js';
 
 /**
  * 숏코드 파서 구현
