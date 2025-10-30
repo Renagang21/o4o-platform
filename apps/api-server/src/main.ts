@@ -11,6 +11,8 @@ import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
@@ -18,6 +20,10 @@ import passport, { initializePassport } from './config/passportDynamic.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Environment variables are loaded by env-loader (imported first)
 // Environment validation

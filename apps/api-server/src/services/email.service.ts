@@ -1,3 +1,9 @@
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 import nodemailer, { Transporter } from 'nodemailer';
 import { EmailOptions, EmailTemplateData } from '../types/email-auth.js';
 import logger from '../utils/logger.js';

@@ -1,5 +1,11 @@
 import { DataSource } from 'typeorm';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { SnakeNamingStrategy } from './SnakeNamingStrategy.js';
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import { User } from '../entities/User.js';
 import { Role } from '../entities/Role.js';
 import { Permission } from '../entities/Permission.js';
