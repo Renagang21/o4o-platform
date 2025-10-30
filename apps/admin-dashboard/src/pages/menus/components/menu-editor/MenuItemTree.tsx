@@ -575,11 +575,15 @@ export const MenuItemTree: FC<MenuItemTreeProps> = ({
     const item = findItemByIdHelper(localItems, id);
     if (!item) return;
 
+    // Find grandparent to get the correct parent_id for the new level
+    const grandParent = findParentById(localItems, parent.id);
+    const newParentId = grandParent?.id;
+
     // Remove from current location
     const withoutItem = removeItem(localItems, id);
 
-    // Insert after parent
-    const newItems = insertItemNear(withoutItem, item, parent.id);
+    // Insert after parent with correct parent_id
+    const newItems = insertItemNear(withoutItem, item, parent.id, newParentId);
 
     setLocalItems(newItems);
     onReorder(newItems);
@@ -764,7 +768,8 @@ function removeItem(items: MenuItemTreeType[], id: string): MenuItemTreeType[] {
 function insertItemNear(
   items: MenuItemTreeType[],
   activeItem: MenuItemTreeType,
-  overId: string
+  overId: string,
+  parentId?: string
 ): MenuItemTreeType[] {
   if (!Array.isArray(items)) {
     console.error('insertItemNear: items is not an array', items);
@@ -779,7 +784,11 @@ function insertItemNear(
     // If this is the over item, insert active item after it
     if (item.id === overId) {
       result.push(item);
-      result.push(activeItem);
+      // Insert with parent_id based on current level
+      result.push({
+        ...activeItem,
+        parent_id: parentId || undefined  // Set parent_id based on level
+      });
       continue;
     }
 
@@ -789,7 +798,7 @@ function insertItemNear(
       if (hasOverInChildren) {
         result.push({
           ...item,
-          children: insertItemNear(item.children, activeItem, overId)
+          children: insertItemNear(item.children, activeItem, overId, item.id)  // Pass item.id as parentId
         });
         continue;
       }
@@ -871,14 +880,18 @@ function makeChildOf(
 
   const withoutChild = removeItem(items, childId);
 
-  // 부모에 자식 추가
+  // 부모에 자식 추가 (parent_id 필드도 업데이트)
   return withoutChild.map(item => {
     if (item.id === parentId) {
       const currentChildren = Array.isArray(item.children) ? item.children : [];
       return {
         ...item,
         isOpen: true, // 자식이 추가되면 자동으로 펼치기
-        children: [...currentChildren, { ...childItem, children: childItem.children || [] }]
+        children: [...currentChildren, {
+          ...childItem,
+          parent_id: parentId,  // parent_id 필드 설정
+          children: childItem.children || []
+        }]
       };
     }
     if (item.children && Array.isArray(item.children) && item.children.length > 0) {
