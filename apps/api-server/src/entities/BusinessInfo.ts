@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export enum BusinessType {
   SOLE_PROPRIETORSHIP = 'sole_proprietorship',
@@ -93,7 +93,7 @@ export class BusinessInfo {
   @Column({ type: 'uuid', unique: true })
   userId!: string;
 
-  @OneToOne(() => User, user => user.businessInfo, { onDelete: 'CASCADE' })
+  @OneToOne('User', 'businessInfo', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;
 

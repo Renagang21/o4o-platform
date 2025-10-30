@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export enum StoreStatus {
   ACTIVE = 'active',
@@ -50,7 +50,7 @@ export class Store {
   @Column()
   managerId!: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'managerId' })
   manager!: User;
 

@@ -9,9 +9,9 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { User } from '../User.js';
-import { FundingProject } from './FundingProject.js';
-import { BackerReward } from './BackerReward.js';
+import type { User } from '../User.js';
+import type { FundingProject } from './FundingProject.js';
+import type { BackerReward } from './BackerReward.js';
 import type { PaymentMethod, PaymentStatus, BackingStatus } from '../../types/crowdfunding-types.js';
 
 @Entity('funding_backings')
@@ -25,14 +25,14 @@ export class FundingBacking {
   @Column({ type: 'uuid' })
   projectId: string;
 
-  @ManyToOne(() => FundingProject, project => project.backings, { onDelete: 'CASCADE' })
+  @ManyToOne('FundingProject', 'backings', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: FundingProject;
 
   @Column({ type: 'uuid' })
   backerId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'backerId' })
   backer: User;
 

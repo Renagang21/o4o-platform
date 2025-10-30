@@ -10,8 +10,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
-import { Seller } from './Seller.js';
+import type { User } from './User.js';
+import type { Seller } from './Seller.js';
 
 export enum PartnerStatus {
   PENDING = 'pending',
@@ -83,7 +83,7 @@ export class Partner {
   @Column({ type: 'uuid', unique: true })
   userId!: string;
 
-  @OneToOne(() => User, user => user.partner, { onDelete: 'CASCADE' })
+  @OneToOne('User', 'partner', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;
 
@@ -91,7 +91,7 @@ export class Partner {
   @Column({ type: 'uuid' })
   sellerId!: string;
 
-  @ManyToOne(() => Seller, { onDelete: 'CASCADE' })
+  @ManyToOne('Seller', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'sellerId' })
   seller!: Seller;
 

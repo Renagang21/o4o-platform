@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
-import { User } from './User.js'
+import type { User } from './User.js'
 import { MediaFolder } from './MediaFolder.js'
 
 export interface MediaSize {
@@ -64,14 +64,14 @@ export class MediaFile {
   @Column({ type: 'uuid', nullable: true })
   folderId!: string
 
-  @ManyToOne(() => MediaFolder, { nullable: true, lazy: true })
+  @ManyToOne('MediaFolder', { nullable: true, lazy: true })
   @JoinColumn({ name: 'folderId' })
   folder!: Promise<MediaFolder>
 
   @Column({ type: 'uuid' })
   uploadedBy!: string
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'uploadedBy' })
   uploader!: User
 

@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Cart } from './Cart.js';
+import type { Cart } from './Cart.js';
 
 @Entity('cart_items')
 @Index(['cartId'])
@@ -20,7 +20,7 @@ export class CartItem {
   @Column('uuid')
   cartId: string;
 
-  @ManyToOne(() => Cart, cart => cart.items, { onDelete: 'CASCADE' })
+  @ManyToOne('Cart', 'items', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cartId' })
   cart: Cart;
 

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth.js';
 import { BusinessInfo } from '../types/user.js';
-import { Role } from './Role.js';
+import type { Role } from './Role.js';
 import * as bcrypt from 'bcryptjs';
 
 // Re-export types for external use
@@ -63,7 +63,7 @@ export class User {
   roles!: string[];
 
   // Database roles (new ManyToMany relation)
-  @ManyToMany(() => Role, role => role.users, { eager: true })
+  @ManyToMany('Role', 'users', { eager: true })
   @JoinTable({
     name: 'user_roles',
     joinColumn: { name: 'user_id', referencedColumnName: 'id' },
@@ -72,7 +72,7 @@ export class User {
   dbRoles?: Role[];
 
   // Active role (for users with multiple roles)
-  @ManyToOne(() => Role, { nullable: true, eager: true })
+  @ManyToOne('Role', { nullable: true, eager: true })
   @JoinColumn({ name: 'active_role_id' })
   activeRole?: Role | null;
 

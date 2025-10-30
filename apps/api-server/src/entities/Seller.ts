@@ -9,7 +9,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 import { BusinessInfo } from './BusinessInfo.js';
 
 export enum SellerStatus {
@@ -68,12 +68,12 @@ export class Seller {
   @Column({ type: 'uuid', unique: true })
   userId!: string;
 
-  @OneToOne(() => User, user => user.seller, { onDelete: 'CASCADE' })
+  @OneToOne('User', 'seller', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;
 
   // BusinessInfo relationship (One-to-One)
-  @OneToOne(() => BusinessInfo, { cascade: true })
+  @OneToOne('BusinessInfo', { cascade: true })
   @JoinColumn()
   businessInfo!: BusinessInfo;
 

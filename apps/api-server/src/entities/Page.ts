@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
-import { User } from './User.js'
+import type { User } from './User.js'
 
 export interface Block {
   id: string
@@ -66,11 +66,11 @@ export class Page {
   @Column({ type: 'uuid', nullable: true })
   parentId!: string
 
-  @ManyToOne(() => Page, { nullable: true })
+  @ManyToOne('Page', { nullable: true })
   @JoinColumn({ name: 'parentId' })
   parent!: Page
 
-  @OneToMany(() => Page, page => page.parent)
+  @OneToMany('Page', 'parent')
   children!: Page[]
 
   @Column({ default: 0 })
@@ -97,14 +97,14 @@ export class Page {
   @Column({ type: 'uuid' })
   authorId!: string
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'authorId' })
   author!: User
 
   @Column({ type: 'uuid', nullable: true })
   lastModifiedBy!: string
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'lastModifiedBy' })
   lastModifier!: User
 

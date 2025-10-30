@@ -9,8 +9,8 @@ import {
   Index,
   Unique
 } from 'typeorm';
-import { Seller } from './Seller.js';
-import { Product } from './Product.js';
+import type { Seller } from './Seller.js';
+import type { Product } from './Product.js';
 
 export enum SellerProductStatus {
   ACTIVE = 'active',
@@ -33,7 +33,7 @@ export class SellerProduct {
   @Column({ type: 'uuid' })
   sellerId!: string;
 
-  @ManyToOne(() => Seller, { onDelete: 'CASCADE' })
+  @ManyToOne('Seller', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'sellerId' })
   seller!: Seller;
 
@@ -41,7 +41,7 @@ export class SellerProduct {
   @Column({ type: 'uuid' })
   productId!: string;
 
-  @ManyToOne(() => Product, { onDelete: 'CASCADE' })
+  @ManyToOne('Product', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'productId' })
   product!: Product;
 

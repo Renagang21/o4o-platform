@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Page } from './Page.js';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export interface PageRevisionChanges {
   title?: { from: string; to: string };
@@ -24,7 +24,7 @@ export class PageRevision {
   @Column({ type: 'uuid' })
   pageId!: string;
 
-  @ManyToOne(() => Page, { onDelete: 'CASCADE' })
+  @ManyToOne('Page', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'pageId' })
   page!: Page;
 
@@ -34,7 +34,7 @@ export class PageRevision {
   @Column({ type: 'uuid' })
   authorId!: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'authorId' })
   author!: User;
 

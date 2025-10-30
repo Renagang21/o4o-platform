@@ -133,14 +133,14 @@ export class UserAction {
   @Column({ type: 'uuid' })
   betaUserId!: string;
 
-  @ManyToOne(() => BetaUser)
+  @ManyToOne('BetaUser')
   @JoinColumn({ name: 'betaUserId' })
   betaUser!: BetaUser;
 
   @Column({ type: 'uuid' })
   sessionId!: string;
 
-  @ManyToOne(() => UserSession)
+  @ManyToOne('UserSession')
   @JoinColumn({ name: 'sessionId' })
   session!: UserSession;
 

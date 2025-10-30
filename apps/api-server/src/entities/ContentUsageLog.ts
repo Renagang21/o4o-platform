@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Store } from './Store.js';
+import type { Store } from './Store.js';
 import { SignageContent } from './SignageContent.js';
 import { StorePlaylist } from './StorePlaylist.js';
 
@@ -43,21 +43,21 @@ export class ContentUsageLog {
   @Column()
   storeId!: string;
 
-  @ManyToOne(() => Store)
+  @ManyToOne('Store')
   @JoinColumn({ name: 'storeId' })
   store!: Store;
 
   @Column({ nullable: true })
   contentId?: string;
 
-  @ManyToOne(() => SignageContent, { nullable: true })
+  @ManyToOne('SignageContent', { nullable: true })
   @JoinColumn({ name: 'contentId' })
   content?: SignageContent;
 
   @Column({ nullable: true })
   playlistId?: string;
 
-  @ManyToOne(() => StorePlaylist, { nullable: true })
+  @ManyToOne('StorePlaylist', { nullable: true })
   @JoinColumn({ name: 'playlistId' })
   playlist?: StorePlaylist;
 

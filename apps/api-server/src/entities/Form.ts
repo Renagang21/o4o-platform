@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { FormSubmission } from './FormSubmission.js';
-import { User } from './User.js';
+import type { User } from './User.js';
 import type { FormField, FormSettings, FormNotification, FormConfirmation, FormStyling } from '../types/index.js';
 
 @Entity('forms')
@@ -45,7 +45,7 @@ export class Form {
   @Column()
   createdBy: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'createdBy' })
   creator: User;
 

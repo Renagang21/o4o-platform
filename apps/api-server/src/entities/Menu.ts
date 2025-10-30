@@ -9,7 +9,7 @@ import {
   BeforeUpdate,
   OneToMany
 } from 'typeorm';
-import { MenuItem } from './MenuItem.js';
+import type { MenuItem } from './MenuItem.js';
 
 @Entity('menus')
 export class Menu {
@@ -35,7 +35,7 @@ export class Menu {
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
 
-  @OneToMany(() => MenuItem, item => item.menu)
+  @OneToMany('MenuItem', 'menu')
   items: MenuItem[];
 
   @CreateDateColumn()

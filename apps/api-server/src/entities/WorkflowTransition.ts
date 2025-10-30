@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { WorkflowState } from './WorkflowState.js';
+import type { WorkflowState } from './WorkflowState.js';
 
 export enum TransitionTrigger {
   MANUAL = 'manual',
@@ -27,7 +27,7 @@ export class WorkflowTransition {
   workflowName: string;
 
   // Source state
-  @ManyToOne(() => WorkflowState, state => state.outgoingTransitions, {
+  @ManyToOne('WorkflowState', 'outgoingTransitions', {
     onDelete: 'CASCADE'
   })
   @JoinColumn({ name: 'from_state_id' })
@@ -37,7 +37,7 @@ export class WorkflowTransition {
   fromStateId: string;
 
   // Target state
-  @ManyToOne(() => WorkflowState, state => state.incomingTransitions, {
+  @ManyToOne('WorkflowState', 'incomingTransitions', {
     onDelete: 'CASCADE'
   })
   @JoinColumn({ name: 'to_state_id' })

@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FundingBacking } from './FundingBacking.js';
-import { FundingReward } from './FundingReward.js';
+import type { FundingBacking } from './FundingBacking.js';
+import type { FundingReward } from './FundingReward.js';
 
 @Entity('backer_rewards')
 @Index(['backingId'])
@@ -20,14 +20,14 @@ export class BackerReward {
   @Column({ type: 'uuid' })
   backingId: string;
 
-  @ManyToOne(() => FundingBacking, backing => backing.rewards, { onDelete: 'CASCADE' })
+  @ManyToOne('FundingBacking', 'rewards', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'backingId' })
   backing: FundingBacking;
 
   @Column({ type: 'uuid' })
   rewardId: string;
 
-  @ManyToOne(() => FundingReward, reward => reward.backerRewards)
+  @ManyToOne('FundingReward', 'backerRewards')
   @JoinColumn({ name: 'rewardId' })
   reward: FundingReward;
 

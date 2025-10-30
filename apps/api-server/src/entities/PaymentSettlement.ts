@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Payment } from './Payment.js';
+import type { Payment } from './Payment.js';
 
 export enum SettlementStatus {
   PENDING = 'pending',
@@ -45,7 +45,7 @@ export class PaymentSettlement {
   @Column({ type: 'uuid' })
   paymentId!: string;
 
-  @ManyToOne(() => Payment, payment => payment.settlements, { onDelete: 'CASCADE' })
+  @ManyToOne('Payment', 'settlements', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'paymentId' })
   payment!: Payment;
 

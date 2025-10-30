@@ -120,7 +120,7 @@ export class ACFField {
   @Column({ type: 'uuid' })
   fieldGroupId!: string;
 
-  @ManyToOne(() => ACFFieldGroup, { onDelete: 'CASCADE', lazy: true })
+  @ManyToOne('ACFFieldGroup', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'fieldGroupId' })
   fieldGroup!: Promise<ACFFieldGroup>;
 

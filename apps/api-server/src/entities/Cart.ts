@@ -9,8 +9,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
-import { CartItem } from './CartItem.js';
+import type { User } from './User.js';
+import type { CartItem } from './CartItem.js';
 
 export interface CartSummary {
   subtotal: number;
@@ -29,11 +29,11 @@ export class Cart {
   @Column('uuid')
   userId: string;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne('User', { nullable: false })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => CartItem, cartItem => cartItem.cart, { cascade: true })
+  @OneToMany('CartItem', 'cart', { cascade: true })
   items: CartItem[];
 
   @Column('jsonb', { nullable: true })

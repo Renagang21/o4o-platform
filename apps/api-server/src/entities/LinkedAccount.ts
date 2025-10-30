@@ -8,7 +8,7 @@ import {
   Index,
   Unique
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 import { AuthProvider } from '../types/account-linking.js';
 
 @Entity('linked_accounts')
@@ -23,7 +23,7 @@ export class LinkedAccount {
   @Column()
   userId!: string;
 
-  @ManyToOne(() => User, user => user.linkedAccounts, { onDelete: 'CASCADE' })
+  @ManyToOne('User', 'linkedAccounts', { onDelete: 'CASCADE' })
   user!: User;
 
   @Column({

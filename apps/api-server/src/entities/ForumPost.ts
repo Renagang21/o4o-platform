@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export enum PostStatus {
   DRAFT = 'draft',
@@ -97,15 +97,15 @@ export class ForumPost {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => ForumCategory, { lazy: true })
+  @ManyToOne('ForumCategory', { lazy: true })
   @JoinColumn({ name: 'categoryId' })
   category?: Promise<ForumCategory>;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'authorId' })
   author?: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'lastCommentBy' })
   lastCommenter?: User;
 

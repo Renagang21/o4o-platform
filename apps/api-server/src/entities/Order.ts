@@ -9,7 +9,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 // Enums
 export enum OrderStatus {
@@ -81,7 +81,7 @@ export class Order {
   @Column('uuid')
   buyerId: string;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne('User', { nullable: false })
   @JoinColumn({ name: 'buyerId' })
   buyer: User;
 

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Post } from './Post.js';
+import type { Post } from './Post.js';
 
 @Entity('post_autosaves')
 export class PostAutosave {
@@ -9,7 +9,7 @@ export class PostAutosave {
   @Column({ type: 'uuid' })
   post_id!: string;
 
-  @ManyToOne(() => Post, { onDelete: 'CASCADE' })
+  @ManyToOne('Post', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post!: Post;
 

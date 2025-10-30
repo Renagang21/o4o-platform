@@ -9,7 +9,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Order } from './Order.js';
+import type { Order } from './Order.js';
 import { PaymentSettlement } from './PaymentSettlement.js';
 
 export enum PaymentStatus {
@@ -83,7 +83,7 @@ export class Payment {
   @Column({ type: 'uuid' })
   orderId!: string;
 
-  @ManyToOne(() => Order, { onDelete: 'CASCADE' })
+  @ManyToOne('Order', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
   order!: Order;
 
@@ -209,7 +209,7 @@ export class Payment {
   cancelIdempotencyKey?: string; // 결제 취소 멱등성 키
 
   // Relations
-  @OneToMany(() => PaymentSettlement, settlement => settlement.payment)
+  @OneToMany('PaymentSettlement', 'payment')
   settlements!: PaymentSettlement[];
 
   // Helper Methods

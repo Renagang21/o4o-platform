@@ -18,7 +18,7 @@ export class AppUsageLog {
   @Index()
   appId!: string;
 
-  @ManyToOne(() => App, { onDelete: 'CASCADE' })
+  @ManyToOne('App', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'appId' })
   app!: App;
 

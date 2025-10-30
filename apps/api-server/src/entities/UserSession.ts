@@ -34,7 +34,7 @@ export class UserSession {
   @Column({ type: 'uuid' })
   betaUserId!: string;
 
-  @ManyToOne(() => BetaUser)
+  @ManyToOne('BetaUser')
   @JoinColumn({ name: 'betaUserId' })
   betaUser!: BetaUser;
 

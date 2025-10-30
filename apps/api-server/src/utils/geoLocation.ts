@@ -3,7 +3,7 @@
  * Replaces heavy geoip-lite package (149MB) with API-based solution
  */
 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 interface GeoLocation {
   country?: string;

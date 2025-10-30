@@ -6,7 +6,7 @@ import {
   CreateDateColumn, 
   Index 
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 import { AuthProvider } from '../types/account-linking.js';
 
 @Entity('account_activities')
@@ -19,7 +19,7 @@ export class AccountActivity {
   @Column()
   userId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE', lazy: true })
+  @ManyToOne('User', { onDelete: 'CASCADE', lazy: true })
   user!: Promise<User>;
 
   @Column({

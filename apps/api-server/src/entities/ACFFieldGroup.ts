@@ -148,7 +148,7 @@ export class ACFFieldGroup {
   @Column({ type: 'uuid', nullable: true })
   updatedBy?: string;
 
-  @OneToMany(() => ACFField, field => field.fieldGroup)
+  @OneToMany('ACFField', 'fieldGroup')
   fields!: ACFField[];
 
   // Helper methods

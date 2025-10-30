@@ -30,7 +30,7 @@ export class AutomationLog {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToOne(() => AutomationRule)
+  @ManyToOne('AutomationRule')
   @JoinColumn({ name: 'ruleId' })
   rule!: AutomationRule;
 }

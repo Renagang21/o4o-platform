@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FundingProject } from './FundingProject.js';
+import type { FundingProject } from './FundingProject.js';
 
 @Entity('funding_updates')
 @Index(['projectId', 'createdAt'])
@@ -19,7 +19,7 @@ export class FundingUpdate {
   @Column({ type: 'uuid' })
   projectId: string;
 
-  @ManyToOne(() => FundingProject, project => project.updates, { onDelete: 'CASCADE' })
+  @ManyToOne('FundingProject', 'updates', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: FundingProject;
 

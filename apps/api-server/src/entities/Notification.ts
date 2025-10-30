@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export interface NotificationData {
   title: string;
@@ -41,7 +41,7 @@ export class Notification {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'recipientId' })
   recipient!: User;
 }

@@ -1,7 +1,7 @@
 import { Router, Request } from 'express';
 import { body, validationResult } from 'express-validator';
-import * as jwt from 'jsonwebtoken';
-import * as bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import { authenticate } from '../middleware/auth.middleware.js';
@@ -22,7 +22,7 @@ router.post('/login',
       throw new ValidationError('Validation failed', errors.array());
     }
       const { email, password } = req.body;
-      
+
     // Check if database is initialized
     if (!AppDataSource.isInitialized) {
       throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');

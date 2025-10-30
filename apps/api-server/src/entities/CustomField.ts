@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
-import { User } from './User.js'
+import type { User } from './User.js'
 
 export interface FieldOption {
   label: string
@@ -37,7 +37,7 @@ export class FieldGroup {
   @Column({ type: 'text', nullable: true })
   description!: string
 
-  @OneToMany(() => CustomField, field => field.fieldGroup)
+  @OneToMany('CustomField', 'fieldGroup')
   fields!: CustomField[]
 
   @Column({ type: 'json' })
@@ -150,7 +150,7 @@ export class CustomField {
   @Column({ type: 'uuid' })
   groupId!: string
 
-  @ManyToOne(() => FieldGroup, group => group.fields, { onDelete: 'CASCADE' })
+  @ManyToOne('FieldGroup', 'fields', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'groupId' })
   fieldGroup!: FieldGroup
 
@@ -169,7 +169,7 @@ export class CustomFieldValue {
   @Column({ type: 'uuid' })
   fieldId!: string
 
-  @ManyToOne(() => CustomField, { onDelete: 'CASCADE' })
+  @ManyToOne('CustomField', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'fieldId' })
   field!: CustomField
 

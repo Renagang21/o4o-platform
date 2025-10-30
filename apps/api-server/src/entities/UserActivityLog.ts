@@ -7,7 +7,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export enum ActivityType {
   // Authentication
@@ -108,7 +108,7 @@ export class UserActivityLog {
   @Column({ type: 'uuid' })
   userId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;
 
@@ -139,7 +139,7 @@ export class UserActivityLog {
   @Column({ type: 'uuid', nullable: true })
   performedByUserId?: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'performedByUserId' })
   performedBy?: User;
 

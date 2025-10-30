@@ -9,7 +9,7 @@ export class ShipmentTrackingHistory {
   @Column({ name: 'shipment_id' })
   shipmentId!: number;
 
-  @ManyToOne(() => Shipment)
+  @ManyToOne('Shipment')
   @JoinColumn({ name: 'shipment_id' })
   shipment?: Shipment;
 

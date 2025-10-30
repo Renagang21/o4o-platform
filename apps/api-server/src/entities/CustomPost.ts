@@ -70,7 +70,7 @@ export class CustomPost {
   @Column({ type: 'timestamp', nullable: true, name: 'publishedat' })
   publishedAt?: Date;
 
-  @ManyToOne(() => CustomPostType, cpt => cpt.posts)
+  @ManyToOne('CustomPostType', 'posts')
   @JoinColumn({ name: 'posttypeslug', referencedColumnName: 'slug' })
   postType!: CustomPostType;
 

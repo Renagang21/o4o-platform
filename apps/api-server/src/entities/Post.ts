@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinColumn, JoinTable } from 'typeorm'
-import { User } from './User.js'
-import { Category } from './Category.js'
-import { Tag } from './Tag.js'
+import type { User } from './User.js'
+import type { Category } from './Category.js'
+import type { Tag } from './Tag.js'
 import { AccessControl } from '@o4o/types'
 
 export interface Block {
@@ -104,7 +104,7 @@ export class Post {
   meta!: Record<string, any>
 
   // Categories and Tags (Many-to-Many relationships)
-  @ManyToMany(() => Category, category => category.posts, { nullable: true, cascade: true })
+  @ManyToMany('Category', 'posts', { nullable: true, cascade: true })
   @JoinTable({
     name: 'post_categories',
     joinColumn: { name: 'postId', referencedColumnName: 'id' },
@@ -112,7 +112,7 @@ export class Post {
   })
   categories!: Category[]
 
-  @ManyToMany(() => Tag, tag => tag.posts, { nullable: true, cascade: true })
+  @ManyToMany('Tag', 'posts', { nullable: true, cascade: true })
   @JoinTable({
     name: 'post_tag_relationships',
     joinColumn: { name: 'postId', referencedColumnName: 'id' },
@@ -137,7 +137,7 @@ export class Post {
   @Column({ type: 'uuid' })
   author_id!: string
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
   author!: User
 

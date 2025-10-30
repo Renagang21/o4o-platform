@@ -9,10 +9,10 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { User } from '../User.js';
-import { FundingReward } from './FundingReward.js';
-import { FundingBacking } from './FundingBacking.js';
-import { FundingUpdate } from './FundingUpdate.js';
+import type { User } from '../User.js';
+import type { FundingReward } from './FundingReward.js';
+import type { FundingBacking } from './FundingBacking.js';
+import type { FundingUpdate } from './FundingUpdate.js';
 import type { FundingStatus, FundingCategory } from '../../types/crowdfunding-types.js';
 
 @Entity('funding_projects')
@@ -45,7 +45,7 @@ export class FundingProject {
   @Column({ type: 'uuid' })
   creatorId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'creatorId' })
   creator: User;
 
@@ -142,10 +142,10 @@ export class FundingProject {
   rejectionReason: string;
 
   // Relations
-  @OneToMany(() => FundingReward, reward => reward.project)
+  @OneToMany('FundingReward', 'project')
   rewards!: FundingReward[];
 
-  @OneToMany(() => FundingBacking, backing => backing.project)
+  @OneToMany('FundingBacking', 'project')
   backings!: FundingBacking[];
 
   @OneToMany('FundingUpdate', 'project')

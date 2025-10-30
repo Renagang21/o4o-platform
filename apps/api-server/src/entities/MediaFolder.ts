@@ -14,7 +14,7 @@ export class MediaFolder {
   @Column({ type: 'uuid', nullable: true })
   parentId!: string
 
-  @ManyToOne(() => MediaFolder, { nullable: true, lazy: true })
+  @ManyToOne('MediaFolder', { nullable: true, lazy: true })
   @JoinColumn({ name: 'parentId' })
   parent!: Promise<MediaFolder>
 

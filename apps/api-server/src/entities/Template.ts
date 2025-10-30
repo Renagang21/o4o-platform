@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
-import { User } from './User.js'
+import type { User } from './User.js'
 
 export interface TemplateBlock {
   id: string
@@ -58,7 +58,7 @@ export class Template {
   @Column({ type: 'uuid', nullable: true })
   authorId!: string
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'author_id' })
   author!: User
 

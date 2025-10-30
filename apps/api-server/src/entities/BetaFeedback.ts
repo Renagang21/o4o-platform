@@ -9,9 +9,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaUser } from './BetaUser.js';
-import { User } from './User.js';
-import { FeedbackConversation } from './FeedbackConversation.js';
+import type { BetaUser } from './BetaUser.js';
+import type { User } from './User.js';
+import type { FeedbackConversation } from './FeedbackConversation.js';
 
 export enum FeedbackType {
   BUG_REPORT = 'bug_report',           // 버그 신고
@@ -191,19 +191,19 @@ export class BetaFeedback {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => BetaUser, betaUser => betaUser.feedback)
+  @ManyToOne('BetaUser', 'feedback')
   @JoinColumn({ name: 'betaUserId' })
   betaUser?: BetaUser;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'assignedTo' })
   assignee?: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'respondedBy' })
   responder?: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'resolvedBy' })
   resolver?: User;
 

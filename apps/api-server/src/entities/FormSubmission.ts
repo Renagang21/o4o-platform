@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { Form } from './Form.js';
-import { User } from './User.js';
+import type { Form } from './Form.js';
+import type { User } from './User.js';
 
 @Entity('form_submissions')
 @Index(['formId', 'status'])
@@ -16,7 +16,7 @@ export class FormSubmission {
   @Column()
   formId: string;
 
-  @ManyToOne(() => Form, form => form.submissions, { onDelete: 'CASCADE' })
+  @ManyToOne('Form', 'submissions', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'formId' })
   form: Form;
 
@@ -30,7 +30,7 @@ export class FormSubmission {
   @Column({ nullable: true })
   userId: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
 

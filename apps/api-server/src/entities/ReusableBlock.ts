@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm'
-import { User } from './User.js'
+import type { User } from './User.js'
 
 export interface BlockContent {
   id: string
@@ -82,14 +82,14 @@ export class ReusableBlock {
   @Index()
   authorId!: string
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
   author!: User
 
   @Column({ type: 'uuid', nullable: true })
   lastModifiedBy!: string
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'lastModifiedBy' })
   lastModifier!: User
 

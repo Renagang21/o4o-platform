@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 import { CrowdfundingProject } from './CrowdfundingProject.js';
 
 export type ParticipationStatus = 'joined' | 'cancelled';
@@ -13,14 +13,14 @@ export class CrowdfundingParticipation {
   @Column({ name: 'project_id' })
   projectId: string;
 
-  @ManyToOne(() => CrowdfundingProject, project => project.participations, { onDelete: 'CASCADE' })
+  @ManyToOne('CrowdfundingProject', 'participations', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'project_id' })
   project: CrowdfundingProject;
 
   @Column({ name: 'vendor_id' })
   vendorId: string;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne('User', { eager: true })
   @JoinColumn({ name: 'vendor_id' })
   vendor: User;
 

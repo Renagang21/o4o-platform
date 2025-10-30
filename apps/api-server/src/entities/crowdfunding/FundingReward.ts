@@ -9,8 +9,8 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FundingProject } from './FundingProject.js';
-import { BackerReward } from './BackerReward.js';
+import type { FundingProject } from './FundingProject.js';
+import type { BackerReward } from './BackerReward.js';
 
 @Entity('funding_rewards')
 @Index(['projectId', 'sortOrder'])
@@ -21,7 +21,7 @@ export class FundingReward {
   @Column({ type: 'uuid' })
   projectId: string;
 
-  @ManyToOne(() => FundingProject, project => project.rewards, { onDelete: 'CASCADE' })
+  @ManyToOne('FundingProject', 'rewards', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: FundingProject;
 

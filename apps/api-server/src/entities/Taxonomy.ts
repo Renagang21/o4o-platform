@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, Tree, TreeParent, TreeChildren } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export interface TaxonomySettings {
   hierarchical?: boolean;
@@ -102,7 +102,7 @@ export class Taxonomy {
   @Column()
   createdBy!: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'createdBy' })
   creator!: User;
 
@@ -112,7 +112,7 @@ export class Taxonomy {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @OneToMany(() => Term, term => term.taxonomy)
+  @OneToMany('Term', 'taxonomy')
   terms!: Term[];
 }
 
@@ -137,7 +137,7 @@ export class Term {
   @Column({ type: 'uuid' })
   taxonomyId!: string;
 
-  @ManyToOne(() => Taxonomy, taxonomy => taxonomy.terms, { onDelete: 'CASCADE' })
+  @ManyToOne('Taxonomy', 'terms', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'taxonomyId' })
   taxonomy!: Taxonomy;
 
@@ -183,7 +183,7 @@ export class TermRelationship {
   @Column({ type: 'uuid' })
   termId!: string;
 
-  @ManyToOne(() => Term, { onDelete: 'CASCADE' })
+  @ManyToOne('Term', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'termId' })
   term!: Term;
 

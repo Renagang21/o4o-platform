@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Store } from './Store.js';
+import type { Store } from './Store.js';
 import { StorePlaylist } from './StorePlaylist.js';
 
 export enum ScheduleType {
@@ -63,14 +63,14 @@ export class SignageSchedule {
   @Column()
   storeId!: string;
 
-  @ManyToOne(() => Store, { lazy: true })
+  @ManyToOne('Store', { lazy: true })
   @JoinColumn({ name: 'storeId' })
   store!: Promise<Store>;
 
   @Column()
   playlistId!: string;
 
-  @ManyToOne(() => StorePlaylist)
+  @ManyToOne('StorePlaylist')
   @JoinColumn({ name: 'playlistId' })
   playlist!: StorePlaylist;
 

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Index } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 @Entity('email_verification_tokens')
 @Index(['token'], { unique: true })
@@ -14,7 +14,7 @@ export class EmailVerificationToken {
   @Column()
   userId: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   user: User;
 
   @Column({ type: 'timestamp' })

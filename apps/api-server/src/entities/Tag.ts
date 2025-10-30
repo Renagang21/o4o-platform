@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from 'typeorm';
-import { Post } from './Post.js';
+import type { Post } from './Post.js';
 
 @Entity('tags')
 export class Tag {
@@ -23,7 +23,7 @@ export class Tag {
   meta!: Record<string, any>;
 
   // Relations
-  @ManyToMany(() => Post, post => post.tags)
+  @ManyToMany('Post', 'tags')
   posts!: Post[];
 
   @CreateDateColumn()

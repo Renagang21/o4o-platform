@@ -7,7 +7,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export type ApprovalAction = 'approved' | 'rejected' | 'status_changed' | 'pending';
 
@@ -52,11 +52,11 @@ export class ApprovalLog {
   updated_at?: Date;
 
   // Relations
-  @ManyToOne(() => User, user => user.approvalLogs)
+  @ManyToOne('User', 'approvalLogs')
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => User, user => user.adminActions)
+  @ManyToOne('User', 'adminActions')
   @JoinColumn({ name: 'admin_id' })
   admin: User;
 }

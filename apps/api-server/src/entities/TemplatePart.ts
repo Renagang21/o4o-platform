@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm'
-import { User } from './User.js'
+import type { User } from './User.js'
 
 export interface TemplatePartBlock {
   id: string
@@ -69,7 +69,7 @@ export class TemplatePart {
   @Column({ name: 'author_id', type: 'uuid', nullable: true })
   authorId!: string
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'author_id' })
   author!: User
 

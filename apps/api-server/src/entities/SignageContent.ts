@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export enum ContentType {
   YOUTUBE = 'youtube',
@@ -58,14 +58,14 @@ export class SignageContent {
   @Column()
   createdBy!: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'createdBy' })
   creator!: User;
 
   @Column({ nullable: true })
   approvedBy?: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'approvedBy' })
   approver?: User;
 

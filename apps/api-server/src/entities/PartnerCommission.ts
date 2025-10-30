@@ -8,10 +8,10 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Partner } from './Partner.js';
-import { Product } from './Product.js';
-import { Seller } from './Seller.js';
-import { Order } from './Order.js';
+import type { Partner } from './Partner.js';
+import type { Product } from './Product.js';
+import type { Seller } from './Seller.js';
+import type { Order } from './Order.js';
 
 export enum CommissionStatus {
   PENDING = 'pending',     // 주문 완료, 커미션 대기
@@ -42,7 +42,7 @@ export class PartnerCommission {
   @Column({ type: 'uuid' })
   partnerId!: string;
 
-  @ManyToOne(() => Partner, { onDelete: 'CASCADE' })
+  @ManyToOne('Partner', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'partnerId' })
   partner!: Partner;
 
@@ -50,7 +50,7 @@ export class PartnerCommission {
   @Column({ type: 'uuid' })
   orderId!: string;
 
-  @ManyToOne(() => Order, { onDelete: 'CASCADE' })
+  @ManyToOne('Order', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
   order?: Order;
 
@@ -58,7 +58,7 @@ export class PartnerCommission {
   @Column({ type: 'uuid' })
   productId!: string;
 
-  @ManyToOne(() => Product, { onDelete: 'CASCADE' })
+  @ManyToOne('Product', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'productId' })
   product!: Product;
 
@@ -66,7 +66,7 @@ export class PartnerCommission {
   @Column({ type: 'uuid' })
   sellerId!: string;
 
-  @ManyToOne(() => Seller, { onDelete: 'CASCADE' })
+  @ManyToOne('Seller', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'sellerId' })
   seller!: Seller;
 

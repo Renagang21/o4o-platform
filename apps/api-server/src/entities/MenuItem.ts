@@ -11,7 +11,7 @@ import {
   TreeParent,
   Index
 } from 'typeorm';
-import { Menu } from './Menu.js';
+import type { Menu } from './Menu.js';
 
 export enum MenuItemType {
   PAGE = 'page',
@@ -45,7 +45,7 @@ export class MenuItem {
   @Index()
   menu_id: string;
 
-  @ManyToOne(() => Menu, { onDelete: 'CASCADE' })
+  @ManyToOne('Menu', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menu_id' })
   menu: Menu;
 

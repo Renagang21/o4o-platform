@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 @Entity('media')
 @Index('idx_media_userId', ['userId'])
@@ -57,7 +57,7 @@ export class Media {
   @Column({ name: 'user_id', type: 'uuid', nullable: true })
   userId?: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'user_id' })
   user?: User;
 

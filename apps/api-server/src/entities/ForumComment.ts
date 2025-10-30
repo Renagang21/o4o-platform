@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { ForumPost } from './ForumPost.js';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 export enum CommentStatus {
   PUBLISHED = 'publish',
@@ -54,15 +54,15 @@ export class ForumComment {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => ForumPost, { lazy: true })
+  @ManyToOne('ForumPost', { lazy: true })
   @JoinColumn({ name: 'postId' })
   post?: Promise<ForumPost>;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'authorId' })
   author?: User;
 
-  @ManyToOne(() => ForumComment, { nullable: true, lazy: true })
+  @ManyToOne('ForumComment', { nullable: true, lazy: true })
   @JoinColumn({ name: 'parentId' })
   parent?: Promise<ForumComment>;
 

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { Post } from './Post.js';
-import { User } from './User.js';
+import type { Post } from './Post.js';
+import type { User } from './User.js';
 
 export interface RevisionChanges {
   title?: { from: string; to: string };
@@ -22,7 +22,7 @@ export class PostRevision {
   @Column({ type: 'uuid' })
   postId!: string;
 
-  @ManyToOne(() => Post, { onDelete: 'CASCADE' })
+  @ManyToOne('Post', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
   post!: Post;
 
@@ -32,7 +32,7 @@ export class PostRevision {
   @Column({ type: 'uuid' })
   authorId!: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne('User')
   @JoinColumn({ name: 'authorId' })
   author!: User;
 

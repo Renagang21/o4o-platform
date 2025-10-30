@@ -6,7 +6,7 @@ import {
   CreateDateColumn, 
   Index 
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 import { AuthProvider, LinkingStatus } from '../types/account-linking.js';
 
 @Entity('linking_sessions')
@@ -19,7 +19,7 @@ export class LinkingSession {
   @Column()
   userId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   user!: User;
 
   @Column({

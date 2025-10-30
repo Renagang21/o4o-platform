@@ -9,9 +9,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaFeedback } from './BetaFeedback.js';
-import { BetaUser } from './BetaUser.js';
-import { User } from './User.js';
+import type { BetaFeedback } from './BetaFeedback.js';
+import type { BetaUser } from './BetaUser.js';
+import type { User } from './User.js';
 
 export enum ConversationStatus {
   ACTIVE = 'active',
@@ -93,19 +93,19 @@ export class FeedbackConversation {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => BetaFeedback, feedback => feedback.conversations)
+  @ManyToOne('BetaFeedback', 'conversations')
   @JoinColumn({ name: 'feedbackId' })
   feedback!: BetaFeedback;
 
-  @ManyToOne(() => BetaUser, betaUser => betaUser.conversations)
+  @ManyToOne('BetaUser', 'conversations')
   @JoinColumn({ name: 'betaUserId' })
   betaUser!: BetaUser;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'assignedTo' })
   assignee?: User;
 
-  @OneToMany(() => ConversationMessage, message => message.conversation)
+  @OneToMany('ConversationMessage', 'conversation')
   messages!: ConversationMessage[];
 
   // Methods
@@ -248,15 +248,15 @@ export class ConversationMessage {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => FeedbackConversation, conversation => conversation.messages)
+  @ManyToOne('FeedbackConversation', 'messages')
   @JoinColumn({ name: 'conversationId' })
   conversation!: FeedbackConversation;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'senderId' })
   sender?: User;
 
-  @ManyToOne(() => ConversationMessage, { nullable: true })
+  @ManyToOne('ConversationMessage', { nullable: true })
   @JoinColumn({ name: 'replyToId' })
   replyTo?: ConversationMessage;
 

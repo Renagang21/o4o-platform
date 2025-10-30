@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 
 @Entity('forum_category')
 @Index(['isActive', 'sortOrder'])
@@ -53,7 +53,7 @@ export class ForumCategory {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'createdBy' })
   creator?: User;
 

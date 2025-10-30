@@ -9,9 +9,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
-import { Category } from './Category.js';
-import { Supplier } from './Supplier.js';
+import type { User } from './User.js';
+import type { Category } from './Category.js';
+import type { Supplier } from './Supplier.js';
 
 export enum ProductStatus {
   DRAFT = 'draft',
@@ -81,7 +81,7 @@ export class Product {
   @Column({ type: 'uuid' })
   supplierId!: string;
 
-  @ManyToOne(() => Supplier, { onDelete: 'CASCADE' })
+  @ManyToOne('Supplier', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'supplierId' })
   supplier!: Supplier;
 
@@ -89,7 +89,7 @@ export class Product {
   @Column({ type: 'uuid', nullable: true })
   categoryId?: string;
 
-  @ManyToOne(() => Category, { nullable: true })
+  @ManyToOne('Category', { nullable: true })
   @JoinColumn({ name: 'categoryId' })
   category?: Category;
 

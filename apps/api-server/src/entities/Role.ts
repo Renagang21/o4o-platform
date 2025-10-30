@@ -8,7 +8,7 @@ import {
   ManyToMany,
   JoinTable
 } from 'typeorm';
-import { Permission } from './Permission.js';
+import type { Permission } from './Permission.js';
 
 @Entity('roles')
 @Index(['name'], { unique: true })
@@ -44,7 +44,7 @@ export class Role {
   updatedAt!: Date;
 
   // Relations
-  @ManyToMany(() => Permission, permission => permission.roles, { eager: true })
+  @ManyToMany('Permission', 'roles', { eager: true })
   @JoinTable({
     name: 'role_permissions',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },

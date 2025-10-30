@@ -9,9 +9,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import type { User } from './User.js';
 import { BusinessInfo } from './BusinessInfo.js';
-import { Product } from './Product.js';
+import type { Product } from './Product.js';
 
 export enum SupplierStatus {
   PENDING = 'pending',
@@ -63,17 +63,17 @@ export class Supplier {
   @Column({ type: 'uuid', unique: true })
   userId!: string;
 
-  @OneToOne(() => User, user => user.supplier, { onDelete: 'CASCADE' })
+  @OneToOne('User', 'supplier', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;
 
   // BusinessInfo relationship (One-to-One)
-  @OneToOne(() => BusinessInfo, { cascade: true })
+  @OneToOne('BusinessInfo', { cascade: true })
   @JoinColumn()
   businessInfo!: BusinessInfo;
 
   // Products relationship (One-to-Many)
-  @OneToMany(() => Product, product => product.supplier)
+  @OneToMany('Product', 'supplier')
   products!: Product[];
 
   // Supplier Status and Tier
