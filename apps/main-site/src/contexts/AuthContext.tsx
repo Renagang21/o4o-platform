@@ -113,10 +113,24 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       // 토큰 유효성 검증
       const response = await authAPI.verifyToken();
       const verifyData: AuthVerifyResponse = response.data;
-      
+
       if (verifyData.valid) {
         // 서버에서 받은 최신 사용자 정보 사용
         const normalizedUser = normalizeUserData(verifyData.user);
+
+        // preferences 로드 (currentRole, defaultRole)
+        try {
+          const prefsResponse = await authAPI.getPreferences();
+          if (prefsResponse.data.success) {
+            normalizedUser.currentRole = prefsResponse.data.data.currentRole;
+            normalizedUser.defaultRole = prefsResponse.data.data.defaultRole;
+            normalizedUser.roles = prefsResponse.data.data.availableRoles;
+          }
+        } catch (error) {
+          // preferences 로드 실패 시 무시하고 계속 진행
+          console.warn('Failed to load user preferences:', error);
+        }
+
         setUser(normalizedUser);
       } else {
         // 토큰이 유효하지 않으면 로그아웃

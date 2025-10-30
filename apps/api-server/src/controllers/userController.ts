@@ -183,4 +183,115 @@ export class UserController {
       });
     }
   }
+
+  // 사용자 preferences 조회
+  async getPreferences(req: Request, res: Response) {
+    try {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { id: (authReq.user as any).id || (authReq.user as any).userId },
+        relations: ['dbRoles', 'activeRole']
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      const activeRole = user.getActiveRole();
+      const defaultRole = user.dbRoles && user.dbRoles.length > 0 ? user.dbRoles[0] : null;
+
+      res.json({
+        success: true,
+        data: {
+          currentRole: activeRole ? activeRole.name : null,
+          defaultRole: defaultRole ? defaultRole.name : null,
+          availableRoles: user.getRoleNames(),
+          canSwitchRoles: user.hasMultipleRoles()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Internal server error'
+      });
+    }
+  }
+
+  // 사용자 preferences 업데이트
+  async updatePreferences(req: Request, res: Response) {
+    try {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const { currentRole } = req.body;
+
+      if (!currentRole) {
+        return res.status(400).json({
+          success: false,
+          message: 'currentRole is required'
+        });
+      }
+
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { id: (authReq.user as any).id || (authReq.user as any).userId },
+        relations: ['dbRoles', 'activeRole']
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      // 요청된 역할이 사용자의 역할 목록에 있는지 확인
+      const targetRole = user.dbRoles?.find(r => r.name === currentRole);
+      if (!targetRole) {
+        return res.status(403).json({
+          success: false,
+          message: 'You do not have permission to switch to this role'
+        });
+      }
+
+      // activeRole 업데이트
+      user.activeRole = targetRole;
+      await userRepository.save(user);
+
+      const activeRole = user.getActiveRole();
+      const defaultRole = user.dbRoles && user.dbRoles.length > 0 ? user.dbRoles[0] : null;
+
+      res.json({
+        success: true,
+        data: {
+          currentRole: activeRole ? activeRole.name : null,
+          defaultRole: defaultRole ? defaultRole.name : null,
+          availableRoles: user.getRoleNames(),
+          canSwitchRoles: user.hasMultipleRoles()
+        },
+        message: 'Role switched successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Internal server error'
+      });
+    }
+  }
 }

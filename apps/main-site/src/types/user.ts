@@ -45,6 +45,8 @@ export interface User {
   phone?: string;
   role?: UserRole;                // 강타입 UserRole (선택사항)
   roles?: UserRole[];             // 호환성을 위한 배열 형태
+  currentRole?: UserRole;         // 현재 활성 역할 (역할 전환용)
+  defaultRole?: UserRole;         // 기본 역할
   userType: 'admin' | 'supplier' | 'retailer' | 'customer'; // 프론트엔드 타입 (필수)
   status: UserStatus;
   businessInfo?: BusinessInfo;

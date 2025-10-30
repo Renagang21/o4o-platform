@@ -13,6 +13,10 @@ router.get('/profile', authenticate, userController.getProfile.bind(userControll
 // 비즈니스 정보 업데이트
 router.put('/business-info', authenticate, userController.updateBusinessInfo.bind(userController));
 
+// 사용자 preferences (역할 전환)
+router.get('/preferences', authenticate, userController.getPreferences.bind(userController));
+router.patch('/preferences', authenticate, userController.updatePreferences.bind(userController));
+
 // 관리자 전용 라우트
 router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), userController.getUsers.bind(userController));
 router.put('/:userId/role', requireAdmin, userController.updateUserRole.bind(userController));

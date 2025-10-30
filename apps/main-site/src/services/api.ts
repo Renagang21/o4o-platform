@@ -102,6 +102,16 @@ export const authAPI = {
   // 토큰 검증
   verifyToken: () => {
     return apiClient.get('/auth/verify');
+  },
+
+  // 사용자 preferences 조회
+  getPreferences: () => {
+    return apiClient.get('/user/preferences');
+  },
+
+  // 사용자 preferences 업데이트 (역할 전환)
+  updatePreferences: (data: { currentRole: string }) => {
+    return apiClient.patch('/user/preferences', data);
   }
 };
 

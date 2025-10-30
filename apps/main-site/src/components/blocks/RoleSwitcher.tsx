@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Check } from 'lucide-react';
 import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
+import { authAPI } from '../../services/api';
+import toast from 'react-hot-toast';
 
 interface RoleSwitcherProps {
   data?: {
@@ -28,9 +30,9 @@ interface RoleOption {
  */
 export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const { showLabel = true, className = '' } = data;
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
   const navigate = useNavigate();
-  const [isSettingDefault, setIsSettingDefault] = useState(false);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   // Not authenticated or single role - don't show
   if (!isAuthenticated || !user || !user.roles || user.roles.length <= 1) {
@@ -72,41 +74,42 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const defaultRole = user.defaultRole || user.roles[0];
 
   const handleRoleSwitch = async (newRole: string) => {
+    if (isSwitching) return;
+
     try {
-      // TODO: API 호출 - PATCH /me/preferences { currentRole: newRole }
-      // await authClient.api.patch('/me/preferences', { currentRole: newRole });
+      setIsSwitching(true);
 
-      // SPA 라우팅
-      const targetPath = roleOptions[newRole]?.path || '/';
-      navigate(targetPath);
+      // API 호출 - PATCH /user/preferences
+      const response = await authAPI.updatePreferences({ currentRole: newRole });
 
-      // 상태 업데이트는 AuthContext에서 자동 처리
-      console.log(`역할 전환: ${currentRole} → ${newRole}`);
-    } catch (error) {
+      if (response.data.success) {
+        // 사용자 상태 업데이트
+        updateUser({
+          currentRole: response.data.data.currentRole,
+          defaultRole: response.data.data.defaultRole,
+          roles: response.data.data.availableRoles
+        });
+
+        // SPA 라우팅
+        const targetPath = roleOptions[newRole]?.path || '/';
+        navigate(targetPath);
+
+        toast.success(`${roleOptions[newRole]?.name}로 전환되었습니다.`);
+      }
+    } catch (error: any) {
       console.error('역할 전환 실패:', error);
-    }
-  };
-
-  const handleSetDefault = async (roleId: string) => {
-    try {
-      setIsSettingDefault(true);
-
-      // TODO: API 호출 - PATCH /me/preferences { defaultRole: roleId }
-      // await authClient.api.patch('/me/preferences', { defaultRole: roleId });
-
-      console.log(`기본 역할 설정: ${roleId}`);
-    } catch (error) {
-      console.error('기본 역할 설정 실패:', error);
+      toast.error(error.response?.data?.message || '역할 전환에 실패했습니다.');
     } finally {
-      setIsSettingDefault(false);
+      setIsSwitching(false);
     }
   };
 
   const trigger = (
     <button
-      className="role-switcher-toggle flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+      className="role-switcher-toggle flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       aria-label="역할 전환"
       tabIndex={0}
+      disabled={isSwitching}
     >
       <Users size={18} />
       {showLabel && <span className="text-sm font-medium">역할 전환</span>}
@@ -137,12 +140,12 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
               <div key={roleId} className="px-2">
                 <button
                   onClick={() => handleRoleSwitch(roleId)}
-                  className={`w-full flex items-start gap-3 px-3 py-2 rounded-md transition-colors ${
+                  className={`w-full flex items-start gap-3 px-3 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     isCurrent
                       ? 'bg-blue-50 text-blue-900'
                       : 'hover:bg-gray-50 text-gray-700'
                   }`}
-                  disabled={isCurrent}
+                  disabled={isCurrent || isSwitching}
                 >
                   <span className="text-lg mt-0.5">{role.icon}</span>
                   <div className="flex-1 text-left">
@@ -162,20 +165,6 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
                     </div>
                   </div>
                 </button>
-
-                {/* Set Default Checkbox */}
-                {isCurrent && !isDefault && (
-                  <label className="flex items-center gap-2 px-3 py-1.5 mt-1 text-xs text-gray-600 cursor-pointer hover:text-gray-900">
-                    <input
-                      type="checkbox"
-                      checked={false}
-                      onChange={() => handleSetDefault(roleId)}
-                      disabled={isSettingDefault}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span>기본 역할로 설정</span>
-                  </label>
-                )}
               </div>
             );
           })}

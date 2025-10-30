@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useMenu } from '../../hooks/useMenu';
+import { useAuth } from '../../contexts/AuthContext';
+import RoleSwitcher from '../blocks/RoleSwitcher';
 import './HamburgerMenu.css';
 
 interface MenuItem {
@@ -25,6 +27,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const { user, isAuthenticated } = useAuth();
 
   // Fetch menu data using the hook
   const { items: menuItems, isLoading: loading, error } = useMenu({
@@ -167,6 +170,13 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
           <ul className="hm-list">
             {displayMenuItems.map(item => renderMenuItem(item))}
           </ul>
+
+          {/* Role Switcher (모바일 전용) */}
+          {isAuthenticated && user && user.roles && user.roles.length > 1 && (
+            <div className="hm-role-switcher px-4 py-3 border-t border-gray-200 mt-4">
+              <RoleSwitcher data={{ showLabel: true }} />
+            </div>
+          )}
         </nav>
       </div>
     </>
