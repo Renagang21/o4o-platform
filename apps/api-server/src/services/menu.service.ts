@@ -51,10 +51,11 @@ class MenuService {
     }
 
     // Get tree structure for menu items
+    // Note: TypeORM Tree uses "parentId" column internally, not "parent"
     const rootItems = await this.menuItemRepository
       .createQueryBuilder('item')
       .where('item.menu_id = :menuId', { menuId: id })
-      .andWhere('item.parent IS NULL')
+      .andWhere('item.parentId IS NULL')
       .orderBy('item.order_num', 'ASC')
       .getMany();
 
