@@ -91,7 +91,7 @@ jobs:
             bash /home/ubuntu/o4o-platform/scripts/ensure-ai-settings.sh
           else
             echo "⚠️ AI settings script not found, creating table directly..."
-            npx typeorm-ts-node-commonjs query "CREATE TABLE IF NOT EXISTS ai_settings (id SERIAL PRIMARY KEY, provider VARCHAR(255) NOT NULL UNIQUE, apiKey TEXT, defaultModel VARCHAR(255), settings JSON, isActive BOOLEAN DEFAULT true, createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)" -d src/database/data-source.ts 2>/dev/null || echo "Table may already exist"
+            npx typeorm-ts-node-commonjs -d src/database/data-source.ts query "CREATE TABLE IF NOT EXISTS ai_settings (id SERIAL PRIMARY KEY, provider VARCHAR(255) NOT NULL UNIQUE, apiKey TEXT, defaultModel VARCHAR(255), settings JSON, isActive BOOLEAN DEFAULT true, createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)" 2>/dev/null || echo "Table may already exist"
           fi
           
           # Restart PM2 API server
