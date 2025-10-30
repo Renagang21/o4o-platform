@@ -24,6 +24,7 @@
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"],
   "references": [
     { "path": "../slide-app" },
-    { "path": "../types" }
+    { "path": "../types" },
+    { "path": "../shortcodes" }
   ]
 }

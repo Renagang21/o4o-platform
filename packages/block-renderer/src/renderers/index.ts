@@ -34,6 +34,7 @@ import { MarkdownBlock } from './special/MarkdownBlock';
 import { HtmlBlock } from './special/HtmlBlock';
 import { EmbedBlock } from './special/EmbedBlock';
 import { CoverBlock } from './special/CoverBlock';
+import { ShortcodeBlock } from './special/ShortcodeBlock';
 
 /**
  * Register all blocks with the registry
@@ -132,6 +133,10 @@ export function registerAllBlocks() {
     'cover': CoverBlock,
     'core/cover': CoverBlock,
     'o4o/cover': CoverBlock,
+
+    'shortcode': ShortcodeBlock,
+    'core/shortcode': ShortcodeBlock,
+    'o4o/shortcode': ShortcodeBlock,
   });
 }
 
@@ -164,3 +169,4 @@ export * from './special/MarkdownBlock';
 export * from './special/HtmlBlock';
 export * from './special/EmbedBlock';
 export * from './special/CoverBlock';
+export * from './special/ShortcodeBlock';
