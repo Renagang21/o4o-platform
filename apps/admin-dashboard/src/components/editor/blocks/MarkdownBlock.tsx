@@ -511,20 +511,21 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
 
       {/* Read-only preview when not selected */}
       {!isSelected && localMarkdown && (
-        <div className="absolute inset-0 bg-white border border-gray-200 rounded-lg overflow-auto pointer-events-none">
-          <div className="flex">
-            {/* Table of Contents Sidebar (read-only) */}
+        <div className="absolute inset-0 bg-white border border-gray-200 rounded-lg overflow-auto">
+          <div className="flex pointer-events-none">
+            {/* Table of Contents Sidebar (read-only) - clickable */}
             {showTOC && (
-              <div className="w-56 flex-shrink-0 border-r border-gray-200 p-4 overflow-y-auto max-h-[600px]">
+              <div className="w-56 flex-shrink-0 border-r border-gray-200 p-4 overflow-y-auto max-h-[600px] pointer-events-auto">
                 <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wider">
                   목차
                 </h3>
                 <nav className="space-y-1">
                   {headings.map((heading) => (
-                    <div
+                    <button
                       key={heading.id}
+                      onClick={() => scrollToHeading(heading.id)}
                       className={cn(
-                        'block w-full text-left text-xs py-1.5 px-2 rounded',
+                        'block w-full text-left text-xs py-1.5 px-2 rounded transition-colors',
                         heading.level === 1 && 'font-semibold',
                         heading.level === 2 && 'font-medium',
                         heading.level >= 3 && 'font-normal text-gray-600',
@@ -532,12 +533,12 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
                         heading.level === 3 && 'pl-4',
                         heading.level === 4 && 'pl-6',
                         heading.level >= 5 && 'pl-8',
-                        'text-gray-700 border-l-2 border-transparent'
+                        'hover:bg-gray-100 text-gray-700 border-l-2 border-transparent'
                       )}
                       title={heading.text}
                     >
                       <span className="line-clamp-2">{heading.text}</span>
-                    </div>
+                    </button>
                   ))}
                 </nav>
               </div>
