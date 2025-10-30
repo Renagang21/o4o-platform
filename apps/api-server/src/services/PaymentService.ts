@@ -1,10 +1,10 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { Payment, PaymentStatus, PaymentMethod } from '../entities/Payment';
-import { PaymentSettlement, SettlementStatus, RecipientType } from '../entities/PaymentSettlement';
-import { PaymentWebhook, WebhookEventType } from '../entities/PaymentWebhook';
-import { Order } from '../entities/Order';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Payment, PaymentStatus, PaymentMethod } from '../entities/Payment.js';
+import { PaymentSettlement, SettlementStatus, RecipientType } from '../entities/PaymentSettlement.js';
+import { PaymentWebhook, WebhookEventType } from '../entities/PaymentWebhook.js';
+import { Order } from '../entities/Order.js';
+import logger from '../utils/logger.js';
 import axios, { AxiosInstance } from 'axios';
 import * as crypto from 'crypto';
 

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { CustomPost, PostStatus } from '../../entities/CustomPost';
-import { CustomPostType } from '../../entities/CustomPostType';
-import { CustomFieldValue, CustomField, FieldGroup } from '../../entities/CustomField';
-import { User } from '../../entities/User';
+import { AppDataSource } from '../../database/connection.js';
+import { CustomPost, PostStatus } from '../../entities/CustomPost.js';
+import { CustomPostType } from '../../entities/CustomPostType.js';
+import { CustomFieldValue, CustomField, FieldGroup } from '../../entities/CustomField.js';
+import { User } from '../../entities/User.js';
 
 export class DropshippingCPTController {
   // Get all products with ACF fields

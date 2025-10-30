@@ -13,10 +13,10 @@ import {
   BlockCategory,
   BlockAIReference,
   BlockRegistryResponse
-} from '../types/block.types';
-import { AppDataSource } from '../database/connection';
-import { AIReference } from '../entities/AIReference';
-import logger from '../utils/logger';
+} from '../types/block.types.js';
+import { AppDataSource } from '../database/connection.js';
+import { AIReference } from '../entities/AIReference.js';
+import logger from '../utils/logger.js';
 
 class BlockRegistryService {
   private static instance: BlockRegistryService;

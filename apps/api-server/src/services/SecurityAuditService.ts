@@ -1,5 +1,5 @@
-import logger from '../utils/logger';
-import { AppDataSource } from '../database/connection';
+import logger from '../utils/logger.js';
+import { AppDataSource } from '../database/connection.js';
 
 export interface SecurityEvent {
   id: string;

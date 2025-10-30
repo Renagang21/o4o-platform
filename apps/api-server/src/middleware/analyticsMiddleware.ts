@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { AnalyticsService } from '../services/AnalyticsService';
-import { ActionType, ActionCategory } from '../entities/UserAction';
-import { MetricType, MetricCategory } from '../entities/SystemMetrics';
+import { AnalyticsService } from '../services/AnalyticsService.js';
+import { ActionType, ActionCategory } from '../entities/UserAction.js';
+import { MetricType, MetricCategory } from '../entities/SystemMetrics.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export class AnalyticsMiddleware {

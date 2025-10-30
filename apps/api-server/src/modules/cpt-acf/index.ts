@@ -4,16 +4,16 @@
  */
 
 // Controllers
-export { CPTController } from './controllers/cpt.controller';
-export { ACFController } from './controllers/acf.controller';
+export { CPTController } from './controllers/cpt.controller.js';
+export { ACFController } from './controllers/acf.controller.js';
 
 // Services
-export { cptService } from './services/cpt.service';
-export { acfService } from './services/acf.service';
-export { blockDataService } from './services/block-data.service';
+export { cptService } from './services/cpt.service.js';
+export { acfService } from './services/acf.service.js';
+export { blockDataService } from './services/block-data.service.js';
 
 // Routes
-export { default as blockApiRoutes } from './routes/block-api.routes';
+export { default as blockApiRoutes } from './routes/block-api.routes.js';
 
 // Module info
 export const MODULE_INFO = {

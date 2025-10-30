@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import ProductService, { CreateProductRequest, UpdateProductRequest, ProductFilters } from '../services/ProductService';
-import logger from '../utils/logger';
+import ProductService, { CreateProductRequest, UpdateProductRequest, ProductFilters } from '../services/ProductService.js';
+import logger from '../utils/logger.js';
 
 export class ProductController {
   private productService: ProductService;

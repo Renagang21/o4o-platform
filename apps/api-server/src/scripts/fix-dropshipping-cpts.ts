@@ -1,6 +1,6 @@
-import { AppDataSource } from '../database/connection';
-import { CustomPostType } from '../entities/CustomPostType';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { CustomPostType } from '../entities/CustomPostType.js';
+import logger from '../utils/logger.js';
 
 const DROPSHIPPING_CPTS = [
   {

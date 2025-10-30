@@ -2,12 +2,12 @@ import { Router, Request } from 'express';
 import { body, validationResult } from 'express-validator';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
-import { AppDataSource } from '../database/connection';
-import { User, UserRole, UserStatus } from '../entities/User';
-import { authenticate } from '../middleware/auth.middleware';
-import { asyncHandler } from '../middleware/error-handler';
-import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error';
-import { env } from '../utils/env-validator';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole, UserStatus } from '../entities/User.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { asyncHandler } from '../middleware/error-handler.js';
+import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error.js';
+import { env } from '../utils/env-validator.js';
 
 const router: Router = Router();
 

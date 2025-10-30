@@ -8,8 +8,8 @@ import {
   Index,
   Unique
 } from 'typeorm';
-import { User } from './User';
-import { AuthProvider } from '../types/account-linking';
+import { User } from './User.js';
+import { AuthProvider } from '../types/account-linking.js';
 
 @Entity('linked_accounts')
 @Unique(['userId', 'provider', 'providerId'])

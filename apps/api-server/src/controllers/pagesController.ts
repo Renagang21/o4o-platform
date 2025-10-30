@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { Page, PageRevision } from '../entities/Page';
-import { User } from '../entities/User';
-import { CustomFieldValue } from '../entities/CustomField';
+import { AppDataSource } from '../database/connection.js';
+import { Page, PageRevision } from '../entities/Page.js';
+import { User } from '../entities/User.js';
+import { CustomFieldValue } from '../entities/CustomField.js';
 import { v4 as uuidv4 } from 'uuid';
 import { In } from 'typeorm';
-import type { AuthRequest } from '../types/auth';
+import type { AuthRequest } from '../types/auth.js';
 
 // Type definitions
 interface PageTreeNode extends Page {

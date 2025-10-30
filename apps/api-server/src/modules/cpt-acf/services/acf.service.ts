@@ -1,8 +1,8 @@
-import { AppDataSource } from '../../../database/connection';
-import { FieldGroup, CustomField, CustomFieldValue } from '../../../entities/CustomField';
-import { metaDataService } from '../../../services/MetaDataService';
+import { AppDataSource } from '../../../database/connection.js';
+import { FieldGroup, CustomField, CustomFieldValue } from '../../../entities/CustomField.js';
+import { metaDataService } from '../../../services/MetaDataService.js';
 import { validate } from 'class-validator';
-import logger from '../../../utils/logger';
+import logger from '../../../utils/logger.js';
 
 /**
  * ACF Service - Business logic layer for Advanced Custom Fields

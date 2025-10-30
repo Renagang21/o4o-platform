@@ -2,12 +2,12 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as KakaoStrategy } from 'passport-kakao';
 import { Strategy as NaverStrategy } from 'passport-naver-v2';
-import { AppDataSource } from '../database/connection';
-import { User, UserRole, UserStatus } from '../entities/User';
-import { emailService } from '../services/emailService';
-import { Settings as Setting } from '../entities/Settings';
-import { decrypt } from '../utils/crypto';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole, UserStatus } from '../entities/User.js';
+import { emailService } from '../services/emailService.js';
+import { Settings as Setting } from '../entities/Settings.js';
+import { decrypt } from '../utils/crypto.js';
+import logger from '../utils/logger.js';
 
 interface OAuthConfig {
   provider: string;

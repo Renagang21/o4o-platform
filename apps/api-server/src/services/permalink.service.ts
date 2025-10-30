@@ -1,11 +1,11 @@
-import { AppDataSource } from '../database/connection';
-import { Settings, PermalinkSettings } from '../entities/Settings';
-import { Post } from '../entities/Post';
-import { Page } from '../entities/Page';
-import { Category } from '../entities/Category';
-import { Tag } from '../entities/Tag';
-import { CustomPostType } from '../entities/CustomPostType';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Settings, PermalinkSettings } from '../entities/Settings.js';
+import { Post } from '../entities/Post.js';
+import { Page } from '../entities/Page.js';
+import { Category } from '../entities/Category.js';
+import { Tag } from '../entities/Tag.js';
+import { CustomPostType } from '../entities/CustomPostType.js';
+import logger from '../utils/logger.js';
 
 export interface ParsedUrl {
   type: 'post' | 'page' | 'category' | 'tag' | 'custom';

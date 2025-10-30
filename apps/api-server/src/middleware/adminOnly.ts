@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthRequest, UserRole } from '../types/auth';
+import { AuthRequest, UserRole } from '../types/auth.js';
 
 export const adminOnly = (req: Request, res: Response, next: NextFunction) => {
   const authReq = req as AuthRequest;

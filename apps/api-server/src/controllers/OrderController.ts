@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { OrderService, CreateOrderRequest, CreateOrderFromCartRequest, OrderFilters } from '../services/OrderService';
-import { OrderStatus, PaymentStatus } from '../entities/Order';
+import { OrderService, CreateOrderRequest, CreateOrderFromCartRequest, OrderFilters } from '../services/OrderService.js';
+import { OrderStatus, PaymentStatus } from '../entities/Order.js';
 import { validationResult } from 'express-validator';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 export class OrderController {
   private orderService: OrderService;

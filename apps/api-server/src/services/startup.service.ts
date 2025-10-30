@@ -1,11 +1,11 @@
-import { AppDataSource } from '../database/connection';
-import { DatabaseChecker } from '../utils/database-checker';
-import { MaterializedViewScheduler } from './MaterializedViewScheduler';
-import settlementScheduler from './SettlementScheduler';
-import { backupService } from './BackupService';
-import { errorAlertService } from './ErrorAlertService';
-import { env } from '../utils/env-validator';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { DatabaseChecker } from '../utils/database-checker.js';
+import { MaterializedViewScheduler } from './MaterializedViewScheduler.js';
+import settlementScheduler from './SettlementScheduler.js';
+import { backupService } from './BackupService.js';
+import { errorAlertService } from './ErrorAlertService.js';
+import { env } from '../utils/env-validator.js';
+import logger from '../utils/logger.js';
 
 /**
  * Startup Service

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { settingsService, SettingsType } from '../services/settingsService';
-import logger from '../utils/logger';
+import { settingsService, SettingsType } from '../services/settingsService.js';
+import logger from '../utils/logger.js';
 
 export class SettingsController {
   private readonly validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email', 'customizer', 'permalink'];

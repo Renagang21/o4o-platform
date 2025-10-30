@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { SessionSyncService } from '../services/sessionSyncService';
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { AuthRequest } from '../types/auth';
+import { SessionSyncService } from '../services/sessionSyncService.js';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { AuthRequest } from '../types/auth.js';
 
 /**
  * Middleware to validate SSO session

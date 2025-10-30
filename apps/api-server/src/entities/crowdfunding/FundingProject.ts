@@ -9,11 +9,11 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { User } from '../User';
-import { FundingReward } from './FundingReward';
-import { FundingBacking } from './FundingBacking';
-import { FundingUpdate } from './FundingUpdate';
-import type { FundingStatus, FundingCategory } from '../../types/crowdfunding-types';
+import { User } from '../User.js';
+import { FundingReward } from './FundingReward.js';
+import { FundingBacking } from './FundingBacking.js';
+import { FundingUpdate } from './FundingUpdate.js';
+import type { FundingStatus, FundingCategory } from '../../types/crowdfunding-types.js';
 
 @Entity('funding_projects')
 @Index(['status', 'endDate'])

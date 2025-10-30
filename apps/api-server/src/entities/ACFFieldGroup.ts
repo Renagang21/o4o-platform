@@ -7,7 +7,7 @@ import {
   Index,
   OneToMany
 } from 'typeorm';
-import { ACFField } from './ACFField';
+import { ACFField } from './ACFField.js';
 
 export enum LocationType {
   POST_TYPE = 'post_type',

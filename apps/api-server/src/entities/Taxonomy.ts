@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, Tree, TreeParent, TreeChildren } from 'typeorm';
-import { User } from './User';
+import { User } from './User.js';
 
 export interface TaxonomySettings {
   hierarchical?: boolean;

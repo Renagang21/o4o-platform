@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Store } from './Store';
-import { SignageContent } from './SignageContent';
-import { StorePlaylist } from './StorePlaylist';
+import { Store } from './Store.js';
+import { SignageContent } from './SignageContent.js';
+import { StorePlaylist } from './StorePlaylist.js';
 
 export enum LogEventType {
   PLAY_START = 'play_start',

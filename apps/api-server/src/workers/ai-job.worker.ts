@@ -11,11 +11,11 @@
 
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { AIJobData, AIJobResult } from '../types/ai-job.types';
-import { aiProxyService } from '../services/ai-proxy.service';
-import { prometheusMetrics } from '../services/prometheus-metrics.service';
-import { aiDLQ } from '../services/ai-dlq.service';
-import logger from '../utils/logger';
+import { AIJobData, AIJobResult } from '../types/ai-job.types.js';
+import { aiProxyService } from '../services/ai-proxy.service.js';
+import { prometheusMetrics } from '../services/prometheus-metrics.service.js';
+import { aiDLQ } from '../services/ai-dlq.service.js';
+import logger from '../utils/logger.js';
 
 class AIJobWorker {
   private static instance: AIJobWorker;

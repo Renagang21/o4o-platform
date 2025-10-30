@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { ThemeService } from '../services/ThemeService';
-import { hooks } from '../services/HookSystem';
+import { ThemeService } from '../services/ThemeService.js';
+import { hooks } from '../services/HookSystem.js';
 import multer from 'multer';
 import * as path from 'path';
-import logger from '../utils/logger';
-import { THEME_UPLOAD } from '../config/appearance.constants';
+import logger from '../utils/logger.js';
+import { THEME_UPLOAD } from '../config/appearance.constants.js';
 
 const upload = multer({
   dest: THEME_UPLOAD.UPLOAD_DIR,

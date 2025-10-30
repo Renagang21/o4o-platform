@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { BackingService } from '../../services/crowdfunding/BackingService';
+import { BackingService } from '../../services/crowdfunding/BackingService.js';
 
 export class BackingController {
   private backingService: BackingService;

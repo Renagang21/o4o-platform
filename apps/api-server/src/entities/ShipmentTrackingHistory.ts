@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Shipment } from './Shipment';
+import { Shipment } from './Shipment.js';
 
 @Entity('shipment_tracking_history')
 export class ShipmentTrackingHistory {

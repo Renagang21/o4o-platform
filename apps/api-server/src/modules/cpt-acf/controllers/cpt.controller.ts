@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { cptService } from '../services/cpt.service';
-import { AuthRequest } from '../../../types/auth';
-import logger from '../../../utils/logger';
-import { CPT_PAGINATION, CPT_QUERY_DEFAULTS } from '../../../config/cpt.constants';
+import { cptService } from '../services/cpt.service.js';
+import { AuthRequest } from '../../../types/auth.js';
+import logger from '../../../utils/logger.js';
+import { CPT_PAGINATION, CPT_QUERY_DEFAULTS } from '../../../config/cpt.constants.js';
 
 /**
  * CPT Controller - HTTP layer only, delegates business logic to service

@@ -1,8 +1,8 @@
 import { Router, Request } from 'express';
-import { UserController } from '../controllers/userController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin, requireAnyRole } from '../middleware/permission.middleware';
-import { UserRole } from '../entities/User';
+import { UserController } from '../controllers/userController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin, requireAnyRole } from '../middleware/permission.middleware.js';
+import { UserRole } from '../entities/User.js';
 
 const router: Router = Router();
 const userController = new UserController();

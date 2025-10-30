@@ -6,17 +6,17 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthRequest } from '../types/auth';
-import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js';
+import { rateLimitMiddleware } from '../middleware/rateLimit.middleware.js';
 import {
   AI_OUTPUT_JSON_SCHEMA,
   AI_OUTPUT_SCHEMA_VERSION,
   AI_OUTPUT_SCHEMA_METADATA,
   SCHEMA_MIGRATIONS,
   SCHEMA_DEPRECATIONS
-} from '../schemas/ai-output.schema';
-import logger from '../utils/logger';
+} from '../schemas/ai-output.schema.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 

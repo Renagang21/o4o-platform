@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { securityAuditService, isIPBlocked, logSecurityEvent } from '../services/SecurityAuditService';
+import { securityAuditService, isIPBlocked, logSecurityEvent } from '../services/SecurityAuditService.js';
 
 /**
  * Security middleware to check blocked IPs and log security events

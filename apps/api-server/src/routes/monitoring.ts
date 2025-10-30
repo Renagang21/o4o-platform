@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { MonitoringController } from '../controllers/monitoringController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/permission.middleware';
+import { MonitoringController } from '../controllers/monitoringController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { WorkflowState } from './WorkflowState';
+import { WorkflowState } from './WorkflowState.js';
 
 export enum TransitionTrigger {
   MANUAL = 'manual',

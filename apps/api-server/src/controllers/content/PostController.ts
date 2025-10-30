@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { Post } from '../../entities/Post';
-import { Tag } from '../../entities/Tag';
-import { Category } from '../../entities/Category';
-import { User } from '../../entities/User';
-import { slugService } from '../../services/slug.service';
-import { revisionService } from '../../services/revision.service';
-import logger from '../../utils/logger';
+import { AppDataSource } from '../../database/connection.js';
+import { Post } from '../../entities/Post.js';
+import { Tag } from '../../entities/Tag.js';
+import { Category } from '../../entities/Category.js';
+import { User } from '../../entities/User.js';
+import { slugService } from '../../services/slug.service.js';
+import { revisionService } from '../../services/revision.service.js';
+import logger from '../../utils/logger.js';
 import { In, Like } from 'typeorm';
 
 export class PostController {

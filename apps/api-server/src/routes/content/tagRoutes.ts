@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { TagController } from '../../controllers/content/TagController';
-import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
-import { checkRole } from '../../middleware/checkRole';
+import { TagController } from '../../controllers/content/TagController.js';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware.js';
+import { checkRole } from '../../middleware/checkRole.js';
 
 const router: Router = Router();
 const tagController = new TagController();

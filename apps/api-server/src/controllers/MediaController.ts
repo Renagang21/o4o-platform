@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { MediaFile } from '../entities/MediaFile';
-import { MediaFolder } from '../entities/MediaFolder';
+import { AppDataSource } from '../database/connection.js';
+import { MediaFile } from '../entities/MediaFile.js';
+import { MediaFolder } from '../entities/MediaFolder.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';

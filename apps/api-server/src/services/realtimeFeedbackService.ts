@@ -1,9 +1,9 @@
 import { Server, Socket } from 'socket.io';
-import { AppDataSource } from '../database/connection';
-import { BetaFeedback, FeedbackStatus, FeedbackPriority } from '../entities/BetaFeedback';
-import { FeedbackConversation, ConversationMessage, ConversationStatus, MessageType, ParticipantRole } from '../entities/FeedbackConversation';
-import { BetaUser } from '../entities/BetaUser';
-import { User } from '../entities/User';
+import { AppDataSource } from '../database/connection.js';
+import { BetaFeedback, FeedbackStatus, FeedbackPriority } from '../entities/BetaFeedback.js';
+import { FeedbackConversation, ConversationMessage, ConversationStatus, MessageType, ParticipantRole } from '../entities/FeedbackConversation.js';
+import { BetaUser } from '../entities/BetaUser.js';
+import { User } from '../entities/User.js';
 
 export interface NotificationData {
   feedbackId?: string;

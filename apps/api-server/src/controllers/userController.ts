@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { authService } from '../services/AuthService';
-import { UserRole, AuthRequest } from '../types/auth';
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
+import { authService } from '../services/AuthService.js';
+import { UserRole, AuthRequest } from '../types/auth.js';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
 
 export class UserController {
   constructor() {

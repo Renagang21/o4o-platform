@@ -4,9 +4,9 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
-import { SettingsService } from '../../services/settingsService';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { SettingsService } from '../../services/settingsService.js';
 import {
   ScrollToTopSchema,
   ButtonSettingsSchema,
@@ -14,9 +14,9 @@ import {
   ScrollToTopInput,
   ButtonSettingsInput,
   BreadcrumbsInput,
-} from '../../validators/customizer.validators';
-import { deepMerge } from '../../utils/deep-merge';
-import { migrateCustomizerSettings, validateMigration } from '../../utils/schema-migration';
+} from '../../validators/customizer.validators.js';
+import { deepMerge } from '../../utils/deep-merge.js';
+import { migrateCustomizerSettings, validateMigration } from '../../utils/schema-migration.js';
 import { ZodError } from 'zod';
 
 const router: Router = Router();

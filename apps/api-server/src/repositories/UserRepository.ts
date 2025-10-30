@@ -1,7 +1,7 @@
 import { Repository, SelectQueryBuilder, Brackets } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { User, UserRole, UserStatus } from '../entities/User';
-import { ApprovalLog } from '../entities/ApprovalLog';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole, UserStatus } from '../entities/User.js';
+import { ApprovalLog } from '../entities/ApprovalLog.js';
 
 export interface UserFilters {
   search?: string;

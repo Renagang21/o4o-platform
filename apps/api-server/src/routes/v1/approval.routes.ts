@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { ApprovalController } from '../../controllers/approvalController';
-import { authenticate } from '../../middleware/auth.middleware';
-import { validateRequest } from '../../middleware/validation.middleware';
+import { ApprovalController } from '../../controllers/approvalController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { validateRequest } from '../../middleware/validation.middleware.js';
 import { body, param, query } from 'express-validator';
 
 const router: Router = Router();

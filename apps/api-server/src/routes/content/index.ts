@@ -1,7 +1,7 @@
 import { Router, RequestHandler } from 'express';
-import postsRouter from './posts';
-import mediaRouter from './media';
-import imageEditingRouter from './image-editing';
+import postsRouter from './posts.js';
+import mediaRouter from './media.js';
+import imageEditingRouter from './image-editing.js';
 
 const router: Router = Router();
 

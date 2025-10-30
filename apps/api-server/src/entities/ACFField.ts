@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { ACFFieldGroup } from './ACFFieldGroup';
+import { ACFFieldGroup } from './ACFFieldGroup.js';
 
 export enum ACFFieldType {
   // Basic

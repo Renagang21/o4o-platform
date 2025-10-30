@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { AutomationRule } from './AutomationRule';
+import { AutomationRule } from './AutomationRule.js';
 
 @Entity('automation_logs')
 export class AutomationLog {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { forumService, ForumSearchOptions } from '../services/forumService';
-import { AuthRequest } from '../types/auth';
-import { PostType, PostStatus } from '../entities/ForumPost';
+import { forumService, ForumSearchOptions } from '../services/forumService.js';
+import { AuthRequest } from '../types/auth.js';
+import { PostType, PostStatus } from '../entities/ForumPost.js';
 
 export class ForumController {
   // Category endpoints

@@ -5,9 +5,9 @@
  * Provides utilities for role management and migration.
  */
 
-import { AppDataSource } from '../database/connection';
-import { User, UserRole } from '../entities/User';
-import { Role } from '../entities/Role';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole } from '../entities/User.js';
+import { Role } from '../entities/Role.js';
 
 export class UserRoleService {
   private static roleRepository = AppDataSource.getRepository(Role);

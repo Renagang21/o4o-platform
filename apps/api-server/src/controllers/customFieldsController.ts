@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
+import { AppDataSource } from '../database/connection.js';
+import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
 import { In } from 'typeorm';
 
 export class CustomFieldsController {

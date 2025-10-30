@@ -7,8 +7,8 @@
 
 import { AccessControl, AccessCheckResult } from '@o4o/types';
 import { checkAccess as checkAccessCommon } from '@o4o/utils';
-import { User } from '../entities/User';
-import { Post } from '../entities/Post';
+import { User } from '../entities/User.js';
+import { Post } from '../entities/Post.js';
 
 /**
  * Check if a user has access to a post based on access control settings

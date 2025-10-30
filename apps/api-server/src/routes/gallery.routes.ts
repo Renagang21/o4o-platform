@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { GalleryController } from '../controllers/GalleryController';
-import { authenticate } from '../middleware/auth.middleware';
+import { GalleryController } from '../controllers/GalleryController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const galleryController = new GalleryController();

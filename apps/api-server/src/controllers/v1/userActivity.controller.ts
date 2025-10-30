@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import AppDataSource from '../../database/data-source';
-import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog';
-import { User } from '../../entities/User';
+import AppDataSource from '../../database/data-source.js';
+import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog.js';
+import { User } from '../../entities/User.js';
 import { validate } from 'class-validator';
 import { Between, FindManyOptions } from 'typeorm';
 import { 
@@ -13,7 +13,7 @@ import {
   UserActivityLogParams,
   UserActivityLogQuery,
   UserStatisticsQuery
-} from '../../types/userManagement.types';
+} from '../../types/userManagement.types.js';
 
 export class UserActivityController {
   private static userActivityRepository = AppDataSource.getRepository(UserActivityLog);

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { imageProcessingService } from '../../services/image-processing.service';
-import { fileOptimizationService } from '../../services/file-optimization.service';
-import logger from '../../utils/logger';
+import { imageProcessingService } from '../../services/image-processing.service.js';
+import { fileOptimizationService } from '../../services/file-optimization.service.js';
+import logger from '../../utils/logger.js';
 
 export class ImageEditingController {
 

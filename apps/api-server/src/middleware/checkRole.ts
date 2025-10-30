@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthRequest } from '../types/auth';
+import { AuthRequest } from '../types/auth.js';
 
 export const checkRole = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {

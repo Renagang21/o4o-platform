@@ -1,12 +1,12 @@
 import { Router, Request } from 'express';
-import { UserRoleController } from '../../controllers/v1/userRole.controller';
-import { authenticate } from '../../middleware/auth.middleware';
+import { UserRoleController } from '../../controllers/v1/userRole.controller.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
 // New unified permission middleware
 import {
   ensureAuthenticated,
   requireAdmin,
   requireSelfOrAdmin
-} from '../../middleware/permission.middleware';
+} from '../../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

@@ -3,9 +3,9 @@ import paymentService, {
   PreparePaymentRequest,
   ConfirmPaymentRequest,
   CancelPaymentRequest
-} from '../services/PaymentService';
-import { WebhookEventType } from '../entities/PaymentWebhook';
-import logger from '../utils/logger';
+} from '../services/PaymentService.js';
+import { WebhookEventType } from '../entities/PaymentWebhook.js';
+import logger from '../utils/logger.js';
 
 export class PaymentController {
   /**

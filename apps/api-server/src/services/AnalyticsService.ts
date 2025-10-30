@@ -1,14 +1,14 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { UserSession, SessionStatus, DeviceType } from '../entities/UserSession';
-import { UserAction, ActionType, ActionCategory } from '../entities/UserAction';
-import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics';
-import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport';
-import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert';
-import { BetaUser } from '../entities/BetaUser';
-import { BetaFeedback } from '../entities/BetaFeedback';
-import { ContentUsageLog } from '../entities/ContentUsageLog';
-import type { AnalyticsMetadata, MetricTags, ErrorContext } from '../types';
+import { AppDataSource } from '../database/connection.js';
+import { UserSession, SessionStatus, DeviceType } from '../entities/UserSession.js';
+import { UserAction, ActionType, ActionCategory } from '../entities/UserAction.js';
+import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics.js';
+import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport.js';
+import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert.js';
+import { BetaUser } from '../entities/BetaUser.js';
+import { BetaFeedback } from '../entities/BetaFeedback.js';
+import { ContentUsageLog } from '../entities/ContentUsageLog.js';
+import type { AnalyticsMetadata, MetricTags, ErrorContext } from '../types/index.js';
 
 export interface SessionData {
   betaUserId: string;

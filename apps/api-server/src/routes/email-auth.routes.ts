@@ -9,15 +9,15 @@ import {
   AuthResponse,
   AuthErrorCode,
   JwtPayload
-} from '../types/email-auth';
-import { validateDto } from '../middleware/validateDto';
-import { authenticate } from '../middleware/auth.middleware';
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { EmailVerificationToken } from '../entities/EmailVerificationToken';
-import { PasswordResetToken } from '../entities/PasswordResetToken';
-import { emailService } from '../services/email.service';
-import { refreshTokenService } from '../services/refreshToken.service';
+} from '../types/email-auth.js';
+import { validateDto } from '../middleware/validateDto.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
+import { PasswordResetToken } from '../entities/PasswordResetToken.js';
+import { emailService } from '../services/email.service.js';
+import { refreshTokenService } from '../services/refreshToken.service.js';
 import {
   hashPassword,
   comparePassword,
@@ -27,9 +27,9 @@ import {
   validatePasswordStrength,
   validateEmail,
   getTokenExpiryDate
-} from '../utils/auth.utils';
-import logger from '../utils/logger';
-import { UserRole, UserStatus } from '../types/auth';
+} from '../utils/auth.utils.js';
+import logger from '../utils/logger.js';
+import { UserRole, UserStatus } from '../types/auth.js';
 
 const router: Router = Router();
 

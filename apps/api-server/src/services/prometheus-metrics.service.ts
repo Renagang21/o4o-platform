@@ -12,8 +12,8 @@
  */
 
 import * as promClient from 'prom-client';
-import { aiMetrics } from './ai-metrics.service';
-import logger from '../utils/logger';
+import { aiMetrics } from './ai-metrics.service.js';
+import logger from '../utils/logger.js';
 
 class PrometheusMetricsService {
   private static instance: PrometheusMetricsService;

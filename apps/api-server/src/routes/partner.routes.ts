@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { PartnerController } from '../controllers/partner/partnerController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAnyRole } from '../middleware/permission.middleware';
-import { UserRole } from '../entities/User';
-import logger from '../utils/logger';
+import { PartnerController } from '../controllers/partner/partnerController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAnyRole } from '../middleware/permission.middleware.js';
+import { UserRole } from '../entities/User.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 

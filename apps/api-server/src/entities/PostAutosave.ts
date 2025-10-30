@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Post } from './Post';
+import { Post } from './Post.js';
 
 @Entity('post_autosaves')
 export class PostAutosave {

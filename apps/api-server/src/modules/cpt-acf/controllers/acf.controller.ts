@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { acfService } from '../services/acf.service';
-import { AuthRequest } from '../../../types/auth';
-import logger from '../../../utils/logger';
+import { acfService } from '../services/acf.service.js';
+import { AuthRequest } from '../../../types/auth.js';
+import logger from '../../../utils/logger.js';
 
 /**
  * ACF Controller - HTTP layer only, delegates business logic to service

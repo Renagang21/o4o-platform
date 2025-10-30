@@ -12,9 +12,9 @@
 
 import { Queue, QueueEvents, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { aiJobQueue } from './ai-job-queue.service';
-import { AIJobResult, ValidationResultLog } from '../types/ai-job.types';
-import logger from '../utils/logger';
+import { aiJobQueue } from './ai-job-queue.service.js';
+import { AIJobResult, ValidationResultLog } from '../types/ai-job.types.js';
+import logger from '../utils/logger.js';
 
 interface AIJobMetrics {
   // Overall statistics

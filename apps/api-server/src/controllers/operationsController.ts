@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { OperationsMonitoringService, SystemStatus, HealthCheckResult, AlertRule } from '../services/OperationsMonitoringService';
-import { MetricType, MetricCategory, SystemMetrics } from '../entities/SystemMetrics';
-import { AlertSeverity, AlertStatus } from '../entities/Alert';
-import { AuthRequest } from '../types/auth';
+import { OperationsMonitoringService, SystemStatus, HealthCheckResult, AlertRule } from '../services/OperationsMonitoringService.js';
+import { MetricType, MetricCategory, SystemMetrics } from '../entities/SystemMetrics.js';
+import { AlertSeverity, AlertStatus } from '../entities/Alert.js';
+import { AuthRequest } from '../types/auth.js';
 
 export class OperationsController {
   private operationsService: OperationsMonitoringService;

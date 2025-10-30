@@ -1,7 +1,7 @@
 import { Router, IRouter, Request, Response } from 'express';
-import { blockDataService } from '../services/block-data.service';
-import logger from '../../../utils/logger';
-import { CACHE_CONFIG } from '../../../config/editor.constants';
+import { blockDataService } from '../services/block-data.service.js';
+import logger from '../../../utils/logger.js';
+import { CACHE_CONFIG } from '../../../config/editor.constants.js';
 
 /**
  * Block API Routes - Optimized endpoints for block editor

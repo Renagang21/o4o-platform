@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { TemplatePart } from '../../entities/TemplatePart';
+import { TemplatePart } from '../../entities/TemplatePart.js';
 
 export class SeedAppSpecificHeaders1825000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

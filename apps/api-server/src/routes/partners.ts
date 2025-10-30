@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import PartnerController from '../controllers/PartnerController';
-import { authenticate } from '../middleware/auth.middleware';
+import PartnerController from '../controllers/PartnerController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const partnerController = new PartnerController();

@@ -1,7 +1,7 @@
 import { Repository, DataSource, SelectQueryBuilder } from 'typeorm';
-import { CrowdfundingProject } from '../entities/CrowdfundingProject';
-import { CrowdfundingParticipation } from '../entities/CrowdfundingParticipation';
-import { User } from '../entities/User';
+import { CrowdfundingProject } from '../entities/CrowdfundingProject.js';
+import { CrowdfundingParticipation } from '../entities/CrowdfundingParticipation.js';
+import { User } from '../entities/User.js';
 
 export class CrowdfundingRepository {
   private projectRepository: Repository<CrowdfundingProject>;

@@ -1,14 +1,14 @@
 import { Router, Request, Response } from 'express';
-import userActivityRoutes from './userActivity.routes';
-import userRoleRoutes from './userRole.routes';
-import userRoleSwitchRoutes from './userRoleSwitch.routes';
-import userStatisticsRoutes from './userStatistics.routes';
-import businessInfoRoutes from './businessInfo.routes';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
-import { AppDataSource } from '../../database/connection';
-import { User } from '../../entities/User';
-import logger from '../../utils/logger';
+import userActivityRoutes from './userActivity.routes.js';
+import userRoleRoutes from './userRole.routes.js';
+import userRoleSwitchRoutes from './userRoleSwitch.routes.js';
+import userStatisticsRoutes from './userStatistics.routes.js';
+import businessInfoRoutes from './businessInfo.routes.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { AppDataSource } from '../../database/connection.js';
+import { User } from '../../entities/User.js';
+import logger from '../../utils/logger.js';
 
 const router: Router = Router();
 

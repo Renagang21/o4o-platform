@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
-import { AppDataSource } from '../database/connection';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import logger from '../utils/logger.js';
 
 /**
  * Materialized View Refresh Scheduler

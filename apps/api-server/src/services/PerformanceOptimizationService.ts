@@ -1,10 +1,10 @@
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { CacheService } from './CacheService';
-import { AnalyticsService } from './AnalyticsService';
+import { AppDataSource } from '../database/connection.js';
+import { CacheService } from './CacheService.js';
+import { AnalyticsService } from './AnalyticsService.js';
 import Redis from 'ioredis';
 import { performance } from 'perf_hooks';
-import { TypeOrmDriver } from '../types/database';
+import { TypeOrmDriver } from '../types/database.js';
 import * as crypto from 'crypto';
 import {
   QueryBuilderWithExecute,
@@ -21,7 +21,7 @@ import {
   QueryPerformanceMetrics,
   CacheMetrics,
   SystemMetrics
-} from '../types';
+} from '../types/index.js';
 
 /**
  * 성능 최적화 서비스

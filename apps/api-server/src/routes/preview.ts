@@ -4,16 +4,16 @@
 
 import { Router, Request, Response } from 'express'
 import { query, body } from 'express-validator'
-import { validateDto } from '../middleware/validateDto'
-import { authenticate } from '../middleware/auth.middleware'
-import { AuthRequest } from '../types/auth'
-import AppDataSource from '../database/connection'
-import { User } from '../entities/User'
-import logger from '../utils/logger'
-import { Post } from '../entities/Post'
+import { validateDto } from '../middleware/validateDto.js'
+import { authenticate } from '../middleware/auth.middleware.js'
+import { AuthRequest } from '../types/auth.js'
+import AppDataSource from '../database/connection.js'
+import { User } from '../entities/User.js'
+import logger from '../utils/logger.js'
+import { Post } from '../entities/Post.js'
 import fs from 'fs/promises'
 import path from 'path'
-import { previewTokenService } from '../services/preview-token.service'
+import { previewTokenService } from '../services/preview-token.service.js'
 
 const router: Router = Router()
 

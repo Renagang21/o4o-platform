@@ -9,8 +9,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User';
-import { CartItem } from './CartItem';
+import { User } from './User.js';
+import { CartItem } from './CartItem.js';
 
 export interface CartSummary {
   subtotal: number;

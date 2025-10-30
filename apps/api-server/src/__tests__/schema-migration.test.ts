@@ -10,7 +10,7 @@ import {
   validateMigration,
   mapLegacyColor,
   getDefaultSettingsV1,
-} from '../utils/schema-migration';
+} from '../utils/schema-migration.js';
 
 describe('Schema Migration', () => {
   describe('detectVersion', () => {

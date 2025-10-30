@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaUser } from './BetaUser';
+import { BetaUser } from './BetaUser.js';
 
 export enum SessionStatus {
   ACTIVE = 'active',

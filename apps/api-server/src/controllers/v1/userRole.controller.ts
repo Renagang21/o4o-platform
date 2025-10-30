@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { User, UserRole } from '../../entities/User';
-import { Role } from '../../entities/Role';
-import { Permission } from '../../entities/Permission';
-import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog';
+import { AppDataSource } from '../../database/connection.js';
+import { User, UserRole } from '../../entities/User.js';
+import { Role } from '../../entities/Role.js';
+import { Permission } from '../../entities/Permission.js';
+import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog.js';
 import { validate } from 'class-validator';
 
 // Legacy hardcoded permissions (kept as fallback during migration)

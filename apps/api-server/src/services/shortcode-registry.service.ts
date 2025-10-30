@@ -13,10 +13,10 @@ import {
   ShortcodeCategory,
   ShortcodeAIReference,
   ShortcodeRegistryResponse
-} from '../types/shortcode.types';
-import { AppDataSource } from '../database/connection';
-import { AIReference } from '../entities/AIReference';
-import logger from '../utils/logger';
+} from '../types/shortcode.types.js';
+import { AppDataSource } from '../database/connection.js';
+import { AIReference } from '../entities/AIReference.js';
+import logger from '../utils/logger.js';
 
 class ShortcodeRegistryService {
   private static instance: ShortcodeRegistryService;

@@ -9,10 +9,10 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { User } from '../User';
-import { FundingProject } from './FundingProject';
-import { BackerReward } from './BackerReward';
-import type { PaymentMethod, PaymentStatus, BackingStatus } from '../../types/crowdfunding-types';
+import { User } from '../User.js';
+import { FundingProject } from './FundingProject.js';
+import { BackerReward } from './BackerReward.js';
+import type { PaymentMethod, PaymentStatus, BackingStatus } from '../../types/crowdfunding-types.js';
 
 @Entity('funding_backings')
 @Index(['projectId', 'backerId'])

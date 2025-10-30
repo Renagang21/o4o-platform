@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { DropshippingController } from '../../controllers/dropshipping/DropshippingController';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
+import { DropshippingController } from '../../controllers/dropshipping/DropshippingController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
 
 const router: Router = Router();
 const dropshippingController = new DropshippingController();

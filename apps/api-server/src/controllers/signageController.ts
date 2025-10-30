@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
-import { AuthRequest } from '../types/auth';
-import { AppDataSource } from '../database/connection';
-import { SignageContent, ContentStatus } from '../entities/SignageContent';
-import { Store } from '../entities/Store';
-import { StorePlaylist } from '../entities/StorePlaylist';
-import { PlaylistItem } from '../entities/PlaylistItem';
-import { SignageSchedule } from '../entities/SignageSchedule';
-import { ScreenTemplate } from '../entities/ScreenTemplate';
-import { ContentUsageLog } from '../entities/ContentUsageLog';
-import { User } from '../entities/User';
+import { AuthRequest } from '../types/auth.js';
+import { AppDataSource } from '../database/connection.js';
+import { SignageContent, ContentStatus } from '../entities/SignageContent.js';
+import { Store } from '../entities/Store.js';
+import { StorePlaylist } from '../entities/StorePlaylist.js';
+import { PlaylistItem } from '../entities/PlaylistItem.js';
+import { SignageSchedule } from '../entities/SignageSchedule.js';
+import { ScreenTemplate } from '../entities/ScreenTemplate.js';
+import { ContentUsageLog } from '../entities/ContentUsageLog.js';
+import { User } from '../entities/User.js';
 import { In, Like } from 'typeorm';
 
 export class SignageController {

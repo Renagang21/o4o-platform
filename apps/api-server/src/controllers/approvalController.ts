@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { approvalWorkflowService } from '../services/approval-workflow.service';
+import { approvalWorkflowService } from '../services/approval-workflow.service.js';
 
 export class ApprovalController {
   

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Store } from './Store';
-import { StorePlaylist } from './StorePlaylist';
+import { Store } from './Store.js';
+import { StorePlaylist } from './StorePlaylist.js';
 
 export enum ScheduleType {
   DAILY = 'daily',

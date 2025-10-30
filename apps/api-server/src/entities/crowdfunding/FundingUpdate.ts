@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FundingProject } from './FundingProject';
+import { FundingProject } from './FundingProject.js';
 
 @Entity('funding_updates')
 @Index(['projectId', 'createdAt'])

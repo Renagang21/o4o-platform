@@ -1,11 +1,11 @@
-import { AppDataSource } from '../../../database/connection';
-import { CustomPostType, FieldGroup, FieldSchema } from '../../../entities/CustomPostType';
-import { CustomPost, PostStatus } from '../../../entities/CustomPost';
-import { WordPressTransformer } from '../../../utils/wordpress-transformer';
-import { metaDataService } from '../../../services/MetaDataService';
+import { AppDataSource } from '../../../database/connection.js';
+import { CustomPostType, FieldGroup, FieldSchema } from '../../../entities/CustomPostType.js';
+import { CustomPost, PostStatus } from '../../../entities/CustomPost.js';
+import { WordPressTransformer } from '../../../utils/wordpress-transformer.js';
+import { metaDataService } from '../../../services/MetaDataService.js';
 import { In } from 'typeorm';
-import logger from '../../../utils/logger';
-import { CPT_PAGINATION, CPT_QUERY_DEFAULTS, DEFAULT_CPTS } from '../../../config/cpt.constants';
+import logger from '../../../utils/logger.js';
+import { CPT_PAGINATION, CPT_QUERY_DEFAULTS, DEFAULT_CPTS } from '../../../config/cpt.constants.js';
 
 /**
  * CPT Service - Business logic layer for Custom Post Types

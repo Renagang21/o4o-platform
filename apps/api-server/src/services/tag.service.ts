@@ -1,9 +1,9 @@
 import { Repository, Like, In } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { Tag } from '../entities/Tag';
-import { Post } from '../entities/Post';
-import { CreateTagDto, UpdateTagDto, TagStatistics } from '../types/tag.types';
-import { generateSlug } from '../utils/slug';
+import { AppDataSource } from '../database/connection.js';
+import { Tag } from '../entities/Tag.js';
+import { Post } from '../entities/Post.js';
+import { CreateTagDto, UpdateTagDto, TagStatistics } from '../types/tag.types.js';
+import { generateSlug } from '../utils/slug.js';
 
 export class TagService {
   private tagRepository: Repository<Tag>;

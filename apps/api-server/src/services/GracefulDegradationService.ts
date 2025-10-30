@@ -1,10 +1,10 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertSeverity } from '../entities/Alert';
-import { PricingResult } from '../types/auth';
-import { signageService } from './signageService';
-import { cacheService } from './CacheService';
+import { AppDataSource } from '../database/connection.js';
+import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics.js';
+import { Alert, AlertSeverity } from '../entities/Alert.js';
+import { PricingResult } from '../types/auth.js';
+import { signageService } from './signageService.js';
+import { cacheService } from './CacheService.js';
 import {
   DegradationMetadata,
   DegradationParameters,
@@ -27,7 +27,7 @@ import {
   convertToRequestQueuingParams,
   convertToRedirectTrafficParams,
   convertToIsolationParameters
-} from '../types';
+} from '../types/index.js';
 
 export enum DegradationLevel {
   NONE = 'none',

@@ -1,8 +1,8 @@
-import { AppDataSource } from '../database/connection';
-import { User, UserRole, UserStatus } from '../entities/User';
-import { authService } from './AuthService';
-import { SessionSyncService } from './sessionSyncService';
-import { emailService } from './emailService';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole, UserStatus } from '../entities/User.js';
+import { authService } from './AuthService.js';
+import { SessionSyncService } from './sessionSyncService.js';
+import { emailService } from './emailService.js';
 import { Response } from 'express';
 
 interface SocialProfile {

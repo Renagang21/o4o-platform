@@ -1,8 +1,8 @@
-import { AppDataSource } from '../database/connection';
-import { Post } from '../entities/Post';
-import { Page } from '../entities/Page';
-import { Tag } from '../entities/Tag';
-import { Category } from '../entities/Category';
+import { AppDataSource } from '../database/connection.js';
+import { Post } from '../entities/Post.js';
+import { Page } from '../entities/Page.js';
+import { Tag } from '../entities/Tag.js';
+import { Category } from '../entities/Category.js';
 
 export class SlugService {
   private postRepository = AppDataSource.getRepository(Post);

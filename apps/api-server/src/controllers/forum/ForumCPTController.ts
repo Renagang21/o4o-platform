@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { User, UserRole } from '../../entities/User';
-import { ForumCategory } from '../../entities/ForumCategory';
-import { ForumPost } from '../../entities/ForumPost';
-import { ForumComment } from '../../entities/ForumComment';
-import { ForumTag } from '../../entities/ForumTag';
+import { User, UserRole } from '../../entities/User.js';
+import { ForumCategory } from '../../entities/ForumCategory.js';
+import { ForumPost } from '../../entities/ForumPost.js';
+import { ForumComment } from '../../entities/ForumComment.js';
+import { ForumTag } from '../../entities/ForumTag.js';
 
 interface ForumSystemStatus {
   entities: {

@@ -1,11 +1,11 @@
 import { performance } from 'perf_hooks';
 import Redis from 'ioredis';
-import { AppDataSource } from '../database/connection';
-import { AnalyticsService } from './AnalyticsService';
-import { PerformanceOptimizationService } from './PerformanceOptimizationService';
+import { AppDataSource } from '../database/connection.js';
+import { AnalyticsService } from './AnalyticsService.js';
+import { PerformanceOptimizationService } from './PerformanceOptimizationService.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { TypeOrmDriver } from '../types/database';
+import { TypeOrmDriver } from '../types/database.js';
 
 const execAsync = promisify(exec);
 

@@ -1,10 +1,10 @@
-import { AppDataSource } from '../database/connection';
-import { RefreshToken } from '../entities/RefreshToken';
-import { LoginAttempt } from '../entities/LoginAttempt';
-import { User } from '../entities/User';
+import { AppDataSource } from '../database/connection.js';
+import { RefreshToken } from '../entities/RefreshToken.js';
+import { LoginAttempt } from '../entities/LoginAttempt.js';
+import { User } from '../entities/User.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 export class RefreshTokenService {
   private refreshTokenRepository = AppDataSource.getRepository(RefreshToken);

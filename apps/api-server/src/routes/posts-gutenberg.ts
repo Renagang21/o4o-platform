@@ -1,11 +1,11 @@
 import { Router, Request, Response } from 'express';
-import AppDataSource from '../database/data-source';
-import { Post } from '../entities/Post';
-import { User } from '../entities/User';
-import { Category } from '../entities/Category';
-import { authenticate } from '../middleware/auth.middleware';
+import AppDataSource from '../database/data-source.js';
+import { Post } from '../entities/Post.js';
+import { User } from '../entities/User.js';
+import { Category } from '../entities/Category.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 import { In, Like, IsNull, Not } from 'typeorm';
-import { validateDto } from '../middleware/validateDto';
+import { validateDto } from '../middleware/validateDto.js';
 import { body, query, param } from 'express-validator';
 
 const router: Router = Router();

@@ -1,12 +1,12 @@
 import cron from 'node-cron';
 import { Repository, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { AnalyticsService } from './AnalyticsService';
-import { AnalyticsReport, ReportType, ReportCategory } from '../entities/AnalyticsReport';
-import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert';
-import { UserSession, SessionStatus } from '../entities/UserSession';
-import { SystemMetrics, MetricCategory, MetricType } from '../entities/SystemMetrics';
-import { BetaUser } from '../entities/BetaUser';
+import { AppDataSource } from '../database/connection.js';
+import { AnalyticsService } from './AnalyticsService.js';
+import { AnalyticsReport, ReportType, ReportCategory } from '../entities/AnalyticsReport.js';
+import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert.js';
+import { UserSession, SessionStatus } from '../entities/UserSession.js';
+import { SystemMetrics, MetricCategory, MetricType } from '../entities/SystemMetrics.js';
+import { BetaUser } from '../entities/BetaUser.js';
 
 export interface SmtpConfig {
   host: string;

@@ -4,12 +4,12 @@
  */
 
 import { Repository, DataSource } from 'typeorm';
-import { App } from '../entities/App';
-import { AppInstance } from '../entities/AppInstance';
-import { AppUsageLog } from '../entities/AppUsageLog';
-import { AIUsageLog, AIProvider } from '../entities/AIUsageLog';
-import { googleAI } from './google-ai.service';
-import logger from '../utils/logger';
+import { App } from '../entities/App.js';
+import { AppInstance } from '../entities/AppInstance.js';
+import { AppUsageLog } from '../entities/AppUsageLog.js';
+import { AIUsageLog, AIProvider } from '../entities/AIUsageLog.js';
+import { googleAI } from './google-ai.service.js';
+import logger from '../utils/logger.js';
 
 interface ExecuteOptions {
   appSlug: string;

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { Template } from '../entities/Template';
-import { User } from '../entities/User';
-// import { MockDataService } from '../services/MockDataService';
+import { AppDataSource } from '../database/connection.js';
+import { Template } from '../entities/Template.js';
+import { User } from '../entities/User.js';
+// import { MockDataService } from '../services/MockDataService.js';
 import path from 'path';
 import fs from 'fs/promises';
-import { AuthRequest } from '../types/auth';
+import { AuthRequest } from '../types/auth.js';
 
 export class TemplatesController {
   private templateRepository = AppDataSource.getRepository(Template);

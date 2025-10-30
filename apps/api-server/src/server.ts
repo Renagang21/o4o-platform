@@ -3,8 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-import { AppDataSource } from './database/connection';
-import logger from './utils/logger';
+import { AppDataSource } from './database/connection.js';
+import logger from './utils/logger.js';
 
 // 환경 변수 검증
 const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'];

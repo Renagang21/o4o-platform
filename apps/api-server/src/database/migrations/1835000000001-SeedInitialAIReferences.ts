@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { AIReference } from '../../entities/AIReference';
+import { AIReference } from '../../entities/AIReference.js';
 import * as fs from 'fs';
 import * as path from 'path';
 

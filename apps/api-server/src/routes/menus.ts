@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { MenuController } from '../controllers/menu/MenuController';
-import { authenticate } from '../middleware/auth.middleware';
-import { checkRole } from '../middleware/checkRole';
+import { MenuController } from '../controllers/menu/MenuController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { checkRole } from '../middleware/checkRole.js';
 
 const router: Router = Router();
 const menuController = new MenuController();

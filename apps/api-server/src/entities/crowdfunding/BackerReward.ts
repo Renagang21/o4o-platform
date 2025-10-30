@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FundingBacking } from './FundingBacking';
-import { FundingReward } from './FundingReward';
+import { FundingBacking } from './FundingBacking.js';
+import { FundingReward } from './FundingReward.js';
 
 @Entity('backer_rewards')
 @Index(['backingId'])

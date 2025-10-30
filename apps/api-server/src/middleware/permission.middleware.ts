@@ -13,7 +13,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { User, UserRole } from '../entities/User';
+import { User, UserRole } from '../entities/User.js';
 
 // Extend Express Request interface
 declare module 'express' {

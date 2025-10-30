@@ -1,8 +1,8 @@
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { LinkedAccount } from '../entities/LinkedAccount';
-import { LinkingSession } from '../entities/LinkingSession';
-import { AccountActivity } from '../entities/AccountActivity';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { LinkedAccount } from '../entities/LinkedAccount.js';
+import { LinkingSession } from '../entities/LinkingSession.js';
+import { AccountActivity } from '../entities/AccountActivity.js';
 import { 
   AuthProvider, 
   LinkAccountRequest, 
@@ -15,10 +15,10 @@ import {
   AccountMergeRequest,
   AccountMergeResult,
   SecurityVerification
-} from '../types/account-linking';
-import { emailService } from './email.service';
-import { generateRandomToken, hashPassword, comparePassword } from '../utils/auth.utils';
-import logger from '../utils/logger';
+} from '../types/account-linking.js';
+import { emailService } from './email.service.js';
+import { generateRandomToken, hashPassword, comparePassword } from '../utils/auth.utils.js';
+import logger from '../utils/logger.js';
 import { EntityManager } from 'typeorm';
 
 export class AccountLinkingService {

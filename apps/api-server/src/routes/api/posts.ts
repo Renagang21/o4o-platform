@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import * as postsController from '../../controllers/postsController'
-import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
+import * as postsController from '../../controllers/postsController.js'
+import { authenticate as authenticateToken } from '../../middleware/auth.middleware.js'
 
 const router: Router = Router()
 

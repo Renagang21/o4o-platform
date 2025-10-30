@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/permission.middleware';
-import { EmailService } from '../services/email.service';
-import logger from '../utils/logger';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/permission.middleware.js';
+import { EmailService } from '../services/email.service.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 const emailService = new EmailService();

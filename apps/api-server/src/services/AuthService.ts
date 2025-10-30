@@ -3,8 +3,8 @@ import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
-import { User } from '../entities/User';
-import { BusinessInfo } from '../types/user';
+import { User } from '../entities/User.js';
+import { BusinessInfo } from '../types/user.js';
 import { 
   AccessTokenPayload, 
   RefreshTokenPayload, 
@@ -14,8 +14,8 @@ import {
   UserRole,
   UserStatus,
   CookieConfig 
-} from '../types/auth';
-import { RefreshTokenService } from './RefreshTokenService';
+} from '../types/auth.js';
+import { RefreshTokenService } from './RefreshTokenService.js';
 
 class AuthService {
   private userRepository: Repository<User>;

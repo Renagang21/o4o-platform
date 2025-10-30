@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { MenuAdvancedController } from '../controllers/menu/MenuAdvancedController';
-import { authenticate } from '../middleware/auth.middleware';
-import { checkRole } from '../middleware/checkRole';
+import { MenuAdvancedController } from '../controllers/menu/MenuAdvancedController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { checkRole } from '../middleware/checkRole.js';
 
 const router: Router = Router();
 const menuAdvancedController = new MenuAdvancedController();

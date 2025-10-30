@@ -7,7 +7,7 @@ import {
   Index,
   ManyToMany
 } from 'typeorm';
-import { Role } from './Role';
+import { Role } from './Role.js';
 
 @Entity('permissions')
 @Index(['key'], { unique: true })

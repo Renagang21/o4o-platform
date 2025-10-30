@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { AppDataSource } from './connection';
+import { AppDataSource } from './connection.js';
 
 async function runMigration() {
   try {

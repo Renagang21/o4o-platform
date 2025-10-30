@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { Supplier, SupplierStatus, SupplierTier } from '../../entities/Supplier';
-import { Partner, PartnerStatus, PartnerTier } from '../../entities/Partner';
-import { PartnerCommission } from '../../entities/PartnerCommission';
-import { Product } from '../../entities/Product';
-import { ApprovalLog } from '../../entities/ApprovalLog';
-import { User, UserRole, UserStatus } from '../../entities/User';
+import { AppDataSource } from '../../database/connection.js';
+import { Supplier, SupplierStatus, SupplierTier } from '../../entities/Supplier.js';
+import { Partner, PartnerStatus, PartnerTier } from '../../entities/Partner.js';
+import { PartnerCommission } from '../../entities/PartnerCommission.js';
+import { Product } from '../../entities/Product.js';
+import { ApprovalLog } from '../../entities/ApprovalLog.js';
+import { User, UserRole, UserStatus } from '../../entities/User.js';
 
 export class DropshippingController {
   

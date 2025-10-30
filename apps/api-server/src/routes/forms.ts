@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { formController } from '../controllers/formController';
-import { authenticate } from '../middleware/auth.middleware';
-import { checkRole } from '../middleware/checkRole';
+import { formController } from '../controllers/formController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { checkRole } from '../middleware/checkRole.js';
 import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';

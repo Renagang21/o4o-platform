@@ -137,18 +137,18 @@ export interface ApiResponse<T = any> {
 }
 
 // Re-export all types
-export * from './crowdfunding-types';
-export * from './form-builder';
+export * from './crowdfunding-types.js';
+export * from './form-builder.js';
 export { 
   SlowQuery, IndexInfo, DuplicateIndex, TableStats, TableSize,
   ConnectionInfo, LockInfo, QueryPlan, PlanNode, QueryResult,
   DatabasePerformanceThresholds, PerformanceThresholds, ConnectionPoolStats,
   IndexRecommendation, QueryCacheEntry, QueryPattern, DatabaseMetrics,
   normalizeConnectionPoolStats, normalizePerformanceThresholds
-} from './database-types';
-export * from './graceful-degradation-types';
+} from './database-types.js';
+export * from './graceful-degradation-types.js';
 export { 
   QueryBuilderWithExecute, QueryType, OptimizedResponse, CacheHeaders,
   PerformanceReport, SlowQueryInfo, PerformanceAlert, PerformanceAlertData,
   CompressionLevel, RedisInfo, CacheMetrics, SystemMetrics, QueryPerformanceMetrics
-} from './performance-types';
+} from './performance-types.js';

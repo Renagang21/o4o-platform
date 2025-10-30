@@ -1,5 +1,5 @@
-import { LoginSecurityService } from '../services/LoginSecurityService';
-import logger from '../utils/logger';
+import { LoginSecurityService } from '../services/LoginSecurityService.js';
+import logger from '../utils/logger.js';
 
 export class CleanupLoginAttemptsJob {
   private intervalId: NodeJS.Timeout | null = null;

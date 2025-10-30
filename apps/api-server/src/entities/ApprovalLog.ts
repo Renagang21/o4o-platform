@@ -7,7 +7,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { User } from './User';
+import { User } from './User.js';
 
 export type ApprovalAction = 'approved' | 'rejected' | 'status_changed' | 'pending';
 

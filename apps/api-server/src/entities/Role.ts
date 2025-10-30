@@ -8,7 +8,7 @@ import {
   ManyToMany,
   JoinTable
 } from 'typeorm';
-import { Permission } from './Permission';
+import { Permission } from './Permission.js';
 
 @Entity('roles')
 @Index(['name'], { unique: true })

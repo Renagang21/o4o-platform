@@ -3,9 +3,9 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '../utils/api-error';
-import { env } from '../utils/env-validator';
-import logger from '../utils/logger';
+import { ApiError } from '../utils/api-error.js';
+import { env } from '../utils/env-validator.js';
+import logger from '../utils/logger.js';
 
 export function errorHandler(
   error: Error | ApiError,

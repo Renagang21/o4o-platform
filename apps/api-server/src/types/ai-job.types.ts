@@ -3,7 +3,7 @@
  * Sprint 2 - P2: Async Reliability with Queue
  */
 
-import { AIProvider } from './ai-proxy.types';
+import { AIProvider } from './ai-proxy.types.js';
 
 // Job Status
 export type JobStatus = 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';

@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { App } from './App';
+import { App } from './App.js';
 
 @Entity('app_instances')
 export class AppInstance {

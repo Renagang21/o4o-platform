@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
-import { User } from './User';
-import { CrowdfundingProject } from './CrowdfundingProject';
+import { User } from './User.js';
+import { CrowdfundingProject } from './CrowdfundingProject.js';
 
 export type ParticipationStatus = 'joined' | 'cancelled';
 

@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { ContentController } from '../../controllers/v1/content.controller';
-import { MediaController } from '../../controllers/content/MediaController';
-import { cache } from '../../middleware/cache';
-import { uploadMiddleware } from '../../middleware/upload.middleware';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { ContentController } from '../../controllers/v1/content.controller.js';
+import { MediaController } from '../../controllers/content/MediaController.js';
+import { cache } from '../../middleware/cache.js';
+import { uploadMiddleware } from '../../middleware/upload.middleware.js';
 
 const router: Router = Router();
 const contentController = new ContentController();

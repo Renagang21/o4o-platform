@@ -9,7 +9,7 @@ import {
   getPostById,
   getUserStats,
   getUserAvailablePostTypes
-} from '../../controllers/post-creation';
+} from '../../controllers/post-creation.js';
 
 const router: Router = Router();
 

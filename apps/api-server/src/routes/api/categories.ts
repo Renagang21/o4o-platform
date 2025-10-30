@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { Request, Response } from 'express'
-import { AppDataSource } from '../../database/connection'
-import { Category } from '../../entities/Category'
-import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
+import { AppDataSource } from '../../database/connection.js'
+import { Category } from '../../entities/Category.js'
+import { authenticate as authenticateToken } from '../../middleware/auth.middleware.js'
 import { Like, IsNull } from 'typeorm'
-import logger from '../../utils/logger'
+import logger from '../../utils/logger.js'
 
 const router: Router = Router()
 const categoryRepository = AppDataSource.getTreeRepository(Category)

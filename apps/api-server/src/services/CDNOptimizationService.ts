@@ -4,7 +4,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import sharp from 'sharp';
-import { AnalyticsService } from './AnalyticsService';
+import { AnalyticsService } from './AnalyticsService.js';
 
 interface OptimizationStats {
   successful: number;

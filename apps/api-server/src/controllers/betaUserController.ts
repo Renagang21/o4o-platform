@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { AuthRequest } from '../types/auth';
-import { betaUserService, BetaUserRegistrationData, BetaFeedbackData, BetaUserSearchOptions, BetaFeedbackSearchOptions } from '../services/betaUserService';
-import { BetaUserStatus, BetaUserType, InterestArea } from '../entities/BetaUser';
-import { BetaFeedback, FeedbackType, FeedbackStatus, FeedbackPriority, SignageFeature } from '../entities/BetaFeedback';
-import { FeedbackConversation, ConversationMessage, ConversationStatus, MessageType, ParticipantRole } from '../entities/FeedbackConversation';
-import { User } from '../entities/User';
-import { AppDataSource } from '../database/connection';
-import { RealtimeFeedbackService } from '../main';
+import { AuthRequest } from '../types/auth.js';
+import { betaUserService, BetaUserRegistrationData, BetaFeedbackData, BetaUserSearchOptions, BetaFeedbackSearchOptions } from '../services/betaUserService.js';
+import { BetaUserStatus, BetaUserType, InterestArea } from '../entities/BetaUser.js';
+import { BetaFeedback, FeedbackType, FeedbackStatus, FeedbackPriority, SignageFeature } from '../entities/BetaFeedback.js';
+import { FeedbackConversation, ConversationMessage, ConversationStatus, MessageType, ParticipantRole } from '../entities/FeedbackConversation.js';
+import { User } from '../entities/User.js';
+import { AppDataSource } from '../database/connection.js';
+import { RealtimeFeedbackService } from '../main.js';
 
 export class BetaUserController {
   // Beta User Registration (Public endpoint)

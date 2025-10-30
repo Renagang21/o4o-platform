@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { AppDataSource } from '../database/connection';
-import { Template } from '../entities/Template';
-import { Page } from '../entities/Page';
-import { Post } from '../entities/Post';
-import { CustomPost, PostStatus } from '../entities/CustomPost';
-import logger from '../utils/logger';
-import { checkPostAccess, getAccessDeniedResponse } from '../utils/accessControl';
+import { AppDataSource } from '../database/connection.js';
+import { Template } from '../entities/Template.js';
+import { Page } from '../entities/Page.js';
+import { Post } from '../entities/Post.js';
+import { CustomPost, PostStatus } from '../entities/CustomPost.js';
+import logger from '../utils/logger.js';
+import { checkPostAccess, getAccessDeniedResponse } from '../utils/accessControl.js';
 
 const router: Router = Router();
 

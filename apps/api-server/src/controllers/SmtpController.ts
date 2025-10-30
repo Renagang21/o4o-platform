@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SmtpSettings } from '../entities/SmtpSettings';
-import { EmailLog } from '../entities/EmailLog';
+import { AppDataSource } from '../database/connection.js';
+import { SmtpSettings } from '../entities/SmtpSettings.js';
+import { EmailLog } from '../entities/EmailLog.js';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 

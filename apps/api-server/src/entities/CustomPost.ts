@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { CustomPostType } from './CustomPostType';
+import { CustomPostType } from './CustomPostType.js';
 
 export enum PostStatus {
   DRAFT = 'draft',

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import type { Router as RouterType } from 'express';
-import { smtpController } from '../../controllers/SmtpController';
-import { authenticate } from '../../middleware/auth';
-import { authorize } from '../../middleware/authorize';
+import { smtpController } from '../../controllers/SmtpController.js';
+import { authenticate } from '../../middleware/auth.js';
+import { authorize } from '../../middleware/authorize.js';
 
 const router: RouterType = Router();
 

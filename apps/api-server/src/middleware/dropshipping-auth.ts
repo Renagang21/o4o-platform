@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '../types/auth';
-import { hasPermission, ROLE_PERMISSIONS } from '../types/dropshipping';
-import { User } from '../entities/User';
+import { UserRole } from '../types/auth.js';
+import { hasPermission, ROLE_PERMISSIONS } from '../types/dropshipping.js';
+import { User } from '../entities/User.js';
 
 interface AuthenticatedRequest extends Request {
   user?: User & {

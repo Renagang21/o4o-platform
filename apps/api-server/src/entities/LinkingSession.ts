@@ -6,8 +6,8 @@ import {
   CreateDateColumn, 
   Index 
 } from 'typeorm';
-import { User } from './User';
-import { AuthProvider, LinkingStatus } from '../types/account-linking';
+import { User } from './User.js';
+import { AuthProvider, LinkingStatus } from '../types/account-linking.js';
 
 @Entity('linking_sessions')
 @Index(['userId', 'status'])

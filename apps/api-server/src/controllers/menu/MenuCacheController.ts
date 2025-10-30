@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../../database/connection';
-import { Menu } from '../../entities/Menu';
-import { MenuItem } from '../../entities/MenuItem';
-import logger from '../../utils/logger';
-import { AuthRequest } from '../../types/auth';
+import { AppDataSource } from '../../database/connection.js';
+import { Menu } from '../../entities/Menu.js';
+import { MenuItem } from '../../entities/MenuItem.js';
+import logger from '../../utils/logger.js';
+import { AuthRequest } from '../../types/auth.js';
 import * as crypto from 'crypto';
 
 interface CacheEntry {

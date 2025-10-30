@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { Request, Response } from 'express'
-import { AppDataSource } from '../../database/connection'
-import { Tag } from '../../entities/Tag'
-import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
+import { AppDataSource } from '../../database/connection.js'
+import { Tag } from '../../entities/Tag.js'
+import { authenticate as authenticateToken } from '../../middleware/auth.middleware.js'
 import { Like, ILike } from 'typeorm'
-import logger from '../../utils/logger'
+import logger from '../../utils/logger.js'
 
 const router: Router = Router()
 const tagRepository = AppDataSource.getRepository(Tag)

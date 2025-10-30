@@ -9,8 +9,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Order } from './Order';
-import { PaymentSettlement } from './PaymentSettlement';
+import { Order } from './Order.js';
+import { PaymentSettlement } from './PaymentSettlement.js';
 
 export enum PaymentStatus {
   PENDING = 'pending',

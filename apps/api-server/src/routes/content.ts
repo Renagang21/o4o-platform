@@ -1,9 +1,9 @@
 import express from 'express';
-import { PagesController } from '../controllers/pagesController';
-import { MediaController } from '../controllers/MediaController';
-import { TemplatesController } from '../controllers/templatesController';
-import { CustomFieldsController } from '../controllers/customFieldsController';
-import { authenticate } from '../middleware/auth.middleware';
+import { PagesController } from '../controllers/pagesController.js';
+import { MediaController } from '../controllers/MediaController.js';
+import { TemplatesController } from '../controllers/templatesController.js';
+import { CustomFieldsController } from '../controllers/customFieldsController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router: express.Router = express.Router();
 

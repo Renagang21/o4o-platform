@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { SessionSyncService } from '../services/sessionSyncService';
-import { AuthRequest } from '../types/auth';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { SessionSyncService } from '../services/sessionSyncService.js';
+import { AuthRequest } from '../types/auth.js';
 
 const router: Router = Router();
 

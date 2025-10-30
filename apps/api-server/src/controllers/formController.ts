@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { Form } from '../entities/Form';
-import { FormSubmission } from '../entities/FormSubmission';
-import { User } from '../entities/User';
-import type { FormField, FormNotification } from '../types';
-import { AuthRequest } from '../types/auth';
-import { sendEmail } from '../utils/email';
-import { evaluateConditionalLogic } from '../utils/conditionalLogic';
-import { calculateFormula } from '../utils/formula';
+import { AppDataSource } from '../database/connection.js';
+import { Form } from '../entities/Form.js';
+import { FormSubmission } from '../entities/FormSubmission.js';
+import { User } from '../entities/User.js';
+import type { FormField, FormNotification } from '../types/index.js';
+import { AuthRequest } from '../types/auth.js';
+import { sendEmail } from '../utils/email.js';
+import { evaluateConditionalLogic } from '../utils/conditionalLogic.js';
+import { calculateFormula } from '../utils/formula.js';
 import type { Express } from 'express';
 import { Between, In, Like } from 'typeorm';
 import * as UAParser from 'ua-parser-js';
-import { getGeoLocation } from '../utils/geoLocation';
+import { getGeoLocation } from '../utils/geoLocation.js';
 
 const formRepository = AppDataSource.getRepository(Form);
 const submissionRepository = AppDataSource.getRepository(FormSubmission);

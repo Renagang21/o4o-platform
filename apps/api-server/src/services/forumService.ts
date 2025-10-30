@@ -1,11 +1,11 @@
 import { MoreThanOrEqual } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { ForumCategory } from '../entities/ForumCategory';
-import { ForumPost, PostStatus, PostType } from '../entities/ForumPost';
-import { ForumComment, CommentStatus } from '../entities/ForumComment';
-import { ForumTag } from '../entities/ForumTag';
-import { User } from '../entities/User';
-import { cacheService } from './CacheService';
+import { AppDataSource } from '../database/connection.js';
+import { ForumCategory } from '../entities/ForumCategory.js';
+import { ForumPost, PostStatus, PostType } from '../entities/ForumPost.js';
+import { ForumComment, CommentStatus } from '../entities/ForumComment.js';
+import { ForumTag } from '../entities/ForumTag.js';
+import { User } from '../entities/User.js';
+import { cacheService } from './CacheService.js';
 
 export interface ForumSearchOptions {
   query?: string;

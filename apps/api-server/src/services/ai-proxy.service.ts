@@ -14,8 +14,8 @@
  * - Max 3-5 retry attempts
  */
 
-import logger from '../utils/logger';
-import { startLLMCallSpan, endSpanSuccess, endSpanError } from '../utils/telemetry';
+import logger from '../utils/logger.js';
+import { startLLMCallSpan, endSpanSuccess, endSpanError } from '../utils/telemetry.js';
 import {
   AIProvider,
   AIGenerateRequest,
@@ -26,10 +26,10 @@ import {
   OpenAIResponse,
   GeminiResponse,
   ClaudeResponse,
-} from '../types/ai-proxy.types';
-import { AppDataSource } from '../database/connection';
-import { AiSettings } from '../entities/AiSettings';
-import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog';
+} from '../types/ai-proxy.types.js';
+import { AppDataSource } from '../database/connection.js';
+import { AiSettings } from '../entities/AiSettings.js';
+import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog.js';
 
 class AIProxyService {
   private static instance: AIProxyService;

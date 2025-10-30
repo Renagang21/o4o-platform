@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { authenticate as authMiddleware } from '../middleware/auth.middleware';
-import { asyncHandler } from '../middleware/error-handler';
-import { ServiceUnavailableError } from '../utils/api-error';
-// import { InventoryController } from '../controllers/inventory/inventoryController';
+import { authenticate as authMiddleware } from '../middleware/auth.middleware.js';
+import { asyncHandler } from '../middleware/error-handler.js';
+import { ServiceUnavailableError } from '../utils/api-error.js';
+// import { InventoryController } from '../controllers/inventory/inventoryController.js';
 
 const router: Router = Router();
 // const inventoryController = new InventoryController();

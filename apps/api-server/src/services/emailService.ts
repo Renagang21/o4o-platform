@@ -3,7 +3,7 @@ import { Transporter } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import path from 'path';
 import fs from 'fs/promises';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 interface EmailOptions {
   to: string | string[];

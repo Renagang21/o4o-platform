@@ -6,7 +6,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Application } from 'express';
-import { schemas } from '../swagger/schemas';
+import { schemas } from '../swagger/schemas/index.js';
 import path from 'path';
 import fs from 'fs';
 import yaml from 'js-yaml';

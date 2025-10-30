@@ -7,8 +7,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaUser } from './BetaUser';
-import { UserSession } from './UserSession';
+import { BetaUser } from './BetaUser.js';
+import { UserSession } from './UserSession.js';
 
 // Type definition for action metadata
 export interface ActionMetadata {

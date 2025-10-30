@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { body, param, query } from 'express-validator';
-import { OrderController } from '../controllers/OrderController';
-import { authenticate } from '../middleware/auth.middleware';
-import { asyncHandler } from '../middleware/error-handler';
+import { OrderController } from '../controllers/OrderController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { asyncHandler } from '../middleware/error-handler.js';
 
 const router: Router = Router();
 const orderController = new OrderController();

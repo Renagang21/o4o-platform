@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { FundingProjectService } from '../../services/crowdfunding/FundingProjectService';
-import type { ProjectFilters } from '../../types/crowdfunding-types';
+import { FundingProjectService } from '../../services/crowdfunding/FundingProjectService.js';
+import type { ProjectFilters } from '../../types/crowdfunding-types.js';
 
 export class FundingProjectController {
   private projectService: FundingProjectService;

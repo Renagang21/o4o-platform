@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 import * as path from 'path';
 import * as fs from 'fs';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 export interface FileOptimizationResult {
   success: boolean;

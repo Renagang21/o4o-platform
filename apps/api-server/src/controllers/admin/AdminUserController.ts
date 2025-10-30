@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { User, UserRole, UserStatus } from '../../entities/User';
+import { User, UserRole, UserStatus } from '../../entities/User.js';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 

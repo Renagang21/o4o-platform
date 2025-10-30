@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Cart } from './Cart';
+import { Cart } from './Cart.js';
 
 @Entity('cart_items')
 @Index(['cartId'])

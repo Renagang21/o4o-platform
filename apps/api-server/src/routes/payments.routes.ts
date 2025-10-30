@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, param } from 'express-validator';
 import express from 'express';
-import paymentController from '../controllers/PaymentController';
-import { authenticate } from '../middleware/auth.middleware';
-import { asyncHandler } from '../middleware/error-handler';
+import paymentController from '../controllers/PaymentController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { asyncHandler } from '../middleware/error-handler.js';
 
 const router: Router = Router();
 

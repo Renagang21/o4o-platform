@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { User, UserRole, UserStatus } from '../../entities/User';
-import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog';
-import { BetaUser, BetaUserStatus } from '../../entities/BetaUser';
+import { AppDataSource } from '../../database/connection.js';
+import { User, UserRole, UserStatus } from '../../entities/User.js';
+import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog.js';
+import { BetaUser, BetaUserStatus } from '../../entities/BetaUser.js';
 import { Between } from 'typeorm';
 
 export class UserStatisticsController {

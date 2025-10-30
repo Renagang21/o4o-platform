@@ -2,8 +2,8 @@
  * WordPress REST API 형식으로 데이터를 변환하는 유틸리티
  */
 
-import { CustomPost } from '../entities/CustomPost';
-import { User } from '../entities/User';
+import { CustomPost } from '../entities/CustomPost.js';
+import { User } from '../entities/User.js';
 
 interface WordPressPost {
   id: number;

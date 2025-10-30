@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppDataSource } from '../database/connection';
-import { AuthRequest } from '../types/auth';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { AuthRequest } from '../types/auth.js';
+import logger from '../utils/logger.js';
 
 interface PerformanceLog {
   id?: string;

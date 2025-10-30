@@ -7,8 +7,8 @@ import {
   OneToMany,
   Index
 } from 'typeorm';
-import { BetaFeedback } from './BetaFeedback';
-import { FeedbackConversation } from './FeedbackConversation';
+import { BetaFeedback } from './BetaFeedback.js';
+import { FeedbackConversation } from './FeedbackConversation.js';
 
 export enum BetaUserStatus {
   PENDING = 'pending',      // 등록 대기

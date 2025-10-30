@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { Post } from './Post';
-import { User } from './User';
+import { Post } from './Post.js';
+import { User } from './User.js';
 
 export interface RevisionChanges {
   title?: { from: string; to: string };

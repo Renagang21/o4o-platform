@@ -10,6 +10,6 @@ dotenv.config({
   path: path.resolve(process.cwd(), envFile) 
 });
 
-import { AppDataSource } from './connection';
+import { AppDataSource } from './connection.js';
 
 export default AppDataSource;

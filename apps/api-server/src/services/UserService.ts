@@ -1,7 +1,7 @@
-import { AppDataSource } from '../database/connection';
-import { User, UserRole, UserStatus } from '../entities/User';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole, UserStatus } from '../entities/User.js';
 import bcrypt from 'bcryptjs';
-import { BusinessInfo } from '../types/user';
+import { BusinessInfo } from '../types/user.js';
 import { MoreThan } from 'typeorm';
 
 export class UserService {

@@ -1,6 +1,6 @@
 import { Router, RequestHandler } from 'express';
-import { ImageEditingController } from '../../controllers/content/ImageEditingController';
-import { authenticate } from '../../middleware/auth.middleware';
+import { ImageEditingController } from '../../controllers/content/ImageEditingController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
 // Simple role guard for now - replace with actual implementation
 const roleGuard = (roles: string[]) => (req: any, res: any, next: any) => {
   // For now, allow all authenticated users

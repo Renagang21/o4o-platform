@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { MenuCacheController } from '../controllers/menu/MenuCacheController';
-import { MenuAnalyticsController } from '../controllers/menu/MenuAnalyticsController';
-import { MenuWidgetController } from '../controllers/menu/MenuWidgetController';
-import { authenticate } from '../middleware/auth.middleware';
-import { checkRole } from '../middleware/checkRole';
+import { MenuCacheController } from '../controllers/menu/MenuCacheController.js';
+import { MenuAnalyticsController } from '../controllers/menu/MenuAnalyticsController.js';
+import { MenuWidgetController } from '../controllers/menu/MenuWidgetController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { checkRole } from '../middleware/checkRole.js';
 
 const router: Router = Router();
 const menuCacheController = new MenuCacheController();

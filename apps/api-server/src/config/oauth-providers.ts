@@ -1,4 +1,4 @@
-import { OAuthProvider } from '../types/settings';
+import { OAuthProvider } from '../types/settings.js';
 
 export interface OAuthProviderConfig {
   authUrl: string;

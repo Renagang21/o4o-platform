@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import type { Router as ExpressRouter } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { AccountLinkingService } from '../services/account-linking.service';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AccountLinkingService } from '../services/account-linking.service.js';
 import { body, query, validationResult } from 'express-validator';
-import { AuthProvider, SecurityVerification } from '../types/account-linking';
-import logger from '../utils/logger';
+import { AuthProvider, SecurityVerification } from '../types/account-linking.js';
+import logger from '../utils/logger.js';
 
 const router: ExpressRouter = Router();
 

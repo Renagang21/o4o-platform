@@ -10,8 +10,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { prometheusMetrics } from '../services/prometheus-metrics.service';
-import logger from '../utils/logger';
+import { prometheusMetrics } from '../services/prometheus-metrics.service.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 

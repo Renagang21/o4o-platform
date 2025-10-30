@@ -1,13 +1,13 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, Address, OrderSummary } from '../entities/Order';
-import { User } from '../entities/User';
-import { Cart } from '../entities/Cart';
-import { CartItem } from '../entities/CartItem';
-import { Partner, PartnerStatus } from '../entities/Partner';
-import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission';
-import { Product } from '../entities/Product';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, Address, OrderSummary } from '../entities/Order.js';
+import { User } from '../entities/User.js';
+import { Cart } from '../entities/Cart.js';
+import { CartItem } from '../entities/CartItem.js';
+import { Partner, PartnerStatus } from '../entities/Partner.js';
+import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
+import { Product } from '../entities/Product.js';
+import logger from '../utils/logger.js';
 
 export interface CreateOrderRequest {
   items?: OrderItem[];

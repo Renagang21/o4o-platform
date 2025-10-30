@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
-import { MediaSize, ImageFormats } from '../entities/MediaFile';
+import { MediaSize, ImageFormats } from '../entities/MediaFile.js';
 
 export interface ProcessImageOptions {
   originalPath: string;

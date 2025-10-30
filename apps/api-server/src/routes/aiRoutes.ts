@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import AppDataSource from '../database/data-source';
-import { AiSettings } from '../entities/AiSettings';
+import { authenticate } from '../middleware/auth.middleware.js';
+import AppDataSource from '../database/data-source.js';
+import { AiSettings } from '../entities/AiSettings.js';
 
 const router: Router = Router();
 

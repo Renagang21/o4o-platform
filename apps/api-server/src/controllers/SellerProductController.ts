@@ -4,8 +4,8 @@ import SellerProductService, {
   UpdateSellerProductRequest, 
   SellerProductFilters,
   BulkAddProductsRequest 
-} from '../services/SellerProductService';
-import logger from '../utils/logger';
+} from '../services/SellerProductService.js';
+import logger from '../utils/logger.js';
 
 export class SellerProductController {
   private sellerProductService: SellerProductService;

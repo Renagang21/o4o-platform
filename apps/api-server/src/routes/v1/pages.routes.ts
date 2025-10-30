@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { authenticate as authenticateToken } from '../../middleware/auth.middleware';
-import { AppDataSource } from '../../database/connection';
-import { Page } from '../../entities/Page';
-import logger from '../../utils/logger';
-import { PAGINATION_DEFAULTS, SORT_FIELDS } from '../../config/editor.constants';
+import { authenticate as authenticateToken } from '../../middleware/auth.middleware.js';
+import { AppDataSource } from '../../database/connection.js';
+import { Page } from '../../entities/Page.js';
+import logger from '../../utils/logger.js';
+import { PAGINATION_DEFAULTS, SORT_FIELDS } from '../../config/editor.constants.js';
 
 const router: Router = Router();
 

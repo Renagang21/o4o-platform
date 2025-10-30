@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { DropshippingCPTController } from '../../controllers/cpt/DropshippingCPTController';
-import { authenticate } from '../../middleware/auth.middleware';
+import { DropshippingCPTController } from '../../controllers/cpt/DropshippingCPTController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const controller = new DropshippingCPTController();

@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import { ValidationError, NotFoundError, ConflictError, ForbiddenError } from '../errors';
+import { ValidationError, NotFoundError, ConflictError, ForbiddenError } from '../errors/index.js';
 
 export function sendError(res: Response, err: any) {
   if (err instanceof ValidationError) {

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Index } from 'typeorm';
-import { User } from './User';
+import { User } from './User.js';
 
 @Entity('password_reset_tokens')
 @Index(['token'], { unique: true })

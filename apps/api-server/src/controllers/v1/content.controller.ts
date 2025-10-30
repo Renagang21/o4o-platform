@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { Post } from '../../entities/Post';
-import { Page } from '../../entities/Page';
-import { Category } from '../../entities/Category';
-import { User, UserStatus } from '../../entities/User';
-import { MediaFile } from '../../entities/MediaFile';
-import { Tag } from '../../entities/Tag';
-import { checkPostAccess, getAccessDeniedResponse } from '../../utils/accessControl';
+import { AppDataSource } from '../../database/connection.js';
+import { Post } from '../../entities/Post.js';
+import { Page } from '../../entities/Page.js';
+import { Category } from '../../entities/Category.js';
+import { User, UserStatus } from '../../entities/User.js';
+import { MediaFile } from '../../entities/MediaFile.js';
+import { Tag } from '../../entities/Tag.js';
+import { checkPostAccess, getAccessDeniedResponse } from '../../utils/accessControl.js';
 
 export class ContentController {
   private postRepository = AppDataSource.getRepository(Post);

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { PerformanceOptimizationService } from '../services/PerformanceOptimizationService';
-import { AutoScalingService } from '../services/AutoScalingService';
-import { CDNOptimizationService } from '../services/CDNOptimizationService';
-import { DatabaseOptimizationService } from '../services/DatabaseOptimizationService';
+import { PerformanceOptimizationService } from '../services/PerformanceOptimizationService.js';
+import { AutoScalingService } from '../services/AutoScalingService.js';
+import { CDNOptimizationService } from '../services/CDNOptimizationService.js';
+import { DatabaseOptimizationService } from '../services/DatabaseOptimizationService.js';
 
 // Type definitions for performance services
 interface PerformanceReport {

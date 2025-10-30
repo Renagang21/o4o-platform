@@ -3,7 +3,7 @@
  * 필수 환경 변수를 체크하고 기본값을 설정합니다.
  */
 
-import logger from './logger';
+import logger from './logger.js';
 
 class EnvironmentValidator {
   private env: { [key: string]: string | undefined };

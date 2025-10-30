@@ -1,11 +1,11 @@
-import { AppDataSource } from '../../../database/connection';
-import { Post } from '../../../entities/Post';
-import { CustomPost } from '../../../entities/CustomPost';
-import { metaDataService } from '../../../services/MetaDataService';
-import { cptService } from './cpt.service';
-import { acfService } from './acf.service';
-import logger from '../../../utils/logger';
-import { CACHE_CONFIG, BLOCK_DYNAMIC_FIELDS } from '../../../config/editor.constants';
+import { AppDataSource } from '../../../database/connection.js';
+import { Post } from '../../../entities/Post.js';
+import { CustomPost } from '../../../entities/CustomPost.js';
+import { metaDataService } from '../../../services/MetaDataService.js';
+import { cptService } from './cpt.service.js';
+import { acfService } from './acf.service.js';
+import logger from '../../../utils/logger.js';
+import { CACHE_CONFIG, BLOCK_DYNAMIC_FIELDS } from '../../../config/editor.constants.js';
 
 /**
  * Block Data Service - Optimized data service for block editor

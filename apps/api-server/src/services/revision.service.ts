@@ -1,10 +1,10 @@
-import { AppDataSource } from '../database/connection';
-import { Post } from '../entities/Post';
-import { Page } from '../entities/Page';
-import { PostRevision, RevisionChanges } from '../entities/PostRevision';
-import { PageRevision, PageRevisionChanges } from '../entities/PageRevision';
-import { User } from '../entities/User';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Post } from '../entities/Post.js';
+import { Page } from '../entities/Page.js';
+import { PostRevision, RevisionChanges } from '../entities/PostRevision.js';
+import { PageRevision, PageRevisionChanges } from '../entities/PageRevision.js';
+import { User } from '../entities/User.js';
+import logger from '../utils/logger.js';
 
 export interface CreateRevisionData {
   entityId: string;

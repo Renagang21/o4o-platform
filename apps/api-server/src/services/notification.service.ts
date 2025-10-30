@@ -1,9 +1,9 @@
-import { AppDataSource } from '../database/connection';
-import { Notification } from '../entities/Notification';
-import { NotificationTemplate as NotificationTemplateEntity } from '../entities/NotificationTemplate';
-import { EmailService } from './email.service';
-import { cacheService } from './cache.service';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Notification } from '../entities/Notification.js';
+import { NotificationTemplate as NotificationTemplateEntity } from '../entities/NotificationTemplate.js';
+import { EmailService } from './email.service.js';
+import { cacheService } from './cache.service.js';
+import logger from '../utils/logger.js';
 import { EventEmitter } from 'events';
 
 export interface NotificationData {

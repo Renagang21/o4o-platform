@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { UserRoleSwitchController } from '../../controllers/v1/userRoleSwitch.controller';
-import { authenticate } from '../../middleware/auth.middleware';
-import { ensureAuthenticated } from '../../middleware/permission.middleware';
+import { UserRoleSwitchController } from '../../controllers/v1/userRoleSwitch.controller.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { ensureAuthenticated } from '../../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
-import { PlatformController } from '../../controllers/v1/platform.controller';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { PlatformController } from '../../controllers/v1/platform.controller.js';
 
 const router: Router = Router();
 const platformController = new PlatformController();

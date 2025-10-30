@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../../database/connection';
-import { Menu } from '../../entities/Menu';
-import logger from '../../utils/logger';
-import { AuthRequest } from '../../types/auth';
+import { AppDataSource } from '../../database/connection.js';
+import { Menu } from '../../entities/Menu.js';
+import logger from '../../utils/logger.js';
+import { AuthRequest } from '../../types/auth.js';
 
 interface MenuWidget {
   id: string;

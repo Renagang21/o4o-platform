@@ -5,8 +5,8 @@ import PartnerService, {
   PartnerFilters, 
   CommissionFilters,
   ReferralLinkParams 
-} from '../services/PartnerService';
-import logger from '../utils/logger';
+} from '../services/PartnerService.js';
+import logger from '../utils/logger.js';
 
 export class PartnerController {
   private partnerService: PartnerService;

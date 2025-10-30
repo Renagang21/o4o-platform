@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { MediaFile } from '../entities/MediaFile';
+import { AppDataSource } from '../database/connection.js';
+import { MediaFile } from '../entities/MediaFile.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';

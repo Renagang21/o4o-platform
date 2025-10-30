@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import logger from '../../utils/logger';
+import { AppDataSource } from '../../database/connection.js';
+import logger from '../../utils/logger.js';
 
 export class AdminStatsController {
   /**

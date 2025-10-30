@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { ACFController } from '../modules/cpt-acf/controllers/acf.controller';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/permission.middleware';
+import { ACFController } from '../modules/cpt-acf/controllers/acf.controller.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

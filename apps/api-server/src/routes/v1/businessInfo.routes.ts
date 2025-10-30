@@ -1,7 +1,7 @@
 import { Router, Request } from 'express';
-import { BusinessInfoController } from '../../controllers/v1/businessInfo.controller';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
+import { BusinessInfoController } from '../../controllers/v1/businessInfo.controller.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

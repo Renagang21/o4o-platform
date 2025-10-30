@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
-import { AppDataSource } from '../database/connection';
-import { User, UserRole, UserStatus } from '../entities/User';
-import { authService } from '../services/AuthService';
-import { AuthServiceV2 } from '../services/AuthServiceV2';
-import { UserService } from '../services/UserService';
-import { RefreshTokenService } from '../services/RefreshTokenService';
-import { SessionSyncService } from '../services/sessionSyncService';
-import { PasswordResetService } from '../services/passwordResetService';
-import { authenticateCookie, AuthRequest } from '../middleware/auth';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserRole, UserStatus } from '../entities/User.js';
+import { authService } from '../services/AuthService.js';
+import { AuthServiceV2 } from '../services/AuthServiceV2.js';
+import { UserService } from '../services/UserService.js';
+import { RefreshTokenService } from '../services/RefreshTokenService.js';
+import { SessionSyncService } from '../services/sessionSyncService.js';
+import { PasswordResetService } from '../services/passwordResetService.js';
+import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
 
 const router: Router = Router();
 

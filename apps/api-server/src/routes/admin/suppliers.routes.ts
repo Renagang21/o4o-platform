@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { AdminSupplierController } from '../../controllers/admin/AdminSupplierController';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
-import { UserRole } from '../../entities/User';
+import { AdminSupplierController } from '../../controllers/admin/AdminSupplierController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware.js';
+import { UserRole } from '../../entities/User.js';
 import { body } from 'express-validator';
 
 const router: Router = Router();

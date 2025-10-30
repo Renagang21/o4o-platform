@@ -12,8 +12,8 @@
 
 import { Queue, QueueEvents } from 'bullmq';
 import { Redis } from 'ioredis';
-import { AIJobData, AIJobResult, AIJobProgress, AIJobStatusResponse } from '../types/ai-job.types';
-import logger from '../utils/logger';
+import { AIJobData, AIJobResult, AIJobProgress, AIJobStatusResponse } from '../types/ai-job.types.js';
+import logger from '../utils/logger.js';
 
 class AIJobQueueService {
   private static instance: AIJobQueueService;

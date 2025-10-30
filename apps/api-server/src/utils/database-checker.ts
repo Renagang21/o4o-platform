@@ -4,8 +4,8 @@
  */
 
 import { DataSource } from 'typeorm';
-import { env } from './env-validator';
-import logger from './logger';
+import { env } from './env-validator.js';
+import logger from './logger.js';
 
 export class DatabaseChecker {
   private dataSource: DataSource;

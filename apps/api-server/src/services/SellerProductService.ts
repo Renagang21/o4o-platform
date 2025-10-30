@@ -1,10 +1,10 @@
 import { Repository, In } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SellerProduct, SellerProductStatus } from '../entities/SellerProduct';
-import { Seller, SellerTier } from '../entities/Seller';
-import { Product, ProductStatus } from '../entities/Product';
-import { User } from '../entities/User';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { SellerProduct, SellerProductStatus } from '../entities/SellerProduct.js';
+import { Seller, SellerTier } from '../entities/Seller.js';
+import { Product, ProductStatus } from '../entities/Product.js';
+import { User } from '../entities/User.js';
+import logger from '../utils/logger.js';
 
 export interface AddProductToSellerRequest {
   sellerId: string;

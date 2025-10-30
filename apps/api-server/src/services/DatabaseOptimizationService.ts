@@ -1,9 +1,9 @@
 import * as crypto from 'crypto';
-import { AppDataSource } from '../database/connection';
+import { AppDataSource } from '../database/connection.js';
 import { Repository, SelectQueryBuilder, EntityMetadata } from 'typeorm';
 import { performance } from 'perf_hooks';
 import Redis from 'ioredis';
-import { AnalyticsService } from './AnalyticsService';
+import { AnalyticsService } from './AnalyticsService.js';
 import {
   SlowQuery as ImportedSlowQuery,
   IndexInfo,
@@ -23,7 +23,7 @@ import {
   QueryCacheEntry as ImportedQueryCacheEntry,
   QueryPattern as ImportedQueryPattern,
   QueryPerformanceMetrics
-} from '../types';
+} from '../types/index.js';
 
 /**
  * 데이터베이스 최적화 서비스

@@ -2,7 +2,7 @@ import multer from 'multer';
 import { Request, Response, NextFunction } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 // File size limits (in bytes)
 const FILE_SIZE_LIMITS = {

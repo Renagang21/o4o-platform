@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { autoRecoveryController } from '../controllers/autoRecoveryController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAnyRole } from '../middleware/permission.middleware';
-import { UserRole } from '../types/auth';
+import { autoRecoveryController } from '../controllers/autoRecoveryController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAnyRole } from '../middleware/permission.middleware.js';
+import { UserRole } from '../types/auth.js';
 
 const router: Router = Router();
 

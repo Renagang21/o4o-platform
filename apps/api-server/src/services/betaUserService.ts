@@ -1,7 +1,7 @@
-import { AppDataSource } from '../database/connection';
-import { BetaUser, BetaUserStatus, BetaUserType, InterestArea } from '../entities/BetaUser';
-import { BetaFeedback, FeedbackType, FeedbackStatus, FeedbackPriority, SignageFeature } from '../entities/BetaFeedback';
-import { User } from '../entities/User';
+import { AppDataSource } from '../database/connection.js';
+import { BetaUser, BetaUserStatus, BetaUserType, InterestArea } from '../entities/BetaUser.js';
+import { BetaFeedback, FeedbackType, FeedbackStatus, FeedbackPriority, SignageFeature } from '../entities/BetaFeedback.js';
+import { User } from '../entities/User.js';
 import { Repository, Between, In, Like } from 'typeorm';
 
 export interface BetaUserRegistrationData {
@@ -301,7 +301,7 @@ export class BetaUserService {
     try {
       // Note: RealtimeFeedbackService instance should be injected or accessed differently
       // For now, commenting out to fix the build error
-      // const { realtimeFeedbackService } = await import('../main');
+      // const { realtimeFeedbackService } = await import('../main.js');
       // if (realtimeFeedbackService && feedbackWithUser) {
       //   await realtimeFeedbackService.notifyNewFeedback(feedbackWithUser);
       // }
@@ -602,7 +602,7 @@ export class BetaUserService {
     try {
       // Note: RealtimeFeedbackService instance should be injected or accessed differently
       // For now, commenting out to fix the build error
-      // const { realtimeFeedbackService } = await import('../main');
+      // const { realtimeFeedbackService } = await import('../main.js');
       // if (realtimeFeedbackService) {
       //   await realtimeFeedbackService.notifyFeedbackUpdate(feedback, updateType);
       // }

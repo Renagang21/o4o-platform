@@ -1,7 +1,7 @@
-import { AppDataSource } from '../database/connection';
-import { CustomFieldValue, CustomField } from '../entities/CustomField';
+import { AppDataSource } from '../database/connection.js';
+import { CustomFieldValue, CustomField } from '../entities/CustomField.js';
 import { In } from 'typeorm';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 export interface MetaValue {
   fieldId: string;

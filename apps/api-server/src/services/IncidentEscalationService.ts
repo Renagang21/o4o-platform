@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { Alert, AlertSeverity, AlertStatus } from '../entities/Alert';
-import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-// import { WebhookService } from './webhookService';
+import { AppDataSource } from '../database/connection.js';
+import { Alert, AlertSeverity, AlertStatus } from '../entities/Alert.js';
+import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics.js';
+// import { WebhookService } from './webhookService.js';
 import * as crypto from 'crypto';
 import { 
   EscalationActionParameters, 
@@ -14,7 +14,7 @@ import {
   ConferenceBridgeParameters,
   StatusPageParameters,
   JiraTicketParameters
-} from '../types/escalation';
+} from '../types/escalation.js';
 
 export enum EscalationLevel {
   L1_MONITORING = 'l1_monitoring',

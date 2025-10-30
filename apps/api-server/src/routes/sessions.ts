@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import type { Router as ExpressRouter } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { SessionSyncService } from '../services/sessionSyncService';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { SessionSyncService } from '../services/sessionSyncService.js';
 
 const router: ExpressRouter = Router();
 

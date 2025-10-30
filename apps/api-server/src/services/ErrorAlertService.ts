@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import logger from '../utils/logger';
-import { emailService } from './emailService';
-// import { webhookService } from './webhookService';
+import logger from '../utils/logger.js';
+import { emailService } from './emailService.js';
+// import { webhookService } from './webhookService.js';
 
 export interface ErrorAlert {
   id: string;

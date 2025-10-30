@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { SignageController } from '../controllers/signageController';
-import { authenticate } from '../middleware/auth.middleware';
-import { validateSignageContent, validateStore, validatePlaylist } from '../middleware/validation';
+import { SignageController } from '../controllers/signageController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { validateSignageContent, validateStore, validatePlaylist } from '../middleware/validation.js';
 
 const router: Router = Router();
 const signageController = new SignageController();

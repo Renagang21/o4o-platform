@@ -1,17 +1,17 @@
 import * as jwt from 'jsonwebtoken';
 import { Response } from 'express';
-import { User } from '../entities/User';
+import { User } from '../entities/User.js';
 import { 
   AccessTokenPayload, 
   AuthTokens, 
   LoginRequest, 
   LoginResponse,
   UserRole
-} from '../types/auth';
-import { UserService } from './UserService';
-import { RefreshTokenService } from './RefreshTokenService';
-import { SessionSyncService } from './sessionSyncService';
-import { LoginSecurityService } from './LoginSecurityService';
+} from '../types/auth.js';
+import { UserService } from './UserService.js';
+import { RefreshTokenService } from './RefreshTokenService.js';
+import { SessionSyncService } from './sessionSyncService.js';
+import { LoginSecurityService } from './LoginSecurityService.js';
 
 interface TokenMetadata {
   userAgent?: string;

@@ -1,7 +1,7 @@
 import { Repository, Not } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert';
+import { AppDataSource } from '../database/connection.js';
+import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics.js';
+import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert.js';
 
 export enum CircuitState {
   CLOSED = 'closed',

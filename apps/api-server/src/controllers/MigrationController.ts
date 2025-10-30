@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { CustomPostType } from '../entities/CustomPostType';
-import { CustomPost, PostStatus } from '../entities/CustomPost';
-import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
-import { User } from '../entities/User';
-import { UserRole } from '../types/auth';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { CustomPostType } from '../entities/CustomPostType.js';
+import { CustomPost, PostStatus } from '../entities/CustomPost.js';
+import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
+import { User } from '../entities/User.js';
+import { UserRole } from '../types/auth.js';
+import logger from '../utils/logger.js';
 
 export class MigrationController {
   // Initialize CPTs and ACF fields for dropshipping

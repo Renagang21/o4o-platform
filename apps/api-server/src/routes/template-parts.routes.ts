@@ -1,11 +1,11 @@
 import { Router, Response, Request } from 'express'
-import AppDataSource from '../database/data-source'
-import { TemplatePart } from '../entities/TemplatePart'
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthRequest } from '../types/auth'
+import AppDataSource from '../database/data-source.js'
+import { TemplatePart } from '../entities/TemplatePart.js'
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js'
 import { In, Not } from 'typeorm'
 import { z } from 'zod'
-import logger from '../utils/logger'
+import logger from '../utils/logger.js'
 
 const router: Router = Router()
 

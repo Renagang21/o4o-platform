@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
-import { JwtPayload } from '../types/email-auth';
-import logger from './logger';
+import { JwtPayload } from '../types/email-auth.js';
+import logger from './logger.js';
 
 // Password hashing
 export const hashPassword = async (password: string): Promise<string> => {

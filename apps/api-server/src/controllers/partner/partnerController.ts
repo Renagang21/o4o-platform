@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { getRepository } from 'typeorm';
-import { User } from '../../entities/User';
-import { AuthRequest } from '../../types/auth';
+import { User } from '../../entities/User.js';
+import { AuthRequest } from '../../types/auth.js';
 
 export class PartnerController {
   // Get partner dashboard summary

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { User } from './User';
+import { User } from './User.js';
 
 export enum AIProvider {
   OPENAI = 'openai',

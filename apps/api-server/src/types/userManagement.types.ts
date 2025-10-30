@@ -1,8 +1,8 @@
 // User Management API Types
 
-import { UserRole, UserStatus } from '../entities/User';
-import { ActivityType, ActivityCategory, ActivityMetadata } from '../entities/UserActivityLog';
-import { BusinessType, BusinessSize, Industry, BusinessAddress, BusinessContact, BusinessFinancials, BusinessLegal } from '../entities/BusinessInfo';
+import { UserRole, UserStatus } from '../entities/User.js';
+import { ActivityType, ActivityCategory, ActivityMetadata } from '../entities/UserActivityLog.js';
+import { BusinessType, BusinessSize, Industry, BusinessAddress, BusinessContact, BusinessFinancials, BusinessLegal } from '../entities/BusinessInfo.js';
 
 // Common API Response Types
 export interface ApiResponse<T = any> {

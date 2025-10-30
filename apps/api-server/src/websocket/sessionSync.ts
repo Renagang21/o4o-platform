@@ -1,7 +1,7 @@
 import { Server as SocketServer, Socket } from 'socket.io';
-import redisClient from '../config/redis';
-import { SessionSyncService } from '../services/sessionSyncService';
-import logger from '../utils/logger';
+import redisClient from '../config/redis.js';
+import { SessionSyncService } from '../services/sessionSyncService.js';
+import logger from '../utils/logger.js';
 import jwt from 'jsonwebtoken';
 
 interface SessionEventData {

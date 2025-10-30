@@ -1,9 +1,9 @@
 import { Response } from 'express';
 import { getRepository } from 'typeorm';
-import { User } from '../../entities/User';
-import { ApprovalLog } from '../../entities/ApprovalLog';
-import { AuthRequest } from '../../types/auth';
-import logger from '../../utils/logger';
+import { User } from '../../entities/User.js';
+import { ApprovalLog } from '../../entities/ApprovalLog.js';
+import { AuthRequest } from '../../types/auth.js';
+import logger from '../../utils/logger.js';
 
 export class AdminApprovalController {
   // Get approval queue with filters

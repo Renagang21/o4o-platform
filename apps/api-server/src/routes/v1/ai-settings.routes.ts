@@ -1,7 +1,7 @@
 import { Router, RequestHandler } from 'express';
-import { AISettingsController } from '../../controllers/v1/ai-settings.controller';
-import { authenticate } from '../../middleware/auth.middleware';
-import { isAdmin } from '../../middleware/admin';
+import { AISettingsController } from '../../controllers/v1/ai-settings.controller.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { isAdmin } from '../../middleware/admin.js';
 
 const router: Router = Router();
 const controller = new AISettingsController();

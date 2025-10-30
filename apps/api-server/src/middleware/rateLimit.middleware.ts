@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RedisService } from '../services/redis.service';
+import { RedisService } from '../services/redis.service.js';
 
 interface RateLimitOptions {
   windowMs: number;  // Time window in milliseconds

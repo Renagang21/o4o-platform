@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { SessionSyncService } from '../services/sessionSyncService';
+import { SessionSyncService } from '../services/sessionSyncService.js';
 
 /**
  * Middleware to update session activity on each request

@@ -1,12 +1,12 @@
-import { AppDataSource } from '../database/connection';
-import { SignageContent, ContentStatus } from '../entities/SignageContent';
-import { Store } from '../entities/Store';
-import { StorePlaylist } from '../entities/StorePlaylist';
-import { PlaylistItem } from '../entities/PlaylistItem';
-import { SignageSchedule, ScheduleStatus } from '../entities/SignageSchedule';
-import { ContentUsageLog, LogEventType } from '../entities/ContentUsageLog';
-import { User } from '../entities/User';
-import { VideoHelper } from '../utils/videoHelper';
+import { AppDataSource } from '../database/connection.js';
+import { SignageContent, ContentStatus } from '../entities/SignageContent.js';
+import { Store } from '../entities/Store.js';
+import { StorePlaylist } from '../entities/StorePlaylist.js';
+import { PlaylistItem } from '../entities/PlaylistItem.js';
+import { SignageSchedule, ScheduleStatus } from '../entities/SignageSchedule.js';
+import { ContentUsageLog, LogEventType } from '../entities/ContentUsageLog.js';
+import { User } from '../entities/User.js';
+import { VideoHelper } from '../utils/videoHelper.js';
 import { MoreThan, Between } from 'typeorm';
 
 export class SignageService {

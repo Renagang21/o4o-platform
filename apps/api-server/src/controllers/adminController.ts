@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { AppDataSource } from '../database/connection';
-import { User, UserStatus } from '../entities/User';
-import { AuthRequest } from '../types/auth';
+import { AppDataSource } from '../database/connection.js';
+import { User, UserStatus } from '../entities/User.js';
+import { AuthRequest } from '../types/auth.js';
 import { Like, SelectQueryBuilder } from 'typeorm';
-import { emailService } from '../services/email.service';
-import logger from '../utils/logger';
+import { emailService } from '../services/email.service.js';
+import logger from '../utils/logger.js';
 
 export const getPendingUsers = async (req: Request, res: Response) => {
   try {

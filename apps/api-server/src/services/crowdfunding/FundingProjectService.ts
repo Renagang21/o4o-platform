@@ -1,14 +1,14 @@
 import { Repository, FindManyOptions, Like, Between, In } from 'typeorm';
-import { AppDataSource } from '../../database/connection';
-import { FundingProject } from '../../entities/crowdfunding/FundingProject';
-import { FundingReward } from '../../entities/crowdfunding/FundingReward';
-import { User } from '../../entities/User';
+import { AppDataSource } from '../../database/connection.js';
+import { FundingProject } from '../../entities/crowdfunding/FundingProject.js';
+import { FundingReward } from '../../entities/crowdfunding/FundingReward.js';
+import { User } from '../../entities/User.js';
 import type { 
   FundingProjectFormData, 
   ProjectFilters,
   FundingStatus 
-} from '../../types/crowdfunding-types';
-import { generateSlug } from '../../utils/string';
+} from '../../types/crowdfunding-types.js';
+import { generateSlug } from '../../utils/string.js';
 
 export class FundingProjectService {
   private projectRepository: Repository<FundingProject>;

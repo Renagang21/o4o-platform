@@ -4,13 +4,13 @@
 
 import { Router, Request, Response } from 'express'
 import { body, param, query } from 'express-validator'
-import AppDataSource from '../database/connection'
-import { Post } from '../entities/Post'
-import { User } from '../entities/User'
-import { authenticate } from '../middleware/auth.middleware'
-import logger from '../utils/logger'
-import { validateDto } from '../middleware/validateDto'
-import { ZoneContentAdapter } from '../utils/zone-adapter'
+import AppDataSource from '../database/connection.js'
+import { Post } from '../entities/Post.js'
+import { User } from '../entities/User.js'
+import { authenticate } from '../middleware/auth.middleware.js'
+import logger from '../utils/logger.js'
+import { validateDto } from '../middleware/validateDto.js'
+import { ZoneContentAdapter } from '../utils/zone-adapter.js'
 // import { 
 //   ZoneBasedContent, 
 //   ThemeCustomization,

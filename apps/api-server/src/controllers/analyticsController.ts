@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { Repository, Between, MoreThan, LessThan, FindOperator } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { AnalyticsService } from '../services/AnalyticsService';
-import { UserSession, SessionStatus } from '../entities/UserSession';
-import { UserAction, ActionType } from '../entities/UserAction';
-import { SystemMetrics, MetricType } from '../entities/SystemMetrics';
-import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport';
-import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert';
-import { BetaUser } from '../entities/BetaUser';
-import { AuthRequest } from '../types/auth';
+import { AppDataSource } from '../database/connection.js';
+import { AnalyticsService } from '../services/AnalyticsService.js';
+import { UserSession, SessionStatus } from '../entities/UserSession.js';
+import { UserAction, ActionType } from '../entities/UserAction.js';
+import { SystemMetrics, MetricType } from '../entities/SystemMetrics.js';
+import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport.js';
+import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert.js';
+import { BetaUser } from '../entities/BetaUser.js';
+import { AuthRequest } from '../types/auth.js';
 
 export class AnalyticsController {
   private analyticsService: AnalyticsService;

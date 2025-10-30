@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { menuService } from '../../services/menu.service';
-import logger from '../../utils/logger';
-import { MenuItemType, MenuItemTarget, MenuItemDisplayMode } from '../../entities/MenuItem';
-import { AuthRequest } from '../../types/auth';
+import { menuService } from '../../services/menu.service.js';
+import logger from '../../utils/logger.js';
+import { MenuItemType, MenuItemTarget, MenuItemDisplayMode } from '../../entities/MenuItem.js';
+import { AuthRequest } from '../../types/auth.js';
 
 export class MenuController {
   // GET /api/menus - Get all menus

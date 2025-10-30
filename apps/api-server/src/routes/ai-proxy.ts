@@ -17,19 +17,19 @@
 
 import { Router, Request, Response } from 'express';
 import { body, param } from 'express-validator';
-import { validateDto } from '../middleware/validateDto';
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthRequest } from '../types/auth';
-import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
-import { aiProxyService } from '../services/ai-proxy.service';
-import { aiJobQueue } from '../services/ai-job-queue.service';
-import { aiMetrics } from '../services/ai-metrics.service';
-import { aiDLQ } from '../services/ai-dlq.service';
-import { aiUsageReport } from '../services/ai-usage-report.service';
-import logger from '../utils/logger';
+import { validateDto } from '../middleware/validateDto.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js';
+import { rateLimitMiddleware } from '../middleware/rateLimit.middleware.js';
+import { aiProxyService } from '../services/ai-proxy.service.js';
+import { aiJobQueue } from '../services/ai-job-queue.service.js';
+import { aiMetrics } from '../services/ai-metrics.service.js';
+import { aiDLQ } from '../services/ai-dlq.service.js';
+import { aiUsageReport } from '../services/ai-usage-report.service.js';
+import logger from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
-import { AIProxyError } from '../types/ai-proxy.types';
-import { AIJobData } from '../types/ai-job.types';
+import { AIProxyError } from '../types/ai-proxy.types.js';
+import { AIJobData } from '../types/ai-job.types.js';
 
 const router: Router = Router();
 

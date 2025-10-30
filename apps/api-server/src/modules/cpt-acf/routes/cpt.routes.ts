@@ -1,7 +1,7 @@
 import { Router, IRouter } from 'express';
-import { CPTController } from '../controllers/cpt.controller';
-import { authenticate } from '../../../middleware/auth.middleware';
-import { requireAdmin } from '../../../middleware/permission.middleware';
+import { CPTController } from '../controllers/cpt.controller.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../middleware/permission.middleware.js';
 
 const router: IRouter = Router();
 

@@ -1,7 +1,7 @@
 import type { DataSource, EntityManager, Repository } from 'typeorm';
-import { AppDataSource } from '../../../database/connection';
-import { CustomPostType } from '../../../entities/CustomPostType';
-import { applyPagination, applySearch, normalizePaging, toPage } from './query-utils';
+import { AppDataSource } from '../../../database/connection.js';
+import { CustomPostType } from '../../../entities/CustomPostType.js';
+import { applyPagination, applySearch, normalizePaging, toPage } from './query-utils.js';
 
 export interface CptListParams {
   q?: string;

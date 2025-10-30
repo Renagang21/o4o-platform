@@ -9,8 +9,8 @@ import {
   Index,
   Unique
 } from 'typeorm';
-import { Seller } from './Seller';
-import { Product } from './Product';
+import { Seller } from './Seller.js';
+import { Product } from './Product.js';
 
 export enum SellerProductStatus {
   ACTIVE = 'active',

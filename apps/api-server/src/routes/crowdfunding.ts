@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { FundingProjectController } from '../controllers/crowdfunding/FundingProjectController';
-import { BackingController } from '../controllers/crowdfunding/BackingController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/permission.middleware';
+import { FundingProjectController } from '../controllers/crowdfunding/FundingProjectController.js';
+import { BackingController } from '../controllers/crowdfunding/BackingController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/permission.middleware.js';
 
 const router: Router = Router();
 const projectController = new FundingProjectController();

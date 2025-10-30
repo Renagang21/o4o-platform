@@ -17,7 +17,7 @@ import { LRUCache } from 'lru-cache';
 import zlib from 'zlib';
 import { promisify } from 'util';
 import crypto from 'crypto';
-import logger from '../utils/simpleLogger';
+import logger from '../utils/simpleLogger.js';
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);

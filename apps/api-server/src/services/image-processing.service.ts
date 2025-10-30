@@ -1,9 +1,9 @@
 import sharp from 'sharp';
 import * as path from 'path';
 import * as fs from 'fs';
-import { AppDataSource } from '../database/connection';
-import { Media } from '../entities/Media';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Media } from '../entities/Media.js';
+import logger from '../utils/logger.js';
 
 export interface ImageEditOptions {
   width?: number;

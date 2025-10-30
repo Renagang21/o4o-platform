@@ -3,8 +3,8 @@
  * Handles Google AI API integrations (Gemini, Imagen, etc.)
  */
 
-import { appRegistry } from './app-registry.service';
-import logger from '../utils/logger';
+import { appRegistry } from './app-registry.service.js';
+import logger from '../utils/logger.js';
 
 interface GeminiGenerateOptions {
   prompt: string;

@@ -2,11 +2,11 @@ import compression from 'compression';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { Express } from 'express';
-import { specs, swaggerUi } from '../swagger/swagger.config';
-import { performanceMiddleware } from '../middleware/performance.middleware';
-import errorHandler from '../middleware/errorHandler.middleware';
-import { cacheService } from '../services/cache.service';
-import logger from '../utils/logger';
+import { specs, swaggerUi } from '../swagger/swagger.config.js';
+import { performanceMiddleware } from '../middleware/performance.middleware.js';
+import errorHandler from '../middleware/errorHandler.middleware.js';
+import { cacheService } from '../services/cache.service.js';
+import logger from '../utils/logger.js';
 
 // Rate limiting configurations
 export const rateLimitConfig = {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { MigrationController } from '../controllers/MigrationController';
-import { authenticate } from '../middleware/auth.middleware';
+import { MigrationController } from '../controllers/MigrationController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const controller = new MigrationController();

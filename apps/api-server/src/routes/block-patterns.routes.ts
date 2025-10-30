@@ -4,14 +4,14 @@
  */
 
 import { Router, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { BlockPattern } from '../entities/BlockPattern';
-import { User } from '../entities/User';
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthRequest } from '../types/auth';
+import { AppDataSource } from '../database/connection.js';
+import { BlockPattern } from '../entities/BlockPattern.js';
+import { User } from '../entities/User.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js';
 import { ILike } from 'typeorm';
-import logger from '../utils/logger';
-import { PAGINATION_DEFAULTS, BLOCK_DUPLICATE, BLOCK_PATTERN_CATEGORIES } from '../config/editor.constants';
+import logger from '../utils/logger.js';
+import { PAGINATION_DEFAULTS, BLOCK_DUPLICATE, BLOCK_PATTERN_CATEGORIES } from '../config/editor.constants.js';
 
 const router: Router = Router();
 const blockPatternRepository = AppDataSource.getRepository(BlockPattern);

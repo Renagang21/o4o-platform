@@ -8,10 +8,10 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Partner } from './Partner';
-import { Product } from './Product';
-import { Seller } from './Seller';
-import { Order } from './Order';
+import { Partner } from './Partner.js';
+import { Product } from './Product.js';
+import { Seller } from './Seller.js';
+import { Order } from './Order.js';
 
 export enum CommissionStatus {
   PENDING = 'pending',     // 주문 완료, 커미션 대기

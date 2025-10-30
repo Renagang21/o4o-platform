@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { AiSettings } from '../../entities/AiSettings';
+import { AppDataSource } from '../../database/connection.js';
+import { AiSettings } from '../../entities/AiSettings.js';
 import { Repository } from 'typeorm';
 
 export class AISettingsController {

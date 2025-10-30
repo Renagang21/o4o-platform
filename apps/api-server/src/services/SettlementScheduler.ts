@@ -1,7 +1,7 @@
 import { LessThanOrEqual, Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { PaymentSettlement, SettlementStatus } from '../entities/PaymentSettlement';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { PaymentSettlement, SettlementStatus } from '../entities/PaymentSettlement.js';
+import logger from '../utils/logger.js';
 import * as cron from 'node-cron';
 
 /**

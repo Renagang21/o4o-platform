@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware.js';
 import { 
   betaUserController, 
   betaUserRegistrationValidation, 
   feedbackSubmissionValidation 
-} from '../controllers/betaUserController';
+} from '../controllers/betaUserController.js';
 
 const router: Router = Router();
 

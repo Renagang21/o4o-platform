@@ -1,8 +1,8 @@
 import { Repository, Between } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertSeverity, AlertType } from '../entities/Alert';
-// import { WebhookService } from './webhookService';
+import { AppDataSource } from '../database/connection.js';
+import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics.js';
+import { Alert, AlertSeverity, AlertType } from '../entities/Alert.js';
+// import { WebhookService } from './webhookService.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';

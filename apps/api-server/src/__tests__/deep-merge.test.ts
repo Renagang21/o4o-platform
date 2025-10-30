@@ -3,7 +3,7 @@
  * Tests for deep object merging utility
  */
 
-import { deepMerge, deepMergeAll } from '../utils/deep-merge';
+import { deepMerge, deepMergeAll } from '../utils/deep-merge.js';
 
 describe('Deep Merge', () => {
   describe('deepMerge - Basic', () => {

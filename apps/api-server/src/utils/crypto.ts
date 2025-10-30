@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import logger from './logger';
+import logger from './logger.js';
 
 // Use environment variable or fallback to a default key (should be changed in production)
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-32-char-encryption-key!!';

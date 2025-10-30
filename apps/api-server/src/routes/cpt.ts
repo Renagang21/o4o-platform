@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller';
-import { FieldGroupsController } from '../controllers/cpt/FieldGroupsController';
-import { TaxonomiesController } from '../controllers/cpt/TaxonomiesController';
-import { FormsController } from '../controllers/cpt/FormsController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/permission.middleware';
+import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller.js';
+import { FieldGroupsController } from '../controllers/cpt/FieldGroupsController.js';
+import { TaxonomiesController } from '../controllers/cpt/TaxonomiesController.js';
+import { FormsController } from '../controllers/cpt/FormsController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

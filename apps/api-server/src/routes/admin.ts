@@ -8,11 +8,11 @@ import {
   suspendUser,
   reactivateUser,
   getDashboardStats
-} from '../controllers/adminController';
-import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/permission.middleware';
-import securityRoutes from './admin/security';
-import { PagesController } from '../controllers/pagesController';
+} from '../controllers/adminController.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/permission.middleware.js';
+import securityRoutes from './admin/security.js';
+import { PagesController } from '../controllers/pagesController.js';
 
 const router: Router = Router();
 const pagesController = new PagesController();

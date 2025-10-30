@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { optionalAuth } from '../middleware/auth';
-import { ForumController } from '../controllers/forumController';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { optionalAuth } from '../middleware/auth.js';
+import { ForumController } from '../controllers/forumController.js';
 
 const router: Router = Router();
 const forumController = new ForumController();

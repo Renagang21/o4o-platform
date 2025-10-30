@@ -5,12 +5,12 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { AIReference } from '../entities/AIReference';
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthRequest } from '../types/auth';
-import { rateLimitMiddleware } from '../middleware/rateLimit.middleware';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { AIReference } from '../entities/AIReference.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js';
+import { rateLimitMiddleware } from '../middleware/rateLimit.middleware.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 

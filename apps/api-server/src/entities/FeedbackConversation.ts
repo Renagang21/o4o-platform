@@ -9,9 +9,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaFeedback } from './BetaFeedback';
-import { BetaUser } from './BetaUser';
-import { User } from './User';
+import { BetaFeedback } from './BetaFeedback.js';
+import { BetaUser } from './BetaUser.js';
+import { User } from './User.js';
 
 export enum ConversationStatus {
   ACTIVE = 'active',

@@ -1,12 +1,12 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { Theme, ThemeInstallation } from '../entities/Theme';
-import { hooks, WP_HOOKS } from './HookSystem';
+import { AppDataSource } from '../database/connection.js';
+import { Theme, ThemeInstallation } from '../entities/Theme.js';
+import { hooks, WP_HOOKS } from './HookSystem.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import AdmZip from 'adm-zip';
 import axios from 'axios';
-import { THEME_DIRS, THEME_SUBDIRS, THEME_FILES } from '../config/appearance.constants';
+import { THEME_DIRS, THEME_SUBDIRS, THEME_FILES } from '../config/appearance.constants.js';
 
 export interface ThemeManifest {
   name: string;

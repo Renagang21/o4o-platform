@@ -8,8 +8,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { ForumCategory } from './ForumCategory';
-import { User } from './User';
+import { ForumCategory } from './ForumCategory.js';
+import { User } from './User.js';
 
 export enum PostStatus {
   DRAFT = 'draft',

@@ -1,12 +1,12 @@
 import { Repository, DataSource } from 'typeorm';
-import { AppDataSource } from '../../database/connection';
-import { FundingBacking } from '../../entities/crowdfunding/FundingBacking';
-import { FundingProject } from '../../entities/crowdfunding/FundingProject';
-import { FundingReward } from '../../entities/crowdfunding/FundingReward';
-import { BackerReward } from '../../entities/crowdfunding/BackerReward';
-import { User } from '../../entities/User';
-import { FundingProjectService } from './FundingProjectService';
-import type { PaymentMethod, BackingStatus } from '../../types/crowdfunding-types';
+import { AppDataSource } from '../../database/connection.js';
+import { FundingBacking } from '../../entities/crowdfunding/FundingBacking.js';
+import { FundingProject } from '../../entities/crowdfunding/FundingProject.js';
+import { FundingReward } from '../../entities/crowdfunding/FundingReward.js';
+import { BackerReward } from '../../entities/crowdfunding/BackerReward.js';
+import { User } from '../../entities/User.js';
+import { FundingProjectService } from './FundingProjectService.js';
+import type { PaymentMethod, BackingStatus } from '../../types/crowdfunding-types.js';
 
 interface CreateBackingData {
   projectId: string;

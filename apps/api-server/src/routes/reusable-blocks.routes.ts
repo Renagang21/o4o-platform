@@ -4,14 +4,14 @@
  */
 
 import { Router, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { ReusableBlock } from '../entities/ReusableBlock';
-import { User } from '../entities/User';
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthRequest } from '../types/auth';
+import { AppDataSource } from '../database/connection.js';
+import { ReusableBlock } from '../entities/ReusableBlock.js';
+import { User } from '../entities/User.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js';
 import { Like, ILike } from 'typeorm';
-import logger from '../utils/logger';
-import { PAGINATION_DEFAULTS, REVISION_LIMITS, BLOCK_DUPLICATE } from '../config/editor.constants';
+import logger from '../utils/logger.js';
+import { PAGINATION_DEFAULTS, REVISION_LIMITS, BLOCK_DUPLICATE } from '../config/editor.constants.js';
 
 const router: Router = Router();
 const reusableBlockRepository = AppDataSource.getRepository(ReusableBlock);

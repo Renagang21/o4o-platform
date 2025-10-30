@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { autoRecoveryService } from '../services/AutoRecoveryService';
-import { circuitBreakerService } from '../services/CircuitBreakerService';
-import { gracefulDegradationService } from '../services/GracefulDegradationService';
-import { incidentEscalationService } from '../services/IncidentEscalationService';
-import { selfHealingService } from '../services/SelfHealingService';
-import { deploymentMonitoringService } from '../services/DeploymentMonitoringService';
+import { autoRecoveryService } from '../services/AutoRecoveryService.js';
+import { circuitBreakerService } from '../services/CircuitBreakerService.js';
+import { gracefulDegradationService } from '../services/GracefulDegradationService.js';
+import { incidentEscalationService } from '../services/IncidentEscalationService.js';
+import { selfHealingService } from '../services/SelfHealingService.js';
+import { deploymentMonitoringService } from '../services/DeploymentMonitoringService.js';
 
 export class AutoRecoveryController {
   // Auto Recovery Service endpoints

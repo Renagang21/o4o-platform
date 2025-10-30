@@ -1,5 +1,5 @@
-import { RedisService } from './redis.service';
-import logger from '../utils/logger';
+import { RedisService } from './redis.service.js';
+import logger from '../utils/logger.js';
 
 export enum CacheKeys {
   // Vendor caching

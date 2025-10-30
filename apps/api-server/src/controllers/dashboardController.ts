@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { Post } from '../entities/Post';
-import { Category } from '../entities/Category';
-import { MediaFile } from '../entities/MediaFile';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { Post } from '../entities/Post.js';
+import { Category } from '../entities/Category.js';
+import { MediaFile } from '../entities/MediaFile.js';
 
 export class DashboardController {
   // Get user statistics

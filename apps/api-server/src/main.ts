@@ -1,8 +1,8 @@
 // MUST be first: Load environment variables before anything else
-import './env-loader';
+import './env-loader.js';
 
 // Initialize OpenTelemetry before any other imports
-import { initTelemetry } from './utils/telemetry';
+import { initTelemetry } from './utils/telemetry.js';
 const telemetrySDK = initTelemetry();
 
 import 'reflect-metadata';
@@ -14,28 +14,28 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { RedisStore } from 'connect-redis';
-import passport, { initializePassport } from './config/passportDynamic';
+import passport, { initializePassport } from './config/passportDynamic.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
 
 // Environment variables are loaded by env-loader (imported first)
 // Environment validation
-import { env } from './utils/env-validator';
-import logger from './utils/logger';
+import { env } from './utils/env-validator.js';
+import logger from './utils/logger.js';
 
 // Middleware
-import { performanceMonitor } from './middleware/performanceMonitor';
-import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
+import { performanceMonitor } from './middleware/performanceMonitor.js';
+import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware.js';
 
 // Services
-import { startupService } from './services/startup.service';
-import { SessionSyncService } from './services/sessionSyncService';
-import { WebSocketSessionSync } from './websocket/sessionSync';
+import { startupService } from './services/startup.service.js';
+import { SessionSyncService } from './services/sessionSyncService.js';
+import { WebSocketSessionSync } from './websocket/sessionSync.js';
 
 // Configuration
-import { setupRoutes } from './config/routes.config';
-import { setupSwagger } from './config/swagger-enhanced';
+import { setupRoutes } from './config/routes.config.js';
+import { setupSwagger } from './config/swagger-enhanced.js';
 
 const app: Application = express();
 
@@ -390,5 +390,5 @@ process.on('SIGINT', async () => {
 });
 
 // Export services for other modules
-export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
+export { RealtimeFeedbackService } from './services/realtimeFeedbackService.js';
 export { io };

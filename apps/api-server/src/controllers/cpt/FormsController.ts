@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { Form } from '../../entities/Form';
-import { FormSubmission } from '../../entities/FormSubmission';
-import { AuthRequest } from '../../types/auth';
-import { User } from '../../entities/User';
-import type { FormField, FormSettings, FormNotification, FormConfirmation } from '../../types/form-builder';
+import { AppDataSource } from '../../database/connection.js';
+import { Form } from '../../entities/Form.js';
+import { FormSubmission } from '../../entities/FormSubmission.js';
+import { AuthRequest } from '../../types/auth.js';
+import { User } from '../../entities/User.js';
+import type { FormField, FormSettings, FormNotification, FormConfirmation } from '../../types/form-builder.js';
 
 export class FormsController {
   private formRepo = AppDataSource.getRepository(Form);

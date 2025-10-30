@@ -2,9 +2,9 @@
 // UAGBFormsBlock & UAGBArchiveBlock과 연동하는 API 컨트롤러
 
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { CustomPost, PostStatus } from '../entities/CustomPost';
-import { CustomPostType } from '../entities/CustomPostType';
+import { AppDataSource } from '../database/connection.js';
+import { CustomPost, PostStatus } from '../entities/CustomPost.js';
+import { CustomPostType } from '../entities/CustomPostType.js';
 import { Repository } from 'typeorm';
 
 // Repository 인스턴스들

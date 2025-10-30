@@ -9,7 +9,7 @@ import {
   BeforeUpdate,
   OneToMany
 } from 'typeorm';
-import { MenuItem } from './MenuItem';
+import { MenuItem } from './MenuItem.js';
 
 @Entity('menus')
 export class Menu {

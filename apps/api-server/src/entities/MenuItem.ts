@@ -11,7 +11,7 @@ import {
   TreeParent,
   Index
 } from 'typeorm';
-import { Menu } from './Menu';
+import { Menu } from './Menu.js';
 
 export enum MenuItemType {
   PAGE = 'page',

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { Form } from './Form';
-import { User } from './User';
+import { Form } from './Form.js';
+import { User } from './User.js';
 
 @Entity('form_submissions')
 @Index(['formId', 'status'])

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { User } from '../../entities/User';
-import { Role } from '../../entities/Role';
-import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog';
+import { AppDataSource } from '../../database/connection.js';
+import { User } from '../../entities/User.js';
+import { Role } from '../../entities/Role.js';
+import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog.js';
 import { validate as isUuid } from 'uuid';
-import logger from '../../utils/logger';
+import logger from '../../utils/logger.js';
 
 export class UserRoleSwitchController {
   private static userRepository = AppDataSource.getRepository(User);

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { Taxonomy, Term, TermRelationship } from '../../entities/Taxonomy';
-import { AuthRequest } from '../../types/auth';
-import { User } from '../../entities/User';
+import { AppDataSource } from '../../database/connection.js';
+import { Taxonomy, Term, TermRelationship } from '../../entities/Taxonomy.js';
+import { AuthRequest } from '../../types/auth.js';
+import { User } from '../../entities/User.js';
 import { TreeRepository } from 'typeorm';
 
 export class TaxonomiesController {

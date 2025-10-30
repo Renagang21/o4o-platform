@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Store } from './Store';
-import { PlaylistItem } from './PlaylistItem';
+import { Store } from './Store.js';
+import { PlaylistItem } from './PlaylistItem.js';
 
 export enum PlaylistStatus {
   ACTIVE = 'active',

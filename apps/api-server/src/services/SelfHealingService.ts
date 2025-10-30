@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertSeverity } from '../entities/Alert';
-import { cacheService } from './CacheService';
+import { AppDataSource } from '../database/connection.js';
+import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics.js';
+import { Alert, AlertSeverity } from '../entities/Alert.js';
+import { cacheService } from './CacheService.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';

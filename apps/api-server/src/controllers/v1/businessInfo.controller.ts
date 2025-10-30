@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import AppDataSource from '../../database/data-source';
-import { BusinessInfo, BusinessType, BusinessSize, Industry } from '../../entities/BusinessInfo';
-import { User } from '../../entities/User';
-import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog';
+import AppDataSource from '../../database/data-source.js';
+import { BusinessInfo, BusinessType, BusinessSize, Industry } from '../../entities/BusinessInfo.js';
+import { User } from '../../entities/User.js';
+import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog.js';
 import { validate } from 'class-validator';
 
 export class BusinessInfoController {

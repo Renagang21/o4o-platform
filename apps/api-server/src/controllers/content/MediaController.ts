@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../../database/connection';
-import { Media } from '../../entities/Media';
-import { User } from '../../entities/User';
-import logger from '../../utils/logger';
+import { AppDataSource } from '../../database/connection.js';
+import { Media } from '../../entities/Media.js';
+import { User } from '../../entities/User.js';
+import logger from '../../utils/logger.js';
 import { Like } from 'typeorm';
 import * as multer from 'multer';
 import * as path from 'path';

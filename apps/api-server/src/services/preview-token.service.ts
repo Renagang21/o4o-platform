@@ -5,9 +5,9 @@
  */
 
 import jwt from 'jsonwebtoken';
-import { RedisService } from './redis.service';
+import { RedisService } from './redis.service.js';
 import { v4 as uuidv4 } from 'uuid';
-import logger from '../utils/logger';
+import logger from '../utils/logger.js';
 
 interface PreviewTokenPayload {
   userId: string;

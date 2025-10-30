@@ -1,5 +1,5 @@
 // Crowdfunding type definitions for API server
-import type { User } from '../entities/User';
+import type { User } from '../entities/User.js';
 
 // Basic types
 export type FundingStatus = 'draft' | 'pending' | 'ongoing' | 'successful' | 'failed' | 'cancelled';

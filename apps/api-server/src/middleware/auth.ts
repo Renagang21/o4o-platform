@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { AuthRequest, UserRole, UserStatus } from '../types/auth';
-import { authService } from '../services/AuthService';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { AuthRequest, UserRole, UserStatus } from '../types/auth.js';
+import { authService } from '../services/AuthService.js';
 
 // Re-export AuthRequest for backward compatibility
 export { AuthRequest };
@@ -168,7 +168,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
 };
 
 // Legacy role checking functions removed - use permission.middleware instead
-// import { requireAdmin, requireRole, requireAnyRole } from './permission.middleware';
+// import { requireAdmin, requireRole, requireAnyRole } from './permission.middleware.js';
 
 // Optional authentication - doesn't fail if no token
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {

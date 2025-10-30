@@ -3,9 +3,9 @@
  */
 
 import { Response } from 'express';
-import { AuthRequest } from '../../types/auth';
-import { asyncHandler, createValidationError } from '../../middleware/errorHandler.middleware';
-import logger from '../../utils/logger';
+import { AuthRequest } from '../../types/auth.js';
+import { asyncHandler, createValidationError } from '../../middleware/errorHandler.middleware.js';
+import logger from '../../utils/logger.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';

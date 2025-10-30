@@ -1,7 +1,7 @@
 import { Router, Request } from 'express';
-import { UserStatisticsController } from '../../controllers/v1/userStatistics.controller';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
+import { UserStatisticsController } from '../../controllers/v1/userStatistics.controller.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
 
 const router: Router = Router();
 

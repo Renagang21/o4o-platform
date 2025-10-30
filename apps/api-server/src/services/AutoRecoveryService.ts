@@ -1,18 +1,18 @@
 import { Repository, MoreThanOrEqual } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert';
-import { OperationsMonitoringService, SystemStatus } from './OperationsMonitoringService';
-import { CircuitBreakerService } from './CircuitBreakerService';
-import { GracefulDegradationService } from './GracefulDegradationService';
-import { IncidentEscalationService } from './IncidentEscalationService';
-import { SelfHealingService } from './SelfHealingService';
-import { DeploymentMonitoringService } from './DeploymentMonitoringService';
-// import { WebhookService } from './webhookService';
+import { AppDataSource } from '../database/connection.js';
+import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics.js';
+import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert.js';
+import { OperationsMonitoringService, SystemStatus } from './OperationsMonitoringService.js';
+import { CircuitBreakerService } from './CircuitBreakerService.js';
+import { GracefulDegradationService } from './GracefulDegradationService.js';
+import { IncidentEscalationService } from './IncidentEscalationService.js';
+import { SelfHealingService } from './SelfHealingService.js';
+import { DeploymentMonitoringService } from './DeploymentMonitoringService.js';
+// import { WebhookService } from './webhookService.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
-import { convertToIsolationParameters } from '../types';
+import { convertToIsolationParameters } from '../types/index.js';
 
 const execAsync = promisify(exec);
 

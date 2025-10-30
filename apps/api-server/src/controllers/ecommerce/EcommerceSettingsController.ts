@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../../database/connection';
+import { AppDataSource } from '../../database/connection.js';
 
 interface EcommerceSettings {
   id?: string;

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
-import { User } from './User'
-import { MediaFolder } from './MediaFolder'
+import { User } from './User.js'
+import { MediaFolder } from './MediaFolder.js'
 
 export interface MediaSize {
   name: string // thumbnail, small, medium, large, original

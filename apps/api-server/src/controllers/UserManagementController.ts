@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { UserRepository, UserFilters, PaginationOptions } from '../repositories/UserRepository';
-import { ApprovalLog } from '../entities/ApprovalLog';
-import { AppDataSource } from '../database/connection';
-import { AuthRequest } from '../types/auth';
+import { UserRepository, UserFilters, PaginationOptions } from '../repositories/UserRepository.js';
+import { ApprovalLog } from '../entities/ApprovalLog.js';
+import { AppDataSource } from '../database/connection.js';
+import { AuthRequest } from '../types/auth.js';
 import * as bcrypt from 'bcryptjs';
 import { Parser } from 'json2csv';
 

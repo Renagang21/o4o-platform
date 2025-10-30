@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import type { Router as ExpressRouter } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
-import { LoginSecurityService } from '../../services/LoginSecurityService';
-import { UserService } from '../../services/UserService';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { LoginSecurityService } from '../../services/LoginSecurityService.js';
+import { UserService } from '../../services/UserService.js';
 
 const router: ExpressRouter = Router();
 

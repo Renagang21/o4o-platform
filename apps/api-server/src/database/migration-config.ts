@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { env } from '../utils/env-validator';
+import { env } from '../utils/env-validator.js';
 
 // 마이그레이션 실행 전용 DataSource
 export default new DataSource({

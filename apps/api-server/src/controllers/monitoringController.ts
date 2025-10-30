@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import * as os from 'os';
-import { AppDataSource } from '../database/connection';
-import { backupService } from '../services/BackupService';
-import { errorAlertService } from '../services/ErrorAlertService';
-import { securityAuditService } from '../services/SecurityAuditService';
-import logger from '../utils/simpleLogger';
-import { createSuccessResponse, createErrorResponse } from '../types/api-response';
+import { AppDataSource } from '../database/connection.js';
+import { backupService } from '../services/BackupService.js';
+import { errorAlertService } from '../services/ErrorAlertService.js';
+import { securityAuditService } from '../services/SecurityAuditService.js';
+import logger from '../utils/simpleLogger.js';
+import { createSuccessResponse, createErrorResponse } from '../types/api-response.js';
 
 export class MonitoringController {
   // Get system metrics

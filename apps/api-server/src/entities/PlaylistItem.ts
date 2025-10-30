@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { StorePlaylist } from './StorePlaylist';
-import { SignageContent } from './SignageContent';
+import { StorePlaylist } from './StorePlaylist.js';
+import { SignageContent } from './SignageContent.js';
 
 export enum ItemType {
   VIDEO = 'video',

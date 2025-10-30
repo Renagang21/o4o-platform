@@ -9,8 +9,8 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { FundingProject } from './FundingProject';
-import { BackerReward } from './BackerReward';
+import { FundingProject } from './FundingProject.js';
+import { BackerReward } from './BackerReward.js';
 
 @Entity('funding_rewards')
 @Index(['projectId', 'sortOrder'])

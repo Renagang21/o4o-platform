@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../database/connection';
-import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
+import { AppDataSource } from '../database/connection.js';
+import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
 import { validate } from 'class-validator';
-import { metaDataService } from '../services/MetaDataService';
+import { metaDataService } from '../services/MetaDataService.js';
 
 export class ACFController {
   // Field Groups

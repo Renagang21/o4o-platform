@@ -1,11 +1,11 @@
-import { AppDataSource } from '../database/connection';
+import { AppDataSource } from '../database/connection.js';
 import { Repository, TreeRepository } from 'typeorm';
-import { Menu } from '../entities/Menu';
-import { MenuItem, MenuItemType } from '../entities/MenuItem';
-import { MenuLocation } from '../entities/MenuLocation';
-import { Post } from '../entities/Post';
-import { CustomPostType } from '../entities/CustomPostType';
-import { generateSlug } from '../utils/slug';
+import { Menu } from '../entities/Menu.js';
+import { MenuItem, MenuItemType } from '../entities/MenuItem.js';
+import { MenuLocation } from '../entities/MenuLocation.js';
+import { Post } from '../entities/Post.js';
+import { CustomPostType } from '../entities/CustomPostType.js';
+import { generateSlug } from '../utils/slug.js';
 
 class MenuService {
   private menuRepository: Repository<Menu>;

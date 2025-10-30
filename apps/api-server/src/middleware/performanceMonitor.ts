@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import logger from '../utils/simpleLogger';
+import logger from '../utils/simpleLogger.js';
 
 interface RequestWithTiming extends Request {
   startTime?: number;

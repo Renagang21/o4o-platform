@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { body, query, validationResult } from 'express-validator';
-import { UnifiedAuthService } from '../services/unified-auth.service';
-import { authenticate } from '../middleware/auth.middleware';
-import { AuthProvider, OAuthProfile } from '../types/account-linking';
-import { refreshTokenService } from '../services/refreshToken.service';
-import logger from '../utils/logger';
+import { UnifiedAuthService } from '../services/unified-auth.service.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { AuthProvider, OAuthProfile } from '../types/account-linking.js';
+import { refreshTokenService } from '../services/refreshToken.service.js';
+import logger from '../utils/logger.js';
 
 const router: ExpressRouter = Router();
 const unifiedAuthService = new UnifiedAuthService();

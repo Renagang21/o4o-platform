@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { Supplier, SupplierStatus } from '../../entities/Supplier';
-import { User } from '../../entities/User';
+import { Supplier, SupplierStatus } from '../../entities/Supplier.js';
+import { User } from '../../entities/User.js';
 import { validationResult } from 'express-validator';
 
 export class AdminSupplierController {

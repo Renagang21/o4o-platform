@@ -11,9 +11,9 @@
 
 import { Queue, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { aiJobQueue } from './ai-job-queue.service';
-import { AIJobResult } from '../types/ai-job.types';
-import logger from '../utils/logger';
+import { aiJobQueue } from './ai-job-queue.service.js';
+import { AIJobResult } from '../types/ai-job.types.js';
+import logger from '../utils/logger.js';
 
 // Approximate pricing per 1K tokens (as of 2024)
 // Note: Update these values based on actual provider pricing

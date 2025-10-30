@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { PagesController } from '../../controllers/pagesController'
-import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
-import { AppDataSource } from '../../database/connection'
-import { Post } from '../../entities/Post'
+import { PagesController } from '../../controllers/pagesController.js'
+import { authenticate as authenticateToken } from '../../middleware/auth.middleware.js'
+import { AppDataSource } from '../../database/connection.js'
+import { Post } from '../../entities/Post.js'
 import { Request, Response } from 'express'
-import logger from '../../utils/logger'
+import logger from '../../utils/logger.js'
 
 const router: Router = Router()
 const pagesController = new PagesController()

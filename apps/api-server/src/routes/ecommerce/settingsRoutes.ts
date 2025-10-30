@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { EcommerceSettingsController } from '../../controllers/ecommerce/EcommerceSettingsController';
-import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
+import { EcommerceSettingsController } from '../../controllers/ecommerce/EcommerceSettingsController.js';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const settingsController = new EcommerceSettingsController();

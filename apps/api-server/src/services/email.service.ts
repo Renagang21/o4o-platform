@@ -1,6 +1,6 @@
 import nodemailer, { Transporter } from 'nodemailer';
-import { EmailOptions, EmailTemplateData } from '../types/email-auth';
-import logger from '../utils/logger';
+import { EmailOptions, EmailTemplateData } from '../types/email-auth.js';
+import logger from '../utils/logger.js';
 import path from 'path';
 import fs from 'fs/promises';
 

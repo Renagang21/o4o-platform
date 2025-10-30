@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { QueryFailedError } from 'typeorm';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import logger from '../utils/simpleLogger';
+import logger from '../utils/simpleLogger.js';
 
 // Custom error class for API errors
 export class ApiError extends Error {

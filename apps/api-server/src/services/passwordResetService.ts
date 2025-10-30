@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { PasswordResetToken } from '../entities/PasswordResetToken';
-import { EmailVerificationToken } from '../entities/EmailVerificationToken';
-import { emailService } from './emailService';
-import { UserStatus } from '../types/auth';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { PasswordResetToken } from '../entities/PasswordResetToken.js';
+import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
+import { emailService } from './emailService.js';
+import { UserStatus } from '../types/auth.js';
 
 export class PasswordResetService {
   private static readonly RESET_TOKEN_EXPIRY_HOURS = 1;

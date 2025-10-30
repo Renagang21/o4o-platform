@@ -6,7 +6,7 @@ import {
   UpdateDateColumn, 
   OneToMany 
 } from 'typeorm';
-import { CustomPost } from './CustomPost';
+import { CustomPost } from './CustomPost.js';
 
 export interface FieldSchema {
   id: string;

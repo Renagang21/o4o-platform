@@ -1,25 +1,25 @@
-import { AppDataSource } from '../database/connection';
-import { User } from '../entities/User';
-import { LinkedAccount } from '../entities/LinkedAccount';
-import { AccountActivity } from '../entities/AccountActivity';
-import { AuthService } from './AuthService';
-import { AccountLinkingService } from './account-linking.service';
-import { emailService } from './email.service';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { LinkedAccount } from '../entities/LinkedAccount.js';
+import { AccountActivity } from '../entities/AccountActivity.js';
+import { AuthService } from './AuthService.js';
+import { AccountLinkingService } from './account-linking.service.js';
+import { emailService } from './email.service.js';
 import { 
   AuthProvider, 
   UnifiedLoginRequest, 
   UnifiedLoginResponse,
   OAuthProfile,
   AccountLinkingError
-} from '../types/account-linking';
+} from '../types/account-linking.js';
 import { 
   UserRole, 
   UserStatus, 
   LoginResponse,
   AuthTokens
-} from '../types/auth';
-import { generateRandomToken, hashPassword, comparePassword } from '../utils/auth.utils';
-import logger from '../utils/logger';
+} from '../types/auth.js';
+import { generateRandomToken, hashPassword, comparePassword } from '../utils/auth.utils.js';
+import logger from '../utils/logger.js';
 
 export class UnifiedAuthService {
   private authService: AuthService;

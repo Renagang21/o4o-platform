@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-// import { Order } from './Order'; // Order entity removed during ecommerce cleanup
+// import { Order } from './Order.js'; // Order entity removed during ecommerce cleanup
 
 @Entity('shipments')
 export class Shipment {

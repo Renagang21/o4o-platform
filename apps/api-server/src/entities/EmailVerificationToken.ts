@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Index } from 'typeorm';
-import { User } from './User';
+import { User } from './User.js';
 
 @Entity('email_verification_tokens')
 @Index(['token'], { unique: true })

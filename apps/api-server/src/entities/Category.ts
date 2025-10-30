@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinColumn, Tree, TreeParent, TreeChildren } from 'typeorm';
-import { Post } from './Post';
+import { Post } from './Post.js';
 
 @Entity('categories')
 @Tree('nested-set')

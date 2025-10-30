@@ -4,9 +4,9 @@
  */
 
 import { Request, Response } from 'express';
-import { appRegistry } from '../services/app-registry.service';
-import { googleAI } from '../services/google-ai.service';
-import logger from '../utils/logger';
+import { appRegistry } from '../services/app-registry.service.js';
+import { googleAI } from '../services/google-ai.service.js';
+import logger from '../utils/logger.js';
 
 export class AppsController {
   /**

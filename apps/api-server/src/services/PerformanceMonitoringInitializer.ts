@@ -1,10 +1,10 @@
-import { PerformanceOptimizationService } from './PerformanceOptimizationService';
-import { AutoScalingService } from './AutoScalingService';
-import { CDNOptimizationService } from './CDNOptimizationService';
-import { DatabaseOptimizationService } from './DatabaseOptimizationService';
-import { AnalyticsService } from './AnalyticsService';
-import { DeploymentMonitoringService } from './DeploymentMonitoringService';
-import { OperationsMonitoringService } from './OperationsMonitoringService';
+import { PerformanceOptimizationService } from './PerformanceOptimizationService.js';
+import { AutoScalingService } from './AutoScalingService.js';
+import { CDNOptimizationService } from './CDNOptimizationService.js';
+import { DatabaseOptimizationService } from './DatabaseOptimizationService.js';
+import { AnalyticsService } from './AnalyticsService.js';
+import { DeploymentMonitoringService } from './DeploymentMonitoringService.js';
+import { OperationsMonitoringService } from './OperationsMonitoringService.js';
 import Redis from 'ioredis';
 
 /**

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { TagService } from '../../services/tag.service';
-import { CreateTagDto, UpdateTagDto } from '../../types/tag.types';
-import { AuthRequest } from '../../types/auth';
+import { TagService } from '../../services/tag.service.js';
+import { CreateTagDto, UpdateTagDto } from '../../types/tag.types.js';
+import { AuthRequest } from '../../types/auth.js';
 
 export class TagController {
   private tagService: TagService;

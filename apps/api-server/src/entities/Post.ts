@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinColumn, JoinTable } from 'typeorm'
-import { User } from './User'
-import { Category } from './Category'
-import { Tag } from './Tag'
+import { User } from './User.js'
+import { Category } from './Category.js'
+import { Tag } from './Tag.js'
 import { AccessControl } from '@o4o/types'
 
 export interface Block {

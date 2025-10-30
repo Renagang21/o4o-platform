@@ -3,8 +3,8 @@
  */
 
 import { Request, Response } from 'express';
-import { asyncHandler } from '../../middleware/errorHandler.middleware';
-import logger from '../../utils/logger';
+import { asyncHandler } from '../../middleware/errorHandler.middleware.js';
+import logger from '../../utils/logger.js';
 
 export class PreviewController {
   /**

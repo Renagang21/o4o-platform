@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { ForumCPTController } from '../../controllers/forum/ForumCPTController';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware';
-import { UserRole } from '../../entities/User';
+import { ForumCPTController } from '../../controllers/forum/ForumCPTController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware.js';
+import { UserRole } from '../../entities/User.js';
 
 const router: Router = Router();
 const forumController = new ForumCPTController();

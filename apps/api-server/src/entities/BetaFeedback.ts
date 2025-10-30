@@ -9,9 +9,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaUser } from './BetaUser';
-import { User } from './User';
-import { FeedbackConversation } from './FeedbackConversation';
+import { BetaUser } from './BetaUser.js';
+import { User } from './User.js';
+import { FeedbackConversation } from './FeedbackConversation.js';
 
 export enum FeedbackType {
   BUG_REPORT = 'bug_report',           // 버그 신고

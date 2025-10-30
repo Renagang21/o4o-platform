@@ -1,9 +1,9 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { Product, ProductStatus } from '../entities/Product';
-import { Supplier } from '../entities/Supplier';
-import { Category } from '../entities/Category';
-import logger from '../utils/logger';
+import { AppDataSource } from '../database/connection.js';
+import { Product, ProductStatus } from '../entities/Product.js';
+import { Supplier } from '../entities/Supplier.js';
+import { Category } from '../entities/Category.js';
+import logger from '../utils/logger.js';
 
 export interface CreateProductRequest {
   name: string;

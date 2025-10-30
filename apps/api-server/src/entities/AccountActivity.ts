@@ -6,8 +6,8 @@ import {
   CreateDateColumn, 
   Index 
 } from 'typeorm';
-import { User } from './User';
-import { AuthProvider } from '../types/account-linking';
+import { User } from './User.js';
+import { AuthProvider } from '../types/account-linking.js';
 
 @Entity('account_activities')
 @Index(['userId', 'createdAt'])

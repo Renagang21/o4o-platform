@@ -11,8 +11,8 @@
 
 import { Queue, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { AIJobData, AIJobResult } from '../types/ai-job.types';
-import logger from '../utils/logger';
+import { AIJobData, AIJobResult } from '../types/ai-job.types.js';
+import logger from '../utils/logger.js';
 
 interface DLQEntry {
   jobId: string;

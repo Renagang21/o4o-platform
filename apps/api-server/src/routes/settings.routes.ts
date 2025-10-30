@@ -1,21 +1,21 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
-import { adminOnly } from '../middleware/adminOnly';
-import { validateDto } from '../middleware/validateDto';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { adminOnly } from '../middleware/adminOnly.js';
+import { validateDto } from '../middleware/validateDto.js';
 import {
   OAuthSettingsData,
   OAuthProvider,
   OAuthConfig,
   OAuthUpdateRequest,
   OAuthTestRequest
-} from '../types/settings';
+} from '../types/settings.js';
 import { body } from 'express-validator';
-import logger from '../utils/logger';
-import { encrypt, decrypt } from '../utils/crypto';
-import { AppDataSource } from '../database/connection';
-import { Settings as Setting } from '../entities/Settings';
-import { reloadPassportStrategies } from '../config/passportDynamic';
-import { getOAuthProviderConfig } from '../config/oauth-providers';
+import logger from '../utils/logger.js';
+import { encrypt, decrypt } from '../utils/crypto.js';
+import { AppDataSource } from '../database/connection.js';
+import { Settings as Setting } from '../entities/Settings.js';
+import { reloadPassportStrategies } from '../config/passportDynamic.js';
+import { getOAuthProviderConfig } from '../config/oauth-providers.js';
 
 const router: Router = Router();
 

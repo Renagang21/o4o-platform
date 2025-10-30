@@ -1,13 +1,13 @@
 import { Repository, MoreThanOrEqual, LessThan, Not, In } from 'typeorm';
-import { AppDataSource } from '../database/connection';
-import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert';
-import { AnalyticsService } from './AnalyticsService';
+import { AppDataSource } from '../database/connection.js';
+import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics.js';
+import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert.js';
+import { AnalyticsService } from './AnalyticsService.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import * as fs from 'fs';
-// import { WebhookService } from './webhookService';
+// import { WebhookService } from './webhookService.js';
 
 const execAsync = promisify(exec);
 

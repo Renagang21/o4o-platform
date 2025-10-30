@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
-import { UserRole, UserStatus } from '../types/auth';
-import { BusinessInfo } from '../types/user';
-import { Role } from './Role';
+import { UserRole, UserStatus } from '../types/auth.js';
+import { BusinessInfo } from '../types/user.js';
+import { Role } from './Role.js';
 import * as bcrypt from 'bcryptjs';
 
 // Re-export types for external use

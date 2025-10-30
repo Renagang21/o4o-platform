@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis';
-import { User } from '../entities/User';
+import { User } from '../entities/User.js';
 import crypto from 'crypto';
 
 interface SessionData {

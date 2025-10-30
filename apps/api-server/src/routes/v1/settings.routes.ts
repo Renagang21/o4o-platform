@@ -1,11 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { requireAdmin } from '../../middleware/permission.middleware';
-import logger from '../../utils/logger';
-import { AppDataSource } from '../../database/connection';
-import { Settings, ReadingSettings, PermalinkSettings } from '../../entities/Settings';
-import { Post } from '../../entities/Post';
-import { permalinkService } from '../../services/permalink.service';
+import { authenticate } from '../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../middleware/permission.middleware.js';
+import logger from '../../utils/logger.js';
+import { AppDataSource } from '../../database/connection.js';
+import { Settings, ReadingSettings, PermalinkSettings } from '../../entities/Settings.js';
+import { Post } from '../../entities/Post.js';
+import { permalinkService } from '../../services/permalink.service.js';
 
 const router: Router = Router();
 

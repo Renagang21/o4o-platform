@@ -8,8 +8,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { ForumPost } from './ForumPost';
-import { User } from './User';
+import { ForumPost } from './ForumPost.js';
+import { User } from './User.js';
 
 export enum CommentStatus {
   PUBLISHED = 'publish',
