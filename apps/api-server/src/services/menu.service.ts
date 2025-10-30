@@ -248,6 +248,7 @@ class MenuService {
         throw new Error(`Parent menu item with ID ${data.parent_id} not found`);
       }
       menuItem.parent = parent;
+      menuItem.parentId = data.parent_id; // Explicitly set parentId for tree structure
     }
 
     return this.menuItemRepository.save(menuItem);
@@ -333,8 +334,10 @@ class MenuService {
               throw new Error(`Parent menu item with ID ${item.parent_id} not found`);
             }
             menuItem.parent = parent;
+            menuItem.parentId = item.parent_id; // Explicitly set parentId for tree structure
           } else {
             menuItem.parent = null;
+            menuItem.parentId = null; // Clear parentId for root items
           }
         }
 
