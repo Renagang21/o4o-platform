@@ -97,7 +97,6 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
         toast.success(`${roleOptions[newRole]?.name}로 전환되었습니다.`);
       }
     } catch (error: any) {
-      console.error('역할 전환 실패:', error);
       toast.error(error.response?.data?.message || '역할 전환에 실패했습니다.');
     } finally {
       setIsSwitching(false);
