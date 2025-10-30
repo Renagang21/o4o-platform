@@ -56,8 +56,8 @@ function getUserRoles(user: User): string[] {
   // Add roles from dbRoles if available
   if (user.dbRoles && Array.isArray(user.dbRoles)) {
     user.dbRoles.forEach((dbRole) => {
-      if (dbRole.role && dbRole.role.name && !roles.includes(dbRole.role.name)) {
-        roles.push(dbRole.role.name);
+      if (dbRole.name && !roles.includes(dbRole.name)) {
+        roles.push(dbRole.name);
       }
     });
   }

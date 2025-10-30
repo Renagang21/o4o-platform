@@ -1,9 +1,10 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { Settings, GeneralSettings, ReadingSettings, ThemeSettings, EmailSettings, PermalinkSettings } from '../entities/Settings';
+import { AccessControlSettings } from '@o4o/types';
 
 export type SettingsType = 'general' | 'reading' | 'theme' | 'email' | 'permalink' | 'customizer';
-export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | Record<string, unknown>;
+export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | AccessControlSettings | Record<string, unknown>;
 
 export class SettingsService {
   private settingsRepository: Repository<Settings>;
