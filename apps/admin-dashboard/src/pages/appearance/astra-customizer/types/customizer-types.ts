@@ -152,18 +152,19 @@ export interface SidebarSettings {
 /**
  * 헤더 모듈 타입
  */
-export type HeaderModuleType = 
-  | 'logo' 
-  | 'site-title' 
-  | 'primary-menu' 
+export type HeaderModuleType =
+  | 'logo'
+  | 'site-title'
+  | 'primary-menu'
   | 'secondary-menu'
-  | 'search' 
-  | 'account' 
-  | 'cart' 
-  | 'button' 
-  | 'html' 
+  | 'search'
+  | 'account'
+  | 'cart'
+  | 'button'
+  | 'html'
   | 'widget'
-  | 'social';
+  | 'social'
+  | 'role-switcher';
 
 /**
  * 모듈 설정 인터페이스

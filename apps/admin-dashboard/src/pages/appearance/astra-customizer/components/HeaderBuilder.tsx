@@ -33,6 +33,7 @@ const AVAILABLE_MODULES: { type: HeaderModuleType; label: string; icon: React.Re
   { type: 'secondary-menu', label: 'Secondary Menu', icon: <Menu size={16} /> },
   { type: 'search', label: 'Search', icon: <Search size={16} /> },
   { type: 'account', label: 'Account', icon: <User size={16} /> },
+  { type: 'role-switcher', label: 'Role Switcher', icon: <User size={16} /> },
   { type: 'cart', label: 'Cart', icon: <ShoppingCart size={16} /> },
   { type: 'button', label: 'Button', icon: <Box size={16} /> },
   { type: 'html', label: 'HTML', icon: <Code size={16} /> },

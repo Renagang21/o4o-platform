@@ -80,6 +80,13 @@ function convertModuleToBlock(module: ModuleConfig): any {
         ...module.settings
       }
     },
+    'role-switcher': {
+      type: 'o4o/role-switcher',
+      data: {
+        showLabel: true,
+        ...module.settings
+      }
+    },
     'cart': {
       type: 'o4o/cart-icon',
       data: {
