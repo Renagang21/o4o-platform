@@ -17,6 +17,7 @@ import Columns from './blocks/Columns';
 import Column from './blocks/Column';
 import { AccountModule } from './blocks/AccountModule';
 import { CartModule } from './blocks/CartModule';
+import RoleSwitcher from './blocks/RoleSwitcher';
 import Button from './blocks/Button';
 import ConditionalBlock from './blocks/ConditionalBlock';
 import { TextWidget } from './blocks/footer/TextWidget';
@@ -39,6 +40,7 @@ const blockComponents: Record<string, FC<any>> = {
   'o4o/social-links': SocialLinks,
   'o4o/account-menu': AccountModule,
   'o4o/cart-icon': CartModule,
+  'o4o/role-switcher': RoleSwitcher,
   'o4o/button': Button,
   'o4o/conditional': ConditionalBlock,
   'o4o/text-widget': TextWidget,
