@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Home, ShoppingBag, HelpCircle, LucideIcon } from 'lucide-react';
 import HamburgerMenu from '../layout/HamburgerMenu';
 import { useMenu } from '../../hooks/useMenu';
 
@@ -74,9 +74,22 @@ const Navigation: FC<NavigationProps> = ({
     return null;
   }
 
+  // Icon mapping for menu items
+  const iconMap: Record<string, LucideIcon> = {
+    'Home': Home,
+    'Shop': ShoppingBag,
+    'Support': HelpCircle,
+  };
+
+  const getMenuIcon = (title: string) => {
+    const IconComponent = iconMap[title];
+    return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
+  };
+
   const renderMenuItem = (item: MenuItem, depth = 0): React.ReactNode => {
     const hasChildren = item.children && item.children.length > 0;
-    
+    const icon = depth === 0 ? getMenuIcon(item.title) : null;
+
     return (
       <li key={item.id} className={`menu-item menu-item-depth-${depth} ${hasChildren ? 'has-children' : ''}`}>
         {item.target === '_blank' ? (
@@ -86,20 +99,22 @@ const Navigation: FC<NavigationProps> = ({
             rel="noopener noreferrer"
             className="menu-link"
           >
-            {item.title}
+            {icon}
+            <span>{item.title}</span>
             {hasChildren && finalShowSubmenuIcon && (
               <ChevronDown className="submenu-icon ml-1 h-4 w-4" />
             )}
           </a>
         ) : (
           <Link to={item.url} className="menu-link">
-            {item.title}
+            {icon}
+            <span>{item.title}</span>
             {hasChildren && finalShowSubmenuIcon && (
               <ChevronDown className="submenu-icon ml-1 h-4 w-4" />
             )}
           </Link>
         )}
-        
+
         {hasChildren && (
           <ul className="submenu">
             {item.children!.map(child => renderMenuItem(child, depth + 1))}
@@ -145,6 +160,7 @@ const Navigation: FC<NavigationProps> = ({
         .menu-link {
           display: flex;
           align-items: center;
+          gap: 0.5rem;
           padding: 0.5rem 1rem;
           color: inherit;
           text-decoration: none;
