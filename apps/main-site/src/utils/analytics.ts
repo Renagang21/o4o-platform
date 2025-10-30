@@ -120,3 +120,82 @@ export function trackPageView(pagePath: string, pageTitle?: string): void {
     page_title: pageTitle || document.title
   });
 }
+
+/**
+ * 개인화 관련 이벤트 (M4)
+ */
+
+/**
+ * 개인화 피드 로드 이벤트
+ */
+export function trackPersonalizedFeedLoaded(role: string, itemCount: number, source: string): void {
+  trackEvent('feed_loaded', {
+    role,
+    items: itemCount,
+    from: source
+  });
+}
+
+/**
+ * 카드 노출 이벤트
+ */
+export function trackCardImpression(role: string, cardId: string, position: number): void {
+  trackEvent('card_impression', {
+    role,
+    cardId,
+    pos: position
+  });
+}
+
+/**
+ * 카드 클릭 이벤트
+ */
+export function trackCardClick(role: string, cardId: string, position: number): void {
+  trackEvent('card_click', {
+    role,
+    cardId,
+    pos: position
+  });
+}
+
+/**
+ * 배너 노출 이벤트
+ */
+export function trackBannerImpression(role: string, bannerId: string, type: string): void {
+  trackEvent('banner_impression', {
+    role,
+    bannerId,
+    type
+  });
+}
+
+/**
+ * 배너 클릭 이벤트
+ */
+export function trackBannerClick(role: string, bannerId: string, url: string): void {
+  trackEvent('banner_click', {
+    role,
+    bannerId,
+    url
+  });
+}
+
+/**
+ * 추천 클릭 이벤트
+ */
+export function trackSuggestionClick(role: string, suggestionId: string, category: string): void {
+  trackEvent('suggestion_click', {
+    role,
+    suggestionId,
+    category
+  });
+}
+
+/**
+ * 개인화 설정 변경 이벤트
+ */
+export function trackPersonalizationToggle(enabled: boolean): void {
+  trackEvent('personalization_toggled', {
+    enabled
+  });
+}
