@@ -19,7 +19,7 @@ export const ColumnBlock: React.FC<BlockRendererProps> = ({ block }) => {
 
   // Build class names
   const columnClasses = clsx(
-    'block-column min-h-[50px]',
+    'block-column min-h-[50px] p-4 border border-gray-200 rounded-lg',
     verticalAlignment && `self-${verticalAlignment}`,
     className
   );

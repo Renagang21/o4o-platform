@@ -21,7 +21,7 @@ export const ColumnsBlock: React.FC<BlockRendererProps> = ({ block }) => {
 
   // Build class names
   const columnsClasses = clsx(
-    'block-columns grid gap-4 mb-4',
+    'block-columns grid gap-4 mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50',
     verticalAlignment && `items-${verticalAlignment}`,
     isStackedOnMobile ? 'md:grid-cols-1' : '',
     className
