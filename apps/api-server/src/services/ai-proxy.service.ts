@@ -504,6 +504,7 @@ class AIProxyService {
           model,
           content: content.substring(0, 500),
           error: parseError.message,
+          stack: parseError.stack,
         });
         throw this.createError(
           'PROVIDER_ERROR',
@@ -544,10 +545,15 @@ class AIProxyService {
         });
 
         // DEBUG: Save full AI response to file for debugging
-        const fs = require('fs');
-        const debugPath = `/tmp/ai-response-${requestId}.json`;
-        fs.writeFileSync(debugPath, JSON.stringify(parsed.blocks, null, 2));
-        logger.info('AI response saved to file', { requestId, debugPath });
+        try {
+          const fs = require('fs');
+          const debugPath = `/tmp/ai-response-${requestId}.json`;
+          fs.writeFileSync(debugPath, JSON.stringify(parsed.blocks, null, 2));
+          logger.info('AI response saved to file', { requestId, debugPath });
+        } catch (debugError: any) {
+          // Ignore file write errors - not critical for AI generation
+          logger.warn('Failed to save debug file', { requestId, error: debugError.message });
+        }
       } else if (Array.isArray(parsed)) {
         // Case 2: [...] 형식 (배열을 blocks로 감싸기)
         normalizedResult = { blocks: parsed };
