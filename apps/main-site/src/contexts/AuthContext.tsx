@@ -128,7 +128,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           }
         } catch (error) {
           // preferences 로드 실패 시 무시하고 계속 진행
-          console.warn('Failed to load user preferences:', error);
         }
 
         setUser(normalizedUser);

@@ -5,6 +5,7 @@ import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
 import { authAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+import { trackRoleSwitch } from '../../utils/analytics';
 
 interface RoleSwitcherProps {
   data?: {
@@ -76,6 +77,8 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const handleRoleSwitch = async (newRole: string) => {
     if (isSwitching) return;
 
+    const previousRole = currentRole;
+
     try {
       setIsSwitching(true);
 
@@ -90,6 +93,9 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
           roles: response.data.data.availableRoles
         });
 
+        // 분석 이벤트 추적
+        trackRoleSwitch(previousRole, newRole);
+
         // SPA 라우팅
         const targetPath = roleOptions[newRole]?.path || '/';
         navigate(targetPath);
@@ -97,7 +103,6 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
         toast.success(`${roleOptions[newRole]?.name}로 전환되었습니다.`);
       }
     } catch (error: any) {
-      console.error('역할 전환 실패:', error);
       toast.error(error.response?.data?.message || '역할 전환에 실패했습니다.');
     } finally {
       setIsSwitching(false);
