@@ -297,35 +297,9 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
               </button>
             )}
 
-            {/* Insert Before */}
-            {onInsertBefore && (
-              <button
-                onClick={() => {
-                  onInsertBefore();
-                  setIsMoreMenuOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
-              >
-                <ChevronUp className="w-4 h-4" />
-                <span>Insert Before</span>
-              </button>
-            )}
+            {/* Insert Before/After - REMOVED per user request */}
 
-            {/* Insert After */}
-            {onInsertAfter && (
-              <button
-                onClick={() => {
-                  onInsertAfter();
-                  setIsMoreMenuOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
-              >
-                <ChevronDown className="w-4 h-4" />
-                <span>Insert After</span>
-              </button>
-            )}
-
-            {(onCopy || onDuplicate || onInsertBefore || onInsertAfter) && (
+            {(onCopy || onDuplicate) && (
               <div className="border-t border-gray-200 my-1" />
             )}
 
