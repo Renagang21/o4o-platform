@@ -50,19 +50,25 @@ class MenuService {
       return null;
     }
 
-    // Get tree structure for menu items
-    // Note: TypeORM Tree uses "parentId" column internally, not "parent"
-    const rootItems = await this.menuItemRepository
+    // Get all menu items for this menu
+    const allItems = await this.menuItemRepository
       .createQueryBuilder('item')
       .where('item.menu_id = :menuId', { menuId: id })
-      .andWhere('item.parentId IS NULL')
       .orderBy('item.order_num', 'ASC')
       .getMany();
 
-    // Load tree for each root item
-    let itemsWithChildren = await Promise.all(
-      rootItems.map(item => this.menuItemRepository.findDescendantsTree(item))
-    );
+    // Manually build tree structure from parentId
+    // This is more reliable than findDescendantsTree when closure table is not properly maintained
+    const buildTree = (items: MenuItem[], parentId: string | null = null): MenuItem[] => {
+      return items
+        .filter(item => item.parentId === parentId)
+        .map(item => ({
+          ...item,
+          children: buildTree(items, item.id)
+        }));
+    };
+
+    let itemsWithChildren = buildTree(allItems, null);
 
     // Expand CPT menu items if requested
     if (expandCPT) {
