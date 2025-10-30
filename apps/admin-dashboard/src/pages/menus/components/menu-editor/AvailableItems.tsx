@@ -56,18 +56,22 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
   const [customTitle, setCustomTitle] = useState('');
   const [customUrl, setCustomUrl] = useState('');
 
-  // Load available items
+  // Load available items with server-side search support
   useEffect(() => {
     const loadItems = async () => {
       try {
         setIsLoading(true);
         const apiClient = unifiedApi as unknown as UnifiedApiClient;
 
+        // Build query params - use search param if searching, otherwise load limited initial data
+        const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
+        const limitParam = searchTerm ? '&limit=100' : '&limit=20'; // Load more when searching
+
         const [pagesResponse, postsResponse, categoriesResponse, tagsResponse, cptsResponse] = await Promise.all([
-          apiClient.raw.get<ApiResponse<Page[]>>('pages?limit=100'),
-          apiClient.raw.get<ApiResponse<Post[]>>('posts?limit=100'),
-          apiClient.raw.get<ApiResponse<Category[]>>('categories?limit=100'),
-          apiClient.raw.get<ApiResponse<TagItem[]>>('tags?limit=100'),
+          apiClient.raw.get<ApiResponse<Page[]>>(`pages?status=publish${limitParam}${searchParam}`),
+          apiClient.raw.get<ApiResponse<Post[]>>(`posts?status=publish${limitParam}${searchParam}`),
+          apiClient.raw.get<ApiResponse<Category[]>>(`categories?limit=100${searchParam}`),
+          apiClient.raw.get<ApiResponse<TagItem[]>>(`tags?limit=100${searchParam}`),
           apiClient.raw.get<any>('v1/platform/custom-post-types')
         ]);
 
@@ -139,8 +143,13 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
       }
     };
 
-    loadItems();
-  }, []);
+    // Debounce search to avoid too many API calls
+    const timeoutId = setTimeout(() => {
+      loadItems();
+    }, searchTerm ? 500 : 0); // 500ms delay for search, immediate for initial load
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]); // Re-run when search term changes
 
   // Get current tab items
   const getCurrentTabItems = (): ContentItem[] => {
@@ -155,10 +164,8 @@ export const AvailableItems: FC<AvailableItemsProps> = ({ onAdd }) => {
     return itemsMap[activeTab];
   };
 
-  // Filter items by search term
-  const filteredItems = getCurrentTabItems().filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Items are already filtered by server-side search, no need for client-side filtering
+  const filteredItems = getCurrentTabItems();
 
   // Toggle item selection
   const toggleSelection = (id: string) => {

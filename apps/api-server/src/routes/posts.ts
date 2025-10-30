@@ -59,6 +59,7 @@ const extractTitle = (title: any): string => {
 interface PostQueryParams {
   page?: number;
   per_page?: number;
+  limit?: number; // Support for limit parameter (alias for per_page)
   search?: string;
   author?: string;
   author_exclude?: string;
@@ -80,9 +81,10 @@ interface PostQueryParams {
 }
 
 // GET /api/posts - List posts
-router.get('/', 
+router.get('/',
   query('page').optional().isInt({ min: 1 }),
   query('per_page').optional().isInt({ min: 1, max: 100 }),
+  query('limit').optional().isInt({ min: 1, max: 100 }),
   query('search').optional().isString(),
   query('status').optional().isIn(['draft', 'publish', 'private', 'archived', 'scheduled']),
   validateDto,
@@ -90,7 +92,8 @@ router.get('/',
     try {
       const {
         page = 1,
-        per_page = 10,
+        per_page,
+        limit,
         search,
         author,
         exclude,
@@ -105,6 +108,9 @@ router.get('/',
         type = 'post',
         post_type
       } = req.query as PostQueryParams & { type?: string; post_type?: string };
+
+      // Support both limit and per_page parameters (limit takes precedence)
+      const itemsPerPage = limit || per_page || 10;
 
       // Check if database is available
       const repos = getRepositories();
@@ -133,6 +139,14 @@ router.get('/',
         queryBuilder.andWhere('post.status = :status', { status });
       }
 
+      // Search filter
+      if (search) {
+        queryBuilder.andWhere(
+          '(post.title LIKE :search OR post.content LIKE :search OR post.excerpt LIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+
       // Ordering
       let orderByField = 'post.created_at';
       switch (orderby) {
@@ -152,8 +166,8 @@ router.get('/',
       queryBuilder.orderBy(orderByField, order.toUpperCase() as 'ASC' | 'DESC');
 
       // Pagination
-      const skip = ((page as number) - 1) * (per_page as number);
-      queryBuilder.skip(skip).take(per_page as number);
+      const skip = ((page as number) - 1) * itemsPerPage;
+      queryBuilder.skip(skip).take(itemsPerPage);
 
       const [posts, total] = await queryBuilder.getManyAndCount();
 

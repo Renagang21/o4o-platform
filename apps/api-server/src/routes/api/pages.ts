@@ -42,7 +42,8 @@ router.get('/', async (req: Request, res: Response) => {
     const postRepository = AppDataSource.getRepository(Post)
     const {
       page = 1,
-      per_page = 10,
+      per_page,
+      limit,
       search,
       status,
       parent,
@@ -53,8 +54,9 @@ router.get('/', async (req: Request, res: Response) => {
     } = req.query
 
     const pageNum = parseInt(page as string)
-    const limitNum = parseInt(per_page as string)
-    const skip = (pageNum - 1) * limitNum
+    // Support both limit and per_page parameters (limit takes precedence)
+    const itemsPerPage = limit ? parseInt(limit as string) : (per_page ? parseInt(per_page as string) : 10)
+    const skip = (pageNum - 1) * itemsPerPage
 
     const queryBuilder = postRepository.createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
@@ -87,7 +89,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     queryBuilder.orderBy(`post.${orderby as string}`, order as 'ASC' | 'DESC')
       .skip(skip)
-      .take(limitNum)
+      .take(itemsPerPage)
 
     const [pages, total] = await queryBuilder.getManyAndCount()
 
@@ -95,9 +97,9 @@ router.get('/', async (req: Request, res: Response) => {
       data: pages,
       pagination: {
         page: pageNum,
-        per_page: limitNum,
+        per_page: itemsPerPage,
         total,
-        total_pages: Math.ceil(total / limitNum)
+        total_pages: Math.ceil(total / itemsPerPage)
       }
     })
   } catch (error) {
