@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import type { LoginCredentials, RegisterData, AuthResponse, User } from './types';
+import type { LoginCredentials, RegisterData, AuthResponse, User } from './types.js';
 
 interface RefreshResponse {
   success: boolean;

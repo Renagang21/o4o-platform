@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import type { LoginCredentials, AuthResponse } from './types';
+import type { LoginCredentials, AuthResponse } from './types.js';
 
 export class AuthClient {
   private baseURL: string;
