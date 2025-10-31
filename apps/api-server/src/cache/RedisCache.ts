@@ -270,7 +270,7 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
 
   async acquireLock(key: string, ttl = 5): Promise<boolean> {
     const lockKey = `lock:${key}`;
-    const result = await this.redis.set(lockKey, '1', 'NX', 'EX', ttl);
+    const result = await this.redis.set(lockKey, '1', 'EX', ttl, 'NX');
     return result === 'OK';
   }
 

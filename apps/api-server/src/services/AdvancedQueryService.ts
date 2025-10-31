@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder, MoreThan, LessThan, Between, In } from 'typeorm';
 import { z } from 'zod';
 import { QuerySecurityValidator } from '../security/QuerySecurityValidator';
 import { PresetDataLoader } from '../loaders/PresetDataLoader';
@@ -228,20 +228,21 @@ export class AdvancedQueryService {
         Object.entries(condition).forEach(([field, value]) => {
           if (typeof value === 'object' && value !== null) {
             // Handle operators
-            if (value.gt) {
-              qb.andWhere(`post.${field} > :${field}_gt`, { [`${field}_gt`]: value.gt });
+            const valueObj = value as Record<string, any>;
+            if (valueObj.gt) {
+              qb.andWhere(`post.${field} > :${field}_gt`, { [`${field}_gt`]: valueObj.gt });
             }
-            if (value.lt) {
-              qb.andWhere(`post.${field} < :${field}_lt`, { [`${field}_lt`]: value.lt });
+            if (valueObj.lt) {
+              qb.andWhere(`post.${field} < :${field}_lt`, { [`${field}_lt`]: valueObj.lt });
             }
-            if (value.between) {
+            if (valueObj.between) {
               qb.andWhere(`post.${field} BETWEEN :${field}_start AND :${field}_end`, {
-                [`${field}_start`]: value.between[0],
-                [`${field}_end`]: value.between[1]
+                [`${field}_start`]: valueObj.between[0],
+                [`${field}_end`]: valueObj.between[1]
               });
             }
-            if (value.in) {
-              qb.andWhere(`post.${field} IN (:...${field}_in)`, { [`${field}_in`]: value.in });
+            if (valueObj.in) {
+              qb.andWhere(`post.${field} IN (:...${field}_in)`, { [`${field}_in`]: valueObj.in });
             }
           } else {
             qb.andWhere(`post.${field} = :${field}`, { [field]: value });

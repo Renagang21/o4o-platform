@@ -199,12 +199,16 @@ export class QuerySecurityValidator {
     });
   }
 
-  private validateSortFields(sorts: Array<{ field: string; order: 'ASC' | 'DESC' }>): void {
+  private validateSortFields(sorts: Array<{ field?: string; order?: 'ASC' | 'DESC' }>): void {
     if (sorts.length > this.rateLimit.maxSorts) {
       throw new ForbiddenException(`Too many sort fields. Maximum allowed: ${this.rateLimit.maxSorts}`);
     }
 
     for (const sort of sorts) {
+      if (!sort.field) {
+        throw new ForbiddenException('Sort field is required');
+      }
+
       if (!this.allowList.fields.includes(sort.field)) {
         throw new ForbiddenException(`Sort field '${sort.field}' is not allowed`);
       }
