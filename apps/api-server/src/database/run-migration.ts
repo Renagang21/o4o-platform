@@ -3,16 +3,18 @@ import { AppDataSource } from './connection.js';
 
 async function runMigration() {
   try {
+    console.log('📦 Initializing database connection...');
     await AppDataSource.initialize();
-    // Data source initialized successfully
-    
-    await AppDataSource.runMigrations();
-    // Migrations executed successfully
-    
+    console.log('✅ Data source initialized successfully');
+
+    console.log('🔄 Running migrations...');
+    const migrations = await AppDataSource.runMigrations();
+    console.log(`✅ ${migrations.length} migration(s) executed successfully`);
+
     await AppDataSource.destroy();
-    // Data source closed successfully
+    console.log('✅ Data source closed successfully');
   } catch (error) {
-    // Error log removed
+    console.error('❌ Migration error:', error);
     process.exit(1);
   }
 }
