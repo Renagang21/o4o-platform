@@ -1,6 +1,6 @@
 import React from 'react';
-import { usePreset, PresetRenderer, type PresetType } from '@o4o/utils';
-import type { ViewPreset } from '@o4o/types';
+import { usePreset, usePresetData, PresetRenderer, FormRenderer, TemplateRenderer, type PresetType } from '@o4o/utils';
+import type { ViewPreset, FormPreset, TemplatePreset } from '@o4o/types';
 import type { ShortcodeProps } from '../types.js';
 
 /**
@@ -16,6 +16,7 @@ import type { ShortcodeProps } from '../types.js';
 export function PresetShortcode({ attributes, context }: ShortcodeProps): React.ReactElement {
   const presetId = attributes.id as string | undefined;
   const presetType = (attributes.type as PresetType) || 'view';
+  const useMockData = attributes.mock === 'true' || attributes.mock === true;
 
   const { preset, loading, error } = usePreset(presetId, presetType);
 
@@ -56,13 +57,13 @@ export function PresetShortcode({ attributes, context }: ShortcodeProps): React.
   // Render based on preset type
   switch (presetType) {
     case 'view':
-      return renderViewPreset(preset as ViewPreset, context);
+      return renderViewPreset(preset as ViewPreset, context, useMockData);
 
     case 'form':
-      return renderFormPreset(preset, context);
+      return renderFormPreset(preset as FormPreset, context);
 
     case 'template':
-      return renderTemplatePreset(preset, context);
+      return renderTemplatePreset(preset as TemplatePreset, context);
 
     default:
       return (
@@ -75,47 +76,75 @@ export function PresetShortcode({ attributes, context }: ShortcodeProps): React.
 }
 
 /**
- * Render ViewPreset
+ * Render ViewPreset with real data
  */
-function renderViewPreset(preset: ViewPreset, context: any): React.ReactElement {
-  // Get data from context if available
-  const data = context?.data || [];
+function ViewPresetRenderer({ preset, useMockData, context }: { preset: ViewPreset; useMockData: boolean; context: any }): React.ReactElement {
+  // Use mock data from context or fetch real data
+  const mockData = context?.data || [];
+  const { data: realData, loading: dataLoading, error: dataError } = usePresetData(useMockData ? undefined : preset);
+
+  const data = useMockData ? mockData : realData;
+  const loading = useMockData ? false : dataLoading;
+
+  if (dataError) {
+    return (
+      <div className="border border-yellow-300 bg-yellow-50 rounded-lg p-4">
+        <p className="text-yellow-800 font-medium">Data Loading Error</p>
+        <p className="text-yellow-600 text-sm">{dataError}</p>
+        <p className="text-xs text-yellow-500 mt-2">Falling back to mock data if available...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="preset-view" data-preset-id={preset.id}>
-      <PresetRenderer preset={preset} data={data} loading={false} />
+      <PresetRenderer preset={preset} data={data} loading={loading} />
     </div>
   );
 }
 
 /**
- * Render FormPreset (placeholder)
+ * Render ViewPreset
  */
-function renderFormPreset(preset: any, _context: any): React.ReactElement {
+function renderViewPreset(preset: ViewPreset, context: any, useMockData: boolean): React.ReactElement {
+  return <ViewPresetRenderer preset={preset} useMockData={useMockData} context={context} />;
+}
+
+/**
+ * Render FormPreset
+ */
+function renderFormPreset(preset: FormPreset, _context: any): React.ReactElement {
+  const handleSubmit = async (data: Record<string, any>) => {
+    console.log('Form submitted:', data);
+    // In a real implementation, this would submit to the API
+    // For now, just log it
+  };
+
   return (
-    <div className="preset-form border border-gray-200 rounded-lg p-6" data-preset-id={preset.id}>
-      <h3 className="text-lg font-semibold mb-4">{preset.name}</h3>
-      <p className="text-gray-600 mb-4">Form rendering coming soon...</p>
-      <div className="text-xs text-gray-500">
-        <p>CPT: {preset.cptSlug}</p>
-        <p>Fields: {preset.config.fields?.length || 0}</p>
-      </div>
+    <div className="preset-form" data-preset-id={preset.id}>
+      <FormRenderer
+        preset={preset}
+        onSubmit={handleSubmit}
+        initialData={{}}
+      />
     </div>
   );
 }
 
 /**
- * Render TemplatePreset (placeholder)
+ * Render TemplatePreset
  */
-function renderTemplatePreset(preset: any, _context: any): React.ReactElement {
+function renderTemplatePreset(preset: TemplatePreset, context: any): React.ReactElement {
+  const content = context?.content || {};
+
   return (
-    <div className="preset-template border border-gray-200 rounded-lg p-6" data-preset-id={preset.id}>
-      <h3 className="text-lg font-semibold mb-4">{preset.name}</h3>
-      <p className="text-gray-600 mb-4">Template rendering coming soon...</p>
-      <div className="text-xs text-gray-500">
-        <p>CPT: {preset.cptSlug}</p>
-        <p>Layout: {preset.config.layout?.type || 'N/A'}</p>
-      </div>
+    <div className="preset-template" data-preset-id={preset.id}>
+      <TemplateRenderer
+        preset={preset}
+        content={content}
+      >
+        {context?.children}
+      </TemplateRenderer>
     </div>
   );
 }

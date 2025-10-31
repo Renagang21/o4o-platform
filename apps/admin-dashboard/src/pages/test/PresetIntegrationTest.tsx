@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { usePreset } from '@o4o/utils';
+import { usePreset, usePresets, usePresetMutations, FormRenderer, TemplateRenderer } from '@o4o/utils';
 import { PresetSelector } from '../../components/presets';
 import { ShortcodeRenderer } from '@o4o/shortcodes';
-import type { ViewPreset } from '@o4o/types';
+import type { ViewPreset, FormPreset, TemplatePreset } from '@o4o/types';
 
 /**
  * Preset Integration Test Page
  *
  * Tests:
- * 1. usePreset hook functionality
+ * 1. usePreset hook functionality (with TanStack Query)
  * 2. PresetSelector component
  * 3. Preset shortcode rendering
- * 4. Consistency between block and shortcode rendering
+ * 4. FormRenderer component
+ * 5. TemplateRenderer component
+ * 6. Real data vs mock data toggle
+ * 7. Cache invalidation
  */
 export default function PresetIntegrationTest() {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('view_post_latest_10_posts_list_v1');
   const [shortcodeContent, setShortcodeContent] = useState<string>(
     '[preset id="view_post_latest_10_posts_list_v1" type="view"]'
   );
+  const [useRealData, setUseRealData] = useState<boolean>(false);
 
   // Sample data for testing
   const samplePosts = [
@@ -47,15 +51,40 @@ export default function PresetIntegrationTest() {
     }
   ];
 
+  // Cache invalidation
+  const mutations = usePresetMutations();
+
+  const handleInvalidateCache = async () => {
+    await mutations.invalidateEverything();
+    alert('Cache invalidated!');
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Preset Integration Test
+          Preset Integration Test - Phase 4
         </h1>
         <p className="text-gray-600">
-          Testing Phase 3: Block and Shortcode Integration with Presets
+          Testing: TanStack Query, FormRenderer, TemplateRenderer, Real Data Integration
         </p>
+        <div className="mt-4 flex gap-4">
+          <button
+            onClick={handleInvalidateCache}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Invalidate Cache
+          </button>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={useRealData}
+              onChange={(e) => setUseRealData(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span className="text-sm text-gray-700">Use Real Data (vs Mock)</span>
+          </label>
+        </div>
       </div>
 
       {/* Test 1: PresetSelector */}
@@ -92,7 +121,7 @@ export default function PresetIntegrationTest() {
 
       {/* Test 3: Shortcode Rendering */}
       <section className="mb-8 border border-gray-200 rounded-lg p-6 bg-white">
-        <h2 className="text-xl font-semibold mb-4">Test 3: Preset Shortcode</h2>
+        <h2 className="text-xl font-semibold mb-4">Test 3: Preset Shortcode (with Real Data)</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -106,10 +135,12 @@ export default function PresetIntegrationTest() {
             />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Rendered Output:</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              Rendered Output {useRealData ? '(Real Data)' : '(Mock Data)'}:
+            </p>
             <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
               <ShortcodeRenderer
-                content={shortcodeContent}
+                content={useRealData ? shortcodeContent : `${shortcodeContent.slice(0, -1)} mock="true"]`}
                 context={{ data: samplePosts }}
               />
             </div>
@@ -164,18 +195,204 @@ export default function PresetIntegrationTest() {
         </div>
       </section>
 
+      {/* Test 6: FormRenderer */}
+      <section className="mb-8 border border-gray-200 rounded-lg p-6 bg-white">
+        <h2 className="text-xl font-semibold mb-4">Test 6: FormRenderer Component</h2>
+        <FormPresetTest />
+      </section>
+
+      {/* Test 7: TemplateRenderer */}
+      <section className="mb-8 border border-gray-200 rounded-lg p-6 bg-white">
+        <h2 className="text-xl font-semibold mb-4">Test 7: TemplateRenderer Component</h2>
+        <TemplatePresetTest />
+      </section>
+
+      {/* Test 8: usePresets Hook */}
+      <section className="mb-8 border border-gray-200 rounded-lg p-6 bg-white">
+        <h2 className="text-xl font-semibold mb-4">Test 8: usePresets Hook (List)</h2>
+        <PresetsListTest />
+      </section>
+
       {/* Instructions */}
       <section className="border border-blue-200 rounded-lg p-6 bg-blue-50">
-        <h2 className="text-xl font-semibold text-blue-900 mb-4">Test Instructions</h2>
+        <h2 className="text-xl font-semibold text-blue-900 mb-4">Phase 4 Test Instructions</h2>
         <ol className="list-decimal list-inside space-y-2 text-blue-800">
-          <li>Select different presets from the dropdown</li>
-          <li>Verify that preset data loads correctly in Test 2</li>
-          <li>Check that the shortcode renders the same content</li>
-          <li>Try editing the shortcode syntax manually</li>
-          <li>Verify error states display properly</li>
-          <li>Check that same presetId produces identical output</li>
+          <li>Toggle "Use Real Data" to test data fetching vs mock data</li>
+          <li>Click "Invalidate Cache" to test TanStack Query cache invalidation</li>
+          <li>Test FormRenderer with sample form preset</li>
+          <li>Test TemplateRenderer with sample template preset</li>
+          <li>Verify preset list loads correctly in Test 8</li>
+          <li>Check browser DevTools Network tab for API calls</li>
+          <li>Verify cache behavior (requests should be cached for 5 minutes)</li>
         </ol>
       </section>
+    </div>
+  );
+}
+
+/**
+ * Test FormRenderer
+ */
+function FormPresetTest() {
+  const sampleFormPreset: FormPreset = {
+    id: 'form_sample_test',
+    name: 'Sample Contact Form',
+    description: 'Test form for FormRenderer',
+    cptSlug: 'contact',
+    version: 1,
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    config: {
+      fields: [
+        {
+          fieldKey: 'name',
+          order: 1,
+          sectionId: 'basic',
+          required: true,
+          placeholder: 'Enter your name',
+          helpText: 'Full name required'
+        },
+        {
+          fieldKey: 'email',
+          order: 2,
+          sectionId: 'basic',
+          required: true,
+          placeholder: 'your@email.com',
+          helpText: 'We will never share your email'
+        },
+        {
+          fieldKey: 'message',
+          order: 3,
+          sectionId: 'basic',
+          required: true,
+          placeholder: 'Your message...',
+          helpText: ''
+        }
+      ],
+      layout: {
+        columns: 1,
+        sections: [
+          {
+            id: 'basic',
+            title: 'Contact Information',
+            description: 'Please fill in your details',
+            order: 1,
+            collapsible: false,
+            defaultCollapsed: false
+          }
+        ]
+      },
+      validation: [
+        { field: 'name', type: 'required', message: 'Name is required' },
+        { field: 'email', type: 'required', message: 'Email is required' },
+        { field: 'email', type: 'email', message: 'Invalid email address' },
+        { field: 'message', type: 'required', message: 'Message is required' }
+      ],
+      submitBehavior: {
+        showSuccessMessage: true,
+        successMessage: 'Thank you for contacting us!'
+      }
+    }
+  };
+
+  const handleSubmit = async (data: Record<string, any>) => {
+    console.log('Form data:', data);
+    alert(`Form submitted:\n${JSON.stringify(data, null, 2)}`);
+  };
+
+  return <FormRenderer preset={sampleFormPreset} onSubmit={handleSubmit} />;
+}
+
+/**
+ * Test TemplateRenderer
+ */
+function TemplatePresetTest() {
+  const sampleTemplatePreset: TemplatePreset = {
+    id: 'template_sample_test',
+    name: 'Sample 2-Column Layout',
+    description: 'Test template for TemplateRenderer',
+    cptSlug: 'page',
+    version: 1,
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    config: {
+      layout: {
+        type: '2-column-right',
+        header: {
+          blocks: [
+            { blockName: 'HeaderBlock', props: {}, order: 1 }
+          ]
+        },
+        main: {
+          blocks: [
+            { blockName: 'ContentBlock', props: {}, order: 1 }
+          ]
+        },
+        sidebar: {
+          blocks: [
+            { blockName: 'WidgetBlock', props: {}, order: 1 }
+          ]
+        },
+        footer: {
+          blocks: [
+            { blockName: 'FooterBlock', props: {}, order: 1 }
+          ]
+        }
+      },
+      seoMeta: {
+        titleTemplate: '{title} | Test Site',
+        descriptionField: 'excerpt',
+        keywords: ['test', 'sample']
+      }
+    }
+  };
+
+  return (
+    <TemplateRenderer
+      preset={sampleTemplatePreset}
+      content={{ title: 'Sample Page', excerpt: 'This is a test page' }}
+    >
+      <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <h3 className="text-lg font-semibold mb-2">Main Content Area</h3>
+        <p className="text-gray-600">This content is rendered in the main zone.</p>
+      </div>
+    </TemplateRenderer>
+  );
+}
+
+/**
+ * Test usePresets hook
+ */
+function PresetsListTest() {
+  const { presets, loading, error, total } = usePresets('view', { isActive: true });
+
+  if (loading) {
+    return <div className="text-gray-600">Loading presets...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-600">Error: {error}</div>;
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm text-gray-600">Total: {total} presets</p>
+      {presets.length === 0 ? (
+        <p className="text-gray-500">No presets found</p>
+      ) : (
+        <ul className="space-y-2">
+          {presets.map((preset) => (
+            <li key={preset.id} className="border border-gray-200 rounded p-3 bg-gray-50">
+              <div className="font-medium">{preset.name}</div>
+              <div className="text-sm text-gray-600">
+                {preset.cptSlug} • v{preset.version}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

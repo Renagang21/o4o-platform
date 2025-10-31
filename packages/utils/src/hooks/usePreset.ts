@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type {
   FormPreset,
@@ -24,54 +24,12 @@ export interface UsePresetResult<T extends AnyPreset> {
 }
 
 /**
- * Simple in-memory cache for presets
- */
-interface PresetCacheEntry {
-  data: AnyPreset;
-  timestamp: number;
-}
-
-const presetCache = new Map<string, PresetCacheEntry>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-/**
- * Clear expired cache entries
- */
-function clearExpiredCache(): void {
-  const now = Date.now();
-  for (const [key, entry] of presetCache.entries()) {
-    if (now - entry.timestamp > CACHE_TTL) {
-      presetCache.delete(key);
-    }
-  }
-}
-
-/**
- * Get cache key
- */
-function getCacheKey(presetId: string, type: PresetType): string {
-  return `${type}:${presetId}`;
-}
-
-/**
  * Fetch preset from API
  */
 async function fetchPreset(
   presetId: string,
   type: PresetType
 ): Promise<AnyPreset> {
-  const cacheKey = getCacheKey(presetId, type);
-
-  // Check cache first
-  const cached = presetCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
-
-  // Clear expired entries periodically
-  clearExpiredCache();
-
-  // Fetch from API
   const endpoint = `/presets/${type}s/${presetId}`;
   const response = await authClient.api.get<PresetResponse<AnyPreset>>(endpoint);
 
@@ -79,21 +37,13 @@ async function fetchPreset(
     throw new Error(`Failed to fetch preset: ${presetId}`);
   }
 
-  const preset = response.data.data;
-
-  // Cache the result
-  presetCache.set(cacheKey, {
-    data: preset,
-    timestamp: Date.now()
-  });
-
-  return preset;
+  return response.data.data;
 }
 
 /**
  * React Hook: usePreset
  *
- * Fetches and caches preset data from the API
+ * Fetches and caches preset data from the API using TanStack Query
  *
  * @param presetId - The preset ID to fetch
  * @param type - The preset type ('form' | 'view' | 'template')
@@ -115,62 +65,72 @@ export function usePreset<T extends AnyPreset = AnyPreset>(
   presetId: string | undefined,
   type: PresetType
 ): UsePresetResult<T> {
-  const [preset, setPreset] = useState<T | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = async () => {
-    if (!presetId) {
-      setPreset(null);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await fetchPreset(presetId, type);
-      setPreset(data as T);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch preset';
-      setError(errorMessage);
-      setPreset(null);
-
-      // Check if it's a permission error (403/401)
-      if (errorMessage.includes('403') || errorMessage.includes('401')) {
-        setError('You do not have permission to access this preset');
+  const {
+    data: preset,
+    isLoading,
+    error,
+    refetch
+  } = useQuery<AnyPreset, Error>({
+    queryKey: ['preset', type, presetId],
+    queryFn: () => {
+      if (!presetId) {
+        throw new Error('Preset ID is required');
       }
-    } finally {
-      setLoading(false);
+      return fetchPreset(presetId, type);
+    },
+    enabled: !!presetId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    retry: (failureCount, error) => {
+      // Don't retry on 403/401 errors
+      if (
+        error.message.includes('403') ||
+        error.message.includes('401') ||
+        error.message.includes('Unauthorized') ||
+        error.message.includes('Forbidden')
+      ) {
+        return false;
+      }
+      return failureCount < 1;
     }
-  };
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [presetId, type]);
+  // Handle error messages
+  let errorMessage: string | null = null;
+  if (error) {
+    if (
+      error.message.includes('403') ||
+      error.message.includes('401') ||
+      error.message.includes('Unauthorized') ||
+      error.message.includes('Forbidden')
+    ) {
+      errorMessage = 'You do not have permission to access this preset';
+    } else {
+      errorMessage = error.message;
+    }
+  }
 
   return {
-    preset,
-    loading,
-    error,
-    refetch: fetchData
+    preset: (preset as T) || null,
+    loading: isLoading,
+    error: errorMessage,
+    refetch: async () => {
+      await refetch();
+    }
   };
 }
 
 /**
- * Clear all cached presets
- * Useful for manual cache invalidation
+ * Legacy cache clearing functions
+ * These are now no-ops since TanStack Query handles cache internally
+ * Kept for backward compatibility
  */
 export function clearPresetCache(): void {
-  presetCache.clear();
+  console.warn('clearPresetCache is deprecated - use invalidateQueries from TanStack Query');
 }
 
-/**
- * Clear a specific preset from cache
- */
 export function clearPresetFromCache(presetId: string, type: PresetType): void {
-  const cacheKey = getCacheKey(presetId, type);
-  presetCache.delete(cacheKey);
+  console.warn(
+    'clearPresetFromCache is deprecated - use invalidateQueries from TanStack Query'
+  );
 }
