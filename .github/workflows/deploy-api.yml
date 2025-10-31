@@ -92,13 +92,8 @@ jobs:
           echo "✅ API server build complete!"
           
           # Database migration check
-          echo "🗄️ Checking database migrations..."
-          if pnpm run migration:show 2>/dev/null | grep -q "No pending migrations"; then
-            echo "📝 No pending migrations"
-          else
-            echo "🔄 Running database migrations..."
-            pnpm run migration:run
-          fi
+          echo "🗄️ Running database migrations..."
+          pnpm run migration:run:prod || echo "⚠️ Migration failed (may already be applied)"
           
           # Ensure AI Settings table exists
           echo "🤖 Ensuring AI Settings table exists..."

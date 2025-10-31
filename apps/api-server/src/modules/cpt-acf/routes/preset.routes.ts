@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, type Router as IRouter } from 'express';
 import { presetController } from '../controllers/preset.controller.js';
 import { authenticateToken } from '../../../middleware/auth.js';
 
-const router = Router();
+const router: IRouter = Router();
 
 // All preset routes require authentication
 router.use(authenticateToken);
