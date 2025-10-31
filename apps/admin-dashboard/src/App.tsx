@@ -94,6 +94,11 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
 
+// CPT Presets
+const FormPresets = lazy(() => import('@/pages/cpt-engine/presets/FormPresets'));
+const ViewPresets = lazy(() => import('@/pages/cpt-engine/presets/ViewPresets'));
+const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePresets'));
+
 // CPT/ACF Router
 const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
@@ -485,6 +490,29 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <CPTEngine />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CPT Presets */}
+                    <Route path="/cpt-engine/presets/forms" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <FormPresets />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cpt-engine/presets/views" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ViewPresets />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cpt-engine/presets/templates" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplatePresets />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

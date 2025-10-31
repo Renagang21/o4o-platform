@@ -176,7 +176,10 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-types', label: '콘텐츠 타입', icon: <FileCode className="w-4 h-4" />, path: '/cpt-engine/types' },
       { id: 'cpt-fields', label: '필드 그룹', icon: <ClipboardList className="w-4 h-4" />, path: '/cpt-engine/field-groups' },
       { id: 'cpt-taxonomies', label: '분류법', icon: <Tag className="w-4 h-4" />, path: '/cpt-engine/taxonomies' },
-      { id: 'cpt-forms', label: '폼 빌더', icon: <Puzzle className="w-4 h-4" />, path: '/cpt-engine/forms' }
+      { id: 'cpt-forms', label: '폼 빌더', icon: <Puzzle className="w-4 h-4" />, path: '/cpt-engine/forms' },
+      { id: 'cpt-form-presets', label: '폼 프리셋', icon: <FileCheck className="w-4 h-4" />, path: '/cpt-engine/presets/forms' },
+      { id: 'cpt-view-presets', label: '뷰 프리셋', icon: <Layout className="w-4 h-4" />, path: '/cpt-engine/presets/views' },
+      { id: 'cpt-template-presets', label: '템플릿 프리셋', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/presets/templates' }
     ]
   },
   // 10. 도구
