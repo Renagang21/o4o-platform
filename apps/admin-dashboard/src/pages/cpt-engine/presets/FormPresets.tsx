@@ -7,11 +7,13 @@ import {
   Trash2,
   FileCheck,
   AlertCircle,
-  Loader2
+  Loader2,
+  Power
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { Pagination } from '@/components/common/Pagination';
 import { formPresetsApi } from '@/api/presets';
+import FormPresetModal from '@/components/presets/FormPresetModal';
 import type { FormPreset } from '@o4o/types';
 import toast from 'react-hot-toast';
 
@@ -69,6 +71,18 @@ const FormPresets: React.FC = () => {
     } catch (err: any) {
       console.error('Error deleting preset:', err);
       toast.error('Failed to delete preset');
+    }
+  };
+
+  // Handle toggle active
+  const handleToggleActive = async (preset: FormPreset) => {
+    try {
+      await formPresetsApi.update(preset.id, { isActive: !preset.isActive });
+      toast.success(`Preset ${!preset.isActive ? 'activated' : 'deactivated'} successfully`);
+      fetchPresets();
+    } catch (err: any) {
+      console.error('Error toggling preset:', err);
+      toast.error('Failed to toggle preset');
     }
   };
 
@@ -222,6 +236,17 @@ const FormPresets: React.FC = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         <button
+                          onClick={() => handleToggleActive(preset)}
+                          className={`p-2 rounded transition-colors ${
+                            preset.isActive
+                              ? 'text-green-600 hover:bg-green-50'
+                              : 'text-gray-400 hover:bg-gray-50'
+                          }`}
+                          title={preset.isActive ? 'Deactivate' : 'Activate'}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => setEditingPreset(preset)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                           title="Edit"
@@ -258,29 +283,18 @@ const FormPresets: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal - Placeholder */}
+      {/* Create/Edit Modal */}
       {(showCreateModal || editingPreset) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
-            <h2 className="text-xl font-semibold mb-4">
-              {editingPreset ? 'Edit Form Preset' : 'Create Form Preset'}
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Form editor will be implemented in Phase 3. This is a placeholder for the modal.
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setShowCreateModal(false);
-                  setEditingPreset(null);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        <FormPresetModal
+          preset={editingPreset}
+          onClose={() => {
+            setShowCreateModal(false);
+            setEditingPreset(null);
+          }}
+          onSuccess={() => {
+            fetchPresets();
+          }}
+        />
       )}
     </div>
   );
