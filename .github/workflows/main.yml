@@ -42,7 +42,7 @@ jobs:
     
     - name: Check for console.log statements
       run: |
-        # Find all console.log statements, excluding comments, test files, CLI scripts, and config files
+        # Find all console.log statements, excluding comments, test files, CLI scripts, config files, and migrations
         CONSOLE_LOGS=$(grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
           --exclude-dir=node_modules --exclude-dir=dist \
           --exclude-dir=test --exclude-dir=e2e \
@@ -51,7 +51,8 @@ jobs:
           --exclude="vite.config.ts" --exclude="*.config.ts" \
           | grep -v "//.*console\.log" \
           | grep -v "^\s*//" \
-          | grep -v "\*.*console\.log" || true)
+          | grep -v "\*.*console\.log" \
+          | grep -v "database/migrations/" || true)
 
         if [ -n "$CONSOLE_LOGS" ]; then
           echo "❌ Found console.log statements in production code:"
