@@ -5,6 +5,9 @@
     "lib": ["ES2022", "DOM"],
     "outDir": "./dist",
     "rootDir": "./src",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
@@ -13,6 +16,7 @@
   },
   "include": ["src/**/*"],
   "references": [
-    { "path": "../types" }
+    { "path": "../types" },
+    { "path": "../auth-client" }
   ]
 }
