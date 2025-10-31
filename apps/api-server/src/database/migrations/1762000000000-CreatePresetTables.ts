@@ -315,6 +315,8 @@ export class CreatePresetTables1762000000000 implements MigrationInterface {
       })
     );
 
+    // Migration output (TypeORM convention)
+    // eslint-disable-next-line no-console
     console.log('✅ Preset tables created successfully');
   }
 
@@ -342,6 +344,8 @@ export class CreatePresetTables1762000000000 implements MigrationInterface {
     await queryRunner.dropTable('view_presets');
     await queryRunner.dropTable('template_presets');
 
+    // Migration output (TypeORM convention)
+    // eslint-disable-next-line no-console
     console.log('✅ Preset tables dropped successfully');
   }
 }

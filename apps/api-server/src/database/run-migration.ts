@@ -1,20 +1,21 @@
 import 'reflect-metadata';
 import { AppDataSource } from './connection.js';
+import logger from '../utils/logger.js';
 
 async function runMigration() {
   try {
-    console.log('📦 Initializing database connection...');
+    logger.info('📦 Initializing database connection...');
     await AppDataSource.initialize();
-    console.log('✅ Data source initialized successfully');
+    logger.info('✅ Data source initialized successfully');
 
-    console.log('🔄 Running migrations...');
+    logger.info('🔄 Running migrations...');
     const migrations = await AppDataSource.runMigrations();
-    console.log(`✅ ${migrations.length} migration(s) executed successfully`);
+    logger.info(`✅ ${migrations.length} migration(s) executed successfully`);
 
     await AppDataSource.destroy();
-    console.log('✅ Data source closed successfully');
+    logger.info('✅ Data source closed successfully');
   } catch (error) {
-    console.error('❌ Migration error:', error);
+    logger.error('❌ Migration error:', error);
     process.exit(1);
   }
 }
