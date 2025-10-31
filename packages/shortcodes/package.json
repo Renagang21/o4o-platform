@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
+    "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
     "react": "18.2.0",
     "react-dom": "18.2.0"

@@ -1712,6 +1712,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../auth-client
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
       '@o4o/utils':
         specifier: workspace:*
         version: link:../utils
@@ -12289,6 +12292,7 @@ snapshots:
   '@o4o/shortcodes@file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@o4o/auth-client': link:packages/auth-client
+      '@o4o/types': link:packages/types
       '@o4o/utils': link:packages/utils
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
