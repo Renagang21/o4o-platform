@@ -17,6 +17,8 @@
   },
   "include": ["src/**/*"],
   "references": [
-    { "path": "../types" }
+    { "path": "../types" },
+    { "path": "../utils" },
+    { "path": "../auth-client" }
   ]
 }
