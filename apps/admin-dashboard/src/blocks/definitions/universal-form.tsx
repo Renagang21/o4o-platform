@@ -68,8 +68,9 @@ export const universalFormBlockDefinition: BlockDefinition = {
     customClassName: true,
     inserter: true,
   },
-  // Allow form-field and form-submit as inner blocks
-  allowedBlocks: ['o4o/form-field', 'o4o/form-submit'],
+  innerBlocksSettings: {
+    allowedBlocks: ['o4o/form-field', 'o4o/form-submit'],
+  },
   example: {
     attributes: {
       postType: 'post',

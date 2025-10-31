@@ -172,7 +172,7 @@ export const PostAccessControl: React.FC<PostAccessControlProps> = ({ value, onC
         </>
       )}
 
-      <style jsx>{`
+      <style>{`
         .post-access-control {
           padding: 1rem;
           background-color: #f9fafb;

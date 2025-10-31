@@ -42,7 +42,6 @@ export const columnsBlockDefinition: BlockDefinition = {
     spacing: {
       padding: true,
       margin: true,
-      blockGap: true,
     },
     typography: {
       fontSize: true,

@@ -39,6 +39,7 @@ export interface AttributeSchema {
   selector?: string;
   attribute?: string;
   query?: Record<string, AttributeSchema>;
+  enum?: string[];
 }
 
 /**

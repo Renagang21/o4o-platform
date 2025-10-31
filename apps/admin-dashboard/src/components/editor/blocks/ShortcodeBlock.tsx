@@ -552,7 +552,7 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
             <Label className="text-sm font-medium">Shortcode</Label>
             {parsedShortcode && (
               <div className="text-xs text-gray-500">
-                Tag: <span className="font-mono bg-gray-100 px-1 rounded">{parsedShortcode.tag}</span>
+                Tag: <span className="font-mono bg-gray-100 px-1 rounded">{parsedShortcode.name}</span>
               </div>
             )}
           </div>

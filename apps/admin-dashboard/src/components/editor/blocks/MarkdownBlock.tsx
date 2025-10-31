@@ -96,7 +96,6 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
     marked.setOptions({
       breaks: true,
       gfm: true,
-      headerIds: true,
       mangle: false,
     });
   }, []);

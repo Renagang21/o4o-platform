@@ -10,7 +10,8 @@ import { Send, Sparkles, Loader2, CheckCircle, XCircle, Bot, User } from 'lucide
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { conversationalAI, EditorContext, AIAction, AIConfig } from '@/services/ai/ConversationalAI';
+import { conversationalAI, EditorContext, AIAction } from '@/services/ai/ConversationalAI';
+import { AIConfig } from '@/services/ai/SimpleAIGenerator';
 
 /**
  * 메시지 타입

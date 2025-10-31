@@ -23,7 +23,7 @@ const ButtonsBlock: BlockComponent = ({
     left: 'justify-start',
     center: 'justify-center',
     right: 'justify-end',
-  }[align] || 'justify-start';
+  }[align as string] || 'justify-start';
 
   const orientationClass = orientation === 'vertical' ? 'flex-col' : 'flex-row';
 
@@ -34,7 +34,7 @@ const ButtonsBlock: BlockComponent = ({
           Add button blocks here
         </div>
       ) : (
-        innerBlocks.map((block) => {
+        innerBlocks.map((block: any) => {
           // Render inner blocks (buttons)
           const DynamicRenderer = require('../registry/DynamicRenderer').DynamicRenderer;
           return (

@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient } from '@/lib/api-client';
 import { Category, Tag } from '@o4o/types';
 import { ApiResponse } from '@/types';
 

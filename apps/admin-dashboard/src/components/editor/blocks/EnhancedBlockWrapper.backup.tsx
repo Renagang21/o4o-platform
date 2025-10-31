@@ -277,7 +277,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         if (!hasCustomHandler && onAddBlock) {
           // Default behavior: create new paragraph block after
           e.preventDefault();
-          onAddBlock('after', 'o4o/paragraph');
+          onAddBlock('after');
         }
       }
     };

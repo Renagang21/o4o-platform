@@ -9,7 +9,7 @@
 import React, { useMemo, useState, useEffect, createContext, useContext } from 'react';
 import { useForm, FormProvider, FieldErrors, FormState } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { z, ZodNumber } from 'zod';
 import { BlockProps } from '@/blocks/registry/types';
 import { Block } from '@/types/post.types';
 import { InnerBlocks } from '../InnerBlocks';
@@ -77,8 +77,8 @@ function generateZodSchemaFromFields(innerBlocks: Block[]): z.ZodObject<Record<s
         break;
       case 'number':
         fieldSchema = z.coerce.number();
-        if (min) fieldSchema = fieldSchema.min(min, `Must be at least ${min}`);
-        if (max) fieldSchema = fieldSchema.max(max, `Must be at most ${max}`);
+        if (typeof min === 'number') fieldSchema = (fieldSchema as z.ZodNumber).min(min, `Must be at least ${min}`);
+        if (typeof max === 'number') fieldSchema = (fieldSchema as z.ZodNumber).max(max, `Must be at most ${max}`);
         break;
       case 'textarea':
       case 'text':

@@ -10,7 +10,10 @@ import { Block } from '@/types/post.types';
 import { AlertCircle } from 'lucide-react';
 
 interface DynamicRendererProps {
+  id?: string;
   block: Block;
+  content?: unknown;
+  attributes?: Record<string, unknown>;
   // Block interaction callbacks
   onChange?: (content: unknown, attributes?: unknown) => void;
   onDelete?: () => void;
@@ -27,6 +30,7 @@ interface DynamicRendererProps {
   onPaste?: () => void;
   onChangeType?: (newType: string) => void;
   // InnerBlocks support
+  innerBlocks?: Block[];
   onInnerBlocksChange?: (innerBlocks: Block[]) => void;
   // Block state
   isSelected?: boolean;
