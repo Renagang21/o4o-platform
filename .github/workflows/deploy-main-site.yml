@@ -23,20 +23,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
       with:
         node-version: '22.18.0'
-
-    - name: Install pnpm
-      run: npm install -g pnpm
-
-    - name: Install dependencies
-      run: |
-        pnpm install --frozen-lockfile
-        
-    - name: Build packages
-      run: pnpm run build:packages
 
     - name: Build main site
       run: |

@@ -1,0 +1,44 @@
+name: 'Setup Build Environment'
+description: 'Setup Node.js, pnpm, install dependencies, and build packages'
+inputs:
+  node-version:
+    description: 'Node.js version'
+    required: false
+    default: '22.18.0'
+  pnpm-version:
+    description: 'pnpm version'
+    required: false
+    default: '9'
+  build-packages:
+    description: 'Whether to build shared packages'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+        cache-dependency-path: '**/pnpm-lock.yaml'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        echo "📦 Installing dependencies..."
+        pnpm install --frozen-lockfile
+
+    - name: Build shared packages
+      if: ${{ inputs.build-packages == 'true' }}
+      shell: bash
+      run: |
+        echo "🔨 Building shared packages..."
+        pnpm run build:packages
+        echo "✅ All packages built successfully"

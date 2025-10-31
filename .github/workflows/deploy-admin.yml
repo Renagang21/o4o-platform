@@ -33,34 +33,11 @@ jobs:
         echo "✅ Deploying latest version to production"
         echo "deploy=true" >> $GITHUB_OUTPUT
 
-    - name: Setup Node.js
+    - name: Setup build environment
       if: steps.check_changes.outputs.deploy == 'true'
-      uses: actions/setup-node@v4
+      uses: ./.github/actions/setup-build-env
       with:
         node-version: '22.18.0'
-
-    - name: Install pnpm
-      if: steps.check_changes.outputs.deploy == 'true'
-      run: npm install -g pnpm
-
-    - name: Install dependencies
-      if: steps.check_changes.outputs.deploy == 'true'
-      run: |
-        echo "📦 Installing dependencies..."
-        pnpm install --frozen-lockfile
-
-    - name: Build packages (required before building apps)
-      if: steps.check_changes.outputs.deploy == 'true'
-      run: |
-        echo "🔨 Building shared packages..."
-        pnpm run build:types
-        pnpm run build:auth-client
-        pnpm run build:utils
-        pnpm run build:ui
-        pnpm run build:auth-context
-        pnpm run build:shortcodes
-        pnpm run build:block-renderer
-        echo "✅ All packages built successfully"
 
     - name: Build admin dashboard
       if: steps.check_changes.outputs.deploy == 'true'

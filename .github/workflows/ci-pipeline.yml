@@ -7,6 +7,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: '22.18.0'
 
@@ -18,21 +22,11 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 9
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
-        cache-dependency-path: '**/pnpm-lock.yaml'
-    
-    - name: Complete CI Setup and Build
-      run: bash scripts/ci-complete-setup.sh
     
     - name: Run TypeScript check (Frontend only)
       run: pnpm run type-check:frontend
@@ -77,69 +71,32 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 9
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'pnpm'
-        cache-dependency-path: '**/pnpm-lock.yaml'
-    
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
 
-    - name: Build packages
+    - name: Verify package builds
       run: |
-        echo "📦 Building shared packages..."
-        pnpm run build:packages || { echo "❌ Package build failed!"; exit 1; }
-        echo ""
-        echo "✅ Packages built. Verifying dist directories..."
-
-        # Verify critical dist directories exist
+        echo "🔍 Verifying critical dist directories..."
         MISSING_DIST=0
 
-        if [ ! -d "packages/auth-client/dist" ]; then
-          echo "❌ auth-client/dist not found!"
-          MISSING_DIST=1
-        else
-          echo "✅ auth-client/dist exists"
-        fi
-
-        if [ ! -d "packages/ui/dist" ]; then
-          echo "❌ ui/dist not found!"
-          MISSING_DIST=1
-        else
-          echo "✅ ui/dist exists"
-        fi
-
-        if [ ! -d "packages/types/dist" ]; then
-          echo "❌ types/dist not found!"
-          MISSING_DIST=1
-        else
-          echo "✅ types/dist exists"
-        fi
-
-        if [ ! -d "packages/shortcodes/dist" ]; then
-          echo "❌ shortcodes/dist not found!"
-          MISSING_DIST=1
-        else
-          echo "✅ shortcodes/dist exists"
-          ls -la packages/shortcodes/dist/
-        fi
+        for pkg in auth-client ui types shortcodes block-renderer slide-app; do
+          if [ ! -d "packages/$pkg/dist" ]; then
+            echo "❌ packages/$pkg/dist not found!"
+            MISSING_DIST=1
+          else
+            echo "✅ packages/$pkg/dist exists"
+          fi
+        done
 
         if [ $MISSING_DIST -eq 1 ]; then
-          echo "❌ Some dist directories are missing. Cannot proceed with app builds."
+          echo "❌ Some dist directories are missing. Cannot proceed."
           exit 1
         fi
 
-        echo ""
-        echo "🔍 Verifying shortcodes package.json..."
-        cat packages/shortcodes/package.json | grep -A10 '"main"'
+        echo "✅ All critical packages verified"
 
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}

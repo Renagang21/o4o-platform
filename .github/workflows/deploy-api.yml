@@ -39,10 +39,12 @@ jobs:
 
     - name: Deploy to API server
       uses: appleboy/ssh-action@v1.0.3
+      timeout-minutes: 15
       with:
         host: ${{ secrets.API_HOST }}
         username: ${{ secrets.API_USER }}
         key: ${{ secrets.API_SSH_KEY }}
+        command_timeout: 10m
         script: |
           cd /home/ubuntu/o4o-platform
           
