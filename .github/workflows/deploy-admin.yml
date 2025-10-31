@@ -54,9 +54,9 @@ jobs:
       run: |
         echo "🔨 Building shared packages..."
         pnpm run build:types
+        pnpm run build:auth-client
         pnpm run build:utils
         pnpm run build:ui
-        pnpm run build:auth-client
         pnpm run build:auth-context
         pnpm run build:shortcodes
         pnpm run build:block-renderer

@@ -105,10 +105,8 @@ export const seedFormPreset = async () => {
 
   try {
     const result = await formPresetsApi.create(formPreset);
-    console.log('Form preset created:', result);
     return result;
   } catch (error) {
-    console.error('Failed to create form preset:', error);
     throw error;
   }
 };
@@ -200,10 +198,8 @@ export const seedViewPreset = async () => {
 
   try {
     const result = await viewPresetsApi.create(viewPreset);
-    console.log('View preset created:', result);
     return result;
   } catch (error) {
-    console.error('Failed to create view preset:', error);
     throw error;
   }
 };
@@ -276,10 +272,8 @@ export const seedTemplatePreset = async () => {
 
   try {
     const result = await templatePresetsApi.create(templatePreset);
-    console.log('Template preset created:', result);
     return result;
   } catch (error) {
-    console.error('Failed to create template preset:', error);
     throw error;
   }
 };
@@ -288,22 +282,10 @@ export const seedTemplatePreset = async () => {
  * Seed all presets at once
  */
 export const seedAllPresets = async () => {
-  console.log('Starting preset seeding...');
-
   try {
-    console.log('Creating Form preset...');
     const formResult = await seedFormPreset();
-    console.log('Form preset created:', formResult.data.id);
-
-    console.log('Creating View preset...');
     const viewResult = await seedViewPreset();
-    console.log('View preset created:', viewResult.data.id);
-
-    console.log('Creating Template preset...');
     const templateResult = await seedTemplatePreset();
-    console.log('Template preset created:', templateResult.data.id);
-
-    console.log('All presets seeded successfully!');
 
     return {
       formPreset: formResult.data,
@@ -311,7 +293,6 @@ export const seedAllPresets = async () => {
       templatePreset: templateResult.data
     };
   } catch (error) {
-    console.error('Error seeding presets:', error);
     throw error;
   }
 };
