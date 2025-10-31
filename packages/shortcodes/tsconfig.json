@@ -16,6 +16,10 @@
     "types": []
   },
   "include": ["src/**/*"],
+  "exclude": [
+    "src/hooks/useUniversalBlock.ts",
+    "src/template/**/*"
+  ],
   "references": [
     { "path": "../types" },
     { "path": "../utils" },
