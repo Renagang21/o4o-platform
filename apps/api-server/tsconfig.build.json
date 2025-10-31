@@ -15,10 +15,8 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     "src/__tests__/**/*",
-    "src/cache/**/*",
     "src/loaders/**/*",
-    "src/routes/v2/**/*",
-    "src/security/**/*",
+    "src/routes/v2/data.routes.ts",
     "src/services/AdvancedQueryService.ts",
     "src/services/QueryComplexityAnalyzer.ts"
   ]

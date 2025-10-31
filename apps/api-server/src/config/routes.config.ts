@@ -94,6 +94,9 @@ import acfRoutes from '../routes/acf.js';
 // CPT-ACF Preset Routes
 import presetRoutes from '../modules/cpt-acf/routes/preset.routes.js';
 
+// V2 API Routes
+import queryV2Routes from '../routes/v2/query.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -256,6 +259,9 @@ export function setupRoutes(app: Application): void {
 
   // CPT-ACF Presets (Form, View, Template)
   app.use('/api/v1/presets', standardLimiter, presetRoutes);
+
+  // V2 API - Advanced Query System
+  app.use('/api/v2', standardLimiter, queryV2Routes);
 
   // Categories & Menus
   app.use('/api/v1/categories', categoriesRoutes);

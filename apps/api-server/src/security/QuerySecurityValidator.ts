@@ -1,6 +1,30 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AdvancedQueryParams } from '../services/AdvancedQueryService';
+// Query parameter types
+export interface AdvancedQueryParams {
+  source: string;
+  expand?: string[];
+  where?: any;
+  sort?: Array<{ field: string; order: 'ASC' | 'DESC' }>;
+  page?: {
+    limit?: number;
+    cursor?: string;
+  };
+  aggregate?: {
+    count?: boolean;
+    sum?: string[];
+    avg?: string[];
+  };
+  cache?: {
+    ttl?: number;
+    key?: string;
+  };
+}
+
+export class ForbiddenError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ForbiddenError';
+  }
+}
 
 export interface AllowListConfig {
   fields: string[];
@@ -18,20 +42,25 @@ export interface RateLimitConfig {
   maxLimit: number;
 }
 
-@Injectable()
+export interface QuerySecurityConfig {
+  allowList?: Partial<AllowListConfig>;
+  rateLimit?: Partial<RateLimitConfig>;
+  sensitiveFields?: string[];
+}
+
 export class QuerySecurityValidator {
   private allowList: AllowListConfig;
   private rateLimit: RateLimitConfig;
   private sensitiveFields: Set<string>;
 
-  constructor(private configService: ConfigService) {
-    this.initializeAllowList();
-    this.initializeRateLimit();
-    this.initializeSensitiveFields();
+  constructor(config: QuerySecurityConfig = {}) {
+    this.allowList = this.initializeAllowList(config.allowList);
+    this.rateLimit = this.initializeRateLimit(config.rateLimit);
+    this.sensitiveFields = this.initializeSensitiveFields(config.sensitiveFields);
   }
 
-  private initializeAllowList(): void {
-    this.allowList = {
+  private initializeAllowList(customAllowList?: Partial<AllowListConfig>): AllowListConfig {
+    const defaultAllowList: AllowListConfig = {
       fields: [
         'id', 'title', 'content', 'excerpt', 'status', 'slug',
         'createdAt', 'updatedAt', 'publishedAt', 'author', 'authorId',
@@ -57,39 +86,45 @@ export class QuerySecurityValidator {
       ]
     };
 
-    // Load custom allow list from config
-    const customAllowList = this.configService.get<Partial<AllowListConfig>>('queryAllowList');
+    // Merge with custom allow list
     if (customAllowList) {
-      this.allowList = {
-        fields: [...this.allowList.fields, ...(customAllowList.fields || [])],
-        relations: [...this.allowList.relations, ...(customAllowList.relations || [])],
-        operators: [...this.allowList.operators, ...(customAllowList.operators || [])],
-        sources: [...this.allowList.sources, ...(customAllowList.sources || [])],
-        aggregates: [...this.allowList.aggregates, ...(customAllowList.aggregates || [])]
+      return {
+        fields: [...defaultAllowList.fields, ...(customAllowList.fields || [])],
+        relations: [...defaultAllowList.relations, ...(customAllowList.relations || [])],
+        operators: [...defaultAllowList.operators, ...(customAllowList.operators || [])],
+        sources: [...defaultAllowList.sources, ...(customAllowList.sources || [])],
+        aggregates: [...defaultAllowList.aggregates, ...(customAllowList.aggregates || [])]
       };
     }
+
+    return defaultAllowList;
   }
 
-  private initializeRateLimit(): void {
-    this.rateLimit = {
-      maxComplexity: this.configService.get<number>('queryMaxComplexity', 100),
-      maxExpands: this.configService.get<number>('queryMaxExpands', 5),
-      maxConditions: this.configService.get<number>('queryMaxConditions', 20),
-      maxSorts: this.configService.get<number>('queryMaxSorts', 3),
-      maxLimit: this.configService.get<number>('queryMaxLimit', 100)
+  private initializeRateLimit(customRateLimit?: Partial<RateLimitConfig>): RateLimitConfig {
+    const defaultRateLimit: RateLimitConfig = {
+      maxComplexity: parseInt(process.env.QUERY_MAX_COMPLEXITY || '100'),
+      maxExpands: parseInt(process.env.QUERY_MAX_EXPANDS || '5'),
+      maxConditions: parseInt(process.env.QUERY_MAX_CONDITIONS || '20'),
+      maxSorts: parseInt(process.env.QUERY_MAX_SORTS || '3'),
+      maxLimit: parseInt(process.env.QUERY_MAX_LIMIT || '100')
     };
+
+    return { ...defaultRateLimit, ...customRateLimit };
   }
 
-  private initializeSensitiveFields(): void {
-    this.sensitiveFields = new Set([
+  private initializeSensitiveFields(additionalFields?: string[]): Set<string> {
+    const fields = new Set([
       'password', 'passwordHash', 'apiKey', 'apiSecret', 'token',
       'refreshToken', 'privateKey', 'secret', 'salt', 'sessionId',
       'creditCard', 'cvv', 'ssn', 'bankAccount', 'routingNumber'
     ]);
 
-    // Load additional sensitive fields from config
-    const additionalSensitiveFields = this.configService.get<string[]>('sensistiveFields', []);
-    additionalSensitiveFields.forEach(field => this.sensitiveFields.add(field));
+    // Add additional sensitive fields
+    if (additionalFields) {
+      additionalFields.forEach(field => fields.add(field));
+    }
+
+    return fields;
   }
 
   async validate(params: AdvancedQueryParams, userId?: string, tenantId?: string): Promise<void> {
@@ -125,13 +160,13 @@ export class QuerySecurityValidator {
 
   private validateSource(source: string): void {
     if (!this.allowList.sources.includes(source)) {
-      throw new ForbiddenException(`Source '${source}' is not allowed`);
+      throw new ForbiddenError(`Source '${source}' is not allowed`);
     }
   }
 
   private validateExpands(expands: string[]): void {
     if (expands.length > this.rateLimit.maxExpands) {
-      throw new ForbiddenException(`Too many expand relations. Maximum allowed: ${this.rateLimit.maxExpands}`);
+      throw new ForbiddenError(`Too many expand relations. Maximum allowed: ${this.rateLimit.maxExpands}`);
     }
 
     for (const expand of expands) {
@@ -140,25 +175,25 @@ export class QuerySecurityValidator {
       // Check each part of nested expansion
       for (const part of parts) {
         if (!this.allowList.relations.includes(part)) {
-          throw new ForbiddenException(`Relation '${part}' is not allowed`);
+          throw new ForbiddenError(`Relation '${part}' is not allowed`);
         }
       }
 
       // Limit nesting depth
       if (parts.length > 3) {
-        throw new ForbiddenException(`Expand nesting too deep. Maximum depth: 3`);
+        throw new ForbiddenError(`Expand nesting too deep. Maximum depth: 3`);
       }
     }
   }
 
   private validateWhereConditions(where: any, depth = 0): void {
     if (depth > 5) {
-      throw new ForbiddenException('Where condition nesting too deep');
+      throw new ForbiddenError('Where condition nesting too deep');
     }
 
     const conditions = this.countConditions(where);
     if (conditions > this.rateLimit.maxConditions) {
-      throw new ForbiddenException(`Too many conditions. Maximum allowed: ${this.rateLimit.maxConditions}`);
+      throw new ForbiddenError(`Too many conditions. Maximum allowed: ${this.rateLimit.maxConditions}`);
     }
 
     // Recursively validate conditions
@@ -179,19 +214,19 @@ export class QuerySecurityValidator {
       if (field !== 'AND' && field !== 'OR') {
         // Check if field is allowed
         if (!this.allowList.fields.includes(field)) {
-          throw new ForbiddenException(`Field '${field}' is not allowed in where conditions`);
+          throw new ForbiddenError(`Field '${field}' is not allowed in where conditions`);
         }
 
         // Check for sensitive fields
         if (this.sensitiveFields.has(field)) {
-          throw new ForbiddenException(`Field '${field}' contains sensitive data and cannot be queried`);
+          throw new ForbiddenError(`Field '${field}' contains sensitive data and cannot be queried`);
         }
 
         // Validate operators if value is an object
         if (typeof value === 'object' && value !== null) {
           Object.keys(value).forEach(operator => {
             if (!this.allowList.operators.includes(operator)) {
-              throw new ForbiddenException(`Operator '${operator}' is not allowed`);
+              throw new ForbiddenError(`Operator '${operator}' is not allowed`);
             }
           });
         }
@@ -201,20 +236,20 @@ export class QuerySecurityValidator {
 
   private validateSortFields(sorts: Array<{ field?: string; order?: 'ASC' | 'DESC' }>): void {
     if (sorts.length > this.rateLimit.maxSorts) {
-      throw new ForbiddenException(`Too many sort fields. Maximum allowed: ${this.rateLimit.maxSorts}`);
+      throw new ForbiddenError(`Too many sort fields. Maximum allowed: ${this.rateLimit.maxSorts}`);
     }
 
     for (const sort of sorts) {
       if (!sort.field) {
-        throw new ForbiddenException('Sort field is required');
+        throw new ForbiddenError('Sort field is required');
       }
 
       if (!this.allowList.fields.includes(sort.field)) {
-        throw new ForbiddenException(`Sort field '${sort.field}' is not allowed`);
+        throw new ForbiddenError(`Sort field '${sort.field}' is not allowed`);
       }
 
       if (this.sensitiveFields.has(sort.field)) {
-        throw new ForbiddenException(`Field '${sort.field}' contains sensitive data and cannot be sorted`);
+        throw new ForbiddenError(`Field '${sort.field}' contains sensitive data and cannot be sorted`);
       }
     }
   }
@@ -223,10 +258,10 @@ export class QuerySecurityValidator {
     if (aggregate.sum) {
       for (const field of aggregate.sum) {
         if (!this.allowList.fields.includes(field)) {
-          throw new ForbiddenException(`Aggregate field '${field}' is not allowed`);
+          throw new ForbiddenError(`Aggregate field '${field}' is not allowed`);
         }
         if (this.sensitiveFields.has(field)) {
-          throw new ForbiddenException(`Field '${field}' contains sensitive data and cannot be aggregated`);
+          throw new ForbiddenError(`Field '${field}' contains sensitive data and cannot be aggregated`);
         }
       }
     }
@@ -234,10 +269,10 @@ export class QuerySecurityValidator {
     if (aggregate.avg) {
       for (const field of aggregate.avg) {
         if (!this.allowList.fields.includes(field)) {
-          throw new ForbiddenException(`Aggregate field '${field}' is not allowed`);
+          throw new ForbiddenError(`Aggregate field '${field}' is not allowed`);
         }
         if (this.sensitiveFields.has(field)) {
-          throw new ForbiddenException(`Field '${field}' contains sensitive data and cannot be aggregated`);
+          throw new ForbiddenError(`Field '${field}' contains sensitive data and cannot be aggregated`);
         }
       }
     }
@@ -246,13 +281,13 @@ export class QuerySecurityValidator {
   private checkRateLimits(params: AdvancedQueryParams): void {
     // Check page limit
     if (params.page?.limit && params.page.limit > this.rateLimit.maxLimit) {
-      throw new ForbiddenException(`Page limit too high. Maximum allowed: ${this.rateLimit.maxLimit}`);
+      throw new ForbiddenError(`Page limit too high. Maximum allowed: ${this.rateLimit.maxLimit}`);
     }
 
     // Calculate and check complexity
     const complexity = this.calculateComplexity(params);
     if (complexity > this.rateLimit.maxComplexity) {
-      throw new ForbiddenException(`Query too complex. Complexity: ${complexity}, Maximum allowed: ${this.rateLimit.maxComplexity}`);
+      throw new ForbiddenError(`Query too complex. Complexity: ${complexity}, Maximum allowed: ${this.rateLimit.maxComplexity}`);
     }
   }
 
@@ -266,7 +301,7 @@ export class QuerySecurityValidator {
 
     // Example: Check if user can access draft posts
     if (params.where?.status === 'draft' && !userId) {
-      throw new ForbiddenException('Authentication required to access draft content');
+      throw new ForbiddenError('Authentication required to access draft content');
     }
 
     // Example: Tenant isolation

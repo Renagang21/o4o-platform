@@ -1,31 +1,42 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import logger from '../utils/logger.js';
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
   tags?: string[]; // Cache tags for invalidation
 }
 
-@Injectable()
-export class RedisCache implements OnModuleInit, OnModuleDestroy {
-  private redis: Redis;
+export interface RedisCacheConfig {
+  host?: string;
+  port?: number;
+  password?: string;
+  db?: number;
+  defaultTTL?: number;
+  keyPrefix?: string;
+}
+
+export class RedisCache {
+  private redis: Redis | null = null;
   private defaultTTL: number;
   private keyPrefix: string;
+  private config: RedisCacheConfig;
 
-  constructor(private configService: ConfigService) {
-    this.defaultTTL = this.configService.get<number>('cache.defaultTTL', 300);
-    this.keyPrefix = this.configService.get<string>('cache.keyPrefix', 'o4o:cache:');
+  constructor(config: RedisCacheConfig = {}) {
+    this.config = config;
+    this.defaultTTL = config.defaultTTL || 300;
+    this.keyPrefix = config.keyPrefix || 'o4o:cache:';
   }
 
-  async onModuleInit() {
-    const redisConfig = this.configService.get('redis');
+  async initialize(): Promise<void> {
+    if (this.redis) {
+      return; // Already initialized
+    }
 
     this.redis = new Redis({
-      host: redisConfig?.host || 'localhost',
-      port: redisConfig?.port || 6379,
-      password: redisConfig?.password,
-      db: redisConfig?.db || 0,
+      host: this.config.host || process.env.REDIS_HOST || 'localhost',
+      port: this.config.port || parseInt(process.env.REDIS_PORT || '6379'),
+      password: this.config.password || process.env.REDIS_PASSWORD,
+      db: this.config.db || parseInt(process.env.REDIS_DB || '0'),
       keyPrefix: this.keyPrefix,
       retryStrategy: (times: number) => {
         const delay = Math.min(times * 50, 2000);
@@ -35,101 +46,117 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
     });
 
     this.redis.on('error', (error) => {
-      console.error('Redis connection error:', error);
+      logger.error('Redis connection error:', error);
     });
 
     this.redis.on('connect', () => {
-      console.log('Redis connected successfully');
+      logger.info('Redis connected successfully');
     });
   }
 
-  async onModuleDestroy() {
+  async disconnect(): Promise<void> {
     if (this.redis) {
       await this.redis.quit();
+      this.redis = null;
     }
+  }
+
+  private ensureConnected(): Redis {
+    if (!this.redis) {
+      throw new Error('Redis not initialized. Call initialize() first.');
+    }
+    return this.redis;
   }
 
   async get<T = any>(key: string): Promise<T | null> {
     try {
-      const value = await this.redis.get(key);
+      const redis = this.ensureConnected();
+      const value = await redis.get(key);
       if (!value) {
         return null;
       }
       return JSON.parse(value);
     } catch (error) {
-      console.error(`Cache get error for key ${key}:`, error);
+      logger.error(`Cache get error for key ${key}:`, error);
       return null;
     }
   }
 
   async set(key: string, value: any, ttl?: number): Promise<void> {
     try {
+      const redis = this.ensureConnected();
       const serialized = JSON.stringify(value);
       const expiry = ttl || this.defaultTTL;
 
       if (expiry > 0) {
-        await this.redis.setex(key, expiry, serialized);
+        await redis.setex(key, expiry, serialized);
       } else {
-        await this.redis.set(key, serialized);
+        await redis.set(key, serialized);
       }
     } catch (error) {
-      console.error(`Cache set error for key ${key}:`, error);
+      logger.error(`Cache set error for key ${key}:`, error);
     }
   }
 
   async delete(key: string): Promise<void> {
     try {
-      await this.redis.del(key);
+      const redis = this.ensureConnected();
+      await redis.del(key);
     } catch (error) {
-      console.error(`Cache delete error for key ${key}:`, error);
+      logger.error(`Cache delete error for key ${key}:`, error);
     }
   }
 
   async deletePattern(pattern: string): Promise<void> {
     try {
-      const keys = await this.redis.keys(`${this.keyPrefix}${pattern}`);
+      const redis = this.ensureConnected();
+      const keys = await redis.keys(`${this.keyPrefix}${pattern}`);
       if (keys.length > 0) {
         // Remove the prefix from keys before deleting
         const cleanKeys = keys.map(k => k.replace(this.keyPrefix, ''));
-        await this.redis.del(...cleanKeys);
+        await redis.del(...cleanKeys);
       }
     } catch (error) {
-      console.error(`Cache delete pattern error for ${pattern}:`, error);
+      logger.error(`Cache delete pattern error for ${pattern}:`, error);
     }
   }
 
   async exists(key: string): Promise<boolean> {
     try {
-      const exists = await this.redis.exists(key);
+      const redis = this.ensureConnected();
+      const exists = await redis.exists(key);
       return exists === 1;
     } catch (error) {
-      console.error(`Cache exists error for key ${key}:`, error);
+      logger.error(`Cache exists error for key ${key}:`, error);
       return false;
     }
   }
 
   async ttl(key: string): Promise<number> {
     try {
-      return await this.redis.ttl(key);
+      const redis = this.ensureConnected();
+      return await redis.ttl(key);
     } catch (error) {
-      console.error(`Cache TTL error for key ${key}:`, error);
+      logger.error(`Cache TTL error for key ${key}:`, error);
       return -1;
     }
   }
 
   async expire(key: string, ttl: number): Promise<void> {
     try {
-      await this.redis.expire(key, ttl);
+      const redis = this.ensureConnected();
+      await redis.expire(key, ttl);
     } catch (error) {
-      console.error(`Cache expire error for key ${key}:`, error);
+      logger.error(`Cache expire error for key ${key}:`, error);
     }
   }
 
   async flush(): Promise<void> {
     try {
-      await this.redis.flushdb();
+      const redis = this.ensureConnected();
+      await redis.flushdb();
     } catch (error) {
-      console.error('Cache flush error:', error);
+      logger.error('Cache flush error:', error);
     }
   }
 
@@ -161,27 +188,29 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
   // Tag-based cache invalidation
 
   async tag(tags: string | string[], key: string): Promise<void> {
+    const redis = this.ensureConnected();
     const tagArray = Array.isArray(tags) ? tags : [tags];
 
     for (const tag of tagArray) {
       const tagKey = `tag:${tag}`;
-      await this.redis.sadd(tagKey, key);
+      await redis.sadd(tagKey, key);
       // Set TTL for tag set to match longest possible cache TTL
-      await this.redis.expire(tagKey, 86400); // 24 hours
+      await redis.expire(tagKey, 86400); // 24 hours
     }
   }
 
   async invalidateTag(tag: string): Promise<void> {
     try {
+      const redis = this.ensureConnected();
       const tagKey = `tag:${tag}`;
-      const keys = await this.redis.smembers(tagKey);
+      const keys = await redis.smembers(tagKey);
 
       if (keys.length > 0) {
-        await this.redis.del(...keys);
-        await this.redis.del(tagKey);
+        await redis.del(...keys);
+        await redis.del(tagKey);
       }
     } catch (error) {
-      console.error(`Tag invalidation error for ${tag}:`, error);
+      logger.error(`Tag invalidation error for ${tag}:`, error);
     }
   }
 
@@ -194,7 +223,8 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
   // Cache warming
 
   async warm(entries: Array<{ key: string; value: any; ttl?: number }>): Promise<void> {
-    const pipeline = this.redis.pipeline();
+    const redis = this.ensureConnected();
+    const pipeline = redis.pipeline();
 
     for (const entry of entries) {
       const serialized = JSON.stringify(entry.value);
@@ -220,8 +250,9 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
     hitRate: number;
   }> {
     try {
-      const info = await this.redis.info('stats');
-      const memory = await this.redis.info('memory');
+      const redis = this.ensureConnected();
+      const info = await redis.info('stats');
+      const memory = await redis.info('memory');
 
       // Parse Redis INFO output
       const stats = this.parseRedisInfo(info);
@@ -232,14 +263,14 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
       const total = hits + misses;
 
       return {
-        size: await this.redis.dbsize(),
+        size: await redis.dbsize(),
         memory: memStats.used_memory_human || 'N/A',
         hits,
         misses,
         hitRate: total > 0 ? (hits / total) * 100 : 0
       };
     } catch (error) {
-      console.error('Error getting cache stats:', error);
+      logger.error('Error getting cache stats:', error);
       return {
         size: 0,
         memory: 'N/A',
@@ -269,14 +300,16 @@ export class RedisCache implements OnModuleInit, OnModuleDestroy {
   // Lock mechanism for preventing cache stampede
 
   async acquireLock(key: string, ttl = 5): Promise<boolean> {
+    const redis = this.ensureConnected();
     const lockKey = `lock:${key}`;
-    const result = await this.redis.set(lockKey, '1', 'EX', ttl, 'NX');
+    const result = await redis.set(lockKey, '1', 'EX', ttl, 'NX');
     return result === 'OK';
   }
 
   async releaseLock(key: string): Promise<void> {
+    const redis = this.ensureConnected();
     const lockKey = `lock:${key}`;
-    await this.redis.del(lockKey);
+    await redis.del(lockKey);
   }
 
   async withLock<T>(
