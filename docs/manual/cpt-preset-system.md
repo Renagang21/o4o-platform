@@ -16,7 +16,7 @@
 ### 사용자 가이드
 4. [Form Preset 사용법](./cpt-preset-form-guide.md)
 5. [View Preset 사용법](./cpt-preset-view-guide.md)
-6. [Template Preset 사용법](./cpt-preset-template-guide.md)
+6. [Template Preset 사용법](./cpt-preset-template-guide.md) ✓
 
 ### 개발자 가이드
 7. [API 레퍼런스](./cpt-preset-api-reference.md)
