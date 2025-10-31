@@ -49,6 +49,13 @@ export {
   DefaultUnknownShortcodeComponent
 } from './components/ShortcodeRenderer.js';
 
+// Preset shortcode
+export { PresetShortcode } from './components/PresetShortcode.js';
+export {
+  registerPresetShortcode,
+  presetShortcodeDefinition
+} from './preset/index.js';
+
 // Dropshipping shortcodes
 export { registerDropshippingShortcodes } from './dropshipping/index.js';
 export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropshipping/index.js';

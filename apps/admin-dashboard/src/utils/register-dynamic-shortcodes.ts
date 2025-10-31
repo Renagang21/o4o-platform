@@ -1,8 +1,8 @@
 /**
  * Register Dynamic Shortcodes in Admin Dashboard
  */
-import { globalRegistry } from '@o4o/shortcodes';
-import { 
+import { globalRegistry, registerPresetShortcode } from '@o4o/shortcodes';
+import {
   CPTListShortcode,
   CPTFieldShortcode,
   ACFFieldShortcode,
@@ -47,6 +47,9 @@ export function registerDynamicShortcodes() {
       single: true,
     },
   });
+
+  // Register Preset Shortcode
+  registerPresetShortcode();
 
   // Dynamic shortcodes registered successfully
 }

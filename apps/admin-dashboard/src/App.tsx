@@ -111,6 +111,7 @@ const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'
 const FocusRestorationTest = lazy(() => import('@/pages/test/FocusRestorationTest'));
 const AIBlockDebug = lazy(() => import('@/pages/test/AIBlockDebug'));
 const SeedPresets = lazy(() => import('@/pages/test/SeedPresets'));
+const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationTest'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -663,6 +664,12 @@ function App() {
                     <Route path="/admin/test/seed-presets" element={
                       <Suspense fallback={<PageLoader />}>
                         <SeedPresets />
+                      </Suspense>
+                    } />
+                    {/* Test - Preset Integration */}
+                    <Route path="/admin/test/preset-integration" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <PresetIntegrationTest />
                       </Suspense>
                     } />
 
