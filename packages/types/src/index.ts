@@ -19,6 +19,9 @@ export * from './form-builder.js';
 export * from './zone.js';
 export * from './access-control.js';
 
+// Export preset types
+export * from './preset.js';
+
 // Export ecommerce types
 export * from './ecommerce.js';
 

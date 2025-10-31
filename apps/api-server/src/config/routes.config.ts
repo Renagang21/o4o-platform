@@ -91,6 +91,9 @@ import categoriesApiRoutes from '../routes/api/categories.js';
 import tagsApiRoutes from '../routes/api/tags.js';
 import acfRoutes from '../routes/acf.js';
 
+// CPT-ACF Preset Routes
+import presetRoutes from '../modules/cpt-acf/routes/preset.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -250,6 +253,9 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/media', mediaV1Routes);
   app.use('/api/v1/pages', pagesV1Routes);
   app.use('/api/v1/acf', acfV1Routes);
+
+  // CPT-ACF Presets (Form, View, Template)
+  app.use('/api/v1/presets', standardLimiter, presetRoutes);
 
   // Categories & Menus
   app.use('/api/v1/categories', categoriesRoutes);
