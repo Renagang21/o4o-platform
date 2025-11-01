@@ -62,6 +62,10 @@ const ShortcodeBlock: FC<ShortcodeBlockProps> = ({ content, settings }) => {
     return null;
   }
 
+  // Debug: Log shortcode content and registered shortcodes
+  console.log('[ShortcodeBlock] Content:', content);
+  console.log('[ShortcodeBlock] Registry keys:', Array.from((window as any).__shortcodeRegistry?.getAll?.()?.keys() || []));
+
   return (
     <div className={`shortcode-block ${settings?.className || ''}`}>
       <ShortcodeRenderer
