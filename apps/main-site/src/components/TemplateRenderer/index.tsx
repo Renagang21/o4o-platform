@@ -15,7 +15,7 @@ import { shortcodeParser } from '@/utils/shortcodeParser';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 import { formShortcodes } from '@/components/shortcodes/formShortcodes';
 import { authShortcodes } from '@/components/shortcodes/authShortcodes';
-import { partnerShortcodes } from '@/components/shortcodes/partnerShortcodes';
+import { dropshippingShortcodes } from '@/components/shortcodes/dropshippingShortcodes';
 
 // Block component mapping
 const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
@@ -51,7 +51,7 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
 shortcodeParser.registerMany(productShortcodes);
 shortcodeParser.registerMany(formShortcodes);
 shortcodeParser.registerMany(authShortcodes);
-shortcodeParser.registerMany(partnerShortcodes);
+shortcodeParser.registerMany(dropshippingShortcodes);
 
 interface TemplateRendererProps {
   blocks: TemplateBlock[];
