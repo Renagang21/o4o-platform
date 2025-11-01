@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ShortcodeAttributes, ShortcodeHandler } from '@/utils/shortcodeParser';
+import { ShortcodeDefinition, ShortcodeAttributes } from '@o4o/shortcodes';
 
 // Import existing dashboard components
 const PartnerDashboardLazy = React.lazy(() =>
@@ -61,12 +61,12 @@ const SupplierDashboardWrapper: React.FC<{ period?: string }> = ({ period = '30d
 );
 
 // All dropshipping shortcode handlers
-export const dropshippingShortcodes: ShortcodeHandler[] = [
+export const dropshippingShortcodes: ShortcodeDefinition[] = [
   // ===== PARTNER SHORTCODES =====
   {
     name: 'partner_dashboard',
-    render: (attrs: ShortcodeAttributes) => (
-      <PartnerDashboardWrapper tab={attrs.tab as string} />
+    component: ({ attributes }) => (
+      <PartnerDashboardWrapper tab={attributes.tab as string} />
     )
   },
   {
@@ -121,8 +121,8 @@ export const dropshippingShortcodes: ShortcodeHandler[] = [
   // ===== SUPPLIER SHORTCODES =====
   {
     name: 'supplier_dashboard',
-    render: (attrs: ShortcodeAttributes) => (
-      <SupplierDashboardWrapper period={attrs.period as string} />
+    component: ({ attributes }) => (
+      <SupplierDashboardWrapper period={attributes.period as string} />
     )
   },
   {

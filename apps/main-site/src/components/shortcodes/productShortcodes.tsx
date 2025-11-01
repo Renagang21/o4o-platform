@@ -1,5 +1,5 @@
 import { FC, Component, Suspense, lazy } from 'react';
-import { ShortcodeHandler, ShortcodeAttributes } from '@/utils/shortcodeParser';
+import { ShortcodeDefinition, ShortcodeAttributes } from '@o4o/shortcodes';
 import { useProducts, useProduct } from '@/hooks/useProducts';
 import { formatCurrency } from '@/lib/utils';
 import { ShoppingCart, Package, Star, Heart } from 'lucide-react';
@@ -20,21 +20,21 @@ const ProductLoading = () => (
 );
 
 // Single Product Shortcode: [product id="123" show_price="true" show_cart="true"]
-export const productShortcode: ShortcodeHandler = {
+export const productShortcode: ShortcodeDefinition = {
   name: 'product',
-  render: (attrs: ShortcodeAttributes) => {
-    const productId = String(attrs.id || '');
-    const showPrice = attrs.show_price !== false;
-    const showCart = attrs.show_cart !== false;
-    const className = String(attrs.class || '');
+  component: ({ attributes }) => {
+    const productId = String(attributes.id || '');
+    const showPrice = attributes.show_price !== false;
+    const showCart = attributes.show_cart !== false;
+    const className = String(attributes.class || '');
 
     if (!productId) {
       return <div className="text-red-500">Product shortcode requires an ID</div>;
     }
 
-    return <SingleProduct 
-      productId={productId} 
-      showPrice={showPrice} 
+    return <SingleProduct
+      productId={productId}
+      showPrice={showPrice}
       showCart={showCart}
       className={className}
     />;
@@ -111,15 +111,15 @@ const SingleProduct: FC<{
 };
 
 // Product Grid Shortcode: [product_grid category="electronics" limit="8" columns="4"]
-export const productGridShortcode: ShortcodeHandler = {
+export const productGridShortcode: ShortcodeDefinition = {
   name: 'product_grid',
-  render: (attrs: ShortcodeAttributes) => {
-    const category = String(attrs.category || '');
-    const limit = Number(attrs.limit || 12);
-    const columns = Number(attrs.columns || 4);
-    const featured = attrs.featured === true;
-    const orderBy = String(attrs.orderby || 'created_at');
-    const order = String(attrs.order || 'desc') as 'asc' | 'desc';
+  component: ({ attributes }) => {
+    const category = String(attributes.category || '');
+    const limit = Number(attributes.limit || 12);
+    const columns = Number(attributes.columns || 4);
+    const featured = attributes.featured === true;
+    const orderBy = String(attributes.orderby || 'created_at');
+    const order = String(attributes.order || 'desc') as 'asc' | 'desc';
 
     return (
       <Suspense fallback={<GridLoading columns={columns} />}>
@@ -197,13 +197,13 @@ const ProductGridWrapper: FC<{
 };
 
 // Add to Cart Button Shortcode: [add_to_cart id="123" text="구매하기" class="custom-class"]
-export const addToCartShortcode: ShortcodeHandler = {
+export const addToCartShortcode: ShortcodeDefinition = {
   name: 'add_to_cart',
-  render: (attrs: ShortcodeAttributes) => {
-    const productId = String(attrs.id || '');
-    const text = String(attrs.text || '장바구니에 담기');
-    const className = String(attrs.class || '');
-    const showPrice = attrs.show_price !== false;
+  component: ({ attributes }) => {
+    const productId = String(attributes.id || '');
+    const text = String(attributes.text || '장바구니에 담기');
+    const className = String(attributes.class || '');
+    const showPrice = attributes.show_price !== false;
 
     if (!productId) {
       return <div className="text-red-500">Add to cart shortcode requires a product ID</div>;
@@ -261,13 +261,13 @@ const AddToCartButton: FC<{
 };
 
 // Product Carousel Shortcode: [product_carousel category="new-arrivals" limit="10" autoplay="true"]
-export const productCarouselShortcode: ShortcodeHandler = {
+export const productCarouselShortcode: ShortcodeDefinition = {
   name: 'product_carousel',
-  render: (attrs: ShortcodeAttributes) => {
-    const category = String(attrs.category || '');
-    const limit = Number(attrs.limit || 10);
-    const autoplay = attrs.autoplay !== false;
-    const title = String(attrs.title || '');
+  component: ({ attributes }) => {
+    const category = String(attributes.category || '');
+    const limit = Number(attributes.limit || 10);
+    const autoplay = attributes.autoplay !== false;
+    const title = String(attributes.title || '');
 
     return (
       <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg" />}>
@@ -310,12 +310,12 @@ const ProductCarouselWrapper: FC<{
 };
 
 // Featured Products Shortcode: [featured_products limit="4" columns="4"]
-export const featuredProductsShortcode: ShortcodeHandler = {
+export const featuredProductsShortcode: ShortcodeDefinition = {
   name: 'featured_products',
-  render: (attrs: ShortcodeAttributes) => {
-    const limit = Number(attrs.limit || 4);
-    const columns = Number(attrs.columns || 4);
-    const title = String(attrs.title || '추천 상품');
+  component: ({ attributes }) => {
+    const limit = Number(attributes.limit || 4);
+    const columns = Number(attributes.columns || 4);
+    const title = String(attributes.title || '추천 상품');
 
     return (
       <div className="featured-products-shortcode">
@@ -335,12 +335,12 @@ export const featuredProductsShortcode: ShortcodeHandler = {
 };
 
 // Product Categories Shortcode: [product_categories show_count="true" hide_empty="true"]
-export const productCategoriesShortcode: ShortcodeHandler = {
+export const productCategoriesShortcode: ShortcodeDefinition = {
   name: 'product_categories',
-  render: (attrs: ShortcodeAttributes) => {
-    const showCount = attrs.show_count !== false;
-    const hideEmpty = attrs.hide_empty !== false;
-    const columns = Number(attrs.columns || 3);
+  component: ({ attributes }) => {
+    const showCount = attributes.show_count !== false;
+    const hideEmpty = attributes.hide_empty !== false;
+    const columns = Number(attributes.columns || 3);
 
     // TODO: Implement when categories API is ready
     return (
@@ -354,7 +354,7 @@ export const productCategoriesShortcode: ShortcodeHandler = {
 };
 
 // Export all shortcodes as an array
-export const productShortcodes: ShortcodeHandler[] = [
+export const productShortcodes: ShortcodeDefinition[] = [
   productShortcode,
   productGridShortcode,
   addToCartShortcode,

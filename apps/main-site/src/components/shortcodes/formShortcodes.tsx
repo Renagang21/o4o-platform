@@ -1,15 +1,16 @@
+import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { SpectraFormBlock, SpectraViewBlock } from '../TemplateRenderer/blocks/SpectraFormBlocks';
 
-// Form shortcode handler
-const formShortcode = {
+// Form shortcode definition
+export const formShortcode: ShortcodeDefinition = {
   name: 'form',
-  handler: (attrs: Record<string, string>) => {
-    const { id, name, theme, layout, 'show-title': showTitle, 'show-description': showDescription } = attrs;
-    
+  component: ({ attributes }) => {
+    const { id, name, theme, layout, 'show-title': showTitle, 'show-description': showDescription } = attributes;
+
     return (
       <SpectraFormBlock
-        formId={id}
-        formName={name}
+        formId={id as string}
+        formName={name as string}
         showTitle={showTitle !== 'false'}
         showDescription={showDescription !== 'false'}
         theme={theme as any}
@@ -19,26 +20,26 @@ const formShortcode = {
   }
 };
 
-// View shortcode handler
-const viewShortcode = {
+// View shortcode definition
+export const viewShortcode: ShortcodeDefinition = {
   name: 'view',
-  handler: (attrs: Record<string, string>) => {
-    const { 
-      id, 
-      name, 
+  component: ({ attributes }) => {
+    const {
+      id,
+      name,
       'show-title': showTitle,
       'items-per-page': itemsPerPage,
       'enable-search': enableSearch,
       'enable-filters': enableFilters,
       'enable-export': enableExport
-    } = attrs;
-    
+    } = attributes;
+
     return (
       <SpectraViewBlock
-        viewId={id}
-        viewName={name}
+        viewId={id as string}
+        viewName={name as string}
         showTitle={showTitle !== 'false'}
-        itemsPerPage={itemsPerPage ? parseInt(itemsPerPage) : 25}
+        itemsPerPage={itemsPerPage ? parseInt(itemsPerPage as string) : 25}
         enableSearch={enableSearch !== 'false'}
         enableFilters={enableFilters !== 'false'}
         enableExport={enableExport !== 'false'}

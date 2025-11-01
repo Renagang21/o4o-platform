@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Loader2 } from 'lucide-react';
-import { ShortcodeAttributes, ShortcodeHandler } from '@/utils/shortcodeParser';
+import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { API_BASE_URL } from '../../config/api';
 
 interface OAuthProvider {
@@ -322,37 +322,39 @@ const OAuthOnlyComponent: React.FC<{
   );
 };
 
-// Auth shortcode handlers
-export const authShortcodes: ShortcodeHandler[] = [
-  {
-    name: 'social_login',
-    render: (attrs: ShortcodeAttributes) => (
-      <SocialLoginComponent
-        redirectUrl={attrs.redirect_url as string || attrs.redirectUrl as string}
-        showEmailLogin={attrs.show_email_login !== false}
-        title={attrs.title as string}
-        subtitle={attrs.subtitle as string}
-      />
-    )
-  },
-  {
-    name: 'login_form',
-    render: (attrs: ShortcodeAttributes) => (
-      <SocialLoginComponent
-        redirectUrl={attrs.redirect_url as string || attrs.redirectUrl as string}
-        showEmailLogin={attrs.show_email_login !== false}
-        title={attrs.title as string}
-        subtitle={attrs.subtitle as string}
-      />
-    )
-  },
-  {
-    name: 'oauth_login',
-    render: (attrs: ShortcodeAttributes) => (
-      <OAuthOnlyComponent
-        redirectUrl={attrs.redirect_url as string || attrs.redirectUrl as string}
-        title={attrs.title as string}
-      />
-    )
-  }
-];
+// Auth shortcode definitions
+export const socialLoginShortcode: ShortcodeDefinition = {
+  name: 'social_login',
+  component: ({ attributes }) => (
+    <SocialLoginComponent
+      redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
+      showEmailLogin={attributes.show_email_login !== false}
+      title={attributes.title as string}
+      subtitle={attributes.subtitle as string}
+    />
+  )
+};
+
+export const loginFormShortcode: ShortcodeDefinition = {
+  name: 'login_form',
+  component: ({ attributes }) => (
+    <SocialLoginComponent
+      redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
+      showEmailLogin={attributes.show_email_login !== false}
+      title={attributes.title as string}
+      subtitle={attributes.subtitle as string}
+    />
+  )
+};
+
+export const oauthLoginShortcode: ShortcodeDefinition = {
+  name: 'oauth_login',
+  component: ({ attributes }) => (
+    <OAuthOnlyComponent
+      redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
+      title={attributes.title as string}
+    />
+  )
+};
+
+export const authShortcodes = [socialLoginShortcode, loginFormShortcode, oauthLoginShortcode];

@@ -1,6 +1,6 @@
 import { CSSProperties, FC } from 'react';
 import DOMPurify from 'dompurify';
-import { shortcodeParser } from '@/utils/shortcodeParser';
+import { ShortcodeRenderer } from '@o4o/shortcodes';
 
 interface ParagraphBlockProps {
   text?: string;
@@ -31,13 +31,12 @@ const ParagraphBlock: FC<ParagraphBlockProps> = ({
 
   // Process shortcodes if enabled
   if (settings.processShortcodes !== false) {
-    const parsedContent = shortcodeParser.parseAsElement(paragraphText);
     return (
       <div
         className="paragraph-block"
         style={style}
       >
-        {parsedContent}
+        <ShortcodeRenderer content={paragraphText} />
       </div>
     );
   }

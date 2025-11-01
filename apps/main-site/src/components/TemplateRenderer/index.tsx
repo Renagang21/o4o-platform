@@ -11,12 +11,11 @@ import ShortcodeBlock from './blocks/ShortcodeBlock';
 import ErrorBlock from './blocks/ErrorBlock';
 import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
 import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
-import { shortcodeParser } from '@/utils/shortcodeParser';
+import { globalRegistry, registerShortcode } from '@o4o/shortcodes';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 import { formShortcodes } from '@/components/shortcodes/formShortcodes';
 import { authShortcodes } from '@/components/shortcodes/authShortcodes';
 import { dropshippingShortcodes } from '@/components/shortcodes/dropshippingShortcodes';
-import { globalRegistry } from '@o4o/shortcodes';
 
 // Block component mapping
 const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
@@ -49,10 +48,10 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
 };
 
 // Register shortcodes on initialization
-shortcodeParser.registerMany(productShortcodes);
-shortcodeParser.registerMany(formShortcodes);
-shortcodeParser.registerMany(authShortcodes);
-shortcodeParser.registerMany(dropshippingShortcodes);
+productShortcodes.forEach(def => registerShortcode(def));
+formShortcodes.forEach(def => registerShortcode(def));
+authShortcodes.forEach(def => registerShortcode(def));
+dropshippingShortcodes.forEach(def => registerShortcode(def));
 
 // Debug: Expose globalRegistry to window for debugging
 (window as any).__shortcodeRegistry = globalRegistry;
