@@ -30,11 +30,10 @@ jobs:
 
     - name: Build main site
       run: |
-        cd apps/main-site
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
         VITE_API_URL=https://api.neture.co.kr/api/v1 \
-        pnpm run build
+        pnpm --filter=@o4o/main-site run build
 
     - name: Prepare Nginx config for deployment
       run: |
