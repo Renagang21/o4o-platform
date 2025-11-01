@@ -49,19 +49,13 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
 };
 
 // Register shortcodes on initialization
-console.log('[TemplateRenderer] Registering shortcodes...');
 shortcodeParser.registerMany(productShortcodes);
-console.log('[TemplateRenderer] Registered product shortcodes:', productShortcodes.length);
 shortcodeParser.registerMany(formShortcodes);
-console.log('[TemplateRenderer] Registered form shortcodes:', formShortcodes.length);
 shortcodeParser.registerMany(authShortcodes);
-console.log('[TemplateRenderer] Registered auth shortcodes:', authShortcodes.length);
 shortcodeParser.registerMany(dropshippingShortcodes);
-console.log('[TemplateRenderer] Registered dropshipping shortcodes:', dropshippingShortcodes.length);
 
 // Debug: Expose globalRegistry to window for debugging
 (window as any).__shortcodeRegistry = globalRegistry;
-console.log('[TemplateRenderer] Total registered shortcodes:', Array.from(globalRegistry.getAll().keys()));
 
 interface TemplateRendererProps {
   blocks: TemplateBlock[];
