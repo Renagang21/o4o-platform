@@ -126,17 +126,17 @@ export class MenuApi {
 
   // Menu item operations
   static async createMenuItem(data: CreateMenuItemDto) {
-    const response = await unifiedApi.raw.post('/v1/menu-items', data);
+    const response = await unifiedApi.raw.post('/v1/menus/items', data);
     return response.data;
   }
 
   static async updateMenuItem(id: string, data: UpdateMenuItemDto) {
-    const response = await unifiedApi.raw.put(`/v1/menu-items/${id}`, data);
+    const response = await unifiedApi.raw.put(`/v1/menus/items/${id}`, data);
     return response.data;
   }
 
   static async deleteMenuItem(id: string) {
-    const response = await unifiedApi.raw.delete(`/v1/menu-items/${id}`);
+    const response = await unifiedApi.raw.delete(`/v1/menus/items/${id}`);
     return response.data;
   }
 
@@ -147,20 +147,20 @@ export class MenuApi {
   }
 
   // Phase 2 APIs (to be implemented)
-  
+
   // Conditional display
   static async createMenuItemConditions(itemId: string, conditions: any) {
-    const response = await unifiedApi.raw.post(`/v1/menu-items/${itemId}/conditions`, conditions);
+    const response = await unifiedApi.raw.post(`/v1/menus/${itemId}/conditions`, conditions);
     return response.data;
   }
 
   static async getMenuItemConditions(itemId: string) {
-    const response = await unifiedApi.raw.get(`/v1/menu-items/${itemId}/conditions`);
+    const response = await unifiedApi.raw.get(`/v1/menus/${itemId}/conditions`);
     return response.data;
   }
 
   static async deleteMenuItemConditions(itemId: string) {
-    const response = await unifiedApi.raw.delete(`/v1/menu-items/${itemId}/conditions`);
+    const response = await unifiedApi.raw.delete(`/v1/menus/${itemId}/conditions`);
     return response.data;
   }
 
