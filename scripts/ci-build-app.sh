@@ -13,24 +13,15 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 echo "🚀 Starting CI build process..."
 echo "📊 Node memory limit: 4GB"
 
-# NOTE: Packages are now built by the workflow before calling this script
-# See .github/workflows/main.yml
-
-# Verify that critical packages have been built
-echo "🔍 Verifying package builds..."
-if [ ! -d "packages/shortcodes/dist" ]; then
-    echo "❌ ERROR: packages/shortcodes/dist not found!"
-    echo "Packages must be built before running app builds."
-    echo "Run: pnpm run build:packages"
-    exit 1
+# Build packages first if not already built
+echo "🔍 Checking package builds..."
+if [ ! -d "packages/shortcodes/dist" ] || [ ! -d "packages/auth-client/dist" ]; then
+    echo "📦 Building packages..."
+    pnpm run build:packages
+    echo "✅ Packages built successfully"
+else
+    echo "✅ Package dist directories already exist"
 fi
-
-if [ ! -d "packages/auth-client/dist" ]; then
-    echo "❌ ERROR: packages/auth-client/dist not found!"
-    exit 1
-fi
-
-echo "✅ Package dist directories verified"
 echo ""
 
 # Function to build specific app
@@ -41,21 +32,16 @@ build_app() {
     case $app in
         "admin"|"admin-dashboard")
             echo "Building Admin Dashboard..."
-            cd apps/admin-dashboard
-            # Apply CI build optimizations
-            if [ -f "ci.build.config" ]; then
+            # Apply CI build optimizations if config exists
+            if [ -f "apps/admin-dashboard/ci.build.config" ]; then
                 echo "📝 Applying CI build optimizations..."
-                # Export environment variables from config
-                export $(cat ci.build.config | grep -v '^#' | xargs)
+                export $(cat apps/admin-dashboard/ci.build.config | grep -v '^#' | xargs)
             fi
-            pnpm run build
-            cd ../..
+            pnpm --filter=@o4o/admin-dashboard run build
             ;;
         "storefront")
             echo "Building Storefront..."
-            cd apps/storefront
-            pnpm run build
-            cd ../..
+            pnpm --filter=@o4o/storefront run build
             ;;
         "api"|"api-server")
             echo "Building API Server..."
@@ -65,22 +51,17 @@ build_app() {
             ;;
         "main"|"main-site")
             echo "Building Main Site..."
-            cd apps/main-site
-            pnpm run build
-            cd ../..
+            pnpm --filter=@o4o/main-site run build
             ;;
         "crowdfunding"|"forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
             # All these are part of admin-dashboard
             echo "Building ${app} components (admin-dashboard module)..."
-            cd apps/admin-dashboard
-            # Apply CI build optimizations
-            if [ -f "ci.build.config" ]; then
+            # Apply CI build optimizations if config exists
+            if [ -f "apps/admin-dashboard/ci.build.config" ]; then
                 echo "📝 Applying CI build optimizations..."
-                # Export environment variables from config
-                export $(cat ci.build.config | grep -v '^#' | xargs)
+                export $(cat apps/admin-dashboard/ci.build.config | grep -v '^#' | xargs)
             fi
-            pnpm run build
-            cd ../..
+            pnpm --filter=@o4o/admin-dashboard run build
             ;;
         "all")
             echo "Building all applications..."
