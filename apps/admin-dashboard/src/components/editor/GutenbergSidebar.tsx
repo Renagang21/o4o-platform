@@ -45,6 +45,9 @@ import {
   canSetFeaturedImage as checkCanSetFeaturedImage
 } from '@/utils/permissions';
 import { authClient } from '@o4o/auth-client';
+import { AccessControl } from '@o4o/types';
+import { getDefaultAccessControl } from '@o4o/utils';
+import PostAccessControl from '@/components/PostAccessControl';
 
 interface PostSettings {
   status: 'draft' | 'pending' | 'private' | 'publish' | 'scheduled';
@@ -62,6 +65,7 @@ interface PostSettings {
   pingStatus: boolean;
   sticky: boolean;
   format: 'standard' | 'aside' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio' | 'chat';
+  accessControl?: AccessControl;
 }
 
 interface BlockSettings {
@@ -535,7 +539,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Switch
                     id="comments"
                     checked={postSettings.commentStatus}
-                    onCheckedChange={(checked: boolean) => 
+                    onCheckedChange={(checked: boolean) =>
                       onPostSettingsChange({ commentStatus: checked })
                     }
                   />
@@ -547,12 +551,22 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Switch
                     id="pingbacks"
                     checked={postSettings.pingStatus}
-                    onCheckedChange={(checked: boolean) => 
+                    onCheckedChange={(checked: boolean) =>
                       onPostSettingsChange({ pingStatus: checked })
                     }
                   />
                 </div>
               </div>
+            </Panel>
+
+            {/* Access Control */}
+            <Panel title="접근 제어" defaultOpen={false}>
+              <PostAccessControl
+                value={postSettings.accessControl || getDefaultAccessControl()}
+                onChange={(accessControl) =>
+                  onPostSettingsChange({ accessControl })
+                }
+              />
             </Panel>
           </div>
         ) : (

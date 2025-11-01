@@ -34,6 +34,21 @@ export const MenuItemEditor: FC<MenuItemEditorProps> = ({
   const [target, setTarget] = useState<'_self' | '_blank'>('_self');
   const [cssClass, setCssClass] = useState('');
   const [description, setDescription] = useState('');
+  const [displayMode, setDisplayMode] = useState<'show' | 'hide'>('show');
+  const [targetRoles, setTargetRoles] = useState<string[]>(['everyone']);
+
+  // Available roles for selection
+  const availableRoles = [
+    { value: 'everyone', label: '모든 사용자' },
+    { value: 'logged_in', label: '로그인 사용자' },
+    { value: 'logged_out', label: '비로그인 사용자' },
+    { value: 'admin', label: '관리자' },
+    { value: 'super_admin', label: '최고 관리자' },
+    { value: 'seller', label: '판매자' },
+    { value: 'supplier', label: '공급자' },
+    { value: 'affiliate', label: '제휴사' },
+    { value: 'customer', label: '고객' }
+  ];
 
   // Sync with item prop
   useEffect(() => {
@@ -43,6 +58,8 @@ export const MenuItemEditor: FC<MenuItemEditorProps> = ({
       setTarget(item.target || '_self');
       setCssClass(item.cssClass || '');
       setDescription(item.description || '');
+      setDisplayMode((item as any).display_mode || 'show');
+      setTargetRoles((item as any).target_audience?.roles || ['everyone']);
     }
   }, [item]);
 
@@ -61,8 +78,12 @@ export const MenuItemEditor: FC<MenuItemEditorProps> = ({
       url: url.trim(),
       target,
       cssClass: cssClass.trim(),
-      description: description.trim()
-    });
+      description: description.trim(),
+      display_mode: displayMode,
+      target_audience: {
+        roles: targetRoles
+      }
+    } as any);
 
     toast.success('메뉴 항목이 업데이트되었습니다');
   };
@@ -197,6 +218,86 @@ export const MenuItemEditor: FC<MenuItemEditorProps> = ({
           />
           <p className="mt-1 text-xs text-gray-500">
             스크린 리더 등 접근성을 위한 설명
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-200 my-4"></div>
+
+        {/* Display Mode */}
+        <div>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            표시 모드
+          </label>
+          <div className="flex gap-2">
+            <label className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 rounded-lg cursor-pointer transition-all ${
+              displayMode === 'show'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input
+                type="radio"
+                value="show"
+                checked={displayMode === 'show'}
+                onChange={() => setDisplayMode('show')}
+                className="sr-only"
+              />
+              <div className="text-sm font-medium">표시</div>
+            </label>
+            <label className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 rounded-lg cursor-pointer transition-all ${
+              displayMode === 'hide'
+                ? 'border-red-500 bg-red-50 text-red-700'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input
+                type="radio"
+                value="hide"
+                checked={displayMode === 'hide'}
+                onChange={() => setDisplayMode('hide')}
+                className="sr-only"
+              />
+              <div className="text-sm font-medium">숨김</div>
+            </label>
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            이 메뉴 항목의 기본 표시 상태를 설정합니다
+          </p>
+        </div>
+
+        {/* Target Roles */}
+        <div>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">
+            대상 Role (보기 권한)
+          </label>
+          <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+            {availableRoles.map(role => (
+              <label
+                key={role.value}
+                className="flex items-center gap-2 cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={targetRoles.includes(role.value)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setTargetRoles([...targetRoles, role.value]);
+                    } else {
+                      // Prevent removing last role
+                      if (targetRoles.length > 1) {
+                        setTargetRoles(targetRoles.filter(r => r !== role.value));
+                      } else {
+                        toast.error('최소 하나의 Role을 선택해야 합니다');
+                      }
+                    }
+                  }}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">{role.label}</span>
+              </label>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            선택한 Role을 가진 사용자만 이 메뉴를 볼 수 있습니다
           </p>
         </div>
 
