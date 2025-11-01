@@ -78,10 +78,8 @@ class MenuService {
             parent.children = [];
           }
           parent.children.push(treeItem);
-        } else {
-          // Parent not found (orphaned item), treat as root
-          rootItems.push(treeItem);
         }
+        // Skip orphaned items (parentId exists but parent not found in current menu)
       } else {
         rootItems.push(treeItem);
       }
