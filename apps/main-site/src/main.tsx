@@ -10,8 +10,24 @@ import { AuthProvider } from './contexts/AuthContext';
 import { initializeIframeContext } from './utils/iframe-context';
 import App from './App';
 
+// Shortcode 등록
+import { registerShortcode, globalRegistry } from '@o4o/shortcodes';
+// import { productShortcodes } from './components/shortcodes/productShortcodes'; // TODO: useProducts hook 필요
+import { formShortcodes } from './components/shortcodes/formShortcodes';
+import { authShortcodes } from './components/shortcodes/authShortcodes';
+import { dropshippingShortcodes } from './components/shortcodes/dropshippingShortcodes';
+
 // React 시작 전에 iframe 컨텍스트 초기화
 initializeIframeContext();
+
+// React 시작 전에 모든 shortcode 등록
+// productShortcodes.forEach(def => registerShortcode(def)); // TODO: 의존성 해결 후 활성화
+formShortcodes.forEach(def => registerShortcode(def));
+authShortcodes.forEach(def => registerShortcode(def));
+dropshippingShortcodes.forEach(def => registerShortcode(def));
+
+// Debug: Expose globalRegistry to window
+(window as any).__shortcodeRegistry = globalRegistry;
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -11,11 +11,6 @@ import ShortcodeBlock from './blocks/ShortcodeBlock';
 import ErrorBlock from './blocks/ErrorBlock';
 import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
 import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
-import { globalRegistry, registerShortcode } from '@o4o/shortcodes';
-import { productShortcodes } from '@/components/shortcodes/productShortcodes';
-import { formShortcodes } from '@/components/shortcodes/formShortcodes';
-import { authShortcodes } from '@/components/shortcodes/authShortcodes';
-import { dropshippingShortcodes } from '@/components/shortcodes/dropshippingShortcodes';
 
 // Block component mapping
 const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
@@ -47,14 +42,7 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   'uagb/view': SpectraViewBlock,
 };
 
-// Register shortcodes on initialization
-productShortcodes.forEach(def => registerShortcode(def));
-formShortcodes.forEach(def => registerShortcode(def));
-authShortcodes.forEach(def => registerShortcode(def));
-dropshippingShortcodes.forEach(def => registerShortcode(def));
-
-// Debug: Expose globalRegistry to window for debugging
-(window as any).__shortcodeRegistry = globalRegistry;
+// Note: Shortcode 등록은 main.tsx에서 앱 초기화 시점에 수행됨
 
 interface TemplateRendererProps {
   blocks: TemplateBlock[];

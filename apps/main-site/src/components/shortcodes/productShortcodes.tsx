@@ -4,9 +4,29 @@ import { useProducts, useProduct } from '@/hooks/useProducts';
 import { formatCurrency } from '@/lib/utils';
 import { ShoppingCart, Package, Star, Heart } from 'lucide-react';
 
-// Lazy load heavier components
-const ProductGrid = lazy(() => import('@/components/ecommerce/ProductGrid'));
-const ProductCarousel = lazy(() => import('@/components/ecommerce/ProductCarousel'));
+// Note: ProductGrid와 ProductCarousel은 미구현 상태
+// Placeholder components
+const ProductGrid: FC<{ products: any[]; columns: number }> = ({ products, columns }) => (
+  <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${columns} gap-6`}>
+    {products.map((product, i) => (
+      <div key={i} className="border rounded-lg p-4">
+        <h3>{product.name}</h3>
+        <p>{product.price}</p>
+      </div>
+    ))}
+  </div>
+);
+
+const ProductCarousel: FC<{ products: any[]; autoplay: boolean }> = ({ products }) => (
+  <div className="flex overflow-x-auto gap-4">
+    {products.map((product, i) => (
+      <div key={i} className="min-w-[250px] border rounded-lg p-4">
+        <h3>{product.name}</h3>
+        <p>{product.price}</p>
+      </div>
+    ))}
+  </div>
+);
 
 // Loading component
 const ProductLoading = () => (

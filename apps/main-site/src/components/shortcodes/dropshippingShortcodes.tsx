@@ -71,51 +71,51 @@ export const dropshippingShortcodes: ShortcodeDefinition[] = [
   },
   {
     name: 'partner_products',
-    render: () => <PlaceholderShortcode name="partner_products" />
+    component: () => <PlaceholderShortcode name="partner_products" />
   },
   {
     name: 'partner_commissions',
-    render: () => <PlaceholderShortcode name="partner_commissions" />
+    component: () => <PlaceholderShortcode name="partner_commissions" />
   },
   {
     name: 'partner_link_generator',
-    render: () => <PlaceholderShortcode name="partner_link_generator" />
+    component: () => <PlaceholderShortcode name="partner_link_generator" />
   },
   {
     name: 'partner_commission_dashboard',
-    render: () => <PlaceholderShortcode name="partner_commission_dashboard" />
+    component: () => <PlaceholderShortcode name="partner_commission_dashboard" />
   },
   {
     name: 'partner_payout_requests',
-    render: () => <PlaceholderShortcode name="partner_payout_requests" />
+    component: () => <PlaceholderShortcode name="partner_payout_requests" />
   },
   {
     name: 'partner_performance_chart',
-    render: () => <PlaceholderShortcode name="partner_performance_chart" />
+    component: () => <PlaceholderShortcode name="partner_performance_chart" />
   },
   {
     name: 'partner_link_stats',
-    render: () => <PlaceholderShortcode name="partner_link_stats" />
+    component: () => <PlaceholderShortcode name="partner_link_stats" />
   },
   {
     name: 'partner_marketing_materials',
-    render: () => <PlaceholderShortcode name="partner_marketing_materials" />
+    component: () => <PlaceholderShortcode name="partner_marketing_materials" />
   },
   {
     name: 'partner_referral_tree',
-    render: () => <PlaceholderShortcode name="partner_referral_tree" />
+    component: () => <PlaceholderShortcode name="partner_referral_tree" />
   },
   {
     name: 'partner_quick_stats',
-    render: () => <PlaceholderShortcode name="partner_quick_stats" />
+    component: () => <PlaceholderShortcode name="partner_quick_stats" />
   },
   {
     name: 'partner_leaderboard',
-    render: () => <PlaceholderShortcode name="partner_leaderboard" />
+    component: () => <PlaceholderShortcode name="partner_leaderboard" />
   },
   {
     name: 'partner_tier_progress',
-    render: () => <PlaceholderShortcode name="partner_tier_progress" />
+    component: () => <PlaceholderShortcode name="partner_tier_progress" />
   },
 
   // ===== SUPPLIER SHORTCODES =====
@@ -127,64 +127,64 @@ export const dropshippingShortcodes: ShortcodeDefinition[] = [
   },
   {
     name: 'supplier_products',
-    render: () => <PlaceholderShortcode name="supplier_products" />
+    component: () => <PlaceholderShortcode name="supplier_products" />
   },
   {
     name: 'supplier_product_editor',
-    render: () => <PlaceholderShortcode name="supplier_product_editor" />
+    component: () => <PlaceholderShortcode name="supplier_product_editor" />
   },
   {
     name: 'supplier_analytics',
-    render: () => <PlaceholderShortcode name="supplier_analytics" />
+    component: () => <PlaceholderShortcode name="supplier_analytics" />
   },
   {
     name: 'supplier_approval_queue',
-    render: () => <PlaceholderShortcode name="supplier_approval_queue" />
+    component: () => <PlaceholderShortcode name="supplier_approval_queue" />
   },
 
   // ===== SELLER SHORTCODES =====
   {
     name: 'seller_dashboard',
-    render: () => <PlaceholderShortcode name="seller_dashboard" />
+    component: () => <PlaceholderShortcode name="seller_dashboard" />
   },
   {
     name: 'seller_products',
-    render: () => <PlaceholderShortcode name="seller_products" />
+    component: () => <PlaceholderShortcode name="seller_products" />
   },
   {
     name: 'seller_settlement',
-    render: () => <PlaceholderShortcode name="seller_settlement" />
+    component: () => <PlaceholderShortcode name="seller_settlement" />
   },
   {
     name: 'seller_analytics',
-    render: () => <PlaceholderShortcode name="seller_analytics" />
+    component: () => <PlaceholderShortcode name="seller_analytics" />
   },
   {
     name: 'seller_pricing_manager',
-    render: () => <PlaceholderShortcode name="seller_pricing_manager" />
+    component: () => <PlaceholderShortcode name="seller_pricing_manager" />
   },
 
   // ===== AFFILIATE SHORTCODES =====
   {
     name: 'affiliate_dashboard',
-    render: () => <PlaceholderShortcode name="affiliate_dashboard" />
+    component: () => <PlaceholderShortcode name="affiliate_dashboard" />
   },
 
   // ===== CORE DROPSHIPPING SHORTCODES =====
   {
     name: 'user_dashboard',
-    render: () => <PlaceholderShortcode name="user_dashboard" />
+    component: () => <PlaceholderShortcode name="user_dashboard" />
   },
   {
     name: 'role_verification',
-    render: () => <PlaceholderShortcode name="role_verification" />
+    component: () => <PlaceholderShortcode name="role_verification" />
   },
   {
     name: 'profile_manager',
-    render: () => <PlaceholderShortcode name="profile_manager" />
+    component: () => <PlaceholderShortcode name="profile_manager" />
   },
   {
     name: 'role_switcher',
-    render: () => <PlaceholderShortcode name="role_switcher" />
+    component: () => <PlaceholderShortcode name="role_switcher" />
   }
 ];
