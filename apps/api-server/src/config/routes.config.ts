@@ -44,9 +44,6 @@ import aiSchemaRoutes from '../routes/ai-schema.js';
 import templatePartsRoutes from '../routes/template-parts.routes.js';
 import categoriesRoutes from '../routes/categories.js';
 import menusRoutes from '../routes/menus.js';
-import menuItemsRoutes from '../routes/menu-items.js';
-import menuAdvancedRoutes from '../routes/menu-advanced.js';
-import menuPhase3Routes from '../routes/menu-phase3.js';
 import healthRoutes from '../routes/health.js';
 import metricsRoutes from '../routes/metrics.js';
 import contentV1Routes from '../routes/v1/content.routes.js';
@@ -263,13 +260,10 @@ export function setupRoutes(app: Application): void {
   // V2 API - Advanced Query System
   app.use('/api/v2', standardLimiter, queryV2Routes);
 
-  // Categories & Menus
+  // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);
-  app.use('/api/v1/menus', menusRoutes);
-  app.use('/api/menus', menusRoutes);
-  app.use('/api/v1/menu-items', menuItemsRoutes);
-  app.use('/api/v1/menus-advanced', menuAdvancedRoutes);
-  app.use('/api/v1/menus-phase3', menuPhase3Routes);
+  app.use('/api/v1/menus', menusRoutes); // All menu functionality in one route
+  app.use('/api/menus', menusRoutes); // Public alias
 
   // Admin routes
   app.use('/api/admin', standardLimiter, adminRoutes);

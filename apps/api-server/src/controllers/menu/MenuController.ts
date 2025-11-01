@@ -448,4 +448,267 @@ export class MenuController {
       });
     }
   };
+
+  // ============================================================================
+  // ADVANCED FEATURES - Conditions, Styles, Mega Menu
+  // ============================================================================
+
+  // In-memory storage for advanced features (in production, use database)
+  private conditions: Map<string, any[]> = new Map();
+  private styles: Map<string, any> = new Map();
+  private megaMenus: Map<string, any> = new Map();
+
+  // POST /api/menus/:id/conditions - Create menu item conditions
+  createMenuItemConditions = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const conditions = req.body;
+
+      const existingConditions = this.conditions.get(id) || [];
+      existingConditions.push({ menu_item_id: id, ...conditions, is_active: true });
+      this.conditions.set(id, existingConditions);
+
+      res.status(201).json({
+        success: true,
+        data: existingConditions[existingConditions.length - 1],
+        message: 'Menu item conditions created successfully'
+      });
+    } catch (error) {
+      logger.error('Error creating menu item conditions:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create menu item conditions'
+      });
+    }
+  };
+
+  // GET /api/menus/:id/conditions - Get menu item conditions
+  getMenuItemConditions = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const conditions = this.conditions.get(id) || [];
+
+      res.json({
+        success: true,
+        data: conditions
+      });
+    } catch (error) {
+      logger.error('Error getting menu item conditions:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get menu item conditions'
+      });
+    }
+  };
+
+  // DELETE /api/menus/:id/conditions - Delete menu item conditions
+  deleteMenuItemConditions = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      this.conditions.delete(id);
+
+      res.json({
+        success: true,
+        message: 'Menu item conditions deleted successfully'
+      });
+    } catch (error) {
+      logger.error('Error deleting menu item conditions:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete menu item conditions'
+      });
+    }
+  };
+
+  // POST /api/menus/:id/styles - Create menu styles
+  createMenuStyles = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const styles = req.body;
+
+      const menu = await menuService.findMenuById(id);
+      if (!menu) {
+        res.status(404).json({
+          success: false,
+          error: 'Menu not found'
+        });
+        return;
+      }
+
+      this.styles.set(id, { menu_id: id, ...styles });
+
+      res.status(201).json({
+        success: true,
+        data: this.styles.get(id),
+        message: 'Menu styles created successfully'
+      });
+    } catch (error) {
+      logger.error('Error creating menu styles:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create menu styles'
+      });
+    }
+  };
+
+  // GET /api/menus/:id/styles - Get menu styles
+  getMenuStyles = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const styles = this.styles.get(id);
+
+      if (!styles) {
+        res.status(404).json({
+          success: false,
+          error: 'Menu styles not found'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: styles
+      });
+    } catch (error) {
+      logger.error('Error getting menu styles:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get menu styles'
+      });
+    }
+  };
+
+  // PUT /api/menus/:id/styles - Update menu styles
+  updateMenuStyles = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const styles = req.body;
+
+      const menu = await menuService.findMenuById(id);
+      if (!menu) {
+        res.status(404).json({
+          success: false,
+          error: 'Menu not found'
+        });
+        return;
+      }
+
+      const existingStyles = this.styles.get(id) || { menu_id: id };
+      const updatedStyles = { ...existingStyles, ...styles, menu_id: id };
+      this.styles.set(id, updatedStyles);
+
+      res.json({
+        success: true,
+        data: updatedStyles,
+        message: 'Menu styles updated successfully'
+      });
+    } catch (error) {
+      logger.error('Error updating menu styles:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update menu styles'
+      });
+    }
+  };
+
+  // POST /api/menus/:id/mega-menu - Create mega menu
+  createMegaMenu = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const config = req.body;
+
+      const menu = await menuService.findMenuById(id);
+      if (!menu) {
+        res.status(404).json({
+          success: false,
+          error: 'Menu not found'
+        });
+        return;
+      }
+
+      const megaMenuData = {
+        menu_id: id,
+        enabled: true,
+        columns: 4,
+        width: 'container',
+        layout: 'grid',
+        content_type: 'menu_items',
+        ...config
+      };
+
+      this.megaMenus.set(id, megaMenuData);
+
+      res.status(201).json({
+        success: true,
+        data: megaMenuData,
+        message: 'Mega menu created successfully'
+      });
+    } catch (error) {
+      logger.error('Error creating mega menu:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create mega menu'
+      });
+    }
+  };
+
+  // GET /api/menus/:id/mega-menu - Get mega menu
+  getMegaMenu = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const megaMenu = this.megaMenus.get(id);
+
+      if (!megaMenu) {
+        res.status(404).json({
+          success: false,
+          error: 'Mega menu configuration not found'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: megaMenu
+      });
+    } catch (error) {
+      logger.error('Error getting mega menu:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get mega menu'
+      });
+    }
+  };
+
+  // PUT /api/menus/:id/mega-menu - Update mega menu
+  updateMegaMenu = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const config = req.body;
+
+      const menu = await menuService.findMenuById(id);
+      if (!menu) {
+        res.status(404).json({
+          success: false,
+          error: 'Menu not found'
+        });
+        return;
+      }
+
+      const existingConfig = this.megaMenus.get(id) || { menu_id: id };
+      const updatedConfig = { ...existingConfig, ...config, menu_id: id };
+      this.megaMenus.set(id, updatedConfig);
+
+      res.json({
+        success: true,
+        data: updatedConfig,
+        message: 'Mega menu updated successfully'
+      });
+    } catch (error) {
+      logger.error('Error updating mega menu:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update mega menu'
+      });
+    }
+  };
 }

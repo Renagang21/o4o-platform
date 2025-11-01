@@ -25,4 +25,32 @@ router.post('/:id/duplicate', checkRole(['admin', 'editor']), menuController.dup
 // Admin only routes
 router.delete('/:id', checkRole(['admin']), menuController.deleteMenu);
 
+// ============================================================================
+// ADVANCED FEATURES - Conditions, Styles, Mega Menu
+// ============================================================================
+
+// Menu item conditions - Admin only
+router.post('/:id/conditions', checkRole(['admin', 'super_admin']), menuController.createMenuItemConditions);
+router.get('/:id/conditions', checkRole(['admin', 'super_admin', 'editor']), menuController.getMenuItemConditions);
+router.delete('/:id/conditions', checkRole(['admin', 'super_admin']), menuController.deleteMenuItemConditions);
+
+// Menu styles - Admin and Editor
+router.post('/:id/styles', checkRole(['admin', 'super_admin', 'editor']), menuController.createMenuStyles);
+router.get('/:id/styles', menuController.getMenuStyles);
+router.put('/:id/styles', checkRole(['admin', 'super_admin', 'editor']), menuController.updateMenuStyles);
+
+// Mega menu configuration - Admin only
+router.post('/:id/mega-menu', checkRole(['admin', 'super_admin']), menuController.createMegaMenu);
+router.get('/:id/mega-menu', menuController.getMegaMenu);
+router.put('/:id/mega-menu', checkRole(['admin', 'super_admin']), menuController.updateMegaMenu);
+
+// ============================================================================
+// MENU ITEMS CRUD (merged from menu-items.ts)
+// ============================================================================
+
+// Menu item operations - Admin and Editor
+router.post('/items', checkRole(['admin', 'editor']), menuController.addMenuItem);
+router.put('/items/:id', checkRole(['admin', 'editor']), menuController.updateMenuItem);
+router.delete('/items/:id', checkRole(['admin', 'editor']), menuController.deleteMenuItem);
+
 export default router;
