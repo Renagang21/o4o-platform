@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
+import { useCustomizerSettings } from '../../hooks/useCustomizerSettings';
 
 interface SiteLogoProps {
   width?: number;
@@ -27,10 +28,23 @@ const SiteLogo: FC<SiteLogoProps> = ({
   siteName: propSiteName,
   data
 }) => {
+  // Fetch customizer settings for logo
+  const { settings, viewportMode } = useCustomizerSettings();
+
+  // Get logo from customizer settings based on viewport
+  const customizerLogo = viewportMode === 'mobile'
+    ? settings?.siteIdentity?.logo?.mobile
+    : settings?.siteIdentity?.logo?.desktop;
+
+  // Get logo width from customizer settings
+  const customizerLogoWidth = settings?.siteIdentity?.logo?.width?.[viewportMode] ||
+                               settings?.siteIdentity?.logo?.width?.desktop;
+
   // Extract values from props or data object (from TemplatePartRenderer)
-  const logoWidth = data?.width || width || 120;
-  const logoUrl = data?.logoUrl || propLogoUrl || '/images/logo.svg';
-  const siteName = propSiteName || 'Neture Platform';
+  // Priority: props > data > customizer > default
+  const logoWidth = data?.width || width || customizerLogoWidth || 120;
+  const logoUrl = data?.logoUrl || propLogoUrl || customizerLogo || '/images/logo.svg';
+  const siteName = propSiteName || settings?.siteIdentity?.siteTitle?.text || 'Neture Platform';
   const shouldLink = data?.isLink !== undefined ? data.isLink : (isLink ?? true);
   const target = data?.linkTarget || linkTarget || '_self';
 
