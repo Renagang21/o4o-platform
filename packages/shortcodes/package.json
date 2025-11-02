@@ -12,13 +12,15 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./dynamic": {
-      "types": "./dist/dynamic/index.d.ts",
       "import": "./dist/dynamic/index.js",
+      "require": "./dist/dynamic/index.js",
+      "types": "./dist/dynamic/index.d.ts",
       "default": "./dist/dynamic/index.js"
     }
   },
