@@ -201,10 +201,10 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           ...headerTemplatePart,
           slug: defaultHeader.slug // Keep existing slug
         };
-        await authClient.api.put(`/api/template-parts/${defaultHeader.id}`, updateData);
+        await authClient.api.put(`/template-parts/${defaultHeader.id}`, updateData);
       } else {
         // Create new header template part
-        await authClient.api.post('/api/template-parts', {
+        await authClient.api.post('/template-parts', {
           ...headerTemplatePart,
           isDefault: true,
           isActive: true
