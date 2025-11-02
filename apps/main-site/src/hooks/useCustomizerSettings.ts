@@ -100,6 +100,7 @@ const BREAKPOINTS = {
 interface CachedData {
   data: CustomizerSettings;
   timestamp: number;
+  version?: number;
 }
 
 // Detect viewport mode based on window width
@@ -134,16 +135,20 @@ export const useCustomizerSettings = () => {
       try {
         // Check cache first
         const cached = localStorage.getItem(STORAGE_KEY);
+        let cachedVersion: number | undefined;
+
         if (cached) {
           try {
             const cachedData: CachedData = JSON.parse(cached);
             const now = Date.now();
+            cachedVersion = cachedData.version;
 
-            // Use cache if still valid
+            // Use cache if still valid (time-based)
             if (now - cachedData.timestamp < CACHE_DURATION) {
               setSettings(cachedData.data);
               setIsLoading(false);
-              return;
+              // Still fetch in background to check version
+              // Will update if version changed
             }
           } catch (e) {
             // Invalid cache, continue to fetch
@@ -161,9 +166,21 @@ export const useCustomizerSettings = () => {
 
         if (result.success && result.data) {
           // API returns full customizer settings
-          // Merge with defaults for container only (preserve all other settings)
+          // Extract version for cache invalidation
           const apiData = result.data;
+          const apiVersion = (apiData as any)?._version;
 
+          // Check if version changed
+          const versionChanged = cachedVersion !== undefined && apiVersion !== cachedVersion;
+
+          // If version changed, force update even if cache is valid
+          if (!versionChanged && cachedVersion !== undefined) {
+            // Cache is valid and version hasn't changed, no need to update
+            setIsLoading(false);
+            return;
+          }
+
+          // Merge with defaults for container only (preserve all other settings)
           const mergedSettings: CustomizerSettings = {
             ...apiData, // Preserve all API data (siteIdentity, colors, typography, header, footer, etc.)
             container: {
@@ -186,11 +203,12 @@ export const useCustomizerSettings = () => {
 
           setSettings(mergedSettings);
 
-          // Update cache
+          // Update cache with version
           try {
             const cacheData: CachedData = {
               data: mergedSettings,
               timestamp: Date.now(),
+              version: apiVersion,
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheData));
           } catch (e) {

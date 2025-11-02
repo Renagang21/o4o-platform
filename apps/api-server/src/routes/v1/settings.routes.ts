@@ -1018,13 +1018,23 @@ async function updateCustomizerSettings(req: Request, res: Response) {
 
       if (dbSettings) {
         // Direct replacement instead of merge to avoid [object Object] issues
-        dbSettings.value = customizerSettings;
+        // Add version for cache invalidation
+        const currentVersion = (dbSettings.value as any)?._version || 0;
+        dbSettings.value = {
+          ...customizerSettings,
+          _version: currentVersion + 1,
+          _updatedAt: new Date().toISOString()
+        };
         dbSettings.updatedAt = new Date();
       } else {
         dbSettings = settingsRepository.create({
           key: 'customizer',
           type: 'customizer',
-          value: customizerSettings,
+          value: {
+            ...customizerSettings,
+            _version: 1,
+            _updatedAt: new Date().toISOString()
+          },
           description: 'Website customizer settings (logo, colors, typography, layout)'
         });
       }
