@@ -46,11 +46,11 @@ interface Taxonomy {
 }
 
 const TaxonomyManager: FC = () => {
-  const [taxonomies, setTaxonomies] = useState<any[]>([]);
+  const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
   const [selectedTaxonomy, setSelectedTaxonomy] = useState<Taxonomy | null>(null);
-  const [expandedTaxonomies, setExpandedTaxonomies] = useState<any[]>([]);
+  const [expandedTaxonomies, setExpandedTaxonomies] = useState<string[]>([]);
 
   // 새 Taxonomy 생성 폼 상태
   const [newTaxonomy, setNewTaxonomy] = useState({
@@ -140,8 +140,9 @@ const TaxonomyManager: FC = () => {
       ];
 
       setTaxonomies(mockTaxonomies);
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      // Error logging - use proper error handler
+      console.error('Failed to load taxonomies:', error);
     } finally {
       setLoading(false);
     }
@@ -163,8 +164,9 @@ const TaxonomyManager: FC = () => {
       resetForm();
       setActiveTab('list');
       alert('✅ Taxonomy가 성공적으로 생성되었습니다!');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      // Error logging - use proper error handler
+      console.error('Failed to create taxonomy:', error);
       alert('❌ Taxonomy 생성 중 오류가 발생했습니다.');
     }
   };
@@ -174,11 +176,12 @@ const TaxonomyManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      
-      setTaxonomies((prev: any) => prev.filter((tax: any) => tax.slug !== slug));
+
+      setTaxonomies(prev => prev.filter(tax => tax.slug !== slug));
       alert('✅ Taxonomy가 삭제되었습니다.');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      // Error logging - use proper error handler
+      console.error('Failed to delete taxonomy:', error);
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };
@@ -201,9 +204,9 @@ const TaxonomyManager: FC = () => {
   };
 
   const toggleTaxonomyExpanded = (slug: string) => {
-    setExpandedTaxonomies((prev: any) =>
+    setExpandedTaxonomies(prev =>
       prev.includes(slug)
-        ? prev.filter((s: any) => s !== slug)
+        ? prev.filter(s => s !== slug)
         : [...prev, slug]
     );
   };
@@ -213,9 +216,9 @@ const TaxonomyManager: FC = () => {
   };
 
   const renderTermHierarchy = (terms: TaxonomyTerm[], parentId?: string, level = 0) => {
-    const childTerms = terms.filter((term: any) => term.parentId === parentId);
-    
-    return childTerms.map((term: any) => (
+    const childTerms = terms.filter(term => term.parentId === parentId);
+
+    return childTerms.map(term => (
       <div key={term.id} className={`${level > 0 ? `ml-${level * 4}` : ''}`}>
         <div className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 rounded-md group">
           <div className="flex items-center gap-2">
@@ -327,7 +330,7 @@ const TaxonomyManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {taxonomies.map((taxonomy: any) => {
+                {taxonomies.map(taxonomy => {
                   const isExpanded = expandedTaxonomies.includes(taxonomy.slug);
                   
                   return (
@@ -398,8 +401,8 @@ const TaxonomyManager: FC = () => {
                           <span className="text-gray-500">연결된 CPT:</span>
                           {taxonomy.connectedCPTs.length > 0 ? (
                             <div className="flex gap-2">
-                              {taxonomy.connectedCPTs.map((cptSlug: any) => {
-                                const cpt = availableCPTs.find((c: any) => c.slug === cptSlug);
+                              {taxonomy.connectedCPTs.map(cptSlug => {
+                                const cpt = availableCPTs.find(c => c.slug === cptSlug);
                                 return (
                                   <span key={cptSlug} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                                     {cpt?.name || cptSlug}
@@ -430,9 +433,9 @@ const TaxonomyManager: FC = () => {
                             </div>
                           ) : (
                             <div className="space-y-1">
-                              {taxonomy.type === 'hierarchical' ? 
+                              {taxonomy.type === 'hierarchical' ?
                                 renderTermHierarchy(taxonomy.terms) :
-                                taxonomy.terms.map((term: any) => (
+                                taxonomy.terms.map(term => (
                                   <div key={term.id} className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 rounded-md group">
                                     <div className="flex items-center gap-2">
                                       <Hash className="w-4 h-4 text-gray-500" />
@@ -481,7 +484,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.slug}
-                      onChange={(e: any) => setNewTaxonomy((prev: any) => ({ ...prev, slug: e.target.value }))}
+                      onChange={e => setNewTaxonomy(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="예: category, location, tags"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -495,7 +498,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.name}
-                      onChange={(e: any) => setNewTaxonomy((prev: any) => ({ ...prev, name: e.target.value }))}
+                      onChange={e => setNewTaxonomy(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: 카테고리, 지역, 태그"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -508,7 +511,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.singularName}
-                      onChange={(e: any) => setNewTaxonomy((prev: any) => ({ ...prev, singularName: e.target.value }))}
+                      onChange={e => setNewTaxonomy(prev => ({ ...prev, singularName: e.target.value }))}
                       placeholder="예: 카테고리, 지역, 태그"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -521,7 +524,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.icon}
-                      onChange={(e: any) => setNewTaxonomy((prev: any) => ({ ...prev, icon: e.target.value }))}
+                      onChange={e => setNewTaxonomy(prev => ({ ...prev, icon: e.target.value }))}
                       placeholder="🏷️"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -533,7 +536,7 @@ const TaxonomyManager: FC = () => {
                     </label>
                     <textarea
                       value={newTaxonomy.description}
-                      onChange={(e: any) => setNewTaxonomy((prev: any) => ({ ...prev, description: e.target.value }))}
+                      onChange={e => setNewTaxonomy(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 분류 체계의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -559,8 +562,8 @@ const TaxonomyManager: FC = () => {
                           name="taxonomyType"
                           value="hierarchical"
                           checked={newTaxonomy.type === 'hierarchical'}
-                          onChange={(e: any) => setNewTaxonomy((prev: any) => ({ 
-                            ...prev, 
+                          onChange={e => setNewTaxonomy(prev => ({
+                            ...prev,
                             type: e.target.value as 'hierarchical' | 'flat',
                             settings: { ...prev.settings, hierarchical: true }
                           }))}
@@ -588,8 +591,8 @@ const TaxonomyManager: FC = () => {
                           name="taxonomyType"
                           value="flat"
                           checked={newTaxonomy.type === 'flat'}
-                          onChange={(e: any) => setNewTaxonomy((prev: any) => ({ 
-                            ...prev, 
+                          onChange={e => setNewTaxonomy(prev => ({
+                            ...prev,
                             type: e.target.value as 'hierarchical' | 'flat',
                             settings: { ...prev.settings, hierarchical: false }
                           }))}
@@ -619,21 +622,21 @@ const TaxonomyManager: FC = () => {
                       연결할 Custom Post Types
                     </label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {availableCPTs.map((cpt: any) => (
+                      {availableCPTs.map(cpt => (
                         <label key={cpt.slug} className="flex items-center">
                           <input
                             type="checkbox"
                             checked={newTaxonomy.connectedCPTs.includes(cpt.slug)}
-                            onChange={(e: any) => {
+                            onChange={e => {
                               if (e.target.checked) {
-                                setNewTaxonomy((prev: any) => ({
+                                setNewTaxonomy(prev => ({
                                   ...prev,
                                   connectedCPTs: [...prev.connectedCPTs, cpt.slug]
                                 }));
                               } else {
-                                setNewTaxonomy((prev: any) => ({
+                                setNewTaxonomy(prev => ({
                                   ...prev,
-                                  connectedCPTs: prev.connectedCPTs.filter((slug: any) => slug !== cpt.slug)
+                                  connectedCPTs: prev.connectedCPTs.filter(slug => slug !== cpt.slug)
                                 }));
                               }
                             }}
@@ -655,7 +658,7 @@ const TaxonomyManager: FC = () => {
                         <input
                           type="checkbox"
                           checked={newTaxonomy.settings.public}
-                          onChange={(e: any) => setNewTaxonomy((prev: any) => ({
+                          onChange={e => setNewTaxonomy(prev => ({
                             ...prev,
                             settings: { ...prev.settings, public: e.target.checked }
                           }))}
@@ -667,7 +670,7 @@ const TaxonomyManager: FC = () => {
                         <input
                           type="checkbox"
                           checked={newTaxonomy.settings.showInMenu}
-                          onChange={(e: any) => setNewTaxonomy((prev: any) => ({
+                          onChange={e => setNewTaxonomy(prev => ({
                             ...prev,
                             settings: { ...prev.settings, showInMenu: e.target.checked }
                           }))}

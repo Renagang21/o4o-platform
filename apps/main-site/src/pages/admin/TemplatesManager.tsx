@@ -55,7 +55,7 @@ interface Template {
 }
 
 const TemplatesManager: FC = () => {
-  const [templates, setTemplates] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
@@ -304,8 +304,8 @@ const TemplatesManager: FC = () => {
       ];
 
       setTemplates(mockTemplates);
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to load templates:', error);
     } finally {
       setLoading(false);
     }
@@ -328,8 +328,8 @@ const TemplatesManager: FC = () => {
       resetForm();
       setActiveTab('list');
       alert('✅ Template이 성공적으로 생성되었습니다!');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to create template:', error);
       alert('❌ Template 생성 중 오류가 발생했습니다.');
     }
   };
@@ -339,11 +339,11 @@ const TemplatesManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      
-      setTemplates((prev: any) => prev.filter((template: any) => template.id !== id));
+
+      setTemplates(prev => prev.filter(template => template.id !== id));
       alert('✅ Template이 삭제되었습니다.');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to delete template:', error);
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };
@@ -387,7 +387,7 @@ const TemplatesManager: FC = () => {
       const after = text.substring(end, text.length);
       
       const newContent = before + shortcode + after;
-      setNewTemplate((prev: any) => ({ ...prev, htmlContent: newContent }));
+      setNewTemplate(prev => ({ ...prev, htmlContent: newContent }));
       
       // 커서 위치 조정
       setTimeout(() => {
@@ -518,7 +518,7 @@ const TemplatesManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {templates.map((template: any) => (
+                {templates.map(template => (
                   <div key={template.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -577,7 +577,7 @@ const TemplatesManager: FC = () => {
                       <div className="mb-4">
                         <span className="text-sm text-gray-500">적용 대상:</span>
                         <span className="ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm">
-                          {availableCPTs.find((cpt: any) => cpt.slug === template.postType)?.name || template.postType}
+                          {availableCPTs.find(cpt => cpt.slug === template.postType)?.name || template.postType}
                         </span>
                       </div>
                     )}
@@ -644,12 +644,12 @@ const TemplatesManager: FC = () => {
                     <input
                       type="text"
                       value={newTemplate.name}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, name: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: product_card"
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       표시 제목 *
@@ -657,19 +657,19 @@ const TemplatesManager: FC = () => {
                     <input
                       type="text"
                       value={newTemplate.title}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, title: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="예: 상품 카드"
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       설명
                     </label>
                     <textarea
                       value={newTemplate.description}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, description: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="템플릿 설명"
                       rows={3}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -687,14 +687,14 @@ const TemplatesManager: FC = () => {
                     { value: 'single', label: '단일 페이지', desc: '개별 포스트 표시' },
                     { value: 'archive', label: '목록 페이지', desc: '포스트 목록 표시' },
                     { value: 'custom', label: '커스텀', desc: '자유 형식' }
-                  ].map((type: any) => (
+                  ].map(type => (
                     <label key={type.value} className="flex items-start">
                       <input
                         type="radio"
                         name="templateType"
                         value={type.value}
                         checked={newTemplate.type === type.value}
-                        onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, type: e.target.value as any }))}
+                        onChange={e => setNewTemplate(prev => ({ ...prev, type: e.target.value as 'single' | 'archive' | 'custom' }))}
                         className="mt-1 mr-2"
                       />
                       <div>
@@ -712,11 +712,11 @@ const TemplatesManager: FC = () => {
                     </label>
                     <select
                       value={newTemplate.postType}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, postType: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, postType: e.target.value }))}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Post Type 선택</option>
-                      {availableCPTs.map((cpt: any) => (
+                      {availableCPTs.map(cpt => (
                         <option key={cpt.slug} value={cpt.slug}>{cpt.name}</option>
                       ))}
                     </select>
@@ -728,7 +728,7 @@ const TemplatesManager: FC = () => {
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-gray-900 mb-4">사용 가능한 필드</h4>
                 <div className="space-y-2">
-                  {availableFields.map((field: any) => (
+                  {availableFields.map(field => (
                     <div key={field.name} className="group">
                       <button
                         onClick={() => insertField(field.shortcode)}
@@ -753,10 +753,10 @@ const TemplatesManager: FC = () => {
                       { id: 'html', label: 'HTML', icon: Code },
                       { id: 'css', label: 'CSS', icon: Settings },
                       { id: 'js', label: 'JavaScript', icon: Zap }
-                    ].map((tab: any) => (
+                    ].map(tab => (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveEditor(tab.id as any)}
+                        onClick={() => setActiveEditor(tab.id as 'html' | 'css' | 'js')}
                         className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
                           activeEditor === tab.id
                             ? 'border-blue-500 text-blue-600'
@@ -776,25 +776,25 @@ const TemplatesManager: FC = () => {
                     <textarea
                       id="html-editor"
                       value={newTemplate.htmlContent}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, htmlContent: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, htmlContent: e.target.value }))}
                       placeholder="HTML 코드를 입력하세요..."
                       className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   )}
-                  
+
                   {activeEditor === 'css' && (
                     <textarea
                       value={newTemplate.cssContent}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, cssContent: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, cssContent: e.target.value }))}
                       placeholder="CSS 스타일을 입력하세요..."
                       className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   )}
-                  
+
                   {activeEditor === 'js' && (
                     <textarea
                       value={newTemplate.jsContent}
-                      onChange={(e: any) => setNewTemplate((prev: any) => ({ ...prev, jsContent: e.target.value }))}
+                      onChange={e => setNewTemplate(prev => ({ ...prev, jsContent: e.target.value }))}
                       placeholder="JavaScript 코드를 입력하세요..."
                       className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -841,10 +841,10 @@ const TemplatesManager: FC = () => {
                     { mode: 'desktop', label: '데스크톱' },
                     { mode: 'tablet', label: '태블릿' },
                     { mode: 'mobile', label: '모바일' }
-                  ].map((item: any) => (
+                  ].map(item => (
                     <button
                       key={item.mode}
-                      onClick={() => setPreviewMode(item.mode as any)}
+                      onClick={() => setPreviewMode(item.mode as 'desktop' | 'tablet' | 'mobile')}
                       className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
                         previewMode === item.mode
                           ? 'bg-white text-gray-900 shadow-sm'

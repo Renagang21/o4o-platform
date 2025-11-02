@@ -148,10 +148,10 @@ const ContentManagement: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // 필터링된 컨텐츠
-  const filteredContents = contents.filter((content: any) => {
+  const filteredContents = contents.filter(content => {
     const matchesSearch = content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          content.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         content.tags.some((tag: any) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         content.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesType = filterType === 'all' || content.type === filterType;
     const matchesStatus = filterStatus === 'all' || content.status === filterStatus;
@@ -275,9 +275,9 @@ const ContentManagement: FC = () => {
     if (!selectedContent) return;
 
     if (isCreating) {
-      setContents((prev: any) => [...prev, selectedContent]);
+      setContents(prev => [...prev, selectedContent]);
     } else {
-      setContents((prev: any) => prev.map((c: any) => 
+      setContents(prev => prev.map(c =>
         c.id === selectedContent.id ? { ...selectedContent, updatedAt: new Date().toISOString().split('T')[0] } : c
       ));
     }
@@ -290,17 +290,17 @@ const ContentManagement: FC = () => {
   // 컨텐츠 삭제
   const handleDelete = (id: string) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      setContents((prev: any) => prev.filter((c: any) => c.id !== id));
+      setContents(prev => prev.filter(c => c.id !== id));
     }
   };
 
   // 상태 변경
   const handleStatusChange = (id: string, newStatus: 'draft' | 'published' | 'archived') => {
-    setContents((prev: any) => prev.map((c: any) => 
-      c.id === id ? { 
-        ...c, 
-        status: newStatus, 
-        publishedAt: newStatus === 'published' ? new Date().toISOString().split('T')[0] : c.publishedAt 
+    setContents(prev => prev.map(c =>
+      c.id === id ? {
+        ...c,
+        status: newStatus,
+        publishedAt: newStatus === 'published' ? new Date().toISOString().split('T')[0] : c.publishedAt
       } : c
     ));
   };
@@ -329,7 +329,7 @@ const ContentManagement: FC = () => {
       seo: newContentData.seo
     };
 
-    setContents((prev: any) => [newContent, ...prev]);
+    setContents(prev => [newContent, ...prev]);
     setShowCloneModal(false);
     
     // 복제된 컨텐츠를 편집 모드로 열기
@@ -357,12 +357,12 @@ const ContentManagement: FC = () => {
         updatedAt: new Date().toISOString()
       };
       
-      setContents((prev: any) => prev.map((c: any) => 
+      setContents(prev => prev.map(c =>
         c.id === selectedContent.id ? updatedContent : c
       ));
-      
-    } catch (error: any) {
-    // Error logging - use proper error handler
+
+    } catch (error: unknown) {
+      console.error('Auto-save failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -428,7 +428,7 @@ const ContentManagement: FC = () => {
                   <input
                     type="text"
                     value={selectedContent.title}
-                    onChange={(e: any) => setSelectedContent((prev: any) => prev ? { ...prev, title: e.target.value } : null)}
+                    onChange={e => setSelectedContent(prev => prev ? { ...prev, title: e.target.value } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -439,7 +439,7 @@ const ContentManagement: FC = () => {
                   <input
                     type="text"
                     value={selectedContent.slug}
-                    onChange={(e: any) => setSelectedContent((prev: any) => prev ? { ...prev, slug: e.target.value } : null)}
+                    onChange={e => setSelectedContent(prev => prev ? { ...prev, slug: e.target.value } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -449,9 +449,9 @@ const ContentManagement: FC = () => {
                   </label>
                   <select
                     value={selectedContent.status}
-                    onChange={(e: any) => setSelectedContent((prev: any) => prev ? { 
-                      ...prev, 
-                      status: e.target.value as 'draft' | 'published' | 'archived' 
+                    onChange={e => setSelectedContent(prev => prev ? {
+                      ...prev,
+                      status: e.target.value as 'draft' | 'published' | 'archived'
                     } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
@@ -467,7 +467,7 @@ const ContentManagement: FC = () => {
                   <input
                     type="text"
                     value={selectedContent.category || ''}
-                    onChange={(e: any) => setSelectedContent((prev: any) => prev ? { ...prev, category: e.target.value } : null)}
+                    onChange={e => setSelectedContent(prev => prev ? { ...prev, category: e.target.value } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="카테고리를 입력하세요"
                   />
@@ -481,7 +481,7 @@ const ContentManagement: FC = () => {
                   </label>
                   <textarea
                     value={selectedContent.excerpt || ''}
-                    onChange={(e: any) => setSelectedContent((prev: any) => prev ? { ...prev, excerpt: e.target.value } : null)}
+                    onChange={e => setSelectedContent(prev => prev ? { ...prev, excerpt: e.target.value } : null)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="포스트 요약을 입력하세요"
@@ -496,7 +496,7 @@ const ContentManagement: FC = () => {
                 {[
                   { id: 'content', name: '컨텐츠 편집', icon: Edit3 },
                   { id: 'seo', name: 'SEO 설정', icon: Search }
-                ].map((tab: any) => (
+                ].map(tab => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveEditTab(tab.id as 'content' | 'seo')}
@@ -521,7 +521,7 @@ const ContentManagement: FC = () => {
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                     <EnhancedTiptapEditor
                       content={selectedContent.content}
-                      onChange={(content: any) => setSelectedContent((prev: any) => prev ? { ...prev, content } : null)}
+                      onChange={content => setSelectedContent(prev => prev ? { ...prev, content } : null)}
                       onSave={handleSave}
                       isLoading={isLoading}
                       page={selectedContent.id}
@@ -529,16 +529,16 @@ const ContentManagement: FC = () => {
                       autoSave={{
                         enabled: true,
                         interval: 30000, // 30초
-                        onAutoSave: async (content: any) => {
+                        onAutoSave: async content => {
                           try {
                             // 자동 저장 로직 (임시로 localStorage 사용)
                             const updatedContent = { ...selectedContent, content, updatedAt: new Date().toISOString() };
                             localStorage.setItem(`content_${selectedContent.id}`, JSON.stringify(updatedContent));
-                            
+
                             // 실제 구현에서는 API 호출
                             return true;
-                          } catch (error: any) {
-    // Error logging - use proper error handler
+                          } catch (error: unknown) {
+                            console.error('Auto-save error:', error);
                             return false;
                           }
                         }
@@ -559,7 +559,7 @@ const ContentManagement: FC = () => {
                         noFollow: false,
                         customMeta: []
                       }}
-                      onChange={(seo: any) => setSelectedContent((prev: any) => prev ? { ...prev, seo } : null)}
+                      onChange={seo => setSelectedContent(prev => prev ? { ...prev, seo } : null)}
                       contentType={selectedContent.type}
                       slug={selectedContent.slug}
                     />
@@ -675,14 +675,14 @@ const ContentManagement: FC = () => {
                 type="text"
                 placeholder="제목, 작성자, 태그로 검색..."
                 value={searchTerm}
-                onChange={(e: any) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={filterType}
-                onChange={(e: any) => setFilterType(e.target.value)}
+                onChange={e => setFilterType(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 타입</option>
@@ -693,7 +693,7 @@ const ContentManagement: FC = () => {
               </select>
               <select
                 value={filterStatus}
-                onChange={(e: any) => setFilterStatus(e.target.value)}
+                onChange={e => setFilterStatus(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 상태</option>
@@ -743,7 +743,7 @@ const ContentManagement: FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredContents.map((content: any) => (
+                {filteredContents.map(content => (
                   <tr key={content.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div>
@@ -765,7 +765,7 @@ const ContentManagement: FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
                         value={content.status}
-                        onChange={(e: any) => handleStatusChange(content.id, e.target.value as 'draft' | 'published' | 'archived')}
+                        onChange={e => handleStatusChange(content.id, e.target.value as 'draft' | 'published' | 'archived')}
                         className={`text-xs px-2 py-1 rounded-full border-0 ${getStatusColor(content.status)}`}
                       >
                         <option value="draft">초안</option>

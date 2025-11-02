@@ -26,11 +26,11 @@ import { ViewPreview } from '../../components/admin/views/ViewPreview';
 import type { View, QueryFilter, QuerySort, ViewQuery, ViewTemplate, AvailableCPT, ViewFormData } from '../../types/views';
 
 const ViewsManager: FC = () => {
-  const [views, setViews] = useState<any[]>([]);
+  const [views, setViews] = useState<View[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingView, setEditingView] = useState<View | null>(null);
-  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewData, setPreviewData] = useState<unknown[]>([]);
 
   // 새 View 생성 폼 상태
   const [newView, setNewView] = useState<ViewFormData>({
@@ -217,8 +217,8 @@ const ViewsManager: FC = () => {
       ];
 
       setViews(mockViews);
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to load views:', error);
     } finally {
       setLoading(false);
     }
@@ -236,13 +236,13 @@ const ViewsManager: FC = () => {
       };
 
       // API 호출 (Mock)
-      
+
       await loadViews();
       resetForm();
       setActiveTab('list');
       alert('✅ View가 성공적으로 생성되었습니다!');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to create view:', error);
       alert('❌ View 생성 중 오류가 발생했습니다.');
     }
   };
@@ -252,11 +252,11 @@ const ViewsManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      
-      setViews((prev: any) => prev.filter((view: any) => view.id !== id));
+
+      setViews(prev => prev.filter(view => view.id !== id));
       alert('✅ View가 삭제되었습니다.');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to delete view:', error);
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };
@@ -305,7 +305,7 @@ const ViewsManager: FC = () => {
       relation: 'AND'
     };
 
-    setNewView((prev: any) => ({
+    setNewView(prev => ({
       ...prev,
       query: {
         ...prev.query,
@@ -315,11 +315,11 @@ const ViewsManager: FC = () => {
   };
 
   const updateFilter = (filterId: string, updates: Partial<QueryFilter>) => {
-    setNewView((prev: any) => ({
+    setNewView(prev => ({
       ...prev,
       query: {
         ...prev.query,
-        filters: prev.query.filters.map((filter: any) =>
+        filters: prev.query.filters.map(filter =>
           filter.id === filterId ? { ...filter, ...updates } : filter
         )
       }
@@ -327,11 +327,11 @@ const ViewsManager: FC = () => {
   };
 
   const removeFilter = (filterId: string) => {
-    setNewView((prev: any) => ({
+    setNewView(prev => ({
       ...prev,
       query: {
         ...prev.query,
-        filters: prev.query.filters.filter((filter: any) => filter.id !== filterId)
+        filters: prev.query.filters.filter(filter => filter.id !== filterId)
       }
     }));
   };
@@ -342,7 +342,7 @@ const ViewsManager: FC = () => {
       direction: 'ASC'
     };
 
-    setNewView((prev: any) => ({
+    setNewView(prev => ({
       ...prev,
       query: {
         ...prev.query,
@@ -352,7 +352,7 @@ const ViewsManager: FC = () => {
   };
 
   const updateSort = (index: number, updates: Partial<QuerySort>) => {
-    setNewView((prev: any) => ({
+    setNewView(prev => ({
       ...prev,
       query: {
         ...prev.query,
@@ -364,7 +364,7 @@ const ViewsManager: FC = () => {
   };
 
   const removeSort = (index: number) => {
-    setNewView((prev: any) => ({
+    setNewView(prev => ({
       ...prev,
       query: {
         ...prev.query,
@@ -374,7 +374,7 @@ const ViewsManager: FC = () => {
   };
 
   const getSelectedCPT = () => {
-    return availableCPTs.find((cpt: any) => cpt.slug === newView.query.postType);
+    return availableCPTs.find(cpt => cpt.slug === newView.query.postType);
   };
 
   const previewView = async (view: View) => {

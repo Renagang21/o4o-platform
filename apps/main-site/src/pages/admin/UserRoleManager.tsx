@@ -25,7 +25,7 @@ const UserRoleManager: FC = () => {
 
   // 필터/검색 적용된 사용자 목록
   const filteredUsers = useMemo(() => {
-    return users.filter((user: any) => {
+    return users.filter(user => {
       const matchesFilter = filter === 'all' ? true : user.roles.includes(filter);
       const matchesSearch =
         user.name.includes(search) ||
@@ -36,12 +36,12 @@ const UserRoleManager: FC = () => {
   }, [users, filter, search]);
 
   const handleRoleChange = (id: string, role: UserRole, checked: boolean) => {
-    setPendingRoles((prev: any) => {
-      const current = prev[id] ?? users.find((u: any) => u.id === id)?.roles ?? [];
+    setPendingRoles(prev => {
+      const current = prev[id] ?? users.find(u => u.id === id)?.roles ?? [];
       if (checked) {
         return { ...prev, [id]: Array.from(new Set([...current, role])) };
       } else {
-        return { ...prev, [id]: current.filter((r: any) => r !== role) };
+        return { ...prev, [id]: current.filter(r => r !== role) };
       }
     });
   };
@@ -55,13 +55,14 @@ const UserRoleManager: FC = () => {
         await logRoleChange(adminId, id, pendingRoles[id]);
         changeRoles(id, pendingRoles[id]);
         toast.success('역할이 변경되었습니다.');
-        setPendingRoles((prev: any) => {
+        setPendingRoles(prev => {
           const copy = { ...prev };
           delete copy[id];
           return copy;
         });
-      } catch (e: any) {
-        toast.error(e.response?.data?.message || '서버 저장에 실패했습니다.');
+      } catch (e: unknown) {
+        const error = e as { response?: { data?: { message?: string } } };
+        toast.error(error.response?.data?.message || '서버 저장에 실패했습니다.');
       }
     }
   };
@@ -75,16 +76,16 @@ const UserRoleManager: FC = () => {
             type="text"
             placeholder="이름, 이메일, 전화번호 검색"
             value={search}
-            onChange={(e: any) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             className="px-3 py-2 border rounded w-64 dark:bg-gray-700 dark:text-white"
           />
           <select
             value={filter}
-            onChange={(e: any) => setFilter(e.target.value as UserRole | 'all')}
+            onChange={e => setFilter(e.target.value as UserRole | 'all')}
             className="px-3 py-2 border rounded dark:bg-gray-700 dark:text-white"
           >
             <option value="all">전체</option>
-            {ALL_ROLES.map((role: any) => (
+            {ALL_ROLES.map(role => (
               <option key={role} value={role}>{roleLabels[role]}</option>
             ))}
           </select>
@@ -102,23 +103,23 @@ const UserRoleManager: FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredUsers.map((user: any) => (
+              {filteredUsers.map(user => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{user.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-300">{user.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-300">{user.phone}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{user.roles.map((r: any) => roleLabels[r]).join(', ')}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{user.roles.map(r => roleLabels[r]).join(', ')}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {user.id === adminId ? (
                       <span className="text-gray-400 text-xs">본인</span>
                     ) : (
                       <div className="flex flex-wrap gap-2">
-                        {ALL_ROLES.map((role: any) => (
+                        {ALL_ROLES.map(role => (
                           <label key={role} className="inline-flex items-center gap-1">
                             <input
                               type="checkbox"
                               checked={(pendingRoles[user.id] ?? user.roles).includes(role)}
-                              onChange={(e: any) => handleRoleChange(user.id, role, e.target.checked)}
+                              onChange={e => handleRoleChange(user.id, role, e.target.checked)}
                               disabled={user.id === adminId && role === 'administrator'}
                             />
                             <span>{roleLabels[role]}</span>

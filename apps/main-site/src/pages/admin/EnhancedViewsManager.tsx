@@ -40,7 +40,7 @@ interface AdvancedQueryFilter {
   groupId?: string;
   field: string;
   operator: string;
-  value: any;
+  value: unknown;
   dataType?: 'string' | 'number' | 'date' | 'boolean' | 'array';
   customFunction?: string;
 }
@@ -75,7 +75,7 @@ interface QueryGroupBy {
   having?: {
     aggregate: string;
     operator: string;
-    value: any;
+    value: unknown;
   };
 }
 
@@ -201,11 +201,11 @@ interface EnhancedView {
 }
 
 const EnhancedViewsManager: FC = () => {
-  const [views, setViews] = useState<any[]>([]);
+  const [views, setViews] = useState<EnhancedView[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingView, setEditingView] = useState<EnhancedView | null>(null);
-  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewData, setPreviewData] = useState<unknown[]>([]);
   const [queryBuilderMode, setQueryBuilderMode] = useState<'visual' | 'sql'>('visual');
 
   // Available data sources
@@ -490,8 +490,8 @@ const EnhancedViewsManager: FC = () => {
       ];
 
       setViews(mockViews);
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to load views:', error);
     } finally {
       setLoading(false);
     }
@@ -513,12 +513,12 @@ const EnhancedViewsManager: FC = () => {
       selectParts.push(...select.fields);
     }
     if (select.aggregates?.length) {
-      selectParts.push(...select.aggregates.map((agg: any) => 
+      selectParts.push(...select.aggregates.map(agg =>
         `${agg.function}(${agg.distinct ? 'DISTINCT ' : ''}${agg.field}) AS ${agg.alias}`
       ));
     }
     if (select.expressions?.length) {
-      selectParts.push(...select.expressions.map((exp: any) => 
+      selectParts.push(...select.expressions.map(exp =>
         `${exp.expression} AS ${exp.alias}`
       ));
     }
@@ -529,7 +529,7 @@ const EnhancedViewsManager: FC = () => {
     
     // JOIN clauses
     if (source.joins?.length) {
-      source.joins.forEach((join: any) => {
+      source.joins.forEach(join => {
         sql += `\n${join.type} JOIN ${join.table}`;
         if (join.alias) sql += ` AS ${join.alias}`;
         sql += ` ON ${join.on.leftField} ${join.on.operator} ${join.on.rightField}`;
@@ -544,20 +544,20 @@ const EnhancedViewsManager: FC = () => {
     
     // GROUP BY clause
     if (groupBy?.length) {
-      sql += `\nGROUP BY ${groupBy.map((g: any) => g.field).join(', ')}`;
-      
+      sql += `\nGROUP BY ${groupBy.map(g => g.field).join(', ')}`;
+
       // HAVING clause
-      const havingClauses = groupBy.filter((g: any) => g.having).map((g: any) => 
+      const havingClauses = groupBy.filter(g => g.having).map(g =>
         `${g.having!.aggregate} ${g.having!.operator} ${g.having!.value}`
       );
       if (havingClauses.length) {
         sql += `\nHAVING ${havingClauses.join(' AND ')}`;
       }
     }
-    
+
     // ORDER BY clause
     if (orderBy?.length) {
-      sql += `\nORDER BY ${orderBy.map((o: any) => 
+      sql += `\nORDER BY ${orderBy.map(o =>
         `${o.field} ${o.direction}${o.nulls ? ` NULLS ${o.nulls}` : ''}`
       ).join(', ')}`;
     }
@@ -576,7 +576,7 @@ const EnhancedViewsManager: FC = () => {
     
     // Process filters
     if (group.filters?.length) {
-      parts.push(...group.filters.map((filter: any) => {
+      parts.push(...group.filters.map(filter => {
         let value = filter.value;
         if (filter.dataType === 'string' && !['in', 'not_in'].includes(filter.operator)) {
           value = `'${value}'`;
@@ -605,34 +605,34 @@ const EnhancedViewsManager: FC = () => {
     
     // Process nested groups
     if (group.groups?.length) {
-      parts.push(...group.groups.map((g: any) => `(${generateWhereClause(g)})`));
+      parts.push(...group.groups.map(g => `(${generateWhereClause(g)})`));
     }
-    
+
     return parts.join(` ${group.type} `);
   };
 
   const createView = async () => {
     try {
       // API call would go here
-      
+
       await loadViews();
       resetForm();
       setActiveTab('list');
       alert('✅ View created successfully!');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to create view:', error);
       alert('❌ Failed to create view');
     }
   };
 
   const deleteView = async (id: string) => {
     if (!confirm('Are you sure you want to delete this view?')) return;
-    
+
     try {
-      setViews((prev: any) => prev.filter((view: any) => view.id !== id));
+      setViews(prev => prev.filter(view => view.id !== id));
       alert('✅ View deleted successfully');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      console.error('Failed to delete view:', error);
       alert('❌ Failed to delete view');
     }
   };
@@ -777,7 +777,7 @@ const EnhancedViewsManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {views.map((view: any) => (
+                {views.map(view => (
                   <div key={view.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">

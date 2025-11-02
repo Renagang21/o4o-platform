@@ -45,7 +45,7 @@ interface Relation {
 }
 
 const RelationsManager: FC = () => {
-  const [relations, setRelations] = useState<any[]>([]);
+  const [relations, setRelations] = useState<Relation[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
   const [editingRelation, setEditingRelation] = useState<Relation | null>(null);
@@ -190,8 +190,9 @@ const RelationsManager: FC = () => {
       ];
 
       setRelations(mockRelations);
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      // Error logging - use proper error handler
+      console.error('Failed to load relations:', error);
     } finally {
       setLoading(false);
     }
@@ -213,8 +214,9 @@ const RelationsManager: FC = () => {
       resetForm();
       setActiveTab('list');
       alert('✅ 관계가 성공적으로 생성되었습니다!');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      // Error logging - use proper error handler
+      console.error('Failed to create relation:', error);
       alert('❌ 관계 생성 중 오류가 발생했습니다.');
     }
   };
@@ -224,11 +226,12 @@ const RelationsManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      
-      setRelations((prev: any) => prev.filter((rel: any) => rel.id !== id));
+
+      setRelations(prev => prev.filter(rel => rel.id !== id));
       alert('✅ 관계가 삭제되었습니다.');
-    } catch (error: any) {
-    // Error logging - use proper error handler
+    } catch (error: unknown) {
+      // Error logging - use proper error handler
+      console.error('Failed to delete relation:', error);
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };
@@ -281,19 +284,19 @@ const RelationsManager: FC = () => {
   };
 
   const getCPTIcon = (slug: string) => {
-    const cpt = availableCPTs.find((c: any) => c.slug === slug);
+    const cpt = availableCPTs.find(c => c.slug === slug);
     return cpt?.icon || '📄';
   };
 
   const getCPTName = (slug: string) => {
-    const cpt = availableCPTs.find((c: any) => c.slug === slug);
+    const cpt = availableCPTs.find(c => c.slug === slug);
     return cpt?.name || slug;
   };
 
   // 관계 타입에 따른 maxItems 자동 설정
   const updateRelationType = (type: 'one-to-one' | 'one-to-many' | 'many-to-many') => {
-    const updates: any = { type };
-    
+    const updates: Partial<typeof newRelation> = { type };
+
     if (type === 'one-to-one') {
       updates.from = { ...newRelation.from, maxItems: 1 };
       updates.to = { ...newRelation.to, maxItems: 1 };
@@ -304,8 +307,8 @@ const RelationsManager: FC = () => {
       updates.from = { ...newRelation.from, maxItems: undefined };
       updates.to = { ...newRelation.to, maxItems: undefined };
     }
-    
-    setNewRelation((prev: any) => ({ ...prev, ...updates }));
+
+    setNewRelation(prev => ({ ...prev, ...updates }));
   };
 
   if (loading) {
@@ -393,7 +396,7 @@ const RelationsManager: FC = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {relations.map((relation: any) => (
+                {relations.map(relation => (
                   <div key={relation.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-6">
@@ -536,7 +539,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="text"
                       value={newRelation.name}
-                      onChange={(e: any) => setNewRelation((prev: any) => ({ ...prev, name: e.target.value }))}
+                      onChange={e => setNewRelation(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: product_brand, event_team"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -550,7 +553,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="text"
                       value={newRelation.label}
-                      onChange={(e: any) => setNewRelation((prev: any) => ({ ...prev, label: e.target.value }))}
+                      onChange={e => setNewRelation(prev => ({ ...prev, label: e.target.value }))}
                       placeholder="예: 상품-브랜드 관계"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -562,7 +565,7 @@ const RelationsManager: FC = () => {
                     </label>
                     <textarea
                       value={newRelation.description}
-                      onChange={(e: any) => setNewRelation((prev: any) => ({ ...prev, description: e.target.value }))}
+                      onChange={e => setNewRelation(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 관계의 목적과 사용법을 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -593,16 +596,16 @@ const RelationsManager: FC = () => {
                       value: 'many-to-many', 
                       label: '다대다 (N:N)', 
                       desc: '여러 항목이 서로 여러 항목과 연결',
-                      example: '이벤트 ↔ 팀원들' 
+                      example: '이벤트 ↔ 팀원들'
                     }
-                  ].map((type: any) => (
+                  ].map(type => (
                     <label key={type.value} className="relative">
                       <input
                         type="radio"
                         name="relationType"
                         value={type.value}
                         checked={newRelation.type === type.value}
-                        onChange={(e: any) => updateRelationType(e.target.value as any)}
+                        onChange={e => updateRelationType(e.target.value as 'one-to-one' | 'one-to-many' | 'many-to-many')}
                         className="sr-only"
                       />
                       <div className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
@@ -622,7 +625,7 @@ const RelationsManager: FC = () => {
                   <input
                     type="checkbox"
                     checked={newRelation.bidirectional}
-                    onChange={(e: any) => setNewRelation((prev: any) => ({ ...prev, bidirectional: e.target.checked }))}
+                    onChange={e => setNewRelation(prev => ({ ...prev, bidirectional: e.target.checked }))}
                     className="mr-2"
                   />
                   <span className="text-sm text-gray-700">양방향 관계 (두 Post Type 모두에 관계 필드 생성)</span>
@@ -647,14 +650,14 @@ const RelationsManager: FC = () => {
                       </label>
                       <select
                         value={newRelation.from.postType}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, postType: e.target.value }
                         }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Post Type 선택</option>
-                        {availableCPTs.map((cpt: any) => (
+                        {availableCPTs.map(cpt => (
                           <option key={cpt.slug} value={cpt.slug}>
                             {cpt.icon} {cpt.name}
                           </option>
@@ -669,7 +672,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.from.label}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, label: e.target.value }
                         }))}
@@ -685,7 +688,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.from.fieldName}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, fieldName: e.target.value }
                         }))}
@@ -702,11 +705,11 @@ const RelationsManager: FC = () => {
                         <input
                           type="number"
                           value={newRelation.from.maxItems || ''}
-                          onChange={(e: any) => setNewRelation((prev: any) => ({
+                          onChange={e => setNewRelation(prev => ({
                             ...prev,
-                            from: { 
-                              ...prev.from, 
-                              maxItems: e.target.value ? parseInt(e.target.value) : undefined 
+                            from: {
+                              ...prev.from,
+                              maxItems: e.target.value ? parseInt(e.target.value) : undefined
                             }
                           }))}
                           placeholder="무제한일 경우 비워두세요"
@@ -719,7 +722,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="checkbox"
                         checked={newRelation.from.required}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, required: e.target.checked }
                         }))}
@@ -742,14 +745,14 @@ const RelationsManager: FC = () => {
                       </label>
                       <select
                         value={newRelation.to.postType}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, postType: e.target.value }
                         }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Post Type 선택</option>
-                        {availableCPTs.map((cpt: any) => (
+                        {availableCPTs.map(cpt => (
                           <option key={cpt.slug} value={cpt.slug}>
                             {cpt.icon} {cpt.name}
                           </option>
@@ -764,7 +767,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.to.label}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, label: e.target.value }
                         }))}
@@ -780,7 +783,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.to.fieldName}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, fieldName: e.target.value }
                         }))}
@@ -797,11 +800,11 @@ const RelationsManager: FC = () => {
                         <input
                           type="number"
                           value={newRelation.to.maxItems || ''}
-                          onChange={(e: any) => setNewRelation((prev: any) => ({
+                          onChange={e => setNewRelation(prev => ({
                             ...prev,
-                            to: { 
-                              ...prev.to, 
-                              maxItems: e.target.value ? parseInt(e.target.value) : undefined 
+                            to: {
+                              ...prev.to,
+                              maxItems: e.target.value ? parseInt(e.target.value) : undefined
                             }
                           }))}
                           placeholder="무제한일 경우 비워두세요"
@@ -814,7 +817,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="checkbox"
                         checked={newRelation.to.required}
-                        onChange={(e: any) => setNewRelation((prev: any) => ({
+                        onChange={e => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, required: e.target.checked }
                         }))}
@@ -835,7 +838,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="checkbox"
                       checked={newRelation.settings.sortable}
-                      onChange={(e: any) => setNewRelation((prev: any) => ({
+                      onChange={e => setNewRelation(prev => ({
                         ...prev,
                         settings: { ...prev.settings, sortable: e.target.checked }
                       }))}
@@ -843,12 +846,12 @@ const RelationsManager: FC = () => {
                     />
                     <span className="text-sm text-gray-700">정렬 가능 (드래그 앤 드롭으로 순서 변경)</span>
                   </label>
-                  
+
                   <label className="flex items-center">
                     <input
                       type="checkbox"
                       checked={newRelation.settings.duplicates}
-                      onChange={(e: any) => setNewRelation((prev: any) => ({
+                      onChange={e => setNewRelation(prev => ({
                         ...prev,
                         settings: { ...prev.settings, duplicates: e.target.checked }
                       }))}
@@ -863,11 +866,11 @@ const RelationsManager: FC = () => {
                     </label>
                     <select
                       value={newRelation.settings.deleteAction}
-                      onChange={(e: any) => setNewRelation((prev: any) => ({
+                      onChange={e => setNewRelation(prev => ({
                         ...prev,
-                        settings: { 
-                          ...prev.settings, 
-                          deleteAction: e.target.value as 'cascade' | 'restrict' | 'set_null' 
+                        settings: {
+                          ...prev.settings,
+                          deleteAction: e.target.value as 'cascade' | 'restrict' | 'set_null'
                         }
                       }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

@@ -133,7 +133,7 @@ const MediaLibrary: FC = () => {
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -152,7 +152,7 @@ const MediaLibrary: FC = () => {
 
         if (response.data.success && response.data.data?.media) {
           // Transform API data to match MediaFile interface
-          const transformedFiles = response.data.data.media.map((file: any) => ({
+          const transformedFiles = response.data.data.media.map(file => ({
             id: file.id,
             name: file.filename,
             originalName: file.originalFilename || file.filename,
@@ -192,11 +192,11 @@ const MediaLibrary: FC = () => {
   };
 
   // 필터링된 파일 목록
-  const filteredFiles = files.filter((file: any) => {
+  const filteredFiles = files.filter(file => {
     const matchesFolder = selectedFolder === 'all' || file.folder === selectedFolder;
     const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          file.originalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         file.tags.some((tag: any) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         file.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesFolder && matchesSearch;
   });
 
@@ -234,7 +234,7 @@ const MediaLibrary: FC = () => {
         createdAt: new Date().toISOString().split('T')[0],
         fileCount: 0
       };
-      setFolders((prev: any) => [...prev, newFolder]);
+      setFolders(prev => [...prev, newFolder]);
       setNewFolderName('');
       setShowNewFolderModal(false);
     }
@@ -268,7 +268,7 @@ const MediaLibrary: FC = () => {
           uploadedBy: '현재 사용자'
         };
 
-        setFiles((prev: any) => [...prev, newFile]);
+        setFiles(prev => [...prev, newFile]);
 
         if (index === uploadedFiles.length - 1) {
           setIsUploading(false);
@@ -286,9 +286,9 @@ const MediaLibrary: FC = () => {
 
   // 파일 선택
   const handleFileSelect = (fileId: string) => {
-    setSelectedFiles((prev: any) => 
-      prev.includes(fileId) 
-        ? prev.filter((id: any) => id !== fileId)
+    setSelectedFiles(prev =>
+      prev.includes(fileId)
+        ? prev.filter(id => id !== fileId)
         : [...prev, fileId]
     );
   };
@@ -296,7 +296,7 @@ const MediaLibrary: FC = () => {
   // 선택된 파일 삭제
   const handleDeleteSelected = () => {
     if (confirm(`선택된 ${selectedFiles.length}개 파일을 삭제하시겠습니까?`)) {
-      setFiles((prev: any) => prev.filter((file: any) => !selectedFiles.includes(file.id)));
+      setFiles(prev => prev.filter(file => !selectedFiles.includes(file.id)));
       setSelectedFiles([]);
     }
   };
@@ -357,19 +357,19 @@ const MediaLibrary: FC = () => {
                 type="text"
                 placeholder="파일명, 태그로 검색..."
                 value={searchTerm}
-                onChange={(e: any) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             <div className="flex gap-2">
               <select
                 value={selectedFolder}
-                onChange={(e: any) => setSelectedFolder(e.target.value)}
+                onChange={e => setSelectedFolder(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 폴더</option>
-                {folders.map((folder: any) => (
+                {folders.map(folder => (
                   <option key={folder.id} value={folder.id}>
                     {folder.name} ({folder.fileCount})
                   </option>
@@ -430,7 +430,7 @@ const MediaLibrary: FC = () => {
           {viewMode === 'grid' ? (
             // 그리드 뷰
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {filteredFiles.map((file: any) => (
+              {filteredFiles.map(file => (
                 <div
                   key={file.id}
                   className={`relative bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg cursor-pointer group ${
@@ -468,7 +468,7 @@ const MediaLibrary: FC = () => {
                   {/* 액션 버튼 */}
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={(e: any) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleShowFileDetails(file);
                       }}
@@ -499,9 +499,9 @@ const MediaLibrary: FC = () => {
                       <input
                         type="checkbox"
                         checked={selectedFiles.length === filteredFiles.length && filteredFiles.length > 0}
-                        onChange={(e: any) => {
+                        onChange={e => {
                           if (e.target.checked) {
-                            setSelectedFiles(filteredFiles.map((f: any) => f.id));
+                            setSelectedFiles(filteredFiles.map(f => f.id));
                           } else {
                             setSelectedFiles([]);
                           }
@@ -524,7 +524,7 @@ const MediaLibrary: FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredFiles.map((file: any) => (
+                  {filteredFiles.map(file => (
                     <tr key={file.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4">
                         <input
@@ -627,10 +627,10 @@ const MediaLibrary: FC = () => {
               <input
                 type="text"
                 value={newFolderName}
-                onChange={(e: any) => setNewFolderName(e.target.value)}
+                onChange={e => setNewFolderName(e.target.value)}
                 placeholder="폴더명을 입력하세요"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                onKeyPress={(e) => e.key === 'Enter' && handleCreateFolder()}
+                onKeyPress={e => e.key === 'Enter' && handleCreateFolder()}
               />
               <div className="flex gap-2 mt-4">
                 <button
