@@ -5,6 +5,53 @@ import { CustomPostType } from '../../entities/CustomPostType.js';
 import { CustomFieldValue, CustomField, FieldGroup } from '../../entities/CustomField.js';
 import { User } from '../../entities/User.js';
 
+/**
+ * CPT Write Guard
+ * Blocks all CPT write operations for dropshipping types when ENABLE_DROPSHIPPING_CPT_WRITES is not set to true
+ */
+class CPTWriteGuard {
+  private static isEnabled(): boolean {
+    return process.env.ENABLE_DROPSHIPPING_CPT_WRITES === 'true';
+  }
+
+  static check(req: Request, res: Response, entityType: string): boolean {
+    if (this.isEnabled()) {
+      return true; // Allow write operation
+    }
+
+    // Block the write operation and log it
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      ip: req.ip || req.socket.remoteAddress || 'unknown',
+      user: (req as any).user?.id || 'anonymous',
+      email: (req as any).user?.email || 'unknown',
+      endpoint: req.originalUrl,
+      method: req.method,
+      action: `${req.method} ${entityType}`,
+      entityType,
+      blocked: true,
+      reason: 'CPT writes are disabled for dropshipping domain (SSOT Entity migration active)'
+    };
+
+    console.log('[CPT_WRITE_BLOCKED]', JSON.stringify(logEntry, null, 2));
+
+    res.status(403).json({
+      success: false,
+      error: 'CPT_WRITES_DISABLED',
+      message: `Write operations to ${entityType} CPT are currently disabled. Please use Entity API endpoints instead.`,
+      alternatives: {
+        products: 'POST /api/v1/entity/products',
+        suppliers: 'POST /api/v1/entity/suppliers',
+        partners: 'POST /api/v1/entity/partners'
+      },
+      documentation: 'https://docs.example.com/entity-api',
+      reason: 'The platform has migrated to Entity-based SSOT. CPT is now read-only.'
+    });
+
+    return false; // Block write operation
+  }
+}
+
 export class DropshippingCPTController {
   // Get all products with ACF fields
   async getProducts(req: Request, res: Response) {
@@ -71,6 +118,11 @@ export class DropshippingCPTController {
 
   // Create a new product
   async createProduct(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_product')) {
+      return;
+    }
+
     try {
       const { title, content, excerpt, acf } = req.body;
       const userId = (req as any).user?.id;
@@ -151,6 +203,11 @@ export class DropshippingCPTController {
 
   // Update a product
   async updateProduct(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_product')) {
+      return;
+    }
+
     try {
       const { id } = req.params;
       const { title, content, excerpt, acf } = req.body;
@@ -235,6 +292,11 @@ export class DropshippingCPTController {
 
   // Delete a product
   async deleteProduct(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_product')) {
+      return;
+    }
+
     try {
       const { id } = req.params;
 
@@ -333,6 +395,11 @@ export class DropshippingCPTController {
 
   // Create a new partner
   async createPartner(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_partner')) {
+      return;
+    }
+
     try {
       const { title, content, acf } = req.body;
       const userId = (req as any).user?.id;
@@ -415,6 +482,11 @@ export class DropshippingCPTController {
 
   // Update a partner
   async updatePartner(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_partner')) {
+      return;
+    }
+
     try {
       const { id } = req.params;
       const { title, content, acf } = req.body;
@@ -519,6 +591,11 @@ export class DropshippingCPTController {
 
   // Create a new supplier
   async createSupplier(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_supplier')) {
+      return;
+    }
+
     try {
       const { title, content, acf } = req.body;
       const userId = (req as any).user?.id;
@@ -595,6 +672,11 @@ export class DropshippingCPTController {
 
   // Update a supplier
   async updateSupplier(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_supplier')) {
+      return;
+    }
+
     try {
       const { id } = req.params;
       const { title, content, acf } = req.body;
@@ -673,6 +755,11 @@ export class DropshippingCPTController {
 
   // Delete a supplier
   async deleteSupplier(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_supplier')) {
+      return;
+    }
+
     try {
       const { id } = req.params;
 
@@ -713,6 +800,11 @@ export class DropshippingCPTController {
 
   // Delete a partner
   async deletePartner(req: Request, res: Response) {
+    // Guard: Block CPT write operations
+    if (!CPTWriteGuard.check(req, res, 'ds_partner')) {
+      return;
+    }
+
     try {
       const { id } = req.params;
 
