@@ -16,10 +16,13 @@ export {
   DefaultShortcodeRegistry,
   globalRegistry,
   registerShortcode,
+  registerLazyShortcode,
   unregisterShortcode,
   getShortcode,
   hasShortcode as hasShortcodeRegistered
 } from './registry.js';
+
+export type { LazyShortcodeDefinition } from './registry.js';
 
 // 렌더러 export
 export { DefaultShortcodeRenderer, useShortcodes } from './renderer.js';

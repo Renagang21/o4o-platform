@@ -11,27 +11,58 @@ import { initializeIframeContext } from './utils/iframe-context';
 import App from './App';
 
 // Shortcode 등록
-import { registerShortcode, globalRegistry } from '@o4o/shortcodes';
-// import { productShortcodes } from './components/shortcodes/productShortcodes'; // TODO: useProducts hook 필요
-import { formShortcodes } from './components/shortcodes/formShortcodes';
-import { authShortcodes } from './components/shortcodes/authShortcodes';
-import { dropshippingShortcodes } from './components/shortcodes/dropshippingShortcodes';
+import { registerLazyShortcode, globalRegistry } from '@o4o/shortcodes';
 
 // React 시작 전에 iframe 컨텍스트 초기화
 initializeIframeContext();
 
-// React 시작 전에 모든 shortcode 등록
-console.log('[Shortcode Registry] Starting shortcode registration...');
+// React 시작 전에 모든 shortcode 등록 (Lazy Loading 사용)
+console.log('[Shortcode Registry] Starting lazy shortcode registration...');
 
-// productShortcodes.forEach(def => registerShortcode(def)); // TODO: 의존성 해결 후 활성화
-formShortcodes.forEach(def => registerShortcode(def));
-console.log(`[Shortcode Registry] ✓ Registered ${formShortcodes.length} form shortcodes`);
+// Form shortcodes - 3개
+const formShortcodeNames = ['contact_form', 'newsletter_form', 'custom_form'];
+formShortcodeNames.forEach(name => {
+  registerLazyShortcode({
+    name,
+    loader: () => import('./components/shortcodes/formShortcodes').then(m => ({
+      default: m.formShortcodes.find(s => s.name === name)?.component || (() => null)
+    }))
+  });
+});
+console.log(`[Shortcode Registry] ✓ Registered ${formShortcodeNames.length} form shortcodes (lazy)`);
 
-authShortcodes.forEach(def => registerShortcode(def));
-console.log(`[Shortcode Registry] ✓ Registered ${authShortcodes.length} auth shortcodes`);
+// Auth shortcodes - 2개
+const authShortcodeNames = ['login_form', 'register_form'];
+authShortcodeNames.forEach(name => {
+  registerLazyShortcode({
+    name,
+    loader: () => import('./components/shortcodes/authShortcodes').then(m => ({
+      default: m.authShortcodes.find(s => s.name === name)?.component || (() => null)
+    }))
+  });
+});
+console.log(`[Shortcode Registry] ✓ Registered ${authShortcodeNames.length} auth shortcodes (lazy)`);
 
-dropshippingShortcodes.forEach(def => registerShortcode(def));
-console.log(`[Shortcode Registry] ✓ Registered ${dropshippingShortcodes.length} dropshipping shortcodes`);
+// Dropshipping shortcodes - 29개
+const dropshippingShortcodeNames = [
+  'partner_dashboard', 'partner_products', 'partner_commissions', 'partner_link_generator',
+  'partner_commission_dashboard', 'partner_payout_requests', 'partner_performance_chart',
+  'partner_link_stats', 'partner_marketing_materials', 'partner_referral_tree',
+  'partner_quick_stats', 'partner_leaderboard', 'partner_tier_progress',
+  'supplier_dashboard', 'supplier_products', 'supplier_product_editor', 'supplier_analytics',
+  'supplier_approval_queue', 'seller_dashboard', 'seller_products', 'seller_settlement',
+  'seller_analytics', 'seller_pricing_manager', 'affiliate_dashboard',
+  'user_dashboard', 'role_verification', 'profile_manager', 'role_switcher'
+];
+dropshippingShortcodeNames.forEach(name => {
+  registerLazyShortcode({
+    name,
+    loader: () => import('./components/shortcodes/dropshippingShortcodes').then(m => ({
+      default: m.dropshippingShortcodes.find(s => s.name === name)?.component || (() => null)
+    }))
+  });
+});
+console.log(`[Shortcode Registry] ✓ Registered ${dropshippingShortcodeNames.length} dropshipping shortcodes (lazy)`);
 
 // Debug: Expose globalRegistry to window
 (window as any).__shortcodeRegistry = globalRegistry;

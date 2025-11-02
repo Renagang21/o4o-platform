@@ -1,14 +1,25 @@
 import { ShortcodeRegistry, ShortcodeDefinition } from './types.js';
+import { ComponentType, lazy } from 'react';
+
+/**
+ * Lazy shortcode definition with component loader
+ */
+export interface LazyShortcodeDefinition extends Omit<ShortcodeDefinition, 'component'> {
+  loader: () => Promise<{ default: ComponentType<any> }>;
+}
 
 /**
  * 숏코드 레지스트리 구현
  * 숏코드 정의를 저장하고 관리합니다.
+ * Lazy loading 지원
  */
 export class DefaultShortcodeRegistry implements ShortcodeRegistry {
   private shortcodes: Map<string, ShortcodeDefinition>;
+  private lazyLoaders: Map<string, () => Promise<{ default: ComponentType<any> }>>;
 
   constructor() {
     this.shortcodes = new Map();
+    this.lazyLoaders = new Map();
   }
 
   /**
@@ -50,6 +61,26 @@ export class DefaultShortcodeRegistry implements ShortcodeRegistry {
   }
 
   /**
+   * Lazy 숏코드 등록
+   * 컴포넌트를 사용 시점에 로드
+   */
+  registerLazy(definition: LazyShortcodeDefinition): void {
+    const { name, loader, ...rest } = definition;
+
+    // Store the loader
+    this.lazyLoaders.set(name, loader);
+
+    // Register with a lazy-loaded component
+    const LazyComponent = lazy(loader);
+
+    this.register({
+      ...rest,
+      name,
+      component: LazyComponent
+    });
+  }
+
+  /**
    * 숏코드 조회
    */
   get(name: string): ShortcodeDefinition | undefined {
@@ -84,6 +115,10 @@ export const globalRegistry = new DefaultShortcodeRegistry();
 // 헬퍼 함수들
 export const registerShortcode = (definition: ShortcodeDefinition): void => {
   globalRegistry.register(definition);
+};
+
+export const registerLazyShortcode = (definition: LazyShortcodeDefinition): void => {
+  globalRegistry.registerLazy(definition);
 };
 
 export const unregisterShortcode = (name: string): void => {
