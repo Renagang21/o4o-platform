@@ -17,8 +17,6 @@ import { registerLazyShortcode, globalRegistry } from '@o4o/shortcodes';
 initializeIframeContext();
 
 // React 시작 전에 모든 shortcode 등록 (Lazy Loading 사용)
-console.log('[Shortcode Registry] Starting lazy shortcode registration...');
-
 // Form shortcodes - 3개
 const formShortcodeNames = ['contact_form', 'newsletter_form', 'custom_form'];
 formShortcodeNames.forEach(name => {
@@ -29,7 +27,6 @@ formShortcodeNames.forEach(name => {
     }))
   });
 });
-console.log(`[Shortcode Registry] ✓ Registered ${formShortcodeNames.length} form shortcodes (lazy)`);
 
 // Auth shortcodes - 2개
 const authShortcodeNames = ['login_form', 'register_form'];
@@ -41,7 +38,6 @@ authShortcodeNames.forEach(name => {
     }))
   });
 });
-console.log(`[Shortcode Registry] ✓ Registered ${authShortcodeNames.length} auth shortcodes (lazy)`);
 
 // Dropshipping shortcodes - 29개
 const dropshippingShortcodeNames = [
@@ -62,18 +58,11 @@ dropshippingShortcodeNames.forEach(name => {
     }))
   });
 });
-console.log(`[Shortcode Registry] ✓ Registered ${dropshippingShortcodeNames.length} dropshipping shortcodes (lazy)`);
 
-// Debug: Expose globalRegistry to window
-(window as any).__shortcodeRegistry = globalRegistry;
-
-// Verify critical shortcodes
-const totalRegistered = globalRegistry.getAll().size;
-console.log(`[Shortcode Registry] Total registered: ${totalRegistered} shortcodes`);
-console.log('[Shortcode Registry] Checking critical shortcodes:');
-console.log('  - partner_dashboard:', globalRegistry.has('partner_dashboard') ? '✓' : '✗ MISSING');
-console.log('  - supplier_dashboard:', globalRegistry.has('supplier_dashboard') ? '✓' : '✗ MISSING');
-console.log('  - login_form:', globalRegistry.has('login_form') ? '✓' : '✗ MISSING');
+// Debug: Expose globalRegistry to window (development only)
+if (import.meta.env.DEV) {
+  (window as any).__shortcodeRegistry = globalRegistry;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
