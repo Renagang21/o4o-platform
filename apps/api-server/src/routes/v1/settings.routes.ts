@@ -6,6 +6,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { Settings, ReadingSettings, PermalinkSettings } from '../../entities/Settings.js';
 import { Post } from '../../entities/Post.js';
 import { permalinkService } from '../../services/permalink.service.js';
+import { settingsService } from '../../services/settingsService.js';
 import { generateGlobalCSS } from '../../utils/customizer/css-generator.js';
 
 const router: Router = Router();
@@ -1008,78 +1009,43 @@ async function updateCustomizerSettings(req: Request, res: Response) {
 
     const customizerSettings = newSettings.settings || newSettings;
 
-    // Save to database
-    const settingsRepository = AppDataSource.getRepository(Settings);
+    // Add version and timestamp metadata
+    const currentSettings = await settingsService.getSettings('customizer') as any;
+    const currentVersion = currentSettings?._version || 0;
+    const settingsWithMetadata = {
+      ...customizerSettings,
+      _version: currentVersion + 1,
+      _updatedAt: new Date().toISOString()
+    };
 
-    try {
-      let dbSettings = await settingsRepository.findOne({
-        where: { key: 'customizer', type: 'customizer' }
-      });
+    // ✅ Use SettingsService - this automatically syncs template parts!
+    const result = await settingsService.updateSettings('customizer', settingsWithMetadata);
 
-      if (dbSettings) {
-        // Direct replacement instead of merge to avoid [object Object] issues
-        // Add version for cache invalidation
-        const currentVersion = (dbSettings.value as any)?._version || 0;
-        dbSettings.value = {
-          ...customizerSettings,
-          _version: currentVersion + 1,
-          _updatedAt: new Date().toISOString()
-        };
-        dbSettings.updatedAt = new Date();
-      } else {
-        dbSettings = settingsRepository.create({
-          key: 'customizer',
-          type: 'customizer',
-          value: {
-            ...customizerSettings,
-            _version: 1,
-            _updatedAt: new Date().toISOString()
-          },
-          description: 'Website customizer settings (logo, colors, typography, layout)'
-        });
-      }
+    logger.info('Customizer settings and template parts saved successfully:', {
+      actor,
+      timestamp: new Date().toISOString()
+    });
 
-      await settingsRepository.save(dbSettings);
+    // Also update memory store for backward compatibility
+    settingsStore.set('customizer', customizerSettings);
 
-      logger.info('Customizer settings saved to database:', {
-        actor,
-        settings: dbSettings.value,
-        timestamp: new Date().toISOString()
-      });
-
-      // Also update memory store for backward compatibility
-      settingsStore.set('customizer', customizerSettings);
-
-      res.json({
-        success: true,
-        data: dbSettings.value,
-        message: 'Customizer settings updated successfully'
-      });
-
-    } catch (dbError) {
-      logger.error('Database save failed for customizer settings:', {
-        actor,
-        error: dbError instanceof Error ? dbError.message : 'Unknown DB error'
-      });
-
-      // Fallback to memory store
-      settingsStore.set('customizer', customizerSettings);
-
-      res.status(500).json({
-        success: false,
-        error: 'Database save failed, settings saved temporarily'
-      });
-    }
+    res.json({
+      success: true,
+      data: result,
+      message: 'Customizer settings and template parts updated successfully'
+    });
 
   } catch (error) {
     logger.error('Customizer settings update failed:', {
       error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString()
     });
 
     res.status(500).json({
       success: false,
-      error: 'Failed to update customizer settings'
+      error: 'Failed to update customizer settings',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 }
