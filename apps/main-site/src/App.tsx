@@ -22,6 +22,7 @@ import BlogArchivePage from './pages/BlogArchive';
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { GlobalStyleInjector } from './components/GlobalStyleInjector';
 
 // Lazy load admin pages
 import { lazy, Suspense } from 'react';
@@ -53,6 +54,7 @@ const App: FC = () => {
 
   return (
     <ErrorBoundary>
+      <GlobalStyleInjector />
       <Router>
         <Routes>
           {/* Public Routes */}

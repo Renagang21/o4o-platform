@@ -89,7 +89,7 @@ const DEFAULT_CONTAINER_SETTINGS: ContainerSettings = {
 };
 
 const STORAGE_KEY = 'customizer-settings-cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 30 * 1000; // 30 seconds
 
 // Breakpoints matching Tailwind defaults
 const BREAKPOINTS = {
