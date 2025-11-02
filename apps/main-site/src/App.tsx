@@ -24,9 +24,8 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { GlobalStyleInjector } from './components/GlobalStyleInjector';
 
-// Lazy load admin pages
+// Lazy load pages
 import { lazy, Suspense } from 'react';
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const PageEditor = lazy(() => import('./pages/PageEditor'));
 const PageViewer = lazy(() => import('./pages/PageViewer'));
 const PublicPage = lazy(() => import('./pages/PublicPage'));
@@ -113,15 +112,6 @@ const App: FC = () => {
             <Layout>
               <ResetPassword />
             </Layout>
-          } />
-          
-          {/* Protected Admin Routes */}
-          <Route path="/admin/*" element={
-            <PrivateRoute>
-              <Suspense fallback={<PageLoader />}>
-                <AdminDashboard />
-              </Suspense>
-            </PrivateRoute>
           } />
           
           {/* Editor Routes (Protected) */}
