@@ -68,7 +68,7 @@ export const BreadcrumbStylingSettings: React.FC<BreadcrumbStylingSettingsProps>
         <h4 className="font-medium mb-4">Typography</h4>
 
         {/* Device Switcher */}
-        <DeviceSwitcher device={device} setDevice={setDevice} />
+        <DeviceSwitcher value={device} onChange={setDevice} />
 
         <div className="space-y-4 mt-4">
           <div>
