@@ -94,6 +94,9 @@ import presetRoutes from '../modules/cpt-acf/routes/preset.routes.js';
 // V2 API Routes
 import queryV2Routes from '../routes/v2/query.routes.js';
 
+// Entity API Routes (SSOT for dropshipping)
+import entityRoutes from '../routes/entity/dropshipping-entity.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -259,6 +262,9 @@ export function setupRoutes(app: Application): void {
 
   // V2 API - Advanced Query System
   app.use('/api/v2', standardLimiter, queryV2Routes);
+
+  // Entity API - SSOT for Dropshipping (Supplier, Partner)
+  app.use('/api/v1/entity', standardLimiter, entityRoutes);
 
   // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);

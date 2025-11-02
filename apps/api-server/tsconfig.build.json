@@ -7,7 +7,8 @@
     "composite": false,
     "skipLibCheck": true,
     "strict": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["node"]
   },
   "exclude": [
     "node_modules",
@@ -18,6 +19,7 @@
     "src/loaders/**/*",
     "src/routes/v2/data.routes.ts",
     "src/services/AdvancedQueryService.ts",
-    "src/services/QueryComplexityAnalyzer.ts"
+    "src/services/QueryComplexityAnalyzer.ts",
+    "src/modules/cpt-acf/**/*"
   ]
 }
