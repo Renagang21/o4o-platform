@@ -60,13 +60,15 @@ router.get('/area/:area/active', async (req: Request, res: Response) => {
     const templatePartRepository = AppDataSource.getRepository(TemplatePart)
 
     // Get all active template parts for the area
+    // Sort by priority (lower is higher priority), then by updatedAt (recent first)
     let templateParts = await templatePartRepository.find({
       where: {
         area: area as any,
         isActive: true
       },
       order: {
-        priority: 'ASC'
+        priority: 'ASC',
+        updatedAt: 'DESC'
       }
     })
 
