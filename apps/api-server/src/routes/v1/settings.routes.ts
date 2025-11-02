@@ -6,6 +6,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { Settings, ReadingSettings, PermalinkSettings } from '../../entities/Settings.js';
 import { Post } from '../../entities/Post.js';
 import { permalinkService } from '../../services/permalink.service.js';
+import { generateGlobalCSS } from '../../utils/customizer/css-generator.js';
 
 const router: Router = Router();
 
@@ -414,6 +415,40 @@ router.get('/customizer',
     }
   }
 );
+
+/**
+ * @route   GET /api/v1/settings/customizer/global-css
+ * @desc    Get generated global CSS from customizer settings
+ * @access  Public
+ */
+router.get('/customizer/global-css', async (req: Request, res: Response) => {
+  try {
+    // Get customizer settings from database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    const dbSettings = await settingsRepository.findOne({
+      where: { key: 'customizer', type: 'customizer' }
+    });
+
+    let css = '';
+    if (dbSettings && dbSettings.value) {
+      // Generate CSS from settings
+      css = generateGlobalCSS(dbSettings.value);
+    } else {
+      // Return empty CSS if no settings found
+      css = '/* No customizer settings found */';
+    }
+
+    // Set proper headers for CSS
+    res.set('Content-Type', 'text/css; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=30'); // 30 seconds cache
+    res.set('X-Generated-At', new Date().toISOString());
+
+    res.send(css);
+  } catch (error) {
+    logger.error('Failed to generate global CSS:', error);
+    res.status(500).set('Content-Type', 'text/css').send('/* Error generating CSS */');
+  }
+});
 
 /**
  * @route   GET /api/v1/settings/permalink
