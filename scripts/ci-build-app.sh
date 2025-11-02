@@ -29,9 +29,9 @@ else
     exit 1
 fi
 
-echo "🔗 Re-linking workspace dependencies..."
-pnpm install --prefer-offline --ignore-scripts
-echo "✅ Workspace re-linked"
+echo "🔗 Re-installing workspace dependencies to pick up updated package.json..."
+pnpm install --no-frozen-lockfile
+echo "✅ Workspace dependencies updated"
 echo ""
 
 # Function to build specific app
