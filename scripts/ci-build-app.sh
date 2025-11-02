@@ -28,6 +28,10 @@ else
     ls -la packages/shortcodes/
     exit 1
 fi
+
+echo "🔗 Re-linking workspace dependencies..."
+pnpm install --prefer-offline --ignore-scripts
+echo "✅ Workspace re-linked"
 echo ""
 
 # Function to build specific app
