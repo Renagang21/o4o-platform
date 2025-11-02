@@ -28,6 +28,12 @@ jobs:
       with:
         node-version: '22.18.0'
 
+    - name: Build dependencies
+      run: |
+        echo "🔨 Building package dependencies..."
+        pnpm --filter=@o4o/shortcodes run build
+        pnpm --filter=@o4o/block-renderer run build
+
     - name: Build main site
       run: |
         echo "🔨 Building main site..."
