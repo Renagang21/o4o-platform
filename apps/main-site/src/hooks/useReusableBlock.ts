@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { transformWordPressBlocks } from '../utils/wordpress-block-parser';
+import { authClient } from '@o4o/auth-client';
 
 interface ReusableBlock {
   id: string;
@@ -22,26 +23,21 @@ export function useReusableBlock(blockId?: string) {
       try {
         setLoading(true);
         setError(null);
-        
-        const response = await fetch(`/api/wp/v2/blocks/${blockId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch reusable block');
-        }
-        
-        const data = await response.json();
-        
+
+        const response = await authClient.api.get(`/wp/v2/blocks/${blockId}`);
+
         // Transform WordPress blocks to our format
         const transformedContent = transformWordPressBlocks(
-          typeof data.content === 'string' ? JSON.parse(data.content) : data.content
+          typeof response.data.content === 'string' ? JSON.parse(response.data.content) : response.data.content
         );
-        
+
         setReusableBlock({
-          id: data.id,
-          title: data.title?.rendered || '',
+          id: response.data.id,
+          title: response.data.title?.rendered || '',
           content: transformedContent,
         });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+      } catch (err: any) {
+        setError(err.response?.data?.message || err.message || 'Unknown error');
       } finally {
         setLoading(false);
       }

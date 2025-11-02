@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { MobileHeaderSettings } from '@/pages/appearance/astra-customizer/types/customizer-types';
+import { authClient } from '@o4o/auth-client';
 
 // Default mobile header settings
 const defaultSettings: MobileHeaderSettings = {
@@ -36,25 +37,19 @@ export const useMobileHeaderSettings = () => {
     const fetchSettings = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch from API
-        const response = await fetch('/api/customizer/mobile-header-settings');
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch mobile header settings');
-        }
-        
-        const data = await response.json();
-        
+        const response = await authClient.api.get('/customizer/mobile-header-settings');
+
         // Merge with defaults to ensure all properties exist
         setSettings({
           ...defaultSettings,
-          ...data
+          ...response.data
         });
-      } catch (err) {
+      } catch (err: any) {
         // Silently use default settings if API endpoint doesn't exist yet
         // console.log('Using default mobile header settings');
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err.response?.data?.message || err.message || 'Unknown error');
         // Use default settings on error
         setSettings(defaultSettings);
       } finally {

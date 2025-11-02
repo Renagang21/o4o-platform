@@ -1,5 +1,5 @@
 import { OAuthProvidersResponse } from '../types/auth';
-import { API_BASE_URL } from '../config/api';
+import { authClient } from '@o4o/auth-client';
 
 export const authProviderService = {
   /**
@@ -7,18 +7,8 @@ export const authProviderService = {
    */
   async getEnabledProviders(): Promise<OAuthProvidersResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/v1/settings/oauth/providers`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch OAuth providers');
-      }
-
-      return await response.json();
+      const response = await authClient.api.get('/v1/settings/oauth/providers');
+      return response.data;
     } catch (error) {
       // Return default disabled state if API fails
       return {

@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../config/api';
+import { authClient } from '@o4o/auth-client';
 
 export type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 
@@ -156,18 +156,12 @@ export const useCustomizerSettings = () => {
         }
 
         // Fetch from API
-        const response = await fetch(`${API_BASE_URL}/settings/customizer`);
+        const response = await authClient.api.get('/settings/customizer');
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success && result.data) {
+        if (response.data.success && response.data.data) {
           // API returns full customizer settings
           // Extract version for cache invalidation
-          const apiData = result.data;
+          const apiData = response.data.data;
           const apiVersion = (apiData as any)?._version;
 
           // Check if version changed

@@ -1,10 +1,10 @@
 // 🛠️ Custom Post Type 관리자 페이지
 
 import { useState, useEffect, FC } from 'react';
-import { 
-  Plus, 
-  Edit3, 
-  Trash2, 
+import {
+  Plus,
+  Edit3,
+  Trash2,
   Database,
   Settings,
   Eye,
@@ -19,6 +19,7 @@ import {
   Link,
   CheckSquare
 } from 'lucide-react';
+import { authClient } from '@o4o/auth-client';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 interface FieldSchema {
@@ -85,18 +86,10 @@ const CPTManager: FC = () => {
 
   const loadCPTs = async () => {
     try {
-      const response = await fetch('/api/cpt/types', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setCPTs(data.data || []);
-      }
+      const response = await authClient.api.get('/cpt/types');
+      setCPTs(response.data.data || []);
     } catch (error: any) {
-    // Error logging - use proper error handler
+      // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -104,27 +97,15 @@ const CPTManager: FC = () => {
 
   const createCPT = async () => {
     try {
-      const response = await fetch('/api/cpt/types', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(newCPT)
-      });
-
-      if (response.ok) {
-        await loadCPTs();
-        resetForm();
-        setActiveTab('list');
-        alert('✅ CPT가 성공적으로 생성되었습니다!');
-      } else {
-        const error = await response.json();
-        alert(`❌ 생성 실패: ${error.message}`);
-      }
+      await authClient.api.post('/cpt/types', newCPT);
+      await loadCPTs();
+      resetForm();
+      setActiveTab('list');
+      alert('✅ CPT가 성공적으로 생성되었습니다!');
     } catch (error: any) {
-    // Error logging - use proper error handler
-      alert('❌ CPT 생성 중 오류가 발생했습니다.');
+      // Error logging - use proper error handler
+      const message = error.response?.data?.message || 'CPT 생성 중 오류가 발생했습니다.';
+      alert(`❌ 생성 실패: ${message}`);
     }
   };
 
@@ -132,19 +113,11 @@ const CPTManager: FC = () => {
     if (!confirm('정말로 이 CPT를 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/cpt/types/${slug}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.ok) {
-        await loadCPTs();
-        alert('✅ CPT가 삭제되었습니다.');
-      }
+      await authClient.api.delete(`/cpt/types/${slug}`);
+      await loadCPTs();
+      alert('✅ CPT가 삭제되었습니다.');
     } catch (error: any) {
-    // Error logging - use proper error handler
+      // Error logging - use proper error handler
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };

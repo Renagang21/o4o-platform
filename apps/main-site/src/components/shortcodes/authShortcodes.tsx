@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Loader2 } from 'lucide-react';
 import { ShortcodeDefinition } from '@o4o/shortcodes';
-import { API_BASE_URL } from '../../config/api';
+import { authClient } from '@o4o/auth-client';
 
 interface OAuthProvider {
   enabled: boolean;
@@ -74,11 +74,10 @@ export const SocialLoginComponent: React.FC<{
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/v1/settings/oauth`);
-        const data = await response.json();
-        
-        if (data.success) {
-          setOauthProviders(data.data);
+        const response = await authClient.api.get('/v1/settings/oauth');
+
+        if (response.data.success) {
+          setOauthProviders(response.data.data);
         }
       } catch (error) {
         console.error('Failed to fetch OAuth providers:', error);
@@ -105,32 +104,24 @@ export const SocialLoginComponent: React.FC<{
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      });
+      const response = await authClient.api.post('/v1/auth/login', formData);
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.data.success) {
         // Redirect on success
         window.location.href = redirectUrl;
       } else {
-        setError(data.message || '로그인에 실패했습니다.');
+        setError(response.data.message || '로그인에 실패했습니다.');
       }
     } catch (err: any) {
-      setError(err.message || '로그인에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSocialLogin = (provider: 'google' | 'kakao' | 'naver') => {
-    window.location.href = `${API_BASE_URL}/v1/auth/${provider}`;
+    const baseUrl = authClient.api.defaults.baseURL || '';
+    window.location.href = `${baseUrl}/v1/auth/${provider}`;
   };
 
   const renderSocialIcon = (provider: string) => {

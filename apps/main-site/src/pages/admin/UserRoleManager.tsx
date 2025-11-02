@@ -2,6 +2,7 @@ import { useState, useMemo, FC } from 'react';
 import { useUserRoleManager, UserRole } from './UserRoleManagerContext';
 import toast from 'react-hot-toast';
 import { logRoleChange } from '../../utils/logRoleChange';
+import { authClient } from '@o4o/auth-client';
 
 const roleLabels: Record<UserRole, string> = {
   user: '방문자',
@@ -49,12 +50,7 @@ const UserRoleManager: FC = () => {
     if (pendingRoles[id]) {
       try {
         // 서버에 PUT 요청
-        const res = await fetch(`/api/users/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roles: pendingRoles[id] }),
-        });
-        if (!res.ok) throw new Error('서버 저장 실패');
+        await authClient.api.put(`/users/${id}`, { roles: pendingRoles[id] });
         // 역할 변경 이력 기록
         await logRoleChange(adminId, id, pendingRoles[id]);
         changeRoles(id, pendingRoles[id]);
@@ -65,7 +61,7 @@ const UserRoleManager: FC = () => {
           return copy;
         });
       } catch (e: any) {
-        toast.error('서버 저장에 실패했습니다.');
+        toast.error(e.response?.data?.message || '서버 저장에 실패했습니다.');
       }
     }
   };

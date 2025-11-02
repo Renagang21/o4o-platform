@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { authClient } from '@o4o/auth-client';
 
 interface StickyHeaderSettings {
   enabled: boolean;
@@ -50,15 +51,12 @@ export const useStickyHeaderSettings = () => {
     const fetchSettings = async () => {
       try {
         // Try to get settings from API
-        const response = await fetch('/api/customizer/settings/header/sticky');
-        
-        if (response.ok) {
-          const data = await response.json();
-          setSettings({
-            ...defaultSettings,
-            ...data
-          });
-        }
+        const response = await authClient.api.get('/customizer/settings/header/sticky');
+
+        setSettings({
+          ...defaultSettings,
+          ...response.data
+        });
       } catch (error) {
         // console.log('Using default sticky header settings');
       } finally {
