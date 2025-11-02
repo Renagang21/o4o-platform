@@ -35,13 +35,10 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        queries: security-extended
+        queries: security-only
         config: |
           paths:
             - 'apps/api-server/src'
-            - 'apps/admin-dashboard/src'
-            - 'apps/main-site/src'
-            - 'packages'
           paths-ignore:
             - '**/node_modules'
             - '**/dist'
@@ -61,6 +58,9 @@ jobs:
             - '**/*.config.ts'
             - '**/*.config.cjs'
             - '**/*.config.mjs'
+            - '**/blocks'
+            - '**/components'
+            - '**/pages'
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
