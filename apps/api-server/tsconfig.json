@@ -28,7 +28,8 @@
     "strictPropertyInitialization": false,
     "composite": true,
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "typeRoots": [
       "node_modules/@types"
@@ -43,7 +44,6 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.test.ts"
+    "dist"
   ]
 }

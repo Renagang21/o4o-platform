@@ -9,7 +9,7 @@
     "build": "tsup",
     "build:js": "tsup --no-dts",
     "dev": "tsup --watch",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
