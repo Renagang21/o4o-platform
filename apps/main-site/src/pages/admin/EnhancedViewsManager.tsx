@@ -1,204 +1,9 @@
 import { useState, useEffect, FC } from 'react';
-import { 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  Save,
-  X,
-  Eye,
-  Code,
-  Settings,
-  Filter,
-  SortAsc,
-  List,
-  Grid,
-  Calendar,
-  Hash,
-  Type,
-  CheckSquare,
-  Play,
-  Copy,
-  Database,
-  Search,
-  Layers,
-  BarChart3,
-  PieChart,
-  LineChart,
-  Table2,
-  Download,
-  RefreshCw,
-  Clock,
-  Zap,
-  Shield,
-  Globe
-} from 'lucide-react';
+import { Eye, Plus, Play } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
-
-// Enhanced query builder types
-interface AdvancedQueryFilter {
-  id: string;
-  groupId?: string;
-  field: string;
-  operator: string;
-  value: unknown;
-  dataType?: 'string' | 'number' | 'date' | 'boolean' | 'array';
-  customFunction?: string;
-}
-
-interface FilterGroup {
-  id: string;
-  type: 'AND' | 'OR';
-  filters: AdvancedQueryFilter[];
-  groups?: FilterGroup[];
-}
-
-interface QueryJoin {
-  type: 'INNER' | 'LEFT' | 'RIGHT';
-  table: string;
-  on: {
-    leftField: string;
-    operator: string;
-    rightField: string;
-  };
-  alias?: string;
-}
-
-interface QueryAggregate {
-  field: string;
-  function: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'GROUP_CONCAT';
-  alias: string;
-  distinct?: boolean;
-}
-
-interface QueryGroupBy {
-  field: string;
-  having?: {
-    aggregate: string;
-    operator: string;
-    value: unknown;
-  };
-}
-
-interface EnhancedViewQuery {
-  source: {
-    type: 'single' | 'multiple' | 'custom';
-    tables: string[];
-    joins?: QueryJoin[];
-  };
-  select: {
-    fields: string[];
-    aggregates?: QueryAggregate[];
-    expressions?: { expression: string; alias: string }[];
-  };
-  where: FilterGroup;
-  groupBy?: QueryGroupBy[];
-  orderBy: {
-    field: string;
-    direction: 'ASC' | 'DESC';
-    nulls?: 'FIRST' | 'LAST';
-  }[];
-  limit?: {
-    offset: number;
-    count: number;
-  };
-  distinct?: boolean;
-}
-
-interface ViewVisualization {
-  type: 'table' | 'list' | 'grid' | 'chart' | 'map' | 'calendar' | 'kanban';
-  chartType?: 'bar' | 'line' | 'pie' | 'donut' | 'area' | 'scatter' | 'heatmap';
-  chartConfig?: {
-    xAxis: string;
-    yAxis: string;
-    series?: string[];
-    stacked?: boolean;
-    colors?: string[];
-  };
-  mapConfig?: {
-    latField: string;
-    lngField: string;
-    markerField?: string;
-    infoFields?: string[];
-  };
-  calendarConfig?: {
-    dateField: string;
-    titleField: string;
-    colorField?: string;
-  };
-  kanbanConfig?: {
-    columnField: string;
-    cardFields: string[];
-    swimlaneField?: string;
-  };
-}
-
-interface ViewInteraction {
-  enableSearch?: boolean;
-  searchFields?: string[];
-  enableFilters?: boolean;
-  filterFields?: string[];
-  enableSort?: boolean;
-  sortFields?: string[];
-  enableExport?: boolean;
-  exportFormats?: ('csv' | 'excel' | 'json' | 'pdf')[];
-  enablePagination?: boolean;
-  pageSize?: number;
-  enableInlineEdit?: boolean;
-  editableFields?: string[];
-  actions?: {
-    type: 'link' | 'modal' | 'function';
-    label: string;
-    icon?: string;
-    handler?: string;
-  }[];
-}
-
-interface ViewCache {
-  enabled: boolean;
-  duration: number; // minutes
-  invalidateOn?: ('create' | 'update' | 'delete')[];
-  customKey?: string;
-}
-
-interface ViewSecurity {
-  public: boolean;
-  roles?: string[];
-  capabilities?: string[];
-  rowLevelSecurity?: {
-    field: string;
-    operator: string;
-    value: string; // Can use {user.id}, {user.role}, etc.
-  }[];
-}
-
-interface EnhancedView {
-  id: string;
-  name: string;
-  title: string;
-  description?: string;
-  query: EnhancedViewQuery;
-  visualization: ViewVisualization;
-  interaction: ViewInteraction;
-  cache: ViewCache;
-  security: ViewSecurity;
-  styling?: {
-    customCSS?: string;
-    theme?: 'default' | 'minimal' | 'modern' | 'dark';
-    responsive?: boolean;
-  };
-  schedule?: {
-    enabled: boolean;
-    cron: string;
-    export?: {
-      format: 'csv' | 'pdf' | 'excel';
-      recipients: string[];
-    };
-  };
-  version: number;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-}
+import { EnhancedViewsList } from '../../components/admin/enhanced-views/EnhancedViewsList';
+import { EnhancedViewCreateForm } from '../../components/admin/enhanced-views/EnhancedViewCreateForm';
+import type { EnhancedView, DataSource, OperatorsByType } from '../../types/enhanced-views';
 
 const EnhancedViewsManager: FC = () => {
   const [views, setViews] = useState<EnhancedView[]>([]);
@@ -208,8 +13,8 @@ const EnhancedViewsManager: FC = () => {
   const [previewData, setPreviewData] = useState<unknown[]>([]);
   const [queryBuilderMode, setQueryBuilderMode] = useState<'visual' | 'sql'>('visual');
 
-  // Available data sources
-  const [dataSources] = useState([
+  // Available data sources (Mock data - would come from API)
+  const [dataSources] = useState<DataSource[]>([
     {
       name: 'posts',
       label: 'Posts',
@@ -315,8 +120,8 @@ const EnhancedViewsManager: FC = () => {
     }
   });
 
-  // Advanced operators by data type
-  const operatorsByType = {
+  // Advanced operators by data type (Mock data - would come from API)
+  const operatorsByType: OperatorsByType = {
     string: [
       { value: 'equals', label: 'Equals' },
       { value: 'not_equals', label: 'Not Equals' },
@@ -497,119 +302,6 @@ const EnhancedViewsManager: FC = () => {
     }
   };
 
-  const generateSQL = (view: Partial<EnhancedView>): string => {
-    if (!view.query) return '';
-    
-    const { source, select, where, groupBy, orderBy, limit, distinct } = view.query;
-    
-    let sql = 'SELECT ';
-    
-    // DISTINCT
-    if (distinct) sql += 'DISTINCT ';
-    
-    // SELECT clause
-    const selectParts = [];
-    if (select.fields?.length) {
-      selectParts.push(...select.fields);
-    }
-    if (select.aggregates?.length) {
-      selectParts.push(...select.aggregates.map(agg =>
-        `${agg.function}(${agg.distinct ? 'DISTINCT ' : ''}${agg.field}) AS ${agg.alias}`
-      ));
-    }
-    if (select.expressions?.length) {
-      selectParts.push(...select.expressions.map(exp =>
-        `${exp.expression} AS ${exp.alias}`
-      ));
-    }
-    sql += selectParts.join(', ');
-    
-    // FROM clause
-    sql += `\nFROM ${source.tables[0]}`;
-    
-    // JOIN clauses
-    if (source.joins?.length) {
-      source.joins.forEach(join => {
-        sql += `\n${join.type} JOIN ${join.table}`;
-        if (join.alias) sql += ` AS ${join.alias}`;
-        sql += ` ON ${join.on.leftField} ${join.on.operator} ${join.on.rightField}`;
-      });
-    }
-    
-    // WHERE clause
-    const whereClause = generateWhereClause(where);
-    if (whereClause) {
-      sql += `\nWHERE ${whereClause}`;
-    }
-    
-    // GROUP BY clause
-    if (groupBy?.length) {
-      sql += `\nGROUP BY ${groupBy.map(g => g.field).join(', ')}`;
-
-      // HAVING clause
-      const havingClauses = groupBy.filter(g => g.having).map(g =>
-        `${g.having!.aggregate} ${g.having!.operator} ${g.having!.value}`
-      );
-      if (havingClauses.length) {
-        sql += `\nHAVING ${havingClauses.join(' AND ')}`;
-      }
-    }
-
-    // ORDER BY clause
-    if (orderBy?.length) {
-      sql += `\nORDER BY ${orderBy.map(o =>
-        `${o.field} ${o.direction}${o.nulls ? ` NULLS ${o.nulls}` : ''}`
-      ).join(', ')}`;
-    }
-    
-    // LIMIT clause
-    if (limit) {
-      sql += `\nLIMIT ${limit.count}`;
-      if (limit.offset) sql += ` OFFSET ${limit.offset}`;
-    }
-    
-    return sql;
-  };
-
-  const generateWhereClause = (group: FilterGroup): string => {
-    const parts: string[] = [];
-    
-    // Process filters
-    if (group.filters?.length) {
-      parts.push(...group.filters.map(filter => {
-        let value = filter.value;
-        if (filter.dataType === 'string' && !['in', 'not_in'].includes(filter.operator)) {
-          value = `'${value}'`;
-        }
-        
-        switch (filter.operator) {
-          case 'contains':
-            return `${filter.field} LIKE '%${filter.value}%'`;
-          case 'starts_with':
-            return `${filter.field} LIKE '${filter.value}%'`;
-          case 'ends_with':
-            return `${filter.field} LIKE '%${filter.value}'`;
-          case 'between':
-            return `${filter.field} BETWEEN ${filter.value[0]} AND ${filter.value[1]}`;
-          case 'in':
-            return `${filter.field} IN (${filter.value.join(', ')})`;
-          case 'is_empty':
-            return `(${filter.field} IS NULL OR ${filter.field} = '')`;
-          case 'is_not_empty':
-            return `(${filter.field} IS NOT NULL AND ${filter.field} != '')`;
-          default:
-            return `${filter.field} ${filter.operator} ${value}`;
-        }
-      }));
-    }
-    
-    // Process nested groups
-    if (group.groups?.length) {
-      parts.push(...group.groups.map(g => `(${generateWhereClause(g)})`));
-    }
-
-    return parts.join(` ${group.type} `);
-  };
 
   const createView = async () => {
     try {
@@ -742,222 +434,30 @@ const EnhancedViewsManager: FC = () => {
       {/* Content */}
       <div className="p-6">
         {activeTab === 'list' && (
-          <div className="space-y-6">
-            {/* Action Bar */}
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Registered Views</h3>
-                <p className="text-sm text-gray-500">Total {views.length} views created</p>
-              </div>
-              <button
-                onClick={() => setActiveTab('create')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                New View
-              </button>
-            </div>
-
-            {views.length === 0 ? (
-              <div className="text-center py-12">
-                <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No views created yet
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Create your first dynamic query view
-                </p>
-                <button
-                  onClick={() => setActiveTab('create')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create View
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {views.map(view => (
-                  <div key={view.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-gray-900 text-lg">{view.title}</h3>
-                          {getVisualizationIcon(view.visualization.type)}
-                        </div>
-                        <p className="text-sm text-gray-500">/{view.name}</p>
-                        {view.description && (
-                          <p className="text-gray-600 text-sm mt-2">{view.description}</p>
-                        )}
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => previewView(view)}
-                          className="p-2 text-gray-400 hover:text-green-600 transition-colors"
-                          title="Preview"
-                        >
-                          <Play className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => copyShortcode(view)}
-                          className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
-                          title="Copy shortcode"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteView(view.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Query Info */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">Source:</span>
-                          <div className="font-medium">{view.query.source.tables.join(', ')}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Type:</span>
-                          <div className="font-medium capitalize">{view.query.source.type}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Fields:</span>
-                          <div className="font-medium">{view.query.select.fields.length}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Cache:</span>
-                          <div className="font-medium">
-                            {view.cache.enabled ? `${view.cache.duration}min` : 'Disabled'}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {view.query.source.joins && view.query.source.joins.length > 0 && (
-                        <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
-                          Joins
-                        </span>
-                      )}
-                      {view.query.select.aggregates && view.query.select.aggregates.length > 0 && (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
-                          Aggregates
-                        </span>
-                      )}
-                      {view.query.groupBy && view.query.groupBy.length > 0 && (
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                          Group By
-                        </span>
-                      )}
-                      {view.security.rowLevelSecurity && view.security.rowLevelSecurity.length > 0 && (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs">
-                          RLS
-                        </span>
-                      )}
-                      {view.schedule?.enabled && (
-                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
-                          Scheduled
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>v{view.version}</span>
-                      <span>Updated {new Date(view.updatedAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <EnhancedViewsList
+            views={views}
+            onCreateClick={() => setActiveTab('create')}
+            onPreview={previewView}
+            onCopyShortcode={copyShortcode}
+            onDelete={deleteView}
+          />
         )}
 
         {activeTab === 'create' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Create New View</h3>
-                <p className="text-gray-600 mt-1">Build advanced queries with visual or SQL editor</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setQueryBuilderMode('visual')}
-                  className={`px-3 py-1 rounded ${
-                    queryBuilderMode === 'visual' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <Layers className="w-4 h-4 inline mr-1" />
-                  Visual
-                </button>
-                <button
-                  onClick={() => setQueryBuilderMode('sql')}
-                  className={`px-3 py-1 rounded ${
-                    queryBuilderMode === 'sql' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <Code className="w-4 h-4 inline mr-1" />
-                  SQL
-                </button>
-              </div>
-            </div>
-            
-            {/* View creation form would go here - showing SQL preview for now */}
-            <div className="bg-gray-900 text-gray-100 p-6 rounded-lg font-mono text-sm">
-              <pre>{generateSQL(newView)}</pre>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-              <button
-                onClick={() => {
-                  resetForm();
-                  setActiveTab('list');
-                }}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={createView}
-                disabled={!newView.name || !newView.title}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                Create View
-              </button>
-            </div>
-          </div>
+          <EnhancedViewCreateForm
+            formData={newView}
+            queryBuilderMode={queryBuilderMode}
+            onQueryBuilderModeChange={setQueryBuilderMode}
+            onSubmit={createView}
+            onCancel={() => {
+              resetForm();
+              setActiveTab('list');
+            }}
+          />
         )}
       </div>
     </AdminLayout>
   );
-
-  function getVisualizationIcon(type: ViewVisualization['type']) {
-    const icons = {
-      table: <Table2 className="w-4 h-4 text-gray-500" />,
-      list: <List className="w-4 h-4 text-gray-500" />,
-      grid: <Grid className="w-4 h-4 text-gray-500" />,
-      chart: <BarChart3 className="w-4 h-4 text-gray-500" />,
-      map: <Globe className="w-4 h-4 text-gray-500" />,
-      calendar: <Calendar className="w-4 h-4 text-gray-500" />,
-      kanban: <Layers className="w-4 h-4 text-gray-500" />
-    };
-    return icons[type] || null;
-  }
 
   function previewView(view: EnhancedView) {
     // Mock preview implementation
