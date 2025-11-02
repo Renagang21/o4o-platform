@@ -1,6 +1,6 @@
 // 🛠️ Custom Post Type 관리자 페이지
 
-import { useState, useEffect, FC } from 'react';
+import { useState, FC } from 'react';
 import {
   Plus,
   Edit3,
@@ -19,7 +19,7 @@ import {
   Link,
   CheckSquare
 } from 'lucide-react';
-import { authClient } from '@o4o/auth-client';
+import { useManagerCRUD } from '../../hooks/admin/useManagerCRUD';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 interface FieldSchema {
@@ -59,8 +59,29 @@ interface CustomPostType {
 }
 
 const CPTManager: FC = () => {
-  const [cpts, setCPTs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Use the generic CRUD hook
+  const {
+    data: cpts,
+    isLoading: loading,
+    create,
+    remove,
+    isCreating,
+    isDeleting
+  } = useManagerCRUD<CustomPostType>('/cpt/types', {
+    onCreateSuccess: () => {
+      resetForm();
+      setActiveTab('list');
+      alert('✅ CPT가 성공적으로 생성되었습니다!');
+    },
+    onDeleteSuccess: () => {
+      alert('✅ CPT가 삭제되었습니다.');
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || '오류가 발생했습니다.';
+      alert(`❌ 실패: ${message}`);
+    }
+  });
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCPT, setEditingCPT] = useState<CustomPostType | null>(null);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
@@ -80,46 +101,13 @@ const CPTManager: FC = () => {
     }
   });
 
-  useEffect(() => {
-    loadCPTs();
-  }, []);
-
-  const loadCPTs = async () => {
-    try {
-      const response = await authClient.api.get('/cpt/types');
-      setCPTs(response.data.data || []);
-    } catch (error: any) {
-      // Error logging - use proper error handler
-    } finally {
-      setLoading(false);
-    }
+  const createCPT = () => {
+    create(newCPT);
   };
 
-  const createCPT = async () => {
-    try {
-      await authClient.api.post('/cpt/types', newCPT);
-      await loadCPTs();
-      resetForm();
-      setActiveTab('list');
-      alert('✅ CPT가 성공적으로 생성되었습니다!');
-    } catch (error: any) {
-      // Error logging - use proper error handler
-      const message = error.response?.data?.message || 'CPT 생성 중 오류가 발생했습니다.';
-      alert(`❌ 생성 실패: ${message}`);
-    }
-  };
-
-  const deleteCPT = async (slug: string) => {
+  const deleteCPT = (slug: string) => {
     if (!confirm('정말로 이 CPT를 삭제하시겠습니까?')) return;
-
-    try {
-      await authClient.api.delete(`/cpt/types/${slug}`);
-      await loadCPTs();
-      alert('✅ CPT가 삭제되었습니다.');
-    } catch (error: any) {
-      // Error logging - use proper error handler
-      alert('❌ 삭제 중 오류가 발생했습니다.');
-    }
+    remove(slug);
   };
 
   const resetForm = () => {
@@ -270,7 +258,7 @@ const CPTManager: FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-medium text-gray-900">등록된 CPT 목록</h3>
-                <p className="text-sm text-gray-500">총 {cpts.length}개의 Custom Post Type이 등록되어 있습니다.</p>
+                <p className="text-sm text-gray-500">총 {cpts?.length || 0}개의 Custom Post Type이 등록되어 있습니다.</p>
               </div>
               <button
                 onClick={() => setActiveTab('create')}
@@ -281,7 +269,7 @@ const CPTManager: FC = () => {
               </button>
             </div>
 
-            {cpts.length === 0 ? (
+            {!cpts || cpts.length === 0 ? (
               <div className="text-center py-12">
                 <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
