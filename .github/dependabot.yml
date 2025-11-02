@@ -1,73 +1,12 @@
 version: 2
 updates:
-  # npm 의존성 업데이트 (pnpm 프로젝트도 npm ecosystem 사용)
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"  # Changed from weekly to monthly
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 3  # Further reduced to minimize API calls
-    groups:
-      # React 관련 패키지 그룹화
-      react:
-        patterns:
-          - "react*"
-          - "@types/react*"
-      # 테스팅 도구 그룹화
-      testing:
-        patterns:
-          - "*test*"
-          - "vitest*"
-          - "@playwright/*"
-          - "@testing-library/*"
-      # 린팅 도구 그룹화
-      linting:
-        patterns:
-          - "eslint*"
-          - "prettier*"
-          - "@typescript-eslint/*"
-      # Tiptap 에디터 그룹화
-      tiptap:
-        patterns:
-          - "@tiptap/*"
-      # 빌드 도구 그룹화
-      build-tools:
-        patterns:
-          - "vite*"
-          - "@vitejs/*"
-          - "rollup*"
-          - "terser*"
-      # 타입 정의 그룹화
-      types:
-        patterns:
-          - "@types/*"
-        exclude-patterns:
-          - "@types/react*"
-      # 유틸리티 라이브러리 그룹화
-      utilities:
-        patterns:
-          - "lodash*"
-          - "date-fns*"
-          - "axios*"
-          - "zod*"
-    ignore:
-      # React 19 호환성 유지를 위해 특정 버전 고정
-      - dependency-name: "react"
-        versions: ["< 19.0.0"]
-      - dependency-name: "react-dom"
-        versions: ["< 19.0.0"]
-      # Node.js 20 요구사항 유지
-      - dependency-name: "@types/node"
-        versions: ["> 20.x"]
-    # 보안 업데이트만 즉시 처리
-    allow:
-      - dependency-type: "direct"
-        update-types: ["version-update:semver-patch", "version-update:semver-minor"]
-    
-  # GitHub Actions 업데이트
+  # Dependabot disabled for npm/pnpm dependencies
+  # Reason: Dependabot doesn't properly support pnpm workspaces
+  # Manual dependency updates: pnpm update --latest --interactive
+  
+  # GitHub Actions 업데이트만 활성화
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"  # Changed from weekly to monthly
-    open-pull-requests-limit: 3  # Reduced from 5 to 3
+      interval: "monthly"
+    open-pull-requests-limit: 3
