@@ -17,47 +17,99 @@ import { registerLazyShortcode, globalRegistry } from '@o4o/shortcodes';
 initializeIframeContext();
 
 // React 시작 전에 모든 shortcode 등록 (Lazy Loading 사용)
-// Form shortcodes - 3개
-const formShortcodeNames = ['contact_form', 'newsletter_form', 'custom_form'];
-formShortcodeNames.forEach(name => {
-  registerLazyShortcode({
-    name,
-    loader: () => import('./components/shortcodes/formShortcodes').then(m => ({
-      default: m.formShortcodes.find(s => s.name === name)?.component || (() => null)
-    }))
-  });
-});
+/**
+ * Helper to register all shortcodes from a module with lazy loading
+ * This approach eliminates hardcoded name arrays and uses a single source of truth
+ */
+const registerShortcodesFromModule = async (
+  moduleName: string,
+  importFn: () => Promise<{ [key: string]: any }>
+) => {
+  try {
+    const module = await importFn();
+    const shortcodeArray = module[moduleName];
 
-// Auth shortcodes - 2개
-const authShortcodeNames = ['login_form', 'register_form'];
-authShortcodeNames.forEach(name => {
-  registerLazyShortcode({
-    name,
-    loader: () => import('./components/shortcodes/authShortcodes').then(m => ({
-      default: m.authShortcodes.find(s => s.name === name)?.component || (() => null)
-    }))
-  });
-});
+    if (!Array.isArray(shortcodeArray)) {
+      console.error(`[Shortcode Registry] "${moduleName}" is not an array in the module`);
+      return;
+    }
 
-// Dropshipping shortcodes - 29개
-const dropshippingShortcodeNames = [
-  'partner_dashboard', 'partner_products', 'partner_commissions', 'partner_link_generator',
-  'partner_commission_dashboard', 'partner_payout_requests', 'partner_performance_chart',
-  'partner_link_stats', 'partner_marketing_materials', 'partner_referral_tree',
-  'partner_quick_stats', 'partner_leaderboard', 'partner_tier_progress',
-  'supplier_dashboard', 'supplier_products', 'supplier_product_editor', 'supplier_analytics',
-  'supplier_approval_queue', 'seller_dashboard', 'seller_products', 'seller_settlement',
-  'seller_analytics', 'seller_pricing_manager', 'affiliate_dashboard',
-  'user_dashboard', 'role_verification', 'profile_manager', 'role_switcher'
-];
-dropshippingShortcodeNames.forEach(name => {
-  registerLazyShortcode({
-    name,
-    loader: () => import('./components/shortcodes/dropshippingShortcodes').then(m => ({
-      default: m.dropshippingShortcodes.find(s => s.name === name)?.component || (() => null)
-    }))
-  });
-});
+    shortcodeArray.forEach((definition: any) => {
+      if (!definition.name) {
+        console.warn(`[Shortcode Registry] Skipping shortcode with no name in ${moduleName}`);
+        return;
+      }
+
+      registerLazyShortcode({
+        name: definition.name,
+        loader: () => importFn().then(m => {
+          const shortcode = m[moduleName]?.find((s: any) => s.name === definition.name);
+
+          if (!shortcode) {
+            console.error(`[Shortcode Error] "${definition.name}" not found in ${moduleName}`);
+            return {
+              default: () => {
+                if (import.meta.env.DEV) {
+                  return (
+                    <div style={{ padding: '1rem', background: '#fee', border: '1px solid #fcc', borderRadius: '4px' }}>
+                      <strong>Shortcode Error:</strong> "{definition.name}" not found
+                    </div>
+                  );
+                }
+                return null;
+              }
+            };
+          }
+
+          return { default: shortcode.component };
+        }).catch(err => {
+          console.error(`[Shortcode Error] Failed to load "${definition.name}":`, err);
+          return {
+            default: () => {
+              if (import.meta.env.DEV) {
+                return (
+                  <div style={{ padding: '1rem', background: '#fee', border: '1px solid #fcc', borderRadius: '4px' }}>
+                    <strong>Load Error:</strong> Failed to load {definition.name}
+                  </div>
+                );
+              }
+              return null;
+            }
+          };
+        })
+      });
+    });
+
+    if (import.meta.env.DEV) {
+      console.log(`[Shortcode Registry] ✓ Registered ${shortcodeArray.length} shortcodes from ${moduleName}`);
+    }
+  } catch (err) {
+    console.error(`[Shortcode Registry] Failed to load module ${moduleName}:`, err);
+  }
+};
+
+// Register all shortcodes from their respective modules
+// This runs once at startup to discover and register all available shortcodes
+(async () => {
+  await registerShortcodesFromModule(
+    'formShortcodes',
+    () => import('./components/shortcodes/formShortcodes')
+  );
+
+  await registerShortcodesFromModule(
+    'authShortcodes',
+    () => import('./components/shortcodes/authShortcodes')
+  );
+
+  await registerShortcodesFromModule(
+    'dropshippingShortcodes',
+    () => import('./components/shortcodes/dropshippingShortcodes')
+  );
+
+  if (import.meta.env.DEV) {
+    console.log(`[Shortcode Registry] Total registered: ${globalRegistry.getAll().size} shortcodes`);
+  }
+})();
 
 // Debug: Expose globalRegistry to window (development only)
 if (import.meta.env.DEV) {
