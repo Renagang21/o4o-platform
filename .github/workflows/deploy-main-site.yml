@@ -34,20 +34,23 @@ jobs:
         pnpm --filter=@o4o/shortcodes run build
         pnpm --filter=@o4o/block-renderer run build
 
+        echo "✅ Package builds complete"
+        ls -la packages/shortcodes/dist/ || echo "⚠️ shortcodes dist not found"
+        ls -la packages/block-renderer/dist/ || echo "⚠️ block-renderer dist not found"
+
     - name: Build main site
       run: |
         echo "🔨 Building main site..."
-        cd apps/main-site
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
         VITE_API_URL=https://api.neture.co.kr/api/v1 \
-        pnpm run build
+        pnpm --filter=@o4o/main-site run build
 
         echo "📋 Build output:"
-        ls -lh dist/
+        ls -lh apps/main-site/dist/
 
         echo "📄 Version info:"
-        cat dist/version.json || echo "No version.json found"
+        cat apps/main-site/dist/version.json || echo "No version.json found"
 
     - name: Prepare Nginx config for deployment
       run: |
