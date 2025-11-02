@@ -21,13 +21,28 @@ import { dropshippingShortcodes } from './components/shortcodes/dropshippingShor
 initializeIframeContext();
 
 // React 시작 전에 모든 shortcode 등록
+console.log('[Shortcode Registry] Starting shortcode registration...');
+
 // productShortcodes.forEach(def => registerShortcode(def)); // TODO: 의존성 해결 후 활성화
 formShortcodes.forEach(def => registerShortcode(def));
+console.log(`[Shortcode Registry] ✓ Registered ${formShortcodes.length} form shortcodes`);
+
 authShortcodes.forEach(def => registerShortcode(def));
+console.log(`[Shortcode Registry] ✓ Registered ${authShortcodes.length} auth shortcodes`);
+
 dropshippingShortcodes.forEach(def => registerShortcode(def));
+console.log(`[Shortcode Registry] ✓ Registered ${dropshippingShortcodes.length} dropshipping shortcodes`);
 
 // Debug: Expose globalRegistry to window
 (window as any).__shortcodeRegistry = globalRegistry;
+
+// Verify critical shortcodes
+const totalRegistered = globalRegistry.getAll().size;
+console.log(`[Shortcode Registry] Total registered: ${totalRegistered} shortcodes`);
+console.log('[Shortcode Registry] Checking critical shortcodes:');
+console.log('  - partner_dashboard:', globalRegistry.has('partner_dashboard') ? '✓' : '✗ MISSING');
+console.log('  - supplier_dashboard:', globalRegistry.has('supplier_dashboard') ? '✓' : '✗ MISSING');
+console.log('  - login_form:', globalRegistry.has('login_form') ? '✓' : '✗ MISSING');
 
 const queryClient = new QueryClient({
   defaultOptions: {
