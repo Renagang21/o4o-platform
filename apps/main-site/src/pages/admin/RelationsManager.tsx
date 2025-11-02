@@ -256,11 +256,6 @@ const RelationsManager: FC = () => {
 
   // 관계 타입에 따른 maxItems 자동 설정
   const updateRelationType = (type: 'one-to-one' | 'one-to-many' | 'many-to-many') => {
-  
-  // Remove helper functions - they're now in RelationsList component
-
-  // 관계 타입에 따른 maxItems 자동 설정
-  const updateRelationType = (type: 'one-to-one' | 'one-to-many' | 'many-to-many') => {
     const updates: Partial<RelationFormData> = { type };
 
     if (type === 'one-to-one') {
