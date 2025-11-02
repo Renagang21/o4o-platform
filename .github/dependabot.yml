@@ -1,7 +1,7 @@
 version: 2
 updates:
-  # pnpm 의존성 업데이트
-  - package-ecosystem: "pnpm"
+  # npm 의존성 업데이트 (pnpm 프로젝트도 npm ecosystem 사용)
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "monthly"  # Changed from weekly to monthly
