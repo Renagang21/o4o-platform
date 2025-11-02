@@ -18,6 +18,17 @@ echo "📦 Building packages..."
 pnpm run build:packages
 echo "✅ Packages built successfully"
 echo ""
+echo "🔍 Verifying @o4o/shortcodes build..."
+if [ -f "packages/shortcodes/dist/index.js" ]; then
+    echo "✅ packages/shortcodes/dist/index.js exists"
+    ls -lh packages/shortcodes/dist/ | head -10
+else
+    echo "❌ packages/shortcodes/dist/index.js NOT FOUND"
+    echo "📂 Listing packages/shortcodes/:"
+    ls -la packages/shortcodes/
+    exit 1
+fi
+echo ""
 
 # Function to build specific app
 build_app() {
