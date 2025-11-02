@@ -32,10 +32,6 @@ export function GlobalStyleInjector() {
 
       // Inject CSS
       styleEl.textContent = css;
-
-      if (import.meta.env.DEV) {
-        console.log('[GlobalStyleInjector] ✅ Customizer CSS injected:', css.length, 'characters');
-      }
     } catch (error) {
       console.error('[GlobalStyleInjector] Failed to inject CSS:', error);
     }

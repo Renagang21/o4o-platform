@@ -79,10 +79,6 @@ const registerShortcodesFromModule = async (
         })
       });
     });
-
-    if (import.meta.env.DEV) {
-      console.log(`[Shortcode Registry] ✓ Registered ${shortcodeArray.length} shortcodes from ${moduleName}`);
-    }
   } catch (err) {
     console.error(`[Shortcode Registry] Failed to load module ${moduleName}:`, err);
   }
@@ -105,10 +101,6 @@ const registerShortcodesFromModule = async (
     'dropshippingShortcodes',
     () => import('./components/shortcodes/dropshippingShortcodes')
   );
-
-  if (import.meta.env.DEV) {
-    console.log(`[Shortcode Registry] Total registered: ${globalRegistry.getAll().size} shortcodes`);
-  }
 })();
 
 // Debug: Expose globalRegistry to window (development only)
