@@ -31,11 +31,14 @@ import { NewsletterWidget } from './blocks/footer/NewsletterWidget';
 import './blocks/footer/FooterWidgets.css';
 
 // Map block types to components
+// Note: Some blocks use o4o/ namespace in DB but are rendered by core/ components
 const blockComponents: Record<string, FC<any>> = {
   'core/site-logo': SiteLogo,
+  'o4o/site-logo': SiteLogo, // Alias for DB compatibility
   'core/site-title': SiteTitle,
   'core/site-tagline': SiteTagline,
   'core/navigation': Navigation,
+  'o4o/navigation': Navigation, // Alias for DB compatibility
   'core/search': SearchBlock,
   'o4o/social-links': SocialLinks,
   'o4o/account-menu': AccountModule,
