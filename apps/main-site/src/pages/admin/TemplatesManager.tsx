@@ -1,73 +1,32 @@
 import { useState, useEffect, FC } from 'react';
-import { 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  Save,
-  X,
-  Code,
-  Eye,
-  Copy,
-  Settings,
-  FileCode,
-  Layout,
-  Layers,
-  Zap,
-  Play,
-  Monitor,
-  Smartphone,
-  Tablet
-} from 'lucide-react';
+import { Eye, Plus, Play, Monitor, Smartphone, Tablet } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import DOMPurify from 'dompurify';
-
-interface TemplateField {
-  name: string;
-  label: string;
-  shortcode: string;
-  example: string;
-}
-
-interface Template {
-  id: string;
-  name: string;
-  title: string;
-  description?: string;
-  type: 'single' | 'archive' | 'custom';
-  postType?: string; // single/archive 타입일 때 적용되는 CPT
-  htmlContent: string;
-  cssContent: string;
-  jsContent?: string;
-  conditions?: {
-    field: string;
-    operator: string;
-    value: string;
-  }[];
-  settings: {
-    responsive: boolean;
-    cache: boolean;
-    cacheTime: number;
-  };
-  shortcode: string; // [template name="template-name"]
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { TemplatesList } from '../../components/admin/templates/TemplatesList';
+import { TemplateCreateForm } from '../../components/admin/templates/TemplateCreateForm';
+import type {
+  Template,
+  TemplateField,
+  TemplateFormData,
+  AvailableCPT,
+  PreviewMode,
+  EditorMode
+} from '../../types/templates';
 
 const TemplatesManager: FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
-  const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const [activeEditor, setActiveEditor] = useState<'html' | 'css' | 'js'>('html');
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop');
+  const [activeEditor, setActiveEditor] = useState<EditorMode>('html');
 
   // 새 Template 생성 폼 상태
-  const [newTemplate, setNewTemplate] = useState({
+  const [newTemplate, setNewTemplate] = useState<TemplateFormData>({
     name: '',
     title: '',
     description: '',
-    type: 'custom' as 'single' | 'archive' | 'custom',
+    type: 'custom',
     postType: '',
     htmlContent: '',
     cssContent: '',
@@ -80,8 +39,8 @@ const TemplatesManager: FC = () => {
     }
   });
 
-  // 사용 가능한 CPT (Mock)
-  const [availableCPTs] = useState([
+  // 사용 가능한 CPT (Mock - would come from API)
+  const [availableCPTs] = useState<AvailableCPT[]>([
     { slug: 'product', name: '상품' },
     { slug: 'event', name: '이벤트' },
     { slug: 'service', name: '서비스' },
@@ -89,8 +48,8 @@ const TemplatesManager: FC = () => {
     { slug: 'portfolio', name: '포트폴리오' }
   ]);
 
-  // 사용 가능한 필드/숏코드 (Mock)
-  const [availableFields] = useState([
+  // 사용 가능한 필드/숏코드 (Mock - would come from API)
+  const [availableFields] = useState<TemplateField[]>([
     { name: 'title', label: '제목', shortcode: '[field name="title"]', example: '상품 제목' },
     { name: 'content', label: '내용', shortcode: '[field name="content"]', example: '상품 설명' },
     { name: 'featured_image', label: '대표 이미지', shortcode: '[field name="featured_image"]', example: '<img src="..." />' },
@@ -397,24 +356,6 @@ const TemplatesManager: FC = () => {
     }
   };
 
-  const getTemplateTypeLabel = (type: string) => {
-    switch (type) {
-      case 'single': return '단일 페이지';
-      case 'archive': return '목록 페이지';
-      case 'custom': return '커스텀';
-      default: return type;
-    }
-  };
-
-  const getTemplateTypeIcon = (type: string) => {
-    switch (type) {
-      case 'single': return <FileCode className="w-5 h-5" />;
-      case 'archive': return <Layout className="w-5 h-5" />;
-      case 'custom': return <Layers className="w-5 h-5" />;
-      default: return <FileCode className="w-5 h-5" />;
-    }
-  };
-
   const getPreviewModeIcon = (mode: string) => {
     switch (mode) {
       case 'desktop': return <Monitor className="w-4 h-4" />;
@@ -483,347 +424,32 @@ const TemplatesManager: FC = () => {
       {/* Content */}
       <div className="p-6">
         {activeTab === 'list' && (
-          <div className="space-y-6">
-            {/* Action Bar */}
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">등록된 Template</h3>
-                <p className="text-sm text-gray-500">총 {templates.length}개의 템플릿이 생성되어 있습니다.</p>
-              </div>
-              <button
-                onClick={() => setActiveTab('create')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                새 Template 생성
-              </button>
-            </div>
-
-            {templates.length === 0 ? (
-              <div className="text-center py-12">
-                <FileCode className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  아직 생성된 Template이 없습니다
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  첫 번째 콘텐츠 템플릿을 생성해보세요
-                </p>
-                <button
-                  onClick={() => setActiveTab('create')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4" />
-                  새 Template 생성
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {templates.map(template => (
-                  <div key={template.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          {getTemplateTypeIcon(template.type)}
-                          <h3 className="font-semibold text-gray-900">{template.title}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            template.type === 'single' ? 'bg-blue-100 text-blue-800' :
-                            template.type === 'archive' ? 'bg-green-100 text-green-800' :
-                            'bg-purple-100 text-purple-800'
-                          }`}>
-                            {getTemplateTypeLabel(template.type)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-500 mb-1">/{template.name}</p>
-                        {template.description && (
-                          <p className="text-gray-600 text-sm">{template.description}</p>
-                        )}
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => previewTemplate(template)}
-                          className="p-2 text-gray-400 hover:text-green-600 transition-colors"
-                          title="미리보기"
-                        >
-                          <Play className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => copyShortcode(template.shortcode)}
-                          className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
-                          title="숏코드 복사"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => {/* TODO: 편집 기능 */}}
-                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                          title="편집"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteTemplate(template.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                          title="삭제"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Type Info */}
-                    {template.postType && (
-                      <div className="mb-4">
-                        <span className="text-sm text-gray-500">적용 대상:</span>
-                        <span className="ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm">
-                          {availableCPTs.find(cpt => cpt.slug === template.postType)?.name || template.postType}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Shortcode */}
-                    <div className="bg-gray-100 rounded-lg p-3 mb-4">
-                      <div className="flex items-center justify-between">
-                        <code className="text-sm text-gray-800">{template.shortcode}</code>
-                        <button
-                          onClick={() => copyShortcode(template.shortcode)}
-                          className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors"
-                        >
-                          <Copy className="w-3 h-3" />
-                          복사
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Settings */}
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-500">반응형:</span>
-                          <span className={template.settings.responsive ? 'text-green-600' : 'text-gray-400'}>
-                            {template.settings.responsive ? '예' : '아니오'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-500">캐시:</span>
-                          <span className={template.settings.cache ? 'text-green-600' : 'text-gray-400'}>
-                            {template.settings.cache ? `${template.settings.cacheTime}분` : '사용 안함'}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-500">상태:</span>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          template.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {template.active ? '활성' : '비활성'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <TemplatesList
+            templates={templates}
+            availableCPTs={availableCPTs}
+            onCreateClick={() => setActiveTab('create')}
+            onPreview={previewTemplate}
+            onCopyShortcode={copyShortcode}
+            onEdit={(template) => {/* TODO: 편집 기능 */}}
+            onDelete={deleteTemplate}
+          />
         )}
 
         {activeTab === 'create' && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
-            {/* 왼쪽: 폼 */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* 기본 정보 */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-4">기본 정보</h4>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Template 이름 *
-                    </label>
-                    <input
-                      type="text"
-                      value={newTemplate.name}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="예: product_card"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      표시 제목 *
-                    </label>
-                    <input
-                      type="text"
-                      value={newTemplate.title}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="예: 상품 카드"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      설명
-                    </label>
-                    <textarea
-                      value={newTemplate.description}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="템플릿 설명"
-                      rows={3}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 타입 설정 */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-4">타입 설정</h4>
-                
-                <div className="space-y-3">
-                  {[
-                    { value: 'single', label: '단일 페이지', desc: '개별 포스트 표시' },
-                    { value: 'archive', label: '목록 페이지', desc: '포스트 목록 표시' },
-                    { value: 'custom', label: '커스텀', desc: '자유 형식' }
-                  ].map(type => (
-                    <label key={type.value} className="flex items-start">
-                      <input
-                        type="radio"
-                        name="templateType"
-                        value={type.value}
-                        checked={newTemplate.type === type.value}
-                        onChange={e => setNewTemplate(prev => ({ ...prev, type: e.target.value as 'single' | 'archive' | 'custom' }))}
-                        className="mt-1 mr-2"
-                      />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{type.label}</div>
-                        <div className="text-xs text-gray-500">{type.desc}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-
-                {(newTemplate.type === 'single' || newTemplate.type === 'archive') && (
-                  <div className="mt-4">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      적용할 Post Type
-                    </label>
-                    <select
-                      value={newTemplate.postType}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, postType: e.target.value }))}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Post Type 선택</option>
-                      {availableCPTs.map(cpt => (
-                        <option key={cpt.slug} value={cpt.slug}>{cpt.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
-
-              {/* 사용 가능한 필드 */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-4">사용 가능한 필드</h4>
-                <div className="space-y-2">
-                  {availableFields.map(field => (
-                    <div key={field.name} className="group">
-                      <button
-                        onClick={() => insertField(field.shortcode)}
-                        className="w-full text-left p-2 rounded hover:bg-blue-50 transition-colors"
-                      >
-                        <div className="text-xs font-medium text-gray-900">{field.label}</div>
-                        <div className="text-xs text-gray-500 font-mono">{field.shortcode}</div>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 오른쪽: 에디터 */}
-            <div className="lg:col-span-3">
-              <div className="bg-white border border-gray-200 rounded-lg h-full flex flex-col">
-                {/* 에디터 탭 */}
-                <div className="border-b border-gray-200">
-                  <nav className="flex space-x-4 px-4">
-                    {[
-                      { id: 'html', label: 'HTML', icon: Code },
-                      { id: 'css', label: 'CSS', icon: Settings },
-                      { id: 'js', label: 'JavaScript', icon: Zap }
-                    ].map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveEditor(tab.id as 'html' | 'css' | 'js')}
-                        className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
-                          activeEditor === tab.id
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                      >
-                        <tab.icon className="w-4 h-4" />
-                        {tab.label}
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-
-                {/* 에디터 영역 */}
-                <div className="flex-1 p-4">
-                  {activeEditor === 'html' && (
-                    <textarea
-                      id="html-editor"
-                      value={newTemplate.htmlContent}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, htmlContent: e.target.value }))}
-                      placeholder="HTML 코드를 입력하세요..."
-                      className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  )}
-
-                  {activeEditor === 'css' && (
-                    <textarea
-                      value={newTemplate.cssContent}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, cssContent: e.target.value }))}
-                      placeholder="CSS 스타일을 입력하세요..."
-                      className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  )}
-
-                  {activeEditor === 'js' && (
-                    <textarea
-                      value={newTemplate.jsContent}
-                      onChange={e => setNewTemplate(prev => ({ ...prev, jsContent: e.target.value }))}
-                      placeholder="JavaScript 코드를 입력하세요..."
-                      className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  )}
-                </div>
-
-                {/* 액션 버튼 */}
-                <div className="border-t border-gray-200 p-4 flex justify-end gap-3">
-                  <button
-                    onClick={() => {
-                      resetForm();
-                      setActiveTab('list');
-                    }}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    취소
-                  </button>
-                  <button
-                    onClick={createTemplate}
-                    disabled={!newTemplate.name || !newTemplate.title}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <Save className="w-4 h-4" />
-                    Template 생성
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TemplateCreateForm
+            formData={newTemplate}
+            availableCPTs={availableCPTs}
+            availableFields={availableFields}
+            activeEditor={activeEditor}
+            onFormChange={setNewTemplate}
+            onActiveEditorChange={setActiveEditor}
+            onInsertField={insertField}
+            onSubmit={createTemplate}
+            onCancel={() => {
+              resetForm();
+              setActiveTab('list');
+            }}
+          />
         )}
 
         {activeTab === 'preview' && editingTemplate && (
