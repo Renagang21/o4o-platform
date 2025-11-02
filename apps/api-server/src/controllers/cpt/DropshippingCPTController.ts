@@ -4,6 +4,7 @@ import { CustomPost, PostStatus } from '../../entities/CustomPost.js';
 import { CustomPostType } from '../../entities/CustomPostType.js';
 import { CustomFieldValue, CustomField, FieldGroup } from '../../entities/CustomField.js';
 import { User } from '../../entities/User.js';
+import logger from '../../utils/logger.js';
 
 /**
  * CPT Write Guard
@@ -33,7 +34,7 @@ class CPTWriteGuard {
       reason: 'CPT writes are disabled for dropshipping domain (SSOT Entity migration active)'
     };
 
-    console.log('[CPT_WRITE_BLOCKED]', JSON.stringify(logEntry, null, 2));
+    logger.warn('[CPT_WRITE_BLOCKED]', logEntry);
 
     res.status(403).json({
       success: false,
