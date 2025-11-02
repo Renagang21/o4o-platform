@@ -159,14 +159,17 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     };
   }, [settings]);
 
-  // Handle save (stores settings in customizer settings table)
+  // Handle save (stores settings in customizer settings table AND publishes to template parts)
   const handleSave = async () => {
     if (!onSave) return;
 
     setIsSaving(true);
     try {
+      // First save the customizer settings
       const success = await onSave(settings);
       if (success) {
+        // Then automatically publish to template parts for frontend
+        await publishToTemplateParts();
         setIsDirty(false);
       }
     } finally {
@@ -174,9 +177,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   };
 
-  // Handle publish (creates/updates template parts for live site)
-  const handlePublish = async () => {
-    setIsSaving(true);
+  // Extract publish logic to reusable function
+  const publishToTemplateParts = async () => {
     try {
       // Convert customizer settings to template parts format
       const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
@@ -195,13 +197,11 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
       if (defaultHeader && isValidUUID) {
         // Update existing default header
-        // Preserve the existing slug to avoid uniqueness conflicts
         const updateData = {
           ...headerTemplatePart,
           slug: defaultHeader.slug // Keep existing slug
         };
         await authClient.api.put(`/template-parts/${defaultHeader.id}`, updateData);
-        toast.success('헤더 템플릿이 업데이트되었습니다');
       } else {
         // Create new header template part
         await authClient.api.post('/template-parts', {
@@ -209,8 +209,19 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           isDefault: true,
           isActive: true
         });
-        toast.success('헤더 템플릿이 생성되었습니다');
       }
+    } catch (error: any) {
+      console.error('[Customizer - Publish] Template part sync error:', error);
+      // Don't throw - allow save to succeed even if template part sync fails
+    }
+  };
+
+  // Handle publish (creates/updates template parts for live site)
+  const handlePublish = async () => {
+    setIsSaving(true);
+    try {
+      // Publish to template parts
+      await publishToTemplateParts();
 
       // Also save to customizer settings
       if (onSave) {
@@ -218,6 +229,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       }
 
       setIsDirty(false);
+      toast.success('헤더가 프론트엔드에 게시되었습니다');
     } catch (error: any) {
       console.error('[Customizer - Publish] 에러 발생:', error);
       console.error('[Customizer - Publish] 에러 응답:', error?.response?.data);
