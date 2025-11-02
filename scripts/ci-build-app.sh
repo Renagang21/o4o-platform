@@ -13,15 +13,10 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 echo "🚀 Starting CI build process..."
 echo "📊 Node memory limit: 4GB"
 
-# Build packages first if not already built
-echo "🔍 Checking package builds..."
-if [ ! -d "packages/shortcodes/dist" ] || [ ! -d "packages/auth-client/dist" ]; then
-    echo "📦 Building packages..."
-    pnpm run build:packages
-    echo "✅ Packages built successfully"
-else
-    echo "✅ Package dist directories already exist"
-fi
+# Build packages first (always rebuild in CI to ensure fresh build)
+echo "📦 Building packages..."
+pnpm run build:packages
+echo "✅ Packages built successfully"
 echo ""
 
 # Function to build specific app
@@ -51,7 +46,9 @@ build_app() {
             ;;
         "main"|"main-site")
             echo "Building Main Site..."
-            pnpm --filter=@o4o/main-site run build
+            cd apps/main-site
+            pnpm run build
+            cd ../..
             ;;
         "crowdfunding"|"forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
             # All these are part of admin-dashboard
