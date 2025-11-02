@@ -16,6 +16,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       actions: read
       contents: read
@@ -35,6 +36,13 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         queries: security-and-quality
+        config: |
+          paths-ignore:
+            - '**/node_modules'
+            - '**/dist'
+            - '**/build'
+            - '**/*.test.ts'
+            - '**/*.spec.ts'
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
@@ -43,3 +51,5 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+        ram: 6000
+        threads: 2
