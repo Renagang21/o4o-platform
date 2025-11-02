@@ -29,8 +29,42 @@ export interface ContainerSettings {
   };
 }
 
+export interface SiteIdentitySettings {
+  logo?: {
+    desktop?: string;
+    mobile?: string;
+    width?: {
+      desktop?: number;
+      tablet?: number;
+      mobile?: number;
+    };
+  };
+  siteTitle?: {
+    text?: string;
+    display?: boolean;
+  };
+  tagline?: {
+    text?: string;
+    display?: boolean;
+  };
+  favicon?: string;
+}
+
 export interface CustomizerSettings {
+  siteIdentity?: SiteIdentitySettings;
   container: ContainerSettings;
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+    [key: string]: any;
+  };
+  typography?: {
+    fontFamily?: string;
+    [key: string]: any;
+  };
+  header?: any;
+  footer?: any;
   [key: string]: any;
 }
 
@@ -126,23 +160,26 @@ export const useCustomizerSettings = () => {
         const result = await response.json();
 
         if (result.success && result.data) {
-          // Ensure container settings exist, merge with defaults
+          // API returns full customizer settings
+          // Merge with defaults for container only (preserve all other settings)
+          const apiData = result.data;
+
           const mergedSettings: CustomizerSettings = {
-            ...result.data,
+            ...apiData, // Preserve all API data (siteIdentity, colors, typography, header, footer, etc.)
             container: {
               ...DEFAULT_CONTAINER_SETTINGS,
-              ...result.data.container,
+              ...apiData.container,
               width: {
                 ...DEFAULT_CONTAINER_SETTINGS.width,
-                ...result.data.container?.width,
+                ...apiData.container?.width,
               },
               padding: {
                 ...DEFAULT_CONTAINER_SETTINGS.padding,
-                ...result.data.container?.padding,
+                ...apiData.container?.padding,
               },
               margin: {
                 ...DEFAULT_CONTAINER_SETTINGS.margin,
-                ...result.data.container?.margin,
+                ...apiData.container?.margin,
               },
             },
           };
