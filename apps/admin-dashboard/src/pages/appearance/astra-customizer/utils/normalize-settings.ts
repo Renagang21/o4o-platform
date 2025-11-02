@@ -69,5 +69,30 @@ export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettin
     return defaults;
   }
 
-  return mergeWithDefaults(defaults, raw as UnknownRecord);
+  const merged = mergeWithDefaults(defaults, raw as UnknownRecord);
+
+  // Special handling for footer.widgets.columns
+  // Ensure it's always a responsive object, not a number
+  if (merged.footer?.widgets?.columns !== undefined) {
+    const columns = merged.footer.widgets.columns;
+
+    // If columns is a number, convert it to responsive object
+    if (typeof columns === 'number') {
+      merged.footer.widgets.columns = {
+        desktop: columns,
+        tablet: Math.max(2, Math.floor(columns / 2)),
+        mobile: 1
+      };
+    } else if (typeof columns === 'object' && columns !== null) {
+      // Ensure all properties exist
+      const cols = columns as any;
+      merged.footer.widgets.columns = {
+        desktop: cols.desktop ?? defaults.footer.widgets.columns.desktop,
+        tablet: cols.tablet ?? defaults.footer.widgets.columns.tablet,
+        mobile: cols.mobile ?? defaults.footer.widgets.columns.mobile
+      };
+    }
+  }
+
+  return merged;
 }

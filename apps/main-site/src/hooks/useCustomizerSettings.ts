@@ -65,6 +65,8 @@ export interface CustomizerSettings {
   };
   header?: any;
   footer?: any;
+  blog?: any;
+  customCSS?: string;
   [key: string]: any;
 }
 
