@@ -30,10 +30,18 @@ jobs:
 
     - name: Build main site
       run: |
+        echo "🔨 Building main site..."
+        cd apps/main-site
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
         VITE_API_URL=https://api.neture.co.kr/api/v1 \
-        pnpm --filter=@o4o/main-site run build
+        pnpm run build
+
+        echo "📋 Build output:"
+        ls -lh dist/
+
+        echo "📄 Version info:"
+        cat dist/version.json || echo "No version.json found"
 
     - name: Prepare Nginx config for deployment
       run: |
