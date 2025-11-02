@@ -38,7 +38,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`${API_BASE_URL}/v1/dropshipping/partner/dashboard/summary`, {
+      const response = await fetch(`${API_BASE_URL}/dropshipping/partner/dashboard/summary`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

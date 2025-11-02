@@ -40,7 +40,7 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
       setLoading(true);
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`${API_BASE_URL}/v1/dropshipping/supplier/dashboard/stats?period=${period}`, {
+      const response = await fetch(`${API_BASE_URL}/dropshipping/supplier/dashboard/stats?period=${period}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
