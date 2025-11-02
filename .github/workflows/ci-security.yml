@@ -16,7 +16,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: read
@@ -43,6 +43,14 @@ jobs:
             - '**/build'
             - '**/*.test.ts'
             - '**/*.spec.ts'
+            - '**/*.test.tsx'
+            - '**/*.spec.tsx'
+            - '**/tests'
+            - '**/test'
+            - '**/__tests__'
+            - '**/coverage'
+            - '**/.next'
+            - '**/.nuxt'
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
