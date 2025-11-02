@@ -50,7 +50,7 @@ function convertModuleToBlock(module: ModuleConfig): any {
     'primary-menu': {
       type: 'o4o/navigation',
       data: {
-        menuRef: 'primary-menu',
+        menuRef: 'primary',
         orientation: 'horizontal',
         ...module.settings
       }
@@ -58,7 +58,7 @@ function convertModuleToBlock(module: ModuleConfig): any {
     'secondary-menu': {
       type: 'o4o/navigation',
       data: {
-        menuRef: 'secondary-menu',
+        menuRef: 'secondary',
         orientation: 'horizontal',
         ...module.settings
       }
@@ -315,7 +315,7 @@ export function convertSettingsToHeaderTemplatePart(
                 id: 'primary-menu',
                 type: 'o4o/navigation',
                 data: {
-                  menuRef: 'primary-menu',
+                  menuRef: 'primary',
                   orientation: 'horizontal',
                   showSubmenuIcon: true
                 }
