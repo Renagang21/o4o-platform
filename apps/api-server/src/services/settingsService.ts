@@ -1,16 +1,21 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { Settings, GeneralSettings, ReadingSettings, ThemeSettings, EmailSettings, PermalinkSettings } from '../entities/Settings.js';
+import { TemplatePart } from '../entities/TemplatePart.js';
 import { AccessControlSettings } from '@o4o/types';
+import { convertSettingsToHeaderTemplatePart, convertSettingsToFooterTemplatePart } from '../utils/customizer/template-parts-converter.js';
+import logger from '../utils/logger.js';
 
 export type SettingsType = 'general' | 'reading' | 'theme' | 'email' | 'permalink' | 'customizer';
 export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | AccessControlSettings | Record<string, unknown>;
 
 export class SettingsService {
   private settingsRepository: Repository<Settings>;
+  private templatePartRepository: Repository<TemplatePart>;
 
   constructor() {
     this.settingsRepository = AppDataSource.getRepository(Settings);
+    this.templatePartRepository = AppDataSource.getRepository(TemplatePart);
   }
 
   // Get settings by type
@@ -44,7 +49,76 @@ export class SettingsService {
     }
 
     await this.settingsRepository.save(setting);
+
+    // If customizer settings are updated, also update template parts
+    if (type === 'customizer') {
+      try {
+        await this.syncTemplatePartsFromCustomizer(value);
+      } catch (error) {
+        logger.error('Failed to sync template parts from customizer:', error);
+        // Don't fail the whole operation if template part sync fails
+      }
+    }
+
     return setting.value;
+  }
+
+  /**
+   * Sync template parts from customizer settings
+   * This creates/updates header and footer template parts based on Header/Footer Builder settings
+   */
+  private async syncTemplatePartsFromCustomizer(customizerSettings: SettingsValue): Promise<void> {
+    logger.info('Syncing template parts from customizer settings...');
+
+    // Convert settings to template parts
+    const headerData = convertSettingsToHeaderTemplatePart(customizerSettings);
+    const footerData = convertSettingsToFooterTemplatePart(customizerSettings);
+
+    // Update or create header template part
+    await this.upsertTemplatePart(headerData);
+
+    // Update or create footer template part
+    await this.upsertTemplatePart(footerData);
+
+    logger.info('Template parts synced successfully');
+  }
+
+  /**
+   * Create or update a template part
+   */
+  private async upsertTemplatePart(data: any): Promise<void> {
+    // Find existing template part by slug
+    let templatePart = await this.templatePartRepository.findOne({
+      where: { slug: data.slug }
+    });
+
+    if (templatePart) {
+      // Update existing
+      templatePart.name = data.name;
+      templatePart.description = data.description;
+      templatePart.content = data.content;
+      templatePart.settings = data.settings;
+      templatePart.isActive = data.isActive ?? true;
+      templatePart.isDefault = data.isDefault ?? true;
+      templatePart.priority = data.priority ?? 10;
+    } else {
+      // Create new
+      templatePart = this.templatePartRepository.create({
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        area: data.area,
+        content: data.content,
+        settings: data.settings,
+        isActive: data.isActive ?? true,
+        isDefault: data.isDefault ?? true,
+        priority: data.priority ?? 10,
+        tags: []
+      });
+    }
+
+    await this.templatePartRepository.save(templatePart);
+    logger.info(`Template part ${data.slug} saved successfully`);
   }
 
   // Get specific setting value
