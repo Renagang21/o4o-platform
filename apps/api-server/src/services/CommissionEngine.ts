@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { CommissionPolicy, PolicyType, PolicyStatus, CommissionType } from '../entities/CommissionPolicy.js';
-import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
+import { Commission, CommissionStatus } from '../entities/Commission.js';
 import { ConversionEvent, ConversionStatus } from '../entities/ConversionEvent.js';
 import { Partner } from '../entities/Partner.js';
 import { Product } from '../entities/Product.js';
@@ -50,7 +50,7 @@ export interface CommissionFilters {
 }
 
 export class CommissionEngine {
-  private commissionRepository: Repository<PartnerCommission>;
+  private commissionRepository: Repository<Commission>;
   private policyRepository: Repository<CommissionPolicy>;
   private conversionRepository: Repository<ConversionEvent>;
   private partnerRepository: Repository<Partner>;
@@ -60,7 +60,7 @@ export class CommissionEngine {
   private readonly HOLD_PERIOD_DAYS = 7;
 
   constructor() {
-    this.commissionRepository = AppDataSource.getRepository(PartnerCommission);
+    this.commissionRepository = AppDataSource.getRepository(Commission);
     this.policyRepository = AppDataSource.getRepository(CommissionPolicy);
     this.conversionRepository = AppDataSource.getRepository(ConversionEvent);
     this.partnerRepository = AppDataSource.getRepository(Partner);
@@ -70,7 +70,7 @@ export class CommissionEngine {
   /**
    * Create commission from conversion event
    */
-  async createCommission(data: CreateCommissionRequest): Promise<PartnerCommission> {
+  async createCommission(data: CreateCommissionRequest): Promise<Commission> {
     try {
       // 1. Get conversion event
       const conversion = await this.conversionRepository.findOne({
@@ -103,7 +103,7 @@ export class CommissionEngine {
         partnerTier: conversion.partner.tier,
         productId: conversion.productId,
         supplierId: conversion.product.supplierId || undefined,
-        category: conversion.product.category || undefined,
+        category: conversion.product.category?.name || conversion.product.category?.slug || undefined,
         tags: conversion.product.tags || undefined,
         orderAmount: conversion.orderAmount,
         isNewCustomer: conversion.isNewCustomer
@@ -267,7 +267,7 @@ export class CommissionEngine {
   /**
    * Confirm commission (move from pending to confirmed)
    */
-  async confirmCommission(commissionId: string): Promise<PartnerCommission> {
+  async confirmCommission(commissionId: string): Promise<Commission> {
     try {
       const commission = await this.commissionRepository.findOne({
         where: { id: commissionId },
@@ -287,11 +287,6 @@ export class CommissionEngine {
 
       const updated = await this.commissionRepository.save(commission);
 
-      // Update partner total commissions
-      const partner = commission.partner;
-      partner.totalCommissions = (partner.totalCommissions || 0) + commission.commissionAmount;
-      await this.partnerRepository.save(partner);
-
       logger.info(`Commission confirmed: ${commissionId} (amount: ${commission.commissionAmount})`);
 
       return updated;
@@ -305,7 +300,7 @@ export class CommissionEngine {
   /**
    * Cancel commission (e.g., when order is cancelled)
    */
-  async cancelCommission(commissionId: string, reason?: string): Promise<PartnerCommission> {
+  async cancelCommission(commissionId: string, reason?: string): Promise<Commission> {
     try {
       const commission = await this.commissionRepository.findOne({
         where: { id: commissionId }
@@ -345,7 +340,7 @@ export class CommissionEngine {
     commissionId: string,
     newAmount: number,
     reason: string
-  ): Promise<PartnerCommission> {
+  ): Promise<Commission> {
     try {
       const commission = await this.commissionRepository.findOne({
         where: { id: commissionId },
@@ -379,14 +374,6 @@ export class CommissionEngine {
 
       const updated = await this.commissionRepository.save(commission);
 
-      // Update partner total commissions if already confirmed
-      if (commission.status === CommissionStatus.CONFIRMED) {
-        const partner = commission.partner;
-        const diff = newAmount - oldAmount;
-        partner.totalCommissions = (partner.totalCommissions || 0) + diff;
-        await this.partnerRepository.save(partner);
-      }
-
       logger.info(
         `Commission adjusted: ${commissionId} (${oldAmount} -> ${newAmount}, reason: ${reason})`
       );
@@ -406,7 +393,7 @@ export class CommissionEngine {
     commissionId: string,
     paymentMethod: string,
     paymentReference?: string
-  ): Promise<PartnerCommission> {
+  ): Promise<Commission> {
     try {
       const commission = await this.commissionRepository.findOne({
         where: { id: commissionId }
@@ -423,13 +410,7 @@ export class CommissionEngine {
       commission.status = CommissionStatus.PAID;
       commission.paidAt = new Date();
       commission.paymentMethod = paymentMethod;
-
-      if (paymentReference) {
-        commission.metadata = {
-          ...commission.metadata,
-          paymentReference
-        };
-      }
+      commission.paymentReference = paymentReference;
 
       const updated = await this.commissionRepository.save(commission);
 

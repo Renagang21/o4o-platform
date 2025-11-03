@@ -433,42 +433,37 @@ export class TrackingService {
   }
 
   /**
-   * Determine click source (organic, social, paid, etc.)
+   * Determine click source (web, mobile, social, etc.)
    */
   private determineClickSource(referer?: string, source?: string): ClickSource {
     if (source) {
       const sourceLower = source.toLowerCase();
-      if (sourceLower.includes('google') || sourceLower.includes('search')) {
-        return ClickSource.ORGANIC;
-      }
+      // Map to actual ClickSource enum values
       if (sourceLower.includes('instagram') || sourceLower.includes('facebook') ||
           sourceLower.includes('twitter') || sourceLower.includes('social')) {
         return ClickSource.SOCIAL;
       }
-      if (sourceLower.includes('email')) {
+      if (sourceLower.includes('email') || sourceLower.includes('mail')) {
         return ClickSource.EMAIL;
       }
-      if (sourceLower.includes('ad') || sourceLower.includes('paid') || sourceLower.includes('cpc')) {
-        return ClickSource.PAID;
+      if (sourceLower.includes('app') || sourceLower.includes('mobile-app')) {
+        return ClickSource.APP;
+      }
+      if (sourceLower.includes('mobile')) {
+        return ClickSource.MOBILE;
       }
     }
 
     if (referer) {
       const refLower = referer.toLowerCase();
-      if (refLower.includes('google.com') || refLower.includes('naver.com') || refLower.includes('bing.com')) {
-        return ClickSource.ORGANIC;
-      }
       if (refLower.includes('instagram.com') || refLower.includes('facebook.com') ||
           refLower.includes('twitter.com') || refLower.includes('t.co')) {
         return ClickSource.SOCIAL;
       }
     }
 
-    if (!referer) {
-      return ClickSource.DIRECT;
-    }
-
-    return ClickSource.UNKNOWN;
+    // Default to WEB for standard web traffic
+    return ClickSource.WEB;
   }
 
   /**
