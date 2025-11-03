@@ -29,6 +29,17 @@ class HttpMetricsService {
   private cacheHitRate: promClient.Gauge;
   private redisErrorsTotal: promClient.Counter;
 
+  // Webhook Metrics
+  private webhookDeliveriesTotal: promClient.Counter;
+  private webhookDeliveryDuration: promClient.Histogram;
+  private webhookQueueSize: promClient.Gauge;
+  private webhookFailuresTotal: promClient.Counter;
+
+  // Batch Job Metrics
+  private batchJobRunsTotal: promClient.Counter;
+  private batchJobDuration: promClient.Histogram;
+  private batchJobItemsProcessed: promClient.Counter;
+
   private constructor(registry: promClient.Registry) {
     this.registry = registry;
 
@@ -95,6 +106,59 @@ class HttpMetricsService {
       name: 'redis_errors_total',
       help: 'Total number of Redis errors',
       labelNames: ['op'],
+      registers: [this.registry],
+    });
+
+    // Webhook metrics
+    this.webhookDeliveriesTotal = new promClient.Counter({
+      name: 'webhook_deliveries_total',
+      help: 'Total number of webhook deliveries',
+      labelNames: ['event', 'status'],
+      registers: [this.registry],
+    });
+
+    this.webhookDeliveryDuration = new promClient.Histogram({
+      name: 'webhook_delivery_duration_seconds',
+      help: 'Webhook delivery duration in seconds',
+      labelNames: ['event', 'status'],
+      buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
+      registers: [this.registry],
+    });
+
+    this.webhookQueueSize = new promClient.Gauge({
+      name: 'webhook_queue_size',
+      help: 'Number of webhooks in queue by status',
+      labelNames: ['status'],
+      registers: [this.registry],
+    });
+
+    this.webhookFailuresTotal = new promClient.Counter({
+      name: 'webhook_failures_total',
+      help: 'Total number of webhook delivery failures',
+      labelNames: ['event', 'reason'],
+      registers: [this.registry],
+    });
+
+    // Batch job metrics
+    this.batchJobRunsTotal = new promClient.Counter({
+      name: 'batch_job_runs_total',
+      help: 'Total number of batch job runs',
+      labelNames: ['job_name', 'status'],
+      registers: [this.registry],
+    });
+
+    this.batchJobDuration = new promClient.Histogram({
+      name: 'batch_job_duration_seconds',
+      help: 'Batch job duration in seconds',
+      labelNames: ['job_name'],
+      buckets: [1, 5, 10, 30, 60, 120, 300],
+      registers: [this.registry],
+    });
+
+    this.batchJobItemsProcessed = new promClient.Counter({
+      name: 'batch_job_items_processed_total',
+      help: 'Total number of items processed by batch jobs',
+      labelNames: ['job_name', 'status'],
       registers: [this.registry],
     });
 
@@ -220,6 +284,54 @@ class HttpMetricsService {
     } catch (error: any) {
       logger.error('Failed to update cache metrics', { error: error.message });
     }
+  }
+
+  /**
+   * Record webhook delivery
+   */
+  recordWebhookDelivery(event: string, status: 'success' | 'failed', duration: number): void {
+    this.webhookDeliveriesTotal.inc({ event, status });
+    this.webhookDeliveryDuration.observe({ event, status }, duration);
+  }
+
+  /**
+   * Record webhook failure
+   */
+  recordWebhookFailure(event: string, reason: string): void {
+    this.webhookFailuresTotal.inc({ event, reason });
+  }
+
+  /**
+   * Update webhook queue size metrics
+   */
+  async updateWebhookQueueMetrics(): Promise<void> {
+    try {
+      const { getWebhookQueueStats } = await import('../queues/webhook.queue.js');
+      const stats = await getWebhookQueueStats();
+
+      this.webhookQueueSize.set({ status: 'waiting' }, stats.waiting);
+      this.webhookQueueSize.set({ status: 'active' }, stats.active);
+      this.webhookQueueSize.set({ status: 'completed' }, stats.completed);
+      this.webhookQueueSize.set({ status: 'failed' }, stats.failed);
+      this.webhookQueueSize.set({ status: 'delayed' }, stats.delayed);
+    } catch (error: any) {
+      logger.error('Failed to update webhook queue metrics', { error: error.message });
+    }
+  }
+
+  /**
+   * Record batch job run
+   */
+  recordBatchJobRun(jobName: string, status: 'success' | 'failed', duration: number): void {
+    this.batchJobRunsTotal.inc({ job_name: jobName, status });
+    this.batchJobDuration.observe({ job_name: jobName }, duration);
+  }
+
+  /**
+   * Record batch job items processed
+   */
+  recordBatchJobItemsProcessed(jobName: string, status: 'success' | 'failed', count: number): void {
+    this.batchJobItemsProcessed.inc({ job_name: jobName, status }, count);
   }
 }
 
