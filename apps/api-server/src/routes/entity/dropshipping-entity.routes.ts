@@ -1,11 +1,15 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { SupplierEntityController } from '../../controllers/entity/SupplierEntityController.js';
 import { PartnerEntityController } from '../../controllers/entity/PartnerEntityController.js';
+import { SupplierDashboardController } from '../../controllers/entity/SupplierDashboardController.js';
+import { PartnerDashboardController } from '../../controllers/entity/PartnerDashboardController.js';
 import { authenticateToken } from '../../middleware/auth.js';
 
 const router: Router = Router();
 const supplierController = new SupplierEntityController();
 const partnerController = new PartnerEntityController();
+const supplierDashboardController = new SupplierDashboardController();
+const partnerDashboardController = new PartnerDashboardController();
 
 // All routes require authentication
 router.use(authenticateToken);
@@ -138,5 +142,44 @@ router.put('/partners/:id/reject', requireAdmin, partnerController.reject.bind(p
  * @access Private (Owner or admin)
  */
 router.get('/partners/:id/referral-link', partnerController.getReferralLink.bind(partnerController));
+
+// ============================================================================
+// DASHBOARD ROUTES
+// ============================================================================
+
+/**
+ * @route GET /api/v1/entity/suppliers/dashboard/stats
+ * @desc Get supplier dashboard statistics
+ * @query period - Time period (7d, 30d, 90d, 1y)
+ * @query supplierId - Supplier ID (admin only)
+ * @access Private (Owner or admin)
+ */
+router.get('/suppliers/dashboard/stats', supplierDashboardController.getStats.bind(supplierDashboardController));
+
+/**
+ * @route GET /api/v1/entity/suppliers/dashboard/products
+ * @desc Get supplier's products with filtering
+ * @query status - Filter by status
+ * @query lowStock - Filter low stock products
+ * @query outOfStock - Filter out of stock products
+ * @access Private (Owner only)
+ */
+router.get('/suppliers/dashboard/products', supplierDashboardController.getProducts.bind(supplierDashboardController));
+
+/**
+ * @route GET /api/v1/entity/partners/dashboard/summary
+ * @desc Get partner dashboard summary (earnings, clicks, conversions)
+ * @query partnerId - Partner ID (admin only)
+ * @access Private (Owner or admin)
+ */
+router.get('/partners/dashboard/summary', partnerDashboardController.getSummary.bind(partnerDashboardController));
+
+/**
+ * @route GET /api/v1/entity/partners/dashboard/commissions
+ * @desc Get partner commission history
+ * @query status - Filter by commission status
+ * @access Private (Owner only)
+ */
+router.get('/partners/dashboard/commissions', partnerDashboardController.getCommissions.bind(partnerDashboardController));
 
 export default router;
