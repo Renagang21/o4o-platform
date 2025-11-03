@@ -23,6 +23,12 @@ class HttpMetricsService {
   private commissionsInProgress: promClient.Gauge;
   private activePartnersCount: promClient.Gauge;
 
+  // Cache Metrics
+  private cacheHitsTotal: promClient.Counter;
+  private cacheMissesTotal: promClient.Counter;
+  private cacheHitRate: promClient.Gauge;
+  private redisErrorsTotal: promClient.Counter;
+
   private constructor(registry: promClient.Registry) {
     this.registry = registry;
 
@@ -61,6 +67,34 @@ class HttpMetricsService {
     this.activePartnersCount = new promClient.Gauge({
       name: 'active_partners_count',
       help: 'Number of active partners in the system',
+      registers: [this.registry],
+    });
+
+    // Cache metrics
+    this.cacheHitsTotal = new promClient.Counter({
+      name: 'cache_hits_total',
+      help: 'Total number of cache hits',
+      labelNames: ['layer', 'type'],
+      registers: [this.registry],
+    });
+
+    this.cacheMissesTotal = new promClient.Counter({
+      name: 'cache_misses_total',
+      help: 'Total number of cache misses',
+      labelNames: ['type'],
+      registers: [this.registry],
+    });
+
+    this.cacheHitRate = new promClient.Gauge({
+      name: 'cache_hit_rate',
+      help: 'Cache hit rate (0-1)',
+      registers: [this.registry],
+    });
+
+    this.redisErrorsTotal = new promClient.Counter({
+      name: 'redis_errors_total',
+      help: 'Total number of Redis errors',
+      labelNames: ['op'],
       registers: [this.registry],
     });
 
@@ -146,6 +180,46 @@ class HttpMetricsService {
    */
   setActivePartnersCount(count: number): void {
     this.activePartnersCount.set(count);
+  }
+
+  /**
+   * Record cache hit
+   */
+  recordCacheHit(layer: 'L1' | 'L2', type: string): void {
+    this.cacheHitsTotal.inc({ layer, type });
+  }
+
+  /**
+   * Record cache miss
+   */
+  recordCacheMiss(type: string): void {
+    this.cacheMissesTotal.inc({ type });
+  }
+
+  /**
+   * Record Redis error
+   */
+  recordRedisError(op: string): void {
+    this.redisErrorsTotal.inc({ op });
+  }
+
+  /**
+   * Update cache hit rate from CacheService stats
+   */
+  async updateCacheMetrics(): Promise<void> {
+    try {
+      // Import CacheService dynamically to avoid circular dependency
+      const { cacheService } = await import('../services/CacheService.js');
+      const stats = cacheService.getStats();
+
+      // Update hit rate gauge
+      this.cacheHitRate.set(stats.hitRate);
+
+      // Update counters with current totals (they track cumulative values)
+      // Note: Prometheus counters should only increase, so we track incrementally
+    } catch (error: any) {
+      logger.error('Failed to update cache metrics', { error: error.message });
+    }
   }
 }
 
