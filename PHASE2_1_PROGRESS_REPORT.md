@@ -2,7 +2,7 @@
 
 **작성일**: 2025-11-03
 **Phase**: 2.1 - Tracking & Commission Core (진행 중)
-**상태**: 🟡 **데이터 구조 완성, 서비스 레이어 구현 필요**
+**상태**: 🟢 **서비스 레이어 완성, 라우트 연결 및 테스트 필요**
 
 ---
 
@@ -155,36 +155,248 @@ appliesTo(context): boolean {
 - conversion_events → referral_clicks
 - conversion_events → products
 
+### 4. 서비스 레이어 구현 완료 ✅
+
+#### **TrackingService** (~710 lines)
+
+**목적**: 클릭 수집 및 필터링 파이프라인
+
+**핵심 기능**:
+- ✅ **클릭 기록**: `recordClick()` - 추천 링크 클릭 수집 with 전체 필터링 파이프라인
+- ✅ **봇 감지**: `detectBot()` - User-agent 분석, 의심 패턴 감지
+- ✅ **중복 체크**: `checkDuplicate()` - Session/Fingerprint 기반 (24시간 윈도우)
+- ✅ **레이트 리밋**: `checkRateLimit()` - 5분 윈도우, 10클릭 제한 (인메모리 캐시)
+- ✅ **내부 트래픽 감지**: IP 패턴 매칭
+- ✅ **개인정보 보호**: IP 익명화, 해시 처리, 지오로케이션 (도시 레벨)
+- ✅ **GDPR 준수**: `anonymizeOldClicks()` - 보존 기간 (기본 90일) 후 자동 익명화
+- ✅ **통계 조회**: `getClickStats()` - 파트너별 클릭 통계
+
+**필터링 파이프라인**:
+```typescript
+recordClick() {
+  1. Partner 검증
+  2. Product 검증 (optional)
+  3. 민감 데이터 해싱 (session, fingerprint)
+  4. 봇 감지
+  5. 내부 트래픽 감지
+  6. 레이트 리밋 체크
+  7. 중복 감지 (24h window)
+  8. 상태 결정 (valid/duplicate/bot/internal/rate_limited)
+  9. 지오로케이션 & User-agent 파싱
+  10. IP 익명화
+  11. Click 저장
+  12. Partner 통계 업데이트 (valid clicks만)
+}
+```
+
+#### **AttributionService** (~645 lines)
+
+**목적**: 전환 추적 및 어트리뷰션
+
+**핵심 기능**:
+- ✅ **전환 생성**: `createConversion()` - 어트리뷰션 with 멱등성
+- ✅ **어트리뷰션 계산**: `calculateAttribution()` - 5가지 모델 지원
+  - Last-touch (기본)
+  - First-touch
+  - Linear (균등 배분)
+  - Time-decay (7일 half-life)
+  - Position-based (40% 첫/40% 마지막/20% 중간)
+- ✅ **전환 확정**: `confirmConversion()` - Pending → Confirmed
+- ✅ **전환 취소**: `cancelConversion()` - 주문 취소 시
+- ✅ **환불 처리**: `processRefund()` - 전액/부분 환불
+- ✅ **통계 조회**: `getConversionStats()` - 파트너별 전환 통계
+
+**어트리뷰션 로직**:
+```typescript
+calculateAttribution() {
+  1. Attribution window 내 모든 valid clicks 조회
+  2. Attribution model 적용:
+     - Last-touch: 마지막 click 100%
+     - First-touch: 첫 click 100%
+     - Linear: 모든 clicks 균등 배분
+     - Time-decay: 지수 감소 (half-life 7일)
+     - Position-based: 40% 첫/40% 마지막/20% 중간
+  3. Attribution path 생성 (clickId, timestamp, weight)
+  4. Primary click 반환
+}
+```
+
+#### **CommissionEngine** (~660 lines)
+
+**목적**: 커미션 계산 및 정책 관리
+
+**핵심 기능**:
+- ✅ **커미션 생성**: `createCommission()` - Conversion → Commission with hold period
+- ✅ **정책 매칭**: `findBestMatchingPolicy()` - Priority + Specificity 기반
+- ✅ **정책 평가**: 시간 검증, 사용 제한, 스태킹 규칙
+- ✅ **커미션 확정**: `confirmCommission()` - Pending → Confirmed
+- ✅ **커미션 취소**: `cancelCommission()` - 주문 취소 시
+- ✅ **커미션 조정**: `adjustCommission()` - 부분 환불 시
+- ✅ **지급 처리**: `markAsPaid()` - 정산 완료
+- ✅ **자동 확정**: `autoConfirmCommissions()` - Hold period 지난 커미션 자동 확정
+- ✅ **통계 조회**: `getCommissionStats()` - 파트너별 커미션 통계
+
+**정책 매칭 로직**:
+```typescript
+findBestMatchingPolicy(context) {
+  1. 모든 active policies 조회
+  2. isActive() 검증 (시간, 사용 제한)
+  3. appliesTo(context) 검증 (partner, tier, product, supplier, category, tags, order amount, new customer)
+  4. Priority 정렬 (높을수록 우선)
+  5. Specificity 계산:
+     - Partner-specific: +100
+     - Product-specific: +90
+     - Tier-specific: +80
+     - Supplier-specific: +70
+     - Category-specific: +60
+     - Has tags: +50
+     - Order amount constraints: +40
+     - Requires new customer: +30
+     - Promotional: +20
+  6. Stacking rules 확인
+  7. Best policy 반환
+}
+```
+
+#### **WebhookHandlers** (~250 lines)
+
+**목적**: 주문 라이프사이클 자동화
+
+**핵심 기능**:
+- ✅ **주문 생성**: `handleOrderCreated()` - Conversion 생성
+- ✅ **주문 확정**: `handleOrderConfirmed()` - Conversion 확정 → Commission 생성 (pending with hold)
+- ✅ **주문 취소**: `handleOrderCancelled()` - Conversion & Commission 취소
+- ✅ **주문 환불**: `handleOrderRefunded()` - 부분/전액 환불 처리
+- ✅ **자동 확정 Job**: `autoConfirmCommissions()` - Hold period 지난 커미션 확정
+- ✅ **익명화 Job**: `anonymizeOldClicks()` - 보존 기간 지난 클릭 익명화
+
+**자동화 플로우**:
+```
+Order Created (with referralCode)
+  → Create ConversionEvent (pending)
+  → [주문 확정 대기]
+
+Order Confirmed
+  → Confirm ConversionEvent
+  → Create Commission (pending, hold period 7 days)
+  → [Hold period 대기]
+
+[Scheduled Job - Daily]
+  → Auto-confirm Commissions (hold period passed)
+  → Status: Pending → Confirmed
+
+[Manual Payment]
+  → Mark as Paid
+  → Status: Confirmed → Paid
+
+[Exception Flows]
+Order Cancelled → Cancel Conversion & Commission
+Order Refunded (partial) → Adjust Commission (proportional)
+Order Refunded (full) → Cancel Commission
+```
+
+### 5. API 컨트롤러 구현 완료 ✅
+
+#### **TrackingController** (~680 lines)
+
+**목적**: RESTful API 엔드포인트
+
+**구현된 엔드포인트** (26개):
+
+**Click Tracking** (4개):
+- `POST /api/v1/tracking/click` - 클릭 기록 (public, rate-limited)
+- `GET /api/v1/tracking/clicks` - 클릭 목록 (authenticated)
+- `GET /api/v1/tracking/clicks/:id` - 클릭 상세 (authenticated)
+- `GET /api/v1/tracking/clicks/stats` - 클릭 통계 (authenticated)
+
+**Conversion Tracking** (7개):
+- `POST /api/v1/tracking/conversion` - 전환 생성 (admin)
+- `GET /api/v1/tracking/conversions` - 전환 목록 (authenticated)
+- `GET /api/v1/tracking/conversions/:id` - 전환 상세 (authenticated)
+- `POST /api/v1/tracking/conversions/:id/confirm` - 전환 확정 (admin)
+- `POST /api/v1/tracking/conversions/:id/cancel` - 전환 취소 (admin)
+- `POST /api/v1/tracking/conversions/:id/refund` - 환불 처리 (admin)
+- `GET /api/v1/tracking/conversions/stats` - 전환 통계 (authenticated)
+
+**Commission Management** (7개):
+- `POST /api/v1/commissions` - 커미션 생성 (admin)
+- `GET /api/v1/commissions` - 커미션 목록 (authenticated)
+- `POST /api/v1/commissions/:id/confirm` - 커미션 확정 (admin)
+- `POST /api/v1/commissions/:id/cancel` - 커미션 취소 (admin)
+- `POST /api/v1/commissions/:id/adjust` - 커미션 조정 (admin)
+- `POST /api/v1/commissions/:id/pay` - 지급 처리 (admin)
+- `GET /api/v1/commissions/stats` - 커미션 통계 (authenticated)
+
+**Policy Management** (2개):
+- `POST /api/v1/policies` - 정책 생성/수정 (admin)
+- `GET /api/v1/policies` - 정책 목록 (admin)
+
+**권한 설계**:
+- Public: Click tracking only (rate-limited)
+- Authenticated (Partner): Own data read
+- Admin: Full CRUD + state transitions
+
+### 6. Phase 2 롤백 스크립트 완료 ✅
+
+#### **scripts/rollback-phase2.sh** (~250 lines)
+
+**목적**: 안전한 Phase 2 롤백
+
+**핵심 기능**:
+- ✅ **Dry-run 모드** (기본) - 실제 변경 없이 시뮬레이션
+- ✅ **Execute 모드** (`--execute` 플래그) - 실제 롤백 실행
+- ✅ **데이터베이스 백업** - 실행 전 자동 백업 (압축)
+- ✅ **테이블 삭제** - Phase 2.1 테이블 제거 (dependencies 역순)
+- ✅ **검증** - Phase 1 테이블 무결성 확인
+- ✅ **Git 롤백** (optional) - `phase1-complete` 태그로 복원
+- ✅ **로깅** - 모든 작업 로그 기록
+
+**사용법**:
+```bash
+# Dry-run (안전, 기본)
+./scripts/rollback-phase2.sh
+
+# 실제 롤백 실행
+./scripts/rollback-phase2.sh --execute
+```
+
+**롤백 순서**:
+```
+1. Database connection 확인
+2. Phase 2 tables 존재 확인
+3. Phase 1 tables 무결성 확인
+4. Database backup 생성 (execute mode만)
+5. Drop tables (dependencies 역순):
+   - commission_policies
+   - conversion_events
+   - referral_clicks
+6. 롤백 검증
+7. Git 롤백 (optional, 사용자 확인)
+```
+
 ---
 
-## 🚧 진행 중 작업
+## 🚧 남은 작업
 
-### 현재 단계: 데이터 구조 완성 → 서비스 레이어 구현 필요
+### Phase 2.1 완료를 위한 작업
 
-**다음 작업**:
-1. **Tracking Service** 구현
-   - 클릭 수집 API (`POST /api/v1/tracking/click`)
-   - 봇/중복 필터링 로직
-   - 레이트 리밋 미들웨어
+1. **라우트 등록** (필수)
+   - TrackingController 라우트 등록
+   - Rate limiter 미들웨어 추가 (click tracking endpoint)
 
-2. **Attribution Service** 구현
-   - 전환 이벤트 생성 (`POST /api/v1/tracking/conversion`)
-   - 어트리뷰션 모델 적용
-   - 멱등성 체크
+2. **마이그레이션 적용** (필수)
+   - `npm run migration:run` 실행
+   - 테이블 생성 확인
 
-3. **Commission Engine** 구현
-   - 정책 매칭 엔진
-   - 커미션 계산 로직
-   - 상태머신 (pending → confirmed → paid)
+3. **기본 정책 시드 데이터** (권장)
+   - Default commission policy 생성
+   - Tier-based policies 생성
 
-4. **Webhook 핸들러**
-   - 주문 생성 훅 → 전환 이벤트 생성
-   - 주문 확정 훅 → 커미션 confirmed
-   - 주문 취소/환불 훅 → 커미션 조정
-
-5. **Phase 2 롤백 스크립트**
-   - Phase 2.1 테이블 롤백
-   - Phase 1 상태로 복원
+4. **통합 테스트** (권장)
+   - Click tracking flow 테스트
+   - Conversion attribution 테스트
+   - Commission calculation 테스트
+   - Webhook automation 테스트
 
 ---
 
@@ -292,71 +504,103 @@ active ←→ inactive
 ### Migration (1개)
 4. `apps/api-server/src/database/migrations/2000000000000-CreateTrackingAndCommissionTables.ts` - 220줄
 
-**총 코드**: 983줄
+### Services (4개)
+5. `apps/api-server/src/services/TrackingService.ts` - 710줄
+6. `apps/api-server/src/services/AttributionService.ts` - 645줄
+7. `apps/api-server/src/services/CommissionEngine.ts` - 660줄
+8. `apps/api-server/src/services/WebhookHandlers.ts` - 250줄
+
+### Controllers (1개)
+9. `apps/api-server/src/controllers/TrackingController.ts` - 680줄
+
+### Scripts (1개)
+10. `scripts/rollback-phase2.sh` - 250줄
+
+**총 코드**: ~4,178줄
+**Commit**: `8d949ea4c` - "feat: Add Phase 2.1 service layer and API controllers"
 
 ---
 
 ## 🎯 다음 세션 계획
 
-### Phase 2.1 완료 작업 (예상)
+### Phase 2.1 완료 작업 (즉시)
 
-1. **서비스 레이어** (3-4개 파일)
-   - TrackingService.ts
-   - AttributionService.ts
-   - CommissionEngine.ts
-   - WebhookHandlers.ts
+1. **라우트 등록** (필수)
+   - TrackingController routes 추가
+   - Rate limiter 미들웨어 통합
 
-2. **API 컨트롤러** (2개 파일)
-   - TrackingController.ts
-   - CommissionController.ts
+2. **마이그레이션 적용** (필수)
+   - DB migration 실행
+   - 테이블 검증
 
-3. **미들웨어** (1-2개 파일)
-   - RateLimiter.ts
-   - BotDetector.ts
+3. **시드 데이터** (권장)
+   - Default commission policy
+   - Tier-based policies (Bronze/Silver/Gold/Platinum)
 
-4. **테스트 & 검증**
-   - 마이그레이션 적용
-   - 샘플 데이터 시드
-   - 엔드투엔드 테스트
+4. **통합 테스트** (권장)
+   - Click → Conversion → Commission 플로우
+   - Webhook automation 검증
 
-5. **Phase 2 롤백 스크립트**
-   - `scripts/rollback-phase2.sh`
-
-### Phase 2.2 작업 (이후 세션)
+### Phase 2.2 작업 (다음 세션)
 
 1. **대시보드 확장**
    - 클릭/전환/커미션 추이 차트
-   - KPI 위젯
+   - Conversion funnel 시각화
+   - KPI 위젯 (CVR, AOV, EPC)
 
 2. **운영 패널**
    - 수동 승인/조정 UI
    - 분쟁 처리 워크플로우
+   - Bulk operations (일괄 처리)
 
 3. **성능 최적화**
-   - 캐싱 전략
-   - 비동기 큐 도입
+   - Redis 기반 rate limiter (인메모리 → Redis)
+   - Cache layer for policies
+   - Async queue for webhooks (Bull/BullMQ)
+   - Database connection pooling
 
-4. **스테이징 배포**
+4. **모니터링 & 알림**
+   - Commission failure rate alerts
+   - Conversion delay warnings
+   - Anomaly detection (봇 트래픽 급증 등)
+
+5. **스테이징 배포**
    - 단계별 검증
+   - Load testing
    - 프로덕션 롤아웃
 
 ---
 
 ## 🚀 현재 상태
 
-**진행률**: 약 30% (데이터 구조 완성)
+**진행률**: 약 70% (Core 로직 완성, 라우트 연결 및 테스트 남음)
 
 **Git 상태**:
-- 최신 커밋: `8e3170b0d` - "feat: Add Phase 2.1 tracking & commission entities and migration"
+- 최신 커밋: `8d949ea4c` - "feat: Add Phase 2.1 service layer and API controllers"
+- 이전 커밋: `8e3170b0d` - "feat: Add Phase 2.1 tracking & commission entities and migration"
 - 태그: `phase1-complete` (기준선)
 - 브랜치: `main`
 
+**완료된 구현**:
+- ✅ 엔티티 (3개) - 983줄
+- ✅ 마이그레이션 (1개) - 220줄
+- ✅ 서비스 (4개) - 2,265줄
+- ✅ 컨트롤러 (1개) - 680줄
+- ✅ 롤백 스크립트 (1개) - 250줄
+- **총 코드**: ~4,178줄
+
+**남은 작업**:
+- ⏳ 라우트 등록 (TrackingController)
+- ⏳ 마이그레이션 적용 (DB 테이블 생성)
+- ⏳ 시드 데이터 (기본 정책)
+- ⏳ 통합 테스트
+
 **블로킹 요소**: 없음
-**준비 상태**: 서비스 레이어 구현 준비 완료
+**배포 준비**: 라우트 등록 후 스테이징 배포 가능
 
 ---
 
 **작성**: Claude Code
-**최종 업데이트**: 2025-11-03 11:45 KST
+**최종 업데이트**: 2025-11-03 15:30 KST
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
