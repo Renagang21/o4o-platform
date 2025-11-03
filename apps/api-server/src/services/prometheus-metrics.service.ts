@@ -17,7 +17,7 @@ import logger from '../utils/logger.js';
 
 class PrometheusMetricsService {
   private static instance: PrometheusMetricsService;
-  private registry: promClient.Registry;
+  public registry: promClient.Registry; // Made public to share with HTTP metrics
 
   // Metrics
   private jobsTotalCounter: promClient.Counter;

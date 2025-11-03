@@ -54,6 +54,22 @@ async function executeCommissionBatchJob(): Promise<void> {
     const results = await operationsService.batchConfirmCommissions();
 
     const duration = Date.now() - startTime;
+    const durationSeconds = duration / 1000;
+
+    // Record metrics
+    try {
+      const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
+      const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+      const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+
+      metricsInstance.recordBatchJobRun('commission-auto-confirm', 'success', durationSeconds);
+      metricsInstance.recordBatchJobItemsProcessed('commission-auto-confirm', 'success', results.confirmed);
+      if (results.failed > 0) {
+        metricsInstance.recordBatchJobItemsProcessed('commission-auto-confirm', 'failed', results.failed);
+      }
+    } catch (metricsError) {
+      logger.warn('[Commission Batch] Failed to record metrics:', metricsError);
+    }
 
     // Update last run stats
     lastRunTime = new Date();
@@ -93,13 +109,27 @@ async function executeCommissionBatchJob(): Promise<void> {
   } catch (error) {
     logger.error('[Commission Batch] ❌ Job failed with error:', error);
 
+    const duration = Date.now() - startTime;
+    const durationSeconds = duration / 1000;
+
+    // Record failure metrics
+    try {
+      const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
+      const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+      const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+
+      metricsInstance.recordBatchJobRun('commission-auto-confirm', 'failed', durationSeconds);
+    } catch (metricsError) {
+      logger.warn('[Commission Batch] Failed to record failure metrics:', metricsError);
+    }
+
     // Update stats with failure
     lastRunTime = new Date();
     lastRunStats = {
       total: 0,
       confirmed: 0,
       failed: 1,
-      duration: Date.now() - startTime
+      duration
     };
   } finally {
     isRunning = false;

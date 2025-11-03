@@ -187,16 +187,42 @@ export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
 /**
  * Webhook worker event handlers
  */
-webhookWorker.on('completed', (job, result) => {
+webhookWorker.on('completed', async (job, result) => {
   logger.info(`[Webhook] Job ${job.id} completed:`, result);
+
+  // Record metrics
+  try {
+    const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
+    const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+    const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+
+    const status = result.success ? 'success' : 'failed';
+    const durationSeconds = result.duration / 1000;
+    metricsInstance.recordWebhookDelivery(job.data.event, status, durationSeconds);
+  } catch (metricsError) {
+    logger.warn('[Webhook] Failed to record metrics:', metricsError);
+  }
 });
 
-webhookWorker.on('failed', (job, error) => {
+webhookWorker.on('failed', async (job, error) => {
   logger.error(`[Webhook] Job ${job?.id} failed:`, error.message);
 
   // If this was the last attempt, move to dead letter queue
   if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
     logger.error(`[Webhook] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`);
+  }
+
+  // Record metrics
+  if (job) {
+    try {
+      const { prometheusMetrics } = await import('../services/prometheus-metrics.service.js');
+      const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+      const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+
+      metricsInstance.recordWebhookFailure(job.data.event, error.name || 'UnknownError');
+    } catch (metricsError) {
+      logger.warn('[Webhook] Failed to record failure metrics:', metricsError);
+    }
   }
 });
 
