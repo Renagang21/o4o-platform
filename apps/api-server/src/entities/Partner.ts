@@ -194,6 +194,22 @@ export class Partner {
   @Column({ type: 'json', nullable: true })
   metadata?: Record<string, any>;
 
+  // Webhook Configuration
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  webhookUrl?: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  webhookSecret?: string | null;
+
+  @Column({ type: 'boolean', default: true })
+  webhookEnabled!: boolean;
+
+  @Column({ type: 'simple-json', nullable: true })
+  webhookEvents?: string[];
+
+  @Column({ type: 'timestamp', nullable: true })
+  webhookLastDeliveredAt?: Date;
+
   // Timestamps
   @CreateDateColumn()
   createdAt!: Date;
