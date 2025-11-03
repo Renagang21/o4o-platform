@@ -195,20 +195,21 @@ export class Commission {
     }
   }
 
-  cancel(reason?: string): void {
+  cancel(reason?: string, adminId?: string): void {
     if (this.canCancel()) {
       this.status = CommissionStatus.CANCELLED;
       this.cancelledAt = new Date();
-      if (reason) {
+      if (reason || adminId) {
         this.metadata = {
           ...this.metadata,
-          cancellationReason: reason
+          cancellationReason: reason,
+          cancelledBy: adminId
         };
       }
     }
   }
 
-  adjustAmount(newAmount: number, reason: string): void {
+  adjustAmount(newAmount: number, reason: string, adminId?: string): void {
     const oldAmount = this.commissionAmount;
     this.commissionAmount = newAmount;
 
@@ -224,7 +225,8 @@ export class Commission {
       oldAmount,
       newAmount,
       reason,
-      adjustedAt: new Date().toISOString()
+      adjustedAt: new Date().toISOString(),
+      adjustedBy: adminId
     });
   }
 
