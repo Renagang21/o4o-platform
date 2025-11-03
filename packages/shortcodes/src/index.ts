@@ -69,15 +69,11 @@ export { SocialLogin } from './auth/index.js';
 
 // Dynamic shortcodes
 export {
-  CPTListShortcode,
-  cptListShortcodeDefinition,
-  CPTFieldShortcode,
-  cptFieldShortcodeDefinition,
-  ACFFieldShortcode,
-  acfFieldShortcodeDefinition,
-  MetaFieldShortcode,
-  metaFieldShortcodeDefinition,
   registerDynamicShortcodes,
   getDynamicShortcodeDefinitions,
-  dynamicShortcodeTemplates
+  dynamicShortcodeTemplates,
+  loadCPTListShortcode,
+  loadCPTFieldShortcode,
+  loadACFFieldShortcode,
+  loadMetaFieldShortcode
 } from './dynamic/index.js';
