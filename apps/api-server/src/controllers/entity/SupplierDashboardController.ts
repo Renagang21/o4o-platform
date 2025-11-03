@@ -206,11 +206,11 @@ export class SupplierDashboardController {
         queryBuilder.andWhere('product.status = :status', { status });
       }
 
-      if (lowStock === 'true' || lowStock === true) {
+      if (lowStock === 'true' || (lowStock as any) === true) {
         queryBuilder.andWhere('product.inventory > 0 AND product.inventory < product.lowStockThreshold');
       }
 
-      if (outOfStock === 'true' || outOfStock === true) {
+      if (outOfStock === 'true' || (outOfStock as any) === true) {
         queryBuilder.andWhere('product.inventory = 0');
       }
 
