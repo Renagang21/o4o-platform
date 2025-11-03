@@ -22,6 +22,7 @@ export class StartupService {
     await this.initializeAppSystem();
     await this.initializeMonitoring();
     await this.initializeSchedulers();
+    await this.initializeWebhooksAndBatchJobs();
     await this.initializeUploadDirectories();
     await this.initializeEmailService();
     await this.initializeWorkers();
@@ -175,6 +176,34 @@ export class StartupService {
       logger.info('✅ Settlement Scheduler started');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
+    }
+  }
+
+  /**
+   * Initialize webhook subscribers and commission batch jobs
+   */
+  private async initializeWebhooksAndBatchJobs(): Promise<void> {
+    if (!AppDataSource.isInitialized) {
+      logger.warn('Skipping webhooks and batch jobs (database not connected)');
+      return;
+    }
+
+    try {
+      // Initialize webhook subscribers
+      const { OperationsService } = await import('./OperationsService.js');
+      const { initializeWebhookSubscribers } = await import('../init/webhook-subscribers.js');
+
+      const operationsService = new OperationsService();
+      initializeWebhookSubscribers(operationsService);
+      logger.info('✅ Webhook subscribers initialized (5 events)');
+
+      // Initialize commission batch job
+      const { initializeCommissionBatchJob } = await import('../jobs/commission-batch.job.js');
+      const schedule = env.getString('COMMISSION_BATCH_SCHEDULE', '0 2 * * *');
+      initializeCommissionBatchJob(schedule);
+      logger.info(`✅ Commission batch job initialized (schedule: ${schedule})`);
+    } catch (webhookError) {
+      logger.warn('Webhook/batch job initialization failed (non-critical):', webhookError);
     }
   }
 

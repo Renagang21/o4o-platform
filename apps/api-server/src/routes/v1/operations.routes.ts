@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
 import { OperationsController } from '../../controllers/OperationsController.js';
 import { authenticate, requireAnyRole } from '../../middleware/auth.middleware.js';
 import { UserRole } from '../../entities/User.js';
@@ -14,7 +14,7 @@ import rateLimit from 'express-rate-limit';
  * @phase Phase 2.2
  */
 
-const router = Router();
+const router: ExpressRouter = Router();
 const operationsController = new OperationsController();
 
 // Rate limiter for admin operations (higher limit than public endpoints)

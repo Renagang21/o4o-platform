@@ -162,11 +162,8 @@ export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
 
       console.error(`[Webhook] ❌ Failed to deliver ${event} to partner ${partnerId}:`, errorMessage);
 
-      // Update job data with attempt count
-      await job.update({
-        ...job.data,
-        attempt: attempt + 1
-      });
+      // Job will automatically retry with incremented attempt count
+      // BullMQ handles retry logic internally
 
       return {
         success: false,

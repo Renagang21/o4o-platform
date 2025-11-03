@@ -537,6 +537,14 @@ export class OperationsService {
           reason: 'Auto-confirmed after hold period'
         });
 
+        // Emit event for webhook notification
+        this.eventEmitter.emit('commission.auto_confirmed', {
+          commissionId: commission.id,
+          partnerId: commission.partnerId,
+          amount: commission.commissionAmount,
+          confirmedAt: new Date().toISOString()
+        });
+
         results.confirmed++;
       } catch (error) {
         results.failed++;
