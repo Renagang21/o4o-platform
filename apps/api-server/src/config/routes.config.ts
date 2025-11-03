@@ -97,6 +97,9 @@ import queryV2Routes from '../routes/v2/query.routes.js';
 // Entity API Routes (SSOT for dropshipping)
 import entityRoutes from '../routes/entity/dropshipping-entity.routes.js';
 
+// Phase 2 - Tracking & Commission Routes
+import trackingRoutes from '../routes/v1/tracking.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -265,6 +268,9 @@ export function setupRoutes(app: Application): void {
 
   // Entity API - SSOT for Dropshipping (Supplier, Partner)
   app.use('/api/v1/entity', standardLimiter, entityRoutes);
+
+  // Phase 2 - Tracking & Commission (includes own rate limiters)
+  app.use('/api/v1/tracking', trackingRoutes);
 
   // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);
