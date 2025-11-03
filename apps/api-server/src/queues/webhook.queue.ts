@@ -1,6 +1,7 @@
 import { Queue, Worker, Job } from 'bullmq';
 import Redis from 'ioredis';
 import crypto from 'crypto';
+import logger from '../utils/logger.js';
 
 /**
  * Webhook Queue
@@ -94,7 +95,7 @@ export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
     const startTime = Date.now();
 
     try {
-      console.log(`[Webhook] Processing ${event} for partner ${partnerId} (attempt ${attempt})`);
+      logger.info(`[Webhook] Processing ${event} for partner ${partnerId} (attempt ${attempt})`);
 
       // If webhook URL not provided in job data, fetch from database
       let url = webhookUrl;
@@ -148,7 +149,7 @@ export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
         throw new Error(`Webhook failed with status ${response.status}: ${response.statusText}`);
       }
 
-      console.log(`[Webhook] ✅ Delivered ${event} to partner ${partnerId} in ${duration}ms`);
+      logger.info(`[Webhook] ✅ Delivered ${event} to partner ${partnerId} in ${duration}ms`);
 
       return {
         success: true,
@@ -160,7 +161,7 @@ export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : String(error);
 
-      console.error(`[Webhook] ❌ Failed to deliver ${event} to partner ${partnerId}:`, errorMessage);
+      logger.error(`[Webhook] ❌ Failed to deliver ${event} to partner ${partnerId}:`, errorMessage);
 
       // Job will automatically retry with incremented attempt count
       // BullMQ handles retry logic internally
@@ -187,20 +188,20 @@ export const webhookWorker = new Worker<WebhookJobData, WebhookResult>(
  * Webhook worker event handlers
  */
 webhookWorker.on('completed', (job, result) => {
-  console.log(`[Webhook] Job ${job.id} completed:`, result);
+  logger.info(`[Webhook] Job ${job.id} completed:`, result);
 });
 
 webhookWorker.on('failed', (job, error) => {
-  console.error(`[Webhook] Job ${job?.id} failed:`, error.message);
+  logger.error(`[Webhook] Job ${job?.id} failed:`, error.message);
 
   // If this was the last attempt, move to dead letter queue
   if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
-    console.error(`[Webhook] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`);
+    logger.error(`[Webhook] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`);
   }
 });
 
 webhookWorker.on('error', (error) => {
-  console.error('[Webhook] Worker error:', error);
+  logger.error('[Webhook] Worker error:', error);
 });
 
 /**
@@ -238,7 +239,7 @@ export async function enqueueWebhook(
     }
   );
 
-  console.log(`[Webhook] Enqueued ${event} for partner ${partnerId} (job ${job.id})`);
+  logger.info(`[Webhook] Enqueued ${event} for partner ${partnerId} (job ${job.id})`);
 
   return job.id || 'unknown';
 }
@@ -283,7 +284,7 @@ export async function retryWebhook(jobId: string): Promise<void> {
   }
 
   await job.retry();
-  console.log(`[Webhook] Retrying job ${jobId}`);
+  logger.info(`[Webhook] Retrying job ${jobId}`);
 }
 
 /**
@@ -298,11 +299,11 @@ export async function retryAllFailedWebhooks(): Promise<number> {
       await job.retry();
       retried++;
     } catch (error) {
-      console.error(`[Webhook] Failed to retry job ${job.id}:`, error);
+      logger.error(`[Webhook] Failed to retry job ${job.id}:`, error);
     }
   }
 
-  console.log(`[Webhook] Retried ${retried} failed jobs`);
+  logger.info(`[Webhook] Retried ${retried} failed jobs`);
   return retried;
 }
 
@@ -315,7 +316,7 @@ export async function cleanWebhookQueue(olderThan: number = 86400000): Promise<v
   await webhookQueue.clean(grace, 1000, 'completed');
   await webhookQueue.clean(grace, 1000, 'failed');
 
-  console.log('[Webhook] Queue cleaned');
+  logger.info('[Webhook] Queue cleaned');
 }
 
 /**
@@ -323,7 +324,7 @@ export async function cleanWebhookQueue(olderThan: number = 86400000): Promise<v
  */
 export async function pauseWebhookQueue(): Promise<void> {
   await webhookQueue.pause();
-  console.log('[Webhook] Queue paused');
+  logger.info('[Webhook] Queue paused');
 }
 
 /**
@@ -331,7 +332,7 @@ export async function pauseWebhookQueue(): Promise<void> {
  */
 export async function resumeWebhookQueue(): Promise<void> {
   await webhookQueue.resume();
-  console.log('[Webhook] Queue resumed');
+  logger.info('[Webhook] Queue resumed');
 }
 
 /**
@@ -340,18 +341,18 @@ export async function resumeWebhookQueue(): Promise<void> {
 export async function closeWebhookQueue(): Promise<void> {
   await webhookWorker.close();
   await webhookQueue.close();
-  console.log('[Webhook] Queue and worker closed');
+  logger.info('[Webhook] Queue and worker closed');
 }
 
 // Graceful shutdown on process termination
 process.on('SIGTERM', async () => {
-  console.log('[Webhook] SIGTERM received, closing queue...');
+  logger.info('[Webhook] SIGTERM received, closing queue...');
   await closeWebhookQueue();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('[Webhook] SIGINT received, closing queue...');
+  logger.info('[Webhook] SIGINT received, closing queue...');
   await closeWebhookQueue();
   process.exit(0);
 });

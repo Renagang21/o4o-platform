@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { cacheService } from '../services/CacheService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Cache Middleware
@@ -69,7 +70,7 @@ export function cacheMiddleware(ttlSeconds: number = 300, namespace?: string) {
         // Only cache successful responses
         if (res.statusCode >= 200 && res.statusCode < 300) {
           cacheService.set(cacheKey, body, namespace, { ttl: ttlSeconds }).catch(err => {
-            console.error('Cache set error:', err);
+            logger.error('Cache set error:', err);
           });
         }
 
@@ -85,7 +86,7 @@ export function cacheMiddleware(ttlSeconds: number = 300, namespace?: string) {
 
       next();
     } catch (error) {
-      console.error('Cache middleware error:', error);
+      logger.error('Cache middleware error:', error);
       // Continue without caching on error
       next();
     }
@@ -164,9 +165,9 @@ export function cacheInvalidationMiddleware(namespace?: string, pattern?: string
             await cacheService.clear('api:*');
           }
 
-          console.log(`Cache invalidated: ${namespace || 'all'} ${pattern || ''}`);
+          logger.info(`Cache invalidated: ${namespace || 'all'} ${pattern || ''}`);
         } catch (error) {
-          console.error('Cache invalidation error:', error);
+          logger.error('Cache invalidation error:', error);
         }
       }
     });

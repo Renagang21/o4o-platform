@@ -1,5 +1,6 @@
 import cron, { type ScheduledTask } from 'node-cron';
 import { OperationsService } from '../services/OperationsService.js';
+import logger from '../utils/logger.js';
 
 /**
  * Commission Batch Job
@@ -33,15 +34,15 @@ let lastRunStats: {
  */
 async function executeCommissionBatchJob(): Promise<void> {
   if (isRunning) {
-    console.log('[Commission Batch] ⚠️  Job already running, skipping this execution');
+    logger.info('[Commission Batch] ⚠️  Job already running, skipping this execution');
     return;
   }
 
   isRunning = true;
   const startTime = Date.now();
 
-  console.log('[Commission Batch] 🚀 Starting batch confirmation job...');
-  console.log(`[Commission Batch] Time: ${new Date().toISOString()}`);
+  logger.info('[Commission Batch] 🚀 Starting batch confirmation job...');
+  logger.info(`[Commission Batch] Time: ${new Date().toISOString()}`);
 
   try {
     const operationsService = new OperationsService();
@@ -65,32 +66,32 @@ async function executeCommissionBatchJob(): Promise<void> {
 
     // Webhook events are automatically emitted by OperationsService.batchConfirmCommissions()
     if (results.confirmed > 0) {
-      console.log(`[Commission Batch] ✅ ${results.confirmed} commission.auto_confirmed events emitted`);
+      logger.info(`[Commission Batch] ✅ ${results.confirmed} commission.auto_confirmed events emitted`);
     }
 
     // Log summary
-    console.log('[Commission Batch] ✅ Job completed successfully');
-    console.log(`[Commission Batch] Total commissions processed: ${results.total}`);
-    console.log(`[Commission Batch] Confirmed: ${results.confirmed}`);
-    console.log(`[Commission Batch] Failed: ${results.failed}`);
-    console.log(`[Commission Batch] Duration: ${duration}ms`);
+    logger.info('[Commission Batch] ✅ Job completed successfully');
+    logger.info(`[Commission Batch] Total commissions processed: ${results.total}`);
+    logger.info(`[Commission Batch] Confirmed: ${results.confirmed}`);
+    logger.info(`[Commission Batch] Failed: ${results.failed}`);
+    logger.info(`[Commission Batch] Duration: ${duration}ms`);
 
     // Log errors if any
     if (results.errors.length > 0) {
-      console.error(`[Commission Batch] ❌ ${results.errors.length} errors occurred:`);
+      logger.error(`[Commission Batch] ❌ ${results.errors.length} errors occurred:`);
       results.errors.forEach(err => {
-        console.error(`  - Commission ${err.commissionId}: ${err.error}`);
+        logger.error(`  - Commission ${err.commissionId}: ${err.error}`);
       });
     }
 
     // Success rate
     if (results.total > 0) {
       const successRate = (results.confirmed / results.total) * 100;
-      console.log(`[Commission Batch] Success rate: ${successRate.toFixed(2)}%`);
+      logger.info(`[Commission Batch] Success rate: ${successRate.toFixed(2)}%`);
     }
 
   } catch (error) {
-    console.error('[Commission Batch] ❌ Job failed with error:', error);
+    logger.error('[Commission Batch] ❌ Job failed with error:', error);
 
     // Update stats with failure
     lastRunTime = new Date();
@@ -118,8 +119,8 @@ export function initializeCommissionBatchJob(schedule: string = '0 2 * * *'): Sc
   // Allow override from environment
   const cronSchedule = process.env.COMMISSION_BATCH_SCHEDULE || schedule;
 
-  console.log('[Commission Batch] Initializing batch job...');
-  console.log(`[Commission Batch] Schedule: ${cronSchedule} (${getCronDescription(cronSchedule)})`);
+  logger.info('[Commission Batch] Initializing batch job...');
+  logger.info(`[Commission Batch] Schedule: ${cronSchedule} (${getCronDescription(cronSchedule)})`);
 
   // Validate cron schedule
   if (!cron.validate(cronSchedule)) {
@@ -137,9 +138,9 @@ export function initializeCommissionBatchJob(schedule: string = '0 2 * * *'): Sc
     }
   );
 
-  console.log('[Commission Batch] ✅ Batch job initialized successfully');
-  console.log(`[Commission Batch] Timezone: ${process.env.TZ || 'Asia/Seoul'}`);
-  console.log(`[Commission Batch] Next run: ${getNextRunTime(cronSchedule)}`);
+  logger.info('[Commission Batch] ✅ Batch job initialized successfully');
+  logger.info(`[Commission Batch] Timezone: ${process.env.TZ || 'Asia/Seoul'}`);
+  logger.info(`[Commission Batch] Next run: ${getNextRunTime(cronSchedule)}`);
 
   return task;
 }
@@ -189,7 +190,7 @@ export function getLastRunStats(): {
  * Manually trigger batch job (for testing)
  */
 export async function triggerBatchJob(): Promise<void> {
-  console.log('[Commission Batch] Manual trigger requested');
+  logger.info('[Commission Batch] Manual trigger requested');
   await executeCommissionBatchJob();
 }
 
@@ -202,11 +203,11 @@ export function isBatchJobRunning(): boolean {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('[Commission Batch] SIGTERM received, waiting for job to complete...');
+  logger.info('[Commission Batch] SIGTERM received, waiting for job to complete...');
 
   const checkInterval = setInterval(() => {
     if (!isRunning) {
-      console.log('[Commission Batch] Job completed, exiting');
+      logger.info('[Commission Batch] Job completed, exiting');
       clearInterval(checkInterval);
       process.exit(0);
     }
@@ -214,7 +215,7 @@ process.on('SIGTERM', () => {
 
   // Force exit after 30 seconds
   setTimeout(() => {
-    console.log('[Commission Batch] Force exit after timeout');
+    logger.info('[Commission Batch] Force exit after timeout');
     clearInterval(checkInterval);
     process.exit(1);
   }, 30000);

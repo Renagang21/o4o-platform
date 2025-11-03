@@ -2,6 +2,7 @@ import { OperationsService } from '../services/OperationsService.js';
 import { enqueueWebhook } from '../queues/webhook.queue.js';
 import { AppDataSource } from '../database/connection.js';
 import { Partner } from '../entities/Partner.js';
+import logger from '../utils/logger.js';
 
 /**
  * Webhook Event Subscribers
@@ -27,7 +28,7 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
   const eventEmitter = operationsService.getEventEmitter();
   const partnerRepo = AppDataSource.getRepository(Partner);
 
-  console.log('[Webhook Subscribers] Initializing event subscriptions...');
+  logger.info('[Webhook Subscribers] Initializing event subscriptions...');
 
   /**
    * Commission Adjusted Event
@@ -43,7 +44,7 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
     adjustedBy: string;
   }) => {
     try {
-      console.log(`[Webhook] commission.adjusted event received for partner ${data.partnerId}`);
+      logger.info(`[Webhook] commission.adjusted event received for partner ${data.partnerId}`);
 
       // Fetch partner
       const partner = await partnerRepo.findOne({
@@ -51,15 +52,15 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
       });
 
       if (!partner) {
-        console.log(`[Webhook] Partner ${data.partnerId} not found, skipping`);
+        logger.warn(`[Webhook] Partner ${data.partnerId} not found, skipping`);
         return;
       }
 
       // TODO: Partner entity needs webhookUrl and webhookSecret fields
       // Webhook delivery will be enabled once Partner entity is updated
-      console.log(`[Webhook] ℹ️  Webhook delivery for commission.adjusted logged (pending Partner entity webhook fields)`);
+      logger.info(`[Webhook] Webhook delivery for commission.adjusted logged (pending Partner entity webhook fields)`);
     } catch (error) {
-      console.error('[Webhook] ❌ Failed to handle commission.adjusted:', error);
+      logger.error('[Webhook] Failed to handle commission.adjusted:', error);
     }
   });
 
@@ -77,10 +78,10 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
     paidBy: string;
   }) => {
     try {
-      console.log(`[Webhook] commission.paid event received for partner ${data.partnerId}`);
-      console.log(`[Webhook] ℹ️  Webhook delivery for commission.paid logged (pending Partner entity webhook fields)`);
+      logger.info(`[Webhook] commission.paid event received for partner ${data.partnerId}`);
+      logger.info(`[Webhook] Webhook delivery for commission.paid logged (pending Partner entity webhook fields)`);
     } catch (error) {
-      console.error('[Webhook] ❌ Failed to handle commission.paid:', error);
+      logger.error('[Webhook] Failed to handle commission.paid:', error);
     }
   });
 
@@ -96,10 +97,10 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
     cancelledBy: string;
   }) => {
     try {
-      console.log(`[Webhook] commission.cancelled event received for partner ${data.partnerId}`);
-      console.log(`[Webhook] ℹ️  Webhook delivery for commission.cancelled logged (pending Partner entity webhook fields)`);
+      logger.info(`[Webhook] commission.cancelled event received for partner ${data.partnerId}`);
+      logger.info(`[Webhook] Webhook delivery for commission.cancelled logged (pending Partner entity webhook fields)`);
     } catch (error) {
-      console.error('[Webhook] ❌ Failed to handle commission.cancelled:', error);
+      logger.error('[Webhook] Failed to handle commission.cancelled:', error);
     }
   });
 
@@ -117,10 +118,10 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
     processedBy: string;
   }) => {
     try {
-      console.log(`[Webhook] commission.refunded event received for partner ${data.partnerId}`);
-      console.log(`[Webhook] ℹ️  Webhook delivery for commission.refunded logged (pending Partner entity webhook fields)`);
+      logger.info(`[Webhook] commission.refunded event received for partner ${data.partnerId}`);
+      logger.info(`[Webhook] Webhook delivery for commission.refunded logged (pending Partner entity webhook fields)`);
     } catch (error) {
-      console.error('[Webhook] ❌ Failed to handle commission.refunded:', error);
+      logger.error('[Webhook] Failed to handle commission.refunded:', error);
     }
   });
 
@@ -136,18 +137,18 @@ export function initializeWebhookSubscribers(operationsService: OperationsServic
     confirmedAt: string;
   }) => {
     try {
-      console.log(`[Webhook] commission.auto_confirmed event received for partner ${data.partnerId}`);
-      console.log(`[Webhook] ℹ️  Webhook delivery for commission.auto_confirmed logged (pending Partner entity webhook fields)`);
+      logger.info(`[Webhook] commission.auto_confirmed event received for partner ${data.partnerId}`);
+      logger.info(`[Webhook] Webhook delivery for commission.auto_confirmed logged (pending Partner entity webhook fields)`);
     } catch (error) {
-      console.error('[Webhook] ❌ Failed to handle commission.auto_confirmed:', error);
+      logger.error('[Webhook] Failed to handle commission.auto_confirmed:', error);
     }
   });
 
-  console.log('[Webhook Subscribers] ✅ 5 event subscriptions initialized:');
-  console.log('  - commission.adjusted');
-  console.log('  - commission.paid');
-  console.log('  - commission.cancelled');
-  console.log('  - commission.refunded');
-  console.log('  - commission.auto_confirmed');
-  console.log('  Note: Actual webhook delivery will be enabled once Partner entity has webhookUrl/webhookSecret fields');
+  logger.info('[Webhook Subscribers] 5 event subscriptions initialized');
+  logger.info('  - commission.adjusted');
+  logger.info('  - commission.paid');
+  logger.info('  - commission.cancelled');
+  logger.info('  - commission.refunded');
+  logger.info('  - commission.auto_confirmed');
+  logger.info('  Note: Actual webhook delivery will be enabled once Partner entity has webhookUrl/webhookSecret fields');
 }
