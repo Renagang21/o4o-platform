@@ -71,9 +71,6 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
       if (response.data.success) {
         const preset = response.data.data;
         toast.success(`Preset '${preset.name}' saved successfully`);
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[Preset] Saved: id=${preset.id}, name=${preset.name}, version=${preset.meta?.sourceVersion}`);
-        }
 
         // Refresh presets list
         await loadPresets();
@@ -107,9 +104,6 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
       if (response.data.success) {
         const { changes } = response.data;
         toast.success(`Preset applied successfully (${changes.itemsChanged} items changed, version: ${changes.oldVersion} → ${changes.newVersion})`);
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[Preset] Applied: id=${changes.presetId}, changed=${changes.itemsChanged}, version: ${changes.oldVersion} → ${changes.newVersion}`);
-        }
 
         // Enable rollback
         setCanRollback(true);
@@ -142,10 +136,7 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
 
       if (response.data.success) {
         const { changes } = response.data;
-        toast.success(`Settings rolled back successfully (version: ${changes.oldVersion} → ${changes.newVersion})`);
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[Preset] Rollback: version: ${changes.oldVersion} → ${changes.newVersion}`);
-        }
+        toast.success(`Settings rolled back successfully (version: ${changes.oldVersion} → ${changes.newVersion})`);}
 
         // Disable rollback after use
         setCanRollback(false);

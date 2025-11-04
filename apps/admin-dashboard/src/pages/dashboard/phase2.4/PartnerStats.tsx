@@ -109,7 +109,6 @@ export function PartnerStats() {
   const handleRowClick = (partnerId: string) => {
     setSelectedPartnerId(partnerId);
     // In real implementation, navigate to partner detail page or expand row
-    console.log('Navigate to partner:', partnerId);
   };
 
   if (isLoading) {
