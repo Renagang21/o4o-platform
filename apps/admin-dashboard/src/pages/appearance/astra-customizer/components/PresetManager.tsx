@@ -136,7 +136,7 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
 
       if (response.data.success) {
         const { changes } = response.data;
-        toast.success(`Settings rolled back successfully (version: ${changes.oldVersion} → ${changes.newVersion})`);}
+        toast.success(`Settings rolled back successfully (version: ${changes.oldVersion} → ${changes.newVersion})`);
 
         // Disable rollback after use
         setCanRollback(false);
