@@ -392,10 +392,86 @@ export const getDefaultSettings = (): AstraCustomizerSettings => {
         inheritArchiveSettings: true
       }
     },
-    
+
+    // Scroll to Top
+    scrollToTop: {
+      enabled: false,
+      displayType: 'both',
+      threshold: 300,
+      backgroundColor: '#333333',
+      iconColor: '#ffffff',
+      position: 'right'
+    },
+
+    // Buttons
+    buttons: {
+      primary: {
+        backgroundColor: '#0073aa',
+        textColor: '#ffffff',
+        borderWidth: 0,
+        borderColor: '#0073aa',
+        borderStyle: 'solid',
+        borderRadius: 4,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        hoverBackgroundColor: '#005177',
+        hoverTextColor: '#ffffff',
+        hoverBorderColor: '#005177',
+        hoverTransform: 'none',
+        transitionDuration: 300,
+        fontSize: { desktop: 14, tablet: 14, mobile: 13 },
+        fontWeight: 500,
+        textTransform: 'none',
+        letterSpacing: 0.5,
+        boxShadow: 'none',
+        hoverBoxShadow: 'none'
+      },
+      secondary: {
+        backgroundColor: '#6c757d',
+        textColor: '#ffffff',
+        borderRadius: 4,
+        paddingVertical: 12,
+        paddingHorizontal: 24
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        textColor: '#0073aa',
+        borderWidth: 1,
+        borderColor: '#0073aa',
+        borderRadius: 4
+      },
+      global: {
+        minHeight: 40,
+        displayType: 'inline-block'
+      }
+    },
+
+    // Breadcrumbs
+    breadcrumbs: {
+      enabled: true,
+      position: 'above-content',
+      homeText: 'Home',
+      separator: '>',
+      showCurrentPage: true,
+      showOnHomepage: false,
+      linkColor: '#0073e6',
+      currentPageColor: '#333333',
+      separatorColor: '#999999',
+      hoverColor: '#005bb5',
+      fontSize: { desktop: 14, tablet: 13, mobile: 12 },
+      fontWeight: 400,
+      textTransform: 'none',
+      itemSpacing: 8,
+      marginTop: 0,
+      marginBottom: 16,
+      maxLength: 30,
+      showIcons: false,
+      mobileHidden: false
+    },
+
     // Custom CSS
     customCSS: '',
-    
+
     // Meta
     _meta: {
       version: '1.0.0',
