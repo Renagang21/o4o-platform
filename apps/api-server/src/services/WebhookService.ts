@@ -5,7 +5,7 @@
 
 import { Repository } from 'typeorm';
 import { Partner } from '../entities/Partner.js';
-import { AppDataSource } from '../database/data-source.js';
+import { AppDataSource } from '../database/connection.js';
 import { webhookQueue } from '../queues/webhook.queue.js';
 import logger from '../utils/logger.js';
 
