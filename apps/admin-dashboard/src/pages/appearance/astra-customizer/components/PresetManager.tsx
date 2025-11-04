@@ -46,7 +46,7 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
 
   const loadPresets = async () => {
     try {
-      const response = await authClient.api.get('/v1/customizer-presets');
+      const response = await authClient.api.get('/customizer-presets');
       if (response.data.success) {
         setPresets(response.data.data);
       }
@@ -63,7 +63,7 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
 
     setIsLoading(true);
     try {
-      const response = await authClient.api.post('/v1/customizer-presets', {
+      const response = await authClient.api.post('/customizer-presets', {
         name: presetName,
         description: presetDescription,
       });
@@ -99,7 +99,7 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
 
     setIsLoading(true);
     try {
-      const response = await authClient.api.post(`/v1/customizer-presets/${selectedPreset}/apply`);
+      const response = await authClient.api.post(`/customizer-presets/${selectedPreset}/apply`);
 
       if (response.data.success) {
         const { changes } = response.data;
@@ -132,7 +132,7 @@ export const PresetManager: React.FC<PresetManagerProps> = ({
 
     setIsLoading(true);
     try {
-      const response = await authClient.api.post('/v1/customizer-presets/rollback');
+      const response = await authClient.api.post('/customizer-presets/rollback');
 
       if (response.data.success) {
         const { changes } = response.data;
