@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { apiClient } from './api';
+import toast from 'react-hot-toast';
 
 interface FailedRequest {
   resolve: (value?: any) => void;
@@ -70,15 +71,23 @@ export const setupAuthInterceptor = () => {
         } catch (refreshError) {
           // Refresh failed - clear auth and redirect to login
           processQueue(refreshError as AxiosError);
-          
+
           // Clear any local auth state
           localStorage.removeItem('user');
-          
+
+          // Show session expired notification
+          toast.error('세션이 만료되었습니다. 다시 로그인해주세요.', {
+            duration: 4000,
+            position: 'top-center',
+          });
+
           // Redirect to login if not already there
           if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 1000);
           }
-          
+
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;

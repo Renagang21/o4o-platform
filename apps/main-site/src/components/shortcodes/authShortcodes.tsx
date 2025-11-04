@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Loader2 } from 'lucide-react';
 import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { authClient } from '@o4o/auth-client';
+import { getRedirectForRole } from '@/config/roleRedirects';
 
 interface OAuthProvider {
   enabled: boolean;
@@ -26,11 +27,15 @@ export const SocialLoginComponent: React.FC<{
   showEmailLogin?: boolean;
   title?: string;
   subtitle?: string;
+  providers?: string; // Comma-separated list: "google,naver,kakao"
+  showTestPanel?: string | boolean; // "env:dev", "true", "false"
 }> = ({
   redirectUrl = '/dashboard',
   showEmailLogin = true,
   title = '로그인',
-  subtitle = '계정에 접속하여 서비스를 이용하세요'
+  subtitle = '계정에 접속하여 서비스를 이용하세요',
+  providers,
+  showTestPanel
 }) => {
   const [formData, setFormData] = useState({
     email: '',
@@ -41,6 +46,26 @@ export const SocialLoginComponent: React.FC<{
   const [error, setError] = useState('');
   const [oauthProviders, setOauthProviders] = useState<OAuthProviders | null>(null);
   const [providersLoading, setProvidersLoading] = useState(true);
+  const [testAccounts, setTestAccounts] = useState<Array<{role: string; email: string}>>([]);
+
+  // Parse providers filter
+  const allowedProviders = providers
+    ? providers.split(',').map(p => p.trim() as 'google' | 'kakao' | 'naver')
+    : null;
+
+  // Determine if test panel should show
+  const shouldShowTestPanel = (() => {
+    if (showTestPanel === true || showTestPanel === 'true') return true;
+    if (showTestPanel === false || showTestPanel === 'false') return false;
+    if (showTestPanel === 'env:dev') {
+      return import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging';
+    }
+    // Default: show in dev/staging only
+    return import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging';
+  })();
+
+  // Prevent test panel in production (double guard)
+  const showTestPanelSafe = shouldShowTestPanel && import.meta.env.MODE !== 'production';
 
   // Social login configuration
   const socialLoginConfig = {
@@ -70,7 +95,7 @@ export const SocialLoginComponent: React.FC<{
     }
   };
 
-  // Fetch OAuth providers
+  // Fetch OAuth providers and test accounts
   useEffect(() => {
     const fetchProviders = async () => {
       try {
@@ -86,8 +111,22 @@ export const SocialLoginComponent: React.FC<{
       }
     };
 
+    const fetchTestAccounts = async () => {
+      if (!showTestPanelSafe) return;
+
+      try {
+        const response = await authClient.api.get('/v1/auth/test-accounts');
+        if (response.data.success) {
+          setTestAccounts(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch test accounts:', error);
+      }
+    };
+
     fetchProviders();
-  }, []);
+    fetchTestAccounts();
+  }, [showTestPanelSafe]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -107,8 +146,12 @@ export const SocialLoginComponent: React.FC<{
       const response = await authClient.api.post('/v1/auth/login', formData);
 
       if (response.data.success) {
-        // Redirect on success
-        window.location.href = redirectUrl;
+        // Determine redirect based on user role
+        const userRole = response.data.user?.role || response.data.user?.currentRole;
+        const roleRedirect = userRole ? getRedirectForRole(userRole) : redirectUrl;
+
+        // Redirect on success (prefer role-based redirect over custom redirect)
+        window.location.href = roleRedirect;
       } else {
         setError(response.data.message || '로그인에 실패했습니다.');
       }
@@ -152,8 +195,13 @@ export const SocialLoginComponent: React.FC<{
     }
   };
 
+  // Filter providers based on enabled status AND allowedProviders prop
   const enabledProviders = Object.entries(socialLoginConfig).filter(
-    ([_, config]) => config.enabled
+    ([provider, config]) => {
+      const isEnabled = config.enabled;
+      const isAllowed = allowedProviders ? allowedProviders.includes(provider as any) : true;
+      return isEnabled && isAllowed;
+    }
   );
 
   return (
@@ -284,6 +332,47 @@ export const SocialLoginComponent: React.FC<{
         </form>
       )}
 
+      {/* Test Account Panel (dev/staging only) */}
+      {showTestPanelSafe && testAccounts.length > 0 && (
+        <div className="mt-6 border-t border-gray-200 pt-6">
+          <div className="text-sm font-medium text-gray-700 mb-3">테스트 계정 (개발용)</div>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-gray-600">
+                  <th className="pb-2">역할</th>
+                  <th className="pb-2">이메일</th>
+                  <th className="pb-2 text-center">복사</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-700">
+                {testAccounts.map((account, index) => (
+                  <tr key={index}>
+                    <td className="py-1">{account.role}</td>
+                    <td className="py-1 font-mono text-xs">{account.email}</td>
+                    <td className="py-1 text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({ email: account.email, password: '' });
+                          navigator.clipboard.writeText(account.email);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 text-xs underline"
+                      >
+                        복사
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="text-xs text-yellow-700 mt-2">
+              ⚠️ 프로덕션 환경에서는 자동으로 숨겨집니다. 비밀번호는 보안상 표시되지 않습니다.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="mt-6 text-center">
         <div className="flex items-center justify-center text-blue-200">
@@ -322,6 +411,8 @@ export const socialLoginShortcode: ShortcodeDefinition = {
       showEmailLogin={attributes.show_email_login !== false}
       title={attributes.title as string}
       subtitle={attributes.subtitle as string}
+      providers={attributes.providers as string}
+      showTestPanel={attributes.showTestPanel as string | boolean}
     />
   )
 };
@@ -334,6 +425,8 @@ export const loginFormShortcode: ShortcodeDefinition = {
       showEmailLogin={attributes.show_email_login !== false}
       title={attributes.title as string}
       subtitle={attributes.subtitle as string}
+      providers={attributes.providers as string}
+      showTestPanel={attributes.showTestPanel as string | boolean}
     />
   )
 };

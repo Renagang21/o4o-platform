@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Mail, BookOpen, Key, MessageSquare, Shield, Link as LinkIcon, Edit, Package } from 'lucide-react'
+import { Settings as SettingsIcon, Mail, BookOpen, Key, MessageSquare, Shield, Link as LinkIcon, Edit, Package, Lock } from 'lucide-react'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
+import AuthSettings from './AuthSettings'
 import EmailSettings from './EmailSettings'
 import PermalinkSettings from './PermalinkSettings'
 import WritingSettings from './WritingSettings'
@@ -38,6 +39,7 @@ const settingsTabs = [
   { id: 'permalink', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: '/settings/permalink' },
   { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: '/settings/discussion' },
   { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: '/settings/privacy' },
+  { id: 'auth', label: '인증', icon: <Lock className="w-4 h-4" />, path: '/settings/auth' },
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
   { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
   { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' }
@@ -85,6 +87,7 @@ const Settings: FC = () => {
         <Route path="reading" element={<ReadingSettings />} />
         <Route path="permalink" element={<PermalinkSettings />} />
         <Route path="privacy" element={<PrivacySettings />} />
+        <Route path="auth" element={<AuthSettings />} />
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />
         <Route path="email" element={<EmailSettings />} />

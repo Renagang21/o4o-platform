@@ -8,6 +8,9 @@ import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
 import Login from './pages/auth/Login';
+import Logout from './pages/auth/Logout';
+import FindId from './pages/auth/FindId';
+import FindPassword from './pages/auth/FindPassword';
 import { OAuthCallback } from './pages/auth/OAuthCallback';
 import { EmailVerificationPending } from './pages/auth/EmailVerificationPending';
 import { EmailVerificationSuccess } from './pages/auth/EmailVerificationSuccess';
@@ -86,6 +89,9 @@ const App: FC = () => {
           
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/find-id" element={<FindId />} />
+          <Route path="/find-password" element={<FindPassword />} />
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           <Route path="/auth/verify-email/pending" element={

@@ -141,6 +141,13 @@ export class User {
   // @IsOptional()
   provider_id?: string; // 외부 제공자 사용자 ID
 
+  // 비밀번호 재설정 토큰
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  resetPasswordToken?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordExpires?: Date | null;
+
   // 계정 잠금 상태 확인
   get isLocked(): boolean {
     return !!(this.lockedUntil && this.lockedUntil > new Date());

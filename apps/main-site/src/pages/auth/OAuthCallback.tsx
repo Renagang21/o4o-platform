@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
 import { Card, CardContent } from '@o4o/ui';
 import { Button } from '@o4o/ui';
+import { getRedirectForRole } from '@/config/roleRedirects';
 
 interface OAuthCallbackResponse {
   success: boolean;
@@ -160,22 +161,11 @@ export const OAuthCallback: FC = () => {
       return;
     }
 
-    // 사용자 역할에 따른 리다이렉트
-    switch (currentUser.role) {
-      case 'admin':
-        navigate('/admin/dashboard');
-        break;
-      case 'supplier':
-        navigate('/supplier/dashboard');
-        break;
-      case 'retailer':
-        navigate('/retailer/dashboard');
-        break;
-      case 'customer':
-      default:
-        navigate('/shop');
-        break;
-    }
+    // Use role-based redirect map
+    const userRole = currentUser.role || currentUser.currentRole;
+    const redirectPath = userRole ? getRedirectForRole(userRole) : '/';
+
+    navigate(redirectPath);
   };
 
   const providerInfo = getProviderInfo();

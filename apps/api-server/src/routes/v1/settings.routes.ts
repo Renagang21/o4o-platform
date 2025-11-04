@@ -1050,4 +1050,83 @@ async function updateCustomizerSettings(req: Request, res: Response) {
   }
 }
 
+/**
+ * @route GET /v1/settings/auth
+ * @desc Get authentication settings (role redirect map)
+ * @access Public
+ */
+router.get('/auth', async (req: Request, res: Response) => {
+  try {
+    const authSettings = settingsStore.get('auth') || {
+      roleRedirects: {
+        user: '/',
+        member: '/',
+        contributor: '/',
+        seller: '/seller/dashboard',
+        vendor: '/vendor/console',
+        partner: '/partner/portal',
+        operator: '/admin',
+        admin: '/admin',
+      }
+    };
+
+    res.json({
+      success: true,
+      data: authSettings
+    });
+  } catch (error) {
+    logger.error('Failed to get auth settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get auth settings'
+    });
+  }
+});
+
+/**
+ * @route PUT /v1/settings/auth
+ * @desc Update authentication settings (role redirect map)
+ * @access Admin only
+ */
+router.put('/auth', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { roleRedirects } = req.body;
+
+    if (!roleRedirects || typeof roleRedirects !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: 'roleRedirects object is required'
+      });
+    }
+
+    // Validate each redirect path starts with /
+    for (const [role, path] of Object.entries(roleRedirects)) {
+      if (typeof path !== 'string' || !path.startsWith('/')) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid redirect path for role ${role}: must start with /`
+        });
+      }
+    }
+
+    const authSettings = {
+      roleRedirects
+    };
+
+    settingsStore.set('auth', authSettings);
+
+    res.json({
+      success: true,
+      data: authSettings,
+      message: 'Auth settings updated successfully'
+    });
+  } catch (error) {
+    logger.error('Failed to update auth settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update auth settings'
+    });
+  }
+});
+
 export default router;

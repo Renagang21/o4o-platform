@@ -368,4 +368,156 @@ export class UnifiedAuthService {
 
     return providers;
   }
+
+  /**
+   * Get test accounts for development/staging
+   */
+  async getTestAccounts(): Promise<Array<{role: string; email: string}>> {
+    if (process.env.NODE_ENV === 'production') {
+      return [];
+    }
+
+    const userRepo = AppDataSource.getRepository(User);
+
+    // Find users with common test emails or marked as test accounts
+    const testUsers = await userRepo
+      .createQueryBuilder('user')
+      .where('user.email LIKE :pattern1', { pattern1: '%@test.com' })
+      .orWhere('user.email LIKE :pattern2', { pattern2: '%test%' })
+      .select(['user.email', 'user.role'])
+      .limit(20)
+      .getMany();
+
+    return testUsers.map(user => ({
+      role: this.getRoleLabel(user.role),
+      email: user.email
+    }));
+  }
+
+  /**
+   * Send find ID email
+   */
+  async sendFindIdEmail(email: string): Promise<void> {
+    const userRepo = AppDataSource.getRepository(User);
+
+    const user = await userRepo.findOne({
+      where: { email }
+    });
+
+    if (!user) {
+      // Don't reveal if user exists
+      return;
+    }
+
+    // Mask email/username for security
+    const maskedEmail = this.maskEmail(user.email);
+
+    await emailService.sendEmail({
+      to: email,
+      subject: '아이디 찾기 결과',
+      html: `
+        <h2>아이디 찾기</h2>
+        <p>입력하신 이메일로 등록된 계정 정보입니다:</p>
+        <p><strong>이메일:</strong> ${maskedEmail}</p>
+        <p>로그인 페이지: <a href="${process.env.FRONTEND_URL}/login">로그인하기</a></p>
+        <p>비밀번호를 잊으셨다면 <a href="${process.env.FRONTEND_URL}/find-password">비밀번호 찾기</a>를 이용해주세요.</p>
+        <br/>
+        <p style="color: #666; font-size: 12px;">본인이 요청하지 않은 경우 이 이메일을 무시하셔도 됩니다.</p>
+      `
+    });
+  }
+
+  /**
+   * Send password reset email
+   */
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    const userRepo = AppDataSource.getRepository(User);
+
+    const user = await userRepo.findOne({
+      where: { email }
+    });
+
+    if (!user) {
+      // Don't reveal if user exists
+      return;
+    }
+
+    // Generate reset token (expires in 10 minutes)
+    const resetToken = generateRandomToken(32);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Save token to user
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = expiresAt;
+    await userRepo.save(user);
+
+    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
+
+    await emailService.sendEmail({
+      to: email,
+      subject: '비밀번호 재설정',
+      html: `
+        <h2>비밀번호 재설정</h2>
+        <p>비밀번호 재설정을 요청하셨습니다.</p>
+        <p>아래 링크를 클릭하여 새 비밀번호를 설정해주세요:</p>
+        <p><a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">비밀번호 재설정하기</a></p>
+        <p>또는 다음 주소를 브라우저에 복사하여 붙여넣으세요:</p>
+        <p>${resetUrl}</p>
+        <br/>
+        <p style="color: #666; font-size: 12px;">이 링크는 10분간 유효합니다.</p>
+        <p style="color: #666; font-size: 12px;">본인이 요청하지 않은 경우 이 이메일을 무시하셔도 됩니다.</p>
+      `
+    });
+  }
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const userRepo = AppDataSource.getRepository(User);
+
+    const user = await userRepo.findOne({
+      where: { resetPasswordToken: token }
+    });
+
+    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+      throw new Error('Invalid or expired token');
+    }
+
+    // Hash new password
+    user.password = await hashPassword(newPassword);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await userRepo.save(user);
+  }
+
+  /**
+   * Helper: Mask email for privacy
+   */
+  private maskEmail(email: string): string {
+    const [local, domain] = email.split('@');
+    if (local.length <= 3) {
+      return `${local[0]}***@${domain}`;
+    }
+    const masked = local.substring(0, 3) + '***';
+    return `${masked}@${domain}`;
+  }
+
+  /**
+   * Helper: Get role label in Korean
+   */
+  private getRoleLabel(role: string): string {
+    const labels: Record<string, string> = {
+      user: '사용자',
+      member: '멤버',
+      contributor: '기여자',
+      seller: '판매자',
+      vendor: '벤더',
+      partner: '파트너',
+      operator: '운영자',
+      admin: '관리자'
+    };
+    return labels[role] || role;
+  }
 }

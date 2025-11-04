@@ -275,7 +275,7 @@ router.post('/logout', authenticate, async (req, res) => {
     // Invalidate refresh token
     const userId = (req as any).user?.userId || (req as any).user?.id;
     const refreshToken = req.body.refreshToken || req.headers['x-refresh-token'];
-    
+
     if (refreshToken) {
       await refreshTokenService.revokeToken(refreshToken, 'Unified auth logout');
     } else if (userId) {
@@ -291,6 +291,149 @@ router.post('/logout', authenticate, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Logout failed'
+    });
+  }
+});
+
+/**
+ * @route GET /api/auth/unified/test-accounts
+ * @desc Get test accounts for development (only in dev/staging)
+ * @access Public (but restricted by environment)
+ */
+router.get('/test-accounts', async (req, res) => {
+  try {
+    // Only allow in development/staging
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        success: false,
+        message: 'Test accounts are not available in production'
+      });
+    }
+
+    // Return sample test accounts from actual DB users with test role
+    const testAccounts = await unifiedAuthService.getTestAccounts();
+
+    res.json({
+      success: true,
+      data: testAccounts
+    });
+  } catch (error: any) {
+    logger.error('Get test accounts error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get test accounts'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/unified/find-id
+ * @desc Find user ID by email
+ * @access Public
+ */
+router.post('/find-id', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    await unifiedAuthService.sendFindIdEmail(email);
+
+    res.json({
+      success: true,
+      message: '입력하신 이메일로 아이디 정보를 발송했습니다.'
+    });
+  } catch (error: any) {
+    logger.error('Find ID error:', error);
+
+    // Don't reveal if email exists
+    res.json({
+      success: true,
+      message: '입력하신 이메일로 아이디 정보를 발송했습니다.'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/unified/forgot-password
+ * @desc Request password reset
+ * @access Public
+ */
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    await unifiedAuthService.sendPasswordResetEmail(email);
+
+    res.json({
+      success: true,
+      message: '비밀번호 재설정 링크를 이메일로 발송했습니다.'
+    });
+  } catch (error: any) {
+    logger.error('Forgot password error:', error);
+
+    // Don't reveal if email exists
+    res.json({
+      success: true,
+      message: '비밀번호 재설정 링크를 이메일로 발송했습니다.'
+    });
+  }
+});
+
+/**
+ * @route POST /api/auth/unified/reset-password
+ * @desc Reset password with token
+ * @access Public
+ */
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token and new password are required'
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters'
+      });
+    }
+
+    await unifiedAuthService.resetPassword(token, newPassword);
+
+    res.json({
+      success: true,
+      message: '비밀번호가 성공적으로 변경되었습니다.'
+    });
+  } catch (error: any) {
+    logger.error('Reset password error:', error);
+
+    if (error.message === 'Invalid or expired token') {
+      return res.status(400).json({
+        success: false,
+        message: '유효하지 않거나 만료된 토큰입니다.'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: '비밀번호 재설정에 실패했습니다.'
     });
   }
 });
