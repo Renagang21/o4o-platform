@@ -9,6 +9,7 @@ import {
   reactivateUser,
   getDashboardStats
 } from '../controllers/adminController.js';
+import { DashboardController } from '../controllers/dashboardController.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { requireAdmin } from '../middleware/permission.middleware.js';
 import securityRoutes from './admin/security.js';
@@ -62,6 +63,13 @@ router.use(requireAdmin);
 
 // 대시보드 통계
 router.get('/dashboard/stats', getDashboardStats);
+
+// Phase 2.4: Advanced Dashboard Endpoints
+router.get('/dashboard/system', DashboardController.getSystemMetrics);
+router.get('/dashboard/partners/:id', DashboardController.getPartnerStats);
+router.get('/dashboard/operations', DashboardController.getOperationsStats);
+router.post('/dashboard/operations/webhook/retry', DashboardController.retryWebhook);
+router.post('/dashboard/operations/batch/trigger', DashboardController.triggerBatchJob);
 
 // Pages routes - for backward compatibility
 router.get('/pages', pagesController.getPages.bind(pagesController));
