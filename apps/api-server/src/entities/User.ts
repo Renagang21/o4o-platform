@@ -142,10 +142,10 @@ export class User {
   provider_id?: string; // 외부 제공자 사용자 ID
 
   // 비밀번호 재설정 토큰
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'reset_password_token' })
   resetPasswordToken?: string | null;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'reset_password_expires' })
   resetPasswordExpires?: Date | null;
 
   // 계정 잠금 상태 확인
