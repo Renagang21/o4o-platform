@@ -9,6 +9,8 @@ import { Commission, CommissionStatus } from '../entities/Commission.js';
 import { Order } from '../entities/Order.js';
 import { prometheusMetrics } from '../services/prometheus-metrics.service.js';
 import { cacheService } from '../services/CacheService.js';
+import { webhookService } from '../services/WebhookService.js';
+import { batchJobService } from '../services/BatchJobService.js';
 import logger from '../utils/logger.js';
 import { Between, MoreThan } from 'typeorm';
 import { AuthRequest } from '../types/auth.js';
@@ -535,19 +537,49 @@ export class DashboardController {
         });
       }
 
-      // TODO: Implement webhook retry logic
-      // This would trigger WebhookService to retry a specific webhook delivery
+      // Validate input
+      if (!webhookId) {
+        return res.status(400).json({
+          success: false,
+          error: 'webhookId is required'
+        });
+      }
+
+      // Trigger webhook retry via WebhookService
+      const result = await webhookService.retryDelivery(webhookId, req.user.id);
 
       logger.info('Manual webhook retry triggered', {
         webhookId,
-        userId: req.user.id
+        userId: req.user.id,
+        result
       });
 
-      res.json({
-        success: true,
-        message: 'Webhook retry triggered successfully',
-        webhookId
-      });
+      // Record metrics
+      try {
+        const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+        const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+        metricsInstance.recordWebhookDelivery(
+          'manual_retry',
+          result.success ? 'enqueued' : 'failed'
+        );
+      } catch (metricsError) {
+        logger.warn('Failed to record webhook retry metrics:', metricsError);
+      }
+
+      if (result.success) {
+        res.json({
+          success: true,
+          message: result.message,
+          webhookId,
+          newJobId: result.jobId
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: result.message,
+          webhookId
+        });
+      }
     } catch (error: any) {
       logger.error('Failed to retry webhook', { webhookId, error: error.message });
       res.status(500).json({
@@ -574,19 +606,51 @@ export class DashboardController {
         });
       }
 
-      // TODO: Implement batch job trigger logic
-      // This would manually trigger commission batch processing
+      // Validate input
+      if (!jobType) {
+        return res.status(400).json({
+          success: false,
+          error: 'jobType is required',
+          supportedTypes: batchJobService.getSupportedJobTypes()
+        });
+      }
+
+      // Trigger batch job via BatchJobService
+      const result = await batchJobService.triggerManual(jobType, req.user.id);
 
       logger.info('Manual batch job triggered', {
         jobType,
-        userId: req.user.id
+        userId: req.user.id,
+        result
       });
 
-      res.json({
-        success: true,
-        message: 'Batch job triggered successfully',
-        jobType
-      });
+      // Record metrics
+      try {
+        const HttpMetricsService = (await import('../middleware/metrics.middleware.js')).default;
+        const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
+        metricsInstance.recordBatchJobRun(
+          jobType,
+          result.success ? 'manual_triggered' : 'failed',
+          0 // Duration will be recorded when job completes
+        );
+      } catch (metricsError) {
+        logger.warn('Failed to record batch job trigger metrics:', metricsError);
+      }
+
+      if (result.success) {
+        res.json({
+          success: true,
+          message: result.message,
+          jobType: result.jobType,
+          triggeredAt: result.triggeredAt
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: result.message,
+          jobType: result.jobType
+        });
+      }
     } catch (error: any) {
       logger.error('Failed to trigger batch job', { jobType, error: error.message });
       res.status(500).json({
