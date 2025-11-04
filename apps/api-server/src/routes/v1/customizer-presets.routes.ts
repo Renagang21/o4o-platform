@@ -113,7 +113,9 @@ router.post('/', authenticate, requireAdmin, async (req: Request, res: Response)
 
     await presetRepo.save(preset);
 
-    console.log(`[Preset] Saved: id=${preset.id}, name=${name}, version=${preset.meta?.sourceVersion}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Preset] Saved: id=${preset.id}, name=${name}, version=${preset.meta?.sourceVersion}`);
+    }
 
     res.json({
       success: true,
@@ -170,7 +172,9 @@ router.post('/:id/apply', authenticate, requireAdmin, async (req: Request, res: 
 
     const changedKeys = Object.keys(preset.settings).filter(key => !key.startsWith('_'));
     
-    console.log(`[Preset] Applied: id=${preset.id}, changed=${changedKeys.length}, version: ${(currentSettings as any)?._version} → ${updatedSettings._version}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Preset] Applied: id=${preset.id}, changed=${changedKeys.length}, version: ${(currentSettings as any)?._version} → ${updatedSettings._version}`);
+    }
 
     res.json({
       success: true,
@@ -223,7 +227,9 @@ router.post('/rollback', authenticate, requireAdmin, async (req: Request, res: R
 
     await settingsService.updateSettings('customizer', rollbackSettings);
     
-    console.log(`[Preset] Rollback: version: ${(currentSettings as any)?._version} → ${rollbackSettings._version}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Preset] Rollback: version: ${(currentSettings as any)?._version} → ${rollbackSettings._version}`);
+    }
 
     // Clear rollback state
     lastAppliedSettings = null;
@@ -269,7 +275,9 @@ router.delete('/:id', authenticate, requireAdmin, async (req: Request, res: Resp
 
     await presetRepo.remove(preset);
 
-    console.log(`[Preset] Deleted: id=${id}, name=${preset.name}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Preset] Deleted: id=${id}, name=${preset.name}`);
+    }
 
     res.json({
       success: true,

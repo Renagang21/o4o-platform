@@ -169,8 +169,8 @@ export const useCustomizerSettings = () => {
           // Check if version changed
           const versionChanged = cachedVersion !== undefined && apiVersion !== cachedVersion;
 
-          // Log version check for debugging
-          if (versionChanged) {
+          // Log version check for debugging (development only)
+          if (versionChanged && process.env.NODE_ENV === 'development') {
             console.log('[Customizer] Version changed - cache:', cachedVersion, '→ api:', apiVersion);
           }
 
