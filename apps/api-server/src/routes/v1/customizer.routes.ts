@@ -463,4 +463,91 @@ router.get('/settings/header/sticky', async (req: Request, res: Response) => {
   }
 });
 
+// ============================================
+// Unified Customizer Endpoint
+// ============================================
+
+/**
+ * GET /api/v1/customizer
+ * Get all customizer settings including buttons, breadcrumbs, scroll-to-top (public)
+ */
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    let customizerSettings = await settingsService.getSettings('customizer');
+
+    // Apply migration if needed
+    customizerSettings = migrateCustomizerSettings(customizerSettings);
+
+    // Ensure all settings are included
+    const completeSettings = {
+      ...customizerSettings,
+      buttons: (customizerSettings as any)?.buttons || defaultButtonSettings,
+      breadcrumbs: (customizerSettings as any)?.breadcrumbs || defaultBreadcrumbs,
+      scrollToTop: (customizerSettings as any)?.scrollToTop || defaultScrollToTop,
+      _version: (customizerSettings as any)?._version || 1,
+      _meta: (customizerSettings as any)?._meta || {
+        lastModified: new Date().toISOString(),
+        isDirty: false,
+      },
+    };
+
+    res.json({
+      success: true,
+      data: completeSettings,
+    });
+  } catch (error: any) {
+    console.error('Error fetching customizer settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch customizer settings',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * PUT /api/v1/customizer
+ * Update all customizer settings (authenticated)
+ */
+router.put(
+  '/',
+  authenticate,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      // Get existing settings
+      let customizerSettings = (await settingsService.getSettings('customizer')) || {};
+      customizerSettings = migrateCustomizerSettings(customizerSettings);
+
+      // Merge with new data
+      const updatedSettings = {
+        ...customizerSettings,
+        ...req.body,
+        _version: ((customizerSettings as any)?._version || 0) + 1,
+        _meta: {
+          ...(customizerSettings as any)?._meta,
+          lastModified: new Date().toISOString(),
+          isDirty: false,
+        },
+      };
+
+      // Save settings
+      await settingsService.updateSettings('customizer', updatedSettings);
+
+      res.json({
+        success: true,
+        data: updatedSettings,
+        message: 'Customizer settings updated successfully',
+      });
+    } catch (error: any) {
+      console.error('Error updating customizer settings:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update customizer settings',
+        message: error.message,
+      });
+    }
+  }
+);
+
 export default router;

@@ -398,6 +398,118 @@
 .has-x-large-font-size { font-size: 2rem; }
 .has-huge-font-size { font-size: 2.5rem; }
 
+/* Button styles - Use CSS variables from customizer */
+.wp-element-button,
+.ast-button,
+.btn-primary,
+button[type="submit"],
+input[type="submit"],
+.wp-block-button__link {
+  background-color: var(--button-primary-bg, var(--wp-color-primary-500, #2563eb));
+  color: var(--button-primary-text, #ffffff);
+  border-radius: var(--button-primary-border-radius, 4px);
+  padding: var(--button-primary-padding-v, 12px) var(--button-primary-padding-h, 24px);
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.wp-element-button:hover,
+.ast-button:hover,
+.btn-primary:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover,
+.wp-block-button__link:hover {
+  background-color: var(--button-primary-bg-hover, var(--button-primary-bg, var(--wp-color-primary-500, #1d4ed8)));
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Secondary button styles */
+.btn-secondary,
+.wp-block-button.is-style-outline .wp-block-button__link {
+  background-color: var(--button-secondary-bg, #6c757d);
+  color: var(--button-secondary-text, #ffffff);
+}
+
+/* Outline button styles */
+.btn-outline,
+.wp-block-button.is-style-outline {
+  background-color: transparent;
+  color: var(--button-outline-text, var(--wp-color-primary-500, #2563eb));
+  border: var(--button-outline-border-width, 1px) solid var(--button-outline-border, var(--wp-color-primary-500, #2563eb));
+}
+
+.btn-outline:hover,
+.wp-block-button.is-style-outline:hover {
+  background-color: var(--button-outline-border, var(--wp-color-primary-500, #2563eb));
+  color: #ffffff;
+}
+
+/* Breadcrumb styles - Use CSS variables */
+.ast-breadcrumbs,
+.breadcrumb,
+nav[aria-label="breadcrumb"] {
+  color: var(--breadcrumb-text-color, #6c757d);
+  font-size: var(--breadcrumb-font-size, 14px);
+  padding: 8px 0;
+  margin-bottom: 16px;
+}
+
+.ast-breadcrumbs a,
+.breadcrumb a,
+nav[aria-label="breadcrumb"] a {
+  color: var(--breadcrumb-link-color, var(--wp-link-color, var(--wp-color-primary-500, #2563eb)));
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.ast-breadcrumbs a:hover,
+.breadcrumb a:hover,
+nav[aria-label="breadcrumb"] a:hover {
+  color: var(--breadcrumb-link-color-hover, var(--wp-link-color-hover, #1d4ed8));
+  text-decoration: underline;
+}
+
+.ast-breadcrumbs .separator,
+.breadcrumb-separator,
+nav[aria-label="breadcrumb"] .separator {
+  color: var(--breadcrumb-separator-color, #6c757d);
+  margin: 0 8px;
+}
+
+/* Scroll to top button styles */
+.ast-scroll-to-top,
+.scroll-to-top,
+#scroll-to-top {
+  background-color: var(--scroll-top-bg, var(--wp-color-primary-500, #2563eb));
+  color: var(--scroll-top-icon-color, #ffffff);
+  width: var(--scroll-top-size, 40px);
+  height: var(--scroll-top-size, 40px);
+  border-radius: var(--scroll-top-border-radius, 4px);
+  position: fixed;
+  bottom: var(--scroll-top-position-bottom, 30px);
+  right: var(--scroll-top-position-right, 30px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ast-scroll-to-top:hover,
+.scroll-to-top:hover,
+#scroll-to-top:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 /* Responsive utilities */
 @media (max-width: 768px) {
   .wp-block-image.alignleft,
