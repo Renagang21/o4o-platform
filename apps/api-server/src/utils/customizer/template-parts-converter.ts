@@ -4,6 +4,8 @@
  * that can be rendered on the frontend.
  */
 
+import logger from '../logger.js';
+
 export interface TemplatePartData {
   name: string;
   slug: string;
@@ -31,6 +33,8 @@ export interface TemplatePartData {
  * Convert module config to block format
  */
 function convertModuleToBlock(module: any): any {
+  logger.info(`[TP-Convert] Processing module: ${module.type} (id: ${module.id})`);
+
   const blockMap: Record<string, any> = {
     'logo': {
       type: 'o4o/site-logo',
@@ -130,7 +134,12 @@ function convertModuleToBlock(module: any): any {
   };
 
   const block = blockMap[module.type];
-  if (!block) return null;
+  if (!block) {
+    logger.warn(`[TP-Convert] Unknown module type: ${module.type} - skipping`);
+    return null;
+  }
+
+  logger.info(`[TP-Convert] ✓ Converted ${module.type} -> ${block.type}`);
 
   // Add visibility information to block data for responsive CSS handling
   const visibility = module.settings?.visibility || { desktop: true, tablet: true, mobile: true };
@@ -151,10 +160,14 @@ function convertModuleToBlock(module: any): any {
 export function convertSettingsToHeaderTemplatePart(
   settings: any
 ): TemplatePartData {
+  logger.info('[TP-Convert] Starting header template part conversion...');
+
   // Use new builder layout if available
   if (settings.header?.builder) {
     const builder = settings.header.builder;
     const sections = [];
+
+    logger.info('[TP-Convert] Header builder configuration found');
 
     // Above Header Section
     if (builder.above?.settings?.enabled) {
@@ -183,6 +196,11 @@ export function convertSettingsToHeaderTemplatePart(
     }
 
     // Primary Header Section
+    logger.info(`[TP-Convert] Processing primary header section...`);
+    logger.info(`[TP-Convert] Primary left modules: ${(builder.primary?.left || []).length}`);
+    logger.info(`[TP-Convert] Primary center modules: ${(builder.primary?.center || []).length}`);
+    logger.info(`[TP-Convert] Primary right modules: ${(builder.primary?.right || []).length}`);
+
     const primaryModules = {
       left: (builder.primary?.left || []).map(convertModuleToBlock).filter(Boolean),
       center: (builder.primary?.center || []).map(convertModuleToBlock).filter(Boolean),
@@ -254,6 +272,23 @@ export function convertSettingsToHeaderTemplatePart(
       }
     }
 
+    // Count all converted blocks
+    const allBlocks: string[] = [];
+    sections.forEach((section: any) => {
+      if (section.innerBlocks) {
+        section.innerBlocks.forEach((group: any) => {
+          if (group?.innerBlocks) {
+            group.innerBlocks.forEach((block: any) => {
+              if (block?.type) allBlocks.push(block.type);
+            });
+          }
+        });
+      }
+    });
+
+    logger.info(`[TP-Convert] ✅ Header conversion complete - ${sections.length} sections, ${allBlocks.length} blocks total`);
+    logger.info(`[TP-Convert] Block types created: ${[...new Set(allBlocks)].join(', ')}`);
+
     return {
       name: 'Default Header',
       slug: 'default-header',
@@ -272,6 +307,7 @@ export function convertSettingsToHeaderTemplatePart(
   }
 
   // Fallback if no builder configuration
+  logger.warn('[TP-Convert] No header builder configuration found - using fallback');
   return {
     name: 'Default Header',
     slug: 'default-header',
