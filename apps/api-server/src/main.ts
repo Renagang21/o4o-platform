@@ -285,6 +285,15 @@ app.use(session(sessionConfig) as any);
 app.use(passport.initialize() as any);
 
 // ============================================================================
+// METRICS MIDDLEWARE
+// ============================================================================
+import { prometheusMetrics } from './services/prometheus-metrics.service.js';
+import HttpMetricsService from './middleware/metrics.middleware.js';
+
+const httpMetrics = HttpMetricsService.getInstance(prometheusMetrics.registry);
+app.use(httpMetrics.middleware());
+
+// ============================================================================
 // ROUTES SETUP
 // ============================================================================
 setupRoutes(app);

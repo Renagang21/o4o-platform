@@ -13,14 +13,14 @@ export {
   cachedDynamicAPI
 } from './api-service.js';
 
-// Import all dynamic shortcode components
-export { CPTListShortcode, cptListShortcodeDefinition } from './cpt-list.js';
-export { CPTFieldShortcode, cptFieldShortcodeDefinition } from './cpt-field.js';
-export { ACFFieldShortcode, acfFieldShortcodeDefinition } from './acf-field.js';
-export { MetaFieldShortcode, metaFieldShortcodeDefinition } from './meta-field.js';
-
 // Import registry and renderer from parent
 import { ShortcodeRegistry } from '../types.js';
+
+// Export lazy loaders for components and definitions
+export const loadCPTListShortcode = () => import('./cpt-list.js');
+export const loadCPTFieldShortcode = () => import('./cpt-field.js');
+export const loadACFFieldShortcode = () => import('./acf-field.js');
+export const loadMetaFieldShortcode = () => import('./meta-field.js');
 
 /**
  * Register all dynamic shortcodes

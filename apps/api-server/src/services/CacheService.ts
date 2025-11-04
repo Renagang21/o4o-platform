@@ -380,22 +380,79 @@ export class CacheService {
   }
   
   /**
-   * Delete value from cache
+   * Get multiple values from cache
    */
-  public async delete(key: string, namespace?: string): Promise<void> {
-    const fullKey = this.generateKey(key, namespace);
-    
-    // Delete from L1 memory cache
-    this.memoryCache.delete(fullKey);
-    
-    // Delete from L2 Redis cache if available
-    if (this.isRedisAvailable() && this.redisClient) {
-      try {
-        await this.redisClient.del([fullKey + ':data', fullKey + ':meta']);
-      } catch (error) {
-        logger.error('Redis delete error:', error);
-        this.handleRedisError();
+  public async mget<T>(keys: string[], namespace?: string): Promise<(T | null)[]> {
+    const results: (T | null)[] = [];
+
+    for (const key of keys) {
+      const value = await this.get<T>(key, namespace);
+      results.push(value);
+    }
+
+    return results;
+  }
+
+  /**
+   * Delete value from cache (single key or array)
+   */
+  public async delete(key: string | string[], namespace?: string): Promise<void> {
+    const keys = Array.isArray(key) ? key : [key];
+
+    for (const k of keys) {
+      const fullKey = this.generateKey(k, namespace);
+
+      // Delete from L1 memory cache
+      this.memoryCache.delete(fullKey);
+
+      // Delete from L2 Redis cache if available
+      if (this.isRedisAvailable() && this.redisClient) {
+        try {
+          await this.redisClient.del([fullKey + ':data', fullKey + ':meta']);
+        } catch (error) {
+          logger.error('Redis delete error:', error);
+          this.handleRedisError();
+        }
       }
+    }
+  }
+
+  /**
+   * Delete multiple keys (alias for delete with array)
+   */
+  public async del(keys: string | string[], namespace?: string): Promise<void> {
+    return this.delete(keys, namespace);
+  }
+
+  /**
+   * Check rate limit using Redis
+   * Returns true if limit exceeded
+   */
+  public async checkRateLimit(
+    id: string,
+    limit: number,
+    windowSec: number
+  ): Promise<boolean> {
+    if (!this.isRedisAvailable() || !this.redisClient) {
+      // If Redis unavailable, allow the request (fail open)
+      return false;
+    }
+
+    try {
+      const key = `${this.config.redis.keyPrefix}ratelimit:${id}`;
+      const current = await this.redisClient.incr(key);
+
+      if (current === 1) {
+        // First request in window, set expiration
+        await this.redisClient.expire(key, windowSec);
+      }
+
+      return current > limit;
+    } catch (error) {
+      logger.error('Rate limit check error:', error);
+      this.handleRedisError();
+      // Fail open on error
+      return false;
     }
   }
   
