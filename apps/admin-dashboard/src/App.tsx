@@ -69,6 +69,7 @@ const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
 const TemplatePartEditor = lazy(() => import(/* webpackChunkName: "template-editor" */ '@/pages/appearance/TemplatePartEditor'));
 const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
+const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
 
 
@@ -698,7 +699,16 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
+
+                    {/* Phase 2.4 - Operations Dashboard */}
+                    <Route path="/admin/dashboard/operations" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OperationsDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 404 핸들링 */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
