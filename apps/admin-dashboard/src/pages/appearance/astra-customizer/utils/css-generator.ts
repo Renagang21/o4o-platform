@@ -22,7 +22,10 @@ export function generateCSS(settings: AstraCustomizerSettings): string {
   css.push(...generateContainerCSS(settings));
   css.push(...generateSidebarCSS(settings));
   css.push(...generateBlogCSS(settings));
-  
+  css.push(...generateButtonCSS(settings));
+  css.push(...generateBreadcrumbCSS(settings));
+  css.push(...generateScrollToTopCSS(settings));
+
   // Add custom CSS
   if (settings.customCSS) {
     css.push(settings.customCSS);
@@ -565,4 +568,139 @@ export function getResponsiveValue<T>(
     return (value as ResponsiveValue<T>)[device];
   }
   return value as T;
+}
+
+function generateButtonCSS(settings: AstraCustomizerSettings): string[] {
+  const css: string[] = [];
+  const { buttons } = settings as any;
+
+  if (!buttons) return css;
+
+  // CSS Variables for button styling
+  css.push(':root {');
+
+  // Primary button variables
+  if (buttons.primary) {
+    css.push(`  --button-primary-bg: ${buttons.primary.backgroundColor || 'var(--wp-color-primary-500)'};`);
+    css.push(`  --button-primary-text: ${buttons.primary.textColor || '#ffffff'};`);
+    css.push(`  --button-primary-border-radius: ${buttons.primary.borderRadius || 4}px;`);
+    css.push(`  --button-primary-padding-v: ${buttons.primary.paddingVertical || 12}px;`);
+    css.push(`  --button-primary-padding-h: ${buttons.primary.paddingHorizontal || 24}px;`);
+
+    if (buttons.primary.hoverBackgroundColor) {
+      css.push(`  --button-primary-bg-hover: ${buttons.primary.hoverBackgroundColor};`);
+    }
+  }
+
+  // Secondary button variables
+  if (buttons.secondary) {
+    css.push(`  --button-secondary-bg: ${buttons.secondary.backgroundColor || '#6c757d'};`);
+    css.push(`  --button-secondary-text: ${buttons.secondary.textColor || '#ffffff'};`);
+  }
+
+  // Outline button variables
+  if (buttons.outline) {
+    css.push(`  --button-outline-border: ${buttons.outline.borderColor || 'var(--wp-color-primary-500)'};`);
+    css.push(`  --button-outline-text: ${buttons.outline.textColor || 'var(--wp-color-primary-500)'};`);
+    css.push(`  --button-outline-border-width: ${buttons.outline.borderWidth || 1}px;`);
+  }
+
+  css.push('}');
+
+  // Apply button styles
+  css.push('.wp-element-button, .ast-button, button[type="submit"] {');
+  css.push('  background-color: var(--button-primary-bg);');
+  css.push('  color: var(--button-primary-text);');
+  css.push('  border-radius: var(--button-primary-border-radius);');
+  css.push('  padding: var(--button-primary-padding-v) var(--button-primary-padding-h);');
+  css.push('  transition: all 0.3s;');
+  css.push('}');
+
+  css.push('.wp-element-button:hover, .ast-button:hover, button[type="submit"]:hover {');
+  css.push('  background-color: var(--button-primary-bg-hover, var(--button-primary-bg));');
+  css.push('  opacity: 0.9;');
+  css.push('}');
+
+  return css;
+}
+
+function generateBreadcrumbCSS(settings: AstraCustomizerSettings): string[] {
+  const css: string[] = [];
+  const { breadcrumbs } = settings as any;
+
+  if (!breadcrumbs) return css;
+
+  css.push(':root {');
+
+  if (breadcrumbs.styling) {
+    css.push(`  --breadcrumb-text-color: ${breadcrumbs.styling.textColor || '#6c757d'};`);
+    css.push(`  --breadcrumb-link-color: ${breadcrumbs.styling.linkColor || 'var(--wp-link-color)'};`);
+    css.push(`  --breadcrumb-separator-color: ${breadcrumbs.styling.separatorColor || '#6c757d'};`);
+    css.push(`  --breadcrumb-font-size: ${breadcrumbs.styling.fontSize || 14}px;`);
+  }
+
+  css.push('}');
+
+  // Apply breadcrumb styles
+  css.push('.ast-breadcrumbs, .breadcrumb {');
+  css.push('  color: var(--breadcrumb-text-color);');
+  css.push('  font-size: var(--breadcrumb-font-size);');
+  css.push('}');
+
+  css.push('.ast-breadcrumbs a, .breadcrumb a {');
+  css.push('  color: var(--breadcrumb-link-color);');
+  css.push('  text-decoration: none;');
+  css.push('}');
+
+  css.push('.ast-breadcrumbs .separator, .breadcrumb-separator {');
+  css.push('  color: var(--breadcrumb-separator-color);');
+  css.push('  margin: 0 8px;');
+  css.push('}');
+
+  return css;
+}
+
+function generateScrollToTopCSS(settings: AstraCustomizerSettings): string[] {
+  const css: string[] = [];
+  const { scrollToTop } = settings as any;
+
+  if (!scrollToTop || !scrollToTop.enabled) return css;
+
+  css.push(':root {');
+
+  if (scrollToTop.styling) {
+    css.push(`  --scroll-top-bg: ${scrollToTop.styling.backgroundColor || 'var(--wp-color-primary-500)'};`);
+    css.push(`  --scroll-top-icon-color: ${scrollToTop.styling.iconColor || '#ffffff'};`);
+    css.push(`  --scroll-top-size: ${scrollToTop.styling.size || 40}px;`);
+    css.push(`  --scroll-top-border-radius: ${scrollToTop.styling.borderRadius || 4}px;`);
+    css.push(`  --scroll-top-position-bottom: ${scrollToTop.position?.bottom || 30}px;`);
+    css.push(`  --scroll-top-position-right: ${scrollToTop.position?.right || 30}px;`);
+  }
+
+  css.push('}');
+
+  // Apply scroll to top styles
+  css.push('.ast-scroll-to-top, .scroll-to-top, #scroll-to-top {');
+  css.push('  background-color: var(--scroll-top-bg);');
+  css.push('  color: var(--scroll-top-icon-color);');
+  css.push('  width: var(--scroll-top-size);');
+  css.push('  height: var(--scroll-top-size);');
+  css.push('  border-radius: var(--scroll-top-border-radius);');
+  css.push('  position: fixed;');
+  css.push('  bottom: var(--scroll-top-position-bottom);');
+  css.push('  right: var(--scroll-top-position-right);');
+  css.push('  z-index: 999;');
+  css.push('  display: flex;');
+  css.push('  align-items: center;');
+  css.push('  justify-content: center;');
+  css.push('  cursor: pointer;');
+  css.push('  transition: all 0.3s;');
+  css.push('}');
+
+  css.push('.ast-scroll-to-top:hover, .scroll-to-top:hover, #scroll-to-top:hover {');
+  css.push('  opacity: 0.8;');
+  css.push('  transform: translateY(-2px);');
+  css.push('}');
+
+  return css;
 }
