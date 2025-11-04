@@ -56,6 +56,7 @@ import platformAppsV1Routes from '../routes/v1/apps.routes.js'; // Platform modu
 import pluginsV1Routes from '../routes/v1/plugins.routes.js';
 import settingsV1Routes from '../routes/v1/settings.routes.js';
 import customizerV1Routes from '../routes/v1/customizer.routes.js';
+import customizerPresetsRoutes from '../routes/v1/customizer-presets.routes.js';
 import galleryRoutes from '../routes/gallery.routes.js';
 import acfV1Routes from '../routes/v1/acf.routes.js';
 import pagesV1Routes from '../routes/v1/pages.routes.js';
@@ -228,6 +229,7 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/settings', settingsLimiter, settingsRoutes); // Public settings (homepage, customizer, etc.)
   app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes);
   app.use('/api/customizer', settingsLimiter, customizerV1Routes);
+  app.use('/api/v1/customizer-presets', settingsLimiter, customizerPresetsRoutes);
   app.use('/api/settings', settingsLimiter, settingsRoutes);
   app.use('/settings', settingsLimiter, settingsRoutes);
   app.use('/v1/settings', settingsV1Routes); // Admin-only settings routes

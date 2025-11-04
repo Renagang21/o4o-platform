@@ -1,5 +1,5 @@
 import { Repository, Between, MoreThan, LessThan } from 'typeorm';
-import { AppDataSource } from '../database/data-source.js';
+import { AppDataSource } from '../database/connection.js';
 import { Commission, CommissionStatus } from '../entities/Commission.js';
 import { ConversionEvent } from '../entities/ConversionEvent.js';
 import { ReferralClick } from '../entities/ReferralClick.js';

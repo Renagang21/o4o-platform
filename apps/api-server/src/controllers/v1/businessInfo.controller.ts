@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import AppDataSource from '../../database/data-source.js';
+import AppDataSource from '../../database/connection.js';
 import { BusinessInfo, BusinessType, BusinessSize, Industry } from '../../entities/BusinessInfo.js';
 import { User } from '../../entities/User.js';
 import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog.js';

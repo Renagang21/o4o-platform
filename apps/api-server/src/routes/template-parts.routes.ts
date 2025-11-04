@@ -1,5 +1,5 @@
 import { Router, Response, Request } from 'express'
-import AppDataSource from '../database/data-source.js'
+import AppDataSource from '../database/connection.js'
 import { TemplatePart } from '../entities/TemplatePart.js'
 import { authenticate } from '../middleware/auth.middleware.js';
 import { AuthRequest } from '../types/auth.js'

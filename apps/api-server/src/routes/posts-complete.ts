@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import AppDataSource from '../database/data-source.js';
+import AppDataSource from '../database/connection.js';
 import { Post } from '../entities/Post.js';
 import { User } from '../entities/User.js';
 import { Category } from '../entities/Category.js';

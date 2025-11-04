@@ -21,6 +21,7 @@ import { CustomCSSSection } from './sections/advanced/CustomCSSSection';
 import { CustomizerProvider } from './context/CustomizerContext';
 import { HeaderBuilder } from './components/HeaderBuilder';
 import { FooterBuilder } from './components/FooterBuilder';
+import { PresetManager } from './components/PresetManager';
 
 import './styles/controls.css';
 import './styles/sections.css';
@@ -388,6 +389,15 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
               </span>
             )}
           </div>
+
+          {/* Preset Manager */}
+          <PresetManager
+            currentSettings={settings}
+            onPresetApplied={() => {
+              // Reload settings after preset is applied
+              window.location.reload();
+            }}
+          />
 
           <div className="flex items-center gap-2">
           <button

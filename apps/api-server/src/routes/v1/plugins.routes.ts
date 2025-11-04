@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
-import AppDataSource from '../../database/data-source.js';
+import AppDataSource from '../../database/connection.js';
 import { In } from 'typeorm';
 
 const router: Router = Router();
