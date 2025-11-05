@@ -32,6 +32,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Metric reuse: Check for existing metrics via `getSingleMetric()` before creating new ones
 - Build verification: All packages and API server build successfully without errors
 
+### Deployment
+- **Commit**: `1387e34f`
+- **Date**: 2025-11-05 12:55 UTC
+- **Verification**:
+  - ✅ `/health` endpoint: HTTP 200, `{"status":"ok"}`
+  - ✅ `/metrics` endpoint: HTTP 200, 53 metrics exposed
+  - ✅ Server restarts: 2 consecutive restarts without errors
+  - ✅ PM2 logs: 0 error entries
+  - ✅ Metrics duplication: Confirmed fixed (no "already registered" errors)
+
 ---
 
 ## [1.6.0] - 2025-10-29
