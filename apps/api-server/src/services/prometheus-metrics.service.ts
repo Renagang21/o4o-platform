@@ -17,6 +17,7 @@ import logger from '../utils/logger.js';
 
 class PrometheusMetricsService {
   private static instance: PrometheusMetricsService;
+  private static defaultMetricsCollected = false;
   public registry: promClient.Registry; // Made public to share with HTTP metrics
 
   // Metrics
@@ -27,16 +28,19 @@ class PrometheusMetricsService {
   private queueSizeGauge: promClient.Gauge;
   private llmTokensCounter: promClient.Counter;
 
-  // Cache metrics
-  private cacheHitsCounter: promClient.Counter;
-  private cacheMissesCounter: promClient.Counter;
+  // Cache metrics - removed to avoid duplication with HttpMetricsService
+  // Cache metrics are now defined in HttpMetricsService only
 
   private constructor() {
     // Create a new registry
     this.registry = new promClient.Registry();
 
-    // Add default metrics (process, nodejs metrics)
-    promClient.collectDefaultMetrics({ register: this.registry });
+    // Add default metrics ONLY ONCE (process, nodejs metrics)
+    if (!PrometheusMetricsService.defaultMetricsCollected) {
+      promClient.collectDefaultMetrics({ register: this.registry });
+      PrometheusMetricsService.defaultMetricsCollected = true;
+      logger.info('✅ Default Prometheus metrics collection started');
+    }
 
     // Define custom metrics
     this.jobsTotalCounter = new promClient.Counter({
@@ -78,21 +82,6 @@ class PrometheusMetricsService {
       name: 'ai_llm_tokens_total',
       help: 'Total LLM tokens consumed',
       labelNames: ['provider', 'model', 'type'], // type: prompt, completion
-      registers: [this.registry],
-    });
-
-    // Cache metrics
-    this.cacheHitsCounter = new promClient.Counter({
-      name: 'cache_hits_total',
-      help: 'Total cache hits',
-      labelNames: ['layer', 'type'], // layer: l1/l2, type: product/vendor/etc
-      registers: [this.registry],
-    });
-
-    this.cacheMissesCounter = new promClient.Counter({
-      name: 'cache_misses_total',
-      help: 'Total cache misses',
-      labelNames: ['type'], // type: product/vendor/etc
       registers: [this.registry],
     });
 
@@ -191,17 +180,19 @@ class PrometheusMetricsService {
   }
 
   /**
-   * Record cache hit
+   * Record cache hit - delegate to HttpMetricsService to avoid duplication
+   * @deprecated Use HttpMetricsService.recordCacheHit() instead
    */
   recordCacheHit(layer: 'l1' | 'l2', type: string): void {
-    this.cacheHitsCounter.inc({ layer, type });
+    logger.warn('prometheusMetrics.recordCacheHit() is deprecated. Use httpMetrics.recordCacheHit() instead');
   }
 
   /**
-   * Record cache miss
+   * Record cache miss - delegate to HttpMetricsService to avoid duplication
+   * @deprecated Use HttpMetricsService.recordCacheMiss() instead
    */
   recordCacheMiss(type: string): void {
-    this.cacheMissesCounter.inc({ type });
+    logger.warn('prometheusMetrics.recordCacheMiss() is deprecated. Use httpMetrics.recordCacheMiss() instead');
   }
 
   /**

@@ -12,7 +12,7 @@ import logger from '../utils/logger.js';
 
 class HttpMetricsService {
   private static instance: HttpMetricsService;
-  private registry: promClient.Registry;
+  private static registry: promClient.Registry;
 
   // HTTP Metrics
   private httpRequestsTotal: promClient.Counter;
@@ -41,125 +41,143 @@ class HttpMetricsService {
   private batchJobItemsProcessed: promClient.Counter;
 
   private constructor(registry: promClient.Registry) {
-    this.registry = registry;
+    HttpMetricsService.registry = registry;
+
+    // Helper to get or create metric
+    const getOrCreateMetric = <T extends promClient.Counter | promClient.Histogram | promClient.Gauge>(
+      MetricClass: any,
+      config: any
+    ): T => {
+      try {
+        // Try to get existing metric
+        const existing = registry.getSingleMetric(config.name);
+        if (existing) {
+          logger.info(`♻️  Reusing existing metric: ${config.name}`);
+          return existing as T;
+        }
+      } catch (e) {
+        // Metric doesn't exist, create new one
+      }
+      return new MetricClass(config) as T;
+    };
 
     // Define HTTP request counter
-    this.httpRequestsTotal = new promClient.Counter({
+    this.httpRequestsTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'http_requests_total',
       help: 'Total number of HTTP requests',
       labelNames: ['method', 'path', 'status'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
     // Define HTTP request duration histogram
-    this.httpRequestDuration = new promClient.Histogram({
+    this.httpRequestDuration = getOrCreateMetric<promClient.Histogram>(promClient.Histogram, {
       name: 'http_request_duration_seconds',
       help: 'HTTP request duration in seconds',
       labelNames: ['method', 'path', 'status'],
       buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10], // seconds
-      registers: [this.registry],
+      registers: [registry],
     });
 
     // Define requests in progress gauge
-    this.httpRequestsInProgress = new promClient.Gauge({
+    this.httpRequestsInProgress = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
       name: 'http_requests_in_progress',
       help: 'Number of HTTP requests currently being processed',
       labelNames: ['method', 'path'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
     // Custom business metrics
-    this.commissionsInProgress = new promClient.Gauge({
+    this.commissionsInProgress = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
       name: 'commissions_in_progress',
       help: 'Number of commissions currently in progress state',
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.activePartnersCount = new promClient.Gauge({
+    this.activePartnersCount = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
       name: 'active_partners_count',
       help: 'Number of active partners in the system',
-      registers: [this.registry],
+      registers: [registry],
     });
 
     // Cache metrics
-    this.cacheHitsTotal = new promClient.Counter({
+    this.cacheHitsTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'cache_hits_total',
       help: 'Total number of cache hits',
       labelNames: ['layer', 'type'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.cacheMissesTotal = new promClient.Counter({
+    this.cacheMissesTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'cache_misses_total',
       help: 'Total number of cache misses',
       labelNames: ['type'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.cacheHitRate = new promClient.Gauge({
+    this.cacheHitRate = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
       name: 'cache_hit_rate',
       help: 'Cache hit rate (0-1)',
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.redisErrorsTotal = new promClient.Counter({
+    this.redisErrorsTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'redis_errors_total',
       help: 'Total number of Redis errors',
       labelNames: ['op'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
     // Webhook metrics
-    this.webhookDeliveriesTotal = new promClient.Counter({
+    this.webhookDeliveriesTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'webhook_deliveries_total',
       help: 'Total number of webhook deliveries',
       labelNames: ['event', 'status'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.webhookDeliveryDuration = new promClient.Histogram({
+    this.webhookDeliveryDuration = getOrCreateMetric<promClient.Histogram>(promClient.Histogram, {
       name: 'webhook_delivery_duration_seconds',
       help: 'Webhook delivery duration in seconds',
       labelNames: ['event', 'status'],
       buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.webhookQueueSize = new promClient.Gauge({
+    this.webhookQueueSize = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
       name: 'webhook_queue_size',
       help: 'Number of webhooks in queue by status',
       labelNames: ['status'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.webhookFailuresTotal = new promClient.Counter({
+    this.webhookFailuresTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'webhook_failures_total',
       help: 'Total number of webhook delivery failures',
       labelNames: ['event', 'reason'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
     // Batch job metrics
-    this.batchJobRunsTotal = new promClient.Counter({
+    this.batchJobRunsTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'batch_job_runs_total',
       help: 'Total number of batch job runs',
       labelNames: ['job_name', 'status'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.batchJobDuration = new promClient.Histogram({
+    this.batchJobDuration = getOrCreateMetric<promClient.Histogram>(promClient.Histogram, {
       name: 'batch_job_duration_seconds',
       help: 'Batch job duration in seconds',
       labelNames: ['job_name'],
       buckets: [1, 5, 10, 30, 60, 120, 300],
-      registers: [this.registry],
+      registers: [registry],
     });
 
-    this.batchJobItemsProcessed = new promClient.Counter({
+    this.batchJobItemsProcessed = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'batch_job_items_processed_total',
       help: 'Total number of items processed by batch jobs',
       labelNames: ['job_name', 'status'],
-      registers: [this.registry],
+      registers: [registry],
     });
 
     logger.info('✅ HTTP metrics middleware initialized');
