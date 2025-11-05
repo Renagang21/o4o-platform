@@ -167,6 +167,44 @@ export type HeaderModuleType =
   | 'role-switcher';
 
 /**
+ * Site Title Module Settings
+ */
+export interface SiteTitleModuleSettings {
+  text?: string;
+  showTagline?: boolean;
+  typography?: { fontSize: 'small' | 'medium' | 'large' };
+  isLink?: boolean;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * HTML Module Settings
+ */
+export interface HTMLModuleSettings {
+  html?: string;
+  height?: 'small' | 'medium' | 'large';
+  enablePreview?: boolean;
+  safeMode?: boolean;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
  * Logo Module Settings
  */
 export interface LogoModuleSettings {

@@ -102,6 +102,12 @@ import entityRoutes from '../routes/entity/dropshipping-entity.routes.js';
 import trackingRoutes from '../routes/v1/tracking.routes.js';
 import operationsRoutes from '../routes/v1/operations.routes.js';
 
+// Phase 3 - Search Routes
+import searchRoutes from '../routes/v1/search.routes.js';
+
+// Phase 3 - Widget Areas Routes
+import widgetAreasRoutes from '../routes/v1/widget-areas.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -275,6 +281,13 @@ export function setupRoutes(app: Application): void {
   // Phase 2 - Tracking & Commission (includes own rate limiters)
   app.use('/api/v1/tracking', trackingRoutes);
   app.use('/api/v1/operations', operationsRoutes); // Phase 2.2 - Operations Panel
+
+  // Phase 3 - Search
+  app.use('/api/v1/search', publicLimiter, searchRoutes);
+  app.use('/api/search', publicLimiter, searchRoutes);
+
+  // Phase 3 - Widget Areas
+  app.use('/api/v1/widget-areas', standardLimiter, widgetAreasRoutes);
 
   // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);
