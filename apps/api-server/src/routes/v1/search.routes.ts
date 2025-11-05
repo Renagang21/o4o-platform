@@ -1,70 +1,50 @@
 import { Router, Request, Response } from 'express';
+import { SearchService } from '../../services/SearchService.js';
 
 const router: Router = Router();
+const searchService = new SearchService();
 
 /**
  * GET /api/v1/search/suggestions
  * Returns search suggestions based on query
+ * Query params:
+ * - q: search query (2-64 characters, required)
+ * - limit: max results (1-10, default 8)
+ * - type: 'product' | 'post' | 'page' | 'category' | 'all' (default 'all')
  */
 router.get('/suggestions', async (req, res) => {
   try {
-    const { q, limit = 5 } = req.query;
+    const { q, limit = '8', type = 'all' } = req.query;
 
-    if (!q || typeof q !== 'string') {
+    // Validate query parameter
+    if (!q || typeof q !== 'string' || q.trim().length < 2) {
       return res.json({ success: true, suggestions: [] });
     }
 
-    const query = q.toLowerCase();
-    const maxLimit = Math.min(Number(limit), 10);
+    // Validate limit parameter
+    const parsedLimit = Math.min(Math.max(parseInt(limit as string, 10) || 8, 1), 10);
 
-    // TODO: Replace with actual database queries
-    // Mock suggestions for now
-    const mockSuggestions = [
-      {
-        id: '1',
-        type: 'product',
-        title: `상품: ${q}`,
-        description: '상품 설명입니다',
-        url: `/products/1`
-      },
-      {
-        id: '2',
-        type: 'page',
-        title: `페이지: ${q}`,
-        description: '페이지 설명입니다',
-        url: `/pages/about`
-      },
-      {
-        id: '3',
-        type: 'category',
-        title: `카테고리: ${q}`,
-        description: '카테고리 설명입니다',
-        url: `/category/electronics`
-      },
-      {
-        id: '4',
-        type: 'post',
-        title: `블로그: ${q}`,
-        description: '블로그 포스트 설명입니다',
-        url: `/blog/post-1`
-      }
-    ];
+    // Validate type parameter
+    const validTypes = ['product', 'post', 'page', 'category', 'all'];
+    const searchType = validTypes.includes(type as string) ? (type as any) : 'all';
 
-    // Filter suggestions that match the query
-    const filtered = mockSuggestions.filter(
-      s => s.title.toLowerCase().includes(query) ||
-           s.description?.toLowerCase().includes(query)
-    );
+    // Get suggestions from database
+    const suggestions = await searchService.getSuggestions(q, parsedLimit, searchType);
+
+    // No-store cache policy (user input based, should not be cached)
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.set('Pragma', 'no-cache');
 
     res.json({
       success: true,
-      suggestions: filtered.slice(0, maxLimit)
+      suggestions
     });
   } catch (error: any) {
-    console.error('Search suggestions error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Failed to fetch search suggestions'
+    console.error('[SearchSuggestions] Error:', error);
+    // Fail silently - return empty suggestions on error
+    res.json({
+      success: true,
+      suggestions: []
     });
   }
 });

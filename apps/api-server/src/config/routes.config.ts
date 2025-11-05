@@ -108,6 +108,9 @@ import searchRoutes from '../routes/v1/search.routes.js';
 // Phase 3 - Widget Areas Routes
 import widgetAreasRoutes from '../routes/v1/widget-areas.routes.js';
 
+// Phase 4 - Cart Routes
+import cartRoutes from '../routes/v1/cart.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -288,6 +291,10 @@ export function setupRoutes(app: Application): void {
 
   // Phase 3 - Widget Areas
   app.use('/api/v1/widget-areas', standardLimiter, widgetAreasRoutes);
+
+  // Phase 4 - Cart
+  app.use('/api/v1/cart', publicLimiter, cartRoutes);
+  app.use('/api/cart', publicLimiter, cartRoutes);
 
   // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);
