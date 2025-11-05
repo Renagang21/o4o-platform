@@ -83,6 +83,9 @@ import { BusinessInfo } from '../entities/BusinessInfo.js';
 // Form entities
 import { Form } from '../entities/Form.js';
 import { FormSubmission } from '../entities/FormSubmission.js';
+// Customizer entities
+import { CustomizerPreset } from '../entities/CustomizerPreset.js';
+import { WidgetArea } from '../entities/WidgetArea.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -224,6 +227,9 @@ export const AppDataSource = new DataSource({
     // Form entities
     Form,
     FormSubmission,
+    // Customizer entities
+    CustomizerPreset,
+    WidgetArea,
   ],
   
   // 마이그레이션 설정
