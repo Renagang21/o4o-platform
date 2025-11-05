@@ -1,6 +1,7 @@
 export { ModuleInspector } from './ModuleInspector';
 export { CommonSettings } from './CommonSettings';
 export { LogoSettings } from './LogoSettings';
+export { SiteTitleSettings } from './SiteTitleSettings';
 export { MenuSettings } from './MenuSettings';
 export { SecondaryMenuSettings } from './SecondaryMenuSettings';
 export { SearchSettings } from './SearchSettings';
@@ -9,3 +10,4 @@ export { RoleSwitcherSettings } from './RoleSwitcherSettings';
 export { WidgetSettings } from './WidgetSettings';
 export { ButtonSettings } from './ButtonSettings';
 export { SocialIconsSettings } from './SocialIconsSettings';
+export { HTMLSettings } from './HTMLSettings';

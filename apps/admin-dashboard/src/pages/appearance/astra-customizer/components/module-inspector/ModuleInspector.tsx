@@ -3,6 +3,7 @@ import { ModuleConfig } from '../../types/customizer-types';
 import { X } from 'lucide-react';
 import { CommonSettings } from './CommonSettings';
 import { LogoSettings } from './LogoSettings';
+import { SiteTitleSettings } from './SiteTitleSettings';
 import { MenuSettings } from './MenuSettings';
 import { SecondaryMenuSettings } from './SecondaryMenuSettings';
 import { SearchSettings } from './SearchSettings';
@@ -11,6 +12,7 @@ import { RoleSwitcherSettings } from './RoleSwitcherSettings';
 import { WidgetSettings } from './WidgetSettings';
 import { ButtonSettings } from './ButtonSettings';
 import { SocialIconsSettings } from './SocialIconsSettings';
+import { HTMLSettings } from './HTMLSettings';
 
 interface ModuleInspectorProps {
   module: ModuleConfig;
@@ -35,6 +37,8 @@ export const ModuleInspector: React.FC<ModuleInspectorProps> = ({
     switch (module.type) {
       case 'logo':
         return <LogoSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'site-title':
+        return <SiteTitleSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'primary-menu':
         return <MenuSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'secondary-menu':
@@ -51,6 +55,8 @@ export const ModuleInspector: React.FC<ModuleInspectorProps> = ({
         return <ButtonSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'social':
         return <SocialIconsSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'html':
+        return <HTMLSettings settings={module.settings} onChange={handleSettingChange} />;
       default:
         return null;
     }
