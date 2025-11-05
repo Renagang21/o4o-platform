@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Hotfix] - 2025-11-05
+
+### Fixed
+- **Critical: Prometheus Metrics Duplication** - Resolved server crashes on restart
+  - `PrometheusMetricsService`: Added `defaultMetricsCollected` flag to prevent duplicate `collectDefaultMetrics()` calls
+  - `HttpMetricsService`: Implemented `getOrCreateMetric()` helper to reuse existing metrics
+  - Removed duplicate cache metrics from `PrometheusMetricsService` (now only in `HttpMetricsService`)
+  - Error fixed: "A metric with the name cache_hits_total has already been registered"
+  - Verified: Server restarts multiple times without metric duplication errors
+
+- **TypeScript Compilation Errors** - Fixed all build-blocking type errors
+  - Restored missing `OperationsController` with commission management methods
+  - Fixed import path in `operations.routes.ts`
+  - Removed duplicate/conflicting controller files
+  - All TypeScript compilation errors resolved (`pnpm -w build` succeeds)
+
+### Changed
+- **Deprecated**: `prometheusMetrics.recordCacheHit/Miss()` - Use `httpMetrics.recordCacheHit/Miss()` instead
+- Registry sharing: Single `Registry` instance properly shared between metrics services
+
+### Technical Details
+- Metrics singleton pattern: Single static Registry, one-time default metrics collection
+- Metric reuse: Check for existing metrics via `getSingleMetric()` before creating new ones
+- Build verification: All packages and API server build successfully without errors
+
+---
+
 ## [1.6.0] - 2025-10-29
 
 ### Added
