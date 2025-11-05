@@ -1,6 +1,6 @@
-import { Router, type Router as ExpressRouter } from 'express';
-import { OperationsController } from '../../controllers/OperationsController.js';
-import { authenticate, requireAnyRole } from '../../middleware/auth.middleware.js';
+import { Router, type Router as ExpressRouter, Request, Response, NextFunction } from 'express';
+import { OperationsController } from '../../controllers/operationsController.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
 import { UserRole } from '../../entities/User.js';
 import rateLimit from 'express-rate-limit';
 
@@ -35,6 +35,19 @@ const adminRateLimiter = rateLimit({
 });
 
 // Admin-only middleware
+const requireAnyRole = (roles: UserRole[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const hasRole = roles.some(role => req.user?.hasRole(role));
+    if (!hasRole) {
+      return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+    }
+    next();
+  };
+};
+
 const adminOnly = requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN]);
 
 /**

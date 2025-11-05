@@ -560,7 +560,8 @@ export class DashboardController {
         const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
         metricsInstance.recordWebhookDelivery(
           'manual_retry',
-          result.success ? 'enqueued' : 'failed'
+          result.success ? 'success' : 'failed',
+          0 // Duration not tracked for manual retries
         );
       } catch (metricsError) {
         logger.warn('Failed to record webhook retry metrics:', metricsError);
@@ -630,7 +631,7 @@ export class DashboardController {
         const metricsInstance = HttpMetricsService.getInstance(prometheusMetrics.registry);
         metricsInstance.recordBatchJobRun(
           jobType,
-          result.success ? 'manual_triggered' : 'failed',
+          result.success ? 'success' : 'failed',
           0 // Duration will be recorded when job completes
         );
       } catch (metricsError) {

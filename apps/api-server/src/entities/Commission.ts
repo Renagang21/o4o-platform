@@ -126,6 +126,7 @@ export class Commission {
       newAmount: number;
       reason: string;
       adjustedAt: string;
+      adjustedBy?: string;
     }>;
     cancellationReason?: string;
     paymentReference?: string;
