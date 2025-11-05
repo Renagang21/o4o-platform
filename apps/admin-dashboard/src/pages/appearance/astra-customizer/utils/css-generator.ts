@@ -649,10 +649,12 @@ function generateBreadcrumbCSS(settings: AstraCustomizerSettings): string[] {
 
   css.push('.ast-breadcrumbs a, .breadcrumb a {');
   css.push('  color: var(--breadcrumb-link-color);');
+  css.push('  text-decoration: none;');
   css.push('}');
 
   css.push('.ast-breadcrumbs .separator, .breadcrumb-separator {');
   css.push('  color: var(--breadcrumb-separator-color);');
+  css.push('  margin: 0 8px;');
   css.push('}');
 
   return css;
@@ -678,7 +680,7 @@ function generateScrollToTopCSS(settings: AstraCustomizerSettings): string[] {
   css.push('}');
 
   // Apply scroll to top styles
-  css.push('.ast-scroll-to-top, .scroll-to-top {');
+  css.push('.ast-scroll-to-top, .scroll-to-top, #scroll-to-top {');
   css.push('  background-color: var(--scroll-top-bg);');
   css.push('  color: var(--scroll-top-icon-color);');
   css.push('  width: var(--scroll-top-size);');
@@ -688,11 +690,16 @@ function generateScrollToTopCSS(settings: AstraCustomizerSettings): string[] {
   css.push('  bottom: var(--scroll-top-position-bottom);');
   css.push('  right: var(--scroll-top-position-right);');
   css.push('  z-index: 999;');
+  css.push('  display: flex;');
+  css.push('  align-items: center;');
+  css.push('  justify-content: center;');
+  css.push('  cursor: pointer;');
   css.push('  transition: all 0.3s;');
   css.push('}');
 
-  css.push('.ast-scroll-to-top:hover, .scroll-to-top:hover {');
+  css.push('.ast-scroll-to-top:hover, .scroll-to-top:hover, #scroll-to-top:hover {');
   css.push('  opacity: 0.8;');
+  css.push('  transform: translateY(-2px);');
   css.push('}');
 
   return css;

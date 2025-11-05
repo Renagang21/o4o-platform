@@ -64,6 +64,43 @@ export default function TemplatePartEditor() {
   });
 
   const [blocks, setBlocks] = useState<any[]>([]);
+  const [accountLoginUrl, setAccountLoginUrl] = useState<string>('');
+
+  // Helper function to find account block in content
+  const findAccountBlock = (content: any[]): any | null => {
+    for (const block of content) {
+      if (block.type === 'o4o/account-menu') {
+        return block;
+      }
+      if (block.innerBlocks && block.innerBlocks.length > 0) {
+        const found = findAccountBlock(block.innerBlocks);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Helper function to update account block loginUrl
+  const updateAccountBlockLoginUrl = (content: any[], loginUrl: string): any[] => {
+    return content.map(block => {
+      if (block.type === 'o4o/account-menu') {
+        return {
+          ...block,
+          data: {
+            ...block.data,
+            loginUrl
+          }
+        };
+      }
+      if (block.innerBlocks && block.innerBlocks.length > 0) {
+        return {
+          ...block,
+          innerBlocks: updateAccountBlockLoginUrl(block.innerBlocks, loginUrl)
+        };
+      }
+      return block;
+    });
+  };
 
   // Fetch template part if editing
   const { data: templatePart, isLoading } = useQuery<any>({
@@ -113,6 +150,12 @@ export default function TemplatePartEditor() {
       // Convert content to WordPress blocks
       // Since content is already in block format, we can use it directly
       setBlocks(templatePart.content);
+
+      // Load account block loginUrl if exists
+      const accountBlock = findAccountBlock(templatePart.content);
+      if (accountBlock && accountBlock.data?.loginUrl) {
+        setAccountLoginUrl(accountBlock.data.loginUrl);
+      }
     }
   }, [templatePart]);
 
@@ -180,12 +223,17 @@ export default function TemplatePartEditor() {
   // Handle form submission
   const handleSubmit = () => {
     // Convert blocks to our format
-    const contentBlocks = blocks.map(block => ({
+    let contentBlocks = blocks.map(block => ({
       id: block.clientId,
       type: block.name,
       data: block.attributes,
       innerBlocks: block.innerBlocks ? convertInnerBlocks(block.innerBlocks) : undefined
     }));
+
+    // Update account block loginUrl if it exists
+    if (accountLoginUrl && findAccountBlock(contentBlocks)) {
+      contentBlocks = updateAccountBlockLoginUrl(contentBlocks, accountLoginUrl);
+    }
 
     const submitData = {
       ...formData,
@@ -500,9 +548,9 @@ export default function TemplatePartEditor() {
                       id="priority"
                       type="number"
                       value={formData.priority}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        priority: parseInt(e.target.value) || 0 
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        priority: parseInt(e.target.value) || 0
                       })}
                       className="mt-2"
                     />
@@ -510,6 +558,32 @@ export default function TemplatePartEditor() {
                       같은 영역에 여러 템플릿 파트가 있을 때 표시 순서를 결정합니다. (낮은 숫자가 먼저 표시)
                     </p>
                   </div>
+
+                  {/* Account Block Settings */}
+                  {formData.area === 'header' && (
+                    <div className="pt-4 border-t">
+                      <h4 className="text-sm font-medium mb-3">Account 블록 설정</h4>
+                      <div>
+                        <Label htmlFor="accountLoginUrl">로그인 페이지 URL</Label>
+                        <Input
+                          id="accountLoginUrl"
+                          value={accountLoginUrl}
+                          onChange={(e) => setAccountLoginUrl(e.target.value)}
+                          placeholder="/login"
+                          className="mt-2"
+                          aria-label="로그인 페이지 URL"
+                        />
+                        <p className="text-sm text-gray-500 mt-1">
+                          미설정 시 기본 경로(/login)가 적용됩니다. 사이트 상황에 맞는 페이지(예: /auth/login, /my-custom-login)를 입력하세요.
+                        </p>
+                        {accountLoginUrl && !accountLoginUrl.startsWith('/') && (
+                          <p className="text-sm text-amber-600 mt-1">
+                            ⚠️ URL은 /로 시작해야 합니다.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </div>

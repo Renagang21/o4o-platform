@@ -12,6 +12,7 @@ interface AccountModuleProps {
     avatarSize?: number;
     dropdownAlignment?: 'left' | 'right';
     customClass?: string;
+    loginUrl?: string;
   };
 }
 
@@ -23,7 +24,8 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
     showName = false,
     avatarSize = 32,
     dropdownAlignment = 'right',
-    customClass = ''
+    customClass = '',
+    loginUrl = '/login'
   } = data;
 
   const { user, isAuthenticated, logout } = useAuth();
@@ -46,7 +48,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
   if (!isAuthenticated || !user) {
     return (
       <div className={`account-module account-module--guest ${customClass}`}>
-        <Link to="/login" className="account-login-link">
+        <Link to={loginUrl} className="account-login-link">
           <User size={20} />
           <span>로그인</span>
         </Link>

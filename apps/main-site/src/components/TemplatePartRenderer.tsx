@@ -40,7 +40,7 @@ const blockComponents: Record<string, FC<any>> = {
   'core/navigation': Navigation,
   'o4o/navigation': Navigation, // Alias for DB compatibility
   'core/search': SearchBlock,
-  'core/social-links': SocialLinks,
+  'core/social-links': SocialLinks, // Backend converter uses core/ namespace
   'o4o/social-links': SocialLinks,
   'o4o/account-menu': AccountModule,
   'o4o/cart-icon': CartModule,
