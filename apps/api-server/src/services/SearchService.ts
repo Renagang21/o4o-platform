@@ -1,4 +1,4 @@
-import { AppDataSource } from '../config/database.js';
+import { AppDataSource } from '../database/connection.js';
 import { Product } from '../entities/Product.js';
 import { Post } from '../entities/Post.js';
 import { Page } from '../entities/Page.js';

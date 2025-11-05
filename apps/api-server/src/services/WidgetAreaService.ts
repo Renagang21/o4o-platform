@@ -1,4 +1,4 @@
-import { AppDataSource } from '../config/database.js';
+import { AppDataSource } from '../database/connection.js';
 import { WidgetArea } from '../entities/WidgetArea.js';
 import { Repository } from 'typeorm';
 

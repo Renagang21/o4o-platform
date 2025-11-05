@@ -484,6 +484,10 @@ router.get('/', async (req: Request, res: Response) => {
       buttons: (customizerSettings as any)?.buttons || defaultButtonSettings,
       breadcrumbs: (customizerSettings as any)?.breadcrumbs || defaultBreadcrumbs,
       scrollToTop: (customizerSettings as any)?.scrollToTop || defaultScrollToTop,
+      // CRITICAL FIX: Ensure customCSS is always a string
+      customCSS: typeof (customizerSettings as any)?.customCSS === 'string'
+        ? (customizerSettings as any).customCSS
+        : '',
       _version: (customizerSettings as any)?._version || 1,
       _meta: (customizerSettings as any)?._meta || {
         lastModified: new Date().toISOString(),
@@ -519,10 +523,20 @@ router.put(
       let customizerSettings = (await settingsService.getSettings('customizer')) || {};
       customizerSettings = migrateCustomizerSettings(customizerSettings);
 
+      // CRITICAL FIX: Ensure customCSS is always a string, never an object
+      // This prevents the [object Object] bug when saving
+      const sanitizedBody = { ...req.body };
+      if ('customCSS' in sanitizedBody) {
+        // Ensure customCSS is a string
+        if (typeof sanitizedBody.customCSS !== 'string') {
+          sanitizedBody.customCSS = '';
+        }
+      }
+
       // Merge with new data
       const updatedSettings = {
         ...customizerSettings,
-        ...req.body,
+        ...sanitizedBody,
         _version: ((customizerSettings as any)?._version || 0) + 1,
         _meta: {
           ...(customizerSettings as any)?._meta,

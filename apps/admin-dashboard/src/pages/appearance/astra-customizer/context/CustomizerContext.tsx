@@ -218,13 +218,25 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     if (!initialSettings) {
       return defaultSettings;
     }
+
+    let settings: AstraCustomizerSettings;
+
     // Ensure initialSettings is a complete AstraCustomizerSettings object
     if ('siteIdentity' in initialSettings && 'header' in initialSettings) {
       // It's already a full settings object, use it directly
-      return initialSettings as AstraCustomizerSettings;
+      settings = initialSettings as AstraCustomizerSettings;
+    } else {
+      // Otherwise merge with defaults
+      settings = deepMerge(defaultSettings, initialSettings as any) as AstraCustomizerSettings;
     }
-    // Otherwise merge with defaults
-    return deepMerge(defaultSettings, initialSettings as any) as AstraCustomizerSettings;
+
+    // CRITICAL FIX: Ensure customCSS is always a string, never an object
+    // This prevents the [object Object] bug when customCSS is saved as {} or null
+    if (typeof settings.customCSS !== 'string') {
+      settings.customCSS = '';
+    }
+
+    return settings;
   }, [defaultSettings, initialSettings]);
 
   const [state, dispatch] = useReducer(customizerReducer, {
