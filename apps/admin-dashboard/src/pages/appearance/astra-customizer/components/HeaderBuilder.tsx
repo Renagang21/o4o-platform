@@ -1,16 +1,16 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { 
-  HeaderBuilderLayout, 
-  HeaderModuleType, 
-  ModuleConfig 
+import {
+  HeaderBuilderLayout,
+  HeaderModuleType,
+  ModuleConfig
 } from '../types/customizer-types';
-import { 
-  Menu, 
-  Search, 
-  User, 
-  ShoppingCart, 
-  Type, 
-  Code, 
+import {
+  Menu,
+  Search,
+  User,
+  ShoppingCart,
+  Type,
+  Code,
   Box,
   Share2,
   Plus,
@@ -18,6 +18,7 @@ import {
   Settings,
   Move
 } from 'lucide-react';
+import { ModuleInspector } from './module-inspector';
 
 interface HeaderBuilderProps {
   layout: HeaderBuilderLayout;
@@ -91,6 +92,46 @@ export const HeaderBuilder: React.FC<HeaderBuilderProps> = React.memo(({
     onChange(newLayout);
   }, [layout, onChange]);
 
+  // 모듈 설정 업데이트
+  const updateModuleSettings = useCallback((moduleId: string, newSettings: any) => {
+    const newLayout = { ...layout };
+
+    // 모든 섹션과 컬럼을 순회하여 해당 모듈 찾기
+    (['above', 'primary', 'below'] as const).forEach(section => {
+      (['left', 'center', 'right'] as const).forEach(column => {
+        const moduleIndex = newLayout[section][column].findIndex(m => m.id === moduleId);
+        if (moduleIndex !== -1) {
+          newLayout[section][column][moduleIndex] = {
+            ...newLayout[section][column][moduleIndex],
+            settings: newSettings
+          };
+        }
+      });
+    });
+
+    onChange(newLayout);
+  }, [layout, onChange]);
+
+  // 모듈 선택 핸들러
+  const handleModuleClick = useCallback((module: ModuleConfig) => {
+    setSelectedModule(module);
+  }, []);
+
+  // 현재 선택된 모듈 찾기 (layout에서 최신 데이터 가져오기)
+  const currentSelectedModule = useMemo(() => {
+    if (!selectedModule) return null;
+
+    let found: ModuleConfig | null = null;
+    (['above', 'primary', 'below'] as const).forEach(section => {
+      (['left', 'center', 'right'] as const).forEach(column => {
+        const module = layout[section][column].find(m => m.id === selectedModule.id);
+        if (module) found = module;
+      });
+    });
+
+    return found;
+  }, [selectedModule, layout]);
+
   // 섹션 렌더링
   const renderSection = (
     sectionName: 'above' | 'primary' | 'below',
@@ -125,14 +166,31 @@ export const HeaderBuilder: React.FC<HeaderBuilderProps> = React.memo(({
                 <div className="column-header">{column.charAt(0).toUpperCase() + column.slice(1)}</div>
                 <div className="column-content">
                   {sectionData[column].map((module) => (
-                    <div key={module.id} className="module-item">
+                    <div
+                      key={module.id}
+                      className={`module-item ${selectedModule?.id === module.id ? 'selected' : ''}`}
+                      onClick={() => handleModuleClick(module)}
+                    >
                       <span className="module-icon">
                         {AVAILABLE_MODULES.find(m => m.type === module.type)?.icon}
                       </span>
                       <span className="module-label">{module.label}</span>
                       <button
+                        className="module-settings"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleModuleClick(module);
+                        }}
+                        title="Module settings"
+                      >
+                        <Settings size={14} />
+                      </button>
+                      <button
                         className="module-remove"
-                        onClick={() => removeModule(sectionName, column, module.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeModule(sectionName, column, module.id);
+                        }}
                       >
                         <X size={14} />
                       </button>
@@ -191,6 +249,15 @@ export const HeaderBuilder: React.FC<HeaderBuilderProps> = React.memo(({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Module Inspector Panel */}
+      {currentSelectedModule && (
+        <ModuleInspector
+          module={currentSelectedModule}
+          onUpdate={updateModuleSettings}
+          onClose={() => setSelectedModule(null)}
+        />
       )}
 
       <style>{`
@@ -309,6 +376,19 @@ export const HeaderBuilder: React.FC<HeaderBuilderProps> = React.memo(({
           background: #f8f9fa;
           border: 1px solid #dee2e6;
           border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .module-item:hover {
+          background: #e9ecef;
+          border-color: #adb5bd;
+        }
+
+        .module-item.selected {
+          background: #e3f2fd;
+          border-color: #2196F3;
+          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
         }
 
         .module-icon {
@@ -325,15 +405,39 @@ export const HeaderBuilder: React.FC<HeaderBuilderProps> = React.memo(({
           font-size: 13px;
         }
 
+        .module-settings {
+          background: none;
+          border: none;
+          color: #999;
+          cursor: pointer;
+          padding: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          transition: all 0.2s;
+        }
+
+        .module-settings:hover {
+          background: #dee2e6;
+          color: #2196F3;
+        }
+
         .module-remove {
           background: none;
           border: none;
           color: #999;
           cursor: pointer;
           padding: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          transition: all 0.2s;
         }
 
         .module-remove:hover {
+          background: #fee;
           color: #e74c3c;
         }
 

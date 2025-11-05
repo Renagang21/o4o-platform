@@ -167,6 +167,82 @@ export type HeaderModuleType =
   | 'role-switcher';
 
 /**
+ * Logo Module Settings
+ */
+export interface LogoModuleSettings {
+  logoUrl?: string;
+  href?: string;
+  width?: number;
+  retinaUrl?: string;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Primary Menu Module Settings
+ */
+export interface MenuModuleSettings {
+  menuRef?: 'primary' | 'secondary' | 'footer';
+  style?: 'default' | 'minimal' | 'bordered';
+  itemGap?: number;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Button Module Settings
+ */
+export interface ButtonModuleSettings {
+  label?: string;
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'small' | 'medium' | 'large';
+  borderRadius?: number;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Social Icons Module Settings
+ */
+export interface SocialIconsModuleSettings {
+  links?: Array<{ type: string; url: string }>;
+  shape?: 'circle' | 'square' | 'rounded';
+  size?: number;
+  colorMode?: 'brand' | 'monochrome';
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
  * 모듈 설정 인터페이스
  */
 export interface ModuleConfig {
@@ -175,9 +251,9 @@ export interface ModuleConfig {
   label?: string;
   settings: {
     // 공통 설정
-    visibility?: ResponsiveValue<boolean>;
+    visibility?: ResponsiveValue<boolean> | { desktop: boolean; tablet: boolean; mobile: boolean };
     customClass?: string;
-    
+
     // 모듈별 설정
     [key: string]: any;
   };
