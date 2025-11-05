@@ -81,8 +81,8 @@ class WebhookService {
         'deliver',
         {
           partnerId: partner.id,
-          url: partner.webhookUrl,
-          secret: partner.webhookSecret,
+          webhookUrl: partner.webhookUrl,
+          webhookSecret: partner.webhookSecret,
           event,
           payload: webhookPayload,
         },
@@ -160,7 +160,7 @@ class WebhookService {
       }
 
       // Get job data
-      const { partnerId, url, secret, event, payload } = job.data;
+      const { partnerId, webhookUrl, webhookSecret, event, payload } = job.data;
 
       // Verify partner still has webhooks enabled
       const partner = await this.partnerRepository.findOne({
@@ -181,13 +181,10 @@ class WebhookService {
         'deliver',
         {
           partnerId,
-          url: url || partner.webhookUrl,
-          secret,
+          webhookUrl: webhookUrl || partner.webhookUrl,
+          webhookSecret,
           event,
           payload,
-          isManualRetry: true,
-          retriedBy: userId,
-          originalJobId: jobId,
         },
         {
           attempts: 3, // Fewer retries for manual retry
