@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { AppDataSource } from '../../config/database.js';
+import { AppDataSource } from '../../database/connection.js';
 import { Cart } from '../../entities/Cart.js';
 import { CartItem } from '../../entities/CartItem.js';
 import { authenticateToken } from '../../middleware/auth.js';
