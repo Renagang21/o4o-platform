@@ -28,6 +28,8 @@ import { ContactWidget } from './blocks/footer/ContactWidget';
 import { CopyrightWidget } from './blocks/footer/CopyrightWidget';
 import { RecentPostsWidget } from './blocks/footer/RecentPostsWidget';
 import { NewsletterWidget } from './blocks/footer/NewsletterWidget';
+import HTMLBlock from './blocks/HTMLBlock';
+import WidgetAreaBlock from './blocks/WidgetAreaBlock';
 import './blocks/footer/FooterWidgets.css';
 
 // Map block types to components
@@ -47,8 +49,10 @@ const blockComponents: Record<string, FC<any>> = {
   'o4o/role-switcher': RoleSwitcher,
   'o4o/button': Button,
   'o4o/conditional': ConditionalBlock,
+  'o4o/html': HTMLBlock, // HTML block for headers/general areas
   'o4o/text-widget': TextWidget,
-  'o4o/html-widget': HTMLWidget,
+  'o4o/html-widget': HTMLWidget, // HTML widget for footers
+  'core/widget-area': WidgetAreaBlock,
   'o4o/menu-widget': MenuWidget,
   'o4o/social-widget': SocialWidget,
   'o4o/contact-widget': ContactWidget,
