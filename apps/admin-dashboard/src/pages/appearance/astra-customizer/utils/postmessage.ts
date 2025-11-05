@@ -173,17 +173,41 @@ export function destroyCustomizerPostMessage() {
 
 /**
  * Preview script to inject into the iframe
+ * Phase 2: Added customizer:update handler for real-time customCSS preview
  */
 export const PREVIEW_SCRIPT = `
 (function() {
   let pendingUpdate = null;
   let rafId = null;
 
-  // Debounced message handler
+  // Origin validation for security
+  const ALLOWED_ORIGINS = [
+    window.location.origin,
+    'https://admin.neture.co.kr',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ];
+
+  function isOriginAllowed(origin) {
+    return ALLOWED_ORIGINS.some(function(allowed) {
+      return origin === allowed || origin.endsWith('.neture.co.kr');
+    });
+  }
+
+  // Message handler with origin validation
   window.addEventListener('message', function(event) {
+    // Validate origin
+    if (!isOriginAllowed(event.origin)) {
+      console.warn('[Customizer Preview] Blocked message from unauthorized origin:', event.origin);
+      return;
+    }
+
     if (!event.data || !event.data.type) return;
 
     switch(event.data.type) {
+      case 'customizer:update':
+        handleCustomizerUpdate(event.data.payload);
+        break;
       case 'setting-change':
         handleSettingChange(event.data.payload);
         break;
@@ -198,6 +222,34 @@ export const PREVIEW_SCRIPT = `
         break;
     }
   });
+
+  /**
+   * Handle customizer:update message for real-time customCSS preview
+   * Phase 2: Separate handler for customCSS with dedicated style tag
+   */
+  function handleCustomizerUpdate(payload) {
+    const { kind, value } = payload;
+
+    if (kind === 'customCSS') {
+      // Batch DOM updates with RAF
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function() {
+        let styleEl = document.getElementById('customizer-user-css');
+        if (!styleEl) {
+          styleEl = document.createElement('style');
+          styleEl.id = 'customizer-user-css';
+          // Insert at the end of head to ensure highest specificity
+          document.head.appendChild(styleEl);
+        }
+        styleEl.textContent = value || '';
+
+        // Trigger custom event
+        window.dispatchEvent(new CustomEvent('customizer-css-update', {
+          detail: { css: value }
+        }));
+      });
+    }
+  }
 
   function handleSettingChange(payload) {
     const { settings, css } = payload;
