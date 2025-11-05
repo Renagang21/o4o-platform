@@ -26,6 +26,7 @@ export enum CacheKeys {
   
   // Product caching
   PRODUCT_LIST = 'product:list',
+  PRODUCT_DETAILS = 'product:details',
   INVENTORY_STATUS = 'inventory:status',
   STOCK_ALERTS = 'stock:alerts'
 }
@@ -300,12 +301,50 @@ export class CacheService {
     return Buffer.from(data, 'base64').toString();
   }
 
+  // Product-specific cache methods
+  async getProductList(filters: any): Promise<any | null> {
+    const cacheKey = `${CacheKeys.PRODUCT_LIST}:filters:${this.hashFilters(filters)}`;
+    return this.get(cacheKey);
+  }
+
+  async setProductList(filters: any, data: any, ttl: number = 300): Promise<boolean> {
+    const cacheKey = `${CacheKeys.PRODUCT_LIST}:filters:${this.hashFilters(filters)}`;
+    return this.set(cacheKey, data, { ttl, tags: ['products'] });
+  }
+
+  async getProductDetails(productId: string): Promise<any | null> {
+    const cacheKey = `${CacheKeys.PRODUCT_DETAILS}:${productId}`;
+    return this.get(cacheKey);
+  }
+
+  async setProductDetails(productId: string, data: any, ttl: number = 600): Promise<boolean> {
+    const cacheKey = `${CacheKeys.PRODUCT_DETAILS}:${productId}`;
+    return this.set(cacheKey, data, { ttl, tags: ['products', `product:${productId}`] });
+  }
+
+  async invalidateProductCache(productId?: string): Promise<void> {
+    try {
+      if (productId) {
+        // Invalidate specific product
+        await this.del(`${CacheKeys.PRODUCT_DETAILS}:${productId}`);
+        await this.invalidateByTag(`product:${productId}`);
+      }
+
+      // Invalidate all product lists
+      await this.invalidateByTag('products');
+
+      logger.info('Product cache invalidated', { productId });
+    } catch (error) {
+      logger.error('Failed to invalidate product cache', { productId, error });
+    }
+  }
+
   // Cache statistics
   async getCacheStats(): Promise<any> {
     try {
       const info = await (this.redis as any).info();
       const keyCount = await (this.redis as any).dbsize();
-      
+
       return {
         connected: true,
         keyCount,

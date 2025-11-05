@@ -27,6 +27,10 @@ class PrometheusMetricsService {
   private queueSizeGauge: promClient.Gauge;
   private llmTokensCounter: promClient.Counter;
 
+  // Cache metrics
+  private cacheHitsCounter: promClient.Counter;
+  private cacheMissesCounter: promClient.Counter;
+
   private constructor() {
     // Create a new registry
     this.registry = new promClient.Registry();
@@ -74,6 +78,21 @@ class PrometheusMetricsService {
       name: 'ai_llm_tokens_total',
       help: 'Total LLM tokens consumed',
       labelNames: ['provider', 'model', 'type'], // type: prompt, completion
+      registers: [this.registry],
+    });
+
+    // Cache metrics
+    this.cacheHitsCounter = new promClient.Counter({
+      name: 'cache_hits_total',
+      help: 'Total cache hits',
+      labelNames: ['layer', 'type'], // layer: l1/l2, type: product/vendor/etc
+      registers: [this.registry],
+    });
+
+    this.cacheMissesCounter = new promClient.Counter({
+      name: 'cache_misses_total',
+      help: 'Total cache misses',
+      labelNames: ['type'], // type: product/vendor/etc
       registers: [this.registry],
     });
 
@@ -169,6 +188,20 @@ class PrometheusMetricsService {
    */
   getContentType(): string {
     return this.registry.contentType;
+  }
+
+  /**
+   * Record cache hit
+   */
+  recordCacheHit(layer: 'l1' | 'l2', type: string): void {
+    this.cacheHitsCounter.inc({ layer, type });
+  }
+
+  /**
+   * Record cache miss
+   */
+  recordCacheMiss(type: string): void {
+    this.cacheMissesCounter.inc({ type });
   }
 
   /**

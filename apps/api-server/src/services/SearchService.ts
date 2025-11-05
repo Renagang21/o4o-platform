@@ -60,20 +60,20 @@ export class SearchService {
     try {
       const products = await this.productRepository
         .createQueryBuilder('product')
-        .select(['product.id', 'product.title', 'product.slug', 'product.description'])
-        .where('product.status = :status', { status: 'published' })
+        .select(['product.id', 'product.name', 'product.slug', 'product.description'])
+        .where('product.status = :status', { status: 'active' })
         .andWhere(
-          '(LOWER(product.title) LIKE LOWER(:query) OR LOWER(product.description) LIKE LOWER(:query))',
+          '(LOWER(product.name) LIKE LOWER(:query) OR LOWER(product.description) LIKE LOWER(:query))',
           { query: `%${query}%` }
         )
-        .orderBy('product.title', 'ASC')
+        .orderBy('product.name', 'ASC')
         .limit(limit)
         .getMany();
 
       return products.map(product => ({
         id: product.id,
         type: 'product' as const,
-        title: product.title,
+        title: product.name,
         description: product.description?.substring(0, 100),
         url: `/products/${product.slug || product.id}`
       }));

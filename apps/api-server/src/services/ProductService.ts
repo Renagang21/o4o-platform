@@ -4,6 +4,8 @@ import { Product, ProductStatus } from '../entities/Product.js';
 import { Supplier } from '../entities/Supplier.js';
 import { Category } from '../entities/Category.js';
 import logger from '../utils/logger.js';
+import { cacheService } from './cache.service.js';
+import { prometheusMetrics } from './prometheus-metrics.service.js';
 
 export interface CreateProductRequest {
   name: string;
@@ -141,8 +143,11 @@ export class ProductService {
 
       const savedProduct = await this.productRepository.save(product);
 
+      // 캐시 무효화 (목록 캐시만)
+      await cacheService.invalidateProductCache();
+
       logger.info(`Product created: ${savedProduct.id} by supplier ${data.supplierId}`);
-      
+
       return savedProduct;
 
     } catch (error) {
@@ -151,13 +156,30 @@ export class ProductService {
     }
   }
 
-  // 제품 조회 (단일)
+  // 제품 조회 (단일) - 캐시 적용
   async getProduct(id: string): Promise<Product | null> {
     try {
+      // 캐시에서 조회
+      const cached = await cacheService.getProductDetails(id);
+      if (cached) {
+        logger.debug(`Product cache hit: ${id}`);
+        prometheusMetrics.recordCacheHit('l2', 'product');
+        return cached;
+      }
+
+      logger.debug(`Product cache miss: ${id}`);
+      prometheusMetrics.recordCacheMiss('product');
+
+      // DB에서 조회
       const product = await this.productRepository.findOne({
         where: { id },
         relations: ['supplier', 'category']
       });
+
+      // 캐시에 저장 (600초 = 10분)
+      if (product) {
+        await cacheService.setProductDetails(id, product, 600);
+      }
 
       return product;
 
@@ -167,7 +189,7 @@ export class ProductService {
     }
   }
 
-  // 제품 목록 조회 (필터링)
+  // 제품 목록 조회 (필터링) - 캐시 적용
   async getProducts(filters: ProductFilters = {}) {
     try {
       const {
@@ -185,6 +207,17 @@ export class ProductService {
         page = 1,
         limit = 20
       } = filters;
+
+      // 캐시에서 조회
+      const cached = await cacheService.getProductList(filters);
+      if (cached) {
+        logger.debug('Product list cache hit', { filters });
+        prometheusMetrics.recordCacheHit('l2', 'product');
+        return cached;
+      }
+
+      logger.debug('Product list cache miss', { filters });
+      prometheusMetrics.recordCacheMiss('product');
 
       const queryBuilder = this.productRepository
         .createQueryBuilder('product')
@@ -241,13 +274,18 @@ export class ProductService {
 
       const [products, total] = await queryBuilder.getManyAndCount();
 
-      return {
+      const result = {
         products,
         total,
         page,
         limit,
         totalPages: Math.ceil(total / limit)
       };
+
+      // 캐시에 저장 (300초 = 5분)
+      await cacheService.setProductList(filters, result, 300);
+
+      return result;
 
     } catch (error) {
       logger.error('Error fetching products:', error);
@@ -306,8 +344,11 @@ export class ProductService {
         updatedAt: new Date()
       });
 
+      // 캐시 무효화 (상세 + 목록)
+      await cacheService.invalidateProductCache(id);
+
       logger.info(`Product updated: ${id}`);
-      
+
       return updatedProduct;
 
     } catch (error) {
@@ -328,8 +369,11 @@ export class ProductService {
         throw new Error('Product not found');
       }
 
+      // 캐시 무효화 (상세 + 목록)
+      await cacheService.invalidateProductCache(id);
+
       logger.info(`Product deleted: ${id}`);
-      
+
       return true;
 
     } catch (error) {
@@ -354,8 +398,11 @@ export class ProductService {
 
       const updatedProduct = await this.productRepository.save(product);
 
+      // 캐시 무효화 (상세 + 목록)
+      await cacheService.invalidateProductCache(id);
+
       logger.info(`Product status changed: ${id} -> ${isActive ? 'active' : 'inactive'}`);
-      
+
       return updatedProduct;
 
     } catch (error) {
@@ -400,8 +447,11 @@ export class ProductService {
 
       const updatedProduct = await this.productRepository.save(product);
 
+      // 캐시 무효화 (상세 + 목록)
+      await cacheService.invalidateProductCache(id);
+
       logger.info(`Product inventory updated: ${id} -> ${newInventory}`);
-      
+
       return updatedProduct;
 
     } catch (error) {
