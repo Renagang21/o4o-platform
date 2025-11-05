@@ -4,6 +4,11 @@ import { X } from 'lucide-react';
 import { CommonSettings } from './CommonSettings';
 import { LogoSettings } from './LogoSettings';
 import { MenuSettings } from './MenuSettings';
+import { SecondaryMenuSettings } from './SecondaryMenuSettings';
+import { SearchSettings } from './SearchSettings';
+import { CartSettings } from './CartSettings';
+import { RoleSwitcherSettings } from './RoleSwitcherSettings';
+import { WidgetSettings } from './WidgetSettings';
 import { ButtonSettings } from './ButtonSettings';
 import { SocialIconsSettings } from './SocialIconsSettings';
 
@@ -32,6 +37,16 @@ export const ModuleInspector: React.FC<ModuleInspectorProps> = ({
         return <LogoSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'primary-menu':
         return <MenuSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'secondary-menu':
+        return <SecondaryMenuSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'search':
+        return <SearchSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'cart':
+        return <CartSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'role-switcher':
+        return <RoleSwitcherSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'widget':
+        return <WidgetSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'button':
         return <ButtonSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'social':

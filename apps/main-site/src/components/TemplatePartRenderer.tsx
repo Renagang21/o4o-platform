@@ -122,6 +122,16 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
       return null;
     }
 
+    // Get visibility settings
+    const visibility = block.data?.visibility || block.settings?.visibility;
+    const visibilityClasses: string[] = [];
+
+    if (visibility) {
+      if (visibility.desktop === false) visibilityClasses.push('hidden-desktop');
+      if (visibility.tablet === false) visibilityClasses.push('hidden-tablet');
+      if (visibility.mobile === false) visibilityClasses.push('hidden-mobile');
+    }
+
     // Filter out React reserved props and rename ref to menuRef for Navigation
     const { ref, ...safeData } = block.data || {};
     const { ref: attrRef, ...safeAttributes } = block.attributes || {};
@@ -131,6 +141,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
       ...safeAttributes,
       key: block.id,
       id: block.id,
+      className: `${block.data?.className || ''} ${visibilityClasses.join(' ')}`.trim(),
       // Convert ref to menuRef for Navigation component
       ...(block.type === 'core/navigation' && (ref || attrRef) ? { menuRef: ref || attrRef } : {})
     };
@@ -296,6 +307,28 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     <>
       {/* Render only the highest priority template (first in sorted array) */}
       {Array.isArray(templateParts) && templateParts.length > 0 ? renderTemplatePart(templateParts[0]) : null}
+
+      {/* Visibility CSS Classes */}
+      <style>{`
+        /* Visibility Classes for Responsive Display Control */
+        @media (min-width: 993px) {
+          .hidden-desktop {
+            display: none !important;
+          }
+        }
+
+        @media (min-width: 577px) and (max-width: 992px) {
+          .hidden-tablet {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .hidden-mobile {
+            display: none !important;
+          }
+        }
+      `}</style>
     </>
   );
 };

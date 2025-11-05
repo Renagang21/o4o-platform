@@ -243,6 +243,84 @@ export interface SocialIconsModuleSettings {
 }
 
 /**
+ * Secondary Menu Module Settings
+ */
+export interface SecondaryMenuModuleSettings extends MenuModuleSettings {
+  // Inherits from MenuModuleSettings
+  // menuRef defaults to 'secondary'
+}
+
+/**
+ * Search Module Settings
+ */
+export interface SearchModuleSettings {
+  variant?: 'icon' | 'input';
+  placeholder?: string;
+  autocomplete?: boolean;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Cart Module Settings
+ */
+export interface CartModuleSettings {
+  showCount?: boolean;
+  showTotal?: boolean;
+  action?: 'mini-cart' | 'page';
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Role Switcher Module Settings
+ */
+export interface RoleSwitcherModuleSettings {
+  displayCondition?: 'always' | 'multi-role';
+  showLabel?: boolean;
+  variant?: 'icon-only' | 'with-label';
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Widget Module Settings
+ */
+export interface WidgetModuleSettings {
+  widgetAreaId?: string;
+  // 공통 설정
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
  * 모듈 설정 인터페이스
  */
 export interface ModuleConfig {
