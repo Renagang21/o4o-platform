@@ -2,11 +2,22 @@
  * Global Style Injector
  * Injects customizer settings as CSS into the document head
  * This makes all customizer settings (colors, typography, header, footer, etc.) apply to the frontend
+ *
+ * Phase 3: Now uses @o4o/appearance-system for standardized CSS generation and injection
  */
 
 import { useEffect } from 'react';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
 import { generateCSS } from '../utils/css-generator';
+import {
+  defaultTokens,
+  generateButtonCSS,
+  generateBreadcrumbCSS,
+  generateScrollToTopCSS,
+  injectCSS,
+  STYLE_IDS,
+  type DesignTokens,
+} from '@o4o/appearance-system';
 
 export function GlobalStyleInjector() {
   const { settings, isLoading } = useCustomizerSettings();
@@ -18,20 +29,48 @@ export function GlobalStyleInjector() {
     }
 
     try {
-      // Generate CSS from customizer settings
-      const css = generateCSS(settings);
+      // Legacy: Generate full CSS from customizer settings (Phase 2.5 generators)
+      const legacyCSS = generateCSS(settings);
 
-      // Get or create style element
-      let styleEl = document.getElementById('customizer-global-css') as HTMLStyleElement;
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = 'customizer-global-css';
-        styleEl.setAttribute('data-source', 'customizer');
-        document.head.appendChild(styleEl);
+      // Phase 3: Generate core component CSS using appearance-system
+      // Map customizer settings to design tokens
+      const tokens: DesignTokens = {
+        ...defaultTokens,
+        colors: {
+          ...defaultTokens.colors,
+          // Map from customizer settings if available
+          primary: (settings as any).colors?.primaryColor || defaultTokens.colors.primary,
+          primaryHover: (settings as any).colors?.primaryHover || defaultTokens.colors.primaryHover,
+          primaryActive: (settings as any).colors?.primaryActive || defaultTokens.colors.primaryActive,
+          buttonBg: (settings as any).buttons?.primary?.backgroundColor || defaultTokens.colors.buttonBg,
+          buttonText: (settings as any).buttons?.primary?.textColor || defaultTokens.colors.buttonText,
+          buttonBorder: (settings as any).buttons?.primary?.backgroundColor || defaultTokens.colors.buttonBorder,
+          breadcrumbText: (settings as any).breadcrumbs?.styling?.textColor || defaultTokens.colors.breadcrumbText,
+          breadcrumbLink: (settings as any).breadcrumbs?.styling?.linkColor || defaultTokens.colors.breadcrumbLink,
+          breadcrumbSeparator: (settings as any).breadcrumbs?.styling?.separatorColor || defaultTokens.colors.breadcrumbSeparator,
+        },
+      };
+
+      // Generate core component CSS (Phase 2 generators)
+      const coreCSS = [
+        generateButtonCSS(tokens),
+        generateBreadcrumbCSS(tokens),
+        generateScrollToTopCSS(tokens),
+      ].join('\n\n');
+
+      // Inject legacy CSS (backward compatibility)
+      let legacyStyleEl = document.getElementById('customizer-global-css') as HTMLStyleElement;
+      if (!legacyStyleEl) {
+        legacyStyleEl = document.createElement('style');
+        legacyStyleEl.id = 'customizer-global-css';
+        legacyStyleEl.setAttribute('data-source', 'customizer-legacy');
+        document.head.appendChild(legacyStyleEl);
       }
+      legacyStyleEl.textContent = legacyCSS;
 
-      // Inject CSS
-      styleEl.textContent = css;
+      // Inject core CSS using appearance-system (Phase 3 standard path)
+      injectCSS(coreCSS, STYLE_IDS.APPEARANCE_SYSTEM);
+
     } catch (error) {
       console.error('[GlobalStyleInjector] Failed to inject CSS:', error);
     }

@@ -31,6 +31,7 @@
     "build:analyze": "vite build --mode production --config vite.config.analyze.ts || echo 'Bundle analysis not configured'"
   },
   "dependencies": {
+    "@o4o/appearance-system": "file:../../packages/appearance-system",
     "@o4o/shortcodes": "file:../../packages/shortcodes",
     "@o4o/types": "file:../../packages/types",
     "@o4o/ui": "file:../../packages/ui",
