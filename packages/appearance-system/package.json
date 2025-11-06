@@ -1,0 +1,40 @@
+{
+  "name": "@o4o/appearance-system",
+  "version": "1.0.0",
+  "description": "Design tokens and appearance system for O4O Platform - Single Source of Truth (SSOT)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npx tsc --build",
+    "type-check": "tsc --noEmit",
+    "lint": "echo 'Lint not configured yet'",
+    "test": "echo 'Tests not configured yet'"
+  },
+  "keywords": [
+    "design-tokens",
+    "appearance",
+    "theming",
+    "css-variables",
+    "o4o"
+  ],
+  "author": "O4O Platform Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "typescript": "5.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

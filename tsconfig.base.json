@@ -23,7 +23,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@o4o/*": ["./packages/*/src", "./packages/*"]
+      "@o4o/*": ["./packages/*/src", "./packages/*"],
+      "@o4o/appearance": ["./packages/appearance-system/src"],
+      "@o4o/appearance-system": ["./packages/appearance-system/src"]
     }
   },
   "include": [
@@ -45,6 +47,7 @@
     { "path": "./apps/api-server" },
     { "path": "./apps/main-site" },
     { "path": "./apps/admin-dashboard" },
+    { "path": "./packages/appearance-system" },
     { "path": "./packages/auth-client" },
     { "path": "./packages/auth-context" },
     { "path": "./packages/types" },
