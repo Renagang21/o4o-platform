@@ -41,6 +41,7 @@ import { PlaylistItem } from '../entities/PlaylistItem.js';
 import { ScreenTemplate } from '../entities/ScreenTemplate.js';
 import { ContentUsageLog } from '../entities/ContentUsageLog.js';
 import { Post } from '../entities/Post.js';
+import { PostMeta } from '../entities/PostMeta.js';
 import { Tag } from '../entities/Tag.js';
 import { PostAutosave } from '../entities/PostAutosave.js';
 import { Page } from '../entities/Page.js';
@@ -181,6 +182,7 @@ export const AppDataSource = new DataSource({
     ContentUsageLog,
     // Content entities
     Post,
+    PostMeta,
     PostAutosave,
     Tag,
     Page,
