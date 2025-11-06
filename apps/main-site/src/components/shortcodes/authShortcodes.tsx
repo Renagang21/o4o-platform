@@ -99,7 +99,7 @@ export const SocialLoginComponent: React.FC<{
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const response = await authClient.api.get('/v1/settings/oauth');
+        const response = await authClient.api.get('/settings/oauth');
 
         if (response.data.success) {
           setOauthProviders(response.data.data);
@@ -115,7 +115,7 @@ export const SocialLoginComponent: React.FC<{
       if (!showTestPanelSafe) return;
 
       try {
-        const response = await authClient.api.get('/v1/auth/test-accounts');
+        const response = await authClient.api.get('/auth/test-accounts');
         if (response.data.success) {
           setTestAccounts(response.data.data);
         }
@@ -143,7 +143,7 @@ export const SocialLoginComponent: React.FC<{
     setError('');
 
     try {
-      const response = await authClient.api.post('/v1/auth/login', formData);
+      const response = await authClient.api.post('/auth/login', formData);
 
       if (response.data.success) {
         // Determine redirect based on user role
@@ -164,7 +164,7 @@ export const SocialLoginComponent: React.FC<{
 
   const handleSocialLogin = (provider: 'google' | 'kakao' | 'naver') => {
     const baseUrl = authClient.api.defaults.baseURL || '';
-    window.location.href = `${baseUrl}/v1/auth/${provider}`;
+    window.location.href = `${baseUrl}/auth/${provider}`;
   };
 
   const renderSocialIcon = (provider: string) => {
@@ -471,7 +471,7 @@ export const FindIdComponent: React.FC<{
     setStatus('idle');
 
     try {
-      const response = await authClient.api.post('/v1/auth/find-id', { email });
+      const response = await authClient.api.post('/auth/find-id', { email });
 
       if (response.data.success) {
         setStatus('success');
@@ -617,7 +617,7 @@ export const FindPasswordComponent: React.FC<{
     setStatus('idle');
 
     try {
-      const response = await authClient.api.post('/v1/auth/forgot-password', { email });
+      const response = await authClient.api.post('/auth/forgot-password', { email });
 
       if (response.data.success) {
         setStatus('success');

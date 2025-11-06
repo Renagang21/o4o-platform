@@ -7,7 +7,7 @@ export const authProviderService = {
    */
   async getEnabledProviders(): Promise<OAuthProvidersResponse> {
     try {
-      const response = await authClient.api.get('/v1/settings/oauth/providers');
+      const response = await authClient.api.get('/settings/oauth/providers');
       return response.data;
     } catch (error) {
       // Return default disabled state if API fails
