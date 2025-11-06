@@ -3,45 +3,15 @@ import type { User } from './User.js'
 import type { Category } from './Category.js'
 import type { Tag } from './Tag.js'
 import { AccessControl } from '@o4o/types'
+// Import types from SSOT - using relative path due to module resolution
+// TODO Phase 3: Update tsconfig paths to support @o4o/types/cpt export
+import type { Block, SEOMetadata, PostRevision, PostMetaFields } from '@o4o/types/dist/cpt/index.js'
 
-export interface Block {
-  id: string
-  type: string
-  data: unknown
-  order: number
-}
+// Re-export for convenience
+export type { Block, SEOMetadata, PostRevision }
 
-export interface SEOMetadata {
-  title?: string
-  description?: string
-  keywords?: string[]
-  ogTitle?: string
-  ogDescription?: string
-  ogImage?: string
-  ogType?: string
-  twitterCard?: string
-  twitterTitle?: string
-  twitterDescription?: string
-  twitterImage?: string
-  canonicalUrl?: string
-  noindex?: boolean
-  nofollow?: boolean
-  schema?: Record<string, unknown>
-}
-
-export interface PostRevision {
-  id: string
-  timestamp: string
-  author: string
-  changes: Partial<Post>
-}
-
-export interface PostMeta {
-  featuredImage?: string
-  excerpt?: string
-  readingTime?: number
-  featured?: boolean
-  sticky?: boolean
+// PostMeta interface (legacy compatibility)
+export interface PostMeta extends PostMetaFields {
   [key: string]: unknown
 }
 

@@ -48,12 +48,18 @@
   - ✅ 표준 응답 형식 정의: `{ data: Post[], meta: { total: number } }`
   - 🔄 `GET /api/v1/posts` 응답 형식 표준화 (진행 중)
 
-### Phase 2 (Week 3-4)
-- **목표:** 레거시 라우트 폐지 및 클라이언트 마이그레이션
+### Phase 2 (Week 3-4) - IN PROGRESS
+- **목표:** 서비스 레이어 통합 및 레거시 라우트 deprecation 시작
 - **작업:**
+  - [✅] 통합 CPT 서비스 구조 생성 (`/src/services/cpt/`)
+  - [✅] 레거시 서비스를 위임 패턴으로 마이그레이션
+  - [✅] 배치 로딩 메서드 구현 (N+1 쿼리 방지)
+  - [✅] 표준 응답 DTO 정의 (`{ data, meta }` 형식)
+  - [✅] Feature flag 추가 (`ROUTE_DEPRECATION_FLAGS`)
+  - [✅] Deprecation 미들웨어 구현
   - [ ] Admin Dashboard를 `/api/v1/posts`로 전환
   - [ ] Main Site를 `/api/v1/posts`로 전환
-  - [ ] `/api/posts` 라우트에 deprecation warning 추가
+  - [ ] `/api/posts` 라우트에 deprecation headers 적용
   - [ ] `/posts` (base) 라우트 완전 제거
   - [ ] `/api/content/posts`를 `/api/v1/posts`로 리다이렉트
 
@@ -142,14 +148,149 @@
 
 ---
 
+## 마이그레이션 가이드
+
+### Backend (API Server)
+
+#### Phase 2 완료 사항
+
+1. **통합 CPT 서비스**
+   - 위치: `/apps/api-server/src/services/cpt/cpt.service.ts`
+   - 레거시 서비스 (`/apps/api-server/src/modules/cpt-acf/services/`) → 위임 패턴으로 전환
+   - 모듈화: `post.module.ts`, `meta.module.ts`, `acf.module.ts`
+
+2. **배치 로딩**
+   - 메서드: `cptService.getPostMetaBatch(postIds, fieldIds?)`
+   - N+1 쿼리 방지를 위한 최적화
+   - 예시:
+     ```typescript
+     // Before (N+1 problem)
+     for (const post of posts) {
+       const meta = await getPostMeta(post.id);
+     }
+
+     // After (batch loading)
+     const postIds = posts.map(p => p.id);
+     const metaBatch = await cptService.getPostMetaBatch(postIds);
+     ```
+
+3. **표준 응답 DTO**
+   - 위치: `/apps/api-server/src/dto/post.dto.ts`
+   - 형식: `{ data: T[], meta: { total, page, limit, ... } }`
+   - Helper 함수: `toPostListResponse()`, `toPostSingleResponse()`
+
+4. **Feature Flag**
+   - 환경변수: `ROUTE_DEPRECATION_FLAGS=on|off`
+   - 미들웨어: `/apps/api-server/src/middleware/deprecation.middleware.ts`
+   - 사용법:
+     ```typescript
+     import { addDeprecationHeaders } from '../middleware/deprecation.middleware.js';
+
+     router.get('/api/posts',
+       addDeprecationHeaders({
+         successorRoute: '/api/v1/posts',
+         message: 'Use /api/v1/posts instead',
+         sunsetDate: '2025-12-31'
+       }),
+       handler
+     );
+     ```
+
+#### Migration Steps for Existing Code
+
+**Step 1: Import the unified service**
+```typescript
+// Old
+import { cptService } from '../modules/cpt-acf/services/cpt.service.js';
+
+// New (recommended)
+import { cptService } from '../services/cpt/cpt.service.js';
+```
+
+**Step 2: Use batch loading for list pages**
+```typescript
+// Before
+const posts = await cptService.getPostsByCPT('product');
+for (const post of posts.data) {
+  post.meta = await getPostMeta(post.id);
+}
+
+// After
+const result = await cptService.getPostsByCPTWithMeta('product', {
+  page: 1,
+  limit: 20
+});
+```
+
+**Step 3: Update response format**
+```typescript
+// Before
+res.json({
+  success: true,
+  data: posts,
+  pagination: { ... }
+});
+
+// After
+import { toPostListResponse } from '../dto/post.dto.js';
+
+res.json(toPostListResponse(posts, pagination));
+```
+
+### Frontend (Admin Dashboard & Main Site)
+
+#### Required Changes
+
+1. **API Client 업데이트**
+   - Admin Dashboard: `/apps/admin-dashboard/src/lib/api/posts.ts`
+   - Main Site: `/apps/main-site/src/lib/api/posts.ts`
+
+2. **Response 형식 처리**
+```typescript
+// Before
+const response = await fetch('/api/posts');
+const posts = await response.json();
+// posts is directly Post[]
+
+// After
+const response = await fetch('/api/v1/posts');
+const { data, meta } = await response.json();
+// data is Post[], meta has pagination info
+```
+
+3. **타입 정의 업데이트**
+```typescript
+// packages/types/src/api-responses.ts 생성 권장
+export interface PostListResponse {
+  data: Post[];
+  meta: {
+    total: number;
+    page?: number;
+    limit?: number;
+  };
+}
+```
+
+#### Migration Timeline
+
+- **Phase 2 (현재)**: Backend 준비 완료, Feature flag로 점진적 적용
+- **Phase 3 (2-3주 후)**: 클라이언트 전환 시작
+  - Admin Dashboard → `/api/v1/posts` 사용
+  - Main Site → `/api/v1/posts` 사용
+- **Phase 4 (1개월 후)**: 레거시 라우트 완전 제거
+
+---
+
 ## 참고 자료
 
 - [CPT/ACF Investigation Report](./CPT_ACF_INVESTIGATION.md)
 - [API Server Routes](../apps/api-server/src/routes/)
+- [Unified CPT Service](../apps/api-server/src/services/cpt/cpt.service.ts)
+- [Standard DTOs](../apps/api-server/src/dto/post.dto.ts)
 - [REST API Best Practices](https://restfulapi.net/)
 - [Semantic Versioning](https://semver.org/)
 
 ---
 
-*최종 업데이트: 2025-11-06*
-*다음 리뷰: Phase 2 시작 시 (Week 3)*
+*최종 업데이트: 2025-11-06 (Phase 2 완료)*
+*다음 리뷰: Phase 3 시작 시 (2주 후)*

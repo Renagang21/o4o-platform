@@ -3,6 +3,7 @@ import { cptService } from '../services/cpt.service.js';
 import { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { CPT_PAGINATION, CPT_QUERY_DEFAULTS } from '../../../config/cpt.constants.js';
+import { toPostListResponse, toPostSingleResponse } from '../../../dto/post.dto.js';
 
 /**
  * CPT Controller - HTTP layer only, delegates business logic to service
@@ -133,6 +134,7 @@ export class CPTController {
 
   /**
    * Get posts by CPT
+   * Returns standardized response format: { data: Post[], meta: { total, page, ... } }
    */
   static async getPostsByCPT(req: Request, res: Response) {
     try {
@@ -159,7 +161,13 @@ export class CPTController {
         return res.status(404).json(result);
       }
 
-      res.json(result);
+      // Transform to standard DTO format
+      const response = toPostListResponse(
+        result.data || [],
+        result.pagination
+      );
+
+      res.json(response);
     } catch (error: any) {
       logger.error('Controller error - getPostsByCPT:', error);
       res.status(500).json({

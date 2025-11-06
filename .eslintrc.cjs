@@ -48,7 +48,16 @@ module.exports = {
       }
     }],
     'n/no-missing-import': 'off', // TypeScript handles this
-    'n/no-unsupported-features/es-syntax': 'off' // We support modern ES
+    'n/no-unsupported-features/es-syntax': 'off', // We support modern ES
+
+    // CPT/ACF SSOT enforcement
+    'no-restricted-syntax': [
+      'warn',
+      {
+        'selector': 'TSInterfaceDeclaration[id.name=/^(Post|PostMeta|PostStatus|PostType|ACF|FieldGroup|CustomField)$/]',
+        'message': 'Local Post/ACF type declarations are discouraged. Please import from @o4o/types/cpt instead to maintain Single Source of Truth.'
+      }
+    ]
   },
   overrides: [
     {

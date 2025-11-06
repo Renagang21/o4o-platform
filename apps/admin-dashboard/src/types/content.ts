@@ -1,8 +1,8 @@
-// Content Management Types
-export type PostStatus = 'draft' | 'published' | 'private' | 'archived' | 'scheduled'
-export type PostType = 'post' | 'page' | 'notice' | 'news' | 'product'
+// Re-export Post types from SSOT
+export type { PostStatus, PostType, SEOMetadata } from '@o4o/types/cpt';
+export type { Tag } from '@o4o/types';
 
-// TipTap Editor Types
+// TipTap Editor Types (unique to this app)
 export interface TipTapJSONContent {
   type?: string
   attrs?: Record<string, unknown>
@@ -14,24 +14,8 @@ export interface TipTapJSONContent {
   text?: string
 }
 
-export interface SEOMetadata {
-  title?: string
-  description?: string
-  keywords?: string[]
-  ogTitle?: string
-  ogDescription?: string
-  ogImage?: string
-  ogType?: string
-  twitterCard?: string
-  twitterTitle?: string
-  twitterDescription?: string
-  twitterImage?: string
-  canonicalUrl?: string
-  noindex?: boolean
-  nofollow?: boolean
-  schema?: Record<string, unknown>
-  score?: number
-}
+// Local Post interface (extends base Post with TipTap content)
+import type { Post as BasePost, PostType, PostStatus, SEOMetadata } from '@o4o/types/cpt';
 
 export interface Post {
   id: string
@@ -152,56 +136,16 @@ export interface MediaFolder {
   updatedAt: string
 }
 
-export interface CustomField {
-  id: string
-  name: string
-  label: string
-  type: CustomFieldType
-  description?: string
-  required: boolean
-  defaultValue?: string | number | boolean | string[] | number[]
-  placeholder?: string
-  validation?: ValidationRules
-  conditionalLogic?: ConditionalLogic[]
-  options?: FieldOption[] // For select, radio, checkbox
-  min?: number
-  max?: number
-  step?: number
-  maxLength?: number
-  minLength?: number
-  pattern?: string
-  multiple?: boolean
-  order: number
-  groupId: string
-}
+// Re-export ACF field types from SSOT (these are essentially the same as CustomField)
+export type {
+  ACFFieldDefinition as CustomField,
+  ACFFieldType as CustomFieldType,
+  ACFFieldGroup as FieldGroup,
+  ACFLocation as LocationRule,
+  ACFValidation as ValidationRules
+} from '@o4o/types/cpt';
 
-export type CustomFieldType = 
-  | 'text'
-  | 'textarea'
-  | 'number'
-  | 'email'
-  | 'url'
-  | 'tel'
-  | 'password'
-  | 'date'
-  | 'datetime'
-  | 'time'
-  | 'color'
-  | 'range'
-  | 'select'
-  | 'radio'
-  | 'checkbox'
-  | 'toggle'
-  | 'image'
-  | 'gallery'
-  | 'file'
-  | 'wysiwyg'
-  | 'code'
-  | 'location'
-  | 'repeater'
-  | 'group'
-  | 'tab'
-
+// Local field option interface (app-specific)
 export interface FieldOption {
   label: string
   value: string
@@ -209,44 +153,12 @@ export interface FieldOption {
   selected?: boolean
 }
 
-export interface ValidationRules {
-  required?: boolean
-  min?: number
-  max?: number
-  minLength?: number
-  maxLength?: number
-  pattern?: string
-  custom?: string // Custom validation function
-}
-
+// Local conditional logic (app-specific with action field)
 export interface ConditionalLogic {
   field: string
   operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'empty' | 'not_empty'
   value: string | number | boolean | string[]
   action: 'show' | 'hide' | 'enable' | 'disable'
-}
-
-export interface FieldGroup {
-  id: string
-  title: string
-  description?: string
-  location: LocationRule[]
-  placement: 'normal' | 'high' | 'side'
-  style: 'default' | 'seamless'
-  hideOnScreen?: string[]
-  active: boolean
-  order: number
-  fields: CustomField[]
-  createdAt: string
-  updatedAt: string
-}
-
-export interface LocationRule {
-  param: string // post_type, page_template, category, etc.
-  operator: 'equals' | 'not_equals' | 'contains'
-  value: string
-  and?: LocationRule[]
-  or?: LocationRule[]
 }
 
 export interface Template {
