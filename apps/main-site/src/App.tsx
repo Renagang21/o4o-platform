@@ -87,12 +87,19 @@ const App: FC = () => {
             </Layout>
           } />
           
-          {/* Auth Routes - OAuth Callbacks Only (no layout needed) */}
+          {/* Auth Routes */}
+          {/* Logout - Hardcoded (auto-processing page, no customization needed) */}
+          <Route path="/logout" element={<Logout />} />
+
+          {/* OAuth Callbacks - Hardcoded (redirect-only, no layout needed) */}
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
 
-          {/* Note: /login, /logout, /find-id, /find-password are handled by PublicPage (/:slug pattern)
-               This allows content editors to customize these pages via page editor with shortcodes */}
+          {/* Note: /login, /find-id, /find-password are handled by PublicPage (/:slug pattern)
+               This allows content editors to customize these pages via page editor with shortcodes:
+               - [login_form] or [social_login]
+               - [find_id]
+               - [find_password] */}
           <Route path="/auth/verify-email/pending" element={
             <Layout>
               <EmailVerificationPending />
