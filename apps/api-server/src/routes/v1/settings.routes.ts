@@ -1129,4 +1129,171 @@ router.put('/auth', authenticate, requireAdmin, async (req: Request, res: Respon
   }
 });
 
+/**
+ * @route   GET /api/v1/settings/oauth
+ * @desc    Get OAuth settings
+ * @access  Private (Admin only)
+ */
+router.get('/oauth', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    // Get OAuth settings from database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    const dbSettings = await settingsRepository.findOne({
+      where: { key: 'oauth', type: 'oauth' }
+    });
+
+    if (dbSettings && dbSettings.value) {
+      return res.json({
+        success: true,
+        data: dbSettings.value
+      });
+    }
+
+    // Fallback to default OAuth settings
+    const defaultSettings = {
+      google: {
+        provider: 'google',
+        enabled: false,
+        clientId: '',
+        clientSecret: '',
+        callbackUrl: '',
+        scope: []
+      },
+      kakao: {
+        provider: 'kakao',
+        enabled: false,
+        clientId: '',
+        clientSecret: '',
+        callbackUrl: '',
+        scope: []
+      },
+      naver: {
+        provider: 'naver',
+        enabled: false,
+        clientId: '',
+        clientSecret: '',
+        callbackUrl: '',
+        scope: []
+      }
+    };
+
+    res.json({
+      success: true,
+      data: defaultSettings
+    });
+  } catch (error) {
+    logger.error('Failed to fetch OAuth settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch OAuth settings'
+    });
+  }
+});
+
+/**
+ * @route   PUT /api/v1/settings/oauth
+ * @desc    Update OAuth settings for a specific provider
+ * @access  Private (Admin only)
+ */
+router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { provider, config } = req.body;
+    const actor = (req as any).user?.id || 'unknown';
+
+    logger.info('OAuth settings update request:', {
+      actor,
+      provider,
+      hasClientId: !!config.clientId,
+      hasClientSecret: !!config.clientSecret,
+      enabled: config.enabled,
+      timestamp: new Date().toISOString()
+    });
+
+    // Validate provider
+    if (!provider || !['google', 'kakao', 'naver'].includes(provider)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid provider. Must be one of: google, kakao, naver'
+      });
+    }
+
+    // Validate required fields if enabled
+    if (config.enabled && (!config.clientId || !config.clientSecret)) {
+      return res.status(400).json({
+        success: false,
+        error: 'clientId and clientSecret are required when OAuth is enabled'
+      });
+    }
+
+    // Get current OAuth settings from database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    let dbSettings = await settingsRepository.findOne({
+      where: { key: 'oauth', type: 'oauth' }
+    });
+
+    let oauthSettings: any = {};
+
+    if (dbSettings && dbSettings.value) {
+      oauthSettings = dbSettings.value as any;
+    } else {
+      // Initialize with default structure
+      oauthSettings = {
+        google: { provider: 'google', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] },
+        kakao: { provider: 'kakao', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] },
+        naver: { provider: 'naver', enabled: false, clientId: '', clientSecret: '', callbackUrl: '', scope: [] }
+      };
+    }
+
+    // Update specific provider
+    oauthSettings[provider] = {
+      ...oauthSettings[provider],
+      ...config,
+      provider // Ensure provider field is always set
+    };
+
+    // Save to database
+    if (dbSettings) {
+      dbSettings.value = oauthSettings;
+      dbSettings.updatedAt = new Date();
+    } else {
+      dbSettings = settingsRepository.create({
+        key: 'oauth',
+        type: 'oauth',
+        value: oauthSettings,
+        description: 'OAuth provider settings for social login'
+      });
+    }
+
+    await settingsRepository.save(dbSettings);
+
+    logger.info('OAuth settings saved to database:', {
+      actor,
+      provider,
+      enabled: config.enabled,
+      timestamp: new Date().toISOString()
+    });
+
+    // Also update memory store for backward compatibility
+    settingsStore.set('oauth', oauthSettings);
+
+    res.json({
+      success: true,
+      data: oauthSettings,
+      message: `${provider} OAuth settings updated successfully`
+    });
+
+  } catch (error) {
+    logger.error('OAuth settings update failed:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update OAuth settings'
+    });
+  }
+});
+
 export default router;
