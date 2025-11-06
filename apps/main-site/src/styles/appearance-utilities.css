@@ -4,6 +4,51 @@
  *
  * Phase 3.5: Component Variable Migration
  * These classes replace hardcoded Tailwind colors with CSS variables
+ *
+ * ============================================================================
+ * STANDARD CSS VARIABLES (Phase 3+)
+ * ============================================================================
+ *
+ * Buttons:
+ *   --o4o-button-bg               Primary button background
+ *   --o4o-button-text             Primary button text color
+ *   --o4o-button-border           Primary button border color
+ *   --o4o-button-bg-hover         Primary button hover background
+ *   --o4o-button-bg-active        Primary button active background
+ *   --o4o-button-secondary-bg     Secondary button background
+ *   --o4o-button-secondary-text   Secondary button text
+ *   --o4o-button-success-bg       Success button background
+ *   --o4o-button-danger-bg        Danger button background
+ *   --o4o-button-ghost-text       Ghost button text color
+ *
+ * Breadcrumbs:
+ *   --o4o-breadcrumb-link         Breadcrumb link color
+ *   --o4o-breadcrumb-link-hover   Breadcrumb link hover color
+ *   --o4o-breadcrumb-text         Current page text color
+ *   --o4o-breadcrumb-separator    Separator color
+ *
+ * Scroll-to-Top:
+ *   --o4o-scroll-top-bg           Background color
+ *   --o4o-scroll-top-text         Icon/text color
+ *   --o4o-scroll-top-bg-hover     Hover background
+ *   --o4o-scroll-top-radius       Border radius
+ *
+ * ============================================================================
+ * @deprecated LEGACY VARIABLES (will be removed in Phase 4)
+ * ============================================================================
+ *
+ * ⚠️ DO NOT USE THESE DIRECTLY - Use --o4o-* variables instead
+ *
+ *   --button-primary-bg           → Use --o4o-button-bg
+ *   --button-primary-text         → Use --o4o-button-text
+ *   --button-primary-border       → Use --o4o-button-border
+ *   --breadcrumb-link-color       → Use --o4o-breadcrumb-link
+ *   --breadcrumb-text-color       → Use --o4o-breadcrumb-text
+ *   --breadcrumb-separator-color  → Use --o4o-breadcrumb-separator
+ *   --scroll-top-bg               → Use --o4o-scroll-top-bg
+ *
+ * These legacy variables are kept as fallbacks for backward compatibility only.
+ * They will be completely removed in Phase 4.
  */
 
 /* ===================================
