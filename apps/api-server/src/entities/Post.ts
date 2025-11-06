@@ -70,8 +70,12 @@ export class Post {
   @Column({ default: false })
   sticky!: boolean
 
-  @Column({ type: 'json', nullable: true })
-  meta!: Record<string, any>
+  // DEPRECATED: meta column removed from database schema (2025-11-06)
+  // Database now uses normalized post_meta table for metadata storage
+  // This TypeScript-only field maintains backward compatibility with legacy routes
+  // TypeORM does not persist this field - always returns undefined/empty object
+  // TODO Phase 3: Migrate all routes reading post.meta to use post_meta table
+  meta?: Record<string, any> = {}
 
   // Categories and Tags (Many-to-Many relationships)
   @ManyToMany('Category', 'posts', { nullable: true, cascade: true })
