@@ -157,28 +157,69 @@ export function convertSettingsToHeaderTemplatePart(
 
     // Above Header Section
     if (builder.above.settings.enabled) {
-      const aboveModules = [
-        ...builder.above.left.map(convertModuleToBlock),
-        ...builder.above.center.map(convertModuleToBlock),
-        ...builder.above.right.map(convertModuleToBlock)
-      ].filter(Boolean);
+      const aboveModules = {
+        left: builder.above.left.map(convertModuleToBlock).filter(Boolean),
+        center: builder.above.center.map(convertModuleToBlock).filter(Boolean),
+        right: builder.above.right.map(convertModuleToBlock).filter(Boolean)
+      };
 
-      if (aboveModules.length > 0) {
-        sections.push({
-          id: 'header-above',
-          type: 'o4o/group',
-          data: {
-            layout: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            className: 'header-above',
-            backgroundColor: builder.above.settings.background,
-            padding: builder.above.settings.padding?.desktop
+      sections.push({
+        id: 'header-above',
+        type: 'o4o/group',
+        data: {
+          layout: 'grid',  // Changed from flex to grid for consistency
+          gridTemplateColumns: '1fr auto 1fr',  // 3-zone fixed layout
+          gap: '16px',
+          alignItems: 'center',
+          className: 'header-above',
+          backgroundColor: builder.above.settings.background,
+          padding: builder.above.settings.padding?.desktop || {
+            top: '12px',
+            bottom: '12px',
+            left: '24px',
+            right: '24px'
+          }
+        },
+        // Always render all 3 zones (even if empty) to maintain grid structure
+        innerBlocks: [
+          // Left zone
+          {
+            id: 'header-above-left',
+            type: 'o4o/group',
+            data: {
+              layout: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifySelf: 'start'
+            },
+            innerBlocks: aboveModules.left.length > 0 ? aboveModules.left : []
           },
-          innerBlocks: aboveModules
-        });
-      }
+          // Center zone
+          {
+            id: 'header-above-center',
+            type: 'o4o/group',
+            data: {
+              layout: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifySelf: 'center'
+            },
+            innerBlocks: aboveModules.center.length > 0 ? aboveModules.center : []
+          },
+          // Right zone
+          {
+            id: 'header-above-right',
+            type: 'o4o/group',
+            data: {
+              layout: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifySelf: 'end'
+            },
+            innerBlocks: aboveModules.right.length > 0 ? aboveModules.right : []
+          }
+        ]
+      });
     }
 
     // Primary Header Section
@@ -248,28 +289,69 @@ export function convertSettingsToHeaderTemplatePart(
 
     // Below Header Section
     if (builder.below.settings.enabled) {
-      const belowModules = [
-        ...builder.below.left.map(convertModuleToBlock),
-        ...builder.below.center.map(convertModuleToBlock),
-        ...builder.below.right.map(convertModuleToBlock)
-      ].filter(Boolean);
+      const belowModules = {
+        left: builder.below.left.map(convertModuleToBlock).filter(Boolean),
+        center: builder.below.center.map(convertModuleToBlock).filter(Boolean),
+        right: builder.below.right.map(convertModuleToBlock).filter(Boolean)
+      };
 
-      if (belowModules.length > 0) {
-        sections.push({
-          id: 'header-below',
-          type: 'o4o/group',
-          data: {
-            layout: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            className: 'header-below',
-            backgroundColor: builder.below.settings.background,
-            padding: builder.below.settings.padding?.desktop
+      sections.push({
+        id: 'header-below',
+        type: 'o4o/group',
+        data: {
+          layout: 'grid',  // Changed from flex to grid for consistency
+          gridTemplateColumns: '1fr auto 1fr',  // 3-zone fixed layout
+          gap: '16px',
+          alignItems: 'center',
+          className: 'header-below',
+          backgroundColor: builder.below.settings.background,
+          padding: builder.below.settings.padding?.desktop || {
+            top: '16px',
+            bottom: '16px',
+            left: '24px',
+            right: '24px'
+          }
+        },
+        // Always render all 3 zones (even if empty) to maintain grid structure
+        innerBlocks: [
+          // Left zone
+          {
+            id: 'header-below-left',
+            type: 'o4o/group',
+            data: {
+              layout: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifySelf: 'start'
+            },
+            innerBlocks: belowModules.left.length > 0 ? belowModules.left : []
           },
-          innerBlocks: belowModules
-        });
-      }
+          // Center zone
+          {
+            id: 'header-below-center',
+            type: 'o4o/group',
+            data: {
+              layout: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifySelf: 'center'
+            },
+            innerBlocks: belowModules.center.length > 0 ? belowModules.center : []
+          },
+          // Right zone
+          {
+            id: 'header-below-right',
+            type: 'o4o/group',
+            data: {
+              layout: 'flex',
+              gap: '16px',
+              alignItems: 'center',
+              justifySelf: 'end'
+            },
+            innerBlocks: belowModules.right.length > 0 ? belowModules.right : []
+          }
+        ]
+      });
     }
 
     return {
