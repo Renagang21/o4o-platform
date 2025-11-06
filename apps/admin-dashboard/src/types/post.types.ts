@@ -1,65 +1,37 @@
 /**
- * Post Types Definition
- * 게시글 관련 타입 정의
+ * Post Types - Re-export from SSOT
+ * This file is kept for backward compatibility but now uses @o4o/types/cpt
  */
 
-// 블록 타입
-export interface Block {
-  id: string;
-  type: string;
-  content: any;
-  attributes?: Record<string, any>;
-  clientId?: string;
-  innerBlocks?: Block[];
-}
+// Re-export all types from the centralized types package
+export type {
+  Post,
+  PostStatus,
+  PostType,
+  PostVisibility,
+  Block,
+  PostCategory,
+  PostResponse,
+  PostListResponse,
+  CreatePostDto as CreatePostRequest,
+  UpdatePostDto as UpdatePostRequest,
+  PostFilter,
+  SEOMetadata,
+  PostRevision,
+  PostWithBlocks,
+  CommentStatus,
+  PingStatus,
+  PostQueryParams,
+  LegacyPostListResponse,
+  CustomPostTypePost
+} from '@o4o/types/cpt';
 
-// 게시글 상태
-export type PostStatus = 'draft' | 'published' | 'scheduled' | 'private' | 'trash';
+// Re-export common types
+export type { Tag } from '@o4o/types';
 
-// 게시글 타입
-export interface Post {
-  id: string;
-  title: string;
-  slug?: string;
-  content: Block[];
-  excerpt?: string;
-  status: PostStatus;
-  visibility: 'public' | 'private' | 'password';
-  password?: string;
-  author: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  featuredImage?: {
-    id: string;
-    url: string;
-    alt?: string;
-  };
-  categories: Category[];
-  tags: Tag[];
-  publishedAt?: Date;
-  scheduledAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  meta?: {
-    views?: number;
-    likes?: number;
-    comments?: number;
-  };
-  seo?: {
-    title?: string;
-    description?: string;
-    keywords?: string[];
-  };
-  settings: {
-    allowComments: boolean;
-    allowPingbacks: boolean;
-    sticky: boolean;
-  };
-}
+// Legacy type aliases for backward compatibility
+import type { Post as BasePost, Block as BaseBlock } from '@o4o/types/cpt';
 
-// 카테고리 타입
 export interface Category {
   id: string;
   name: string;
@@ -69,16 +41,6 @@ export interface Category {
   count?: number;
 }
 
-// 태그 타입
-export interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  count?: number;
-}
-
-// 미디어 타입
 export interface Media {
   id: string;
   url: string;
@@ -92,45 +54,6 @@ export interface Media {
   caption?: string;
   uploadedBy: string;
   uploadedAt: Date;
-}
-
-// API 요청 타입
-export interface CreatePostRequest {
-  title: string;
-  content: Block[] | string;
-  slug?: string;
-  excerpt?: string;
-  status?: PostStatus | 'publish' | 'pending';
-  visibility?: 'public' | 'private' | 'password';
-  type?: string; // Content type: 'post' or 'page'
-  featuredImageId?: string;
-  categoryIds?: string[];
-  tagIds?: string[];
-  categories?: string[];
-  tags?: string[];
-  settings?: Partial<Post['settings']>;
-}
-
-export interface UpdatePostRequest extends Partial<CreatePostRequest> {
-  id: string;
-}
-
-// API 응답 타입
-export interface PostResponse {
-  success: boolean;
-  data?: Post;
-  error?: string;
-}
-
-export interface PostListResponse {
-  success: boolean;
-  data?: {
-    posts: Post[];
-    total: number;
-    page: number;
-    pageSize: number;
-  };
-  error?: string;
 }
 
 export interface MediaUploadResponse {

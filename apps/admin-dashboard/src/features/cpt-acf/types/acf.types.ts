@@ -1,241 +1,53 @@
 /**
- * ACF (Advanced Custom Fields) Type Definitions
- * Frontend types for ACF management
+ * ACF Types - Re-export from SSOT
+ * This file is kept for backward compatibility but now uses @o4o/types/cpt
  */
 
-export interface FieldGroup {
-  id: string;
-  name: string;
-  key: string;
-  title: string;
-  description?: string;
-  location: FieldLocation[][];
-  fields: CustomField[];
-  menuOrder: number;
-  position: 'normal' | 'side' | 'acf_after_title';
-  style: 'default' | 'seamless';
-  labelPlacement: 'top' | 'left';
-  instructionPlacement: 'label' | 'field';
-  hideOnScreen?: string[];
-  active: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Re-export all ACF types from the centralized types package
+export type {
+  ACFFieldGroup as FieldGroup,
+  ACFFieldDefinition as CustomField,
+  ACFFieldType as FieldType,
+  ACFLocation as FieldLocation,
+  ACFLocationParam as LocationParam,
+  ACFFieldConditional as FieldConditional,
+  ACFConditionalLogic as ConditionalLogic,
+  ACFConditionalRule as ConditionalRule,
+  ACFConditionalOperator as ConditionalOperator,
+  ACFFlexibleLayout as FieldLayout,
+  ACFLinkValue as LinkValue,
+  ACFRepeaterRow as RepeaterRow,
+  ACFRepeaterValue as RepeaterValue,
+  ACFRepeaterConfig as RepeaterConfig,
+  ACFFieldValue as FieldValue,
+  ACFApiResponse,
+  CreateACFFieldGroupDto as CreateFieldGroupDto,
+  UpdateACFFieldGroupDto as UpdateFieldGroupDto,
+  SaveACFFieldValuesDto as SaveFieldValuesDto,
+  ExportACFFieldGroupsDto as ExportFieldGroupsDto,
+  ImportACFFieldGroupsDto as ImportFieldGroupsDto,
+  ACFRepeaterField,
+  ACFFlexibleContentField,
+  ACFGroupField,
+  ACFCloneField,
+  ACFGalleryField,
+  ACFRelationshipField,
+  ACFPostObjectField,
+  ACFTaxonomyField,
+  ACFUserField,
+  ACFGoogleMapField,
+  ACFDatePickerField,
+  ACFColorPickerField,
+  ACFField,
+  ACFLocationGroup,
+  ACFValidation
+} from '@o4o/types/cpt';
 
-export interface CustomField {
-  id: string;
-  name: string;
-  key: string;
-  label: string;
-  type: FieldType;
-  instructions?: string;
-  required: boolean;
-  defaultValue?: any;
-  placeholder?: string;
-  maxLength?: number;
-  rows?: number;
-  min?: number;
-  max?: number;
-  step?: number;
-  choices?: FieldChoice[];
-  allowNull?: boolean;
-  multiple?: boolean;
-  returnFormat?: string;
-  conditional?: FieldConditional; // Legacy single condition
-  conditionalLogic?: ConditionalLogic; // New multi-condition logic
-  wrapper?: {
-    width?: string;
-    class?: string;
-    id?: string;
-  };
-  subFields?: CustomField[]; // For repeater/flexible content
-  layouts?: FieldLayout[]; // For flexible content
-  layout?: 'table' | 'block' | 'row'; // For repeater layout
-  buttonLabel?: string; // For repeater
-  minRows?: number; // For repeater
-  maxRows?: number; // For repeater
-  collapsed?: string; // For repeater
-}
-
-export type FieldType =
-  | 'text'
-  | 'textarea'
-  | 'number'
-  | 'email'
-  | 'url'
-  | 'link'
-  | 'select'
-  | 'checkbox'
-  | 'radio'
-  | 'true_false'
-  | 'date_picker'
-  | 'time_picker'
-  | 'datetime_picker'
-  | 'color_picker'
-  | 'image'
-  | 'file'
-  | 'gallery'
-  | 'wysiwyg'
-  | 'oembed'
-  | 'relationship'
-  | 'post_object'
-  | 'page_link'
-  | 'user'
-  | 'taxonomy'
-  | 'repeater'
-  | 'flexible_content'
-  | 'group'
-  | 'clone';
-
+// Type alias for FieldChoice
 export interface FieldChoice {
   value: string;
   label: string;
 }
 
-// Location parameter types
-export type LocationParam =
-  | 'post_type'
-  | 'user_role'
-  | 'post_taxonomy'
-  | 'post_category'
-  | 'page_template'
-  | 'post_template'
-  | 'post_status'
-  | 'post_format'
-  | 'page_type'
-  | 'page_parent'
-  | 'page_template'
-  | 'current_user'
-  | 'current_user_role'
-  | 'user_form';
-
-export interface FieldLocation {
-  param: LocationParam | string; // Allow custom params
-  operator: '==' | '!=' | 'contains' | 'not_contains';
-  value: string;
-}
-
-// Legacy single condition (for backward compatibility)
-export interface FieldConditional {
-  field: string;
-  operator: '==' | '!=' | 'empty' | '!empty' | '>' | '<';
-  value: any;
-}
-
-// Conditional Logic Operator Types
-export type ConditionalOperator =
-  | '=='
-  | '!='
-  | '>'
-  | '<'
-  | '>='
-  | '<='
-  | 'contains'
-  | 'not_contains'
-  | 'empty'
-  | '!empty'
-  | 'pattern' // regex pattern match
-  | '!pattern';
-
-// Single conditional rule
-export interface ConditionalRule {
-  field: string; // field name/key to check
-  operator: ConditionalOperator;
-  value: any;
-}
-
-// Multi-condition logic with AND/OR support
-export interface ConditionalLogic {
-  enabled: boolean;
-  logic: 'and' | 'or'; // how to combine rules
-  rules: ConditionalRule[];
-}
-
-export interface FieldLayout {
-  key: string;
-  name: string;
-  label: string;
-  display: 'table' | 'block' | 'row';
-  subFields: CustomField[];
-}
-
-export interface LinkValue {
-  url: string;
-  title?: string;
-  target?: '_blank' | '_self';
-}
-
-/**
- * Repeater Field Types
- */
-
-// Single repeater row - map of field names to values
-export interface RepeaterRow {
-  _id: string; // Unique ID for this row (for React keys and drag-drop)
-  [fieldName: string]: any; // Field values keyed by field name
-}
-
-// Repeater field value - array of rows
-export type RepeaterValue = RepeaterRow[];
-
-// Repeater layout options
+// Repeater layout type alias
 export type RepeaterLayout = 'table' | 'block' | 'row';
-
-// Repeater configuration (extends CustomField properties)
-export interface RepeaterConfig {
-  layout?: RepeaterLayout; // Default: 'block'
-  buttonLabel?: string; // Label for "Add Row" button
-  minRows?: number; // Minimum number of rows (0 = no minimum)
-  maxRows?: number; // Maximum number of rows (0 = no maximum)
-  collapsed?: string; // Field name to show when row is collapsed
-  subFields: CustomField[]; // Sub-fields for each row
-}
-
-export interface FieldValue {
-  id: string;
-  fieldId: string;
-  fieldName: string;
-  entityType: string;
-  entityId: string;
-  value: any;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface ACFApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  total?: number;
-}
-
-export interface CreateFieldGroupDto {
-  name: string;
-  key: string;
-  title: string;
-  description?: string;
-  location: FieldLocation[];
-  fields: Omit<CustomField, 'id'>[];
-  menuOrder?: number;
-  position?: FieldGroup['position'];
-  style?: FieldGroup['style'];
-  active?: boolean;
-}
-
-export interface UpdateFieldGroupDto extends Partial<CreateFieldGroupDto> {
-  id?: string;
-}
-
-export interface SaveFieldValuesDto {
-  [fieldName: string]: any;
-}
-
-export interface ExportFieldGroupsDto {
-  groupIds?: string[];
-}
-
-export interface ImportFieldGroupsDto {
-  groups: FieldGroup[];
-  version?: string;
-}
