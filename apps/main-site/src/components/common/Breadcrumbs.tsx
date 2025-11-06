@@ -171,11 +171,6 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         }}
       />
 
-      {/*
-        @deprecated Phase 3.5
-        Inline styles are deprecated. CSS variables from GlobalStyleInjector should be used instead.
-        This <style> block remains for backward compatibility with customizer settings.
-      */}
       <style>{`
         .breadcrumbs {
           display: flex;
@@ -209,7 +204,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         }
 
         .breadcrumb-link:hover {
-          color: var(--o4o-breadcrumb-link-hover, ${settings.hoverColor}) !important;
+          color: var(--o4o-breadcrumb-link-hover) !important;
         }
 
         .breadcrumb-current {
@@ -271,7 +266,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
 
         /* Focus styles for accessibility */
         .breadcrumb-link:focus-visible {
-          outline: 2px solid var(--o4o-breadcrumb-link, ${settings.linkColor});
+          outline: 2px solid var(--o4o-breadcrumb-link);
           outline-offset: 2px;
           border-radius: 2px;
         }

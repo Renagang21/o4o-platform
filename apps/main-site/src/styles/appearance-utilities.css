@@ -2,11 +2,11 @@
  * Appearance System Utilities
  * CSS utility classes using standardized CSS variables from @o4o/appearance-system
  *
- * Phase 3.5: Component Variable Migration
- * These classes replace hardcoded Tailwind colors with CSS variables
+ * Phase 4: Legacy Variable Removal Complete
+ * All legacy variables removed. Only --o4o-* standard variables are used.
  *
  * ============================================================================
- * STANDARD CSS VARIABLES (Phase 3+)
+ * STANDARD CSS VARIABLES
  * ============================================================================
  *
  * Buttons:
@@ -32,23 +32,6 @@
  *   --o4o-scroll-top-text         Icon/text color
  *   --o4o-scroll-top-bg-hover     Hover background
  *   --o4o-scroll-top-radius       Border radius
- *
- * ============================================================================
- * @deprecated LEGACY VARIABLES (will be removed in Phase 4)
- * ============================================================================
- *
- * ⚠️ DO NOT USE THESE DIRECTLY - Use --o4o-* variables instead
- *
- *   --button-primary-bg           → Use --o4o-button-bg
- *   --button-primary-text         → Use --o4o-button-text
- *   --button-primary-border       → Use --o4o-button-border
- *   --breadcrumb-link-color       → Use --o4o-breadcrumb-link
- *   --breadcrumb-text-color       → Use --o4o-breadcrumb-text
- *   --breadcrumb-separator-color  → Use --o4o-breadcrumb-separator
- *   --scroll-top-bg               → Use --o4o-scroll-top-bg
- *
- * These legacy variables are kept as fallbacks for backward compatibility only.
- * They will be completely removed in Phase 4.
  */
 
 /* ===================================
@@ -56,58 +39,58 @@
    =================================== */
 
 .btn-primary {
-  background-color: var(--o4o-button-bg, var(--button-primary-bg, #007bff));
-  color: var(--o4o-button-text, var(--button-primary-text, #ffffff));
-  border: 1px solid var(--o4o-button-border, var(--button-primary-border, #007bff));
+  background-color: var(--o4o-button-bg);
+  color: var(--o4o-button-text);
+  border: 1px solid var(--o4o-button-border);
 }
 
 .btn-primary:hover {
-  background-color: var(--o4o-button-bg-hover, var(--button-primary-bg-hover, #0056b3));
+  background-color: var(--o4o-button-bg-hover);
 }
 
 .btn-primary:active {
-  background-color: var(--o4o-button-bg-active, var(--button-primary-bg-active, #004085));
+  background-color: var(--o4o-button-bg-active);
 }
 
 .btn-secondary {
-  background-color: var(--o4o-button-secondary-bg, #6c757d);
-  color: var(--o4o-button-secondary-text, #ffffff);
-  border: 1px solid var(--o4o-button-secondary-border, #6c757d);
+  background-color: var(--o4o-button-secondary-bg);
+  color: var(--o4o-button-secondary-text);
+  border: 1px solid var(--o4o-button-secondary-border);
 }
 
 .btn-secondary:hover {
-  background-color: var(--o4o-button-secondary-bg-hover, #5a6268);
+  background-color: var(--o4o-button-secondary-bg-hover);
 }
 
 .btn-success {
-  background-color: var(--o4o-button-success-bg, #28a745);
-  color: var(--o4o-button-success-text, #ffffff);
-  border: 1px solid var(--o4o-button-success-border, #28a745);
+  background-color: var(--o4o-button-success-bg);
+  color: var(--o4o-button-success-text);
+  border: 1px solid var(--o4o-button-success-border);
 }
 
 .btn-success:hover {
-  background-color: var(--o4o-button-success-bg-hover, #218838);
+  background-color: var(--o4o-button-success-bg-hover);
 }
 
 .btn-danger {
-  background-color: var(--o4o-button-danger-bg, #dc3545);
-  color: var(--o4o-button-danger-text, #ffffff);
-  border: 1px solid var(--o4o-button-danger-border, #dc3545);
+  background-color: var(--o4o-button-danger-bg);
+  color: var(--o4o-button-danger-text);
+  border: 1px solid var(--o4o-button-danger-border);
 }
 
 .btn-danger:hover {
-  background-color: var(--o4o-button-danger-bg-hover, #c82333);
+  background-color: var(--o4o-button-danger-bg-hover);
 }
 
 .btn-ghost {
   background-color: transparent;
-  color: var(--o4o-button-ghost-text, #6c757d);
+  color: var(--o4o-button-ghost-text);
   border: none;
 }
 
 .btn-ghost:hover {
-  background-color: var(--o4o-button-ghost-bg-hover, rgba(0, 0, 0, 0.05));
-  color: var(--o4o-button-ghost-text-hover, #343a40);
+  background-color: var(--o4o-button-ghost-bg-hover);
+  color: var(--o4o-button-ghost-text-hover);
 }
 
 /* ===================================
@@ -115,21 +98,21 @@
    =================================== */
 
 .breadcrumb-link {
-  color: var(--o4o-breadcrumb-link, var(--breadcrumb-link-color, #007bff));
+  color: var(--o4o-breadcrumb-link);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .breadcrumb-link:hover {
-  color: var(--o4o-breadcrumb-link-hover, var(--breadcrumb-hover-color, #0056b3));
+  color: var(--o4o-breadcrumb-link-hover);
 }
 
 .breadcrumb-current {
-  color: var(--o4o-breadcrumb-text, var(--breadcrumb-text-color, #6c757d));
+  color: var(--o4o-breadcrumb-text);
 }
 
 .breadcrumb-separator {
-  color: var(--o4o-breadcrumb-separator, var(--breadcrumb-separator-color, #999999));
+  color: var(--o4o-breadcrumb-separator);
 }
 
 /* ===================================
@@ -137,25 +120,11 @@
    =================================== */
 
 .scroll-to-top {
-  background-color: var(--o4o-scroll-top-bg, var(--scroll-top-bg, #007bff));
-  color: var(--o4o-scroll-top-text, var(--scroll-top-text, #ffffff));
-  border-radius: var(--o4o-scroll-top-radius, 50%);
+  background-color: var(--o4o-scroll-top-bg);
+  color: var(--o4o-scroll-top-text);
+  border-radius: var(--o4o-scroll-top-radius);
 }
 
 .scroll-to-top:hover {
-  background-color: var(--o4o-scroll-top-bg-hover, var(--scroll-top-bg-hover, #0056b3));
+  background-color: var(--o4o-scroll-top-bg-hover);
 }
-
-/* ===================================
-   Legacy Compatibility Notes
-   =================================== */
-
-/**
- * Variable Fallback Chain:
- * 1. --o4o-* (Phase 3+ standard)
- * 2. --button-*, --breadcrumb-* (legacy, Phase 2)
- * 3. Hardcoded hex values (absolute fallback)
- *
- * Phase 4 will remove legacy variables
- * Phase 5 will enforce --o4o-* only via linting
- */

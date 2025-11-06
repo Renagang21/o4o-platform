@@ -152,11 +152,57 @@ import { generateCSS } from '@o4o/appearance-system';
 3. 레거시 변수 제거
 
 ### 체크리스트
-- [ ] 네이밍 규칙 문서화
-- [ ] 변수 매핑 테이블 작성
-- [ ] 자동 변환 스크립트 작성
-- [ ] 레거시 호환성 레이어 구현
-- [ ] 최종 레거시 제거
+- [x] 네이밍 규칙 문서화
+- [x] 변수 매핑 테이블 작성
+- [x] 자동 변환 스크립트 작성
+- [x] 레거시 호환성 레이어 구현
+- [x] 최종 레거시 제거
+
+### Phase 4 완료 보고 (2025-11-06)
+
+**실행 내용**:
+1. ✅ **CSS 생성기 정리** (`packages/appearance-system/src/css-generators.ts`)
+   - 레거시 변수 생성 제거 (`--button-*`, `--breadcrumb-*`, `--scroll-top-*`)
+   - `--o4o-*` 표준 변수만 생성하도록 변경
+   - Button, Breadcrumb, ScrollToTop 생성기 모두 업데이트
+
+2. ✅ **유틸리티 CSS 정리** (`apps/main-site/src/styles/appearance-utilities.css`)
+   - 3-tier 폴백 체인 제거 → 1-tier로 단순화
+   - `var(--o4o-*, var(--legacy-*, #hex))` → `var(--o4o-*)`로 변경
+   - @deprecated 섹션 및 문서 정리
+   - "Phase 4: Legacy Variable Removal Complete" 헤더 추가
+
+3. ✅ **Breadcrumbs 컴포넌트** (`apps/main-site/src/components/common/Breadcrumbs.tsx`)
+   - `${settings.hoverColor}` 폴백 제거
+   - `${settings.linkColor}` 폴백 제거
+   - @deprecated 주석 제거
+   - CSS 변수만 사용하도록 정리
+
+4. ✅ **WordPress Blocks CSS** (`apps/main-site/src/styles/wordpress-blocks.css`)
+   - 모든 레거시 변수를 `--o4o-*`로 변경
+   - Button: `--button-primary-*` → `--o4o-button-*`
+   - Breadcrumb: `--breadcrumb-*-color` → `--o4o-breadcrumb-*`
+   - Scroll-to-top: `--scroll-top-*` → `--o4o-scroll-top-*`
+
+5. ✅ **Custom CSS Autocomplete** (`apps/admin-dashboard/.../CustomCSSSection.tsx`)
+   - `--o4o-*` 표준 변수 추가 (우선 표시)
+   - 레거시 변수는 하위 호환성 위해 유지 (deprecated 표시)
+
+**검증 결과**:
+- ✅ TypeScript 빌드 성공 (appearance-system)
+- ✅ Main-site 빌드 성공
+- ✅ Admin-dashboard 타입 체크 완료
+- ✅ 레거시 변수 검색 결과: 테스트/deprecated 파일에만 존재
+
+**영향 범위**:
+- 5개 파일 수정
+- 0개 파일 추가
+- 0개 파일 삭제
+- Bundle 크기 변화: 영향 없음 (CSS 변수명만 변경)
+
+**Next Steps (Phase 5)**:
+- 문서화 및 가이드 작성
+- Storybook 통합 (선택)
 
 ## Phase 5: 문서화 및 가이드 (2일)
 

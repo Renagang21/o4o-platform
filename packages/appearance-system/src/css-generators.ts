@@ -84,33 +84,26 @@ export function generateButtonCSS(
 
   const css: string[] = [];
 
-  // CSS Variables for button styling (legacy compat + new naming)
+  // CSS Variables for button styling (Phase 4: --o4o-* only)
   css.push(':root {');
-  css.push(`  --button-primary-bg: ${backgroundColor};`);
-  css.push(`  --button-primary-text: ${textColor};`);
-  css.push(`  --button-primary-border-radius: ${borderRadius}px;`);
-  css.push(`  --button-primary-padding-v: ${paddingVertical}px;`);
-  css.push(`  --button-primary-padding-h: ${paddingHorizontal}px;`);
-
-  if (hoverBackgroundColor) {
-    css.push(`  --button-primary-bg-hover: ${hoverBackgroundColor};`);
-  }
-
-  // Future standard naming (Phase 4)
   css.push(`  --o4o-button-bg: ${backgroundColor};`);
   css.push(`  --o4o-button-text: ${textColor};`);
   css.push(`  --o4o-button-radius: ${borderRadius}px;`);
   css.push(`  --o4o-button-padding-y: ${paddingVertical}px;`);
   css.push(`  --o4o-button-padding-x: ${paddingHorizontal}px;`);
 
+  if (hoverBackgroundColor) {
+    css.push(`  --o4o-button-bg-hover: ${hoverBackgroundColor};`);
+  }
+
   css.push('}');
 
-  // Apply button styles using CSS variables
+  // Apply button styles using CSS variables (Phase 4: --o4o-* only)
   css.push('.wp-element-button, .ast-button, button[type="submit"], .btn-primary {');
-  css.push('  background-color: var(--button-primary-bg, var(--o4o-button-bg));');
-  css.push('  color: var(--button-primary-text, var(--o4o-button-text));');
-  css.push('  border-radius: var(--button-primary-border-radius, var(--o4o-button-radius));');
-  css.push('  padding: var(--button-primary-padding-v, var(--o4o-button-padding-y)) var(--button-primary-padding-h, var(--o4o-button-padding-x));');
+  css.push('  background-color: var(--o4o-button-bg);');
+  css.push('  color: var(--o4o-button-text);');
+  css.push('  border-radius: var(--o4o-button-radius);');
+  css.push('  padding: var(--o4o-button-padding-y) var(--o4o-button-padding-x);');
   css.push('  border: none;');
   css.push('  cursor: pointer;');
   css.push('  transition: all 0.3s ease;');
@@ -123,7 +116,7 @@ export function generateButtonCSS(
   // Hover state
   css.push('.wp-element-button:hover, .ast-button:hover, button[type="submit"]:hover, .btn-primary:hover {');
   if (hoverBackgroundColor) {
-    css.push(`  background-color: var(--button-primary-bg-hover, ${hoverBackgroundColor});`);
+    css.push(`  background-color: var(--o4o-button-bg-hover);`);
   } else {
     css.push('  opacity: 0.9;');
   }
@@ -168,23 +161,18 @@ export function generateBreadcrumbCSS(
 
   const css: string[] = [];
 
-  // CSS Variables (legacy compat + new naming)
+  // CSS Variables (Phase 4: --o4o-* only)
   css.push(':root {');
-  css.push(`  --breadcrumb-text-color: ${textColor};`);
-  css.push(`  --breadcrumb-link-color: ${linkColor};`);
-  css.push(`  --breadcrumb-separator-color: ${separatorColor};`);
-  css.push(`  --breadcrumb-font-size: ${fontSize}px;`);
-
-  // Future standard naming (Phase 4)
   css.push(`  --o4o-breadcrumb-text: ${textColor};`);
   css.push(`  --o4o-breadcrumb-link: ${linkColor};`);
   css.push(`  --o4o-breadcrumb-separator: ${separatorColor};`);
+  css.push(`  --o4o-breadcrumb-font-size: ${fontSize}px;`);
   css.push('}');
 
-  // Apply breadcrumb styles
+  // Apply breadcrumb styles (Phase 4: --o4o-* only)
   css.push('.ast-breadcrumbs, .breadcrumb, nav[aria-label="breadcrumb"] {');
-  css.push('  color: var(--breadcrumb-text-color, var(--o4o-breadcrumb-text));');
-  css.push('  font-size: var(--breadcrumb-font-size, 14px);');
+  css.push('  color: var(--o4o-breadcrumb-text);');
+  css.push('  font-size: var(--o4o-breadcrumb-font-size);');
   css.push('  margin: 1rem 0;');
   css.push('  padding: 0;');
   css.push('  list-style: none;');
@@ -195,7 +183,7 @@ export function generateBreadcrumbCSS(
 
   // Breadcrumb links
   css.push('.ast-breadcrumbs a, .breadcrumb a, nav[aria-label="breadcrumb"] a {');
-  css.push('  color: var(--breadcrumb-link-color, var(--o4o-breadcrumb-link));');
+  css.push('  color: var(--o4o-breadcrumb-link);');
   css.push('  text-decoration: none;');
   css.push('  transition: color 0.2s ease, opacity 0.2s ease;');
   css.push('}');
@@ -207,7 +195,7 @@ export function generateBreadcrumbCSS(
 
   // Breadcrumb separator
   css.push('.ast-breadcrumbs .separator, .breadcrumb-separator, .breadcrumb-item + .breadcrumb-item::before {');
-  css.push('  color: var(--breadcrumb-separator-color, var(--o4o-breadcrumb-separator));');
+  css.push('  color: var(--o4o-breadcrumb-separator);');
   css.push('  margin: 0 0.5rem;');
   css.push(`  content: "${separator}";`);
   css.push('  user-select: none;');
@@ -215,7 +203,7 @@ export function generateBreadcrumbCSS(
 
   // Current/active item
   css.push('.ast-breadcrumbs .active, .breadcrumb-item.active {');
-  css.push('  color: var(--breadcrumb-text-color, var(--o4o-breadcrumb-text));');
+  css.push('  color: var(--o4o-breadcrumb-text);');
   css.push('  font-weight: 500;');
   css.push('}');
 
@@ -250,31 +238,26 @@ export function generateScrollToTopCSS(
 
   const css: string[] = [];
 
-  // CSS Variables (legacy compat + new naming)
+  // CSS Variables (Phase 4: --o4o-* only)
   css.push(':root {');
-  css.push(`  --scroll-top-bg: ${backgroundColor};`);
-  css.push(`  --scroll-top-icon-color: ${iconColor};`);
-  css.push(`  --scroll-top-size: ${size}px;`);
-  css.push(`  --scroll-top-border-radius: ${borderRadius}px;`);
-  css.push(`  --scroll-top-position-bottom: ${position.bottom}px;`);
-  css.push(`  --scroll-top-position-right: ${position.right}px;`);
-
-  // Future standard naming (Phase 4)
   css.push(`  --o4o-scroll-top-bg: ${backgroundColor};`);
   css.push(`  --o4o-scroll-top-icon: ${iconColor};`);
   css.push(`  --o4o-scroll-top-size: ${size}px;`);
+  css.push(`  --o4o-scroll-top-border-radius: ${borderRadius}px;`);
+  css.push(`  --o4o-scroll-top-position-bottom: ${position.bottom}px;`);
+  css.push(`  --o4o-scroll-top-position-right: ${position.right}px;`);
   css.push('}');
 
-  // Apply scroll to top styles
+  // Apply scroll to top styles (Phase 4: --o4o-* only)
   css.push('.ast-scroll-to-top, .scroll-to-top, #scroll-to-top {');
-  css.push('  background-color: var(--scroll-top-bg, var(--o4o-scroll-top-bg));');
-  css.push('  color: var(--scroll-top-icon-color, var(--o4o-scroll-top-icon));');
-  css.push('  width: var(--scroll-top-size, var(--o4o-scroll-top-size));');
-  css.push('  height: var(--scroll-top-size, var(--o4o-scroll-top-size));');
-  css.push('  border-radius: var(--scroll-top-border-radius, 4px);');
+  css.push('  background-color: var(--o4o-scroll-top-bg);');
+  css.push('  color: var(--o4o-scroll-top-icon);');
+  css.push('  width: var(--o4o-scroll-top-size);');
+  css.push('  height: var(--o4o-scroll-top-size);');
+  css.push('  border-radius: var(--o4o-scroll-top-border-radius);');
   css.push('  position: fixed;');
-  css.push('  bottom: var(--scroll-top-position-bottom, 30px);');
-  css.push('  right: var(--scroll-top-position-right, 30px);');
+  css.push('  bottom: var(--o4o-scroll-top-position-bottom);');
+  css.push('  right: var(--o4o-scroll-top-position-right);');
   css.push('  z-index: 999;');
   css.push('  display: flex;');
   css.push('  align-items: center;');

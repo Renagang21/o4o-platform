@@ -47,17 +47,30 @@ const CSS_VARIABLES = [
   '--ast-palette-color4', '--ast-palette-color5', '--ast-palette-color6',
   '--ast-palette-color7', '--ast-palette-color8', '--ast-palette-color9',
 
-  // Button variables
+  // Button variables (Phase 4: --o4o-* standard)
+  '--o4o-button-bg', '--o4o-button-text', '--o4o-button-border', '--o4o-button-radius',
+  '--o4o-button-padding-y', '--o4o-button-padding-x', '--o4o-button-bg-hover', '--o4o-button-bg-active',
+  '--o4o-button-secondary-bg', '--o4o-button-secondary-text', '--o4o-button-secondary-border',
+  '--o4o-button-success-bg', '--o4o-button-danger-bg', '--o4o-button-ghost-text',
+  '--o4o-button-outline-text', '--o4o-button-outline-border', '--o4o-button-outline-border-width',
+  // Legacy button variables (deprecated, for backward compatibility)
   '--button-primary-bg', '--button-primary-text', '--button-primary-border-radius',
   '--button-primary-padding-v', '--button-primary-padding-h', '--button-primary-bg-hover',
   '--button-secondary-bg', '--button-secondary-text',
   '--button-outline-border', '--button-outline-text', '--button-outline-border-width',
 
-  // Breadcrumb variables
+  // Breadcrumb variables (Phase 4: --o4o-* standard)
+  '--o4o-breadcrumb-link', '--o4o-breadcrumb-link-hover', '--o4o-breadcrumb-text',
+  '--o4o-breadcrumb-separator', '--o4o-breadcrumb-font-size',
+  // Legacy breadcrumb variables (deprecated, for backward compatibility)
   '--breadcrumb-text-color', '--breadcrumb-link-color', '--breadcrumb-separator-color',
   '--breadcrumb-font-size',
 
-  // Scroll to top variables
+  // Scroll to top variables (Phase 4: --o4o-* standard)
+  '--o4o-scroll-top-bg', '--o4o-scroll-top-icon', '--o4o-scroll-top-text',
+  '--o4o-scroll-top-size', '--o4o-scroll-top-border-radius',
+  '--o4o-scroll-top-position-bottom', '--o4o-scroll-top-position-right', '--o4o-scroll-top-bg-hover',
+  // Legacy scroll-to-top variables (deprecated, for backward compatibility)
   '--scroll-top-bg', '--scroll-top-icon-color', '--scroll-top-size',
   '--scroll-top-border-radius', '--scroll-top-position-bottom', '--scroll-top-position-right',
 
