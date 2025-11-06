@@ -8,6 +8,7 @@ const router: Router = Router();
 const forumController = new ForumController();
 
 // Deprecation middleware for legacy routes
+// Controlled by ROUTE_DEPRECATION_FLAGS environment variable
 const deprecatePosts = addDeprecationHeaders({
   successorRoute: '/api/v1/posts',
   message: 'Use /api/v1/posts instead',
