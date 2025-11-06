@@ -235,13 +235,12 @@ export function setupRoutes(app: Application): void {
   });
 
   // Settings routes
-  app.use('/api/v1/settings', settingsLimiter, settingsRoutes); // Public settings (homepage, customizer, etc.)
+  app.use('/api/v1/settings', settingsLimiter, settingsV1Routes); // Admin settings routes (OAuth, reading, etc.)
   app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes);
   app.use('/api/customizer', settingsLimiter, customizerV1Routes);
   app.use('/api/v1/customizer-presets', settingsLimiter, customizerPresetsRoutes);
-  app.use('/api/settings', settingsLimiter, settingsRoutes);
-  app.use('/settings', settingsLimiter, settingsRoutes);
-  app.use('/v1/settings', settingsV1Routes); // Admin-only settings routes
+  app.use('/api/settings', settingsLimiter, settingsRoutes); // Legacy public settings
+  app.use('/settings', settingsLimiter, settingsRoutes); // Legacy public settings
 
   // ============================================================================
   // 5. V1 API ROUTES (Protected with standard rate limiting)
