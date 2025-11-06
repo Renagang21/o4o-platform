@@ -88,10 +88,26 @@ const App: FC = () => {
           } />
           
           {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="/find-id" element={<FindId />} />
-          <Route path="/find-password" element={<FindPassword />} />
+          <Route path="/login" element={
+            <Layout>
+              <Login />
+            </Layout>
+          } />
+          <Route path="/logout" element={
+            <Layout>
+              <Logout />
+            </Layout>
+          } />
+          <Route path="/find-id" element={
+            <Layout>
+              <FindId />
+            </Layout>
+          } />
+          <Route path="/find-password" element={
+            <Layout>
+              <FindPassword />
+            </Layout>
+          } />
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           <Route path="/auth/verify-email/pending" element={
