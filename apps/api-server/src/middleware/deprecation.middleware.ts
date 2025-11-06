@@ -36,6 +36,13 @@ export function addDeprecationHeaders(options: DeprecationOptions) {
     // Check if deprecation warnings are enabled
     const deprecationEnabled = process.env.ROUTE_DEPRECATION_FLAGS === 'on';
 
+    // Debug logging
+    logger.info('[DEPRECATION_DEBUG] Middleware called', {
+      path: req.path,
+      envValue: process.env.ROUTE_DEPRECATION_FLAGS,
+      enabled: deprecationEnabled
+    });
+
     if (!deprecationEnabled) {
       return next();
     }
