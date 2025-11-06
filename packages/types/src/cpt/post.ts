@@ -110,7 +110,15 @@ export interface Post {
   featured_media?: string; // WordPress-style compatibility
 
   // Metadata and SEO
-  meta?: Record<string, any>; // Flexible meta field
+  /**
+   * @deprecated Phase 4-2: Use normalized Meta API instead
+   * - GET /api/v1/posts/:id/meta
+   * - PUT /api/v1/posts/:id/meta (upsert)
+   * - DELETE /api/v1/posts/:id/meta/:key
+   * This field is maintained for backward compatibility during migration.
+   * Access via metaApi service or usePostMeta() hook.
+   */
+  meta?: Record<string, any>;
   seo?: SEOMetadata;
 
   // Timestamps

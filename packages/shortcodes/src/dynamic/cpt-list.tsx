@@ -221,6 +221,9 @@ export const CPTListShortcode: React.FC<ShortcodeProps> = ({ attributes, context
         const data = await response.json();
         
         // Map API response to CPTPost format
+        // Phase 4-2: meta field is provided by API - downstream consumers
+        // should use Meta API for normalized access, but we preserve this
+        // for backward compatibility during transition period
         const mappedPosts: CPTPost[] = (data.data || data || []).map((post: any) => ({
           id: post.id,
           title: post.title || 'Untitled',
@@ -232,7 +235,7 @@ export const CPTListShortcode: React.FC<ShortcodeProps> = ({ attributes, context
           date: post.createdAt || post.date,
           modified: post.updatedAt || post.modified,
           status: post.status,
-          meta: post.meta || {},
+          meta: post.meta || {}, // Legacy - use Meta API endpoints instead
           acf: post.customFields || post.acf || {},
           taxonomies: post.taxonomies,
         }));

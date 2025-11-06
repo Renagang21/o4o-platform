@@ -56,6 +56,10 @@ module.exports = {
       {
         'selector': 'TSInterfaceDeclaration[id.name=/^(Post|PostMeta|PostStatus|PostType|ACF|FieldGroup|CustomField)$/]',
         'message': 'Local Post/ACF type declarations are discouraged. Please import from @o4o/types/cpt instead to maintain Single Source of Truth.'
+      },
+      {
+        'selector': 'MemberExpression[object.name="post"][property.name="meta"]',
+        'message': 'Phase 4-2: Direct post.meta access is deprecated. Use Meta API instead: metaApi.get(postId, key) or usePostMeta(postId, key) hook.'
       }
     ]
   },

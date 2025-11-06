@@ -1,6 +1,7 @@
 import { AppDataSource } from '../../../database/connection.js';
 import { Post } from '../../../entities/Post.js';
 import { CustomPost } from '../../../entities/CustomPost.js';
+import { PostMeta } from '../../../entities/PostMeta.js';
 import { metaDataService } from '../../../services/MetaDataService.js';
 import { cptService } from './cpt.service.js';
 import { acfService } from './acf.service.js';
@@ -14,6 +15,7 @@ import { CACHE_CONFIG, BLOCK_DYNAMIC_FIELDS } from '../../../config/editor.const
 export class BlockDataService {
   private postRepo = AppDataSource.getRepository(Post);
   private customPostRepo = AppDataSource.getRepository(CustomPost);
+  private postMetaRepo = AppDataSource.getRepository(PostMeta);
 
   // Cache configuration
   private cache = new Map<string, { data: any; timestamp: number }>();
@@ -125,13 +127,29 @@ export class BlockDataService {
       let featuredImage: string | null = null;
 
       if (postType === 'custom') {
-        const post = await this.customPostRepo.findOne({
-          where: { id: postId },
-          select: ['id', 'meta']
-        });
+        // Phase 4-2: Try normalized post_meta first
+        try {
+          const metaItem = await this.postMetaRepo.findOne({
+            where: { post_id: postId, meta_key: 'featuredImage' }
+          });
 
-        if (post?.meta && 'featuredImage' in post.meta) {
-          featuredImage = post.meta.featuredImage as string;
+          if (metaItem?.meta_value) {
+            featuredImage = metaItem.meta_value as string;
+          }
+        } catch (metaErr) {
+          logger.warn(`Failed to fetch featuredImage from post_meta for post ${postId}, falling back to legacy`);
+        }
+
+        // Legacy fallback (TODO: Remove after 2-week migration period)
+        if (!featuredImage) {
+          const post = await this.customPostRepo.findOne({
+            where: { id: postId },
+            select: ['id', 'meta']
+          });
+
+          if (post?.meta && 'featuredImage' in post.meta) {
+            featuredImage = post.meta.featuredImage as string;
+          }
         }
       } else {
         const post = await this.postRepo.findOne({
