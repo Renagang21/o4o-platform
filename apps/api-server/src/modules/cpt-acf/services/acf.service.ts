@@ -1,212 +1,58 @@
-import { AppDataSource } from '../../../database/connection.js';
-import { FieldGroup, CustomField, CustomFieldValue } from '../../../entities/CustomField.js';
+import { cptService as unifiedCPTService } from '../../../services/cpt/cpt.service.js';
 import { metaDataService } from '../../../services/MetaDataService.js';
-import { validate } from 'class-validator';
-import logger from '../../../utils/logger.js';
 
 /**
- * ACF Service - Business logic layer for Advanced Custom Fields
- * Follows the pattern from affiliate module
+ * Legacy ACF Service - Delegates to unified service
+ *
+ * Phase 2 Migration: This service now delegates all operations to the unified
+ * cpt.service.ts (acf module) to maintain backward compatibility while consolidating logic.
+ *
+ * DO NOT add new methods here. Use the unified service directly instead.
  */
 export class ACFService {
-  private fieldGroupRepo = AppDataSource.getRepository(FieldGroup);
-  private fieldRepo = AppDataSource.getRepository(CustomField);
-  private fieldValueRepo = AppDataSource.getRepository(CustomFieldValue);
-
   /**
    * Get all field groups
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async getFieldGroups() {
-    try {
-      const fieldGroups = await this.fieldGroupRepo.find({
-        relations: ['fields'],
-        order: { order: 'ASC' }
-      });
-
-      return {
-        success: true,
-        data: fieldGroups,
-        total: fieldGroups.length
-      };
-    } catch (error: any) {
-      logger.error('Error fetching field groups:', error);
-      throw new Error('Failed to fetch field groups');
-    }
+    return unifiedCPTService.getFieldGroups();
   }
 
   /**
    * Get field group by ID
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async getFieldGroup(id: string) {
-    try {
-      const fieldGroup = await this.fieldGroupRepo.findOne({
-        where: { id },
-        relations: ['fields']
-      });
-
-      if (!fieldGroup) {
-        return {
-          success: false,
-          error: 'Field group not found'
-        };
-      }
-
-      return {
-        success: true,
-        data: fieldGroup
-      };
-    } catch (error: any) {
-      logger.error('Error fetching field group:', error);
-      throw new Error('Failed to fetch field group');
-    }
+    return unifiedCPTService.getFieldGroup(id);
   }
 
   /**
    * Create field group
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async createFieldGroup(data: any) {
-    try {
-      const { fields, ...groupData } = data;
-
-      // Create the field group first
-      const fieldGroup = this.fieldGroupRepo.create(groupData);
-
-      // Validate the entity
-      const errors = await validate(fieldGroup);
-      if (errors.length > 0) {
-        return {
-          success: false,
-          error: 'Validation failed',
-          details: errors
-        };
-      }
-
-      const savedGroup = await this.fieldGroupRepo.save(fieldGroup) as unknown as FieldGroup;
-
-      // Create fields if provided
-      if (fields && Array.isArray(fields)) {
-        for (const fieldData of fields) {
-          const field = this.fieldRepo.create({
-            ...fieldData,
-            groupId: savedGroup.id
-          });
-          await this.fieldRepo.save(field);
-        }
-      }
-
-      // Fetch the complete group with fields
-      const completeGroup = await this.fieldGroupRepo.findOne({
-        where: { id: savedGroup.id },
-        relations: ['fields']
-      });
-
-      return {
-        success: true,
-        data: completeGroup
-      };
-    } catch (error: any) {
-      logger.error('Error creating field group:', error);
-      throw new Error('Failed to create field group');
-    }
+    return unifiedCPTService.createFieldGroup(data);
   }
 
   /**
    * Update field group
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async updateFieldGroup(id: string, data: any) {
-    try {
-      const fieldGroup = await this.fieldGroupRepo.findOne({
-        where: { id },
-        relations: ['fields']
-      });
-
-      if (!fieldGroup) {
-        return {
-          success: false,
-          error: 'Field group not found'
-        };
-      }
-
-      const { fields, ...groupData } = data;
-
-      // Update group data
-      Object.assign(fieldGroup, groupData);
-
-      // Validate before saving
-      const errors = await validate(fieldGroup);
-      if (errors.length > 0) {
-        return {
-          success: false,
-          error: 'Validation failed',
-          details: errors
-        };
-      }
-
-      await this.fieldGroupRepo.save(fieldGroup);
-
-      // Update fields if provided
-      if (fields && Array.isArray(fields)) {
-        // Delete existing fields
-        await this.fieldRepo.delete({ groupId: id });
-
-        // Create new fields
-        for (const fieldData of fields) {
-          const field = this.fieldRepo.create({
-            ...fieldData,
-            groupId: id
-          });
-          await this.fieldRepo.save(field);
-        }
-      }
-
-      // Fetch updated group
-      const updatedGroup = await this.fieldGroupRepo.findOne({
-        where: { id },
-        relations: ['fields']
-      });
-
-      return {
-        success: true,
-        data: updatedGroup
-      };
-    } catch (error: any) {
-      logger.error('Error updating field group:', error);
-      throw new Error('Failed to update field group');
-    }
+    return unifiedCPTService.updateFieldGroup(id, data);
   }
 
   /**
    * Delete field group
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async deleteFieldGroup(id: string) {
-    try {
-      const fieldGroup = await this.fieldGroupRepo.findOne({
-        where: { id }
-      });
-
-      if (!fieldGroup) {
-        return {
-          success: false,
-          error: 'Field group not found'
-        };
-      }
-
-      // Delete associated fields and values
-      await this.fieldRepo.delete({ groupId: id });
-      await this.fieldGroupRepo.remove(fieldGroup);
-
-      return {
-        success: true,
-        message: 'Field group deleted successfully'
-      };
-    } catch (error: any) {
-      logger.error('Error deleting field group:', error);
-      throw new Error('Failed to delete field group');
-    }
+    return unifiedCPTService.deleteFieldGroup(id);
   }
 
   /**
    * Get field values for an entity
+   * @deprecated Use metaDataService or unifiedCPTService.meta directly
    */
   async getFieldValues(entityType: string, entityId: string) {
     try {
@@ -217,13 +63,13 @@ export class ACFService {
         data: values
       };
     } catch (error: any) {
-      logger.error('Error fetching field values:', error);
       throw new Error('Failed to fetch field values');
     }
   }
 
   /**
    * Save field values for an entity
+   * @deprecated Use metaDataService or unifiedCPTService.meta directly
    */
   async saveFieldValues(entityType: string, entityId: string, values: any) {
     try {
@@ -245,102 +91,26 @@ export class ACFService {
         message: 'Field values saved successfully'
       };
     } catch (error: any) {
-      logger.error('Error saving field values:', error);
       throw new Error('Failed to save field values');
     }
   }
 
   /**
    * Export field groups
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async exportFieldGroups(groupIds?: string[]) {
-    try {
-      const queryBuilder = this.fieldGroupRepo.createQueryBuilder('group')
-        .leftJoinAndSelect('group.fields', 'fields');
-
-      if (groupIds && groupIds.length > 0) {
-        queryBuilder.where('group.id IN (:...ids)', { ids: groupIds });
-      }
-
-      const groups = await queryBuilder.getMany();
-
-      return {
-        success: true,
-        data: {
-          version: '1.0.0',
-          groups: groups,
-          exportedAt: new Date()
-        }
-      };
-    } catch (error: any) {
-      logger.error('Error exporting field groups:', error);
-      throw new Error('Failed to export field groups');
-    }
+    return unifiedCPTService.exportFieldGroups(groupIds);
   }
 
   /**
    * Import field groups
+   * @deprecated Use unifiedCPTService.acf directly
    */
   async importFieldGroups(data: any) {
-    try {
-      const { groups } = data;
-
-      if (!groups || !Array.isArray(groups)) {
-        return {
-          success: false,
-          error: 'Invalid import data'
-        };
-      }
-
-      const imported = [];
-
-      for (const groupData of groups) {
-        const { fields, ...group } = groupData;
-
-        // Check if group already exists
-        const existingGroup = await this.fieldGroupRepo.findOne({
-          where: { title: group.title }
-        });
-
-        let savedGroup;
-        if (existingGroup) {
-          // Update existing group
-          Object.assign(existingGroup, group);
-          savedGroup = await this.fieldGroupRepo.save(existingGroup);
-
-          // Delete existing fields
-          await this.fieldRepo.delete({ groupId: savedGroup.id });
-        } else {
-          // Create new group
-          const newGroup = this.fieldGroupRepo.create(group);
-          savedGroup = await this.fieldGroupRepo.save(newGroup);
-        }
-
-        // Create fields
-        if (fields && Array.isArray(fields)) {
-          for (const fieldData of fields) {
-            const field = this.fieldRepo.create({
-              ...fieldData,
-              groupId: savedGroup.id
-            });
-            await this.fieldRepo.save(field);
-          }
-        }
-
-        imported.push(savedGroup);
-      }
-
-      return {
-        success: true,
-        data: imported,
-        message: `Imported ${imported.length} field groups successfully`
-      };
-    } catch (error: any) {
-      logger.error('Error importing field groups:', error);
-      throw new Error('Failed to import field groups');
-    }
+    return unifiedCPTService.importFieldGroups(data);
   }
 }
 
-// Export singleton instance
+// Export singleton instance (maintains backward compatibility)
 export const acfService = new ACFService();

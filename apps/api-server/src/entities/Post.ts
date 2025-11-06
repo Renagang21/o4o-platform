@@ -3,8 +3,9 @@ import type { User } from './User.js'
 import type { Category } from './Category.js'
 import type { Tag } from './Tag.js'
 import { AccessControl } from '@o4o/types'
-// Import types from SSOT
-import type { Block, SEOMetadata, PostRevision, PostMetaFields } from '@o4o/types/cpt'
+// Import types from SSOT - using relative path due to module resolution
+// TODO Phase 3: Update tsconfig paths to support @o4o/types/cpt export
+import type { Block, SEOMetadata, PostRevision, PostMetaFields } from '@o4o/types/dist/cpt/index.js'
 
 // Re-export for convenience
 export type { Block, SEOMetadata, PostRevision }

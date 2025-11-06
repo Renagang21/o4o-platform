@@ -210,6 +210,7 @@ export function setupRoutes(app: Application): void {
   });
 
   // Gutenberg Content Routes (public access)
+  // Phase 2 Note: /api/posts is deprecated, use /api/v1/posts instead
   app.use('/api/posts', publicLimiter, postsApiRoutes);
   app.use('/api/v1/posts', publicLimiter, postsApiRoutes);
   app.use('/api/pages', publicLimiter, pagesApiRoutes);
@@ -343,6 +344,7 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 6. NON-V1 ROUTES (Legacy & Direct routes)
   // ============================================================================
+  // Phase 2 Note: /api/cpt is deprecated, use /api/v1/cpt instead
   app.use('/api/cpt', standardLimiter, cptRoutes);
   app.use('/api/v1/cpt', standardLimiter, cptRoutes);
   app.use('/api/post-creation', standardLimiter, postCreationRoutes);
