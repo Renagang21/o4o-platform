@@ -323,6 +323,15 @@ const startServer = async () => {
     logger.error('Failed to initialize Passport strategies:', passportError);
   }
 
+  // Initialize CPT Registry (Phase 5)
+  try {
+    const { initializeCPT } = await import('./init/cpt.init.js');
+    await initializeCPT();
+  } catch (cptError) {
+    logger.error('CPT Registry initialization failed:', cptError);
+    // Continue server startup even if CPT init fails
+  }
+
   // Initialize all services
   try {
     await startupService.initialize();
