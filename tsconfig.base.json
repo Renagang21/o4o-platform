@@ -50,6 +50,7 @@
     { "path": "./packages/appearance-system" },
     { "path": "./packages/auth-client" },
     { "path": "./packages/auth-context" },
+    { "path": "./packages/cpt-registry" },
     { "path": "./packages/types" },
     { "path": "./packages/ui" },
     { "path": "./packages/utils" }

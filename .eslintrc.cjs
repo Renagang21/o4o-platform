@@ -59,7 +59,17 @@ module.exports = {
       },
       {
         'selector': 'MemberExpression[object.name="post"][property.name="meta"]',
-        'message': 'Phase 4-2: Direct post.meta access is deprecated. Use Meta API instead: metaApi.get(postId, key) or usePostMeta(postId, key) hook.'
+        'message': 'Phase 6: Direct post.meta access is now ERROR. Use Meta API instead: metaApi.get(postId, key) or usePostMeta(postId, key) hook.'
+      }
+    ],
+
+    // Phase 6: Enforce post.meta ban as ERROR
+    'no-restricted-properties': [
+      'error',
+      {
+        'object': 'post',
+        'property': 'meta',
+        'message': 'Phase 6: Direct post.meta access is forbidden. Use Meta API: metaApi.get(postId, key) or usePostMeta(postId, key).'
       }
     ]
   },

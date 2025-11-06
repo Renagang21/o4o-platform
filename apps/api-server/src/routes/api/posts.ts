@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import * as postsController from '../../controllers/postsController.js'
 import { authenticate as authenticateToken } from '../../middleware/auth.middleware.js'
 import { addDeprecationHeaders } from '../../middleware/deprecation.middleware.js'
+import { validateCPTPayload } from '../../middleware/cpt-validation.middleware.js'
 
 const router: Router = Router()
 
@@ -29,8 +30,8 @@ router.get('/:id/preview', deprecateIfLegacy, postsController.previewPost)
 
 // Protected routes (with conditional deprecation warnings for legacy path only)
 router.use(authenticateToken)
-router.post('/', deprecateIfLegacy, postsController.createPost)
-router.put('/:id', deprecateIfLegacy, postsController.updatePost)
+router.post('/', deprecateIfLegacy, validateCPTPayload, postsController.createPost)
+router.put('/:id', deprecateIfLegacy, validateCPTPayload, postsController.updatePost)
 router.delete('/:id', deprecateIfLegacy, postsController.deletePost)
 router.post('/:id/autosave', deprecateIfLegacy, postsController.autoSavePost)
 router.get('/:id/revisions', deprecateIfLegacy, postsController.getPostRevisions)
