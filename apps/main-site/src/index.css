@@ -1,6 +1,9 @@
 /* Import all theme variations */
 @import './styles/themes/index.css';
 
+/* Import appearance system utilities (Phase 3.5) */
+@import './styles/appearance-utilities.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

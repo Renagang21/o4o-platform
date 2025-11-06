@@ -1,0 +1,116 @@
+/**
+ * Appearance System Utilities
+ * CSS utility classes using standardized CSS variables from @o4o/appearance-system
+ *
+ * Phase 3.5: Component Variable Migration
+ * These classes replace hardcoded Tailwind colors with CSS variables
+ */
+
+/* ===================================
+   Button Utilities
+   =================================== */
+
+.btn-primary {
+  background-color: var(--o4o-button-bg, var(--button-primary-bg, #007bff));
+  color: var(--o4o-button-text, var(--button-primary-text, #ffffff));
+  border: 1px solid var(--o4o-button-border, var(--button-primary-border, #007bff));
+}
+
+.btn-primary:hover {
+  background-color: var(--o4o-button-bg-hover, var(--button-primary-bg-hover, #0056b3));
+}
+
+.btn-primary:active {
+  background-color: var(--o4o-button-bg-active, var(--button-primary-bg-active, #004085));
+}
+
+.btn-secondary {
+  background-color: var(--o4o-button-secondary-bg, #6c757d);
+  color: var(--o4o-button-secondary-text, #ffffff);
+  border: 1px solid var(--o4o-button-secondary-border, #6c757d);
+}
+
+.btn-secondary:hover {
+  background-color: var(--o4o-button-secondary-bg-hover, #5a6268);
+}
+
+.btn-success {
+  background-color: var(--o4o-button-success-bg, #28a745);
+  color: var(--o4o-button-success-text, #ffffff);
+  border: 1px solid var(--o4o-button-success-border, #28a745);
+}
+
+.btn-success:hover {
+  background-color: var(--o4o-button-success-bg-hover, #218838);
+}
+
+.btn-danger {
+  background-color: var(--o4o-button-danger-bg, #dc3545);
+  color: var(--o4o-button-danger-text, #ffffff);
+  border: 1px solid var(--o4o-button-danger-border, #dc3545);
+}
+
+.btn-danger:hover {
+  background-color: var(--o4o-button-danger-bg-hover, #c82333);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--o4o-button-ghost-text, #6c757d);
+  border: none;
+}
+
+.btn-ghost:hover {
+  background-color: var(--o4o-button-ghost-bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--o4o-button-ghost-text-hover, #343a40);
+}
+
+/* ===================================
+   Breadcrumb Utilities
+   =================================== */
+
+.breadcrumb-link {
+  color: var(--o4o-breadcrumb-link, var(--breadcrumb-link-color, #007bff));
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--o4o-breadcrumb-link-hover, var(--breadcrumb-hover-color, #0056b3));
+}
+
+.breadcrumb-current {
+  color: var(--o4o-breadcrumb-text, var(--breadcrumb-text-color, #6c757d));
+}
+
+.breadcrumb-separator {
+  color: var(--o4o-breadcrumb-separator, var(--breadcrumb-separator-color, #999999));
+}
+
+/* ===================================
+   Scroll-to-Top Utilities
+   =================================== */
+
+.scroll-to-top {
+  background-color: var(--o4o-scroll-top-bg, var(--scroll-top-bg, #007bff));
+  color: var(--o4o-scroll-top-text, var(--scroll-top-text, #ffffff));
+  border-radius: var(--o4o-scroll-top-radius, 50%);
+}
+
+.scroll-to-top:hover {
+  background-color: var(--o4o-scroll-top-bg-hover, var(--scroll-top-bg-hover, #0056b3));
+}
+
+/* ===================================
+   Legacy Compatibility Notes
+   =================================== */
+
+/**
+ * Variable Fallback Chain:
+ * 1. --o4o-* (Phase 3+ standard)
+ * 2. --button-*, --breadcrumb-* (legacy, Phase 2)
+ * 3. Hardcoded hex values (absolute fallback)
+ *
+ * Phase 4 will remove legacy variables
+ * Phase 5 will enforce --o4o-* only via linting
+ */
