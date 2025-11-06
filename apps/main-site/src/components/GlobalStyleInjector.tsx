@@ -33,7 +33,7 @@ export function GlobalStyleInjector() {
       const legacyCSS = generateCSS(settings);
 
       // Phase 3: Generate core component CSS using appearance-system
-      // Map customizer settings to design tokens
+      // Map customizer settings to design tokens (A-4: Essential mappings added)
       const tokens: DesignTokens = {
         ...defaultTokens,
         colors: {
@@ -49,6 +49,11 @@ export function GlobalStyleInjector() {
           breadcrumbLink: (settings as any).breadcrumbs?.styling?.linkColor || defaultTokens.colors.breadcrumbLink,
           breadcrumbSeparator: (settings as any).breadcrumbs?.styling?.separatorColor || defaultTokens.colors.breadcrumbSeparator,
         },
+        typography: {
+          ...defaultTokens.typography,
+          // A-4: Map body font from customizer
+          fontFamily: (settings as any).typography?.bodyFont?.fontFamily || defaultTokens.typography.fontFamily,
+        },
       };
 
       // Generate core component CSS (Phase 2 generators)
@@ -58,17 +63,29 @@ export function GlobalStyleInjector() {
         generateScrollToTopCSS(tokens),
       ].join('\n\n');
 
-      // Inject legacy CSS (backward compatibility)
+      // INJECTION ORDER GUARANTEE: Legacy first, then appearance-system
+      // This ensures --o4o-* variables can override legacy --wp-* variables
+
+      // Step 1: Inject legacy CSS (backward compatibility)
+      // Creates/updates <style id="customizer-global-css"> with header, footer, typography, blog CSS
       let legacyStyleEl = document.getElementById('customizer-global-css') as HTMLStyleElement;
       if (!legacyStyleEl) {
         legacyStyleEl = document.createElement('style');
         legacyStyleEl.id = 'customizer-global-css';
         legacyStyleEl.setAttribute('data-source', 'customizer-legacy');
-        document.head.appendChild(legacyStyleEl);
+        // Ensure legacy is inserted BEFORE appearance-system
+        const appearanceEl = document.getElementById(STYLE_IDS.APPEARANCE_SYSTEM);
+        if (appearanceEl) {
+          document.head.insertBefore(legacyStyleEl, appearanceEl);
+        } else {
+          document.head.appendChild(legacyStyleEl);
+        }
       }
       legacyStyleEl.textContent = legacyCSS;
 
-      // Inject core CSS using appearance-system (Phase 3 standard path)
+      // Step 2: Inject core CSS using appearance-system (Phase 3 standard path)
+      // Creates/updates <style id="o4o-appearance-system"> with button, breadcrumb, scroll-to-top CSS
+      // This MUST come after legacy to ensure proper cascade
       injectCSS(coreCSS, STYLE_IDS.APPEARANCE_SYSTEM);
 
     } catch (error) {

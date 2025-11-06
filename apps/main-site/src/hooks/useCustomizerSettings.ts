@@ -91,7 +91,7 @@ const DEFAULT_CONTAINER_SETTINGS: ContainerSettings = {
 };
 
 const STORAGE_KEY = 'customizer-settings-cache';
-const CACHE_DURATION = 30 * 1000; // 30 seconds
+const CACHE_DURATION = 5 * 1000; // 5 seconds (fast refresh for immediate updates)
 
 // Breakpoints matching Tailwind defaults
 const BREAKPOINTS = {
@@ -135,8 +135,18 @@ export const useCustomizerSettings = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
+        // Check for forceRefresh query parameter (debug mode)
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceRefresh = urlParams.get('forceRefresh') === '1';
+
+        if (forceRefresh) {
+          // Force refresh: clear cache immediately
+          localStorage.removeItem(STORAGE_KEY);
+          console.log('[useCustomizerSettings] Force refresh mode - cache cleared');
+        }
+
         // Check cache first
-        const cached = localStorage.getItem(STORAGE_KEY);
+        const cached = !forceRefresh ? localStorage.getItem(STORAGE_KEY) : null;
         let cachedVersion: number | undefined;
 
         if (cached) {
@@ -166,11 +176,18 @@ export const useCustomizerSettings = () => {
           const apiData = response.data.data;
           const apiVersion = (apiData as any)?._version;
 
-          // Check if version changed
-          const versionChanged = cachedVersion !== undefined && apiVersion !== cachedVersion;
+          // Check if version changed - ALWAYS update if version differs
+          const versionChanged = cachedVersion !== undefined && apiVersion !== undefined && apiVersion !== cachedVersion;
 
-          // If version changed, force update even if cache is valid
-          if (!versionChanged && cachedVersion !== undefined) {
+          if (versionChanged) {
+            console.log('[useCustomizerSettings] Version changed, force updating...', {
+              cached: cachedVersion,
+              api: apiVersion
+            });
+          }
+
+          // Only skip update if version is same AND cache is still valid
+          if (!versionChanged && cachedVersion !== undefined && cachedVersion === apiVersion) {
             // Cache is valid and version hasn't changed, no need to update
             setIsLoading(false);
             return;

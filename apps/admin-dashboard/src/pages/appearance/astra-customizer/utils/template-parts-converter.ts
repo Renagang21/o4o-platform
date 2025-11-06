@@ -192,9 +192,9 @@ export function convertSettingsToHeaderTemplatePart(
       id: 'header-primary',
       type: 'o4o/group',
       data: {
-        layout: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        layout: 'grid',  // B-1: Changed from flex to grid
+        gridTemplateColumns: '1fr auto 1fr',  // B-1: 3-zone fixed layout
+        gap: '16px',
         alignItems: 'center',
         className: 'header-primary',
         backgroundColor: builder.primary.settings.background,
@@ -205,26 +205,45 @@ export function convertSettingsToHeaderTemplatePart(
           right: '24px'
         }
       },
+      // B-2: Always render all 3 zones (even if empty) to maintain grid structure
       innerBlocks: [
-        primaryModules.left.length > 0 && {
+        // Left zone: always render (placeholder if empty)
+        {
           id: 'header-primary-left',
           type: 'o4o/group',
-          data: { layout: 'flex', gap: '16px', alignItems: 'center' },
-          innerBlocks: primaryModules.left
+          data: {
+            layout: 'flex',
+            gap: '16px',
+            alignItems: 'center',
+            justifySelf: 'start'  // Grid alignment
+          },
+          innerBlocks: primaryModules.left.length > 0 ? primaryModules.left : []
         },
-        primaryModules.center.length > 0 && {
+        // Center zone: always render (placeholder if empty)
+        {
           id: 'header-primary-center',
           type: 'o4o/group',
-          data: { layout: 'flex', gap: '16px', alignItems: 'center' },
-          innerBlocks: primaryModules.center
+          data: {
+            layout: 'flex',
+            gap: '16px',
+            alignItems: 'center',
+            justifySelf: 'center'  // Grid alignment
+          },
+          innerBlocks: primaryModules.center.length > 0 ? primaryModules.center : []
         },
-        primaryModules.right.length > 0 && {
+        // Right zone: always render (placeholder if empty)
+        {
           id: 'header-primary-right',
           type: 'o4o/group',
-          data: { layout: 'flex', gap: '16px', alignItems: 'center' },
-          innerBlocks: primaryModules.right
+          data: {
+            layout: 'flex',
+            gap: '16px',
+            alignItems: 'center',
+            justifySelf: 'end'  // Grid alignment
+          },
+          innerBlocks: primaryModules.right.length > 0 ? primaryModules.right : []
         }
-      ].filter(Boolean)
+      ]
     });
 
     // Below Header Section
