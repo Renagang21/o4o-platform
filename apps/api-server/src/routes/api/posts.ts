@@ -27,6 +27,10 @@ router.get('/', deprecateIfLegacy, postsController.getAllPosts)
 router.get('/:id', deprecateIfLegacy, postsController.getPost)
 router.get('/:id/preview', deprecateIfLegacy, postsController.previewPost)
 
+// Public meta routes (Phase 4-1: Post Meta CRUD API)
+router.get('/:id/meta', deprecateIfLegacy, postsController.listPostMeta)
+router.get('/:id/meta/:key', deprecateIfLegacy, postsController.getPostMetaByKey)
+
 // Protected routes (with conditional deprecation warnings for legacy path only)
 router.use(authenticateToken)
 router.post('/', deprecateIfLegacy, postsController.createPost)
@@ -35,5 +39,10 @@ router.delete('/:id', deprecateIfLegacy, postsController.deletePost)
 router.post('/:id/autosave', deprecateIfLegacy, postsController.autoSavePost)
 router.get('/:id/revisions', deprecateIfLegacy, postsController.getPostRevisions)
 router.post('/bulk', deprecateIfLegacy, postsController.bulkOperatePosts)
+
+// Protected meta routes (Phase 4-1: Post Meta CRUD API)
+router.put('/:id/meta', deprecateIfLegacy, postsController.upsertPostMeta)
+router.delete('/:id/meta/:key', deprecateIfLegacy, postsController.deletePostMetaByKey)
+router.patch('/:id/meta/:key/increment', deprecateIfLegacy, postsController.incrementPostMeta)
 
 export default router

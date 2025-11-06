@@ -739,3 +739,194 @@ export const getPostCounts = async (req: Request, res: Response) => {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch post counts' } })
   }
 }
+
+// ============================================================================
+// Post Meta CRUD Handlers (Phase 4-1)
+// ============================================================================
+
+import { postMetaModule } from '../services/cpt/modules/post-meta.module.js'
+import { UpsertMetaDto, IncrementMetaDto, InvalidMetaKeyError } from '../dto/meta.dto.js'
+
+/**
+ * List all metadata for a post
+ * GET /api/v1/posts/:id/meta
+ */
+export const listPostMeta = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    const items = await postMetaModule.list(id)
+
+    res.json({
+      data: items,
+      meta: {
+        total: items.length
+      }
+    })
+  } catch (error: any) {
+    console.error('Error listing post meta:', error)
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to list post meta',
+        details: error.message
+      }
+    })
+  }
+}
+
+/**
+ * Get specific metadata by key
+ * GET /api/v1/posts/:id/meta/:key
+ */
+export const getPostMetaByKey = async (req: Request, res: Response) => {
+  try {
+    const { id, key } = req.params
+
+    const item = await postMetaModule.get(id, key)
+
+    res.json({
+      data: item
+    })
+  } catch (error: any) {
+    if (error instanceof InvalidMetaKeyError) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_META_KEY',
+          message: error.message
+        }
+      })
+    }
+
+    console.error('Error getting post meta by key:', error)
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to get post meta',
+        details: error.message
+      }
+    })
+  }
+}
+
+/**
+ * Upsert metadata
+ * PUT /api/v1/posts/:id/meta
+ */
+export const upsertPostMeta = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const { meta_key, meta_value } = req.body as UpsertMetaDto
+
+    if (!meta_key) {
+      return res.status(400).json({
+        error: {
+          code: 'MISSING_FIELD',
+          message: 'meta_key is required'
+        }
+      })
+    }
+
+    const item = await postMetaModule.upsert(id, meta_key, meta_value)
+
+    res.json({
+      data: item
+    })
+  } catch (error: any) {
+    if (error instanceof InvalidMetaKeyError) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_META_KEY',
+          message: error.message
+        }
+      })
+    }
+
+    console.error('Error upserting post meta:', error)
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to upsert post meta',
+        details: error.message
+      }
+    })
+  }
+}
+
+/**
+ * Delete metadata by key
+ * DELETE /api/v1/posts/:id/meta/:key
+ */
+export const deletePostMetaByKey = async (req: Request, res: Response) => {
+  try {
+    const { id, key } = req.params
+
+    const result = await postMetaModule.delete(id, key)
+
+    res.json({
+      data: result
+    })
+  } catch (error: any) {
+    if (error instanceof InvalidMetaKeyError) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_META_KEY',
+          message: error.message
+        }
+      })
+    }
+
+    console.error('Error deleting post meta:', error)
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to delete post meta',
+        details: error.message
+      }
+    })
+  }
+}
+
+/**
+ * Increment counter metadata
+ * PATCH /api/v1/posts/:id/meta/:key/increment
+ */
+export const incrementPostMeta = async (req: Request, res: Response) => {
+  try {
+    const { id, key } = req.params
+    const { by = 1 } = req.body as IncrementMetaDto
+
+    if (typeof by !== 'number') {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_PARAMETER',
+          message: 'by must be a number'
+        }
+      })
+    }
+
+    const item = await postMetaModule.increment(id, key, by)
+
+    res.json({
+      data: item
+    })
+  } catch (error: any) {
+    if (error instanceof InvalidMetaKeyError) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_META_KEY',
+          message: error.message
+        }
+      })
+    }
+
+    console.error('Error incrementing post meta:', error)
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to increment post meta',
+        details: error.message
+      }
+    })
+  }
+}
