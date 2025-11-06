@@ -7,6 +7,8 @@ interface GroupProps {
   justifyContent?: string;
   alignItems?: string;
   gap?: string;
+  gridTemplateColumns?: string;
+  justifySelf?: string;
   padding?: {
     top?: string;
     bottom?: string;
@@ -29,6 +31,8 @@ const Group: FC<GroupProps> = ({
   justifyContent,
   alignItems,
   gap,
+  gridTemplateColumns,
+  justifySelf,
   padding,
   margin,
   marginTop,
@@ -49,6 +53,8 @@ const Group: FC<GroupProps> = ({
     justifyContent,
     alignItems,
     gap,
+    gridTemplateColumns: layout === 'grid' ? gridTemplateColumns : undefined,
+    justifySelf,
     paddingTop: padding?.top || paddingTop,
     paddingBottom: padding?.bottom,
     paddingLeft: padding?.left,
@@ -61,7 +67,7 @@ const Group: FC<GroupProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`${layoutClasses[layout]} ${className}`}
       style={style}
     >
