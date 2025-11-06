@@ -6,11 +6,12 @@
 
 This document provides a complete reference for all design tokens used in the O4O Platform. Design tokens are the single source of truth for all appearance-related values (colors, spacing, typography, etc.).
 
+**Status**: Phase 4 Complete (Legacy Variables Removed)
+**Standard**: `--o4o-*` naming convention only
+
 ## Import Path
 
 ```typescript
-import { defaultTokens } from '@o4o/appearance';
-// or
 import { defaultTokens } from '@o4o/appearance-system';
 ```
 
@@ -25,114 +26,157 @@ interface DesignTokens {
 }
 ```
 
-## Color Tokens
+---
 
-### Primary Colors
+## CSS Variables Reference
 
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `colors.primary` | `--o4o-color-primary` | `#007bff` | Primary brand color |
-| `colors.primaryHover` | `--o4o-color-primary-hover` | `#0056b3` | Primary hover state |
-| `colors.primaryActive` | `--o4o-color-primary-active` | `#004085` | Primary active state |
+### Button Variables
 
-### Button Colors
+| CSS Variable | Default Value | Description | Component |
+|-------------|---------------|-------------|-----------|
+| `--o4o-button-bg` | `#007bff` | Primary button background | Button |
+| `--o4o-button-text` | `#ffffff` | Primary button text color | Button |
+| `--o4o-button-border` | `#007bff` | Primary button border color | Button |
+| `--o4o-button-radius` | `4px` | Button border radius | Button |
+| `--o4o-button-padding-y` | `12px` | Button vertical padding | Button |
+| `--o4o-button-padding-x` | `24px` | Button horizontal padding | Button |
+| `--o4o-button-bg-hover` | `#0056b3` | Primary button hover background | Button |
+| `--o4o-button-bg-active` | `#004085` | Primary button active background | Button |
+| `--o4o-button-secondary-bg` | `#6c757d` | Secondary button background | Button |
+| `--o4o-button-secondary-text` | `#ffffff` | Secondary button text | Button |
+| `--o4o-button-secondary-border` | `#6c757d` | Secondary button border | Button |
+| `--o4o-button-success-bg` | `#28a745` | Success button background | Button |
+| `--o4o-button-success-text` | `#ffffff` | Success button text | Button |
+| `--o4o-button-danger-bg` | `#dc3545` | Danger button background | Button |
+| `--o4o-button-danger-text` | `#ffffff` | Danger button text | Button |
+| `--o4o-button-ghost-text` | `#6c757d` | Ghost button text color | Button |
+| `--o4o-button-ghost-bg-hover` | `rgba(0,0,0,0.05)` | Ghost button hover background | Button |
 
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `colors.buttonBg` | `--o4o-button-bg` | `#007bff` | Button background |
-| `colors.buttonText` | `--o4o-button-text` | `#ffffff` | Button text color |
-| `colors.buttonBorder` | `--o4o-button-border` | `#007bff` | Button border color |
+### Breadcrumb Variables
 
-### Breadcrumb Colors
+| CSS Variable | Default Value | Description | Component |
+|-------------|---------------|-------------|-----------|
+| `--o4o-breadcrumb-text` | `#6c757d` | Breadcrumb current page text | Breadcrumbs |
+| `--o4o-breadcrumb-link` | `#007bff` | Breadcrumb link color | Breadcrumbs |
+| `--o4o-breadcrumb-link-hover` | `#0056b3` | Breadcrumb link hover color | Breadcrumbs |
+| `--o4o-breadcrumb-separator` | `#6c757d` | Breadcrumb separator color | Breadcrumbs |
+| `--o4o-breadcrumb-font-size` | `14px` | Breadcrumb font size | Breadcrumbs |
 
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `colors.breadcrumbText` | `--o4o-breadcrumb-text` | `#6c757d` | Breadcrumb text |
-| `colors.breadcrumbLink` | `--o4o-breadcrumb-link` | `#007bff` | Breadcrumb link |
-| `colors.breadcrumbSeparator` | `--o4o-breadcrumb-separator` | `#6c757d` | Breadcrumb separator |
+### Scroll-to-Top Variables
 
-## Spacing Tokens
+| CSS Variable | Default Value | Description | Component |
+|-------------|---------------|-------------|-----------|
+| `--o4o-scroll-top-bg` | `#007bff` | Scroll-to-top background | ScrollToTop |
+| `--o4o-scroll-top-icon` | `#ffffff` | Scroll-to-top icon color | ScrollToTop |
+| `--o4o-scroll-top-text` | `#ffffff` | Scroll-to-top text color | ScrollToTop |
+| `--o4o-scroll-top-size` | `40px` | Scroll-to-top button size | ScrollToTop |
+| `--o4o-scroll-top-border-radius` | `4px` | Scroll-to-top border radius | ScrollToTop |
+| `--o4o-scroll-top-position-bottom` | `30px` | Distance from bottom | ScrollToTop |
+| `--o4o-scroll-top-position-right` | `30px` | Distance from right | ScrollToTop |
+| `--o4o-scroll-top-bg-hover` | `#0056b3` | Hover background color | ScrollToTop |
 
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `spacing.xs` | `--o4o-space-xs` | `0.25rem` | Extra small spacing (4px) |
-| `spacing.sm` | `--o4o-space-sm` | `0.5rem` | Small spacing (8px) |
-| `spacing.md` | `--o4o-space-md` | `1rem` | Medium spacing (16px) |
-| `spacing.lg` | `--o4o-space-lg` | `1.5rem` | Large spacing (24px) |
-| `spacing.xl` | `--o4o-space-xl` | `2rem` | Extra large spacing (32px) |
+### Core Colors
 
-## Border Radius Tokens
+| CSS Variable | Default Value | Description |
+|-------------|---------------|-------------|
+| `--o4o-color-primary` | `#007bff` | Primary brand color |
+| `--o4o-color-primary-hover` | `#0056b3` | Primary hover state |
+| `--o4o-color-primary-active` | `#004085` | Primary active state |
 
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `radius.sm` | `--o4o-radius-sm` | `0.125rem` | Small radius (2px) |
-| `radius.md` | `--o4o-radius-md` | `0.25rem` | Medium radius (4px) |
-| `radius.lg` | `--o4o-radius-lg` | `0.5rem` | Large radius (8px) |
+### Spacing
 
-## Typography Tokens
+| CSS Variable | Default Value | Description |
+|-------------|---------------|-------------|
+| `--o4o-space-xs` | `0.25rem` (4px) | Extra small spacing |
+| `--o4o-space-sm` | `0.5rem` (8px) | Small spacing |
+| `--o4o-space-md` | `1rem` (16px) | Medium spacing |
+| `--o4o-space-lg` | `1.5rem` (24px) | Large spacing |
+| `--o4o-space-xl` | `2rem` (32px) | Extra large spacing |
 
-### Font Family
+### Border Radius
 
-| Token | CSS Variable | Default Value |
-|-------|-------------|---------------|
-| `typography.fontFamily` | `--o4o-font-family` | System font stack |
+| CSS Variable | Default Value | Description |
+|-------------|---------------|-------------|
+| `--o4o-radius-sm` | `0.125rem` (2px) | Small radius |
+| `--o4o-radius-md` | `0.25rem` (4px) | Medium radius |
+| `--o4o-radius-lg` | `0.5rem` (8px) | Large radius |
 
-### Font Size
-
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `typography.fontSize.sm` | `--o4o-font-size-sm` | `0.875rem` | Small text (14px) |
-| `typography.fontSize.md` | `--o4o-font-size-md` | `1rem` | Medium text (16px) |
-| `typography.fontSize.lg` | `--o4o-font-size-lg` | `1.25rem` | Large text (20px) |
-
-### Font Weight
-
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `typography.fontWeight.normal` | `--o4o-font-weight-normal` | `400` | Normal weight |
-| `typography.fontWeight.medium` | `--o4o-font-weight-medium` | `500` | Medium weight |
-| `typography.fontWeight.bold` | `--o4o-font-weight-bold` | `700` | Bold weight |
-
-### Line Height
-
-| Token | CSS Variable | Default Value | Description |
-|-------|-------------|---------------|-------------|
-| `typography.lineHeight.tight` | `--o4o-line-height-tight` | `1.25` | Tight line height |
-| `typography.lineHeight.normal` | `--o4o-line-height-normal` | `1.5` | Normal line height |
-| `typography.lineHeight.relaxed` | `--o4o-line-height-relaxed` | `1.75` | Relaxed line height |
+---
 
 ## Usage Examples
 
-### Using Tokens in TypeScript
+### Example 1: Customize Button Colors
+
+```css
+/* In Admin Dashboard Custom CSS section */
+:root {
+  --o4o-button-bg: #28a745;           /* Green background */
+  --o4o-button-bg-hover: #218838;     /* Darker green on hover */
+  --o4o-button-text: #ffffff;         /* White text */
+}
+```
+
+**Result**: All primary buttons become green.
+
+### Example 2: Customize Breadcrumb Style
+
+```css
+:root {
+  --o4o-breadcrumb-link: #6f42c1;        /* Purple links */
+  --o4o-breadcrumb-link-hover: #5a32a3;  /* Darker purple on hover */
+  --o4o-breadcrumb-separator: #dee2e6;   /* Light gray separator */
+  --o4o-breadcrumb-font-size: 16px;      /* Larger font */
+}
+```
+
+**Result**: Breadcrumbs use purple color scheme with larger text.
+
+### Example 3: Customize Scroll-to-Top Button
+
+```css
+:root {
+  --o4o-scroll-top-bg: #dc3545;              /* Red background */
+  --o4o-scroll-top-size: 50px;               /* Larger button */
+  --o4o-scroll-top-border-radius: 25px;      /* Fully rounded */
+  --o4o-scroll-top-position-bottom: 20px;    /* Closer to bottom */
+  --o4o-scroll-top-position-right: 20px;     /* Closer to right */
+}
+```
+
+**Result**: Scroll-to-top button becomes a large red circle in the bottom-right corner.
+
+### Example 4: Using Variables in TypeScript
 
 ```typescript
-import { defaultTokens } from '@o4o/appearance';
+import { defaultTokens } from '@o4o/appearance-system';
 
 // Access a specific token
 const primaryColor = defaultTokens.colors.primary;
 
-// Override tokens
+// Override tokens for custom theme
 const customTokens = {
   ...defaultTokens,
   colors: {
     ...defaultTokens.colors,
-    primary: '#ff0000',
+    buttonBg: '#28a745',      // Green buttons
+    buttonText: '#ffffff',
   },
 };
 ```
 
-### Using CSS Variables in Components
+### Example 5: Using CSS Variables in React Components
 
 ```tsx
 // React component using CSS variables
-function Button() {
+function CustomButton() {
   return (
     <button
       style={{
         backgroundColor: 'var(--o4o-button-bg)',
         color: 'var(--o4o-button-text)',
-        padding: 'var(--o4o-space-md)',
-        borderRadius: 'var(--o4o-radius-md)',
+        padding: 'var(--o4o-button-padding-y) var(--o4o-button-padding-x)',
+        borderRadius: 'var(--o4o-button-radius)',
+        border: '1px solid var(--o4o-button-border)',
       }}
     >
       Click me
@@ -141,115 +185,120 @@ function Button() {
 }
 ```
 
-### Using CSS Variables in Stylesheets
+### Example 6: Using Utility Classes
 
-```css
-/* CSS file using design tokens */
-.btn-primary {
-  background-color: var(--o4o-button-bg);
-  color: var(--o4o-button-text);
-  border: 1px solid var(--o4o-button-border);
-  padding: var(--o4o-space-sm) var(--o4o-space-md);
-  border-radius: var(--o4o-radius-md);
-  font-size: var(--o4o-font-size-md);
-  font-weight: var(--o4o-font-weight-medium);
-}
-
-.btn-primary:hover {
-  background-color: var(--o4o-color-primary-hover);
-}
+```tsx
+// Using pre-built utility classes (recommended)
+<button className="btn-primary">Primary Button</button>
+<button className="btn-secondary">Secondary Button</button>
+<button className="btn-success">Success Button</button>
+<button className="btn-danger">Danger Button</button>
 ```
 
-## Legacy Variables (Deprecated)
+Utility classes automatically use `--o4o-*` variables and support theme customization.
 
-### Migration Mapping
+---
 
-| Legacy Variable | New Variable | Status |
-|----------------|--------------|--------|
-| `--wp-button-bg` | `--o4o-button-bg` | Phase 4 migration |
-| `--ast-button-bg` | `--o4o-button-bg` | Phase 4 migration |
-| `--wp-primary-color` | `--o4o-color-primary` | Phase 4 migration |
-| `--ast-primary-color` | `--o4o-color-primary` | Phase 4 migration |
-| `--wp-spacing-*` | `--o4o-space-*` | Phase 4 migration |
-| `--ast-spacing-*` | `--o4o-space-*` | Phase 4 migration |
+## Legacy Variables (Deprecated - Phase 4 Complete)
 
-**⚠️ Warning**: Do not use legacy variables in new code. They will be removed in Phase 4.
+### Migration Mapping Table
 
-## Extending the Token System
+| Legacy Variable (❌ Removed) | New Variable (✅ Standard) | Migration Date |
+|------------------------------|---------------------------|----------------|
+| `--button-primary-bg` | `--o4o-button-bg` | 2025-11-06 (Phase 4) |
+| `--button-primary-text` | `--o4o-button-text` | 2025-11-06 (Phase 4) |
+| `--button-primary-border-radius` | `--o4o-button-radius` | 2025-11-06 (Phase 4) |
+| `--button-primary-padding-v` | `--o4o-button-padding-y` | 2025-11-06 (Phase 4) |
+| `--button-primary-padding-h` | `--o4o-button-padding-x` | 2025-11-06 (Phase 4) |
+| `--button-primary-bg-hover` | `--o4o-button-bg-hover` | 2025-11-06 (Phase 4) |
+| `--button-secondary-bg` | `--o4o-button-secondary-bg` | 2025-11-06 (Phase 4) |
+| `--breadcrumb-text-color` | `--o4o-breadcrumb-text` | 2025-11-06 (Phase 4) |
+| `--breadcrumb-link-color` | `--o4o-breadcrumb-link` | 2025-11-06 (Phase 4) |
+| `--breadcrumb-separator-color` | `--o4o-breadcrumb-separator` | 2025-11-06 (Phase 4) |
+| `--scroll-top-bg` | `--o4o-scroll-top-bg` | 2025-11-06 (Phase 4) |
+| `--scroll-top-icon-color` | `--o4o-scroll-top-icon` | 2025-11-06 (Phase 4) |
+| `--scroll-top-size` | `--o4o-scroll-top-size` | 2025-11-06 (Phase 4) |
+| `--scroll-top-border-radius` | `--o4o-scroll-top-border-radius` | 2025-11-06 (Phase 4) |
 
-### Adding New Tokens (Phase 2+)
+**⚠️ Warning**: Legacy variables have been completely removed in Phase 4. Do not use them in any code.
 
-When adding new tokens, follow this process:
+**Auto-Detection**: ESLint will raise **errors** if legacy variables are detected in code.
 
-1. Add the token to the appropriate interface in `packages/appearance-system/src/tokens.ts`
-2. Add the default value to `defaultTokens`
-3. Update this documentation
-4. Update the CSS variable naming convention
-
-Example:
-
-```typescript
-// In tokens.ts
-export interface ColorTokens {
-  // ... existing tokens
-  errorBg: string;  // New token
-}
-
-export const defaultTokens: DesignTokens = {
-  colors: {
-    // ... existing values
-    errorBg: '#dc3545',  // New value
-  },
-  // ...
-};
-```
+---
 
 ## Best Practices
 
 ### ✅ DO
 
-- Use tokens for all color, spacing, and typography values
-- Reference tokens through CSS variables in components
-- Override tokens at the theme level, not component level
-- Keep token names semantic (e.g., `buttonBg` not `blue500`)
+- Use `--o4o-*` variables for all styling
+- Customize theme by overriding CSS variables in Admin Dashboard
+- Use utility classes (`.btn-primary`, `.breadcrumb-link`) for components
+- Reference tokens through CSS variables in custom CSS
+- Keep token names semantic (e.g., `--o4o-button-bg` not `--o4o-blue-500`)
 
 ### ❌ DON'T
 
 - Hardcode color values (e.g., `#007bff`, `rgb(0, 123, 255)`)
 - Hardcode spacing values (e.g., `16px`, `1rem`)
-- Use legacy variables (`--wp-*`, `--ast-*`)
-- Create component-specific tokens (use semantic names)
+- Use legacy variables (`--button-*`, `--breadcrumb-*`, `--scroll-top-*`)
+- Create component-specific tokens without consulting the team
+- Override CSS variables in component files (use Admin Dashboard only)
+
+### Quick Start Checklist
+
+New to theming? Follow these steps:
+
+1. ✅ Go to Admin Dashboard → Appearance → Custom CSS
+2. ✅ Copy one of the examples above (Button, Breadcrumb, or ScrollToTop)
+3. ✅ Paste into Custom CSS editor
+4. ✅ Modify color/size values to match your brand
+5. ✅ Save and preview changes in real-time
+6. ✅ Test on 3 pages: Home, Category, Product Detail
+
+**Time to theme**: < 5 minutes
+
+---
 
 ## Roadmap
 
-### Phase 2 (Current → Next)
-- Migrate existing token values from apps
-- Consolidate duplicate token definitions
-- Implement CSS variable generation
+### ✅ Phase 1 (Complete)
+- Package structure created
+- Token system established
 
-### Phase 3
-- Update all components to use CSS variables
-- Remove hardcoded values from components
-- Add visual regression tests
+### ✅ Phase 2 (Complete)
+- CSS generators consolidated
+- GlobalStyleInjector implemented
 
-### Phase 4
-- Complete migration from legacy variables
-- Remove all `--wp-*` and `--ast-*` references
-- Finalize `--o4o-*` naming convention
+### ✅ Phase 3 Mini & 3.5 (Complete)
+- Button and Breadcrumb components migrated
+- CSS variable injection standardized
 
-### Phase 5
-- Complete documentation
-- Add Storybook integration
-- Create design token visualization tool
+### ✅ Phase 4 (Complete - 2025-11-06)
+- Legacy variables completely removed
+- `--o4o-*` naming convention enforced
+- ESLint rules added for legacy variable detection
+
+### 🔄 Phase 5 (In Progress)
+- Documentation finalization
+- Quality rules enforcement
+- Admin UI help tooltips
+
+### 📋 Phase 6 (Planned)
+- Legacy code cleanup
+- Unused file removal
+- Final optimization
+
+---
 
 ## Related Documentation
 
 - [APPEARANCE_CLEANUP_PLAN.md](/docs/APPEARANCE_CLEANUP_PLAN.md) - Overall migration strategy
-- [APPEARANCE_INVESTIGATION.md](/docs/APPEARANCE_INVESTIGATION.md) - Technical analysis
+- [APPEARANCE_MIGRATION_GUIDE.md](/docs/APPEARANCE_MIGRATION_GUIDE.md) - Step-by-step migration guide
+- [APPEARANCE_COMPONENT_MAP.md](/docs/APPEARANCE_COMPONENT_MAP.md) - Component usage tracking
 - [packages/appearance-system/README.md](/packages/appearance-system/README.md) - Package documentation
 
 ---
 
-**Last Updated**: 2024-11-06
-**Status**: Phase 1 Complete
-**Next Review**: Phase 2 Start
+**Last Updated**: 2025-11-06
+**Status**: Phase 4 Complete, Phase 5 In Progress
+**Next Review**: Phase 5 Completion
