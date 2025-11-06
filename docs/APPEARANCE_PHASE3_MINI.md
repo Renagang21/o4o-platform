@@ -253,5 +253,83 @@ new file:   docs/APPEARANCE_PHASE3_MINI.md
 
 ---
 
+## Deployment Results
+
+### Production Deployment - 2025-11-06
+
+**Commits**:
+- `beca78b1e` - Phase 3 Mini (GlobalStyleInjector migration)
+- `c079647a6` - CI build script fix (add appearance-system)
+- `8a757d60d` - Final commit hash
+
+**CI Status**: ✅ Passed (appearance-system dist verification successful)
+
+**Deployment**:
+- **Admin**: 2025.11.06-1027 (deployed at 01:27 UTC)
+- **Main Site**: 1762392559 (deployed at 01:29 UTC)
+
+**Version Verification**:
+```bash
+# Admin
+curl -s https://admin.neture.co.kr/version.json
+{"version":"2025.11.06-1027","buildDate":"2025-11-06T01:27:31.149Z","environment":"production","timestamp":1762392451149}
+
+# Main Site
+curl -s https://neture.co.kr/version.json
+{"version":"1762392559","buildTime":"2025. 11. 06. (목) 01:29:19 UTC"}
+```
+
+**Status**: ✅ Deployed to production
+
+---
+
+## Smoke Test Checklist
+
+### Required Manual Verification (Browser DevTools)
+
+**1. Style Injection**
+- [ ] Open DevTools → Elements → `<head>`
+- [ ] Verify `<style id="o4o-appearance-system">` exists
+- [ ] Verify `<style id="customizer-global-css">` exists (legacy)
+- [ ] Check no duplicate style tags with same IDs
+- [ ] Inspect style content contains `--o4o-button-bg`, `--o4o-breadcrumb-text`, etc.
+
+**2. CSS Variables Applied**
+- [ ] Elements tab → Select any button → Computed styles
+- [ ] Verify `--o4o-button-bg` is defined
+- [ ] Verify `--button-primary-bg` is defined (legacy compat)
+- [ ] Both variables should have the same value
+
+**3. UI Verification (3 pages)**
+
+**Home Page** (`https://neture.co.kr`)
+- [ ] Button hover/active states work correctly
+- [ ] Scroll-to-top button appears on scroll (position, size, color)
+- [ ] No visual regressions
+
+**Category Page** (`https://neture.co.kr/category/...`)
+- [ ] Breadcrumbs display correctly (text color, link color, separator)
+- [ ] Breadcrumb hover states work
+- [ ] Button styles consistent
+
+**Product Detail Page** (`https://neture.co.kr/product/...`)
+- [ ] Add to cart button styles correct
+- [ ] Breadcrumb navigation works
+- [ ] All interactive elements responsive
+
+**4. Console Check**
+- [ ] Open DevTools → Console
+- [ ] No errors related to `GlobalStyleInjector`
+- [ ] No CSS priority conflicts warnings
+- [ ] No missing CSS variable warnings
+
+**5. Network Check**
+- [ ] DevTools → Network → Filter: CSS
+- [ ] Check bundle size hasn't increased significantly
+- [ ] Verify all CSS loaded correctly (no 404s)
+
+---
+
 **Author**: Claude Code
-**Review**: Pending deployment verification
+**Deployed**: 2025-11-06 01:29 UTC
+**Status**: Awaiting manual smoke test verification

@@ -72,13 +72,10 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   // Render separator
   const renderSeparator = () => {
     if (settings.separator === '→') {
-      return <ChevronRight size={14} style={{ color: settings.separatorColor }} />;
+      return <ChevronRight size={14} className="breadcrumb-separator" />;
     }
     return (
-      <span
-        className="breadcrumb-separator"
-        style={{ color: settings.separatorColor }}
-      >
+      <span className="breadcrumb-separator">
         {settings.separator}
       </span>
     );
@@ -112,7 +109,6 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                   <Link
                     to={item.url}
                     className="breadcrumb-link"
-                    style={{ color: settings.linkColor }}
                   >
                     {settings.showIcons && item.icon && (
                       <span className="breadcrumb-icon" dangerouslySetInnerHTML={{ __html: item.icon }} />
@@ -127,7 +123,6 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
                 ) : (
                   <span
                     className="breadcrumb-current"
-                    style={{ color: settings.currentPageColor }}
                     aria-current="page"
                   >
                     {settings.showIcons && item.icon && (
@@ -176,7 +171,11 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         }}
       />
 
-      {/* Inline Styles */}
+      {/*
+        @deprecated Phase 3.5
+        Inline styles are deprecated. CSS variables from GlobalStyleInjector should be used instead.
+        This <style> block remains for backward compatibility with customizer settings.
+      */}
       <style>{`
         .breadcrumbs {
           display: flex;
@@ -210,7 +209,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         }
 
         .breadcrumb-link:hover {
-          color: ${settings.hoverColor} !important;
+          color: var(--o4o-breadcrumb-link-hover, ${settings.hoverColor}) !important;
         }
 
         .breadcrumb-current {
@@ -272,7 +271,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
 
         /* Focus styles for accessibility */
         .breadcrumb-link:focus-visible {
-          outline: 2px solid ${settings.linkColor};
+          outline: 2px solid var(--o4o-breadcrumb-link, ${settings.linkColor});
           outline-offset: 2px;
           border-radius: 2px;
         }
