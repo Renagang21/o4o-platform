@@ -40,6 +40,9 @@ export {
   generateMiniCartCSS,
   generateScrollToTopCSS,
   generateAllCSS,
+  type ButtonOptions,
+  type BreadcrumbOptions,
+  type ScrollToTopOptions,
 } from './css-generators.js';
 
 // Export injection utilities

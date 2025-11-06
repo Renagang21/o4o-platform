@@ -21,11 +21,21 @@ export function injectCSS(css: string, id?: string): void {
     return;
   }
 
-  // TODO: Phase 2 - Implement CSS injection logic
-  // - Check if style element with ID exists
-  // - Update or create new style element
-  // - Insert into document head
-  console.log('TODO: Inject CSS', { id, cssLength: css.length });
+  const styleId = id || STYLE_IDS.APPEARANCE_SYSTEM;
+
+  // Check if style element already exists
+  let styleElement = document.getElementById(styleId) as HTMLStyleElement | null;
+
+  if (styleElement) {
+    // Update existing style element
+    styleElement.textContent = css;
+  } else {
+    // Create new style element
+    styleElement = document.createElement('style');
+    styleElement.id = styleId;
+    styleElement.textContent = css;
+    document.head.appendChild(styleElement);
+  }
 }
 
 /**
