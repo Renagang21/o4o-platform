@@ -36,7 +36,7 @@ describe('CSS Generators', () => {
       const css = generateButtonCSS(defaultTokens, options);
       expect(css).toContain('#ff0000');
       expect(css).toContain('#cc0000');
-      expect(css).toContain('--button-primary-bg-hover');
+      expect(css).toContain('--o4o-button-bg-hover');
     });
 
     it('generates outline button variant', () => {
