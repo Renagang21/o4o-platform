@@ -40,12 +40,21 @@ export class Post {
   status!: 'draft' | 'publish' | 'private' | 'trash'
 
   // Post type field for supporting custom post types
-  @Column({ 
+  @Column({
     type: 'varchar',
     length: 50,
     default: 'post'
   })
   type!: string
+
+  // Phase 6: Multi-tenant support
+  @Column({
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+    comment: 'Tenant identifier for multi-tenant isolation (NULL = global)'
+  })
+  tenant_id!: string | null
 
   @Column({ nullable: true })
   template!: string

@@ -27,3 +27,9 @@ export {
   validateMetaKey,
   validateFieldValue,
 } from './validators.js';
+
+// Runtime validators
+export {
+  validateCPTInput,
+  validateMetaKeyAgainstSchema,
+} from './validators/runtime.js';
