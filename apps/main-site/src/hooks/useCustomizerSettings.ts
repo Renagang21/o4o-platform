@@ -142,7 +142,6 @@ export const useCustomizerSettings = () => {
         if (forceRefresh) {
           // Force refresh: clear cache immediately
           localStorage.removeItem(STORAGE_KEY);
-          console.log('[useCustomizerSettings] Force refresh mode - cache cleared');
         }
 
         // Check cache first
@@ -178,13 +177,6 @@ export const useCustomizerSettings = () => {
 
           // Check if version changed - ALWAYS update if version differs
           const versionChanged = cachedVersion !== undefined && apiVersion !== undefined && apiVersion !== cachedVersion;
-
-          if (versionChanged) {
-            console.log('[useCustomizerSettings] Version changed, force updating...', {
-              cached: cachedVersion,
-              api: apiVersion
-            });
-          }
 
           // Only skip update if version is same AND cache is still valid
           if (!versionChanged && cachedVersion !== undefined && cachedVersion === apiVersion) {

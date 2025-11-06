@@ -386,5 +386,3 @@ const shortcodeStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = shortcodeStyles;
 document.head.appendChild(styleSheet);
-
-console.log('🚀 Dropshipping Shortcodes Initialized:', Object.keys(window.DropshippingShortcodes).length, 'shortcodes registered');

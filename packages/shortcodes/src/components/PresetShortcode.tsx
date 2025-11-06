@@ -115,9 +115,9 @@ function renderViewPreset(preset: ViewPreset, context: any, useMockData: boolean
  */
 function renderFormPreset(preset: FormPreset, _context: any): React.ReactElement {
   const handleSubmit = async (data: Record<string, any>) => {
-    console.log('Form submitted:', data);
     // In a real implementation, this would submit to the API
-    // For now, just log it
+    // For now, form submission is handled by the FormRenderer
+    void data; // Suppress unused variable warning
   };
 
   return (
