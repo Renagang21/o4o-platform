@@ -379,7 +379,7 @@ const PageList = () => {
     if (id) {
       hoverTimeoutRef.current = setTimeout(() => {
         setHoveredRow(id);
-      }, 100);
+      }, 300);
     } else {
       setHoveredRow(null);
     }
