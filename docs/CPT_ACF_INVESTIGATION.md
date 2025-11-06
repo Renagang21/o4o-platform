@@ -6,6 +6,53 @@
 
 ---
 
+## 🎉 최근 업데이트 (2025-11-06)
+
+### Zero-Data Fast Track 완료
+
+**변경사항:**
+- ✅ 정규화된 `post_meta` 테이블 생성 (JSONB 지원)
+- ✅ 레거시 `meta`, `postMeta`, `customFields` 컬럼 제거
+- ✅ 5개 테스트 포스트 + 7개 메타데이터 엔트리 시드
+- ✅ Post.meta 필드를 TypeScript 전용 필드로 전환 (DB 컬럼 없음)
+- ✅ 표준 라우트 검증 완료 (`GET /api/v1/posts` 작동)
+- ✅ 레거시 라우트 deprecation 헤더 적용
+
+**데이터베이스 구조:**
+```sql
+-- 새로운 normalized 구조
+CREATE TABLE post_meta (
+  id UUID PRIMARY KEY,
+  post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
+  meta_key VARCHAR(255) NOT NULL,
+  meta_value JSONB,
+  created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now()
+);
+
+-- 인덱스
+CREATE INDEX idx_post_meta_post_key ON post_meta (post_id, meta_key);
+CREATE INDEX idx_post_meta_key ON post_meta (meta_key);
+```
+
+**마이그레이션 파일:**
+- `20251106_create_post_meta_table.sql` - 테이블 생성
+- `20251106_reset_zero_data.sql` - 데이터 리셋 및 레거시 컬럼 제거
+- `20251106_seed_test_data.sql` - 테스트 데이터 삽입
+
+**API 상태:**
+- `GET /api/v1/posts` - ✅ 작동 (5개 포스트 반환)
+- `GET /api/v1/posts/:id` - ✅ 작동 (meta: {} 반환)
+- `GET /api/posts` - ⚠️ Deprecated (헤더: `Deprecation: true`)
+
+**TODO:**
+- [ ] `/api/v1/posts/:id/meta` 엔드포인트 구현
+- [ ] 레거시 라우트의 `post.meta` 읽기 로직을 `post_meta` 테이블로 마이그레이션
+- [ ] View count 증가 로직을 `post_meta` 테이블로 마이그레이션
+- [ ] GIN 인덱스 추가 (데이터 1000+ 행 도달 시)
+
+---
+
 ## 📊 요약
 
 ### 주요 발견사항
@@ -109,21 +156,37 @@ apps/admin-dashboard/src/components/
 
 ## 3️⃣ 데이터/성능 분석
 
-### 💾 JSONB 사용 현황
+### 💾 JSONB 사용 현황 (2025-11-06 업데이트)
 
 ```sql
--- 현재 테이블 구조
+-- ✅ 새로운 normalized 테이블 구조 (2025-11-06)
 CREATE TABLE post_meta (
-    id UUID PRIMARY KEY,
-    post_id UUID REFERENCES posts(id),
-    meta_key VARCHAR(255),
-    meta_value JSONB,  -- JSONB 타입 사용
-    created_at TIMESTAMP
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    meta_key VARCHAR(255) NOT NULL,
+    meta_value JSONB,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now()
 );
 
--- 인덱스 현황
-CREATE INDEX idx_post_meta_key ON post_meta(meta_key);
--- JSONB GIN 인덱스 누락!
+-- ✅ 인덱스 현황 (복합 인덱스 추가)
+CREATE INDEX idx_post_meta_post_key ON post_meta (post_id, meta_key);  -- 복합 인덱스
+CREATE INDEX idx_post_meta_key ON post_meta (meta_key);
+-- ⚠️ JSONB GIN 인덱스 - 데이터가 1000+ 행 도달 시 추가 예정
+-- CREATE INDEX idx_post_meta_value_gin ON post_meta USING gin (meta_value jsonb_path_ops);
+
+-- ✅ Auto-update trigger
+CREATE TRIGGER trigger_update_post_meta_timestamp
+  BEFORE UPDATE ON post_meta
+  FOR EACH ROW
+  EXECUTE FUNCTION update_post_meta_timestamp();
+```
+
+**변경사항:**
+- `posts` 테이블에서 `meta`, `postMeta`, `customFields` JSON 컬럼 제거
+- Normalized `post_meta` 테이블로 전환 완료
+- Composite index `(post_id, meta_key)` 추가로 조회 성능 최적화
+- Auto-update trigger로 `updated_at` 자동 관리
 ```
 
 ### ⚠️ 성능 위험요소
