@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { apiClient as api } from '../../services/api';
+import { metaApi, MetaItemResponse } from '../../services/metaApi';
 
 interface CPTPost {
   id: string;
@@ -40,6 +41,7 @@ const CPTArchive: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [postMetaMap, setPostMetaMap] = useState<Map<string, MetaItemResponse[]>>(new Map());
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const postsPerPage = 12;
@@ -75,10 +77,10 @@ const CPTArchive: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       if (!cptInfo) return;
-      
+
       try {
         setLoading(true);
-        
+
         const params = new URLSearchParams({
           page: currentPage.toString(),
           limit: postsPerPage.toString(),
@@ -88,14 +90,27 @@ const CPTArchive: React.FC = () => {
         });
 
         const response = await api.get(`/cpt/${cptSlug}/posts?${params}`);
-        
+
         if (response.data.success) {
-          setPosts(response.data.data || []);
+          const fetchedPosts = response.data.data || [];
+          setPosts(fetchedPosts);
           setTotalPages(Math.ceil((response.data.total || 0) / postsPerPage));
+
+          // Phase 4-2: Batch fetch metadata for price display (ds_product only)
+          if (cptSlug === 'ds_product' && fetchedPosts.length > 0) {
+            try {
+              const postIds = fetchedPosts.map((p: CPTPost) => p.id);
+              const metaMap = await metaApi.getBatch(postIds, 'price');
+              setPostMetaMap(metaMap);
+            } catch (metaErr) {
+              console.error('Failed to batch fetch price metadata:', metaErr);
+              // Continue without metadata - graceful fallback
+            }
+          }
         } else {
           setPosts([]);
         }
-        
+
         setError(null);
       } catch (err: any) {
         console.error('Error fetching posts:', err);
@@ -202,12 +217,21 @@ const CPTArchive: React.FC = () => {
                       {post.author && <span>{post.author.name}</span>}
                     </div>
                     
-                    {/* Price for products */}
-                    {cptSlug === 'ds_product' && post.meta?.price && (
-                      <div className="mt-3 text-lg font-bold text-blue-600">
-                        ₩{post.meta.price.toLocaleString()}
-                      </div>
-                    )}
+                    {/* Price for products - Phase 4-2: Use Meta API */}
+                    {cptSlug === 'ds_product' && (() => {
+                      const metaItems = postMetaMap.get(post.id);
+                      const priceItem = metaItems?.find(m => m.meta_key === 'price');
+                      const price = priceItem?.meta_value as number | undefined;
+
+                      if (price) {
+                        return (
+                          <div className="mt-3 text-lg font-bold text-blue-600">
+                            ₩{price.toLocaleString()}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                 </article>
               ))}

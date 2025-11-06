@@ -6,6 +6,7 @@
 import React, { useEffect, useState, createElement } from 'react';
 import { CPTFieldShortcodeAttributes, DynamicShortcodeContext } from './types.js';
 import { ShortcodeProps } from '../types.js';
+import { fetchPostMeta } from '../utils/metaApi.js';
 
 // Field formatters
 const formatters: Record<string, (value: any, format?: string) => string> = {
@@ -106,10 +107,16 @@ export const CPTFieldShortcode: React.FC<ShortcodeProps> = ({ attributes, contex
               fieldValue = currentPost.featuredImage || currentPost.thumbnail;
               break;
             default:
-              // Check in meta or custom fields
-              fieldValue = currentPost.meta?.[field] || 
-                          currentPost.customFields?.[field] || 
-                          currentPost[field];
+              // Phase 4-2: Try Meta API first, fallback to legacy
+              try {
+                const metaValue = await fetchPostMeta(currentPost.id || postId, field);
+                fieldValue = metaValue ?? currentPost.customFields?.[field] ?? currentPost[field];
+              } catch {
+                // Fallback to legacy meta/customFields
+                fieldValue = currentPost.meta?.[field] ||
+                            currentPost.customFields?.[field] ||
+                            currentPost[field];
+              }
           }
           
           setValue(fieldValue);
@@ -164,10 +171,16 @@ export const CPTFieldShortcode: React.FC<ShortcodeProps> = ({ attributes, contex
               fieldValue = post.featuredImage || post.thumbnail;
               break;
             default:
-              // Check in meta or custom fields
-              fieldValue = post.meta?.[field] || 
-                          post.customFields?.[field] || 
-                          post[field];
+              // Phase 4-2: Try Meta API first, fallback to legacy
+              try {
+                const metaValue = await fetchPostMeta(postId, field);
+                fieldValue = metaValue ?? post.customFields?.[field] ?? post[field];
+              } catch {
+                // Fallback to legacy meta/customFields
+                fieldValue = post.meta?.[field] ||
+                            post.customFields?.[field] ||
+                            post[field];
+              }
           }
           
           setValue(fieldValue);
