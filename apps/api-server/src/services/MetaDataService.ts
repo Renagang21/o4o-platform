@@ -256,6 +256,25 @@ export class MetaDataService {
   }
 
   /**
+   * 여러 게시물의 메타 데이터를 배치로 가져옵니다 (Post 전용 헬퍼)
+   * N+1 문제를 방지하기 위한 배치 로딩 메서드
+   *
+   * @param postIds 게시물 ID 배열
+   * @param fieldIds 필드 ID 또는 필드명 배열 (선택사항, 없으면 모든 필드)
+   * @returns 게시물 ID를 키로 하는 메타 데이터 맵
+   *
+   * @example
+   * const metaBatch = await metaDataService.getPostMetaBatch(['post-1', 'post-2']);
+   * const post1Meta = metaBatch['post-1'];
+   */
+  async getPostMetaBatch(
+    postIds: string[],
+    fieldIds?: string[]
+  ): Promise<ManyMetaResult> {
+    return this.getManyMeta('post', postIds, fieldIds);
+  }
+
+  /**
    * 여러 필드 값을 한 번에 저장합니다 (트랜잭션 사용)
    * @param entityType 엔티티 타입
    * @param entityId 엔티티 ID
@@ -263,8 +282,8 @@ export class MetaDataService {
    * @returns 성공 여부
    */
   async setManyMeta(
-    entityType: string, 
-    entityId: string, 
+    entityType: string,
+    entityId: string,
     values: Record<string, string | number | boolean | Date | null | string[] | Record<string, unknown>>
   ): Promise<boolean> {
     const queryRunner = AppDataSource.createQueryRunner();
