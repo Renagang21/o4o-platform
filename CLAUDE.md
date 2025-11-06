@@ -11,12 +11,21 @@
 - **사용자는 자동 배포된 버전만 테스트 가능**
 - 변경사항은 반드시 `git commit && git push` 완료
 - ⚠️ **GitHub Actions가 자주 실패함 - 수동 배포 스크립트 사용 필수**
+
+#### 🔴 중요: Main Site 및 Admin 변경 시 수동 배포 필수
+- **`apps/main-site/**` 또는 `apps/admin-dashboard/**` 파일을 변경한 경우:**
+  - Git 커밋/푸시 후 **반드시 수동 배포 실행**
+  - GitHub Actions 워크플로우가 실행되지 않거나 실패할 수 있음
+  - 배포 없이는 변경사항이 프로덕션에 반영되지 않음
+
 - 수동 배포 스크립트:
   - Admin: `./scripts/deploy-admin-manual.sh`
-  - Main Site: `ssh o4o-web` 후 `/home/ubuntu/o4o-platform` 경로에서 `./scripts/deploy-main-site.sh`
+  - Main Site: `ssh o4o-web "cd /home/ubuntu/o4o-platform && ./scripts/deploy-main-site.sh"`
+
 - 배포 확인:
   - Admin: `curl -s https://admin.neture.co.kr/version.json`
   - Main Site: `curl -s https://neture.co.kr/version.json`
+
 - 로컬 빌드만으로는 사용자 테스트 불가능
 
 ### 3. 디버깅 작업 절차
@@ -83,4 +92,4 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 
 ---
 
-*최종 업데이트: 2025-10-17*
+*최종 업데이트: 2025-11-06*
