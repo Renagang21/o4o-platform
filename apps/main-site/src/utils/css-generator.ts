@@ -1,13 +1,21 @@
 /**
- * CSS Generator for Main Site
- * Generates CSS from customizer settings
- * Adapted from admin-dashboard css-generator
+ * @deprecated Phase 7: This file should be migrated to @o4o/appearance-system
+ *
+ * Current status: Phase 6 cleanup complete (legacy variables removed)
+ * Next step: Expand appearance-system to handle header, footer, typography, blog CSS
+ *
+ * Until then, this file is still needed for full customizer functionality.
+ *
+ * Note: Button, Breadcrumb, and ScrollToTop CSS generation removed in Phase 6.
+ * These components are now handled by @o4o/appearance-system.
  */
 
 import { CustomizerSettings } from '../hooks/useCustomizerSettings';
 
 /**
  * Generate CSS from customizer settings
+ *
+ * @deprecated Phase 6: Button/Breadcrumb/ScrollToTop removed - use @o4o/appearance-system
  */
 export function generateCSS(settings: CustomizerSettings): string {
   const css: string[] = [];
@@ -32,9 +40,9 @@ export function generateCSS(settings: CustomizerSettings): string {
   css.push(...generateFooterCSS(settings));
   css.push(...generateContainerCSS(settings));
   css.push(...generateBlogCSS(settings));
-  css.push(...generateButtonCSS(settings));
-  css.push(...generateBreadcrumbCSS(settings));
-  css.push(...generateScrollToTopCSS(settings));
+
+  // Phase 6: Button/Breadcrumb/ScrollToTop generation removed
+  // These are now handled by @o4o/appearance-system
 
   // Add custom CSS if present
   if (settings.customCSS) {
@@ -610,147 +618,12 @@ function generateBlogCSS(settings: CustomizerSettings): string[] {
   return css;
 }
 
-function generateButtonCSS(settings: CustomizerSettings): string[] {
-  const css: string[] = [];
-  const buttons = (settings as any).buttons;
-
-  if (!buttons) return css;
-
-  // CSS Variables for button styling
-  css.push(':root {');
-
-  // Primary button variables
-  if (buttons.primary) {
-    css.push(`  --button-primary-bg: ${buttons.primary.backgroundColor || 'var(--wp-color-primary-500)'};`);
-    css.push(`  --button-primary-text: ${buttons.primary.textColor || '#ffffff'};`);
-    css.push(`  --button-primary-border-radius: ${buttons.primary.borderRadius || 4}px;`);
-    css.push(`  --button-primary-padding-v: ${buttons.primary.paddingVertical || 12}px;`);
-    css.push(`  --button-primary-padding-h: ${buttons.primary.paddingHorizontal || 24}px;`);
-
-    if (buttons.primary.hoverBackgroundColor) {
-      css.push(`  --button-primary-bg-hover: ${buttons.primary.hoverBackgroundColor};`);
-    }
-  }
-
-  // Secondary button variables
-  if (buttons.secondary) {
-    css.push(`  --button-secondary-bg: ${buttons.secondary.backgroundColor || '#6c757d'};`);
-    css.push(`  --button-secondary-text: ${buttons.secondary.textColor || '#ffffff'};`);
-  }
-
-  // Outline button variables
-  if (buttons.outline) {
-    css.push(`  --button-outline-border: ${buttons.outline.borderColor || 'var(--wp-color-primary-500)'};`);
-    css.push(`  --button-outline-text: ${buttons.outline.textColor || 'var(--wp-color-primary-500)'};`);
-    css.push(`  --button-outline-border-width: ${buttons.outline.borderWidth || 1}px;`);
-  }
-
-  css.push('}');
-
-  // Apply button styles using CSS variables
-  css.push('.wp-element-button, .ast-button, button[type="submit"], .btn-primary {');
-  css.push('  background-color: var(--button-primary-bg, var(--wp-color-primary-500));');
-  css.push('  color: var(--button-primary-text, #ffffff);');
-  css.push('  border-radius: var(--button-primary-border-radius, 4px);');
-  css.push('  padding: var(--button-primary-padding-v, 12px) var(--button-primary-padding-h, 24px);');
-  css.push('  border: none;');
-  css.push('  transition: all 0.3s;');
-  css.push('}');
-
-  css.push('.wp-element-button:hover, .ast-button:hover, button[type="submit"]:hover, .btn-primary:hover {');
-  css.push('  background-color: var(--button-primary-bg-hover, var(--button-primary-bg, var(--wp-color-primary-500)));');
-  css.push('  opacity: 0.9;');
-  css.push('}');
-
-  // Link styling to use primary color
-  css.push('a {');
-  css.push('  color: var(--wp-link-color, var(--wp-color-primary-500));');
-  css.push('}');
-
-  css.push('a:hover {');
-  css.push('  color: var(--wp-link-color-hover, var(--wp-link-color, var(--wp-color-primary-500)));');
-  css.push('}');
-
-  return css;
-}
-
-function generateBreadcrumbCSS(settings: CustomizerSettings): string[] {
-  const css: string[] = [];
-  const breadcrumbs = (settings as any).breadcrumbs;
-
-  if (!breadcrumbs) return css;
-
-  css.push(':root {');
-
-  if (breadcrumbs.styling) {
-    css.push(`  --breadcrumb-text-color: ${breadcrumbs.styling.textColor || '#6c757d'};`);
-    css.push(`  --breadcrumb-link-color: ${breadcrumbs.styling.linkColor || 'var(--wp-link-color)'};`);
-    css.push(`  --breadcrumb-separator-color: ${breadcrumbs.styling.separatorColor || '#6c757d'};`);
-    css.push(`  --breadcrumb-font-size: ${breadcrumbs.styling.fontSize || 14}px;`);
-  }
-
-  css.push('}');
-
-  // Apply breadcrumb styles
-  css.push('.ast-breadcrumbs, .breadcrumb, nav[aria-label="breadcrumb"] {');
-  css.push('  color: var(--breadcrumb-text-color, #6c757d);');
-  css.push('  font-size: var(--breadcrumb-font-size, 14px);');
-  css.push('}');
-
-  css.push('.ast-breadcrumbs a, .breadcrumb a, nav[aria-label="breadcrumb"] a {');
-  css.push('  color: var(--breadcrumb-link-color, var(--wp-link-color));');
-  css.push('  text-decoration: none;');
-  css.push('}');
-
-  css.push('.ast-breadcrumbs .separator, .breadcrumb-separator {');
-  css.push('  color: var(--breadcrumb-separator-color, #6c757d);');
-  css.push('  margin: 0 8px;');
-  css.push('}');
-
-  return css;
-}
-
-function generateScrollToTopCSS(settings: CustomizerSettings): string[] {
-  const css: string[] = [];
-  const scrollToTop = (settings as any).scrollToTop;
-
-  if (!scrollToTop || !scrollToTop.enabled) return css;
-
-  css.push(':root {');
-
-  if (scrollToTop.styling) {
-    css.push(`  --scroll-top-bg: ${scrollToTop.styling.backgroundColor || 'var(--wp-color-primary-500)'};`);
-    css.push(`  --scroll-top-icon-color: ${scrollToTop.styling.iconColor || '#ffffff'};`);
-    css.push(`  --scroll-top-size: ${scrollToTop.styling.size || 40}px;`);
-    css.push(`  --scroll-top-border-radius: ${scrollToTop.styling.borderRadius || 4}px;`);
-    css.push(`  --scroll-top-position-bottom: ${scrollToTop.position?.bottom || 30}px;`);
-    css.push(`  --scroll-top-position-right: ${scrollToTop.position?.right || 30}px;`);
-  }
-
-  css.push('}');
-
-  // Apply scroll to top styles
-  css.push('.ast-scroll-to-top, .scroll-to-top, #scroll-to-top {');
-  css.push('  background-color: var(--scroll-top-bg, var(--wp-color-primary-500));');
-  css.push('  color: var(--scroll-top-icon-color, #ffffff);');
-  css.push('  width: var(--scroll-top-size, 40px);');
-  css.push('  height: var(--scroll-top-size, 40px);');
-  css.push('  border-radius: var(--scroll-top-border-radius, 4px);');
-  css.push('  position: fixed;');
-  css.push('  bottom: var(--scroll-top-position-bottom, 30px);');
-  css.push('  right: var(--scroll-top-position-right, 30px);');
-  css.push('  z-index: 999;');
-  css.push('  display: flex;');
-  css.push('  align-items: center;');
-  css.push('  justify-content: center;');
-  css.push('  cursor: pointer;');
-  css.push('  transition: all 0.3s;');
-  css.push('}');
-
-  css.push('.ast-scroll-to-top:hover, .scroll-to-top:hover, #scroll-to-top:hover {');
-  css.push('  opacity: 0.8;');
-  css.push('  transform: translateY(-2px);');
-  css.push('}');
-
-  return css;
-}
+/**
+ * Phase 6: Button/Breadcrumb/ScrollToTop CSS generation removed
+ *
+ * These functions have been deleted as they generated legacy variables.
+ * Use @o4o/appearance-system generators instead:
+ * - generateButtonCSS()
+ * - generateBreadcrumbCSS()
+ * - generateScrollToTopCSS()
+ */

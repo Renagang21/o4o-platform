@@ -19,10 +19,10 @@ describe('CSS Generators', () => {
   describe('generateButtonCSS', () => {
     it('generates default button styles', () => {
       const css = generateButtonCSS(defaultTokens);
-      expect(css).toContain('--button-primary-bg');
+      // Phase 6: Legacy variables removed
       expect(css).toContain('--o4o-button-bg');
       expect(css).toContain('.wp-element-button');
-      expect(css).toContain('background-color: var(--button-primary-bg');
+      expect(css).toContain('background-color: var(--o4o-button-bg');
       expect(typeof css).toBe('string');
       expect(css.length).toBeGreaterThan(0);
     });
@@ -53,10 +53,10 @@ describe('CSS Generators', () => {
   describe('generateBreadcrumbCSS', () => {
     it('generates default breadcrumb styles', () => {
       const css = generateBreadcrumbCSS(defaultTokens);
-      expect(css).toContain('--breadcrumb-text-color');
+      // Phase 6: Legacy variables removed
       expect(css).toContain('--o4o-breadcrumb-text');
       expect(css).toContain('.ast-breadcrumbs');
-      expect(css).toContain('color: var(--breadcrumb-text-color');
+      expect(css).toContain('color: var(--o4o-breadcrumb-text');
       expect(typeof css).toBe('string');
       expect(css.length).toBeGreaterThan(0);
     });
@@ -86,7 +86,7 @@ describe('CSS Generators', () => {
   describe('generateScrollToTopCSS', () => {
     it('generates default scroll-to-top styles', () => {
       const css = generateScrollToTopCSS(defaultTokens);
-      expect(css).toContain('--scroll-top-bg');
+      // Phase 6: Legacy variables removed
       expect(css).toContain('--o4o-scroll-top-bg');
       expect(css).toContain('.ast-scroll-to-top');
       expect(css).toContain('position: fixed');
@@ -137,9 +137,10 @@ describe('CSS Generators', () => {
     it('combines all CSS generators', () => {
       const css = generateAllCSS(defaultTokens);
       expect(css).toContain('O4O Appearance System');
-      expect(css).toContain('--button-primary-bg');
-      expect(css).toContain('--breadcrumb-text-color');
-      expect(css).toContain('--scroll-top-bg');
+      // Phase 6: Legacy variables removed - now using --o4o-* only
+      expect(css).toContain('--o4o-button-bg');
+      expect(css).toContain('--o4o-breadcrumb-text');
+      expect(css).toContain('--o4o-scroll-top-bg');
       expect(typeof css).toBe('string');
       expect(css.length).toBeGreaterThan(500);
     });

@@ -1,10 +1,16 @@
 /**
- * CSS Generator for API Server
- * Generates CSS from customizer settings for /api/v1/customizer/global-css endpoint
+ * @deprecated Phase 7: This file should be migrated to @o4o/appearance-system
+ *
+ * Current status: Phase 6 - No legacy variables found (this file doesn't generate button/breadcrumb/scroll-to-top CSS)
+ * Next step: Expand appearance-system to handle header, footer, typography CSS generation
+ *
+ * Until then, this file is still needed for API endpoint /api/v1/settings/global-css
  */
 
 /**
- * Generate CSS from customizer settings
+ * Generate CSS from customizer settings for API endpoint
+ *
+ * @deprecated Phase 7: Migrate to @o4o/appearance-system
  */
 export function generateGlobalCSS(settings: any): string {
   const css: string[] = [];

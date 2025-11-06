@@ -200,9 +200,41 @@ import { generateCSS } from '@o4o/appearance-system';
 - 0개 파일 삭제
 - Bundle 크기 변화: 영향 없음 (CSS 변수명만 변경)
 
-**Next Steps (Phase 5)**:
-- 문서화 및 가이드 작성
-- Storybook 통합 (선택)
+### Phase 6 완료 보고 (2025-11-06)
+
+**실행 내용**:
+1. ✅ **CSS 생성기 정리**
+   - 레거시 Button/Breadcrumb/ScrollToTop 함수 제거
+   - Admin-dashboard, Main-site, API-server 모두 업데이트
+   - @deprecated 주석 추가 (Phase 7 migration 안내)
+
+2. ✅ **테스트 업데이트**
+   - 레거시 변수 기대값 제거 (`--button-primary-*`, `--breadcrumb-*-color`, `--scroll-top-*`)
+   - 표준 변수만 검증 (`--o4o-*`)
+
+3. ✅ **빌드 검증**
+   - appearance-system: 빌드 성공
+   - main-site: 빌드 성공 (4.82s)
+   - 레거시 변수 검색: CustomCSSSection.tsx만 남음 (의도적 유지 for autocomplete)
+
+**검증 결과**:
+- ✅ TypeScript 빌드 성공 (appearance-system)
+- ✅ Main-site 빌드 성공 (4.82s)
+- ✅ 레거시 변수 제거 완료 (autocomplete 제외)
+- ✅ 테스트 기대값 업데이트 완료
+
+**영향 범위**:
+- 6개 파일 수정
+- ~150줄 삭제 (레거시 함수 제거)
+- 0개 파일 추가
+- Bundle 크기 변화: 영향 없음 (legacy generation만 제거)
+
+**Status**: ✅ Phase 6 Complete
+
+**Next Steps (Phase 7)**:
+- Expand @o4o/appearance-system to handle header, footer, typography, blog CSS
+- Remove deprecated css-generator files completely
+- Full migration to centralized appearance system
 
 ## Phase 5: 문서화 및 가이드 (2일)
 
