@@ -100,58 +100,112 @@ router.post('/login',
   })
 );
 
-// 회원가입
+// 회원가입 핸들러 (공통 로직)
+const signupHandler = asyncHandler(async (req, res, next) => {
+  // Validation check
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new ValidationError('Validation failed', errors.array());
+  }
+
+  const { email, password, passwordConfirm, name, tos } = req.body;
+
+  // Check if signup is allowed
+  if (env.getString('AUTH_ALLOW_SIGNUP', 'true') !== 'true') {
+    throw new BadRequestError('Signup is currently disabled', 'SIGNUP_DISABLED');
+  }
+
+  // Check if database is initialized
+  if (!AppDataSource.isInitialized) {
+    throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
+  }
+
+  // 비밀번호 확인 검증
+  if (password !== passwordConfirm) {
+    throw new BadRequestError('Passwords do not match', 'PASSWORD_MISMATCH');
+  }
+
+  // 약관 동의 검증
+  if (!tos) {
+    throw new BadRequestError('Terms of service must be accepted', 'TOS_NOT_ACCEPTED');
+  }
+
+  const userRepository = AppDataSource.getRepository(User);
+
+  // 이메일 중복 확인
+  const existingUser = await userRepository.findOne({ where: { email } });
+  if (existingUser) {
+    throw new BadRequestError('Email already exists', 'EMAIL_EXISTS');
+  }
+
+  // 비밀번호 해싱
+  const hashedPassword = await bcrypt.hash(password, env.getNumber('BCRYPT_ROUNDS', 12));
+
+  // 새 사용자 생성
+  const user = new User();
+  user.email = email;
+  user.password = hashedPassword;
+  user.name = name || email.split('@')[0]; // 이름이 없으면 이메일 앞부분 사용
+  user.role = UserRole.CUSTOMER; // 기본 역할
+  user.status = UserStatus.ACTIVE; // 즉시 활성화 (승인 대기 없음)
+
+  await userRepository.save(user);
+
+  // JWT 토큰 생성 (즉시 로그인)
+  const token = jwt.sign(
+    { userId: user.id, email: user.email, role: user.role },
+    env.getString('JWT_SECRET'),
+    { expiresIn: '7d' }
+  );
+
+  // 역할별 기본 리다이렉트 경로
+  const getRedirectPath = (role: UserRole): string => {
+    switch (role) {
+      case UserRole.SELLER:
+        return '/seller/dashboard';
+      case UserRole.PARTNER:
+        return '/partner/portal';
+      case UserRole.OPERATOR:
+      case UserRole.ADMIN:
+        return '/admin';
+      default:
+        return '/';
+    }
+  };
+
+  return res.status(201).json({
+    success: true,
+    message: 'Signup successful',
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      status: user.status
+    },
+    redirectUrl: getRedirectPath(user.role)
+  });
+});
+
+// 회원가입 (새 엔드포인트)
+router.post('/signup',
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain uppercase, lowercase, number and special character'),
+  body('passwordConfirm').notEmpty().withMessage('Password confirmation is required'),
+  body('name').optional().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+  body('tos').isBoolean().equals('true').withMessage('Terms of service must be accepted'),
+  signupHandler
+);
+
+// 회원가입 (레거시 엔드포인트 - 호환성 유지)
 router.post('/register',
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('name').isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
-  asyncHandler(async (req, res, next) => {
-    // Validation check
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new ValidationError('Validation failed', errors.array());
-    }
-
-    const { email, password, name } = req.body;
-    
-    // Check if database is initialized
-    if (!AppDataSource.isInitialized) {
-      throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
-    }
-    
-    const userRepository = AppDataSource.getRepository(User);
-    
-    // 이메일 중복 확인
-    const existingUser = await userRepository.findOne({ where: { email } });
-    if (existingUser) {
-      throw new BadRequestError('Email already exists', 'EMAIL_EXISTS');
-    }
-
-    // 비밀번호 해싱
-    const hashedPassword = await bcrypt.hash(password, env.getNumber('BCRYPT_ROUNDS', 12));
-
-    // 새 사용자 생성
-    const user = new User();
-    user.email = email;
-    user.password = hashedPassword;
-    user.name = name;
-    user.role = UserRole.CUSTOMER; // 기본 역할
-    user.status = UserStatus.PENDING; // 관리자 승인 필요
-
-    await userRepository.save(user);
-
-    return res.status(201).json({
-      success: true,
-      message: 'Registration successful. Please wait for admin approval.',
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        status: user.status
-      }
-    });
-  })
+  signupHandler
 );
 
 // 토큰 검증
