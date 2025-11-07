@@ -8,6 +8,7 @@ import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
 import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
 import Logout from './pages/auth/Logout';
 import FindId from './pages/auth/FindId';
 import FindPassword from './pages/auth/FindPassword';
@@ -88,6 +89,12 @@ const App: FC = () => {
           } />
           
           {/* Auth Routes */}
+          {/* Signup - Hardcoded */}
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/register" element={<Signup />} />
+          <Route path="/auth/signup" element={<Signup />} />
+          <Route path="/auth/register" element={<Signup />} />
+
           {/* Logout - Hardcoded (auto-processing page, no customization needed) */}
           <Route path="/logout" element={<Logout />} />
 

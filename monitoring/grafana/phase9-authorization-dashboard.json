@@ -1,0 +1,390 @@
+{
+  "dashboard": {
+    "title": "Phase 9: Seller Authorization System",
+    "uid": "phase9-seller-auth",
+    "timezone": "Asia/Seoul",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Volume by Action",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(seller_auth_requests_total{action=\"request\"}[5m])",
+            "legendFormat": "Requests",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(seller_auth_requests_total{action=\"approve\"}[5m])",
+            "legendFormat": "Approvals",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(seller_auth_requests_total{action=\"reject\"}[5m])",
+            "legendFormat": "Rejections",
+            "refId": "C"
+          },
+          {
+            "expr": "rate(seller_auth_requests_total{action=\"revoke\"}[5m])",
+            "legendFormat": "Revocations",
+            "refId": "D"
+          },
+          {
+            "expr": "rate(seller_auth_requests_total{action=\"cancel\"}[5m])",
+            "legendFormat": "Cancellations",
+            "refId": "E"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqps",
+            "label": "Requests/sec"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(seller_auth_requests_total{result=\"error\"}[5m])",
+            "legendFormat": "Error Rate",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(seller_auth_requests_total{result=\"success\"}[5m])",
+            "legendFormat": "Success Rate",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqps",
+            "label": "Requests/sec"
+          }
+        ],
+        "alert": {
+          "name": "High Authorization Error Rate",
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [0.01],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["A", "5m", "now"]
+              },
+              "reducer": {
+                "params": [],
+                "type": "avg"
+              },
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "for": "10m",
+          "frequency": "1m",
+          "message": "Authorization error rate exceeded 0.01 req/s",
+          "noDataState": "no_data"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Gate Latency (P95/P99)",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(seller_auth_gate_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 Latency",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(seller_auth_gate_duration_seconds_bucket[5m]))",
+            "legendFormat": "P99 Latency",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(seller_auth_gate_duration_seconds_bucket{cache_hit=\"true\"}[5m]))",
+            "legendFormat": "P95 (Cache Hit)",
+            "refId": "C"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(seller_auth_gate_duration_seconds_bucket{cache_hit=\"false\"}[5m]))",
+            "legendFormat": "P95 (Cache Miss)",
+            "refId": "D"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Duration",
+            "logBase": 1
+          }
+        ],
+        "alert": {
+          "name": "Slow Gate Performance",
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [0.015],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["A", "5m", "now"]
+              },
+              "reducer": {
+                "params": [],
+                "type": "avg"
+              },
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "for": "15m",
+          "frequency": "1m",
+          "message": "P95 gate latency exceeded 15ms",
+          "noDataState": "no_data"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Cache Hit Rate",
+        "type": "gauge",
+        "gridPos": {
+          "x": 12,
+          "y": 8,
+          "w": 6,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "seller_auth_cache_hit_rate",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 0.7
+                },
+                {
+                  "color": "green",
+                  "value": 0.8
+                }
+              ]
+            },
+            "unit": "percentunit"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Gate Denies by Stage",
+        "type": "graph",
+        "gridPos": {
+          "x": 18,
+          "y": 8,
+          "w": 6,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(seller_auth_gate_denies_total{stage=\"cart\"}[5m])",
+            "legendFormat": "Cart Denies",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(seller_auth_gate_denies_total{stage=\"order\"}[5m])",
+            "legendFormat": "Order Denies",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(seller_auth_gate_denies_total{stage=\"settlement\"}[5m])",
+            "legendFormat": "Settlement Denies",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqps",
+            "label": "Denies/sec"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Business Rules - Limit Rejections",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 16,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(seller_auth_limit_rejections_total[1h])",
+            "legendFormat": "Limit Rejections/hour",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqph",
+            "label": "Rejections/hour"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Business Rules - Cooldown Blocks",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 16,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(seller_auth_cooldown_blocks_total[1h])",
+            "legendFormat": "Cooldown Blocks/hour",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqph",
+            "label": "Blocks/hour"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Supplier Inbox Size",
+        "type": "heatmap",
+        "gridPos": {
+          "x": 0,
+          "y": 24,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "seller_auth_inbox_size",
+            "legendFormat": "{{supplierId}}",
+            "refId": "A"
+          }
+        ],
+        "yAxis": {
+          "format": "short",
+          "label": "Pending Requests"
+        }
+      },
+      {
+        "id": 9,
+        "title": "Total Pending Requests (All Suppliers)",
+        "type": "stat",
+        "gridPos": {
+          "x": 12,
+          "y": 24,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "sum(seller_auth_inbox_size)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 50
+                },
+                {
+                  "color": "red",
+                  "value": 100
+                }
+              ]
+            },
+            "unit": "short"
+          }
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus"
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "datasource": "prometheus",
+          "enable": true,
+          "expr": "changes(seller_auth_requests_total[5m]) > 0",
+          "name": "Deployment Events",
+          "step": "60s",
+          "tagKeys": "deployment",
+          "textFormat": "Deployment detected",
+          "titleFormat": "Deployment"
+        }
+      ]
+    }
+  }
+}

@@ -69,14 +69,10 @@ export class AuthClient {
 
           try {
             const refreshToken = localStorage.getItem('refreshToken');
-            
+
             if (refreshToken) {
-              // Call refresh endpoint - remove /v1 from baseURL for auth endpoints
-              const refreshUrl = this.baseURL.includes('api.neture.co.kr') 
-                ? 'https://api.neture.co.kr/api/auth/refresh'
-                : `${this.baseURL.replace('/v1', '')}/auth/refresh`;
-                
-              const response = await axios.post(refreshUrl, { refreshToken });
+              // Call refresh endpoint using baseURL
+              const response = await this.api.post('/auth/refresh', { refreshToken });
               const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken: string; refreshToken?: string };
               
               // Update tokens
@@ -140,16 +136,8 @@ export class AuthClient {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // For production API server, use the correct auth endpoint
-    let authUrl: string;
-    if (this.baseURL.includes('api.neture.co.kr')) {
-      // Production API server - use /api/auth/login
-      authUrl = 'https://api.neture.co.kr/api/auth/login';
-    } else {
-      // Development - remove /v1 from baseURL for auth endpoints
-      authUrl = `${this.baseURL.replace('/v1', '')}/auth/login`;
-    }
-    const response = await axios.post(authUrl, credentials);
+    // Use baseURL /auth/login (will become /api/v1/auth/login)
+    const response = await this.api.post('/auth/login', credentials);
     return response.data as AuthResponse;
   }
 
@@ -170,28 +158,14 @@ export class AuthClient {
 
   async logout(): Promise<void> {
     try {
-      // For production API server, use the correct auth endpoint
-      let authUrl: string;
-      if (this.baseURL.includes('api.neture.co.kr')) {
-        // Production API server - use /api/auth/logout
-        authUrl = 'https://api.neture.co.kr/api/auth/logout';
-      } else {
-        // Development - remove /v1 from baseURL for auth endpoints
-        authUrl = `${this.baseURL.replace('/v1', '')}/auth/logout`;
-      }
-      
-      // Get token for authorization
-      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-      if (token) {
-        await axios.post(authUrl, {}, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-      }
+      // Use baseURL /auth/logout (will become /api/v1/auth/logout)
+      await this.api.post('/auth/logout', {});
     } catch (error) {
       // Even if logout fails (e.g., token expired), continue with local cleanup
       // This is normal if token expired
+    } finally {
+      // Always clear local tokens
+      this.clearAllTokens();
     }
   }
 
