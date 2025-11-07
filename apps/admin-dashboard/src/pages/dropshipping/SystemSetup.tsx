@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, RefreshCw, Database, Loader, AlertTriangle, Play, Zap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { apiClient as api } from '../../services/api';
+import { authClient } from '@o4o/auth-client';
 
 interface SystemStatus {
   cpts: {
@@ -33,14 +34,10 @@ const SystemSetup: React.FC = () => {
   const checkSystemStatus = async () => {
     setLoading(true);
     try {
-      // Fetch actual system status from API
-      const response = await fetch('/api/admin/dropshipping/system-status');
-      if (response.ok) {
-        const data = await response.json();
-        setStatus(data);
-      } else {
-        console.error('Failed to fetch system status');
-        toast.error('시스템 상태 확인 실패');
+      // Fetch actual system status from API using authClient
+      const response = await authClient.api.get('/admin/dropshipping/system-status');
+      if (response.data) {
+        setStatus(response.data);
       }
     } catch (error) {
       console.error('Error checking system status:', error);
@@ -55,20 +52,9 @@ const SystemSetup: React.FC = () => {
 
     setInitializing(true);
     try {
-      const response = await fetch('/api/admin/dropshipping/initialize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        toast.success('시스템이 성공적으로 초기화되었습니다');
-        await checkSystemStatus();
-      } else {
-        toast.error('시스템 초기화에 실패했습니다');
-      }
+      await authClient.api.post('/admin/dropshipping/initialize');
+      toast.success('시스템이 성공적으로 초기화되었습니다');
+      await checkSystemStatus();
     } catch (error) {
       console.error('Error initializing system:', error);
       toast.error('시스템 초기화에 실패했습니다');
@@ -82,23 +68,13 @@ const SystemSetup: React.FC = () => {
 
     setSeeding(true);
     try {
-      const response = await fetch('/api/admin/dropshipping/seed', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(`샘플 데이터가 생성되었습니다: 
-          공급자 ${data.suppliers || 0}개, 
-          파트너 ${data.partners || 0}개, 
-          상품 ${data.products || 0}개`);
-        await checkSystemStatus();
-      } else {
-        toast.error('샘플 데이터 생성에 실패했습니다');
-      }
+      const response = await authClient.api.post('/admin/dropshipping/seed');
+      const data = response.data;
+      toast.success(`샘플 데이터가 생성되었습니다:
+        공급자 ${data.suppliers || 0}개,
+        파트너 ${data.partners || 0}개,
+        상품 ${data.products || 0}개`);
+      await checkSystemStatus();
     } catch (error) {
       console.error('Error creating sample data:', error);
       toast.error('샘플 데이터 생성에 실패했습니다');
