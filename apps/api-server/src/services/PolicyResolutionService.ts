@@ -5,6 +5,7 @@ import { Product } from '../entities/Product.js';
 import { Supplier } from '../entities/Supplier.js';
 import FeatureFlags from '../config/featureFlags.js';
 import logger from '../utils/logger.js';
+import metricsService from './metrics.service.js';
 
 /**
  * PolicyResolutionService
@@ -86,28 +87,50 @@ export class PolicyResolutionService {
       // Priority 1: Product Policy Override
       const productPolicy = await this.resolveProductPolicy(context);
       if (productPolicy) {
+        const resolutionTimeMs = Date.now() - startTime;
+
         logger.info('[PolicyResolution] Resolved to product policy', {
           policyId: productPolicy.id,
-          resolutionLevel: 'product'
+          resolutionLevel: 'product',
+          resolutionTimeMs
         });
+
+        // Record metrics
+        metricsService.recordPolicyResolution({
+          source: 'product',
+          durationMs: resolutionTimeMs,
+          success: true
+        });
+
         return {
           policy: productPolicy,
           resolutionLevel: 'product',
-          resolutionTimeMs: Date.now() - startTime
+          resolutionTimeMs
         };
       }
 
       // Priority 2: Supplier Policy
       const supplierPolicy = await this.resolveSupplierPolicy(context);
       if (supplierPolicy) {
+        const resolutionTimeMs = Date.now() - startTime;
+
         logger.info('[PolicyResolution] Resolved to supplier policy', {
           policyId: supplierPolicy.id,
-          resolutionLevel: 'supplier'
+          resolutionLevel: 'supplier',
+          resolutionTimeMs
         });
+
+        // Record metrics
+        metricsService.recordPolicyResolution({
+          source: 'supplier',
+          durationMs: resolutionTimeMs,
+          success: true
+        });
+
         return {
           policy: supplierPolicy,
           resolutionLevel: 'supplier',
-          resolutionTimeMs: Date.now() - startTime
+          resolutionTimeMs
         };
       }
 
@@ -120,30 +143,61 @@ export class PolicyResolutionService {
       // Priority 4: Default Policy
       const defaultPolicy = await this.resolveDefaultPolicy(context);
       if (defaultPolicy) {
+        const resolutionTimeMs = Date.now() - startTime;
+
         logger.info('[PolicyResolution] Resolved to default policy', {
           policyId: defaultPolicy.id,
-          resolutionLevel: 'default'
+          resolutionLevel: 'default',
+          resolutionTimeMs
         });
+
+        // Record metrics
+        metricsService.recordPolicyResolution({
+          source: 'default',
+          durationMs: resolutionTimeMs,
+          success: true
+        });
+
         return {
           policy: defaultPolicy,
           resolutionLevel: 'default',
-          resolutionTimeMs: Date.now() - startTime
+          resolutionTimeMs
         };
       }
 
       // Safe Mode: No policy found
+      const resolutionTimeMs = Date.now() - startTime;
+
       logger.warn('[PolicyResolution] No valid policy found - entering safe mode', {
         productId: context.productId,
         supplierId: context.supplierId,
-        partnerId: context.partnerId
+        partnerId: context.partnerId,
+        resolutionTimeMs
+      });
+
+      // Record metrics for safe mode
+      metricsService.recordPolicyResolution({
+        source: 'safe_mode',
+        durationMs: resolutionTimeMs,
+        success: true
       });
 
       return null; // Triggers 0% commission
 
     } catch (error: any) {
+      const resolutionTimeMs = Date.now() - startTime;
+
       logger.error('[PolicyResolution] Error during policy resolution', {
         error: error.message,
-        context
+        context,
+        resolutionTimeMs
+      });
+
+      // Record error metrics
+      metricsService.recordPolicyResolution({
+        source: 'default',
+        durationMs: resolutionTimeMs,
+        success: false
       });
 
       // Fallback to default policy on error
@@ -152,7 +206,7 @@ export class PolicyResolutionService {
         return {
           policy: defaultPolicy,
           resolutionLevel: 'default',
-          resolutionTimeMs: Date.now() - startTime
+          resolutionTimeMs
         };
       }
 
@@ -222,18 +276,39 @@ export class PolicyResolutionService {
     const defaultPolicy = await this.resolveDefaultPolicy(context);
 
     if (defaultPolicy) {
+      const resolutionTimeMs = Date.now() - startTime;
+
       logger.info('[PolicyResolution] Legacy mode - resolved to default policy', {
-        policyId: defaultPolicy.id
+        policyId: defaultPolicy.id,
+        resolutionTimeMs
       });
+
+      // Record metrics for legacy mode
+      metricsService.recordPolicyResolution({
+        source: 'default',
+        durationMs: resolutionTimeMs,
+        success: true
+      });
+
       return {
         policy: defaultPolicy,
         resolutionLevel: 'default',
-        resolutionTimeMs: Date.now() - startTime
+        resolutionTimeMs
       };
     }
 
+    const resolutionTimeMs = Date.now() - startTime;
+
     logger.warn('[PolicyResolution] Legacy mode - no default policy found', {
-      productId: context.productId
+      productId: context.productId,
+      resolutionTimeMs
+    });
+
+    // Record metrics for safe mode in legacy
+    metricsService.recordPolicyResolution({
+      source: 'safe_mode',
+      durationMs: resolutionTimeMs,
+      success: true
     });
 
     return null; // Safe mode
