@@ -1131,10 +1131,10 @@ router.put('/auth', authenticate, requireAdmin, async (req: Request, res: Respon
 
 /**
  * @route   GET /api/v1/settings/oauth
- * @desc    Get OAuth settings
- * @access  Private (Admin only)
+ * @desc    Get OAuth settings (Public - for login form to display providers)
+ * @access  Public
  */
-router.get('/oauth', authenticate, requireAdmin, async (req: Request, res: Response) => {
+router.get('/oauth', async (req: Request, res: Response) => {
   try {
     // Get OAuth settings from database
     const settingsRepository = AppDataSource.getRepository(Settings);
@@ -1142,44 +1142,55 @@ router.get('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
       where: { key: 'oauth', type: 'oauth' }
     });
 
+    let oauthSettings: any = {};
+
     if (dbSettings && dbSettings.value) {
-      return res.json({
-        success: true,
-        data: dbSettings.value
-      });
+      oauthSettings = dbSettings.value as any;
+    } else {
+      // Fallback to default OAuth settings
+      oauthSettings = {
+        google: {
+          provider: 'google',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        },
+        kakao: {
+          provider: 'kakao',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        },
+        naver: {
+          provider: 'naver',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        }
+      };
     }
 
-    // Fallback to default OAuth settings
-    const defaultSettings = {
-      google: {
-        provider: 'google',
-        enabled: false,
-        clientId: '',
-        clientSecret: '',
-        callbackUrl: '',
-        scope: []
-      },
-      kakao: {
-        provider: 'kakao',
-        enabled: false,
-        clientId: '',
-        clientSecret: '',
-        callbackUrl: '',
-        scope: []
-      },
-      naver: {
-        provider: 'naver',
-        enabled: false,
-        clientId: '',
-        clientSecret: '',
-        callbackUrl: '',
-        scope: []
-      }
-    };
+    // 🔒 Security: Only expose safe fields to public (hide secrets)
+    const publicSettings: any = {};
+    for (const [provider, config] of Object.entries(oauthSettings)) {
+      publicSettings[provider] = {
+        provider: (config as any).provider || provider,
+        enabled: (config as any).enabled || false,
+        callbackUrl: (config as any).callbackUrl || '',
+        scope: (config as any).scope || []
+        // ❌ Do NOT expose: clientId, clientSecret
+      };
+    }
 
     res.json({
       success: true,
-      data: defaultSettings
+      data: publicSettings
     });
   } catch (error) {
     logger.error('Failed to fetch OAuth settings:', error);
