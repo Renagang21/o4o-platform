@@ -459,7 +459,36 @@ export function setupRoutes(app: Application): void {
   });
 
   // ============================================================================
-  // 9. ERROR HANDLERS (MUST BE LAST)
+  // 9. STUB ROUTES FOR ADMIN DASHBOARD COMPATIBILITY
+  // ============================================================================
+  // These routes return 200 with helpful messages instead of 404
+  // Admin dashboard may request these endpoints for main site features
+
+  app.get('/api/v1/auth/login', (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: 'Use POST method for login'
+    });
+  });
+
+  app.get('/api/v1/template-parts/area/:area/active', (req, res) => {
+    res.status(200).json({
+      success: true,
+      data: null,
+      message: 'No template parts configured'
+    });
+  });
+
+  app.get('/api/v1/settings/customizer', (req, res) => {
+    res.status(200).json({
+      success: true,
+      data: {},
+      message: 'No customizer settings configured'
+    });
+  });
+
+  // ============================================================================
+  // 10. ERROR HANDLERS (MUST BE LAST)
   // ============================================================================
   app.use(errorHandler as any);
   app.use('*', notFoundHandler as any);
