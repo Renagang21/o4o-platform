@@ -1,10 +1,14 @@
 /**
  * Partner Dashboard Component for Main Site
- * Displays partner metrics, commissions, and link management
+ * Displays partner metrics, commissions, link management, and settlements
  */
 
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
+import { SettlementSummaryCards } from '../dashboard/SettlementSummaryCards';
+import { SettlementTable } from '../dashboard/SettlementTable';
+import { SettlementDetailsModal } from '../dashboard/SettlementDetailsModal';
+import type { Settlement } from '../../services/settlementApi';
 
 interface PartnerDashboardProps {
   defaultTab?: string;
@@ -28,6 +32,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const [selectedSettlement, setSelectedSettlement] = useState<Settlement | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -225,6 +230,29 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
           </p>
         </div>
       </div>
+
+      {/* Settlements Section */}
+      <div className="mt-8">
+        <div className="border-b border-gray-200 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 pb-4">정산 내역</h2>
+        </div>
+
+        {/* Settlement Summary Cards */}
+        <SettlementSummaryCards />
+
+        {/* Settlement Table */}
+        <SettlementTable
+          onSelectSettlement={(settlement) => setSelectedSettlement(settlement)}
+        />
+      </div>
+
+      {/* Settlement Details Modal */}
+      {selectedSettlement && (
+        <SettlementDetailsModal
+          settlementId={selectedSettlement.id}
+          onClose={() => setSelectedSettlement(null)}
+        />
+      )}
     </div>
   );
 };
