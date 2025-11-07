@@ -62,6 +62,7 @@ const OAuthSettings = () => {
   // Sync server settings to local state when data loads
   useEffect(() => {
     if (settings?.data) {
+      console.log('[OAuth] Server data received:', JSON.stringify(settings.data, null, 2));
       setLocalSettings(settings.data);
       // Reset unsaved changes when fresh data loads
       setHasUnsavedChanges({
@@ -95,25 +96,25 @@ const OAuthSettings = () => {
     }
   });
 
-  // Test OAuth connection mutation
-  const testMutation = useMutation<OAuthTestResponse, Error, OAuthTestRequest>({
-    mutationFn: async (data: OAuthTestRequest) => {
-      const response = await authClient.api.post('/settings/oauth/test', data);
-      return response.data;
-    },
-    onSuccess: (data, _variables) => {
-      addNotice({
-        type: data.success ? 'success' : 'error',
-        message: data.message
-      });
-    },
-    onError: (error: Error) => {
-      addNotice({
-        type: 'error',
-        message: `연결 테스트 실패: ${error.message}`
-      });
-    }
-  });
+  // Test OAuth connection mutation (temporarily disabled - endpoint not implemented)
+  // const testMutation = useMutation<OAuthTestResponse, Error, OAuthTestRequest>({
+  //   mutationFn: async (data: OAuthTestRequest) => {
+  //     const response = await authClient.api.post('/settings/oauth/test', data);
+  //     return response.data;
+  //   },
+  //   onSuccess: (data, _variables) => {
+  //     addNotice({
+  //       type: data.success ? 'success' : 'error',
+  //       message: data.message
+  //     });
+  //   },
+  //   onError: (error: Error) => {
+  //     addNotice({
+  //       type: 'error',
+  //       message: `연결 테스트 실패: ${error.message}`
+  //     });
+  //   }
+  // });
 
   // Handle local input changes (no immediate save)
   const handleInputChange = useCallback((provider: OAuthProvider, field: keyof OAuthConfig, value: string | boolean | string[]) => {
@@ -190,10 +191,10 @@ const OAuthSettings = () => {
     }
   }, [addNotice]);
 
-  // Test connection
-  const testConnection = useCallback((provider: OAuthProvider) => {
-    testMutation.mutate({ provider });
-  }, [testMutation]);
+  // Test connection (temporarily disabled)
+  // const testConnection = useCallback((provider: OAuthProvider) => {
+  //   testMutation.mutate({ provider });
+  // }, [testMutation]);
 
   // Generate callback URL
   const generateCallbackUrl = useCallback((provider: OAuthProvider): string => {
@@ -379,8 +380,8 @@ const OAuthSettings = () => {
                   {hasUnsavedChanges[provider] ? '저장' : '저장됨'}
                 </Button>
 
-                {/* Test Connection - only show when saved and enabled */}
-                {config.enabled && config.clientId && config.clientSecret && !hasUnsavedChanges[provider] && (
+                {/* Test Connection - temporarily disabled (endpoint not implemented) */}
+                {/* {config.enabled && config.clientId && config.clientSecret && !hasUnsavedChanges[provider] && (
                   <Button
                     variant="secondary"
                     onClick={() => testConnection(provider)}
@@ -389,7 +390,7 @@ const OAuthSettings = () => {
                     <TestTube className="h-4 w-4 mr-2" />
                     연결 테스트
                   </Button>
-                )}
+                )} */}
               </div>
               </form>
             </CardContent>

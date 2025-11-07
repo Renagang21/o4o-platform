@@ -513,6 +513,8 @@ router.get('/auth', async (req: Request, res: Response) => {
  */
 router.get('/oauth/admin', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
+    const actor = (req as any).user?.id || 'unknown';
+
     // Get OAuth settings from database
     const settingsRepository = AppDataSource.getRepository(Settings);
     const dbSettings = await settingsRepository.findOne({
@@ -523,6 +525,20 @@ router.get('/oauth/admin', authenticate, requireAdmin, async (req: Request, res:
 
     if (dbSettings && dbSettings.value) {
       oauthSettings = dbSettings.value as any;
+
+      logger.info('OAuth settings loaded from database:', {
+        actor,
+        hasDbSettings: true,
+        providers: Object.keys(oauthSettings),
+        google: {
+          enabled: oauthSettings.google?.enabled,
+          hasClientId: !!oauthSettings.google?.clientId,
+          hasClientSecret: !!oauthSettings.google?.clientSecret,
+          clientIdLength: oauthSettings.google?.clientId?.length || 0,
+          clientSecretLength: oauthSettings.google?.clientSecret?.length || 0
+        },
+        timestamp: new Date().toISOString()
+      });
     } else {
       // Fallback to default OAuth settings
       oauthSettings = {
@@ -551,6 +567,12 @@ router.get('/oauth/admin', authenticate, requireAdmin, async (req: Request, res:
           scope: []
         }
       };
+
+      logger.warn('No OAuth settings in database, using defaults:', {
+        actor,
+        hasDbSettings: false,
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Return full settings including secrets for admin
