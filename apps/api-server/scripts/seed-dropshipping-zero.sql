@@ -124,17 +124,17 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO commission_policies (
     id,
-    policy_code,
+    "policyCode",
     name,
     description,
-    policy_type,
+    "policyType",
     status,
     priority,
-    commission_type,
-    commission_rate,
-    valid_from,
-    created_at,
-    updated_at
+    "commissionType",
+    "commissionRate",
+    "validFrom",
+    "createdAt",
+    "updatedAt"
 ) VALUES
 (
     '44444444-4444-4444-4444-444444444444',
@@ -149,19 +149,98 @@ INSERT INTO commission_policies (
     '2025-01-01'::timestamp,
     NOW(),
     NOW()
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 \echo '  ✓ Created 1 commission policy'
 
 -- ============================================================================
--- 3. 테스트용 Payments 생성 (payment_settlements FK 의존성)
+-- 3. 테스트용 Orders 및 Payments 생성 (payment_settlements FK 의존성)
 -- ============================================================================
-\echo '💳 Creating test Payments for settlements...'
+\echo '📦 Creating test Orders (if table exists)...'
 
--- Payment 테이블이 있는지 확인하고 샘플 데이터 생성
--- Note: payments 테이블은 orderId FK를 요구할 수 있으므로,
--- 실제 환경에서는 orders가 먼저 생성되어야 합니다.
--- 여기서는 FK 제약이 없다고 가정하고 진행합니다.
+-- Orders 테이블이 존재하는 경우에만 생성
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'orders') THEN
+        INSERT INTO orders (
+            id,
+            "orderNumber",
+            "buyerId",
+            "buyerName",
+            "buyerEmail",
+            items,
+            summary,
+            currency,
+            status,
+            "paymentStatus",
+            "billingAddress",
+            "shippingAddress",
+            "orderDate",
+            "createdAt",
+            "updatedAt"
+        ) VALUES
+        (
+            'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            'ORD-TEST-001',
+            '70333ceb-9bcc-4108-a336-ac5e58454f37', -- 김민수
+            '김민수',
+            'kim@example.com',
+            '[]'::jsonb,
+            '{"total": 500000, "subtotal": 500000}'::jsonb,
+            'KRW',
+            'delivered',
+            'completed',
+            '{"address": "서울시 강남구"}'::jsonb,
+            '{"address": "서울시 강남구"}'::jsonb,
+            NOW() - INTERVAL '7 days',
+            NOW() - INTERVAL '7 days',
+            NOW()
+        ),
+        (
+            'cccccccc-cccc-cccc-cccc-cccccccccccc',
+            'ORD-TEST-002',
+            'd007f052-c2cb-466f-8163-426bcb54e162', -- 최유나
+            '최유나',
+            'choi@example.com',
+            '[]'::jsonb,
+            '{"total": 300000, "subtotal": 300000}'::jsonb,
+            'KRW',
+            'delivered',
+            'completed',
+            '{"address": "서울시 서초구"}'::jsonb,
+            '{"address": "서울시 서초구"}'::jsonb,
+            NOW() - INTERVAL '14 days',
+            NOW() - INTERVAL '14 days',
+            NOW()
+        ),
+        (
+            'dddddddd-dddd-dddd-dddd-dddddddddddd',
+            'ORD-TEST-003',
+            '5eadcd73-fb61-42f3-b8f1-0683dcd64115', -- Admin
+            'Admin',
+            'admin@example.com',
+            '[]'::jsonb,
+            '{"total": 200000, "subtotal": 200000}'::jsonb,
+            'KRW',
+            'delivered',
+            'completed',
+            '{"address": "서울시 송파구"}'::jsonb,
+            '{"address": "서울시 송파구"}'::jsonb,
+            NOW() - INTERVAL '3 days',
+            NOW() - INTERVAL '3 days',
+            NOW()
+        )
+        ON CONFLICT (id) DO NOTHING;
+
+        RAISE NOTICE '  ✓ Created 3 test orders';
+    ELSE
+        RAISE NOTICE '  ℹ orders table does not exist - skipping';
+    END IF;
+END
+$$;
+
+\echo '💳 Creating test Payments for settlements...'
 
 INSERT INTO payments (
     id,
@@ -171,39 +250,43 @@ INSERT INTO payments (
     currency,
     "orderName",
     status,
-    "createdAt",
+    "requestedAt",
+    "approvedAt",
     "updatedAt"
 ) VALUES
 (
     '88888888-8888-8888-8888-888888888888',
-    'TEST-ORDER-001',
+    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', -- links to order 1
     500000.00,
     500000.00,
     'KRW',
     '테스트 주문 1',
     'done',
     NOW() - INTERVAL '7 days',
+    NOW() - INTERVAL '7 days',
     NOW()
 ),
 (
     '99999999-9999-9999-9999-999999999999',
-    'TEST-ORDER-002',
+    'cccccccc-cccc-cccc-cccc-cccccccccccc', -- links to order 2
     300000.00,
     300000.00,
     'KRW',
     '테스트 주문 2',
     'done',
     NOW() - INTERVAL '14 days',
+    NOW() - INTERVAL '14 days',
     NOW()
 ),
 (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    'TEST-ORDER-003',
+    'dddddddd-dddd-dddd-dddd-dddddddddddd', -- links to order 3
     200000.00,
     200000.00,
     'KRW',
     '테스트 주문 3',
     'done',
+    NOW() - INTERVAL '3 days',
     NOW() - INTERVAL '3 days',
     NOW()
 )
