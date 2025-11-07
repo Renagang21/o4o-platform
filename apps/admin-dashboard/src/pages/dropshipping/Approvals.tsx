@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock, AlertCircle, Filter, Search } from 'lucide-react';
 import { dropshippingAPI } from '../../api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
+import { authClient } from '@o4o/auth-client';
 
 interface ApprovalLog {
   id: string;
@@ -34,14 +35,10 @@ const Approvals: React.FC = () => {
   const fetchApprovals = async () => {
     setLoading(true);
     try {
-      // Fetch from actual API endpoint
-      const response = await fetch('/api/admin/dropshipping/approvals');
-      if (response.ok) {
-        const data = await response.json();
-        setApprovals(data.approvals || []);
-      } else {
-        console.error('Failed to fetch approvals');
-        toast.error('승인 목록을 불러오는데 실패했습니다');
+      // Fetch from actual API endpoint using authClient
+      const response = await authClient.api.get('/admin/dropshipping/approvals');
+      if (response.data) {
+        setApprovals(response.data.approvals || []);
       }
     } catch (error) {
       console.error('Error fetching approvals:', error);
@@ -53,21 +50,11 @@ const Approvals: React.FC = () => {
 
   const handleApprove = async (id: string) => {
     if (!confirm('승인하시겠습니까?')) return;
-    
+
     try {
-      const response = await fetch(`/api/admin/dropshipping/approvals/${id}/approve`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (response.ok) {
-        toast.success('승인 처리되었습니다');
-        fetchApprovals();
-      } else {
-        toast.error('승인 처리에 실패했습니다');
-      }
+      await authClient.api.post(`/admin/dropshipping/approvals/${id}/approve`);
+      toast.success('승인 처리되었습니다');
+      fetchApprovals();
     } catch (error) {
       console.error('Error approving:', error);
       toast.error('승인 처리에 실패했습니다');
@@ -77,22 +64,11 @@ const Approvals: React.FC = () => {
   const handleReject = async (id: string) => {
     const reason = prompt('반려 사유를 입력해주세요:');
     if (!reason) return;
-    
+
     try {
-      const response = await fetch(`/api/admin/dropshipping/approvals/${id}/reject`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ reason })
-      });
-      
-      if (response.ok) {
-        toast.success('반려 처리되었습니다');
-        fetchApprovals();
-      } else {
-        toast.error('반려 처리에 실패했습니다');
-      }
+      await authClient.api.post(`/admin/dropshipping/approvals/${id}/reject`, { reason });
+      toast.success('반려 처리되었습니다');
+      fetchApprovals();
     } catch (error) {
       console.error('Error rejecting:', error);
       toast.error('반려 처리에 실패했습니다');

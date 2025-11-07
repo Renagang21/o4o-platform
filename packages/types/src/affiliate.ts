@@ -1,267 +1,68 @@
 /**
- * 제휴 마케팅 (추천인) 시스템 타입 정의
- * 단계: 1단계 추천만 허용 (다단계 금지)
+ * DEPRECATED: Use @o4o/types/partner instead
+ *
+ * This file provides backward compatibility aliases.
+ * All affiliate types have been migrated to partner types.
+ *
+ * Migration path:
+ * - AffiliateUser → PartnerUser
+ * - AffiliateCommission → PartnerCommission
+ * - AffiliateStats → PartnerStats
+ *
+ * @deprecated since v0.6.0 - Use partner types instead
  */
 
-export interface AffiliateUser {
-  id: string;
-  userId: string;
-  referralCode: string;
-  status: 'active' | 'inactive' | 'suspended';
-  joinedAt: Date;
-  
-  // 추천 실적
-  totalClicks: number;
-  totalSignups: number;
-  totalOrders: number;
-  totalRevenue: number;
-  
-  // 수수료
-  totalCommission: number;
-  paidCommission: number;
-  pendingCommission: number;
-  
-  // 설정
-  commissionRate?: number; // 개별 수수료율 (없으면 기본값 사용)
-  paymentMethod?: 'bank' | 'point';
-  bankAccount?: BankAccount;
-  
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Re-export all partner types with affiliate aliases
+export type {
+  PartnerUser,
+  BankAccount,
+  ReferralRelationship,
+  ReferralClick,
+  PartnerCommission,
+  CommissionPolicy,
+  PartnerStats,
+  CreatePartnerRequest,
+  CreatePartnerResponse,
+  GetPartnerStatsRequest,
+  ProcessCommissionRequest,
+  GenerateReferralLinkRequest,
+  GenerateReferralLinkResponse,
+  AdminPartnerOverview,
+  UserPartnerDashboard,
+} from './partner.js';
 
-export interface BankAccount {
-  bankName: string;
-  accountNumber: string;
-  accountHolder: string;
-}
+import type {
+  PartnerUser,
+  PartnerCommission,
+  PartnerStats,
+  CreatePartnerRequest,
+  CreatePartnerResponse,
+  GetPartnerStatsRequest,
+  AdminPartnerOverview,
+  UserPartnerDashboard,
+} from './partner.js';
 
-export interface ReferralRelationship {
-  id: string;
-  referrerId: string; // 추천인
-  referredId: string; // 피추천인
-  referralCode: string;
-  signupDate: Date;
-  firstOrderDate?: Date;
-  status: 'pending' | 'confirmed' | 'expired';
-  
-  // 추적 정보
-  signupIp?: string;
-  signupDevice?: string;
-  signupSource?: string; // kakao, facebook, band, direct
-  
-  createdAt: Date;
-}
+// Backward compatibility aliases
+/** @deprecated Use PartnerUser instead */
+export type AffiliateUser = PartnerUser;
 
-export interface ReferralClick {
-  id: string;
-  referralCode: string;
-  affiliateUserId: string;
-  
-  // 클릭 정보
-  clickedAt: Date;
-  ip: string;
-  userAgent: string;
-  referer?: string;
-  
-  // 추적 정보
-  source?: 'kakao' | 'facebook' | 'band' | 'direct' | 'qr';
-  productId?: string;
-  landingPage?: string;
-  
-  // 전환 정보
-  converted: boolean;
-  convertedUserId?: string;
-  convertedAt?: Date;
-}
+/** @deprecated Use PartnerCommission instead */
+export type AffiliateCommission = PartnerCommission;
 
-export interface AffiliateCommission {
-  id: string;
-  affiliateUserId: string;
-  orderId: string;
-  orderAmount: number;
-  
-  // 수수료 정보
-  commissionRate: number;
-  commissionAmount: number;
-  status: 'pending' | 'approved' | 'paid' | 'cancelled';
-  
-  // 지급 정보
-  approvedAt?: Date;
-  approvedBy?: string;
-  paidAt?: Date;
-  paymentMethod?: 'bank' | 'point';
-  paymentReference?: string;
-  
-  // 취소/조정
-  cancelledAt?: Date;
-  cancelledReason?: string;
-  adjustmentAmount?: number;
-  adjustmentReason?: string;
-  
-  createdAt: Date;
-  updatedAt: Date;
-}
+/** @deprecated Use PartnerStats instead */
+export type AffiliateStats = PartnerStats;
 
-export interface CommissionPolicy {
-  id: string;
-  name: string;
-  description?: string;
-  
-  // 기본 수수료율
-  defaultRate: number;
-  minCommission: number;
-  maxCommission: number;
-  
-  // 카테고리별 수수료율
-  categoryRates?: Record<string, number>;
-  
-  // 실적 기반 보너스
-  performanceBonus?: {
-    threshold: number; // 월 매출 기준
-    bonusRate: number; // 추가 수수료율
-  }[];
-  
-  // 정책 적용 기간
-  startDate: Date;
-  endDate?: Date;
-  
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+/** @deprecated Use CreatePartnerRequest instead */
+export type CreateAffiliateRequest = CreatePartnerRequest;
 
-export interface AffiliateStats {
-  period: 'today' | 'week' | 'month' | 'year' | 'all';
-  
-  // 클릭 & 전환
-  clicks: number;
-  uniqueVisitors: number;
-  signups: number;
-  orders: number;
-  conversionRate: number;
-  
-  // 매출 & 수수료
-  revenue: number;
-  commission: number;
-  avgOrderValue: number;
-  
-  // 추천인 현황
-  activeAffiliates: number;
-  newAffiliates: number;
-  
-  // 상위 실적자
-  topAffiliates: {
-    affiliateId: string;
-    userName: string;
-    revenue: number;
-    commission: number;
-  }[];
-}
+/** @deprecated Use CreatePartnerResponse instead */
+export type CreateAffiliateResponse = CreatePartnerResponse;
 
-// API 요청/응답 타입
-export interface CreateAffiliateRequest {
-  userId: string;
-  commissionRate?: number;
-  paymentMethod?: 'bank' | 'point';
-  bankAccount?: BankAccount;
-}
+/** @deprecated Use GetPartnerStatsRequest instead */
+export type GetAffiliateStatsRequest = GetPartnerStatsRequest;
 
-export interface CreateAffiliateResponse {
-  success: boolean;
-  affiliate?: AffiliateUser;
-  referralCode?: string;
-  message?: string;
-}
+/** @deprecated Use AdminPartnerOverview instead */
+export type AdminAffiliateOverview = AdminPartnerOverview;
 
-export interface GetAffiliateStatsRequest {
-  affiliateId?: string;
-  period: 'today' | 'week' | 'month' | 'year' | 'all';
-  startDate?: string;
-  endDate?: string;
-}
-
-export interface ProcessCommissionRequest {
-  commissionIds: string[];
-  action: 'approve' | 'pay' | 'cancel';
-  paymentMethod?: 'bank' | 'point';
-  reason?: string;
-}
-
-export interface GenerateReferralLinkRequest {
-  affiliateId: string;
-  productId?: string;
-  source?: string;
-  campaign?: string;
-}
-
-export interface GenerateReferralLinkResponse {
-  longUrl: string;
-  shortUrl?: string;
-  qrCodeUrl?: string;
-  referralCode: string;
-}
-
-// 관리자용 대시보드 타입
-export interface AdminAffiliateOverview {
-  totalAffiliates: number;
-  activeAffiliates: number;
-  totalRevenue: number;
-  totalCommission: number;
-  pendingCommission: number;
-  avgCommissionRate: number;
-  
-  // 차트 데이터
-  revenueChart: {
-    date: string;
-    revenue: number;
-    commission: number;
-  }[];
-  
-  // 수수료 지급 현황
-  commissionStatus: {
-    pending: number;
-    approved: number;
-    paid: number;
-    cancelled: number;
-  };
-}
-
-// 사용자용 추천 대시보드 타입
-export interface UserAffiliateDashboard {
-  referralCode: string;
-  status: 'active' | 'inactive' | 'suspended';
-  
-  // 이번 달 실적
-  monthlyStats: {
-    clicks: number;
-    signups: number;
-    orders: number;
-    revenue: number;
-    commission: number;
-  };
-  
-  // 전체 실적
-  totalStats: {
-    signups: number;
-    revenue: number;
-    paidCommission: number;
-    pendingCommission: number;
-  };
-  
-  // 최근 추천 활동
-  recentActivities: {
-    type: 'click' | 'signup' | 'order' | 'commission';
-    description: string;
-    amount?: number;
-    timestamp: Date;
-  }[];
-  
-  // 추천 링크
-  referralLinks: {
-    type: 'main' | 'product';
-    name: string;
-    url: string;
-    clicks: number;
-  }[];
-}
+/** @deprecated Use UserPartnerDashboard instead */
+export type UserAffiliateDashboard = UserPartnerDashboard;
