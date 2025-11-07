@@ -62,10 +62,6 @@ const OAuthSettings = () => {
   // Sync server settings to local state when data loads
   useEffect(() => {
     if (settings?.data) {
-      console.log('[OAuth Settings] Server data received:', settings.data);
-      console.log('[OAuth Settings] Google clientId:', settings.data.google?.clientId);
-      console.log('[OAuth Settings] Google clientSecret:', settings.data.google?.clientSecret);
-
       setLocalSettings(settings.data);
       // Reset unsaved changes when fresh data loads
       setHasUnsavedChanges({
@@ -79,9 +75,7 @@ const OAuthSettings = () => {
   // Update OAuth settings mutation
   const updateMutation = useMutation<OAuthUpdateResponse, Error, OAuthUpdateRequest>({
     mutationFn: async (data: OAuthUpdateRequest) => {
-      console.log('[OAuth Settings] Sending to server:', data);
       const response = await authClient.api.put('/settings/oauth', data);
-      console.log('[OAuth Settings] Server response:', response.data);
       return response.data;
     },
     onMutate: async (newData) => {
@@ -110,8 +104,15 @@ const OAuthSettings = () => {
       // Return a context object with the snapshotted value
       return { previousSettings };
     },
-    onSuccess: (_data, variables) => {
-      console.log('[OAuth Settings] Update success, data:', _data);
+    onSuccess: (responseData, variables) => {
+      // Update query cache with server response data to avoid refetch issues
+      if (responseData?.data) {
+        queryClient.setQueryData(['oauth-settings'], {
+          success: true,
+          data: responseData.data
+        });
+      }
+
       addNotice({
         type: 'success',
         message: `${OAUTH_PROVIDERS[variables.provider].displayName} 설정이 저장되었습니다.`
@@ -127,9 +128,11 @@ const OAuthSettings = () => {
         message: `설정 저장 실패: ${error.message}`
       });
     },
-    onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
-      queryClient.invalidateQueries({ queryKey: ['oauth-settings'] });
+    onSettled: (_data, error) => {
+      // Only refetch on error to ensure we have the latest data
+      if (error) {
+        queryClient.invalidateQueries({ queryKey: ['oauth-settings'] });
+      }
     }
   });
 
