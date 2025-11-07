@@ -62,6 +62,10 @@ const OAuthSettings = () => {
   // Sync server settings to local state when data loads
   useEffect(() => {
     if (settings?.data) {
+      console.log('[OAuth Settings] Server data received:', settings.data);
+      console.log('[OAuth Settings] Google clientId:', settings.data.google?.clientId);
+      console.log('[OAuth Settings] Google clientSecret:', settings.data.google?.clientSecret);
+
       setLocalSettings(settings.data);
       // Reset unsaved changes when fresh data loads
       setHasUnsavedChanges({
@@ -75,7 +79,9 @@ const OAuthSettings = () => {
   // Update OAuth settings mutation
   const updateMutation = useMutation<OAuthUpdateResponse, Error, OAuthUpdateRequest>({
     mutationFn: async (data: OAuthUpdateRequest) => {
+      console.log('[OAuth Settings] Sending to server:', data);
       const response = await authClient.api.put('/settings/oauth', data);
+      console.log('[OAuth Settings] Server response:', response.data);
       return response.data;
     },
     onMutate: async (newData) => {
@@ -105,6 +111,7 @@ const OAuthSettings = () => {
       return { previousSettings };
     },
     onSuccess: (_data, variables) => {
+      console.log('[OAuth Settings] Update success, data:', _data);
       addNotice({
         type: 'success',
         message: `${OAUTH_PROVIDERS[variables.provider].displayName} 설정이 저장되었습니다.`
