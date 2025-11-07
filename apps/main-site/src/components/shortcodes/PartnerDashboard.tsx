@@ -1,11 +1,15 @@
 /**
  * Partner Dashboard Component for Main Site
- * Displays partner metrics, commissions, and link management
+ * Displays partner metrics, commissions, link management, and settlements
  */
 
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { AnalyticsTab } from '../analytics/AnalyticsTab';
+import { SettlementSummaryCards } from '../dashboard/SettlementSummaryCards';
+import { SettlementTable } from '../dashboard/SettlementTable';
+import { SettlementDetailsModal } from '../dashboard/SettlementDetailsModal';
+import type { Settlement } from '../../services/settlementApi';
 
 interface PartnerDashboardProps {
   defaultTab?: string;
@@ -29,6 +33,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const [selectedSettlement, setSelectedSettlement] = useState<Settlement | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -250,6 +255,16 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
           >
             📊 분석
           </button>
+          <button
+            onClick={() => setActiveTab('settlements')}
+            className={`${
+              activeTab === 'settlements'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+          >
+            💰 정산
+          </button>
         </nav>
       </div>
 
@@ -263,7 +278,26 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
         {activeTab === 'analytics' && (
           <AnalyticsTab />
         )}
+        {activeTab === 'settlements' && (
+          <div>
+            {/* Settlement Summary Cards */}
+            <SettlementSummaryCards />
+
+            {/* Settlement Table */}
+            <SettlementTable
+              onSelectSettlement={(settlement) => setSelectedSettlement(settlement)}
+            />
+          </div>
+        )}
       </div>
+
+      {/* Settlement Details Modal */}
+      {selectedSettlement && (
+        <SettlementDetailsModal
+          settlementId={selectedSettlement.id}
+          onClose={() => setSelectedSettlement(null)}
+        />
+      )}
     </div>
   );
 };
