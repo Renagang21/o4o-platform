@@ -296,15 +296,26 @@ export const postApi = {
       return { success: true, data: payload };
     } catch (error: any) {
       pendingRequests.delete(requestKey);
-      
+
       // Don't report aborted requests as errors
       if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
         return { success: false, error: 'Request canceled' };
       }
-      
-      return { 
-        success: false, 
-        error: error.response?.data?.message || `Failed to create post (${error.response?.status})` 
+
+      // Handle 409 Conflict (slug already exists)
+      if (error.response?.status === 409) {
+        const errorData = error.response?.data?.error;
+        if (errorData?.code === 'CONFLICT' && errorData?.message === 'Slug already exists') {
+          return {
+            success: false,
+            error: '이 슬러그(URL)는 이미 사용 중입니다. 다른 슬러그를 사용해주세요.'
+          };
+        }
+      }
+
+      return {
+        success: false,
+        error: error.response?.data?.message || `Failed to create post (${error.response?.status})`
       };
     }
   },
@@ -350,15 +361,26 @@ export const postApi = {
       return { success: true, data: payload };
     } catch (error: any) {
       pendingRequests.delete(requestKey);
-      
+
       // Don't report aborted requests as errors
       if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
         return { success: false, error: 'Request canceled' };
       }
-      
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Failed to update post' 
+
+      // Handle 409 Conflict (slug already exists)
+      if (error.response?.status === 409) {
+        const errorData = error.response?.data?.error;
+        if (errorData?.code === 'CONFLICT' && errorData?.message === 'Slug already exists') {
+          return {
+            success: false,
+            error: '이 슬러그(URL)는 이미 사용 중입니다. 다른 슬러그를 사용해주세요.'
+          };
+        }
+      }
+
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Failed to update post'
       };
     }
   },
