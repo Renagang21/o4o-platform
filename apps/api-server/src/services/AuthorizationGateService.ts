@@ -22,9 +22,9 @@ import logger from '../utils/logger.js';
  */
 
 /**
- * Authorization status with detailed context
+ * Authorization gate check result with detailed context
  */
-export interface AuthorizationStatus {
+export interface AuthorizationGateResult {
   /** Is seller authorized for this product? */
   isAuthorized: boolean;
 
@@ -457,9 +457,9 @@ export class AuthorizationGateService {
    * Implementation Notes:
    * 1. Query seller_authorizations table
    * 2. Calculate canRequest based on status, cooldown
-   * 3. Return detailed AuthorizationStatus object
+   * 3. Return detailed AuthorizationGateResult object
    */
-  async getAuthorizationStatus(sellerId: string, productId: string): Promise<AuthorizationStatus> {
+  async getAuthorizationStatus(sellerId: string, productId: string): Promise<AuthorizationGateResult> {
     try {
       if (!this.isFeatureEnabled()) {
         return {

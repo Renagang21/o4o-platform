@@ -427,33 +427,33 @@ async function createAuthorization(
   await auditRepo.save(auditLog);
 
   if (data.status === AuthorizationStatus.APPROVED) {
-    const approveLog = SellerAuthorizationAuditLog.createApproveLog(
+    const approveLog = SellerAuthorizationAuditLog.createApprovalLog(
       authorization,
       'supplier-admin'
     );
     await auditRepo.save(approveLog);
   } else if (data.status === AuthorizationStatus.REJECTED) {
-    const rejectLog = SellerAuthorizationAuditLog.createRejectLog(
+    const rejectLog = SellerAuthorizationAuditLog.createRejectionLog(
       authorization,
       'supplier-admin',
       data.rejectionReason || 'Rejected by supplier'
     );
     await auditRepo.save(rejectLog);
   } else if (data.status === AuthorizationStatus.REVOKED) {
-    const approveLog = SellerAuthorizationAuditLog.createApproveLog(
+    const approveLog = SellerAuthorizationAuditLog.createApprovalLog(
       authorization,
       'supplier-admin'
     );
     await auditRepo.save(approveLog);
 
-    const revokeLog = SellerAuthorizationAuditLog.createRevokeLog(
+    const revokeLog = SellerAuthorizationAuditLog.createRevocationLog(
       authorization,
       'admin',
       data.revocationReason || 'Revoked by admin'
     );
     await auditRepo.save(revokeLog);
   } else if (data.status === AuthorizationStatus.CANCELLED) {
-    const cancelLog = SellerAuthorizationAuditLog.createCancelLog(authorization, data.sellerId);
+    const cancelLog = SellerAuthorizationAuditLog.createCancellationLog(authorization, data.sellerId);
     await auditRepo.save(cancelLog);
   }
 
