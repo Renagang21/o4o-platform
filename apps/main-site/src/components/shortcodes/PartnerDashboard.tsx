@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
+import { AnalyticsTab } from '../analytics/AnalyticsTab';
 
 interface PartnerDashboardProps {
   defaultTab?: string;
@@ -224,6 +225,44 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
             ${summary?.totalEarnings?.toLocaleString() || '0'} / $5,000 to reach Silver tier
           </p>
         </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="mt-8 border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`${
+              activeTab === 'overview'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+          >
+            개요
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`${
+              activeTab === 'analytics'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+          >
+            📊 분석
+          </button>
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === 'overview' && (
+          <div className="text-gray-600">
+            <p>개요 탭 - 기존 대시보드 콘텐츠가 여기에 표시됩니다.</p>
+          </div>
+        )}
+        {activeTab === 'analytics' && (
+          <AnalyticsTab />
+        )}
       </div>
     </div>
   );
