@@ -331,7 +331,7 @@ const Signup: FC = () => {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              onClick={() => window.location.href = `${API_URL}/api/auth/oauth/google?redirect_url=${encodeURIComponent(redirectUrl)}`}
+              onClick={() => window.location.href = `${API_URL}/api/v1/social/google?redirect_url=${encodeURIComponent(redirectUrl)}`}
             >
               <img src="/icons/google.svg" alt="Google" className="h-5 w-5" />
               Google로 가입
@@ -340,7 +340,7 @@ const Signup: FC = () => {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              onClick={() => window.location.href = `${API_URL}/api/auth/oauth/naver?redirect_url=${encodeURIComponent(redirectUrl)}`}
+              onClick={() => window.location.href = `${API_URL}/api/v1/social/naver?redirect_url=${encodeURIComponent(redirectUrl)}`}
             >
               <img src="/icons/naver.svg" alt="Naver" className="h-5 w-5" />
               네이버로 가입
@@ -349,7 +349,7 @@ const Signup: FC = () => {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              onClick={() => window.location.href = `${API_URL}/api/auth/oauth/kakao?redirect_url=${encodeURIComponent(redirectUrl)}`}
+              onClick={() => window.location.href = `${API_URL}/api/v1/social/kakao?redirect_url=${encodeURIComponent(redirectUrl)}`}
             >
               <img src="/icons/kakao.svg" alt="Kakao" className="h-5 w-5" />
               카카오로 가입
