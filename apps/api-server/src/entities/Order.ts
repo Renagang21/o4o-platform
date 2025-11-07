@@ -70,6 +70,8 @@ export interface OrderSummary {
 @Index(['status'])
 @Index(['orderDate'])
 @Index(['orderNumber'], { unique: true })
+@Index(['partnerId'])
+@Index(['referralCode'])
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -190,12 +192,22 @@ export class Order {
   refundDate: Date;
 
   // Metadata
-  @Column({ 
+  @Column({
     type: 'enum',
     enum: ['web', 'mobile', 'api', 'admin'],
     default: 'web'
   })
   source: string;
+
+  // Partner/Referral tracking
+  @Column({ type: 'uuid', nullable: true })
+  partnerId: string | null;
+
+  @Column({ nullable: true })
+  partnerName: string | null;
+
+  @Column({ nullable: true })
+  referralCode: string | null;
 
   // Standard timestamps
   @CreateDateColumn()
