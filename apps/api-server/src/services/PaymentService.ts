@@ -364,14 +364,50 @@ export class PaymentService {
       const signature = headers['tosspayments-signature'];
       const transmissionTime = headers['tosspayments-webhook-transmission-time'];
 
+      // 필수 헤더 검증
       if (!signature || !transmissionTime) {
-        logger.warn('Missing webhook signature or transmission time');
+        logger.warn('[Webhook] Missing required headers', {
+          hasSignature: !!signature,
+          hasTransmissionTime: !!transmissionTime
+        });
         return false;
       }
 
-      // 서명 형식: "v1:signature1,signature2,..."
+      // 서명 형식 검증: "v1:signature1,signature2,..."
       if (!signature.startsWith('v1:')) {
-        logger.warn('Invalid signature format');
+        logger.warn('[Webhook] Invalid signature format (must start with v1:)', {
+          signaturePrefix: signature.substring(0, 10)
+        });
+        return false;
+      }
+
+      // Clock skew 검증 (타임스탬프 유효성)
+      try {
+        const transmissionTimestamp = parseInt(transmissionTime, 10);
+        if (isNaN(transmissionTimestamp)) {
+          logger.warn('[Webhook] Invalid transmission time format', {
+            transmissionTime
+          });
+          return false;
+        }
+
+        const now = Math.floor(Date.now() / 1000); // 현재 시간 (초 단위)
+        const clockSkewSeconds = parseInt(process.env.WEBHOOK_CLOCK_SKEW_SECONDS || '300', 10); // 기본 5분
+        const timeDifference = Math.abs(now - transmissionTimestamp);
+
+        if (timeDifference > clockSkewSeconds) {
+          logger.warn('[Webhook] Transmission time exceeds clock skew tolerance', {
+            transmissionTimestamp,
+            currentTimestamp: now,
+            timeDifference,
+            clockSkewSeconds,
+            transmissionDate: new Date(transmissionTimestamp * 1000).toISOString(),
+            currentDate: new Date(now * 1000).toISOString()
+          });
+          return false;
+        }
+      } catch (error) {
+        logger.error('[Webhook] Error validating transmission time', { error });
         return false;
       }
 
@@ -385,29 +421,49 @@ export class PaymentService {
       const expectedHash = crypto
         .createHmac('sha256', this.config.secretKey)
         .update(dataToVerify)
-        .digest('base64');
+        .digest();
 
-      // 제공된 서명 중 하나와 일치하는지 확인
+      // 제공된 서명 중 하나와 timing-safe 비교
       const isValid = signatures.some(sig => {
         try {
-          // base64 디코드된 서명과 비교
-          const decodedSig = Buffer.from(sig, 'base64').toString('base64');
-          return decodedSig === expectedHash;
+          const receivedHash = Buffer.from(sig, 'base64');
+
+          // 길이가 다르면 비교 불가
+          if (receivedHash.length !== expectedHash.length) {
+            return false;
+          }
+
+          // Timing-safe 비교 (타이밍 공격 방지)
+          return crypto.timingSafeEqual(receivedHash, expectedHash);
         } catch (error) {
+          logger.debug('[Webhook] Signature comparison error (likely invalid base64)', {
+            error: error instanceof Error ? error.message : String(error)
+          });
           return false;
         }
       });
 
       if (!isValid) {
-        logger.error('Webhook signature verification failed', {
-          receivedSignatures: signatures,
-          expectedHash
+        logger.error('[Webhook] Signature verification failed', {
+          receivedSignatureCount: signatures.length,
+          // 보안상 실제 서명은 로깅하지 않음
+          signaturePrefix: signatures[0]?.substring(0, 10),
+          payloadLength: payload.length,
+          transmissionTime
+        });
+      } else {
+        logger.info('[Webhook] Signature verification succeeded', {
+          transmissionTime,
+          payloadLength: payload.length
         });
       }
 
       return isValid;
     } catch (error) {
-      logger.error('Error verifying webhook signature:', error);
+      logger.error('[Webhook] Error verifying webhook signature', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return false;
     }
   }
