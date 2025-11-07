@@ -1342,15 +1342,18 @@ router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
       actor,
       provider,
       enabled: config.enabled,
+      clientId: config.clientId ? 'present' : 'empty',
+      clientSecret: config.clientSecret ? 'present' : 'empty',
       timestamp: new Date().toISOString()
     });
 
     // Also update memory store for backward compatibility
     settingsStore.set('oauth', oauthSettings);
 
+    // Return the complete settings so frontend can update its state
     res.json({
       success: true,
-      data: oauthSettings,
+      data: oauthSettings,  // Return full oauth settings (all providers)
       message: `${provider} OAuth settings updated successfully`
     });
 

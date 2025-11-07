@@ -78,61 +78,20 @@ const OAuthSettings = () => {
       const response = await authClient.api.put('/settings/oauth', data);
       return response.data;
     },
-    onMutate: async (newData) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['oauth-settings'] });
-      
-      // Snapshot the previous value
-      const previousSettings = queryClient.getQueryData(['oauth-settings']);
-      
-      // Optimistically update to the new value
-      queryClient.setQueryData(['oauth-settings'], (old: any) => {
-        if (!old?.data) return old;
-        
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            [newData.provider]: {
-              ...old.data[newData.provider],
-              ...newData.config
-            }
-          }
-        };
-      });
-      
-      // Return a context object with the snapshotted value
-      return { previousSettings };
-    },
     onSuccess: (responseData, variables) => {
-      // Update query cache with server response data to avoid refetch issues
-      if (responseData?.data) {
-        queryClient.setQueryData(['oauth-settings'], {
-          success: true,
-          data: responseData.data
-        });
-      }
+      // Refetch to get latest data from server
+      queryClient.invalidateQueries({ queryKey: ['oauth-settings'] });
 
       addNotice({
         type: 'success',
         message: `${OAUTH_PROVIDERS[variables.provider].displayName} 설정이 저장되었습니다.`
       });
     },
-    onError: (error: Error, _variables, context: { previousSettings?: any } | undefined) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousSettings) {
-        queryClient.setQueryData(['oauth-settings'], context.previousSettings);
-      }
+    onError: (error: Error) => {
       addNotice({
         type: 'error',
         message: `설정 저장 실패: ${error.message}`
       });
-    },
-    onSettled: (_data, error) => {
-      // Only refetch on error to ensure we have the latest data
-      if (error) {
-        queryClient.invalidateQueries({ queryKey: ['oauth-settings'] });
-      }
     }
   });
 
