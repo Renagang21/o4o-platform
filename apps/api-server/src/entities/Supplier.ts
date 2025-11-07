@@ -6,12 +6,14 @@ import {
   UpdateDateColumn,
   OneToOne,
   OneToMany,
+  ManyToOne,
   JoinColumn,
   Index
 } from 'typeorm';
 import type { User } from './User.js';
 import { BusinessInfo } from './BusinessInfo.js';
 import type { Product } from './Product.js';
+import type { CommissionPolicy } from './CommissionPolicy.js';
 
 export enum SupplierStatus {
   PENDING = 'pending',
@@ -105,6 +107,17 @@ export class Supplier {
 
   @Column({ type: 'json', nullable: true })
   supplierPolicy?: SupplierPolicy;
+
+  // Phase 8: Commission Policy Integration
+  @Column({ type: 'uuid', nullable: true })
+  policyId?: string;
+
+  @ManyToOne('CommissionPolicy', { nullable: true })
+  @JoinColumn({ name: 'policyId' })
+  policy?: CommissionPolicy;
+
+  @Column({ type: 'integer', nullable: true })
+  settlementCycleDays?: number; // Settlement cycle in days (e.g., 30)
 
   // Default Commission Settings (문서 #66: 공급자가 파트너 커미션 설정)
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 5.0 })

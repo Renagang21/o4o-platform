@@ -114,6 +114,11 @@ import cartRoutes from '../routes/v1/cart.routes.js';
 // Phase 7 - Partner Analytics Routes
 import partnerAnalyticsRoutes from '../routes/analytics/partner-analytics.routes.js';
 
+// Phase 8/9 - Supplier Policy & Seller Authorization Routes
+import dsSellerAuthorizationRoutes from '../routes/ds-seller-authorization.routes.js';
+import dsSellerProductRoutes from '../routes/ds-seller-product.routes.js';
+import dsSettlementsRoutes from '../routes/ds-settlements.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -301,6 +306,11 @@ export function setupRoutes(app: Application): void {
 
   // Phase 7 - Partner Analytics
   app.use('/api/v1/analytics/partner', standardLimiter, partnerAnalyticsRoutes);
+
+  // Phase 8/9 - Supplier Policy & Seller Authorization
+  app.use('/api/v1/ds/seller/authorizations', standardLimiter, dsSellerAuthorizationRoutes);
+  app.use('/api/v1/ds/seller/products', standardLimiter, dsSellerProductRoutes);
+  app.use('/api/v1/ds/settlements', standardLimiter, dsSettlementsRoutes);
 
   // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);
