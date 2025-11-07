@@ -1,0 +1,196 @@
+# Phase 9: Seller Authorization System - Prometheus Alert Rules
+#
+# These alert rules monitor the health and performance of the authorization system.
+# Alerts are tiered by severity:
+# - critical: Immediate action required (page on-call)
+# - warning: Investigation needed (notify via Slack)
+# - info: Informational only (log to dashboard)
+#
+# Last Updated: 2025-01-07
+
+groups:
+  - name: phase9_seller_authorization
+    interval: 1m
+    rules:
+      # ====================================
+      # Critical Alerts (Page On-Call)
+      # ====================================
+
+      - alert: HighAuthorizationErrorRate
+        expr: rate(seller_auth_requests_total{result="error"}[5m]) > 0.001
+        for: 10m
+        labels:
+          severity: critical
+          component: seller_authorization
+          page: true
+        annotations:
+          summary: "High authorization error rate detected"
+          description: "Authorization error rate is {{ $value | humanize }} req/s (threshold: 0.001 req/s). Check logs for error codes."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+          runbook: "https://docs.o4o.com/runbooks/phase9-high-error-rate"
+
+      - alert: HighGateDenyRate
+        expr: rate(seller_auth_gate_denies_total[1m]) > 50
+        for: 5m
+        labels:
+          severity: critical
+          component: seller_authorization_gate
+          page: true
+        annotations:
+          summary: "Abnormal gate deny rate detected"
+          description: "Gate is denying {{ $value | humanize }} requests/min (threshold: 50/min). Possible authorization data corruption."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+          runbook: "https://docs.o4o.com/runbooks/phase9-gate-deny-spike"
+
+      - alert: AuthorizationServiceDown
+        expr: up{job="o4o-api-server"} == 0 or absent(seller_auth_requests_total)
+        for: 2m
+        labels:
+          severity: critical
+          component: seller_authorization
+          page: true
+        annotations:
+          summary: "Authorization service metrics unavailable"
+          description: "Authorization service is not reporting metrics. Service may be down."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+      # ====================================
+      # Warning Alerts (Notify via Slack)
+      # ====================================
+
+      - alert: SlowGatePerformance
+        expr: histogram_quantile(0.95, rate(seller_auth_gate_duration_seconds_bucket[5m])) > 0.015
+        for: 15m
+        labels:
+          severity: warning
+          component: seller_authorization_gate
+        annotations:
+          summary: "Gate latency degraded"
+          description: "P95 gate latency is {{ $value | humanize }}s (threshold: 0.015s). Check cache health."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+          runbook: "https://docs.o4o.com/runbooks/phase9-slow-gate"
+
+      - alert: LowCacheHitRate
+        expr: seller_auth_cache_hit_rate < 0.7
+        for: 30m
+        labels:
+          severity: warning
+          component: seller_authorization_cache
+        annotations:
+          summary: "Cache hit rate below threshold"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (threshold: 70%). Consider increasing TTL or warming cache."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+          runbook: "https://docs.o4o.com/runbooks/phase9-low-cache-hit"
+
+      - alert: HighSupplierInboxSize
+        expr: seller_auth_inbox_size > 100
+        for: 1h
+        labels:
+          severity: warning
+          component: seller_authorization_supplier
+        annotations:
+          summary: "Supplier inbox overloaded"
+          description: "Supplier {{ $labels.supplierId }} has {{ $value }} pending requests (threshold: 100). Notify supplier to expedite processing."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+      - alert: HighLimitRejectionRate
+        expr: rate(seller_auth_limit_rejections_total[1h]) > 10
+        for: 1h
+        labels:
+          severity: warning
+          component: seller_authorization_limits
+        annotations:
+          summary: "High product limit rejection rate"
+          description: "{{ $value | humanize }} sellers/hour are hitting the 10-product limit. Consider tiered limits or business policy review."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+      - alert: HighCooldownBlockRate
+        expr: rate(seller_auth_cooldown_blocks_total[1h]) > 5
+        for: 1h
+        labels:
+          severity: warning
+          component: seller_authorization_cooldown
+        annotations:
+          summary: "High cooldown block rate"
+          description: "{{ $value | humanize }} re-requests/hour are blocked by cooldown. Sellers may need education about cooldown policy."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+      - alert: UnbalancedApprovalRate
+        expr: |
+          rate(seller_auth_requests_total{action="approve"}[1h]) /
+          rate(seller_auth_requests_total{action="request"}[1h]) < 0.3
+        for: 2h
+        labels:
+          severity: warning
+          component: seller_authorization_approval
+        annotations:
+          summary: "Low approval rate detected"
+          description: "Approval rate is {{ $value | humanizePercentage }} (threshold: 30%). Investigate supplier responsiveness or rejection reasons."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+      # ====================================
+      # Info Alerts (Dashboard Only)
+      # ====================================
+
+      - alert: HighRevocationRate
+        expr: rate(seller_auth_requests_total{action="revoke"}[24h]) > 1
+        for: 4h
+        labels:
+          severity: info
+          component: seller_authorization_revoke
+        annotations:
+          summary: "Elevated revocation activity"
+          description: "{{ $value | humanize }} revocations/day detected. Monitor for policy violations."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+      - alert: FeatureFlagDisabled
+        expr: seller_auth_requests_total == 0 and up{job="o4o-api-server"} == 1
+        for: 10m
+        labels:
+          severity: info
+          component: seller_authorization_feature_flag
+        annotations:
+          summary: "Authorization feature flag may be disabled"
+          description: "No authorization requests detected. Verify ENABLE_SELLER_AUTHORIZATION=true."
+          dashboard: "https://grafana.o4o.com/d/phase9-seller-auth"
+
+  # ====================================
+  # Recording Rules (Pre-computed Metrics)
+  # ====================================
+
+  - name: phase9_recording_rules
+    interval: 30s
+    rules:
+      # Approval rate (approve / request)
+      - record: seller_auth:approval_rate:5m
+        expr: |
+          rate(seller_auth_requests_total{action="approve"}[5m]) /
+          rate(seller_auth_requests_total{action="request"}[5m])
+
+      # Rejection rate (reject / request)
+      - record: seller_auth:rejection_rate:5m
+        expr: |
+          rate(seller_auth_requests_total{action="reject"}[5m]) /
+          rate(seller_auth_requests_total{action="request"}[5m])
+
+      # Overall error rate (error / all requests)
+      - record: seller_auth:error_rate:5m
+        expr: |
+          rate(seller_auth_requests_total{result="error"}[5m]) /
+          rate(seller_auth_requests_total[5m])
+
+      # Gate latency P95
+      - record: seller_auth:gate_latency_p95:5m
+        expr: histogram_quantile(0.95, rate(seller_auth_gate_duration_seconds_bucket[5m]))
+
+      # Gate latency P99
+      - record: seller_auth:gate_latency_p99:5m
+        expr: histogram_quantile(0.99, rate(seller_auth_gate_duration_seconds_bucket[5m]))
+
+      # Total pending requests across all suppliers
+      - record: seller_auth:total_pending_requests
+        expr: sum(seller_auth_inbox_size)
+
+      # Average inbox size per supplier
+      - record: seller_auth:avg_inbox_size
+        expr: avg(seller_auth_inbox_size)
