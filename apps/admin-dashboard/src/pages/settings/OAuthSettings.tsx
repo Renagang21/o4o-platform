@@ -50,11 +50,11 @@ const OAuthSettings = () => {
     naver: false
   });
 
-  // Fetch OAuth settings
+  // Fetch OAuth settings (use admin endpoint to get secrets)
   const { data: settings, isLoading } = useQuery<OAuthSettingsResponse>({
     queryKey: ['oauth-settings'],
     queryFn: async () => {
-      const response = await authClient.api.get('/settings/oauth');
+      const response = await authClient.api.get('/settings/oauth/admin');
       return response.data;
     }
   });

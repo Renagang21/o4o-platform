@@ -507,6 +507,67 @@ router.get('/auth', async (req: Request, res: Response) => {
 });
 
 /**
+ * @route   GET /api/v1/settings/oauth/admin
+ * @desc    Get OAuth settings with secrets (Admin only - for settings page)
+ * @access  Private (Admin only)
+ */
+router.get('/oauth/admin', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    // Get OAuth settings from database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    const dbSettings = await settingsRepository.findOne({
+      where: { key: 'oauth', type: 'oauth' }
+    });
+
+    let oauthSettings: any = {};
+
+    if (dbSettings && dbSettings.value) {
+      oauthSettings = dbSettings.value as any;
+    } else {
+      // Fallback to default OAuth settings
+      oauthSettings = {
+        google: {
+          provider: 'google',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        },
+        kakao: {
+          provider: 'kakao',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        },
+        naver: {
+          provider: 'naver',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        }
+      };
+    }
+
+    // Return full settings including secrets for admin
+    res.json({
+      success: true,
+      data: oauthSettings
+    });
+  } catch (error) {
+    logger.error('Failed to fetch OAuth settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch OAuth settings'
+    });
+  }
+});
+
+/**
  * @route   GET /api/v1/settings/oauth
  * @desc    Get OAuth settings (Public - for login form to display providers)
  * @access  Public
