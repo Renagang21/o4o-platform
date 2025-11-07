@@ -47,5 +47,13 @@ declare namespace NodeJS {
     SESSION_SECRET?: string;
     RATE_LIMIT_WINDOW?: string;
     RATE_LIMIT_MAX?: string;
+
+    // Phase 9: Seller Authorization System
+    ENABLE_SELLER_AUTHORIZATION?: string;
+    SELLER_PRODUCT_LIMIT?: string;
+    SELLER_REJECT_COOLDOWN_DAYS?: string;
+    PHASE9_ROLLOUT_PERCENTAGE?: string;
+    PHASE9_CANARY_PRODUCTS?: string;
+    AUTHORIZATION_CACHE_TTL?: string;
   }
 }
