@@ -502,12 +502,10 @@ export class PaymentService {
       const supplierSettlements = this.calculateSupplierSettlements(order, payment);
       settlements.push(...supplierSettlements);
 
-      // 2. 파트너 커미션 정산 (referralCode가 있는 경우)
-      if (order.items?.[0]) {
-        const partnerSettlement = this.calculatePartnerSettlement(order, payment);
-        if (partnerSettlement) {
-          settlements.push(partnerSettlement);
-        }
+      // 2. 파트너 커미션 정산 (partnerId가 있는 경우)
+      const partnerSettlement = this.calculatePartnerSettlement(order, payment);
+      if (partnerSettlement) {
+        settlements.push(partnerSettlement);
       }
 
       // 3. 플랫폼 수수료 정산
@@ -577,32 +575,58 @@ export class PaymentService {
    * 파트너 커미션 정산 계산
    */
   private calculatePartnerSettlement(order: any, payment: Payment): PaymentSettlement | null {
-    // 파트너 정보가 있는 경우에만 커미션 정산
-    // TODO: Order에 partnerId, partnerName 필드 추가 필요
-    // 임시로 null 반환
+    // Feature flag 체크
+    const enablePartnerSettlement = process.env.ENABLE_PARTNER_SETTLEMENT === 'true';
+    if (!enablePartnerSettlement) {
+      logger.debug('Partner settlement disabled by feature flag');
+      return null;
+    }
 
-    // 실제 구현 예시:
-    // const commissionRate = 0.1; // 10% 커미션
-    // const commissionAmount = order.summary.total * commissionRate;
-    //
-    // const settlement = new PaymentSettlement();
-    // settlement.paymentId = payment.id;
-    // settlement.recipientType = RecipientType.PARTNER;
-    // settlement.recipientId = order.partnerId;
-    // settlement.recipientName = order.partnerName;
-    // settlement.amount = commissionAmount;
-    // settlement.fee = 0;
-    // settlement.tax = 0;
-    // settlement.netAmount = commissionAmount;
-    // settlement.status = SettlementStatus.SCHEDULED;
-    //
-    // const settlementDate = new Date();
-    // settlementDate.setDate(settlementDate.getDate() + 7); // D+7
-    // settlement.scheduledAt = settlementDate;
-    //
-    // return settlement;
+    // 파트너 정보가 없으면 null 반환
+    if (!order.partnerId || !order.partnerName) {
+      logger.debug('No partner information in order, skipping partner settlement');
+      return null;
+    }
 
-    return null;
+    // 기본 커미션 비율 (향후 CommissionPolicy 또는 Partner 엔티티에서 가져올 수 있음)
+    const defaultCommissionRate = 10.0; // 10%
+    const commissionAmount = (order.summary?.total || payment.amount) * (defaultCommissionRate / 100);
+
+    // 커미션이 0 이하면 정산하지 않음
+    if (commissionAmount <= 0) {
+      logger.warn(`Partner commission is zero or negative for order ${order.id}`);
+      return null;
+    }
+
+    // 정산 보류 기간 (환경변수, 기본 7일)
+    const settlementHoldDays = parseInt(process.env.SETTLEMENT_HOLD_DAYS || '7', 10);
+    const settlementDate = new Date();
+    settlementDate.setDate(settlementDate.getDate() + settlementHoldDays);
+
+    // PaymentSettlement 생성
+    const settlement = new PaymentSettlement();
+    settlement.paymentId = payment.id;
+    settlement.recipientType = RecipientType.PARTNER;
+    settlement.recipientId = order.partnerId;
+    settlement.recipientName = order.partnerName;
+    settlement.amount = commissionAmount;
+    settlement.fee = 0; // 파트너 수수료 없음
+    settlement.tax = 0; // 세금 계산 필요 시 추가
+    settlement.netAmount = commissionAmount;
+    settlement.status = SettlementStatus.SCHEDULED;
+    settlement.scheduledAt = settlementDate;
+
+    // 메타데이터 추가 (추적용)
+    settlement.metadata = {
+      referralCode: order.referralCode,
+      commissionRate: defaultCommissionRate,
+      orderTotal: order.summary?.total || payment.amount,
+      calculatedAt: new Date().toISOString()
+    };
+
+    logger.info(`Partner settlement calculated for order ${order.id}: ${commissionAmount} KRW for partner ${order.partnerId}`);
+
+    return settlement;
   }
 
   /**
