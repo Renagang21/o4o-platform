@@ -165,8 +165,11 @@ const signupHandler = asyncHandler(async (req, res, next) => {
         return '/seller/dashboard';
       case UserRole.PARTNER:
         return '/partner/portal';
-      case UserRole.OPERATOR:
+      case UserRole.SUPPLIER:
+        return '/supplier/dashboard';
       case UserRole.ADMIN:
+      case UserRole.SUPER_ADMIN:
+      case UserRole.MODERATOR:
         return '/admin';
       default:
         return '/';
