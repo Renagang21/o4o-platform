@@ -474,6 +474,111 @@ router.get('/permalink', async (req: Request, res: Response) => {
 });
 
 /**
+ * @route GET /v1/settings/auth
+ * @desc Get authentication settings (role redirect map)
+ * @access Public
+ */
+router.get('/auth', async (req: Request, res: Response) => {
+  try {
+    const authSettings = settingsStore.get('auth') || {
+      roleRedirects: {
+        user: '/',
+        member: '/',
+        contributor: '/',
+        seller: '/seller/dashboard',
+        vendor: '/vendor/console',
+        partner: '/partner/portal',
+        operator: '/admin',
+        admin: '/admin',
+      }
+    };
+
+    res.json({
+      success: true,
+      data: authSettings
+    });
+  } catch (error) {
+    logger.error('Failed to get auth settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get auth settings'
+    });
+  }
+});
+
+/**
+ * @route   GET /api/v1/settings/oauth
+ * @desc    Get OAuth settings (Public - for login form to display providers)
+ * @access  Public
+ */
+router.get('/oauth', async (req: Request, res: Response) => {
+  try {
+    // Get OAuth settings from database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    const dbSettings = await settingsRepository.findOne({
+      where: { key: 'oauth', type: 'oauth' }
+    });
+
+    let oauthSettings: any = {};
+
+    if (dbSettings && dbSettings.value) {
+      oauthSettings = dbSettings.value as any;
+    } else {
+      // Fallback to default OAuth settings
+      oauthSettings = {
+        google: {
+          provider: 'google',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        },
+        kakao: {
+          provider: 'kakao',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        },
+        naver: {
+          provider: 'naver',
+          enabled: false,
+          clientId: '',
+          clientSecret: '',
+          callbackUrl: '',
+          scope: []
+        }
+      };
+    }
+
+    // 🔒 Security: Only expose safe fields to public (hide secrets)
+    const publicSettings: any = {};
+    for (const [provider, config] of Object.entries(oauthSettings)) {
+      publicSettings[provider] = {
+        provider: (config as any).provider || provider,
+        enabled: (config as any).enabled || false,
+        callbackUrl: (config as any).callbackUrl || '',
+        scope: (config as any).scope || []
+        // ❌ Do NOT expose: clientId, clientSecret
+      };
+    }
+
+    res.json({
+      success: true,
+      data: publicSettings
+    });
+  } catch (error) {
+    logger.error('Failed to fetch OAuth settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch OAuth settings'
+    });
+  }
+});
+
+/**
  * @route   GET /api/v1/settings/:section
  * @desc    Get settings for a specific section
  * @access  Private
@@ -1051,39 +1156,6 @@ async function updateCustomizerSettings(req: Request, res: Response) {
 }
 
 /**
- * @route GET /v1/settings/auth
- * @desc Get authentication settings (role redirect map)
- * @access Public
- */
-router.get('/auth', async (req: Request, res: Response) => {
-  try {
-    const authSettings = settingsStore.get('auth') || {
-      roleRedirects: {
-        user: '/',
-        member: '/',
-        contributor: '/',
-        seller: '/seller/dashboard',
-        vendor: '/vendor/console',
-        partner: '/partner/portal',
-        operator: '/admin',
-        admin: '/admin',
-      }
-    };
-
-    res.json({
-      success: true,
-      data: authSettings
-    });
-  } catch (error) {
-    logger.error('Failed to get auth settings:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get auth settings'
-    });
-  }
-});
-
-/**
  * @route PUT /v1/settings/auth
  * @desc Update authentication settings (role redirect map)
  * @access Admin only
@@ -1125,78 +1197,6 @@ router.put('/auth', authenticate, requireAdmin, async (req: Request, res: Respon
     res.status(500).json({
       success: false,
       error: 'Failed to update auth settings'
-    });
-  }
-});
-
-/**
- * @route   GET /api/v1/settings/oauth
- * @desc    Get OAuth settings (Public - for login form to display providers)
- * @access  Public
- */
-router.get('/oauth', async (req: Request, res: Response) => {
-  try {
-    // Get OAuth settings from database
-    const settingsRepository = AppDataSource.getRepository(Settings);
-    const dbSettings = await settingsRepository.findOne({
-      where: { key: 'oauth', type: 'oauth' }
-    });
-
-    let oauthSettings: any = {};
-
-    if (dbSettings && dbSettings.value) {
-      oauthSettings = dbSettings.value as any;
-    } else {
-      // Fallback to default OAuth settings
-      oauthSettings = {
-        google: {
-          provider: 'google',
-          enabled: false,
-          clientId: '',
-          clientSecret: '',
-          callbackUrl: '',
-          scope: []
-        },
-        kakao: {
-          provider: 'kakao',
-          enabled: false,
-          clientId: '',
-          clientSecret: '',
-          callbackUrl: '',
-          scope: []
-        },
-        naver: {
-          provider: 'naver',
-          enabled: false,
-          clientId: '',
-          clientSecret: '',
-          callbackUrl: '',
-          scope: []
-        }
-      };
-    }
-
-    // 🔒 Security: Only expose safe fields to public (hide secrets)
-    const publicSettings: any = {};
-    for (const [provider, config] of Object.entries(oauthSettings)) {
-      publicSettings[provider] = {
-        provider: (config as any).provider || provider,
-        enabled: (config as any).enabled || false,
-        callbackUrl: (config as any).callbackUrl || '',
-        scope: (config as any).scope || []
-        // ❌ Do NOT expose: clientId, clientSecret
-      };
-    }
-
-    res.json({
-      success: true,
-      data: publicSettings
-    });
-  } catch (error) {
-    logger.error('Failed to fetch OAuth settings:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch OAuth settings'
     });
   }
 });
