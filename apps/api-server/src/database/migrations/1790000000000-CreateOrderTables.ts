@@ -190,6 +190,23 @@ export class CreateOrderTables1790000000000 implements MigrationInterface {
             isNullable: false
           },
           {
+            name: 'partnerId',
+            type: 'uuid',
+            isNullable: true
+          },
+          {
+            name: 'partnerName',
+            type: 'varchar',
+            length: '255',
+            isNullable: true
+          },
+          {
+            name: 'referralCode',
+            type: 'varchar',
+            length: '50',
+            isNullable: true
+          },
+          {
             name: 'createdAt',
             type: 'timestamp with time zone',
             default: 'CURRENT_TIMESTAMP',
@@ -232,6 +249,14 @@ export class CreateOrderTables1790000000000 implements MigrationInterface {
     await queryRunner.createIndex('orders', {
       name: 'IDX_orders_trackingNumber',
       columnNames: ['trackingNumber']
+    } as any);
+    await queryRunner.createIndex('orders', {
+      name: 'IDX_orders_partnerId',
+      columnNames: ['partnerId']
+    } as any);
+    await queryRunner.createIndex('orders', {
+      name: 'IDX_orders_referralCode',
+      columnNames: ['referralCode']
     } as any);
 
     // Create foreign key constraint to users table
@@ -296,6 +321,8 @@ export class CreateOrderTables1790000000000 implements MigrationInterface {
     await queryRunner.dropIndex('orders', 'IDX_orders_orderDate');
     await queryRunner.dropIndex('orders', 'IDX_orders_orderNumber');
     await queryRunner.dropIndex('orders', 'IDX_orders_trackingNumber');
+    await queryRunner.dropIndex('orders', 'IDX_orders_partnerId');
+    await queryRunner.dropIndex('orders', 'IDX_orders_referralCode');
 
     // Drop foreign key
     const table = await queryRunner.getTable('orders');
