@@ -111,6 +111,9 @@ import widgetAreasRoutes from '../routes/v1/widget-areas.routes.js';
 // Phase 4 - Cart Routes
 import cartRoutes from '../routes/v1/cart.routes.js';
 
+// Phase 7 - Partner Analytics Routes
+import partnerAnalyticsRoutes from '../routes/analytics/partner-analytics.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -295,6 +298,9 @@ export function setupRoutes(app: Application): void {
   // Phase 4 - Cart
   app.use('/api/v1/cart', publicLimiter, cartRoutes);
   app.use('/api/cart', publicLimiter, cartRoutes);
+
+  // Phase 7 - Partner Analytics
+  app.use('/api/v1/analytics/partner', standardLimiter, partnerAnalyticsRoutes);
 
   // Categories & Menus (unified menu system)
   app.use('/api/v1/categories', categoriesRoutes);
