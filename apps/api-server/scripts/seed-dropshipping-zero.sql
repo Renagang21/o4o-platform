@@ -14,70 +14,106 @@ BEGIN;
 -- ============================================================================
 \echo '👥 Creating Partners...'
 
+-- Note: userId와 sellerId는 필수 필드입니다.
+-- 기존 users와 sellers 테이블의 ID를 사용합니다.
+
 INSERT INTO partners (
     id,
-    user_id,
-    partner_code,
-    partner_name,
-    email,
-    phone,
-    tier,
-    commission_rate,
-    total_earnings,
-    pending_balance,
-    paid_balance,
+    "userId",
+    "sellerId",
     status,
-    created_at,
-    updated_at
+    tier,
+    "isActive",
+    "referralCode",
+    "referralLink",
+    profile,
+    "totalEarnings",
+    "availableBalance",
+    "pendingBalance",
+    "paidOut",
+    "totalClicks",
+    "totalOrders",
+    "conversionRate",
+    "averageOrderValue",
+    "monthlyClicks",
+    "monthlyOrders",
+    "monthlyEarnings",
+    "createdAt",
+    "updatedAt"
 ) VALUES
 (
     '11111111-1111-1111-1111-111111111111',
-    NULL, -- user_id (optional)
-    'PARTNER001',
-    '파트너 홍길동',
-    'hong@example.com',
-    '010-1234-5678',
-    'gold',
-    10.00, -- 10% commission rate
-    0,
-    0,
-    0,
+    '70333ceb-9bcc-4108-a336-ac5e58454f37', -- 김민수
+    '71892b32-4980-4847-b17d-2dbc1b37cecf', -- existing seller
     'active',
+    'gold',
+    true,
+    'PARTNER001',
+    'https://neture.co.kr/ref/PARTNER001',
+    '{"name": "파트너 홍길동", "email": "hong@example.com", "phone": "010-1234-5678", "description": "골드 파트너"}'::json,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
     NOW(),
     NOW()
 ),
 (
     '22222222-2222-2222-2222-222222222222',
-    NULL,
-    'PARTNER002',
-    '파트너 김철수',
-    'kim@example.com',
-    '010-2345-6789',
-    'silver',
-    8.00, -- 8% commission rate
-    0,
-    0,
-    0,
+    'd007f052-c2cb-466f-8163-426bcb54e162', -- 최유나
+    '71892b32-4980-4847-b17d-2dbc1b37cecf', -- existing seller
     'active',
+    'silver',
+    true,
+    'PARTNER002',
+    'https://neture.co.kr/ref/PARTNER002',
+    '{"name": "파트너 김철수", "email": "kim@example.com", "phone": "010-2345-6789", "description": "실버 파트너"}'::json,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
     NOW(),
     NOW()
 ),
 (
     '33333333-3333-3333-3333-333333333333',
-    NULL,
-    'PARTNER003',
-    '파트너 이영희',
-    'lee@example.com',
-    '010-3456-7890',
-    'bronze',
-    5.00, -- 5% commission rate
-    0,
-    0,
-    0,
+    '5eadcd73-fb61-42f3-b8f1-0683dcd64115', -- Admin
+    '71892b32-4980-4847-b17d-2dbc1b37cecf', -- existing seller
     'active',
+    'bronze',
+    true,
+    'PARTNER003',
+    'https://neture.co.kr/ref/PARTNER003',
+    '{"name": "파트너 이영희", "email": "lee@example.com", "phone": "010-3456-7890", "description": "브론즈 파트너"}'::json,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
     NOW(),
     NOW()
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 \echo '  ✓ Created 3 partners'
 
@@ -118,41 +154,92 @@ INSERT INTO commission_policies (
 \echo '  ✓ Created 1 commission policy'
 
 -- ============================================================================
--- 3. Payment Settlements (정산 데이터 3건)
+-- 3. 테스트용 Payments 생성 (payment_settlements FK 의존성)
+-- ============================================================================
+\echo '💳 Creating test Payments for settlements...'
+
+-- Payment 테이블이 있는지 확인하고 샘플 데이터 생성
+-- Note: payments 테이블은 orderId FK를 요구할 수 있으므로,
+-- 실제 환경에서는 orders가 먼저 생성되어야 합니다.
+-- 여기서는 FK 제약이 없다고 가정하고 진행합니다.
+
+INSERT INTO payments (
+    id,
+    "orderId",
+    amount,
+    "balanceAmount",
+    currency,
+    "orderName",
+    status,
+    "createdAt",
+    "updatedAt"
+) VALUES
+(
+    '88888888-8888-8888-8888-888888888888',
+    'TEST-ORDER-001',
+    500000.00,
+    500000.00,
+    'KRW',
+    '테스트 주문 1',
+    'done',
+    NOW() - INTERVAL '7 days',
+    NOW()
+),
+(
+    '99999999-9999-9999-9999-999999999999',
+    'TEST-ORDER-002',
+    300000.00,
+    300000.00,
+    'KRW',
+    '테스트 주문 2',
+    'done',
+    NOW() - INTERVAL '14 days',
+    NOW()
+),
+(
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'TEST-ORDER-003',
+    200000.00,
+    200000.00,
+    'KRW',
+    '테스트 주문 3',
+    'done',
+    NOW() - INTERVAL '3 days',
+    NOW()
+)
+ON CONFLICT (id) DO NOTHING;
+
+\echo '  ✓ Created 3 test payments'
+
+-- ============================================================================
+-- 4. Payment Settlements (정산 데이터 3건)
 -- ============================================================================
 \echo '💰 Creating Payment Settlements...'
-
--- Note: payment_settlements 테이블은 paymentId FK를 요구하므로,
--- 실제 Payment가 있어야 합니다. 여기서는 샘플로 NULL을 허용하거나
--- 테스트용 Payment를 먼저 생성해야 합니다.
-
--- 먼저 payment_settlements 테이블 구조를 확인
-\echo '  ℹ Checking payment_settlements table structure...'
 
 -- Settlement 1: 파트너 홍길동 - 정산 예정
 INSERT INTO payment_settlements (
     id,
-    payment_id,
-    recipient_type,
-    recipient_id,
-    recipient_name,
+    "paymentId",
+    "recipientType",
+    "recipientId",
+    "recipientName",
     amount,
     currency,
     fee,
     tax,
-    net_amount,
+    "netAmount",
     status,
-    scheduled_at,
-    created_at,
-    updated_at
+    "scheduledAt",
+    "createdAt",
+    "updatedAt"
 ) VALUES
 (
     '55555555-5555-5555-5555-555555555555',
-    NULL, -- paymentId (테스트 데이터이므로 NULL 허용 필요)
+    '88888888-8888-8888-8888-888888888888',
     'partner',
     '11111111-1111-1111-1111-111111111111',
     '파트너 홍길동',
-    50000.00, -- 50만원 정산 예정
+    50000.00, -- 50,000원 정산 예정
     'KRW',
     0,
     0,
@@ -167,28 +254,28 @@ ON CONFLICT (id) DO NOTHING;
 -- Settlement 2: 파트너 김철수 - 정산 완료
 INSERT INTO payment_settlements (
     id,
-    payment_id,
-    recipient_type,
-    recipient_id,
-    recipient_name,
+    "paymentId",
+    "recipientType",
+    "recipientId",
+    "recipientName",
     amount,
     currency,
     fee,
     tax,
-    net_amount,
+    "netAmount",
     status,
-    scheduled_at,
-    completed_at,
-    created_at,
-    updated_at
+    "scheduledAt",
+    "completedAt",
+    "createdAt",
+    "updatedAt"
 ) VALUES
 (
     '66666666-6666-6666-6666-666666666666',
-    NULL,
+    '99999999-9999-9999-9999-999999999999',
     'partner',
     '22222222-2222-2222-2222-222222222222',
     '파트너 김철수',
-    30000.00, -- 30만원 정산 완료
+    30000.00, -- 30,000원 정산 완료
     'KRW',
     0,
     0,
@@ -204,28 +291,28 @@ ON CONFLICT (id) DO NOTHING;
 -- Settlement 3: 파트너 이영희 - 정산 진행중
 INSERT INTO payment_settlements (
     id,
-    payment_id,
-    recipient_type,
-    recipient_id,
-    recipient_name,
+    "paymentId",
+    "recipientType",
+    "recipientId",
+    "recipientName",
     amount,
     currency,
     fee,
     tax,
-    net_amount,
+    "netAmount",
     status,
-    scheduled_at,
-    processed_at,
-    created_at,
-    updated_at
+    "scheduledAt",
+    "processedAt",
+    "createdAt",
+    "updatedAt"
 ) VALUES
 (
     '77777777-7777-7777-7777-777777777777',
-    NULL,
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'partner',
     '33333333-3333-3333-3333-333333333333',
     '파트너 이영희',
-    20000.00, -- 20만원 정산 진행중
+    20000.00, -- 20,000원 정산 진행중
     'KRW',
     0,
     0,
@@ -255,19 +342,19 @@ ORDER BY table_name;
 
 \echo ''
 \echo '👥 Partners summary:'
-SELECT partner_code, partner_name, tier, commission_rate, status
+SELECT "referralCode", profile->>'name' as partner_name, tier, status
 FROM partners
-ORDER BY created_at;
+ORDER BY "createdAt";
 
 \echo ''
 \echo '💰 Settlements summary:'
 SELECT
-    recipient_name,
+    "recipientName",
     amount,
     status,
-    scheduled_at::date as scheduled_date
+    "scheduledAt"::date as scheduled_date
 FROM payment_settlements
-ORDER BY created_at;
+ORDER BY "createdAt";
 
 COMMIT;
 
