@@ -62,11 +62,6 @@ const OAuthSettings = () => {
   // Sync server settings to local state when data loads
   useEffect(() => {
     if (settings?.data) {
-      // Debug logging (remove after issue is resolved)
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log('[OAuth] Server data received:', settings.data);
-      }
       setLocalSettings(settings.data);
       // Reset unsaved changes when fresh data loads
       setHasUnsavedChanges({
