@@ -142,17 +142,13 @@ export const getPost = async (req: Request, res: Response) => {
     if (!post) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
-    
 
-    // Increment view count safely (using meta field)
-    const currentViews = post.meta?.views || 0;
-    const updatedMeta = { 
-      ...post.meta, 
-      views: Number(currentViews) + 1 
-    };
-    await postRepository.update(id, { 
-      meta: updatedMeta as any
-    });
+    // TODO: Implement view count increment using post_meta table
+    // Old implementation used post.meta.views (removed column)
+    // New implementation should:
+    //   1. SELECT meta_value FROM post_meta WHERE post_id = ? AND meta_key = 'views_count'
+    //   2. UPDATE or INSERT with incremented count
+    //   3. Consider using JSONB operators for atomic increment
 
     res.json({ data: post })
   } catch (error) {
@@ -423,7 +419,8 @@ export const updatePost = async (req: Request, res: Response) => {
     if (comment_status !== undefined) post.comment_status = comment_status
     if (ping_status !== undefined) post.ping_status = ping_status
     if (sticky !== undefined) post.sticky = sticky
-    if (meta !== undefined) post.meta = meta
+    // TODO: Migrate meta updates to post_meta table
+    // if (meta !== undefined) post.meta = meta
 
     // Update categories
     if (categories !== undefined) {
