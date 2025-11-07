@@ -423,37 +423,38 @@ async function createAuthorization(
   await authRepo.save(authorization);
 
   // Create audit trail
-  const auditLog = SellerAuthorizationAuditLog.createRequestLog(authorization, data.sellerId);
+  const auditLog = SellerAuthorizationAuditLog.createRequestLog(authorization.id, data.sellerId);
   await auditRepo.save(auditLog);
 
   if (data.status === AuthorizationStatus.APPROVED) {
     const approveLog = SellerAuthorizationAuditLog.createApprovalLog(
-      authorization,
+      authorization.id,
       'supplier-admin'
     );
     await auditRepo.save(approveLog);
   } else if (data.status === AuthorizationStatus.REJECTED) {
     const rejectLog = SellerAuthorizationAuditLog.createRejectionLog(
-      authorization,
+      authorization.id,
       'supplier-admin',
-      data.rejectionReason || 'Rejected by supplier'
+      data.rejectionReason || 'Rejected by supplier',
+      authorization.cooldownUntil || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     );
     await auditRepo.save(rejectLog);
   } else if (data.status === AuthorizationStatus.REVOKED) {
     const approveLog = SellerAuthorizationAuditLog.createApprovalLog(
-      authorization,
+      authorization.id,
       'supplier-admin'
     );
     await auditRepo.save(approveLog);
 
     const revokeLog = SellerAuthorizationAuditLog.createRevocationLog(
-      authorization,
+      authorization.id,
       'admin',
       data.revocationReason || 'Revoked by admin'
     );
     await auditRepo.save(revokeLog);
   } else if (data.status === AuthorizationStatus.CANCELLED) {
-    const cancelLog = SellerAuthorizationAuditLog.createCancellationLog(authorization, data.sellerId);
+    const cancelLog = SellerAuthorizationAuditLog.createCancellationLog(authorization.id, data.sellerId);
     await auditRepo.save(cancelLog);
   }
 
