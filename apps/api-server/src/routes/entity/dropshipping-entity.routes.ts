@@ -3,6 +3,7 @@ import { SupplierEntityController } from '../../controllers/entity/SupplierEntit
 import { PartnerEntityController } from '../../controllers/entity/PartnerEntityController.js';
 import { SupplierDashboardController } from '../../controllers/entity/SupplierDashboardController.js';
 import { PartnerDashboardController } from '../../controllers/entity/PartnerDashboardController.js';
+import { SettlementEntityController } from '../../controllers/entity/SettlementEntityController.js';
 import { authenticateToken } from '../../middleware/auth.js';
 
 const router: Router = Router();
@@ -10,6 +11,7 @@ const supplierController = new SupplierEntityController();
 const partnerController = new PartnerEntityController();
 const supplierDashboardController = new SupplierDashboardController();
 const partnerDashboardController = new PartnerDashboardController();
+const settlementController = new SettlementEntityController();
 
 // All routes require authentication
 router.use(authenticateToken);
@@ -181,5 +183,36 @@ router.get('/partners/dashboard/summary', partnerDashboardController.getSummary.
  * @access Private (Owner only)
  */
 router.get('/partners/dashboard/commissions', partnerDashboardController.getCommissions.bind(partnerDashboardController));
+
+// ============================================================================
+// SETTLEMENT ROUTES
+// ============================================================================
+
+/**
+ * @route GET /api/v1/entity/settlements/summary
+ * @desc Get settlement summary statistics for partner dashboard
+ * @access Private (Partner sees own, admin sees all)
+ */
+router.get('/settlements/summary', settlementController.getSummary.bind(settlementController));
+
+/**
+ * @route GET /api/v1/entity/settlements
+ * @desc List all settlements with filtering & pagination
+ * @query status - Filter by settlement status
+ * @query recipientType - Filter by recipient type
+ * @query startDate - Filter by start date
+ * @query endDate - Filter by end date
+ * @query page - Page number
+ * @query limit - Items per page
+ * @access Private (Partner sees own, admin sees all)
+ */
+router.get('/settlements', settlementController.list.bind(settlementController));
+
+/**
+ * @route GET /api/v1/entity/settlements/:id
+ * @desc Get single settlement by ID
+ * @access Private (Owner or admin)
+ */
+router.get('/settlements/:id', settlementController.get.bind(settlementController));
 
 export default router;
