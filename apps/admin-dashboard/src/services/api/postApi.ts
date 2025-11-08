@@ -459,15 +459,8 @@ export const postApi = {
     tag?: string;
     search?: string;
   }): Promise<PostListResponse> => {
-    try {
-      const response = await apiV1Client.get('/posts', { params });
-      return { success: true, data: response.data };
-    } catch (error: any) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Failed to list posts' 
-      };
-    }
+    const response = await apiV1Client.get('/posts', { params });
+    return response.data;
   },
 };
 
