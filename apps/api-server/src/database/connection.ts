@@ -84,6 +84,7 @@ import { BusinessInfo } from '../entities/BusinessInfo.js';
 import { CommissionPolicy } from '../entities/CommissionPolicy.js';
 import { Commission } from '../entities/Commission.js';
 import { ConversionEvent } from '../entities/ConversionEvent.js';
+import { ReferralClick } from '../entities/ReferralClick.js';
 import { SellerAuthorization } from '../entities/SellerAuthorization.js';
 // Form entities
 import { Form } from '../entities/Form.js';
@@ -233,6 +234,7 @@ export const AppDataSource = new DataSource({
     CommissionPolicy,
     Commission,
     ConversionEvent,
+    ReferralClick,
     SellerAuthorization,
     // Form entities
     Form,
