@@ -4,8 +4,7 @@ import type {
   PresetFieldConfig,
   PresetValidationRule,
   PresetConditionalLogic,
-  PresetConditionalRule,
-  FormSection
+  PresetConditionalRule
 } from '@o4o/types';
 
 /**

@@ -20,7 +20,7 @@ export interface PostCategory {
 }
 
 // Post Status Types
-export type PostStatus = 'draft' | 'published' | 'publish' | 'scheduled' | 'trash' | 'private';
+export type PostStatus = 'draft' | 'pending' | 'published' | 'publish' | 'scheduled' | 'trash' | 'private';
 export type PostType = 'post' | 'page' | string; // Allow custom post types
 export type PostVisibility = 'public' | 'private' | 'password';
 export type CommentStatus = 'open' | 'closed';

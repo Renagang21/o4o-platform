@@ -9,3 +9,6 @@ import { authClient } from '@o4o/auth-client';
 
 // Export the API instance from auth-client
 export const api = authClient.api;
+
+// Default export for backward compatibility
+export default authClient.api;

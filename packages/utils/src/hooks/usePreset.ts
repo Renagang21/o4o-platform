@@ -129,7 +129,7 @@ export function clearPresetCache(): void {
   console.warn('clearPresetCache is deprecated - use invalidateQueries from TanStack Query');
 }
 
-export function clearPresetFromCache(presetId: string, type: PresetType): void {
+export function clearPresetFromCache(_presetId: string, _type: PresetType): void {
   console.warn(
     'clearPresetFromCache is deprecated - use invalidateQueries from TanStack Query'
   );

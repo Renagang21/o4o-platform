@@ -3,9 +3,6 @@
  * Consolidated from all apps to ensure consistency
  */
 
-// Import base types from custom-post-type (but don't re-export to avoid conflicts)
-import type { CustomField as BaseCustomField, CustomFieldGroup as BaseCustomFieldGroup } from '../custom-post-type.js';
-
 // Field Types
 export type ACFFieldType =
   | 'text'

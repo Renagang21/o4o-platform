@@ -21,7 +21,7 @@ export interface TemplateRendererProps {
  */
 function renderSlot(
   slotConfig: SlotConfig | undefined,
-  content: Record<string, any>
+  _content: Record<string, any>
 ): React.ReactNode {
   if (!slotConfig || !slotConfig.blocks || slotConfig.blocks.length === 0) {
     return null;
