@@ -197,8 +197,9 @@ const OAuthSettings = () => {
 
   // Generate callback URL
   const generateCallbackUrl = useCallback((provider: OAuthProvider): string => {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/api/auth/callback/${provider}`;
+    // Use production frontend URL for callback
+    const frontendUrl = 'https://neture.co.kr';
+    return `${frontendUrl}/api/v1/social/${provider}/callback`;
   }, []);
 
   // Mask sensitive data
@@ -230,8 +231,18 @@ const OAuthSettings = () => {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          각 OAuth 제공자의 개발자 콘솔에서 애플리케이션을 생성하고, 
-          아래의 Callback URL을 리다이렉트 URI로 등록해야 합니다.
+          <p className="mb-2">
+            각 OAuth 제공자의 개발자 콘솔에서 애플리케이션을 생성하고,
+            아래의 Callback URL을 리다이렉트 URI로 등록해야 합니다.
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            <strong>참고:</strong> 환경변수를 통한 설정도 가능합니다.
+            API 서버의 <code className="bg-gray-100 px-1 rounded">.env</code> 파일에
+            <code className="bg-gray-100 px-1 rounded">KAKAO_CLIENT_ID</code>,
+            <code className="bg-gray-100 px-1 rounded">KAKAO_CLIENT_SECRET</code> 등을 설정하면
+            데이터베이스 설정 없이도 사용 가능합니다.
+            자세한 내용은 <code className="bg-gray-100 px-1 rounded">docs/OAUTH_SETUP.md</code>를 참조하세요.
+          </p>
         </AlertDescription>
       </Alert>
 
@@ -340,14 +351,14 @@ const OAuthSettings = () => {
 
               {/* Callback URL */}
               <div className="space-y-2">
-                <Label htmlFor={`${provider}-callback-url`}>Callback URL</Label>
+                <Label htmlFor={`${provider}-callback-url`}>Callback URL (Redirect URI)</Label>
                 <div className="flex space-x-2">
                   <Input
                     id={`${provider}-callback-url`}
                     type="text"
                     value={callbackUrl}
                     readOnly
-                    className="bg-muted"
+                    className="bg-muted font-mono text-xs"
                   />
                   <Button
                     type="button"
@@ -355,14 +366,18 @@ const OAuthSettings = () => {
                     size="icon"
                     onClick={() => copyCallbackUrl(provider, callbackUrl)}
                   >
-                    {copiedUrls[provider] ? 
-                      <Check className="h-4 w-4 text-green-600" /> : 
+                    {copiedUrls[provider] ?
+                      <Check className="h-4 w-4 text-green-600" /> :
                       <Copy className="h-4 w-4" />
                     }
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  이 URL을 OAuth 제공자의 리다이렉트 URI로 등록하세요
+                  ⚠️ 이 URL을 <strong>{providerInfo.displayName} 개발자 콘솔</strong>의
+                  <strong> Redirect URI</strong>로 정확히 등록하세요.
+                  {provider === 'kakao' && ' (플랫폼 → Web → Redirect URI 설정)'}
+                  {provider === 'naver' && ' (애플리케이션 → API 설정 → Callback URL)'}
+                  {provider === 'google' && ' (Credentials → OAuth 2.0 Client IDs → Authorized redirect URIs)'}
                 </p>
               </div>
 
