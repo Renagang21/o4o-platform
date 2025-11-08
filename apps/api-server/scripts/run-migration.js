@@ -5,6 +5,9 @@
  * Runs pending TypeORM migrations
  */
 
+// MUST load environment first
+import '../dist/env-loader.js';
+
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
