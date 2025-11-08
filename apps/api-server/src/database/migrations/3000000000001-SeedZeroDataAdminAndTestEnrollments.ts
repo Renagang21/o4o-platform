@@ -33,7 +33,7 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'admin-0000-0000-0000-000000000000',
+        '00000000-0000-0000-0000-000000000001',
         'admin@neture.co.kr',
         '${adminPassword}',
         'System Admin',
@@ -61,13 +61,13 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'admin-assign-0000-0000-000000000000',
-        'admin-0000-0000-0000-000000000000',
+        '00000000-0000-0000-0000-000000000002',
+        '00000000-0000-0000-0000-000000000001',
         'admin',
         true,
         NOW(),
         NOW(),
-        'admin-0000-0000-0000-000000000000',
+        '00000000-0000-0000-0000-000000000001',
         NOW(),
         NOW()
       )
@@ -90,7 +90,7 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'test-supplier-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000011',
         'test-supplier@neture.co.kr',
         '${testPassword}',
         'Test Supplier',
@@ -116,7 +116,7 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'test-seller-0000-0000-000000000002',
+        '00000000-0000-0000-0000-000000000012',
         'test-seller@neture.co.kr',
         '${testPassword}',
         'Test Seller',
@@ -142,7 +142,7 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'test-partner-0000-0000-000000000003',
+        '00000000-0000-0000-0000-000000000013',
         'test-partner@neture.co.kr',
         '${testPassword}',
         'Test Partner',
@@ -168,8 +168,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'enrollment-supplier-000000000001',
-        'test-supplier-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000021',
+        '00000000-0000-0000-0000-000000000011',
         'supplier',
         'PENDING',
         '{"companyName": "테스트 공급사", "taxId": "123-45-67890", "businessEmail": "supplier@test.com", "businessPhone": "02-1234-5678", "businessAddress": "서울특별시 강남구 테스트로 123"}'::jsonb,
@@ -190,8 +190,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'enrollment-seller-000000000002',
-        'test-seller-0000-0000-000000000002',
+        '00000000-0000-0000-0000-000000000022',
+        '00000000-0000-0000-0000-000000000012',
         'seller',
         'PENDING',
         '{"storeName": "테스트 스토어", "storeUrl": "https://smartstore.naver.com/test", "salesChannel": "smartstore", "businessEmail": "seller@test.com", "businessPhone": "02-2345-6789"}'::jsonb,
@@ -212,8 +212,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         "createdAt",
         "updatedAt"
       ) VALUES (
-        'enrollment-partner-000000000003',
-        'test-partner-0000-0000-000000000003',
+        '00000000-0000-0000-0000-000000000023',
+        '00000000-0000-0000-0000-000000000013',
         'partner',
         'PENDING',
         '{"partnerType": "influencer", "platform": "youtube", "channelUrl": "https://youtube.com/@test", "followerCount": 50000, "contactEmail": "partner@test.com", "contactPhone": "010-1234-5678"}'::jsonb,
@@ -230,29 +230,29 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
     // 신청 삭제
     await queryRunner.query(`
       DELETE FROM role_enrollments WHERE id IN (
-        'enrollment-supplier-000000000001',
-        'enrollment-seller-000000000002',
-        'enrollment-partner-000000000003'
+        '00000000-0000-0000-0000-000000000021',
+        '00000000-0000-0000-0000-000000000022',
+        '00000000-0000-0000-0000-000000000023'
       )
     `);
 
     // 테스트 사용자 삭제
     await queryRunner.query(`
       DELETE FROM users WHERE id IN (
-        'test-supplier-0000-0000-000000000001',
-        'test-seller-0000-0000-000000000002',
-        'test-partner-0000-0000-000000000003'
+        '00000000-0000-0000-0000-000000000011',
+        '00000000-0000-0000-0000-000000000012',
+        '00000000-0000-0000-0000-000000000013'
       )
     `);
 
     // 관리자 역할 할당 삭제
     await queryRunner.query(`
-      DELETE FROM role_assignments WHERE id = 'admin-assign-0000-0000-000000000000'
+      DELETE FROM role_assignments WHERE id = '00000000-0000-0000-0000-000000000002'
     `);
 
     // 관리자 계정 삭제
     await queryRunner.query(`
-      DELETE FROM users WHERE id = 'admin-0000-0000-0000-000000000000'
+      DELETE FROM users WHERE id = '00000000-0000-0000-0000-000000000001'
     `);
   }
 }
