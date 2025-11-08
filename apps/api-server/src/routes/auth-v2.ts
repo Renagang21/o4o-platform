@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
+import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { authService } from '../services/AuthService.js';
 import { AuthServiceV2 } from '../services/AuthServiceV2.js';
 import { UserService } from '../services/UserService.js';
@@ -237,13 +238,13 @@ router.post('/logout', async (req, res) => {
   }
 });
 
-// Verify current session
+// Verify current session (P0 extended with assignments)
 router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: (req.user as any)?.userId || (req.user as any)?.id },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'permissions']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'permissions', 'isActive', 'isEmailVerified', 'createdAt', 'updatedAt']
     });
 
     if (!user) {
@@ -253,9 +254,40 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
       });
     }
 
+    // P0: Fetch active role assignments
+    const assignmentRepository = AppDataSource.getRepository(RoleAssignment);
+    const assignments = await assignmentRepository.find({
+      where: { userId: user.id },
+      order: { createdAt: 'DESC' }
+    });
+
+    // Format assignments response
+    const assignmentsResponse = assignments.map(assignment => ({
+      role: assignment.role,
+      active: assignment.isActive,
+      activated_at: assignment.isActive ? assignment.validFrom : null,
+      deactivated_at: !assignment.isActive && assignment.validUntil ? assignment.validUntil : null,
+      valid_from: assignment.validFrom,
+      valid_until: assignment.validUntil,
+      assigned_by: assignment.assignedBy,
+      assigned_at: assignment.assignedAt
+    }));
+
     res.json({
       success: true,
-      user
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        status: user.status,
+        businessInfo: user.businessInfo,
+        permissions: user.permissions,
+        isActive: user.isActive,
+        isEmailVerified: user.isEmailVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      },
+      assignments: assignmentsResponse
     });
   } catch (error) {
     // Error log removed
