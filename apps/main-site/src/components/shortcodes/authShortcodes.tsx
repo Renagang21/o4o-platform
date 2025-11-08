@@ -164,7 +164,7 @@ export const SocialLoginComponent: React.FC<{
 
   const handleSocialLogin = (provider: 'google' | 'kakao' | 'naver') => {
     const baseUrl = authClient.api.defaults.baseURL || '';
-    window.location.href = `${baseUrl}/auth/${provider}`;
+    window.location.href = `${baseUrl}/social/${provider}`;
   };
 
   const renderSocialIcon = (provider: string) => {
