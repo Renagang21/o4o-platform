@@ -519,7 +519,7 @@ router.get('/oauth/admin', authenticate, requireAdmin, async (req: Request, res:
     // Get OAuth settings from database
     const settingsRepository = AppDataSource.getRepository(Settings);
     const dbSettings = await settingsRepository.findOne({
-      where: { key: 'oauth', type: 'oauth' }
+      where: { key: 'oauth_settings' }
     });
 
     let oauthSettings: any = {};
@@ -600,7 +600,7 @@ router.get('/oauth', async (req: Request, res: Response) => {
     // Get OAuth settings from database
     const settingsRepository = AppDataSource.getRepository(Settings);
     const dbSettings = await settingsRepository.findOne({
-      where: { key: 'oauth', type: 'oauth' }
+      where: { key: 'oauth_settings' }
     });
 
     let oauthSettings: any = {};
@@ -977,7 +977,7 @@ router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
     // Get current OAuth settings from database
     const settingsRepository = AppDataSource.getRepository(Settings);
     let dbSettings = await settingsRepository.findOne({
-      where: { key: 'oauth', type: 'oauth' }
+      where: { key: 'oauth_settings' }
     });
 
     let oauthSettings: any = {};
@@ -1006,8 +1006,8 @@ router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
       dbSettings.updatedAt = new Date();
     } else {
       dbSettings = settingsRepository.create({
-        key: 'oauth',
-        type: 'oauth',
+        key: 'oauth_settings',
+        type: 'json',
         value: oauthSettings,
         description: 'OAuth provider settings for social login'
       });
