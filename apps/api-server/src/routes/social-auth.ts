@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import passport from '../config/passportDynamic.js';
+import passport, { getActiveStrategies } from '../config/passportDynamic.js';
 import { SocialAuthService } from '../services/socialAuthService.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
 
@@ -9,6 +9,28 @@ const router: Router = Router();
 const getRedirectUrls = () => ({
   success: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?success=true`,
   failure: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?error=social_auth_failed`
+});
+
+// OAuth status endpoint (for debugging)
+router.get('/status', (req, res) => {
+  const activeStrategies = getActiveStrategies();
+  const hasOAuth = activeStrategies.length > 0;
+
+  res.json({
+    success: true,
+    oauth: {
+      enabled: hasOAuth,
+      providers: {
+        google: activeStrategies.includes('google'),
+        kakao: activeStrategies.includes('kakao'),
+        naver: activeStrategies.includes('naver')
+      },
+      activeStrategies,
+      message: hasOAuth
+        ? 'OAuth is configured and ready'
+        : 'OAuth is not configured. Set environment variables or configure in Admin Dashboard.'
+    }
+  });
 });
 
 // Google OAuth routes

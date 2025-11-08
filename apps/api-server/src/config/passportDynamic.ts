@@ -377,4 +377,9 @@ export const reloadPassportStrategies = async (): Promise<void> => {
   await PassportManager.reloadStrategies();
 };
 
+// Export function to get active strategies (for status endpoint)
+export const getActiveStrategies = (): string[] => {
+  return PassportManager.getActiveStrategies();
+};
+
 export default passport;
