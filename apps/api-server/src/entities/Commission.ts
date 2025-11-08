@@ -6,11 +6,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  Index
+  Index,
+  OneToOne
 } from 'typeorm';
 import type { Partner } from './Partner.js';
 import type { Product } from './Product.js';
-import type { ConversionEvent } from './ConversionEvent.js';
+import { ConversionEvent } from './ConversionEvent.js';
 import type { CommissionPolicy } from './CommissionPolicy.js';
 
 /**
@@ -66,7 +67,7 @@ export class Commission {
   @Column({ type: 'uuid', unique: true })
   conversionId!: string;
 
-  @ManyToOne('ConversionEvent', { onDelete: 'CASCADE' })
+  @ManyToOne(() => ConversionEvent, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'conversionId' })
   conversion!: ConversionEvent;
 
