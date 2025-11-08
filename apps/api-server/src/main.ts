@@ -315,14 +315,6 @@ try {
 const startServer = async () => {
   logger.info('Starting server...');
 
-  // Initialize dynamic Passport strategies
-  try {
-    await initializePassport();
-    logger.info('✅ Dynamic Passport strategies initialized');
-  } catch (passportError) {
-    logger.error('Failed to initialize Passport strategies:', passportError);
-  }
-
   // Initialize CPT Registry (Phase 5)
   try {
     const { initializeCPT } = await import('./init/cpt.init.js');
@@ -332,7 +324,7 @@ const startServer = async () => {
     // Continue server startup even if CPT init fails
   }
 
-  // Initialize all services
+  // Initialize all services (including database)
   try {
     await startupService.initialize();
   } catch (error) {
@@ -340,6 +332,14 @@ const startServer = async () => {
     if (process.env.NODE_ENV === 'production') {
       process.exit(1);
     }
+  }
+
+  // Initialize dynamic Passport strategies (AFTER database is initialized)
+  try {
+    await initializePassport();
+    logger.info('✅ Dynamic Passport strategies initialized');
+  } catch (passportError) {
+    logger.error('Failed to initialize Passport strategies:', passportError);
   }
 
   // Initialize Redis for session sync (if enabled)

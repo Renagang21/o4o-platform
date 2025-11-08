@@ -47,12 +47,14 @@ class PassportManager {
     try {
       // Check if AppDataSource is initialized
       if (!AppDataSource.isInitialized) {
+        logger.warn('⚠️ Database not initialized yet, falling back to environment variables or defaults');
         // DataSource not initialized, try environment variables first
         const envSettings = this.getEnvSettings();
         if (this.hasValidEnvSettings(envSettings)) {
-          logger.info('Using OAuth settings from environment variables (DB not initialized)');
+          logger.info('✅ Using OAuth settings from environment variables (DB not initialized)');
           return envSettings;
         }
+        logger.warn('⚠️ No OAuth settings found in environment variables, using defaults (all disabled)');
         return this.getDefaultSettings();
       }
 
@@ -62,12 +64,14 @@ class PassportManager {
       });
 
       if (!oauthSetting || !oauthSetting.value) {
+        logger.warn('⚠️ No OAuth settings found in database, falling back to environment variables');
         // No DB settings, fallback to environment variables
         const envSettings = this.getEnvSettings();
         if (this.hasValidEnvSettings(envSettings)) {
-          logger.info('Using OAuth settings from environment variables (no DB settings)');
+          logger.info('✅ Using OAuth settings from environment variables (no DB settings)');
           return envSettings;
         }
+        logger.warn('⚠️ No OAuth settings in DB or environment, using defaults (all disabled)');
         return this.getDefaultSettings();
       }
 
@@ -100,6 +104,25 @@ class PassportManager {
           parsedData.naver.clientSecret = '';
         }
       }
+
+      logger.info('✅ OAuth settings loaded from database', {
+        providers: Object.keys(parsedData).filter(key => parsedData[key as keyof OAuthSettingsData]?.enabled),
+        google: {
+          enabled: parsedData.google?.enabled || false,
+          hasClientId: !!parsedData.google?.clientId,
+          hasClientSecret: !!parsedData.google?.clientSecret
+        },
+        kakao: {
+          enabled: parsedData.kakao?.enabled || false,
+          hasClientId: !!parsedData.kakao?.clientId,
+          hasClientSecret: !!parsedData.kakao?.clientSecret
+        },
+        naver: {
+          enabled: parsedData.naver?.enabled || false,
+          hasClientId: !!parsedData.naver?.clientId,
+          hasClientSecret: !!parsedData.naver?.clientSecret
+        }
+      });
 
       return parsedData;
     } catch (error) {
@@ -179,22 +202,40 @@ class PassportManager {
       // Clear existing strategies
       this.clearStrategies();
 
+      const registeredStrategies: string[] = [];
+
       // Configure Google strategy
       if (settings.google.enabled && settings.google.clientId && settings.google.clientSecret) {
         this.configureGoogleStrategy(settings.google);
+        registeredStrategies.push('google');
+        logger.info('✅ Google OAuth strategy registered');
+      } else if (settings.google.enabled) {
+        logger.warn('⚠️ Google OAuth enabled but missing credentials (clientId or clientSecret)');
       }
 
       // Configure Kakao strategy
       if (settings.kakao.enabled && settings.kakao.clientId) {
         this.configureKakaoStrategy(settings.kakao);
+        registeredStrategies.push('kakao');
+        logger.info('✅ Kakao OAuth strategy registered');
+      } else if (settings.kakao.enabled) {
+        logger.warn('⚠️ Kakao OAuth enabled but missing clientId');
       }
 
       // Configure Naver strategy
       if (settings.naver.enabled && settings.naver.clientId && settings.naver.clientSecret) {
         this.configureNaverStrategy(settings.naver);
+        registeredStrategies.push('naver');
+        logger.info('✅ Naver OAuth strategy registered');
+      } else if (settings.naver.enabled) {
+        logger.warn('⚠️ Naver OAuth enabled but missing credentials (clientId or clientSecret)');
       }
 
-      logger.info('OAuth strategies configured successfully');
+      if (registeredStrategies.length > 0) {
+        logger.info(`🔐 OAuth strategies configured successfully: ${registeredStrategies.join(', ')}`);
+      } else {
+        logger.warn('⚠️ No OAuth strategies registered (all providers disabled or missing credentials)');
+      }
     } catch (error) {
       logger.error('Error configuring OAuth strategies:', error);
     }
