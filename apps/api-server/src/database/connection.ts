@@ -92,6 +92,13 @@ import { FormSubmission } from '../entities/FormSubmission.js';
 // Customizer entities
 import { CustomizerPreset } from '../entities/CustomizerPreset.js';
 import { WidgetArea } from '../entities/WidgetArea.js';
+// P0 Zero-Data Role Management entities
+import { RoleEnrollment } from '../entities/RoleEnrollment.js';
+import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { KycDocument } from '../entities/KycDocument.js';
+import { SupplierProfile } from '../entities/SupplierProfile.js';
+import { SellerProfile } from '../entities/SellerProfile.js';
+import { PartnerProfile } from '../entities/PartnerProfile.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -242,6 +249,13 @@ export const AppDataSource = new DataSource({
     // Customizer entities
     CustomizerPreset,
     WidgetArea,
+    // P0 Zero-Data Role Management entities
+    RoleEnrollment,
+    RoleAssignment,
+    KycDocument,
+    SupplierProfile,
+    SellerProfile,
+    PartnerProfile,
   ],
   
   // 마이그레이션 설정
