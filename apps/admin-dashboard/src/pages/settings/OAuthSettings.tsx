@@ -135,12 +135,22 @@ const OAuthSettings = () => {
   // Save specific provider settings to server
   const handleSaveProvider = useCallback(async (provider: OAuthProvider) => {
     const config = localSettings[provider];
-    
+
     // Validate required fields
-    if (config.enabled && (!config.clientId || !config.clientSecret)) {
+    // Note: Kakao only requires REST API key (clientId), Client Secret is optional
+    if (config.enabled && !config.clientId) {
       addNotice({
         type: 'error',
-        message: `${OAUTH_PROVIDERS[provider].displayName} 설정을 저장하려면 Client ID와 Client Secret을 모두 입력해주세요.`
+        message: `${OAUTH_PROVIDERS[provider].displayName} 설정을 저장하려면 ${provider === 'kakao' ? 'REST API 키' : 'Client ID'}를 입력해주세요.`
+      });
+      return;
+    }
+
+    // For non-Kakao providers, Client Secret is required
+    if (config.enabled && provider !== 'kakao' && !config.clientSecret) {
+      addNotice({
+        type: 'error',
+        message: `${OAUTH_PROVIDERS[provider].displayName} 설정을 저장하려면 Client Secret을 입력해주세요.`
       });
       return;
     }
@@ -301,33 +311,37 @@ const OAuthSettings = () => {
 
               <Separator />
 
-              {/* Client ID */}
+              {/* Client ID / REST API Key */}
               <div className="space-y-2">
-                <Label htmlFor={`${provider}-client-id`}>Client ID</Label>
+                <Label htmlFor={`${provider}-client-id`}>
+                  {provider === 'kakao' ? 'REST API 키' : 'Client ID'}
+                </Label>
                 <Input
                   id={`${provider}-client-id`}
                   type="text"
                   value={config.clientId}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     handleInputChange(provider, 'clientId', e.target.value)
                   }
-                  placeholder="OAuth 애플리케이션의 Client ID"
+                  placeholder={provider === 'kakao' ? 'Kakao REST API 키' : 'OAuth 애플리케이션의 Client ID'}
                   disabled={!config.enabled || updateMutation.isPending}
                 />
               </div>
 
               {/* Client Secret */}
               <div className="space-y-2">
-                <Label htmlFor={`${provider}-client-secret`}>Client Secret</Label>
+                <Label htmlFor={`${provider}-client-secret`}>
+                  {provider === 'kakao' ? 'Client Secret (선택사항)' : 'Client Secret'}
+                </Label>
                 <div className="flex space-x-2">
                   <Input
                     id={`${provider}-client-secret`}
                     type={showSecrets[provider] ? 'text' : 'password'}
                     value={config.clientSecret || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleInputChange(provider, 'clientSecret', e.target.value)
                     }
-                    placeholder="OAuth 애플리케이션의 Client Secret"
+                    placeholder={provider === 'kakao' ? 'Client Secret (보안 강화 시 사용)' : 'OAuth 애플리케이션의 Client Secret'}
                     disabled={!config.enabled || updateMutation.isPending}
                     autoComplete="new-password"
                   />
@@ -338,14 +352,16 @@ const OAuthSettings = () => {
                     onClick={() => toggleSecretVisibility(provider)}
                     disabled={updateMutation.isPending}
                   >
-                    {showSecrets[provider] ? 
-                      <EyeOff className="h-4 w-4" /> : 
+                    {showSecrets[provider] ?
+                      <EyeOff className="h-4 w-4" /> :
                       <Eye className="h-4 w-4" />
                     }
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  안전하게 암호화되어 저장됩니다
+                  {provider === 'kakao'
+                    ? 'Kakao는 REST API 키만으로 인증 가능 (Client Secret은 선택사항)'
+                    : '안전하게 암호화되어 저장됩니다'}
                 </p>
               </div>
 
