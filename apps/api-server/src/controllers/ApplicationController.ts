@@ -54,16 +54,23 @@ export class ApplicationController {
       const businessInfoRepo = AppDataSource.getRepository(BusinessInfo);
       const businessInfo = businessInfoRepo.create({
         userId,
-        type: 'corporate',
-        businessNumber,
         businessName,
-        representativeName: ceoName,
-        address: businessAddress,
-        phone: businessPhone,
-        email: taxEmail,
-        contactPerson: managerName,
-        contactPhone: managerPhone,
-        contactEmail: managerEmail,
+        businessType: 'corporation' as any,
+        industry: 'other' as any,
+        address: {
+          street1: businessAddress || '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: 'KR'
+        },
+        contact: {
+          phone: businessPhone,
+          email: taxEmail
+        },
+        legal: {
+          taxId: businessNumber
+        },
         isVerified: false
       });
       await businessInfoRepo.save(businessInfo);
@@ -74,8 +81,7 @@ export class ApplicationController {
         businessInfo,
         status: SupplierStatus.PENDING,
         isActive: true,
-        suppliedCategories: suppliedCategories ? suppliedCategories.split(',').map((c: string) => c.trim()) : [],
-        applicationMessage,
+        specialties: suppliedCategories ? suppliedCategories.split(',').map((c: string) => c.trim()) : [],
         website,
         certifications: certifications ? certifications.split(',').map((c: string) => c.trim()) : [],
         averageRating: 0,
@@ -149,16 +155,23 @@ export class ApplicationController {
       const businessInfoRepo = AppDataSource.getRepository(BusinessInfo);
       const businessInfo = businessInfoRepo.create({
         userId,
-        type: 'corporate',
-        businessNumber,
         businessName,
-        representativeName: ceoName,
-        address: businessAddress,
-        phone: businessPhone,
-        email: taxEmail,
-        contactPerson: managerName,
-        contactPhone: managerPhone,
-        contactEmail: managerEmail,
+        businessType: 'corporation' as any,
+        industry: 'retail' as any,
+        address: {
+          street1: businessAddress || '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: 'KR'
+        },
+        contact: {
+          phone: businessPhone,
+          email: taxEmail
+        },
+        legal: {
+          taxId: businessNumber
+        },
         isVerified: false
       });
       await businessInfoRepo.save(businessInfo);
@@ -282,16 +295,23 @@ export class ApplicationController {
         const businessInfoRepo = AppDataSource.getRepository(BusinessInfo);
         businessInfo = businessInfoRepo.create({
           userId,
-          type: 'corporate',
-          businessNumber,
           businessName,
-          representativeName: ceoName,
-          address: businessAddress,
-          phone: businessPhone,
-          email: taxEmail,
-          contactPerson: managerName,
-          contactPhone: managerPhone,
-          contactEmail: managerEmail,
+          businessType: 'corporation' as any,
+          industry: 'marketing' as any,
+          address: {
+            street1: businessAddress || '',
+            city: '',
+            state: '',
+            postalCode: '',
+            country: 'KR'
+          },
+          contact: {
+            phone: businessPhone,
+            email: taxEmail
+          },
+          legal: {
+            taxId: businessNumber
+          },
           isVerified: false
         });
         await businessInfoRepo.save(businessInfo);
