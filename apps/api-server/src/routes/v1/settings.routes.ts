@@ -1015,38 +1015,22 @@ router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
 
     await settingsRepository.save(dbSettings);
 
-    logger.info('OAuth settings saved to database:', {
-      actor,
+    logger.info('OAuth settings saved', {
       provider,
-      enabled: config.enabled,
-      clientId: config.clientId ? 'present' : 'empty',
-      clientSecret: config.clientSecret ? 'present' : 'empty',
-      timestamp: new Date().toISOString()
+      enabled: config.enabled
     });
 
     // Reload Passport strategies with new configuration
-    logger.info(`🔄 ABOUT TO RELOAD Passport strategies for provider: ${provider}`, {
-      actor,
-      enabled: config.enabled,
-      hasClientId: !!config.clientId,
-      hasClientSecret: !!config.clientSecret
-    });
-
     try {
-      logger.info('🔄 Calling reloadPassportStrategies()...', { actor });
       await reloadPassportStrategies();
-      logger.info('✅ Passport strategies reloaded successfully', { actor, provider });
+      logger.info('Passport strategies reloaded', { provider });
     } catch (passportError) {
-      logger.error('❌ Failed to reload Passport strategies:', {
-        actor,
+      logger.error('Failed to reload Passport strategies:', {
         provider,
-        error: passportError instanceof Error ? passportError.message : 'Unknown error',
-        stack: passportError instanceof Error ? passportError.stack : undefined
+        error: passportError instanceof Error ? passportError.message : 'Unknown error'
       });
       // Don't fail the request, just log the error
     }
-
-    logger.info('🔄 AFTER reload attempt, continuing with response', { actor, provider });
 
     // Also update memory store for backward compatibility
     settingsStore.set('oauth', oauthSettings);

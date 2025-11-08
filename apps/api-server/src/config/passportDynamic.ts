@@ -1,3 +1,13 @@
+/**
+ * Dynamic Passport OAuth Configuration
+ *
+ * Dynamically loads OAuth provider settings from database and configures
+ * Passport strategies at runtime. Supports Google, Kakao, and Naver.
+ *
+ * Database key: 'oauth_settings'
+ * Fallback: Environment variables → Default (all disabled)
+ */
+
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as KakaoStrategy } from 'passport-kakao';
@@ -47,14 +57,12 @@ class PassportManager {
     try {
       // Check if AppDataSource is initialized
       if (!AppDataSource.isInitialized) {
-        logger.warn('⚠️ Database not initialized yet, falling back to environment variables or defaults');
-        // DataSource not initialized, try environment variables first
         const envSettings = this.getEnvSettings();
         if (this.hasValidEnvSettings(envSettings)) {
-          logger.info('✅ Using OAuth settings from environment variables (DB not initialized)');
+          logger.info('OAuth settings loaded from environment (DB not ready)');
           return envSettings;
         }
-        logger.warn('⚠️ No OAuth settings found in environment variables, using defaults (all disabled)');
+        logger.warn('No OAuth settings available, using defaults');
         return this.getDefaultSettings();
       }
 
@@ -64,14 +72,12 @@ class PassportManager {
       });
 
       if (!oauthSetting || !oauthSetting.value) {
-        logger.warn('⚠️ No OAuth settings found in database, falling back to environment variables');
-        // No DB settings, fallback to environment variables
         const envSettings = this.getEnvSettings();
         if (this.hasValidEnvSettings(envSettings)) {
-          logger.info('✅ Using OAuth settings from environment variables (no DB settings)');
+          logger.info('OAuth settings loaded from environment (no DB config)');
           return envSettings;
         }
-        logger.warn('⚠️ No OAuth settings in DB or environment, using defaults (all disabled)');
+        logger.warn('No OAuth settings in DB or environment, using defaults');
         return this.getDefaultSettings();
       }
 
@@ -105,23 +111,12 @@ class PassportManager {
         }
       }
 
-      logger.info('✅ OAuth settings loaded from database', {
-        providers: Object.keys(parsedData).filter(key => parsedData[key as keyof OAuthSettingsData]?.enabled),
-        google: {
-          enabled: parsedData.google?.enabled || false,
-          hasClientId: !!parsedData.google?.clientId,
-          hasClientSecret: !!parsedData.google?.clientSecret
-        },
-        kakao: {
-          enabled: parsedData.kakao?.enabled || false,
-          hasClientId: !!parsedData.kakao?.clientId,
-          hasClientSecret: !!parsedData.kakao?.clientSecret
-        },
-        naver: {
-          enabled: parsedData.naver?.enabled || false,
-          hasClientId: !!parsedData.naver?.clientId,
-          hasClientSecret: !!parsedData.naver?.clientSecret
-        }
+      const enabledProviders = Object.keys(parsedData)
+        .filter(key => parsedData[key as keyof OAuthSettingsData]?.enabled);
+
+      logger.info('OAuth settings loaded from database', {
+        source: 'database',
+        enabledProviders: enabledProviders.length > 0 ? enabledProviders : ['none']
       });
 
       return parsedData;
@@ -208,33 +203,31 @@ class PassportManager {
       if (settings.google.enabled && settings.google.clientId && settings.google.clientSecret) {
         this.configureGoogleStrategy(settings.google);
         registeredStrategies.push('google');
-        logger.info('✅ Google OAuth strategy registered');
       } else if (settings.google.enabled) {
-        logger.warn('⚠️ Google OAuth enabled but missing credentials (clientId or clientSecret)');
+        logger.warn('Google OAuth enabled but missing credentials');
       }
 
       // Configure Kakao strategy
       if (settings.kakao.enabled && settings.kakao.clientId) {
         this.configureKakaoStrategy(settings.kakao);
         registeredStrategies.push('kakao');
-        logger.info('✅ Kakao OAuth strategy registered');
       } else if (settings.kakao.enabled) {
-        logger.warn('⚠️ Kakao OAuth enabled but missing clientId');
+        logger.warn('Kakao OAuth enabled but missing clientId');
       }
 
       // Configure Naver strategy
       if (settings.naver.enabled && settings.naver.clientId && settings.naver.clientSecret) {
         this.configureNaverStrategy(settings.naver);
         registeredStrategies.push('naver');
-        logger.info('✅ Naver OAuth strategy registered');
       } else if (settings.naver.enabled) {
-        logger.warn('⚠️ Naver OAuth enabled but missing credentials (clientId or clientSecret)');
+        logger.warn('Naver OAuth enabled but missing credentials');
       }
 
+      // Log final result
       if (registeredStrategies.length > 0) {
-        logger.info(`🔐 OAuth strategies configured successfully: ${registeredStrategies.join(', ')}`);
+        logger.info(`OAuth strategies registered: ${registeredStrategies.join(', ')}`);
       } else {
-        logger.warn('⚠️ No OAuth strategies registered (all providers disabled or missing credentials)');
+        logger.warn('No OAuth strategies registered');
       }
     } catch (error) {
       logger.error('Error configuring OAuth strategies:', error);
@@ -294,7 +287,6 @@ class PassportManager {
     }));
 
     this.activeStrategies.add('google');
-    logger.info('Google OAuth strategy configured');
   }
 
   private static configureKakaoStrategy(config: OAuthConfig): void {
@@ -345,7 +337,6 @@ class PassportManager {
     }));
 
     this.activeStrategies.add('kakao');
-    logger.info('Kakao OAuth strategy configured');
   }
 
   private static configureNaverStrategy(config: OAuthConfig): void {
@@ -396,7 +387,6 @@ class PassportManager {
     }));
 
     this.activeStrategies.add('naver');
-    logger.info('Naver OAuth strategy configured');
   }
 
   static async reloadStrategies(): Promise<void> {

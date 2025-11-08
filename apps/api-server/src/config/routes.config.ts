@@ -23,7 +23,6 @@ import contentRoutes from '../routes/content.js';
 import cmsRoutes from '../routes/content/index.js';
 import publicRoutes from '../routes/public.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
-import oauthSettingsRoutes from '../routes/settings.routes.js';
 import emailAuthRoutes from '../routes/email-auth.routes.js';
 import forumRoutes from '../routes/forum.js';
 import linkedAccountsRoutes from '../routes/linked-accounts.js';
