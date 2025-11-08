@@ -7,13 +7,24 @@ import React from 'react';
 import { Block } from '@/types/post.types';
 import { PanelBody, SelectControl, ToggleControl, ColorPicker, RangeControl } from '../controls';
 
+interface ListAttributes {
+  ordered?: boolean;
+  indent?: number;
+  fontSize?: number;
+  lineHeight?: number;
+  textColor?: string;
+  markerColor?: string;
+  reversed?: boolean;
+  start?: number;
+}
+
 interface ListSettingsProps {
   block: Block;
   onUpdate: (updates: { content?: any; attributes?: any }) => void;
 }
 
 export const ListSettings: React.FC<ListSettingsProps> = ({ block, onUpdate }) => {
-  const attributes = block.attributes || {};
+  const attributes = (block.attributes || {}) as ListAttributes;
 
   return (
     <>

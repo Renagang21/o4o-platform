@@ -9,13 +9,24 @@ import { PanelBody, TextControl, RangeControl, ToggleControl, SelectControl } fr
 import { ButtonGroup } from '../controls/ButtonGroup';
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 
+interface ImageAttributes {
+  alt?: string;
+  align?: string;
+  width?: number;
+  href?: string;
+  linkTarget?: string;
+  sizeSlug?: string;
+  rounded?: boolean;
+  border?: boolean;
+}
+
 interface ImageSettingsProps {
   block: Block;
   onUpdate: (updates: { content?: any; attributes?: any }) => void;
 }
 
 export const ImageSettings: React.FC<ImageSettingsProps> = ({ block, onUpdate }) => {
-  const attributes = block.attributes || {};
+  const attributes = (block.attributes || {}) as ImageAttributes;
   const content = block.content || {};
 
   return (
