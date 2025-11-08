@@ -15,6 +15,19 @@ const SupplierDashboardLazy = React.lazy(() =>
   import('./SupplierDashboard').then(module => ({ default: module.SupplierDashboard }))
 );
 
+// Import application forms
+const SupplierApplicationLazy = React.lazy(() =>
+  import('../dropshipping/RoleApplicationForms').then(module => ({ default: module.SupplierApplicationForm }))
+);
+
+const SellerApplicationLazy = React.lazy(() =>
+  import('../dropshipping/RoleApplicationForms').then(module => ({ default: module.SellerApplicationForm }))
+);
+
+const PartnerApplicationLazy = React.lazy(() =>
+  import('../dropshipping/RoleApplicationForms').then(module => ({ default: module.PartnerApplicationForm }))
+);
+
 // Loading fallback component
 const LoadingFallback: React.FC<{ message: string }> = ({ message }) => (
   <div className="flex items-center justify-center py-12">
@@ -186,5 +199,31 @@ export const dropshippingShortcodes: ShortcodeDefinition[] = [
   {
     name: 'role_switcher',
     component: () => <PlaceholderShortcode name="role_switcher" />
+  },
+
+  // ===== ROLE APPLICATION FORMS =====
+  {
+    name: 'supplier_application',
+    component: () => (
+      <React.Suspense fallback={<LoadingFallback message="Loading application form..." />}>
+        <SupplierApplicationLazy />
+      </React.Suspense>
+    )
+  },
+  {
+    name: 'seller_application',
+    component: () => (
+      <React.Suspense fallback={<LoadingFallback message="Loading application form..." />}>
+        <SellerApplicationLazy />
+      </React.Suspense>
+    )
+  },
+  {
+    name: 'partner_application',
+    component: ({ attributes }) => (
+      <React.Suspense fallback={<LoadingFallback message="Loading application form..." />}>
+        <PartnerApplicationLazy sellerId={attributes.seller_id as string} />
+      </React.Suspense>
+    )
   }
 ];

@@ -110,6 +110,9 @@ import widgetAreasRoutes from '../routes/v1/widget-areas.routes.js';
 // Phase 4 - Cart Routes
 import cartRoutes from '../routes/v1/cart.routes.js';
 
+// Phase 5 - Role Applications Routes
+import applicationsRoutes from '../routes/v1/applications.routes.js';
+
 // Phase 7 - Partner Analytics Routes
 import partnerAnalyticsRoutes from '../routes/analytics/partner-analytics.routes.js';
 
@@ -302,6 +305,9 @@ export function setupRoutes(app: Application): void {
   // Phase 4 - Cart
   app.use('/api/v1/cart', publicLimiter, cartRoutes);
   app.use('/api/cart', publicLimiter, cartRoutes);
+
+  // Phase 5 - Role Applications (Supplier, Seller, Partner)
+  app.use('/api/v1/applications', standardLimiter, applicationsRoutes);
 
   // Phase 7 - Partner Analytics
   app.use('/api/v1/analytics/partner', standardLimiter, partnerAnalyticsRoutes);
