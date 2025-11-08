@@ -8,6 +8,7 @@ import { Post } from '../../entities/Post.js';
 import { permalinkService } from '../../services/permalink.service.js';
 import { settingsService } from '../../services/settingsService.js';
 import { generateGlobalCSS } from '../../utils/customizer/css-generator.js';
+import { reloadPassportStrategies } from '../../config/passportDynamic.js';
 
 const router: Router = Router();
 
@@ -1022,6 +1023,30 @@ router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
       clientSecret: config.clientSecret ? 'present' : 'empty',
       timestamp: new Date().toISOString()
     });
+
+    // Reload Passport strategies with new configuration
+    logger.info(`🔄 ABOUT TO RELOAD Passport strategies for provider: ${provider}`, {
+      actor,
+      enabled: config.enabled,
+      hasClientId: !!config.clientId,
+      hasClientSecret: !!config.clientSecret
+    });
+
+    try {
+      logger.info('🔄 Calling reloadPassportStrategies()...', { actor });
+      await reloadPassportStrategies();
+      logger.info('✅ Passport strategies reloaded successfully', { actor, provider });
+    } catch (passportError) {
+      logger.error('❌ Failed to reload Passport strategies:', {
+        actor,
+        provider,
+        error: passportError instanceof Error ? passportError.message : 'Unknown error',
+        stack: passportError instanceof Error ? passportError.stack : undefined
+      });
+      // Don't fail the request, just log the error
+    }
+
+    logger.info('🔄 AFTER reload attempt, continuing with response', { actor, provider });
 
     // Also update memory store for backward compatibility
     settingsStore.set('oauth', oauthSettings);
