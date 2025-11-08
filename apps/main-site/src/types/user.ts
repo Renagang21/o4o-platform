@@ -69,7 +69,7 @@ export interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>; // P0 RBAC: async logout
   updateUser: (userData: Partial<User>) => void;
   checkAuthStatus: () => Promise<void>;
   // P0 RBAC: role assignment checker

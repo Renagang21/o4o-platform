@@ -1,16 +1,16 @@
 import { FC, createContext, useContext, useEffect, useState, ReactNode  } from 'react';
-import Cookies from 'js-cookie';
-import { authAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
+// P0 RBAC: cookieAuthClient 사용
+import { cookieAuthClient } from '@o4o/auth-client';
+
 // 공통 타입 import
-import { 
-  User, 
-  UserRole, 
-  AuthContextType, 
+import {
+  User,
+  UserRole,
+  AuthContextType,
   UserPermissions,
-  LoginResponse,
-  AuthVerifyResponse 
+  RoleAssignment
 } from '../types/user';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,32 +25,33 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!user && user.status === 'approved';
 
-  // 사용자 데이터 정규화 함수 (id 속성 추가)
-  const normalizeUserData = (userData: Partial<User> & { _id?: string }): User => {
-    return {
-      ...userData,
-      id: userData._id || userData.id || '', // MongoDB _id를 id로 매핑
-    } as User;
+  // P0 RBAC: hasRole helper - checks active assignments
+  const hasRole = (role: string): boolean => {
+    return user?.assignments?.some(a => a.role === role && a.active) ?? false;
   };
 
-  // 로그인
+  // P0 RBAC: 로그인 - cookieAuthClient 사용
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await authAPI.login(email, password);
-      const { token, user: userData }: LoginResponse = response.data;
+      // 1. 로그인 요청
+      await cookieAuthClient.login({ email, password });
 
-      // 사용자 데이터 정규화 (id 속성 추가)
-      const normalizedUser = normalizeUserData(userData);
+      // 2. /me 호출하여 사용자 정보 + assignments 가져오기
+      const meResponse = await cookieAuthClient.getCurrentUser();
 
-      // 쿠키에 토큰 저장 (24시간)
-      Cookies.set('authToken', token, { expires: 1 });
-      Cookies.set('user', JSON.stringify(normalizedUser), { expires: 1 });
-
-      setUser(normalizedUser);
-      toast.success('로그인되었습니다.');
-      return true;
+      if (meResponse) {
+        setUser({
+          ...meResponse.user,
+          assignments: meResponse.assignments
+        });
+        toast.success('로그인되었습니다.');
+        return true;
+      } else {
+        toast.error('사용자 정보를 가져올 수 없습니다.');
+        return false;
+      }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error || '로그인에 실패했습니다.';
+      const errorMessage = error.response?.data?.message || '로그인에 실패했습니다.';
       const errorCode = error.response?.data?.code;
 
       switch (errorCode) {
@@ -73,71 +74,45 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // 로그아웃
-  const logout = () => {
-    Cookies.remove('authToken');
-    Cookies.remove('user');
-    setUser(null);
-    toast.info('로그아웃되었습니다.');
+  // P0 RBAC: 로그아웃 - cookieAuthClient 사용
+  const logout = async () => {
+    try {
+      await cookieAuthClient.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      toast.info('로그아웃되었습니다.');
+    }
   };
 
   // 사용자 정보 업데이트
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
-      // id 속성 유지
-      updatedUser.id = updatedUser._id || updatedUser.id;
-      
       setUser(updatedUser);
-      Cookies.set('user', JSON.stringify(updatedUser), { expires: 1 });
     }
   };
 
-  // 인증 상태 확인
+  // P0 RBAC: 인증 상태 확인 - /me 기반
   const checkAuthStatus = async () => {
     try {
       setIsLoading(true);
-      
-      // 쿠키에서 토큰과 사용자 정보 확인
-      const token = Cookies.get('authToken');
-      const storedUser = Cookies.get('user');
 
-      if (!token || !storedUser) {
-        setUser(null);
-        return;
-      }
+      // /me 호출하여 사용자 정보 + assignments 가져오기
+      const meResponse = await cookieAuthClient.getCurrentUser();
 
-      // 저장된 사용자 정보 복원
-      const userData = JSON.parse(storedUser);
-      
-      // 토큰 유효성 검증
-      const response = await authAPI.verifyToken();
-      const verifyData: AuthVerifyResponse = response.data;
-
-      if (verifyData.valid) {
-        // 서버에서 받은 최신 사용자 정보 사용
-        const normalizedUser = normalizeUserData(verifyData.user);
-
-        // preferences 로드 (currentRole, defaultRole)
-        try {
-          const prefsResponse = await authAPI.getPreferences();
-          if (prefsResponse.data.success) {
-            normalizedUser.currentRole = prefsResponse.data.data.currentRole;
-            normalizedUser.defaultRole = prefsResponse.data.data.defaultRole;
-            normalizedUser.roles = prefsResponse.data.data.availableRoles;
-          }
-        } catch (error) {
-          // preferences 로드 실패 시 무시하고 계속 진행
-        }
-
-        setUser(normalizedUser);
+      if (meResponse) {
+        setUser({
+          ...meResponse.user,
+          assignments: meResponse.assignments
+        });
       } else {
-        // 토큰이 유효하지 않으면 로그아웃
-        logout();
+        setUser(null);
       }
     } catch (error: any) {
-      // 토큰 검증 실패 시 로그아웃
-      logout();
+      console.error('Auth check error:', error);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -159,6 +134,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         logout,
         updateUser,
         checkAuthStatus,
+        hasRole, // P0 RBAC: hasRole 추가
       }}
     >
       {children}
