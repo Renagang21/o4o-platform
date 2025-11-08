@@ -54,12 +54,12 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         id,
         user_id,
         role,
-        "isActive",
+        is_active,
         valid_from,
         assigned_at,
         assigned_by,
-        "createdAt",
-        "updatedAt"
+        created_at,
+        updated_at
       ) VALUES (
         '00000000-0000-0000-0000-000000000002',
         '00000000-0000-0000-0000-000000000001',
@@ -165,8 +165,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         role,
         status,
         application_data,
-        "createdAt",
-        "updatedAt"
+        created_at,
+        updated_at
       ) VALUES (
         '00000000-0000-0000-0000-000000000021',
         '00000000-0000-0000-0000-000000000011',
@@ -187,8 +187,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         role,
         status,
         application_data,
-        "createdAt",
-        "updatedAt"
+        created_at,
+        updated_at
       ) VALUES (
         '00000000-0000-0000-0000-000000000022',
         '00000000-0000-0000-0000-000000000012',
@@ -209,8 +209,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         role,
         status,
         application_data,
-        "createdAt",
-        "updatedAt"
+        created_at,
+        updated_at
       ) VALUES (
         '00000000-0000-0000-0000-000000000023',
         '00000000-0000-0000-0000-000000000013',
