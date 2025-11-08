@@ -26,12 +26,12 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         password,
         name,
         status,
-        is_active,
-        is_email_verified,
+        "isActive",
+        "isEmailVerified",
         role,
         roles,
-        created_at,
-        updated_at
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'admin-0000-0000-0000-000000000000',
         'admin@neture.co.kr',
@@ -54,12 +54,12 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         id,
         user_id,
         role,
-        is_active,
+        "isActive",
         valid_from,
         assigned_at,
         assigned_by,
-        created_at,
-        updated_at
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'admin-assign-0000-0000-000000000000',
         'admin-0000-0000-0000-000000000000',
@@ -85,10 +85,10 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         password,
         name,
         status,
-        is_active,
-        is_email_verified,
-        created_at,
-        updated_at
+        "isActive",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'test-supplier-0000-0000-000000000001',
         'test-supplier@neture.co.kr',
@@ -111,10 +111,10 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         password,
         name,
         status,
-        is_active,
-        is_email_verified,
-        created_at,
-        updated_at
+        "isActive",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'test-seller-0000-0000-000000000002',
         'test-seller@neture.co.kr',
@@ -137,10 +137,10 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         password,
         name,
         status,
-        is_active,
-        is_email_verified,
-        created_at,
-        updated_at
+        "isActive",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'test-partner-0000-0000-000000000003',
         'test-partner@neture.co.kr',
@@ -165,8 +165,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         role,
         status,
         application_data,
-        created_at,
-        updated_at
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'enrollment-supplier-000000000001',
         'test-supplier-0000-0000-000000000001',
@@ -187,8 +187,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         role,
         status,
         application_data,
-        created_at,
-        updated_at
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'enrollment-seller-000000000002',
         'test-seller-0000-0000-000000000002',
@@ -209,8 +209,8 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
         role,
         status,
         application_data,
-        created_at,
-        updated_at
+        "createdAt",
+        "updatedAt"
       ) VALUES (
         'enrollment-partner-000000000003',
         'test-partner-0000-0000-000000000003',
