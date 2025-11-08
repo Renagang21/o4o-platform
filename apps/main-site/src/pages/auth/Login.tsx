@@ -39,26 +39,18 @@ const Login: FC = () => {
             showEmailLogin={true}
             title="로그인"
             subtitle="계정에 접속하여 서비스를 이용하세요"
+            showSignupLink={true}
+            signupUrl="/register"
           />
         </Suspense>
 
-        <div className="mt-6 text-center space-y-2">
+        <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/auth/forgot-password')}
             className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
           >
             비밀번호를 잊으셨나요?
           </button>
-
-          <div className="text-sm text-gray-600">
-            계정이 없으신가요?{' '}
-            <button
-              onClick={() => navigate('/register')}
-              className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-            >
-              회원가입
-            </button>
-          </div>
         </div>
       </div>
     </div>
