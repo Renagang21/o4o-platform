@@ -47,7 +47,12 @@ class PassportManager {
     try {
       // Check if AppDataSource is initialized
       if (!AppDataSource.isInitialized) {
-        // DataSource not initialized, using default settings
+        // DataSource not initialized, try environment variables first
+        const envSettings = this.getEnvSettings();
+        if (this.hasValidEnvSettings(envSettings)) {
+          logger.info('Using OAuth settings from environment variables (DB not initialized)');
+          return envSettings;
+        }
         return this.getDefaultSettings();
       }
 
@@ -57,6 +62,12 @@ class PassportManager {
       });
 
       if (!oauthSetting || !oauthSetting.value) {
+        // No DB settings, fallback to environment variables
+        const envSettings = this.getEnvSettings();
+        if (this.hasValidEnvSettings(envSettings)) {
+          logger.info('Using OAuth settings from environment variables (no DB settings)');
+          return envSettings;
+        }
         return this.getDefaultSettings();
       }
 
@@ -97,6 +108,41 @@ class PassportManager {
     }
   }
 
+  private static getEnvSettings(): OAuthSettingsData {
+    const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+
+    return {
+      google: {
+        provider: 'google',
+        enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+        clientId: process.env.GOOGLE_CLIENT_ID || '',
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+        callbackUrl: `${frontendUrl}/api/v1/social/google/callback`,
+        scope: ['profile', 'email']
+      },
+      kakao: {
+        provider: 'kakao',
+        enabled: !!(process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET),
+        clientId: process.env.KAKAO_CLIENT_ID || '',
+        clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
+        callbackUrl: `${frontendUrl}/api/v1/social/kakao/callback`,
+        scope: []
+      },
+      naver: {
+        provider: 'naver',
+        enabled: !!(process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET),
+        clientId: process.env.NAVER_CLIENT_ID || '',
+        clientSecret: process.env.NAVER_CLIENT_SECRET || '',
+        callbackUrl: `${frontendUrl}/api/v1/social/naver/callback`,
+        scope: []
+      }
+    };
+  }
+
+  private static hasValidEnvSettings(settings: OAuthSettingsData): boolean {
+    return settings.google.enabled || settings.kakao.enabled || settings.naver.enabled;
+  }
+
   private static getDefaultSettings(): OAuthSettingsData {
     return {
       google: {
@@ -104,7 +150,7 @@ class PassportManager {
         enabled: false,
         clientId: '',
         clientSecret: '',
-        callbackUrl: '/api/v1/auth/google/callback',
+        callbackUrl: '/api/v1/social/google/callback',
         scope: ['profile', 'email']
       },
       kakao: {
@@ -112,7 +158,7 @@ class PassportManager {
         enabled: false,
         clientId: '',
         clientSecret: '',
-        callbackUrl: '/api/v1/auth/kakao/callback',
+        callbackUrl: '/api/v1/social/kakao/callback',
         scope: []
       },
       naver: {
@@ -120,7 +166,7 @@ class PassportManager {
         enabled: false,
         clientId: '',
         clientSecret: '',
-        callbackUrl: '/api/v1/auth/naver/callback',
+        callbackUrl: '/api/v1/social/naver/callback',
         scope: []
       }
     };
