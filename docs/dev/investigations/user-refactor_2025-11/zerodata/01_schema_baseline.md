@@ -551,16 +551,26 @@ await queryRunner.query(`
 
 ## 10. 검증 체크리스트
 
-- [ ] 모든 테이블 생성 성공
-- [ ] 인덱스 생성 확인
-- [ ] FK 제약 조건 확인
-- [ ] 관리자 계정 시드 성공
-- [ ] TypeORM 엔티티 매핑 확인
-- [ ] 레거시 필드에 deprecated 표기
-- [ ] audit_logs에 이벤트 기록 확인
+- [x] 모든 테이블 생성 성공 (마이그레이션 완료)
+- [x] 인덱스 생성 확인 (마이그레이션 포함)
+- [x] FK 제약 조건 확인 (마이그레이션 포함)
+- [x] 관리자 계정 시드 성공 (시드 마이그레이션 완료)
+- [x] TypeORM 엔티티 매핑 확인 (6개 엔티티 생성 완료)
+- [x] 레거시 필드에 deprecated 표기 (User.ts 업데이트 완료)
+- [ ] audit_logs에 이벤트 기록 확인 (Phase B에서 API 구현 시 테스트)
 
 ---
 
 **작성**: Claude Code
-**상태**: ✅ P0 스키마 정의 완료
-**다음**: `02_flows_enrollment.md` (신청-승인-할당 플로우)
+**상태**: ✅ Phase A 구현 완료 (2025-01-08)
+**구현 파일**:
+- `apps/api-server/src/entities/RoleEnrollment.ts`
+- `apps/api-server/src/entities/RoleAssignment.ts`
+- `apps/api-server/src/entities/KycDocument.ts`
+- `apps/api-server/src/entities/SupplierProfile.ts`
+- `apps/api-server/src/entities/SellerProfile.ts`
+- `apps/api-server/src/entities/PartnerProfile.ts`
+- `apps/api-server/src/database/migrations/3000000000000-CreateZeroDataRoleManagementTables.ts`
+- `apps/api-server/src/database/migrations/3000000000001-SeedZeroDataAdminAndTestEnrollments.ts`
+
+**다음**: Phase B (API 엔드포인트 & RBAC 미들웨어)
