@@ -2,10 +2,22 @@ import { DataSource } from 'typeorm';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { SnakeNamingStrategy } from './SnakeNamingStrategy.js';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Load environment variables for migrations
+// In production, load .env-apiserver; in development, load .env.development
+const envFile = process.env.NODE_ENV === 'production'
+  ? '.env-apiserver'
+  : '.env.development';
+
+dotenv.config({
+  path: path.resolve(__dirname, '../../', envFile)
+});
 import { User } from '../entities/User.js';
 import { Role } from '../entities/Role.js';
 import { Permission } from '../entities/Permission.js';
