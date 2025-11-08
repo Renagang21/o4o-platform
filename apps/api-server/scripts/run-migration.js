@@ -5,7 +5,15 @@
  * Runs pending TypeORM migrations
  */
 
-import { AppDataSource } from '../dist/database/connection.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Import from absolute path
+const connectionPath = join(__dirname, '../dist/database/connection.js');
+const { AppDataSource } = await import(connectionPath);
 
 async function runMigrations() {
   try {
