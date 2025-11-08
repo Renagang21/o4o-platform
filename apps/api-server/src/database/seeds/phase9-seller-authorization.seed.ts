@@ -31,6 +31,7 @@ import { Product } from '../../entities/Product';
 import { SellerAuthorization, AuthorizationStatus } from '../../entities/SellerAuthorization';
 import { SellerAuthorizationAuditLog } from '../../entities/SellerAuthorizationAuditLog';
 import * as bcrypt from 'bcrypt';
+import logger from '../../utils/logger.js';
 
 interface SeedData {
   sellers: User[];
@@ -43,7 +44,7 @@ interface SeedData {
  * Main seed execution
  */
 export async function seedPhase9Authorization(): Promise<SeedData> {
-  console.log('🌱 Starting Phase 9 Authorization Seed...\n');
+  logger.info('🌱 Starting Phase 9 Authorization Seed...\n');
 
   await AppDataSource.initialize();
 
@@ -58,7 +59,7 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
   // await auditRepo.delete({});
 
   // Step 1: Create 3 Partner Sellers
-  console.log('📦 Creating 3 partner sellers...');
+  logger.info('📦 Creating 3 partner sellers...');
   const sellers = await Promise.all([
     createSeller(userRepo, {
       username: 'partner-alice',
@@ -79,10 +80,10 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
       hasSellerRole: true,
     }),
   ]);
-  console.log(`✅ Created ${sellers.length} sellers\n`);
+  logger.info(`✅ Created ${sellers.length} sellers\n`);
 
   // Step 2: Create 2 Suppliers
-  console.log('🏭 Creating 2 suppliers...');
+  logger.info('🏭 Creating 2 suppliers...');
   const suppliers = await Promise.all([
     createSupplier(supplierRepo, {
       name: 'Premium Electronics Co.',
@@ -95,10 +96,10 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
       contactEmail: 'sales@fashionwholesale.com',
     }),
   ]);
-  console.log(`✅ Created ${suppliers.length} suppliers\n`);
+  logger.info(`✅ Created ${suppliers.length} suppliers\n`);
 
   // Step 3: Create 5 Products
-  console.log('📱 Creating 5 products...');
+  logger.info('📱 Creating 5 products...');
   const products = await Promise.all([
     createProduct(productRepo, {
       name: 'Wireless Headphones Pro',
@@ -131,15 +132,15 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
       price: 12900,
     }),
   ]);
-  console.log(`✅ Created ${products.length} products\n`);
+  logger.info(`✅ Created ${products.length} products\n`);
 
   // Step 4: Create 12 Authorization Requests (covering all scenarios)
-  console.log('🔐 Creating 12 authorization requests...\n');
+  logger.info('🔐 Creating 12 authorization requests...\n');
 
   const authorizations: SellerAuthorization[] = [];
 
   // Scenario A: Approved (5 cases)
-  console.log('Scenario A: Creating 5 APPROVED authorizations...');
+  logger.info('Scenario A: Creating 5 APPROVED authorizations...');
   authorizations.push(
     await createAuthorization(authRepo, auditRepo, {
       sellerId: sellers[0].id,
@@ -187,7 +188,7 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
   );
 
   // Scenario B: Pending (3 cases)
-  console.log('Scenario B: Creating 3 REQUESTED (pending) authorizations...');
+  logger.info('Scenario B: Creating 3 REQUESTED (pending) authorizations...');
   authorizations.push(
     await createAuthorization(authRepo, auditRepo, {
       sellerId: sellers[0].id,
@@ -220,7 +221,7 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
   );
 
   // Scenario C: Rejected with cooldown (2 cases)
-  console.log('Scenario C: Creating 2 REJECTED (with cooldown) authorizations...');
+  logger.info('Scenario C: Creating 2 REJECTED (with cooldown) authorizations...');
   authorizations.push(
     await createAuthorization(authRepo, auditRepo, {
       sellerId: sellers[1].id,
@@ -245,7 +246,7 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
   );
 
   // Scenario D: Revoked (1 case)
-  console.log('Scenario D: Creating 1 REVOKED (permanent block) authorization...');
+  logger.info('Scenario D: Creating 1 REVOKED (permanent block) authorization...');
   authorizations.push(
     await createAuthorization(authRepo, auditRepo, {
       sellerId: sellers[2].id,
@@ -258,7 +259,7 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
   );
 
   // Scenario E: Cancelled (1 case)
-  console.log('Scenario E: Creating 1 CANCELLED authorization...');
+  logger.info('Scenario E: Creating 1 CANCELLED authorization...');
   authorizations.push(
     await createAuthorization(authRepo, auditRepo, {
       sellerId: sellers[0].id,
@@ -269,21 +270,21 @@ export async function seedPhase9Authorization(): Promise<SeedData> {
     })
   );
 
-  console.log(`\n✅ Created ${authorizations.length} authorization records\n`);
+  logger.info(`\n✅ Created ${authorizations.length} authorization records\n`);
 
   // Summary
-  console.log('📊 Seed Summary:');
-  console.log(`   Sellers: ${sellers.length}`);
-  console.log(`   Suppliers: ${suppliers.length}`);
-  console.log(`   Products: ${products.length}`);
-  console.log(`   Authorizations: ${authorizations.length}`);
-  console.log(`     - APPROVED: ${authorizations.filter((a) => a.status === AuthorizationStatus.APPROVED).length}`);
-  console.log(`     - REQUESTED: ${authorizations.filter((a) => a.status === AuthorizationStatus.REQUESTED).length}`);
-  console.log(`     - REJECTED: ${authorizations.filter((a) => a.status === AuthorizationStatus.REJECTED).length}`);
-  console.log(`     - REVOKED: ${authorizations.filter((a) => a.status === AuthorizationStatus.REVOKED).length}`);
-  console.log(`     - CANCELLED: ${authorizations.filter((a) => a.status === AuthorizationStatus.CANCELLED).length}`);
+  logger.info('📊 Seed Summary:');
+  logger.info(`   Sellers: ${sellers.length}`);
+  logger.info(`   Suppliers: ${suppliers.length}`);
+  logger.info(`   Products: ${products.length}`);
+  logger.info(`   Authorizations: ${authorizations.length}`);
+  logger.info(`     - APPROVED: ${authorizations.filter((a) => a.status === AuthorizationStatus.APPROVED).length}`);
+  logger.info(`     - REQUESTED: ${authorizations.filter((a) => a.status === AuthorizationStatus.REQUESTED).length}`);
+  logger.info(`     - REJECTED: ${authorizations.filter((a) => a.status === AuthorizationStatus.REJECTED).length}`);
+  logger.info(`     - REVOKED: ${authorizations.filter((a) => a.status === AuthorizationStatus.REVOKED).length}`);
+  logger.info(`     - CANCELLED: ${authorizations.filter((a) => a.status === AuthorizationStatus.CANCELLED).length}`);
 
-  console.log('\n✅ Phase 9 Seed Complete!\n');
+  logger.info('\n✅ Phase 9 Seed Complete!\n');
 
   await AppDataSource.destroy();
 
@@ -299,7 +300,7 @@ async function createSeller(
 ): Promise<User> {
   const existing = await userRepo.findOne({ where: { username: data.username } });
   if (existing) {
-    console.log(`  ⏭️  Seller '${data.username}' already exists, skipping...`);
+    logger.info(`  ⏭️  Seller '${data.username}' already exists, skipping...`);
     return existing;
   }
 
@@ -313,7 +314,7 @@ async function createSeller(
   });
 
   await userRepo.save(user);
-  console.log(`  ✓ Created seller: ${data.name} (${data.username})`);
+  logger.info(`  ✓ Created seller: ${data.name} (${data.username})`);
   return user;
 }
 
@@ -326,7 +327,7 @@ async function createSupplier(
 ): Promise<Supplier> {
   const existing = await supplierRepo.findOne({ where: { code: data.code } });
   if (existing) {
-    console.log(`  ⏭️  Supplier '${data.code}' already exists, skipping...`);
+    logger.info(`  ⏭️  Supplier '${data.code}' already exists, skipping...`);
     return existing;
   }
 
@@ -338,7 +339,7 @@ async function createSupplier(
   });
 
   await supplierRepo.save(supplier);
-  console.log(`  ✓ Created supplier: ${data.name} (${data.code})`);
+  logger.info(`  ✓ Created supplier: ${data.name} (${data.code})`);
   return supplier;
 }
 
@@ -351,7 +352,7 @@ async function createProduct(
 ): Promise<Product> {
   const existing = await productRepo.findOne({ where: { sku: data.sku } });
   if (existing) {
-    console.log(`  ⏭️  Product '${data.sku}' already exists, skipping...`);
+    logger.info(`  ⏭️  Product '${data.sku}' already exists, skipping...`);
     return existing;
   }
 
@@ -364,7 +365,7 @@ async function createProduct(
   });
 
   await productRepo.save(product);
-  console.log(`  ✓ Created product: ${data.name} (${data.sku})`);
+  logger.info(`  ✓ Created product: ${data.name} (${data.sku})`);
   return product;
 }
 
@@ -458,7 +459,7 @@ async function createAuthorization(
     await auditRepo.save(cancelLog);
   }
 
-  console.log(
+  logger.info(
     `  ✓ Created ${data.status} authorization: Seller ${data.sellerId.slice(0, 8)}... → Product ${data.productId.slice(0, 8)}...`
   );
 
@@ -471,11 +472,11 @@ async function createAuthorization(
 if (require.main === module) {
   seedPhase9Authorization()
     .then(() => {
-      console.log('✅ Seed script completed successfully');
+      logger.info('✅ Seed script completed successfully');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('❌ Seed script failed:', error);
+      logger.error('❌ Seed script failed:', error);
       process.exit(1);
     });
 }
