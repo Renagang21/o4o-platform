@@ -12,6 +12,7 @@ import {
 import type { User } from './User.js';
 import type { Category } from './Category.js';
 import type { Supplier } from './Supplier.js';
+import type { CommissionPolicy } from './CommissionPolicy.js';
 
 export enum ProductStatus {
   DRAFT = 'draft',
@@ -131,6 +132,14 @@ export class Product {
 
   @Column({ type: 'varchar', length: 3, default: 'KRW' })
   currency!: string;
+
+  // Phase 8: Commission Policy Override
+  @Column({ type: 'uuid', nullable: true })
+  policyId?: string;
+
+  @ManyToOne('CommissionPolicy', { nullable: true })
+  @JoinColumn({ name: 'policyId' })
+  policy?: CommissionPolicy;
 
   // Commission Settings (문서 #66: 공급자가 파트너 커미션 설정)
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })

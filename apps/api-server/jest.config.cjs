@@ -1,5 +1,6 @@
 /** @type {import("jest").Config} **/
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: "node",
   passWithNoTests: true,
   roots: ['<rootDir>/src'],
@@ -12,11 +13,21 @@ module.exports = {
     '/__tests__/setup/'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: {
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        types: ['jest', 'node'],
+      },
+      isolatedModules: true,
+      diagnostics: false,
+    }],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
