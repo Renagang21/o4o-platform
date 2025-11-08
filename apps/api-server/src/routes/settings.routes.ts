@@ -154,6 +154,7 @@ router.put('/oauth',
       if (oauthSetting) {
         oauthSetting.value = encryptedData as unknown as Record<string, unknown>;
         await settingRepository.save(oauthSetting);
+        logger.info(`💾 OAuth settings UPDATED in database for provider: ${provider}`);
       } else {
         oauthSetting = settingRepository.create({
           key: 'oauth_settings',
@@ -161,16 +162,26 @@ router.put('/oauth',
           type: 'json'
         });
         await settingRepository.save(oauthSetting);
+        logger.info(`💾 OAuth settings CREATED in database for provider: ${provider}`);
       }
 
       // Reload Passport strategies with new configuration
+      logger.info(`🔄 ABOUT TO RELOAD Passport strategies for provider: ${provider}`, {
+        enabled: config.enabled,
+        hasClientId: !!config.clientId,
+        hasClientSecret: !!config.clientSecret
+      });
+
       try {
+        logger.info('🔄 Calling reloadPassportStrategies()...');
         await reloadPassportStrategies();
-        logger.info('Passport strategies reloaded successfully');
+        logger.info('✅ Passport strategies reloaded successfully');
       } catch (passportError) {
-        logger.error('Failed to reload Passport strategies:', passportError);
+        logger.error('❌ Failed to reload Passport strategies:', passportError);
         // Don't fail the request, just log the error
       }
+
+      logger.info('🔄 AFTER reload attempt, continuing with response');
 
       res.json({
         success: true,
