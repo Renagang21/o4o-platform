@@ -85,29 +85,30 @@ class PassportManager {
         ? JSON.parse(oauthSetting.value)
         : oauthSetting.value as unknown as OAuthSettingsData;
 
-      // Decrypt client secrets
+      // Decrypt client secrets (if encrypted)
+      // Handle both encrypted and plain-text secrets for backward compatibility
       if (parsedData.google?.clientSecret) {
         try {
           parsedData.google.clientSecret = decrypt(parsedData.google.clientSecret);
         } catch (error) {
-          logger.error('Failed to decrypt Google client secret');
-          parsedData.google.clientSecret = '';
+          // If decryption fails, assume it's plain-text (legacy data)
+          logger.warn('Google client secret not encrypted, using as-is');
         }
       }
       if (parsedData.kakao?.clientSecret) {
         try {
           parsedData.kakao.clientSecret = decrypt(parsedData.kakao.clientSecret);
         } catch (error) {
-          logger.error('Failed to decrypt Kakao client secret');
-          parsedData.kakao.clientSecret = '';
+          // If decryption fails, assume it's plain-text (legacy data)
+          logger.warn('Kakao client secret not encrypted, using as-is');
         }
       }
       if (parsedData.naver?.clientSecret) {
         try {
           parsedData.naver.clientSecret = decrypt(parsedData.naver.clientSecret);
         } catch (error) {
-          logger.error('Failed to decrypt Naver client secret');
-          parsedData.naver.clientSecret = '';
+          // If decryption fails, assume it's plain-text (legacy data)
+          logger.warn('Naver client secret not encrypted, using as-is');
         }
       }
 
