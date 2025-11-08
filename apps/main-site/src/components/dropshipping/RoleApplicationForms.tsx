@@ -23,7 +23,7 @@ export const SupplierApplicationForm: React.FC = () => {
     businessAddress: '',
     businessPhone: '',
     taxEmail: '',
-    manager Name: '',
+    managerName: '',
     managerPhone: '',
     managerEmail: '',
     // Supplier specific
