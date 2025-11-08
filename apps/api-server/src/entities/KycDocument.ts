@@ -9,7 +9,6 @@ import {
   Index,
 } from 'typeorm';
 import { User } from './User.js';
-import { RoleEnrollment } from './RoleEnrollment.js';
 
 /**
  * KYC 문서 (Know Your Customer Documents)
@@ -52,12 +51,12 @@ export class KycDocument {
   @Column({ name: 'enrollment_id', type: 'uuid', nullable: true })
   enrollmentId?: string;
 
-  @ManyToOne(() => RoleEnrollment, (enrollment) => enrollment.documents, {
+  @ManyToOne('RoleEnrollment', 'documents', {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'enrollment_id' })
-  enrollment?: RoleEnrollment;
+  enrollment?: any;
 
   /**
    * 문서 타입
