@@ -15,64 +15,45 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
   name = 'SeedZeroDataAdminAndTestEnrollments3000000000001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // 관리자 비밀번호 해시
-    const adminPassword = await bcrypt.hash('admin123!@#', 10);
-
-    // 1. 관리자 계정 생성
-    await queryRunner.query(`
-      INSERT INTO users (
-        id,
-        email,
-        password,
-        name,
-        status,
-        "isActive",
-        "isEmailVerified",
-        role,
-        roles,
-        "createdAt",
-        "updatedAt"
-      ) VALUES (
-        '00000000-0000-0000-0000-000000000001',
-        'admin@neture.co.kr',
-        '${adminPassword}',
-        'System Admin',
-        'ACTIVE',
-        true,
-        true,
-        'admin',
-        '{admin}',
-        NOW(),
-        NOW()
-      )
-      ON CONFLICT (email) DO NOTHING
+    // 1. 관리자 계정 - 기존 admin@neture.co.kr 사용 (이미 존재)
+    // 기존 관리자 ID 조회
+    const adminResult = await queryRunner.query(`
+      SELECT id FROM users WHERE email = 'admin@neture.co.kr' LIMIT 1
     `);
 
-    // 2. 관리자 역할 할당
-    await queryRunner.query(`
-      INSERT INTO role_assignments (
-        id,
-        user_id,
-        role,
-        is_active,
-        valid_from,
-        assigned_at,
-        assigned_by,
-        created_at,
-        updated_at
-      ) VALUES (
-        '00000000-0000-0000-0000-000000000002',
-        '00000000-0000-0000-0000-000000000001',
-        'admin',
-        true,
-        NOW(),
-        NOW(),
-        '00000000-0000-0000-0000-000000000001',
-        NOW(),
-        NOW()
-      )
-      ON CONFLICT (id) DO NOTHING
-    `);
+    const adminId = adminResult[0]?.id;
+
+    if (!adminId) {
+      console.log('⚠️  Admin user not found, skipping admin role assignment');
+      // Admin doesn't exist - skip admin setup in this migration
+    } else {
+      // 2. 관리자 역할 할당 (기존 admin 사용자에게)
+      await queryRunner.query(`
+        INSERT INTO role_assignments (
+          id,
+          user_id,
+          role,
+          is_active,
+          valid_from,
+          assigned_at,
+          assigned_by,
+          created_at,
+          updated_at
+        ) VALUES (
+          gen_random_uuid(),
+          '${adminId}',
+          'admin',
+          true,
+          NOW(),
+          NOW(),
+          '${adminId}',
+          NOW(),
+          NOW()
+        )
+        ON CONFLICT DO NOTHING
+      `);
+      console.log('✅ Admin role assignment created');
+    }
 
     // 3. 테스트용 일반 사용자 생성 (역할 신청용)
     const testPassword = await bcrypt.hash('test123!@#', 10);
@@ -245,14 +226,15 @@ export class SeedZeroDataAdminAndTestEnrollments3000000000001 implements Migrati
       )
     `);
 
-    // 관리자 역할 할당 삭제
+    // 관리자 역할 할당 삭제 (기존 admin에게 부여한 role_assignment)
+    // admin@neture.co.kr의 admin role assignment 삭제 (이 migration에서 생성한 것만)
     await queryRunner.query(`
-      DELETE FROM role_assignments WHERE id = '00000000-0000-0000-0000-000000000002'
+      DELETE FROM role_assignments
+      WHERE user_id = (SELECT id FROM users WHERE email = 'admin@neture.co.kr')
+        AND role = 'admin'
+        AND assigned_by = user_id
     `);
 
-    // 관리자 계정 삭제
-    await queryRunner.query(`
-      DELETE FROM users WHERE id = '00000000-0000-0000-0000-000000000001'
-    `);
+    // Note: 기존 admin 계정은 삭제하지 않음 (이 migration 전부터 존재했으므로)
   }
 }
