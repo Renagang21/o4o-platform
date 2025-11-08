@@ -70,6 +70,7 @@ export const GutenbergColumnBlock: React.FC<GutenbergColumnBlockProps> = ({
       id={id}
       type="column"
       isSelected={isSelected}
+      onSelect={() => {}}
       className="gutenberg-column-block"
     >
       {/* Gutenberg-style Block Toolbar */}

@@ -46,7 +46,16 @@ export class User {
   @Column({ type: 'json', nullable: true })
   businessInfo?: BusinessInfo;
 
-  // Single role for backward compatibility
+  /**
+   * @deprecated Phase P0: DO NOT USE for authorization
+   *
+   * This field is kept for backward compatibility only.
+   * Use role_assignments table for RBAC instead.
+   *
+   * @see RoleAssignment entity
+   * @see docs/dev/investigations/user-refactor_2025-11/zerodata/01_schema_baseline.md
+   * @see docs/dev/investigations/user-refactor_2025-11/zerodata/04_rbac_policy.md
+   */
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -55,14 +64,28 @@ export class User {
   // @IsEnum(UserRole)
   role!: UserRole;
 
-  // Multiple roles support (legacy string array - kept for backward compatibility)
+  /**
+   * @deprecated Phase P0: DO NOT USE for authorization
+   *
+   * Legacy string array for multiple roles.
+   * Use role_assignments table for RBAC instead.
+   *
+   * @see RoleAssignment entity
+   */
   @Column({
     type: 'simple-array',
     default: () => `'${UserRole.CUSTOMER}'`
   })
   roles!: string[];
 
-  // Database roles (new ManyToMany relation)
+  /**
+   * @deprecated Phase P0: DO NOT USE for authorization
+   *
+   * Legacy ManyToMany relation with roles table.
+   * Use role_assignments table for RBAC instead.
+   *
+   * @see RoleAssignment entity
+   */
   @ManyToMany('Role', 'users', { eager: true })
   @JoinTable({
     name: 'user_roles',
@@ -71,7 +94,15 @@ export class User {
   })
   dbRoles?: Role[];
 
-  // Active role (for users with multiple roles)
+  /**
+   * @deprecated Phase P0: DO NOT USE for authorization
+   *
+   * Legacy active role selector.
+   * Use role_assignments table to query active roles instead.
+   *
+   * @see RoleAssignment entity
+   * @see RoleAssignment.isActive
+   */
   @ManyToOne('Role', { nullable: true, eager: true })
   @JoinColumn({ name: 'active_role_id' })
   activeRole?: Role | null;
