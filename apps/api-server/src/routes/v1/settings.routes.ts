@@ -1325,6 +1325,11 @@ async function updateCustomizerSettings(req: Request, res: Response) {
     const currentVersion = currentSettings?._version || 0;
     const settingsWithMetadata = {
       ...customizerSettings,
+      _meta: {
+        version: '1.0.0', // Required by schema-migration.ts detectVersion()
+        lastModified: new Date().toISOString(),
+        isDirty: false
+      },
       _version: currentVersion + 1,
       _updatedAt: new Date().toISOString()
     };
