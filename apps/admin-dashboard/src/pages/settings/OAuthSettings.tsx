@@ -62,7 +62,23 @@ const OAuthSettings = () => {
   // Sync server settings to local state when data loads
   useEffect(() => {
     if (settings?.data) {
-      setLocalSettings(settings.data);
+      // Ensure each provider has a callback URL (generate if missing)
+      const settingsWithCallbacks: Record<OAuthProvider, OAuthConfig> = {
+        google: {
+          ...settings.data.google,
+          callbackUrl: settings.data.google.callbackUrl || generateCallbackUrl('google')
+        },
+        kakao: {
+          ...settings.data.kakao,
+          callbackUrl: settings.data.kakao.callbackUrl || generateCallbackUrl('kakao')
+        },
+        naver: {
+          ...settings.data.naver,
+          callbackUrl: settings.data.naver.callbackUrl || generateCallbackUrl('naver')
+        }
+      };
+
+      setLocalSettings(settingsWithCallbacks);
       // Reset unsaved changes when fresh data loads
       setHasUnsavedChanges({
         google: false,
@@ -259,7 +275,7 @@ const OAuthSettings = () => {
       {(Object.keys(OAUTH_PROVIDERS) as OAuthProvider[]).map((provider) => {
         const providerInfo = OAUTH_PROVIDERS[provider];
         const config = oauthData[provider];
-        const callbackUrl = generateCallbackUrl(provider);
+        const callbackUrl = config.callbackUrl || generateCallbackUrl(provider);
 
         return (
           <Card key={provider}>
@@ -373,8 +389,12 @@ const OAuthSettings = () => {
                     id={`${provider}-callback-url`}
                     type="text"
                     value={callbackUrl}
-                    readOnly
-                    className="bg-muted font-mono text-xs"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange(provider, 'callbackUrl', e.target.value)
+                    }
+                    placeholder={generateCallbackUrl(provider)}
+                    disabled={!config.enabled || updateMutation.isPending}
+                    className="font-mono text-xs"
                   />
                   <Button
                     type="button"

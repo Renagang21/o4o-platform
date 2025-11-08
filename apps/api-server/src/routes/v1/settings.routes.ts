@@ -995,11 +995,14 @@ router.put('/oauth', authenticate, requireAdmin, async (req: Request, res: Respo
 
     // Update specific provider
     const apiUrl = process.env.API_URL || process.env.APP_URL || 'https://api.neture.co.kr';
+    const defaultCallbackUrl = `${apiUrl}/api/v1/social/${provider}/callback`;
+
     oauthSettings[provider] = {
       ...oauthSettings[provider],
       ...config,
       provider, // Ensure provider field is always set
-      callbackUrl: `${apiUrl}/api/v1/social/${provider}/callback` // Correct callback URL
+      // Use user-provided callbackUrl if available, otherwise use default
+      callbackUrl: config.callbackUrl || defaultCallbackUrl
     };
 
     // Save to database
