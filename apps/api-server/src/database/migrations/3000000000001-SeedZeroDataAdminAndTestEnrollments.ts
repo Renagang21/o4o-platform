@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
 /**
  * P0 Zero-Data: 시드 데이터 (관리자 + 테스트 신청)
