@@ -215,9 +215,9 @@ function generateHeaderCSS(settings: AstraCustomizerSettings): string[] {
     css.push('  z-index: 999;');
   }
   css.push('}');
-  
-  // Site title
-  if (siteIdentity.siteTitle.show) {
+
+  // Site title (with null check)
+  if (siteIdentity?.siteTitle?.show) {
     css.push('.site-title {');
     css.push(`  color: ${siteIdentity.siteTitle.color.normal};`);
     css.push(`  font-family: ${siteIdentity.siteTitle.typography.fontFamily};`);
@@ -228,9 +228,9 @@ function generateHeaderCSS(settings: AstraCustomizerSettings): string[] {
     css.push(`  color: ${siteIdentity.siteTitle.color.hover};`);
     css.push('}');
   }
-  
-  // Logo
-  if (siteIdentity.logo.desktop) {
+
+  // Logo (with null check)
+  if (siteIdentity?.logo?.desktop) {
     css.push('.site-logo img {');
     css.push(`  max-width: ${siteIdentity.logo.width.desktop}px;`);
     css.push('}');
