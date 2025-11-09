@@ -58,6 +58,14 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Skip API calls when inside iframe (customizer preview)
+    const isInIframe = window.self !== window.top;
+    if (isInIframe) {
+      setLoading(false);
+      setTemplateParts([]);
+      return;
+    }
+
     const fetchTemplateParts = async () => {
       try {
         setLoading(true);
