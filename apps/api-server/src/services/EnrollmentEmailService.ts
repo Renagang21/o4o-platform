@@ -26,7 +26,7 @@ export class EnrollmentEmailService {
   private emailService: EmailService;
 
   private constructor() {
-    this.emailService = new EmailService();
+    this.emailService = EmailService.getInstance();
   }
 
   static getInstance(): EnrollmentEmailService {
@@ -73,12 +73,14 @@ export class EnrollmentEmailService {
         })
       });
 
-      return await this.emailService.sendEmail({
+      const result = await this.emailService.sendEmail({
         to: user.email,
         subject: `[Neture] ${roleDisplayName} 역할 신청이 접수되었습니다`,
         html,
         text: this.extractTextFromHtml(html)
       });
+
+      return { success: result };
     } catch (error: any) {
       logger.error('Failed to send enrollment created email:', {
         enrollmentId: enrollment.id,
@@ -126,12 +128,14 @@ export class EnrollmentEmailService {
         supportUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`
       });
 
-      return await this.emailService.sendEmail({
+      const result = await this.emailService.sendEmail({
         to: user.email,
         subject: `[Neture] ${roleDisplayName} 역할 신청이 보류되었습니다`,
         html,
         text: this.extractTextFromHtml(html)
       });
+
+      return { success: result };
     } catch (error: any) {
       logger.error('Failed to send enrollment held email:', {
         enrollmentId: enrollment.id,
@@ -182,12 +186,14 @@ export class EnrollmentEmailService {
         }) || new Date().toLocaleString('ko-KR')
       });
 
-      return await this.emailService.sendEmail({
+      const result = await this.emailService.sendEmail({
         to: user.email,
         subject: `[Neture] 🎉 ${roleDisplayName} 역할 신청이 승인되었습니다!`,
         html,
         text: this.extractTextFromHtml(html)
       });
+
+      return { success: result };
     } catch (error: any) {
       logger.error('Failed to send enrollment approved email:', {
         enrollmentId: enrollment.id,
@@ -241,12 +247,14 @@ export class EnrollmentEmailService {
         cooldownHours: reapplyAfter ? this.calculateCooldownHours(reapplyAfter) : undefined
       });
 
-      return await this.emailService.sendEmail({
+      const result = await this.emailService.sendEmail({
         to: user.email,
         subject: `[Neture] ${roleDisplayName} 역할 신청이 거부되었습니다`,
         html,
         text: this.extractTextFromHtml(html)
       });
+
+      return { success: result };
     } catch (error: any) {
       logger.error('Failed to send enrollment rejected email:', {
         enrollmentId: enrollment.id,
