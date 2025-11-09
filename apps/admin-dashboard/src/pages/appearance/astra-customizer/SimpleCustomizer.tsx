@@ -99,7 +99,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   const updateSetting = useCallback((section: keyof AstraCustomizerSettings, value: any, path?: string[]) => {
     setSettings(prev => {
       const newSettings = { ...prev };
-      
+
       if (path && path.length > 0) {
         let target: any = newSettings[section];
         for (let i = 0; i < path.length - 1; i++) {
@@ -107,9 +107,15 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         }
         target[path[path.length - 1]] = value;
       } else {
-        (newSettings as any)[section] = { ...(newSettings as any)[section], ...value };
+        // Only spread if value is a plain object (not string/array/null)
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          (newSettings as any)[section] = { ...(newSettings as any)[section], ...value };
+        } else {
+          // For non-objects (string, number, array, etc.), directly assign
+          (newSettings as any)[section] = value;
+        }
       }
-      
+
       return newSettings;
     });
     setIsDirty(true);
