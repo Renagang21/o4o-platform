@@ -41,7 +41,8 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
     try {
       setLoading(true);
       setError(null);
-      const currentUser = await cookieAuthClient.getCurrentUser();
+      const meResponse = await cookieAuthClient.getCurrentUser();
+      const currentUser = meResponse?.user || null;
       setUser(currentUser);
       onAuthChange?.(currentUser);
       
@@ -193,7 +194,7 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
 
   // Check if user has specific role(s)
   const hasRole = useCallback((role: string | string[]) => {
-    if (!user) return false;
+    if (!user || !user.role) return false;
     const roles = Array.isArray(role) ? role : [role];
     return roles.includes(user.role);
   }, [user]);

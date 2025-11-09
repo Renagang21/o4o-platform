@@ -126,8 +126,8 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   // 역할 기반 접근 제어
   if (requiredRoles.length > 0) {
     const userRole = user.role;
-    const hasRequiredRole = requiredRoles.includes(userRole);
-    
+    const hasRequiredRole = userRole ? requiredRoles.includes(userRole) : false;
+
     if (!hasRequiredRole) {
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }

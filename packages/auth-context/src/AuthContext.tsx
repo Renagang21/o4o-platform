@@ -5,7 +5,7 @@ export interface User {
   id: string | number;  // Support both string and number IDs
   email: string;
   name?: string;
-  role: string;
+  role?: string;  // Optional to match auth-client User type
   isApproved?: boolean;
   permissions?: string[];
   createdAt?: Date;
