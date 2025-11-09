@@ -24,9 +24,12 @@ export const AstraColorPicker: React.FC<AstraColorPickerProps> = ({
   const pickerRef = useRef<HTMLDivElement>(null);
   
   // Convert value to ColorState format
-  const colorState: ColorState = typeof value === 'string' 
-    ? { normal: value, hover: undefined }
-    : value;
+  // CRITICAL: Ensure colorState is never undefined
+  const colorState: ColorState = !value
+    ? { normal: '', hover: undefined }
+    : typeof value === 'string'
+      ? { normal: value, hover: undefined }
+      : value;
   
   const handleColorChange = (color: string, state: 'normal' | 'hover') => {
     if (hasHover) {
