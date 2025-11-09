@@ -46,37 +46,38 @@ const Customize: React.FC = () => {
     return import.meta.env.VITE_SITE_URL || `${protocol}//${currentHost}`;
   };
   
+  // 설정 불러오기 함수 (프리셋 적용 후 재사용 가능)
+  const loadSettings = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await authClient.api.get('/settings/customizer');
+
+      if (response.data?.success && response.data?.data) {
+        // API 응답 구조 정규화:
+        // Case 1: { success: true, data: { settings: {...} } }
+        // Case 2: { success: true, data: {...} }
+        const rawData = response.data.data;
+        const settingsData = rawData.settings || rawData;
+
+        // normalize 함수가 AstraCustomizerSettings 반환
+        const normalized = normalizeCustomizerSettings(settingsData);
+        setInitialSettings(normalized);
+      } else {
+        // 설정이 없으면 기본값 사용
+        setInitialSettings(normalizeCustomizerSettings(null));
+      }
+    } catch (error: any) {
+      // 에러 시 기본값 사용
+      setInitialSettings(normalizeCustomizerSettings(null));
+      errorHandler.handleApiError(error, 'Settings Load');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // 설정 불러오기
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        setIsLoading(true);
-
-        const response = await authClient.api.get('/settings/customizer');
-
-        if (response.data?.success && response.data?.data) {
-          // API 응답 구조 정규화:
-          // Case 1: { success: true, data: { settings: {...} } }
-          // Case 2: { success: true, data: {...} }
-          const rawData = response.data.data;
-          const settingsData = rawData.settings || rawData;
-
-          // normalize 함수가 AstraCustomizerSettings 반환
-          const normalized = normalizeCustomizerSettings(settingsData);
-          setInitialSettings(normalized);
-        } else {
-          // 설정이 없으면 기본값 사용
-          setInitialSettings(normalizeCustomizerSettings(null));
-        }
-      } catch (error: any) {
-        // 에러 시 기본값 사용
-        setInitialSettings(normalizeCustomizerSettings(null));
-        errorHandler.handleApiError(error, 'Settings Load');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadSettings();
   }, []);
 
@@ -160,6 +161,7 @@ const Customize: React.FC = () => {
       previewUrl={getSitePreviewUrl()}
       siteName="Neture Platform"
       onSave={handleSave}
+      onReloadSettings={loadSettings}
       initialSettings={initialSettings}
     />
   );
