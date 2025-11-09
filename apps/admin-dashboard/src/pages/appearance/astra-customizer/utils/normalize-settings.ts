@@ -210,99 +210,69 @@ export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettin
   // ========================================
 
   // --- Site Identity: Responsive Fields ---
-  if (merged.siteIdentity?.logo?.width !== undefined) {
-    merged.siteIdentity.logo.width = ensureResponsiveValue(
-      merged.siteIdentity.logo.width,
-      defaults.siteIdentity.logo.width
-    );
-  }
+  // CRITICAL: Always enforce types, even if value is undefined
+  // This ensures UI never encounters undefined when accessing .desktop, .tablet, .mobile
+  merged.siteIdentity.logo.width = ensureResponsiveValue(
+    merged.siteIdentity?.logo?.width,
+    defaults.siteIdentity.logo.width
+  );
 
-  if (merged.siteIdentity?.siteTitle?.typography?.fontSize !== undefined) {
-    merged.siteIdentity.siteTitle.typography.fontSize = ensureResponsiveValue(
-      merged.siteIdentity.siteTitle.typography.fontSize,
-      defaults.siteIdentity.siteTitle.typography.fontSize
-    );
-  }
+  merged.siteIdentity.siteTitle.typography.fontSize = ensureResponsiveValue(
+    merged.siteIdentity?.siteTitle?.typography?.fontSize,
+    defaults.siteIdentity.siteTitle.typography.fontSize
+  );
 
-  if (merged.siteIdentity?.siteTitle?.typography?.lineHeight !== undefined) {
-    merged.siteIdentity.siteTitle.typography.lineHeight = ensureResponsiveValue(
-      merged.siteIdentity.siteTitle.typography.lineHeight,
-      defaults.siteIdentity.siteTitle.typography.lineHeight
-    );
-  }
+  merged.siteIdentity.siteTitle.typography.lineHeight = ensureResponsiveValue(
+    merged.siteIdentity?.siteTitle?.typography?.lineHeight,
+    defaults.siteIdentity.siteTitle.typography.lineHeight
+  );
 
-  if (merged.siteIdentity?.siteTitle?.typography?.letterSpacing !== undefined) {
-    merged.siteIdentity.siteTitle.typography.letterSpacing = ensureResponsiveValue(
-      merged.siteIdentity.siteTitle.typography.letterSpacing,
-      defaults.siteIdentity.siteTitle.typography.letterSpacing
-    );
-  }
+  merged.siteIdentity.siteTitle.typography.letterSpacing = ensureResponsiveValue(
+    merged.siteIdentity?.siteTitle?.typography?.letterSpacing,
+    defaults.siteIdentity.siteTitle.typography.letterSpacing
+  );
 
-  if (merged.siteIdentity?.tagline?.typography?.fontSize !== undefined) {
-    merged.siteIdentity.tagline.typography.fontSize = ensureResponsiveValue(
-      merged.siteIdentity.tagline.typography.fontSize,
-      defaults.siteIdentity.tagline.typography.fontSize
-    );
-  }
+  merged.siteIdentity.tagline.typography.fontSize = ensureResponsiveValue(
+    merged.siteIdentity?.tagline?.typography?.fontSize,
+    defaults.siteIdentity.tagline.typography.fontSize
+  );
 
-  if (merged.siteIdentity?.tagline?.typography?.lineHeight !== undefined) {
-    merged.siteIdentity.tagline.typography.lineHeight = ensureResponsiveValue(
-      merged.siteIdentity.tagline.typography.lineHeight,
-      defaults.siteIdentity.tagline.typography.lineHeight
-    );
-  }
+  merged.siteIdentity.tagline.typography.lineHeight = ensureResponsiveValue(
+    merged.siteIdentity?.tagline?.typography?.lineHeight,
+    defaults.siteIdentity.tagline.typography.lineHeight
+  );
 
-  if (merged.siteIdentity?.tagline?.typography?.letterSpacing !== undefined) {
-    merged.siteIdentity.tagline.typography.letterSpacing = ensureResponsiveValue(
-      merged.siteIdentity.tagline.typography.letterSpacing,
-      defaults.siteIdentity.tagline.typography.letterSpacing
-    );
-  }
+  merged.siteIdentity.tagline.typography.letterSpacing = ensureResponsiveValue(
+    merged.siteIdentity?.tagline?.typography?.letterSpacing,
+    defaults.siteIdentity.tagline.typography.letterSpacing
+  );
 
   // --- Site Identity: ColorState Fields ---
-  if (merged.siteIdentity?.siteTitle?.color !== undefined) {
-    merged.siteIdentity.siteTitle.color = ensureColorState(
-      merged.siteIdentity.siteTitle.color,
-      defaults.siteIdentity.siteTitle.color
-    );
-  }
+  // CRITICAL: Always enforce types, even if value is undefined
+  // This ensures UI never encounters undefined when accessing .normal, .hover
+  merged.siteIdentity.siteTitle.color = ensureColorState(
+    merged.siteIdentity?.siteTitle?.color,
+    defaults.siteIdentity.siteTitle.color
+  );
 
-  if (merged.siteIdentity?.tagline?.color !== undefined) {
-    merged.siteIdentity.tagline.color = ensureColorState(
-      merged.siteIdentity.tagline.color,
-      defaults.siteIdentity.tagline.color
-    );
-  }
+  merged.siteIdentity.tagline.color = ensureColorState(
+    merged.siteIdentity?.tagline?.color,
+    defaults.siteIdentity.tagline.color
+  );
 
   // --- Colors: ColorState Fields ---
-  if (merged.colors?.linkColor !== undefined) {
-    merged.colors.linkColor = ensureColorState(
-      merged.colors.linkColor,
-      defaults.colors.linkColor
-    );
-  }
+  // CRITICAL: Always enforce types, even if value is undefined
+  merged.colors.linkColor = ensureColorState(
+    merged.colors?.linkColor,
+    defaults.colors.linkColor
+  );
 
   // --- Footer Widgets: Responsive Fields ---
-  if (merged.footer?.widgets?.columns !== undefined) {
-    const columns = merged.footer.widgets.columns;
-
-    // If columns is a number, convert it to responsive object
-    if (typeof columns === 'number') {
-      merged.footer.widgets.columns = {
-        desktop: columns,
-        tablet: Math.max(2, Math.floor(columns / 2)),
-        mobile: 1
-      };
-    } else if (typeof columns === 'object' && columns !== null) {
-      // Ensure all properties exist
-      const cols = columns as any;
-      merged.footer.widgets.columns = {
-        desktop: cols.desktop ?? defaults.footer.widgets.columns.desktop,
-        tablet: cols.tablet ?? defaults.footer.widgets.columns.tablet,
-        mobile: cols.mobile ?? defaults.footer.widgets.columns.mobile
-      };
-    }
-  }
+  // CRITICAL: Always enforce types, even if value is undefined
+  merged.footer.widgets.columns = ensureResponsiveValue(
+    merged.footer?.widgets?.columns,
+    defaults.footer.widgets.columns
+  );
 
   return merged;
 }

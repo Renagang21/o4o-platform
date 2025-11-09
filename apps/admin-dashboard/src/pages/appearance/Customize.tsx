@@ -93,6 +93,9 @@ const Customize: React.FC = () => {
       const response = await authClient.api.put('/settings/customizer', { settings: normalized });
 
       if (response.data?.success) {
+        // CRITICAL: Update local state with normalized settings (no re-fetch)
+        // This prevents state inconsistencies and unnecessary API calls
+        setInitialSettings(normalized);
         toast.success('설정이 저장되었습니다.');
         return true;
       }

@@ -99,9 +99,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   // P0 RBAC: 인증 상태 확인 - /me 기반
   const checkAuthStatus = async (retryCount = 0) => {
-    // Stage 1 Hotfix: Skip auth check in iframe or limit retries
-    if (isInIframe && retryCount >= 3) {
-      console.warn('[AuthContext] Skipping auth check in iframe after 3 retries');
+    // CRITICAL: Skip ALL auth checks in iframe (no retries)
+    // This prevents cross-origin auth calls from admin.neture.co.kr → neture.co.kr
+    if (isInIframe) {
+      console.warn('[AuthContext] Skipping auth check completely in iframe (cross-origin blocked)');
       setIsLoading(false);
       return;
     }
@@ -123,14 +124,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Auth check error:', error);
       setUser(null);
-
-      // Stage 1 Hotfix: Exponential backoff retry for iframe
-      if (isInIframe && retryCount < 3) {
-        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-        console.warn(`[AuthContext] Retry ${retryCount + 1}/3 in ${delay}ms`);
-        setTimeout(() => checkAuthStatus(retryCount + 1), delay);
-        return; // Don't set isLoading to false yet
-      }
     } finally {
       setIsLoading(false);
     }
