@@ -3,6 +3,7 @@ import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronL
 import { Button } from '@/components/ui/button';
 import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
+import { normalizeCustomizerSettings } from './utils/normalize-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
 import { convertSettingsToHeaderTemplatePart } from './utils/template-parts-converter';
 import { authClient } from '@o4o/auth-client';
@@ -254,7 +255,11 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   // Handle reset
   const handleReset = () => {
     if (window.confirm('모든 설정을 기본값으로 되돌리시겠습니까?')) {
-      setSettings(getDefaultSettings());
+      // Always normalize default settings to ensure type safety
+      // This prevents TypeError when accessing nested properties like 'desktop'
+      const defaults = getDefaultSettings();
+      const normalized = normalizeCustomizerSettings(defaults);
+      setSettings(normalized);
       setIsDirty(true);
     }
   };
