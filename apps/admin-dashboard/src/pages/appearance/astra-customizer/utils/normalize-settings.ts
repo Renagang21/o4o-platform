@@ -198,19 +198,11 @@ function ensureColorState(
 export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettings {
   const defaults = getDefaultSettings();
 
-  console.log('[NORMALIZE] Input raw:', raw);
-  console.log('[NORMALIZE] Defaults siteIdentity.logo.width:', defaults.siteIdentity.logo.width);
-  console.log('[NORMALIZE] Defaults colors.linkColor:', defaults.colors.linkColor);
-
   if (raw === undefined || raw === null) {
-    console.log('[NORMALIZE] Raw is null/undefined, returning defaults');
     return defaults;
   }
 
   const merged = mergeWithDefaults(defaults, raw as UnknownRecord);
-
-  console.log('[NORMALIZE] After merge, siteIdentity.logo.width:', merged.siteIdentity?.logo?.width);
-  console.log('[NORMALIZE] After merge, colors.linkColor:', merged.colors?.linkColor);
 
   // ========================================
   // Control-Based Type Enforcement
@@ -218,92 +210,62 @@ export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettin
   // ========================================
 
   // --- Site Identity: Responsive Fields ---
-  console.log('[NORMALIZE] Enforcing siteIdentity.logo.width...');
-  console.log('[NORMALIZE] Before enforcement:', merged.siteIdentity?.logo?.width);
+  // CRITICAL: Always enforce types, even if value is undefined
+  // This ensures UI never encounters undefined when accessing .desktop, .tablet, .mobile
+  merged.siteIdentity.logo.width = ensureResponsiveValue(
+    merged.siteIdentity?.logo?.width,
+    defaults.siteIdentity.logo.width
+  );
 
-  if (merged.siteIdentity?.logo?.width !== undefined) {
-    merged.siteIdentity.logo.width = ensureResponsiveValue(
-      merged.siteIdentity.logo.width,
-      defaults.siteIdentity.logo.width
-    );
-    console.log('[NORMALIZE] After enforcement:', merged.siteIdentity.logo.width);
-  } else {
-    console.log('[NORMALIZE] WARNING: siteIdentity.logo.width is undefined, enforcement SKIPPED!');
-  }
+  merged.siteIdentity.siteTitle.typography.fontSize = ensureResponsiveValue(
+    merged.siteIdentity?.siteTitle?.typography?.fontSize,
+    defaults.siteIdentity.siteTitle.typography.fontSize
+  );
 
-  if (merged.siteIdentity?.siteTitle?.typography?.fontSize !== undefined) {
-    merged.siteIdentity.siteTitle.typography.fontSize = ensureResponsiveValue(
-      merged.siteIdentity.siteTitle.typography.fontSize,
-      defaults.siteIdentity.siteTitle.typography.fontSize
-    );
-  }
+  merged.siteIdentity.siteTitle.typography.lineHeight = ensureResponsiveValue(
+    merged.siteIdentity?.siteTitle?.typography?.lineHeight,
+    defaults.siteIdentity.siteTitle.typography.lineHeight
+  );
 
-  if (merged.siteIdentity?.siteTitle?.typography?.lineHeight !== undefined) {
-    merged.siteIdentity.siteTitle.typography.lineHeight = ensureResponsiveValue(
-      merged.siteIdentity.siteTitle.typography.lineHeight,
-      defaults.siteIdentity.siteTitle.typography.lineHeight
-    );
-  }
+  merged.siteIdentity.siteTitle.typography.letterSpacing = ensureResponsiveValue(
+    merged.siteIdentity?.siteTitle?.typography?.letterSpacing,
+    defaults.siteIdentity.siteTitle.typography.letterSpacing
+  );
 
-  if (merged.siteIdentity?.siteTitle?.typography?.letterSpacing !== undefined) {
-    merged.siteIdentity.siteTitle.typography.letterSpacing = ensureResponsiveValue(
-      merged.siteIdentity.siteTitle.typography.letterSpacing,
-      defaults.siteIdentity.siteTitle.typography.letterSpacing
-    );
-  }
+  merged.siteIdentity.tagline.typography.fontSize = ensureResponsiveValue(
+    merged.siteIdentity?.tagline?.typography?.fontSize,
+    defaults.siteIdentity.tagline.typography.fontSize
+  );
 
-  if (merged.siteIdentity?.tagline?.typography?.fontSize !== undefined) {
-    merged.siteIdentity.tagline.typography.fontSize = ensureResponsiveValue(
-      merged.siteIdentity.tagline.typography.fontSize,
-      defaults.siteIdentity.tagline.typography.fontSize
-    );
-  }
+  merged.siteIdentity.tagline.typography.lineHeight = ensureResponsiveValue(
+    merged.siteIdentity?.tagline?.typography?.lineHeight,
+    defaults.siteIdentity.tagline.typography.lineHeight
+  );
 
-  if (merged.siteIdentity?.tagline?.typography?.lineHeight !== undefined) {
-    merged.siteIdentity.tagline.typography.lineHeight = ensureResponsiveValue(
-      merged.siteIdentity.tagline.typography.lineHeight,
-      defaults.siteIdentity.tagline.typography.lineHeight
-    );
-  }
-
-  if (merged.siteIdentity?.tagline?.typography?.letterSpacing !== undefined) {
-    merged.siteIdentity.tagline.typography.letterSpacing = ensureResponsiveValue(
-      merged.siteIdentity.tagline.typography.letterSpacing,
-      defaults.siteIdentity.tagline.typography.letterSpacing
-    );
-  }
+  merged.siteIdentity.tagline.typography.letterSpacing = ensureResponsiveValue(
+    merged.siteIdentity?.tagline?.typography?.letterSpacing,
+    defaults.siteIdentity.tagline.typography.letterSpacing
+  );
 
   // --- Site Identity: ColorState Fields ---
-  if (merged.siteIdentity?.siteTitle?.color !== undefined) {
-    merged.siteIdentity.siteTitle.color = ensureColorState(
-      merged.siteIdentity.siteTitle.color,
-      defaults.siteIdentity.siteTitle.color
-    );
-  }
+  // CRITICAL: Always enforce types, even if value is undefined
+  // This ensures UI never encounters undefined when accessing .normal, .hover
+  merged.siteIdentity.siteTitle.color = ensureColorState(
+    merged.siteIdentity?.siteTitle?.color,
+    defaults.siteIdentity.siteTitle.color
+  );
 
-  if (merged.siteIdentity?.tagline?.color !== undefined) {
-    merged.siteIdentity.tagline.color = ensureColorState(
-      merged.siteIdentity.tagline.color,
-      defaults.siteIdentity.tagline.color
-    );
-  }
+  merged.siteIdentity.tagline.color = ensureColorState(
+    merged.siteIdentity?.tagline?.color,
+    defaults.siteIdentity.tagline.color
+  );
 
   // --- Colors: ColorState Fields ---
-  console.log('[NORMALIZE] Enforcing colors.linkColor...');
-  console.log('[NORMALIZE] Before enforcement:', merged.colors?.linkColor);
-
-  if (merged.colors?.linkColor !== undefined) {
-    merged.colors.linkColor = ensureColorState(
-      merged.colors.linkColor,
-      defaults.colors.linkColor
-    );
-    console.log('[NORMALIZE] After enforcement:', merged.colors.linkColor);
-  } else {
-    console.log('[NORMALIZE] WARNING: colors.linkColor is undefined, enforcement SKIPPED!');
-  }
-
-  console.log('[NORMALIZE] Final return value, siteIdentity.logo.width:', merged.siteIdentity?.logo?.width);
-  console.log('[NORMALIZE] Final return value, colors.linkColor:', merged.colors?.linkColor);
+  // CRITICAL: Always enforce types, even if value is undefined
+  merged.colors.linkColor = ensureColorState(
+    merged.colors?.linkColor,
+    defaults.colors.linkColor
+  );
 
   // --- Footer Widgets: Responsive Fields ---
   if (merged.footer?.widgets?.columns !== undefined) {
