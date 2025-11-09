@@ -66,7 +66,9 @@ export interface Enrollment {
   submittedAt: string;
   reviewedAt?: string;
   reviewedBy?: string;
-  reason?: string;
+  reason?: string; // P1 Phase B-2: Detailed reason for hold/reject
+  reapplyAfterAt?: string; // P1 Phase B-2: Cooldown period end time (ISO string)
+  canReapply?: boolean; // P1 Phase B-2: Whether user can reapply now
 }
 
 export interface EnrollmentCreateData {
