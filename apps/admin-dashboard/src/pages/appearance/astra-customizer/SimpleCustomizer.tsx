@@ -29,6 +29,7 @@ import './styles/sections.css';
 interface SimpleCustomizerProps {
   onClose: () => void;
   onSave?: (settings: AstraCustomizerSettings) => Promise<boolean>;
+  onReloadSettings?: () => Promise<void>;  // Function to reload settings without page refresh
   previewUrl?: string;
   siteName?: string;
   initialSettings?: AstraCustomizerSettings;
@@ -37,6 +38,7 @@ interface SimpleCustomizerProps {
 export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   onClose,
   onSave,
+  onReloadSettings,
   previewUrl = '/',
   siteName = 'Site Preview',
   initialSettings,
@@ -399,9 +401,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           {/* Preset Manager */}
           <PresetManager
             currentSettings={settings}
-            onPresetApplied={() => {
-              // Reload settings after preset is applied
-              window.location.reload();
+            onPresetApplied={async () => {
+              // Reload settings without page refresh
+              if (onReloadSettings) {
+                await onReloadSettings();
+                toast.success('프리셋이 적용되었습니다.');
+              }
             }}
           />
 
