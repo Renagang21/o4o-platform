@@ -3,6 +3,51 @@ import { getDefaultSettings } from './default-settings';
 
 type UnknownRecord = Record<string, unknown> | undefined | null;
 
+// --- Guard helpers -----------------------------------------------------------
+const NUMERIC_KEY_RE = /^\d+$/;
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+/**
+ * Remove numeric-key properties recursively.
+ * This prevents data contamination from spread operations like { ...'string' }
+ */
+function sanitizeObjectDeep<T = unknown>(input: T): T {
+  if (Array.isArray(input)) {
+    // arrays are allowed as-is (elements sanitized recursively)
+    return input.map(sanitizeObjectDeep) as unknown as T;
+  }
+  if (!isPlainObject(input)) return input;
+
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(input)) {
+    if (NUMERIC_KEY_RE.test(key)) {
+      // drop numeric keys to prevent contamination
+      continue;
+    }
+    const val = (input as Record<string, unknown>)[key];
+    out[key] = sanitizeObjectDeep(val);
+  }
+  return out as unknown as T;
+}
+
+/**
+ * Safe keys from defaults & source (exclude numeric keys)
+ */
+function collectSafeKeys(a?: Record<string, unknown>, b?: Record<string, unknown>) {
+  const keys = new Set<string>();
+  for (const o of [a, b]) {
+    if (o) {
+      for (const k of Object.keys(o)) {
+        if (!NUMERIC_KEY_RE.test(k)) keys.add(k);
+      }
+    }
+  }
+  return keys;
+}
+
 function mergeWithDefaults<T>(defaults: T, source: UnknownRecord): T {
   if (source === undefined) {
     return defaults;
@@ -42,18 +87,37 @@ function mergeWithDefaults<T>(defaults: T, source: UnknownRecord): T {
       return defaults;
     }
 
-    const result: Record<string, unknown> = {
-      ...(defaults as Record<string, unknown>),
-    };
-    const keys = new Set([
-      ...Object.keys(defaults as Record<string, unknown>),
-      ...Object.keys(source as Record<string, unknown>),
-    ]);
+    // Sanitize both inputs to drop numeric-key contamination (deep)
+    const safeDefaults = sanitizeObjectDeep(defaults as Record<string, unknown>) as Record<string, unknown>;
+    const safeSource = sanitizeObjectDeep(source as Record<string, unknown>) as Record<string, unknown>;
+
+    const result: Record<string, unknown> = {};
+    const keys = collectSafeKeys(safeDefaults, safeSource);
 
     keys.forEach((key) => {
-      const defaultValue = (defaults as Record<string, unknown>)[key];
-      const sourceValue = (source as Record<string, unknown>)[key];
-      result[key] = mergeWithDefaults(defaultValue, sourceValue as UnknownRecord);
+      const defaultValue = safeDefaults[key];
+      const sourceValue = safeSource[key];
+
+      // If 'source' is undefined, fall back to default
+      if (typeof sourceValue === 'undefined') {
+        result[key] = defaultValue;
+        return;
+      }
+
+      // Arrays: don't attempt to merge objects into arrays or vice versa
+      if (Array.isArray(defaultValue) || Array.isArray(sourceValue)) {
+        result[key] = Array.isArray(sourceValue) ? sourceValue : (Array.isArray(defaultValue) ? defaultValue : sourceValue);
+        return;
+      }
+
+      // Nested plain objects: recurse
+      if (isPlainObject(defaultValue) && isPlainObject(sourceValue)) {
+        result[key] = mergeWithDefaults(defaultValue as UnknownRecord, sourceValue as UnknownRecord);
+        return;
+      }
+
+      // Primitives: prefer source
+      result[key] = sourceValue;
     });
 
     return result as T;

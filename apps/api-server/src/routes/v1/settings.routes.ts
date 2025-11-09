@@ -12,6 +12,30 @@ import { reloadPassportStrategies } from '../../config/passportDynamic.js';
 
 const router: Router = Router();
 
+// --- Validation Helpers ------------------------------------------------------
+const NUMERIC_KEY_RE = /^\d+$/;
+
+/**
+ * Detect numeric keys in object recursively (data contamination detection)
+ */
+function findNumericKeys(obj: unknown, path = 'root'): string[] {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return [];
+  const o = obj as Record<string, unknown>;
+  const issues: string[] = [];
+
+  const numeric = Object.keys(o).filter(k => NUMERIC_KEY_RE.test(k));
+  if (numeric.length) issues.push(`${path}: ${numeric.length} numeric key(s)`);
+
+  for (const k of Object.keys(o)) {
+    if (!NUMERIC_KEY_RE.test(k)) {
+      const v = o[k];
+      if (v && typeof v === 'object' && !Array.isArray(v)) {
+        issues.push(...findNumericKeys(v, `${path}.${k}`));
+      }
+    }
+  }
+  return issues;
+}
 
 // 설정 데이터 저장 (실제로는 DB 사용)
 const settingsStore: Map<string, any> = new Map([
@@ -1329,6 +1353,22 @@ async function updateCustomizerSettings(req: Request, res: Response) {
     if (customizerSettings.colors) {
       console.log('[DEBUG] colors type:', typeof customizerSettings.colors);
       console.log('[DEBUG] colors keys:', Object.keys(customizerSettings.colors).slice(0, 20));
+    }
+
+    // 🛡️ VALIDATION: Detect numeric keys (data contamination)
+    const contamination = findNumericKeys(customizerSettings);
+    if (contamination.length > 0) {
+      logger.warn('Numeric keys detected in customizer settings:', {
+        actor,
+        contamination,
+        timestamp: new Date().toISOString()
+      });
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid data structure: numeric keys detected',
+        details: contamination,
+        message: 'Customizer settings contain contaminated data. Please reload the page and try again.'
+      });
     }
 
     // Add version and timestamp metadata
