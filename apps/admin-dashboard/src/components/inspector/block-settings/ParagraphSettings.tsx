@@ -9,13 +9,21 @@ import { PanelBody, SelectControl, RangeControl, ColorPicker, ToggleControl } fr
 import { ButtonGroup } from '../controls/ButtonGroup';
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 
+interface ParagraphAttributes {
+  align?: string;
+  fontSize?: number;
+  textColor?: string;
+  backgroundColor?: string;
+  dropCap?: boolean;
+}
+
 interface ParagraphSettingsProps {
   block: Block;
   onUpdate: (updates: { content?: any; attributes?: any }) => void;
 }
 
 export const ParagraphSettings: React.FC<ParagraphSettingsProps> = ({ block, onUpdate }) => {
-  const attributes = block.attributes || {};
+  const attributes = (block.attributes || {}) as ParagraphAttributes;
 
   return (
     <>

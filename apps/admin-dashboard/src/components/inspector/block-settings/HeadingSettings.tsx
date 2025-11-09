@@ -9,13 +9,21 @@ import { PanelBody, SelectControl, TextControl, ColorPicker } from '../controls'
 import { ButtonGroup } from '../controls/ButtonGroup';
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 
+interface HeadingAttributes {
+  level?: number;
+  align?: string;
+  anchor?: string;
+  textColor?: string;
+  backgroundColor?: string;
+}
+
 interface HeadingSettingsProps {
   block: Block;
   onUpdate: (updates: { content?: any; attributes?: any }) => void;
 }
 
 export const HeadingSettings: React.FC<HeadingSettingsProps> = ({ block, onUpdate }) => {
-  const attributes = block.attributes || {};
+  const attributes = (block.attributes || {}) as HeadingAttributes;
 
   return (
     <>

@@ -29,6 +29,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cptApi } from '@/features/cpt-acf/services/cpt.api';
 import { acfGroupApi } from '@/features/cpt-acf/services/acf.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
+import type { ACFFieldGroup } from '@o4o/types/cpt';
 
 // Import Toolset table styles
 import '@/styles/toolset-tables.css';
@@ -49,15 +50,6 @@ interface CPTType {
   labels?: Record<string, string>;
   createdAt?: string;
   updatedAt?: string;
-}
-
-interface ACFFieldGroup {
-  id: string;
-  key: string;
-  title: string;
-  fields?: any[];
-  location?: any[];
-  active: boolean;
 }
 
 // Dropshipping CPT definitions (these should exist in the database)
@@ -176,9 +168,10 @@ const CPTDashboardToolset = () => {
     if (!Array.isArray(fieldGroups)) return 0;
     return fieldGroups.filter((group: ACFFieldGroup) => {
       if (!group.location || !Array.isArray(group.location)) return false;
-      return group.location.some((rule: any) => 
-        Array.isArray(rule) && rule.some((condition: any) => 
-          condition && condition.param === 'post_type' && condition.value === cptSlug
+      // location is ACFLocationGroup[] (array of {rules: ACFLocation[]})
+      return group.location.some((locationGroup) =>
+        locationGroup.rules && locationGroup.rules.some((rule) =>
+          rule && rule.param === 'post_type' && rule.value === cptSlug
         )
       );
     }).length;

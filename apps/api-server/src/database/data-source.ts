@@ -6,10 +6,10 @@ const envFile = process.env.NODE_ENV === 'production'
   ? '.env-apiserver' 
   : '.env.development';
 
-dotenv.config({ 
-  path: path.resolve(process.cwd(), envFile) 
+dotenv.config({
+  path: path.resolve(process.cwd(), envFile)
 });
 
-import { AppDataSource } from './connection.js';
+import { AppDataSource } from './connection';
 
 export default AppDataSource;

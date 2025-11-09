@@ -1,5 +1,14 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import type { LoginCredentials, RegisterData, AuthResponse, User } from './types.js';
+import type {
+  LoginCredentials,
+  RegisterData,
+  AuthResponse,
+  User,
+  MeResponse,
+  EnrollmentCreateData,
+  Enrollment,
+  EnrollmentListResponse
+} from './types.js';
 
 interface RefreshResponse {
   success: boolean;
@@ -94,10 +103,10 @@ export class CookieAuthClient {
     }
   }
 
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(): Promise<MeResponse | null> {
     try {
-      const response = await this.api.get('/auth/v2/me');
-      return response.data.user;
+      const response = await this.api.get('/auth/cookie/me');
+      return response.data;
     } catch (error) {
       return null;
     }
@@ -150,6 +159,74 @@ export class CookieAuthClient {
   async logoutWithSync(): Promise<void> {
     await this.logout();
     this.broadcastAuthChange('logout');
+  }
+
+  // ============================================================================
+  // P0 RBAC: Enrollment API Methods
+  // ============================================================================
+
+  /**
+   * Create a new role enrollment application
+   * POST /enrollments
+   */
+  async createEnrollment(data: EnrollmentCreateData): Promise<Enrollment> {
+    const response = await this.api.post('/enrollments', data);
+    return response.data.enrollment;
+  }
+
+  /**
+   * Get current user's enrollment history
+   * GET /enrollments/my
+   */
+  async getMyEnrollments(): Promise<Enrollment[]> {
+    const response = await this.api.get('/enrollments/my');
+    return response.data.enrollments;
+  }
+
+  // ============================================================================
+  // P0 RBAC: Admin Enrollment Review API Methods
+  // ============================================================================
+
+  /**
+   * Get all enrollments (admin only)
+   * GET /admin/enrollments
+   */
+  async getAdminEnrollments(params?: {
+    role?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<EnrollmentListResponse> {
+    const response = await this.api.get('/admin/enrollments', { params });
+    return response.data;
+  }
+
+  /**
+   * Approve an enrollment (admin only)
+   * PATCH /admin/enrollments/:id/approve
+   */
+  async approveEnrollment(id: string, notes?: string): Promise<void> {
+    await this.api.patch(`/admin/enrollments/${id}/approve`, { notes });
+  }
+
+  /**
+   * Reject an enrollment (admin only)
+   * PATCH /admin/enrollments/:id/reject
+   */
+  async rejectEnrollment(id: string, reason: string): Promise<void> {
+    await this.api.patch(`/admin/enrollments/${id}/reject`, { reason });
+  }
+
+  /**
+   * Put an enrollment on hold (admin only)
+   * PATCH /admin/enrollments/:id/hold
+   */
+  async holdEnrollment(id: string, reason: string, requiredFields?: string[]): Promise<void> {
+    await this.api.patch(`/admin/enrollments/${id}/hold`, {
+      reason,
+      required_fields: requiredFields
+    });
   }
 }
 

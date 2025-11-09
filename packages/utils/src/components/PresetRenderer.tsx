@@ -1,8 +1,7 @@
 import React from 'react';
 import type {
   ViewPreset,
-  ViewField,
-  ViewRenderMode
+  ViewField
 } from '@o4o/types';
 
 /**

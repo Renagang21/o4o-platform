@@ -1,5 +1,5 @@
 import { Application, Request, Response, RequestHandler } from 'express';
-import { standardLimiter, publicLimiter, settingsLimiter, ssoCheckLimiter, userPermissionsLimiter } from './rate-limiters.config.js';
+import { standardLimiter, publicLimiter, settingsLimiter, ssoCheckLimiter, userPermissionsLimiter, enrollmentLimiter, adminReviewLimiter } from './rate-limiters.config.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { errorHandler, notFoundHandler } from '../middleware/error-handler.js';
 import { AppDataSource } from '../database/connection.js';
@@ -80,6 +80,10 @@ import supplierAdminRoutes from '../routes/admin/suppliers.routes.js';
 import productsRoutes from '../routes/products.js';
 import partnersRoutes from '../routes/partners.js';
 import sellerProductsRoutes from '../routes/seller-products.js';
+
+// P0 RBAC - Role Enrollment Routes (Phase B)
+import enrollmentsRoutes from '../routes/enrollments.routes.js';
+import adminEnrollmentsRoutes from '../routes/admin/enrollments.routes.js';
 
 // Gutenberg Content Management Routes
 import postsApiRoutes from '../routes/api/posts.js';
@@ -309,6 +313,10 @@ export function setupRoutes(app: Application): void {
   // Phase 5 - Role Applications (Supplier, Seller, Partner)
   app.use('/api/v1/applications', standardLimiter, applicationsRoutes);
 
+  // P0 RBAC - Role Enrollments (Phase B)
+  app.use('/api/enrollments', enrollmentLimiter, enrollmentsRoutes);
+  app.use('/api/v1/enrollments', enrollmentLimiter, enrollmentsRoutes);
+
   // Phase 7 - Partner Analytics
   app.use('/api/v1/analytics/partner', standardLimiter, partnerAnalyticsRoutes);
 
@@ -391,6 +399,10 @@ export function setupRoutes(app: Application): void {
   app.use('/api/admin/forum', standardLimiter, forumAdminRoutes);
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/admin/suppliers', standardLimiter, supplierAdminRoutes);
+
+  // P0 RBAC - Admin Enrollment Review (Phase B)
+  app.use('/api/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);
+  app.use('/api/v1/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);
 
   // ============================================================================
   // 7. DASHBOARD ENDPOINTS

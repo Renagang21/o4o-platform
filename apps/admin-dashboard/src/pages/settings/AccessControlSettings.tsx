@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AccessControlSettings as AccessControlSettingsType } from '@o4o/types';
-import { authClient } from '@/services/authClient';
+import { authClient } from '@o4o/auth-client';
 
 /**
  * AccessControlSettings Page

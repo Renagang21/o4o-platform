@@ -111,11 +111,47 @@ export const userPermissionsLimiter = rateLimit({
   skip: isLocalhost
 });
 
+/**
+ * Strict rate limiter for enrollment creation
+ * 3 requests per minute (per Phase B security spec)
+ */
+export const enrollmentLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 3,
+  message: {
+    error: 'Too many enrollment requests. Please try again later.',
+    code: 'ENROLLMENT_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: getClientIP,
+  skip: isLocalhost
+});
+
+/**
+ * Lenient rate limiter for admin review actions
+ * 20 requests per minute (for operator protection)
+ */
+export const adminReviewLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20,
+  message: {
+    error: 'Too many admin review requests',
+    code: 'ADMIN_REVIEW_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: getClientIP,
+  skip: isLocalhost
+});
+
 // Export all limiters as an object for convenience
 export const rateLimiters = {
   standard: standardLimiter,
   public: publicLimiter,
   settings: settingsLimiter,
   ssoCheck: ssoCheckLimiter,
-  userPermissions: userPermissionsLimiter
+  userPermissions: userPermissionsLimiter,
+  enrollment: enrollmentLimiter,
+  adminReview: adminReviewLimiter
 };

@@ -9,13 +9,24 @@ import { PanelBody, TextControl, SelectControl, ToggleControl, ColorPicker, Rang
 import { ButtonGroup } from '../controls/ButtonGroup';
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 
+interface ButtonAttributes {
+  url?: string;
+  linkTarget?: string;
+  align?: string;
+  style?: string;
+  borderRadius?: string;
+  width?: number;
+  backgroundColor?: string;
+  textColor?: string;
+}
+
 interface ButtonSettingsProps {
   block: Block;
   onUpdate: (updates: { content?: any; attributes?: any }) => void;
 }
 
 export const ButtonSettings: React.FC<ButtonSettingsProps> = ({ block, onUpdate }) => {
-  const attributes = block.attributes || {};
+  const attributes = (block.attributes || {}) as ButtonAttributes;
 
   return (
     <>

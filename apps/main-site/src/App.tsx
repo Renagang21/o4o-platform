@@ -28,6 +28,20 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { GlobalStyleInjector } from './components/GlobalStyleInjector';
 
+// P0 RBAC: Role-based components
+import RoleGuard from './components/auth/RoleGuard';
+
+// P0 RBAC: Application pages
+import ApplySupplier from './pages/apply/ApplySupplier';
+import ApplySeller from './pages/apply/ApplySeller';
+import ApplyPartner from './pages/apply/ApplyPartner';
+import ApplyStatus from './pages/apply/ApplyStatus';
+
+// P0 RBAC: Dashboard pages
+import SupplierDashboard from './pages/dashboard/SupplierDashboard';
+import SellerDashboard from './pages/dashboard/SellerDashboard';
+import PartnerDashboard from './pages/dashboard/PartnerDashboard';
+
 // Lazy load pages
 import { lazy, Suspense } from 'react';
 const PageEditor = lazy(() => import('./pages/PageEditor'));
@@ -132,7 +146,52 @@ const App: FC = () => {
               <ResetPassword />
             </Layout>
           } />
-          
+
+          {/* P0 RBAC: Application Routes */}
+          <Route path="/apply/supplier" element={
+            <PrivateRoute>
+              <ApplySupplier />
+            </PrivateRoute>
+          } />
+          <Route path="/apply/seller" element={
+            <PrivateRoute>
+              <ApplySeller />
+            </PrivateRoute>
+          } />
+          <Route path="/apply/partner" element={
+            <PrivateRoute>
+              <ApplyPartner />
+            </PrivateRoute>
+          } />
+          <Route path="/apply/:role/status" element={
+            <PrivateRoute>
+              <ApplyStatus />
+            </PrivateRoute>
+          } />
+
+          {/* P0 RBAC: Dashboard Routes (Role-Protected) */}
+          <Route path="/dashboard/supplier" element={
+            <PrivateRoute>
+              <RoleGuard role="supplier">
+                <SupplierDashboard />
+              </RoleGuard>
+            </PrivateRoute>
+          } />
+          <Route path="/dashboard/seller" element={
+            <PrivateRoute>
+              <RoleGuard role="seller">
+                <SellerDashboard />
+              </RoleGuard>
+            </PrivateRoute>
+          } />
+          <Route path="/dashboard/partner" element={
+            <PrivateRoute>
+              <RoleGuard role="partner">
+                <PartnerDashboard />
+              </RoleGuard>
+            </PrivateRoute>
+          } />
+
           {/* Editor Routes (Protected) */}
           <Route path="/editor/page/:id?" element={
             <PrivateRoute>

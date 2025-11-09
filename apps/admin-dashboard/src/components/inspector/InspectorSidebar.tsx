@@ -155,7 +155,7 @@ const BlockInspector: React.FC<BlockInspectorProps> = ({ block, onUpdate }) => {
                 type="text"
                 className="inspector-input text-sm"
                 placeholder="custom-class"
-                value={block.attributes?.className || ''}
+                value={(block.attributes?.className as string) || ''}
                 onChange={(e) => onUpdate({
                   attributes: { ...block.attributes, className: e.target.value }
                 })}
@@ -167,7 +167,7 @@ const BlockInspector: React.FC<BlockInspectorProps> = ({ block, onUpdate }) => {
                 type="text"
                 className="inspector-input text-sm"
                 placeholder="unique-id"
-                value={block.attributes?.anchor || ''}
+                value={(block.attributes?.anchor as string) || ''}
                 onChange={(e) => onUpdate({
                   attributes: { ...block.attributes, anchor: e.target.value }
                 })}

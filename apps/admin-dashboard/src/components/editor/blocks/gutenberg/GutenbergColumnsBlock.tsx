@@ -152,6 +152,7 @@ export const GutenbergColumnsBlock: React.FC<GutenbergColumnsBlockProps> = ({
       id={id}
       type="columns"
       isSelected={isSelected}
+      onSelect={() => {}}
       className="gutenberg-columns-block"
     >
       {/* Gutenberg-style Block Toolbar */}
@@ -230,7 +231,7 @@ export const GutenbergColumnsBlock: React.FC<GutenbergColumnsBlockProps> = ({
             {/* Column will render here - simplified for now */}
             <div className="min-h-[100px] border-2 border-dashed border-gray-300 rounded p-4">
               <p className="text-sm text-gray-500">
-                Column {index + 1} ({column.attributes?.width?.toFixed(0)}%)
+                Column {index + 1} ({((column.attributes?.width as number) || 100 / columnCount).toFixed(0)}%)
               </p>
               <p className="text-xs text-gray-400 mt-2">
                 Inner blocks will be rendered here

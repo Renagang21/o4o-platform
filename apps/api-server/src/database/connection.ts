@@ -2,10 +2,22 @@ import { DataSource } from 'typeorm';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { SnakeNamingStrategy } from './SnakeNamingStrategy.js';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Load environment variables for migrations
+// In production, load .env-apiserver; in development, load .env.development
+const envFile = process.env.NODE_ENV === 'production'
+  ? '.env-apiserver'
+  : '.env.development';
+
+dotenv.config({
+  path: path.resolve(__dirname, '../../', envFile)
+});
 import { User } from '../entities/User.js';
 import { Role } from '../entities/Role.js';
 import { Permission } from '../entities/Permission.js';
@@ -92,6 +104,13 @@ import { FormSubmission } from '../entities/FormSubmission.js';
 // Customizer entities
 import { CustomizerPreset } from '../entities/CustomizerPreset.js';
 import { WidgetArea } from '../entities/WidgetArea.js';
+// P0 Zero-Data Role Management entities
+import { RoleEnrollment } from '../entities/RoleEnrollment.js';
+import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { KycDocument } from '../entities/KycDocument.js';
+import { SupplierProfile } from '../entities/SupplierProfile.js';
+import { SellerProfile } from '../entities/SellerProfile.js';
+import { PartnerProfile } from '../entities/PartnerProfile.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -242,6 +261,13 @@ export const AppDataSource = new DataSource({
     // Customizer entities
     CustomizerPreset,
     WidgetArea,
+    // P0 Zero-Data Role Management entities
+    RoleEnrollment,
+    RoleAssignment,
+    KycDocument,
+    SupplierProfile,
+    SellerProfile,
+    PartnerProfile,
   ],
   
   // 마이그레이션 설정

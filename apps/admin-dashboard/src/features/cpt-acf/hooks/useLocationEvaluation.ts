@@ -76,8 +76,11 @@ export function useLocationEvaluation(
           return false;
         }
 
+        // Convert ACFLocationGroup[] to FieldLocation[][]
+        const locationRules = group.location.map(g => g.rules);
+
         // Evaluate location rules
-        return shouldShowFieldGroup(group.location, context);
+        return shouldShowFieldGroup(locationRules, context);
       });
     },
     [context]

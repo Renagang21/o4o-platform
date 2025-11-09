@@ -37,7 +37,7 @@ export const usePostsActions = ({ posts, setPosts }: UsePostsActionsProps) => {
         slug: sanitizedSlug,
         status: data.status,
         categoryIds: data.categoryIds || [],
-        tags: tagsArray
+        tagIds: tagsArray
       });
       
       if (response.success) {

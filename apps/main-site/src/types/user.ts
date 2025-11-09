@@ -4,19 +4,23 @@
  * - MongoDB _id와 일반적인 id 모두 지원하여 호환성 확보
  */
 
+// P0 RBAC: auth-client에서 re-export
+import type { RoleAssignment, MeResponse } from '@o4o/auth-client';
+export type { RoleAssignment, MeResponse };
+
 // UserRole 타입 정의 - 모든 가능한 역할 포함
-export type UserRole = 
-  | 'user' 
-  | 'admin' 
-  | 'administrator' 
-  | 'manager' 
-  | 'partner' 
-  | 'operator' 
-  | 'member' 
-  | 'seller' 
-  | 'affiliate' 
-  | 'contributor' 
-  | 'vendor' 
+export type UserRole =
+  | 'user'
+  | 'admin'
+  | 'administrator'
+  | 'manager'
+  | 'partner'
+  | 'operator'
+  | 'member'
+  | 'seller'
+  | 'affiliate'
+  | 'contributor'
+  | 'vendor'
   | 'supplier'
   | 'retailer'
   | 'customer';
@@ -43,10 +47,10 @@ export interface User {
   email: string;
   name: string;
   phone?: string;
-  role?: UserRole;                // 강타입 UserRole (선택사항)
-  roles?: UserRole[];             // 호환성을 위한 배열 형태
-  currentRole?: UserRole;         // 현재 활성 역할 (역할 전환용)
-  defaultRole?: UserRole;         // 기본 역할
+  role?: UserRole;                // 강타입 UserRole (선택사항) - DEPRECATED: use assignments instead
+  roles?: UserRole[];             // 호환성을 위한 배열 형태 - DEPRECATED: use assignments instead
+  currentRole?: UserRole;         // 현재 활성 역할 (역할 전환용) - DEPRECATED: use assignments instead
+  defaultRole?: UserRole;         // 기본 역할 - DEPRECATED: use assignments instead
   userType: 'admin' | 'supplier' | 'retailer' | 'customer'; // 프론트엔드 타입 (필수)
   status: UserStatus;
   businessInfo?: BusinessInfo;
@@ -54,6 +58,9 @@ export interface User {
   updatedAt?: Date | string;
   lastLoginAt?: Date | string;
   avatar?: string;
+
+  // P0 RBAC: assignments array (replaces role/roles/currentRole/defaultRole)
+  assignments?: RoleAssignment[];
 }
 
 // AuthContext 관련 타입들
@@ -62,9 +69,11 @@ export interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>; // P0 RBAC: async logout
   updateUser: (userData: Partial<User>) => void;
   checkAuthStatus: () => Promise<void>;
+  // P0 RBAC: role assignment checker
+  hasRole: (role: string) => boolean;
 }
 
 // 권한 확인 관련 타입

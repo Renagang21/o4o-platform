@@ -42,6 +42,8 @@ const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
 const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
+// P0 RBAC: Enrollment Management
+const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
@@ -359,7 +361,23 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
+
+                    {/* P0 RBAC: 역할 신청 관리 */}
+                    <Route path="/enrollments" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EnrollmentManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/enrollments" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EnrollmentManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 글 관리 */}
                     <Route path="/posts" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>

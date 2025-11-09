@@ -1,6 +1,6 @@
 // Re-export Post types from SSOT
 export type { PostStatus, PostType, SEOMetadata } from '@o4o/types/cpt';
-export type { Tag } from '@o4o/types';
+// Note: Tag is defined locally in this file (line 80), not re-exported
 
 // TipTap Editor Types (unique to this app)
 export interface TipTapJSONContent {

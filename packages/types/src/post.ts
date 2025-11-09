@@ -15,7 +15,7 @@ export interface PostCategory {
   updatedAt: Date;
 }
 
-export type PostStatus = 'draft' | 'published' | 'publish' | 'scheduled' | 'trash' | 'private';
+export type PostStatus = 'draft' | 'pending' | 'published' | 'publish' | 'scheduled' | 'trash' | 'private';
 export type PostType = 'post' | 'page';
 export type PostVisibility = 'public' | 'private' | 'password';
 export type CommentStatus = 'open' | 'closed';

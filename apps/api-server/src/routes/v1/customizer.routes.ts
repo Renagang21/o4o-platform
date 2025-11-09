@@ -136,6 +136,7 @@ router.put(
         scrollToTop: mergedScrollToTop,
         _meta: {
           ...(customizerSettings as any)?._meta,
+          version: '1.0.0', // Required by schema-migration.ts detectVersion()
           lastModified: new Date().toISOString(),
           isDirty: false,
         },
@@ -232,6 +233,7 @@ router.put(
         buttons: mergedButtons,
         _meta: {
           ...(customizerSettings as any)?._meta,
+          version: '1.0.0', // Required by schema-migration.ts detectVersion()
           lastModified: new Date().toISOString(),
           isDirty: false,
         },
@@ -328,6 +330,7 @@ router.put(
         breadcrumbs: mergedBreadcrumbs,
         _meta: {
           ...(customizerSettings as any)?._meta,
+          version: '1.0.0', // Required by schema-migration.ts detectVersion()
           lastModified: new Date().toISOString(),
           isDirty: false,
         },
@@ -540,6 +543,7 @@ router.put(
         _version: ((customizerSettings as any)?._version || 0) + 1,
         _meta: {
           ...(customizerSettings as any)?._meta,
+          version: '1.0.0', // Required by schema-migration.ts detectVersion()
           lastModified: new Date().toISOString(),
           isDirty: false,
         },

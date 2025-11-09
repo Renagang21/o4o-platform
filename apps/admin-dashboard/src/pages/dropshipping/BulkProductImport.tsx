@@ -256,16 +256,16 @@ const BulkProductImport: React.FC = () => {
       // Call API to import products
       const response = await authClient.api.post('/api/admin/dropshipping/products/bulk-import', products);
 
-      if (response.success) {
+      if (response.data.success) {
         setImportResults({
-          success: response.data.success || 0,
-          failed: response.data.failed || 0,
-          errors: response.data.errors || []
+          success: response.data.data?.success || 0,
+          failed: response.data.data?.failed || 0,
+          errors: response.data.data?.errors || []
         });
         setCurrentStep('complete');
         toast.success('상품 임포트가 완료되었습니다');
       } else {
-        throw new Error(response.message || '임포트 실패');
+        throw new Error(response.data.message || '임포트 실패');
       }
     } catch (error: any) {
       toast.error(`임포트 오류: ${error.message}`);

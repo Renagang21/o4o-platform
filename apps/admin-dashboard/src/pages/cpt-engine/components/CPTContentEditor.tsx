@@ -79,9 +79,9 @@ const CPTContentEditor: React.FC<CPTContentEditorProps> = ({
       const allGroups = response.data || [];
       return allGroups.filter(group => {
         if (!group.location) return false;
-        // location is FieldLocation[][] (OR groups of AND rules)
-        return group.location.some(ruleGroup =>
-          ruleGroup.some(rule =>
+        // location is ACFLocationGroup[] (array of {rules: ACFLocation[]})
+        return group.location.some(locationGroup =>
+          locationGroup.rules.some(rule =>
             rule.param === 'post_type' && rule.value === cptSlug
           )
         );
