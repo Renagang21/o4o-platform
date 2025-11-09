@@ -236,9 +236,50 @@ import { normalizeCustomizerSettings } from './utils/normalize-settings';
 - [x] 초기화 경로 확인: ❌ 우회 발견
 - [x] 로드 경로 확인: ✅ 안전
 - [x] 저장 경로 확인: ✅ 안전
-- [ ] BYPASS-01 수정 완료
-- [ ] 검증 테스트 1-3 Pass
+- [x] BYPASS-01 수정 완료
+- [ ] 검증 테스트 1-3 Pass (사용자 테스트 필요)
 
 ---
 
-**다음 작업**: BYPASS-01 수정 → 검증 테스트 실행
+## ✅ 수정 완료 (2025-11-09)
+
+### 적용된 변경사항
+
+**파일**: `apps/admin-dashboard/src/pages/appearance/astra-customizer/SimpleCustomizer.tsx`
+
+**Import 추가**:
+```typescript
+import { normalizeCustomizerSettings } from './utils/normalize-settings';
+```
+
+**handleReset 수정** (Line 257-267):
+```typescript
+const handleReset = () => {
+  if (window.confirm('모든 설정을 기본값으로 되돌리시겠습니까?')) {
+    // Always normalize default settings to ensure type safety
+    // This prevents TypeError when accessing nested properties like 'desktop'
+    const defaults = getDefaultSettings();
+    const normalized = normalizeCustomizerSettings(defaults);
+    setSettings(normalized);
+    setIsDirty(true);
+  }
+};
+```
+
+### 배포 정보
+
+- **버전**: `2025.11.09-1902`
+- **배포일시**: 2025-11-09 10:03:17 UTC
+- **커밋**: `95ec2f22`
+- **URL**: https://admin.neture.co.kr
+
+### 예상 효과
+
+- ✅ 초기화 버튼 클릭 시 `TypeError: ... reading 'desktop'` 완전 제거
+- ✅ `footer.widgets.columns`가 항상 `{desktop, tablet, mobile}` 형태 보장
+- ✅ 모든 3분기 객체 필드 타입 안전성 확보
+- ✅ BUG-02 근본 원인 해결
+
+---
+
+**다음 작업**: 사용자 검증 테스트 1-3 실행 후 결과 보고
