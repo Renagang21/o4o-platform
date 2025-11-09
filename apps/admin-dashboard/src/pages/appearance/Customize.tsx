@@ -8,24 +8,6 @@ import { AstraCustomizerSettings } from './astra-customizer/types/customizer-typ
 import { normalizeCustomizerSettings } from './astra-customizer/utils/normalize-settings';
 import { errorHandler, ErrorLevel } from './astra-customizer/utils/error-handler';
 
-// Helper to remove numeric keys from objects (prevent data contamination)
-const sanitizeSettings = (obj: any): any => {
-  if (Array.isArray(obj)) {
-    return obj.map(sanitizeSettings);
-  }
-  if (obj && typeof obj === 'object') {
-    const cleaned: any = {};
-    for (const key in obj) {
-      // Skip numeric keys
-      if (!/^\d+$/.test(key)) {
-        cleaned[key] = sanitizeSettings(obj[key]);
-      }
-    }
-    return cleaned;
-  }
-  return obj;
-};
-
 const Customize: React.FC = () => {
   const navigate = useNavigate();
   const adminFullscreen = useAdminFullscreen();
@@ -102,13 +84,13 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
-      // Sanitize settings to remove any numeric keys before sending to API
-      // This prevents "contaminated data" errors from the backend validation
-      const sanitized = sanitizeSettings(settings);
+      // Normalize settings: sanitize numeric keys + convert legacy formats + merge defaults
+      // This ensures clean data structure and prevents "contaminated data" errors
+      const normalized = normalizeCustomizerSettings(settings);
 
       // API를 통해 설정 저장 (PUT 메서드 사용)
       // 서버는 { settings: {...} } 형식을 기대함
-      const response = await authClient.api.put('/settings/customizer', { settings: sanitized });
+      const response = await authClient.api.put('/settings/customizer', { settings: normalized });
 
       if (response.data?.success) {
         toast.success('설정이 저장되었습니다.');
