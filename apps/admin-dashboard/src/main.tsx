@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { initVersionCheck } from '@/utils/versionCheck'
 import { registerAllBlocks } from '@/blocks'
+import { registerAllWidgets } from '@/lib/widgets/registerWidgets'
 import App from './App'
 import './styles/globals.css'
 // WordPress styles will be loaded only when needed
@@ -46,6 +47,9 @@ initVersionCheck();
 
 // Register all blocks before rendering
 registerAllBlocks();
+
+// Register all dashboard widgets before rendering (P1 Phase C)
+registerAllWidgets();
 
 // Note: StrictMode disabled for Slate.js compatibility
 // Slate's focus management conflicts with React's double-rendering in development mode

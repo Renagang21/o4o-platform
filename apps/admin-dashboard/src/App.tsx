@@ -37,6 +37,8 @@ const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const WordPressDashboard = lazy(() => import('@/pages/WordPressDashboard'));
 const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
+// P1 Phase C: Widget-based Dashboard
+const AdminDashboardPageWrapper = lazy(() => import('@/pages/dashboard/AdminDashboardPageWrapper'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
@@ -301,7 +303,16 @@ function App() {
                         <DashboardSimple />
                       </Suspense>
                     } />
-                    
+
+                    {/* P1 Phase C: Widget-based Admin Dashboard */}
+                    <Route path="/admin/dashboard/widgets" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AdminDashboardPageWrapper />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 사용자 관리 */}
                     <Route path="/users" element={
                       <AdminProtectedRoute requiredPermissions={['users:read']}>
