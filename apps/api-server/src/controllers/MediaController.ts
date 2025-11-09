@@ -261,7 +261,21 @@ export class MediaController {
 
       // Apply filters
       if (type) {
-        queryBuilder.andWhere('media.mimeType LIKE :type', { type: `${type}%` });
+        // Use type-specific flags for more accurate filtering
+        if (type === 'image') {
+          // Filter by mimeType AND exclude common document extensions
+          queryBuilder.andWhere(
+            '(media.mimeType LIKE :type AND media.filename NOT LIKE :mdExt AND media.filename NOT LIKE :txtExt AND media.filename NOT LIKE :pdfExt)',
+            { type: 'image%', mdExt: '%.md', txtExt: '%.txt', pdfExt: '%.pdf' }
+          );
+        } else if (type === 'video') {
+          queryBuilder.andWhere('media.mimeType LIKE :type', { type: 'video%' });
+        } else if (type === 'audio') {
+          queryBuilder.andWhere('media.mimeType LIKE :type', { type: 'audio%' });
+        } else {
+          // For other types, use LIKE matching
+          queryBuilder.andWhere('media.mimeType LIKE :type', { type: `${type}%` });
+        }
       }
 
       if (folderId) {
