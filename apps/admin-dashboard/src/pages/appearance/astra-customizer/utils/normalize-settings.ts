@@ -198,11 +198,19 @@ function ensureColorState(
 export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettings {
   const defaults = getDefaultSettings();
 
+  console.log('[NORMALIZE] Input raw:', raw);
+  console.log('[NORMALIZE] Defaults siteIdentity.logo.width:', defaults.siteIdentity.logo.width);
+  console.log('[NORMALIZE] Defaults colors.linkColor:', defaults.colors.linkColor);
+
   if (raw === undefined || raw === null) {
+    console.log('[NORMALIZE] Raw is null/undefined, returning defaults');
     return defaults;
   }
 
   const merged = mergeWithDefaults(defaults, raw as UnknownRecord);
+
+  console.log('[NORMALIZE] After merge, siteIdentity.logo.width:', merged.siteIdentity?.logo?.width);
+  console.log('[NORMALIZE] After merge, colors.linkColor:', merged.colors?.linkColor);
 
   // ========================================
   // Control-Based Type Enforcement
@@ -210,11 +218,17 @@ export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettin
   // ========================================
 
   // --- Site Identity: Responsive Fields ---
+  console.log('[NORMALIZE] Enforcing siteIdentity.logo.width...');
+  console.log('[NORMALIZE] Before enforcement:', merged.siteIdentity?.logo?.width);
+
   if (merged.siteIdentity?.logo?.width !== undefined) {
     merged.siteIdentity.logo.width = ensureResponsiveValue(
       merged.siteIdentity.logo.width,
       defaults.siteIdentity.logo.width
     );
+    console.log('[NORMALIZE] After enforcement:', merged.siteIdentity.logo.width);
+  } else {
+    console.log('[NORMALIZE] WARNING: siteIdentity.logo.width is undefined, enforcement SKIPPED!');
   }
 
   if (merged.siteIdentity?.siteTitle?.typography?.fontSize !== undefined) {
@@ -275,12 +289,21 @@ export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettin
   }
 
   // --- Colors: ColorState Fields ---
+  console.log('[NORMALIZE] Enforcing colors.linkColor...');
+  console.log('[NORMALIZE] Before enforcement:', merged.colors?.linkColor);
+
   if (merged.colors?.linkColor !== undefined) {
     merged.colors.linkColor = ensureColorState(
       merged.colors.linkColor,
       defaults.colors.linkColor
     );
+    console.log('[NORMALIZE] After enforcement:', merged.colors.linkColor);
+  } else {
+    console.log('[NORMALIZE] WARNING: colors.linkColor is undefined, enforcement SKIPPED!');
   }
+
+  console.log('[NORMALIZE] Final return value, siteIdentity.logo.width:', merged.siteIdentity?.logo?.width);
+  console.log('[NORMALIZE] Final return value, colors.linkColor:', merged.colors?.linkColor);
 
   // --- Footer Widgets: Responsive Fields ---
   if (merged.footer?.widgets?.columns !== undefined) {

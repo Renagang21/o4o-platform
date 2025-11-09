@@ -42,8 +42,18 @@ const Customize: React.FC = () => {
         const rawData = response.data.data;
         const settingsData = rawData.settings || rawData;
 
+        console.log('[DIAG] Raw API response data:', response.data.data);
+        console.log('[DIAG] Extracted settingsData:', settingsData);
+        console.log('[DIAG] siteIdentity.logo.width from API:', settingsData?.siteIdentity?.logo?.width);
+        console.log('[DIAG] colors.linkColor from API:', settingsData?.colors?.linkColor);
+
         // normalize 함수가 AstraCustomizerSettings 반환
         const normalized = normalizeCustomizerSettings(settingsData);
+
+        console.log('[DIAG] Normalized settings:', normalized);
+        console.log('[DIAG] siteIdentity.logo.width after normalize:', normalized?.siteIdentity?.logo?.width);
+        console.log('[DIAG] colors.linkColor after normalize:', normalized?.colors?.linkColor);
+
         setInitialSettings(normalized);
       } else {
         // 설정이 없으면 기본값 사용
