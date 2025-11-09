@@ -101,6 +101,25 @@ export class RoleEnrollment {
   reviewNote?: string;
 
   /**
+   * 보류/거부 사유 (P1 Phase B-2)
+   *
+   * ON_HOLD 또는 REJECTED 상태일 때 관리자가 제공하는 상세 사유
+   * 이메일 알림과 사용자 UI에 표시됨
+   */
+  @Column({ type: 'text', nullable: true })
+  reason?: string;
+
+  /**
+   * 재신청 가능 시각 (P1 Phase B-2)
+   *
+   * REJECTED 상태일 때 설정되는 쿨다운 기간
+   * 이 시각 이전에는 동일 역할 재신청 불가
+   * null이면 즉시 재신청 가능
+   */
+  @Column({ name: 'reapply_after_at', type: 'timestamp', nullable: true })
+  reapplyAfterAt?: Date;
+
+  /**
    * 신청 생성 시각
    */
   @CreateDateColumn()
@@ -164,28 +183,46 @@ export class RoleEnrollment {
   }
 
   /**
-   * 거부 처리
+   * 거부 처리 (P1 Phase B-2 enhanced)
    */
-  reject(reviewerId: string, note: string): void {
+  reject(reviewerId: string, reason: string, reapplyAfterAt?: Date): void {
     if (!this.canReject()) {
       throw new Error(`Cannot reject enrollment in ${this.status} status`);
     }
     this.status = 'REJECTED';
     this.reviewedAt = new Date();
     this.reviewedBy = reviewerId;
-    this.reviewNote = note;
+    this.reason = reason;
+    this.reapplyAfterAt = reapplyAfterAt;
+    // Keep reviewNote for backward compatibility
+    this.reviewNote = reason;
   }
 
   /**
-   * 보류 처리
+   * 보류 처리 (P1 Phase B-2 enhanced)
    */
-  hold(reviewerId: string, note: string): void {
+  hold(reviewerId: string, reason: string): void {
     if (!this.canHold()) {
       throw new Error(`Cannot hold enrollment in ${this.status} status`);
     }
     this.status = 'ON_HOLD';
     this.reviewedAt = new Date();
     this.reviewedBy = reviewerId;
-    this.reviewNote = note;
+    this.reason = reason;
+    // Keep reviewNote for backward compatibility
+    this.reviewNote = reason;
+  }
+
+  /**
+   * 재신청 가능 여부 체크 (P1 Phase B-2)
+   */
+  canReapply(): boolean {
+    if (this.status !== 'REJECTED') {
+      return true; // Not rejected, can apply
+    }
+    if (!this.reapplyAfterAt) {
+      return true; // No cooldown set
+    }
+    return new Date() >= this.reapplyAfterAt;
   }
 }
