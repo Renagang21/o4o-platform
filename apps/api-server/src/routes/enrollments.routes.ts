@@ -4,6 +4,7 @@ import { RoleEnrollment } from '../entities/RoleEnrollment.js';
 import { AuditLog } from '../entities/AuditLog.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { AuthRequest } from '../types/auth.js';
+import { enrollmentEmailService } from '../services/EnrollmentEmailService.js';
 import logger from '../utils/logger.js';
 
 const router: Router = Router();
@@ -104,6 +105,9 @@ router.post('/', requireAuth, async (req: AuthRequest, res) => {
       status: 'PENDING'
     });
 
+    // P1 Phase B-3: Send enrollment created email
+    await enrollmentEmailService.sendEnrollmentCreated(enrollment, user);
+
     return res.status(201).json({
       id: enrollment.id,
       user_id: enrollment.userId,
@@ -152,6 +156,9 @@ router.get('/my', requireAuth, async (req: AuthRequest, res) => {
       decided_at: enrollment.reviewedAt || null,
       decided_by: enrollment.reviewedBy || null,
       decision_reason: enrollment.reviewNote || null,
+      reason: enrollment.reason || null, // P1 Phase B-2
+      reapply_after_at: enrollment.reapplyAfterAt || null, // P1 Phase B-2
+      can_reapply: enrollment.canReapply(), // P1 Phase B-2
       application_data: enrollment.applicationData,
       created_at: enrollment.createdAt,
       updated_at: enrollment.updatedAt

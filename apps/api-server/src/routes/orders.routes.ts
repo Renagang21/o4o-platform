@@ -135,6 +135,108 @@ router.get('/', authenticate, asyncHandler(orderController.getOrders));
 router.get('/stats', authenticate, asyncHandler(orderController.getOrderStats));
 
 /**
+ * GET /api/orders/today
+ * Get today's order count for dashboard widget
+ */
+router.get('/today', authenticate, async (req, res) => {
+  try {
+    const { AppDataSource } = await import('../database/connection.js');
+    const { Order } = await import('../entities/Order.js');
+    const { Between } = await import('typeorm');
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const orderRepo = AppDataSource.getRepository(Order);
+    const count = await orderRepo.count({
+      where: {
+        orderDate: Between(todayStart, now) as any
+      }
+    });
+
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({
+      code: 'INTERNAL_ERROR',
+      message: 'Failed to fetch today\'s orders'
+    });
+  }
+});
+
+/**
+ * GET /api/orders/series
+ * Get order metrics time series for dashboard charts
+ *
+ * @query metric - Metric to aggregate (revenue|count)
+ * @query days - Number of days to look back (default: 7)
+ * @query currency - Currency code (default: KRW)
+ */
+router.get('/series', authenticate, async (req, res) => {
+  try {
+    const { AppDataSource } = await import('../database/connection.js');
+    const { Order } = await import('../entities/Order.js');
+
+    const metric = (req.query.metric as string) || 'revenue';
+    const days = parseInt(req.query.days as string) || 7;
+    const currency = (req.query.currency as string) || 'KRW';
+
+    const orderRepo = AppDataSource.getRepository(Order);
+
+    // Calculate date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days + 1);
+    startDate.setHours(0, 0, 0, 0);
+
+    // Generate all dates in range
+    const dates: string[] = [];
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      dates.push(date.toISOString().split('T')[0]);
+    }
+
+    // Get orders grouped by date
+    const orders = await orderRepo
+      .createQueryBuilder('order')
+      .select('DATE(order.orderDate)', 'date')
+      .addSelect('SUM(order.totalAmount)', 'totalRevenue')
+      .addSelect('COUNT(order.id)', 'orderCount')
+      .where('order.orderDate >= :startDate', { startDate })
+      .andWhere('order.orderDate <= :endDate', { endDate })
+      .groupBy('DATE(order.orderDate)')
+      .getRawMany();
+
+    // Create lookup map
+    const dataMap = new Map();
+    orders.forEach((row: any) => {
+      dataMap.set(row.date, {
+        value: metric === 'revenue' ? parseFloat(row.totalRevenue || '0') : parseInt(row.orderCount || '0'),
+        orderCount: parseInt(row.orderCount || '0')
+      });
+    });
+
+    // Fill in missing dates with 0
+    const points = dates.map(date => ({
+      date,
+      value: dataMap.get(date)?.value || 0,
+      orderCount: dataMap.get(date)?.orderCount || 0
+    }));
+
+    res.json({
+      metric,
+      currency,
+      points
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 'INTERNAL_ERROR',
+      message: 'Failed to fetch order series'
+    });
+  }
+});
+
+/**
  * @swagger
  * /api/orders/{id}:
  *   get:

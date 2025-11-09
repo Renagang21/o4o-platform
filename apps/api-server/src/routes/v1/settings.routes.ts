@@ -1344,17 +1344,6 @@ async function updateCustomizerSettings(req: Request, res: Response) {
 
     const customizerSettings = newSettings.settings || newSettings;
 
-    // 🔍 DEBUG: Log received data types
-    console.log('[DEBUG] customizerSettings keys:', Object.keys(customizerSettings).slice(0, 20));
-    if (customizerSettings.siteIdentity) {
-      console.log('[DEBUG] siteIdentity type:', typeof customizerSettings.siteIdentity);
-      console.log('[DEBUG] siteIdentity keys:', Object.keys(customizerSettings.siteIdentity).slice(0, 20));
-    }
-    if (customizerSettings.colors) {
-      console.log('[DEBUG] colors type:', typeof customizerSettings.colors);
-      console.log('[DEBUG] colors keys:', Object.keys(customizerSettings.colors).slice(0, 20));
-    }
-
     // 🛡️ VALIDATION: Detect numeric keys (data contamination)
     const contamination = findNumericKeys(customizerSettings);
     if (contamination.length > 0) {

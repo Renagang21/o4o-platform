@@ -7,6 +7,7 @@ import { ApprovalLog } from '../../entities/ApprovalLog.js';
 import { AuditLog } from '../../entities/AuditLog.js';
 import { requireAdmin } from '../../middleware/auth.middleware.js';
 import { AuthRequest } from '../../types/auth.js';
+import { enrollmentEmailService } from '../../services/EnrollmentEmailService.js';
 import logger from '../../utils/logger.js';
 import { In, Like, Between } from 'typeorm';
 
@@ -94,6 +95,8 @@ router.get('/', requireAdmin, async (req: AuthRequest, res) => {
       decided_at: enrollment.reviewedAt,
       decided_by: enrollment.reviewedBy,
       decision_reason: enrollment.reviewNote,
+      reason: enrollment.reason, // P1 Phase B-2
+      reapply_after_at: enrollment.reapplyAfterAt, // P1 Phase B-2
       application_data: enrollment.applicationData
     }));
 
@@ -269,6 +272,16 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthRequest, res) => {
       assignmentId: assignment.id
     });
 
+    // P1 Phase B-3: Send approval email
+    const enrolledUser = enrollment.user;
+    if (enrolledUser) {
+      await enrollmentEmailService.sendEnrollmentApproved(
+        enrollment,
+        enrolledUser,
+        reason
+      );
+    }
+
     return res.json({
       ok: true,
       enrollment: {
@@ -307,11 +320,11 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthRequest, res) => {
  *
  * Reject a role enrollment
  *
- * @body { reason: string } (required)
+ * @body { reason: string, cooldownHours?: number } (reason required)
  */
 router.patch('/:id/reject', requireAdmin, async (req: AuthRequest, res) => {
   const { id } = req.params;
-  const { reason } = req.body;
+  const { reason, cooldownHours = 24 } = req.body; // P1 Phase B-2: Default 24h cooldown
   const admin = req.user!;
 
   if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
@@ -331,7 +344,10 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthRequest, res) => {
     const approvalLogRepo = queryRunner.manager.getRepository(ApprovalLog);
     const auditLogRepo = queryRunner.manager.getRepository(AuditLog);
 
-    const enrollment = await enrollmentRepo.findOne({ where: { id } });
+    const enrollment = await enrollmentRepo.findOne({
+      where: { id },
+      relations: ['user']
+    });
 
     if (!enrollment) {
       await queryRunner.rollbackTransaction();
@@ -352,8 +368,12 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthRequest, res) => {
 
     const previousStatus = enrollment.status;
 
+    // P1 Phase B-2: Calculate reapply date based on cooldown
+    const reapplyAfterAt = new Date();
+    reapplyAfterAt.setHours(reapplyAfterAt.getHours() + cooldownHours);
+
     // Update enrollment using entity method
-    enrollment.reject(admin.id, reason);
+    enrollment.reject(admin.id, reason, reapplyAfterAt);
     await enrollmentRepo.save(enrollment);
 
     // Create ApprovalLog
@@ -397,8 +417,21 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthRequest, res) => {
       userId: enrollment.userId,
       role: enrollment.role,
       adminId: admin.id,
-      reason
+      reason,
+      cooldownHours,
+      reapplyAfterAt
     });
+
+    // P1 Phase B-3: Send rejection email
+    const enrolledUser = enrollment.user;
+    if (enrolledUser) {
+      await enrollmentEmailService.sendEnrollmentRejected(
+        enrollment,
+        enrolledUser,
+        reason,
+        reapplyAfterAt
+      );
+    }
 
     return res.json({
       ok: true,
@@ -406,7 +439,9 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthRequest, res) => {
         id: enrollment.id,
         status: enrollment.status,
         decided_at: enrollment.reviewedAt,
-        decided_by: enrollment.reviewedBy
+        decided_by: enrollment.reviewedBy,
+        reason: enrollment.reason,
+        reapply_after_at: enrollment.reapplyAfterAt
       }
     });
   } catch (error) {
@@ -456,7 +491,10 @@ router.patch('/:id/hold', requireAdmin, async (req: AuthRequest, res) => {
     const approvalLogRepo = queryRunner.manager.getRepository(ApprovalLog);
     const auditLogRepo = queryRunner.manager.getRepository(AuditLog);
 
-    const enrollment = await enrollmentRepo.findOne({ where: { id } });
+    const enrollment = await enrollmentRepo.findOne({
+      where: { id },
+      relations: ['user']
+    });
 
     if (!enrollment) {
       await queryRunner.rollbackTransaction();
@@ -525,12 +563,24 @@ router.patch('/:id/hold', requireAdmin, async (req: AuthRequest, res) => {
       required_fields
     });
 
+    // P1 Phase B-3: Send hold email
+    const enrolledUser = enrollment.user;
+    if (enrolledUser) {
+      await enrollmentEmailService.sendEnrollmentHeld(
+        enrollment,
+        enrolledUser,
+        reason,
+        required_fields
+      );
+    }
+
     return res.json({
       ok: true,
       enrollment: {
         id: enrollment.id,
         status: enrollment.status,
         reviewer_note: enrollment.reviewNote,
+        reason: enrollment.reason,
         required_fields: required_fields || null
       }
     });
@@ -549,6 +599,62 @@ router.patch('/:id/hold', requireAdmin, async (req: AuthRequest, res) => {
     });
   } finally {
     await queryRunner.release();
+  }
+});
+
+/**
+ * GET /admin/enrollments/stats
+ *
+ * Get enrollment statistics for dashboard widgets
+ *
+ * @query since - Start date (ISO format, default: today 00:00)
+ * @query until - End date (ISO format, default: now)
+ */
+router.get('/stats', requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const enrollmentRepo = AppDataSource.getRepository(RoleEnrollment);
+
+    // Get today's start (00:00)
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Get yesterday's range (00:00 - 24:00)
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    const yesterdayEnd = new Date(todayStart);
+
+    // Count today's pending enrollments
+    const todayPendingCount = await enrollmentRepo.count({
+      where: {
+        status: 'PENDING',
+        createdAt: Between(todayStart, now) as any
+      }
+    });
+
+    // Count yesterday's pending enrollments (for comparison)
+    const yesterdayPendingCount = await enrollmentRepo.count({
+      where: {
+        status: 'PENDING',
+        createdAt: Between(yesterdayStart, yesterdayEnd) as any
+      }
+    });
+
+    const delta = todayPendingCount - yesterdayPendingCount;
+
+    return res.json({
+      pendingCount: todayPendingCount,
+      yesterdayPendingCount,
+      delta
+    });
+  } catch (error) {
+    logger.error('Error fetching enrollment stats', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+
+    return res.status(500).json({
+      code: 'INTERNAL_ERROR',
+      message: 'Failed to fetch enrollment stats'
+    });
   }
 });
 
