@@ -23,6 +23,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Stage 1 Hotfix: Detect if running in iframe
+  const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+
   const isAuthenticated = !!user && user.status === 'approved';
 
   // P0 RBAC: hasRole helper - checks active assignments
@@ -95,7 +98,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   };
 
   // P0 RBAC: 인증 상태 확인 - /me 기반
-  const checkAuthStatus = async () => {
+  const checkAuthStatus = async (retryCount = 0) => {
+    // Stage 1 Hotfix: Skip auth check in iframe or limit retries
+    if (isInIframe && retryCount >= 3) {
+      console.warn('[AuthContext] Skipping auth check in iframe after 3 retries');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -113,6 +123,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Auth check error:', error);
       setUser(null);
+
+      // Stage 1 Hotfix: Exponential backoff retry for iframe
+      if (isInIframe && retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        console.warn(`[AuthContext] Retry ${retryCount + 1}/3 in ${delay}ms`);
+        setTimeout(() => checkAuthStatus(retryCount + 1), delay);
+        return; // Don't set isLoading to false yet
+      }
     } finally {
       setIsLoading(false);
     }
