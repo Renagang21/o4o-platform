@@ -29,7 +29,7 @@ router.get('/low-stock', async (req, res) => {
     // Count low stock products
     const count = await productRepo.count({
       where: {
-        stockQuantity: LessThan(threshold) as any
+        inventory: LessThan(threshold) as any
       }
     });
 
@@ -37,13 +37,13 @@ router.get('/low-stock', async (req, res) => {
     if (limit > 0) {
       sample = await productRepo.find({
         where: {
-          stockQuantity: LessThan(threshold) as any
+          inventory: LessThan(threshold) as any
         },
         take: limit,
         order: {
-          stockQuantity: 'ASC'
+          inventory: 'ASC'
         },
-        select: ['id', 'sku', 'name', 'stockQuantity']
+        select: ['id', 'sku', 'name', 'inventory']
       });
     }
 
