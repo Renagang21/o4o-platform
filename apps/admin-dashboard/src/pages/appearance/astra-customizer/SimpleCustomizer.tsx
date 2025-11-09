@@ -84,6 +84,9 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const cssUpdateTimeoutRef = useRef<NodeJS.Timeout>();
 
+  // PREVIEW OFF: Disable iframe preview to prevent reload loops and cross-origin issues
+  const ENABLE_IFRAME_PREVIEW = false;
+
   // Auto-show builder overlays when header/footer sections are active
   useEffect(() => {
     if (activeSection === 'header') {
@@ -124,13 +127,14 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     setIsDirty(true);
   }, []);
 
-  // Simple CSS injection
+  // Simple CSS injection - DISABLED when iframe preview is off
   const injectCSS = useCallback(() => {
+    if (!ENABLE_IFRAME_PREVIEW) return; // Skip if preview disabled
     if (!iframeRef.current?.contentWindow) return;
 
     try {
       const css = generateCSS(settings);
-      
+
       // Try direct DOM access
       const doc = iframeRef.current.contentDocument;
       if (doc) {
@@ -152,12 +156,14 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   }, [settings]);
 
-  // Debounced CSS update
+  // Debounced CSS update - DISABLED when iframe preview is off
   useEffect(() => {
+    if (!ENABLE_IFRAME_PREVIEW) return; // Skip if preview disabled
+
     if (cssUpdateTimeoutRef.current) {
       clearTimeout(cssUpdateTimeoutRef.current);
     }
-    
+
     cssUpdateTimeoutRef.current = setTimeout(() => {
       injectCSS();
     }, 200);
@@ -266,16 +272,23 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   };
 
-  // Handle iframe load
+  // Handle iframe load - DISABLED when iframe preview is off
   const handleIframeLoad = () => {
+    if (!ENABLE_IFRAME_PREVIEW) return; // Skip if preview disabled
+
     // Debounce iframe load injection to prevent potential loops
     if (cssUpdateTimeoutRef.current) {
       clearTimeout(cssUpdateTimeoutRef.current);
     }
-    
+
     cssUpdateTimeoutRef.current = setTimeout(() => {
       injectCSS();
     }, 100);
+  };
+
+  // Open preview in new tab
+  const handleOpenPreview = () => {
+    window.open(previewUrl, '_blank');
   };
 
   // Define sections with icons and labels
@@ -542,23 +555,46 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
           {/* Preview Frame */}
           <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 relative">
-            <div
-              className="bg-white shadow-lg"
-              style={{
-                width: deviceSizes[previewDevice].width,
-                height: deviceSizes[previewDevice].height,
-                maxWidth: '100%',
-                maxHeight: '100%',
-              }}
-            >
-              <iframe
-                ref={iframeRef}
-                src={previewUrl}
-                onLoad={handleIframeLoad}
-                className="w-full h-full border-0"
-                title={`${siteName} Preview`}
-              />
-            </div>
+            {ENABLE_IFRAME_PREVIEW ? (
+              <div
+                className="bg-white shadow-lg"
+                style={{
+                  width: deviceSizes[previewDevice].width,
+                  height: deviceSizes[previewDevice].height,
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                }}
+              >
+                <iframe
+                  ref={iframeRef}
+                  src={previewUrl}
+                  onLoad={handleIframeLoad}
+                  className="w-full h-full border-0"
+                  title={`${siteName} Preview`}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-6 max-w-md text-center">
+                <div className="text-6xl">👁️</div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">미리보기</h3>
+                  <p className="text-gray-600 mb-4">
+                    변경사항을 저장한 후 프론트엔드 사이트에서 확인하세요.
+                  </p>
+                </div>
+                <Button
+                  onClick={handleOpenPreview}
+                  size="lg"
+                  className="gap-2"
+                >
+                  <Monitor size={20} />
+                  새 탭에서 사이트 열기
+                </Button>
+                <p className="text-sm text-gray-500">
+                  설정 변경은 "게시" 버튼을 누른 후 반영됩니다.
+                </p>
+              </div>
+            )}
 
             {/* Header Builder Overlay - Astra Style */}
             {showHeaderBuilderOverlay && (
