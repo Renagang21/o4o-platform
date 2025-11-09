@@ -602,4 +602,60 @@ router.patch('/:id/hold', requireAdmin, async (req: AuthRequest, res) => {
   }
 });
 
+/**
+ * GET /admin/enrollments/stats
+ *
+ * Get enrollment statistics for dashboard widgets
+ *
+ * @query since - Start date (ISO format, default: today 00:00)
+ * @query until - End date (ISO format, default: now)
+ */
+router.get('/stats', requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const enrollmentRepo = AppDataSource.getRepository(RoleEnrollment);
+
+    // Get today's start (00:00)
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Get yesterday's range (00:00 - 24:00)
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    const yesterdayEnd = new Date(todayStart);
+
+    // Count today's pending enrollments
+    const todayPendingCount = await enrollmentRepo.count({
+      where: {
+        status: 'PENDING',
+        createdAt: Between(todayStart, now) as any
+      }
+    });
+
+    // Count yesterday's pending enrollments (for comparison)
+    const yesterdayPendingCount = await enrollmentRepo.count({
+      where: {
+        status: 'PENDING',
+        createdAt: Between(yesterdayStart, yesterdayEnd) as any
+      }
+    });
+
+    const delta = todayPendingCount - yesterdayPendingCount;
+
+    return res.json({
+      pendingCount: todayPendingCount,
+      yesterdayPendingCount,
+      delta
+    });
+  } catch (error) {
+    logger.error('Error fetching enrollment stats', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+
+    return res.status(500).json({
+      code: 'INTERNAL_ERROR',
+      message: 'Failed to fetch enrollment stats'
+    });
+  }
+});
+
 export default router;
