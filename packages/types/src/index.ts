@@ -31,6 +31,9 @@ export * from './pricing.js';
 // Export crowdfunding types
 export * from './crowdfunding.js';
 
+// Export dashboard types (P1 Phase C)
+export * from './dashboard.js';
+
 // Export partner types (replacing old affiliate module)
 export * from './partner.js';
 

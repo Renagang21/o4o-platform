@@ -2,7 +2,7 @@ import {
   AstraCustomizerSettings, 
   ModuleConfig, 
   HeaderModuleType,
-  FooterWidgetConfig,
+  FooterDashboardWidgetConfig,
   FooterWidgetType 
 } from '../types/customizer-types';
 
@@ -451,7 +451,7 @@ export function convertSettingsToHeaderTemplatePart(
 /**
  * Convert footer widget to block format
  */
-function convertFooterWidgetToBlock(widget: FooterWidgetConfig): any {
+function convertFooterWidgetToBlock(widget: FooterDashboardWidgetConfig): any {
   const widgetMap: Record<FooterWidgetType, any> = {
     'text': {
       type: 'o4o/paragraph',

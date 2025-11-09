@@ -11,7 +11,7 @@ interface ActivityItem {
   status?: string;
 }
 
-interface ActivityWidgetProps {
+interface ActivityDashboardWidgetProps {
   showPosts?: boolean;
   showComments?: boolean;
   showUsers?: boolean;
@@ -21,7 +21,7 @@ interface ActivityWidgetProps {
 /**
  * WordPress Activity Widget
  */
-const ActivityWidget: FC<ActivityWidgetProps> = ({
+const ActivityWidget: FC<ActivityDashboardWidgetProps> = ({
   showPosts = true,
   showComments = true,
   showUsers = true,

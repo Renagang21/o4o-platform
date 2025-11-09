@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { 
   FooterBuilderLayout, 
   FooterWidgetType, 
-  FooterWidgetConfig 
+  FooterDashboardWidgetConfig 
 } from '../types/customizer-types';
 import { 
   Type, 
@@ -43,7 +43,7 @@ export const FooterBuilder: React.FC<FooterBuilderProps> = React.memo(({
   onChange,
   device
 }) => {
-  const [selectedWidget, setSelectedWidget] = useState<FooterWidgetConfig | null>(null);
+  const [selectedWidget, setSelectedWidget] = useState<FooterDashboardWidgetConfig | null>(null);
   const [showWidgetSelector, setShowWidgetSelector] = useState<{
     section: 'widgets' | 'bar';
     column?: number;
@@ -57,7 +57,7 @@ export const FooterBuilder: React.FC<FooterBuilderProps> = React.memo(({
     column?: number,
     position?: 'left' | 'right'
   ) => {
-    const newWidget: FooterWidgetConfig = {
+    const newWidget: FooterDashboardWidgetConfig = {
       id: `${widgetType}-${Date.now()}`,
       type: widgetType,
       label: AVAILABLE_WIDGETS.find(w => w.type === widgetType)?.label,

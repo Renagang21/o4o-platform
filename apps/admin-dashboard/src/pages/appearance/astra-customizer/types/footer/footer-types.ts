@@ -21,7 +21,7 @@ export type FooterWidgetType =
 /**
  * 푸터 위젯 설정
  */
-export interface FooterWidgetConfig {
+export interface FooterDashboardWidgetConfig {
   id: string;
   type: FooterWidgetType;
   label?: string;
@@ -76,7 +76,7 @@ export interface FooterBuilderLayout {
   widgets: {
     enabled: boolean;
     columns: 1 | 2 | 3 | 4 | 5;
-    layout: FooterWidgetConfig[][];
+    layout: FooterDashboardWidgetConfig[][];
     settings: {
       background: string;
       textColor: string;
@@ -87,8 +87,8 @@ export interface FooterBuilderLayout {
   };
   bar: {
     enabled: boolean;
-    left: FooterWidgetConfig[];
-    right: FooterWidgetConfig[];
+    left: FooterDashboardWidgetConfig[];
+    right: FooterDashboardWidgetConfig[];
     settings: {
       background: string;
       textColor: string;

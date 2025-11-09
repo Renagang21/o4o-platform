@@ -2,7 +2,7 @@ import { useState, FC, ReactNode, Children } from 'react';
 import { GripVertical, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface DraggableWidgetProps {
+interface DraggableDashboardWidgetProps {
   id: string;
   title: string;
   children: ReactNode;
@@ -12,7 +12,7 @@ interface DraggableWidgetProps {
   defaultCollapsed?: boolean;
 }
 
-const DraggableWidget: FC<DraggableWidgetProps> = ({
+const DraggableWidget: FC<DraggableDashboardWidgetProps> = ({
   id,
   title,
   children,
