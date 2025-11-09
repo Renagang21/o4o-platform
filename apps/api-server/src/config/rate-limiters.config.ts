@@ -62,11 +62,12 @@ export const publicLimiter = rateLimit({
 
 /**
  * Very lenient rate limiter for settings endpoints
- * 2000 requests per 15 minutes
+ * EMERGENCY: Temporarily disabled due to infinite loop investigation
+ * 100000 requests per 15 minutes (effectively unlimited)
  */
 export const settingsLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 2000,
+  max: 100000, // 긴급: infinite loop 조사 위해 임시로 높임
   message: {
     error: 'Too many settings requests',
     code: 'SETTINGS_RATE_LIMIT_EXCEEDED'
@@ -74,7 +75,7 @@ export const settingsLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: getClientIP,
-  skip: isLocalhost
+  skip: (req) => true // 긴급: 완전 비활성화
 });
 
 /**
