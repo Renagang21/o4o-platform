@@ -10,12 +10,15 @@ import {
   Clock,
   AlertCircle,
   Search,
-  Filter
+  Filter,
+  MoreVertical
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { cookieAuthClient, Enrollment } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { Pagination } from '@/components/common/Pagination';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 type FilterStatus = 'all' | 'pending' | 'approved' | 'rejected' | 'on_hold';
 type FilterRole = 'all' | 'supplier' | 'seller' | 'partner';
@@ -42,11 +45,34 @@ const EnrollmentManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
   const [totalEnrollments, setTotalEnrollments] = useState(0);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  // D-2: Debounced search (300ms delay)
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // D-3: Keyboard shortcuts
+  useKeyboardShortcuts();
+
+  // Close dropdown on ESC key
+  useEffect(() => {
+    const handleEscape = () => setActiveDropdown(null);
+    window.addEventListener('keyboard-escape', handleEscape);
+    return () => window.removeEventListener('keyboard-escape', handleEscape);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setActiveDropdown(null);
+    if (activeDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [activeDropdown]);
 
   // Fetch enrollments
   useEffect(() => {
     fetchEnrollments();
-  }, [filterStatus, filterRole, currentPage, searchQuery]);
+  }, [filterStatus, filterRole, currentPage, debouncedSearchQuery]);
 
   const fetchEnrollments = async () => {
     try {
@@ -58,7 +84,7 @@ const EnrollmentManagement = () => {
 
       if (filterStatus !== 'all') params.status = filterStatus;
       if (filterRole !== 'all') params.role = filterRole;
-      if (searchQuery) params.search = searchQuery;
+      if (debouncedSearchQuery) params.search = debouncedSearchQuery;
 
       const response = await cookieAuthClient.getAdminEnrollments(params);
       setEnrollments(response.enrollments);
@@ -242,30 +268,50 @@ const EnrollmentManagement = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(enrollment.submittedAt).toLocaleDateString('ko-KR')}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                          {enrollment.status === 'pending' && (
-                            <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          {enrollment.status === 'pending' ? (
+                            <div className="relative">
+                              {/* D-4: Quick Actions Dropdown */}
                               <button
-                                onClick={() => handleApprove(enrollment.id)}
-                                className="text-green-600 hover:text-green-900"
+                                onClick={() => setActiveDropdown(activeDropdown === enrollment.id ? null : enrollment.id)}
+                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="액션"
                               >
-                                승인
+                                <MoreVertical className="w-5 h-5 text-gray-600" />
                               </button>
-                              <button
-                                onClick={() => handleHold(enrollment.id)}
-                                className="text-orange-600 hover:text-orange-900"
-                              >
-                                보류
-                              </button>
-                              <button
-                                onClick={() => handleReject(enrollment.id)}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                거부
-                              </button>
-                            </>
-                          )}
-                          {enrollment.status !== 'pending' && (
+                              {activeDropdown === enrollment.id && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                                  <button
+                                    onClick={() => {
+                                      handleApprove(enrollment.id);
+                                      setActiveDropdown(null);
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 text-green-600 rounded-t-lg"
+                                  >
+                                    ✓ 승인
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleHold(enrollment.id);
+                                      setActiveDropdown(null);
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 text-orange-600"
+                                  >
+                                    ⏸ 보류
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleReject(enrollment.id);
+                                      setActiveDropdown(null);
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 rounded-b-lg"
+                                  >
+                                    ✕ 거부
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
                             <span className="text-gray-400">처리 완료</span>
                           )}
                         </td>

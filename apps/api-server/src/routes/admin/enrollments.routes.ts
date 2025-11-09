@@ -23,6 +23,8 @@ const router: Router = Router();
  * @query q - Search by email or name
  * @query date_from - Filter by submission date (start)
  * @query date_to - Filter by submission date (end)
+ * @query sort_by - Sort field (created_at|status|role) (default: created_at)
+ * @query sort_order - Sort order (ASC|DESC) (default: DESC)
  * @query page - Page number (default: 1)
  * @query limit - Items per page (default: 20)
  */
@@ -34,6 +36,8 @@ router.get('/', requireAdmin, async (req: AuthRequest, res) => {
       q,
       date_from,
       date_to,
+      sort_by = 'created_at',
+      sort_order = 'DESC',
       page = '1',
       limit = '20'
     } = req.query;
@@ -75,9 +79,23 @@ router.get('/', requireAdmin, async (req: AuthRequest, res) => {
     // Get total count
     const total = await queryBuilder.getCount();
 
+    // Apply sorting
+    const sortField = sort_by as string;
+    const sortOrder = (sort_order as string).toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const sortMapping: Record<string, string> = {
+      'created_at': 'enrollment.createdAt',
+      'status': 'enrollment.status',
+      'role': 'enrollment.role',
+      'user_email': 'user.email',
+      'user_name': 'user.name'
+    };
+
+    const orderByField = sortMapping[sortField] || 'enrollment.createdAt';
+
     // Get paginated results
     const enrollments = await queryBuilder
-      .orderBy('enrollment.createdAt', 'DESC')
+      .orderBy(orderByField, sortOrder as 'ASC' | 'DESC')
       .skip(skip)
       .take(limitNum)
       .getMany();

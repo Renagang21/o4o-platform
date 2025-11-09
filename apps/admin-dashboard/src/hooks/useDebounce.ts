@@ -1,11 +1,11 @@
+import { useEffect, useState } from 'react';
+
 /**
- * Debounce Hook
- * Delays execution of value updates
+ * P1 Phase D-2: Debounce hook for search optimization
+ * @param value - Value to debounce
+ * @param delay - Delay in milliseconds (default: 300ms)
  */
-
-import { useState, useEffect } from 'react';
-
-export function useDebounce<T>(value: T, delay: number): T {
+export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
@@ -20,5 +20,3 @@ export function useDebounce<T>(value: T, delay: number): T {
 
   return debouncedValue;
 }
-
-export default useDebounce;
