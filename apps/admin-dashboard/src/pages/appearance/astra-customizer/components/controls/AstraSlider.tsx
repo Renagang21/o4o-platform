@@ -40,19 +40,23 @@ export const AstraSlider: React.FC<AstraSliderProps> = ({
   
   // Get value for current device
   const getCurrentValue = (): number => {
+    // CRITICAL: Guard against undefined value
+    if (!value) {
+      return min;
+    }
     if (typeof value === 'number') {
       return value;
     }
-    return value[currentDevice];
+    return value[currentDevice] ?? min;
   };
   
   // Handle value change
   const handleChange = (newValue: number, device?: PreviewDevice) => {
-    if (!responsive || typeof value === 'number') {
+    if (!responsive || typeof value === 'number' || !value) {
       onChange(newValue);
       return;
     }
-    
+
     const targetDevice = device || currentDevice;
     const responsiveValue = value as ResponsiveValue<number>;
     
