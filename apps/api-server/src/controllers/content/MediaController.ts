@@ -151,6 +151,7 @@ export class MediaController {
         limit = 20,
         search,
         mimeType,
+        type, // Accept 'type' as alias for 'mimeType' (for frontend compatibility)
         folder,
         userId,
         orderBy = 'createdAt',
@@ -159,7 +160,7 @@ export class MediaController {
 
       // Build where conditions
       const where: any = {};
-      
+
       // User filter
       if (userId) {
         where.userId = userId;
@@ -170,21 +171,26 @@ export class MediaController {
         where.folderPath = folder;
       }
 
-      // MIME type filter
+      // MIME type filter - accept both 'mimeType' and 'type' parameters
+      // Use 'type' if provided, otherwise fall back to 'mimeType'
       // Note: document type filter is handled separately using query builder
       // because it requires OR conditions (text/* OR application/pdf)
+      const filterType = type || mimeType;
       let useQueryBuilder = false;
-      if (mimeType) {
-        if (mimeType === 'image') {
-          where.mimeType = Like('image/%');
-        } else if (mimeType === 'video') {
+      if (filterType) {
+        if (filterType === 'image') {
+          // For images, we need to exclude document files that might have been
+          // incorrectly uploaded with image-like extensions
+          // Use query builder to add NOT LIKE conditions for document extensions
+          useQueryBuilder = true;
+        } else if (filterType === 'video') {
           where.mimeType = Like('video/%');
-        } else if (mimeType === 'audio') {
+        } else if (filterType === 'audio') {
           where.mimeType = Like('audio/%');
-        } else if (mimeType === 'document') {
+        } else if (filterType === 'document') {
           useQueryBuilder = true;
         } else {
-          where.mimeType = mimeType;
+          where.mimeType = filterType;
         }
       }
 
@@ -205,17 +211,26 @@ export class MediaController {
       const skip = (Number(page) - 1) * Number(limit);
 
       if (useQueryBuilder) {
-        // Use query builder for document type filtering (requires OR conditions)
+        // Use query builder for filters that require complex WHERE conditions
         const queryBuilder = this.mediaRepository.createQueryBuilder('media')
           .leftJoinAndSelect('media.user', 'user'); // Join user for author info
 
-        // Apply document type filter
-        queryBuilder.where('media.mimeType = :pdf', { pdf: 'application/pdf' })
-          .orWhere('media.mimeType LIKE :text', { text: 'text/%' })
-          .orWhere('media.mimeType LIKE :doc', { doc: '%document%' })
-          .orWhere('media.mimeType LIKE :word', { word: '%word%' })
-          .orWhere('media.mimeType LIKE :sheet', { sheet: '%sheet%' })
-          .orWhere('media.mimeType LIKE :presentation', { presentation: '%presentation%' });
+        // Apply type-specific filters
+        if (filterType === 'image') {
+          // For image type: filter by mimeType AND exclude document extensions
+          queryBuilder.where('media.mimeType LIKE :imageType', { imageType: 'image/%' })
+            .andWhere('media.filename NOT LIKE :mdExt', { mdExt: '%.md' })
+            .andWhere('media.filename NOT LIKE :txtExt', { txtExt: '%.txt' })
+            .andWhere('media.filename NOT LIKE :pdfExt', { pdfExt: '%.pdf' });
+        } else if (filterType === 'document') {
+          // For document type: use OR conditions for various document mimeTypes
+          queryBuilder.where('media.mimeType = :pdf', { pdf: 'application/pdf' })
+            .orWhere('media.mimeType LIKE :text', { text: 'text/%' })
+            .orWhere('media.mimeType LIKE :doc', { doc: '%document%' })
+            .orWhere('media.mimeType LIKE :word', { word: '%word%' })
+            .orWhere('media.mimeType LIKE :sheet', { sheet: '%sheet%' })
+            .orWhere('media.mimeType LIKE :presentation', { presentation: '%presentation%' });
+        }
 
         // Apply other filters
         if (userId) {
