@@ -100,7 +100,11 @@ const Customize: React.FC = () => {
         return true;
       }
 
-      errorHandler.log('설정 저장 실패: 응답이 성공하지 않았습니다', ErrorLevel.WARNING, 'Settings');
+      // 🔧 FIX: Show detailed error message to user
+      const errorMsg = response.data?.error || response.data?.message || '알 수 없는 오류가 발생했습니다';
+      errorHandler.log(`설정 저장 실패: ${errorMsg}`, ErrorLevel.WARNING, 'Settings');
+      toast.error(`저장 실패: ${errorMsg}`);
+      console.error('Save failed - Response:', response.data);
       return false;
     } catch (error: any) {
       const statusCode = error?.response?.status;

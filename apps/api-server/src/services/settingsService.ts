@@ -56,7 +56,8 @@ export class SettingsService {
         await this.syncTemplatePartsFromCustomizer(value);
       } catch (error) {
         logger.error('Failed to sync template parts from customizer:', error);
-        // Don't fail the whole operation if template part sync fails
+        // Re-throw the error so the user knows template parts failed to update
+        throw new Error(`설정은 저장되었으나 템플릿 파트 동기화에 실패했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
       }
     }
 

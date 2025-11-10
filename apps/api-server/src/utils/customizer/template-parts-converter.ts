@@ -31,15 +31,18 @@ export interface TemplatePartData {
 
 /**
  * Convert module config to block format
+ * @param module - Module configuration from header builder
+ * @param settings - Full customizer settings (needed for logo URL, etc.)
  */
-function convertModuleToBlock(module: any): any {
+function convertModuleToBlock(module: any, settings?: any): any {
   logger.info(`[TP-Convert] Processing module: ${module.type} (id: ${module.id})`);
 
   const blockMap: Record<string, any> = {
     'logo': {
       type: 'o4o/site-logo',
       data: {
-        width: 120,
+        width: settings?.siteIdentity?.logo?.width?.desktop || 120,
+        logoUrl: settings?.siteIdentity?.logo?.desktop,
         isLink: true,
         ...module.settings
       }
@@ -172,9 +175,9 @@ export function convertSettingsToHeaderTemplatePart(
     // Above Header Section
     if (builder.above?.settings?.enabled) {
       const aboveModules = [
-        ...(builder.above.left || []).map(convertModuleToBlock),
-        ...(builder.above.center || []).map(convertModuleToBlock),
-        ...(builder.above.right || []).map(convertModuleToBlock)
+        ...(builder.above.left || []).map((m: any) => convertModuleToBlock(m, settings)),
+        ...(builder.above.center || []).map((m: any) => convertModuleToBlock(m, settings)),
+        ...(builder.above.right || []).map((m: any) => convertModuleToBlock(m, settings))
       ].filter(Boolean);
 
       if (aboveModules.length > 0) {
@@ -202,9 +205,9 @@ export function convertSettingsToHeaderTemplatePart(
     logger.info(`[TP-Convert] Primary right modules: ${(builder.primary?.right || []).length}`);
 
     const primaryModules = {
-      left: (builder.primary?.left || []).map(convertModuleToBlock).filter(Boolean),
-      center: (builder.primary?.center || []).map(convertModuleToBlock).filter(Boolean),
-      right: (builder.primary?.right || []).map(convertModuleToBlock).filter(Boolean)
+      left: (builder.primary?.left || []).map((m: any) => convertModuleToBlock(m, settings)).filter(Boolean),
+      center: (builder.primary?.center || []).map((m: any) => convertModuleToBlock(m, settings)).filter(Boolean),
+      right: (builder.primary?.right || []).map((m: any) => convertModuleToBlock(m, settings)).filter(Boolean)
     };
 
     sections.push({
@@ -249,9 +252,9 @@ export function convertSettingsToHeaderTemplatePart(
     // Below Header Section
     if (builder.below?.settings?.enabled) {
       const belowModules = [
-        ...(builder.below.left || []).map(convertModuleToBlock),
-        ...(builder.below.center || []).map(convertModuleToBlock),
-        ...(builder.below.right || []).map(convertModuleToBlock)
+        ...(builder.below.left || []).map((m: any) => convertModuleToBlock(m, settings)),
+        ...(builder.below.center || []).map((m: any) => convertModuleToBlock(m, settings)),
+        ...(builder.below.right || []).map((m: any) => convertModuleToBlock(m, settings))
       ].filter(Boolean);
 
       if (belowModules.length > 0) {

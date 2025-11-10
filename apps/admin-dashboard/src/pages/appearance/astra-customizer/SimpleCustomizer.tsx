@@ -5,8 +5,7 @@ import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
 import { normalizeCustomizerSettings } from './utils/normalize-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
-import { convertSettingsToHeaderTemplatePart } from './utils/template-parts-converter';
-import { authClient } from '@o4o/auth-client';
+// Removed: convertSettingsToHeaderTemplatePart (now handled by backend)
 import toast from 'react-hot-toast';
 
 // Import Astra sections and context
@@ -175,19 +174,20 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     };
   }, [settings]);
 
-  // Handle save (stores settings in customizer settings table AND publishes to template parts)
+  // Handle save (stores settings in customizer settings table)
+  // Backend automatically syncs to template parts via settingsService
   const handleSave = async () => {
     if (!onSave) return;
 
     setIsSaving(true);
     try {
-      // First save the customizer settings
       const success = await onSave(settings);
       if (success) {
-        // Then automatically publish to template parts for frontend
-        await publishToTemplateParts();
         setIsDirty(false);
         toast.success('설정이 저장되었습니다');
+      } else {
+        toast.error('설정 저장에 실패했습니다. 다시 시도해주세요.');
+        console.error('Save failed: onSave returned false');
       }
     } catch (error: any) {
       console.error('Save error:', error);
@@ -198,61 +198,9 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   };
 
-  // Extract publish logic to reusable function
-  const publishToTemplateParts = async () => {
-    // Convert customizer settings to template parts format
-    const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
-
-    // Check if default header exists and update it
-    const existingResponse = await authClient.api.get('/public/template-parts');
-    const existingParts = existingResponse.data?.data || [];
-    const defaultHeader = existingParts.find((part: any) =>
-      part.area === 'header' && part.isDefault === true
-    );
-
-    // Check if defaultHeader has valid UUID (not placeholder UUID)
-    const isValidUUID = defaultHeader?.id &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(defaultHeader.id) &&
-      defaultHeader.id !== 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-
-    if (defaultHeader && isValidUUID) {
-      // Update existing default header
-      const updateData = {
-        ...headerTemplatePart,
-        slug: defaultHeader.slug // Keep existing slug
-      };
-      await authClient.api.put(`/template-parts/${defaultHeader.id}`, updateData);
-    } else {
-      // Create new header template part
-      await authClient.api.post('/template-parts', {
-        ...headerTemplatePart,
-        isDefault: true,
-        isActive: true
-      });
-    }
-  };
-
-  // Handle publish (creates/updates template parts for live site)
-  const handlePublish = async () => {
-    setIsSaving(true);
-    try {
-      // Publish to template parts
-      await publishToTemplateParts();
-
-      // Also save to customizer settings
-      if (onSave) {
-        await onSave(settings);
-      }
-
-      setIsDirty(false);
-      toast.success('헤더가 프론트엔드에 게시되었습니다');
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || '템플릿 업데이트에 실패했습니다';
-      toast.error(errorMessage);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  // Note: publishToTemplateParts and handlePublish removed
+  // Backend automatically syncs customizer settings to template parts
+  // via settingsService.syncTemplatePartsFromCustomizer()
 
   // Handle reset
   const handleReset = () => {
@@ -439,20 +387,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             초기화
           </Button>
           <Button
-            variant="outline"
             onClick={handleSave}
             disabled={!isDirty || isSaving}
             size="sm"
           >
             <Save size={16} />
-            임시 저장
-          </Button>
-          <Button
-            onClick={handlePublish}
-            disabled={isSaving}
-            size="sm"
-          >
-            {isSaving ? '게시 중...' : '게시'}
+            {isSaving ? '저장 중...' : '저장'}
           </Button>
           </div>
         </div>
@@ -585,7 +525,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                   새 탭에서 사이트 열기
                 </Button>
                 <p className="text-sm text-gray-500">
-                  설정 변경은 "게시" 버튼을 누른 후 반영됩니다.
+                  설정 변경은 "저장" 버튼을 누른 후 자동으로 반영됩니다.
                 </p>
               </div>
             )}
