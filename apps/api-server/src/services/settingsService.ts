@@ -69,19 +69,37 @@ export class SettingsService {
    * This creates/updates header and footer template parts based on Header/Footer Builder settings
    */
   private async syncTemplatePartsFromCustomizer(customizerSettings: SettingsValue): Promise<void> {
-    logger.info('Syncing template parts from customizer settings...');
+    logger.info('[DEBUG] Syncing template parts from customizer settings...');
+    logger.info('[DEBUG] customizerSettings type:', typeof customizerSettings);
+    logger.info('[DEBUG] customizerSettings keys:', Object.keys(customizerSettings || {}));
+    logger.info('[DEBUG] siteIdentity.logo:', JSON.stringify((customizerSettings as any)?.siteIdentity?.logo));
 
     // Convert settings to template parts
-    const headerData = convertSettingsToHeaderTemplatePart(customizerSettings);
-    const footerData = convertSettingsToFooterTemplatePart(customizerSettings);
+    try {
+      logger.info('[DEBUG] Converting header template part...');
+      const headerData = convertSettingsToHeaderTemplatePart(customizerSettings);
+      logger.info('[DEBUG] Header data created successfully');
 
-    // Update or create header template part
-    await this.upsertTemplatePart(headerData);
+      logger.info('[DEBUG] Converting footer template part...');
+      const footerData = convertSettingsToFooterTemplatePart(customizerSettings);
+      logger.info('[DEBUG] Footer data created successfully');
 
-    // Update or create footer template part
-    await this.upsertTemplatePart(footerData);
+      // Update or create header template part
+      logger.info('[DEBUG] Upserting header template part...');
+      await this.upsertTemplatePart(headerData);
+      logger.info('[DEBUG] Header template part upserted');
 
-    logger.info('Template parts synced successfully');
+      // Update or create footer template part
+      logger.info('[DEBUG] Upserting footer template part...');
+      await this.upsertTemplatePart(footerData);
+      logger.info('[DEBUG] Footer template part upserted');
+
+      logger.info('[DEBUG] Template parts synced successfully');
+    } catch (error) {
+      logger.error('[DEBUG] Error in syncTemplatePartsFromCustomizer:', error);
+      logger.error('[DEBUG] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      throw error;
+    }
   }
 
   /**
