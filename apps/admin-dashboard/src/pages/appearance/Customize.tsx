@@ -33,7 +33,9 @@ const Customize: React.FC = () => {
     try {
       setIsLoading(true);
 
+      console.log('[Customize] Loading customizer settings...');
       const response = await authClient.api.get('/settings/customizer');
+      console.log('[Customize] API response:', response.data);
 
       if (response.data?.success && response.data?.data) {
         // API 응답 구조 정규화:
@@ -42,14 +44,39 @@ const Customize: React.FC = () => {
         const rawData = response.data.data;
         const settingsData = rawData.settings || rawData;
 
-        // normalize 함수가 AstraCustomizerSettings 반환
-        const normalized = normalizeCustomizerSettings(settingsData);
-        setInitialSettings(normalized);
+        console.log('[Customize] Normalizing settings...');
+        try {
+          // normalize 함수가 AstraCustomizerSettings 반환
+          const normalized = normalizeCustomizerSettings(settingsData);
+          console.log('[Customize] Settings normalized successfully');
+          setInitialSettings(normalized);
+        } catch (normalizeError) {
+          console.error('[Customize] Failed to normalize settings:', normalizeError);
+          console.error('[Customize] Raw settings data:', settingsData);
+
+          // Show detailed error to user
+          const errorMsg = normalizeError instanceof Error
+            ? `설정 정규화 실패: ${normalizeError.message}`
+            : '설정을 정규화하는 중 오류가 발생했습니다.';
+
+          toast.error(errorMsg);
+
+          // Fallback to defaults
+          setInitialSettings(normalizeCustomizerSettings(null));
+        }
       } else {
+        console.warn('[Customize] No settings data in response, using defaults');
         // 설정이 없으면 기본값 사용
         setInitialSettings(normalizeCustomizerSettings(null));
       }
     } catch (error: any) {
+      console.error('[Customize] Failed to load settings:', error);
+      console.error('[Customize] Error details:', {
+        message: error?.message,
+        response: error?.response,
+        stack: error?.stack
+      });
+
       // 에러 시 기본값 사용
       setInitialSettings(normalizeCustomizerSettings(null));
       errorHandler.handleApiError(error, 'Settings Load');
