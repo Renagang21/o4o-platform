@@ -10,20 +10,15 @@
  * These components are now handled by @o4o/appearance-system.
  */
 
-import { CustomizerSettings } from '../hooks/useCustomizerSettings';
+import { AstraCustomizerSettings, ResponsiveValue } from '../types/customizer-types';
 
 /**
  * Generate CSS from customizer settings
  *
  * @deprecated Phase 6: Button/Breadcrumb/ScrollToTop removed - use @o4o/appearance-system
  */
-export function generateCSS(settings: CustomizerSettings): string {
+export function generateCSS(settings: AstraCustomizerSettings): string {
   const css: string[] = [];
-
-  // Safety check
-  if (!settings) {
-    return '';
-  }
 
   // Add CSS custom properties (CSS Variables)
   css.push(':root {');
@@ -39,12 +34,13 @@ export function generateCSS(settings: CustomizerSettings): string {
   css.push(...generateHeaderCSS(settings));
   css.push(...generateFooterCSS(settings));
   css.push(...generateContainerCSS(settings));
+  css.push(...generateSidebarCSS(settings));
   css.push(...generateBlogCSS(settings));
 
   // Phase 6: Button/Breadcrumb/ScrollToTop generation removed
   // These are now handled by @o4o/appearance-system
 
-  // Add custom CSS if present
+  // Add custom CSS
   if (settings.customCSS) {
     css.push(settings.customCSS);
   }
@@ -52,191 +48,114 @@ export function generateCSS(settings: CustomizerSettings): string {
   return css.join('\n');
 }
 
-function generateColorVariables(settings: CustomizerSettings): string[] {
+function generateColorVariables(settings: AstraCustomizerSettings): string[] {
   const vars: string[] = [];
-  const colors = (settings as any).colors;
+  const { colors } = settings;
 
-  if (!colors) {
-    return vars;
-  }
+  // Unified --wp-* variables (matching token-map.ts)
+  vars.push(`  --wp-color-primary-500: ${colors.primaryColor};`);
+  vars.push(`  --wp-color-secondary-500: ${colors.secondaryColor};`);
+  vars.push(`  --wp-text-primary: ${colors.textColor};`);
+  vars.push(`  --wp-link-color: ${colors.linkColor.normal};`);
+  vars.push(`  --wp-link-color-hover: ${colors.linkColor.hover || colors.linkColor.normal};`);
+  vars.push(`  --wp-border-primary: ${colors.borderColor};`);
+  vars.push(`  --wp-bg-body: ${colors.bodyBackground};`);
+  vars.push(`  --wp-bg-content: ${colors.contentBackground};`);
 
-  // Unified --wp-* variables
-  if (colors.primaryColor) {
-    vars.push(`  --wp-color-primary-500: ${colors.primaryColor};`);
-    vars.push(`  --ast-primary-color: ${colors.primaryColor};`);
-  }
-
-  if (colors.secondaryColor) {
-    vars.push(`  --wp-color-secondary-500: ${colors.secondaryColor};`);
-    vars.push(`  --ast-secondary-color: ${colors.secondaryColor};`);
-  }
-
-  if (colors.textColor) {
-    vars.push(`  --wp-text-primary: ${colors.textColor};`);
-    vars.push(`  --ast-text-color: ${colors.textColor};`);
-  }
-
-  if (colors.linkColor) {
-    const normal = typeof colors.linkColor === 'object' ? colors.linkColor.normal : colors.linkColor;
-    const hover = typeof colors.linkColor === 'object' ? (colors.linkColor.hover || normal) : normal;
-    vars.push(`  --wp-link-color: ${normal};`);
-    vars.push(`  --wp-link-color-hover: ${hover};`);
-    vars.push(`  --ast-link-color: ${normal};`);
-    vars.push(`  --ast-link-hover-color: ${hover};`);
-  }
-
-  if (colors.borderColor) {
-    vars.push(`  --wp-border-primary: ${colors.borderColor};`);
-    vars.push(`  --ast-border-color: ${colors.borderColor};`);
-  }
-
-  if (colors.bodyBackground) {
-    vars.push(`  --wp-bg-body: ${colors.bodyBackground};`);
-    vars.push(`  --ast-body-bg: ${colors.bodyBackground};`);
-  }
-
-  if (colors.contentBackground) {
-    vars.push(`  --wp-bg-content: ${colors.contentBackground};`);
-    vars.push(`  --ast-content-bg: ${colors.contentBackground};`);
-  }
+  // Legacy backward compatibility
+  vars.push(`  --ast-primary-color: ${colors.primaryColor};`);
+  vars.push(`  --ast-secondary-color: ${colors.secondaryColor};`);
+  vars.push(`  --ast-text-color: ${colors.textColor};`);
+  vars.push(`  --ast-link-color: ${colors.linkColor.normal};`);
+  vars.push(`  --ast-link-hover-color: ${colors.linkColor.hover || colors.linkColor.normal};`);
+  vars.push(`  --ast-border-color: ${colors.borderColor};`);
+  vars.push(`  --ast-body-bg: ${colors.bodyBackground};`);
+  vars.push(`  --ast-content-bg: ${colors.contentBackground};`);
 
   // Palette colors
-  if (colors.palette && typeof colors.palette === 'object') {
-    Object.entries(colors.palette).forEach(([key, value]) => {
-      vars.push(`  --ast-palette-${key}: ${value};`);
-    });
-  }
+  Object.entries(colors.palette).forEach(([key, value]) => {
+    vars.push(`  --ast-palette-${key}: ${value};`);
+  });
 
   return vars;
 }
 
-function generateTypographyVariables(settings: CustomizerSettings): string[] {
+function generateTypographyVariables(settings: AstraCustomizerSettings): string[] {
   const vars: string[] = [];
-  const typography = (settings as any).typography;
+  const { typography } = settings;
 
-  if (!typography) {
-    return vars;
-  }
+  // Unified --wp-* variables
+  vars.push(`  --wp-font-body: ${typography.bodyFont.fontFamily};`);
+  vars.push(`  --wp-font-size-body-desktop: ${typography.bodyFont.fontSize.desktop}px;`);
+  vars.push(`  --wp-font-size-body-tablet: ${typography.bodyFont.fontSize.tablet}px;`);
+  vars.push(`  --wp-font-size-body-mobile: ${typography.bodyFont.fontSize.mobile}px;`);
+  vars.push(`  --wp-line-height-body-desktop: ${typography.bodyFont.lineHeight.desktop};`);
+  vars.push(`  --wp-line-height-body-tablet: ${typography.bodyFont.lineHeight.tablet};`);
+  vars.push(`  --wp-line-height-body-mobile: ${typography.bodyFont.lineHeight.mobile};`);
 
-  // Body font
-  if (typography.bodyFont) {
-    const { fontFamily, fontSize, fontWeight, lineHeight, textTransform } = typography.bodyFont;
-
-    if (fontFamily) {
-      vars.push(`  --wp-font-body: ${fontFamily};`);
-      vars.push(`  --ast-body-font-family: ${fontFamily};`);
-    }
-
-    if (fontSize) {
-      if (typeof fontSize === 'object') {
-        vars.push(`  --wp-font-size-body-desktop: ${fontSize.desktop || 16}px;`);
-        vars.push(`  --wp-font-size-body-tablet: ${fontSize.tablet || 15}px;`);
-        vars.push(`  --wp-font-size-body-mobile: ${fontSize.mobile || 14}px;`);
-      } else {
-        vars.push(`  --wp-font-size-body-desktop: ${fontSize}px;`);
-      }
-    }
-
-    if (lineHeight) {
-      if (typeof lineHeight === 'object') {
-        vars.push(`  --wp-line-height-body-desktop: ${lineHeight.desktop || 1.6};`);
-        vars.push(`  --wp-line-height-body-tablet: ${lineHeight.tablet || 1.6};`);
-        vars.push(`  --wp-line-height-body-mobile: ${lineHeight.mobile || 1.6};`);
-      }
-    }
-
-    if (fontWeight) {
-      vars.push(`  --ast-body-font-weight: ${fontWeight};`);
-    }
-
-    if (textTransform) {
-      vars.push(`  --ast-body-text-transform: ${textTransform};`);
-    }
-  }
+  // Legacy backward compatibility
+  vars.push(`  --ast-body-font-family: ${typography.bodyFont.fontFamily};`);
+  vars.push(`  --ast-body-font-weight: ${typography.bodyFont.fontWeight};`);
+  vars.push(`  --ast-body-text-transform: ${typography.bodyFont.textTransform};`);
 
   // Button font
-  if (typography.button) {
-    const { fontFamily, fontWeight, textTransform } = typography.button;
-    if (fontFamily) vars.push(`  --ast-button-font-family: ${fontFamily};`);
-    if (fontWeight) vars.push(`  --ast-button-font-weight: ${fontWeight};`);
-    if (textTransform) vars.push(`  --ast-button-text-transform: ${textTransform};`);
-  }
+  vars.push(`  --ast-button-font-family: ${typography.button.fontFamily};`);
+  vars.push(`  --ast-button-font-weight: ${typography.button.fontWeight};`);
+  vars.push(`  --ast-button-text-transform: ${typography.button.textTransform};`);
 
   return vars;
 }
 
-function generateSpacingVariables(settings: CustomizerSettings): string[] {
+function generateSpacingVariables(settings: AstraCustomizerSettings): string[] {
   const vars: string[] = [];
-  const { container } = settings;
+  const { container, sidebar } = settings;
 
-  if (!container) {
-    return vars;
-  }
+  // Unified --wp-* variables
+  vars.push(`  --wp-container-width-desktop: ${container.width.desktop}px;`);
+  vars.push(`  --wp-container-width-tablet: ${container.width.tablet}px;`);
+  vars.push(`  --wp-container-width-mobile: ${container.width.mobile}px;`);
 
-  // Container width
-  if (container.width) {
-    vars.push(`  --wp-container-width-desktop: ${container.width.desktop}px;`);
-    vars.push(`  --wp-container-width-tablet: ${container.width.tablet}px;`);
-    vars.push(`  --wp-container-width-mobile: ${container.width.mobile}px;`);
-    vars.push(`  --ast-container-width-desktop: ${container.width.desktop}px;`);
-    vars.push(`  --ast-container-width-tablet: ${container.width.tablet}px;`);
-    vars.push(`  --ast-container-width-mobile: ${container.width.mobile}px;`);
-  }
+  // Legacy backward compatibility
+  vars.push(`  --ast-container-width-desktop: ${container.width.desktop}px;`);
+  vars.push(`  --ast-container-width-tablet: ${container.width.tablet}px;`);
+  vars.push(`  --ast-container-width-mobile: ${container.width.mobile}px;`);
 
-  // Sidebar (if exists)
-  const sidebar = (settings as any).sidebar;
-  if (sidebar) {
-    if (sidebar.width) {
-      vars.push(`  --ast-sidebar-width-desktop: ${sidebar.width.desktop}%;`);
-      vars.push(`  --ast-sidebar-width-tablet: ${sidebar.width.tablet}%;`);
-      vars.push(`  --ast-sidebar-width-mobile: ${sidebar.width.mobile}%;`);
-    }
-    if (sidebar.gap) {
-      vars.push(`  --ast-sidebar-gap: ${sidebar.gap.desktop || 20}px;`);
-    }
-  }
+  // Sidebar
+  vars.push(`  --ast-sidebar-width-desktop: ${sidebar.width.desktop}%;`);
+  vars.push(`  --ast-sidebar-width-tablet: ${sidebar.width.tablet}%;`);
+  vars.push(`  --ast-sidebar-width-mobile: ${sidebar.width.mobile}%;`);
+  vars.push(`  --ast-sidebar-gap: ${sidebar.gap.desktop}px;`);
 
   return vars;
 }
 
-function generateResponsiveCSS(settings: CustomizerSettings): string[] {
+function generateResponsiveCSS(settings: AstraCustomizerSettings): string[] {
   const css: string[] = [];
-  const typography = (settings as any).typography;
-  const colors = (settings as any).colors;
-
-  if (!typography?.bodyFont) {
-    return css;
-  }
-
-  const { bodyFont, headings } = typography;
-
+  const { typography, container } = settings;
+  
   // Desktop styles (default)
   css.push('body {');
-  if (bodyFont.fontFamily) css.push(`  font-family: ${bodyFont.fontFamily};`);
-  if (bodyFont.fontSize?.desktop) css.push(`  font-size: ${bodyFont.fontSize.desktop}px;`);
-  if (bodyFont.fontWeight) css.push(`  font-weight: ${bodyFont.fontWeight};`);
-  if (bodyFont.lineHeight?.desktop) css.push(`  line-height: ${bodyFont.lineHeight.desktop};`);
-  if (bodyFont.letterSpacing?.desktop) css.push(`  letter-spacing: ${bodyFont.letterSpacing.desktop}px;`);
-  if (colors?.textColor) css.push(`  color: var(--wp-text-primary);`);
-  if (colors?.bodyBackground) css.push(`  background-color: var(--wp-bg-body);`);
+  css.push(`  font-family: ${typography.bodyFont.fontFamily};`);
+  css.push(`  font-size: ${typography.bodyFont.fontSize.desktop}px;`);
+  css.push(`  font-weight: ${typography.bodyFont.fontWeight};`);
+  css.push(`  line-height: ${typography.bodyFont.lineHeight.desktop};`);
+  css.push(`  letter-spacing: ${typography.bodyFont.letterSpacing.desktop}px;`);
+  css.push(`  color: var(--wp-text-primary);`);
+  css.push(`  background-color: var(--wp-bg-body);`);
   css.push('}');
 
   // Headings
-  if (headings) {
-    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
-      const heading = headings[tag];
-      if (heading) {
-        css.push(`${tag} {`);
-        if (heading.fontFamily) css.push(`  font-family: ${heading.fontFamily};`);
-        if (heading.fontSize?.desktop) css.push(`  font-size: ${heading.fontSize.desktop}px;`);
-        if (heading.fontWeight) css.push(`  font-weight: ${heading.fontWeight};`);
-        if (heading.lineHeight?.desktop) css.push(`  line-height: ${heading.lineHeight.desktop};`);
-        if (heading.letterSpacing?.desktop) css.push(`  letter-spacing: ${heading.letterSpacing.desktop}px;`);
-        if (heading.textTransform) css.push(`  text-transform: ${heading.textTransform};`);
-        css.push('}');
-      }
-    });
-  }
+  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
+    const heading = typography.headings[tag as keyof typeof typography.headings];
+    css.push(`${tag} {`);
+    css.push(`  font-family: ${heading.fontFamily};`);
+    css.push(`  font-size: ${heading.fontSize.desktop}px;`);
+    css.push(`  font-weight: ${heading.fontWeight};`);
+    css.push(`  line-height: ${heading.lineHeight.desktop};`);
+    css.push(`  letter-spacing: ${heading.letterSpacing.desktop}px;`);
+    css.push(`  text-transform: ${heading.textTransform};`);
+    css.push('}');
+  });
 
   // Links
   css.push('a {');
@@ -247,187 +166,137 @@ function generateResponsiveCSS(settings: CustomizerSettings): string[] {
   css.push('a:hover {');
   css.push(`  color: var(--wp-link-color-hover);`);
   css.push('}');
-
+  
   // Tablet styles
-  if (bodyFont.fontSize?.tablet || headings) {
-    css.push('@media (max-width: 992px) {');
-    css.push('  body {');
-    if (bodyFont.fontSize?.tablet) css.push(`    font-size: ${bodyFont.fontSize.tablet}px;`);
-    if (bodyFont.lineHeight?.tablet) css.push(`    line-height: ${bodyFont.lineHeight.tablet};`);
+  css.push('@media (max-width: 992px) {');
+  css.push('  body {');
+  css.push(`    font-size: ${typography.bodyFont.fontSize.tablet}px;`);
+  css.push(`    line-height: ${typography.bodyFont.lineHeight.tablet};`);
+  css.push('  }');
+  
+  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
+    const heading = typography.headings[tag as keyof typeof typography.headings];
+    css.push(`  ${tag} {`);
+    css.push(`    font-size: ${heading.fontSize.tablet}px;`);
+    css.push(`    line-height: ${heading.lineHeight.tablet};`);
     css.push('  }');
-
-    if (headings) {
-      ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
-        const heading = headings[tag];
-        if (heading?.fontSize?.tablet) {
-          css.push(`  ${tag} {`);
-          css.push(`    font-size: ${heading.fontSize.tablet}px;`);
-          if (heading.lineHeight?.tablet) css.push(`    line-height: ${heading.lineHeight.tablet};`);
-          css.push('  }');
-        }
-      });
-    }
-    css.push('}');
-  }
-
+  });
+  css.push('}');
+  
   // Mobile styles
-  if (bodyFont.fontSize?.mobile || headings) {
-    css.push('@media (max-width: 576px) {');
-    css.push('  body {');
-    if (bodyFont.fontSize?.mobile) css.push(`    font-size: ${bodyFont.fontSize.mobile}px;`);
-    if (bodyFont.lineHeight?.mobile) css.push(`    line-height: ${bodyFont.lineHeight.mobile};`);
+  css.push('@media (max-width: 576px) {');
+  css.push('  body {');
+  css.push(`    font-size: ${typography.bodyFont.fontSize.mobile}px;`);
+  css.push(`    line-height: ${typography.bodyFont.lineHeight.mobile};`);
+  css.push('  }');
+  
+  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
+    const heading = typography.headings[tag as keyof typeof typography.headings];
+    css.push(`  ${tag} {`);
+    css.push(`    font-size: ${heading.fontSize.mobile}px;`);
+    css.push(`    line-height: ${heading.lineHeight.mobile};`);
     css.push('  }');
-
-    if (headings) {
-      ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
-        const heading = headings[tag];
-        if (heading?.fontSize?.mobile) {
-          css.push(`  ${tag} {`);
-          css.push(`    font-size: ${heading.fontSize.mobile}px;`);
-          if (heading.lineHeight?.mobile) css.push(`    line-height: ${heading.lineHeight.mobile};`);
-          css.push('  }');
-        }
-      });
-    }
-    css.push('}');
-  }
-
+  });
+  css.push('}');
+  
   return css;
 }
 
-function generateHeaderCSS(settings: CustomizerSettings): string[] {
+function generateHeaderCSS(settings: AstraCustomizerSettings): string[] {
   const css: string[] = [];
-  const header = (settings as any).header;
-  const siteIdentity = settings.siteIdentity;
-
-  if (!header && !siteIdentity) {
-    return css;
+  const { header, siteIdentity } = settings;
+  
+  css.push('.ast-header {');
+  css.push(`  background: ${header.primary.background};`);
+  css.push(`  height: ${header.primary.height.desktop}px;`);
+  if (header.sticky) {
+    css.push('  position: sticky;');
+    css.push('  top: 0;');
+    css.push('  z-index: 999;');
   }
+  css.push('}');
 
-  // Header background and height
-  if (header?.primary) {
-    css.push('.ast-header {');
-    if (header.primary.background) css.push(`  background: ${header.primary.background};`);
-    if (header.primary.height?.desktop) css.push(`  height: ${header.primary.height.desktop}px;`);
-    if (header.sticky) {
-      css.push('  position: sticky;');
-      css.push('  top: 0;');
-      css.push('  z-index: 999;');
-    }
-    css.push('}');
-
-    // Menu alignment
-    if (header.primary.menuAlignment) {
-      css.push('.ast-primary-menu {');
-      css.push(`  text-align: ${header.primary.menuAlignment};`);
-      css.push('}');
-    }
-  }
-
-  // Site title
-  if (siteIdentity?.siteTitle?.display) {
+  // Site title (with null check)
+  if (siteIdentity?.siteTitle?.show) {
     css.push('.site-title {');
-    if ((siteIdentity.siteTitle as any).color?.normal) {
-      css.push(`  color: ${(siteIdentity.siteTitle as any).color.normal};`);
-    }
-    if ((siteIdentity.siteTitle as any).typography) {
-      const typo = (siteIdentity.siteTitle as any).typography;
-      if (typo.fontFamily) css.push(`  font-family: ${typo.fontFamily};`);
-      if (typo.fontSize?.desktop) css.push(`  font-size: ${typo.fontSize.desktop}px;`);
-      if (typo.fontWeight) css.push(`  font-weight: ${typo.fontWeight};`);
-    }
+    css.push(`  color: ${siteIdentity.siteTitle.color.normal};`);
+    css.push(`  font-family: ${siteIdentity.siteTitle.typography.fontFamily};`);
+    css.push(`  font-size: ${siteIdentity.siteTitle.typography.fontSize.desktop}px;`);
+    css.push(`  font-weight: ${siteIdentity.siteTitle.typography.fontWeight};`);
     css.push('}');
-
-    if ((siteIdentity.siteTitle as any).color?.hover) {
-      css.push('.site-title:hover {');
-      css.push(`  color: ${(siteIdentity.siteTitle as any).color.hover};`);
-      css.push('}');
-    }
+    css.push('.site-title:hover {');
+    css.push(`  color: ${siteIdentity.siteTitle.color.hover};`);
+    css.push('}');
   }
 
-  // Logo
+  // Logo (with null check)
   if (siteIdentity?.logo?.desktop) {
     css.push('.site-logo img {');
-    if (siteIdentity.logo.width?.desktop) {
-      css.push(`  max-width: ${siteIdentity.logo.width.desktop}px;`);
-    }
+    css.push(`  max-width: ${siteIdentity.logo.width.desktop}px;`);
     css.push('}');
   }
-
+  
+  // Menu alignment
+  css.push('.ast-primary-menu {');
+  css.push(`  text-align: ${header.primary.menuAlignment};`);
+  css.push('}');
+  
   return css;
 }
 
-function generateFooterCSS(settings: CustomizerSettings): string[] {
+function generateFooterCSS(settings: AstraCustomizerSettings): string[] {
   const css: string[] = [];
-  const footer = (settings as any).footer;
-
-  if (!footer) {
-    return css;
-  }
-
+  const { footer } = settings;
+  
   // Footer widgets
-  if (footer.widgets?.enabled) {
+  if (footer.widgets.enabled) {
     css.push('.ast-footer-widgets {');
-    if (footer.widgets.background) css.push(`  background: ${footer.widgets.background};`);
-    if (footer.widgets.textColor) css.push(`  color: ${footer.widgets.textColor};`);
-    if (footer.widgets.padding?.desktop) {
-      css.push(`  padding-top: ${footer.widgets.padding.desktop.top || 40}px;`);
-      css.push(`  padding-bottom: ${footer.widgets.padding.desktop.bottom || 40}px;`);
-    }
+    css.push(`  background: ${footer.widgets.background};`);
+    css.push(`  color: ${footer.widgets.textColor};`);
+    css.push(`  padding-top: ${footer.widgets.padding.desktop.top}px;`);
+    css.push(`  padding-bottom: ${footer.widgets.padding.desktop.bottom}px;`);
     css.push('}');
-
-    if (footer.widgets.linkColor) {
-      css.push('.ast-footer-widgets a {');
-      css.push(`  color: ${footer.widgets.linkColor.normal};`);
-      css.push('}');
-      css.push('.ast-footer-widgets a:hover {');
-      css.push(`  color: ${footer.widgets.linkColor.hover || footer.widgets.linkColor.normal};`);
-      css.push('}');
-    }
-
-    if (footer.widgets.columns?.desktop) {
-      css.push('.ast-footer-widget-area {');
-      css.push('  display: grid;');
-      css.push(`  grid-template-columns: repeat(${footer.widgets.columns.desktop}, 1fr);`);
-      css.push('  gap: 30px;');
-      css.push('}');
-    }
+    
+    css.push('.ast-footer-widgets a {');
+    css.push(`  color: ${footer.widgets.linkColor.normal};`);
+    css.push('}');
+    css.push('.ast-footer-widgets a:hover {');
+    css.push(`  color: ${footer.widgets.linkColor.hover};`);
+    css.push('}');
+    
+    css.push('.ast-footer-widget-area {');
+    css.push('  display: grid;');
+    css.push(`  grid-template-columns: repeat(${footer.widgets.columns.desktop}, 1fr);`);
+    css.push('  gap: 30px;');
+    css.push('}');
   }
-
+  
   // Bottom bar
-  if (footer.bottomBar?.enabled) {
+  if (footer.bottomBar.enabled) {
     css.push('.ast-footer-bottom {');
-    if (footer.bottomBar.background) css.push(`  background: ${footer.bottomBar.background};`);
-    if (footer.bottomBar.textColor) css.push(`  color: ${footer.bottomBar.textColor};`);
-    if (footer.bottomBar.padding?.desktop) {
-      css.push(`  padding-top: ${footer.bottomBar.padding.desktop.top || 20}px;`);
-      css.push(`  padding-bottom: ${footer.bottomBar.padding.desktop.bottom || 20}px;`);
-    }
+    css.push(`  background: ${footer.bottomBar.background};`);
+    css.push(`  color: ${footer.bottomBar.textColor};`);
+    css.push(`  padding-top: ${footer.bottomBar.padding.desktop.top}px;`);
+    css.push(`  padding-bottom: ${footer.bottomBar.padding.desktop.bottom}px;`);
     css.push('}');
-
-    if (footer.bottomBar.linkColor) {
-      css.push('.ast-footer-bottom a {');
-      css.push(`  color: ${footer.bottomBar.linkColor.normal};`);
-      css.push('}');
-      css.push('.ast-footer-bottom a:hover {');
-      css.push(`  color: ${footer.bottomBar.linkColor.hover || footer.bottomBar.linkColor.normal};`);
-      css.push('}');
-    }
+    
+    css.push('.ast-footer-bottom a {');
+    css.push(`  color: ${footer.bottomBar.linkColor.normal};`);
+    css.push('}');
+    css.push('.ast-footer-bottom a:hover {');
+    css.push(`  color: ${footer.bottomBar.linkColor.hover};`);
+    css.push('}');
   }
-
+  
   return css;
 }
 
-function generateContainerCSS(settings: CustomizerSettings): string[] {
+function generateContainerCSS(settings: AstraCustomizerSettings): string[] {
   const css: string[] = [];
   const { container } = settings;
-
-  if (!container) {
-    return css;
-  }
-
+  
   css.push('.ast-container {');
-
+  
   if (container.layout === 'boxed') {
     css.push(`  max-width: ${container.width.desktop}px;`);
     css.push('  margin: 0 auto;');
@@ -439,43 +308,72 @@ function generateContainerCSS(settings: CustomizerSettings): string[] {
     css.push(`  max-width: ${container.width.desktop}px;`);
     css.push('  margin: 0 auto;');
   }
-
-  if (container.padding?.desktop) {
-    css.push(`  padding-left: ${container.padding.desktop.left}px;`);
-    css.push(`  padding-right: ${container.padding.desktop.right}px;`);
-  }
+  
+  css.push(`  padding-left: ${container.padding.desktop.left}px;`);
+  css.push(`  padding-right: ${container.padding.desktop.right}px;`);
   css.push('}');
-
+  
   // Responsive container
   css.push('@media (max-width: 992px) {');
   css.push('  .ast-container {');
   css.push(`    max-width: ${container.width.tablet}px;`);
-  if (container.padding?.tablet) {
-    css.push(`    padding-left: ${container.padding.tablet.left}px;`);
-    css.push(`    padding-right: ${container.padding.tablet.right}px;`);
-  }
+  css.push(`    padding-left: ${container.padding.tablet.left}px;`);
+  css.push(`    padding-right: ${container.padding.tablet.right}px;`);
   css.push('  }');
   css.push('}');
-
+  
   css.push('@media (max-width: 576px) {');
   css.push('  .ast-container {');
   css.push(`    max-width: ${container.width.mobile}px;`);
-  if (container.padding?.mobile) {
-    css.push(`    padding-left: ${container.padding.mobile.left}px;`);
-    css.push(`    padding-right: ${container.padding.mobile.right}px;`);
-  }
+  css.push(`    padding-left: ${container.padding.mobile.left}px;`);
+  css.push(`    padding-right: ${container.padding.mobile.right}px;`);
   css.push('  }');
   css.push('}');
-
+  
   return css;
 }
 
-/**
- * Generate blog-specific CSS
- */
-function generateBlogCSS(settings: CustomizerSettings): string[] {
+function generateSidebarCSS(settings: AstraCustomizerSettings): string[] {
   const css: string[] = [];
-  const blog = (settings as any).blog;
+  const { sidebar } = settings;
+  
+  if (sidebar.layout !== 'no-sidebar') {
+    css.push('.ast-content-area {');
+    css.push('  display: flex;');
+    css.push(`  gap: ${sidebar.gap.desktop}px;`);
+    css.push('}');
+    
+    css.push('.ast-primary-content {');
+    css.push(`  flex: 1 1 ${100 - sidebar.width.desktop}%;`);
+    css.push('}');
+    
+    css.push('.ast-sidebar {');
+    css.push(`  flex: 0 0 ${sidebar.width.desktop}%;`);
+    css.push('}');
+    
+    if (sidebar.layout === 'left-sidebar') {
+      css.push('.ast-sidebar {');
+      css.push('  order: -1;');
+      css.push('}');
+    }
+    
+    // Responsive
+    css.push('@media (max-width: 768px) {');
+    css.push('  .ast-content-area {');
+    css.push('    flex-direction: column;');
+    css.push('  }');
+    css.push('  .ast-sidebar {');
+    css.push('    flex: 0 0 100%;');
+    css.push('  }');
+    css.push('}');
+  }
+  
+  return css;
+}
+
+function generateBlogCSS(settings: AstraCustomizerSettings): string[] {
+  const css: string[] = [];
+  const { blog } = settings;
 
   // Safety check - if blog settings are incomplete, return empty CSS
   if (!blog?.archive?.styling) {
@@ -486,7 +384,6 @@ function generateBlogCSS(settings: CustomizerSettings): string[] {
   const { styling, meta } = archive;
 
   // CSS Variables for blog styling
-  css.push('/* Blog Styling */');
   css.push(':root {');
   css.push(`  --blog-card-spacing: ${archive.cardSpacing || 20}px;`);
   css.push(`  --blog-card-bg: ${styling.backgroundColor || '#ffffff'};`);
@@ -510,12 +407,12 @@ function generateBlogCSS(settings: CustomizerSettings): string[] {
   css.push(`  --blog-meta-size-tablet: ${styling.typography?.metaSize?.tablet || 11}px;`);
   css.push(`  --blog-meta-size-mobile: ${styling.typography?.metaSize?.mobile || 10}px;`);
   css.push('}');
-
+  
   // Blog Archive Container
   css.push('.blog-archive {');
   css.push('  width: 100%;');
   css.push('}');
-
+  
   // Grid Layout
   if (blog.archive.layout === 'grid') {
     css.push('.blog-archive-grid .posts-container {');
@@ -523,26 +420,8 @@ function generateBlogCSS(settings: CustomizerSettings): string[] {
     css.push('  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));');
     css.push('  gap: var(--blog-card-spacing);');
     css.push('}');
-
-    // Responsive columns
-    const columns = archive.columns || { desktop: 3, tablet: 2, mobile: 1 };
-    css.push('@media (min-width: 992px) {');
-    css.push('  .blog-archive-grid .posts-container {');
-    css.push(`    grid-template-columns: repeat(${columns.desktop}, 1fr);`);
-    css.push('  }');
-    css.push('}');
-    css.push('@media (min-width: 576px) and (max-width: 991px) {');
-    css.push('  .blog-archive-grid .posts-container {');
-    css.push(`    grid-template-columns: repeat(${columns.tablet}, 1fr);`);
-    css.push('  }');
-    css.push('}');
-    css.push('@media (max-width: 575px) {');
-    css.push('  .blog-archive-grid .posts-container {');
-    css.push(`    grid-template-columns: repeat(${columns.mobile}, 1fr);`);
-    css.push('  }');
-    css.push('}');
   }
-
+  
   // List Layout
   if (blog.archive.layout === 'list') {
     css.push('.blog-archive-list .posts-container {');
@@ -551,71 +430,158 @@ function generateBlogCSS(settings: CustomizerSettings): string[] {
     css.push('  gap: var(--blog-card-spacing);');
     css.push('}');
   }
-
-  // Blog Card Styles
-  css.push('.blog-card {');
+  
+  // Masonry Layout
+  if (blog.archive.layout === 'masonry') {
+    css.push('.blog-archive-masonry .posts-container {');
+    css.push('  column-count: auto;');
+    css.push('  column-width: 300px;');
+    css.push('  column-gap: var(--blog-card-spacing);');
+    css.push('  column-fill: balance;');
+    css.push('}');
+  }
+  
+  // Post Cards
+  css.push('.post-card {');
   css.push('  background: var(--blog-card-bg);');
-  css.push('  border: 1px solid var(--blog-card-border);');
   css.push('  border-radius: var(--blog-card-border-radius);');
   css.push('  padding: var(--blog-card-padding);');
-  css.push('  transition: transform 0.2s, box-shadow 0.2s;');
+  css.push('  transition: all 0.3s ease;');
+  css.push('  height: fit-content;');
   css.push('}');
-
-  // Card style variations
-  if (archive.cardStyle === 'shadow') {
-    css.push('.blog-card {');
+  
+  // Card Styles
+  if (blog.archive.cardStyle === 'boxed') {
+    css.push('.card-style-boxed {');
+    css.push('  border: 1px solid var(--blog-card-border);');
+    css.push('}');
+  }
+  
+  if (blog.archive.cardStyle === 'shadow') {
+    css.push('.card-style-shadow {');
     css.push('  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);');
     css.push('}');
-    css.push('.blog-card:hover {');
+    css.push('.card-style-shadow:hover {');
     css.push('  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);');
     css.push('  transform: translateY(-2px);');
     css.push('}');
   }
-
-  // Blog title
-  css.push('.blog-card-title {');
+  
+  // Typography
+  css.push('.post-title a {');
   css.push('  color: var(--blog-title-color);');
   css.push('  font-size: var(--blog-title-size-desktop);');
   css.push('  font-weight: var(--blog-title-weight);');
-  css.push('  margin-bottom: 12px;');
+  css.push('  text-decoration: none;');
+  css.push('  transition: color 0.3s ease;');
   css.push('}');
-  css.push('.blog-card-title:hover {');
+  
+  css.push('.post-title a:hover {');
   css.push('  color: var(--blog-title-hover-color);');
   css.push('}');
-
-  // Blog excerpt
-  css.push('.blog-card-excerpt {');
+  
+  css.push('.post-excerpt {');
   css.push('  color: var(--blog-excerpt-color);');
   css.push('  font-size: var(--blog-excerpt-size-desktop);');
   css.push('  line-height: 1.6;');
   css.push('}');
-
-  // Blog meta
-  css.push('.blog-card-meta {');
-  css.push('  display: flex;');
-  css.push('  flex-wrap: wrap;');
-  css.push('  gap: 12px;');
-  css.push('  color: var(--blog-meta-text-color);');
+  
+  css.push('.post-meta {');
   css.push('  font-size: var(--blog-meta-size-desktop);');
-  css.push('  margin-top: 12px;');
+  css.push('  color: var(--blog-meta-text-color);');
   css.push('}');
-  css.push('.blog-card-meta a {');
+  
+  css.push('.meta-link {');
   css.push('  color: var(--blog-meta-link-color);');
+  css.push('  text-decoration: none;');
+  css.push('  transition: opacity 0.3s ease;');
   css.push('}');
-
-  // Responsive typography
-  css.push('@media (max-width: 992px) {');
-  css.push('  .blog-card-title { font-size: var(--blog-title-size-tablet); }');
-  css.push('  .blog-card-excerpt { font-size: var(--blog-excerpt-size-tablet); }');
-  css.push('  .blog-card-meta { font-size: var(--blog-meta-size-tablet); }');
+  
+  css.push('.meta-link:hover {');
+  css.push('  opacity: 0.8;');
   css.push('}');
-  css.push('@media (max-width: 576px) {');
-  css.push('  .blog-card-title { font-size: var(--blog-title-size-mobile); }');
-  css.push('  .blog-card-excerpt { font-size: var(--blog-excerpt-size-mobile); }');
-  css.push('  .blog-card-meta { font-size: var(--blog-meta-size-mobile); }');
+  
+  css.push('.meta-icon {');
+  css.push('  color: var(--blog-meta-icon-color);');
   css.push('}');
-
+  
+  // Featured Images
+  if (blog.archive.featuredImage.enabled) {
+    css.push('.featured-image {');
+    css.push('  width: 100%;');
+    css.push('  height: 100%;');
+    css.push('  object-fit: cover;');
+    css.push('  transition: transform 0.3s ease;');
+    css.push('}');
+    
+    if (blog.archive.featuredImage.hoverEffect === 'zoom') {
+      css.push('.post-card:hover .featured-image {');
+      css.push('  transform: scale(1.05);');
+      css.push('}');
+    }
+    
+    if (blog.archive.featuredImage.hoverEffect === 'fade') {
+      css.push('.post-card:hover .featured-image {');
+      css.push('  opacity: 0.8;');
+      css.push('}');
+    }
+  }
+  
+  // Responsive Design
+  css.push('@media (max-width: 1024px) {');
+  css.push('  .post-title a {');
+  css.push('    font-size: var(--blog-title-size-tablet);');
+  css.push('  }');
+  css.push('  .post-excerpt {');
+  css.push('    font-size: var(--blog-excerpt-size-tablet);');
+  css.push('  }');
+  css.push('  .post-meta {');
+  css.push('    font-size: var(--blog-meta-size-tablet);');
+  css.push('  }');
+  css.push('  .blog-archive-grid .posts-container {');
+  css.push('    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));');
+  css.push('  }');
+  css.push('  .blog-archive-masonry .posts-container {');
+  css.push('    column-count: 2;');
+  css.push('    column-width: auto;');
+  css.push('  }');
+  css.push('}');
+  
+  css.push('@media (max-width: 768px) {');
+  css.push('  .post-title a {');
+  css.push('    font-size: var(--blog-title-size-mobile);');
+  css.push('  }');
+  css.push('  .post-excerpt {');
+  css.push('    font-size: var(--blog-excerpt-size-mobile);');
+  css.push('  }');
+  css.push('  .post-meta {');
+  css.push('    font-size: var(--blog-meta-size-mobile);');
+  css.push('  }');
+  css.push('  .blog-archive-grid .posts-container {');
+  css.push('    grid-template-columns: 1fr;');
+  css.push('  }');
+  css.push('  .blog-archive-masonry .posts-container {');
+  css.push('    column-count: 1;');
+  css.push('  }');
+  css.push('  .post-card-list {');
+  css.push('    flex-direction: column;');
+  css.push('  }');
+  css.push('}');
+  
   return css;
+}
+
+/**
+ * Get responsive value for current device
+ */
+export function getResponsiveValue<T>(
+  value: ResponsiveValue<T> | T,
+  device: 'desktop' | 'tablet' | 'mobile' = 'desktop'
+): T {
+  if (value && typeof value === 'object' && 'desktop' in value) {
+    return (value as ResponsiveValue<T>)[device];
+  }
+  return value as T;
 }
 
 /**

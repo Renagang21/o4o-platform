@@ -3,10 +3,12 @@
  * Fetches and manages customizer settings from API
  * Provides container width settings for frontend rendering
  * Auto-detects viewport mode based on window size
+ * Generates and injects CSS from settings
  */
 
 import { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
+import { generateCSS } from '../utils/css-generator';
 
 export type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 
@@ -130,6 +132,64 @@ export const useCustomizerSettings = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Inject CSS from settings
+  useEffect(() => {
+    if (!settings) return;
+
+    // Generate CSS from settings
+    const css = generateCSS(settings as any);
+
+    // Create or update <style> tag
+    const STYLE_ID = 'customizer-dynamic-css';
+    let styleEl = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
+
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = STYLE_ID;
+      document.head.appendChild(styleEl);
+    }
+
+    styleEl.textContent = css;
+
+    return () => {
+      // Cleanup on unmount
+      styleEl?.remove();
+    };
+  }, [settings]);
+
+  // Apply favicon from settings
+  useEffect(() => {
+    if (!settings?.siteIdentity?.favicon) return;
+
+    const faviconUrl = settings.siteIdentity.favicon;
+
+    // Remove existing favicon links
+    const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
+    existingFavicons.forEach((el) => el.remove());
+
+    // Add new favicon
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.href = faviconUrl;
+
+    // Detect file type and set appropriate type
+    if (faviconUrl.endsWith('.png')) {
+      link.type = 'image/png';
+    } else if (faviconUrl.endsWith('.svg')) {
+      link.type = 'image/svg+xml';
+    } else if (faviconUrl.endsWith('.ico')) {
+      link.type = 'image/x-icon';
+    }
+
+    document.head.appendChild(link);
+
+    // Also add apple-touch-icon for iOS
+    const appleLink = document.createElement('link');
+    appleLink.rel = 'apple-touch-icon';
+    appleLink.href = faviconUrl;
+    document.head.appendChild(appleLink);
+  }, [settings?.siteIdentity?.favicon]);
 
   // Fetch settings from API with cache
   useEffect(() => {
