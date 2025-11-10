@@ -122,29 +122,21 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   // Handle save (stores settings in customizer settings table)
   // Backend automatically syncs to template parts via settingsService
   const handleSave = async () => {
-    console.log('[DEBUG SimpleCustomizer] handleSave called');
-    console.log('[DEBUG SimpleCustomizer] onSave exists?', !!onSave);
-    console.log('[DEBUG SimpleCustomizer] settings:', settings);
-
     if (!onSave) {
-      console.error('[DEBUG SimpleCustomizer] onSave is not defined!');
       toast.error('저장 함수가 정의되지 않았습니다.');
       return;
     }
 
     setIsSaving(true);
     try {
-      console.log('[DEBUG SimpleCustomizer] Calling onSave...');
       const success = await onSave(settings);
       if (success) {
         setIsDirty(false);
         toast.success('설정이 저장되었습니다');
       } else {
         toast.error('설정 저장에 실패했습니다. 다시 시도해주세요.');
-        console.error('Save failed: onSave returned false');
       }
     } catch (error: any) {
-      console.error('Save error:', error);
       const errorMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message || '저장에 실패했습니다';
       toast.error(errorMessage);
     } finally {
