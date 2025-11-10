@@ -128,6 +128,9 @@ import dsSettlementsRoutes from '../routes/ds-settlements.routes.js';
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
+// UserRole controller
+import { UserRoleController } from '../controllers/v1/userRole.controller.js';
+
 /**
  * Setup all application routes
  * Organized by priority and feature domain
@@ -244,8 +247,7 @@ export function setupRoutes(app: Application): void {
   // 4. SETTINGS ROUTES (Lenient rate limiting - before standard limiter)
   // ============================================================================
   // Public roles endpoint
-  app.get('/api/v1/users/roles', (req, res) => {
-    const { UserRoleController } = require('../controllers/v1/userRole.controller.js');
+  app.get('/api/v1/users/roles', (req: Request, res: Response) => {
     return UserRoleController.getRoles(req, res);
   });
 
