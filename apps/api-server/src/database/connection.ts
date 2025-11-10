@@ -15,9 +15,13 @@ const envFile = process.env.NODE_ENV === 'production'
   ? '.env-apiserver'
   : '.env.development';
 
+// When compiled, this file is in dist/src/database/, need to go up 3 levels to api-server root
+const envPath = path.resolve(__dirname, '../../../', envFile);
+console.log(`[DB Connection] Loading environment from: ${envPath}`);
 dotenv.config({
-  path: path.resolve(__dirname, '../../', envFile)
+  path: envPath
 });
+console.log(`[DB Connection] DB_PASSWORD loaded: ${process.env.DB_PASSWORD ? 'YES' : 'NO'}`);
 import { User } from '../entities/User.js';
 import { Role } from '../entities/Role.js';
 import { Permission } from '../entities/Permission.js';
