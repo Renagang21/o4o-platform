@@ -132,7 +132,16 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
     };
 
     fetchTemplateParts();
-  }, [area, context?.pageId, context?.postType, context]);
+  }, [
+    area,
+    context?.pageId,
+    context?.postType,
+    context?.subdomain,
+    context?.path,
+    context?.pathPrefix,
+    context?.userRole,
+    JSON.stringify(context?.categories || [])
+  ]);
 
   return { templateParts, loading, error };
 }
@@ -154,62 +163,30 @@ export function useTemplatePart(identifier: string) {
         setLoading(true);
         setError(null);
 
-        console.info('🔍 Fetching single template part:', {
-          identifier,
-          url: `/template-parts/${identifier}`
-        });
-
         const response = await authClient.api.get(`/template-parts/${identifier}`);
-
-        console.info('📡 Single template part API response:', {
-          status: response.status,
-          data_type: typeof response.data,
-          has_success_prop: response.data && typeof response.data === 'object' && 'success' in response.data,
-          data_keys: response.data && typeof response.data === 'object' ? Object.keys(response.data) : null
-        });
 
         if (response.status === 200) {
           // Handle both old and new API response structures
           const data = response.data;
           if (data && typeof data === 'object' && 'success' in data) {
             // New structure: {success: true, data: {...}}
-            console.info('📋 Using new API structure for single part');
             if (data.success) {
-              console.info('✅ Template part loaded:', {
-                id: data.data?.id,
-                name: data.data?.name,
-                area: data.data?.area
-              });
               setTemplatePart(data.data || null);
             } else {
               throw new Error(data.error || 'Failed to fetch template part');
             }
           } else if (data && typeof data === 'object') {
             // Old structure: direct object
-            console.info('📋 Using legacy API structure for single part');
-            console.info('✅ Template part loaded:', {
-              id: data.id,
-              name: data.name,
-              area: data.area
-            });
             setTemplatePart(data);
           } else {
             // Fallback
-            console.warn('⚠️ Unknown single template part response, falling back to null:', data);
             setTemplatePart(null);
           }
         } else {
-          console.error('❌ HTTP error for single template part:', response.status);
           throw new Error('Failed to fetch template part');
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        console.error('❌ Single template part fetch failed:', {
-          identifier,
-          error: errorMessage,
-          error_type: err instanceof Error ? err.constructor.name : typeof err,
-          stack: err instanceof Error ? err.stack : null
-        });
         setError(errorMessage);
         setTemplatePart(null);
       } finally {
