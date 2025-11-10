@@ -26,8 +26,9 @@ import { RoleAssignment } from '../src/entities/RoleAssignment.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const envFile = process.env.NODE_ENV === 'production' ? '.env-apiserver' : '.env.development';
-// When compiled, script is in dist/scripts/, so we need to go up two levels to reach the api-server root
-const envPath = path.resolve(__dirname, '../../', envFile);
+// When running with tsx, script is in scripts/ dir; when compiled, it's in dist/scripts/
+// So we go up one level (../) to reach api-server root
+const envPath = path.resolve(__dirname, '../', envFile);
 dotenv.config({ path: envPath });
 
 interface UserData {
