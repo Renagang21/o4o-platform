@@ -251,7 +251,6 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     historyIndex: 0,
   });
   
-  const previewIframeRef = useRef<HTMLIFrameElement | null>(null);
   const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Update setting with history tracking
@@ -271,19 +270,6 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     // Call event handler if provided
     eventHandlers?.onSettingChange?.(section, value);
   }, [eventHandlers]); // Remove state.settings from dependencies
-  
-  // PostMessage communication with preview iframe
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent<CustomizerMessage>) => {
-      if (event.data.type === 'preview-ready') {
-        // Initial settings will be sent by EnhancedPreview component
-        // No need to send duplicate messages here
-      }
-    };
-    
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
   
   // Settings ref for external access
   const settingsRef = useRef(state.settings);
@@ -345,14 +331,6 @@ export const CustomizerProvider: React.FC<CustomizerProviderProps> = ({
     canRedo: state.historyIndex < state.history.length - 1,
     eventHandlers,
   };
-  
-  // Store iframe ref globally for PostMessage
-  useEffect(() => {
-    const iframe = document.querySelector('#customizer-preview-iframe') as HTMLIFrameElement;
-    if (iframe) {
-      previewIframeRef.current = iframe;
-    }
-  }, []);
   
   // Cleanup on unmount
   useEffect(() => {

@@ -31,24 +31,6 @@ export const AstraImageUploader: React.FC<AstraImageUploaderProps> = ({
       // Add timestamp for cache busting
       const urlWithTimestamp = `${selectedMedia.url}${selectedMedia.url.includes('?') ? '&' : '?'}t=${Date.now()}`;
       onChange(urlWithTimestamp);
-      
-      // Force preview refresh
-      const iframe = document.getElementById('customizer-preview-iframe') as HTMLIFrameElement;
-      if (iframe) {
-        // Send message to iframe to update logo
-        iframe.contentWindow?.postMessage(
-          { 
-            type: 'update-logo', 
-            url: urlWithTimestamp 
-          },
-          '*'
-        );
-        
-        // Also trigger a refresh after a short delay
-        setTimeout(() => {
-          iframe.src = iframe.src;
-        }, 500);
-      }
     }
     setShowMediaSelector(false);
   };

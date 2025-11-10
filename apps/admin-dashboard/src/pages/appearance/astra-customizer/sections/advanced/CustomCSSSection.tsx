@@ -1,14 +1,11 @@
 /**
  * Custom CSS Section Component
- * 사용자 정의 CSS 섹션 - Astra Additional CSS 모방
- * Phase 2: 실시간 미리보기 (300ms debounce + postMessage)
- * Phase 3: Monaco 에디터 고도화 (autocomplete, history, security)
+ * 사용자 정의 CSS 섹션 - 간단한 CSS 편집기
  */
 
 import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { useCustomizer } from '../../context/CustomizerContext';
 import { AlertCircle, History, Minimize2 } from 'lucide-react';
-import { getCustomizerPostMessage } from '../../utils/postmessage';
 import Editor, { loader, OnMount } from '@monaco-editor/react';
 import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
@@ -91,7 +88,6 @@ const MAX_CSS_SIZE = 64 * 1024;
 export const CustomCSSSection: React.FC = () => {
   const { state, updateSetting } = useCustomizer();
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const postMessage = getCustomizerPostMessage();
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof Monaco | null>(null);
 
@@ -242,21 +238,14 @@ export const CustomCSSSection: React.FC = () => {
         // Apply minification if enabled
         const processedCSS = minify ? minifyCSS(newCSS) : newCSS;
 
-        // Send customCSS update via postMessage for live preview
-        const iframe = document.getElementById('customizer-preview-iframe') as HTMLIFrameElement;
-        if (iframe?.contentWindow) {
-          postMessage.setTargetWindow(iframe.contentWindow);
-          postMessage.send('customizer:update', {
-            kind: 'customCSS',
-            value: processedCSS,
-          });
-        }
+        // Update setting (will be applied after save)
+        updateSetting('customCSS', processedCSS);
 
         // Add to history (debounced)
         addToHistory(newCSS);
       }, 300);
     },
-    [updateSetting, postMessage, minify, addToHistory]
+    [updateSetting, minify, addToHistory]
   );
 
   // Cleanup on unmount

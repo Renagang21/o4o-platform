@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Save, RotateCcw, ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getDefaultSettings } from './utils/default-settings';
 import { normalizeCustomizerSettings } from './utils/normalize-settings';
@@ -49,7 +49,6 @@ const SimpleCustomizerInner: React.FC<SimpleCustomizerProps> = ({
   const settings = state.settings;
   const isDirty = state.isDirty;
 
-  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
   const [isSaving, setIsSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
@@ -252,24 +251,10 @@ const SimpleCustomizerInner: React.FC<SimpleCustomizerProps> = ({
 
         {/* Preview Panel */}
         <div className="flex-1 flex flex-col">
-          {/* Device Controls */}
+          {/* Top Bar with Builder Toggles */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <div className="flex items-center gap-2">
-              {(['desktop', 'tablet', 'mobile'] as const).map((device) => (
-                <button
-                  key={device}
-                  onClick={() => setPreviewDevice(device)}
-                  className={`p-2 rounded-md ${
-                    previewDevice === device
-                      ? 'bg-blue-100 text-blue-600'
-                      : 'hover:bg-gray-100'
-                  }`}
-                >
-                  {device === 'desktop' && <Monitor size={20} />}
-                  {device === 'tablet' && <Tablet size={20} />}
-                  {device === 'mobile' && <Smartphone size={20} />}
-                </button>
-              ))}
+            <div className="text-sm text-gray-600">
+              사용자 정의 설정을 변경하세요
             </div>
 
             {/* Header Builder Toggle */}
@@ -304,33 +289,33 @@ const SimpleCustomizerInner: React.FC<SimpleCustomizerProps> = ({
           </div>
 
           {/* Preview Area */}
-          <div className="flex-1 bg-gray-100 relative overflow-hidden">
-            <div
-              className={`h-full flex items-center justify-center transition-all ${
-                previewDevice === 'mobile'
-                  ? 'p-4'
-                  : previewDevice === 'tablet'
-                  ? 'p-8'
-                  : 'p-0'
-              }`}
-            >
-              <div
-                className={`bg-white shadow-2xl ${
-                  previewDevice === 'mobile'
-                    ? 'w-[375px] h-[667px]'
-                    : previewDevice === 'tablet'
-                    ? 'w-[768px] h-[1024px]'
-                    : 'w-full h-full'
-                }`}
-              >
-                <iframe
-                  id="customizer-preview-iframe"
-                  src={previewUrl}
-                  className="w-full h-full border-0"
-                  title="Preview"
-                />
+          <div className="flex-1 bg-gray-100 relative overflow-hidden flex items-center justify-center">
+            <div className="text-center p-8 max-w-md">
+              <div className="mb-6">
+                <svg className="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">실시간 미리보기</h3>
+              <p className="text-gray-600 mb-6">
+                변경사항을 저장한 후 새 탭에서 미리보기를 확인하세요
+              </p>
+              <Button
+                onClick={handleOpenPreview}
+                size="lg"
+                className="w-full"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                새 탭에서 미리보기
+              </Button>
+              <p className="text-xs text-gray-500 mt-4">
+                💡 팁: 저장 후 미리보기를 새로고침하면 변경사항을 확인할 수 있습니다
+              </p>
             </div>
+          </div>
 
             {/* Header Builder Overlay */}
             {showHeaderBuilderOverlay && (
@@ -361,7 +346,7 @@ const SimpleCustomizerInner: React.FC<SimpleCustomizerProps> = ({
                     onChange={(newLayout) => {
                       updateSetting('header', { ...settings.header, builder: newLayout });
                     }}
-                    device={previewDevice}
+                    device="desktop"
                   />
                 </div>
               </div>
@@ -450,7 +435,7 @@ const SimpleCustomizerInner: React.FC<SimpleCustomizerProps> = ({
                         }
                       });
                     }}
-                    device={previewDevice}
+                    device="desktop"
                   />
                 </div>
               </div>
