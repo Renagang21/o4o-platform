@@ -33,9 +33,13 @@ const Customize: React.FC = () => {
     try {
       setIsLoading(true);
 
-      console.log('[Customize] Loading customizer settings...');
+      if (import.meta.env.DEV) {
+        console.log('[Customize] Loading customizer settings...');
+      }
       const response = await authClient.api.get('/settings/customizer');
-      console.log('[Customize] API response:', response.data);
+      if (import.meta.env.DEV) {
+        console.log('[Customize] API response:', response.data);
+      }
 
       if (response.data?.success && response.data?.data) {
         // API 응답 구조 정규화:
@@ -44,11 +48,15 @@ const Customize: React.FC = () => {
         const rawData = response.data.data;
         const settingsData = rawData.settings || rawData;
 
-        console.log('[Customize] Normalizing settings...');
+        if (import.meta.env.DEV) {
+          console.log('[Customize] Normalizing settings...');
+        }
         try {
           // normalize 함수가 AstraCustomizerSettings 반환
           const normalized = normalizeCustomizerSettings(settingsData);
-          console.log('[Customize] Settings normalized successfully');
+          if (import.meta.env.DEV) {
+            console.log('[Customize] Settings normalized successfully');
+          }
           setInitialSettings(normalized);
         } catch (normalizeError) {
           console.error('[Customize] Failed to normalize settings:', normalizeError);
@@ -65,7 +73,9 @@ const Customize: React.FC = () => {
           setInitialSettings(normalizeCustomizerSettings(null));
         }
       } else {
-        console.warn('[Customize] No settings data in response, using defaults');
+        if (import.meta.env.DEV) {
+          console.warn('[Customize] No settings data in response, using defaults');
+        }
         // 설정이 없으면 기본값 사용
         setInitialSettings(normalizeCustomizerSettings(null));
       }
@@ -111,8 +121,10 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
-      console.log('[Customize] Saving settings...');
-      console.log('[Customize] Settings to save:', JSON.stringify(settings, null, 2));
+      if (import.meta.env.DEV) {
+        console.log('[Customize] Saving settings...');
+        console.log('[Customize] Settings to save:', JSON.stringify(settings, null, 2));
+      }
 
       // Check for numeric keys before sending
       const checkForNumericKeys = (obj: any, path = ''): string[] => {
@@ -142,7 +154,9 @@ const Customize: React.FC = () => {
       const response = await authClient.api.put('/settings/customizer', { settings });
 
       if (response.data?.success) {
-        console.log('[Customize] Settings saved successfully');
+        if (import.meta.env.DEV) {
+          console.log('[Customize] Settings saved successfully');
+        }
         setInitialSettings(settings);
         toast.success('설정이 저장되었습니다.');
         return true;
