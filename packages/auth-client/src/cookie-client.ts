@@ -83,7 +83,6 @@ export class CookieAuthClient {
       await this.api.post('/auth/v2/logout');
     } catch (error) {
       // Even if logout fails, we should clear local state
-      console.error('Logout error:', error);
     } finally {
       this.currentToken = null;
     }

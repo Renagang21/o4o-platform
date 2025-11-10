@@ -82,7 +82,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     try {
       await cookieAuthClient.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      // Logout error handled silently
     } finally {
       setUser(null);
       toast.info('로그아웃되었습니다.');
@@ -122,7 +122,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
       }
     } catch (error: any) {
-      console.error('Auth check error:', error);
+      // Auth check error handled silently
       setUser(null);
     } finally {
       setIsLoading(false);
