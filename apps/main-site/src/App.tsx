@@ -59,15 +59,13 @@ const PageLoader: FC = () => (
 );
 
 const App: FC = () => {
-  const { checkAuthStatus } = useAuth();
-
   useEffect(() => {
     // Initialize auth interceptor
     initializeAuthInterceptor();
 
-    // Check auth status on app start
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    // Note: Auth status check is handled by AuthContext on mount
+    // No need to call checkAuthStatus here to avoid duplicate API calls
+  }, []);
 
   return (
     <ErrorBoundary>
