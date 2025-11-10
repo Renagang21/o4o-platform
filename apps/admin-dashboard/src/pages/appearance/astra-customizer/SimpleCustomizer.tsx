@@ -6,6 +6,7 @@ import { normalizeCustomizerSettings } from './utils/normalize-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
 // Removed: convertSettingsToHeaderTemplatePart (now handled by backend)
 import toast from 'react-hot-toast';
+import { devLog } from '@/utils/logger';
 
 // Import Astra sections and context
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -95,24 +96,36 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
   // Simple setting update with deep cloning for all updates
   const updateSetting = useCallback((section: keyof AstraCustomizerSettings, value: any, path?: string[]) => {
+    devLog('[updateSetting] Called with:', { section, value, path });
+
     setSettings(prev => {
       const newSettings = { ...prev };
+
+      devLog('[updateSetting] Current section value:', JSON.stringify(newSettings[section], null, 2));
 
       if (path && path.length > 0) {
         // Deep clone the section to avoid mutating the previous state
         const sectionClone = JSON.parse(JSON.stringify(newSettings[section]));
+        devLog('[updateSetting] Section cloned:', JSON.stringify(sectionClone, null, 2));
 
         let target: any = sectionClone;
         for (let i = 0; i < path.length - 1; i++) {
+          devLog(`[updateSetting] Traversing path[${i}]="${path[i]}", target before:`, target);
           target = target[path[i]];
+          devLog(`[updateSetting] Target after traversal:`, target);
         }
-        target[path[path.length - 1]] = value;
 
+        const finalKey = path[path.length - 1];
+        devLog(`[updateSetting] Setting target["${finalKey}"] = ${JSON.stringify(value)}`);
+        target[finalKey] = value;
+
+        devLog('[updateSetting] Final section after update:', JSON.stringify(sectionClone, null, 2));
         (newSettings as any)[section] = sectionClone;
       } else {
         // For path-less updates (e.g., HeaderBuilder, FooterBuilder)
         // Simply deep clone and assign the value directly
         // DO NOT use spread operator as it can create numeric keys from strings
+        devLog('[updateSetting] No path provided, direct assignment');
         if (value && typeof value === 'object' && !Array.isArray(value)) {
           // Deep clone the value to avoid mutations
           (newSettings as any)[section] = JSON.parse(JSON.stringify(value));
@@ -122,6 +135,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         }
       }
 
+      devLog('[updateSetting] Final newSettings[section]:', JSON.stringify(newSettings[section], null, 2));
       return newSettings;
     });
     setIsDirty(true);
