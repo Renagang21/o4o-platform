@@ -84,9 +84,11 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
+      console.log('[DEBUG] handleSave called with settings:', settings);
       // Normalize settings: sanitize numeric keys + convert legacy formats + merge defaults
       // This ensures clean data structure and prevents "contaminated data" errors
       const normalized = normalizeCustomizerSettings(settings);
+      console.log('[DEBUG] Settings normalized successfully:', normalized);
 
       // API를 통해 설정 저장 (PUT 메서드 사용)
       // 서버는 { settings: {...} } 형식을 기대함
@@ -107,6 +109,13 @@ const Customize: React.FC = () => {
       console.error('Save failed - Response:', response.data);
       return false;
     } catch (error: any) {
+      console.error('[DEBUG] handleSave ERROR:', error);
+      console.error('[DEBUG] Error details:', {
+        message: error?.message,
+        response: error?.response,
+        statusCode: error?.response?.status
+      });
+
       const statusCode = error?.response?.status;
       const errorCode = error?.response?.data?.code;
 
