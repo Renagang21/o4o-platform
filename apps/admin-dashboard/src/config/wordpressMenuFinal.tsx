@@ -1,8 +1,8 @@
 import { ReactElement } from 'react';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Image, 
+import {
+  LayoutDashboard,
+  FileText,
+  Image,
   FileTextIcon,
   ShoppingCart,
   Users,
@@ -34,7 +34,8 @@ import {
   Puzzle,
   Plus,
   Code,
-  ChevronLeft
+  ChevronLeft,
+  ShoppingBag
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -104,6 +105,9 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       { id: 'users-all', label: '모든 사용자', icon: <Users className="w-4 h-4" />, path: '/users' },
       { id: 'users-new', label: '새로 추가', icon: <UserPlus className="w-4 h-4" />, path: '/users/new' },
+      { id: 'users-suppliers', label: '공급자', icon: <Store className="w-4 h-4" />, path: '/dropshipping/suppliers' },
+      { id: 'users-sellers', label: '판매자', icon: <ShoppingBag className="w-4 h-4" />, path: '/dropshipping/sellers' },
+      { id: 'users-partners', label: '파트너', icon: <Users className="w-4 h-4" />, path: '/dropshipping/partners' },
       { id: 'users-profile', label: '프로필', icon: <Users className="w-4 h-4" />, path: '/users/profile' },
       { id: 'users-roles', label: '역할 관리', icon: <UserCheck className="w-4 h-4" />, path: '/users/roles' },
       { id: 'users-statistics', label: '사용자 통계', icon: <BarChart3 className="w-4 h-4" />, path: '/users/statistics' }
