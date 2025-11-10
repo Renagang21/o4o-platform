@@ -1,7 +1,6 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { generateCSS } from './utils/css-generator';
 import { getDefaultSettings } from './utils/default-settings';
 import { normalizeCustomizerSettings } from './utils/normalize-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
@@ -80,12 +79,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
   const [showHeaderBuilderOverlay, setShowHeaderBuilderOverlay] = useState(false);
   const [showFooterBuilderOverlay, setShowFooterBuilderOverlay] = useState(false);
 
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const cssUpdateTimeoutRef = useRef<NodeJS.Timeout>();
-
-  // PREVIEW OFF: Disable iframe preview to prevent reload loops and cross-origin issues
-  const ENABLE_IFRAME_PREVIEW = false;
-
   // Auto-show builder overlays when header/footer sections are active
   useEffect(() => {
     if (activeSection === 'header') {
@@ -125,54 +118,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     });
     setIsDirty(true);
   }, []);
-
-  // Simple CSS injection - DISABLED when iframe preview is off
-  const injectCSS = useCallback(() => {
-    if (!ENABLE_IFRAME_PREVIEW) return; // Skip if preview disabled
-    if (!iframeRef.current?.contentWindow) return;
-
-    try {
-      const css = generateCSS(settings);
-
-      // Try direct DOM access
-      const doc = iframeRef.current.contentDocument;
-      if (doc) {
-        let styleEl = doc.getElementById('customizer-css');
-        if (!styleEl) {
-          styleEl = doc.createElement('style');
-          styleEl.id = 'customizer-css';
-          doc.head?.appendChild(styleEl);
-        }
-        styleEl.textContent = css;
-      }
-    } catch (error) {
-      // Fallback: send via postMessage
-      const css = generateCSS(settings);
-      iframeRef.current?.contentWindow?.postMessage({
-        type: 'customizer-css',
-        css
-      }, '*');
-    }
-  }, [settings]);
-
-  // Debounced CSS update - DISABLED when iframe preview is off
-  useEffect(() => {
-    if (!ENABLE_IFRAME_PREVIEW) return; // Skip if preview disabled
-
-    if (cssUpdateTimeoutRef.current) {
-      clearTimeout(cssUpdateTimeoutRef.current);
-    }
-
-    cssUpdateTimeoutRef.current = setTimeout(() => {
-      injectCSS();
-    }, 200);
-
-    return () => {
-      if (cssUpdateTimeoutRef.current) {
-        clearTimeout(cssUpdateTimeoutRef.current);
-      }
-    };
-  }, [settings]);
 
   // Handle save (stores settings in customizer settings table)
   // Backend automatically syncs to template parts via settingsService
@@ -221,20 +166,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       setSettings(normalized);
       setIsDirty(true);
     }
-  };
-
-  // Handle iframe load - DISABLED when iframe preview is off
-  const handleIframeLoad = () => {
-    if (!ENABLE_IFRAME_PREVIEW) return; // Skip if preview disabled
-
-    // Debounce iframe load injection to prevent potential loops
-    if (cssUpdateTimeoutRef.current) {
-      clearTimeout(cssUpdateTimeoutRef.current);
-    }
-
-    cssUpdateTimeoutRef.current = setTimeout(() => {
-      injectCSS();
-    }, 100);
   };
 
   // Open preview in new tab
@@ -316,12 +247,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     );
   };
 
-  // Device sizes for responsive preview
-  const deviceSizes = {
-    desktop: { width: '100%', height: '100%' },
-    tablet: { width: '768px', height: '1024px' },
-    mobile: { width: '375px', height: '667px' },
-  };
 
   const handleSaveWrapper = async () => {
     if (!onSave) return;
@@ -500,46 +425,26 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
           {/* Preview Frame */}
           <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 relative">
-            {ENABLE_IFRAME_PREVIEW ? (
-              <div
-                className="bg-white shadow-lg"
-                style={{
-                  width: deviceSizes[previewDevice].width,
-                  height: deviceSizes[previewDevice].height,
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                }}
-              >
-                <iframe
-                  ref={iframeRef}
-                  src={previewUrl}
-                  onLoad={handleIframeLoad}
-                  className="w-full h-full border-0"
-                  title={`${siteName} Preview`}
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-6 max-w-md text-center">
-                <div className="text-6xl">👁️</div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">미리보기</h3>
-                  <p className="text-gray-600 mb-4">
-                    변경사항을 저장한 후 프론트엔드 사이트에서 확인하세요.
-                  </p>
-                </div>
-                <Button
-                  onClick={handleOpenPreview}
-                  size="lg"
-                  className="gap-2"
-                >
-                  <Monitor size={20} />
-                  새 탭에서 사이트 열기
-                </Button>
-                <p className="text-sm text-gray-500">
-                  설정 변경은 "저장" 버튼을 누른 후 자동으로 반영됩니다.
+            <div className="flex flex-col items-center justify-center gap-6 max-w-md text-center">
+              <div className="text-6xl">👁️</div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">미리보기</h3>
+                <p className="text-gray-600 mb-4">
+                  변경사항을 저장한 후 프론트엔드 사이트에서 확인하세요.
                 </p>
               </div>
-            )}
+              <Button
+                onClick={handleOpenPreview}
+                size="lg"
+                className="gap-2"
+              >
+                <Monitor size={20} />
+                새 탭에서 사이트 열기
+              </Button>
+              <p className="text-sm text-gray-500">
+                설정 변경은 "저장" 버튼을 누른 후 자동으로 반영됩니다.
+              </p>
+            </div>
 
             {/* Header Builder Overlay - Astra Style */}
             {showHeaderBuilderOverlay && (
