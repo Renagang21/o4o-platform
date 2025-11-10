@@ -14,9 +14,9 @@
 
 import 'reflect-metadata';
 import bcrypt from 'bcryptjs';
-import { AppDataSource } from '../src/database/connection';
-import { User, UserStatus } from '../src/entities/User';
-import { RoleAssignment } from '../src/entities/RoleAssignment';
+import { AppDataSource } from '../src/database/connection.ts';
+import { User, UserStatus } from '../src/entities/User.ts';
+import { RoleAssignment } from '../src/entities/RoleAssignment.ts';
 
 interface UserData {
   name: string;
