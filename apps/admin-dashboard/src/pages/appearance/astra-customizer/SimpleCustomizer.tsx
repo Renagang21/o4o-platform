@@ -337,6 +337,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         onSettingChange: (section, value) => {
           // Update local state when context changes
           updateSetting(section as keyof AstraCustomizerSettings, value);
+          // CRITICAL FIX: Mark as dirty when settings change
+          setIsDirty(true);
         }
       }}
     >
