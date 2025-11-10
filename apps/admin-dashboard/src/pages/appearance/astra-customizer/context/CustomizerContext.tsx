@@ -58,13 +58,14 @@ export const CustomizerContext = createContext<CustomizerContextValue | undefine
 const customizerReducer = (state: CustomizerState, action: CustomizerAction): CustomizerState => {
   switch (action.type) {
     case 'UPDATE_SETTING': {
-      const updatedSettings = { ...state.settings };
+      // CRITICAL: Deep clone the entire settings object to avoid mutation
+      const updatedSettings = JSON.parse(JSON.stringify(state.settings)) as AstraCustomizerSettings;
 
       // Special case: customCSS is a top-level string property
       if (action.section === 'customCSS' as any) {
         (updatedSettings as any).customCSS = action.value;
       } else if (action.path && action.path.length > 0) {
-        // Navigate to nested property
+        // Navigate to nested property with deep cloned object
         let target: any = updatedSettings[action.section];
         for (let i = 0; i < action.path.length - 1; i++) {
           target = target[action.path[i]];
