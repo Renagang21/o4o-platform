@@ -93,17 +93,22 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   }, [activeSection]);
 
-  // Simple setting update
+  // Simple setting update with deep cloning for nested paths
   const updateSetting = useCallback((section: keyof AstraCustomizerSettings, value: any, path?: string[]) => {
     setSettings(prev => {
       const newSettings = { ...prev };
 
       if (path && path.length > 0) {
-        let target: any = newSettings[section];
+        // Deep clone the section to avoid mutating the previous state
+        const sectionClone = JSON.parse(JSON.stringify(newSettings[section]));
+
+        let target: any = sectionClone;
         for (let i = 0; i < path.length - 1; i++) {
           target = target[path[i]];
         }
         target[path[path.length - 1]] = value;
+
+        (newSettings as any)[section] = sectionClone;
       } else {
         // Only spread if value is a plain object (not string/array/null)
         if (value && typeof value === 'object' && !Array.isArray(value)) {
