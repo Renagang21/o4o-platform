@@ -9,14 +9,24 @@
  * - 5 additional partners (customer + partner role)
  *
  * Usage:
- * ts-node scripts/seed-users.ts
+ * NODE_ENV=production node dist/scripts/seed-users.js
  */
 
 import 'reflect-metadata';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../src/database/connection.js';
 import { User, UserStatus } from '../src/entities/User.js';
 import { RoleAssignment } from '../src/entities/RoleAssignment.js';
+
+// Load environment variables
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const envFile = process.env.NODE_ENV === 'production' ? '.env-apiserver' : '.env.development';
+dotenv.config({ path: path.resolve(__dirname, '../', envFile) });
 
 interface UserData {
   name: string;
