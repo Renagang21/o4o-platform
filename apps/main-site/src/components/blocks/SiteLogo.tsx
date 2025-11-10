@@ -41,9 +41,9 @@ const SiteLogo: FC<SiteLogoProps> = ({
                                settings?.siteIdentity?.logo?.width?.desktop;
 
   // Extract values from props or data object (from TemplatePartRenderer)
-  // Priority: props > data > customizer > default
+  // Priority: props > data > customizer (NO DEFAULT FALLBACK)
   const logoWidth = data?.width || width || customizerLogoWidth || 120;
-  const logoUrl = data?.logoUrl || propLogoUrl || customizerLogo || '/images/logo.svg';
+  const logoUrl = data?.logoUrl || propLogoUrl || customizerLogo;
   const siteName = propSiteName || settings?.siteIdentity?.siteTitle?.text || 'Neture Platform';
   const shouldLink = data?.isLink !== undefined ? data.isLink : (isLink ?? true);
   const target = data?.linkTarget || linkTarget || '_self';

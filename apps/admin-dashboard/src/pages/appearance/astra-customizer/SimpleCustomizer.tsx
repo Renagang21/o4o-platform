@@ -195,40 +195,35 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
   // Extract publish logic to reusable function
   const publishToTemplateParts = async () => {
-    try {
-      // Convert customizer settings to template parts format
-      const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
+    // Convert customizer settings to template parts format
+    const headerTemplatePart = convertSettingsToHeaderTemplatePart(settings);
 
-      // Check if default header exists and update it
-      const existingResponse = await authClient.api.get('/public/template-parts');
-      const existingParts = existingResponse.data?.data || [];
-      const defaultHeader = existingParts.find((part: any) =>
-        part.area === 'header' && part.isDefault === true
-      );
+    // Check if default header exists and update it
+    const existingResponse = await authClient.api.get('/public/template-parts');
+    const existingParts = existingResponse.data?.data || [];
+    const defaultHeader = existingParts.find((part: any) =>
+      part.area === 'header' && part.isDefault === true
+    );
 
-      // Check if defaultHeader has valid UUID (not placeholder UUID)
-      const isValidUUID = defaultHeader?.id &&
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(defaultHeader.id) &&
-        defaultHeader.id !== 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+    // Check if defaultHeader has valid UUID (not placeholder UUID)
+    const isValidUUID = defaultHeader?.id &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(defaultHeader.id) &&
+      defaultHeader.id !== 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
-      if (defaultHeader && isValidUUID) {
-        // Update existing default header
-        const updateData = {
-          ...headerTemplatePart,
-          slug: defaultHeader.slug // Keep existing slug
-        };
-        await authClient.api.put(`/template-parts/${defaultHeader.id}`, updateData);
-      } else {
-        // Create new header template part
-        await authClient.api.post('/template-parts', {
-          ...headerTemplatePart,
-          isDefault: true,
-          isActive: true
-        });
-      }
-    } catch (error: any) {
-      // Template part sync failed - allow save to succeed anyway
-      // Error is logged for debugging but not thrown
+    if (defaultHeader && isValidUUID) {
+      // Update existing default header
+      const updateData = {
+        ...headerTemplatePart,
+        slug: defaultHeader.slug // Keep existing slug
+      };
+      await authClient.api.put(`/template-parts/${defaultHeader.id}`, updateData);
+    } else {
+      // Create new header template part
+      await authClient.api.post('/template-parts', {
+        ...headerTemplatePart,
+        isDefault: true,
+        isActive: true
+      });
     }
   };
 
