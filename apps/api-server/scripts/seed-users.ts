@@ -28,9 +28,7 @@ const __dirname = dirname(__filename);
 const envFile = process.env.NODE_ENV === 'production' ? '.env-apiserver' : '.env.development';
 // When compiled, script is in dist/scripts/, so we need to go up two levels to reach the api-server root
 const envPath = path.resolve(__dirname, '../../', envFile);
-console.log(`Loading environment from: ${envPath}`);
 dotenv.config({ path: envPath });
-console.log(`DB_PASSWORD type: ${typeof process.env.DB_PASSWORD}, value: ${process.env.DB_PASSWORD ? '[SET]' : '[NOT SET]'}`);
 
 interface UserData {
   name: string;
