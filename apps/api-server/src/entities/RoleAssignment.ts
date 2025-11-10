@@ -70,7 +70,7 @@ export class RoleAssignment {
    *
    * RBAC 미들웨어는 isActive = true인 레코드만 권한으로 인정합니다.
    */
-  @Column({ type: 'boolean', default: true })
+  @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive!: boolean;
 
   /**
@@ -78,7 +78,7 @@ export class RoleAssignment {
    *
    * 역할이 활성화된 시각
    */
-  @Column({ type: 'timestamp', default: () => 'NOW()' })
+  @Column({ name: 'valid_from', type: 'timestamp', default: () => 'NOW()' })
   validFrom!: Date;
 
   /**
@@ -87,13 +87,13 @@ export class RoleAssignment {
    * null이면 무기한 유효
    * 임시 권한 부여 시 사용
    */
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'valid_until', type: 'timestamp', nullable: true })
   validUntil?: Date;
 
   /**
    * 할당 시각
    */
-  @Column({ type: 'timestamp', default: () => 'NOW()' })
+  @Column({ name: 'assigned_at', type: 'timestamp', default: () => 'NOW()' })
   assignedAt!: Date;
 
   /**
@@ -109,13 +109,13 @@ export class RoleAssignment {
   /**
    * 생성 시각
    */
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
   /**
    * 수정 시각
    */
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   // Helper methods
