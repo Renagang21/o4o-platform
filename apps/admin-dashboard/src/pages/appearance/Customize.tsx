@@ -84,57 +84,35 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
-      console.log('[DEBUG] handleSave called with settings:', settings);
-      // Normalize settings: sanitize numeric keys + convert legacy formats + merge defaults
-      // This ensures clean data structure and prevents "contaminated data" errors
-      const normalized = normalizeCustomizerSettings(settings);
-      console.log('[DEBUG] Settings normalized successfully:', normalized);
-
-      // API를 통해 설정 저장 (PUT 메서드 사용)
-      // 서버는 { settings: {...} } 형식을 기대함
-      const response = await authClient.api.put('/settings/customizer', { settings: normalized });
+      // SIMPLIFIED: Just save the settings as-is (no complex normalization)
+      // The normalize function was causing issues - keep it simple
+      const response = await authClient.api.put('/settings/customizer', { settings });
 
       if (response.data?.success) {
-        // CRITICAL: Update local state with normalized settings (no re-fetch)
-        // This prevents state inconsistencies and unnecessary API calls
-        setInitialSettings(normalized);
+        setInitialSettings(settings);
         toast.success('설정이 저장되었습니다.');
         return true;
       }
 
-      // 🔧 FIX: Show detailed error message to user
       const errorMsg = response.data?.error || response.data?.message || '알 수 없는 오류가 발생했습니다';
-      errorHandler.log(`설정 저장 실패: ${errorMsg}`, ErrorLevel.WARNING, 'Settings');
       toast.error(`저장 실패: ${errorMsg}`);
-      console.error('Save failed - Response:', response.data);
       return false;
     } catch (error: any) {
-      console.error('[DEBUG] handleSave ERROR:', error);
-      console.error('[DEBUG] Error details:', {
-        message: error?.message,
-        response: error?.response,
-        statusCode: error?.response?.status
-      });
-
       const statusCode = error?.response?.status;
       const errorCode = error?.response?.data?.code;
 
-      // 인증 에러 처리
       if (statusCode === 401 || statusCode === 403) {
         if (errorCode === 'USER_NOT_AUTHENTICATED') {
-          errorHandler.log('세션 만료', ErrorLevel.WARNING, 'Settings Save');
           toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
-          setTimeout(() => {
-            navigate('/login');
-          }, 2000);
+          setTimeout(() => navigate('/login'), 2000);
         } else if (errorCode === 'INSUFFICIENT_PERMISSIONS') {
-          errorHandler.log('권한 부족', ErrorLevel.WARNING, 'Settings Save');
           toast.error('설정을 저장할 권한이 없습니다.');
         } else {
-          errorHandler.handleApiError(error, 'Settings Save');
+          toast.error('권한 오류가 발생했습니다.');
         }
       } else {
-        errorHandler.handleApiError(error, 'Settings Save');
+        const errorMsg = error?.response?.data?.message || error?.message || '저장 중 오류가 발생했습니다';
+        toast.error(errorMsg);
       }
 
       return false;
