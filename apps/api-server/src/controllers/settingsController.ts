@@ -45,7 +45,12 @@ export class SettingsController {
         });
       }
 
-      const settings = await settingsService.updateSettings(type as SettingsType, req.body);
+      // Extract settings from request body
+      // Frontend sends: { settings: {...} } for customizer type
+      // We need to unwrap it to get the actual settings object
+      const settingsData = req.body.settings || req.body;
+
+      const settings = await settingsService.updateSettings(type as SettingsType, settingsData);
 
       res.json({
         success: true,

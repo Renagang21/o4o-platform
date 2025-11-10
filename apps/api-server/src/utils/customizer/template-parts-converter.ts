@@ -309,23 +309,9 @@ export function convertSettingsToHeaderTemplatePart(
     };
   }
 
-  // Fallback if no builder configuration
-  logger.warn('[TP-Convert] No header builder configuration found - using fallback');
-  return {
-    name: 'Default Header',
-    slug: 'default-header',
-    description: 'Default site header',
-    area: 'header',
-    content: [],
-    settings: {
-      containerWidth: 'wide',
-      backgroundColor: '#ffffff',
-      textColor: '#333333'
-    },
-    isDefault: true,
-    isActive: true,
-    priority: 10
-  };
+  // No builder configuration - this should not happen in normal operation
+  logger.error('[TP-Convert] No header builder configuration found - cannot create header template part');
+  throw new Error('Header builder configuration is required but not found in settings');
 }
 
 /**
