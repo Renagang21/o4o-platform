@@ -111,20 +111,52 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
+      console.log('[Customize] Saving settings...');
+      console.log('[Customize] Settings to save:', JSON.stringify(settings, null, 2));
+
+      // Check for numeric keys before sending
+      const checkForNumericKeys = (obj: any, path = ''): string[] => {
+        const issues: string[] = [];
+        if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+          for (const key in obj) {
+            if (/^\d+$/.test(key)) {
+              issues.push(`${path}.${key}`);
+            }
+            if (typeof obj[key] === 'object') {
+              issues.push(...checkForNumericKeys(obj[key], `${path}.${key}`));
+            }
+          }
+        }
+        return issues;
+      };
+
+      const numericKeys = checkForNumericKeys(settings);
+      if (numericKeys.length > 0) {
+        console.error('[Customize] Numeric keys detected:', numericKeys);
+        toast.error(`데이터 오류: 숫자 키 발견 (${numericKeys.join(', ')})`);
+        return false;
+      }
+
       // SIMPLIFIED: Just save the settings as-is (no complex normalization)
       // The normalize function was causing issues - keep it simple
       const response = await authClient.api.put('/settings/customizer', { settings });
 
       if (response.data?.success) {
+        console.log('[Customize] Settings saved successfully');
         setInitialSettings(settings);
         toast.success('설정이 저장되었습니다.');
         return true;
       }
 
       const errorMsg = response.data?.error || response.data?.message || '알 수 없는 오류가 발생했습니다';
+      console.error('[Customize] Save failed (non-success response):', response.data);
       toast.error(`저장 실패: ${errorMsg}`);
       return false;
     } catch (error: any) {
+      console.error('[Customize] Save error:', error);
+      console.error('[Customize] Error response:', error?.response);
+      console.error('[Customize] Error response data:', error?.response?.data);
+
       const statusCode = error?.response?.status;
       const errorCode = error?.response?.data?.code;
 

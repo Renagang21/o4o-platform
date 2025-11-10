@@ -110,12 +110,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
         (newSettings as any)[section] = sectionClone;
       } else {
-        // Deep clone to avoid shallow copy issues with nested objects
-        // This is important for complex structures like header.builder and footer.widgets
+        // For path-less updates (e.g., HeaderBuilder, FooterBuilder)
+        // Simply deep clone and assign the value directly
+        // DO NOT use spread operator as it can create numeric keys from strings
         if (value && typeof value === 'object' && !Array.isArray(value)) {
-          // Deep merge the value into the section
-          const sectionClone = JSON.parse(JSON.stringify(newSettings[section]));
-          (newSettings as any)[section] = { ...sectionClone, ...JSON.parse(JSON.stringify(value)) };
+          // Deep clone the value to avoid mutations
+          (newSettings as any)[section] = JSON.parse(JSON.stringify(value));
         } else {
           // For non-objects (string, number, array, etc.), directly assign
           (newSettings as any)[section] = value;
