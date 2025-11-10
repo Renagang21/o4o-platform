@@ -202,7 +202,27 @@ export function normalizeCustomizerSettings(raw: unknown): AstraCustomizerSettin
     return defaults;
   }
 
-  const merged = mergeWithDefaults(defaults, raw as UnknownRecord);
+  // Handle legacy siteIdentity format (string URL instead of object)
+  let processedRaw = raw as UnknownRecord;
+  if (processedRaw && typeof processedRaw === 'object') {
+    const rawObj = processedRaw as Record<string, unknown>;
+
+    // If siteIdentity is a string (legacy format), convert to object
+    if (typeof rawObj.siteIdentity === 'string') {
+      const logoUrl = rawObj.siteIdentity as string;
+      rawObj.siteIdentity = {
+        logo: {
+          desktop: logoUrl,
+          mobile: logoUrl,
+          width: defaults.siteIdentity.logo.width
+        },
+        siteTitle: defaults.siteIdentity.siteTitle,
+        tagline: defaults.siteIdentity.tagline
+      };
+    }
+  }
+
+  const merged = mergeWithDefaults(defaults, processedRaw);
 
   // ========================================
   // Control-Based Type Enforcement

@@ -95,6 +95,7 @@ class CustomizerErrorHandler {
     const statusCode = error?.response?.status;
     const errorCode = error?.response?.data?.code;
     const errorMessage = error?.response?.data?.message;
+    const errorDetails = error?.response?.data?.details;
 
     let message = '오류가 발생했습니다.';
     let level = ErrorLevel.ERROR;
@@ -113,7 +114,23 @@ class CustomizerErrorHandler {
       level = ErrorLevel.CRITICAL;
     } else if (errorMessage) {
       message = errorMessage;
+      // Add error details to message if available
+      if (errorDetails) {
+        message += ` (${typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails)})`;
+      }
+    } else if (error?.message) {
+      // If no API error message, use generic error message
+      message = `오류가 발생했습니다: ${error.message}`;
     }
+
+    // Enhanced logging with full error object
+    console.error(`[Customizer - ${context}] Full error details:`, {
+      statusCode,
+      errorCode,
+      errorMessage,
+      errorDetails,
+      fullError: error
+    });
 
     this.log(message, level, context, error);
   }
