@@ -1,12 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save, RotateCcw, Monitor, Tablet, Smartphone, ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getDefaultSettings } from './utils/default-settings';
 import { normalizeCustomizerSettings } from './utils/normalize-settings';
 import { AstraCustomizerSettings, PreviewDevice, SettingSection } from './types/customizer-types';
-// Removed: convertSettingsToHeaderTemplatePart (now handled by backend)
 import toast from 'react-hot-toast';
-import { devLog } from '@/utils/logger';
 
 // Import Astra sections and context
 import { SiteIdentitySection } from './sections/global/SiteIdentitySection';
@@ -18,7 +16,7 @@ import { FooterSection } from './sections/footer/FooterSection';
 import { GeneralSection } from './sections/general/GeneralSection';
 import { BlogSection } from './sections/blog/BlogSection';
 import { CustomCSSSection } from './sections/advanced/CustomCSSSection';
-import { CustomizerProvider } from './context/CustomizerContext';
+import { CustomizerProvider, useCustomizer } from './context/CustomizerContext';
 import { HeaderBuilder } from './components/HeaderBuilder';
 import { FooterBuilder } from './components/FooterBuilder';
 import { PresetManager } from './components/PresetManager';
@@ -29,52 +27,30 @@ import './styles/sections.css';
 interface SimpleCustomizerProps {
   onClose: () => void;
   onSave?: (settings: AstraCustomizerSettings) => Promise<boolean>;
-  onReloadSettings?: () => Promise<void>;  // Function to reload settings without page refresh
+  onReloadSettings?: () => Promise<void>;
   previewUrl?: string;
   siteName?: string;
   initialSettings?: AstraCustomizerSettings;
 }
 
-export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
+/**
+ * Inner component that uses CustomizerContext
+ * This component has access to the context state and functions
+ */
+const SimpleCustomizerInner: React.FC<SimpleCustomizerProps> = ({
   onClose,
   onSave,
   onReloadSettings,
   previewUrl = '/',
   siteName = 'Site Preview',
-  initialSettings,
 }) => {
-  // Enhanced state management for full Astra functionality
-  const [settings, setSettings] = useState<AstraCustomizerSettings>(() => {
-    if (!initialSettings) {
-      return getDefaultSettings();
-    }
-    // Ensure header.builder and footer.widgets exist by merging with defaults
-    const defaults = getDefaultSettings();
-    return {
-      ...defaults,
-      ...initialSettings,
-      header: {
-        ...defaults.header,
-        ...initialSettings.header,
-        builder: initialSettings.header?.builder || defaults.header.builder
-      },
-      footer: {
-        ...defaults.footer,
-        ...initialSettings.footer,
-        widgets: {
-          ...defaults.footer.widgets,
-          ...initialSettings.footer?.widgets
-        },
-        bottomBar: {
-          ...defaults.footer.bottomBar,
-          ...initialSettings.footer?.bottomBar
-        }
-      }
-    };
-  });
+  // Get state and functions from CustomizerContext
+  const { state, updateSetting } = useCustomizer();
+  const settings = state.settings;
+  const isDirty = state.isDirty;
+
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
   const [isSaving, setIsSaving] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
   const [activeSection, setActiveSection] = useState<SettingSection | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showHeaderBuilderOverlay, setShowHeaderBuilderOverlay] = useState(false);
@@ -94,55 +70,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   }, [activeSection]);
 
-  // Simple setting update with deep cloning for all updates
-  const updateSetting = useCallback((section: keyof AstraCustomizerSettings, value: any, path?: string[]) => {
-    devLog('[updateSetting] Called with:', { section, value, path });
-
-    setSettings(prev => {
-      const newSettings = { ...prev };
-
-      devLog('[updateSetting] Current section value:', JSON.stringify(newSettings[section], null, 2));
-
-      if (path && path.length > 0) {
-        // Deep clone the section to avoid mutating the previous state
-        const sectionClone = JSON.parse(JSON.stringify(newSettings[section]));
-        devLog('[updateSetting] Section cloned:', JSON.stringify(sectionClone, null, 2));
-
-        let target: any = sectionClone;
-        for (let i = 0; i < path.length - 1; i++) {
-          devLog(`[updateSetting] Traversing path[${i}]="${path[i]}", target before:`, target);
-          target = target[path[i]];
-          devLog(`[updateSetting] Target after traversal:`, target);
-        }
-
-        const finalKey = path[path.length - 1];
-        devLog(`[updateSetting] Setting target["${finalKey}"] = ${JSON.stringify(value)}`);
-        target[finalKey] = value;
-
-        devLog('[updateSetting] Final section after update:', JSON.stringify(sectionClone, null, 2));
-        (newSettings as any)[section] = sectionClone;
-      } else {
-        // For path-less updates (e.g., HeaderBuilder, FooterBuilder)
-        // Simply deep clone and assign the value directly
-        // DO NOT use spread operator as it can create numeric keys from strings
-        devLog('[updateSetting] No path provided, direct assignment');
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-          // Deep clone the value to avoid mutations
-          (newSettings as any)[section] = JSON.parse(JSON.stringify(value));
-        } else {
-          // For non-objects (string, number, array, etc.), directly assign
-          (newSettings as any)[section] = value;
-        }
-      }
-
-      devLog('[updateSetting] Final newSettings[section]:', JSON.stringify(newSettings[section], null, 2));
-      return newSettings;
-    });
-    setIsDirty(true);
-  }, []);
-
-  // Handle save (stores settings in customizer settings table)
-  // Backend automatically syncs to template parts via settingsService
+  // Handle save - uses Context state
   const handleSave = async () => {
     if (!onSave) {
       toast.error('저장 함수가 정의되지 않았습니다.');
@@ -151,9 +79,9 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
 
     setIsSaving(true);
     try {
+      // Save the Context state (single source of truth)
       const success = await onSave(settings);
       if (success) {
-        setIsDirty(false);
         toast.success('설정이 저장되었습니다');
       } else {
         toast.error('설정 저장에 실패했습니다. 다시 시도해주세요.');
@@ -166,19 +94,18 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     }
   };
 
-  // Note: publishToTemplateParts and handlePublish removed
-  // Backend automatically syncs customizer settings to template parts
-  // via settingsService.syncTemplatePartsFromCustomizer()
-
   // Handle reset
   const handleReset = () => {
     if (window.confirm('모든 설정을 기본값으로 되돌리시겠습니까?')) {
-      // Always normalize default settings to ensure type safety
-      // This prevents TypeError when accessing nested properties like 'desktop'
       const defaults = getDefaultSettings();
       const normalized = normalizeCustomizerSettings(defaults);
-      setSettings(normalized);
-      setIsDirty(true);
+
+      // Update each section in Context
+      Object.keys(normalized).forEach((key) => {
+        updateSetting(key as SettingSection, (normalized as any)[key]);
+      });
+
+      toast.success('설정이 초기화되었습니다');
     }
   };
 
@@ -198,129 +125,78 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
     { key: 'blog', label: '블로그', icon: '📰' },
     { key: 'customCSS', label: 'Custom CSS', icon: '💅' },
     { key: 'general', label: '일반 설정', icon: '⚙️' },
-  ] as const;
+  ];
 
   // Render section content
-  const renderSectionContent = () => {
-    if (!activeSection) {
-      return (
-        <div className="p-6 text-center">
-          <h2 className="text-xl font-medium mb-4">Astra 사용자 정의하기</h2>
-          <p className="text-gray-600 mb-6">
-            왼쪽 메뉴에서 섹션을 선택하여 사이트를 사용자 정의하세요.
-          </p>
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-            {sections.map((section) => (
-              <button
-                key={section.key}
-                onClick={() => setActiveSection(section.key as SettingSection)}
-                className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
-              >
-                <div className="text-2xl mb-2">{section.icon}</div>
-                <div className="text-sm font-medium">{section.label}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      );
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'siteIdentity': return <SiteIdentitySection />;
+      case 'colors': return <ColorsSection />;
+      case 'typography': return <TypographySection />;
+      case 'container': return <ContainerSection />;
+      case 'header': return <HeaderLayoutSection />;
+      case 'footer': return <FooterSection />;
+      case 'blog': return <BlogSection />;
+      case 'customCSS': return <CustomCSSSection />;
+      case 'general': return <GeneralSection />;
+      default: return <div>Section not found</div>;
     }
+  };
 
-    // Render appropriate section component without complex context dependencies
-    const renderSection = () => {
-      switch (activeSection) {
-        case 'siteIdentity': return <SiteIdentitySection />;
-        case 'colors': return <ColorsSection />;
-        case 'typography': return <TypographySection />;
-        case 'container': return <ContainerSection />;
-        case 'header': return <HeaderLayoutSection />;
-        case 'footer': return <FooterSection />;
-        case 'blog': return <BlogSection />;
-        case 'customCSS': return <CustomCSSSection />;
-        case 'general': return <GeneralSection />;
-        default: return <div className="p-6">섹션을 찾을 수 없습니다.</div>;
-      }
-    };
-
+  const renderSectionContent = () => {
     return (
-      <div className="h-full overflow-y-auto">
-        <div className="p-4 border-b border-gray-200 flex items-center gap-3">
+      <div className="h-full flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <button
             onClick={() => setActiveSection(null)}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
           >
             <ChevronLeft size={16} />
+            뒤로
           </button>
-          <h2 className="font-medium">
+          <h3 className="font-medium">
             {sections.find(s => s.key === activeSection)?.label}
-          </h2>
+          </h3>
+          <div className="w-16" />
         </div>
-        <div className="p-4">
+        <div className="flex-1 overflow-y-auto p-4">
           {renderSection()}
         </div>
       </div>
     );
   };
 
-
-  const handleSaveWrapper = async () => {
-    if (!onSave) return;
-    
-    setIsSaving(true);
-    try {
-      const success = await onSave(settings);
-      if (success) {
-        setIsDirty(false);
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
-    <CustomizerProvider
-      initialSettings={settings as any}
-      previewUrl={previewUrl}
-      eventHandlers={{
-        onSave: handleSaveWrapper,
-        onSettingChange: (section, value) => {
-          // Update local state when context changes
-          updateSetting(section as keyof AstraCustomizerSettings, value);
-          // CRITICAL FIX: Mark as dirty when settings change
-          setIsDirty(true);
-        }
-      }}
-    >
-      <div className="fixed inset-0 bg-white z-50">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-md"
-            >
-              <X size={20} />
-            </button>
-            <h1 className="text-lg font-medium">사용자 정의하기</h1>
-            {activeSection && (
-              <span className="text-sm text-gray-500">
-                › {sections.find(s => s.key === activeSection)?.label}
-              </span>
-            )}
-          </div>
+    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-md"
+          >
+            <X size={20} />
+          </button>
+          <h1 className="text-lg font-medium">사용자 정의하기</h1>
+          {activeSection && (
+            <span className="text-sm text-gray-500">
+              › {sections.find(s => s.key === activeSection)?.label}
+            </span>
+          )}
+        </div>
 
-          {/* Preset Manager */}
-          <PresetManager
-            currentSettings={settings}
-            onPresetApplied={async () => {
-              // Reload settings without page refresh
-              if (onReloadSettings) {
-                await onReloadSettings();
-                toast.success('프리셋이 적용되었습니다.');
-              }
-            }}
-          />
+        {/* Preset Manager */}
+        <PresetManager
+          currentSettings={settings}
+          onPresetApplied={async () => {
+            if (onReloadSettings) {
+              await onReloadSettings();
+              toast.success('프리셋이 적용되었습니다.');
+            }
+          }}
+        />
 
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSidebar(!showSidebar)}
             className="p-2 hover:bg-gray-100 rounded-md md:hidden"
@@ -344,8 +220,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
             <Save size={16} />
             {isSaving ? '저장 중...' : '저장'}
           </Button>
-          </div>
         </div>
+      </div>
 
       <div className="flex h-[calc(100vh-80px)]">
         {/* Sidebar */}
@@ -396,71 +272,67 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
               ))}
             </div>
 
-            {/* Header Builder Toggle - Only show when header section is active */}
+            {/* Header Builder Toggle */}
             {activeSection === 'header' && (
               <button
                 onClick={() => setShowHeaderBuilderOverlay(!showHeaderBuilderOverlay)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 text-sm rounded-md ${
                   showHeaderBuilderOverlay
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <span>🔝</span>
-                <span>헤더 빌더</span>
-                {showHeaderBuilderOverlay ? (
-                  <ChevronDown size={16} />
-                ) : (
-                  <ChevronUp size={16} />
-                )}
+                {showHeaderBuilderOverlay ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                {' '}헤더 빌더 {showHeaderBuilderOverlay ? '숨기기' : '열기'}
               </button>
             )}
 
-            {/* Footer Builder Toggle - Only show when footer section is active */}
+            {/* Footer Builder Toggle */}
             {activeSection === 'footer' && (
               <button
                 onClick={() => setShowFooterBuilderOverlay(!showFooterBuilderOverlay)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 text-sm rounded-md ${
                   showFooterBuilderOverlay
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <span>🔻</span>
-                <span>푸터 빌더</span>
-                {showFooterBuilderOverlay ? (
-                  <ChevronDown size={16} />
-                ) : (
-                  <ChevronUp size={16} />
-                )}
+                {showFooterBuilderOverlay ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                {' '}푸터 빌더 {showFooterBuilderOverlay ? '숨기기' : '열기'}
               </button>
             )}
           </div>
 
-          {/* Preview Frame */}
-          <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 relative">
-            <div className="flex flex-col items-center justify-center gap-6 max-w-md text-center">
-              <div className="text-6xl">👁️</div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">미리보기</h3>
-                <p className="text-gray-600 mb-4">
-                  변경사항을 저장한 후 프론트엔드 사이트에서 확인하세요.
-                </p>
-              </div>
-              <Button
-                onClick={handleOpenPreview}
-                size="lg"
-                className="gap-2"
+          {/* Preview Area */}
+          <div className="flex-1 bg-gray-100 relative overflow-hidden">
+            <div
+              className={`h-full flex items-center justify-center transition-all ${
+                previewDevice === 'mobile'
+                  ? 'p-4'
+                  : previewDevice === 'tablet'
+                  ? 'p-8'
+                  : 'p-0'
+              }`}
+            >
+              <div
+                className={`bg-white shadow-2xl ${
+                  previewDevice === 'mobile'
+                    ? 'w-[375px] h-[667px]'
+                    : previewDevice === 'tablet'
+                    ? 'w-[768px] h-[1024px]'
+                    : 'w-full h-full'
+                }`}
               >
-                <Monitor size={20} />
-                새 탭에서 사이트 열기
-              </Button>
-              <p className="text-sm text-gray-500">
-                설정 변경은 "저장" 버튼을 누른 후 자동으로 반영됩니다.
-              </p>
+                <iframe
+                  id="customizer-preview-iframe"
+                  src={previewUrl}
+                  className="w-full h-full border-0"
+                  title="Preview"
+                />
+              </div>
             </div>
 
-            {/* Header Builder Overlay - Astra Style */}
+            {/* Header Builder Overlay */}
             {showHeaderBuilderOverlay && (
               <div className="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 shadow-2xl"
                 style={{
@@ -495,7 +367,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
               </div>
             )}
 
-            {/* Footer Builder Overlay - Astra Style */}
+            {/* Footer Builder Overlay */}
             {showFooterBuilderOverlay && (
               <div className="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 shadow-2xl"
                 style={{
@@ -523,17 +395,11 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                     layout={{
                       widgets: {
                         enabled: settings.footer.widgets?.enabled ?? true,
-                        columns: (() => {
-                          const columns = settings.footer.widgets?.columns;
-                          if (typeof columns === 'object' && columns !== null && 'desktop' in columns) {
-                            return (columns.desktop ?? 4) as 1 | 2 | 3 | 4 | 5;
-                          }
-                          return (columns ?? 4) as 1 | 2 | 3 | 4 | 5;
-                        })(),
-                        layout: [], // TODO: Map from settings.footer.widgets
+                        columns: settings.footer.widgets?.columns?.desktop ?? 4,
+                        areas: [], // TODO: Parse from footer.widgets
                         settings: {
-                          background: settings.footer.widgets?.background ?? '#333333',
-                          textColor: settings.footer.widgets?.textColor ?? '#ffffff',
+                          background: settings.footer.widgets?.background ?? '#1a1a1a',
+                          textColor: settings.footer.widgets?.textColor ?? '#cccccc',
                           linkColor: settings.footer.widgets?.linkColor ?? { normal: '#ffffff', hover: '#0073aa' },
                           padding: settings.footer.widgets?.padding ?? {
                             desktop: { top: 60, bottom: 60 },
@@ -544,8 +410,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                       },
                       bar: {
                         enabled: settings.footer.bottomBar?.enabled ?? true,
-                        left: [], // TODO: Parse from bottomBar.section1
-                        right: [], // TODO: Parse from bottomBar.section2
+                        left: [],
+                        right: [],
                         settings: {
                           background: settings.footer.bottomBar?.background ?? '#1a1a1a',
                           textColor: settings.footer.bottomBar?.textColor ?? '#999999',
@@ -559,7 +425,6 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
                       }
                     }}
                     onChange={(newLayout) => {
-                      // Map FooterBuilderLayout back to footer settings structure
                       updateSetting('footer', {
                         ...settings.footer,
                         widgets: {
@@ -593,7 +458,55 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
           </div>
         </div>
       </div>
-      </div>
+    </div>
+  );
+};
+
+/**
+ * Wrapper component that provides CustomizerContext
+ * This is the main export
+ */
+export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = (props) => {
+  const { initialSettings } = props;
+
+  // Prepare initial settings for Context
+  const preparedSettings = React.useMemo(() => {
+    if (!initialSettings) {
+      return getDefaultSettings();
+    }
+    const defaults = getDefaultSettings();
+    return {
+      ...defaults,
+      ...initialSettings,
+      header: {
+        ...defaults.header,
+        ...initialSettings.header,
+        builder: initialSettings.header?.builder || defaults.header.builder
+      },
+      footer: {
+        ...defaults.footer,
+        ...initialSettings.footer,
+        widgets: {
+          ...defaults.footer.widgets,
+          ...initialSettings.footer?.widgets
+        },
+        bottomBar: {
+          ...defaults.footer.bottomBar,
+          ...initialSettings.footer?.bottomBar
+        }
+      }
+    };
+  }, [initialSettings]);
+
+  return (
+    <CustomizerProvider
+      initialSettings={preparedSettings}
+      previewUrl={props.previewUrl}
+      eventHandlers={{
+        onSave: props.onSave,
+      }}
+    >
+      <SimpleCustomizerInner {...props} />
     </CustomizerProvider>
   );
 };
