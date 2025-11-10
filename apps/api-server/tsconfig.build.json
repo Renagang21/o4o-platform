@@ -24,6 +24,8 @@
     "src/routes/v2/data.routes.ts",
     "src/services/AdvancedQueryService.ts",
     "src/services/QueryComplexityAnalyzer.ts",
-    "src/modules/cpt-acf/**/*"
+    "src/modules/cpt-acf/**/*",
+    "scripts/ai-admin-cli.ts",
+    "scripts/seed-roles-permissions.ts"
   ]
 }
