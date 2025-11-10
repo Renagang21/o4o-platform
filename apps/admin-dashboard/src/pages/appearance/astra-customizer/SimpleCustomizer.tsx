@@ -187,7 +187,12 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         // Then automatically publish to template parts for frontend
         await publishToTemplateParts();
         setIsDirty(false);
+        toast.success('설정이 저장되었습니다');
       }
+    } catch (error: any) {
+      console.error('Save error:', error);
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message || '저장에 실패했습니다';
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
