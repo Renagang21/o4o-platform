@@ -29,12 +29,13 @@ export interface TemplatePartData {
 /**
  * Convert module config to block format
  */
-function convertModuleToBlock(module: ModuleConfig): any {
+function convertModuleToBlock(module: ModuleConfig, settings?: AstraCustomizerSettings): any {
   const blockMap: Record<HeaderModuleType, any> = {
     'logo': {
       type: 'o4o/site-logo',
       data: {
-        width: 120,
+        width: settings?.siteIdentity?.logo?.width?.desktop || 120,
+        logoUrl: settings?.siteIdentity?.logo?.desktop,
         isLink: true,
         ...module.settings
       }
@@ -158,9 +159,9 @@ export function convertSettingsToHeaderTemplatePart(
     // Above Header Section
     if (builder.above.settings.enabled) {
       const aboveModules = {
-        left: builder.above.left.map(convertModuleToBlock).filter(Boolean),
-        center: builder.above.center.map(convertModuleToBlock).filter(Boolean),
-        right: builder.above.right.map(convertModuleToBlock).filter(Boolean)
+        left: builder.above.left.map(m => convertModuleToBlock(m, settings)).filter(Boolean),
+        center: builder.above.center.map(m => convertModuleToBlock(m, settings)).filter(Boolean),
+        right: builder.above.right.map(m => convertModuleToBlock(m, settings)).filter(Boolean)
       };
 
       sections.push({
@@ -224,9 +225,9 @@ export function convertSettingsToHeaderTemplatePart(
 
     // Primary Header Section
     const primaryModules = {
-      left: builder.primary.left.map(convertModuleToBlock).filter(Boolean),
-      center: builder.primary.center.map(convertModuleToBlock).filter(Boolean),
-      right: builder.primary.right.map(convertModuleToBlock).filter(Boolean)
+      left: builder.primary.left.map(m => convertModuleToBlock(m, settings)).filter(Boolean),
+      center: builder.primary.center.map(m => convertModuleToBlock(m, settings)).filter(Boolean),
+      right: builder.primary.right.map(m => convertModuleToBlock(m, settings)).filter(Boolean)
     };
 
     sections.push({
@@ -290,9 +291,9 @@ export function convertSettingsToHeaderTemplatePart(
     // Below Header Section
     if (builder.below.settings.enabled) {
       const belowModules = {
-        left: builder.below.left.map(convertModuleToBlock).filter(Boolean),
-        center: builder.below.center.map(convertModuleToBlock).filter(Boolean),
-        right: builder.below.right.map(convertModuleToBlock).filter(Boolean)
+        left: builder.below.left.map(m => convertModuleToBlock(m, settings)).filter(Boolean),
+        center: builder.below.center.map(m => convertModuleToBlock(m, settings)).filter(Boolean),
+        right: builder.below.right.map(m => convertModuleToBlock(m, settings)).filter(Boolean)
       };
 
       sections.push({

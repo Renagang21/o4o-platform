@@ -227,8 +227,8 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
         });
       }
     } catch (error: any) {
-      console.error('[Customizer - Publish] Template part sync error:', error);
-      // Don't throw - allow save to succeed even if template part sync fails
+      // Template part sync failed - allow save to succeed anyway
+      // Error is logged for debugging but not thrown
     }
   };
 
@@ -247,13 +247,7 @@ export const SimpleCustomizer: React.FC<SimpleCustomizerProps> = ({
       setIsDirty(false);
       toast.success('헤더가 프론트엔드에 게시되었습니다');
     } catch (error: any) {
-      console.error('[Customizer - Publish] 에러 발생:', error);
-      console.error('[Customizer - Publish] 에러 응답:', error?.response?.data);
       const errorMessage = error?.response?.data?.message || error?.response?.data?.error || '템플릿 업데이트에 실패했습니다';
-      const errorDetails = error?.response?.data?.details;
-      if (errorDetails) {
-        console.error('[Customizer - Publish] 에러 상세:', errorDetails);
-      }
       toast.error(errorMessage);
     } finally {
       setIsSaving(false);
