@@ -26,7 +26,10 @@ import { RoleAssignment } from '../src/entities/RoleAssignment.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const envFile = process.env.NODE_ENV === 'production' ? '.env-apiserver' : '.env.development';
-dotenv.config({ path: path.resolve(__dirname, '../', envFile) });
+const envPath = path.resolve(__dirname, '../', envFile);
+console.log(`Loading environment from: ${envPath}`);
+dotenv.config({ path: envPath });
+console.log(`DB_PASSWORD type: ${typeof process.env.DB_PASSWORD}, value: ${process.env.DB_PASSWORD ? '[SET]' : '[NOT SET]'}`);
 
 interface UserData {
   name: string;
