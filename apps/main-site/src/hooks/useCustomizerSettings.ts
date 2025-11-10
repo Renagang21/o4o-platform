@@ -160,9 +160,10 @@ export const useCustomizerSettings = () => {
 
   // Apply favicon from settings
   useEffect(() => {
-    if (!settings?.siteIdentity?.favicon) return;
+    if (!settings) return;
 
-    const faviconUrl = settings.siteIdentity.favicon;
+    // Use customizer favicon or fallback to default
+    const faviconUrl = settings.siteIdentity?.favicon || '/vite.svg';
 
     // Remove existing favicon links
     const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
@@ -184,12 +185,14 @@ export const useCustomizerSettings = () => {
 
     document.head.appendChild(link);
 
-    // Also add apple-touch-icon for iOS
-    const appleLink = document.createElement('link');
-    appleLink.rel = 'apple-touch-icon';
-    appleLink.href = faviconUrl;
-    document.head.appendChild(appleLink);
-  }, [settings?.siteIdentity?.favicon]);
+    // Also add apple-touch-icon for iOS (only if custom favicon set)
+    if (settings.siteIdentity?.favicon) {
+      const appleLink = document.createElement('link');
+      appleLink.rel = 'apple-touch-icon';
+      appleLink.href = faviconUrl;
+      document.head.appendChild(appleLink);
+    }
+  }, [settings]);
 
   // Fetch settings from API with cache
   useEffect(() => {
