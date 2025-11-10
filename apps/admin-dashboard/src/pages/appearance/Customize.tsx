@@ -45,10 +45,17 @@ const Customize: React.FC = () => {
         const rawData = response.data.data;
         const settingsData = rawData.settings || rawData;
 
+        // PRODUCTION DEBUG
+        console.error('[DEBUG] Raw settingsData from API:', JSON.stringify(settingsData.siteIdentity, null, 2));
+
         devLog('[Customize] Normalizing settings...');
         try {
           // normalize 함수가 AstraCustomizerSettings 반환
           const normalized = normalizeCustomizerSettings(settingsData);
+
+          // PRODUCTION DEBUG
+          console.error('[DEBUG] After normalize:', JSON.stringify(normalized.siteIdentity, null, 2));
+
           devLog('[Customize] Settings normalized successfully');
           setInitialSettings(normalized);
         } catch (normalizeError) {
@@ -112,6 +119,10 @@ const Customize: React.FC = () => {
   
   const handleSave = async (settings: any) => {
     try {
+      // PRODUCTION DEBUG: Temporary logging
+      console.error('[DEBUG] Saving settings...');
+      console.error('[DEBUG] siteIdentity:', JSON.stringify(settings.siteIdentity, null, 2));
+
       devLog('[Customize] Saving settings...');
       devLog('[Customize] Settings to save:', JSON.stringify(settings, null, 2));
 

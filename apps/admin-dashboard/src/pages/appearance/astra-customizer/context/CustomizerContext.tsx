@@ -58,6 +58,13 @@ export const CustomizerContext = createContext<CustomizerContextValue | undefine
 const customizerReducer = (state: CustomizerState, action: CustomizerAction): CustomizerState => {
   switch (action.type) {
     case 'UPDATE_SETTING': {
+      // PRODUCTION DEBUG
+      console.error('[DEBUG reducer] UPDATE_SETTING:', {
+        section: action.section,
+        path: action.path,
+        value: action.value
+      });
+
       // CRITICAL: Deep clone the entire settings object to avoid mutation
       const updatedSettings = JSON.parse(JSON.stringify(state.settings)) as AstraCustomizerSettings;
 
@@ -71,6 +78,11 @@ const customizerReducer = (state: CustomizerState, action: CustomizerAction): Cu
           target = target[action.path[i]];
         }
         target[action.path[action.path.length - 1]] = action.value;
+
+        // PRODUCTION DEBUG
+        if (action.section === 'siteIdentity') {
+          console.error('[DEBUG reducer] Updated siteIdentity:', JSON.stringify(updatedSettings.siteIdentity, null, 2));
+        }
       } else {
         // Direct section update
         updatedSettings[action.section] = deepMerge(
