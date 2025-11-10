@@ -129,8 +129,8 @@ async function seedUsers() {
         role: 'customer',
         isActive: true,
         validFrom: new Date(),
-        assignedBy: 'system',
         assignedAt: new Date(),
+        // assignedBy is nullable, leave it null for system-generated assignments
       });
       await roleAssignmentRepository.save(customerAssignment);
 
@@ -142,8 +142,8 @@ async function seedUsers() {
             role: role,
             isActive: true,
             validFrom: new Date(),
-            assignedBy: 'system',
             assignedAt: new Date(),
+            // assignedBy is nullable, leave it null for system-generated assignments
           });
           await roleAssignmentRepository.save(roleAssignment);
         }
