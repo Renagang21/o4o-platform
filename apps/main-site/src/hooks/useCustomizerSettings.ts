@@ -132,30 +132,8 @@ export const useCustomizerSettings = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Inject CSS from settings
-  useEffect(() => {
-    if (!settings) return;
-
-    // Generate CSS from settings
-    const css = generateCSS(settings as any);
-
-    // Create or update <style> tag
-    const STYLE_ID = 'customizer-dynamic-css';
-    let styleEl = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
-
-    if (!styleEl) {
-      styleEl = document.createElement('style');
-      styleEl.id = STYLE_ID;
-      document.head.appendChild(styleEl);
-    }
-
-    styleEl.textContent = css;
-
-    return () => {
-      // Cleanup on unmount
-      styleEl?.remove();
-    };
-  }, [settings]);
+  // Note: CSS injection is now handled by GlobalStyleInjector component
+  // to avoid duplication and ensure proper injection order (legacy CSS first, then appearance-system)
 
   // Apply favicon from settings
   useEffect(() => {
