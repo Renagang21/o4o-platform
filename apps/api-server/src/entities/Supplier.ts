@@ -108,14 +108,6 @@ export class Supplier {
   @Column({ type: 'json', nullable: true })
   supplierPolicy?: SupplierPolicy;
 
-  // Phase 8: Commission Policy Integration
-  @Column({ type: 'uuid', nullable: true })
-  policyId?: string;
-
-  @ManyToOne('CommissionPolicy', { nullable: true })
-  @JoinColumn({ name: 'policyId' })
-  policy?: CommissionPolicy;
-
   @Column({ type: 'integer', nullable: true })
   settlementCycleDays?: number; // Settlement cycle in days (e.g., 30)
 
