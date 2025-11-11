@@ -304,6 +304,20 @@ export class SettingsService {
       return;
     }
 
+    // Delete old header-main template part (legacy slug)
+    try {
+      const oldTemplatePart = await this.templatePartRepository.findOne({
+        where: { slug: 'header-main' }
+      });
+      if (oldTemplatePart) {
+        await this.templatePartRepository.remove(oldTemplatePart);
+        logger.info('Old header-main template part deleted');
+      }
+    } catch (error) {
+      logger.error('Error deleting old header-main:', error);
+      // Continue anyway
+    }
+
     // Convert Header Builder modules to Template Part blocks
     const content: any[] = [];
 
@@ -421,7 +435,7 @@ export class SettingsService {
       },
       isActive: true,
       isDefault: true,
-      priority: 10,
+      priority: 0, // Changed from 10 to 0 (highest priority)
       tags: [], // Add empty tags array to prevent PostgreSQL error
     };
 
