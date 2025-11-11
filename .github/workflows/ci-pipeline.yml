@@ -37,6 +37,7 @@ jobs:
     - name: Check for console.log statements
       run: |
         # Find all console.log statements, excluding comments, test files, CLI scripts, config files, migrations, and logger utilities
+        # Also exclude main.tsx files (entry points with DEV-only debug logs)
         CONSOLE_LOGS=$(grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
           --exclude-dir=node_modules --exclude-dir=dist \
           --exclude-dir=test --exclude-dir=e2e \
@@ -44,6 +45,7 @@ jobs:
           --exclude="*test*" --exclude="*spec*" \
           --exclude="vite.config.ts" --exclude="*.config.ts" \
           --exclude="logger.ts" --exclude="*logger*.ts" \
+          --exclude="main.tsx" \
           | grep -v "//.*console\.log" \
           | grep -v "^\s*//" \
           | grep -v "\*.*console\.log" \
