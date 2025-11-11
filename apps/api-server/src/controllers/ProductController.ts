@@ -89,10 +89,16 @@ export class ProductController {
       };
 
       const result = await this.productService.getProducts(filters);
-      
+
       res.json({
         success: true,
-        data: result
+        data: result.products,
+        pagination: {
+          page: result.page,
+          limit: result.limit,
+          total: result.total,
+          totalPages: result.totalPages
+        }
       });
 
     } catch (error) {
@@ -269,10 +275,16 @@ export class ProductController {
       };
 
       const result = await this.productService.getAvailableProductsForSellers(filters);
-      
+
       res.json({
         success: true,
-        data: result
+        data: result.products,
+        pagination: {
+          page: result.page,
+          limit: result.limit,
+          total: result.total,
+          totalPages: result.totalPages
+        }
       });
 
     } catch (error) {

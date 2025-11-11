@@ -72,7 +72,8 @@ export class DefaultShortcodeParser implements ShortcodeParser {
     // 2. name='value' (작은 따옴표)
     // 3. name=value (따옴표 없는 값)
     // 4. name (값 없는 속성, boolean true로 처리)
-    const attrRegex = /(\w+)(?:=(?:"([^"]*)"|'([^']*)'|([^\s]+)))?/g;
+    // Allows spaces around equals sign: name = "value" or name ="value" or name= "value"
+    const attrRegex = /(\w+)\s*(?:=\s*(?:"([^"]*)"|'([^']*)'|([^\s]+)))?/g;
     let attrMatch;
 
     while ((attrMatch = attrRegex.exec(attributesString)) !== null) {
