@@ -114,7 +114,7 @@ export class SettingsService {
       templatePart.isActive = data.isActive ?? true;
       templatePart.isDefault = data.isDefault ?? true;
       templatePart.priority = data.priority ?? 10;
-      templatePart.tags = data.tags ?? []; // Update tags field
+      templatePart.tags = data.tags ?? null; // Update tags field (null for simple-array)
     } else {
       // Create new
       templatePart = this.templatePartRepository.create({
@@ -127,7 +127,7 @@ export class SettingsService {
         isActive: data.isActive ?? true,
         isDefault: data.isDefault ?? true,
         priority: data.priority ?? 10,
-        tags: data.tags ?? []
+        tags: data.tags ?? null // Use null for simple-array type
       });
     }
 
@@ -436,7 +436,7 @@ export class SettingsService {
       isActive: true,
       isDefault: true,
       priority: 0, // Changed from 10 to 0 (highest priority)
-      tags: [], // Add empty tags array to prevent PostgreSQL error
+      tags: null, // Use null for simple-array type (nullable column)
     };
 
     await this.upsertTemplatePart(headerTemplatePart);
