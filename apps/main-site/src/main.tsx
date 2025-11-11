@@ -101,6 +101,11 @@ const registerShortcodesFromModule = async (
     'dropshippingShortcodes',
     () => import('./components/shortcodes/dropshippingShortcodes')
   );
+
+  await registerShortcodesFromModule(
+    'productShortcodes',
+    () => import('./components/shortcodes/productShortcodes')
+  );
 })();
 
 // Debug: Expose globalRegistry to window (development only)
