@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import Editor from '@monaco-editor/react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
 import {
@@ -18,7 +19,10 @@ import {
   Info,
   AlertTriangle,
   CheckCircle,
-  Book
+  Book,
+  FileText,
+  Save,
+  Edit3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +35,9 @@ import {
   ParsedShortcode,
   dynamicShortcodeTemplates
 } from '@o4o/shortcodes';
+import FileSelector, { FileItem } from './shared/FileSelector';
+import toast from 'react-hot-toast';
+import { ContentApi } from '@/api/contentApi';
 
 interface ShortcodeBlockProps {
   id: string;
@@ -49,6 +56,9 @@ interface ShortcodeBlockProps {
     preview?: string;
     valid?: boolean;
     errorMessage?: string;
+    markdownContent?: string;
+    markdownFilename?: string;
+    markdownMediaId?: string;
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -262,7 +272,10 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
     parameters = {},
     preview = '',
     valid = true,
-    errorMessage = ''
+    errorMessage = '',
+    markdownContent = '',
+    markdownFilename = '',
+    markdownMediaId = ''
   } = attributes;
 
   const [localShortcode, setLocalShortcode] = useState(initialShortcode || content || '');
@@ -271,6 +284,14 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
   const [builderParams, setBuilderParams] = useState<Record<string, string>>({});
   const [builderContent, setBuilderContent] = useState('');
   const [copied, setCopied] = useState(false);
+
+  // Markdown editor states
+  const [showMarkdownEditor, setShowMarkdownEditor] = useState(false);
+  const [showFileSelector, setShowFileSelector] = useState(false);
+  const [markdownText, setMarkdownText] = useState(markdownContent);
+  const [filename, setFilename] = useState(markdownFilename);
+  const [mediaId, setMediaId] = useState(markdownMediaId);
+  const [isSaving, setIsSaving] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -348,6 +369,69 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
     }
   };
 
+  // Handle file selection and load content
+  const handleFileSelect = async (file: FileItem | FileItem[]) => {
+    const selectedFile = Array.isArray(file) ? file[0] : file;
+
+    if (!selectedFile) return;
+
+    try {
+      // Fetch the file content from URL
+      const response = await fetch(selectedFile.url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch file');
+      }
+
+      const text = await response.text();
+      setMarkdownText(text);
+      setFilename(selectedFile.title);
+      setMediaId(selectedFile.id);
+
+      // Save to attributes
+      onChange(localShortcode, {
+        ...attributes,
+        markdownContent: text,
+        markdownFilename: selectedFile.title,
+        markdownMediaId: selectedFile.id
+      });
+
+      toast.success(`${selectedFile.title} 파일을 불러왔습니다.`);
+      setShowFileSelector(false);
+      setShowMarkdownEditor(true);
+    } catch (error) {
+      console.error('Failed to load markdown file:', error);
+      toast.error('파일을 불러오는데 실패했습니다.');
+    }
+  };
+
+  // Save file content
+  const handleSaveMarkdown = async () => {
+    if (!mediaId || !filename) {
+      toast.error('저장할 파일 정보가 없습니다.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await ContentApi.updateMediaFileContent(mediaId, markdownText, filename);
+
+      // Update attributes
+      onChange(localShortcode, {
+        ...attributes,
+        markdownContent: markdownText,
+        markdownFilename: filename,
+        markdownMediaId: mediaId
+      });
+
+      toast.success('파일이 성공적으로 저장되었습니다.');
+    } catch (error) {
+      console.error('Failed to save markdown file:', error);
+      toast.error('파일 저장에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Parse current shortcode for display (using unified parser)
   const parsedShortcode = defaultParser.parseOne(localShortcode);
 
@@ -379,6 +463,47 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
       customToolbarContent={
         isSelected ? (
           <div className="flex items-center gap-2">
+            {/* Markdown File Loader Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setShowFileSelector(true)}
+              title="마크다운 파일 불러오기"
+            >
+              <FileText className="h-3 w-3 mr-1" />
+              MD 파일
+            </Button>
+
+            {/* Markdown Editor Toggle (only show if markdown is loaded) */}
+            {markdownText && (
+              <Button
+                variant={showMarkdownEditor ? "default" : "ghost"}
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => setShowMarkdownEditor(!showMarkdownEditor)}
+              >
+                <Edit3 className="h-3 w-3 mr-1" />
+                MD 편집
+              </Button>
+            )}
+
+            {/* Save button (only in markdown editor mode) */}
+            {showMarkdownEditor && markdownText && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={handleSaveMarkdown}
+                disabled={isSaving || !mediaId}
+              >
+                <Save className="h-3 w-3 mr-1" />
+                {isSaving ? '저장 중...' : '저장'}
+              </Button>
+            )}
+
+            <div className="h-5 w-px bg-gray-300" />
+
             <Button
               variant={showBuilder ? "default" : "ghost"}
               size="sm"
@@ -535,6 +660,46 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
       }
     >
       <div className="relative">
+        {/* Markdown Editor Section */}
+        {showMarkdownEditor && markdownText && (
+          <div className="mb-4 border border-gray-300 rounded-lg overflow-hidden">
+            {/* Header */}
+            <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <FileText className="h-4 w-4" />
+                <span className="font-medium">{filename || 'Markdown Editor'}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={() => setShowMarkdownEditor(false)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+
+            {/* Monaco Editor */}
+            <div className="w-full">
+              <Editor
+                height="400px"
+                defaultLanguage="markdown"
+                value={markdownText}
+                onChange={(value) => setMarkdownText(value || '')}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  wordWrap: 'on',
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                }}
+                theme="vs-light"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Error message */}
         {!valid && errorMessage && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
@@ -667,6 +832,18 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
           </div>
         )}
       </div>
+
+      {/* File Selector Modal */}
+      <FileSelector
+        isOpen={showFileSelector}
+        onClose={() => setShowFileSelector(false)}
+        onSelect={handleFileSelect}
+        multiple={false}
+        acceptedTypes={['document']}
+        acceptedMimeTypes={['text/markdown', 'text/plain']}
+        acceptedExtensions={['.md', '.markdown', '.txt']}
+        title="마크다운 파일 선택"
+      />
     </EnhancedBlockWrapper>
   );
 };
