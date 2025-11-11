@@ -22,6 +22,7 @@
     "src/services/QueryComplexityAnalyzer.ts",
     "src/modules/cpt-acf/**/*",
     "scripts/ai-admin-cli.ts",
-    "scripts/seed-roles-permissions.ts"
+    "scripts/seed-roles-permissions.ts",
+    "src/scripts/**/*"
   ]
 }
