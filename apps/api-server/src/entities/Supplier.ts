@@ -108,9 +108,6 @@ export class Supplier {
   @Column({ type: 'json', nullable: true })
   supplierPolicy?: SupplierPolicy;
 
-  @Column({ type: 'integer', nullable: true })
-  settlementCycleDays?: number; // Settlement cycle in days (e.g., 30)
-
   // Default Commission Settings (문서 #66: 공급자가 파트너 커미션 설정)
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 5.0 })
   defaultPartnerCommissionRate!: number; // 기본 파트너 커미션 비율
