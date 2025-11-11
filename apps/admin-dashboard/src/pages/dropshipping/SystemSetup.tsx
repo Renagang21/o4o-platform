@@ -7,7 +7,6 @@ import { authClient } from '@o4o/auth-client';
 interface SystemStatus {
   cpts: {
     ds_supplier: string;
-    ds_partner: string;
     ds_product: string;
     ds_commission_policy: string;
   };
@@ -158,10 +157,6 @@ const SystemSetup: React.FC = () => {
                   <div className="flex justify-between items-center text-sm">
                     <span>공급자 (ds_supplier)</span>
                     {getCPTStatus(status?.cpts?.ds_supplier || 'not_installed')}
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>파트너 (ds_partner)</span>
-                    {getCPTStatus(status?.cpts?.ds_partner || 'not_installed')}
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span>상품 (ds_product)</span>

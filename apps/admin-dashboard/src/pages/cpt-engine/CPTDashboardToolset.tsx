@@ -55,7 +55,6 @@ interface CPTType {
 // Dropshipping CPT definitions (these should exist in the database)
 const DROPSHIPPING_CPTS = [
   { slug: 'ds_supplier', name: '공급자' },
-  { slug: 'ds_partner', name: '파트너' },
   { slug: 'ds_product', name: '드롭쉬핑 상품' },
   { slug: 'ds_commission_policy', name: '수수료 정책' }
 ];
