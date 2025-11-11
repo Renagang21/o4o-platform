@@ -5,8 +5,7 @@ import { authenticate } from '../middleware/auth.middleware.js';
 const router: Router = Router();
 const productController = new ProductController();
 
-// 모든 제품 관련 라우트는 인증 필요
-router.use(authenticate);
+// 공개 제품 조회는 인증 불필요 (GET), 생성/수정/삭제는 인증 필요 (POST/PUT/DELETE/PATCH)
 
 /**
  * GET /api/products/low-stock
@@ -57,15 +56,15 @@ router.get('/low-stock', async (req, res) => {
 });
 
 // 제품 CRUD
-router.post('/', productController.createProduct);
-router.get('/:id', productController.getProduct);
-router.get('/', productController.getProducts);
-router.put('/:id', productController.updateProduct);
-router.delete('/:id', productController.deleteProduct);
+router.post('/', authenticate, productController.createProduct);
+router.get('/:id', productController.getProduct); // Public
+router.get('/', productController.getProducts); // Public
+router.put('/:id', authenticate, productController.updateProduct);
+router.delete('/:id', authenticate, productController.deleteProduct);
 
 // 제품 관리
-router.patch('/:id/status', productController.toggleProductStatus);
-router.patch('/:id/inventory', productController.updateInventory);
+router.patch('/:id/status', authenticate, productController.toggleProductStatus);
+router.patch('/:id/inventory', authenticate, productController.updateInventory);
 
 // 공급자 통계
 router.get('/supplier/:supplierId/stats', productController.getSupplierProductStats);
