@@ -69,30 +69,32 @@ const ShortcodeBlock: FC<ShortcodeBlockProps> = ({ content, settings }) => {
 
   return (
     <div className={`shortcode-block ${settings?.className || ''}`}>
-      {/* Debug Info Panel */}
-      <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-4">
-        <h3 className="font-bold text-yellow-900 mb-2">🔍 Shortcode Debug Info</h3>
-        <div className="space-y-2 text-sm">
-          <div>
-            <span className="font-semibold">Content:</span>
-            <code className="ml-2 bg-white px-2 py-1 rounded">{content}</code>
-          </div>
-          <div>
-            <span className="font-semibold">Registered Shortcodes ({registeredShortcodes.length}):</span>
-            <div className="mt-1 flex flex-wrap gap-1">
-              {registeredShortcodes.length > 0 ? (
-                registeredShortcodes.map((name) => (
-                  <span key={name} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                    {name}
-                  </span>
-                ))
-              ) : (
-                <span className="text-red-600">No shortcodes registered!</span>
-              )}
+      {/* Debug Info Panel (Development Only) */}
+      {import.meta.env.DEV && (
+        <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-4">
+          <h3 className="font-bold text-yellow-900 mb-2">🔍 Shortcode Debug Info</h3>
+          <div className="space-y-2 text-sm">
+            <div>
+              <span className="font-semibold">Content:</span>
+              <code className="ml-2 bg-white px-2 py-1 rounded">{content}</code>
+            </div>
+            <div>
+              <span className="font-semibold">Registered Shortcodes ({registeredShortcodes.length}):</span>
+              <div className="mt-1 flex flex-wrap gap-1">
+                {registeredShortcodes.length > 0 ? (
+                  registeredShortcodes.map((name) => (
+                    <span key={name} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                      {name}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-red-600">No shortcodes registered!</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <ShortcodeRenderer
         content={content}
