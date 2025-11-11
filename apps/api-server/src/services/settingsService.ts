@@ -114,6 +114,7 @@ export class SettingsService {
       templatePart.isActive = data.isActive ?? true;
       templatePart.isDefault = data.isDefault ?? true;
       templatePart.priority = data.priority ?? 10;
+      templatePart.tags = data.tags ?? []; // Update tags field
     } else {
       // Create new
       templatePart = this.templatePartRepository.create({
@@ -126,7 +127,7 @@ export class SettingsService {
         isActive: data.isActive ?? true,
         isDefault: data.isDefault ?? true,
         priority: data.priority ?? 10,
-        tags: []
+        tags: data.tags ?? []
       });
     }
 
