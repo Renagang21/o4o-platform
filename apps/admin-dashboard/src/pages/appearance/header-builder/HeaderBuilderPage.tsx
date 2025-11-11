@@ -134,3 +134,5 @@ export const HeaderBuilderPage: React.FC = () => {
     </div>
   );
 };
+
+export default HeaderBuilderPage;
