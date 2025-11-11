@@ -8,7 +8,6 @@
 
 import { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
-import { generateCSS } from '../utils/css-generator';
 
 export type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 

@@ -25,12 +25,17 @@ export function GlobalStyleInjector() {
   useEffect(() => {
     // Wait for settings to load
     if (isLoading || !settings) {
+      console.log('[GlobalStyleInjector] Waiting for settings...', { isLoading, hasSettings: !!settings });
       return;
     }
+
+    console.log('[GlobalStyleInjector] Settings loaded:', settings);
+    console.log('[GlobalStyleInjector] Colors from settings:', (settings as any).colors);
 
     try {
       // Legacy: Generate full CSS from customizer settings (Phase 2.5 generators)
       const legacyCSS = generateCSS(settings);
+      console.log('[GlobalStyleInjector] Generated legacy CSS (first 500 chars):', legacyCSS.substring(0, 500));
 
       // Phase 3: Generate core component CSS using appearance-system
       // Map customizer settings to design tokens (A-4: Essential mappings added)
@@ -82,14 +87,16 @@ export function GlobalStyleInjector() {
         }
       }
       legacyStyleEl.textContent = legacyCSS;
+      console.log('[GlobalStyleInjector] ✅ Legacy CSS injected into <style id="customizer-global-css">');
 
       // Step 2: Inject core CSS using appearance-system (Phase 3 standard path)
       // Creates/updates <style id="o4o-appearance-system"> with button, breadcrumb, scroll-to-top CSS
       // This MUST come after legacy to ensure proper cascade
       injectCSS(coreCSS, STYLE_IDS.APPEARANCE_SYSTEM);
+      console.log('[GlobalStyleInjector] ✅ Core CSS injected via appearance-system');
 
     } catch (error) {
-      console.error('[GlobalStyleInjector] Failed to inject CSS:', error);
+      console.error('[GlobalStyleInjector] ❌ Failed to inject CSS:', error);
     }
   }, [settings, isLoading]);
 
