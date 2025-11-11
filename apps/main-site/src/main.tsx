@@ -123,7 +123,9 @@ const allShortcodeModules = { ...shortcodeFileModules, ...shortcodeIndexModules 
     await registerShortcodesFromModule(moduleName, importFn as any);
   }
 
-  console.log(`[Shortcode Registry] ✅ Auto-discovered ${discoveredModules.length} modules:`, discoveredModules);
+  if (import.meta.env.DEV) {
+    console.log(`[Shortcode Registry] ✅ Auto-discovered ${discoveredModules.length} modules:`, discoveredModules);
+  }
 })();
 
 // Debug: Expose globalRegistry to window (development only)
