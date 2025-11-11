@@ -3,7 +3,7 @@
  * Full-featured header builder with module management
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -29,6 +29,7 @@ import type {
   ModuleConfig,
   HeaderModuleType
 } from './types/header-types';
+import { ModuleInspector } from './components/module-inspector';
 
 // Module type definitions with icons
 const MODULE_TYPES: Array<{
@@ -54,7 +55,7 @@ const MODULE_TYPES: Array<{
 const HeaderBuilderPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [layout, setLayout] = useState<HeaderBuilderLayout | null>(null);
-  const [selectedModule, setSelectedModule] = useState<{ row: string; col: string; moduleId: string } | null>(null);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [showModulePicker, setShowModulePicker] = useState<{ row: string; col: string } | null>(null);
 
   // Fetch header builder data
@@ -150,6 +151,43 @@ const HeaderBuilderPage: React.FC = () => {
     });
   };
 
+  // Update module settings
+  const updateModuleSettings = (moduleId: string, newSettings: any) => {
+    if (!layout) return;
+
+    const newLayout = { ...layout };
+
+    // Find and update the module across all rows and columns
+    (['above', 'primary', 'below'] as const).forEach(row => {
+      (['left', 'center', 'right'] as const).forEach(col => {
+        const moduleIndex = newLayout[row][col].findIndex(m => m.id === moduleId);
+        if (moduleIndex !== -1) {
+          newLayout[row][col][moduleIndex] = {
+            ...newLayout[row][col][moduleIndex],
+            settings: newSettings
+          };
+        }
+      });
+    });
+
+    setLayout(newLayout);
+  };
+
+  // Find currently selected module from layout
+  const currentSelectedModule = useMemo(() => {
+    if (!selectedModuleId || !layout) return null;
+
+    let found: ModuleConfig | null = null;
+    (['above', 'primary', 'below'] as const).forEach(row => {
+      (['left', 'center', 'right'] as const).forEach(col => {
+        const module = layout[row][col].find(m => m.id === selectedModuleId);
+        if (module) found = module;
+      });
+    });
+
+    return found;
+  }, [selectedModuleId, layout]);
+
   if (isLoading || !layout) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -220,7 +258,7 @@ const HeaderBuilderPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => setSelectedModule({ row, col, moduleId: module.id })}
+                        onClick={() => setSelectedModuleId(module.id)}
                         className="p-1 text-gray-500 hover:text-blue-600"
                         title="Settings"
                       >
@@ -328,6 +366,15 @@ const HeaderBuilderPage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Module Inspector Panel */}
+      {currentSelectedModule && (
+        <ModuleInspector
+          module={currentSelectedModule}
+          onUpdate={updateModuleSettings}
+          onClose={() => setSelectedModuleId(null)}
+        />
       )}
     </div>
   );
