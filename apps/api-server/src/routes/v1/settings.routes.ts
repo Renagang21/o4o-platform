@@ -443,6 +443,71 @@ router.get('/customizer',
 );
 
 /**
+ * @route   GET /api/v1/settings/header-builder
+ * @desc    Get header builder settings
+ * @access  Public (for frontend header rendering)
+ */
+router.get('/header-builder', async (req: Request, res: Response) => {
+  try {
+    const settings = await settingsService.getHeaderBuilder();
+
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    logger.error('Error fetching header builder settings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch header builder settings',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * @route   POST /api/v1/settings/header-builder
+ * @desc    Update header builder settings
+ * @access  Private (Admin only)
+ */
+router.post('/header-builder', authenticate, requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const actor = (req as any).user?.id || 'unknown';
+    const headerBuilderData = req.body;
+
+    logger.info('Header builder settings update request:', {
+      actor,
+      timestamp: new Date().toISOString()
+    });
+
+    const result = await settingsService.updateHeaderBuilder(headerBuilderData);
+
+    logger.info('Header builder settings updated successfully:', {
+      actor,
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'Header builder settings updated successfully'
+    });
+  } catch (error) {
+    logger.error('Header builder settings update failed:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update header builder settings',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
  * @route   GET /api/v1/settings/customizer/global-css
  * @desc    Get generated global CSS from customizer settings
  * @access  Public
