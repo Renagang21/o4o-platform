@@ -759,21 +759,23 @@ router.get('/oauth', async (req: Request, res: Response) => {
 router.get('/:section', authenticate, async (req: Request, res: Response) => {
   try {
     const { section } = req.params;
-    const settings = settingsStore.get(section);
-    
+
+    // Use settingsService instead of hardcoded settingsStore
+    const settings = await settingsService.getSettings(section as any);
+
     if (!settings) {
       return res.status(404).json({
         success: false,
         error: 'Settings section not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: settings
     });
   } catch (error) {
-    // Error log removed
+    logger.error(`Error fetching settings for section "${req.params.section}":`, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch settings'
@@ -1268,28 +1270,32 @@ router.put('/:section',
     try {
       const { section } = req.params;
       const newSettings = req.body;
-      
-      if (!settingsStore.has(section)) {
+
+      // Get existing settings from database
+      const currentSettings = await settingsService.getSettings(section as any);
+
+      if (!currentSettings) {
         return res.status(404).json({
           success: false,
           error: 'Settings section not found'
         });
       }
-      
+
       // 기존 설정과 병합
-      const currentSettings = settingsStore.get(section);
       const updatedSettings = { ...currentSettings, ...newSettings };
-      
-      // 설정 저장
-      settingsStore.set(section, updatedSettings);
-      
+
+      // 설정 저장 (데이터베이스에 영구 저장)
+      await settingsService.updateSettings(section as any, updatedSettings);
+
+      logger.info(`Settings updated for section "${section}" by user ${(req as any).user?.id || 'unknown'}`);
+
       res.json({
         success: true,
         data: updatedSettings,
         message: 'Settings updated successfully'
       });
     } catch (error) {
-      // Error log removed
+      logger.error(`Error updating settings for section "${req.params.section}":`, error);
       res.status(500).json({
         success: false,
         error: 'Failed to update settings'
