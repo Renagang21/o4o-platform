@@ -421,6 +421,7 @@ export class SettingsService {
       isActive: true,
       isDefault: true,
       priority: 10,
+      tags: [], // Add empty tags array to prevent PostgreSQL error
     };
 
     await this.upsertTemplatePart(headerTemplatePart);
