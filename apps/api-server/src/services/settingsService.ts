@@ -280,7 +280,151 @@ export class SettingsService {
     await this.settingsRepository.save(setting);
     logger.info('Header Builder settings saved successfully');
 
+    // Sync Header Builder to Template Parts
+    try {
+      await this.syncTemplatePartsFromHeaderBuilder(value);
+      logger.info('Template parts synced from Header Builder successfully');
+    } catch (error) {
+      logger.error('Failed to sync template parts from Header Builder:', error);
+      // Don't fail the save operation, just log the error
+    }
+
     return setting.value as Record<string, unknown>;
+  }
+
+  /**
+   * Sync Template Parts from Header Builder settings
+   * Converts Header Builder data to Template Part blocks
+   */
+  private async syncTemplatePartsFromHeaderBuilder(headerBuilderData: Record<string, unknown>): Promise<void> {
+    const builder = headerBuilderData.builder as any;
+    if (!builder) {
+      logger.warn('No builder data found in Header Builder settings');
+      return;
+    }
+
+    // Convert Header Builder modules to Template Part blocks
+    const content: any[] = [];
+
+    // Helper function to convert module type to block type
+    const getBlockType = (moduleType: string): string => {
+      const typeMap: Record<string, string> = {
+        'logo': 'core/site-logo',
+        'site-title': 'core/site-title',
+        'primary-menu': 'core/navigation',
+        'secondary-menu': 'core/navigation',
+        'search': 'core/search',
+        'account': 'o4o/account-menu',
+        'cart': 'o4o/cart-icon',
+        'role-switcher': 'o4o/role-switcher',
+        'button': 'o4o/button',
+        'html': 'o4o/html',
+        'widget': 'core/widget-area',
+        'social': 'core/social-links',
+      };
+      return typeMap[moduleType] || moduleType;
+    };
+
+    // Helper function to convert module to block
+    const convertModuleToBlock = (module: any, rowName: string): any => {
+      const blockType = getBlockType(module.type);
+
+      return {
+        id: module.id,
+        type: blockType,
+        data: {
+          className: module.settings?.customClass || '',
+          ...(module.type === 'primary-menu' || module.type === 'secondary-menu' ? {
+            menuRef: module.type === 'primary-menu' ? 'primary' : 'secondary',
+            orientation: 'horizontal',
+            showSubmenuIcon: true,
+          } : {}),
+        },
+        settings: {
+          visibility: module.settings?.visibility || { desktop: true, tablet: true, mobile: true },
+        },
+        attributes: {},
+        innerBlocks: []
+      };
+    };
+
+    // Process each row (above, primary, below)
+    for (const rowName of ['above', 'primary', 'below']) {
+      const row = builder[rowName];
+      if (!row) continue;
+
+      // Skip disabled rows
+      if (rowName !== 'primary' && row.settings?.enabled === false) {
+        continue;
+      }
+
+      // Create a group for the row with 3 columns
+      const rowGroup: any = {
+        id: `header-${rowName}-row`,
+        type: 'o4o/group',
+        data: {
+          className: `header-${rowName}-row`,
+          layout: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+        settings: {
+          backgroundColor: row.settings?.background || '#ffffff',
+          padding: row.settings?.padding || { top: 10, bottom: 10, left: 20, right: 20 },
+        },
+        attributes: {},
+        innerBlocks: []
+      };
+
+      // Add columns (left, center, right)
+      for (const position of ['left', 'center', 'right']) {
+        const modules = row[position] || [];
+
+        const columnGroup: any = {
+          id: `header-${rowName}-${position}`,
+          type: 'o4o/group',
+          data: {
+            className: `header-${rowName}-${position}`,
+            layout: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 15,
+          },
+          attributes: {},
+          innerBlocks: modules.map((module: any) => convertModuleToBlock(module, rowName))
+        };
+
+        rowGroup.innerBlocks.push(columnGroup);
+      }
+
+      content.push(rowGroup);
+    }
+
+    // Create or update header template part
+    const headerTemplatePart = {
+      name: 'Main Header',
+      slug: 'main-header',
+      description: 'Main site header generated from Header Builder',
+      area: 'header',
+      content: content,
+      settings: {
+        containerWidth: 'wide',
+        backgroundColor: builder.primary?.settings?.background || '#ffffff',
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        },
+      },
+      isActive: true,
+      isDefault: true,
+      priority: 10,
+    };
+
+    await this.upsertTemplatePart(headerTemplatePart);
+    logger.info('Header template part synced successfully');
   }
 
   /**
