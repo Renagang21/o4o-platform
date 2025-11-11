@@ -227,16 +227,9 @@ export class PolicyResolutionService {
    * Priority 2: Resolve supplier-level policy
    */
   private async resolveSupplierPolicy(context: PolicyResolutionContext): Promise<CommissionPolicy | null> {
-    const supplier = await this.supplierRepo.findOne({
-      where: { id: context.supplierId },
-      relations: ['policy']
-    });
-
-    if (!supplier?.policy) {
-      return null;
-    }
-
-    return this.validatePolicy(supplier.policy, context.orderDate) ? supplier.policy : null;
+    // Supplier-level policy has been removed in Phase 8-9
+    // Commission policies are now resolved at partner/global level only
+    return null;
   }
 
   /**
