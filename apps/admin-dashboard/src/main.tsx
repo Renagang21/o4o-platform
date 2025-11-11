@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import { initVersionCheck } from '@/utils/versionCheck'
 import { registerAllBlocks } from '@/blocks'
 import { registerAllWidgets } from '@/lib/widgets/registerWidgets'
+import { registerLazyShortcode, globalRegistry } from '@o4o/shortcodes'
 import App from './App'
 import './styles/globals.css'
 // WordPress styles will be loaded only when needed
@@ -50,6 +51,70 @@ registerAllBlocks();
 
 // Register all dashboard widgets before rendering (P1 Phase C)
 registerAllWidgets();
+
+// Auto-discover and register all shortcode modules
+// Convention: Files named *Shortcodes.tsx in components/shortcodes/
+const shortcodeModules = import.meta.glob('./components/shortcodes/**/*Shortcodes.{ts,tsx}', { eager: false });
+
+const registerShortcodesFromModule = async (
+  moduleName: string,
+  importFn: () => Promise<{ [key: string]: any }>
+) => {
+  try {
+    const module = await importFn();
+    const shortcodeArray = module[moduleName];
+
+    if (!Array.isArray(shortcodeArray)) {
+      console.error(`[Admin Shortcode Registry] "${moduleName}" is not an array`);
+      return;
+    }
+
+    shortcodeArray.forEach((definition: any) => {
+      if (!definition.name) {
+        console.warn(`[Admin Shortcode Registry] Skipping shortcode with no name in ${moduleName}`);
+        return;
+      }
+
+      registerLazyShortcode({
+        name: definition.name,
+        loader: () => importFn().then(m => {
+          const shortcode = m[moduleName]?.find((s: any) => s.name === definition.name);
+          if (!shortcode) {
+            console.error(`[Admin Shortcode Error] "${definition.name}" not found`);
+            return { default: () => null };
+          }
+          return { default: shortcode.component };
+        }).catch(err => {
+          console.error(`[Admin Shortcode Error] Failed to load "${definition.name}":`, err);
+          return { default: () => null };
+        })
+      });
+    });
+  } catch (err) {
+    console.error(`[Admin Shortcode Registry] Failed to load module ${moduleName}:`, err);
+  }
+};
+
+(async () => {
+  const discoveredModules: string[] = [];
+
+  for (const [path, importFn] of Object.entries(shortcodeModules)) {
+    const fileMatch = path.match(/\/([^/]+)\.tsx?$/);
+    const moduleName = fileMatch ? fileMatch[1] : '';
+
+    if (!moduleName) continue;
+
+    discoveredModules.push(moduleName);
+    await registerShortcodesFromModule(moduleName, importFn as any);
+  }
+
+  console.log(`[Admin Shortcode Registry] ✅ Auto-discovered ${discoveredModules.length} modules:`, discoveredModules);
+})();
+
+// Debug: Expose globalRegistry to window (development only)
+if (import.meta.env.DEV) {
+  (window as any).__shortcodeRegistry = globalRegistry;
+}
 
 // Note: StrictMode disabled for Slate.js compatibility
 // Slate's focus management conflicts with React's double-rendering in development mode
