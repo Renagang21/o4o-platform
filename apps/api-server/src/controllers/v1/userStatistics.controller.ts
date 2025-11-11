@@ -3,7 +3,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../entities/User.js';
 import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog.js';
 import { BetaUser, BetaUserStatus } from '../../entities/BetaUser.js';
-import { Between } from 'typeorm';
+import { Between, In } from 'typeorm';
 
 export class UserStatisticsController {
   private static userRepository = AppDataSource.getRepository(User);
@@ -291,7 +291,7 @@ export class UserStatisticsController {
 
     const securityActivities = await UserStatisticsController.activityRepository.count({
       where: {
-        activityType: { $in: securityActivityTypes } as any,
+        activityType: In(securityActivityTypes),
         createdAt: Between(startDate, new Date())
       }
     });
@@ -330,11 +330,15 @@ export class UserStatisticsController {
       const { months = '12' } = req.query;
       const monthsNum = parseInt(months as string, 10);
 
+      // Calculate start date in JavaScript for PostgreSQL compatibility
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - monthsNum);
+
       const growth = await UserStatisticsController.userRepository
         .createQueryBuilder('user')
-        .select('YEAR(user.createdAt) as year, MONTH(user.createdAt) as month, COUNT(*) as count')
-        .where('user.createdAt >= DATE_SUB(NOW(), INTERVAL :months MONTH)', { months: monthsNum })
-        .groupBy('YEAR(user.createdAt), MONTH(user.createdAt)')
+        .select('EXTRACT(YEAR FROM user.createdAt) as year, EXTRACT(MONTH FROM user.createdAt) as month, COUNT(*) as count')
+        .where("user.createdAt >= :startDate", { startDate })
+        .groupBy('EXTRACT(YEAR FROM user.createdAt), EXTRACT(MONTH FROM user.createdAt)')
         .orderBy('year, month', 'ASC')
         .getRawMany();
 
