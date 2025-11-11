@@ -231,11 +231,147 @@ export class SettingsService {
     postsPerPage: number;
   }> {
     const readingSettings = await this.getSettings('reading') as ReadingSettings;
-    
+
     return {
       type: readingSettings.homepageType,
       pageId: readingSettings.homepageId,
       postsPerPage: readingSettings.postsPerPage
+    };
+  }
+
+  /**
+   * Get Header Builder settings
+   */
+  async getHeaderBuilder(): Promise<Record<string, unknown>> {
+    const setting = await this.settingsRepository.findOne({
+      where: { key: 'headerBuilder' }
+    });
+
+    if (!setting) {
+      // Return default header builder layout
+      return {
+        builder: this.getDefaultHeaderBuilderLayout(),
+        sticky: this.getDefaultStickySettings(),
+        mobile: this.getDefaultMobileSettings(),
+      };
+    }
+
+    return setting.value as Record<string, unknown>;
+  }
+
+  /**
+   * Update Header Builder settings
+   */
+  async updateHeaderBuilder(value: Record<string, unknown>): Promise<Record<string, unknown>> {
+    let setting = await this.settingsRepository.findOne({
+      where: { key: 'headerBuilder' }
+    });
+
+    if (!setting) {
+      setting = this.settingsRepository.create({
+        key: 'headerBuilder',
+        type: 'headerBuilder' as any,
+        value: value
+      });
+    } else {
+      setting.value = value;
+    }
+
+    await this.settingsRepository.save(setting);
+    logger.info('Header Builder settings saved successfully');
+
+    return setting.value as Record<string, unknown>;
+  }
+
+  /**
+   * Default Header Builder Layout
+   */
+  private getDefaultHeaderBuilderLayout() {
+    return {
+      above: {
+        left: [],
+        center: [],
+        right: [],
+        settings: {
+          enabled: false,
+          height: { desktop: 40, tablet: 40, mobile: 40 },
+          background: '#f8f9fa',
+        }
+      },
+      primary: {
+        left: [
+          {
+            id: 'logo-1',
+            type: 'logo',
+            label: 'Logo',
+            settings: {
+              visibility: { desktop: true, tablet: true, mobile: true }
+            }
+          }
+        ],
+        center: [],
+        right: [
+          {
+            id: 'menu-1',
+            type: 'primary-menu',
+            label: 'Primary Menu',
+            settings: {
+              visibility: { desktop: true, tablet: true, mobile: true }
+            }
+          }
+        ],
+        settings: {
+          height: { desktop: 70, tablet: 60, mobile: 60 },
+          background: '#ffffff',
+        }
+      },
+      below: {
+        left: [],
+        center: [],
+        right: [],
+        settings: {
+          enabled: false,
+          height: { desktop: 40, tablet: 40, mobile: 40 },
+          background: '#f8f9fa',
+        }
+      }
+    };
+  }
+
+  /**
+   * Default Sticky Header Settings
+   */
+  private getDefaultStickySettings() {
+    return {
+      enabled: false,
+      triggerHeight: 100,
+      stickyOn: ['primary'],
+      shrinkEffect: false,
+      shrinkHeight: { desktop: 60, tablet: 50, mobile: 50 },
+      backgroundOpacity: 0.95,
+      boxShadow: true,
+      shadowIntensity: 'medium',
+      animationDuration: 300,
+      hideOnScrollDown: false,
+      zIndex: 1000,
+    };
+  }
+
+  /**
+   * Default Mobile Header Settings
+   */
+  private getDefaultMobileSettings() {
+    return {
+      enabled: true,
+      breakpoint: 768,
+      hamburgerStyle: 'default',
+      menuPosition: 'left',
+      menuAnimation: 'slide',
+      overlayEnabled: true,
+      overlayOpacity: 0.5,
+      submenuStyle: 'accordion',
+      closeOnItemClick: true,
+      swipeToClose: true,
     };
   }
 }

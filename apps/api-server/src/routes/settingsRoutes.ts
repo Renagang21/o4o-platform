@@ -10,10 +10,12 @@ const settingsController = new SettingsController();
 router.get('/homepage', settingsController.getHomepageSettings.bind(settingsController));
 router.get('/general', settingsController.getGeneralSettings.bind(settingsController));
 router.get('/customizer', settingsController.getCustomizerSettings.bind(settingsController));
+router.get('/header-builder', settingsController.getHeaderBuilder.bind(settingsController));
 
 // Admin only endpoints
 router.get('/:type', authenticate, requireAdmin, settingsController.getSettings.bind(settingsController));
 router.put('/:type', authenticate, requireAdmin, settingsController.updateSettings.bind(settingsController));
 router.post('/initialize', authenticate, requireAdmin, settingsController.initializeSettings.bind(settingsController));
+router.post('/header-builder', authenticate, requireAdmin, settingsController.updateHeaderBuilder.bind(settingsController));
 
 export default router;

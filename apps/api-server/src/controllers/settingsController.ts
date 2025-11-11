@@ -142,4 +142,43 @@ export class SettingsController {
       });
     }
   }
+
+  // GET /api/settings/header-builder
+  async getHeaderBuilder(req: Request, res: Response) {
+    try {
+      const settings = await settingsService.getHeaderBuilder();
+
+      res.json({
+        success: true,
+        data: settings
+      });
+    } catch (error) {
+      logger.error('Error fetching header builder settings:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch header builder settings',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // POST /api/settings/header-builder
+  async updateHeaderBuilder(req: Request, res: Response) {
+    try {
+      const settings = await settingsService.updateHeaderBuilder(req.body);
+
+      res.json({
+        success: true,
+        data: settings,
+        message: 'Header builder settings updated successfully'
+      });
+    } catch (error) {
+      logger.error('Error updating header builder settings:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update header builder settings',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
 }

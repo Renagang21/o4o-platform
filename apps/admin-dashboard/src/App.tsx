@@ -121,7 +121,7 @@ const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationT
 // Removed Apps Manager - using WordPress style menu
 
 // Appearance Pages (WordPress Style)
-const Customize = lazy(() => import('@/pages/appearance/Customize'));
+const HeaderBuilder = lazy(() => import('@/pages/appearance/header-builder/HeaderBuilderPage'));
 
 // Shortcode Management - REMOVED
 
@@ -454,10 +454,10 @@ function App() {
                     } />
                     
                     {/* 외모 관리 (WordPress Style) */}
-                    <Route path="/customize" element={
+                    <Route path="/appearance/header-builder" element={
                       <AdminProtectedRoute requiredPermissions={['templates:write']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Customize />
+                          <HeaderBuilder />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
