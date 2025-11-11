@@ -181,4 +181,23 @@ export class SettingsController {
       });
     }
   }
+
+  // DELETE /api/settings/customizer (admin only - cleanup legacy Astra data)
+  async deleteCustomizerSettings(req: Request, res: Response) {
+    try {
+      const result = await settingsService.deleteCustomizerSettings();
+
+      res.json({
+        success: result.success,
+        message: result.message
+      });
+    } catch (error) {
+      logger.error('Error deleting customizer settings:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete customizer settings',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
 }

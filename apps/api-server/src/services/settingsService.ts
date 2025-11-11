@@ -374,6 +374,32 @@ export class SettingsService {
       swipeToClose: true,
     };
   }
+
+  /**
+   * Delete customizer settings (cleanup legacy Astra data)
+   */
+  async deleteCustomizerSettings(): Promise<{ success: boolean; message: string }> {
+    try {
+      const result = await this.settingsRepository.delete({ key: 'customizer' });
+
+      if (result.affected && result.affected > 0) {
+        logger.info('Customizer settings deleted successfully');
+        return {
+          success: true,
+          message: `Customizer settings deleted (${result.affected} row(s) affected)`
+        };
+      } else {
+        logger.info('No customizer settings found to delete');
+        return {
+          success: true,
+          message: 'No customizer settings found to delete'
+        };
+      }
+    } catch (error) {
+      logger.error('Error deleting customizer settings:', error);
+      throw error;
+    }
+  }
 }
 
 export const settingsService = new SettingsService();

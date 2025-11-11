@@ -17,5 +17,6 @@ router.get('/:type', authenticate, requireAdmin, settingsController.getSettings.
 router.put('/:type', authenticate, requireAdmin, settingsController.updateSettings.bind(settingsController));
 router.post('/initialize', authenticate, requireAdmin, settingsController.initializeSettings.bind(settingsController));
 router.post('/header-builder', authenticate, requireAdmin, settingsController.updateHeaderBuilder.bind(settingsController));
+router.delete('/customizer', authenticate, requireAdmin, settingsController.deleteCustomizerSettings.bind(settingsController));
 
 export default router;
