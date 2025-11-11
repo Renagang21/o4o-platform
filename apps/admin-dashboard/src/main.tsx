@@ -53,8 +53,17 @@ registerAllBlocks();
 registerAllWidgets();
 
 // Auto-discover and register all shortcode modules
-// Convention: Files named *Shortcodes.tsx in components/shortcodes/
-const shortcodeModules = import.meta.glob('./components/shortcodes/**/*Shortcodes.{ts,tsx}', { eager: false });
+// Convention: Files named *Shortcodes.tsx or */index.ts in components/shortcodes/
+// Examples:
+// - formShortcodes.tsx -> exports formShortcodes array
+// - auth/index.ts -> exports authShortcodes array
+// - product/productShortcodes.tsx -> exports productShortcodes array
+
+const shortcodeFileModules = import.meta.glob('./components/shortcodes/**/*Shortcodes.{ts,tsx}', { eager: false });
+const shortcodeIndexModules = import.meta.glob('./components/shortcodes/**/index.{ts,tsx}', { eager: false });
+
+// Merge both patterns
+const allShortcodeModules = { ...shortcodeFileModules, ...shortcodeIndexModules };
 
 const registerShortcodesFromModule = async (
   moduleName: string,
@@ -98,11 +107,24 @@ const registerShortcodesFromModule = async (
 (async () => {
   const discoveredModules: string[] = [];
 
-  for (const [path, importFn] of Object.entries(shortcodeModules)) {
-    const fileMatch = path.match(/\/([^/]+)\.tsx?$/);
-    const moduleName = fileMatch ? fileMatch[1] : '';
+  for (const [path, importFn] of Object.entries(allShortcodeModules)) {
+    // Extract module name from path
+    let moduleName: string;
 
-    if (!moduleName) continue;
+    if (path.includes('/index.')) {
+      // Example: ./components/shortcodes/auth/index.ts -> authShortcodes
+      const folderMatch = path.match(/\/([^/]+)\/index\./);
+      moduleName = folderMatch ? `${folderMatch[1]}Shortcodes` : '';
+    } else {
+      // Example: ./components/shortcodes/formShortcodes.tsx -> formShortcodes
+      const fileMatch = path.match(/\/([^/]+)\.tsx?$/);
+      moduleName = fileMatch ? fileMatch[1] : '';
+    }
+
+    if (!moduleName) {
+      console.warn(`[Admin Shortcode Registry] Could not extract module name from ${path}`);
+      continue;
+    }
 
     discoveredModules.push(moduleName);
     await registerShortcodesFromModule(moduleName, importFn as any);
