@@ -437,12 +437,33 @@ const MediaListWordPress: React.FC = () => {
                       )}
                       
                       {/* File Info */}
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm text-blue-600 hover:text-blue-800 cursor-pointer">
                           {item.title}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">{item.filename}</div>
-                        
+
+                        {/* File URL */}
+                        <div className="flex items-center gap-2 mt-2">
+                          <input
+                            type="text"
+                            value={item.url}
+                            readOnly
+                            className="flex-1 text-xs px-2 py-1 bg-gray-50 border border-gray-200 rounded font-mono text-gray-600 cursor-pointer hover:bg-gray-100"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(item.url);
+                              toast.success('URL copied to clipboard!');
+                            }}
+                            className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap"
+                            title="Copy URL"
+                          >
+                            Copy URL
+                          </button>
+                        </div>
+
                         {/* Actions */}
                         <div className="flex items-center gap-2 mt-2 text-xs">
                           <button
