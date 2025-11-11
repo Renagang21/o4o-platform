@@ -358,7 +358,8 @@ export function setupRoutes(app: Application): void {
   // Dropshipping & Ecommerce
   app.use('/api/v1/dropshipping', dropshippingCPTRoutes);
   app.use('/api/v1/dropshipping/partner', partnerRoutes);
-  app.use('/api/products', productsRoutes);
+  app.use('/api/v1/products', productsRoutes);
+  app.use('/api/products', productsRoutes); // Legacy compatibility
   app.use('/api/partners', partnersRoutes);
   app.use('/api/seller-products', sellerProductsRoutes);
   app.use('/api/orders', orderRoutes);
