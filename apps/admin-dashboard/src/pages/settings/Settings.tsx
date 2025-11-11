@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Mail, BookOpen, Key, MessageSquare, Shield, Link as LinkIcon, Edit, Package, Lock } from 'lucide-react'
+import { Settings as SettingsIcon, Mail, BookOpen, Key, MessageSquare, Shield, Link as LinkIcon, Edit, Package, Lock, Code } from 'lucide-react'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
@@ -10,6 +10,7 @@ import PermalinkSettings from './PermalinkSettings'
 import WritingSettings from './WritingSettings'
 import PrivacySettings from './PrivacySettings'
 import AppServices from './AppServices'
+import CustomCSSSettings from './CustomCSSSettings'
 
 const UserSettings: FC = () => (
   <div className="wp-card">
@@ -42,6 +43,7 @@ const settingsTabs = [
   { id: 'auth', label: '인증', icon: <Lock className="w-4 h-4" />, path: '/settings/auth' },
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
   { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
+  { id: 'custom-css', label: 'Custom CSS', icon: <Code className="w-4 h-4" />, path: '/settings/custom-css' },
   { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' }
 ]
 
@@ -91,6 +93,7 @@ const Settings: FC = () => {
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />
         <Route path="email" element={<EmailSettings />} />
+        <Route path="custom-css" element={<CustomCSSSettings />} />
         <Route path="app-services" element={<AppServices />} />
         <Route path="integrations" element={<IntegrationSettings />} />
         <Route path="*" element={<Navigate to="" replace />} />
