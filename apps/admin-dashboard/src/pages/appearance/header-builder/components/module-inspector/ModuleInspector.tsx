@@ -13,6 +13,7 @@ import { WidgetSettings } from './WidgetSettings';
 import { ButtonSettings } from './ButtonSettings';
 import { SocialIconsSettings } from './SocialIconsSettings';
 import { HTMLSettings } from './HTMLSettings';
+import { FaviconSettings } from './FaviconSettings';
 
 interface ModuleInspectorProps {
   module: ModuleConfig;
@@ -57,6 +58,8 @@ export const ModuleInspector: React.FC<ModuleInspectorProps> = ({
         return <SocialIconsSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'html':
         return <HTMLSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'favicon':
+        return <FaviconSettings settings={module.settings} onChange={handleSettingChange} />;
       default:
         return null;
     }

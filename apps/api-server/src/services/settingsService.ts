@@ -336,6 +336,7 @@ export class SettingsService {
         'html': 'o4o/html',
         'widget': 'core/widget-area',
         'social': 'core/social-links',
+        'favicon': 'o4o/favicon',
       };
       return typeMap[moduleType] || moduleType;
     };
@@ -344,19 +345,73 @@ export class SettingsService {
     const convertModuleToBlock = (module: any, rowName: string): any => {
       const blockType = getBlockType(module.type);
 
+      // Build module-specific data
+      let moduleData: any = {
+        className: module.settings?.customClass || '',
+      };
+
+      // Add module-specific settings to data
+      if (module.type === 'logo') {
+        moduleData = {
+          ...moduleData,
+          logoUrl: module.settings?.logoUrl || '',
+          href: module.settings?.href || '/',
+          width: module.settings?.width || 120,
+          retinaUrl: module.settings?.retinaUrl || '',
+          isLink: module.settings?.isLink !== false,
+        };
+      } else if (module.type === 'primary-menu' || module.type === 'secondary-menu') {
+        moduleData = {
+          ...moduleData,
+          menuRef: module.type === 'primary-menu' ? 'primary' : 'secondary',
+          orientation: 'horizontal',
+          showSubmenuIcon: true,
+        };
+      } else if (module.type === 'site-title') {
+        moduleData = {
+          ...moduleData,
+          text: module.settings?.text || '',
+          showTagline: module.settings?.showTagline || false,
+          isLink: module.settings?.isLink !== false,
+        };
+      } else if (module.type === 'button') {
+        moduleData = {
+          ...moduleData,
+          label: module.settings?.label || 'Button',
+          href: module.settings?.href || '#',
+          variant: module.settings?.variant || 'primary',
+          size: module.settings?.size || 'medium',
+        };
+      } else if (module.type === 'html') {
+        moduleData = {
+          ...moduleData,
+          html: module.settings?.html || '',
+        };
+      } else if (module.type === 'social') {
+        moduleData = {
+          ...moduleData,
+          links: module.settings?.links || [],
+          shape: module.settings?.shape || 'circle',
+          size: module.settings?.size || 24,
+        };
+      } else if (module.type === 'favicon') {
+        moduleData = {
+          ...moduleData,
+          faviconUrl: module.settings?.faviconUrl || '',
+          type: module.settings?.type || 'png',
+          sizes: module.settings?.sizes || '32x32',
+          appleTouchIcon: module.settings?.appleTouchIcon || '',
+        };
+      }
+
       return {
         id: module.id,
         type: blockType,
-        data: {
-          className: module.settings?.customClass || '',
-          ...(module.type === 'primary-menu' || module.type === 'secondary-menu' ? {
-            menuRef: module.type === 'primary-menu' ? 'primary' : 'secondary',
-            orientation: 'horizontal',
-            showSubmenuIcon: true,
-          } : {}),
-        },
+        data: moduleData,
         settings: {
           visibility: module.settings?.visibility || { desktop: true, tablet: true, mobile: true },
+          alignment: module.settings?.alignment || 'left',
+          spacing: module.settings?.spacing || {},
         },
         attributes: {},
         innerBlocks: []

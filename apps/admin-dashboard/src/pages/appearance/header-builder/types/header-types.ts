@@ -43,7 +43,8 @@ export type HeaderModuleType =
   | 'html'
   | 'widget'
   | 'social'
-  | 'role-switcher';
+  | 'role-switcher'
+  | 'favicon';
 
 /**
  * Site Title Module Settings
@@ -226,6 +227,26 @@ export interface RoleSwitcherModuleSettings {
  */
 export interface WidgetModuleSettings {
   widgetAreaId?: string;
+  // Common settings
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Favicon Module Settings
+ */
+export interface FaviconModuleSettings {
+  faviconUrl?: string;
+  type?: 'ico' | 'png' | 'svg';
+  sizes?: string;
+  appleTouchIcon?: string;
+  appleIconSizes?: string;
   // Common settings
   alignment?: 'left' | 'center' | 'right';
   visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
