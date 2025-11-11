@@ -336,7 +336,6 @@ export class SettingsService {
         'html': 'o4o/html',
         'widget': 'core/widget-area',
         'social': 'core/social-links',
-        'favicon': 'o4o/favicon',
       };
       return typeMap[moduleType] || moduleType;
     };
@@ -396,14 +395,6 @@ export class SettingsService {
           links: module.settings?.links || [],
           shape: module.settings?.shape || 'circle',
           size: module.settings?.size || 24,
-        };
-      } else if (module.type === 'favicon') {
-        moduleData = {
-          ...moduleData,
-          faviconUrl: module.settings?.faviconUrl || '',
-          type: module.settings?.type || 'png',
-          sizes: module.settings?.sizes || '32x32',
-          appleTouchIcon: module.settings?.appleTouchIcon || '',
         };
       } else if (module.type === 'account') {
         moduleData = {

@@ -17,6 +17,7 @@ interface GeneralSettingsData {
   siteDescription: string;
   siteUrl: string;
   adminEmail: string;
+  favicon?: string;
   timezone: string;
   dateFormat: string;
   timeFormat: string;
@@ -59,6 +60,7 @@ export default function GeneralSettings() {
     siteDescription: '',
     siteUrl: '',
     adminEmail: '',
+    favicon: '',
     timezone: 'Asia/Seoul',
     dateFormat: 'YYYY-MM-DD',
     timeFormat: 'HH:mm',
@@ -173,6 +175,42 @@ export default function GeneralSettings() {
               onChange={(e: any) => handleChange('adminEmail', e.target.value)}
               placeholder="admin@example.com"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="favicon">파비콘 URL</Label>
+            <Input
+              id="favicon"
+              name="favicon"
+              type="url"
+              value={settings.favicon}
+              onChange={(e: any) => handleChange('favicon', e.target.value)}
+              placeholder="https://example.com/favicon.ico"
+            />
+            <p className="text-xs text-gray-500">
+              사이트 파비콘 이미지 URL을 입력하세요 (.ico, .png, .svg 지원)
+            </p>
+            {settings.favicon && (
+              <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <p className="text-xs font-medium text-gray-700 mb-2">미리보기:</p>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={settings.favicon}
+                    alt="Favicon preview"
+                    className="w-8 h-8"
+                    onError={(e: any) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <span
+                    className="text-xs text-red-500 hidden"
+                    style={{ display: 'none' }}
+                  >
+                    이미지를 불러올 수 없습니다
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

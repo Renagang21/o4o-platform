@@ -51,7 +51,6 @@ const MODULE_TYPES: Array<{
   { type: 'widget', label: 'Widget', icon: <Layout className="w-4 h-4" />, description: 'Widget area' },
   { type: 'social', label: 'Social', icon: <Share2 className="w-4 h-4" />, description: 'Social media links' },
   { type: 'role-switcher', label: 'Role Switcher', icon: <UserCheck className="w-4 h-4" />, description: 'User role switcher' },
-  { type: 'favicon', label: 'Favicon', icon: <Image className="w-4 h-4" />, description: 'Browser tab icon' },
 ];
 
 const HeaderBuilderPage: React.FC = () => {
