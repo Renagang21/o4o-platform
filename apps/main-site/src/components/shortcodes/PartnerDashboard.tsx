@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/config/api';
+import { authClient } from '@o4o/auth-client';
 import { AnalyticsTab } from '../analytics/AnalyticsTab';
 import { SettlementSummaryCards } from '../dashboard/SettlementSummaryCards';
 import { SettlementTable } from '../dashboard/SettlementTable';
@@ -42,20 +42,10 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
 
-      const response = await fetch(`${API_BASE_URL}/dropshipping/partner/dashboard/summary`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch dashboard data');
-      }
-
-      const data = await response.json();
+      // Use authClient which automatically handles baseURL and authentication
+      const response = await authClient.api.get('/dropshipping/partner/dashboard/summary');
+      const data = response.data;
 
       if (data.success) {
         setSummary(data.summary);
@@ -64,7 +54,7 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
       }
     } catch (err: any) {
       console.error('Dashboard fetch error:', err);
-      setError(err.message || 'Network error occurred');
+      setError(err.response?.data?.message || err.message || 'Network error occurred');
     } finally {
       setLoading(false);
     }
