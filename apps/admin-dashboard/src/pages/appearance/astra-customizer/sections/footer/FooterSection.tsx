@@ -135,8 +135,20 @@ export const FooterSection: React.FC = () => {
                 
                 <AstraSlider
                   label="Number of Columns"
-                  value={footer.widgets.columns}
-                  onChange={(value) => updateSetting('footer', value, ['widgets', 'columns'])}
+                  value={{
+                    desktop: footer.widgets.columns.desktop,
+                    tablet: footer.widgets.columns.tablet,
+                    mobile: footer.widgets.columns.mobile,
+                  }}
+                  onChange={(value) => {
+                    if (typeof value === 'number') {
+                      updateSetting('footer', value, ['widgets', 'columns', 'desktop']);
+                    } else {
+                      updateSetting('footer', value.desktop, ['widgets', 'columns', 'desktop']);
+                      updateSetting('footer', value.tablet, ['widgets', 'columns', 'tablet']);
+                      updateSetting('footer', value.mobile, ['widgets', 'columns', 'mobile']);
+                    }
+                  }}
                   min={1}
                   max={6}
                   step={1}
