@@ -94,7 +94,7 @@ const registerShortcodesFromModule = async (
 
   await registerShortcodesFromModule(
     'authShortcodes',
-    () => import('./components/shortcodes/authShortcodes')
+    () => import('./components/shortcodes/auth')
   );
 
   await registerShortcodesFromModule(
