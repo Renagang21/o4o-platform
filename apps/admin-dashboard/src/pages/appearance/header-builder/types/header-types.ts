@@ -51,9 +51,12 @@ export type HeaderModuleType =
  */
 export interface SiteTitleModuleSettings {
   text?: string;
+  tagline?: string;
+  showTitle?: boolean;
   showTagline?: boolean;
   typography?: { fontSize: 'small' | 'medium' | 'large' };
   isLink?: boolean;
+  href?: string;
   // Common settings
   alignment?: 'left' | 'center' | 'right';
   visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
@@ -193,6 +196,26 @@ export interface CartModuleSettings {
   showCount?: boolean;
   showTotal?: boolean;
   action?: 'mini-cart' | 'page';
+  cartUrl?: string;
+  // Common settings
+  alignment?: 'left' | 'center' | 'right';
+  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
+  spacing?: {
+    margin: { top: number; right: number; bottom: number; left: number };
+    padding: { top: number; right: number; bottom: number; left: number };
+  };
+  className?: string;
+  ariaLabel?: string;
+}
+
+/**
+ * Account Module Settings
+ */
+export interface AccountModuleSettings {
+  accountUrl?: string;
+  showIcon?: boolean;
+  showLabel?: boolean;
+  label?: string;
   // Common settings
   alignment?: 'left' | 'center' | 'right';
   visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };

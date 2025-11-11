@@ -12,6 +12,7 @@ export const CartSettings: React.FC<CartSettingsProps> = ({
   const showCount = settings.showCount !== false; // Default true
   const showTotal = settings.showTotal || false;
   const action = settings.action || 'mini-cart';
+  const cartUrl = settings.cartUrl || '/cart';
 
   return (
     <div className="border-b border-gray-200 pb-6 mb-6">
@@ -58,6 +59,21 @@ export const CartSettings: React.FC<CartSettingsProps> = ({
         </select>
         <p className="text-xs text-gray-500 mt-1">Action when cart icon is clicked</p>
       </div>
+
+      {/* Cart URL (shown when action is 'page') */}
+      {action === 'page' && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Cart Page URL</label>
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={cartUrl}
+            onChange={(e) => onChange('cartUrl', e.target.value)}
+            placeholder="/cart"
+          />
+          <p className="text-xs text-gray-500 mt-1">URL to the cart page</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -14,6 +14,7 @@ import { ButtonSettings } from './ButtonSettings';
 import { SocialIconsSettings } from './SocialIconsSettings';
 import { HTMLSettings } from './HTMLSettings';
 import { FaviconSettings } from './FaviconSettings';
+import { AccountSettings } from './AccountSettings';
 
 interface ModuleInspectorProps {
   module: ModuleConfig;
@@ -46,6 +47,8 @@ export const ModuleInspector: React.FC<ModuleInspectorProps> = ({
         return <SecondaryMenuSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'search':
         return <SearchSettings settings={module.settings} onChange={handleSettingChange} />;
+      case 'account':
+        return <AccountSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'cart':
         return <CartSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'role-switcher':

@@ -371,8 +371,11 @@ export class SettingsService {
         moduleData = {
           ...moduleData,
           text: module.settings?.text || '',
+          tagline: module.settings?.tagline || '',
+          showTitle: module.settings?.showTitle !== false,
           showTagline: module.settings?.showTagline || false,
           isLink: module.settings?.isLink !== false,
+          href: module.settings?.href || '/',
         };
       } else if (module.type === 'button') {
         moduleData = {
@@ -401,6 +404,22 @@ export class SettingsService {
           type: module.settings?.type || 'png',
           sizes: module.settings?.sizes || '32x32',
           appleTouchIcon: module.settings?.appleTouchIcon || '',
+        };
+      } else if (module.type === 'account') {
+        moduleData = {
+          ...moduleData,
+          accountUrl: module.settings?.accountUrl || '/account',
+          showIcon: module.settings?.showIcon !== false,
+          showLabel: module.settings?.showLabel !== false,
+          label: module.settings?.label || 'Account',
+        };
+      } else if (module.type === 'cart') {
+        moduleData = {
+          ...moduleData,
+          showCount: module.settings?.showCount !== false,
+          showTotal: module.settings?.showTotal || false,
+          action: module.settings?.action || 'mini-cart',
+          cartUrl: module.settings?.cartUrl || '/cart',
         };
       }
 
