@@ -84,28 +84,46 @@ const registerShortcodesFromModule = async (
   }
 };
 
-// Register all shortcodes from their respective modules
-// This runs once at startup to discover and register all available shortcodes
+// Auto-discover and register all shortcode modules
+// Convention: Files named *Shortcodes.tsx or */index.ts in components/shortcodes/
+// Examples:
+// - formShortcodes.tsx -> exports formShortcodes array
+// - auth/index.ts -> exports authShortcodes array
+// - product/productShortcodes.tsx -> exports productShortcodes array
+
+const shortcodeFileModules = import.meta.glob('./components/shortcodes/**/*Shortcodes.{ts,tsx}', { eager: false });
+const shortcodeIndexModules = import.meta.glob('./components/shortcodes/**/index.{ts,tsx}', { eager: false });
+
+// Merge both patterns
+const allShortcodeModules = { ...shortcodeFileModules, ...shortcodeIndexModules };
+
 (async () => {
-  await registerShortcodesFromModule(
-    'formShortcodes',
-    () => import('./components/shortcodes/formShortcodes')
-  );
+  const discoveredModules: string[] = [];
 
-  await registerShortcodesFromModule(
-    'authShortcodes',
-    () => import('./components/shortcodes/auth')
-  );
+  for (const [path, importFn] of Object.entries(allShortcodeModules)) {
+    // Extract module name from path
+    let moduleName: string;
 
-  await registerShortcodesFromModule(
-    'dropshippingShortcodes',
-    () => import('./components/shortcodes/dropshippingShortcodes')
-  );
+    if (path.includes('/index.')) {
+      // Example: ./components/shortcodes/auth/index.ts -> authShortcodes
+      const folderMatch = path.match(/\/([^/]+)\/index\./);
+      moduleName = folderMatch ? `${folderMatch[1]}Shortcodes` : '';
+    } else {
+      // Example: ./components/shortcodes/formShortcodes.tsx -> formShortcodes
+      const fileMatch = path.match(/\/([^/]+)\.tsx?$/);
+      moduleName = fileMatch ? fileMatch[1] : '';
+    }
 
-  await registerShortcodesFromModule(
-    'productShortcodes',
-    () => import('./components/shortcodes/productShortcodes')
-  );
+    if (!moduleName) {
+      console.warn(`[Shortcode Registry] Could not extract module name from ${path}`);
+      continue;
+    }
+
+    discoveredModules.push(moduleName);
+    await registerShortcodesFromModule(moduleName, importFn as any);
+  }
+
+  console.log(`[Shortcode Registry] ✅ Auto-discovered ${discoveredModules.length} modules:`, discoveredModules);
 })();
 
 // Debug: Expose globalRegistry to window (development only)
