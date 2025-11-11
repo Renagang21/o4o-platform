@@ -44,6 +44,7 @@ const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
 const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
+const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 // P0 RBAC: Enrollment Management
 const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
@@ -314,6 +315,15 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
+                    {/* 현재 접속자 */}
+                    <Route path="/active-users" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ActiveUsers />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 사용자 관리 */}
                     <Route path="/users" element={
                       <AdminProtectedRoute requiredPermissions={['users:read']}>
@@ -336,15 +346,7 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
-                    <Route path="/users/profile" element={
-                      <AdminProtectedRoute requiredPermissions={['users:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <UserDetail />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
+
                     <Route path="/users/roles" element={
                       <AdminProtectedRoute requiredPermissions={['users:update']}>
                         <Suspense fallback={<PageLoader />}>

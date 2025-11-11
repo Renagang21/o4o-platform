@@ -54,6 +54,12 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <LayoutDashboard className="w-5 h-5" />,
     path: '/admin'
   },
+  {
+    id: 'active-users',
+    label: '현재 접속자',
+    icon: <Activity className="w-5 h-5" />,
+    path: '/active-users'
+  },
   // 1. 글
   {
     id: 'posts',
@@ -108,7 +114,6 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'users-suppliers', label: '공급자', icon: <Store className="w-4 h-4" />, path: '/dropshipping/suppliers' },
       { id: 'users-sellers', label: '판매자', icon: <ShoppingBag className="w-4 h-4" />, path: '/dropshipping/sellers' },
       { id: 'users-partners', label: '파트너', icon: <Users className="w-4 h-4" />, path: '/dropshipping/partners' },
-      { id: 'users-profile', label: '프로필', icon: <Users className="w-4 h-4" />, path: '/users/profile' },
       { id: 'users-roles', label: '역할 관리', icon: <UserCheck className="w-4 h-4" />, path: '/users/roles' },
       { id: 'users-statistics', label: '사용자 통계', icon: <BarChart3 className="w-4 h-4" />, path: '/users/statistics' }
     ]
