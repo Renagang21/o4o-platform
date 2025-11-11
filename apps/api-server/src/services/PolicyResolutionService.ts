@@ -218,16 +218,9 @@ export class PolicyResolutionService {
    * Priority 1: Resolve product-level policy (override)
    */
   private async resolveProductPolicy(context: PolicyResolutionContext): Promise<CommissionPolicy | null> {
-    const product = await this.productRepo.findOne({
-      where: { id: context.productId },
-      relations: ['policy']
-    });
-
-    if (!product?.policy) {
-      return null;
-    }
-
-    return this.validatePolicy(product.policy, context.orderDate) ? product.policy : null;
+    // Product-level policy has been removed in Phase 8-9
+    // Commission policies are now resolved at supplier/partner/global level only
+    return null;
   }
 
   /**
