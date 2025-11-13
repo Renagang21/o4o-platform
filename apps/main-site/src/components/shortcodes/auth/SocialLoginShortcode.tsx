@@ -410,9 +410,13 @@ export const SocialLoginComponent: React.FC<{
 const OAuthOnlyComponent: React.FC<{
   redirectUrl?: string;
   title?: string;
+  providers?: string;
+  showTestPanel?: string | boolean;
 }> = ({
   redirectUrl = '/dashboard',
-  title = '소셜 로그인'
+  title = '소셜 로그인',
+  providers,
+  showTestPanel
 }) => {
   return (
     <SocialLoginComponent
@@ -420,6 +424,8 @@ const OAuthOnlyComponent: React.FC<{
       showEmailLogin={false}
       title={title}
       subtitle="소셜 계정으로 간편하게 로그인하세요"
+      providers={providers}
+      showTestPanel={showTestPanel}
     />
   );
 };
@@ -459,12 +465,19 @@ export const loginFormShortcode: ShortcodeDefinition = {
 
 export const oauthLoginShortcode: ShortcodeDefinition = {
   name: 'oauth_login',
-  component: ({ attributes }) => (
-    <OAuthOnlyComponent
-      redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
-      title={attributes.title as string}
-    />
-  )
+  component: ({ attributes }) => {
+    if (import.meta.env.DEV) {
+      console.log('[oauth_login] Parsed attributes:', attributes);
+    }
+    return (
+      <OAuthOnlyComponent
+        redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
+        title={attributes.title as string}
+        providers={attributes.providers as string}
+        showTestPanel={attributes.showTestPanel as string | boolean}
+      />
+    );
+  }
 };
 
 // Default export for auto-registration (SocialLoginShortcode.tsx → SocialLogin)
