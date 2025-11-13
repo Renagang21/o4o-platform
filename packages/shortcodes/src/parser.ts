@@ -70,10 +70,10 @@ export class DefaultShortcodeParser implements ShortcodeParser {
     // 속성 파싱 정규식
     // 1. name="value" (따옴표 있는 값)
     // 2. name='value' (작은 따옴표)
-    // 3. name=value (따옴표 없는 값)
+    // 3. name=value (따옴표 없는 값 - 공백이나 ] 전까지)
     // 4. name (값 없는 속성, boolean true로 처리)
     // Allows spaces around equals sign: name = "value" or name ="value" or name= "value"
-    const attrRegex = /(\w+)\s*(?:=\s*(?:"([^"]*)"|'([^']*)'|([^\s]+)))?/g;
+    const attrRegex = /(\w+)\s*(?:=\s*(?:"([^"]*)"|'([^']*)'|([^\s\]]+)))?/g;
     let attrMatch;
 
     while ((attrMatch = attrRegex.exec(attributesString)) !== null) {
