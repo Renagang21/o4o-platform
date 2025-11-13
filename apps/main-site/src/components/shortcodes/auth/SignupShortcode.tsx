@@ -440,3 +440,6 @@ export const signupShortcode: ShortcodeDefinition = {
     />
   )
 };
+
+// Default export for auto-registration (SignupShortcode.tsx → Signup)
+export default SignupComponent;

@@ -466,3 +466,6 @@ export const oauthLoginShortcode: ShortcodeDefinition = {
     />
   )
 };
+
+// Default export for auto-registration (SocialLoginShortcode.tsx → SocialLogin)
+export default SocialLoginComponent;

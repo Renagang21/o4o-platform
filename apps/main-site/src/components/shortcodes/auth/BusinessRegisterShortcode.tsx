@@ -825,3 +825,6 @@ export const businessRegisterShortcode: ShortcodeDefinition = {
     />
   )
 };
+
+// Default export for auto-registration (BusinessRegisterShortcode.tsx → BusinessRegister)
+export default BusinessRegisterComponent;

@@ -169,3 +169,6 @@ export const findPasswordShortcode: ShortcodeDefinition = {
     />
   )
 };
+
+// Default export for auto-registration (FindPasswordShortcode.tsx → FindPassword)
+export default FindPasswordComponent;

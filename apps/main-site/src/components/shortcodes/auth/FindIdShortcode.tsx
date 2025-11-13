@@ -166,3 +166,6 @@ export const findIdShortcode: ShortcodeDefinition = {
     />
   )
 };
+
+// Default export for auto-registration (FindIdShortcode.tsx → FindId)
+export default FindIdComponent;
