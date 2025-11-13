@@ -115,23 +115,23 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
   };
 
   const renderComponent = () => {
-    // Check if shortcode exists
-    const shortcodeConfig = dropshippingShortcodes[name as keyof typeof dropshippingShortcodes];
+    // Find shortcode definition from array
+    const shortcodeConfig = dropshippingShortcodes.find(sc => sc.name === name);
     if (!shortcodeConfig) {
       setError({
         type: 'component_not_found',
         message: `Shortcode [${name}] not found`,
-        details: `Available shortcodes: ${Object.keys(dropshippingShortcodes).join(', ')}`
+        details: `Available shortcodes: ${dropshippingShortcodes.map(sc => sc.name).join(', ')}`
       });
       return null;
     }
 
-    // Get component from map
-    const Component = COMPONENT_MAP[shortcodeConfig.component as keyof typeof COMPONENT_MAP];
+    // Get component from shortcode definition or COMPONENT_MAP (legacy support)
+    const Component = shortcodeConfig.component || COMPONENT_MAP[name as keyof typeof COMPONENT_MAP];
     if (!Component) {
       setError({
         type: 'component_not_found',
-        message: `Component ${shortcodeConfig.component} not found`,
+        message: `Component for ${name} not found`,
         details: 'This shortcode is registered but the component is not available'
       });
       return null;
@@ -212,20 +212,18 @@ export const registerShortcodes = () => {
   const shortcodes: Record<string, {
     callback: (attributes?: Record<string, unknown>, content?: string) => string;
   }> = {};
-  
-  Object.keys(dropshippingShortcodes).forEach(shortcodeName => {
-    const config = dropshippingShortcodes[shortcodeName as keyof typeof dropshippingShortcodes];
-    
-    shortcodes[shortcodeName] = {
+
+  dropshippingShortcodes.forEach(sc => {
+    shortcodes[sc.name] = {
       callback: (attributes: Record<string, unknown> = {}, content: string = '') => {
-        return `<div id="shortcode-${shortcodeName}-${Date.now()}"></div>
+        return `<div id="shortcode-${sc.name}-${Date.now()}"></div>
         <script>
-          window.renderShortcode('${shortcodeName}', ${JSON.stringify(attributes)}, '${content}');
+          window.renderShortcode('${sc.name}', ${JSON.stringify(attributes)}, '${content}');
         </script>`;
       }
     };
   });
-  
+
   return shortcodes;
 };
 
@@ -242,17 +240,16 @@ export const renderShortcodeInWordPress = (name: string, attributes: Record<stri
 
 // Export shortcode information for WordPress admin
 export const getShortcodeInfo = () => {
-  return Object.keys(dropshippingShortcodes).map(name => ({
-    name,
-    tag: `[${name}]`,
-    description: dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.description,
-    attributes: (dropshippingShortcodes as any)[name]?.attributes || {},
-    example: `[${name}${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).length > 0 
-      ? ` ${Object.keys(dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes || {}).slice(0, 2).map((attr: string) => 
-          `${attr}="${dropshippingShortcodes[name as keyof typeof dropshippingShortcodes]?.attributes?.[attr]?.default || 'value'}"`
-        ).join(' ')}`
-      : ''}]`,
-    category: name.startsWith('partner_') ? 'Partner Portal' : 'General'
+  return dropshippingShortcodes.map(sc => ({
+    name: sc.name,
+    tag: `[${sc.name}]`,
+    description: sc.description || '',
+    attributes: {},
+    example: `[${sc.name}]`,
+    category: sc.name.startsWith('partner_') ? 'Partner Portal'
+            : sc.name.startsWith('supplier_') ? 'Supplier Portal'
+            : sc.name.startsWith('seller_') ? 'Seller Portal'
+            : 'General'
   }));
 };
 
