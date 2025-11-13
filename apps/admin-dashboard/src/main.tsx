@@ -73,12 +73,21 @@ function pascalToSnakeCase(str: string): string {
 }
 
 /**
- * Extract component name from file path
+ * Extract component name from file path and remove 'Shortcode' suffix
  * ./components/shortcodes/dropshipping/PartnerDashboard.tsx → PartnerDashboard
+ * ./components/shortcodes/VideoShortcodes.tsx → VideoShortcodes (already filtered)
  */
 function extractComponentName(path: string): string {
   const match = path.match(/\/([^/]+)\.tsx$/);
-  return match ? match[1] : '';
+  if (!match) return '';
+
+  let componentName = match[1];
+  // Remove 'Shortcode' suffix if present (for files like SocialLoginShortcode.tsx)
+  if (componentName.endsWith('Shortcode')) {
+    componentName = componentName.slice(0, -9); // Remove 'Shortcode' (9 chars)
+  }
+
+  return componentName;
 }
 
 // Scan all .tsx component files
