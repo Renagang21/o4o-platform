@@ -123,7 +123,7 @@ export const SocialLoginComponent: React.FC<{
       if (!showTestPanelSafe) return;
 
       try {
-        const response = await authClient.api.get('/auth/test-accounts');
+        const response = await authClient.api.get('/auth/unified/test-accounts');
         if (response.data.success) {
           setTestAccounts(response.data.data);
         }
