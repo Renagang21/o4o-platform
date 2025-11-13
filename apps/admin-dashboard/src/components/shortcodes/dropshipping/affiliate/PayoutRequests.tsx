@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import SharedPayoutRequests from '../shared/PayoutRequests';
+import SharedPayoutRequests from '../shared/SharedPayoutRequests';
 
 const PayoutRequests: React.FC = () => {
   return <SharedPayoutRequests roleType="affiliate" />;

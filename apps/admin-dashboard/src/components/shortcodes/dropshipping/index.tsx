@@ -16,7 +16,7 @@ export {
   PartnerProducts,
   PartnerCommissions,
   PartnerLinkGenerator,
-  CommissionDashboard,
+  PartnerCommissionDashboard,
   PayoutRequests
 } from './partner';
 

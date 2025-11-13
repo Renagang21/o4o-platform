@@ -4,34 +4,35 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 
 // Import all shortcode components
 import { dropshippingShortcodes } from './dropshipping';
-import { 
+import {
   PartnerMainDashboard,
   PartnerProducts,
   PartnerCommissions,
   PartnerLinkGenerator,
-  CommissionDashboard,
+  PartnerCommissionDashboard,
   PayoutRequests,
   UserDashboard,
   RoleVerification
 } from './dropshipping';
 import adminComponents from './admin';
 
-// Shortcode component map
+// Shortcode component map (Legacy support for old manual registration)
 const COMPONENT_MAP = {
   // Partner components
   'PartnerMainDashboard': PartnerMainDashboard,
   'PartnerProducts': PartnerProducts,
   'PartnerCommissions': PartnerCommissions,
   'PartnerLinkGenerator': PartnerLinkGenerator,
-  'CommissionDashboard': CommissionDashboard,
+  'PartnerCommissionDashboard': PartnerCommissionDashboard,
+  'CommissionDashboard': PartnerCommissionDashboard, // Alias for backward compatibility
   'PayoutRequests': PayoutRequests,
-  
+
   // Admin components
   'AdminApprovalQueue': adminComponents.AdminApprovalQueue,
   'admin_approval_queue': adminComponents.AdminApprovalQueue,
   'AdminPlatformStats': adminComponents.AdminPlatformStats,
   'admin_platform_stats': adminComponents.AdminPlatformStats,
-  
+
   // Core components
   'UserDashboard': UserDashboard,
   'RoleVerification': RoleVerification

@@ -20,7 +20,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 
 // Import existing components
-import CommissionDashboard from './CommissionDashboard';
+import PartnerCommissionDashboard from './PartnerCommissionDashboard';
 import PartnerLinkGenerator from './PartnerLinkGenerator';
 
 interface PartnerDashboardSummary {
@@ -323,7 +323,7 @@ const PartnerMainDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="commissions">
-          <CommissionDashboard />
+          <PartnerCommissionDashboard />
         </TabsContent>
 
         <TabsContent value="links">

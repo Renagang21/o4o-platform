@@ -1,6 +1,6 @@
 // Affiliate Shortcodes Export
 export { default as AffiliateLinkGenerator } from './AffiliateLinkGenerator';
-export { default as CommissionDashboard } from './CommissionDashboard';
+export { default as AffiliateCommissionDashboard } from './AffiliateCommissionDashboard';
 export { default as PayoutRequests } from './PayoutRequests';
 
 // Shortcode Registration Map for Affiliate Components

@@ -8,7 +8,7 @@ import { ShortcodeDefinition } from '@o4o/shortcodes';
 
 // Partner Shortcodes Export
 export { default as PartnerLinkGenerator } from './PartnerLinkGenerator';
-export { default as CommissionDashboard } from './CommissionDashboard';
+export { default as PartnerCommissionDashboard } from './PartnerCommissionDashboard';
 export { default as PayoutRequests } from './PayoutRequests';
 export { default as PartnerMainDashboard } from './PartnerMainDashboard';
 export { default as PartnerProducts } from './PartnerProducts';
@@ -19,7 +19,7 @@ const PartnerMainDashboardLazy = React.lazy(() => import('./PartnerMainDashboard
 const PartnerProductsLazy = React.lazy(() => import('./PartnerProducts'));
 const PartnerCommissionsLazy = React.lazy(() => import('./PartnerCommissions'));
 const PartnerLinkGeneratorLazy = React.lazy(() => import('./PartnerLinkGenerator'));
-const CommissionDashboardLazy = React.lazy(() => import('./CommissionDashboard'));
+const PartnerCommissionDashboardLazy = React.lazy(() => import('./PartnerCommissionDashboard'));
 const PayoutRequestsLazy = React.lazy(() => import('./PayoutRequests'));
 
 // Loading component
@@ -74,7 +74,7 @@ export const partnerShortcodes: ShortcodeDefinition[] = [
     name: 'partner_commission_dashboard',
     component: ({ attributes }) => (
       <React.Suspense fallback={<Loading />}>
-        <CommissionDashboardLazy {...attributes} />
+        <PartnerCommissionDashboardLazy {...attributes} />
       </React.Suspense>
     ),
     description: 'Track commissions, earnings, and performance metrics'

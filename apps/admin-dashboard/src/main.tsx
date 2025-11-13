@@ -52,86 +52,89 @@ registerAllBlocks();
 // Register all dashboard widgets before rendering (P1 Phase C)
 registerAllWidgets();
 
-// Auto-discover and register all shortcode modules
-// Convention: Files named *Shortcodes.tsx or */index.ts in components/shortcodes/
+// Auto-discover and register all shortcode components (Pure File-Based Convention)
+// Convention: Filename → Shortcode Name (PascalCase → snake_case)
 // Examples:
-// - formShortcodes.tsx -> exports formShortcodes array
-// - auth/index.ts -> exports authShortcodes array
-// - product/productShortcodes.tsx -> exports productShortcodes array
+// - PartnerDashboard.tsx → [partner_dashboard]
+// - SupplierProducts.tsx → [supplier_products]
+// - UserRoleVerification.tsx → [user_role_verification]
+//
+// NO manual registration needed! Just create/delete component files.
 
-const shortcodeFileModules = import.meta.glob('./components/shortcodes/**/*Shortcodes.{ts,tsx}', { eager: false });
-const shortcodeIndexModules = import.meta.glob('./components/shortcodes/**/index.{ts,tsx}', { eager: false });
+/**
+ * Convert PascalCase filename to snake_case shortcode name
+ * PartnerDashboard → partner_dashboard
+ */
+function pascalToSnakeCase(str: string): string {
+  return str
+    .replace(/([A-Z])/g, '_$1')
+    .toLowerCase()
+    .replace(/^_/, '');
+}
 
-// Merge both patterns
-const allShortcodeModules = { ...shortcodeFileModules, ...shortcodeIndexModules };
+/**
+ * Extract component name from file path
+ * ./components/shortcodes/dropshipping/PartnerDashboard.tsx → PartnerDashboard
+ */
+function extractComponentName(path: string): string {
+  const match = path.match(/\/([^/]+)\.tsx$/);
+  return match ? match[1] : '';
+}
 
-const registerShortcodesFromModule = async (
-  moduleName: string,
-  importFn: () => Promise<{ [key: string]: any }>
-) => {
-  try {
-    const module = await importFn();
-    const shortcodeArray = module[moduleName];
-
-    if (!Array.isArray(shortcodeArray)) {
-      console.error(`[Admin Shortcode Registry] "${moduleName}" is not an array`);
-      return;
-    }
-
-    shortcodeArray.forEach((definition: any) => {
-      if (!definition.name) {
-        console.warn(`[Admin Shortcode Registry] Skipping shortcode with no name in ${moduleName}`);
-        return;
-      }
-
-      registerLazyShortcode({
-        name: definition.name,
-        loader: () => importFn().then(m => {
-          const shortcode = m[moduleName]?.find((s: any) => s.name === definition.name);
-          if (!shortcode) {
-            console.error(`[Admin Shortcode Error] "${definition.name}" not found`);
-            return { default: () => null };
-          }
-          return { default: shortcode.component };
-        }).catch(err => {
-          console.error(`[Admin Shortcode Error] Failed to load "${definition.name}":`, err);
-          return { default: () => null };
-        })
-      });
-    });
-  } catch (err) {
-    console.error(`[Admin Shortcode Registry] Failed to load module ${moduleName}:`, err);
-  }
-};
+// Scan all .tsx component files
+const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { eager: false });
 
 (async () => {
-  const discoveredModules: string[] = [];
+  const registered: string[] = [];
 
-  for (const [path, importFn] of Object.entries(allShortcodeModules)) {
-    // Extract module name from path
-    let moduleName: string;
-
-    if (path.includes('/index.')) {
-      // Example: ./components/shortcodes/auth/index.ts -> authShortcodes
-      const folderMatch = path.match(/\/([^/]+)\/index\./);
-      moduleName = folderMatch ? `${folderMatch[1]}Shortcodes` : '';
-    } else {
-      // Example: ./components/shortcodes/formShortcodes.tsx -> formShortcodes
-      const fileMatch = path.match(/\/([^/]+)\.tsx?$/);
-      moduleName = fileMatch ? fileMatch[1] : '';
-    }
-
-    if (!moduleName) {
-      console.warn(`[Admin Shortcode Registry] Could not extract module name from ${path}`);
+  for (const [path, importFn] of Object.entries(componentModules)) {
+    // Skip utility files, types, legacy array-based files, etc.
+    if (
+      path.includes('/types.tsx') ||
+      path.includes('/utils.tsx') ||
+      path.includes('/helpers.tsx') ||
+      path.includes('/index.tsx') ||
+      path.includes('/__tests__/') ||
+      path.endsWith('ShortcodeRenderer.tsx') ||
+      path.endsWith('Shortcodes.tsx') || // Legacy array-based definition files
+      path.endsWith('shortcodes.tsx')
+    ) {
       continue;
     }
 
-    discoveredModules.push(moduleName);
-    await registerShortcodesFromModule(moduleName, importFn as any);
+    const componentName = extractComponentName(path);
+    if (!componentName) continue;
+
+    const shortcodeName = pascalToSnakeCase(componentName);
+
+    // Register with lazy loading
+    registerLazyShortcode({
+      name: shortcodeName,
+      loader: async () => {
+        try {
+          const module = await importFn();
+          // Try named export first, then default
+          const Component = (module as any)[componentName] || (module as any).default;
+
+          if (!Component) {
+            console.error(`[Admin Shortcode] Component "${componentName}" not found in ${path}`);
+            return { default: () => null };
+          }
+
+          return { default: Component };
+        } catch (err) {
+          console.error(`[Admin Shortcode] Failed to load "${componentName}":`, err);
+          return { default: () => null };
+        }
+      },
+      description: `Auto-registered from ${path}`
+    });
+
+    registered.push(shortcodeName);
   }
 
   if (import.meta.env.DEV) {
-    console.log(`[Admin Shortcode Registry] ✅ Auto-discovered ${discoveredModules.length} modules:`, discoveredModules);
+    console.log(`[Admin Shortcode Registry] ✅ Auto-registered ${registered.length} shortcodes:`, registered.sort());
   }
 })();
 
