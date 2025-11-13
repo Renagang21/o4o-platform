@@ -74,57 +74,60 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
       continue;
     }
 
-    const componentName = extractComponentName(path);
-    if (!componentName) continue;
+    try {
+      const module = await importFn();
+      let foundShortcodes = false;
 
-    const shortcodeName = pascalToSnakeCase(componentName);
+      // First, try to find all ShortcodeDefinition exports in the module
+      for (const [exportName, exportValue] of Object.entries(module)) {
+        // Check if this export is a ShortcodeDefinition (has 'name' and 'component' properties)
+        if (
+          exportValue &&
+          typeof exportValue === 'object' &&
+          'name' in exportValue &&
+          'component' in exportValue
+        ) {
+          const shortcodeDef = exportValue as any;
 
-    // Register with lazy loading
-    registerLazyShortcode({
-      name: shortcodeName,
-      loader: async () => {
-        try {
-          const module = await importFn();
-          // Try named export first, then default
-          const Component = (module as any)[componentName] || (module as any).default;
+          registerLazyShortcode({
+            name: shortcodeDef.name,
+            loader: async () => ({ default: shortcodeDef.component }),
+            description: `Auto-registered from ${path} (${exportName})`
+          });
 
-          if (!Component) {
-            console.error(`[Main-Site Shortcode] Component "${componentName}" not found in ${path}`);
-            return {
-              default: () => {
-                if (import.meta.env.DEV) {
-                  return (
-                    <div style={{ padding: '1rem', background: '#fee', border: '1px solid #fcc', borderRadius: '4px' }}>
-                      <strong>Shortcode Error:</strong> "{componentName}" not found in {path}
-                    </div>
-                  );
-                }
-                return null;
-              }
-            };
+          registered.push(shortcodeDef.name);
+          foundShortcodes = true;
+
+          if (import.meta.env.DEV) {
+            console.log(`[Main-Site Shortcode] ✅ Registered [${shortcodeDef.name}] from ${exportName} in ${path}`);
           }
-
-          return { default: Component };
-        } catch (err) {
-          console.error(`[Main-Site Shortcode] Failed to load "${componentName}":`, err);
-          return {
-            default: () => {
-              if (import.meta.env.DEV) {
-                return (
-                  <div style={{ padding: '1rem', background: '#fee', border: '1px solid #fcc', borderRadius: '4px' }}>
-                    <strong>Load Error:</strong> Failed to load {componentName}
-                  </div>
-                );
-              }
-              return null;
-            }
-          };
         }
-      },
-      description: `Auto-registered from ${path}`
-    });
+      }
 
-    registered.push(shortcodeName);
+      // Fallback: if no ShortcodeDefinitions found, use filename-based registration
+      if (!foundShortcodes) {
+        const componentName = extractComponentName(path);
+        if (!componentName) continue;
+
+        const shortcodeName = pascalToSnakeCase(componentName);
+        const Component = (module as any)[componentName] || (module as any).default;
+
+        if (!Component) {
+          console.error(`[Main-Site Shortcode] Component "${componentName}" not found in ${path}`);
+          continue;
+        }
+
+        registerLazyShortcode({
+          name: shortcodeName,
+          loader: async () => ({ default: Component }),
+          description: `Auto-registered from ${path}`
+        });
+
+        registered.push(shortcodeName);
+      }
+    } catch (err) {
+      console.error(`[Main-Site Shortcode] Failed to load ${path}:`, err);
+    }
   }
 
   if (import.meta.env.DEV) {
