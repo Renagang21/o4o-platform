@@ -63,8 +63,11 @@ export const SocialLoginComponent: React.FC<{
 
   // Determine if test panel should show
   const shouldShowTestPanel = (() => {
+    // Explicit true bypasses environment check (for development/testing)
     if (showTestPanel === true || showTestPanel === 'true') return true;
+    // Explicit false always hides
     if (showTestPanel === false || showTestPanel === 'false') return false;
+    // env:dev respects environment
     if (showTestPanel === 'env:dev') {
       return import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging';
     }
@@ -72,8 +75,9 @@ export const SocialLoginComponent: React.FC<{
     return import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging';
   })();
 
-  // Prevent test panel in production (double guard)
-  const showTestPanelSafe = shouldShowTestPanel && import.meta.env.MODE !== 'production';
+  // Only apply environment guard when showTestPanel is not explicitly true
+  const explicitTrue = showTestPanel === true || showTestPanel === 'true';
+  const showTestPanelSafe = explicitTrue ? shouldShowTestPanel : (shouldShowTestPanel && import.meta.env.MODE !== 'production');
 
   // Social login configuration
   const socialLoginConfig = {
@@ -105,6 +109,12 @@ export const SocialLoginComponent: React.FC<{
 
   // Fetch OAuth providers and test accounts
   useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('[SocialLoginComponent] showTestPanel prop:', showTestPanel);
+      console.log('[SocialLoginComponent] showTestPanelSafe:', showTestPanelSafe);
+      console.log('[SocialLoginComponent] import.meta.env.MODE:', import.meta.env.MODE);
+    }
+
     const fetchProviders = async () => {
       try {
         const response = await authClient.api.get('/settings/oauth');
@@ -120,10 +130,22 @@ export const SocialLoginComponent: React.FC<{
     };
 
     const fetchTestAccounts = async () => {
-      if (!showTestPanelSafe) return;
+      if (!showTestPanelSafe) {
+        if (import.meta.env.DEV) {
+          console.log('[SocialLoginComponent] Test panel disabled, skipping fetch');
+        }
+        return;
+      }
+
+      if (import.meta.env.DEV) {
+        console.log('[SocialLoginComponent] Fetching test accounts...');
+      }
 
       try {
         const response = await authClient.api.get('/auth/unified/test-accounts');
+        if (import.meta.env.DEV) {
+          console.log('[SocialLoginComponent] Test accounts response:', response.data);
+        }
         if (response.data.success) {
           setTestAccounts(response.data.data);
         }
@@ -134,7 +156,7 @@ export const SocialLoginComponent: React.FC<{
 
     fetchProviders();
     fetchTestAccounts();
-  }, [showTestPanelSafe]);
+  }, [showTestPanelSafe, showTestPanel]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
