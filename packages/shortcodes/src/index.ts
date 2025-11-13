@@ -27,9 +27,6 @@ export type { LazyShortcodeDefinition } from './registry.js';
 // 렌더러 export
 export { DefaultShortcodeRenderer, useShortcodes } from './renderer.js';
 
-// Auto-registration system export
-export { autoRegisterShortcodes, pascalToSnakeCase, extractComponentName } from './auto-register.js';
-
 // 편의를 위한 기본 인스턴스들
 import { defaultParser } from './parser.js';
 import { globalRegistry } from './registry.js';
