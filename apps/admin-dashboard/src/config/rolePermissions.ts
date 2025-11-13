@@ -98,38 +98,38 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['admin.analytics']
   },
 
-  // Settings - Admin only
+  // Settings - Admin roles only
   {
     menuId: 'settings',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   {
     menuId: 'general-settings',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   {
     menuId: 'system-settings',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   {
     menuId: 'integrations',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   
   // Appearance - No restriction (allow all)
   
-  // Tools
+  // Tools - Admin roles only
   {
     menuId: 'tools',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   {
     menuId: 'import-export',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   {
     menuId: 'database',
-    permissions: ['admin.settings']
+    roles: ['admin', 'super_admin', 'administrator', 'manager']
   },
   {
     menuId: 'logs',
