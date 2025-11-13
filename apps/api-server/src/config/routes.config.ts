@@ -187,6 +187,7 @@ export function setupRoutes(app: Application): void {
   // Account linking
   app.use('/api/auth/accounts', accountLinkingRoutes);
   app.use('/api/auth/unified', unifiedAuthRoutes);
+  app.use('/api/v1/auth/unified', unifiedAuthRoutes);
 
   // Linked accounts
   app.use('/accounts', linkedAccountsRoutes);
