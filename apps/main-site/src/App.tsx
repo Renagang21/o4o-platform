@@ -55,6 +55,7 @@ import { PartnerDashboardPage } from './pages/dashboard/PartnerDashboardPage';
 import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
 import { PartnerLinkCreatePage } from './pages/dashboard/PartnerLinkCreatePage';
 import { PartnerLinkEditPage } from './pages/dashboard/PartnerLinkEditPage';
+import { PartnerAnalyticsPage } from './pages/dashboard/PartnerAnalyticsPage';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -235,6 +236,7 @@ const App: FC = () => {
             </PrivateRoute>
           }>
             <Route index element={<PartnerDashboardPage />} />
+            <Route path="analytics" element={<PartnerAnalyticsPage />} />
             <Route path="links" element={<PartnerLinksPage />} />
             <Route path="links/new" element={<PartnerLinkCreatePage />} />
             <Route path="links/:id/edit" element={<PartnerLinkEditPage />} />

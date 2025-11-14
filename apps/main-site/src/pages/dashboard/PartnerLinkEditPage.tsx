@@ -5,13 +5,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Copy } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Copy, TrendingUp } from 'lucide-react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { PageHeader } from '../../components/common/PageHeader';
 import { partnerLinkAPI, generateFinalUrl } from '../../services/partnerLinkApi';
 import {
   PartnerLinkDetail,
   PartnerLinkUpdateRequest,
+  AnalyticsPeriod,
+  PartnerLinkSummary,
 } from '../../types/partner-link';
 
 export const PartnerLinkEditPage: React.FC = () => {
@@ -34,6 +36,10 @@ export const PartnerLinkEditPage: React.FC = () => {
 
   // Preview final URL
   const [finalUrl, setFinalUrl] = useState('');
+
+  // Performance analytics
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<AnalyticsPeriod>('30d');
+  const [linkSummary, setLinkSummary] = useState<PartnerLinkSummary | null>(null);
 
   // Fetch link detail
   useEffect(() => {
@@ -66,6 +72,23 @@ export const PartnerLinkEditPage: React.FC = () => {
 
     fetchLink();
   }, [id]);
+
+  // Fetch link summary for analytics
+  useEffect(() => {
+    const fetchSummary = async () => {
+      if (!id) return;
+
+      try {
+        const response = await partnerLinkAPI.fetchLinkSummaries(analyticsPeriod);
+        const summary = response.data.find((s) => s.link_id === id);
+        setLinkSummary(summary || null);
+      } catch (error) {
+        console.error('링크 성과 조회 실패:', error);
+      }
+    };
+
+    fetchSummary();
+  }, [id, analyticsPeriod]);
 
   // Update final URL preview
   useEffect(() => {
@@ -213,25 +236,70 @@ export const PartnerLinkEditPage: React.FC = () => {
           </h2>
 
           <div className="space-y-4">
-            {/* Performance Stats */}
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                성과 현황
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-xs text-gray-600">클릭수</div>
-                  <div className="text-lg font-bold text-gray-900">
-                    {link.clicks.toLocaleString()}
-                  </div>
+            {/* Performance Stats - Enhanced */}
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg border border-blue-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    이 링크의 성과 요약
+                  </h3>
                 </div>
-                <div>
-                  <div className="text-xs text-gray-600">전환수</div>
-                  <div className="text-lg font-bold text-green-600">
-                    {link.conversions.toLocaleString()}
-                  </div>
-                </div>
+                <select
+                  value={analyticsPeriod}
+                  onChange={(e) => setAnalyticsPeriod(e.target.value as AnalyticsPeriod)}
+                  className="text-xs px-2 py-1 border border-gray-300 rounded"
+                >
+                  <option value="7d">최근 7일</option>
+                  <option value="30d">최근 30일</option>
+                  <option value="90d">최근 90일</option>
+                </select>
               </div>
+
+              {linkSummary ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="bg-white p-3 rounded">
+                      <div className="text-xs text-gray-600 mb-1">클릭수</div>
+                      <div className="text-lg font-bold text-gray-900">
+                        {linkSummary.total_clicks.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded">
+                      <div className="text-xs text-gray-600 mb-1">전환수</div>
+                      <div className="text-lg font-bold text-green-600">
+                        {linkSummary.total_conversions.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="bg-white p-3 rounded">
+                      <div className="text-xs text-gray-600 mb-1">전환율 (CVR)</div>
+                      <div className="text-lg font-bold text-blue-600">
+                        {linkSummary.cvr.toFixed(2)}%
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded">
+                      <div className="text-xs text-gray-600 mb-1">예상 커미션</div>
+                      <div className="text-lg font-bold text-purple-600">
+                        {linkSummary.total_commission.toLocaleString()}원
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-3 rounded">
+                    <div className="text-xs text-gray-600 mb-1">추정 매출</div>
+                    <div className="text-sm font-semibold text-gray-700">
+                      {linkSummary.total_revenue.toLocaleString()}원
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-4 text-sm text-gray-500">
+                  성과 데이터를 불러오는 중...
+                </div>
+              )}
             </div>
 
             {/* Link Name */}

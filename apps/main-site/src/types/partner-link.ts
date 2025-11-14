@@ -128,3 +128,76 @@ export interface DeletePartnerLinkResponse {
   success: boolean;
   message?: string;
 }
+
+/**
+ * Analytics Period Type
+ */
+export type AnalyticsPeriod = '7d' | '30d' | '90d' | '365d';
+
+/**
+ * Partner Analytics Summary
+ * 파트너 전체 성과 요약
+ */
+export interface PartnerAnalyticsSummary {
+  period: AnalyticsPeriod;
+  total_clicks: number;
+  total_conversions: number;
+  total_revenue: number;      // 전환 기준 매출(추정)
+  total_commission: number;   // 파트너 예상 커미션 합계
+  average_ctr: number;        // 평균 클릭률 (%)
+  average_cvr: number;        // 평균 전환율 (%)
+}
+
+/**
+ * Partner Analytics Timeseries Point
+ * 시간별 데이터 포인트
+ */
+export interface PartnerAnalyticsTimeseriesPoint {
+  date: string;         // YYYY-MM-DD
+  clicks: number;
+  conversions: number;
+  revenue: number;      // 해당 날짜 매출(추정)
+  commission: number;   // 해당 날짜 커미션
+}
+
+/**
+ * Partner Analytics Timeseries
+ * 시간별 트렌드 데이터
+ */
+export interface PartnerAnalyticsTimeseries {
+  period: AnalyticsPeriod;
+  points: PartnerAnalyticsTimeseriesPoint[];
+}
+
+/**
+ * Partner Link Summary
+ * 링크별 성과 요약
+ */
+export interface PartnerLinkSummary {
+  link_id: string;
+  name: string;
+  total_clicks: number;
+  total_conversions: number;
+  total_revenue: number;
+  total_commission: number;
+  ctr: number; // 클릭률 (%)
+  cvr: number; // 전환율: conversions / clicks (%)
+}
+
+/**
+ * Analytics API Response types
+ */
+export interface GetPartnerAnalyticsSummaryResponse {
+  success: boolean;
+  data: PartnerAnalyticsSummary;
+}
+
+export interface GetPartnerAnalyticsTimeseriesResponse {
+  success: boolean;
+  data: PartnerAnalyticsTimeseries;
+}
+
+export interface GetPartnerLinkSummariesResponse {
+  success: boolean;
+  data: PartnerLinkSummary[];
+}
