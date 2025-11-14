@@ -9,7 +9,8 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({
   settings,
   onChange
 }) => {
-  const accountUrl = settings.accountUrl || '/account';
+  const accountUrl = settings.accountUrl || '/my-account';
+  const loginUrl = settings.loginUrl || '/login';
   const showIcon = settings.showIcon !== false; // Default to true
   const showLabel = settings.showLabel !== false; // Default to true
   const label = settings.label || 'Account';
@@ -26,9 +27,22 @@ export const AccountSettings: React.FC<AccountSettingsProps> = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={accountUrl}
           onChange={(e) => onChange('accountUrl', e.target.value)}
-          placeholder="/account"
+          placeholder="/my-account"
         />
-        <p className="text-xs text-gray-500 mt-1">URL to the account/profile page</p>
+        <p className="text-xs text-gray-500 mt-1">URL to the account/profile page (for logged-in users)</p>
+      </div>
+
+      {/* Login URL */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Login URL</label>
+        <input
+          type="text"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={loginUrl}
+          onChange={(e) => onChange('loginUrl', e.target.value)}
+          placeholder="/login"
+        />
+        <p className="text-xs text-gray-500 mt-1">URL to the login page (for guests)</p>
       </div>
 
       {/* Show Icon */}

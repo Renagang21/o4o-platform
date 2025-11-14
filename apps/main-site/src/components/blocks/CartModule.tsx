@@ -12,6 +12,7 @@ interface CartModuleProps {
     showTotal?: boolean;
     dropdownAlignment?: 'left' | 'right';
     customClass?: string;
+    cartUrl?: string;
   };
 }
 
@@ -23,7 +24,8 @@ export const CartModule: React.FC<CartModuleProps> = ({
     showCount = true,
     showTotal = false,
     dropdownAlignment = 'right',
-    customClass = ''
+    customClass = '',
+    cartUrl = '/cart'
   } = data;
 
   const [showMiniCart, setShowMiniCart] = useState(false);
@@ -37,7 +39,7 @@ export const CartModule: React.FC<CartModuleProps> = ({
 
   const handleCartClick = () => {
     if (action === 'page') {
-      navigate('/cart');
+      navigate(cartUrl);
     } else {
       setShowMiniCart(!showMiniCart);
     }

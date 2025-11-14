@@ -13,6 +13,7 @@ interface AccountModuleProps {
     dropdownAlignment?: 'left' | 'right';
     customClass?: string;
     loginUrl?: string;
+    accountUrl?: string;
   };
 }
 
@@ -25,7 +26,8 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
     avatarSize = 32,
     dropdownAlignment = 'right',
     customClass = '',
-    loginUrl = '/login'
+    loginUrl = '/login',
+    accountUrl = '/my-account'
   } = data;
 
   const { user, isAuthenticated, logout } = useAuth();
@@ -96,7 +98,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
         {/* Menu Items */}
         <div className="account-dropdown-menu py-2">
           <Link
-            to="/my-account"
+            to={accountUrl}
             className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
             onClick={() => handleMenuClick()}
           >
@@ -105,7 +107,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
           </Link>
 
           <Link
-            to="/my-account/orders"
+            to={`${accountUrl}/orders`}
             className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
             onClick={() => handleMenuClick()}
           >
@@ -114,7 +116,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
           </Link>
 
           <Link
-            to="/my-account/wishlist"
+            to={`${accountUrl}/wishlist`}
             className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
             onClick={() => handleMenuClick()}
           >
@@ -123,7 +125,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
           </Link>
 
           <Link
-            to="/my-account/notifications"
+            to={`${accountUrl}/notifications`}
             className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
             onClick={() => handleMenuClick()}
           >
@@ -132,7 +134,7 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
           </Link>
 
           <Link
-            to="/my-account/settings"
+            to={`${accountUrl}/settings`}
             className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
             onClick={() => handleMenuClick()}
           >
