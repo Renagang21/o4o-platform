@@ -84,6 +84,9 @@ export const EnhancedLinkControl: React.FC<EnhancedLinkControlProps> = ({
   showRecent = true,
 }) => {
   const [linkType, setLinkType] = useState<LinkType>(value.type || 'url');
+  const [urlSubType, setUrlSubType] = useState<'external' | 'internal'>(
+    value.url && value.url.startsWith('/') && !value.url.startsWith('//') ? 'internal' : 'external'
+  );
   const [localUrl, setLocalUrl] = useState(value.url || '');
   const [localTarget, setLocalTarget] = useState(value.target || '_self');
   const [localRel, setLocalRel] = useState(value.rel || '');
@@ -165,6 +168,11 @@ export const EnhancedLinkControl: React.FC<EnhancedLinkControlProps> = ({
         return localUrl.startsWith('/') ? localUrl : `/${localUrl}`;
       case 'url':
       default:
+        if (urlSubType === 'internal') {
+          // Internal path - ensure it starts with /
+          return localUrl.startsWith('/') ? localUrl : `/${localUrl}`;
+        }
+        // External URL - normalize
         return normalizeURL(localUrl);
     }
   };
@@ -213,7 +221,10 @@ export const EnhancedLinkControl: React.FC<EnhancedLinkControlProps> = ({
         return 'Search for a page...';
       case 'url':
       default:
-        return 'https://example.com or /relative-path';
+        if (urlSubType === 'internal') {
+          return '/about';
+        }
+        return 'https://example.com';
     }
   };
 
@@ -259,8 +270,52 @@ export const EnhancedLinkControl: React.FC<EnhancedLinkControlProps> = ({
 
         {/* URL Tab */}
         <TabsContent value="url" className="space-y-3">
+          {/* URL Type Selector */}
           <div>
-            <Label className="text-xs mb-1">URL or Path</Label>
+            <Label className="text-xs mb-2">Link to</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setUrlSubType('external');
+                  setLocalUrl('');
+                }}
+                className={cn(
+                  'px-3 py-2 text-xs rounded border transition-colors',
+                  urlSubType === 'external'
+                    ? 'bg-blue-50 border-blue-500 text-blue-700'
+                    : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+                )}
+              >
+                <ExternalLink className="w-3 h-3 mx-auto mb-1" />
+                <div className="font-medium">External URL</div>
+                <div className="text-gray-500 mt-0.5">Full web address</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUrlSubType('internal');
+                  setLocalUrl('');
+                }}
+                className={cn(
+                  'px-3 py-2 text-xs rounded border transition-colors',
+                  urlSubType === 'internal'
+                    ? 'bg-blue-50 border-blue-500 text-blue-700'
+                    : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+                )}
+              >
+                <FileText className="w-3 h-3 mx-auto mb-1" />
+                <div className="font-medium">Internal Path</div>
+                <div className="text-gray-500 mt-0.5">Relative path</div>
+              </button>
+            </div>
+          </div>
+
+          {/* URL Input */}
+          <div>
+            <Label className="text-xs mb-1">
+              {urlSubType === 'external' ? 'External URL' : 'Internal Path'}
+            </Label>
             <URLInput
               ref={urlInputRef}
               value={localUrl}
@@ -268,6 +323,11 @@ export const EnhancedLinkControl: React.FC<EnhancedLinkControlProps> = ({
               placeholder={getPlaceholder()}
               variant="default"
               showIcon
+              helperText={
+                urlSubType === 'internal'
+                  ? '예: /about, /products/new, /contact'
+                  : '예: https://example.com, https://google.com'
+              }
             />
           </div>
         </TabsContent>
@@ -371,7 +431,7 @@ export const EnhancedLinkControl: React.FC<EnhancedLinkControlProps> = ({
 
       {/* Common Settings */}
       <div className="mt-4 space-y-3 border-t border-gray-200 pt-3">
-        {/* Open in new tab */}
+        {/* Open in new tab - show for both external and internal URLs */}
         {linkType === 'url' && (
           <div className="flex items-center justify-between">
             <Label className="text-xs">Open in new tab</Label>
