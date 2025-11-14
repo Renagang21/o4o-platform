@@ -46,6 +46,7 @@ import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
 import { SupplierProductCreatePage } from './pages/dashboard/SupplierProductCreatePage';
 import { SupplierProductEditPage } from './pages/dashboard/SupplierProductEditPage';
 import { SupplierOrdersPage } from './pages/dashboard/SupplierOrdersPage';
+import { SupplierOrderDetailPage } from './pages/dashboard/SupplierOrderDetailPage';
 import { SellerDashboardPage } from './pages/dashboard/SellerDashboardPage';
 import { SellerProductsPage } from './pages/dashboard/SellerProductsPage';
 import { PartnerDashboardPage } from './pages/dashboard/PartnerDashboardPage';
@@ -206,6 +207,7 @@ const App: FC = () => {
             <Route path="products/new" element={<SupplierProductCreatePage />} />
             <Route path="products/:id/edit" element={<SupplierProductEditPage />} />
             <Route path="orders" element={<SupplierOrdersPage />} />
+            <Route path="orders/:id" element={<SupplierOrderDetailPage />} />
           </Route>
 
           <Route path="/dashboard/seller/*" element={

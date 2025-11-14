@@ -16,7 +16,6 @@ export const SupplierOrdersPage: React.FC = () => {
           { label: '주문 관리', isCurrent: true },
         ]}
       />
-
       <SupplierOrdersSection mode="full-page" />
     </>
   );
