@@ -53,6 +53,8 @@ import { SellerProductCreatePage } from './pages/dashboard/SellerProductCreatePa
 import { SellerProductEditPage } from './pages/dashboard/SellerProductEditPage';
 import { PartnerDashboardPage } from './pages/dashboard/PartnerDashboardPage';
 import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
+import { PartnerLinkCreatePage } from './pages/dashboard/PartnerLinkCreatePage';
+import { PartnerLinkEditPage } from './pages/dashboard/PartnerLinkEditPage';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -234,6 +236,8 @@ const App: FC = () => {
           }>
             <Route index element={<PartnerDashboardPage />} />
             <Route path="links" element={<PartnerLinksPage />} />
+            <Route path="links/new" element={<PartnerLinkCreatePage />} />
+            <Route path="links/:id/edit" element={<PartnerLinkEditPage />} />
           </Route>
 
           {/* Editor Routes (Protected) */}
