@@ -70,6 +70,12 @@ import { SupplierProductAuthorizationsPage } from './pages/dashboard/SupplierPro
 import { AdminSettlementsPage } from './pages/dashboard/admin/AdminSettlementsPage';
 import { AdminSettlementDetailPage } from './pages/dashboard/admin/AdminSettlementDetailPage';
 
+// Phase 5-1: Storefront
+import { ProductsPage } from './pages/storefront/ProductsPage';
+import { ProductDetailPage } from './pages/storefront/ProductDetailPage';
+import { CheckoutPage } from './pages/storefront/CheckoutPage';
+import { OrderSuccessPage } from './pages/storefront/OrderSuccessPage';
+
 // Lazy load pages
 import { lazy, Suspense } from 'react';
 const PageEditor = lazy(() => import('./pages/PageEditor'));
@@ -283,6 +289,13 @@ const App: FC = () => {
               </RoleGuard>
             </PrivateRoute>
           } />
+
+          {/* Phase 5-1: Storefront Routes */}
+          <Route path="/store/products" element={<ProductsPage />} />
+          <Route path="/store/:sellerId/products" element={<ProductsPage />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order/success/:id" element={<OrderSuccessPage />} />
 
           {/* Editor Routes (Protected) */}
           <Route path="/editor/page/:id?" element={
