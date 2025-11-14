@@ -128,14 +128,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isBlockListOpen, setIsBlockListOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [sessionRestored, setSessionRestored] = useState(false);
 
-  // List View state - use external control if provided, otherwise internal state
-  const [internalShowListView, setInternalShowListView] = useState(false);
-  const showListView = externalShowListView !== undefined ? externalShowListView : internalShowListView;
-  const toggleListView = externalOnToggleListView || (() => setInternalShowListView(!internalShowListView));
+  // List View state - use external control, default to false if not provided
+  const showListView = externalShowListView ?? false;
+  const toggleListView = externalOnToggleListView ?? (() => {});
 
   // Toast notifications
   const { toast, showToast } = useToast();
@@ -286,13 +284,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlock(null);
     }
   }, [selectedBlockId, blocks]);
-
-  // Sync list view state with external prop
-  useEffect(() => {
-    if (externalShowListView !== undefined) {
-      setIsBlockListOpen(externalShowListView);
-    }
-  }, [externalShowListView]);
 
   // ✨ Update blocks and history
   const updateBlocks = useCallback(
@@ -850,7 +841,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           <div className="flex items-center gap-2">
             {/* Block List Toggle Button */}
             <button
-              onClick={() => setIsBlockListOpen(!isBlockListOpen)}
+              onClick={toggleListView}
               className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
               title="Toggle block list"
             >
@@ -867,7 +858,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                   d="M4 6h16M4 12h16M4 18h16"
                 />
               </svg>
-              <span>{isBlockListOpen ? 'Hide' : 'Show'} List</span>
+              <span>{showListView ? 'Hide' : 'Show'} List</span>
             </button>
           </div>
 
@@ -908,7 +899,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       {/* Main Layout */}
       <div className="flex-1 flex relative" style={{ marginTop: hideHeader ? '0' : '56px' }}>
         {/* Block List Sidebar */}
-        {!hideHeader && isBlockListOpen && (
+        {!hideHeader && showListView && (
           <div className="fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 shadow-lg">
             <div className="p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
@@ -976,7 +967,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         {/* Editor Canvas */}
         <div
           className={`flex-1 transition-all duration-300 overflow-y-auto bg-gray-100 ${
-            !hideHeader && isBlockListOpen ? 'ml-64' : 'ml-0'
+            !hideHeader && showListView ? 'ml-64' : 'ml-0'
           } ${
             isBlockInserterOpen ? 'ml-80' : ''
           } ${
