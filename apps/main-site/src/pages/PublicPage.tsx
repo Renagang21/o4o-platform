@@ -58,8 +58,19 @@ const fetchPageBySlug = async (slug: string): Promise<PageData> => {
 };
 
 const PublicPage: FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, section, subsection } = useParams<{
+    slug?: string;
+    section?: string;
+    subsection?: string;
+  }>();
   const navigate = useNavigate();
+
+  // Construct full slug from URL params
+  // If we have section/subsection (e.g., /my-account/orders), use that
+  // Otherwise, use single slug (e.g., /login)
+  const fullSlug = subsection
+    ? `${section}/${subsection}`
+    : (section || slug);
 
   // Fetch page data
   const {
@@ -67,9 +78,9 @@ const PublicPage: FC = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['public-page', slug],
-    queryFn: () => fetchPageBySlug(slug!),
-    enabled: !!slug,
+    queryKey: ['public-page', fullSlug],
+    queryFn: () => fetchPageBySlug(fullSlug!),
+    enabled: !!fullSlug,
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

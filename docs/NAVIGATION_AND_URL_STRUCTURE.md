@@ -323,7 +323,70 @@ Page: /my-account (slug: my-account)
 
 ## 📄 페이지 생성 가이드
 
-### Step 1: 페이지 목적 파악
+### 🗂️ 페이지 Slug 생성 체크리스트
+
+Admin Dashboard에서 페이지를 생성할 때 참고할 전체 목록입니다.
+
+#### 🛍️ Customer Pages
+
+| 우선순위 | 페이지 제목 | Slug | Shortcode | 헤더 모듈 링크 | 상태 |
+|---------|-----------|------|-----------|--------------|------|
+| **P0** | My Account | `my-account` | `[user_dashboard]` | AccountModule → 프로필 | ✅ 구현 |
+| P1 | My Orders | `my-account/orders` | `[user_orders]` | AccountModule → 주문 내역 | ⏳ 필요 |
+| P1 | My Wishlist | `my-account/wishlist` | `[user_wishlist]` | AccountModule → 위시리스트 | ⏳ 필요 |
+| P1 | My Notifications | `my-account/notifications` | `[user_notifications]` | AccountModule → 알림 | ⏳ 필요 |
+| P1 | Account Settings | `my-account/settings` | `[user_settings]` | AccountModule → 설정 | ⏳ 필요 |
+| P1 | Support | `support` | `[support_center]` | AccountModule → 고객지원 | ⏳ 필요 |
+
+#### 🏪 Seller Pages
+
+| 우선순위 | 페이지 제목 | Slug | Shortcode | 접근 경로 | 상태 |
+|---------|-----------|------|-----------|----------|------|
+| **P0** | Seller Dashboard | `seller` 또는 `seller/dashboard` | `[seller_dashboard]` | RoleSwitcher → 판매자 모드 | ✅ 구현 |
+| P1 | Seller Profile | `seller/profile` | `[profile_editor role="seller"]` | Sidebar → 프로필 | ⏳ 필요 |
+| P1 | Seller Settings | `seller/settings` | `[seller_settings]` | Sidebar → 설정 | ⏳ 필요 |
+| P2 | Products | `seller/products` | `[seller_products]` | Sidebar → 상품 관리 | ⏳ 필요 |
+| P2 | Orders | `seller/orders` | `[seller_orders]` | Sidebar → 주문 관리 | ⏳ 필요 |
+| P2 | Analytics | `seller/analytics` | `[seller_analytics]` | Sidebar → 분석 | ⏳ 필요 |
+| P2 | Settlements | `seller/settlements` | `[seller_settlements]` | Sidebar → 정산 | ⏳ 필요 |
+
+#### 🏭 Supplier Pages
+
+| 우선순위 | 페이지 제목 | Slug | Shortcode | 접근 경로 | 상태 |
+|---------|-----------|------|-----------|----------|------|
+| **P0** | Supplier Dashboard | `supplier` 또는 `supplier/dashboard` | `[supplier_dashboard]` | RoleSwitcher → 공급자 모드 | ✅ 구현 |
+| P1 | Supplier Profile | `supplier/profile` | `[profile_editor role="supplier"]` | Sidebar → 프로필 | ⏳ 필요 |
+| P1 | Supplier Settings | `supplier/settings` | `[supplier_settings]` | Sidebar → 설정 | ⏳ 필요 |
+| P2 | Products | `supplier/products` | `[supplier_products]` | Sidebar → 제품 관리 | ⏳ 필요 |
+| P2 | Orders | `supplier/orders` | `[supplier_orders]` | Sidebar → 주문 처리 | ⏳ 필요 |
+| P2 | Inventory | `supplier/inventory` | `[supplier_inventory]` | Sidebar → 재고 관리 | ⏳ 필요 |
+| P2 | Analytics | `supplier/analytics` | `[supplier_analytics]` | Sidebar → 분석 | ⏳ 필요 |
+
+#### 🤝 Partner Pages
+
+| 우선순위 | 페이지 제목 | Slug | Shortcode | 접근 경로 | 상태 |
+|---------|-----------|------|-----------|----------|------|
+| **P0** | Partner Dashboard | `partner` 또는 `partner/dashboard` | `[partner_dashboard]` | RoleSwitcher → 파트너 모드 | ✅ 구현 |
+| P1 | Partner Profile | `partner/profile` | `[profile_editor role="partner"]` | Sidebar → 프로필 | ⏳ 필요 |
+| P1 | Partner Settings | `partner/settings` | `[partner_settings]` | Sidebar → 설정 | ⏳ 필요 |
+| P2 | Links | `partner/links` | `[partner_links]` | Sidebar → 링크 관리 | ⏳ 필요 |
+| P2 | Generate Link | `partner/links/generate` | `[partner_link_generator]` | Links 페이지 내 버튼 | ⏳ 필요 |
+| P2 | Analytics | `partner/analytics` | `[partner_analytics]` | Sidebar → 성과 분석 | ⏳ 필요 |
+| P2 | Settlements | `partner/settlements` | `[partner_settlements]` | Sidebar → 정산 | ⏳ 필요 |
+| P2 | Marketing Materials | `partner/marketing-materials` | `[partner_marketing]` | Sidebar → 마케팅 자료 | ⏳ 필요 |
+
+#### 📝 우선순위 설명
+
+- **P0 (최우선)**: 현재 구현 완료된 필수 페이지
+- **P1 (높음)**: 기본 기능을 위해 즉시 필요한 페이지
+- **P2 (중간)**: 추가 기능 페이지
+- **P3 (낮음)**: 향후 확장 기능
+
+---
+
+### 📋 Admin에서 페이지 생성 방법
+
+#### Step 1: 페이지 목적 파악
 
 먼저 생성하려는 페이지가 어떤 역할인지 결정:
 

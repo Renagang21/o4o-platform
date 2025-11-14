@@ -225,6 +225,13 @@ const App: FC = () => {
           } />
 
           {/* WordPress-style: Direct page slug access (must be before 404) */}
+          {/* Multi-level page routing: /section/subsection */}
+          <Route path="/:section/:subsection" element={
+            <Suspense fallback={<PageLoader />}>
+              <PublicPage />
+            </Suspense>
+          } />
+          {/* Single-level page routing: /slug */}
           <Route path="/:slug" element={
             <Suspense fallback={<PageLoader />}>
               <PublicPage />
