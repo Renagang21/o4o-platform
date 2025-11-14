@@ -28,6 +28,10 @@ export interface SupplierProductListItem {
   status: SupplierProductStatus;
   createdAt: string;
   updatedAt: string;
+  // Phase 3-6: 판매자 모집 관련 필드
+  is_open_for_applications?: boolean;  // 기본값: true (신규 판매자 신청 허용)
+  max_approved_sellers?: number | null; // 승인할 판매자 수 상한 (null이면 제한 없음)
+  approved_seller_count?: number;       // 현재 승인된 판매자 수
 }
 
 /**
@@ -50,6 +54,10 @@ export interface SupplierProductDetail {
   specifications: Record<string, string>;
   createdAt: string;
   updatedAt: string;
+  // Phase 3-6: 판매자 모집 관련 필드
+  is_open_for_applications?: boolean;  // 기본값: true (신규 판매자 신청 허용)
+  max_approved_sellers?: number | null; // 승인할 판매자 수 상한 (null이면 제한 없음)
+  approved_seller_count?: number;       // 현재 승인된 판매자 수
 }
 
 /**
@@ -170,4 +178,8 @@ export interface SupplierProductForSelection {
   authorization_status?: AuthorizationStatus;
   authorization_id?: string;
   authorization_rejection_reason?: string;
+  // 판매자 모집 관련 필드
+  is_open_for_applications?: boolean;  // 기본값: true (신규 판매자 신청 허용)
+  max_approved_sellers?: number | null; // 승인할 판매자 수 상한 (null이면 제한 없음)
+  approved_seller_count?: number;       // 현재 승인된 판매자 수
 }

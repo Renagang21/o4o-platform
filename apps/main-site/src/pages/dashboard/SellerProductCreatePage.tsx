@@ -76,8 +76,33 @@ export const SellerProductCreatePage: React.FC = () => {
     setSalePrice('');
   };
 
+  // Check if recruitment is closed
+  const isRecruitmentClosed = (product: SupplierProductForSelection): boolean => {
+    // Explicitly closed
+    if (product.is_open_for_applications === false) {
+      return true;
+    }
+
+    // Max sellers reached
+    if (
+      product.max_approved_sellers != null &&
+      product.approved_seller_count != null &&
+      product.approved_seller_count >= product.max_approved_sellers
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   // Handle authorization request
   const handleRequestAuthorization = async (product: SupplierProductForSelection) => {
+    // Check if recruitment is closed
+    if (isRecruitmentClosed(product)) {
+      alert('이 상품은 현재 신규 판매자 모집이 종료되었습니다.');
+      return;
+    }
+
     try {
       const response = await authorizationAPI.createAuthorization({
         supplier_product_id: product.id,
@@ -298,8 +323,25 @@ export const SellerProductCreatePage: React.FC = () => {
                             )}
                           </div>
 
+                          {/* Recruitment Info */}
+                          {product.max_approved_sellers != null && (
+                            <div className="mt-2 text-xs text-gray-600">
+                              모집 인원: {product.approved_seller_count || 0} / {product.max_approved_sellers}명
+                            </div>
+                          )}
+
+                          {/* Recruitment Closed Badge */}
+                          {isRecruitmentClosed(product) && product.authorization_status !== 'approved' && (
+                            <div className="mt-2">
+                              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                                <AlertCircle className="w-3 h-3" />
+                                모집 종료
+                              </span>
+                            </div>
+                          )}
+
                           {/* Authorization Actions */}
-                          {isNone && (
+                          {isNone && !isRecruitmentClosed(product) && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -312,6 +354,12 @@ export const SellerProductCreatePage: React.FC = () => {
                             </button>
                           )}
 
+                          {isNone && isRecruitmentClosed(product) && (
+                            <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+                              이 상품은 현재 신규 판매자 모집이 종료되었습니다.
+                            </div>
+                          )}
+
                           {isRejected && product.authorization_rejection_reason && (
                             <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
                               <div className="font-medium mb-1">거절 사유:</div>
@@ -322,6 +370,12 @@ export const SellerProductCreatePage: React.FC = () => {
                           {isPending && (
                             <div className="mt-2 text-xs text-yellow-700">
                               공급자 승인을 기다리고 있습니다.
+                            </div>
+                          )}
+
+                          {isApproved && isRecruitmentClosed(product) && (
+                            <div className="mt-2 text-xs text-green-700">
+                              ✓ 모집이 종료되었지만 기존 승인으로 사용 가능합니다.
                             </div>
                           )}
                         </div>

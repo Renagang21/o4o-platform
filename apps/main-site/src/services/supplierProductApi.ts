@@ -44,6 +44,10 @@ const MOCK_PRODUCTS: SupplierProductDetail[] = [
     },
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-03-20T14:30:00Z',
+    // Phase 3-6: 모집 중 (제한 없음)
+    is_open_for_applications: true,
+    max_approved_sellers: null,
+    approved_seller_count: 3,
   },
   {
     id: '2',
@@ -68,6 +72,10 @@ const MOCK_PRODUCTS: SupplierProductDetail[] = [
     },
     createdAt: '2024-02-01T09:00:00Z',
     updatedAt: '2024-03-21T08:15:00Z',
+    // Phase 3-6: 모집 종료 (명시적으로 중단)
+    is_open_for_applications: false,
+    max_approved_sellers: null,
+    approved_seller_count: 5,
   },
   {
     id: '3',
@@ -92,6 +100,10 @@ const MOCK_PRODUCTS: SupplierProductDetail[] = [
     },
     createdAt: '2024-01-20T11:00:00Z',
     updatedAt: '2024-03-22T16:45:00Z',
+    // Phase 3-6: 모집 중이지만 정원 초과 (3명 한정, 현재 3명)
+    is_open_for_applications: true,
+    max_approved_sellers: 3,
+    approved_seller_count: 3,
   },
   {
     id: '4',
@@ -116,6 +128,10 @@ const MOCK_PRODUCTS: SupplierProductDetail[] = [
     },
     createdAt: '2024-02-10T13:00:00Z',
     updatedAt: '2024-03-19T10:20:00Z',
+    // Phase 3-6: 모집 중 (10명 한정, 현재 2명 - 여유 있음)
+    is_open_for_applications: true,
+    max_approved_sellers: 10,
+    approved_seller_count: 2,
   },
   {
     id: '5',
@@ -140,6 +156,10 @@ const MOCK_PRODUCTS: SupplierProductDetail[] = [
     },
     createdAt: '2024-01-25T08:30:00Z',
     updatedAt: '2024-03-18T15:10:00Z',
+    // Phase 3-6: 모집 중단 (명시적 중단, 아직 승인된 판매자 없음)
+    is_open_for_applications: false,
+    max_approved_sellers: null,
+    approved_seller_count: 0,
   },
 ];
 
@@ -251,6 +271,9 @@ const toListItem = (product: SupplierProductDetail): SupplierProductListItem => 
     status: product.status,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
+    is_open_for_applications: product.is_open_for_applications,
+    max_approved_sellers: product.max_approved_sellers,
+    approved_seller_count: product.approved_seller_count,
   };
 };
 
@@ -411,6 +434,80 @@ export const supplierProductAPI = {
 
     // Real API call
     const response = await authClient.api.delete(`/api/v1/supplier/products/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Toggle application status (open/close seller recruitment)
+   * Phase 3-6: 판매자 모집 중단/재개
+   */
+  async toggleApplicationStatus(
+    id: string,
+    isOpen: boolean
+  ): Promise<SupplierProductUpdateResponse> {
+    if (USE_MOCK_DATA) {
+      await mockDelay();
+
+      const index = MOCK_PRODUCTS.findIndex((p) => p.id === id);
+      if (index === -1) {
+        throw new Error('Product not found');
+      }
+
+      MOCK_PRODUCTS[index] = {
+        ...MOCK_PRODUCTS[index],
+        is_open_for_applications: isOpen,
+        updatedAt: new Date().toISOString(),
+      };
+
+      return {
+        data: MOCK_PRODUCTS[index],
+        message: isOpen
+          ? '판매자 신청이 재개되었습니다.'
+          : '판매자 신청이 중단되었습니다.',
+      };
+    }
+
+    // Real API call
+    const response = await authClient.api.patch(
+      `/api/v1/supplier/products/${id}/application-status`,
+      { is_open_for_applications: isOpen }
+    );
+    return response.data;
+  },
+
+  /**
+   * Set max approved sellers
+   * Phase 3-6: 최대 승인 판매자 수 설정
+   */
+  async setMaxApprovedSellers(
+    id: string,
+    maxSellers: number | null
+  ): Promise<SupplierProductUpdateResponse> {
+    if (USE_MOCK_DATA) {
+      await mockDelay();
+
+      const index = MOCK_PRODUCTS.findIndex((p) => p.id === id);
+      if (index === -1) {
+        throw new Error('Product not found');
+      }
+
+      MOCK_PRODUCTS[index] = {
+        ...MOCK_PRODUCTS[index],
+        max_approved_sellers: maxSellers,
+        updatedAt: new Date().toISOString(),
+      };
+
+      return {
+        data: MOCK_PRODUCTS[index],
+        message: '최대 승인 판매자 수가 설정되었습니다.',
+      };
+    }
+
+    // Real API call
+    const response = await authClient.api.patch(
+      `/api/v1/supplier/products/${id}/max-sellers`,
+      { max_approved_sellers: maxSellers }
+    );
     return response.data;
   },
 };

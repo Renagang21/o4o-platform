@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, Plus, Search, Filter, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, Plus, Search, Filter, Edit, Trash2, ChevronLeft, ChevronRight, UserCheck, UserX, Users } from 'lucide-react';
 import { EmptyState } from '../../common/EmptyState';
 import { supplierProductAPI } from '../../../services/supplierProductApi';
 import {
@@ -88,6 +88,29 @@ export const SupplierProductsSection: React.FC<SupplierProductsSectionProps> = (
       fetchProducts();
     } catch (err) {
       alert('제품 삭제에 실패했습니다.');
+    }
+  };
+
+  // Handle toggle application status (Phase 3-6: 모집 중단/재개)
+  const handleToggleApplicationStatus = async (product: SupplierProductListItem) => {
+    const currentStatus = product.is_open_for_applications ?? true;
+    const newStatus = !currentStatus;
+
+    const confirmMessage = newStatus
+      ? '이 상품의 판매자 모집을 재개하시겠습니까?'
+      : '이 상품의 판매자 모집을 중단하시겠습니까? (기존 승인된 판매자는 영향받지 않습니다)';
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      await supplierProductAPI.toggleApplicationStatus(product.id, newStatus);
+      alert(newStatus ? '판매자 모집이 재개되었습니다.' : '판매자 모집이 중단되었습니다.');
+      fetchProducts();
+    } catch (err) {
+      alert('상태 변경에 실패했습니다.');
+      console.error('Failed to toggle application status:', err);
     }
   };
 
@@ -374,6 +397,9 @@ export const SupplierProductsSection: React.FC<SupplierProductsSectionProps> = (
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       상태
                     </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      판매자 모집
+                    </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       작업
                     </th>
@@ -413,6 +439,44 @@ export const SupplierProductsSection: React.FC<SupplierProductsSectionProps> = (
                         >
                           {getStatusLabel(product.status)}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                            <Users className="w-3 h-3" />
+                            <span>{product.approved_seller_count || 0}명</span>
+                            {product.max_approved_sellers != null && (
+                              <span className="text-gray-400">
+                                / {product.max_approved_sellers}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleToggleApplicationStatus(product)}
+                            className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                              product.is_open_for_applications !== false
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                            title={
+                              product.is_open_for_applications !== false
+                                ? '모집 중 (클릭하여 중단)'
+                                : '모집 중단 (클릭하여 재개)'
+                            }
+                          >
+                            {product.is_open_for_applications !== false ? (
+                              <>
+                                <UserCheck className="w-3 h-3" />
+                                모집 중
+                              </>
+                            ) : (
+                              <>
+                                <UserX className="w-3 h-3" />
+                                모집 중단
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">

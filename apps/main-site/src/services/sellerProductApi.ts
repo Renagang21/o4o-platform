@@ -81,6 +81,10 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProductForSelection[] = [
     category: '곡물',
     authorization_status: 'approved', // 승인됨 - Import 가능
     authorization_id: 'auth-1',
+    // 모집 중 (제한 없음)
+    is_open_for_applications: true,
+    max_approved_sellers: null,
+    approved_seller_count: 3,
   },
   {
     id: 'sup-prod-2',
@@ -89,8 +93,12 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProductForSelection[] = [
     supply_price: 9000,
     thumbnail_url: 'https://images.unsplash.com/photo-1592921870789-04563d55041c?w=200',
     category: '채소',
-    authorization_status: 'approved', // 승인됨 - Import 가능
+    authorization_status: 'approved', // 승인됨 - Import 가능 (기존 승인자)
     authorization_id: 'auth-2',
+    // 모집 종료 (명시적 중단) - 하지만 기존 승인자는 사용 가능
+    is_open_for_applications: false,
+    max_approved_sellers: null,
+    approved_seller_count: 5,
   },
   {
     id: 'sup-prod-3',
@@ -99,7 +107,11 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProductForSelection[] = [
     supply_price: 45000,
     thumbnail_url: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=200',
     category: '육류',
-    authorization_status: 'none', // 신청 필요
+    authorization_status: 'none', // 신청 필요하지만 정원 초과
+    // 모집 중이지만 정원 초과 (3명 한정, 현재 3명) - 신청 불가
+    is_open_for_applications: true,
+    max_approved_sellers: 3,
+    approved_seller_count: 3,
   },
   {
     id: 'sup-prod-4',
@@ -110,6 +122,10 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProductForSelection[] = [
     category: '과일',
     authorization_status: 'pending', // 승인 대기중
     authorization_id: 'auth-3',
+    // 모집 중 (10명 한정, 현재 2명)
+    is_open_for_applications: true,
+    max_approved_sellers: 10,
+    approved_seller_count: 2,
   },
   {
     id: 'sup-prod-5',
@@ -121,6 +137,10 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProductForSelection[] = [
     authorization_status: 'rejected', // 거절됨
     authorization_id: 'auth-4',
     authorization_rejection_reason: '현재 독점 계약으로 인해 추가 승인이 어렵습니다.',
+    // 모집 중단 (명시적 중단)
+    is_open_for_applications: false,
+    max_approved_sellers: null,
+    approved_seller_count: 0,
   },
 ];
 
