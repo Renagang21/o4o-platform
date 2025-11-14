@@ -5,15 +5,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Package, Check } from 'lucide-react';
+import { ArrowLeft, Search, Package, Check, AlertCircle, Clock, XCircle, Send } from 'lucide-react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { PageHeader } from '../../components/common/PageHeader';
 import { EmptyState } from '../../components/common/EmptyState';
 import { sellerProductAPI } from '../../services/sellerProductApi';
+import { authorizationAPI } from '../../services/authorizationApi';
 import {
   SupplierProductForSelection,
   SellerProductCreateRequest,
 } from '../../types/seller-product';
+import { AuthorizationStatus } from '../../types/dropshipping-authorization';
 
 export const SellerProductCreatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -65,9 +67,69 @@ export const SellerProductCreatePage: React.FC = () => {
 
   // Handle product selection
   const handleSelectProduct = (product: SupplierProductForSelection) => {
+    // Only allow selection if approved
+    if (product.authorization_status !== 'approved') {
+      return;
+    }
     setSelectedProduct(product);
     setTitle(product.title);
     setSalePrice('');
+  };
+
+  // Handle authorization request
+  const handleRequestAuthorization = async (product: SupplierProductForSelection) => {
+    try {
+      const response = await authorizationAPI.createAuthorization({
+        supplier_product_id: product.id,
+        message: '이 상품을 판매하고 싶습니다.',
+      });
+      alert(response.message || '판매 신청이 완료되었습니다. 공급자 승인을 기다려주세요.');
+
+      // Refresh supplier products list
+      const refreshResponse = await sellerProductAPI.fetchSupplierProductsForSelection({
+        search: searchQuery || undefined,
+        limit: 100,
+      });
+      setSupplierProducts(refreshResponse.data.products);
+    } catch (error) {
+      console.error('판매 신청 실패:', error);
+      alert('판매 신청에 실패했습니다.');
+    }
+  };
+
+  // Get authorization status badge
+  const getAuthorizationBadge = (status?: AuthorizationStatus) => {
+    switch (status) {
+      case 'approved':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+            <Check className="w-3 h-3" />
+            승인됨
+          </span>
+        );
+      case 'pending':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+            <Clock className="w-3 h-3" />
+            승인 대기중
+          </span>
+        );
+      case 'rejected':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+            <XCircle className="w-3 h-3" />
+            신청 거절됨
+          </span>
+        );
+      case 'none':
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+            <AlertCircle className="w-3 h-3" />
+            신청 필요
+          </span>
+        );
+    }
   };
 
   // Calculate margin
@@ -183,51 +245,90 @@ export const SellerProductCreatePage: React.FC = () => {
               />
             ) : (
               <div className="space-y-3">
-                {supplierProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                      selectedProduct?.id === product.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}
-                    onClick={() => handleSelectProduct(product)}
-                  >
-                    <div className="flex items-start gap-3">
-                      {product.thumbnail_url && (
-                        <img
-                          src={product.thumbnail_url}
-                          alt={product.title}
-                          className="w-16 h-16 rounded object-cover flex-shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 mb-1">
-                          {product.title}
-                        </div>
-                        <div className="text-xs text-gray-500 mb-1">
-                          SKU: {product.sku}
-                        </div>
-                        {product.category && (
-                          <div className="text-xs text-gray-500 mb-2">
-                            분류: {product.category}
-                          </div>
+                {supplierProducts.map((product) => {
+                  const isApproved = product.authorization_status === 'approved';
+                  const isPending = product.authorization_status === 'pending';
+                  const isRejected = product.authorization_status === 'rejected';
+                  const isNone = !product.authorization_status || product.authorization_status === 'none';
+
+                  return (
+                    <div
+                      key={product.id}
+                      className={`border rounded-lg p-3 transition-all ${
+                        selectedProduct?.id === product.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : isApproved
+                          ? 'border-gray-200 hover:border-blue-300 cursor-pointer'
+                          : 'border-gray-200 opacity-75'
+                      }`}
+                      onClick={() => isApproved && handleSelectProduct(product)}
+                    >
+                      <div className="flex items-start gap-3">
+                        {product.thumbnail_url && (
+                          <img
+                            src={product.thumbnail_url}
+                            alt={product.title}
+                            className="w-16 h-16 rounded object-cover flex-shrink-0"
+                          />
                         )}
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium text-gray-900">
-                            공급가: {product.supply_price.toLocaleString()}원
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="font-medium text-gray-900 flex-1">
+                              {product.title}
+                            </div>
+                            {getAuthorizationBadge(product.authorization_status)}
                           </div>
-                          {selectedProduct?.id === product.id && (
-                            <div className="flex items-center gap-1 text-blue-600 text-sm font-medium">
-                              <Check className="w-4 h-4" />
-                              선택됨
+                          <div className="text-xs text-gray-500 mb-1">
+                            SKU: {product.sku}
+                          </div>
+                          {product.category && (
+                            <div className="text-xs text-gray-500 mb-2">
+                              분류: {product.category}
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-sm font-medium text-gray-900">
+                              공급가: {product.supply_price.toLocaleString()}원
+                            </div>
+                            {selectedProduct?.id === product.id && isApproved && (
+                              <div className="flex items-center gap-1 text-blue-600 text-sm font-medium">
+                                <Check className="w-4 h-4" />
+                                선택됨
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Authorization Actions */}
+                          {isNone && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRequestAuthorization(product);
+                              }}
+                              className="mt-2 w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                              <Send className="w-4 h-4" />
+                              판매 신청
+                            </button>
+                          )}
+
+                          {isRejected && product.authorization_rejection_reason && (
+                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                              <div className="font-medium mb-1">거절 사유:</div>
+                              {product.authorization_rejection_reason}
+                            </div>
+                          )}
+
+                          {isPending && (
+                            <div className="mt-2 text-xs text-yellow-700">
+                              공급자 승인을 기다리고 있습니다.
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

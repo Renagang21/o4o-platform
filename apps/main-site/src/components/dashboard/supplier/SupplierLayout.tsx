@@ -7,12 +7,13 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import { RoleDashboardMenu, DashboardMenuItem } from '../RoleDashboardMenu';
-import { LayoutDashboard, Package, ShoppingCart, BarChart3, Warehouse } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, BarChart3, Warehouse, UserCheck } from 'lucide-react';
 
-type SupplierSection = 'overview' | 'products' | 'orders' | 'analytics' | 'inventory';
+type SupplierSection = 'overview' | 'products' | 'product-applications' | 'orders' | 'analytics' | 'inventory';
 
 // Helper to determine active section from current path
 const getActiveSectionFromPath = (pathname: string): SupplierSection => {
+  if (pathname.includes('/product-applications')) return 'product-applications';
   if (pathname.includes('/products')) return 'products';
   if (pathname.includes('/orders')) return 'orders';
   if (pathname.includes('/analytics')) return 'analytics';
@@ -38,6 +39,13 @@ export const SupplierLayout: React.FC = () => {
       icon: <Package className="w-4 h-4" />,
       type: 'route',
       href: '/dashboard/supplier/products'
+    },
+    {
+      key: 'product-applications',
+      label: '판매자 신청 관리',
+      icon: <UserCheck className="w-4 h-4" />,
+      type: 'route',
+      href: '/dashboard/supplier/product-applications'
     },
     {
       key: 'orders',

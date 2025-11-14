@@ -3,6 +3,8 @@
  * Type definitions for seller product management
  */
 
+import { AuthorizationStatus } from './dropshipping-authorization';
+
 /**
  * Product status for seller
  */
@@ -129,6 +131,7 @@ export interface DeleteSellerProductResponse {
 
 /**
  * Supplier Product (for selection during import)
+ * Phase 3-6: Authorization 정보 포함
  */
 export interface SupplierProductForSelection {
   id: string;
@@ -137,6 +140,10 @@ export interface SupplierProductForSelection {
   supply_price: number;
   thumbnail_url?: string;
   category?: string;
+  // Authorization 정보
+  authorization_status?: AuthorizationStatus;
+  authorization_id?: string;
+  authorization_rejection_reason?: string;
 }
 
 /**

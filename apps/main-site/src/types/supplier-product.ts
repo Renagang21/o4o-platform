@@ -3,6 +3,8 @@
  * Type definitions for supplier product management
  */
 
+import { AuthorizationStatus } from './dropshipping-authorization';
+
 /**
  * Product status enum
  */
@@ -147,4 +149,25 @@ export interface SupplierProductFormErrors {
   minStock?: string;
   unit?: string;
   status?: string;
+}
+
+/**
+ * Supplier Product For Selection (Seller 측에서 Import 대상 선택 시)
+ * Phase 3-6: Authorization 정보 포함
+ */
+export interface SupplierProductForSelection {
+  id: string;
+  sku: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;           // 공급가
+  supply_price: number;    // 공급가 (alias)
+  stock: number;
+  status: SupplierProductStatus;
+  images: string[];
+  // Authorization 정보
+  authorization_status?: AuthorizationStatus;
+  authorization_id?: string;
+  authorization_rejection_reason?: string;
 }

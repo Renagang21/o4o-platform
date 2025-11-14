@@ -56,6 +56,7 @@ import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
 import { PartnerLinkCreatePage } from './pages/dashboard/PartnerLinkCreatePage';
 import { PartnerLinkEditPage } from './pages/dashboard/PartnerLinkEditPage';
 import { PartnerAnalyticsPage } from './pages/dashboard/PartnerAnalyticsPage';
+import { SupplierProductAuthorizationsPage } from './pages/dashboard/SupplierProductAuthorizationsPage';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -211,6 +212,7 @@ const App: FC = () => {
             <Route path="products" element={<SupplierProductsPage />} />
             <Route path="products/new" element={<SupplierProductCreatePage />} />
             <Route path="products/:id/edit" element={<SupplierProductEditPage />} />
+            <Route path="product-applications" element={<SupplierProductAuthorizationsPage />} />
             <Route path="orders" element={<SupplierOrdersPage />} />
             <Route path="orders/:id" element={<SupplierOrderDetailPage />} />
           </Route>
