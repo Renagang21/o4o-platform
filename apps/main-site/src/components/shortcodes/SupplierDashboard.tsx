@@ -13,9 +13,17 @@
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '../../contexts/AuthContext';
+import { RoleDashboardMenu, useDashboardSection, type DashboardMenuItem } from '../dashboard/RoleDashboardMenu';
+import { Package, ShoppingCart, BarChart3, Warehouse, LayoutDashboard } from 'lucide-react';
+
+// Section types for internal navigation
+type SupplierSection = 'overview' | 'products' | 'orders' | 'analytics' | 'inventory';
+
+const SUPPLIER_SECTIONS: readonly SupplierSection[] = ['overview', 'products', 'orders', 'analytics', 'inventory'];
 
 interface SupplierDashboardProps {
   defaultPeriod?: string;
+  defaultSection?: SupplierSection;
 }
 
 interface DashboardStats {
@@ -67,7 +75,8 @@ const orderStatusLabels = {
 };
 
 export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
-  defaultPeriod = '30d'
+  defaultPeriod = '30d',
+  defaultSection = 'overview'
 }) => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -76,6 +85,9 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState(defaultPeriod);
+
+  // Section navigation with hash support
+  const [activeSection, setActiveSection] = useDashboardSection(defaultSection, SUPPLIER_SECTIONS);
 
   useEffect(() => {
     loadDashboardData();
@@ -129,10 +141,19 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
     );
   }
 
+  // Menu items for section navigation
+  const menuItems: DashboardMenuItem<SupplierSection>[] = [
+    { key: 'overview', label: '개요', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { key: 'products', label: '제품', icon: <Package className="w-4 h-4" />, badge: stats?.totalProducts },
+    { key: 'orders', label: '주문', icon: <ShoppingCart className="w-4 h-4" />, badge: stats?.pendingFulfillment },
+    { key: 'analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" /> },
+    { key: 'inventory', label: '재고', icon: <Warehouse className="w-4 h-4" />, badge: stats?.lowStockProducts },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">공급자 대시보드</h1>
           <p className="text-gray-600 mt-2">
@@ -161,6 +182,17 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Section Navigation Menu */}
+      <div className="mb-8">
+        <RoleDashboardMenu
+          items={menuItems}
+          active={activeSection}
+          onChange={setActiveSection}
+          variant="tabs"
+          orientation="horizontal"
+        />
       </div>
 
       {/* Error Display */}
@@ -286,90 +318,218 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">빠른 실행</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <QuickActionButton
-            icon="➕"
-            label="제품 등록"
-            href="/supplier/products/new"
-          />
-          <QuickActionButton
-            icon="📊"
-            label="제품 관리"
-            href="/supplier/products"
-          />
-          <QuickActionButton
-            icon="📦"
-            label="주문 내역"
-            href="/supplier/orders"
-          />
-          <QuickActionButton
-            icon="💳"
-            label="수익 분석"
-            href="/supplier/analytics"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Top Products */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">인기 제품</h2>
-            <a
-              href="/supplier/products?sort=sales"
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              전체 보기 →
-            </a>
+      {/* Quick Actions - Only show in overview section */}
+      {activeSection === 'overview' && (
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">빠른 실행</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <QuickActionButton
+              icon="➕"
+              label="제품 등록"
+              onClick={() => setActiveSection('products')}
+            />
+            <QuickActionButton
+              icon="📊"
+              label="제품 관리"
+              onClick={() => setActiveSection('products')}
+            />
+            <QuickActionButton
+              icon="📦"
+              label="주문 내역"
+              onClick={() => setActiveSection('orders')}
+            />
+            <QuickActionButton
+              icon="💳"
+              label="수익 분석"
+              onClick={() => setActiveSection('analytics')}
+            />
           </div>
+        </div>
+      )}
 
-          {topProducts.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">판매 데이터가 없습니다</p>
-              <a
-                href="/supplier/products/new"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+      {/* Section Content */}
+      {activeSection === 'overview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Top Products */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">인기 제품</h2>
+              <button
+                onClick={() => setActiveSection('products')}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                제품 등록하기
-              </a>
+                전체 보기 →
+              </button>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {topProducts.map((product, index) => (
-                <TopProductCard key={product.id} product={product} rank={index + 1} />
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Recent Orders */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">최근 주문</h2>
-            <a
-              href="/supplier/orders"
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              전체 보기 →
-            </a>
+            {topProducts.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">판매 데이터가 없습니다</p>
+                <button
+                  onClick={() => setActiveSection('products')}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  제품 등록하기
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {topProducts.map((product, index) => (
+                  <TopProductCard key={product.id} product={product} rank={index + 1} />
+                ))}
+              </div>
+            )}
           </div>
 
-          {recentOrders.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">최근 주문이 없습니다</p>
+          {/* Recent Orders */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">최근 주문</h2>
+              <button
+                onClick={() => setActiveSection('orders')}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                전체 보기 →
+              </button>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {recentOrders.map((order) => (
-                <OrderCard key={order.id} order={order} />
-              ))}
-            </div>
-          )}
+
+            {recentOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">최근 주문이 없습니다</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentOrders.map((order) => (
+                  <OrderCard key={order.id} order={order} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Products Section */}
+      {activeSection === 'products' && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">제품 관리</h2>
+          <div className="space-y-4">
+            {topProducts.length > 0 ? (
+              topProducts.map((product, index) => (
+                <TopProductCard key={product.id} product={product} rank={index + 1} />
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 mb-4">등록된 제품이 없습니다</p>
+                <p className="text-sm text-gray-400">제품을 등록하여 판매를 시작하세요</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Orders Section */}
+      {activeSection === 'orders' && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">주문 관리</h2>
+          <div className="space-y-3">
+            {recentOrders.length > 0 ? (
+              recentOrders.map((order) => (
+                <OrderCard key={order.id} order={order} />
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <ShoppingCart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500">주문 내역이 없습니다</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Analytics Section */}
+      {activeSection === 'analytics' && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">수익 분석</h2>
+          <div className="space-y-6">
+            {/* Revenue Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                title="총 매출"
+                value={formatPrice(stats?.totalRevenue || 0)}
+                icon="💰"
+                color="green"
+              />
+              <StatCard
+                title="총 수익"
+                value={formatPrice(stats?.totalProfit || 0)}
+                icon="📈"
+                color="purple"
+              />
+              <StatCard
+                title="평균 주문액"
+                value={formatPrice(stats?.avgOrderValue || 0)}
+                icon="🎯"
+                color="blue"
+              />
+            </div>
+
+            {/* Chart Placeholder */}
+            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-center">
+                <BarChart3 className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                <p className="text-gray-500">수익 차트</p>
+                <p className="text-sm text-gray-400 mt-1">상세 분석 데이터 준비 중</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inventory Section */}
+      {activeSection === 'inventory' && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">재고 관리</h2>
+          <div className="space-y-6">
+            {/* Inventory Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                title="재고 부족"
+                value={stats?.lowStockProducts || 0}
+                subtitle="10개 이하"
+                icon="⚠️"
+                color="orange"
+              />
+              <StatCard
+                title="품절"
+                value={stats?.outOfStockProducts || 0}
+                subtitle="재입고 필요"
+                icon="🚫"
+                color="red" as any
+              />
+              <StatCard
+                title="정상 재고"
+                value={(stats?.totalProducts || 0) - (stats?.lowStockProducts || 0) - (stats?.outOfStockProducts || 0)}
+                subtitle="충분한 재고"
+                icon="✅"
+                color="green"
+              />
+            </div>
+
+            {/* Low Stock Products */}
+            {topProducts.filter(p => p.stock < 10).length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">재고 부족 제품</h3>
+                <div className="space-y-3">
+                  {topProducts.filter(p => p.stock < 10).map((product, index) => (
+                    <TopProductCard key={product.id} product={product} rank={index + 1} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -430,15 +590,15 @@ const StatusBadge: React.FC<{
 const QuickActionButton: React.FC<{
   icon: string;
   label: string;
-  href: string;
-}> = ({ icon, label, href }) => (
-  <a
-    href={href}
+  onClick: () => void;
+}> = ({ icon, label, onClick }) => (
+  <button
+    onClick={onClick}
     className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
   >
     <span className="text-3xl mb-2">{icon}</span>
     <span className="text-sm font-medium text-gray-700 text-center">{label}</span>
-  </a>
+  </button>
 );
 
 // Top Product Card

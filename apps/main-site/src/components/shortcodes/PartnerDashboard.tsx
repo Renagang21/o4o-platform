@@ -3,6 +3,11 @@
  * Displays partner metrics, commissions, link management, and settlements
  */
 
+// Section types for internal navigation
+type PartnerSection = 'overview' | 'analytics' | 'settlements' | 'links' | 'marketing';
+
+const PARTNER_SECTIONS: readonly PartnerSection[] = ['overview', 'analytics', 'settlements', 'links', 'marketing'];
+
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { AnalyticsTab } from '../analytics/AnalyticsTab';
@@ -10,9 +15,11 @@ import { SettlementSummaryCards } from '../dashboard/SettlementSummaryCards';
 import { SettlementTable } from '../dashboard/SettlementTable';
 import { SettlementDetailsModal } from '../dashboard/SettlementDetailsModal';
 import type { Settlement } from '../../services/settlementApi';
+import { RoleDashboardMenu, useDashboardSection, type DashboardMenuItem } from '../dashboard/RoleDashboardMenu';
+import { LayoutDashboard, BarChart3, DollarSign, Link2, Megaphone } from 'lucide-react';
 
 interface PartnerDashboardProps {
-  defaultTab?: string;
+  defaultSection?: PartnerSection;
 }
 
 interface DashboardSummary {
@@ -28,12 +35,14 @@ interface DashboardSummary {
   referralCode: string;
 }
 
-export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab = 'overview' }) => {
+export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultSection = 'overview' }) => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState(defaultTab);
   const [selectedSettlement, setSelectedSettlement] = useState<Settlement | null>(null);
+
+  // Section navigation with hash support
+  const [activeSection, setActiveSection] = useDashboardSection(defaultSection, PARTNER_SECTIONS);
 
   useEffect(() => {
     fetchDashboardData();
@@ -222,45 +231,26 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mt-8 border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`${
-              activeTab === 'overview'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-          >
-            개요
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`${
-              activeTab === 'analytics'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-          >
-            📊 분석
-          </button>
-          <button
-            onClick={() => setActiveTab('settlements')}
-            className={`${
-              activeTab === 'settlements'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-          >
-            💰 정산
-          </button>
-        </nav>
+      {/* Section Navigation Menu */}
+      <div className="mt-8">
+        <RoleDashboardMenu
+          items={[
+            { key: 'overview', label: '개요', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { key: 'analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" /> },
+            { key: 'settlements', label: '정산', icon: <DollarSign className="w-4 h-4" /> },
+            { key: 'links', label: '링크 관리', icon: <Link2 className="w-4 h-4" />, badge: summary?.activeLinks },
+            { key: 'marketing', label: '마케팅 자료', icon: <Megaphone className="w-4 h-4" /> },
+          ]}
+          active={activeSection}
+          onChange={setActiveSection}
+          variant="tabs"
+          orientation="horizontal"
+        />
       </div>
 
-      {/* Tab Content */}
+      {/* Section Content */}
       <div className="mt-6">
-        {activeTab === 'overview' && (
+        {activeSection === 'overview' && (
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -269,22 +259,22 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
                 <QuickActionButton
                   icon="🔗"
                   label="링크 생성"
-                  href="/partner/links/generate"
+                  onClick={() => setActiveSection('links')}
                 />
                 <QuickActionButton
                   icon="📊"
                   label="성과 분석"
-                  onClick={() => setActiveTab('analytics')}
+                  onClick={() => setActiveSection('analytics')}
                 />
                 <QuickActionButton
                   icon="💰"
                   label="정산 내역"
-                  onClick={() => setActiveTab('settlements')}
+                  onClick={() => setActiveSection('settlements')}
                 />
                 <QuickActionButton
                   icon="📢"
                   label="마케팅 자료"
-                  href="/partner/marketing-materials"
+                  onClick={() => setActiveSection('marketing')}
                 />
               </div>
             </div>
@@ -307,10 +297,12 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
             </div>
           </div>
         )}
-        {activeTab === 'analytics' && (
+
+        {activeSection === 'analytics' && (
           <AnalyticsTab />
         )}
-        {activeTab === 'settlements' && (
+
+        {activeSection === 'settlements' && (
           <div>
             {/* Settlement Summary Cards */}
             <SettlementSummaryCards />
@@ -319,6 +311,55 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
             <SettlementTable
               onSelectSettlement={(settlement) => setSelectedSettlement(settlement)}
             />
+          </div>
+        )}
+
+        {/* Links Section */}
+        {activeSection === 'links' && (
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">링크 관리</h2>
+            <div className="text-center py-12">
+              <Link2 className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-500 mb-2">링크 생성 및 관리 기능</p>
+              <p className="text-sm text-gray-400 mb-6">
+                제품별 추천 링크를 생성하고 성과를 추적하세요
+              </p>
+              <div className="inline-block px-6 py-3 bg-blue-50 text-blue-700 rounded-lg">
+                <p className="text-sm font-medium">활성 링크: {summary?.activeLinks || 0}개</p>
+                <p className="text-xs text-blue-600 mt-1">총 클릭: {summary?.totalClicks?.toLocaleString() || 0}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Marketing Section */}
+        {activeSection === 'marketing' && (
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">마케팅 자료</h2>
+            <div className="text-center py-12">
+              <Megaphone className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-500 mb-2">마케팅 자료 라이브러리</p>
+              <p className="text-sm text-gray-400 mb-6">
+                배너, 로고, 상품 이미지 등 다양한 마케팅 자료를 다운로드하세요
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="text-3xl mb-2">🖼️</div>
+                  <p className="font-medium text-gray-900">배너 이미지</p>
+                  <p className="text-sm text-gray-500 mt-1">다양한 사이즈의 배너</p>
+                </div>
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="text-3xl mb-2">📱</div>
+                  <p className="font-medium text-gray-900">SNS 자료</p>
+                  <p className="text-sm text-gray-500 mt-1">소셜 미디어용 이미지</p>
+                </div>
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="text-3xl mb-2">📝</div>
+                  <p className="font-medium text-gray-900">카피라이팅</p>
+                  <p className="text-sm text-gray-500 mt-1">추천 문구 및 템플릿</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
