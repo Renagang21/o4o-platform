@@ -899,8 +899,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       {/* Main Layout */}
       <div className="flex-1 flex relative" style={{ marginTop: hideHeader ? '0' : '56px' }}>
         {/* Block List Sidebar */}
-        {!hideHeader && showListView && (
-          <div className="fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 shadow-lg">
+        {showListView && (
+          <div className="fixed left-0 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto z-40 shadow-lg" style={{ top: hideHeader ? '55px' : '56px' }}>
             <div className="p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
                 Block List
@@ -967,7 +967,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         {/* Editor Canvas */}
         <div
           className={`flex-1 transition-all duration-300 overflow-y-auto bg-gray-100 ${
-            !hideHeader && showListView ? 'ml-64' : 'ml-0'
+            showListView ? 'ml-64' : 'ml-0'
           } ${
             isBlockInserterOpen ? 'ml-80' : ''
           } ${
