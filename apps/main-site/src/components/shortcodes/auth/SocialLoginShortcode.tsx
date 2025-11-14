@@ -382,7 +382,7 @@ export const SocialLoginComponent: React.FC<{
               </tbody>
             </table>
             <p className="text-xs text-yellow-700 mt-2">
-              ⚠️ 프로덕션 환경에서는 자동으로 숨겨집니다.
+              ⚠️ 테스트용 계정입니다. 사용 후 반드시 비활성화하세요.
             </p>
           </div>
         </div>

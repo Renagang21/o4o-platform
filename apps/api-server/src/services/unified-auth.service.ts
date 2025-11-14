@@ -374,10 +374,6 @@ export class UnifiedAuthService {
    * Returns one user per role: admin, seller, supplier, partner, customer
    */
   async getTestAccounts(): Promise<Array<{role: string; email: string; password: string}>> {
-    if (process.env.NODE_ENV === 'production') {
-      return [];
-    }
-
     const userRepo = AppDataSource.getRepository(User);
 
     // Define roles we want to show in test panel

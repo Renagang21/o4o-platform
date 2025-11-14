@@ -297,19 +297,11 @@ router.post('/logout', authenticate, async (req, res) => {
 
 /**
  * @route GET /api/auth/unified/test-accounts
- * @desc Get test accounts for development (only in dev/staging)
- * @access Public (but restricted by environment)
+ * @desc Get test accounts for testing
+ * @access Public
  */
 router.get('/test-accounts', async (req, res) => {
   try {
-    // Only allow in development/staging
-    if (process.env.NODE_ENV === 'production') {
-      return res.status(403).json({
-        success: false,
-        message: 'Test accounts are not available in production'
-      });
-    }
-
     // Return sample test accounts from actual DB users with test role
     const testAccounts = await unifiedAuthService.getTestAccounts();
 
