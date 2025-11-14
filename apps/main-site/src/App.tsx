@@ -43,6 +43,8 @@ import { SellerLayout } from './components/dashboard/seller/SellerLayout';
 import { PartnerLayout } from './components/dashboard/partner/PartnerLayout';
 import { SupplierDashboardPage } from './pages/dashboard/SupplierDashboardPage';
 import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
+import { SupplierProductCreatePage } from './pages/dashboard/SupplierProductCreatePage';
+import { SupplierProductEditPage } from './pages/dashboard/SupplierProductEditPage';
 import { SupplierOrdersPage } from './pages/dashboard/SupplierOrdersPage';
 import { SellerDashboardPage } from './pages/dashboard/SellerDashboardPage';
 import { SellerProductsPage } from './pages/dashboard/SellerProductsPage';
@@ -201,6 +203,8 @@ const App: FC = () => {
           }>
             <Route index element={<SupplierDashboardPage />} />
             <Route path="products" element={<SupplierProductsPage />} />
+            <Route path="products/new" element={<SupplierProductCreatePage />} />
+            <Route path="products/:id/edit" element={<SupplierProductEditPage />} />
             <Route path="orders" element={<SupplierOrdersPage />} />
           </Route>
 
