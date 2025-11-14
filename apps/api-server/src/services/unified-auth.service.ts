@@ -372,7 +372,7 @@ export class UnifiedAuthService {
   /**
    * Get test accounts for development/staging
    */
-  async getTestAccounts(): Promise<Array<{role: string; email: string}>> {
+  async getTestAccounts(): Promise<Array<{role: string; email: string; password: string}>> {
     if (process.env.NODE_ENV === 'production') {
       return [];
     }
@@ -388,9 +388,13 @@ export class UnifiedAuthService {
       .limit(20)
       .getMany();
 
+    // All test accounts use the same password for convenience
+    const testPassword = 'test123!@#';
+
     return testUsers.map(user => ({
       role: this.getRoleLabel(user.role),
-      email: user.email
+      email: user.email,
+      password: testPassword
     }));
   }
 

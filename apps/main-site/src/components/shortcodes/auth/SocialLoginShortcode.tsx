@@ -54,7 +54,7 @@ export const SocialLoginComponent: React.FC<{
   const [error, setError] = useState('');
   const [oauthProviders, setOauthProviders] = useState<OAuthProviders | null>(null);
   const [providersLoading, setProvidersLoading] = useState(true);
-  const [testAccounts, setTestAccounts] = useState<Array<{role: string; email: string}>>([]);
+  const [testAccounts, setTestAccounts] = useState<Array<{role: string; email: string; password: string}>>([]);
 
   // Parse providers filter
   const allowedProviders = providers
@@ -372,7 +372,8 @@ export const SocialLoginComponent: React.FC<{
                 <tr className="text-left text-gray-600">
                   <th className="pb-2">역할</th>
                   <th className="pb-2">이메일</th>
-                  <th className="pb-2 text-center">복사</th>
+                  <th className="pb-2">비밀번호</th>
+                  <th className="pb-2 text-center">자동입력</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -380,16 +381,16 @@ export const SocialLoginComponent: React.FC<{
                   <tr key={index}>
                     <td className="py-1">{account.role}</td>
                     <td className="py-1 font-mono text-xs">{account.email}</td>
+                    <td className="py-1 font-mono text-xs">{account.password}</td>
                     <td className="py-1 text-center">
                       <button
                         type="button"
                         onClick={() => {
-                          setFormData({ email: account.email, password: '' });
-                          navigator.clipboard.writeText(account.email);
+                          setFormData({ email: account.email, password: account.password });
                         }}
                         className="text-blue-600 hover:text-blue-800 text-xs underline"
                       >
-                        복사
+                        입력
                       </button>
                     </td>
                   </tr>
@@ -397,7 +398,7 @@ export const SocialLoginComponent: React.FC<{
               </tbody>
             </table>
             <p className="text-xs text-yellow-700 mt-2">
-              ⚠️ 프로덕션 환경에서는 자동으로 숨겨집니다. 비밀번호는 보안상 표시되지 않습니다.
+              ⚠️ 프로덕션 환경에서는 자동으로 숨겨집니다.
             </p>
           </div>
         </div>
