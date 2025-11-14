@@ -372,37 +372,67 @@ export class UnifiedAuthService {
   /**
    * Get test accounts for development/staging
    * Returns one user per role: admin, seller, supplier, partner, customer
+   * Auto-creates test accounts if they don't exist
    */
   async getTestAccounts(): Promise<Array<{role: string; email: string; password: string}>> {
     const userRepo = AppDataSource.getRepository(User);
 
     // Define roles we want to show in test panel
-    const targetRoles = ['admin', 'seller', 'supplier', 'partner', 'customer'];
+    const targetRoles: UserRole[] = [
+      UserRole.ADMIN,
+      UserRole.SELLER,
+      UserRole.SUPPLIER,
+      UserRole.PARTNER,
+      UserRole.CUSTOMER
+    ];
     const testAccounts: Array<{role: string; email: string; password: string}> = [];
 
     // All test accounts use the same password for convenience
     const testPassword = 'test123!@#';
 
-    // Find one user for each role
+    // Find or create one user for each role
     for (const role of targetRoles) {
-      const user = await userRepo
+      let user = await userRepo
         .createQueryBuilder('user')
         .where('user.role = :role', { role })
         .andWhere(
           '(user.email LIKE :pattern1 OR user.email LIKE :pattern2)',
           { pattern1: '%@test.com', pattern2: '%test%' }
         )
-        .select(['user.email', 'user.role'])
+        .select(['user.id', 'user.email', 'user.role', 'user.password'])
         .limit(1)
         .getOne();
 
-      if (user) {
-        testAccounts.push({
-          role: this.getRoleLabel(user.role),
-          email: user.email,
-          password: testPassword
+      // If user doesn't exist, create one
+      if (!user) {
+        const testEmail = `${role}@test.com`;
+        user = userRepo.create({
+          email: testEmail,
+          name: `Test ${this.getRoleLabel(role)}`,
+          password: await hashPassword(testPassword),
+          role: role,
+          roles: [role],
+          status: UserStatus.ACTIVE,
+          isEmailVerified: true,
+          permissions: []
         });
+        await userRepo.save(user);
+        logger.info(`Created test account: ${testEmail} (${role})`);
+      } else {
+        // Update password if it's not already set correctly
+        const isCorrectPassword = await comparePassword(testPassword, user.password || '');
+        if (!isCorrectPassword) {
+          user.password = await hashPassword(testPassword);
+          await userRepo.save(user);
+          logger.info(`Updated password for test account: ${user.email}`);
+        }
       }
+
+      testAccounts.push({
+        role: this.getRoleLabel(user.role),
+        email: user.email,
+        password: testPassword
+      });
     }
 
     return testAccounts;
