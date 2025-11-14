@@ -35,6 +35,7 @@ import { registerAllBlocks } from '@/blocks';
 import GutenbergSidebar from './GutenbergSidebar';
 import { BlockWrapper } from './BlockWrapper';
 import SlashCommandMenu from './SlashCommandMenu';
+import { BlockListItem } from './BlockListItem';
 // Toast components
 import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
@@ -910,16 +911,23 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               ) : (
                 <div className="space-y-1">
                   {blocks.map((block, index) => {
-                    const blockType = block.type.replace('o4o/', '');
                     const blockContent = typeof block.content === 'string'
                       ? block.content
                       : block.content?.text || '';
                     const preview = blockContent.replace(/<[^>]*>/g, '').substring(0, 50);
 
                     return (
-                      <button
+                      <BlockListItem
                         key={block.id}
-                        onClick={() => {
+                        blockId={block.id}
+                        blockType={block.type}
+                        blockIndex={index}
+                        blockPreview={preview}
+                        isSelected={selectedBlockId === block.id}
+                        canMoveUp={index > 0}
+                        canMoveDown={index < blocks.length - 1}
+                        isDragging={draggedBlockId === block.id}
+                        onSelect={() => {
                           setSelectedBlockId(block.id);
                           // Scroll to block
                           const blockElement = document.querySelector(`[data-block-id="${block.id}"]`);
@@ -927,28 +935,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                             blockElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                           }
                         }}
-                        className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
-                          selectedBlockId === block.id
-                            ? 'bg-blue-50 border border-blue-200'
-                            : 'hover:bg-gray-100 border border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-start gap-2">
-                          <span className="text-xs font-mono text-gray-400 mt-0.5">
-                            {index + 1}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-xs font-semibold text-gray-700 capitalize">
-                              {blockType}
-                            </div>
-                            {preview && (
-                              <div className="text-xs text-gray-500 truncate mt-0.5">
-                                {preview}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </button>
+                        onMoveUp={() => handleMoveUp(block.id)}
+                        onMoveDown={() => handleMoveDown(block.id)}
+                        onDuplicate={() => handleDuplicate(block.id)}
+                        onDelete={() => handleBlockDelete(block.id)}
+                        onDragStart={(e) => handleDragStart(block.id, e)}
+                        onDragEnd={(e) => handleDragEnd(block.id, e)}
+                        onDragOver={(e) => handleDragOver(block.id, e)}
+                        onDrop={(e) => {
+                          const draggedId = e.dataTransfer.getData('application/block-id') || e.dataTransfer.getData('text/plain');
+                          handleDrop(block.id, draggedId, e);
+                        }}
+                      />
                     );
                   })}
                 </div>
