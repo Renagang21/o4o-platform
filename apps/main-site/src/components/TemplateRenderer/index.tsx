@@ -8,6 +8,7 @@ import HeroBlock from './blocks/HeroBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 import SpacerBlock from './blocks/SpacerBlock';
 import ShortcodeBlock from './blocks/ShortcodeBlock';
+import TabsBlock from './blocks/TabsBlock';
 import ErrorBlock from './blocks/ErrorBlock';
 import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
 import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
@@ -23,6 +24,7 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   columns: ColumnsBlock,
   spacer: SpacerBlock,
   shortcode: ShortcodeBlock,
+  tabs: TabsBlock,
 
   // O4O blocks (AI-generated blocks with o4o/ prefix)
   'o4o/paragraph': ParagraphBlock,
@@ -32,6 +34,7 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   'o4o/columns': ColumnsBlock,
   'o4o/spacer': SpacerBlock,
   'o4o/shortcode': ShortcodeBlock,
+  'o4o/tabs': TabsBlock,
 
   // Spectra blocks
   'uagb/call-to-action': CTABlock,
