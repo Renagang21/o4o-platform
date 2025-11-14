@@ -74,13 +74,13 @@ export const SellerProductEditPage: React.FC = () => {
     if (!id || !product) return;
 
     if (!salePrice || parseInt(salePrice) <= 0) {
-      alert('Please enter sale price');
+      alert('판매가를 입력해주세요.');
       return;
     }
 
     const salePriceNum = parseInt(salePrice);
     if (product.supply_price && salePriceNum <= product.supply_price) {
-      alert('Sale price must be higher than supply price');
+      alert('판매가는 공급가보다 높아야 합니다.');
       return;
     }
 
@@ -97,11 +97,11 @@ export const SellerProductEditPage: React.FC = () => {
       };
 
       await sellerProductAPI.updateProduct(id, payload);
-      alert('Product updated successfully');
+      alert('상품이 수정되었습니다.');
       navigate('/dashboard/seller/products');
     } catch (error) {
       console.error('Failed to update product:', error);
-      alert('Failed to update product');
+      alert('상품 수정에 실패했습니다.');
     } finally {
       setUpdating(false);
     }
@@ -114,12 +114,12 @@ export const SellerProductEditPage: React.FC = () => {
       <>
         <Breadcrumb
           items={[
-            { label: 'Seller Dashboard', href: '/dashboard/seller' },
-            { label: 'Products', href: '/dashboard/seller/products' },
-            { label: 'Edit Product', isCurrent: true },
+            { label: '판매자 대시보드', href: '/dashboard/seller' },
+            { label: '상품 관리', href: '/dashboard/seller/products' },
+            { label: '상품 수정', isCurrent: true },
           ]}
         />
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">로딩 중...</div>
       </>
     );
   }
@@ -129,18 +129,18 @@ export const SellerProductEditPage: React.FC = () => {
       <>
         <Breadcrumb
           items={[
-            { label: 'Seller Dashboard', href: '/dashboard/seller' },
-            { label: 'Products', href: '/dashboard/seller/products' },
-            { label: 'Edit Product', isCurrent: true },
+            { label: '판매자 대시보드', href: '/dashboard/seller' },
+            { label: '상품 관리', href: '/dashboard/seller/products' },
+            { label: '상품 수정', isCurrent: true },
           ]}
         />
         <div className="text-center py-12">
-          <p className="text-red-500 mb-4">{error || 'Product not found'}</p>
+          <p className="text-red-500 mb-4">{error || '상품을 찾을 수 없습니다'}</p>
           <button
             onClick={() => navigate('/dashboard/seller/products')}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Back to Product List
+            목록으로 돌아가기
           </button>
         </div>
       </>
@@ -151,22 +151,22 @@ export const SellerProductEditPage: React.FC = () => {
     <>
       <Breadcrumb
         items={[
-          { label: 'Seller Dashboard', href: '/dashboard/seller' },
-          { label: 'Products', href: '/dashboard/seller/products' },
+          { label: '판매자 대시보드', href: '/dashboard/seller' },
+          { label: '상품 관리', href: '/dashboard/seller/products' },
           { label: product.title, isCurrent: true },
         ]}
       />
 
       <PageHeader
-        title="Edit Product"
-        subtitle={`Editing: ${product.sku}`}
+        title="상품 수정"
+        subtitle={`수정 중: ${product.sku}`}
         actions={
           <button
             onClick={() => navigate('/dashboard/seller/products')}
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to List
+            목록으로
           </button>
         }
       />
@@ -175,7 +175,7 @@ export const SellerProductEditPage: React.FC = () => {
         <div className="space-y-4">
           {/* Source Product Info */}
           <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-sm text-gray-600 mb-1">Source Product</div>
+            <div className="text-sm text-gray-600 mb-1">원본 공급상품</div>
             <div className="flex items-center gap-3">
               {product.thumbnail_url && (
                 <img
@@ -196,13 +196,13 @@ export const SellerProductEditPage: React.FC = () => {
           {/* Product Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Title
+              판매 상품명
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter product title"
+              placeholder="상품명을 입력하세요"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -211,11 +211,11 @@ export const SellerProductEditPage: React.FC = () => {
           {product.supply_price !== undefined && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Supply Price
+                공급가
               </label>
               <input
                 type="text"
-                value={`${product.supply_price.toLocaleString()} KRW`}
+                value={`${product.supply_price.toLocaleString()}원`}
                 disabled
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
               />
@@ -225,13 +225,13 @@ export const SellerProductEditPage: React.FC = () => {
           {/* Sale Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sale Price <span className="text-red-500">*</span>
+              판매가 <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
               value={salePrice}
               onChange={(e) => setSalePrice(e.target.value)}
-              placeholder="Enter sale price"
+              placeholder="판매가를 입력하세요"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -241,14 +241,14 @@ export const SellerProductEditPage: React.FC = () => {
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">
-                  Expected Margin
+                  예상 마진
                 </span>
                 <span className="text-lg font-bold text-green-600">
-                  {margin.amount.toLocaleString()} KRW
+                  {margin.amount.toLocaleString()}원
                 </span>
               </div>
               <div className="text-xs text-gray-600">
-                Margin Rate: {margin.rate.toFixed(2)}%
+                마진율: {margin.rate.toFixed(2)}%
               </div>
             </div>
           )}
@@ -262,7 +262,9 @@ export const SellerProductEditPage: React.FC = () => {
                 onChange={(e) => setIsPublished(e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Published</span>
+              <span className="text-sm text-gray-700">
+                {isPublished ? '판매 중' : '비공개'}
+              </span>
             </label>
           </div>
 
@@ -278,7 +280,7 @@ export const SellerProductEditPage: React.FC = () => {
               }
               className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {updating ? 'Updating...' : 'Update Product'}
+              {updating ? '수정 중...' : '수정하기'}
             </button>
           </div>
         </div>
