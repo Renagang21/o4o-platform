@@ -15,6 +15,14 @@ const SupplierDashboardLazy = React.lazy(() =>
   import('./SupplierDashboard').then(module => ({ default: module.SupplierDashboard }))
 );
 
+const CustomerDashboardLazy = React.lazy(() =>
+  import('./CustomerDashboard').then(module => ({ default: module.CustomerDashboard }))
+);
+
+const SellerDashboardLazy = React.lazy(() =>
+  import('./SellerDashboard').then(module => ({ default: module.SellerDashboard }))
+);
+
 // Import application forms
 const SupplierApplicationLazy = React.lazy(() =>
   import('../dropshipping/RoleApplicationForms').then(module => ({ default: module.SupplierApplicationForm }))
@@ -70,6 +78,20 @@ const PartnerDashboardWrapper: React.FC<{ tab?: string }> = ({ tab = 'overview' 
 const SupplierDashboardWrapper: React.FC<{ period?: string }> = ({ period = '30d' }) => (
   <React.Suspense fallback={<LoadingFallback message="Loading supplier dashboard..." />}>
     <SupplierDashboardLazy defaultPeriod={period} />
+  </React.Suspense>
+);
+
+// Customer Dashboard Wrapper
+const CustomerDashboardWrapper: React.FC = () => (
+  <React.Suspense fallback={<LoadingFallback message="Loading customer dashboard..." />}>
+    <CustomerDashboardLazy />
+  </React.Suspense>
+);
+
+// Seller Dashboard Wrapper
+const SellerDashboardWrapper: React.FC<{ period?: string }> = ({ period = '30d' }) => (
+  <React.Suspense fallback={<LoadingFallback message="Loading seller dashboard..." />}>
+    <SellerDashboardLazy defaultPeriod={period} />
   </React.Suspense>
 );
 
@@ -158,7 +180,9 @@ export const dropshippingShortcodes: ShortcodeDefinition[] = [
   // ===== SELLER SHORTCODES =====
   {
     name: 'seller_dashboard',
-    component: () => <PlaceholderShortcode name="seller_dashboard" />
+    component: ({ attributes }) => (
+      <SellerDashboardWrapper period={attributes.period as string} />
+    )
   },
   {
     name: 'seller_products',
@@ -186,7 +210,7 @@ export const dropshippingShortcodes: ShortcodeDefinition[] = [
   // ===== CORE DROPSHIPPING SHORTCODES =====
   {
     name: 'user_dashboard',
-    component: () => <PlaceholderShortcode name="user_dashboard" />
+    component: () => <CustomerDashboardWrapper />
   },
   {
     name: 'role_verification',

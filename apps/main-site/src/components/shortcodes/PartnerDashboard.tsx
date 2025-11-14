@@ -261,8 +261,50 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
       {/* Tab Content */}
       <div className="mt-6">
         {activeTab === 'overview' && (
-          <div className="text-gray-600">
-            <p>개요 탭 - 기존 대시보드 콘텐츠가 여기에 표시됩니다.</p>
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">빠른 실행</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <QuickActionButton
+                  icon="🔗"
+                  label="링크 생성"
+                  href="/partner/links/generate"
+                />
+                <QuickActionButton
+                  icon="📊"
+                  label="성과 분석"
+                  onClick={() => setActiveTab('analytics')}
+                />
+                <QuickActionButton
+                  icon="💰"
+                  label="정산 내역"
+                  onClick={() => setActiveTab('settlements')}
+                />
+                <QuickActionButton
+                  icon="📢"
+                  label="마케팅 자료"
+                  href="/partner/marketing-materials"
+                />
+              </div>
+            </div>
+
+            {/* Info Panel */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">💡</span>
+                <div>
+                  <p className="font-semibold text-blue-900 mb-2">
+                    파트너 프로그램 팁
+                  </p>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• 추천 링크를 SNS와 블로그에 공유하여 더 많은 수익을 창출하세요</li>
+                    <li>• {summary?.tierLevel === 'Bronze' ? 'Silver 등급으로 승급하면 커미션율이 15%로 증가합니다' : '꾸준한 활동으로 더 높은 등급을 달성하세요'}</li>
+                    <li>• 정산은 매월 1일 자동으로 처리됩니다</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {activeTab === 'analytics' && (
@@ -289,5 +331,31 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultTab =
         />
       )}
     </div>
+  );
+};
+
+// Quick Action Button Component
+const QuickActionButton: React.FC<{
+  icon: string;
+  label: string;
+  href?: string;
+  onClick?: () => void;
+}> = ({ icon, label, href, onClick }) => {
+  const className = "flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer";
+
+  if (href) {
+    return (
+      <a href={href} className={className}>
+        <span className="text-3xl mb-2">{icon}</span>
+        <span className="text-sm font-medium text-gray-700 text-center">{label}</span>
+      </a>
+    );
+  }
+
+  return (
+    <button onClick={onClick} className={className}>
+      <span className="text-3xl mb-2">{icon}</span>
+      <span className="text-sm font-medium text-gray-700 text-center">{label}</span>
+    </button>
   );
 };

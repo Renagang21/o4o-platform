@@ -1,36 +1,28 @@
 /**
- * Supplier Dashboard Component
- * Based on research from Alibaba 1688, AliExpress, and DHgate supplier portals
+ * Seller Dashboard Component
+ * Based on research from Shopify, Amazon Seller Central, and eBay Seller Hub
  *
  * Primary Features:
- * - Product catalog management
- * - Order fulfillment tracking
- * - Revenue and profit analytics
- * - Inventory management
- * - Product approval status
+ * - Sales overview and analytics
+ * - Product performance tracking
+ * - Order management
+ * - Inventory alerts
+ * - Revenue and profit metrics
  */
 
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '../../contexts/AuthContext';
 
-interface SupplierDashboardProps {
-  defaultPeriod?: string;
-}
-
-interface DashboardStats {
-  totalProducts: number;
-  approvedProducts: number;
-  pendingProducts: number;
-  rejectedProducts: number;
-  totalRevenue: number;
-  totalProfit: number;
-  lowStockProducts: number;
-  outOfStockProducts: number;
-  monthlyOrders: number;
-  avgOrderValue: number;
-  pendingFulfillment: number;
-  topSellerCount: number;
+interface SellerStats {
+  totalSales: number;
+  monthlySales: number;
+  activeListings: number;
+  totalListings: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  pendingOrders: number;
+  lowStockItems: number;
 }
 
 interface TopProduct {
@@ -38,44 +30,53 @@ interface TopProduct {
   name: string;
   sales: number;
   revenue: number;
-  stock: number;
   image: string;
+  stock: number;
 }
 
 interface RecentOrder {
   id: string;
   orderNumber: string;
-  sellerName: string;
+  customer: string;
   date: string;
   total: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
+  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
   items: number;
+}
+
+interface SalesData {
+  date: string;
+  sales: number;
+  orders: number;
 }
 
 const orderStatusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-blue-100 text-blue-800',
+  paid: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
+  cancelled: 'bg-red-100 text-red-800',
 };
 
 const orderStatusLabels = {
-  pending: '확인대기',
-  confirmed: '확인완료',
+  pending: '대기중',
+  paid: '결제완료',
   shipped: '배송중',
   delivered: '배송완료',
+  cancelled: '취소됨',
 };
 
-export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
+export const SellerDashboard: React.FC<{ defaultPeriod?: string }> = ({
   defaultPeriod = '30d'
 }) => {
   const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [stats, setStats] = useState<SellerStats | null>(null);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+  const [salesData, setSalesData] = useState<SalesData[]>([]);
+  const [period, setPeriod] = useState(defaultPeriod);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [period, setPeriod] = useState(defaultPeriod);
 
   useEffect(() => {
     loadDashboardData();
@@ -86,14 +87,15 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
       setLoading(true);
       setError(null);
 
-      const [statsRes, productsRes, ordersRes] = await Promise.allSettled([
-        authClient.api.get(`/dropshipping/supplier/dashboard/stats?period=${period}`),
-        authClient.api.get('/dropshipping/supplier/products/top?limit=5'),
-        authClient.api.get('/dropshipping/supplier/orders/recent?limit=5'),
+      const [statsRes, productsRes, ordersRes, salesRes] = await Promise.allSettled([
+        authClient.api.get(`/seller/dashboard/stats?period=${period}`),
+        authClient.api.get('/seller/products/top?limit=5'),
+        authClient.api.get('/seller/orders/recent?limit=5'),
+        authClient.api.get(`/seller/sales/chart?period=${period}`),
       ]);
 
       if (statsRes.status === 'fulfilled' && statsRes.value.data) {
-        setStats(statsRes.value.data.stats || statsRes.value.data);
+        setStats(statsRes.value.data);
       }
 
       if (productsRes.status === 'fulfilled' && productsRes.value.data) {
@@ -103,19 +105,16 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
       if (ordersRes.status === 'fulfilled' && ordersRes.value.data) {
         setRecentOrders(ordersRes.value.data);
       }
+
+      if (salesRes.status === 'fulfilled' && salesRes.value.data) {
+        setSalesData(salesRes.value.data);
+      }
     } catch (err) {
-      console.error('Supplier dashboard fetch error:', err);
+      console.error('Failed to load seller dashboard:', err);
       setError('대시보드 정보를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR', {
-      style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
   };
 
   if (loading) {
@@ -123,7 +122,7 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">공급자 대시보드 로딩중...</p>
+          <p className="text-gray-600">판매자 대시보드 로딩중...</p>
         </div>
       </div>
     );
@@ -134,9 +133,9 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">공급자 대시보드</h1>
+          <h1 className="text-3xl font-bold text-gray-900">판매자 대시보드</h1>
           <p className="text-gray-600 mt-2">
-            {user?.name || '공급자'}님의 제품과 주문을 관리하세요
+            {user?.name || '판매자'}님의 스토어 성과를 확인하세요
           </p>
         </div>
 
@@ -166,67 +165,58 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
       {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <p className="text-red-800">{error}</p>
-            <button
-              onClick={loadDashboardData}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
-            >
-              다시 시도
-            </button>
-          </div>
+          <p className="text-red-800">{error}</p>
         </div>
       )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
-          title="총 제품"
-          value={stats?.totalProducts || 0}
-          subtitle={`승인: ${stats?.approvedProducts || 0} | 대기: ${stats?.pendingProducts || 0}`}
-          icon="📦"
-          color="blue"
-        />
-        <StatCard
           title="이번 달 매출"
-          value={formatPrice(stats?.totalRevenue || 0)}
-          subtitle={`${stats?.monthlyOrders || 0}건 주문`}
+          value={`${(stats?.monthlySales || 0).toLocaleString()}원`}
+          change="+12.5%"
+          changeType="increase"
           icon="💰"
-          color="green"
         />
         <StatCard
-          title="이번 달 수익"
-          value={formatPrice(stats?.totalProfit || 0)}
-          subtitle={`평균: ${formatPrice(stats?.avgOrderValue || 0)}`}
+          title="활성 상품"
+          value={`${stats?.activeListings || 0} / ${stats?.totalListings || 0}`}
+          subtitle="전체 상품"
+          icon="📦"
+        />
+        <StatCard
+          title="전환율"
+          value={`${(stats?.conversionRate || 0).toFixed(1)}%`}
+          change="+2.1%"
+          changeType="increase"
           icon="📈"
-          color="purple"
         />
         <StatCard
-          title="재고 부족"
-          value={stats?.lowStockProducts || 0}
-          subtitle={`품절: ${stats?.outOfStockProducts || 0}개`}
-          icon="⚠️"
-          color="orange"
+          title="평균 주문액"
+          value={`${(stats?.averageOrderValue || 0).toLocaleString()}원`}
+          change="-3.2%"
+          changeType="decrease"
+          icon="🎯"
         />
       </div>
 
       {/* Alert Banners */}
-      {(stats?.pendingFulfillment || 0) > 0 || (stats?.lowStockProducts || 0) > 0 ? (
+      {(stats?.pendingOrders || 0) > 0 || (stats?.lowStockItems || 0) > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {(stats?.pendingFulfillment || 0) > 0 && (
+          {(stats?.pendingOrders || 0) > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">📦</span>
+                <span className="text-2xl">📮</span>
                 <div className="flex-1">
                   <p className="font-semibold text-blue-900">
-                    {stats?.pendingFulfillment}개 주문 처리 대기
+                    {stats?.pendingOrders}개의 주문 대기중
                   </p>
                   <p className="text-sm text-blue-700">
-                    배송 준비가 필요한 주문이 있습니다
+                    처리가 필요한 주문이 있습니다
                   </p>
                 </div>
                 <a
-                  href="/supplier/orders?status=pending"
+                  href="/seller/orders?status=pending"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                 >
                   확인하기
@@ -235,20 +225,20 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
             </div>
           )}
 
-          {(stats?.lowStockProducts || 0) > 0 && (
+          {(stats?.lowStockItems || 0) > 0 && (
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">⚠️</span>
                 <div className="flex-1">
                   <p className="font-semibold text-orange-900">
-                    {stats?.lowStockProducts}개 제품 재고 부족
+                    {stats?.lowStockItems}개 상품 재고 부족
                   </p>
                   <p className="text-sm text-orange-700">
                     재고 보충이 필요합니다
                   </p>
                 </div>
                 <a
-                  href="/supplier/inventory?filter=low-stock"
+                  href="/seller/inventory?filter=low-stock"
                   className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium"
                 >
                   확인하기
@@ -259,56 +249,29 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
         </div>
       ) : null}
 
-      {/* Product Status Breakdown */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">제품 상태</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatusBadge
-            label="승인됨"
-            value={stats?.approvedProducts || 0}
-            color="green"
-          />
-          <StatusBadge
-            label="대기중"
-            value={stats?.pendingProducts || 0}
-            color="yellow"
-          />
-          <StatusBadge
-            label="거부됨"
-            value={stats?.rejectedProducts || 0}
-            color="red"
-          />
-          <StatusBadge
-            label="전체"
-            value={stats?.totalProducts || 0}
-            color="blue"
-          />
-        </div>
-      </div>
-
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">빠른 실행</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <QuickActionButton
             icon="➕"
-            label="제품 등록"
-            href="/supplier/products/new"
+            label="상품 등록"
+            href="/seller/products/new"
           />
           <QuickActionButton
             icon="📊"
-            label="제품 관리"
-            href="/supplier/products"
+            label="판매 분석"
+            href="/seller/analytics"
           />
           <QuickActionButton
             icon="📦"
-            label="주문 내역"
-            href="/supplier/orders"
+            label="재고 관리"
+            href="/seller/inventory"
           />
           <QuickActionButton
             icon="💳"
-            label="수익 분석"
-            href="/supplier/analytics"
+            label="정산 내역"
+            href="/seller/settlements"
           />
         </div>
       </div>
@@ -317,9 +280,9 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
         {/* Top Products */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">인기 제품</h2>
+            <h2 className="text-xl font-semibold text-gray-900">인기 상품</h2>
             <a
-              href="/supplier/products?sort=sales"
+              href="/seller/products/analytics"
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
               전체 보기 →
@@ -330,10 +293,10 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">판매 데이터가 없습니다</p>
               <a
-                href="/supplier/products/new"
+                href="/seller/products/new"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                제품 등록하기
+                상품 등록하기
               </a>
             </div>
           ) : (
@@ -350,7 +313,7 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">최근 주문</h2>
             <a
-              href="/supplier/orders"
+              href="/seller/orders"
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
               전체 보기 →
@@ -370,6 +333,21 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Sales Chart Placeholder */}
+      <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">매출 추이</h2>
+        <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
+          <div className="text-center">
+            <p className="text-gray-500 mb-2">매출 차트</p>
+            <p className="text-sm text-gray-400">
+              {salesData.length > 0
+                ? `${salesData.length}일간의 판매 데이터`
+                : '판매 데이터를 수집하는 중입니다'}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -377,54 +355,30 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
 // Stat Card Component
 const StatCard: React.FC<{
   title: string;
-  value: string | number;
+  value: string;
+  change?: string;
+  changeType?: 'increase' | 'decrease';
   subtitle?: string;
   icon: string;
-  color: 'blue' | 'green' | 'purple' | 'orange';
-}> = ({ title, value, subtitle, icon, color }) => {
-  const colorClasses = {
-    blue: 'from-blue-50 to-blue-100 border-blue-200',
-    green: 'from-green-50 to-green-100 border-green-200',
-    purple: 'from-purple-50 to-purple-100 border-purple-200',
-    orange: 'from-orange-50 to-orange-100 border-orange-200',
-  };
-
-  return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} rounded-lg p-6 border`}>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-700 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          {subtitle && <p className="text-xs text-gray-600 mt-1">{subtitle}</p>}
-        </div>
-        <span className="text-2xl">{icon}</span>
-      </div>
+}> = ({ title, value, change, changeType, subtitle, icon }) => (
+  <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="flex items-start justify-between mb-3">
+      <p className="text-sm text-gray-600">{title}</p>
+      <span className="text-2xl">{icon}</span>
     </div>
-  );
-};
-
-// Status Badge Component
-const StatusBadge: React.FC<{
-  label: string;
-  value: number;
-  color: 'green' | 'yellow' | 'red' | 'blue';
-}> = ({ label, value, color }) => {
-  const colorClasses = {
-    green: 'bg-green-100 border-green-300 text-green-800',
-    yellow: 'bg-yellow-100 border-yellow-300 text-yellow-800',
-    red: 'bg-red-100 border-red-300 text-red-800',
-    blue: 'bg-blue-100 border-blue-300 text-blue-800',
-  };
-
-  return (
-    <div className="text-center">
-      <div className={`inline-block px-3 py-1 border rounded-full font-semibold mb-2 ${colorClasses[color]}`}>
-        {label}
-      </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-    </div>
-  );
-};
+    <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
+    {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+    {change && (
+      <p
+        className={`text-sm font-medium ${
+          changeType === 'increase' ? 'text-green-600' : 'text-red-600'
+        }`}
+      >
+        {change} {changeType === 'increase' ? '↑' : '↓'}
+      </p>
+    )}
+  </div>
+);
 
 // Quick Action Button
 const QuickActionButton: React.FC<{
@@ -480,7 +434,7 @@ const OrderCard: React.FC<{ order: RecentOrder }> = ({ order }) => (
     <div className="flex items-start justify-between mb-2">
       <div>
         <p className="font-medium text-gray-900">#{order.orderNumber}</p>
-        <p className="text-sm text-gray-600">{order.sellerName}</p>
+        <p className="text-sm text-gray-600">{order.customer}</p>
       </div>
       <span
         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -501,4 +455,4 @@ const OrderCard: React.FC<{ order: RecentOrder }> = ({ order }) => (
   </div>
 );
 
-export default SupplierDashboard;
+export default SellerDashboard;
