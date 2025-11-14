@@ -1,0 +1,230 @@
+/**
+ * Supplier Settlements Page
+ * Phase 4-1 Step 2: 공급자 정산 목록 페이지
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Breadcrumb from '../../components/common/Breadcrumb';
+import { PageHeader } from '../../components/common/PageHeader';
+import { Plus, Eye } from 'lucide-react';
+import type { SettlementSummary, SettlementStatus } from '../../types/settlement';
+import { supplierSettlementAPI } from '../../services/supplierSettlementApi';
+import { CreateSettlementModal } from '../../components/dashboard/partner/CreateSettlementModal';
+
+export const SupplierSettlementsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [settlements, setSettlements] = useState<SettlementSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<SettlementStatus | 'ALL'>('ALL');
+  const [dateFilter, setDateFilter] = useState<'30' | '90' | 'year' | 'all'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const limit = 20;
+
+  const fetchSettlements = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      let date_from: string | undefined;
+      const today = new Date();
+      if (dateFilter === '30') {
+        const date = new Date(today);
+        date.setDate(date.getDate() - 30);
+        date_from = date.toISOString().split('T')[0];
+      } else if (dateFilter === '90') {
+        const date = new Date(today);
+        date.setDate(date.getDate() - 90);
+        date_from = date.toISOString().split('T')[0];
+      } else if (dateFilter === 'year') {
+        date_from = `${today.getFullYear()}-01-01`;
+      }
+
+      const response = await supplierSettlementAPI.fetchSupplierSettlements({
+        page: currentPage,
+        limit,
+        status: statusFilter,
+        date_from,
+      });
+
+      if (response.success) {
+        setSettlements(response.data.settlements);
+        setTotal(response.data.pagination.total);
+        setTotalPages(response.data.pagination.total_pages);
+      }
+    } catch (err: any) {
+      console.error('정산 목록 조회 실패:', err);
+      setError(err.message || '정산 목록을 불러오는 데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettlements();
+  }, [currentPage, statusFilter, dateFilter]);
+
+  const getStatusBadge = (status: SettlementStatus) => {
+    const badges = {
+      OPEN: <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">정산 준비중</span>,
+      PENDING_PAYOUT: <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">지급 대기</span>,
+      PAID: <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">지급 완료</span>,
+      CANCELLED: <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">취소됨</span>,
+      DRAFT: <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">임시</span>,
+    };
+    return badges[status] || null;
+  };
+
+  const formatCurrency = (amount: number) => `₩ ${amount.toLocaleString()}`;
+  const formatDate = (dateString: string) => dateString.split('T')[0];
+
+  const handleSettlementCreated = (settlementId: string) => {
+    setIsCreateModalOpen(false);
+    navigate(`/dashboard/supplier/settlements/${settlementId}`);
+  };
+
+  return (
+    <>
+      <Breadcrumb
+        items={[
+          { label: '공급자 대시보드', href: '/dashboard/supplier' },
+          { label: '정산', isCurrent: true },
+        ]}
+      />
+
+      <PageHeader
+        title="정산 내역"
+        subtitle="공급 상품 판매에 대한 정산 내역을 기간별로 확인합니다."
+      >
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          새 정산 생성
+        </button>
+      </PageHeader>
+
+      <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="flex flex-wrap gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">기간</label>
+            <select
+              value={dateFilter}
+              onChange={(e) => { setDateFilter(e.target.value as any); setCurrentPage(1); }}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="30">최근 30일</option>
+              <option value="90">최근 90일</option>
+              <option value="year">올해</option>
+              <option value="all">전체</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value as any); setCurrentPage(1); }}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="ALL">전체</option>
+              <option value="OPEN">정산 준비중</option>
+              <option value="PENDING_PAYOUT">지급 대기</option>
+              <option value="PAID">지급 완료</option>
+              <option value="CANCELLED">취소됨</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">로딩 중...</div>
+        ) : error ? (
+          <div className="p-8 text-center text-red-600">{error}</div>
+        ) : settlements.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">정산 내역이 없습니다.</div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">정산 기간</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">정산 ID</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">공급 금액</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">생성일</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">액션</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {settlements.map((settlement) => (
+                    <tr key={settlement.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatDate(settlement.period_start)} ~ {formatDate(settlement.period_end)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">{settlement.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                        {formatCurrency(settlement.net_payout_amount)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{getStatusBadge(settlement.status)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{formatDate(settlement.created_at)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => navigate(`/dashboard/supplier/settlements/${settlement.id}`)}
+                          className="inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                          상세보기
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  전체 {total}개 중 {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, total)}개 표시
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    이전
+                  </button>
+                  <span className="px-3 py-1 text-sm text-gray-700">{currentPage} / {totalPages}</span>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    다음
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {isCreateModalOpen && (
+        <CreateSettlementModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onSettlementCreated={handleSettlementCreated}
+        />
+      )}
+    </>
+  );
+};
+
+export default SupplierSettlementsPage;

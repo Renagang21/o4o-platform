@@ -7,15 +7,16 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import { RoleDashboardMenu, DashboardMenuItem } from '../RoleDashboardMenu';
-import { LayoutDashboard, Package, ShoppingCart, BarChart3, Warehouse, UserCheck } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, BarChart3, Warehouse, UserCheck, DollarSign } from 'lucide-react';
 
-type SupplierSection = 'overview' | 'products' | 'product-applications' | 'orders' | 'analytics' | 'inventory';
+type SupplierSection = 'overview' | 'products' | 'product-applications' | 'orders' | 'settlements' | 'analytics' | 'inventory';
 
 // Helper to determine active section from current path
 const getActiveSectionFromPath = (pathname: string): SupplierSection => {
   if (pathname.includes('/product-applications')) return 'product-applications';
   if (pathname.includes('/products')) return 'products';
   if (pathname.includes('/orders')) return 'orders';
+  if (pathname.includes('/settlements')) return 'settlements';
   if (pathname.includes('/analytics')) return 'analytics';
   if (pathname.includes('/inventory')) return 'inventory';
   return 'overview';
@@ -53,6 +54,13 @@ export const SupplierLayout: React.FC = () => {
       icon: <ShoppingCart className="w-4 h-4" />,
       type: 'route',
       href: '/dashboard/supplier/orders'
+    },
+    {
+      key: 'settlements',
+      label: '정산',
+      icon: <DollarSign className="w-4 h-4" />,
+      type: 'route',
+      href: '/dashboard/supplier/settlements'
     },
     {
       key: 'analytics',

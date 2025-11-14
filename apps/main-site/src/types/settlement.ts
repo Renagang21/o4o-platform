@@ -153,3 +153,202 @@ export interface UpdatePartnerSettlementMemoResponse {
   data: PartnerSettlementDetail;
   message?: string;
 }
+
+/**
+ * Supplier Settlement 관련 타입
+ */
+
+// 공급자 정산 라인 아이템
+export interface SupplierSettlementLineItem {
+  order_id: string;
+  order_number: string;
+  order_date: string;         // YYYY-MM-DD
+
+  seller_id: string;
+  seller_name: string;
+
+  product_id: string;
+  product_name: string;
+  sku?: string;
+
+  quantity: number;
+  supply_price: number;       // 공급가(단가)
+  line_total: number;         // 공급가 × 수량
+
+  // 선택 필드
+  shipping_fee?: number;      // 공급자가 부담하는 배송비
+}
+
+// 공급자 정산 상세
+export interface SupplierSettlementDetail extends SettlementSummary {
+  role: 'supplier';
+  supplier_id: string;
+
+  lines: SupplierSettlementLineItem[];
+
+  // 요약 지표
+  total_supply_amount: number;  // Σ line_total
+  total_orders: number;         // 포함된 주문 수
+  total_items: number;          // 포함된 전체 수량
+}
+
+// 공급자 정산 목록 조회 쿼리
+export interface GetSupplierSettlementsQuery {
+  page?: number;
+  limit?: number;
+  status?: SettlementStatus | 'ALL';
+  date_from?: string;
+  date_to?: string;
+}
+
+// 공급자 정산 목록 조회 응답
+export interface GetSupplierSettlementsResponse {
+  success: boolean;
+  data: {
+    settlements: SettlementSummary[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      total_pages: number;
+    };
+  };
+}
+
+// 공급자 정산 상세 조회 응답
+export interface GetSupplierSettlementDetailResponse {
+  success: boolean;
+  data: SupplierSettlementDetail;
+}
+
+// 공급자 정산 생성 요청
+export type CreateSupplierSettlementRequest = CreatePartnerSettlementRequest;
+
+// 공급자 정산 생성 응답
+export interface CreateSupplierSettlementResponse {
+  success: boolean;
+  data: SupplierSettlementDetail;
+  message?: string;
+}
+
+// 공급자 정산 상태 변경 요청
+export type UpdateSupplierSettlementStatusRequest = UpdatePartnerSettlementStatusRequest;
+
+// 공급자 정산 상태 변경 응답
+export interface UpdateSupplierSettlementStatusResponse {
+  success: boolean;
+  data: SupplierSettlementDetail;
+  message?: string;
+}
+
+// 공급자 정산 메모 업데이트 요청
+export type UpdateSupplierSettlementMemoRequest = UpdatePartnerSettlementMemoRequest;
+
+// 공급자 정산 메모 업데이트 응답
+export interface UpdateSupplierSettlementMemoResponse {
+  success: boolean;
+  data: SupplierSettlementDetail;
+  message?: string;
+}
+
+/**
+ * Seller Settlement 관련 타입
+ */
+
+// 판매자 정산 라인 아이템
+export interface SellerSettlementLineItem {
+  order_id: string;
+  order_number: string;
+  order_date: string;         // YYYY-MM-DD
+
+  customer_name: string;
+  customer_email?: string;
+
+  product_id: string;
+  product_name: string;
+  sku?: string;
+
+  quantity: number;
+
+  sale_price: number;         // 판매가(단가)
+  supply_price?: number;      // 공급가(선택)
+  line_revenue: number;       // sale_price × 수량
+  line_cost?: number;         // supply_price × 수량
+  line_margin_amount?: number; // line_revenue - line_cost
+  line_margin_rate?: number;   // margin_rate (0.15 = 15%)
+}
+
+// 판매자 정산 상세
+export interface SellerSettlementDetail extends SettlementSummary {
+  role: 'seller';
+  seller_id: string;
+
+  lines: SellerSettlementLineItem[];
+
+  // 요약 지표
+  total_revenue: number;        // Σ line_revenue
+  total_cost?: number;          // Σ line_cost
+  total_margin_amount?: number; // Σ line_margin_amount
+  average_margin_rate?: number; // 가중 평균 마진율
+  total_orders: number;
+  total_items: number;
+}
+
+// 판매자 정산 목록 조회 쿼리
+export interface GetSellerSettlementsQuery {
+  page?: number;
+  limit?: number;
+  status?: SettlementStatus | 'ALL';
+  date_from?: string;
+  date_to?: string;
+}
+
+// 판매자 정산 목록 조회 응답
+export interface GetSellerSettlementsResponse {
+  success: boolean;
+  data: {
+    settlements: SettlementSummary[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      total_pages: number;
+    };
+  };
+}
+
+// 판매자 정산 상세 조회 응답
+export interface GetSellerSettlementDetailResponse {
+  success: boolean;
+  data: SellerSettlementDetail;
+}
+
+// 판매자 정산 생성 요청
+export type CreateSellerSettlementRequest = CreatePartnerSettlementRequest;
+
+// 판매자 정산 생성 응답
+export interface CreateSellerSettlementResponse {
+  success: boolean;
+  data: SellerSettlementDetail;
+  message?: string;
+}
+
+// 판매자 정산 상태 변경 요청
+export type UpdateSellerSettlementStatusRequest = UpdatePartnerSettlementStatusRequest;
+
+// 판매자 정산 상태 변경 응답
+export interface UpdateSellerSettlementStatusResponse {
+  success: boolean;
+  data: SellerSettlementDetail;
+  message?: string;
+}
+
+// 판매자 정산 메모 업데이트 요청
+export type UpdateSellerSettlementMemoRequest = UpdatePartnerSettlementMemoRequest;
+
+// 판매자 정산 메모 업데이트 응답
+export interface UpdateSellerSettlementMemoResponse {
+  success: boolean;
+  data: SellerSettlementDetail;
+  message?: string;
+}

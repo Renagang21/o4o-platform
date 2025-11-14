@@ -60,6 +60,10 @@ import { PartnerLinkEditPage } from './pages/dashboard/PartnerLinkEditPage';
 import { PartnerAnalyticsPage } from './pages/dashboard/PartnerAnalyticsPage';
 import { PartnerSettlementsPage } from './pages/dashboard/PartnerSettlementsPage';
 import { PartnerSettlementDetailPage } from './pages/dashboard/PartnerSettlementDetailPage';
+import { SupplierSettlementsPage } from './pages/dashboard/SupplierSettlementsPage';
+import { SupplierSettlementDetailPage } from './pages/dashboard/SupplierSettlementDetailPage';
+import { SellerSettlementsPage } from './pages/dashboard/SellerSettlementsPage';
+import { SellerSettlementDetailPage } from './pages/dashboard/SellerSettlementDetailPage';
 import { SupplierProductAuthorizationsPage } from './pages/dashboard/SupplierProductAuthorizationsPage';
 
 // Lazy load pages
@@ -219,6 +223,8 @@ const App: FC = () => {
             <Route path="product-applications" element={<SupplierProductAuthorizationsPage />} />
             <Route path="orders" element={<SupplierOrdersPage />} />
             <Route path="orders/:id" element={<SupplierOrderDetailPage />} />
+            <Route path="settlements" element={<SupplierSettlementsPage />} />
+            <Route path="settlements/:id" element={<SupplierSettlementDetailPage />} />
           </Route>
 
           <Route path="/dashboard/seller/*" element={
@@ -234,6 +240,8 @@ const App: FC = () => {
             <Route path="products/:id/edit" element={<SellerProductEditPage />} />
             <Route path="orders" element={<SellerOrdersPage />} />
             <Route path="orders/:id" element={<SellerOrderDetailPage />} />
+            <Route path="settlements" element={<SellerSettlementsPage />} />
+            <Route path="settlements/:id" element={<SellerSettlementDetailPage />} />
           </Route>
 
           <Route path="/dashboard/partner/*" element={
