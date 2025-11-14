@@ -371,6 +371,7 @@ export class UnifiedAuthService {
 
   /**
    * Get test accounts for development/staging
+   * Returns one user per role: admin, seller, supplier, partner, customer
    */
   async getTestAccounts(): Promise<Array<{role: string; email: string; password: string}>> {
     if (process.env.NODE_ENV === 'production') {
@@ -379,23 +380,36 @@ export class UnifiedAuthService {
 
     const userRepo = AppDataSource.getRepository(User);
 
-    // Find users with common test emails or marked as test accounts
-    const testUsers = await userRepo
-      .createQueryBuilder('user')
-      .where('user.email LIKE :pattern1', { pattern1: '%@test.com' })
-      .orWhere('user.email LIKE :pattern2', { pattern2: '%test%' })
-      .select(['user.email', 'user.role'])
-      .limit(20)
-      .getMany();
+    // Define roles we want to show in test panel
+    const targetRoles = ['admin', 'seller', 'supplier', 'partner', 'customer'];
+    const testAccounts: Array<{role: string; email: string; password: string}> = [];
 
     // All test accounts use the same password for convenience
     const testPassword = 'test123!@#';
 
-    return testUsers.map(user => ({
-      role: this.getRoleLabel(user.role),
-      email: user.email,
-      password: testPassword
-    }));
+    // Find one user for each role
+    for (const role of targetRoles) {
+      const user = await userRepo
+        .createQueryBuilder('user')
+        .where('user.role = :role', { role })
+        .andWhere(
+          '(user.email LIKE :pattern1 OR user.email LIKE :pattern2)',
+          { pattern1: '%@test.com', pattern2: '%test%' }
+        )
+        .select(['user.email', 'user.role'])
+        .limit(1)
+        .getOne();
+
+      if (user) {
+        testAccounts.push({
+          role: this.getRoleLabel(user.role),
+          email: user.email,
+          password: testPassword
+        });
+      }
+    }
+
+    return testAccounts;
   }
 
   /**
