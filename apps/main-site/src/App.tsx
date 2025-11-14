@@ -58,6 +58,23 @@ const PageLoader: FC = () => (
   </div>
 );
 
+// Admin redirect component
+const RedirectToAdmin: FC = () => {
+  useEffect(() => {
+    const adminUrl = import.meta.env.VITE_ADMIN_URL || 'https://admin.neture.co.kr';
+    window.location.href = adminUrl;
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">관리자 페이지로 이동 중...</p>
+      </div>
+    </div>
+  );
+};
+
 const App: FC = () => {
   useEffect(() => {
     // Initialize auth interceptor
@@ -197,6 +214,14 @@ const App: FC = () => {
                 <PageEditor />
               </Suspense>
             </PrivateRoute>
+          } />
+
+          {/* Admin Redirect (must be before /:slug catch-all) */}
+          <Route path="/admin" element={
+            <RedirectToAdmin />
+          } />
+          <Route path="/admin/*" element={
+            <RedirectToAdmin />
           } />
 
           {/* WordPress-style: Direct page slug access (must be before 404) */}
