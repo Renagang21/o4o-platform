@@ -1,11 +1,13 @@
 /**
  * Role Dashboard Menu Component
  *
- * Simple horizontal/vertical menu for role-based dashboards
- * Supports section/tab navigation within a single page dashboard
+ * Supports both section/tab navigation and route-based navigation
+ * - Section mode: Uses onChange callback for hash-based navigation
+ * - Route mode: Uses href for route-based navigation
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 
 export interface DashboardMenuItem<T extends string = string> {
@@ -13,12 +15,14 @@ export interface DashboardMenuItem<T extends string = string> {
   label: string;
   icon?: React.ReactNode;
   badge?: number | string;
+  href?: string;                      // Route path for navigation
+  type?: 'section' | 'route';         // Navigation type
 }
 
 interface RoleDashboardMenuProps<T extends string = string> {
   items: DashboardMenuItem<T>[];
   active: T;
-  onChange: (key: T) => void;
+  onChange?: (key: T) => void;        // Optional for route-based menus
   orientation?: 'horizontal' | 'vertical';
   variant?: 'tabs' | 'pills' | 'sidebar';
   className?: string;
@@ -32,7 +36,19 @@ export function RoleDashboardMenu<T extends string = string>({
   variant = 'tabs',
   className
 }: RoleDashboardMenuProps<T>) {
+  const navigate = useNavigate();
   const isHorizontal = orientation === 'horizontal';
+
+  const handleClick = (item: DashboardMenuItem<T>) => {
+    // Priority: type === 'route' with href → navigate
+    if (item.type === 'route' && item.href) {
+      navigate(item.href);
+    }
+    // Fallback: onChange callback (section-based)
+    else if (onChange) {
+      onChange(item.key);
+    }
+  };
 
   const renderMenuItem = (item: DashboardMenuItem<T>) => {
     const isActive = active === item.key;
@@ -42,7 +58,7 @@ export function RoleDashboardMenu<T extends string = string>({
       return (
         <button
           key={item.key}
-          onClick={() => onChange(item.key)}
+          onClick={() => handleClick(item)}
           className={cn(
             'px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap',
             isActive
@@ -71,7 +87,7 @@ export function RoleDashboardMenu<T extends string = string>({
       return (
         <button
           key={item.key}
-          onClick={() => onChange(item.key)}
+          onClick={() => handleClick(item)}
           className={cn(
             'px-4 py-2 text-sm font-medium rounded-lg transition-colors',
             isActive
@@ -100,7 +116,7 @@ export function RoleDashboardMenu<T extends string = string>({
       return (
         <button
           key={item.key}
-          onClick={() => onChange(item.key)}
+          onClick={() => handleClick(item)}
           className={cn(
             'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
             isActive

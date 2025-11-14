@@ -37,10 +37,17 @@ import ApplySeller from './pages/apply/ApplySeller';
 import ApplyPartner from './pages/apply/ApplyPartner';
 import ApplyStatus from './pages/apply/ApplyStatus';
 
-// P0 RBAC: Dashboard pages
-import SupplierDashboard from './pages/dashboard/SupplierDashboard';
-import SellerDashboard from './pages/dashboard/SellerDashboard';
-import PartnerDashboard from './pages/dashboard/PartnerDashboard';
+// P0 RBAC: Dashboard layouts and pages
+import { SupplierLayout } from './components/dashboard/supplier/SupplierLayout';
+import { SellerLayout } from './components/dashboard/seller/SellerLayout';
+import { PartnerLayout } from './components/dashboard/partner/PartnerLayout';
+import { SupplierDashboardPage } from './pages/dashboard/SupplierDashboardPage';
+import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
+import { SupplierOrdersPage } from './pages/dashboard/SupplierOrdersPage';
+import { SellerDashboardPage } from './pages/dashboard/SellerDashboardPage';
+import { SellerProductsPage } from './pages/dashboard/SellerProductsPage';
+import { PartnerDashboardPage } from './pages/dashboard/PartnerDashboardPage';
+import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -184,28 +191,40 @@ const App: FC = () => {
             </PrivateRoute>
           } />
 
-          {/* P0 RBAC: Dashboard Routes (Role-Protected) */}
-          <Route path="/dashboard/supplier" element={
+          {/* P0 RBAC: Dashboard Routes (Role-Protected) with Nested Routes */}
+          <Route path="/dashboard/supplier/*" element={
             <PrivateRoute>
               <RoleGuard role="supplier">
-                <SupplierDashboard />
+                <SupplierLayout />
               </RoleGuard>
             </PrivateRoute>
-          } />
-          <Route path="/dashboard/seller" element={
+          }>
+            <Route index element={<SupplierDashboardPage />} />
+            <Route path="products" element={<SupplierProductsPage />} />
+            <Route path="orders" element={<SupplierOrdersPage />} />
+          </Route>
+
+          <Route path="/dashboard/seller/*" element={
             <PrivateRoute>
               <RoleGuard role="seller">
-                <SellerDashboard />
+                <SellerLayout />
               </RoleGuard>
             </PrivateRoute>
-          } />
-          <Route path="/dashboard/partner" element={
+          }>
+            <Route index element={<SellerDashboardPage />} />
+            <Route path="products" element={<SellerProductsPage />} />
+          </Route>
+
+          <Route path="/dashboard/partner/*" element={
             <PrivateRoute>
               <RoleGuard role="partner">
-                <PartnerDashboard />
+                <PartnerLayout />
               </RoleGuard>
             </PrivateRoute>
-          } />
+          }>
+            <Route index element={<PartnerDashboardPage />} />
+            <Route path="links" element={<PartnerLinksPage />} />
+          </Route>
 
           {/* Editor Routes (Protected) */}
           <Route path="/editor/page/:id?" element={

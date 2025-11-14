@@ -73,9 +73,10 @@ const orderStatusLabels = {
   cancelled: '취소됨',
 };
 
-export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?: SellerSection }> = ({
+export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?: SellerSection; showMenu?: boolean }> = ({
   defaultPeriod = '30d',
-  defaultSection = 'overview'
+  defaultSection = 'overview',
+  showMenu = true
 }) => {
   const { user } = useAuth();
   const [stats, setStats] = useState<SellerStats | null>(null);
@@ -183,16 +184,18 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
         </div>
       </div>
 
-      {/* Section Navigation Menu */}
-      <div className="mb-8">
-        <RoleDashboardMenu
-          items={menuItems}
-          active={activeSection}
-          onChange={setActiveSection}
-          variant="tabs"
-          orientation="horizontal"
-        />
-      </div>
+      {/* Section Navigation Menu (Phase 2: Hidden when inside Layout) */}
+      {showMenu && (
+        <div className="mb-8">
+          <RoleDashboardMenu
+            items={menuItems}
+            active={activeSection}
+            onChange={setActiveSection}
+            variant="tabs"
+            orientation="horizontal"
+          />
+        </div>
+      )}
 
       {/* Error Display */}
       {error && (

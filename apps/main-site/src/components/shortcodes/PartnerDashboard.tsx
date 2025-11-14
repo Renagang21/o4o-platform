@@ -20,6 +20,7 @@ import { LayoutDashboard, BarChart3, DollarSign, Link2, Megaphone } from 'lucide
 
 interface PartnerDashboardProps {
   defaultSection?: PartnerSection;
+  showMenu?: boolean; // Phase 2: Hide menu when used inside PartnerLayout
 }
 
 interface DashboardSummary {
@@ -35,7 +36,7 @@ interface DashboardSummary {
   referralCode: string;
 }
 
-export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultSection = 'overview' }) => {
+export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultSection = 'overview', showMenu = true }) => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -231,22 +232,24 @@ export const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ defaultSecti
         </div>
       </div>
 
-      {/* Section Navigation Menu */}
-      <div className="mt-8">
-        <RoleDashboardMenu
-          items={[
-            { key: 'overview', label: '개요', icon: <LayoutDashboard className="w-4 h-4" /> },
-            { key: 'analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" /> },
-            { key: 'settlements', label: '정산', icon: <DollarSign className="w-4 h-4" /> },
-            { key: 'links', label: '링크 관리', icon: <Link2 className="w-4 h-4" />, badge: summary?.activeLinks },
-            { key: 'marketing', label: '마케팅 자료', icon: <Megaphone className="w-4 h-4" /> },
-          ]}
-          active={activeSection}
-          onChange={setActiveSection}
-          variant="tabs"
-          orientation="horizontal"
-        />
-      </div>
+      {/* Section Navigation Menu (Phase 2: Hidden when inside Layout) */}
+      {showMenu && (
+        <div className="mt-8">
+          <RoleDashboardMenu
+            items={[
+              { key: 'overview', label: '개요', icon: <LayoutDashboard className="w-4 h-4" /> },
+              { key: 'analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" /> },
+              { key: 'settlements', label: '정산', icon: <DollarSign className="w-4 h-4" /> },
+              { key: 'links', label: '링크 관리', icon: <Link2 className="w-4 h-4" />, badge: summary?.activeLinks },
+              { key: 'marketing', label: '마케팅 자료', icon: <Megaphone className="w-4 h-4" /> },
+            ]}
+            active={activeSection}
+            onChange={setActiveSection}
+            variant="tabs"
+            orientation="horizontal"
+          />
+        </div>
+      )}
 
       {/* Section Content */}
       <div className="mt-6">

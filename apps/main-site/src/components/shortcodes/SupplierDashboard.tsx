@@ -24,6 +24,7 @@ const SUPPLIER_SECTIONS: readonly SupplierSection[] = ['overview', 'products', '
 interface SupplierDashboardProps {
   defaultPeriod?: string;
   defaultSection?: SupplierSection;
+  showMenu?: boolean; // Phase 2: Hide menu when used inside SupplierLayout
 }
 
 interface DashboardStats {
@@ -76,7 +77,8 @@ const orderStatusLabels = {
 
 export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
   defaultPeriod = '30d',
-  defaultSection = 'overview'
+  defaultSection = 'overview',
+  showMenu = true
 }) => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -184,16 +186,18 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
         </div>
       </div>
 
-      {/* Section Navigation Menu */}
-      <div className="mb-8">
-        <RoleDashboardMenu
-          items={menuItems}
-          active={activeSection}
-          onChange={setActiveSection}
-          variant="tabs"
-          orientation="horizontal"
-        />
-      </div>
+      {/* Section Navigation Menu (Phase 2: Hidden when inside Layout) */}
+      {showMenu && (
+        <div className="mb-8">
+          <RoleDashboardMenu
+            items={menuItems}
+            active={activeSection}
+            onChange={setActiveSection}
+            variant="tabs"
+            orientation="horizontal"
+          />
+        </div>
+      )}
 
       {/* Error Display */}
       {error && (
