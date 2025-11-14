@@ -58,6 +58,8 @@ import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
 import { PartnerLinkCreatePage } from './pages/dashboard/PartnerLinkCreatePage';
 import { PartnerLinkEditPage } from './pages/dashboard/PartnerLinkEditPage';
 import { PartnerAnalyticsPage } from './pages/dashboard/PartnerAnalyticsPage';
+import { PartnerSettlementsPage } from './pages/dashboard/PartnerSettlementsPage';
+import { PartnerSettlementDetailPage } from './pages/dashboard/PartnerSettlementDetailPage';
 import { SupplierProductAuthorizationsPage } from './pages/dashboard/SupplierProductAuthorizationsPage';
 
 // Lazy load pages
@@ -246,6 +248,8 @@ const App: FC = () => {
             <Route path="links" element={<PartnerLinksPage />} />
             <Route path="links/new" element={<PartnerLinkCreatePage />} />
             <Route path="links/:id/edit" element={<PartnerLinkEditPage />} />
+            <Route path="settlements" element={<PartnerSettlementsPage />} />
+            <Route path="settlements/:id" element={<PartnerSettlementDetailPage />} />
           </Route>
 
           {/* Editor Routes (Protected) */}
