@@ -26,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { URLInput, normalizeURL } from '@/components/common';
+import { EnhancedLinkControl, type LinkData } from '@/components/editor/controls/EnhancedLinkControl';
 
 interface ButtonBlockProps {
   id: string;
@@ -104,15 +105,28 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
 
   const [localText, setLocalText] = useState(text);
   const [showURLPopover, setShowURLPopover] = useState(false);
+  const [showEnhancedLinkControl, setShowEnhancedLinkControl] = useState(false);
   const [localUrl, setLocalUrl] = useState(url);
   const [localTarget, setLocalTarget] = useState(linkTarget);
+  const [linkData, setLinkData] = useState<LinkData>({
+    url: url || '#',
+    type: 'url',
+    target: linkTarget,
+    rel: rel,
+  });
 
   // Sync text when attributes change
   useEffect(() => {
     setLocalText(text);
     setLocalUrl(url);
     setLocalTarget(linkTarget);
-  }, [text, url, linkTarget]);
+    setLinkData({
+      url: url || '#',
+      type: 'url',
+      target: linkTarget,
+      rel: rel,
+    });
+  }, [text, url, linkTarget, rel]);
 
   // Update attribute
   const updateAttribute = useCallback((key: string, value: any) => {
@@ -127,12 +141,25 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
     updateAttribute('text', plainText);
   };
 
-  // Handle URL save
+  // Handle URL save (legacy)
   const handleUrlSave = () => {
     const normalizedUrl = normalizeURL(localUrl);
     updateAttribute('url', normalizedUrl);
     updateAttribute('linkTarget', localTarget);
     setShowURLPopover(false);
+  };
+
+  // Handle enhanced link control apply
+  const handleEnhancedLinkApply = () => {
+    updateAttribute('url', linkData.url);
+    updateAttribute('linkTarget', linkData.target);
+    updateAttribute('rel', linkData.rel || '');
+    setShowEnhancedLinkControl(false);
+  };
+
+  // Handle enhanced link control change
+  const handleEnhancedLinkChange = (data: LinkData) => {
+    setLinkData(data);
   };
 
   // Handle Enter key
@@ -271,10 +298,10 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
 
           {/* Link button */}
           <button
-            onClick={() => setShowURLPopover(!showURLPopover)}
+            onClick={() => setShowEnhancedLinkControl(!showEnhancedLinkControl)}
             className={cn(
               'p-1.5 rounded hover:bg-gray-100 transition-colors',
-              showURLPopover && 'bg-gray-200'
+              showEnhancedLinkControl && 'bg-gray-200'
             )}
             title="Edit link"
           >
@@ -283,41 +310,16 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
         </BlockToolbar>
       )}
 
-      {/* URL Popover */}
-      {showURLPopover && isSelected && (
-        <div className="absolute top-full left-0 mt-2 p-4 bg-white border border-gray-300 rounded shadow-lg z-50 w-96">
-          <div className="space-y-3">
-            <div>
-              <Label className="text-xs">URL</Label>
-              <URLInput
-                value={localUrl}
-                onChange={(e) => setLocalUrl(e.target.value)}
-                variant="default"
-                showIcon
-                className="mt-1"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`${id}-new-tab`}
-                checked={localTarget === '_blank'}
-                onChange={(e) => setLocalTarget(e.target.checked ? '_blank' : '_self')}
-                className="rounded border-gray-300"
-              />
-              <Label htmlFor={`${id}-new-tab`} className="text-xs cursor-pointer">
-                Open in new tab
-              </Label>
-            </div>
-            <div className="flex gap-2">
-              <Button size="sm" onClick={handleUrlSave}>
-                Apply
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => setShowURLPopover(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
+      {/* Enhanced Link Control */}
+      {showEnhancedLinkControl && isSelected && (
+        <div className="absolute top-full left-0 mt-2 z-50">
+          <EnhancedLinkControl
+            value={linkData}
+            onChange={handleEnhancedLinkChange}
+            onClose={() => setShowEnhancedLinkControl(false)}
+            onApply={handleEnhancedLinkApply}
+            showRecent={true}
+          />
         </div>
       )}
 
