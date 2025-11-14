@@ -66,6 +66,10 @@ import { SellerSettlementsPage } from './pages/dashboard/SellerSettlementsPage';
 import { SellerSettlementDetailPage } from './pages/dashboard/SellerSettlementDetailPage';
 import { SupplierProductAuthorizationsPage } from './pages/dashboard/SupplierProductAuthorizationsPage';
 
+// Phase 4-2: Admin Settlement Management
+import { AdminSettlementsPage } from './pages/dashboard/admin/AdminSettlementsPage';
+import { AdminSettlementDetailPage } from './pages/dashboard/admin/AdminSettlementDetailPage';
+
 // Lazy load pages
 import { lazy, Suspense } from 'react';
 const PageEditor = lazy(() => import('./pages/PageEditor'));
@@ -259,6 +263,26 @@ const App: FC = () => {
             <Route path="settlements" element={<PartnerSettlementsPage />} />
             <Route path="settlements/:id" element={<PartnerSettlementDetailPage />} />
           </Route>
+
+          {/* Phase 4-2: Admin Settlement Management Routes */}
+          <Route path="/dashboard/admin/settlements" element={
+            <PrivateRoute>
+              <RoleGuard role="administrator">
+                <Layout>
+                  <AdminSettlementsPage />
+                </Layout>
+              </RoleGuard>
+            </PrivateRoute>
+          } />
+          <Route path="/dashboard/admin/settlements/:id" element={
+            <PrivateRoute>
+              <RoleGuard role="administrator">
+                <Layout>
+                  <AdminSettlementDetailPage />
+                </Layout>
+              </RoleGuard>
+            </PrivateRoute>
+          } />
 
           {/* Editor Routes (Protected) */}
           <Route path="/editor/page/:id?" element={

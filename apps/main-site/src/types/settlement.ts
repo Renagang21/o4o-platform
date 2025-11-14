@@ -352,3 +352,136 @@ export interface UpdateSellerSettlementMemoResponse {
   data: SellerSettlementDetail;
   message?: string;
 }
+
+/**
+ * Admin Settlement 관련 타입
+ * Phase 4-2: Admin Settlement Management
+ */
+
+// 지급 방법
+export type PayoutMethod = 'BANK_TRANSFER' | 'POINT' | 'OTHER';
+
+// Admin 전용 정산 뷰 (통합)
+export interface AdminSettlementView {
+  id: string;
+  role: SettlementRole;
+
+  // 역할별 대상 정보
+  target_id: string;        // partner_id | supplier_id | seller_id
+  target_name: string;      // 표시명
+
+  // 정산 기간
+  period_start: string;
+  period_end: string;
+
+  status: SettlementStatus;
+
+  // 금액
+  currency: string;
+  gross_commission_amount: number;
+  adjustment_amount: number;
+  net_payout_amount: number;
+
+  // 타임스탬프
+  created_at: string;
+  updated_at: string;
+
+  // 메모
+  memo_internal?: string;
+
+  // Admin 전용 필드
+  payout_date?: string;           // 실제 지급일 (YYYY-MM-DD)
+  payout_method?: PayoutMethod;   // 지급 수단
+  payout_note?: string;           // 지급 관련 메모
+}
+
+// Admin용 정산 상세 (역할별 세부 정보 포함)
+export type AdminSettlementDetail =
+  | (PartnerSettlementDetail & { payout_date?: string; payout_method?: PayoutMethod; payout_note?: string })
+  | (SupplierSettlementDetail & { payout_date?: string; payout_method?: PayoutMethod; payout_note?: string })
+  | (SellerSettlementDetail & { payout_date?: string; payout_method?: PayoutMethod; payout_note?: string });
+
+// Admin 정산 목록 조회 쿼리
+export interface GetAdminSettlementsQuery {
+  page?: number;
+  limit?: number;
+  role?: SettlementRole | 'ALL';      // 역할 필터
+  status?: SettlementStatus | 'ALL';  // 상태 필터
+  date_from?: string;
+  date_to?: string;
+}
+
+// Admin 정산 목록 조회 응답
+export interface GetAdminSettlementsResponse {
+  success: boolean;
+  data: {
+    settlements: AdminSettlementView[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      total_pages: number;
+    };
+  };
+}
+
+// Admin 정산 상세 조회 응답
+export interface GetAdminSettlementDetailResponse {
+  success: boolean;
+  data: AdminSettlementDetail;
+}
+
+// Admin 정산 생성 요청
+export interface CreateAdminSettlementRequest {
+  role: SettlementRole;
+  period_start: string;
+  period_end: string;
+  auto_calculate_from_analytics?: boolean;
+  memo_internal?: string;
+}
+
+// Admin 정산 생성 응답
+export interface CreateAdminSettlementResponse {
+  success: boolean;
+  data: AdminSettlementDetail;
+  message?: string;
+}
+
+// Admin 정산 상태 변경 요청
+export interface UpdateAdminSettlementStatusRequest {
+  status: SettlementStatus;
+  memo_internal?: string;
+}
+
+// Admin 정산 상태 변경 응답
+export interface UpdateAdminSettlementStatusResponse {
+  success: boolean;
+  data: AdminSettlementDetail;
+  message?: string;
+}
+
+// Admin 정산 지급 정보 업데이트 요청
+export interface UpdateAdminSettlementPayoutRequest {
+  payout_date?: string;
+  payout_method?: PayoutMethod;
+  payout_note?: string;
+}
+
+// Admin 정산 지급 정보 업데이트 응답
+export interface UpdateAdminSettlementPayoutResponse {
+  success: boolean;
+  data: AdminSettlementDetail;
+  message?: string;
+}
+
+// Admin 정산 메모 업데이트 요청
+export interface UpdateAdminSettlementMemoRequest {
+  memo_internal: string;
+}
+
+// Admin 정산 메모 업데이트 응답
+export interface UpdateAdminSettlementMemoResponse {
+  success: boolean;
+  data: AdminSettlementDetail;
+  message?: string;
+}
