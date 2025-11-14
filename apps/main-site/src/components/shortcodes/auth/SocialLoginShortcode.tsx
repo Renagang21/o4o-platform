@@ -109,12 +109,6 @@ export const SocialLoginComponent: React.FC<{
 
   // Fetch OAuth providers and test accounts
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('[SocialLoginComponent] showTestPanel prop:', showTestPanel);
-      console.log('[SocialLoginComponent] showTestPanelSafe:', showTestPanelSafe);
-      console.log('[SocialLoginComponent] import.meta.env.MODE:', import.meta.env.MODE);
-    }
-
     const fetchProviders = async () => {
       try {
         const response = await authClient.api.get('/settings/oauth');
@@ -131,21 +125,11 @@ export const SocialLoginComponent: React.FC<{
 
     const fetchTestAccounts = async () => {
       if (!showTestPanelSafe) {
-        if (import.meta.env.DEV) {
-          console.log('[SocialLoginComponent] Test panel disabled, skipping fetch');
-        }
         return;
-      }
-
-      if (import.meta.env.DEV) {
-        console.log('[SocialLoginComponent] Fetching test accounts...');
       }
 
       try {
         const response = await authClient.api.get('/auth/unified/test-accounts');
-        if (import.meta.env.DEV) {
-          console.log('[SocialLoginComponent] Test accounts response:', response.data);
-        }
         if (response.data.success) {
           setTestAccounts(response.data.data);
         }
@@ -488,19 +472,14 @@ export const loginFormShortcode: ShortcodeDefinition = {
 
 export const oauthLoginShortcode: ShortcodeDefinition = {
   name: 'oauth_login',
-  component: ({ attributes }) => {
-    if (import.meta.env.DEV) {
-      console.log('[oauth_login] Parsed attributes:', attributes);
-    }
-    return (
-      <OAuthOnlyComponent
-        redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
-        title={attributes.title as string}
-        providers={attributes.providers as string}
-        showTestPanel={attributes.showTestPanel as string | boolean}
-      />
-    );
-  }
+  component: ({ attributes }) => (
+    <OAuthOnlyComponent
+      redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
+      title={attributes.title as string}
+      providers={attributes.providers as string}
+      showTestPanel={attributes.showTestPanel as string | boolean}
+    />
+  )
 };
 
 // Default export for auto-registration (SocialLoginShortcode.tsx → SocialLogin)
