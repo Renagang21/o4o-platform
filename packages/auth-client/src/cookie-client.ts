@@ -65,7 +65,7 @@ export class CookieAuthClient {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await this.api.post('/auth/v2/login', credentials);
+    const response = await this.api.post('/auth/cookie/login', credentials);
     // Store token if returned (for WebSocket auth)
     if (response.data.token) {
       this.currentToken = response.data.token;
@@ -74,13 +74,13 @@ export class CookieAuthClient {
   }
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await this.api.post('/auth/v2/register', data);
+    const response = await this.api.post('/auth/cookie/register', data);
     return response.data;
   }
 
   async logout(): Promise<void> {
     try {
-      await this.api.post('/auth/v2/logout');
+      await this.api.post('/auth/cookie/logout');
     } catch (error) {
       // Even if logout fails, we should clear local state
     } finally {
@@ -89,13 +89,13 @@ export class CookieAuthClient {
   }
 
   async logoutAll(): Promise<void> {
-    await this.api.post('/auth/v2/logout-all');
+    await this.api.post('/auth/cookie/logout-all');
     this.currentToken = null;
   }
 
   async refreshToken(): Promise<boolean> {
     try {
-      const response = await this.api.post<RefreshResponse>('/auth/v2/refresh');
+      const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh');
       return response.data.success;
     } catch (error) {
       return false;
