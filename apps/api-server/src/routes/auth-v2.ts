@@ -69,7 +69,7 @@ router.post('/login',
         }
       });
     } catch (error) {
-      // Error log removed
+      console.error('[AUTH-V2 LOGIN ERROR]', error);
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       
       if (errorMessage.includes('Account is')) {
