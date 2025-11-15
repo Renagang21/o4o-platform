@@ -234,8 +234,13 @@ function getApiUrl(): string {
   // Browser environment
   if (typeof window !== 'undefined') {
     // Check for environment variable (Vite)
-    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL;
+    try {
+      const envUrl = (import.meta as any).env?.VITE_API_URL;
+      if (envUrl) {
+        return envUrl;
+      }
+    } catch {
+      // import.meta may not be available in all build contexts
     }
 
     // Localhost development
