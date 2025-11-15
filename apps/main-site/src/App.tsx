@@ -82,6 +82,9 @@ const PageEditor = lazy(() => import('./pages/PageEditor'));
 const PageViewer = lazy(() => import('./pages/PageViewer'));
 const PublicPage = lazy(() => import('./pages/PublicPage'));
 
+// Test Pages
+import LoginDebugPage from './pages/test/LoginDebugPage';
+
 // Loading component
 const PageLoader: FC = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -195,6 +198,9 @@ const App: FC = () => {
               <ResetPassword />
             </Layout>
           } />
+
+          {/* Test Routes - For debugging purposes */}
+          <Route path="/test/login" element={<LoginDebugPage />} />
 
           {/* P0 RBAC: Application Routes */}
           <Route path="/apply/supplier" element={
