@@ -233,7 +233,7 @@ export class CookieAuthClient {
 export const cookieAuthClient = new CookieAuthClient(
   typeof window !== 'undefined' && window.location.hostname === 'localhost'
     ? 'http://localhost:4000/api/v1'
-    : '/api/v1'
+    : 'https://api.neture.co.kr/api/v1'
 );
 
 // Auto-setup session sync
