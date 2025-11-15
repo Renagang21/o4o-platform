@@ -125,6 +125,14 @@ import dsSellerAuthorizationRoutes from '../routes/ds-seller-authorization.route
 import dsSellerProductRoutes from '../routes/ds-seller-product.routes.js';
 import dsSettlementsRoutes from '../routes/ds-settlements.routes.js';
 
+// Phase 6-5 - Partner Links, Analytics & Settlements Routes
+import partnerLinksRoutes from '../routes/partner/links.routes.js';
+import partnerAnalyticsV2Routes from '../routes/partner/analytics.routes.js';
+import partnerSettlementsRoutes from '../routes/partner/settlements.routes.js';
+import supplierSettlementsRoutes from '../routes/supplier/settlements.routes.js';
+import sellerSettlementsRoutes from '../routes/seller/settlements.routes.js';
+import adminSettlementsRoutes from '../routes/admin/settlements.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -320,8 +328,16 @@ export function setupRoutes(app: Application): void {
   app.use('/api/enrollments', enrollmentLimiter, enrollmentsRoutes);
   app.use('/api/v1/enrollments', enrollmentLimiter, enrollmentsRoutes);
 
-  // Phase 7 - Partner Analytics
+  // Phase 7 - Partner Analytics (OLD PATH - Deprecated)
   app.use('/api/v1/analytics/partner', standardLimiter, partnerAnalyticsRoutes);
+
+  // Phase 6-5 - Partner Links, Analytics & Settlements (NEW PATHS)
+  app.use('/api/v1/partner/links', standardLimiter, partnerLinksRoutes);
+  app.use('/api/v1/partner/analytics', standardLimiter, partnerAnalyticsV2Routes);
+  app.use('/api/v1/partner/settlements', standardLimiter, partnerSettlementsRoutes);
+  app.use('/api/v1/supplier/settlements', standardLimiter, supplierSettlementsRoutes);
+  app.use('/api/v1/seller/settlements', standardLimiter, sellerSettlementsRoutes);
+  app.use('/api/v1/admin/settlements', standardLimiter, adminSettlementsRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization
   app.use('/api/v1/ds/seller/authorizations', standardLimiter, dsSellerAuthorizationRoutes);
