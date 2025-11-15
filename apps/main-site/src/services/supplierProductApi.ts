@@ -473,7 +473,7 @@ export const supplierProductAPI = {
 
     // Real API call
     const response = await authClient.api.patch(
-      `/api/v1/supplier/products/${id}/application-status`,
+      API_ENDPOINTS.SUPPLIER_PRODUCTS.TOGGLE_APPLICATION_STATUS(id),
       { is_open_for_applications: isOpen }
     );
     return response.data;
@@ -509,7 +509,7 @@ export const supplierProductAPI = {
 
     // Real API call
     const response = await authClient.api.patch(
-      `/api/v1/supplier/products/${id}/max-sellers`,
+      API_ENDPOINTS.SUPPLIER_PRODUCTS.SET_MAX_APPROVED_SELLERS(id),
       { max_approved_sellers: maxSellers }
     );
     return response.data;

@@ -14,6 +14,8 @@ export const API_ENDPOINTS = {
     CREATE: '/dropshipping/supplier/products',
     UPDATE: (id: string) => `/dropshipping/supplier/products/${id}`,
     DELETE: (id: string) => `/dropshipping/supplier/products/${id}`,
+    TOGGLE_APPLICATION_STATUS: (id: string) => `/dropshipping/supplier/products/${id}/application-status`,
+    SET_MAX_APPROVED_SELLERS: (id: string) => `/dropshipping/supplier/products/${id}/max-sellers`,
   },
 
   // Dropshipping - Supplier Orders
