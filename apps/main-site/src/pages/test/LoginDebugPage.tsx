@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@o4o/auth-context';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface LogEntry {
   timestamp: string;
