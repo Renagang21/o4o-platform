@@ -9,7 +9,8 @@ import {
   UserRole
 } from '../types/auth.js';
 import { UserService } from './UserService.js';
-import { RefreshTokenService } from './RefreshTokenService.js';
+import { RefreshTokenService as RefreshTokenServiceStub } from './RefreshTokenService.js';
+import { RefreshTokenService } from './refreshToken.service.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { LoginSecurityService } from './LoginSecurityService.js';
 
@@ -21,6 +22,7 @@ interface TokenMetadata {
 export class AuthServiceV2 {
   private static readonly JWT_SECRET = process.env.JWT_SECRET || 'jwt-secret';
   private static readonly JWT_EXPIRES_IN = '15m';
+  private static readonly refreshTokenService = new RefreshTokenService();
 
   /**
    * User login
@@ -187,11 +189,11 @@ export class AuthServiceV2 {
     const accessToken = jwt.sign(accessTokenPayload, this.JWT_SECRET);
     
     // Generate refresh token via RefreshTokenService
-    const tokenFamily = RefreshTokenService.generateTokenFamily();
-    const refreshToken = await RefreshTokenService.generateRefreshToken(
+    const refreshToken = await this.refreshTokenService.generateRefreshToken(
       user,
-      tokenFamily,
-      metadata
+      undefined, // deviceId
+      metadata?.userAgent,
+      metadata?.ipAddress
     );
 
     return {
@@ -209,47 +211,22 @@ export class AuthServiceV2 {
     metadata?: TokenMetadata
   ): Promise<AuthTokens | null> {
     try {
-      // Rotate refresh token
-      const rotationResult = await RefreshTokenService.rotateRefreshToken(
-        refreshToken,
-        metadata
-      );
+      // Verify refresh token
+      const verifyResult = await this.refreshTokenService.verifyRefreshToken(refreshToken);
 
-      if (!rotationResult) {
+      if (!verifyResult.valid || !verifyResult.user) {
         return null;
       }
 
-      // Verify the new refresh token
-      const payload = await RefreshTokenService.verifyRefreshToken(rotationResult.token);
-      if (!payload) {
+      const user = verifyResult.user;
+
+      // Check if user is still active
+      if (!user.isActive) {
         return null;
       }
 
-      // Get user
-      const user = await UserService.getUserById(payload.userId);
-      if (!user || !user.isActive) {
-        return null;
-      }
-
-      // Generate new access token
-      const accessTokenPayload: AccessTokenPayload = {
-        userId: user.id,
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-        permissions: user.permissions || [],
-        domain: 'neture.co.kr',
-        exp: Math.floor(Date.now() / 1000) + (15 * 60),
-        iat: Math.floor(Date.now() / 1000)
-      };
-
-      const accessToken = jwt.sign(accessTokenPayload, this.JWT_SECRET);
-
-      return {
-        accessToken,
-        refreshToken: rotationResult.refreshToken,
-        expiresIn: 15 * 60
-      };
+      // Generate new tokens
+      return await this.generateTokens(user, metadata);
     } catch (error) {
       // Error log removed
       return null;
@@ -271,7 +248,7 @@ export class AuthServiceV2 {
    * Logout user
    */
   static async logout(userId: string): Promise<void> {
-    await RefreshTokenService.revokeAllUserTokens(userId);
+    await this.refreshTokenService.revokeAllUserTokens(userId);
   }
 
   /**
