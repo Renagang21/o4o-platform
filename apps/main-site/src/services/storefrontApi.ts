@@ -15,6 +15,8 @@ import type {
   Order,
   OrderItem,
 } from '../types/storefront';
+import { sellerOrderAPI } from './sellerOrderApi';
+import { supplierOrderAPI } from './supplierOrderApi';
 
 // Mock/Real API 전환 플래그
 const USE_MOCK_STOREFRONT =
@@ -155,6 +157,17 @@ const MOCK_PRODUCTS: StorefrontProduct[] = [
 let mockProductsStore = [...MOCK_PRODUCTS];
 let mockOrdersStore: Order[] = [];
 let orderCounter = 1000;
+
+// Product-to-Supplier mapping (Phase 5-1 Step 2)
+// In real implementation, this would come from product authorization data
+const PRODUCT_SUPPLIER_MAP: Record<string, { supplier_id: string; supplier_name: string }> = {
+  'product-001': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+  'product-002': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+  'product-003': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+  'product-004': { supplier_id: 'supplier-2', supplier_name: '식품 공급업체 B' },
+  'product-005': { supplier_id: 'supplier-2', supplier_name: '식품 공급업체 B' },
+  'product-006': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+};
 
 /**
  * Mock 헬퍼: 필터링 및 정렬
@@ -348,6 +361,56 @@ export async function createOrder(
     };
 
     mockOrdersStore.push(newOrder);
+
+    // Phase 5-1 Step 2: Create corresponding seller and supplier orders
+    try {
+      // Group items by seller
+      const sellerGroups = new Map<string, typeof orderItems>();
+      for (const item of orderItems) {
+        if (!sellerGroups.has(item.seller_id)) {
+          sellerGroups.set(item.seller_id, []);
+        }
+        sellerGroups.get(item.seller_id)!.push(item);
+      }
+
+      // Create seller orders
+      for (const [sellerId, items] of sellerGroups.entries()) {
+        const sellerName = items[0].seller_name;
+        await sellerOrderAPI.createFromCustomerOrder(newOrder, sellerId);
+        console.log(`[Order Pipeline] Created seller order for ${sellerName} (${sellerId})`);
+      }
+
+      // Group items by supplier
+      const supplierGroups = new Map<string, { supplier_id: string; supplier_name: string; seller_id: string; seller_name: string }>();
+      for (const item of orderItems) {
+        const productSupplier = PRODUCT_SUPPLIER_MAP[item.product_id];
+        if (productSupplier) {
+          const key = `${productSupplier.supplier_id}|${item.seller_id}`;
+          if (!supplierGroups.has(key)) {
+            supplierGroups.set(key, {
+              supplier_id: productSupplier.supplier_id,
+              supplier_name: productSupplier.supplier_name,
+              seller_id: item.seller_id,
+              seller_name: item.seller_name,
+            });
+          }
+        }
+      }
+
+      // Create supplier orders
+      for (const [key, info] of supplierGroups.entries()) {
+        await supplierOrderAPI.createFromCustomerOrder(
+          newOrder,
+          info.supplier_id,
+          { seller_id: info.seller_id, seller_name: info.seller_name }
+        );
+        console.log(`[Order Pipeline] Created supplier order for ${info.supplier_name} (${info.supplier_id}) via ${info.seller_name}`);
+      }
+    } catch (err) {
+      console.error('[Order Pipeline] Error creating seller/supplier orders:', err);
+      // Don't fail customer order if seller/supplier order creation fails
+      // In production, this should be handled with retry logic or queues
+    }
 
     return {
       success: true,

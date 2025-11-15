@@ -8,6 +8,7 @@ import {
   SellerOrderStatus,
   SellerOrderListItem,
   SellerOrderDetail,
+  SellerOrderItem,
   GetSellerOrdersQuery,
   GetSellerOrdersResponse,
   GetSellerOrderDetailResponse,
@@ -16,6 +17,7 @@ import {
   UpdateSellerOrderMemoRequest,
   UpdateSellerOrderMemoResponse,
 } from '../types/seller-order';
+import type { Order } from '../types/storefront';
 
 // Mock data for development
 const MOCK_ORDERS: SellerOrderDetail[] = [
@@ -403,10 +405,91 @@ const paginateData = <T>(
   };
 };
 
+// Make MOCK_ORDERS mutable for testing
+let mockOrdersStore = [...MOCK_ORDERS];
+let mockOrderCounter = MOCK_ORDERS.length + 1;
+
 /**
  * Seller Order API
  */
 export const sellerOrderAPI = {
+  /**
+   * Create seller order from customer order
+   * Phase 5-1 Step 2: Customer → Seller order integration
+   */
+  async createFromCustomerOrder(customerOrder: Order, sellerId: string): Promise<SellerOrderDetail> {
+    if (USE_MOCK_SELLER_ORDERS) {
+      await mockDelay();
+
+      // Filter items for this seller
+      const sellerItems = customerOrder.items.filter(
+        (item) => item.seller_id === sellerId
+      );
+
+      if (sellerItems.length === 0) {
+        throw new Error(`판매자 ${sellerId}의 주문 아이템이 없습니다.`);
+      }
+
+      // Convert to SellerOrderItem format
+      const orderItems: SellerOrderItem[] = sellerItems.map((item, index) => ({
+        id: `item-${customerOrder.id}-${index + 1}`,
+        product_name: item.product_name,
+        sku: item.product_id, // Use product_id as SKU for now
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        line_total: item.total_price,
+        seller_product_id: item.product_id,
+      }));
+
+      // Calculate totals for this seller
+      const subtotal = orderItems.reduce((sum, item) => sum + item.line_total, 0);
+      const shipping_fee = customerOrder.shipping_fee; // Simplified: use full shipping fee
+      const total = subtotal + shipping_fee;
+
+      // Create seller order
+      const newOrder: SellerOrderDetail = {
+        id: `seller-order-${String(mockOrderCounter++).padStart(3, '0')}`,
+        order_number: `${customerOrder.order_number}-S${sellerId.slice(-3)}`,
+        created_at: customerOrder.created_at,
+        status: 'NEW',
+        channel: '스토어',
+        memo_from_buyer: customerOrder.customer.order_note,
+        memo_internal: `고객 주문 ${customerOrder.order_number}에서 생성`,
+        buyer: {
+          name: customerOrder.customer.name,
+          phone: customerOrder.customer.phone,
+          email: customerOrder.customer.email,
+        },
+        shipping_address: {
+          receiver_name: customerOrder.customer.name,
+          postal_code: customerOrder.customer.shipping_address.postcode,
+          address1: customerOrder.customer.shipping_address.address,
+          address2: customerOrder.customer.shipping_address.address_detail,
+          phone: customerOrder.customer.phone,
+        },
+        items: orderItems,
+        totals: {
+          subtotal,
+          shipping_fee,
+          discount: 0,
+          total,
+          currency: customerOrder.currency,
+        },
+      };
+
+      // Add to mock store
+      mockOrdersStore.unshift(newOrder);
+
+      return newOrder;
+    }
+
+    // Real API call
+    const response = await authClient.api.post('/api/v1/seller/orders/from-customer', {
+      customer_order_id: customerOrder.id,
+      seller_id: sellerId,
+    });
+    return response.data;
+  },
   /**
    * Fetch seller orders list
    */
@@ -419,8 +502,8 @@ export const sellerOrderAPI = {
       const page = query.page || 1;
       const limit = query.limit || 20;
 
-      // Filter and sort
-      const filtered = filterAndSortMockOrders(MOCK_ORDERS, query);
+      // Filter and sort (use mockOrdersStore instead of MOCK_ORDERS)
+      const filtered = filterAndSortMockOrders(mockOrdersStore, query);
 
       // Paginate
       const { data, total, total_pages } = paginateData(filtered, page, limit);
@@ -455,7 +538,7 @@ export const sellerOrderAPI = {
     if (USE_MOCK_SELLER_ORDERS) {
       await mockDelay();
 
-      const order = MOCK_ORDERS.find((o) => o.id === id);
+      const order = mockOrdersStore.find((o) => o.id === id);
       if (!order) {
         throw new Error('주문을 찾을 수 없습니다.');
       }
@@ -481,32 +564,58 @@ export const sellerOrderAPI = {
     if (USE_MOCK_SELLER_ORDERS) {
       await mockDelay();
 
-      const orderIndex = MOCK_ORDERS.findIndex((o) => o.id === id);
+      const orderIndex = mockOrdersStore.findIndex((o) => o.id === id);
       if (orderIndex === -1) {
         throw new Error('주문을 찾을 수 없습니다.');
       }
 
+      const order = mockOrdersStore[orderIndex];
+      const previousStatus = order.status;
+
       // Update order
-      MOCK_ORDERS[orderIndex] = {
-        ...MOCK_ORDERS[orderIndex],
+      mockOrdersStore[orderIndex] = {
+        ...mockOrdersStore[orderIndex],
         status: payload.status,
       };
 
       // Update shipping info if provided
       if (payload.shipping_info) {
-        MOCK_ORDERS[orderIndex].shipping_info = {
-          ...MOCK_ORDERS[orderIndex].shipping_info,
+        mockOrdersStore[orderIndex].shipping_info = {
+          ...mockOrdersStore[orderIndex].shipping_info,
           ...payload.shipping_info,
           shipped_at:
             payload.status === 'SHIPPED'
               ? new Date().toISOString()
-              : MOCK_ORDERS[orderIndex].shipping_info?.shipped_at,
+              : mockOrdersStore[orderIndex].shipping_info?.shipped_at,
         };
+      }
+
+      // Phase 5-1 Step 2: State synchronization
+      // When seller confirms order → trigger supplier order to PROCESSING
+      if (payload.status === 'CONFIRMED' && previousStatus !== 'CONFIRMED') {
+        try {
+          // Import here to avoid circular dependency issues
+          const { supplierOrderAPI } = await import('./supplierOrderApi');
+          const { SupplierOrderStatus } = await import('../types/supplier-order');
+
+          // Extract customer order number from seller order number
+          // Format: ORD-2025-00001-S001 → ORD-2025-00001
+          const baseOrderNumber = order.order_number.replace(/-S\d+$/, '');
+
+          // Sync supplier orders to PROCESSING status
+          console.log(`[State Sync] Seller order ${order.order_number} confirmed, syncing supplier orders...`);
+          await supplierOrderAPI.syncSupplierOrdersByCustomerOrderNumber(
+            baseOrderNumber,
+            SupplierOrderStatus.PROCESSING
+          );
+        } catch (err) {
+          console.error('[State Sync] Error syncing to supplier orders:', err);
+        }
       }
 
       return {
         success: true,
-        data: MOCK_ORDERS[orderIndex],
+        data: mockOrdersStore[orderIndex],
         message: '주문 상태가 업데이트되었습니다.',
       };
     }
@@ -529,19 +638,19 @@ export const sellerOrderAPI = {
     if (USE_MOCK_SELLER_ORDERS) {
       await mockDelay();
 
-      const orderIndex = MOCK_ORDERS.findIndex((o) => o.id === id);
+      const orderIndex = mockOrdersStore.findIndex((o) => o.id === id);
       if (orderIndex === -1) {
         throw new Error('주문을 찾을 수 없습니다.');
       }
 
-      MOCK_ORDERS[orderIndex] = {
-        ...MOCK_ORDERS[orderIndex],
+      mockOrdersStore[orderIndex] = {
+        ...mockOrdersStore[orderIndex],
         memo_internal: payload.memo_internal,
       };
 
       return {
         success: true,
-        data: MOCK_ORDERS[orderIndex],
+        data: mockOrdersStore[orderIndex],
         message: '메모가 저장되었습니다.',
       };
     }
@@ -552,5 +661,49 @@ export const sellerOrderAPI = {
       payload
     );
     return response.data;
+  },
+
+  /**
+   * Sync seller order status based on customer order number (Phase 5-1 Step 2)
+   * Used for state synchronization when supplier ships order
+   */
+  async syncSellerOrdersByCustomerOrderNumber(
+    customerOrderNumber: string,
+    newStatus: SellerOrderStatus,
+    shippingInfo?: { courier?: string; tracking_number?: string }
+  ): Promise<void> {
+    if (USE_MOCK_SELLER_ORDERS) {
+      // Find seller orders that match the customer order number
+      const matchingOrders = mockOrdersStore.filter((order) =>
+        order.order_number.startsWith(customerOrderNumber)
+      );
+
+      for (const order of matchingOrders) {
+        const orderIndex = mockOrdersStore.findIndex((o) => o.id === order.id);
+        if (orderIndex !== -1) {
+          mockOrdersStore[orderIndex].status = newStatus;
+
+          // Update shipping info if provided
+          if (shippingInfo && newStatus === 'SHIPPED') {
+            mockOrdersStore[orderIndex].shipping_info = {
+              ...mockOrdersStore[orderIndex].shipping_info,
+              ...shippingInfo,
+              shipped_at: new Date().toISOString(),
+            };
+          }
+
+          console.log(`[State Sync] Updated seller order ${order.order_number} to ${newStatus}`);
+        }
+      }
+
+      return;
+    }
+
+    // Real API call
+    await authClient.api.post('/api/v1/seller/orders/sync-status', {
+      customer_order_number: customerOrderNumber,
+      new_status: newStatus,
+      shipping_info: shippingInfo,
+    });
   },
 };

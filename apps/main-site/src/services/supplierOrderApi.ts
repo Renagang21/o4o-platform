@@ -13,10 +13,12 @@ import {
   SupplierOrderDetail,
   SupplierOrderStatus,
   SupplierOrderListItem,
+  SupplierOrderItem,
 } from '../types/supplier-order';
+import type { Order } from '../types/storefront';
 
-// Mock data for development
-const MOCK_ORDERS: SupplierOrderDetail[] = [
+// Mock data for development (mutable for order creation)
+let mockOrdersStore: SupplierOrderDetail[] = [
   {
     id: '1',
     order_number: 'ORD-2025-00001',
@@ -225,6 +227,20 @@ const MOCK_ORDERS: SupplierOrderDetail[] = [
   },
 ];
 
+// Order counter for generating new IDs
+let mockOrderCounter = mockOrdersStore.length + 1;
+
+// Product-to-Supplier mapping (for mock data)
+// In real implementation, this would come from product authorization data
+const PRODUCT_SUPPLIER_MAP: Record<string, { supplier_id: string; supplier_name: string }> = {
+  'product-001': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+  'product-002': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+  'product-003': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+  'product-004': { supplier_id: 'supplier-2', supplier_name: '식품 공급업체 B' },
+  'product-005': { supplier_id: 'supplier-2', supplier_name: '식품 공급업체 B' },
+  'product-006': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
+};
+
 // Enable/disable mock mode
 const USE_MOCK_DATA = true;
 
@@ -341,7 +357,7 @@ export const supplierOrderAPI = {
       const limit = query.limit || 20;
 
       // Filter and sort
-      const filtered = filterAndSortMockOrders(MOCK_ORDERS, query);
+      const filtered = filterAndSortMockOrders(mockOrdersStore, query);
 
       // Paginate
       const { orders, total, totalPages } = paginateOrders(filtered, page, limit);
@@ -374,7 +390,7 @@ export const supplierOrderAPI = {
     if (USE_MOCK_DATA) {
       await mockDelay();
 
-      const order = MOCK_ORDERS.find((o) => o.id === id);
+      const order = mockOrdersStore.find((o) => o.id === id);
       if (!order) {
         throw new Error('Order not found');
       }
@@ -402,12 +418,13 @@ export const supplierOrderAPI = {
     if (USE_MOCK_DATA) {
       await mockDelay();
 
-      const orderIndex = MOCK_ORDERS.findIndex((o) => o.id === id);
+      const orderIndex = mockOrdersStore.findIndex((o) => o.id === id);
       if (orderIndex === -1) {
         throw new Error('Order not found');
       }
 
-      const order = MOCK_ORDERS[orderIndex];
+      const order = mockOrdersStore[orderIndex];
+      const previousStatus = order.order_status;
 
       // Update order status
       order.order_status = payload.order_status;
@@ -418,6 +435,33 @@ export const supplierOrderAPI = {
         order.courier = payload.courier;
         order.tracking_number = payload.tracking_number;
         order.shipped_at = new Date().toISOString();
+      }
+
+      // Phase 5-1 Step 2: State synchronization
+      // When supplier ships order → trigger seller order to SHIPPED
+      if (payload.order_status === SupplierOrderStatus.SHIPPED && previousStatus !== SupplierOrderStatus.SHIPPED) {
+        try {
+          // Import here to avoid circular dependency issues
+          const { sellerOrderAPI } = await import('./sellerOrderApi');
+          const { SellerOrderStatus } = await import('../types/seller-order');
+
+          // Extract customer order number from supplier order number
+          // Format: ORD-2025-00001-SUP001 → ORD-2025-00001
+          const baseOrderNumber = order.order_number.replace(/-SUP\d+$/, '');
+
+          // Sync seller orders to SHIPPED status with tracking info
+          console.log(`[State Sync] Supplier order ${order.order_number} shipped, syncing seller orders...`);
+          await sellerOrderAPI.syncSellerOrdersByCustomerOrderNumber(
+            baseOrderNumber,
+            SellerOrderStatus.SHIPPED,
+            {
+              courier: order.courier,
+              tracking_number: order.tracking_number,
+            }
+          );
+        } catch (err) {
+          console.error('[State Sync] Error syncing to seller orders:', err);
+        }
       }
 
       return {
@@ -439,5 +483,129 @@ export const supplierOrderAPI = {
       payload
     );
     return response.data;
+  },
+
+  /**
+   * Create supplier order from customer order (Phase 5-1 Step 2)
+   * Filters customer order items by supplier and creates a supplier order
+   */
+  async createFromCustomerOrder(
+    customerOrder: Order,
+    supplierId: string,
+    sellerInfo: { seller_id: string; seller_name: string }
+  ): Promise<SupplierOrderDetail> {
+    if (USE_MOCK_DATA) {
+      await mockDelay(200);
+
+      // Filter items for this supplier
+      const supplierItems = customerOrder.items.filter((item) => {
+        const productSupplier = PRODUCT_SUPPLIER_MAP[item.product_id];
+        return productSupplier && productSupplier.supplier_id === supplierId;
+      });
+
+      if (supplierItems.length === 0) {
+        throw new Error(`No items found for supplier ${supplierId}`);
+      }
+
+      // Convert to SupplierOrderItem format
+      const orderItems: SupplierOrderItem[] = supplierItems.map((item, index) => ({
+        id: `item-${customerOrder.id}-${index + 1}`,
+        product_id: item.product_id,
+        product_name: item.product_name,
+        sku: item.product_id, // Using product_id as SKU for mock
+        quantity: item.quantity,
+        supply_price: item.unit_price,
+        line_total: item.total_price,
+        thumbnail_url: item.main_image,
+      }));
+
+      // Calculate total
+      const total_amount = orderItems.reduce((sum, item) => sum + item.line_total, 0);
+
+      // Create supplier order with NEW status
+      const newOrder: SupplierOrderDetail = {
+        id: `supplier-order-${String(mockOrderCounter++).padStart(3, '0')}`,
+        order_number: `${customerOrder.order_number}-SUP${supplierId.slice(-3)}`,
+        supplier_id: supplierId,
+
+        // Customer info (end user)
+        buyer_name: customerOrder.customer.name,
+        buyer_phone: customerOrder.customer.phone,
+        buyer_email: customerOrder.customer.email,
+
+        // Shipping address (convert from customer format)
+        shipping_address: {
+          postal_code: customerOrder.customer.shipping_address.postcode,
+          address1: customerOrder.customer.shipping_address.address,
+          address2: customerOrder.customer.shipping_address.address_detail || '',
+          city: '', // Not available in customer order
+        },
+
+        // Order status and metadata
+        order_status: SupplierOrderStatus.NEW,
+        order_date: customerOrder.created_at,
+        total_amount,
+
+        // Channel indicates which seller this came from
+        channel: `Seller: ${sellerInfo.seller_name}`,
+        note: customerOrder.customer.order_note,
+
+        // Items
+        items: orderItems,
+
+        // Timestamps
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Add to mock store
+      mockOrdersStore.unshift(newOrder);
+
+      return newOrder;
+    }
+
+    // Real API call
+    const response = await authClient.api.post(
+      '/api/v1/dropshipping/supplier/orders/from-customer',
+      {
+        customer_order_id: customerOrder.id,
+        supplier_id: supplierId,
+        seller_info: sellerInfo,
+      }
+    );
+    return response.data;
+  },
+
+  /**
+   * Sync supplier order status based on customer order number (Phase 5-1 Step 2)
+   * Used for state synchronization when seller confirms order
+   */
+  async syncSupplierOrdersByCustomerOrderNumber(
+    customerOrderNumber: string,
+    newStatus: SupplierOrderStatus
+  ): Promise<void> {
+    if (USE_MOCK_DATA) {
+      // Find supplier orders that match the customer order number
+      const matchingOrders = mockOrdersStore.filter((order) =>
+        order.order_number.startsWith(customerOrderNumber)
+      );
+
+      for (const order of matchingOrders) {
+        const orderIndex = mockOrdersStore.findIndex((o) => o.id === order.id);
+        if (orderIndex !== -1) {
+          mockOrdersStore[orderIndex].order_status = newStatus;
+          mockOrdersStore[orderIndex].updated_at = new Date().toISOString();
+          console.log(`[State Sync] Updated supplier order ${order.order_number} to ${newStatus}`);
+        }
+      }
+
+      return;
+    }
+
+    // Real API call
+    await authClient.api.post('/api/v1/dropshipping/supplier/orders/sync-status', {
+      customer_order_number: customerOrderNumber,
+      new_status: newStatus,
+    });
   },
 };
