@@ -15,7 +15,7 @@ interface LogEntry {
 
 export default function LoginDebugPage() {
   const [email, setEmail] = useState('test-supplier@neture.co.kr');
-  const [password, setPassword] = useState('test123!@#');
+  const [password, setPassword] = useState('testpass123');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
