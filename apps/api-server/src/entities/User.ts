@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { UserRole, UserStatus } from '../types/auth.js';
 import { BusinessInfo } from '../types/user.js';
 import type { Role } from './Role.js';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 
 // Re-export types for external use
 export { UserRole, UserStatus };
