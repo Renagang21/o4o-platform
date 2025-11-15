@@ -54,7 +54,12 @@ export default function LoginDebugPage() {
       addLog('info', '로그인 시작', { email });
 
       // Step 1: API 호출 전
+      const payload = { email, password };
       addLog('info', 'Step 1: API 호출 준비');
+      addLog('info', 'JSON Payload', {
+        payload,
+        stringified: JSON.stringify(payload)
+      });
 
       // Step 2: authClient를 통한 로그인
       addLog('info', 'Step 2: login() 함수 호출');
