@@ -7,9 +7,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { PageHeader } from '../../components/common/PageHeader';
-import { ArrowLeft, Save } from 'lucide-react';
+import { EmptyState } from '../../components/common/EmptyState';
+import { ArrowLeft, Save, AlertCircle, RefreshCw, FileText } from 'lucide-react';
 import type { PartnerSettlementDetail, SettlementStatus } from '../../types/settlement';
 import { partnerSettlementAPI } from '../../services/partnerSettlementApi';
+import { handleApiError } from '../../utils/apiErrorHandler';
 
 export const PartnerSettlementDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,12 +39,18 @@ export const PartnerSettlementDetailPage: React.FC = () => {
         setSettlement(response.data);
         setMemoText(response.data.memo_internal || '');
       }
-    } catch (err: any) {
-      console.error('정산 상세 조회 실패:', err);
-      setError(err.message || '정산 상세를 불러오는 데 실패했습니다.');
+    } catch (err) {
+      const errorMessage = handleApiError(err, '정산 상세 정보');
+      setError(errorMessage);
+      setSettlement(null);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Retry handler
+  const handleRetry = () => {
+    fetchSettlementDetail();
   };
 
   useEffect(() => {
@@ -88,15 +96,17 @@ export const PartnerSettlementDetailPage: React.FC = () => {
   };
 
   // 금액 포맷
-  const formatCurrency = (amount: number, currency: string = 'KRW') => {
+  const formatCurrency = (amount: number | undefined | null, currency: string = 'KRW') => {
+    const value = amount ?? 0;
     if (currency === 'KRW') {
-      return `₩ ${amount.toLocaleString()}`;
+      return `₩ ${value.toLocaleString()}`;
     }
-    return `${amount.toLocaleString()} ${currency}`;
+    return `${value.toLocaleString()} ${currency}`;
   };
 
   // 날짜 포맷
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return '-';
     return dateString.split('T')[0];
   };
 
@@ -192,16 +202,47 @@ export const PartnerSettlementDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-gray-500">
-        로딩 중...
+      <div className="p-12 text-center text-gray-500">데이터를 불러오는 중입니다...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-12">
+        <EmptyState
+          icon={<AlertCircle className="w-16 h-16 text-red-400" />}
+          title="정산 상세 정보를 불러올 수 없습니다"
+          description={error}
+          action={
+            <button
+              onClick={handleRetry}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              <RefreshCw className="w-5 h-5" />
+              다시 시도
+            </button>
+          }
+        />
       </div>
     );
   }
 
-  if (error || !settlement) {
+  if (!settlement) {
     return (
-      <div className="p-8 text-center text-red-600">
-        {error || '정산을 찾을 수 없습니다.'}
+      <div className="p-12">
+        <EmptyState
+          icon={<FileText className="w-16 h-16 text-gray-400" />}
+          title="정산 정보를 찾을 수 없습니다"
+          description="요청하신 정산 데이터가 존재하지 않습니다."
+          action={
+            <button
+              onClick={() => navigate('/dashboard/partner/settlements')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              정산 목록으로 돌아가기
+            </button>
+          }
+        />
       </div>
     );
   }
@@ -293,13 +334,13 @@ export const PartnerSettlementDetailPage: React.FC = () => {
             <div>
               <div className="text-sm text-gray-600 mb-1">총 클릭수</div>
               <div className="text-xl font-bold text-gray-900">
-                {settlement.total_clicks.toLocaleString()}
+                {(settlement.total_clicks ?? 0).toLocaleString()}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">총 전환수</div>
               <div className="text-xl font-bold text-gray-900">
-                {settlement.total_conversions.toLocaleString()}
+                {(settlement.total_conversions ?? 0).toLocaleString()}
               </div>
             </div>
             <div>

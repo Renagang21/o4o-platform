@@ -13,10 +13,15 @@ import {
   Percent,
   ArrowUpRight,
   ArrowDownRight,
+  AlertCircle,
+  RefreshCw,
+  BarChart3,
 } from 'lucide-react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { PageHeader } from '../../components/common/PageHeader';
+import { EmptyState } from '../../components/common/EmptyState';
 import { partnerLinkAPI } from '../../services/partnerLinkApi';
+import { handleApiError } from '../../utils/apiErrorHandler';
 import {
   AnalyticsPeriod,
   PartnerAnalyticsSummary,
@@ -33,11 +38,13 @@ export const PartnerAnalyticsPage: React.FC = () => {
   const [timeseries, setTimeseries] = useState<PartnerAnalyticsTimeseries | null>(null);
   const [linkSummaries, setLinkSummaries] = useState<PartnerLinkSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
       try {
         const [summaryRes, timeseriesRes, linksRes] = await Promise.all([
           partnerLinkAPI.fetchAnalyticsSummary(period),
@@ -45,11 +52,15 @@ export const PartnerAnalyticsPage: React.FC = () => {
           partnerLinkAPI.fetchLinkSummaries(period),
         ]);
 
-        setSummary(summaryRes.data);
-        setTimeseries(timeseriesRes.data);
-        setLinkSummaries(linksRes.data);
-      } catch (error) {
-        console.error('성과 분석 데이터 조회 실패:', error);
+        setSummary(summaryRes.data ?? null);
+        setTimeseries(timeseriesRes.data ?? null);
+        setLinkSummaries(linksRes.data ?? []);
+      } catch (err) {
+        const errorMessage = handleApiError(err, '분석 데이터');
+        setError(errorMessage);
+        setSummary(null);
+        setTimeseries(null);
+        setLinkSummaries([]);
       } finally {
         setLoading(false);
       }
@@ -57,6 +68,11 @@ export const PartnerAnalyticsPage: React.FC = () => {
 
     fetchData();
   }, [period]);
+
+  // Retry handler
+  const handleRetry = () => {
+    window.location.reload();
+  };
 
   // Period labels
   const periodLabels: Record<AnalyticsPeriod, string> = {
@@ -72,7 +88,10 @@ export const PartnerAnalyticsPage: React.FC = () => {
   };
 
   // Format percentage
-  const formatPercent = (value: number): string => {
+  const formatPercent = (value: number | undefined | null): string => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '0.00%';
+    }
     return `${value.toFixed(2)}%`;
   };
 
@@ -103,10 +122,39 @@ export const PartnerAnalyticsPage: React.FC = () => {
       />
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">로딩 중...</div>
+        <div className="text-center py-12 text-gray-500">데이터를 불러오는 중입니다...</div>
+      ) : error ? (
+        <div className="py-12">
+          <EmptyState
+            icon={<AlertCircle className="w-16 h-16 text-red-400" />}
+            title="분석 데이터를 불러올 수 없습니다"
+            description={error}
+            action={
+              <button
+                onClick={handleRetry}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <RefreshCw className="w-5 h-5" />
+                다시 시도
+              </button>
+            }
+          />
+        </div>
       ) : !summary ? (
-        <div className="text-center py-12 text-gray-500">
-          데이터를 불러올 수 없습니다.
+        <div className="py-12">
+          <EmptyState
+            icon={<BarChart3 className="w-16 h-16 text-gray-400" />}
+            title="선택한 기간에 대한 분석 데이터가 없습니다"
+            description="링크를 생성하고 홍보를 시작하면 성과를 확인할 수 있습니다."
+            action={
+              <button
+                onClick={() => navigate('/dashboard/partner/links/new')}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                링크 생성하기
+              </button>
+            }
+          />
         </div>
       ) : (
         <div className="space-y-6">
@@ -119,7 +167,7 @@ export const PartnerAnalyticsPage: React.FC = () => {
                 <MousePointerClick className="w-5 h-5 text-blue-500" />
               </div>
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {summary.total_clicks.toLocaleString()}
+                {(summary.total_clicks ?? 0).toLocaleString()}
               </div>
               <div className="text-xs text-gray-500">{periodLabels[period]}</div>
             </div>
@@ -131,7 +179,7 @@ export const PartnerAnalyticsPage: React.FC = () => {
                 <ShoppingCart className="w-5 h-5 text-green-500" />
               </div>
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {summary.total_conversions.toLocaleString()}
+                {(summary.total_conversions ?? 0).toLocaleString()}
               </div>
               <div className="text-xs text-gray-500">{periodLabels[period]}</div>
             </div>
@@ -143,7 +191,7 @@ export const PartnerAnalyticsPage: React.FC = () => {
                 <TrendingUp className="w-5 h-5 text-purple-500" />
               </div>
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {formatCurrency(summary.total_revenue)}
+                {formatCurrency(summary.total_revenue ?? 0)}
               </div>
               <div className="text-xs text-gray-500">{periodLabels[period]}</div>
             </div>
@@ -155,7 +203,7 @@ export const PartnerAnalyticsPage: React.FC = () => {
                 <DollarSign className="w-5 h-5 text-yellow-500" />
               </div>
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {formatCurrency(summary.total_commission)}
+                {formatCurrency(summary.total_commission ?? 0)}
               </div>
               <div className="text-xs text-gray-500">{periodLabels[period]}</div>
             </div>
@@ -275,18 +323,18 @@ export const PartnerAnalyticsPage: React.FC = () => {
                           <div className="text-sm font-medium text-gray-900">{link.name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                          {link.total_clicks.toLocaleString()}
+                          {(link.total_clicks ?? 0).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                          {link.total_conversions.toLocaleString()}
+                          {(link.total_conversions ?? 0).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                          <span className={`font-medium ${link.cvr >= 5 ? 'text-green-600' : 'text-gray-900'}`}>
+                          <span className={`font-medium ${(link.cvr ?? 0) >= 5 ? 'text-green-600' : 'text-gray-900'}`}>
                             {formatPercent(link.cvr)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
-                          {formatCurrency(link.total_commission)}
+                          {formatCurrency(link.total_commission ?? 0)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                           <button

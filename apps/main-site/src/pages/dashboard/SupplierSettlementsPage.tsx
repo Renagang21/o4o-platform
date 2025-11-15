@@ -7,9 +7,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { PageHeader } from '../../components/common/PageHeader';
-import { Plus, Eye } from 'lucide-react';
+import { EmptyState } from '../../components/common/EmptyState';
+import { Plus, Eye, AlertCircle, RefreshCw, FileText } from 'lucide-react';
 import type { SettlementSummary, SettlementStatus } from '../../types/settlement';
 import { supplierSettlementAPI } from '../../services/supplierSettlementApi';
+import { handleApiError } from '../../utils/apiErrorHandler';
 import { CreateSettlementModal } from '../../components/dashboard/partner/CreateSettlementModal';
 
 export const SupplierSettlementsPage: React.FC = () => {
@@ -52,16 +54,21 @@ export const SupplierSettlementsPage: React.FC = () => {
       });
 
       if (response.success) {
-        setSettlements(response.data.settlements);
-        setTotal(response.data.pagination.total);
-        setTotalPages(response.data.pagination.total_pages);
+        setSettlements(response.data.settlements ?? []);
+        setTotal(response.data.pagination.total ?? 0);
+        setTotalPages(response.data.pagination.total_pages ?? 1);
       }
-    } catch (err: any) {
-      console.error('정산 목록 조회 실패:', err);
-      setError(err.message || '정산 목록을 불러오는 데 실패했습니다.');
+    } catch (err) {
+      const errorMessage = handleApiError(err, '정산 내역');
+      setError(errorMessage);
+      setSettlements([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    fetchSettlements();
   };
 
   useEffect(() => {
@@ -79,8 +86,18 @@ export const SupplierSettlementsPage: React.FC = () => {
     return badges[status] || null;
   };
 
-  const formatCurrency = (amount: number) => `₩ ${amount.toLocaleString()}`;
-  const formatDate = (dateString: string) => dateString.split('T')[0];
+  const formatCurrency = (amount: number | undefined | null, currency: string = 'KRW') => {
+    const value = amount ?? 0;
+    if (currency === 'KRW') {
+      return `₩ ${value.toLocaleString()}`;
+    }
+    return `${value.toLocaleString()} ${currency}`;
+  };
+
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return '-';
+    return dateString.split('T')[0];
+  };
 
   const handleSettlementCreated = (settlementId: string) => {
     setIsCreateModalOpen(false);
@@ -143,11 +160,41 @@ export const SupplierSettlementsPage: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">로딩 중...</div>
+          <div className="p-12 text-center text-gray-500">정산 내역을 불러오는 중입니다...</div>
         ) : error ? (
-          <div className="p-8 text-center text-red-600">{error}</div>
+          <div className="p-12">
+            <EmptyState
+              icon={<AlertCircle className="w-16 h-16 text-red-400" />}
+              title="정산 내역을 불러올 수 없습니다"
+              description={error}
+              action={
+                <button
+                  onClick={handleRetry}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  다시 시도
+                </button>
+              }
+            />
+          </div>
         ) : settlements.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">정산 내역이 없습니다.</div>
+          <div className="p-12">
+            <EmptyState
+              icon={<FileText className="w-16 h-16 text-gray-400" />}
+              title="아직 생성된 공급자 정산 내역이 없습니다"
+              description="정산을 생성하면 공급 상품 판매 내역을 기간별로 관리할 수 있습니다."
+              action={
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                  첫 정산 생성하기
+                </button>
+              }
+            />
+          </div>
         ) : (
           <>
             <div className="overflow-x-auto">
