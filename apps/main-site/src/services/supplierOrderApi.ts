@@ -451,7 +451,6 @@ export const supplierOrderAPI = {
           const baseOrderNumber = order.order_number.replace(/-SUP\d+$/, '');
 
           // Sync seller orders to SHIPPED status with tracking info
-          console.log(`[State Sync] Supplier order ${order.order_number} shipped, syncing seller orders...`);
           await sellerOrderAPI.syncSellerOrdersByCustomerOrderNumber(
             baseOrderNumber,
             SellerOrderStatus.SHIPPED,
@@ -596,7 +595,6 @@ export const supplierOrderAPI = {
         if (orderIndex !== -1) {
           mockOrdersStore[orderIndex].order_status = newStatus;
           mockOrdersStore[orderIndex].updated_at = new Date().toISOString();
-          console.log(`[State Sync] Updated supplier order ${order.order_number} to ${newStatus}`);
         }
       }
 

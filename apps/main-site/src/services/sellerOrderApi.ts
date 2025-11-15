@@ -604,7 +604,6 @@ export const sellerOrderAPI = {
           const baseOrderNumber = order.order_number.replace(/-S\d+$/, '');
 
           // Sync supplier orders to PROCESSING status
-          console.log(`[State Sync] Seller order ${order.order_number} confirmed, syncing supplier orders...`);
           await supplierOrderAPI.syncSupplierOrdersByCustomerOrderNumber(
             baseOrderNumber,
             SupplierOrderStatus.PROCESSING
@@ -692,8 +691,6 @@ export const sellerOrderAPI = {
               shipped_at: new Date().toISOString(),
             };
           }
-
-          console.log(`[State Sync] Updated seller order ${order.order_number} to ${newStatus}`);
         }
       }
 

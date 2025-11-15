@@ -378,7 +378,6 @@ export async function createOrder(
       for (const [sellerId, items] of sellerGroups.entries()) {
         const sellerName = items[0].seller_name;
         await sellerOrderAPI.createFromCustomerOrder(newOrder, sellerId);
-        console.log(`[Order Pipeline] Created seller order for ${sellerName} (${sellerId})`);
       }
 
       // Group items by supplier
@@ -405,7 +404,6 @@ export async function createOrder(
           info.supplier_id,
           { seller_id: info.seller_id, seller_name: info.seller_name }
         );
-        console.log(`[Order Pipeline] Created supplier order for ${info.supplier_name} (${info.supplier_id}) via ${info.seller_name}`);
       }
     } catch (err) {
       console.error('[Order Pipeline] Error creating seller/supplier orders:', err);

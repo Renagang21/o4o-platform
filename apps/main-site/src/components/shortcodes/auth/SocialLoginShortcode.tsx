@@ -447,6 +447,59 @@ const OAuthOnlyComponent: React.FC<{
 // Auth shortcode definitions
 export const socialLoginShortcode: ShortcodeDefinition = {
   name: 'social_login',
+  description: '소셜 로그인 컴포넌트',
+  attributes: {
+    providers: {
+      type: 'string',
+      required: false,
+      default: 'google,naver,kakao'
+    },
+    showTestPanel: {
+      type: 'boolean',
+      required: false,
+      default: false
+    },
+    redirectUrl: {
+      type: 'string',
+      required: false,
+      default: '/dashboard'
+    },
+    title: {
+      type: 'string',
+      required: false,
+      default: '로그인'
+    },
+    subtitle: {
+      type: 'string',
+      required: false,
+      default: '계정에 접속하여 서비스를 이용하세요'
+    },
+    showEmailLogin: {
+      type: 'boolean',
+      required: false,
+      default: true
+    },
+    showSignupLink: {
+      type: 'boolean',
+      required: false,
+      default: true
+    },
+    signupUrl: {
+      type: 'string',
+      required: false,
+      default: '/register'
+    },
+    signupText: {
+      type: 'string',
+      required: false,
+      default: '계정이 없으신가요?'
+    },
+    signupLinkText: {
+      type: 'string',
+      required: false,
+      default: '회원가입'
+    }
+  },
   component: ({ attributes }) => (
     <SocialLoginComponent
       redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}

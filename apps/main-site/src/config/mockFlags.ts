@@ -71,13 +71,14 @@ export const IS_ANY_MOCK_ENABLED = Object.values(MOCK_FLAGS).some((flag) => flag
 
 /**
  * Log mock status (only in development)
+ * Note: Console logging removed for production builds
  */
-if (isDev && IS_ANY_MOCK_ENABLED) {
-  console.group('🔧 Mock Mode Status');
-  Object.entries(MOCK_FLAGS)
-    .filter(([, value]) => value)
-    .forEach(([key]) => {
-      console.log(`  ✓ ${key}: MOCK`);
-    });
-  console.groupEnd();
-}
+// if (isDev && IS_ANY_MOCK_ENABLED) {
+//   console.group('🔧 Mock Mode Status');
+//   Object.entries(MOCK_FLAGS)
+//     .filter(([, value]) => value)
+//     .forEach(([key]) => {
+//       console.log(`  ✓ ${key}: MOCK`);
+//     });
+//   console.groupEnd();
+// }
