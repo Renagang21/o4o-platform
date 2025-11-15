@@ -189,9 +189,10 @@ export class AuthServiceV2 {
     const accessToken = jwt.sign(accessTokenPayload, this.JWT_SECRET);
     
     // Generate refresh token via RefreshTokenService
+    // Note: deviceId parameter omitted as it's not in DB schema yet
     const refreshToken = await this.refreshTokenService.generateRefreshToken(
       user,
-      undefined, // deviceId
+      undefined, // deviceId - skip for now
       metadata?.userAgent,
       metadata?.ipAddress
     );
