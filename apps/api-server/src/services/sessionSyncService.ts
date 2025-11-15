@@ -48,13 +48,22 @@ export class SessionSyncService {
   }
 
   /**
+   * Check if Redis is available
+   */
+  private static isRedisAvailable(): boolean {
+    return !!this.redis;
+  }
+
+  /**
    * Create a new session across all apps
    */
   static async createSession(
-    user: User, 
+    user: User,
     sessionId: string,
     metadata?: { userAgent?: string; ipAddress?: string }
   ): Promise<void> {
+    if (!this.isRedisAvailable()) return;
+
     const sessionData: SessionData = {
       userId: user.id,
       email: user.email,
@@ -121,6 +130,8 @@ export class SessionSyncService {
    * Remove a single session
    */
   static async removeSession(sessionId: string, userId: string): Promise<void> {
+    if (!this.isRedisAvailable()) return;
+
     await this.redis.del(`${this.SESSION_PREFIX}${sessionId}`);
     await this.redis.srem(`${this.USER_SESSIONS_PREFIX}${userId}`, sessionId);
 
@@ -138,6 +149,8 @@ export class SessionSyncService {
    * Remove all sessions for a user (logout from all devices)
    */
   static async removeAllUserSessions(userId: string): Promise<void> {
+    if (!this.isRedisAvailable()) return;
+
     const sessions = await this.redis.smembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
     
     // Remove each session
@@ -162,6 +175,8 @@ export class SessionSyncService {
    * Get all active sessions for a user with full data
    */
   static async getUserSessions(userId: string): Promise<SessionData[]> {
+    if (!this.isRedisAvailable()) return [];
+
     const sessionIds = await this.redis.smembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
     const sessions: SessionData[] = [];
     
