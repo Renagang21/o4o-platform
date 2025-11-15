@@ -279,12 +279,14 @@ export class AuthServiceV2 {
    */
   static setAuthCookies(res: Response, tokens: AuthTokens): void {
     const isProduction = process.env.NODE_ENV === 'production';
-    
+    const cookieDomain = process.env.COOKIE_DOMAIN;
+
     // Access token cookie
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'strict',
+      sameSite: 'lax',
+      domain: cookieDomain,
       maxAge: tokens.expiresIn * 1000 // Convert to milliseconds
     });
 
@@ -292,7 +294,8 @@ export class AuthServiceV2 {
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'strict',
+      sameSite: 'lax',
+      domain: cookieDomain,
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
   }
@@ -301,9 +304,17 @@ export class AuthServiceV2 {
    * Clear authentication cookies
    */
   static clearAuthCookies(res: Response): void {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-    res.clearCookie('sessionId');
+    const cookieDomain = process.env.COOKIE_DOMAIN;
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      domain: cookieDomain
+    };
+
+    res.clearCookie('accessToken', cookieOptions);
+    res.clearCookie('refreshToken', cookieOptions);
+    res.clearCookie('sessionId', cookieOptions);
   }
 
   /**
