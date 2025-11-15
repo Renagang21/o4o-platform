@@ -187,7 +187,7 @@ router.post('/refresh', async (req, res) => {
     });
   } catch (error) {
     // Error log removed
-    authService.clearAuthCookies(res);
+    AuthServiceV2.clearAuthCookies(res);
     res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR'
@@ -215,7 +215,7 @@ router.post('/logout', async (req, res) => {
     }
 
     // Clear cookies
-    authService.clearAuthCookies(res);
+    AuthServiceV2.clearAuthCookies(res);
     res.clearCookie('sessionId', {
       domain: process.env.COOKIE_DOMAIN || undefined
     });
@@ -227,7 +227,7 @@ router.post('/logout', async (req, res) => {
   } catch (error) {
     // Error log removed
     // Still clear cookies even if error occurs
-    authService.clearAuthCookies(res);
+    AuthServiceV2.clearAuthCookies(res);
     res.clearCookie('sessionId', {
       domain: process.env.COOKIE_DOMAIN || undefined
     });
@@ -313,9 +313,9 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
     
     // Remove all SSO sessions
     await SessionSyncService.removeAllUserSessions((req.user as any).userId || (req.user as any)!.id);
-    
+
     // Clear current session cookies
-    authService.clearAuthCookies(res);
+    AuthServiceV2.clearAuthCookies(res);
     res.clearCookie('sessionId', {
       domain: process.env.COOKIE_DOMAIN || undefined
     });
