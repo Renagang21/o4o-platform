@@ -1,9 +1,12 @@
 /**
  * Storefront API Service
  * Phase 5-1: Customer-facing Storefront API
+ * Phase 6-1: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import type {
   StorefrontProduct,
   GetProductsQuery,
@@ -18,10 +21,8 @@ import type {
 import { sellerOrderAPI } from './sellerOrderApi';
 import { supplierOrderAPI } from './supplierOrderApi';
 
-// Mock/Real API 전환 플래그
-const USE_MOCK_STOREFRONT =
-  import.meta.env.VITE_USE_MOCK_STOREFRONT === 'true' ||
-  import.meta.env.DEV;
+// Phase 6-1: Use centralized mock flag
+const USE_MOCK_STOREFRONT = MOCK_FLAGS.STOREFRONT;
 
 // Mock 지연 시간
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 300));
@@ -263,7 +264,7 @@ export async function fetchProducts(
   }
 
   // Real API
-  const response = await authClient.api.get('/api/v1/storefront/products', {
+  const response = await authClient.api.get(API_ENDPOINTS.STOREFRONT.PRODUCTS, {
     params: query,
   });
   return response.data;
@@ -290,7 +291,7 @@ export async function fetchProductDetail(
   }
 
   // Real API
-  const response = await authClient.api.get(`/api/v1/storefront/products/${id}`);
+  const response = await authClient.api.get(API_ENDPOINTS.STOREFRONT.PRODUCT_DETAIL(id));
   return response.data;
 }
 
@@ -420,7 +421,7 @@ export async function createOrder(
   }
 
   // Real API
-  const response = await authClient.api.post('/api/v1/storefront/orders', payload);
+  const response = await authClient.api.post(API_ENDPOINTS.STOREFRONT.ORDERS, payload);
   return response.data;
 }
 
@@ -443,7 +444,7 @@ export async function fetchOrder(id: string): Promise<GetOrderResponse> {
   }
 
   // Real API
-  const response = await authClient.api.get(`/api/v1/storefront/orders/${id}`);
+  const response = await authClient.api.get(API_ENDPOINTS.STOREFRONT.ORDER_DETAIL(id));
   return response.data;
 }
 

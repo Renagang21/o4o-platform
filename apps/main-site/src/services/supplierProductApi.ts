@@ -1,9 +1,12 @@
 /**
  * Supplier Product API Service
  * Phase 3-1: Product management API client
+ * Phase 6-1: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import {
   SupplierProductListResponse,
   SupplierProductDetailResponse,
@@ -164,7 +167,8 @@ const MOCK_PRODUCTS: SupplierProductDetail[] = [
 ];
 
 // Enable/disable mock mode
-const USE_MOCK_DATA = true;
+// Phase 6-1: Use centralized mock flag
+const USE_MOCK_DATA = MOCK_FLAGS.SUPPLIER_PRODUCTS;
 
 /**
  * Mock API delay to simulate network latency
@@ -310,7 +314,7 @@ export const supplierProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/supplier/products', {
+    const response = await authClient.api.get(API_ENDPOINTS.SUPPLIER_PRODUCTS.LIST, {
       params: {
         ...filters,
         sortBy: sort?.field,
@@ -340,7 +344,7 @@ export const supplierProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(`/api/v1/supplier/products/${id}`);
+    const response = await authClient.api.get(API_ENDPOINTS.SUPPLIER_PRODUCTS.DETAIL(id));
     return response.data;
   },
 
@@ -372,7 +376,7 @@ export const supplierProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.post('/api/v1/supplier/products', data);
+    const response = await authClient.api.post(API_ENDPOINTS.SUPPLIER_PRODUCTS.CREATE, data);
     return response.data;
   },
 
@@ -407,7 +411,7 @@ export const supplierProductAPI = {
 
     // Real API call
     const response = await authClient.api.put(
-      `/api/v1/supplier/products/${id}`,
+      API_ENDPOINTS.SUPPLIER_PRODUCTS.UPDATE(id),
       data
     );
     return response.data;
@@ -433,7 +437,7 @@ export const supplierProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.delete(`/api/v1/supplier/products/${id}`);
+    const response = await authClient.api.delete(API_ENDPOINTS.SUPPLIER_PRODUCTS.DELETE(id));
     return response.data;
   },
 

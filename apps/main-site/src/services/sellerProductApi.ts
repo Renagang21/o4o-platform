@@ -1,9 +1,12 @@
 /**
  * Seller Product API Service
  * Phase 3-3: Seller product management API client
+ * Phase 6-1: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import {
   GetSellerProductsQuery,
   GetSellerProductsResponse,
@@ -144,10 +147,8 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProductForSelection[] = [
   },
 ];
 
-// Enable/disable mock mode based on environment
-// Use VITE_USE_MOCK_SELLER_PRODUCTS env var or default to true in development
-const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_SELLER_PRODUCTS !== 'false'
-  && import.meta.env.MODE === 'development';
+// Phase 6-1: Use centralized mock flag
+const USE_MOCK_DATA = MOCK_FLAGS.SELLER_PRODUCTS;
 
 /**
  * Mock API delay
@@ -290,7 +291,7 @@ export const sellerProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/dropshipping/seller/products', {
+    const response = await authClient.api.get(API_ENDPOINTS.SELLER_PRODUCTS.LIST, {
       params: query,
     });
     return response.data;
@@ -315,9 +316,7 @@ export const sellerProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(
-      `/api/v1/dropshipping/seller/products/${id}`
-    );
+    const response = await authClient.api.get(API_ENDPOINTS.SELLER_PRODUCTS.DETAIL(id));
     return response.data;
   },
 
@@ -367,7 +366,7 @@ export const sellerProductAPI = {
 
     // Real API call
     const response = await authClient.api.post(
-      '/api/v1/dropshipping/seller/products',
+      API_ENDPOINTS.SELLER_PRODUCTS.CREATE,
       payload
     );
     return response.data;
@@ -415,7 +414,7 @@ export const sellerProductAPI = {
 
     // Real API call
     const response = await authClient.api.patch(
-      `/api/v1/dropshipping/seller/products/${id}`,
+      API_ENDPOINTS.SELLER_PRODUCTS.UPDATE(id),
       payload
     );
     return response.data;
@@ -442,9 +441,7 @@ export const sellerProductAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.delete(
-      `/api/v1/dropshipping/seller/products/${id}`
-    );
+    const response = await authClient.api.delete(API_ENDPOINTS.SELLER_PRODUCTS.DELETE(id));
     return response.data;
   },
 
@@ -491,7 +488,7 @@ export const sellerProductAPI = {
 
     // Real API call
     const response = await authClient.api.get(
-      '/api/v1/dropshipping/seller/supplier-products',
+      API_ENDPOINTS.SELLER_PRODUCTS.SUPPLIER_PRODUCTS_FOR_SELECTION,
       {
         params: query,
       }

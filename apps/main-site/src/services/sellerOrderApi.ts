@@ -1,9 +1,12 @@
 /**
  * Seller Order API Service
  * Phase 3-7: 판매자 주문 관리 API 클라이언트
+ * Phase 6-1: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import {
   SellerOrderStatus,
   SellerOrderListItem,
@@ -281,10 +284,8 @@ const MOCK_ORDERS: SellerOrderDetail[] = [
   },
 ];
 
-// Enable/disable mock mode
-const USE_MOCK_SELLER_ORDERS =
-  import.meta.env.VITE_USE_MOCK_SELLER_ORDERS === 'true' ||
-  import.meta.env.DEV;
+// Phase 6-1: Use centralized mock flag
+const USE_MOCK_SELLER_ORDERS = MOCK_FLAGS.SELLER_ORDERS;
 
 /**
  * Mock API delay
@@ -484,7 +485,7 @@ export const sellerOrderAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.post('/api/v1/seller/orders/from-customer', {
+    const response = await authClient.api.post(API_ENDPOINTS.SELLER_ORDERS.CREATE_FROM_CUSTOMER, {
       customer_order_id: customerOrder.id,
       seller_id: sellerId,
     });
@@ -523,7 +524,7 @@ export const sellerOrderAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/seller/orders', {
+    const response = await authClient.api.get(API_ENDPOINTS.SELLER_ORDERS.LIST, {
       params: query,
     });
     return response.data;
@@ -550,7 +551,7 @@ export const sellerOrderAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(`/api/v1/seller/orders/${id}`);
+    const response = await authClient.api.get(API_ENDPOINTS.SELLER_ORDERS.DETAIL(id));
     return response.data;
   },
 
@@ -622,7 +623,7 @@ export const sellerOrderAPI = {
 
     // Real API call
     const response = await authClient.api.patch(
-      `/api/v1/seller/orders/${id}/status`,
+      API_ENDPOINTS.SELLER_ORDERS.UPDATE_STATUS(id),
       payload
     );
     return response.data;
@@ -657,7 +658,7 @@ export const sellerOrderAPI = {
 
     // Real API call
     const response = await authClient.api.patch(
-      `/api/v1/seller/orders/${id}/memo`,
+      API_ENDPOINTS.SELLER_ORDERS.UPDATE_MEMO(id),
       payload
     );
     return response.data;
@@ -700,7 +701,7 @@ export const sellerOrderAPI = {
     }
 
     // Real API call
-    await authClient.api.post('/api/v1/seller/orders/sync-status', {
+    await authClient.api.post(API_ENDPOINTS.SELLER_ORDERS.SYNC_STATUS, {
       customer_order_number: customerOrderNumber,
       new_status: newStatus,
       shipping_info: shippingInfo,

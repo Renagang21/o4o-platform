@@ -1,9 +1,12 @@
 /**
  * Supplier Order API Service
  * Phase 3-2: Order management API client
+ * Phase 6-1: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import {
   GetSupplierOrdersQuery,
   GetSupplierOrdersResponse,
@@ -241,8 +244,8 @@ const PRODUCT_SUPPLIER_MAP: Record<string, { supplier_id: string; supplier_name:
   'product-006': { supplier_id: 'supplier-1', supplier_name: '농산물 공급업체 A' },
 };
 
-// Enable/disable mock mode
-const USE_MOCK_DATA = true;
+// Phase 6-1: Use centralized mock flag
+const USE_MOCK_DATA = MOCK_FLAGS.SUPPLIER_ORDERS;
 
 /**
  * Mock API delay
@@ -377,7 +380,7 @@ export const supplierOrderAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/dropshipping/supplier/orders', {
+    const response = await authClient.api.get(API_ENDPOINTS.SUPPLIER_ORDERS.LIST, {
       params: query,
     });
     return response.data;
@@ -402,9 +405,7 @@ export const supplierOrderAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(
-      `/api/v1/dropshipping/supplier/orders/${id}`
-    );
+    const response = await authClient.api.get(API_ENDPOINTS.SUPPLIER_ORDERS.DETAIL(id));
     return response.data;
   },
 
@@ -479,7 +480,7 @@ export const supplierOrderAPI = {
 
     // Real API call
     const response = await authClient.api.patch(
-      `/api/v1/dropshipping/supplier/orders/${id}/status`,
+      API_ENDPOINTS.SUPPLIER_ORDERS.UPDATE_STATUS(id),
       payload
     );
     return response.data;
@@ -566,7 +567,7 @@ export const supplierOrderAPI = {
 
     // Real API call
     const response = await authClient.api.post(
-      '/api/v1/dropshipping/supplier/orders/from-customer',
+      API_ENDPOINTS.SUPPLIER_ORDERS.CREATE_FROM_CUSTOMER,
       {
         customer_order_id: customerOrder.id,
         supplier_id: supplierId,
@@ -603,7 +604,7 @@ export const supplierOrderAPI = {
     }
 
     // Real API call
-    await authClient.api.post('/api/v1/dropshipping/supplier/orders/sync-status', {
+    await authClient.api.post(API_ENDPOINTS.SUPPLIER_ORDERS.SYNC_STATUS, {
       customer_order_number: customerOrderNumber,
       new_status: newStatus,
     });
