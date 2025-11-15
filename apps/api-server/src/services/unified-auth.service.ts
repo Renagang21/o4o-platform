@@ -419,12 +419,24 @@ export class UnifiedAuthService {
         await userRepo.save(user);
         logger.info(`Created test account: ${testEmail} (${role})`);
       } else {
-        // Update password if it's not already set correctly
+        // Update password and status if needed
+        let needsUpdate = false;
         const isCorrectPassword = await comparePassword(testPassword, user.password || '');
         if (!isCorrectPassword) {
           user.password = await hashPassword(testPassword);
+          needsUpdate = true;
+        }
+        if (user.status !== UserStatus.ACTIVE) {
+          user.status = UserStatus.ACTIVE;
+          needsUpdate = true;
+        }
+        if (!user.isEmailVerified) {
+          user.isEmailVerified = true;
+          needsUpdate = true;
+        }
+        if (needsUpdate) {
           await userRepo.save(user);
-          logger.info(`Updated password for test account: ${user.email}`);
+          logger.info(`Updated test account: ${user.email} (status: ACTIVE, verified: true)`);
         }
       }
 
