@@ -6,6 +6,8 @@
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import type {
   AdminSettlementView,
   AdminSettlementDetail,
@@ -27,9 +29,9 @@ import type {
 } from '../types/settlement';
 
 // Mock/Real API 전환 플래그
-const USE_MOCK_ADMIN_SETTLEMENTS =
+const USE_MOCK_ADMIN_SETTLEMENTS = MOCK_FLAGS.ADMIN_SETTLEMENTS;
   import.meta.env.VITE_USE_MOCK_ADMIN_SETTLEMENTS === 'true' ||
-  import.meta.env.DEV;
+  
 
 // Mock 지연 시간
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 300));
@@ -473,7 +475,7 @@ export async function fetchAdminSettlements(
   }
 
   // Real API
-  const response = await authClient.api.get('/api/v1/admin/settlements', {
+  const response = await authClient.api.get(API_ENDPOINTS.ADMIN_SETTLEMENTS.LIST, {
     params: query,
   });
   return response.data;
@@ -500,7 +502,7 @@ export async function fetchAdminSettlementDetail(
   }
 
   // Real API
-  const response = await authClient.api.get(`/api/v1/admin/settlements/${id}`);
+  const response = await authClient.api.get(API_ENDPOINTS.ADMIN_SETTLEMENTS.DETAIL(id));
   return response.data;
 }
 
@@ -640,7 +642,7 @@ export async function createAdminSettlement(
   }
 
   // Real API
-  const response = await authClient.api.post('/api/v1/admin/settlements', payload);
+  const response = await authClient.api.post(API_ENDPOINTS.ADMIN_SETTLEMENTS.LIST, payload);
   return response.data;
 }
 
@@ -681,7 +683,7 @@ export async function updateAdminSettlementStatus(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/admin/settlements/${id}/status`,
+    API_ENDPOINTS.ADMIN_SETTLEMENTS.UPDATE_STATUS(id),
     payload
   );
   return response.data;
@@ -757,7 +759,7 @@ export async function updateAdminSettlementMemo(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/admin/settlements/${id}/memo`,
+    API_ENDPOINTS.ADMIN_SETTLEMENTS.UPDATE_MEMO(id),
     payload
   );
   return response.data;

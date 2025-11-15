@@ -53,20 +53,58 @@ export const API_ENDPOINTS = {
     ORDER_DETAIL: (id: string) => `/storefront/orders/${id}`,
   },
 
-  // Partner (for Phase 6-2)
-  PARTNER: {
-    LINKS: '/dropshipping/partner/links',
-    LINK_DETAIL: (id: string) => `/dropshipping/partner/links/${id}`,
-    ANALYTICS: '/dropshipping/partner/analytics',
-    SETTLEMENTS: '/dropshipping/partner/settlements',
+  // Partner Links (Phase 6-2)
+  PARTNER_LINKS: {
+    LIST: '/partner/links',
+    DETAIL: (id: string) => `/partner/links/${id}`,
+    CREATE: '/partner/links',
+    UPDATE: (id: string) => `/partner/links/${id}`,
+    DELETE: (id: string) => `/partner/links/${id}`,
   },
 
-  // Settlements (for Phase 6-2)
-  SETTLEMENTS: {
-    PARTNER: '/settlements/partner',
-    SUPPLIER: '/settlements/supplier',
-    SELLER: '/settlements/seller',
-    ADMIN: '/settlements/admin',
+  // Partner Analytics (Phase 6-2)
+  PARTNER_ANALYTICS: {
+    SUMMARY: '/partner/analytics/summary',
+    TIMESERIES: '/partner/analytics/timeseries',
+    LINKS: '/partner/analytics/links',
+  },
+
+  // Partner Settlements (Phase 6-2)
+  PARTNER_SETTLEMENTS: {
+    LIST: '/partner/settlements',
+    DETAIL: (id: string) => `/partner/settlements/${id}`,
+    CREATE: '/partner/settlements',
+    UPDATE_STATUS: (id: string) => `/partner/settlements/${id}/status`,
+    UPDATE_PAYOUT_INFO: (id: string) => `/partner/settlements/${id}/payout-info`,
+    UPDATE_MEMO: (id: string) => `/partner/settlements/${id}/internal-note`,
+  },
+
+  // Supplier Settlements (Phase 6-2)
+  SUPPLIER_SETTLEMENTS: {
+    LIST: '/supplier/settlements',
+    DETAIL: (id: string) => `/supplier/settlements/${id}`,
+    CREATE: '/supplier/settlements',
+    UPDATE_STATUS: (id: string) => `/supplier/settlements/${id}/status`,
+    UPDATE_MEMO: (id: string) => `/supplier/settlements/${id}/internal-note`,
+  },
+
+  // Seller Settlements (Phase 6-2)
+  SELLER_SETTLEMENTS: {
+    LIST: '/seller/settlements',
+    DETAIL: (id: string) => `/seller/settlements/${id}`,
+    CREATE: '/seller/settlements',
+    UPDATE_STATUS: (id: string) => `/seller/settlements/${id}/status`,
+    UPDATE_MEMO: (id: string) => `/seller/settlements/${id}/internal-note`,
+  },
+
+  // Admin Settlements (Phase 6-2)
+  ADMIN_SETTLEMENTS: {
+    LIST: '/admin/settlements',
+    DETAIL: (id: string) => `/admin/settlements/${id}`,
+    CREATE: '/admin/settlements',
+    UPDATE_STATUS: (id: string) => `/admin/settlements/${id}/status`,
+    UPDATE_PAYOUT_INFO: (id: string) => `/admin/settlements/${id}/payout-info`,
+    UPDATE_MEMO: (id: string) => `/admin/settlements/${id}/internal-note`,
   },
 } as const;
 

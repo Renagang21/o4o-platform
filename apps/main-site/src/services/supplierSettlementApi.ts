@@ -4,6 +4,8 @@
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import type {
   SupplierSettlementDetail,
   SettlementSummary,
@@ -20,9 +22,9 @@ import type {
 } from '../types/settlement';
 
 // Mock/Real API 전환 플래그
-const USE_MOCK_SUPPLIER_SETTLEMENTS =
+const USE_MOCK_SUPPLIER_SETTLEMENTS = MOCK_FLAGS.SUPPLIER_SETTLEMENTS;
   import.meta.env.VITE_USE_MOCK_SUPPLIER_SETTLEMENTS === 'true' ||
-  import.meta.env.DEV;
+  
 
 // Mock 지연 시간
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 300));
@@ -363,7 +365,7 @@ export async function fetchSupplierSettlements(
   }
 
   // Real API
-  const response = await authClient.api.get('/api/v1/supplier/settlements', {
+  const response = await authClient.api.get(API_ENDPOINTS.SUPPLIER_SETTLEMENTS.LIST, {
     params: query,
   });
   return response.data;
@@ -390,7 +392,7 @@ export async function fetchSupplierSettlementDetail(
   }
 
   // Real API
-  const response = await authClient.api.get(`/api/v1/supplier/settlements/${id}`);
+  const response = await authClient.api.get(API_ENDPOINTS.SUPPLIER_SETTLEMENTS.DETAIL(id));
   return response.data;
 }
 
@@ -470,7 +472,7 @@ export async function createSupplierSettlement(
 
   // Real API
   const response = await authClient.api.post(
-    '/api/v1/supplier/settlements',
+    API_ENDPOINTS.SUPPLIER_SETTLEMENTS.LIST,
     payload
   );
   return response.data;
@@ -511,7 +513,7 @@ export async function updateSupplierSettlementStatus(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/supplier/settlements/${id}/status`,
+    API_ENDPOINTS.SUPPLIER_SETTLEMENTS.UPDATE_STATUS(id),
     payload
   );
   return response.data;
@@ -544,7 +546,7 @@ export async function updateSupplierSettlementMemo(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/supplier/settlements/${id}/memo`,
+    API_ENDPOINTS.SUPPLIER_SETTLEMENTS.UPDATE_MEMO(id),
     payload
   );
   return response.data;

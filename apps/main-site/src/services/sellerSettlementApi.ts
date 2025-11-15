@@ -4,6 +4,8 @@
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import type {
   SellerSettlementDetail,
   SettlementSummary,
@@ -20,9 +22,9 @@ import type {
 } from '../types/settlement';
 
 // Mock/Real API 전환 플래그
-const USE_MOCK_SELLER_SETTLEMENTS =
+const USE_MOCK_SELLER_SETTLEMENTS = MOCK_FLAGS.SELLER_SETTLEMENTS;
   import.meta.env.VITE_USE_MOCK_SELLER_SETTLEMENTS === 'true' ||
-  import.meta.env.DEV;
+  
 
 // Mock 지연 시간
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 300));
@@ -427,7 +429,7 @@ export async function fetchSellerSettlements(
   }
 
   // Real API
-  const response = await authClient.api.get('/api/v1/seller/settlements', {
+  const response = await authClient.api.get(API_ENDPOINTS.SELLER_SETTLEMENTS.LIST, {
     params: query,
   });
   return response.data;
@@ -454,7 +456,7 @@ export async function fetchSellerSettlementDetail(
   }
 
   // Real API
-  const response = await authClient.api.get(`/api/v1/seller/settlements/${id}`);
+  const response = await authClient.api.get(API_ENDPOINTS.SELLER_SETTLEMENTS.DETAIL(id));
   return response.data;
 }
 
@@ -551,7 +553,7 @@ export async function createSellerSettlement(
 
   // Real API
   const response = await authClient.api.post(
-    '/api/v1/seller/settlements',
+    API_ENDPOINTS.SELLER_SETTLEMENTS.LIST,
     payload
   );
   return response.data;
@@ -592,7 +594,7 @@ export async function updateSellerSettlementStatus(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/seller/settlements/${id}/status`,
+    API_ENDPOINTS.SELLER_SETTLEMENTS.UPDATE_STATUS(id),
     payload
   );
   return response.data;
@@ -625,7 +627,7 @@ export async function updateSellerSettlementMemo(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/seller/settlements/${id}/memo`,
+    API_ENDPOINTS.SELLER_SETTLEMENTS.UPDATE_MEMO(id),
     payload
   );
   return response.data;

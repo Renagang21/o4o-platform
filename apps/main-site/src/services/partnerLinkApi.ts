@@ -1,9 +1,12 @@
 /**
  * Partner Link API Service
  * Phase 3-4: Partner link management API client
+ * Phase 6-2: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import {
   GetPartnerLinksQuery,
   GetPartnerLinksResponse,
@@ -110,9 +113,9 @@ const MOCK_PARTNER_LINKS: PartnerLinkDetail[] = [
   },
 ];
 
-// Enable/disable mock mode based on environment
-const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_PARTNER_LINKS !== 'false'
-  && import.meta.env.MODE === 'development';
+// Phase 6-2: Use centralized mock flags
+const USE_MOCK_LINKS = MOCK_FLAGS.PARTNER_LINKS;
+const USE_MOCK_ANALYTICS = MOCK_FLAGS.PARTNER_ANALYTICS;
 
 /**
  * Mock API delay
@@ -245,7 +248,7 @@ export const partnerLinkAPI = {
   async fetchLinks(
     query: GetPartnerLinksQuery = {}
   ): Promise<GetPartnerLinksResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_LINKS) {
       await mockDelay();
 
       const page = query.page || 1;
@@ -272,7 +275,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/dropshipping/partner/links', {
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_LINKS.LIST, {
       params: query,
     });
     return response.data;
@@ -282,7 +285,7 @@ export const partnerLinkAPI = {
    * Fetch partner link detail by ID
    */
   async fetchLinkDetail(id: string): Promise<GetPartnerLinkDetailResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_LINKS) {
       await mockDelay();
 
       const link = MOCK_PARTNER_LINKS.find((l) => l.id === id);
@@ -297,9 +300,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(
-      `/api/v1/dropshipping/partner/links/${id}`
-    );
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_LINKS.DETAIL(id));
     return response.data;
   },
 
@@ -309,7 +310,7 @@ export const partnerLinkAPI = {
   async createLink(
     payload: PartnerLinkCreateRequest
   ): Promise<CreatePartnerLinkResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_LINKS) {
       await mockDelay();
 
       // Generate final URL with UTM parameters
@@ -349,10 +350,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.post(
-      '/api/v1/dropshipping/partner/links',
-      payload
-    );
+    const response = await authClient.api.post(API_ENDPOINTS.PARTNER_LINKS.CREATE, payload);
     return response.data;
   },
 
@@ -363,7 +361,7 @@ export const partnerLinkAPI = {
     id: string,
     payload: PartnerLinkUpdateRequest
   ): Promise<UpdatePartnerLinkResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_LINKS) {
       await mockDelay();
 
       const linkIndex = MOCK_PARTNER_LINKS.findIndex((l) => l.id === id);
@@ -408,10 +406,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.patch(
-      `/api/v1/dropshipping/partner/links/${id}`,
-      payload
-    );
+    const response = await authClient.api.patch(API_ENDPOINTS.PARTNER_LINKS.UPDATE(id), payload);
     return response.data;
   },
 
@@ -419,7 +414,7 @@ export const partnerLinkAPI = {
    * Delete partner link
    */
   async deleteLink(id: string): Promise<DeletePartnerLinkResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_LINKS) {
       await mockDelay();
 
       const linkIndex = MOCK_PARTNER_LINKS.findIndex((l) => l.id === id);
@@ -436,9 +431,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.delete(
-      `/api/v1/dropshipping/partner/links/${id}`
-    );
+    const response = await authClient.api.delete(API_ENDPOINTS.PARTNER_LINKS.DELETE(id));
     return response.data;
   },
 
@@ -449,7 +442,7 @@ export const partnerLinkAPI = {
   async fetchAnalyticsSummary(
     period: AnalyticsPeriod = '30d'
   ): Promise<GetPartnerAnalyticsSummaryResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_ANALYTICS) {
       await mockDelay();
 
       // Calculate summary from mock links
@@ -485,7 +478,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/partner/analytics/summary', {
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.SUMMARY, {
       params: { period },
     });
     return response.data;
@@ -498,7 +491,7 @@ export const partnerLinkAPI = {
   async fetchAnalyticsTimeseries(
     period: AnalyticsPeriod = '30d'
   ): Promise<GetPartnerAnalyticsTimeseriesResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_ANALYTICS) {
       await mockDelay();
 
       // Generate mock timeseries data
@@ -538,7 +531,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/partner/analytics/timeseries', {
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.TIMESERIES, {
       params: { period },
     });
     return response.data;
@@ -551,7 +544,7 @@ export const partnerLinkAPI = {
   async fetchLinkSummaries(
     period: AnalyticsPeriod = '30d'
   ): Promise<GetPartnerLinkSummariesResponse> {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_ANALYTICS) {
       await mockDelay();
 
       const avgOrderValue = 45000;
@@ -582,7 +575,7 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get('/api/v1/partner/analytics/links', {
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.LINKS, {
       params: { period },
     });
     return response.data;

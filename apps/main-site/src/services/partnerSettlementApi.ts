@@ -1,9 +1,12 @@
 /**
  * Partner Settlement API Service
  * Phase 4-1: Partner Commission Settlement
+ * Phase 6-2: Mock/Real API integration
  */
 
 import { authClient } from '@o4o/auth-client';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
+import { MOCK_FLAGS } from '../config/mockFlags';
 import type {
   PartnerSettlementDetail,
   SettlementSummary,
@@ -20,10 +23,8 @@ import type {
   SettlementStatus,
 } from '../types/settlement';
 
-// Mock/Real API 전환 플래그
-const USE_MOCK_PARTNER_SETTLEMENTS =
-  import.meta.env.VITE_USE_MOCK_PARTNER_SETTLEMENTS === 'true' ||
-  import.meta.env.DEV;
+// Phase 6-2: Use centralized mock flag
+const USE_MOCK_PARTNER_SETTLEMENTS = MOCK_FLAGS.PARTNER_SETTLEMENTS;
 
 // Mock 지연 시간
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 300));
@@ -325,7 +326,7 @@ export async function fetchPartnerSettlements(
   }
 
   // Real API
-  const response = await authClient.api.get('/api/v1/partner/settlements', {
+  const response = await authClient.api.get(API_ENDPOINTS.PARTNER_SETTLEMENTS.LIST, {
     params: query,
   });
   return response.data;
@@ -352,7 +353,7 @@ export async function fetchPartnerSettlementDetail(
   }
 
   // Real API
-  const response = await authClient.api.get(`/api/v1/partner/settlements/${id}`);
+  const response = await authClient.api.get(API_ENDPOINTS.PARTNER_SETTLEMENTS.DETAIL(id));
   return response.data;
 }
 
@@ -434,7 +435,7 @@ export async function createPartnerSettlement(
 
   // Real API
   const response = await authClient.api.post(
-    '/api/v1/partner/settlements',
+    API_ENDPOINTS.PARTNER_SETTLEMENTS.CREATE,
     payload
   );
   return response.data;
@@ -477,7 +478,7 @@ export async function updatePartnerSettlementStatus(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/partner/settlements/${id}/status`,
+    API_ENDPOINTS.PARTNER_SETTLEMENTS.UPDATE_STATUS(id),
     payload
   );
   return response.data;
@@ -510,7 +511,7 @@ export async function updatePartnerSettlementMemo(
 
   // Real API
   const response = await authClient.api.patch(
-    `/api/v1/partner/settlements/${id}/memo`,
+    API_ENDPOINTS.PARTNER_SETTLEMENTS.UPDATE_MEMO(id),
     payload
   );
   return response.data;
