@@ -21,10 +21,8 @@ import type {
   UpdateSupplierSettlementMemoResponse,
 } from '../types/settlement';
 
-// Mock/Real API 전환 플래그
+// Phase 6-2: Use centralized mock flag
 const USE_MOCK_SUPPLIER_SETTLEMENTS = MOCK_FLAGS.SUPPLIER_SETTLEMENTS;
-  import.meta.env.VITE_USE_MOCK_SUPPLIER_SETTLEMENTS === 'true' ||
-  
 
 // Mock 지연 시간
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 300));
