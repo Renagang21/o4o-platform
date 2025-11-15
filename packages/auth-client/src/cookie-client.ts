@@ -229,12 +229,27 @@ export class CookieAuthClient {
   }
 }
 
+// Helper function to get API URL
+function getApiUrl(): string {
+  // Browser environment
+  if (typeof window !== 'undefined') {
+    // Check for environment variable (Vite)
+    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL;
+    }
+
+    // Localhost development
+    if (window.location.hostname === 'localhost') {
+      return 'http://localhost:4000/api/v1';
+    }
+  }
+
+  // Production default
+  return 'https://api.neture.co.kr/api/v1';
+}
+
 // Export singleton instance
-export const cookieAuthClient = new CookieAuthClient(
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:4000/api/v1'
-    : 'https://api.neture.co.kr/api/v1'
-);
+export const cookieAuthClient = new CookieAuthClient(getApiUrl());
 
 // Auto-setup session sync
 if (typeof window !== 'undefined') {
