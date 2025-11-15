@@ -7,6 +7,7 @@
 import { authClient } from '@o4o/auth-client';
 import { API_ENDPOINTS } from '../config/apiEndpoints';
 import { MOCK_FLAGS } from '../config/mockFlags';
+import { handleApiError, SETTLEMENT_ERROR_MESSAGES } from '../utils/apiErrorHandler';
 import type {
   PartnerSettlementDetail,
   SettlementSummary,
@@ -326,10 +327,15 @@ export async function fetchPartnerSettlements(
   }
 
   // Real API
-  const response = await authClient.api.get(API_ENDPOINTS.PARTNER_SETTLEMENTS.LIST, {
-    params: query,
-  });
-  return response.data;
+  try {
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_SETTLEMENTS.LIST, {
+      params: query,
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error, SETTLEMENT_ERROR_MESSAGES.FETCH_LIST);
+    throw error;
+  }
 }
 
 /**
@@ -353,8 +359,13 @@ export async function fetchPartnerSettlementDetail(
   }
 
   // Real API
-  const response = await authClient.api.get(API_ENDPOINTS.PARTNER_SETTLEMENTS.DETAIL(id));
-  return response.data;
+  try {
+    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_SETTLEMENTS.DETAIL(id));
+    return response.data;
+  } catch (error) {
+    handleApiError(error, SETTLEMENT_ERROR_MESSAGES.FETCH_DETAIL);
+    throw error;
+  }
 }
 
 /**
@@ -434,11 +445,16 @@ export async function createPartnerSettlement(
   }
 
   // Real API
-  const response = await authClient.api.post(
-    API_ENDPOINTS.PARTNER_SETTLEMENTS.CREATE,
-    payload
-  );
-  return response.data;
+  try {
+    const response = await authClient.api.post(
+      API_ENDPOINTS.PARTNER_SETTLEMENTS.CREATE,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error, SETTLEMENT_ERROR_MESSAGES.CREATE);
+    throw error;
+  }
 }
 
 /**
@@ -477,11 +493,16 @@ export async function updatePartnerSettlementStatus(
   }
 
   // Real API
-  const response = await authClient.api.patch(
-    API_ENDPOINTS.PARTNER_SETTLEMENTS.UPDATE_STATUS(id),
-    payload
-  );
-  return response.data;
+  try {
+    const response = await authClient.api.patch(
+      API_ENDPOINTS.PARTNER_SETTLEMENTS.UPDATE_STATUS(id),
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error, SETTLEMENT_ERROR_MESSAGES.UPDATE_STATUS);
+    throw error;
+  }
 }
 
 /**
@@ -510,11 +531,16 @@ export async function updatePartnerSettlementMemo(
   }
 
   // Real API
-  const response = await authClient.api.patch(
-    API_ENDPOINTS.PARTNER_SETTLEMENTS.UPDATE_MEMO(id),
-    payload
-  );
-  return response.data;
+  try {
+    const response = await authClient.api.patch(
+      API_ENDPOINTS.PARTNER_SETTLEMENTS.UPDATE_MEMO(id),
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error, SETTLEMENT_ERROR_MESSAGES.UPDATE_MEMO);
+    throw error;
+  }
 }
 
 // Export 기본 API 객체

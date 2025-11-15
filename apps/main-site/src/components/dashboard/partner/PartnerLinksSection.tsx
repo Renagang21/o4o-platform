@@ -5,10 +5,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Filter, Edit, Trash2, Copy, ExternalLink, Link2 } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Copy, ExternalLink, Link2, AlertCircle, RefreshCw } from 'lucide-react';
 import { EmptyState } from '../../common/EmptyState';
 import { PageHeader } from '../../common/PageHeader';
 import { partnerLinkAPI } from '../../../services/partnerLinkApi';
+import { handleApiError } from '../../../utils/apiErrorHandler';
 import {
   PartnerLinkListItem,
   GetPartnerLinksQuery,
@@ -26,6 +27,7 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
   const navigate = useNavigate();
   const [links, setLinks] = useState<PartnerLinkListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState<PartnerLinkStatus | 'all'>('all');
@@ -51,6 +53,7 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
   useEffect(() => {
     const fetchLinks = async () => {
       setLoading(true);
+      setError(null);
       try {
         const query: GetPartnerLinksQuery = {
           page: currentPage,
@@ -65,8 +68,10 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
         setLinks(response.data.links);
         setTotalPages(response.data.pagination.total_pages);
         setTotal(response.data.pagination.total);
-      } catch (error) {
-        console.error('링크 조회 실패:', error);
+      } catch (err) {
+        const errorMessage = handleApiError(err, '파트너 링크 목록');
+        setError(errorMessage);
+        setLinks([]);
       } finally {
         setLoading(false);
       }
@@ -84,6 +89,7 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
       await partnerLinkAPI.deleteLink(id);
       alert('링크가 삭제되었습니다.');
       // Refresh list
+      setError(null);
       const query: GetPartnerLinksQuery = {
         page: currentPage,
         limit: pageSize,
@@ -96,9 +102,9 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
       setLinks(response.data.links);
       setTotalPages(response.data.pagination.total_pages);
       setTotal(response.data.pagination.total);
-    } catch (error) {
-      console.error('링크 삭제 실패:', error);
-      alert('삭제에 실패했습니다.');
+    } catch (err) {
+      const errorMessage = handleApiError(err, '링크 삭제');
+      alert(errorMessage);
     }
   };
 
@@ -146,6 +152,21 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
 
         {loading ? (
           <div className="text-center py-8 text-gray-500">로딩 중...</div>
+        ) : error ? (
+          <EmptyState
+            icon={<AlertCircle className="w-12 h-12 text-red-400" />}
+            title="데이터를 불러올 수 없습니다"
+            description={error}
+            action={
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                다시 시도
+              </button>
+            }
+          />
         ) : links.length === 0 ? (
           <EmptyState
             icon={<Link2 className="w-12 h-12 text-gray-400" />}
@@ -269,6 +290,23 @@ export const PartnerLinksSection: React.FC<PartnerLinksSectionProps> = ({
         {/* Table */}
         {loading ? (
           <div className="text-center py-12 text-gray-500">로딩 중...</div>
+        ) : error ? (
+          <div className="p-12">
+            <EmptyState
+              icon={<AlertCircle className="w-16 h-16 text-red-400" />}
+              title="데이터를 불러올 수 없습니다"
+              description={error}
+              action={
+                <button
+                  onClick={() => window.location.reload()}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  다시 시도
+                </button>
+              }
+            />
+          </div>
         ) : links.length === 0 ? (
           <div className="p-12">
             <EmptyState

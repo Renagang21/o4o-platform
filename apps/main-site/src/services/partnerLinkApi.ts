@@ -7,6 +7,7 @@
 import { authClient } from '@o4o/auth-client';
 import { API_ENDPOINTS } from '../config/apiEndpoints';
 import { MOCK_FLAGS } from '../config/mockFlags';
+import { handleApiError, PARTNER_ERROR_MESSAGES } from '../utils/apiErrorHandler';
 import {
   GetPartnerLinksQuery,
   GetPartnerLinksResponse,
@@ -275,10 +276,15 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_LINKS.LIST, {
-      params: query,
-    });
-    return response.data;
+    try {
+      const response = await authClient.api.get(API_ENDPOINTS.PARTNER_LINKS.LIST, {
+        params: query,
+      });
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.FETCH_LINKS);
+      throw error;
+    }
   },
 
   /**
@@ -300,8 +306,13 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_LINKS.DETAIL(id));
-    return response.data;
+    try {
+      const response = await authClient.api.get(API_ENDPOINTS.PARTNER_LINKS.DETAIL(id));
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.FETCH_LINKS);
+      throw error;
+    }
   },
 
   /**
@@ -350,8 +361,13 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.post(API_ENDPOINTS.PARTNER_LINKS.CREATE, payload);
-    return response.data;
+    try {
+      const response = await authClient.api.post(API_ENDPOINTS.PARTNER_LINKS.CREATE, payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.CREATE_LINK);
+      throw error;
+    }
   },
 
   /**
@@ -406,8 +422,13 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.patch(API_ENDPOINTS.PARTNER_LINKS.UPDATE(id), payload);
-    return response.data;
+    try {
+      const response = await authClient.api.patch(API_ENDPOINTS.PARTNER_LINKS.UPDATE(id), payload);
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.UPDATE_LINK);
+      throw error;
+    }
   },
 
   /**
@@ -431,8 +452,13 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.delete(API_ENDPOINTS.PARTNER_LINKS.DELETE(id));
-    return response.data;
+    try {
+      const response = await authClient.api.delete(API_ENDPOINTS.PARTNER_LINKS.DELETE(id));
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.DELETE_LINK);
+      throw error;
+    }
   },
 
   /**
@@ -478,10 +504,15 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.SUMMARY, {
-      params: { period },
-    });
-    return response.data;
+    try {
+      const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.SUMMARY, {
+        params: { period },
+      });
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.FETCH_ANALYTICS_SUMMARY);
+      throw error;
+    }
   },
 
   /**
@@ -531,10 +562,15 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.TIMESERIES, {
-      params: { period },
-    });
-    return response.data;
+    try {
+      const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.TIMESERIES, {
+        params: { period },
+      });
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.FETCH_ANALYTICS_TIMESERIES);
+      throw error;
+    }
   },
 
   /**
@@ -575,9 +611,14 @@ export const partnerLinkAPI = {
     }
 
     // Real API call
-    const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.LINKS, {
-      params: { period },
-    });
-    return response.data;
+    try {
+      const response = await authClient.api.get(API_ENDPOINTS.PARTNER_ANALYTICS.LINKS, {
+        params: { period },
+      });
+      return response.data;
+    } catch (error) {
+      handleApiError(error, PARTNER_ERROR_MESSAGES.FETCH_LINK_SUMMARIES);
+      throw error;
+    }
   },
 };
