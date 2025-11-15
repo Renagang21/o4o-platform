@@ -84,15 +84,19 @@ export class UnifiedAuthService {
     // Verify password
     const isValidPassword = await comparePassword(credentials.password, user.password);
     if (!isValidPassword) {
-      // Log failed attempt
-      await activityRepo.save(activityRepo.create({
-        userId: user.id,
-        action: 'failed_link',
-        provider: 'email',
-        ipAddress,
-        userAgent,
-        metadata: { reason: 'invalid_password' }
-      }));
+      // Log failed attempt (non-blocking)
+      try {
+        await activityRepo.save(activityRepo.create({
+          userId: user.id,
+          action: 'failed_link',
+          provider: 'email',
+          ipAddress,
+          userAgent,
+          metadata: { reason: 'invalid_password' }
+        }));
+      } catch (logError) {
+        logger.warn('Failed to log activity:', logError);
+      }
       throw new Error('Invalid credentials');
     }
 
@@ -109,14 +113,18 @@ export class UnifiedAuthService {
       ipAddress
     );
 
-    // Log successful login
-    await activityRepo.save(activityRepo.create({
-      userId: user.id,
-      action: 'login',
-      provider: 'email',
-      ipAddress,
-      userAgent
-    }));
+    // Log successful login (non-blocking)
+    try {
+      await activityRepo.save(activityRepo.create({
+        userId: user.id,
+        action: 'login',
+        provider: 'email',
+        ipAddress,
+        userAgent
+      }));
+    } catch (logError) {
+      logger.warn('Failed to log activity:', logError);
+    }
 
     // Update last used for email linked account
     const emailAccount = user.linkedAccounts.find(acc => acc.provider === 'email');
@@ -185,15 +193,19 @@ export class UnifiedAuthService {
       // Generate tokens
       const tokens = await this.authService.generateTokens(user, 'neture.co.kr');
 
-      // Log successful login
-      await activityRepo.save(activityRepo.create({
-        userId: user.id,
-        action: 'login',
-        provider,
-        ipAddress,
-        userAgent,
-        metadata: { providerId: profile.id }
-      }));
+      // Log successful login (non-blocking)
+      try {
+        await activityRepo.save(activityRepo.create({
+          userId: user.id,
+          action: 'login',
+          provider,
+          ipAddress,
+          userAgent,
+          metadata: { providerId: profile.id }
+        }));
+      } catch (logError) {
+        logger.warn('Failed to log activity:', logError);
+      }
 
       // Get merged profile
       const mergedProfile = await AccountLinkingService.getMergedProfile(user.id);
@@ -238,15 +250,19 @@ export class UnifiedAuthService {
       // Generate tokens
       const tokens = await this.authService.generateTokens(existingUserByEmail, 'neture.co.kr');
 
-      // Log successful login
-      await activityRepo.save(activityRepo.create({
-        userId: existingUserByEmail.id,
-        action: 'login',
-        provider,
-        ipAddress,
-        userAgent,
-        metadata: { providerId: profile.id, autoLinked: true }
-      }));
+      // Log successful login (non-blocking)
+      try {
+        await activityRepo.save(activityRepo.create({
+          userId: existingUserByEmail.id,
+          action: 'login',
+          provider,
+          ipAddress,
+          userAgent,
+          metadata: { providerId: profile.id, autoLinked: true }
+        }));
+      } catch (logError) {
+        logger.warn('Failed to log activity:', logError);
+      }
 
       // Get merged profile
       const mergedProfile = await AccountLinkingService.getMergedProfile(existingUserByEmail.id);
@@ -304,15 +320,19 @@ export class UnifiedAuthService {
     // Generate tokens
     const tokens = await this.authService.generateTokens(newUser, 'neture.co.kr');
 
-    // Log new user creation and login
-    await activityRepo.save(activityRepo.create({
-      userId: newUser.id,
-      action: 'linked',
-      provider,
-      ipAddress,
-      userAgent,
-      metadata: { providerId: profile.id, newUser: true }
-    }));
+    // Log new user creation and login (non-blocking)
+    try {
+      await activityRepo.save(activityRepo.create({
+        userId: newUser.id,
+        action: 'linked',
+        provider,
+        ipAddress,
+        userAgent,
+        metadata: { providerId: profile.id, newUser: true }
+      }));
+    } catch (logError) {
+      logger.warn('Failed to log activity:', logError);
+    }
 
     return {
       success: true,
