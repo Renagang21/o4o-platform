@@ -744,7 +744,7 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
                 <div key={key} className="flex items-center text-xs">
                   <span className="font-mono bg-blue-100 text-blue-800 px-1 rounded mr-2">{key}</span>
                   <span className="text-gray-600">=</span>
-                  <span className="font-mono bg-green-100 text-green-800 px-1 rounded ml-2">{value}</span>
+                  <span className="font-mono bg-green-100 text-green-800 px-1 rounded ml-2">{String(value)}</span>
                 </div>
               ))}
             </div>
