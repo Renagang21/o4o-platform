@@ -281,21 +281,22 @@ export class AuthServiceV2 {
     const isProduction = process.env.NODE_ENV === 'production';
     const cookieDomain = process.env.COOKIE_DOMAIN;
 
-    // Access token cookie
-    res.cookie('accessToken', tokens.accessToken, {
+    const baseCookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax',
-      domain: cookieDomain,
+      sameSite: 'lax' as const,
+      ...(cookieDomain && { domain: cookieDomain })
+    };
+
+    // Access token cookie
+    res.cookie('accessToken', tokens.accessToken, {
+      ...baseCookieOptions,
       maxAge: tokens.expiresIn * 1000 // Convert to milliseconds
     });
 
     // Refresh token cookie
     res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax',
-      domain: cookieDomain,
+      ...baseCookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
   }
@@ -309,7 +310,7 @@ export class AuthServiceV2 {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
-      domain: cookieDomain
+      ...(cookieDomain && { domain: cookieDomain })
     };
 
     res.clearCookie('accessToken', cookieOptions);
