@@ -3,7 +3,7 @@ import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
 import { hasMenuPermission, getAccessibleMenus } from '@/config/rolePermissions';
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/services/api';
+import { authClient } from '@o4o/auth-client';
 
 /**
  * Admin menu hook that dynamically filters menus based on user roles and permissions
@@ -26,7 +26,7 @@ export const useAdminMenu = () => {
 
       try {
         // Fetch user permissions from API with authentication (authClient handles baseURL)
-        const response = await apiClient.get(`/users/${user.id}/permissions`);
+        const response = await authClient.api.get(`/users/${user.id}/permissions`);
         if (response.data?.success) {
           setUserPermissions(response.data.data?.permissions || []);
         } else {
