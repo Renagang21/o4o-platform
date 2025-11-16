@@ -6,7 +6,7 @@
  */
 
 import { FC } from 'react';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeComponentProps } from '@o4o/shortcodes';
 import { useProduct } from '@/hooks/useProducts';
 import { formatCurrency } from '@/lib/utils';
 import { ShoppingCart } from 'lucide-react';
@@ -53,26 +53,23 @@ const AddToCartButton: FC<{
   );
 };
 
-// Shortcode Definition
-export const addToCartShortcode: ShortcodeDefinition = {
-  name: 'add_to_cart',
-  component: ({ attributes }) => {
-    const productId = String(attributes.id || '');
-    const text = String(attributes.text || '장바구니에 담기');
-    const className = String(attributes.class || '');
-    const showPrice = attributes.show_price !== false;
+// Main Component (will be registered as [add_to_cart])
+const AddToCartShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
+  const productId = String(attributes.id || '');
+  const text = String(attributes.text || '장바구니에 담기');
+  const className = String(attributes.class || '');
+  const showPrice = attributes.show_price !== false;
 
-    if (!productId) {
-      return <div className="text-red-500">Add to cart shortcode requires a product ID</div>;
-    }
-
-    return <AddToCartButton
-      productId={productId}
-      text={text}
-      className={className}
-      showPrice={showPrice}
-    />;
+  if (!productId) {
+    return <div className="text-red-500">Add to cart shortcode requires a product ID</div>;
   }
+
+  return <AddToCartButton
+    productId={productId}
+    text={text}
+    className={className}
+    showPrice={showPrice}
+  />;
 };
 
-export default addToCartShortcode.component;
+export default AddToCartShortcode;

@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeComponentProps } from '@o4o/shortcodes';
 import { useCategories } from '@/hooks/useCategories';
 import { FolderOpen } from 'lucide-react';
 
@@ -87,24 +87,21 @@ const ProductCategoriesWrapper: FC<{
   );
 };
 
-// Shortcode Definition
-export const productCategoriesShortcode: ShortcodeDefinition = {
-  name: 'product_categories',
-  component: ({ attributes }) => {
-    const showCount = attributes.show_count !== false;
-    const hideEmpty = attributes.hide_empty !== false;
-    const columns = Number(attributes.columns || 3);
+// Main Component (will be registered as [product_categories])
+const ProductCategoriesShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
+  const showCount = attributes.show_count !== false;
+  const hideEmpty = attributes.hide_empty !== false;
+  const columns = Number(attributes.columns || 3);
 
-    return (
-      <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg" />}>
-        <ProductCategoriesWrapper
-          showCount={showCount}
-          hideEmpty={hideEmpty}
-          columns={columns}
-        />
-      </Suspense>
-    );
-  }
+  return (
+    <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg" />}>
+      <ProductCategoriesWrapper
+        showCount={showCount}
+        hideEmpty={hideEmpty}
+        columns={columns}
+      />
+    </Suspense>
+  );
 };
 
-export default productCategoriesShortcode.component;
+export default ProductCategoriesShortcode;

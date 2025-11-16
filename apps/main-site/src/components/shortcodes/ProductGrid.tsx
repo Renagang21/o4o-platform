@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeComponentProps } from '@o4o/shortcodes';
 import { useProducts } from '@/hooks/useProducts';
 
 // Placeholder ProductGrid component
@@ -92,30 +92,27 @@ const ProductGridWrapper: FC<{
   return <ProductGrid products={products} columns={columns} />;
 };
 
-// Shortcode Definition
-export const productGridShortcode: ShortcodeDefinition = {
-  name: 'product_grid',
-  component: ({ attributes }) => {
-    const category = String(attributes.category || '');
-    const limit = Number(attributes.limit || 12);
-    const columns = Number(attributes.columns || 4);
-    const featured = attributes.featured === true;
-    const orderBy = String(attributes.orderby || 'created_at');
-    const order = String(attributes.order || 'desc') as 'asc' | 'desc';
+// Main Component (will be registered as [product_grid])
+const ProductGridShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
+  const category = String(attributes.category || '');
+  const limit = Number(attributes.limit || 12);
+  const columns = Number(attributes.columns || 4);
+  const featured = attributes.featured === true;
+  const orderBy = String(attributes.orderby || 'created_at');
+  const order = String(attributes.order || 'desc') as 'asc' | 'desc';
 
-    return (
-      <Suspense fallback={<GridLoading columns={columns} />}>
-        <ProductGridWrapper
-          category={category}
-          limit={limit}
-          columns={columns}
-          featured={featured}
-          orderBy={orderBy}
-          order={order}
-        />
-      </Suspense>
-    );
-  }
+  return (
+    <Suspense fallback={<GridLoading columns={columns} />}>
+      <ProductGridWrapper
+        category={category}
+        limit={limit}
+        columns={columns}
+        featured={featured}
+        orderBy={orderBy}
+        order={order}
+      />
+    </Suspense>
+  );
 };
 
-export default productGridShortcode.component;
+export default ProductGridShortcode;

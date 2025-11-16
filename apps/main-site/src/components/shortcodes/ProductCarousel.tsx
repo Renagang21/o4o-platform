@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeComponentProps } from '@o4o/shortcodes';
 import { useProducts } from '@/hooks/useProducts';
 
 // Placeholder ProductCarousel component
@@ -48,26 +48,23 @@ const ProductCarouselWrapper: FC<{
   );
 };
 
-// Shortcode Definition
-export const productCarouselShortcode: ShortcodeDefinition = {
-  name: 'product_carousel',
-  component: ({ attributes }) => {
-    const category = String(attributes.category || '');
-    const limit = Number(attributes.limit || 10);
-    const autoplay = attributes.autoplay !== false;
-    const title = String(attributes.title || '');
+// Main Component (will be registered as [product_carousel])
+const ProductCarouselShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
+  const category = String(attributes.category || '');
+  const limit = Number(attributes.limit || 10);
+  const autoplay = attributes.autoplay !== false;
+  const title = String(attributes.title || '');
 
-    return (
-      <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg" />}>
-        <ProductCarouselWrapper
-          category={category}
-          limit={limit}
-          autoplay={autoplay}
-          title={title}
-        />
-      </Suspense>
-    );
-  }
+  return (
+    <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg" />}>
+      <ProductCarouselWrapper
+        category={category}
+        limit={limit}
+        autoplay={autoplay}
+        title={title}
+      />
+    </Suspense>
+  );
 };
 
-export default productCarouselShortcode.component;
+export default ProductCarouselShortcode;

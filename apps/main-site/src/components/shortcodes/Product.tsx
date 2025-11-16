@@ -6,7 +6,7 @@
  */
 
 import { FC } from 'react';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeComponentProps } from '@o4o/shortcodes';
 import { useProduct } from '@/hooks/useProducts';
 import { formatCurrency } from '@/lib/utils';
 import { ShoppingCart, Package } from 'lucide-react';
@@ -91,26 +91,23 @@ const SingleProduct: FC<{
   );
 };
 
-// Shortcode Definition
-export const productShortcode: ShortcodeDefinition = {
-  name: 'product',
-  component: ({ attributes }) => {
-    const productId = String(attributes.id || '');
-    const showPrice = attributes.show_price !== false;
-    const showCart = attributes.show_cart !== false;
-    const className = String(attributes.class || '');
+// Main Component (will be registered as [product])
+const ProductShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
+  const productId = String(attributes.id || '');
+  const showPrice = attributes.show_price !== false;
+  const showCart = attributes.show_cart !== false;
+  const className = String(attributes.class || '');
 
-    if (!productId) {
-      return <div className="text-red-500">Product shortcode requires an ID</div>;
-    }
-
-    return <SingleProduct
-      productId={productId}
-      showPrice={showPrice}
-      showCart={showCart}
-      className={className}
-    />;
+  if (!productId) {
+    return <div className="text-red-500">Product shortcode requires an ID</div>;
   }
+
+  return <SingleProduct
+    productId={productId}
+    showPrice={showPrice}
+    showCart={showCart}
+    className={className}
+  />;
 };
 
-export default productShortcode.component;
+export default ProductShortcode;

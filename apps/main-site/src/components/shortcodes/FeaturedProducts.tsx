@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeComponentProps } from '@o4o/shortcodes';
 import { useProducts } from '@/hooks/useProducts';
 
 // Placeholder ProductGrid component
@@ -90,29 +90,26 @@ const ProductGridWrapper: FC<{
   return <ProductGrid products={products} columns={columns} />;
 };
 
-// Shortcode Definition
-export const featuredProductsShortcode: ShortcodeDefinition = {
-  name: 'featured_products',
-  component: ({ attributes }) => {
-    const limit = Number(attributes.limit || 4);
-    const columns = Number(attributes.columns || 4);
-    const title = String(attributes.title || '추천 상품');
+// Main Component (will be registered as [featured_products])
+const FeaturedProductsShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
+  const limit = Number(attributes.limit || 4);
+  const columns = Number(attributes.columns || 4);
+  const title = String(attributes.title || '추천 상품');
 
-    return (
-      <div className="featured-products-shortcode">
-        <h2 className="text-2xl font-bold mb-6">{title}</h2>
-        <Suspense fallback={<GridLoading columns={columns} />}>
-          <ProductGridWrapper
-            featured={true}
-            limit={limit}
-            columns={columns}
-            orderBy="created_at"
-            order="desc"
-          />
-        </Suspense>
-      </div>
-    );
-  }
+  return (
+    <div className="featured-products-shortcode">
+      <h2 className="text-2xl font-bold mb-6">{title}</h2>
+      <Suspense fallback={<GridLoading columns={columns} />}>
+        <ProductGridWrapper
+          featured={true}
+          limit={limit}
+          columns={columns}
+          orderBy="created_at"
+          order="desc"
+        />
+      </Suspense>
+    </div>
+  );
 };
 
-export default featuredProductsShortcode.component;
+export default FeaturedProductsShortcode;
