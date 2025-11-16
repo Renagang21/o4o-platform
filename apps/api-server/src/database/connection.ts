@@ -106,6 +106,10 @@ import { FormSubmission } from '../entities/FormSubmission.js';
 // Customizer entities
 import { CustomizerPreset } from '../entities/CustomizerPreset.js';
 import { WidgetArea } from '../entities/WidgetArea.js';
+// CPT-ACF Preset entities
+import { FormPreset } from '../entities/FormPreset.js';
+import { ViewPreset } from '../entities/ViewPreset.js';
+import { TemplatePreset } from '../entities/TemplatePreset.js';
 // P0 Zero-Data Role Management entities
 import { RoleEnrollment } from '../entities/RoleEnrollment.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
@@ -263,6 +267,10 @@ export const AppDataSource = new DataSource({
     // Customizer entities
     CustomizerPreset,
     WidgetArea,
+    // CPT-ACF Preset entities
+    FormPreset,
+    ViewPreset,
+    TemplatePreset,
     // P0 Zero-Data Role Management entities
     RoleEnrollment,
     RoleAssignment,
