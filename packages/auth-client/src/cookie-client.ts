@@ -37,6 +37,14 @@ export class CookieAuthClient {
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
 
+        // Skip retry for auth endpoints to avoid infinite loops
+        const skipRetryPaths = ['/auth/cookie/me', '/auth/cookie/refresh'];
+        const requestPath = originalRequest.url || '';
+
+        if (skipRetryPaths.some(path => requestPath.includes(path))) {
+          return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
 
