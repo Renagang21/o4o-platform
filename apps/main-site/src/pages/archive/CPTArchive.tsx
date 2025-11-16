@@ -4,6 +4,7 @@ import Layout from '../../components/layout/Layout';
 import { cookieAuthClient } from '@o4o/auth-client';
 import { metaApi, MetaItemResponse } from '../../services/metaApi';
 import type { ViewPreset, ViewPresetConfig } from '@o4o/types';
+import { ProductCardBlock } from '@o4o/block-renderer';
 
 interface CPTPost {
   id: string;
@@ -250,59 +251,71 @@ const CPTArchive: React.FC = () => {
               archiveConfig.columns === 2 ? 'lg:grid-cols-2' :
               'lg:grid-cols-3 xl:grid-cols-4'
             } gap-6 mb-8`}>
-              {posts.map((post) => (
-                <article
-                  key={post.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => handlePostClick(post)}
-                >
-                  {/* Featured Image */}
-                  {post.featuredImage && (
-                    <div className="aspect-w-16 aspect-h-9">
-                      <img
-                        src={post.featuredImage}
-                        alt={post.title}
-                        className="w-full h-48 object-cover"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Content */}
-                  <div className="p-4">
-                    <h2 className="text-xl font-semibold mb-2 line-clamp-2">
-                      {post.title}
-                    </h2>
-                    
-                    {post.excerpt && (
-                      <p className="text-gray-600 text-sm line-clamp-3 mb-3">
-                        {post.excerpt}
-                      </p>
-                    )}
-                    
-                    {/* Meta info */}
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                      {post.author && <span>{post.author.name}</span>}
-                    </div>
-                    
-                    {/* Price for products - Phase 4-2: Use Meta API */}
-                    {cptSlug === 'ds_product' && (() => {
-                      const metaItems = postMetaMap.get(post.id);
-                      const priceItem = metaItems?.find(m => m.meta_key === 'price');
-                      const price = priceItem?.meta_value as number | undefined;
+              {posts.map((post) => {
+                // For ds_product CPT, use ProductCardBlock
+                if (cptSlug === 'ds_product') {
+                  // Prepare product data with meta information
+                  const metaItems = postMetaMap.get(post.id);
+                  const priceItem = metaItems?.find(m => m.meta_key === 'price');
+                  const price = priceItem?.meta_value as number | undefined;
 
-                      if (price) {
-                        return (
-                          <div className="mt-3 text-lg font-bold text-blue-600">
-                            ₩{price.toLocaleString()}
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
-                </article>
-              ))}
+                  const productData = {
+                    ...post,
+                    customFields: {
+                      ...post.meta,
+                      price,
+                    },
+                  };
+
+                  return (
+                    <ProductCardBlock
+                      key={post.id}
+                      block={{} as any}
+                      product={productData}
+                      onClick={() => handlePostClick(post)}
+                    />
+                  );
+                }
+
+                // Default rendering for non-product CPTs
+                return (
+                  <article
+                    key={post.id}
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => handlePostClick(post)}
+                  >
+                    {/* Featured Image */}
+                    {post.featuredImage && (
+                      <div className="aspect-w-16 aspect-h-9">
+                        <img
+                          src={post.featuredImage}
+                          alt={post.title}
+                          className="w-full h-48 object-cover"
+                        />
+                      </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="p-4">
+                      <h2 className="text-xl font-semibold mb-2 line-clamp-2">
+                        {post.title}
+                      </h2>
+
+                      {post.excerpt && (
+                        <p className="text-gray-600 text-sm line-clamp-3 mb-3">
+                          {post.excerpt}
+                        </p>
+                      )}
+
+                      {/* Meta info */}
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                        {post.author && <span>{post.author.name}</span>}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
 
             {/* Pagination */}

@@ -37,6 +37,7 @@ import { CoverBlock } from './special/CoverBlock';
 import { ShortcodeBlock } from './special/ShortcodeBlock';
 
 // Product blocks
+import { ProductCardBlock } from './product/ProductCardBlock';
 import { ProductTitleBlock } from './product/ProductTitleBlock';
 import { ProductPriceBlock } from './product/ProductPriceBlock';
 import { ProductGalleryBlock } from './product/ProductGalleryBlock';
@@ -146,6 +147,9 @@ export function registerAllBlocks() {
     'o4o/shortcode': ShortcodeBlock,
 
     // Product blocks
+    'product-card': ProductCardBlock,
+    'o4o/product-card': ProductCardBlock,
+
     'product-title': ProductTitleBlock,
     'o4o/product-title': ProductTitleBlock,
 
@@ -194,6 +198,7 @@ export * from './special/EmbedBlock';
 export * from './special/CoverBlock';
 export * from './special/ShortcodeBlock';
 
+export * from './product/ProductCardBlock';
 export * from './product/ProductTitleBlock';
 export * from './product/ProductPriceBlock';
 export * from './product/ProductGalleryBlock';
