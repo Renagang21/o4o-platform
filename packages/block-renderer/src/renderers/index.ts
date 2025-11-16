@@ -36,6 +36,13 @@ import { EmbedBlock } from './special/EmbedBlock';
 import { CoverBlock } from './special/CoverBlock';
 import { ShortcodeBlock } from './special/ShortcodeBlock';
 
+// Product blocks
+import { ProductTitleBlock } from './product/ProductTitleBlock';
+import { ProductPriceBlock } from './product/ProductPriceBlock';
+import { ProductGalleryBlock } from './product/ProductGalleryBlock';
+import { ProductDescriptionBlock } from './product/ProductDescriptionBlock';
+import { AddToCartPanelBlock } from './product/AddToCartPanelBlock';
+
 /**
  * Register all blocks with the registry
  * This is called automatically when the package is imported
@@ -137,6 +144,22 @@ export function registerAllBlocks() {
     'shortcode': ShortcodeBlock,
     'core/shortcode': ShortcodeBlock,
     'o4o/shortcode': ShortcodeBlock,
+
+    // Product blocks
+    'product-title': ProductTitleBlock,
+    'o4o/product-title': ProductTitleBlock,
+
+    'product-price': ProductPriceBlock,
+    'o4o/product-price': ProductPriceBlock,
+
+    'product-gallery': ProductGalleryBlock,
+    'o4o/product-gallery': ProductGalleryBlock,
+
+    'product-description': ProductDescriptionBlock,
+    'o4o/product-description': ProductDescriptionBlock,
+
+    'add-to-cart-panel': AddToCartPanelBlock,
+    'o4o/add-to-cart-panel': AddToCartPanelBlock,
   });
 }
 
@@ -170,3 +193,9 @@ export * from './special/HtmlBlock';
 export * from './special/EmbedBlock';
 export * from './special/CoverBlock';
 export * from './special/ShortcodeBlock';
+
+export * from './product/ProductTitleBlock';
+export * from './product/ProductPriceBlock';
+export * from './product/ProductGalleryBlock';
+export * from './product/ProductDescriptionBlock';
+export * from './product/AddToCartPanelBlock';

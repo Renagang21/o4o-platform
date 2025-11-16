@@ -22,6 +22,9 @@ import ResetPassword from './pages/auth/ResetPassword';
 import CPTArchive from './pages/archive/CPTArchive';
 import BlogArchivePage from './pages/BlogArchive';
 
+// CPT Single Page
+import CPTSingle from './pages/CPTSingle';
+
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -150,6 +153,10 @@ const App: FC = () => {
               <CPTArchive />
             </Layout>
           } />
+
+          {/* CPT Single/Detail Routes */}
+          <Route path="/cpt/:cptSlug" element={<CPTArchive />} />
+          <Route path="/cpt/:cptSlug/:slug" element={<CPTSingle />} />
           
           {/* Auth Routes */}
           {/* Signup - Hardcoded */}
