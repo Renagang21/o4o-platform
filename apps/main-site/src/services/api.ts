@@ -3,6 +3,28 @@ import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 import { API_BASE_URL } from '../config/api';
 
+/**
+ * @deprecated Use cookieAuthClient from '@o4o/auth-client' instead.
+ * This legacy API client will be removed in v2.0.
+ *
+ * Migration guide:
+ * ```typescript
+ * // Before
+ * import { apiClient } from '@/services/api';
+ * const response = await apiClient.get('/posts');
+ *
+ * // After
+ * import { cookieAuthClient } from '@o4o/auth-client';
+ * const response = await cookieAuthClient.api.get('/posts');
+ * ```
+ *
+ * Benefits of using cookieAuthClient:
+ * - Automatic cookie-based authentication
+ * - Better security (httpOnly cookies)
+ * - Automatic token refresh
+ * - Type safety
+ * - Centralized configuration
+ */
 // Axios 인스턴스 생성
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

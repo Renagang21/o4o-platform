@@ -2,6 +2,27 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
 
+/**
+ * @deprecated Use authClient from '@o4o/auth-client' instead.
+ * This legacy API client will be removed in v2.0.
+ *
+ * Migration guide:
+ * ```typescript
+ * // Before
+ * import { apiClient } from '@/services/api';
+ * const response = await apiClient.get('/users');
+ *
+ * // After
+ * import { authClient } from '@o4o/auth-client';
+ * const response = await authClient.api.get('/users');
+ * ```
+ *
+ * Benefits of using authClient:
+ * - Automatic token management
+ * - Better error handling
+ * - Type safety
+ * - Centralized configuration
+ */
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
