@@ -41,7 +41,7 @@ export const CartEventHandler: React.FC = () => {
         );
 
         // Optional: Show toast notification (if you have a toast system)
-        console.log('[CartEventHandler] Added to cart:', item);
+        // Success - item added to cart
       } catch (error) {
         console.error('[CartEventHandler] Failed to add to cart:', error);
       }
