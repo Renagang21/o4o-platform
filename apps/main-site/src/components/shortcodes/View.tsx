@@ -1,24 +1,12 @@
+/**
+ * View Shortcode Component
+ * Renders a Spectra view (data table/list) with customizable options
+ *
+ * Usage: [view id="view-id" name="Products" items-per-page="25" enable-search="true"]
+ */
+
 import { ShortcodeDefinition } from '@o4o/shortcodes';
-import { SpectraFormBlock, SpectraViewBlock } from '../TemplateRenderer/blocks/SpectraFormBlocks';
-
-// Form shortcode definition
-export const formShortcode: ShortcodeDefinition = {
-  name: 'form',
-  component: ({ attributes }) => {
-    const { id, name, theme, layout, 'show-title': showTitle, 'show-description': showDescription } = attributes;
-
-    return (
-      <SpectraFormBlock
-        formId={id as string}
-        formName={name as string}
-        showTitle={showTitle !== 'false'}
-        showDescription={showDescription !== 'false'}
-        theme={theme as any}
-        layout={layout as any}
-      />
-    );
-  }
-};
+import { SpectraViewBlock } from '../TemplateRenderer/blocks/SpectraFormBlocks';
 
 // View shortcode definition
 export const viewShortcode: ShortcodeDefinition = {
@@ -48,4 +36,4 @@ export const viewShortcode: ShortcodeDefinition = {
   }
 };
 
-export const formShortcodes = [formShortcode, viewShortcode];
+export default viewShortcode.component;
