@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { Button } from '@o4o/ui';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, Alert, AlertDescription } from '@o4o/ui';
 
@@ -70,7 +70,7 @@ export const ResetPassword: FC = () => {
     setErrorType(null);
     
     try {
-      const response = await apiClient.post<ResetPasswordResponse>(
+      const response = await cookieAuthClient.api.post<ResetPasswordResponse>(
         '/auth/v2/reset-password',
         {
           token,

@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { Button } from '@o4o/ui';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, Alert, AlertDescription } from '@o4o/ui';
 
@@ -37,7 +37,7 @@ export const ForgotPassword: FC = () => {
     setError(null);
     
     try {
-      const response = await apiClient.post<ForgotPasswordResponse>(
+      const response = await cookieAuthClient.api.post<ForgotPasswordResponse>(
         '/auth/v2/forgot-password',
         data
       );

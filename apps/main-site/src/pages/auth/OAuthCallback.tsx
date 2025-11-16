@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { Card, CardContent } from '@o4o/ui';
 import { Button } from '@o4o/ui';
 import { getRedirectForRole } from '@/config/roleRedirects';
@@ -82,9 +82,9 @@ export const OAuthCallback: FC = () => {
       }
 
       // 백엔드에 인가 코드 전송하여 토큰 교환
-      const response = await apiClient.post<OAuthCallbackResponse>(
+      const response = await cookieAuthClient.api.post<OAuthCallbackResponse>(
         `/auth/oauth/${provider}/callback`,
-        { 
+        {
           code,
           state,
           redirect_uri: `${window.location.origin}/auth/callback/${provider}`

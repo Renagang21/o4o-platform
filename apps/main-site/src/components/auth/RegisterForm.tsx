@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Loader2, AlertCircle } from 'lucide-react';
 import { RegisterFormData, AuthErrorCode } from '@/types/auth';
 import { Button } from '@o4o/ui';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await apiClient.post('/auth/register', data);
+      const response = await cookieAuthClient.api.post('/auth/register', data);
 
       if (response.data.success) {
         navigate('/auth/verify-email/pending?email=' + encodeURIComponent(data.email));

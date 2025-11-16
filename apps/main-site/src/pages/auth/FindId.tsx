@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@o4o/ui';
 import { Button } from '@o4o/ui';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 export const FindId: FC = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ export const FindId: FC = () => {
     setStatus('idle');
 
     try {
-      const response = await apiClient.post('/auth/find-id', { email });
+      const response = await cookieAuthClient.api.post('/auth/find-id', { email });
 
       if (response.data.success) {
         setStatus('success');
