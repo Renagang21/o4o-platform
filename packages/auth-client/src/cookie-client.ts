@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import type {
   LoginCredentials,
   RegisterData,
@@ -103,9 +103,10 @@ export class CookieAuthClient {
 
   async refreshToken(): Promise<boolean> {
     try {
-      const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh', {}, {
-        validateStatus: (status) => status === 200 || status === 401
-      });
+      const config: AxiosRequestConfig = {
+        validateStatus: (status: number) => status === 200 || status === 401
+      };
+      const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh', {}, config);
 
       if (response.status === 401) {
         return false;
@@ -119,9 +120,10 @@ export class CookieAuthClient {
 
   async getCurrentUser(): Promise<MeResponse | null> {
     try {
-      const response = await this.api.get('/auth/cookie/me', {
-        validateStatus: (status) => status === 200 || status === 401
-      });
+      const config: AxiosRequestConfig = {
+        validateStatus: (status: number) => status === 200 || status === 401
+      };
+      const response = await this.api.get('/auth/cookie/me', config);
 
       if (response.status === 401) {
         return null;
