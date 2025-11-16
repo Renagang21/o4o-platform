@@ -85,6 +85,13 @@ export class CustomPostType {
   @Column({ type: 'json', nullable: true })
   rewrite?: any;
 
+  // Phase 1: Default Preset IDs
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'default_view_preset_id' })
+  defaultViewPresetId?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'default_template_preset_id' })
+  defaultTemplatePresetId?: string;
+
   // Relations
   @OneToMany('CustomPost', 'postType')
   posts!: CustomPost[];

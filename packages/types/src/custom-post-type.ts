@@ -69,6 +69,11 @@ export interface CustomPostType {
   showInAdminBar: boolean;
   hasArchive: boolean;
   active?: boolean; // For compatibility
+
+  // Phase 1: Default Preset IDs for Archive and Single views
+  defaultViewPresetId?: string; // Default ViewPreset for archive/listing pages
+  defaultTemplatePresetId?: string; // Default TemplatePreset for single/detail pages
+
   supports: {
     title: boolean;
     editor: boolean;
@@ -147,6 +152,8 @@ export interface CreateCustomPostTypeDto {
   showInMenu?: boolean;
   showInAdminBar?: boolean;
   hasArchive?: boolean;
+  defaultViewPresetId?: string;
+  defaultTemplatePresetId?: string;
   supports?: Partial<CustomPostType['supports']>;
   labels?: Partial<CustomPostType['labels']>;
   taxonomies?: string[];
