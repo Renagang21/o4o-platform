@@ -4,7 +4,7 @@
  * Phase 4-2: post.meta 직접 접근 대체
  */
 
-import { apiClient } from './api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 export interface UpsertMetaDto {
   meta_key: string;
@@ -49,7 +49,7 @@ export const metaApi = {
    * List all metadata for a post
    */
   async list(postId: string): Promise<MetaListResponse> {
-    const response = await apiClient.get<MetaListResponse>(`/v1/posts/${postId}/meta`);
+    const response = await cookieAuthClient.api.get<MetaListResponse>(`/v1/posts/${postId}/meta`);
     return response.data;
   },
 
@@ -57,7 +57,7 @@ export const metaApi = {
    * Get metadata by key
    */
   async get(postId: string, key: string): Promise<MetaSingleResponse> {
-    const response = await apiClient.get<MetaSingleResponse>(`/v1/posts/${postId}/meta/${key}`);
+    const response = await cookieAuthClient.api.get<MetaSingleResponse>(`/v1/posts/${postId}/meta/${key}`);
     return response.data;
   },
 
@@ -65,7 +65,7 @@ export const metaApi = {
    * Upsert metadata (create or update)
    */
   async set(postId: string, payload: UpsertMetaDto): Promise<MetaSingleResponse> {
-    const response = await apiClient.put<MetaSingleResponse>(`/v1/posts/${postId}/meta`, payload);
+    const response = await cookieAuthClient.api.put<MetaSingleResponse>(`/v1/posts/${postId}/meta`, payload);
     return response.data;
   },
 
@@ -73,7 +73,7 @@ export const metaApi = {
    * Delete metadata by key
    */
   async delete(postId: string, key: string): Promise<MetaDeleteResponse> {
-    const response = await apiClient.delete<MetaDeleteResponse>(`/v1/posts/${postId}/meta/${key}`);
+    const response = await cookieAuthClient.api.delete<MetaDeleteResponse>(`/v1/posts/${postId}/meta/${key}`);
     return response.data;
   },
 
@@ -81,7 +81,7 @@ export const metaApi = {
    * Increment counter metadata
    */
   async increment(postId: string, key: string, by = 1): Promise<MetaSingleResponse> {
-    const response = await apiClient.patch<MetaSingleResponse>(
+    const response = await cookieAuthClient.api.patch<MetaSingleResponse>(
       `/v1/posts/${postId}/meta/${key}/increment`,
       { by }
     );

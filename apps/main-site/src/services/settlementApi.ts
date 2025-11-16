@@ -1,4 +1,4 @@
-import { apiClient } from './api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 /**
  * Settlement API Types
@@ -95,7 +95,7 @@ export const settlementAPI = {
    * List settlements with filtering and pagination
    */
   list: (params?: SettlementListParams): Promise<SettlementListResponse> => {
-    return apiClient.get('/api/v1/entity/settlements', { params }).then(res => res.data);
+    return cookieAuthClient.api.get('/api/v1/entity/settlements', { params }).then(res => res.data);
   },
 
   /**
@@ -103,7 +103,7 @@ export const settlementAPI = {
    * Get settlement details by ID
    */
   get: (id: string): Promise<SettlementDetailResponse> => {
-    return apiClient.get(`/api/v1/entity/settlements/${id}`).then(res => res.data);
+    return cookieAuthClient.api.get(`/api/v1/entity/settlements/${id}`).then(res => res.data);
   },
 
   /**
@@ -111,7 +111,7 @@ export const settlementAPI = {
    * Get settlement summary statistics for dashboard
    */
   summary: (): Promise<SettlementSummaryResponse> => {
-    return apiClient.get('/api/v1/entity/settlements/summary').then(res => res.data);
+    return cookieAuthClient.api.get('/api/v1/entity/settlements/summary').then(res => res.data);
   },
 };
 
