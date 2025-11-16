@@ -132,3 +132,30 @@ export const getShortcode = (name: string): ShortcodeDefinition | undefined => {
 export const hasShortcode = (name: string): boolean => {
   return globalRegistry.has(name);
 };
+
+/**
+ * Get all registered shortcode names (Phase SC-2)
+ * Useful for debugging and diagnostic purposes
+ *
+ * @returns Array of registered shortcode names, sorted alphabetically
+ *
+ * @example
+ * ```ts
+ * const registered = getRegisteredShortcodes();
+ * console.log('Available shortcodes:', registered);
+ * // Output: ['partner_dashboard', 'product_carousel', 'contact_form', ...]
+ * ```
+ */
+export const getRegisteredShortcodes = (): string[] => {
+  return Array.from(globalRegistry.getAll().keys()).sort();
+};
+
+/**
+ * Get all registered shortcodes with their definitions (Phase SC-2)
+ * Useful for building admin UIs or documentation
+ *
+ * @returns Map of shortcode names to their definitions
+ */
+export const getAllShortcodes = (): Map<string, ShortcodeDefinition> => {
+  return globalRegistry.getAll();
+};

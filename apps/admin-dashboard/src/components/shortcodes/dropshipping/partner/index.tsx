@@ -10,12 +10,12 @@ import { ShortcodeDefinition } from '@o4o/shortcodes';
 export { default as PartnerLinkGenerator } from './PartnerLinkGenerator';
 export { default as PartnerCommissionDashboard } from './PartnerCommissionDashboard';
 export { default as PayoutRequests } from './PayoutRequests';
-export { default as PartnerMainDashboard } from './PartnerMainDashboard';
+export { default as PartnerDashboard, PartnerMainDashboard } from './PartnerDashboard';
 export { default as PartnerProducts } from './PartnerProducts';
 export { default as PartnerCommissions } from './PartnerCommissions';
 
 // Lazy imports for shortcode components
-const PartnerMainDashboardLazy = React.lazy(() => import('./PartnerMainDashboard'));
+const PartnerDashboardLazy = React.lazy(() => import('./PartnerDashboard'));
 const PartnerProductsLazy = React.lazy(() => import('./PartnerProducts'));
 const PartnerCommissionsLazy = React.lazy(() => import('./PartnerCommissions'));
 const PartnerLinkGeneratorLazy = React.lazy(() => import('./PartnerLinkGenerator'));
@@ -38,7 +38,7 @@ export const partnerShortcodes: ShortcodeDefinition[] = [
     name: 'partner_dashboard',
     component: ({ attributes }) => (
       <React.Suspense fallback={<Loading />}>
-        <PartnerMainDashboardLazy {...attributes} />
+        <PartnerDashboardLazy {...attributes} />
       </React.Suspense>
     ),
     description: '파트너 메인 대시보드 - 총 수익, 전환율, 개인 추천 링크를 보여주는 통합 UI'

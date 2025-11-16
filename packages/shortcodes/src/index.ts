@@ -19,7 +19,9 @@ export {
   registerLazyShortcode,
   unregisterShortcode,
   getShortcode,
-  hasShortcode as hasShortcodeRegistered
+  hasShortcode as hasShortcodeRegistered,
+  getRegisteredShortcodes, // Phase SC-2: Get all registered shortcode names
+  getAllShortcodes // Phase SC-2: Get all shortcode definitions
 } from './registry.js';
 
 export type { LazyShortcodeDefinition } from './registry.js';

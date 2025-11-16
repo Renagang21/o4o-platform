@@ -12,7 +12,8 @@ export { default as RoleVerification } from './RoleVerification';
 
 // Partner Shortcodes
 export {
-  PartnerMainDashboard,
+  PartnerDashboard,
+  PartnerMainDashboard, // Deprecated: use PartnerDashboard instead
   PartnerProducts,
   PartnerCommissions,
   PartnerLinkGenerator,

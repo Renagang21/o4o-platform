@@ -63,7 +63,13 @@ registerAllWidgets();
 
 /**
  * Convert PascalCase filename to snake_case shortcode name
- * PartnerDashboard → partner_dashboard
+ *
+ * OFFICIAL SHORTCODE NAMING CONVENTION:
+ * File: PartnerDashboard.tsx -> Shortcode: [partner_dashboard]
+ * File: ProductCarousel.tsx -> Shortcode: [product_carousel]
+ * File: ContactForm.tsx -> Shortcode: [contact_form]
+ *
+ * For explicit naming, use ShortcodeDefinition array export (Phase SC-2)
  */
 function pascalToSnakeCase(str: string): string {
   return str
@@ -97,12 +103,12 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
   const registered: string[] = [];
 
   for (const [path, importFn] of Object.entries(componentModules)) {
-    // Skip utility files, types, legacy array-based files, etc.
+    // Skip utility files, types, renderers, etc.
+    // NOTE: index.tsx is NO LONGER skipped (Phase SC-2 change)
     if (
       path.includes('/types.tsx') ||
       path.includes('/utils.tsx') ||
       path.includes('/helpers.tsx') ||
-      path.includes('/index.tsx') ||
       path.includes('/__tests__/') ||
       path.endsWith('ShortcodeRenderer.tsx') ||
       path.endsWith('Shortcodes.tsx') || // Legacy array-based definition files
@@ -115,34 +121,68 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
       const module = await importFn();
       let foundShortcodes = false;
 
-      // First, try to find all ShortcodeDefinition exports in the module
+      // Strategy 1: Look for ShortcodeDefinition[] arrays (e.g., partnerShortcodes, sellerShortcodes)
+      // This is the PREFERRED pattern for index.tsx files or multi-shortcode files
       for (const [exportName, exportValue] of Object.entries(module)) {
-        // Check if this export is a ShortcodeDefinition (has 'name' and 'component' properties)
-        if (
-          exportValue &&
-          typeof exportValue === 'object' &&
-          'name' in exportValue &&
-          'component' in exportValue
-        ) {
-          const shortcodeDef = exportValue as any;
+        if (Array.isArray(exportValue) && exportValue.length > 0) {
+          // Check if it's an array of ShortcodeDefinitions
+          const firstItem = exportValue[0];
+          if (
+            firstItem &&
+            typeof firstItem === 'object' &&
+            'name' in firstItem &&
+            'component' in firstItem
+          ) {
+            // Register all shortcodes from this array
+            for (const shortcodeDef of exportValue as any[]) {
+              registerLazyShortcode({
+                name: shortcodeDef.name,
+                loader: async () => ({ default: shortcodeDef.component }),
+                description: shortcodeDef.description || `Auto-registered from ${path} (${exportName} array)`
+              });
 
-          registerLazyShortcode({
-            name: shortcodeDef.name,
-            loader: async () => ({ default: shortcodeDef.component }),
-            description: `Auto-registered from ${path} (${exportName})`
-          });
+              registered.push(shortcodeDef.name);
+              foundShortcodes = true;
 
-          registered.push(shortcodeDef.name);
-          foundShortcodes = true;
-
-          if (import.meta.env.DEV) {
-            console.log(`[Admin Shortcode] ✅ Registered [${shortcodeDef.name}] from ${exportName} in ${path}`);
+              if (import.meta.env.DEV) {
+                console.log(`[Admin Shortcode] ✅ Registered [${shortcodeDef.name}] from ${exportName}[] in ${path}`);
+              }
+            }
           }
         }
       }
 
-      // Fallback: if no ShortcodeDefinitions found, use filename-based registration
+      // Strategy 2: Look for individual ShortcodeDefinition objects (less common)
       if (!foundShortcodes) {
+        for (const [exportName, exportValue] of Object.entries(module)) {
+          if (
+            exportValue &&
+            typeof exportValue === 'object' &&
+            !Array.isArray(exportValue) &&
+            'name' in exportValue &&
+            'component' in exportValue
+          ) {
+            const shortcodeDef = exportValue as any;
+
+            registerLazyShortcode({
+              name: shortcodeDef.name,
+              loader: async () => ({ default: shortcodeDef.component }),
+              description: shortcodeDef.description || `Auto-registered from ${path} (${exportName})`
+            });
+
+            registered.push(shortcodeDef.name);
+            foundShortcodes = true;
+
+            if (import.meta.env.DEV) {
+              console.log(`[Admin Shortcode] ✅ Registered [${shortcodeDef.name}] from ${exportName} in ${path}`);
+            }
+          }
+        }
+      }
+
+      // Strategy 3 (Fallback): Filename-based registration for simple default exports
+      // Skip if this is index.tsx since it typically doesn't have a component named "index"
+      if (!foundShortcodes && !path.endsWith('/index.tsx')) {
         const componentName = extractComponentName(path);
         if (!componentName) continue;
 
@@ -150,7 +190,9 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
         const Component = (module as any)[componentName] || (module as any).default;
 
         if (!Component) {
-          console.error(`[Admin Shortcode] Component "${componentName}" not found in ${path}`);
+          if (import.meta.env.DEV) {
+            console.warn(`[Admin Shortcode] Component "${componentName}" not found in ${path}`);
+          }
           continue;
         }
 

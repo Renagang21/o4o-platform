@@ -46,7 +46,7 @@ interface QuickStat {
   color: string;
 }
 
-const PartnerMainDashboard: React.FC = () => {
+const PartnerDashboard: React.FC = () => {
   const { toast } = useToast();
   const [summary, setSummary] = useState<PartnerDashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -334,4 +334,9 @@ const PartnerMainDashboard: React.FC = () => {
   );
 };
 
-export default PartnerMainDashboard;
+// Renamed from PartnerMainDashboard to PartnerDashboard for shortcode auto-discovery
+// This allows the file to be registered as [partner_dashboard] instead of [partner_main_dashboard]
+export default PartnerDashboard;
+
+// Also export with original name for backwards compatibility during migration
+export { PartnerDashboard as PartnerMainDashboard };

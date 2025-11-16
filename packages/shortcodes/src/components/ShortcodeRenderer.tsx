@@ -110,7 +110,18 @@ export const ShortcodeRenderer: FC<ShortcodeRendererProps> = ({
         }
       }
     } else {
-      // Unknown shortcode
+      // Unknown shortcode - not registered in globalRegistry
+      // Phase SC-2: Add diagnostic warning (always in development, can be disabled in production)
+      console.warn(
+        `[Shortcode] Not registered: [${shortcode.name}]`,
+        {
+          name: shortcode.name,
+          attributes: shortcode.attributes,
+          fullMatch: shortcode.fullMatch,
+          hint: 'Check if the shortcode component file exists and follows naming conventions (PascalCase → snake_case)'
+        }
+      );
+
       if (UnknownShortcodeComponent) {
         elements.push(
           <UnknownShortcodeComponent key={`unknown-${keyIndex++}`} shortcode={shortcode} />
