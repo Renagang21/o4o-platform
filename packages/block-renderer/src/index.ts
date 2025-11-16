@@ -64,3 +64,10 @@ export * from './renderers/special/MarkdownBlock';
 export * from './renderers/special/HtmlBlock';
 export * from './renderers/special/EmbedBlock';
 export * from './renderers/special/CoverBlock';
+
+export * from './renderers/product/ProductCardBlock';
+export * from './renderers/product/ProductTitleBlock';
+export * from './renderers/product/ProductPriceBlock';
+export * from './renderers/product/ProductGalleryBlock';
+export * from './renderers/product/ProductDescriptionBlock';
+export * from './renderers/product/AddToCartPanelBlock';
