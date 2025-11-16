@@ -62,11 +62,11 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
       path: '/supplier',
       icon: '🏭'
     },
-    affiliate: {
-      id: 'affiliate',
-      name: '제휴자',
+    partner: {
+      id: 'partner',
+      name: '파트너',
       description: '제품 추천 및 수익',
-      path: '/affiliate',
+      path: '/partner',
       icon: '🤝'
     }
   };

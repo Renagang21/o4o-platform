@@ -20,8 +20,8 @@ export const DEFAULT_ROLE_REDIRECTS: RoleRedirectMap = {
   // Vendor -> Vendor Console
   vendor: '/vendor/console',
 
-  // Partner -> Partner Portal
-  partner: '/partner/portal',
+  // Partner -> Partner Dashboard
+  partner: '/partner',
 
   // Operators/Admins -> Admin Dashboard
   operator: '/admin',
