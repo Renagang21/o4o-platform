@@ -103,9 +103,9 @@ export class CookieAuthClient {
 
   async refreshToken(): Promise<boolean> {
     try {
-      const config: AxiosRequestConfig = {
+      const config = {
         validateStatus: (status: number) => status === 200 || status === 401
-      };
+      } as AxiosRequestConfig;
       const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh', {}, config);
 
       if (response.status === 401) {
@@ -120,9 +120,9 @@ export class CookieAuthClient {
 
   async getCurrentUser(): Promise<MeResponse | null> {
     try {
-      const config: AxiosRequestConfig = {
+      const config = {
         validateStatus: (status: number) => status === 200 || status === 401
-      };
+      } as AxiosRequestConfig;
       const response = await this.api.get('/auth/cookie/me', config);
 
       if (response.status === 401) {
