@@ -48,8 +48,8 @@ export const MOCK_FLAGS = {
   SELLER_PRODUCTS: shouldUseMock('VITE_USE_MOCK_SELLER_PRODUCTS'),
   SELLER_ORDERS: shouldUseMock('VITE_USE_MOCK_SELLER_ORDERS'),
 
-  // Storefront
-  STOREFRONT: shouldUseMock('VITE_USE_MOCK_STOREFRONT'),
+  // Storefront (Phase 3: Now using Real API)
+  STOREFRONT: shouldUseMock('VITE_USE_MOCK_STOREFRONT', false),
 
   // Partner (Phase 6-2)
   // Phase 6-5: Partner Links & Analytics now use Real API

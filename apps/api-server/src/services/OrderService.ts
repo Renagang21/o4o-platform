@@ -152,13 +152,16 @@ export class OrderService {
         productId: cartItem.productId,
         productName: cartItem.product?.name || 'Unknown Product',
         productSku: cartItem.product?.sku || '',
-        productImage: cartItem.product?.featuredImageUrl || '',
+        productImage: cartItem.product?.getMainImage() || '',
         productBrand: cartItem.product?.brand,
         quantity: cartItem.quantity,
         unitPrice: cartItem.unitPrice || 0,
         totalPrice: (cartItem.unitPrice || 0) * cartItem.quantity,
         supplierId: cartItem.product?.supplierId || '',
         supplierName: cartItem.product?.supplierName || '',
+        // Phase 3: Add seller info (default to empty if not available from cart)
+        sellerId: '',
+        sellerName: '',
         attributes: cartItem.attributes
       }));
 

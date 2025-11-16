@@ -78,6 +78,7 @@ import forumAdminRoutes from '../routes/admin/forum.routes.js';
 import userAdminRoutes from '../routes/admin/users.routes.js';
 import supplierAdminRoutes from '../routes/admin/suppliers.routes.js';
 import productsRoutes from '../routes/products.js';
+import storefrontRoutes from '../routes/storefront.routes.js';
 import partnersRoutes from '../routes/partners.js';
 import sellerProductsRoutes from '../routes/seller-products.js';
 
@@ -381,6 +382,9 @@ export function setupRoutes(app: Application): void {
   app.use('/api/seller-products', sellerProductsRoutes);
   app.use('/api/orders', orderRoutes);
   app.use('/api/v1/payments', paymentRoutes);
+
+  // Phase 3: Storefront Order API
+  app.use('/api/v1/storefront/orders', storefrontRoutes);
   app.use('/ecommerce', ecommerceSettingsRoutes);
 
   // Themes & Plugins

@@ -250,11 +250,15 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  
+
   // Supplier info
   supplierId: string;
   supplierName: string;
-  
+
+  // Seller info (Phase 3: 프론트엔드 계약 충족)
+  sellerId: string;
+  sellerName: string;
+
   // Product attributes at time of order
   attributes?: Record<string, string>;
   notes?: string;
