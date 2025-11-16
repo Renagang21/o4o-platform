@@ -5,11 +5,16 @@ import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
 
 const router: Router = Router();
 
-// Success/Failure redirect URLs
-const getRedirectUrls = () => ({
-  success: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?success=true`,
-  failure: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?error=social_auth_failed`
-});
+// Success/Failure redirect URLs (with dynamic redirect_url support)
+const getRedirectUrls = (redirectUrl?: string) => {
+  const defaultUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+  const baseRedirect = redirectUrl || defaultUrl;
+
+  return {
+    success: `${baseRedirect}?social_auth=success`,
+    failure: `${baseRedirect}?social_auth=error`
+  };
+};
 
 // OAuth status endpoint (for debugging)
 router.get('/status', (req, res) => {
@@ -34,66 +39,151 @@ router.get('/status', (req, res) => {
 });
 
 // Google OAuth routes
-router.get('/google', passport.authenticate('google', { 
-  scope: ['profile', 'email'] 
-}));
+router.get('/google', (req, res, next) => {
+  const redirectUrl = req.query.redirect_url as string;
+  const state = redirectUrl ? Buffer.from(JSON.stringify({ redirect_url: redirectUrl })).toString('base64') : undefined;
 
-router.get('/google/callback', 
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    state
+  })(req, res, next);
+});
+
+router.get('/google/callback',
   passport.authenticate('google', { session: false }),
   async (req, res) => {
     try {
       const user = req.user as any;
+
+      // Extract redirect_url from state
+      let redirectUrl: string | undefined;
+      const state = req.query.state as string;
+      if (state) {
+        try {
+          const decoded = JSON.parse(Buffer.from(state, 'base64').toString());
+          redirectUrl = decoded.redirect_url;
+        } catch (error) {
+          // Invalid state, ignore
+        }
+      }
+
       if (!user) {
-        return res.redirect(getRedirectUrls().failure);
+        return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
       await SocialAuthService.completeSocialLogin(user, res);
-      res.redirect(getRedirectUrls().success);
+      res.redirect(getRedirectUrls(redirectUrl).success);
     } catch (error: any) {
       // Error log removed
-      res.redirect(getRedirectUrls().failure);
+      const state = req.query.state as string;
+      let redirectUrl: string | undefined;
+      if (state) {
+        try {
+          const decoded = JSON.parse(Buffer.from(state, 'base64').toString());
+          redirectUrl = decoded.redirect_url;
+        } catch (error) {
+          // Invalid state, ignore
+        }
+      }
+      res.redirect(getRedirectUrls(redirectUrl).failure);
     }
   }
 );
 
 // Kakao OAuth routes
-router.get('/kakao', passport.authenticate('kakao'));
+router.get('/kakao', (req, res, next) => {
+  const redirectUrl = req.query.redirect_url as string;
+  const state = redirectUrl ? Buffer.from(JSON.stringify({ redirect_url: redirectUrl })).toString('base64') : undefined;
+
+  passport.authenticate('kakao', { state })(req, res, next);
+});
 
 router.get('/kakao/callback',
   passport.authenticate('kakao', { session: false }),
   async (req, res) => {
     try {
       const user = req.user as any;
+
+      // Extract redirect_url from state
+      let redirectUrl: string | undefined;
+      const state = req.query.state as string;
+      if (state) {
+        try {
+          const decoded = JSON.parse(Buffer.from(state, 'base64').toString());
+          redirectUrl = decoded.redirect_url;
+        } catch (error) {
+          // Invalid state, ignore
+        }
+      }
+
       if (!user) {
-        return res.redirect(getRedirectUrls().failure);
+        return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
       await SocialAuthService.completeSocialLogin(user, res);
-      res.redirect(getRedirectUrls().success);
+      res.redirect(getRedirectUrls(redirectUrl).success);
     } catch (error: any) {
       // Error log removed
-      res.redirect(getRedirectUrls().failure);
+      const state = req.query.state as string;
+      let redirectUrl: string | undefined;
+      if (state) {
+        try {
+          const decoded = JSON.parse(Buffer.from(state, 'base64').toString());
+          redirectUrl = decoded.redirect_url;
+        } catch (error) {
+          // Invalid state, ignore
+        }
+      }
+      res.redirect(getRedirectUrls(redirectUrl).failure);
     }
   }
 );
 
 // Naver OAuth routes
-router.get('/naver', passport.authenticate('naver'));
+router.get('/naver', (req, res, next) => {
+  const redirectUrl = req.query.redirect_url as string;
+  const state = redirectUrl ? Buffer.from(JSON.stringify({ redirect_url: redirectUrl })).toString('base64') : undefined;
+
+  passport.authenticate('naver', { state })(req, res, next);
+});
 
 router.get('/naver/callback',
   passport.authenticate('naver', { session: false }),
   async (req, res) => {
     try {
       const user = req.user as any;
+
+      // Extract redirect_url from state
+      let redirectUrl: string | undefined;
+      const state = req.query.state as string;
+      if (state) {
+        try {
+          const decoded = JSON.parse(Buffer.from(state, 'base64').toString());
+          redirectUrl = decoded.redirect_url;
+        } catch (error) {
+          // Invalid state, ignore
+        }
+      }
+
       if (!user) {
-        return res.redirect(getRedirectUrls().failure);
+        return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
       await SocialAuthService.completeSocialLogin(user, res);
-      res.redirect(getRedirectUrls().success);
+      res.redirect(getRedirectUrls(redirectUrl).success);
     } catch (error: any) {
       // Error log removed
-      res.redirect(getRedirectUrls().failure);
+      const state = req.query.state as string;
+      let redirectUrl: string | undefined;
+      if (state) {
+        try {
+          const decoded = JSON.parse(Buffer.from(state, 'base64').toString());
+          redirectUrl = decoded.redirect_url;
+        } catch (error) {
+          // Invalid state, ignore
+        }
+      }
+      res.redirect(getRedirectUrls(redirectUrl).failure);
     }
   }
 );
