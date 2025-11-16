@@ -75,8 +75,12 @@ import { AdminSettlementDetailPage } from './pages/dashboard/admin/AdminSettleme
 // Phase 5-1: Storefront
 import { ProductsPage } from './pages/storefront/ProductsPage';
 import { ProductDetailPage } from './pages/storefront/ProductDetailPage';
+import { CartPage } from './pages/storefront/CartPage';
 import { CheckoutPage } from './pages/storefront/CheckoutPage';
 import { OrderSuccessPage } from './pages/storefront/OrderSuccessPage';
+
+// Phase 2-B: Cart Event Handler
+import { CartEventHandler } from './components/cart/CartEventHandler';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -125,6 +129,7 @@ const App: FC = () => {
     <ErrorBoundary>
       <GlobalStyleInjector />
       <Router>
+        <CartEventHandler />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
@@ -304,7 +309,10 @@ const App: FC = () => {
           <Route path="/store/products" element={<ProductsPage />} />
           <Route path="/store/:sellerId/products" element={<ProductsPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/store/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/store/checkout" element={<CheckoutPage />} />
           <Route path="/order/success/:id" element={<OrderSuccessPage />} />
 
           {/* Editor Routes (Protected) */}

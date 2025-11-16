@@ -49,6 +49,7 @@ export const ProductCardBlock: React.FC<ProductCardBlockProps> = ({ block, produ
   const originalPrice = customFields.original_price ?? customFields.originalPrice ?? meta.original_price;
   const currency = customFields.currency ?? meta.currency ?? 'KRW';
   const vendor = customFields.vendor ?? customFields.seller_name ?? meta.vendor ?? meta.seller_name;
+  const sellerId = customFields.seller_id ?? meta.seller_id ?? '';
   const isAvailable = customFields.is_available !== false;
   const stockQuantity = customFields.stock_quantity ?? customFields.stockQuantity ?? meta.stock_quantity ?? 99;
 
@@ -79,12 +80,15 @@ export const ProductCardBlock: React.FC<ProductCardBlockProps> = ({ block, produ
 
     const event = new CustomEvent('addToCart', {
       detail: {
-        productId: id,
-        productName: title,
-        price,
+        product_id: id,
+        product_name: title,
+        seller_id: sellerId,
+        seller_name: vendor || 'Unknown Seller',
+        price: price || 0,
         currency,
         quantity: 1,
-        customFields,
+        main_image: featuredImage,
+        available_stock: stockQuantity,
       },
     });
     window.dispatchEvent(event);
@@ -96,12 +100,15 @@ export const ProductCardBlock: React.FC<ProductCardBlockProps> = ({ block, produ
 
     const event = new CustomEvent('buyNow', {
       detail: {
-        productId: id,
-        productName: title,
-        price,
+        product_id: id,
+        product_name: title,
+        seller_id: sellerId,
+        seller_name: vendor || 'Unknown Seller',
+        price: price || 0,
         currency,
         quantity: 1,
-        customFields,
+        main_image: featuredImage,
+        available_stock: stockQuantity,
       },
     });
     window.dispatchEvent(event);

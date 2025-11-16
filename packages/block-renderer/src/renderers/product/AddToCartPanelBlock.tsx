@@ -25,6 +25,8 @@ export const AddToCartPanelBlock: React.FC<BlockRendererProps> = ({ block }) => 
   const currency = customFields.currency || 'KRW';
   const stockQuantity = customFields.stock_quantity || customFields.stockQuantity || 99;
   const isAvailable = customFields.is_available !== false;
+  const seller_id = customFields.seller_id || postData.meta?.seller_id || '';
+  const seller_name = customFields.seller_name || customFields.vendor || postData.meta?.seller_name || postData.meta?.vendor || 'Unknown Seller';
 
   const [quantity, setQuantity] = useState(1);
 
@@ -62,12 +64,15 @@ export const AddToCartPanelBlock: React.FC<BlockRendererProps> = ({ block }) => 
     // Dispatch custom event that can be handled by the application
     const event = new CustomEvent('addToCart', {
       detail: {
-        productId: postData.id,
-        productName: postData.title,
+        product_id: postData.id,
+        product_name: postData.title,
+        seller_id,
+        seller_name,
         price,
         currency,
         quantity,
-        customFields,
+        main_image: postData.featuredImage,
+        available_stock: stockQuantity,
       },
     });
     window.dispatchEvent(event);
@@ -79,12 +84,15 @@ export const AddToCartPanelBlock: React.FC<BlockRendererProps> = ({ block }) => 
     // Dispatch custom event
     const event = new CustomEvent('buyNow', {
       detail: {
-        productId: postData.id,
-        productName: postData.title,
+        product_id: postData.id,
+        product_name: postData.title,
+        seller_id,
+        seller_name,
         price,
         currency,
         quantity,
-        customFields,
+        main_image: postData.featuredImage,
+        available_stock: stockQuantity,
       },
     });
     window.dispatchEvent(event);
