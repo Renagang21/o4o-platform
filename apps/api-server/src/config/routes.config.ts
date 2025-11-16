@@ -77,6 +77,7 @@ import dropshippingAdminRoutes from '../routes/admin/dropshipping.routes.js';
 import forumAdminRoutes from '../routes/admin/forum.routes.js';
 import userAdminRoutes from '../routes/admin/users.routes.js';
 import supplierAdminRoutes from '../routes/admin/suppliers.routes.js';
+import adminOrdersRoutes from '../routes/admin/orders.routes.js';
 import productsRoutes from '../routes/products.js';
 import storefrontRoutes from '../routes/storefront.routes.js';
 import partnersRoutes from '../routes/partners.js';
@@ -417,12 +418,14 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/admin/forum', standardLimiter, forumAdminRoutes);
   app.use('/api/v1/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/v1/admin/suppliers', standardLimiter, supplierAdminRoutes);
+  app.use('/api/v1/admin/orders', standardLimiter, adminOrdersRoutes);
 
   // Admin sub-routes (legacy)
   app.use('/api/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
   app.use('/api/admin/forum', standardLimiter, forumAdminRoutes);
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/admin/suppliers', standardLimiter, supplierAdminRoutes);
+  app.use('/api/admin/orders', standardLimiter, adminOrdersRoutes);
 
   // P0 RBAC - Admin Enrollment Review (Phase B)
   app.use('/api/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);

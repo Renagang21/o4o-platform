@@ -132,6 +132,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <ShoppingCart className="w-5 h-5" />,
     children: [
       { id: 'ds-products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/dropshipping/products' },
+      { id: 'ds-orders', label: '주문 관리', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/orders' },
       { id: 'ds-suppliers', label: '공급자', icon: <Store className="w-4 h-4" />, path: '/dropshipping/suppliers' },
       { id: 'ds-sellers', label: '판매자', icon: <UserCheck className="w-4 h-4" />, path: '/dropshipping/sellers' },
       { id: 'ds-partners', label: '파트너', icon: <Users className="w-4 h-4" />, path: '/dropshipping/partners' },

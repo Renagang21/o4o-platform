@@ -111,6 +111,10 @@ const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 // Dropshipping Pages
 const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 
+// Admin Order Pages (Phase 4)
+const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
+const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'));
+
 // Test Page - Minimal Editor
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
@@ -569,7 +573,23 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
+
+                    {/* Admin Order Management (Phase 4) */}
+                    <Route path="/admin/orders" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OrderListPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/orders/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OrderDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* CPT & ACF - Legacy Routes - Removed (replaced by CPT Engine) */}
                     
                     <Route path="/acf/*" element={
