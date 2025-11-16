@@ -107,11 +107,12 @@ export const ProductCardBlock: React.FC<ProductCardBlockProps> = ({ block, produ
     window.dispatchEvent(event);
   };
 
-  const aspectRatioClass = {
+  const aspectRatioMap: Record<string, string> = {
     '1:1': 'aspect-square',
     '4:3': 'aspect-[4/3]',
     '3:4': 'aspect-[3/4]',
-  }[imageAspectRatio] || 'aspect-square';
+  };
+  const aspectRatioClass = aspectRatioMap[imageAspectRatio] || 'aspect-square';
 
   return (
     <article
