@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 interface ScrollToTopSettings {
   enabled: boolean;
@@ -31,7 +31,7 @@ export const useScrollToTopSettings = () => {
     const fetchSettings = async () => {
       try {
         // Get settings from new API endpoint
-        const response = await apiClient.get('/customizer/scroll-to-top');
+        const response = await cookieAuthClient.api.get('/customizer/scroll-to-top');
 
         // Extract data from API response (format: { success: true, data: {...} })
         if (response.data?.success && response.data?.data) {

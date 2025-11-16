@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { ButtonVariants, ButtonStyleSettings } from '@/types/customizer-types';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 // Default button style
 const defaultButtonStyle: ButtonStyleSettings = {
@@ -68,7 +68,7 @@ export const useButtonSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const response = await apiClient.get('/customizer/button-settings');
+        const response = await cookieAuthClient.api.get('/customizer/button-settings');
 
         // Extract data from API response (format: { success: true, data: {...} })
         if (!response.data?.success || !response.data?.data) {

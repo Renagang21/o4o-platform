@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { apiClient as api } from '../../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { metaApi, MetaItemResponse } from '../../services/metaApi';
 
 interface CPTPost {
@@ -50,7 +50,7 @@ const CPTArchive: React.FC = () => {
   useEffect(() => {
     const fetchCPTInfo = async () => {
       try {
-        const response = await api.get(`/cpt/types/${cptSlug}`);
+        const response = await cookieAuthClient.api.get(`/cpt/types/${cptSlug}`);
         const cptData = response.data;
         
         // Check if this CPT has archive enabled
@@ -89,7 +89,7 @@ const CPTArchive: React.FC = () => {
           order: 'DESC'
         });
 
-        const response = await api.get(`/cpt/${cptSlug}/posts?${params}`);
+        const response = await cookieAuthClient.api.get(`/cpt/${cptSlug}/posts?${params}`);
 
         if (response.data.success) {
           const fetchedPosts = response.data.data || [];

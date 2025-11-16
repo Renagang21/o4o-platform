@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import PageRenderer from '../components/PageRenderer';
 import Layout from '../components/layout/Layout';
 
@@ -31,13 +31,13 @@ interface Page {
 
 // Fetch homepage settings
 const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
-  const response = await apiClient.get('/settings/homepage');
+  const response = await cookieAuthClient.api.get('/settings/homepage');
   return response.data;
 };
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  const response = await apiClient.get(`/pages/${pageId}`);
+  const response = await cookieAuthClient.api.get(`/pages/${pageId}`);
   const page = (response.data && (response.data.data || response.data)) as Page;
 
   if (!page || !page.id) {

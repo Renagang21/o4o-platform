@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { apiClient as api } from '../../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { renderShortcodes } from '@o4o/shortcodes';
 
 interface Template {
@@ -45,7 +45,7 @@ const TemplateArchive: React.FC = () => {
     const fetchTemplate = async () => {
       try {
         // Try to find an archive template for this CPT
-        const response = await api.get(`/templates`, {
+        const response = await cookieAuthClient.api.get(`/templates`, {
           params: {
             type: 'archive',
             postType: cptSlug,
@@ -57,7 +57,7 @@ const TemplateArchive: React.FC = () => {
           setTemplate(response.data.data[0]);
         } else {
           // Try to find a generic archive template
-          const genericResponse = await api.get(`/templates`, {
+          const genericResponse = await cookieAuthClient.api.get(`/templates`, {
             params: {
               type: 'archive',
               status: 'active'
@@ -92,7 +92,7 @@ const TemplateArchive: React.FC = () => {
           order: 'DESC'
         });
 
-        const response = await api.get(`/cpt/${cptSlug}/posts?${params}`);
+        const response = await cookieAuthClient.api.get(`/cpt/${cptSlug}/posts?${params}`);
         
         if (response.data.success) {
           setPosts(response.data.data || []);
