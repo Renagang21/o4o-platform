@@ -87,6 +87,9 @@ export class Order {
   @JoinColumn({ name: 'buyerId' })
   buyer: User;
 
+  @OneToMany('OrderEvent', 'order')
+  events: any[];
+
   @Column({ nullable: true })
   buyerType: string; // UserRole
 
@@ -142,6 +145,9 @@ export class Order {
   // Shipping & tracking
   @Column({ nullable: true })
   shippingMethod: string;
+
+  @Column({ nullable: true })
+  shippingCarrier: string;
 
   @Column({ nullable: true })
   trackingNumber: string;

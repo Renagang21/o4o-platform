@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Package, User, MapPin, CreditCard, Calendar, FileText } from 'lucide-react';
+import { ArrowLeft, Package, User, MapPin, CreditCard, Calendar, FileText, Truck, Edit2, Check, X } from 'lucide-react';
 
 /**
- * Admin Order Detail Page (Phase 4)
+ * Admin Order Detail Page (Phase 5)
  *
- * Administrator/Operator only page for viewing order details
- * Read-only (no status changes in Phase 4)
+ * Administrator/Operator page for viewing and managing order details
+ * - View order details
+ * - Change order status
+ * - Update shipping information
+ * - View order timeline/events
  */
 
 interface OrderItem {
@@ -38,6 +41,17 @@ interface Address {
   country: string;
 }
 
+interface OrderEvent {
+  id: string;
+  type: string;
+  prevStatus?: string;
+  newStatus?: string;
+  message: string;
+  actorName?: string;
+  actorRole?: string;
+  createdAt: string;
+}
+
 interface Order {
   id: string;
   orderNumber: string;
@@ -49,7 +63,7 @@ interface Order {
   shippingAddress: Address;
   summary: {
     subtotal: number;
-    shippingFee: number;
+    shipping: number;
     tax: number;
     discount: number;
     total: number;
@@ -57,17 +71,31 @@ interface Order {
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
   paymentMethod: 'card' | 'bank_transfer' | 'virtual_account' | 'cash';
   paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
-  paidAt: string | null;
+  shippingCarrier?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+  paymentDate: string | null;
   customerNotes: string;
-  internalNotes: string;
+  adminNotes: string;
   createdAt: string;
   updatedAt: string;
+  events?: OrderEvent[];
 }
 
 interface OrderResponse {
   success: boolean;
   data: Order;
 }
+
+const ORDER_STATUSES = [
+  { value: 'pending', label: '대기' },
+  { value: 'confirmed', label: '확인' },
+  { value: 'processing', label: '처리중' },
+  { value: 'shipped', label: '배송중' },
+  { value: 'delivered', label: '배송완료' },
+  { value: 'cancelled', label: '취소' },
+  { value: 'returned', label: '반품' }
+];
 
 const OrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -76,11 +104,36 @@ const OrderDetailPage: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Status change state
+  const [showStatusChange, setShowStatusChange] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
+  const [statusChanging, setStatusChanging] = useState(false);
+
+  // Shipping edit state
+  const [editingShipping, setEditingShipping] = useState(false);
+  const [shippingData, setShippingData] = useState({
+    shippingCarrier: '',
+    trackingNumber: '',
+    trackingUrl: ''
+  });
+  const [shippingUpdating, setShippingUpdating] = useState(false);
+
   useEffect(() => {
     if (id) {
       fetchOrder();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (order) {
+      setShippingData({
+        shippingCarrier: order.shippingCarrier || '',
+        trackingNumber: order.trackingNumber || '',
+        trackingUrl: order.trackingUrl || ''
+      });
+    }
+  }, [order]);
 
   const fetchOrder = async () => {
     try {
@@ -101,6 +154,57 @@ const OrderDetailPage: React.FC = () => {
       navigate('/admin/orders');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async () => {
+    if (!newStatus || !order) return;
+
+    try {
+      setStatusChanging(true);
+      const response = await authClient.api.patch(
+        `/api/v1/admin/orders/${order.id}/status`,
+        {
+          status: newStatus,
+          message: statusMessage || undefined
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('주문 상태가 변경되었습니다');
+        setShowStatusChange(false);
+        setNewStatus('');
+        setStatusMessage('');
+        await fetchOrder(); // Refresh order data
+      }
+    } catch (error: any) {
+      console.error('Error updating status:', error);
+      toast.error(error.response?.data?.message || '상태 변경 중 오류가 발생했습니다');
+    } finally {
+      setStatusChanging(false);
+    }
+  };
+
+  const handleShippingUpdate = async () => {
+    if (!order) return;
+
+    try {
+      setShippingUpdating(true);
+      const response = await authClient.api.patch(
+        `/api/v1/admin/orders/${order.id}/shipping`,
+        shippingData
+      );
+
+      if (response.data.success) {
+        toast.success('배송 정보가 업데이트되었습니다');
+        setEditingShipping(false);
+        await fetchOrder(); // Refresh order data
+      }
+    } catch (error: any) {
+      console.error('Error updating shipping:', error);
+      toast.error(error.response?.data?.message || '배송 정보 업데이트 중 오류가 발생했습니다');
+    } finally {
+      setShippingUpdating(false);
     }
   };
 
@@ -228,9 +332,85 @@ const OrderDetailPage: React.FC = () => {
           <div className="flex items-center gap-3">
             {getStatusBadge(order.status)}
             {getPaymentStatusBadge(order.paymentStatus)}
+            <button
+              onClick={() => setShowStatusChange(!showStatusChange)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
+              <Edit2 className="w-4 h-4" />
+              상태 변경
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Status Change Section */}
+      {showStatusChange && (
+        <div className="mb-6 bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold mb-4">주문 상태 변경</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                새 상태
+              </label>
+              <select
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">상태 선택...</option>
+                {ORDER_STATUSES.map((status) => (
+                  <option key={status.value} value={status.value}>
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                메모 (선택사항)
+              </label>
+              <input
+                type="text"
+                value={statusMessage}
+                onChange={(e) => setStatusMessage(e.target.value)}
+                placeholder="상태 변경 사유..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={handleStatusChange}
+              disabled={!newStatus || statusChanging}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {statusChanging ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  처리중...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  변경 적용
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => {
+                setShowStatusChange(false);
+                setNewStatus('');
+                setStatusMessage('');
+              }}
+              disabled={statusChanging}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+            >
+              <X className="w-4 h-4 inline mr-1" />
+              취소
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
@@ -298,7 +478,7 @@ const OrderDetailPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">배송비</span>
-                  <span className="font-medium">{formatCurrency(order.summary.shippingFee)}</span>
+                  <span className="font-medium">{formatCurrency(order.summary.shipping)}</span>
                 </div>
                 {order.summary.tax > 0 && (
                   <div className="flex justify-between text-sm">
@@ -321,7 +501,7 @@ const OrderDetailPage: React.FC = () => {
           </div>
 
           {/* Notes */}
-          {(order.customerNotes || order.internalNotes) && (
+          {(order.customerNotes || order.adminNotes) && (
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2" />
@@ -333,10 +513,10 @@ const OrderDetailPage: React.FC = () => {
                   <p className="text-sm text-gray-600 p-3 bg-gray-50 rounded">{order.customerNotes}</p>
                 </div>
               )}
-              {order.internalNotes && (
+              {order.adminNotes && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-1">내부 메모</h3>
-                  <p className="text-sm text-gray-600 p-3 bg-yellow-50 rounded">{order.internalNotes}</p>
+                  <p className="text-sm text-gray-600 p-3 bg-yellow-50 rounded">{order.adminNotes}</p>
                 </div>
               )}
             </div>
@@ -365,6 +545,120 @@ const OrderDetailPage: React.FC = () => {
                 <span className="ml-2 font-medium">{order.shippingAddress.phone}</span>
               </div>
             </div>
+          </div>
+
+          {/* Shipping Info - Phase 5 */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                <Truck className="w-5 h-5 mr-2" />
+                배송 정보
+              </h2>
+              {!editingShipping && (
+                <button
+                  onClick={() => setEditingShipping(true)}
+                  className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  수정
+                </button>
+              )}
+            </div>
+
+            {editingShipping ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    택배사
+                  </label>
+                  <input
+                    type="text"
+                    value={shippingData.shippingCarrier}
+                    onChange={(e) => setShippingData({ ...shippingData, shippingCarrier: e.target.value })}
+                    placeholder="CJ대한통운, 로젠택배 등"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    운송장 번호
+                  </label>
+                  <input
+                    type="text"
+                    value={shippingData.trackingNumber}
+                    onChange={(e) => setShippingData({ ...shippingData, trackingNumber: e.target.value })}
+                    placeholder="운송장 번호"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    추적 URL (선택)
+                  </label>
+                  <input
+                    type="url"
+                    value={shippingData.trackingUrl}
+                    onChange={(e) => setShippingData({ ...shippingData, trackingUrl: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={handleShippingUpdate}
+                    disabled={shippingUpdating}
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {shippingUpdating ? '저장중...' : '저장'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingShipping(false);
+                      setShippingData({
+                        shippingCarrier: order.shippingCarrier || '',
+                        trackingNumber: order.trackingNumber || '',
+                        trackingUrl: order.trackingUrl || ''
+                      });
+                    }}
+                    disabled={shippingUpdating}
+                    className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-md hover:bg-gray-300"
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2 text-sm">
+                {order.shippingCarrier ? (
+                  <>
+                    <div>
+                      <span className="text-gray-600">택배사:</span>
+                      <span className="ml-2 font-medium">{order.shippingCarrier}</span>
+                    </div>
+                    {order.trackingNumber && (
+                      <div>
+                        <span className="text-gray-600">운송장:</span>
+                        <span className="ml-2 font-medium">{order.trackingNumber}</span>
+                      </div>
+                    )}
+                    {order.trackingUrl && (
+                      <div>
+                        <a
+                          href={order.trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          배송 추적 →
+                        </a>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-gray-500 text-sm">배송 정보 없음</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Shipping Address */}
@@ -405,30 +699,54 @@ const OrderDetailPage: React.FC = () => {
                 <span className="text-gray-600">결제 상태:</span>
                 <span className="ml-2">{getPaymentStatusBadge(order.paymentStatus)}</span>
               </div>
-              {order.paidAt && (
+              {order.paymentDate && (
                 <div>
                   <span className="text-gray-600">결제 일시:</span>
-                  <span className="ml-2 font-medium">{formatDate(order.paidAt)}</span>
+                  <span className="ml-2 font-medium">{formatDate(order.paymentDate)}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Order Timeline */}
+          {/* Order Timeline - Phase 5 */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <Calendar className="w-5 h-5 mr-2" />
               주문 이력
             </h2>
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="text-gray-600">주문 일시:</span>
-                <div className="font-medium mt-1">{formatDate(order.createdAt)}</div>
-              </div>
-              <div>
-                <span className="text-gray-600">최종 수정:</span>
-                <div className="font-medium mt-1">{formatDate(order.updatedAt)}</div>
-              </div>
+            <div className="space-y-4">
+              {order.events && order.events.length > 0 ? (
+                <div className="space-y-3">
+                  {order.events.map((event) => (
+                    <div key={event.id} className="border-l-2 border-blue-500 pl-3 pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{event.message}</p>
+                          {event.actorName && (
+                            <p className="text-xs text-gray-500">
+                              {event.actorName} {event.actorRole && `(${event.actorRole})`}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {formatDate(event.createdAt)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="text-gray-600">주문 일시:</span>
+                    <div className="font-medium mt-1">{formatDate(order.createdAt)}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">최종 수정:</span>
+                    <div className="font-medium mt-1">{formatDate(order.updatedAt)}</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { param, query } from 'express-validator';
+import { param, query, body } from 'express-validator';
 import { AdminOrderController } from '../../controllers/AdminOrderController.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { checkRole } from '../../middleware/checkRole.js';
@@ -153,5 +153,115 @@ router.get('/stats/summary', asyncHandler(adminOrderController.getOrderStats));
  *         description: Forbidden
  */
 router.get('/:id', validateOrderId, asyncHandler(adminOrderController.getOrder));
+
+// Validation for status update
+const validateStatusUpdate = [
+  param('id').isUUID().withMessage('Order ID must be a valid UUID'),
+  body('status').isIn(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])
+    .withMessage('Invalid status'),
+  body('message').optional().isString().withMessage('Message must be a string')
+];
+
+/**
+ * @swagger
+ * /api/v1/admin/orders/{id}/status:
+ *   patch:
+ *     summary: Update order status (admin only - Phase 5)
+ *     tags: [Admin - Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, confirmed, processing, shipped, delivered, cancelled, returned]
+ *               message:
+ *                 type: string
+ *                 description: Optional message about the status change
+ *     responses:
+ *       200:
+ *         description: Order status updated successfully
+ *       400:
+ *         description: Invalid status or transition not allowed
+ *       404:
+ *         description: Order not found
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
+router.patch('/:id/status', validateStatusUpdate, asyncHandler(adminOrderController.updateStatus));
+
+// Validation for shipping update
+const validateShippingUpdate = [
+  param('id').isUUID().withMessage('Order ID must be a valid UUID'),
+  body('shippingCarrier').optional().isString().withMessage('Shipping carrier must be a string'),
+  body('trackingNumber').optional().isString().withMessage('Tracking number must be a string'),
+  body('trackingUrl').optional().isURL().withMessage('Tracking URL must be a valid URL'),
+  body('message').optional().isString().withMessage('Message must be a string')
+];
+
+/**
+ * @swagger
+ * /api/v1/admin/orders/{id}/shipping:
+ *   patch:
+ *     summary: Update shipping information (admin only - Phase 5)
+ *     tags: [Admin - Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               shippingCarrier:
+ *                 type: string
+ *                 description: Shipping carrier name (e.g., "CJ대한통운", "로젠택배")
+ *               trackingNumber:
+ *                 type: string
+ *                 description: Tracking/invoice number
+ *               trackingUrl:
+ *                 type: string
+ *                 format: url
+ *                 description: Tracking URL
+ *               message:
+ *                 type: string
+ *                 description: Optional message about the shipping update
+ *     responses:
+ *       200:
+ *         description: Shipping information updated successfully
+ *       404:
+ *         description: Order not found
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
+router.patch('/:id/shipping', validateShippingUpdate, asyncHandler(adminOrderController.updateShipping));
 
 export default router;

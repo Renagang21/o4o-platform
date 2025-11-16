@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, Address, OrderSummary } from '../entities/Order.js';
+import { OrderEvent, OrderEventType, OrderEventPayload } from '../entities/OrderEvent.js';
 import { User } from '../entities/User.js';
 import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
@@ -49,6 +50,7 @@ export interface OrderFilters {
 
 export class OrderService {
   private orderRepository: Repository<Order>;
+  private orderEventRepository: Repository<OrderEvent>;
   private userRepository: Repository<User>;
   private cartRepository: Repository<Cart>;
   private cartItemRepository: Repository<CartItem>;
@@ -58,6 +60,7 @@ export class OrderService {
 
   constructor() {
     this.orderRepository = AppDataSource.getRepository(Order);
+    this.orderEventRepository = AppDataSource.getRepository(OrderEvent);
     this.userRepository = AppDataSource.getRepository(User);
     this.cartRepository = AppDataSource.getRepository(Cart);
     this.cartItemRepository = AppDataSource.getRepository(CartItem);
@@ -107,6 +110,20 @@ export class OrderService {
       order.paymentStatus = PaymentStatus.PENDING;
 
       const savedOrder = await queryRunner.manager.save(Order, order);
+
+      // Create ORDER_CREATED event
+      await this.createOrderEvent(
+        queryRunner.manager,
+        savedOrder.id,
+        OrderEventType.ORDER_CREATED,
+        {
+          message: `Order created by ${buyer.name}`,
+          actorId: buyerId,
+          actorName: buyer.name,
+          actorRole: buyer.role,
+          source: 'web'
+        }
+      );
 
       await queryRunner.commitTransaction();
 
@@ -293,15 +310,29 @@ export class OrderService {
   }
 
   /**
-   * Update order status
+   * Update order status (Phase 5: with event tracking)
    */
-  async updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order> {
+  async updateOrderStatus(
+    orderId: string,
+    status: OrderStatus,
+    options?: {
+      actorId?: string;
+      actorName?: string;
+      actorRole?: string;
+      message?: string;
+      source?: string;
+    }
+  ): Promise<Order> {
     const order = await this.orderRepository.findOne({ where: { id: orderId } });
-    
+
     if (!order) {
       throw new Error('Order not found');
     }
 
+    // Check if transition is allowed
+    this.validateStatusTransition(order.status, status);
+
+    const prevStatus = order.status;
     order.status = status;
 
     // Update timestamp based on status
@@ -322,8 +353,25 @@ export class OrderService {
 
     const savedOrder = await this.orderRepository.save(order);
 
+    // Create status change event
+    await this.createOrderEvent(
+      this.orderEventRepository.manager,
+      orderId,
+      OrderEventType.STATUS_CHANGE,
+      {
+        prevStatus,
+        newStatus: status,
+        message: options?.message || `Status changed from ${prevStatus} to ${status}`,
+        actorId: options?.actorId,
+        actorName: options?.actorName,
+        actorRole: options?.actorRole,
+        source: options?.source || 'admin'
+      }
+    );
+
     logger.info(`Order status updated: ${order.orderNumber}`, {
       orderId,
+      prevStatus,
       newStatus: status
     });
 
@@ -654,12 +702,149 @@ export class OrderService {
       await this.partnerRepository.save(partner);
 
       logger.info(`Referral click tracked: ${referralCode}`, metadata);
-      
+
       return true;
 
     } catch (error) {
       logger.error('Error tracking referral click:', error);
       return false;
     }
+  }
+
+  /**
+   * Update shipping information (Phase 5)
+   */
+  async updateOrderShipping(
+    orderId: string,
+    shippingInfo: {
+      shippingCarrier?: string;
+      trackingNumber?: string;
+      trackingUrl?: string;
+    },
+    options?: {
+      actorId?: string;
+      actorName?: string;
+      actorRole?: string;
+      message?: string;
+      source?: string;
+    }
+  ): Promise<Order> {
+    const order = await this.orderRepository.findOne({ where: { id: orderId } });
+
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    // Update shipping fields
+    if (shippingInfo.shippingCarrier !== undefined) {
+      order.shippingCarrier = shippingInfo.shippingCarrier;
+    }
+    if (shippingInfo.trackingNumber !== undefined) {
+      order.trackingNumber = shippingInfo.trackingNumber;
+    }
+    if (shippingInfo.trackingUrl !== undefined) {
+      order.trackingUrl = shippingInfo.trackingUrl;
+    }
+
+    const savedOrder = await this.orderRepository.save(order);
+
+    // Create shipping update event
+    await this.createOrderEvent(
+      this.orderEventRepository.manager,
+      orderId,
+      OrderEventType.SHIPPING_UPDATE,
+      {
+        message: options?.message || 'Shipping information updated',
+        actorId: options?.actorId,
+        actorName: options?.actorName,
+        actorRole: options?.actorRole,
+        source: options?.source || 'admin',
+        payload: shippingInfo
+      }
+    );
+
+    logger.info(`Shipping information updated: ${order.orderNumber}`, {
+      orderId,
+      shippingInfo
+    });
+
+    return savedOrder;
+  }
+
+  /**
+   * Get order with events (Phase 5)
+   */
+  async getOrderWithEvents(orderId: string, buyerId?: string): Promise<Order> {
+    const query = this.orderRepository.createQueryBuilder('order')
+      .leftJoinAndSelect('order.buyer', 'buyer')
+      .leftJoinAndSelect('order.events', 'events')
+      .where('order.id = :orderId', { orderId });
+
+    if (buyerId) {
+      query.andWhere('order.buyerId = :buyerId', { buyerId });
+    }
+
+    // Order events by creation time
+    query.orderBy('events.createdAt', 'ASC');
+
+    const order = await query.getOne();
+
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    return order;
+  }
+
+  /**
+   * Create order event (helper method - Phase 5)
+   */
+  private async createOrderEvent(
+    manager: any,
+    orderId: string,
+    type: OrderEventType,
+    data: {
+      prevStatus?: OrderStatus | string;
+      newStatus?: OrderStatus | string;
+      message?: string;
+      actorId?: string;
+      actorName?: string;
+      actorRole?: string;
+      source?: string;
+      payload?: OrderEventPayload;
+    }
+  ): Promise<OrderEvent> {
+    const event = this.orderEventRepository.create({
+      orderId,
+      type,
+      prevStatus: data.prevStatus,
+      newStatus: data.newStatus,
+      message: data.message,
+      actorId: data.actorId,
+      actorName: data.actorName,
+      actorRole: data.actorRole,
+      source: data.source || 'system',
+      payload: data.payload
+    });
+
+    return await manager.save(OrderEvent, event);
+  }
+
+  /**
+   * Validate status transition (helper method - Phase 5)
+   */
+  private validateStatusTransition(currentStatus: OrderStatus, newStatus: OrderStatus): void {
+    // Terminal statuses cannot be changed
+    const terminalStatuses = [OrderStatus.CANCELLED, OrderStatus.RETURNED];
+    if (terminalStatuses.includes(currentStatus)) {
+      throw new Error(`Cannot change status from ${currentStatus}`);
+    }
+
+    // Delivered orders can only be returned
+    if (currentStatus === OrderStatus.DELIVERED && newStatus !== OrderStatus.RETURNED) {
+      throw new Error('Delivered orders can only be returned');
+    }
+
+    // Add more business rules as needed
   }
 }
