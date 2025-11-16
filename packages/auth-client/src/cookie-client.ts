@@ -103,7 +103,14 @@ export class CookieAuthClient {
 
   async refreshToken(): Promise<boolean> {
     try {
-      const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh');
+      const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh', {}, {
+        validateStatus: (status) => status === 200 || status === 401
+      });
+
+      if (response.status === 401) {
+        return false;
+      }
+
       return response.data.success;
     } catch (error) {
       return false;
@@ -112,7 +119,14 @@ export class CookieAuthClient {
 
   async getCurrentUser(): Promise<MeResponse | null> {
     try {
-      const response = await this.api.get('/auth/cookie/me');
+      const response = await this.api.get('/auth/cookie/me', {
+        validateStatus: (status) => status === 200 || status === 401
+      });
+
+      if (response.status === 401) {
+        return null;
+      }
+
       return response.data;
     } catch (error) {
       return null;
