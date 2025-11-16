@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/services/api';
+import { authClient } from '@o4o/auth-client';
 import {
   Dialog,
   DialogContent,
@@ -201,7 +201,7 @@ const WordPressPluginManager: FC = () => {
     queryKey: ['plugins'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/apps/plugins');
+        const response = await authClient.api.get('/apps/plugins');
         return response.data.data || pluginsList;
       } catch {
         return pluginsList;
@@ -212,7 +212,7 @@ const WordPressPluginManager: FC = () => {
   // 플러그인 활성화/비활성화
   const togglePlugin = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return apiClient.put(`/apps/plugins/${id}/toggle`, { isActive });
+      return authClient.api.put(`/apps/plugins/${id}/toggle`, { isActive });
     },
     onSuccess: (_, variables) => {
       const action = variables.isActive ? '활성화' : '비활성화';
@@ -227,7 +227,7 @@ const WordPressPluginManager: FC = () => {
   // 플러그인 삭제
   const deletePlugin = useMutation({
     mutationFn: async (id: string) => {
-      return apiClient.delete(`/apps/plugins/${id}`);
+      return authClient.api.delete(`/apps/plugins/${id}`);
     },
     onSuccess: () => {
       toast.success('플러그인이 삭제되었습니다.');
