@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { apiClient } from '@/services/api';
+import { authClient } from '@o4o/auth-client';
 import { 
   Link2, 
   Mail, 
@@ -69,7 +69,7 @@ export const AccountLinkingCard: React.FC<AccountLinkingCardProps> = ({ onSucces
 
     setLoading(true);
     try {
-      const response = await apiClient.post('/auth/accounts/link/email', {
+      const response = await authClient.api.post('/auth/accounts/link/email', {
         email: emailForm.email,
         password: emailForm.password
       });

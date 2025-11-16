@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getPageContext } from '../utils/context-detector';
 import { useLocation } from 'react-router';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 interface MenuItem {
   id: string;
@@ -76,7 +76,7 @@ export function useMenu(options: UseMenuOptions): UseMenuResult {
         params.path = finalPath;
       }
 
-      const response = await apiClient.get(`/menus/location/${location}`, { params });
+      const response = await cookieAuthClient.api.get(`/menus/location/${location}`, { params });
 
       if (!response.data?.success || !response.data?.data) {
         throw new Error(response.data?.message || 'Failed to fetch menu');

@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { apiClient } from '@/services/api';
+import { authClient } from '@o4o/auth-client';
 import { 
   Shield, 
   Mail, 
@@ -69,7 +69,7 @@ export const LinkedAccountsManager: React.FC = () => {
 
   const fetchLinkedAccounts = async () => {
     try {
-      const response = await apiClient.get('/auth/accounts/linked');
+      const response = await authClient.api.get('/auth/accounts/linked');
       if (response.data.success) {
         setLinkedAccounts(response.data.data.linkedAccounts);
       }
@@ -89,7 +89,7 @@ export const LinkedAccountsManager: React.FC = () => {
 
     setUnlinking(true);
     try {
-      const response = await apiClient.post('/auth/accounts/unlink', {
+      const response = await authClient.api.post('/auth/accounts/unlink', {
         provider: unlinkDialog.account.provider,
         verification: {
           method: 'password',
@@ -119,7 +119,7 @@ export const LinkedAccountsManager: React.FC = () => {
 
   const handleSetPrimary = async (accountId: string) => {
     try {
-      const response = await apiClient.post('/auth/accounts/set-primary', { accountId });
+      const response = await authClient.api.post('/auth/accounts/set-primary', { accountId });
       if (response.data.success) {
         toast({
           title: '성공',

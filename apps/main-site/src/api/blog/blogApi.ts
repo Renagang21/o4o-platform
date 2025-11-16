@@ -3,7 +3,7 @@
  * Handles all blog-related API calls
  */
 
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { PostItem, BlogSettings } from '@/types/customizer-types';
 
 // API Response Types
@@ -76,93 +76,93 @@ export interface UpdatePostData extends Partial<CreatePostData> {
 export const blogAPI = {
   // Get blog posts with filtering and pagination
   getPosts: (params?: BlogPostsParams) =>
-    apiClient.get<BlogPostsResponse>('/blog/posts', { params }),
+    cookieAuthClient.api.get<BlogPostsResponse>('/blog/posts', { params }),
 
   // Get a single blog post by ID or slug
   getPost: (identifier: string) =>
-    apiClient.get<BlogPostResponse>(`/v1/blog/posts/${identifier}`),
+    cookieAuthClient.api.get<BlogPostResponse>(`/v1/blog/posts/${identifier}`),
 
   // Get blog customizer settings
   getSettings: () =>
-    apiClient.get<BlogSettingsResponse>('/blog/settings'),
+    cookieAuthClient.api.get<BlogSettingsResponse>('/blog/settings'),
 
   // Update blog customizer settings (admin only)
   updateSettings: (settings: BlogSettings) =>
-    apiClient.put<BlogSettingsResponse>('/blog/settings', { settings }),
+    cookieAuthClient.api.put<BlogSettingsResponse>('/blog/settings', { settings }),
 
   // Create a new blog post (admin only)
   createPost: (data: CreatePostData) =>
-    apiClient.post<BlogPostResponse>('/blog/posts', data),
+    cookieAuthClient.api.post<BlogPostResponse>('/blog/posts', data),
 
   // Update an existing blog post (admin only)
   updatePost: (data: UpdatePostData) =>
-    apiClient.put<BlogPostResponse>(`/v1/blog/posts/${data.id}`, data),
+    cookieAuthClient.api.put<BlogPostResponse>(`/v1/blog/posts/${data.id}`, data),
 
   // Delete a blog post (admin only)
   deletePost: (id: string) =>
-    apiClient.delete(`/v1/blog/posts/${id}`),
+    cookieAuthClient.api.delete(`/v1/blog/posts/${id}`),
 
   // Get blog categories
   getCategories: () =>
-    apiClient.get('/blog/categories'),
+    cookieAuthClient.api.get('/blog/categories'),
 
   // Get blog tags
   getTags: () =>
-    apiClient.get('/blog/tags'),
+    cookieAuthClient.api.get('/blog/tags'),
 
   // Get popular posts
   getPopularPosts: (limit: number = 5) =>
-    apiClient.get<BlogPostsResponse>('/blog/posts/popular', { 
-      params: { limit } 
+    cookieAuthClient.api.get<BlogPostsResponse>('/blog/posts/popular', {
+      params: { limit }
     }),
 
   // Get recent posts
   getRecentPosts: (limit: number = 5) =>
-    apiClient.get<BlogPostsResponse>('/blog/posts/recent', { 
-      params: { limit } 
+    cookieAuthClient.api.get<BlogPostsResponse>('/blog/posts/recent', {
+      params: { limit }
     }),
 
   // Get related posts for a specific post
   getRelatedPosts: (postId: string, limit: number = 3) =>
-    apiClient.get<BlogPostsResponse>(`/v1/blog/posts/${postId}/related`, { 
-      params: { limit } 
+    cookieAuthClient.api.get<BlogPostsResponse>(`/v1/blog/posts/${postId}/related`, {
+      params: { limit }
     }),
 
   // Search posts
   searchPosts: (query: string, params?: Omit<BlogPostsParams, 'search'>) =>
-    apiClient.get<BlogPostsResponse>('/blog/posts/search', { 
-      params: { search: query, ...params } 
+    cookieAuthClient.api.get<BlogPostsResponse>('/blog/posts/search', {
+      params: { search: query, ...params }
     }),
 
   // Get posts by category
   getPostsByCategory: (categorySlug: string, params?: Omit<BlogPostsParams, 'category'>) =>
-    apiClient.get<BlogPostsResponse>(`/v1/blog/categories/${categorySlug}/posts`, { 
-      params 
+    cookieAuthClient.api.get<BlogPostsResponse>(`/v1/blog/categories/${categorySlug}/posts`, {
+      params
     }),
 
   // Get posts by tag
   getPostsByTag: (tagSlug: string, params?: Omit<BlogPostsParams, 'tag'>) =>
-    apiClient.get<BlogPostsResponse>(`/v1/blog/tags/${tagSlug}/posts`, { 
-      params 
+    cookieAuthClient.api.get<BlogPostsResponse>(`/v1/blog/tags/${tagSlug}/posts`, {
+      params
     }),
 
   // Get posts by author
   getPostsByAuthor: (authorId: string, params?: Omit<BlogPostsParams, 'author'>) =>
-    apiClient.get<BlogPostsResponse>(`/v1/blog/authors/${authorId}/posts`, { 
-      params 
+    cookieAuthClient.api.get<BlogPostsResponse>(`/v1/blog/authors/${authorId}/posts`, {
+      params
     }),
 
   // Increment post view count
   incrementViewCount: (postId: string) =>
-    apiClient.post(`/v1/blog/posts/${postId}/view`),
+    cookieAuthClient.api.post(`/v1/blog/posts/${postId}/view`),
 
   // Get blog archive data (posts grouped by date)
   getArchive: () =>
-    apiClient.get('/blog/archive'),
+    cookieAuthClient.api.get('/blog/archive'),
 
   // Get blog statistics (admin only)
   getStats: () =>
-    apiClient.get('/blog/stats')
+    cookieAuthClient.api.get('/blog/stats')
 };
 
 // Export default

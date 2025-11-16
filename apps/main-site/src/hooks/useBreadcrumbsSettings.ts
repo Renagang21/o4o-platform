@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { BreadcrumbsSettings } from '@/types/customizer-types';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 // Default breadcrumbs settings
 const defaultSettings: BreadcrumbsSettings = {
@@ -40,7 +40,7 @@ export const useBreadcrumbsSettings = () => {
         setIsLoading(true);
 
         // Fetch from new API endpoint
-        const response = await apiClient.get('/customizer/breadcrumbs-settings');
+        const response = await cookieAuthClient.api.get('/customizer/breadcrumbs-settings');
 
         // Extract data from API response (format: { success: true, data: {...} })
         if (!response.data?.success || !response.data?.data) {

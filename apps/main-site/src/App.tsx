@@ -4,7 +4,6 @@ import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
 import { useAuth } from './contexts/AuthContext';
-import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -114,9 +113,7 @@ const RedirectToAdmin: FC = () => {
 
 const App: FC = () => {
   useEffect(() => {
-    // Initialize auth interceptor
-    initializeAuthInterceptor();
-
+    // Note: Auth interceptors are handled by @o4o/auth-client
     // Note: Auth status check is handled by AuthContext on mount
     // No need to call checkAuthStatus here to avoid duplicate API calls
   }, []);

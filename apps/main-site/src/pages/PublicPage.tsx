@@ -6,7 +6,7 @@
 import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import PageRenderer from '../components/PageRenderer';
 import Layout from '../components/layout/Layout';
 import { ArrowLeft } from 'lucide-react';
@@ -50,7 +50,7 @@ interface PageResponse {
 const fetchPageBySlug = async (slug: string): Promise<PageData> => {
   // Use new unified slug endpoint that searches all content types
   // apiClient baseURL is /api, and public routes are at /api/public
-  const response = await apiClient.get(`/public/content/slug/${slug}`);
+  const response = await cookieAuthClient.api.get(`/public/content/slug/${slug}`);
 
   // API returns {success: true, data: {...}} format
   const apiResponse = response.data as PageResponse;

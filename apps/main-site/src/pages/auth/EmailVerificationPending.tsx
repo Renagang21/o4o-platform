@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { Button } from '@o4o/ui';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/ui';
 import { Alert, AlertDescription } from '@o4o/ui';
@@ -37,7 +37,7 @@ export const EmailVerificationPending: FC = () => {
     setResendSuccess(false);
 
     try {
-      const response = await apiClient.post<ResendResponse>('/auth/v2/resend-verification', {
+      const response = await cookieAuthClient.api.post<ResendResponse>('/auth/v2/resend-verification', {
         email
       });
 

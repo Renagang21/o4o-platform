@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { apiClient } from '../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { BlockRenderer } from '@o4o/block-renderer';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
 import AccessDeniedMessage from '../components/common/AccessDeniedMessage';
@@ -30,7 +30,7 @@ export default function PostDetail() {
       setError(null);
       try {
         // Use public API for both slug and ID lookups
-        const res = await apiClient.get(`/public/posts/post/${encodeURIComponent(slugOrId)}`);
+        const res = await cookieAuthClient.api.get(`/public/posts/post/${encodeURIComponent(slugOrId)}`);
         const fetched = res.data?.data || res.data;
 
         if (!active) return;

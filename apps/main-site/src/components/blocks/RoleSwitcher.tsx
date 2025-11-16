@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Check } from 'lucide-react';
 import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
-import { authAPI } from '../../services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { trackRoleSwitch } from '../../utils/analytics';
 
@@ -83,7 +83,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
       setIsSwitching(true);
 
       // API 호출 - PATCH /user/preferences
-      const response = await authAPI.updatePreferences({ currentRole: newRole });
+      const response = await cookieAuthClient.api.patch('/user/preferences', { currentRole: newRole });
 
       if (response.data.success) {
         // 사용자 상태 업데이트
