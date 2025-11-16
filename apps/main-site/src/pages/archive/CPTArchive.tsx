@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { cookieAuthClient } from '@o4o/auth-client';
 import { metaApi, MetaItemResponse } from '../../services/metaApi';
+import type { ViewPreset, ViewPresetConfig } from '@o4o/types';
 
 interface CPTPost {
   id: string;
@@ -29,6 +30,39 @@ interface CPTType {
   hasArchive: boolean;
   public: boolean;
   rewrite?: any;
+  // Phase 1: Preset IDs
+  defaultViewPresetId?: string;
+  defaultTemplatePresetId?: string;
+}
+
+// Archive configuration interface
+interface ArchiveConfig {
+  pageSize: number;
+  orderBy: string;
+  order: 'ASC' | 'DESC';
+  status: string;
+  columns: number;
+}
+
+// Helper: Apply ViewPreset config to archive settings with fallback
+function applyViewPresetToArchiveConfig(
+  presetConfig: ViewPresetConfig | undefined,
+  defaults: ArchiveConfig
+): ArchiveConfig {
+  if (!presetConfig) return defaults;
+
+  return {
+    ...defaults,
+    // Pagination
+    pageSize: presetConfig.pageSize ?? defaults.pageSize,
+    // Sorting
+    orderBy: presetConfig.sort?.field ?? defaults.orderBy,
+    order: presetConfig.sort?.direction?.toUpperCase() as 'ASC' | 'DESC' ?? defaults.order,
+    // Filters (can extend later)
+    status: defaults.status, // Keep default for now
+    // Layout
+    columns: presetConfig.columns ?? defaults.columns,
+  };
 }
 
 const CPTArchive: React.FC = () => {
@@ -38,29 +72,59 @@ const CPTArchive: React.FC = () => {
 
   const [posts, setPosts] = useState<CPTPost[]>([]);
   const [cptInfo, setCptInfo] = useState<CPTType | null>(null);
+  const [viewPreset, setViewPreset] = useState<ViewPreset | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [postMetaMap, setPostMetaMap] = useState<Map<string, MetaItemResponse[]>>(new Map());
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const postsPerPage = 12;
 
-  // Fetch CPT information
+  // Default archive config (fallback)
+  const defaultConfig: ArchiveConfig = {
+    pageSize: 12,
+    orderBy: 'date',
+    order: 'DESC',
+    status: 'publish',
+    columns: 4,
+  };
+
+  // Apply ViewPreset if available
+  const archiveConfig = applyViewPresetToArchiveConfig(viewPreset?.config, defaultConfig);
+
+  // Fetch CPT information and ViewPreset
   useEffect(() => {
     const fetchCPTInfo = async () => {
       try {
         const response = await cookieAuthClient.api.get(`/cpt/types/${cptSlug}`);
         const cptData = response.data;
-        
+
         // Check if this CPT has archive enabled
         if (!cptData.hasArchive) {
           setError('This post type does not have an archive page.');
           setLoading(false);
           return;
         }
-        
+
         setCptInfo(cptData);
+
+        // Phase 1: Fetch ViewPreset if configured
+        if (cptData.defaultViewPresetId) {
+          try {
+            const presetResponse = await cookieAuthClient.api.get(`/presets/views/${cptData.defaultViewPresetId}`);
+            if (presetResponse.data.success && presetResponse.data.data) {
+              setViewPreset(presetResponse.data.data);
+              console.log('[CPTArchive] ViewPreset loaded:', presetResponse.data.data.name);
+            }
+          } catch (presetErr) {
+            console.warn('[CPTArchive] Failed to load ViewPreset, using fallback:', presetErr);
+            // Graceful fallback - continue without preset
+            setViewPreset(null);
+          }
+        } else {
+          console.log('[CPTArchive] No defaultViewPresetId configured, using fallback layout');
+          setViewPreset(null);
+        }
       } catch (err: any) {
         console.error('Error fetching CPT info:', err);
         setError('Post type not found');
@@ -81,12 +145,13 @@ const CPTArchive: React.FC = () => {
       try {
         setLoading(true);
 
+        // Phase 1: Use archiveConfig from ViewPreset or fallback
         const params = new URLSearchParams({
           page: currentPage.toString(),
-          limit: postsPerPage.toString(),
-          status: 'publish',
-          orderby: 'date',
-          order: 'DESC'
+          limit: archiveConfig.pageSize.toString(),
+          status: archiveConfig.status,
+          orderby: archiveConfig.orderBy,
+          order: archiveConfig.order
         });
 
         const response = await cookieAuthClient.api.get(`/cpt/${cptSlug}/posts?${params}`);
@@ -94,7 +159,7 @@ const CPTArchive: React.FC = () => {
         if (response.data.success) {
           const fetchedPosts = response.data.data || [];
           setPosts(fetchedPosts);
-          setTotalPages(Math.ceil((response.data.total || 0) / postsPerPage));
+          setTotalPages(Math.ceil((response.data.total || 0) / archiveConfig.pageSize));
 
           // Phase 4-2: Batch fetch metadata for price display (ds_product only)
           if (cptSlug === 'ds_product' && fetchedPosts.length > 0) {
@@ -124,7 +189,7 @@ const CPTArchive: React.FC = () => {
     if (cptInfo) {
       fetchPosts();
     }
-  }, [cptSlug, cptInfo, currentPage]);
+  }, [cptSlug, cptInfo, currentPage, archiveConfig.pageSize, archiveConfig.orderBy, archiveConfig.order, archiveConfig.status]);
 
   const handlePageChange = (page: number) => {
     setSearchParams({ page: page.toString() });
@@ -181,7 +246,12 @@ const CPTArchive: React.FC = () => {
         {/* Posts Grid */}
         {posts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${
+              archiveConfig.columns === 3 ? 'lg:grid-cols-3' :
+              archiveConfig.columns === 4 ? 'lg:grid-cols-3 xl:grid-cols-4' :
+              archiveConfig.columns === 2 ? 'lg:grid-cols-2' :
+              'lg:grid-cols-3 xl:grid-cols-4'
+            } gap-6 mb-8`}>
               {posts.map((post) => (
                 <article
                   key={post.id}

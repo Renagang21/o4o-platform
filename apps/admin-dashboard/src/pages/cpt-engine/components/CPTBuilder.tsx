@@ -60,7 +60,10 @@ const CPTBuilder: React.FC<CPTBuilderProps> = ({
     supports: (selectedType?.supports || ['title', 'editor', 'thumbnail']) as any,
     rewrite: selectedType?.rewrite || { slug: '', withFront: true },
     capabilities: selectedType?.capabilities || {},
-    taxonomies: selectedType?.taxonomies || []
+    taxonomies: selectedType?.taxonomies || [],
+    // Phase 1: Preset IDs
+    defaultViewPresetId: selectedType?.defaultViewPresetId || undefined,
+    defaultTemplatePresetId: selectedType?.defaultTemplatePresetId || undefined
   });
 
   // Available supports features
@@ -188,7 +191,10 @@ const CPTBuilder: React.FC<CPTBuilderProps> = ({
       supports: cpt.supports as any,
       rewrite: cpt.rewrite,
       capabilities: cpt.capabilities,
-      taxonomies: cpt.taxonomies
+      taxonomies: cpt.taxonomies,
+      // Phase 1: Preset IDs
+      defaultViewPresetId: cpt.defaultViewPresetId,
+      defaultTemplatePresetId: cpt.defaultTemplatePresetId
     });
   };
 
@@ -417,6 +423,47 @@ const CPTBuilder: React.FC<CPTBuilderProps> = ({
                       })}
                     />
                     <Label htmlFor="withFront">Front 접두사 사용</Label>
+                  </div>
+
+                  {/* Phase 1: Preset Selection */}
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="text-sm font-medium mb-3">Preset 설정 (Phase 1)</h4>
+
+                    <div className="grid gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="defaultViewPresetId">
+                          기본 Archive ViewPreset ID
+                        </Label>
+                        <Input
+                          id="defaultViewPresetId"
+                          value={formData.defaultViewPresetId || ''}
+                          onChange={(e) => handleInputChange('defaultViewPresetId', e.target.value || undefined)}
+                          placeholder="ViewPreset UUID (선택사항)"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          이 CPT의 Archive(목록) 페이지에서 사용할 기본 ViewPreset ID
+                        </p>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="defaultTemplatePresetId">
+                          기본 Single TemplatePreset ID
+                        </Label>
+                        <Input
+                          id="defaultTemplatePresetId"
+                          value={formData.defaultTemplatePresetId || ''}
+                          onChange={(e) => handleInputChange('defaultTemplatePresetId', e.target.value || undefined)}
+                          placeholder="TemplatePreset UUID (선택사항)"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          이 CPT의 Single(상세) 페이지에서 사용할 기본 TemplatePreset ID
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-yellow-600 bg-yellow-50 p-2 rounded">
+                        💡 TODO(Phase2): 드롭다운으로 Preset 목록 선택 기능 추가 예정
+                      </p>
+                    </div>
                   </div>
                 </div>
               </TabsContent>

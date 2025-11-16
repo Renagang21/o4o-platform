@@ -43,6 +43,11 @@ export interface CustomPostType {
     slug: string;
     withFront: boolean;
   };
+
+  // Phase 1: Preset IDs
+  defaultViewPresetId?: string;
+  defaultTemplatePresetId?: string;
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -121,6 +126,9 @@ export interface CreateCPTDto {
   taxonomies?: string[];
   labels?: Partial<CustomPostType['labels']>;
   showInRest?: boolean;
+  // Phase 1: Preset IDs
+  defaultViewPresetId?: string;
+  defaultTemplatePresetId?: string;
 }
 
 export interface UpdateCPTDto extends Partial<CreateCPTDto> {
