@@ -6,8 +6,8 @@
 import { FC, useState, FormEvent } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, CheckCircle, AlertCircle } from 'lucide-react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 const Signup: FC = () => {
   const [email, setEmail] = useState('');
@@ -24,8 +24,6 @@ const Signup: FC = () => {
   // Get redirect URL from query params or default to home
   const params = new URLSearchParams(location.search);
   const redirectUrl = params.get('redirect') || '/';
-
-  const API_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -73,7 +71,7 @@ const Signup: FC = () => {
     setErrors({});
 
     try {
-      const response = await axios.post(`${API_URL}/api/v1/auth/signup`, {
+      const response = await cookieAuthClient.register({
         email,
         password,
         passwordConfirm,
@@ -81,17 +79,9 @@ const Signup: FC = () => {
         tos: true
       });
 
-      const { token, user, redirectUrl: apiRedirectUrl } = response.data;
+      const { user, redirectUrl: apiRedirectUrl } = response.data;
 
-      // 토큰 저장
-      if (token) {
-        localStorage.setItem('accessToken', token);
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('token', token);
-      }
-
-      // 사용자 정보 저장
-      localStorage.setItem('user', JSON.stringify(user));
+      // 쿠키에 토큰 자동 저장됨 (localStorage 불필요)
 
       toast.success('회원가입이 완료되었습니다!');
 
@@ -331,7 +321,10 @@ const Signup: FC = () => {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              onClick={() => window.location.href = `${API_URL}/api/v1/social/google?redirect_url=${encodeURIComponent(redirectUrl)}`}
+              onClick={() => {
+                const baseUrl = cookieAuthClient.getBaseUrl();
+                window.location.href = `${baseUrl}/social/google?redirect_url=${encodeURIComponent(redirectUrl)}`;
+              }}
             >
               <img src="/icons/google.svg" alt="Google" className="h-5 w-5" />
               Google로 가입
@@ -340,7 +333,10 @@ const Signup: FC = () => {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              onClick={() => window.location.href = `${API_URL}/api/v1/social/naver?redirect_url=${encodeURIComponent(redirectUrl)}`}
+              onClick={() => {
+                const baseUrl = cookieAuthClient.getBaseUrl();
+                window.location.href = `${baseUrl}/social/naver?redirect_url=${encodeURIComponent(redirectUrl)}`;
+              }}
             >
               <img src="/icons/naver.svg" alt="Naver" className="h-5 w-5" />
               네이버로 가입
@@ -349,7 +345,10 @@ const Signup: FC = () => {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-              onClick={() => window.location.href = `${API_URL}/api/v1/social/kakao?redirect_url=${encodeURIComponent(redirectUrl)}`}
+              onClick={() => {
+                const baseUrl = cookieAuthClient.getBaseUrl();
+                window.location.href = `${baseUrl}/social/kakao?redirect_url=${encodeURIComponent(redirectUrl)}`;
+              }}
             >
               <img src="/icons/kakao.svg" alt="Kakao" className="h-5 w-5" />
               카카오로 가입

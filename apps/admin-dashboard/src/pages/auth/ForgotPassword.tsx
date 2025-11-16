@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { authClient } from '@o4o/auth-client';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -14,24 +15,15 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
-      const response = await fetch(`${apiUrl}/auth/v2/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await authClient.api.post('/auth/v2/forgot-password', { email });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.data.success) {
         setIsSubmitted(true);
       } else {
-        setError(data.error || '비밀번호 재설정 요청에 실패했습니다.');
+        setError(response.data.message || '비밀번호 재설정 요청에 실패했습니다.');
       }
-    } catch (err) {
-      setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } catch (err: any) {
+      setError(err.response?.data?.message || '서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
