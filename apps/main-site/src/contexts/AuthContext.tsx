@@ -47,6 +47,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           ...meResponse.user,
           assignments: meResponse.assignments
         });
+        // Set auth hint for future sessions
+        localStorage.setItem('auth_session_hint', '1');
         toast.success('로그인되었습니다.');
         return true;
       } else {
@@ -85,6 +87,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       // Logout error handled silently
     } finally {
       setUser(null);
+      // Clear auth hint
+      localStorage.removeItem('auth_session_hint');
       toast.info('로그아웃되었습니다.');
     }
   };
@@ -107,6 +111,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
+    // Skip API call if no auth session hint (prevents 401 on first visit)
+    const hasAuthHint = typeof window !== 'undefined' && localStorage.getItem('auth_session_hint');
+    if (!hasAuthHint) {
+      setIsLoading(false);
+      setUser(null);
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -120,10 +132,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         });
       } else {
         setUser(null);
+        // Clear hint if session is invalid
+        localStorage.removeItem('auth_session_hint');
       }
     } catch (error: any) {
       // Auth check error handled silently
       setUser(null);
+      // Clear hint on error
+      localStorage.removeItem('auth_session_hint');
     } finally {
       setIsLoading(false);
     }

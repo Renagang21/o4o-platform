@@ -82,6 +82,8 @@ const Signup: FC = () => {
       const { user, redirectUrl: apiRedirectUrl } = response.data;
 
       // 쿠키에 토큰 자동 저장됨 (localStorage 불필요)
+      // Set auth hint for future sessions
+      localStorage.setItem('auth_session_hint', '1');
 
       toast.success('회원가입이 완료되었습니다!');
 
