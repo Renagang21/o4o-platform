@@ -114,7 +114,6 @@ const CPTArchive: React.FC = () => {
             const presetResponse = await cookieAuthClient.api.get(`/presets/views/${cptData.defaultViewPresetId}`);
             if (presetResponse.data.success && presetResponse.data.data) {
               setViewPreset(presetResponse.data.data);
-              console.log('[CPTArchive] ViewPreset loaded:', presetResponse.data.data.name);
             }
           } catch (presetErr) {
             console.warn('[CPTArchive] Failed to load ViewPreset, using fallback:', presetErr);
@@ -122,7 +121,6 @@ const CPTArchive: React.FC = () => {
             setViewPreset(null);
           }
         } else {
-          console.log('[CPTArchive] No defaultViewPresetId configured, using fallback layout');
           setViewPreset(null);
         }
       } catch (err: any) {
