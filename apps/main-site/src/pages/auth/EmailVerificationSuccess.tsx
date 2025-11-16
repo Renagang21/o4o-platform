@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
-import { apiClient } from '@/services/api';
+import { cookieAuthClient } from '@o4o/auth-client';
 import { Button } from '@o4o/ui';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/ui';
 import { Alert, AlertDescription } from '@o4o/ui';
@@ -47,7 +47,7 @@ export const EmailVerificationSuccess: FC = () => {
 
   const verifyEmail = async () => {
     try {
-      const response = await apiClient.get<VerifyResponse>(`/auth/v2/verify-email?token=${token}`);
+      const response = await cookieAuthClient.api.get<VerifyResponse>(`/auth/v2/verify-email?token=${token}`);
 
       if (response.data.success) {
         setVerified(true);
