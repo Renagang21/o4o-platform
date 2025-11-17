@@ -3,13 +3,14 @@
  * Phase 5-1: Storefront Checkout & Order Creation
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { ArrowLeft, X, Trash2 } from 'lucide-react';
 import type { CustomerInfo } from '../../types/storefront';
 import { storefrontAPI } from '../../services/storefrontApi';
 import { useCartStore } from '../../stores/cartStore';
+import { loadTossPaymentsSDK, requestTossPayment, generateOrderName } from '../../utils/tossPayments';
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,6 +31,17 @@ export const CheckoutPage: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tossSDKLoaded, setTossSDKLoaded] = useState(false);
+
+  // Load Toss Payments SDK on mount
+  useEffect(() => {
+    loadTossPaymentsSDK()
+      .then(() => setTossSDKLoaded(true))
+      .catch((err) => {
+        console.error('Failed to load Toss SDK:', err);
+        setError('결제 시스템을 불러오는데 실패했습니다.');
+      });
+  }, []);
 
   // 금액 포맷
   const formatCurrency = (amount: number, currency: string = 'KRW') => {
@@ -48,7 +60,7 @@ export const CheckoutPage: React.FC = () => {
   const shippingFee = calculateShippingFee();
   const totalAmount = cartStore.total_amount + shippingFee;
 
-  // 주문 생성
+  // Phase PG-1: 주문 생성 및 Toss Payments 결제 시작
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -72,9 +84,15 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
+    if (!tossSDKLoaded) {
+      setError('결제 시스템이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
+      // 1. 주문 생성 (status: PENDING, paymentStatus: PENDING)
       const response = await storefrontAPI.createOrder({
         customer: customerInfo,
         items: cartStore.items.map((item) => ({
@@ -85,16 +103,29 @@ export const CheckoutPage: React.FC = () => {
       });
 
       if (response.success) {
-        // 장바구니 비우기
-        cartStore.clearCart();
+        const order = response.data;
 
-        // 주문 완료 페이지로 이동
-        navigate(`/order/success/${response.data.id}`);
+        // 2. Toss Payments 결제 위젯 실행
+        const orderName = generateOrderName(cartStore.items);
+        const baseUrl = window.location.origin;
+
+        await requestTossPayment({
+          orderId: order.orderNumber, // Use orderNumber as orderId
+          orderName,
+          amount: totalAmount,
+          customerName: customerInfo.name,
+          customerEmail: customerInfo.email,
+          successUrl: `${baseUrl}/payment/success`,
+          failUrl: `${baseUrl}/payment/fail`,
+        });
+
+        // requestTossPayment will redirect to Toss checkout page
+        // User will be redirected back to successUrl or failUrl
+
       }
     } catch (err: any) {
-      console.error('주문 생성 실패:', err);
-      setError(err.message || '주문 생성에 실패했습니다.');
-    } finally {
+      console.error('결제 시작 실패:', err);
+      setError(err.message || '결제를 시작할 수 없습니다.');
       setSubmitting(false);
     }
   };

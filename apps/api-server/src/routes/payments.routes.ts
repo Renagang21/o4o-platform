@@ -59,6 +59,19 @@ const validateOrderId = [
   param('orderId').isUUID().withMessage('Order ID must be a valid UUID')
 ];
 
+// Phase PG-1: Toss-specific validation
+const validateTossConfirmPayment = [
+  body('paymentKey').notEmpty().withMessage('Payment key is required'),
+  body('orderId').notEmpty().withMessage('Order ID (orderNumber) is required'),
+  body('amount').isFloat({ min: 0 }).withMessage('Amount must be a positive number')
+];
+
+const validateTossFailPayment = [
+  body('orderNumber').notEmpty().withMessage('Order number is required'),
+  body('errorCode').optional().isString(),
+  body('errorMessage').optional().isString()
+];
+
 /**
  * @route   POST /api/v1/payments/prepare
  * @desc    결제 준비
@@ -80,6 +93,32 @@ router.post(
   '/confirm',
   validateConfirmPayment,
   asyncHandler(paymentController.confirmPayment)
+);
+
+/**
+ * Phase PG-1: Toss Payments - Simplified Order-centric routes
+ */
+
+/**
+ * @route   POST /api/v1/payments/toss/confirm
+ * @desc    Toss Payments 결제 승인 (Order-centric, simplified)
+ * @access  Public (프론트엔드 성공 콜백에서 호출)
+ */
+router.post(
+  '/toss/confirm',
+  validateTossConfirmPayment,
+  asyncHandler(paymentController.confirmTossPayment)
+);
+
+/**
+ * @route   POST /api/v1/payments/toss/fail
+ * @desc    Toss Payments 결제 실패 처리
+ * @access  Public (프론트엔드 실패 콜백에서 호출)
+ */
+router.post(
+  '/toss/fail',
+  validateTossFailPayment,
+  asyncHandler(paymentController.failTossPayment)
 );
 
 /**

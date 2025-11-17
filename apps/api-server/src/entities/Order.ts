@@ -132,6 +132,16 @@ export class Order {
   })
   paymentMethod: PaymentMethod;
 
+  // Phase PG-1: Toss Payments integration fields
+  @Column({ nullable: true })
+  paymentKey: string; // Toss payment key from successful transaction
+
+  @Column({ default: 'tosspayments' })
+  paymentProvider: string; // Payment gateway provider
+
+  @Column({ type: 'timestamp', nullable: true })
+  paidAt: Date; // Actual payment approval timestamp
+
   // Addresses
   @Column('jsonb')
   billingAddress: Address;

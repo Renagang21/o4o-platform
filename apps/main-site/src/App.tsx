@@ -79,6 +79,9 @@ import { CartPage } from './pages/storefront/CartPage';
 import { CheckoutPage } from './pages/storefront/CheckoutPage';
 import { OrderSuccessPage } from './pages/storefront/OrderSuccessPage';
 
+// Phase PG-1: Payment Callbacks
+import { PaymentSuccessPage, PaymentFailPage } from './pages/payment';
+
 // Phase 2-B: Cart Event Handler
 import { CartEventHandler } from './components/cart/CartEventHandler';
 
@@ -314,6 +317,10 @@ const App: FC = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/store/checkout" element={<CheckoutPage />} />
           <Route path="/order/success/:id" element={<OrderSuccessPage />} />
+
+          {/* Phase PG-1: Payment Callback Routes */}
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/fail" element={<PaymentFailPage />} />
 
           {/* Editor Routes (Protected) */}
           <Route path="/editor/page/:id?" element={
