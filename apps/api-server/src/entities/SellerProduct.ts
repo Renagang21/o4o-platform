@@ -59,6 +59,15 @@ export class SellerProduct {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   basePriceSnapshot: number | null; // Snapshot of supplier price at import time
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  costPrice: number | null; // Supplier cost price (for calculation)
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  profit: number | null; // Profit amount (salePrice - costPrice)
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  profitMargin: number | null; // Profit margin percentage
+
   @Column({ type: 'decimal', precision: 5, scale: 4, nullable: true })
   marginRate: number | null; // Margin rate (0-1, e.g., 0.25 = 25%)
 
@@ -70,10 +79,31 @@ export class SellerProduct {
   syncPolicy: SyncPolicy; // 'auto' | 'manual'
 
   // Status
+  @Column({
+    type: 'varchar',
+    length: 20,
+    default: SellerProductStatus.ACTIVE
+  })
+  status: SellerProductStatus; // Product status
+
   @Column({ type: 'boolean', default: true })
   isActive: boolean; // Whether the product is currently being sold
 
+  // Inventory (Seller's inventory for this product)
+  @Column({ type: 'integer', default: 0, nullable: true })
+  sellerInventory: number | null;
+
+  // Sales Statistics
+  @Column({ type: 'integer', default: 0 })
+  salesCount: number; // Number of sales
+
+  @Column({ type: 'integer', default: 0 })
+  totalSold: number; // Total quantity sold
+
   // Timestamps
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  addedAt: Date; // When the seller added this product
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -88,20 +88,26 @@ export class StorefrontController {
         let sellerPrice = product.recommendedPrice || 0;
 
         if (item.seller_id) {
-          // Try to get SellerProduct for accurate pricing and seller info
+          // Try to get SellerProduct for accurate pricing
           const sellerProduct = await this.sellerProductRepository.findOne({
             where: {
               sellerId: item.seller_id,
               productId: item.product_id,
               isActive: true
-            },
-            relations: ['seller']
+            }
           });
 
           if (sellerProduct) {
             sellerId = sellerProduct.sellerId;
-            sellerName = sellerProduct.seller?.branding?.storeName || 'Unknown Seller';
-            sellerPrice = sellerProduct.sellerPrice;
+            sellerPrice = sellerProduct.salePrice || product.recommendedPrice || 0;
+
+            // Get seller information
+            const seller = await this.sellerRepository.findOne({
+              where: { id: sellerProduct.sellerId }
+            });
+            if (seller) {
+              sellerName = seller.branding?.storeName || 'Unknown Seller';
+            }
           } else {
             // Fallback: get seller info directly
             const seller = await this.sellerRepository.findOne({

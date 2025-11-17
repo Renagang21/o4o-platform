@@ -9,7 +9,7 @@ import logger from '../utils/logger.js';
 export interface AddProductToSellerRequest {
   sellerId: string;
   productId: string;
-  sellerPrice: number;
+  salePrice: number;
   inventory?: number;
   customTitle?: string;
   customDescription?: string;
@@ -19,7 +19,7 @@ export interface AddProductToSellerRequest {
 }
 
 export interface UpdateSellerProductRequest {
-  sellerPrice?: number;
+  salePrice?: number;
   inventory?: number;
   customTitle?: string;
   customDescription?: string;
@@ -41,7 +41,7 @@ export interface SellerProductFilters {
   priceMax?: number;
   search?: string;
   tags?: string[];
-  sortBy?: 'addedAt' | 'sellerPrice' | 'inventory' | 'salesCount' | 'productName';
+  sortBy?: 'addedAt' | 'salePrice' | 'inventory' | 'salesCount' | 'productName';
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
@@ -51,14 +51,14 @@ export interface BulkAddProductsRequest {
   sellerId: string;
   products: {
     productId: string;
-    sellerPrice: number;
+    salePrice: number;
     inventory?: number;
   }[];
 }
 
 export interface ProfitAnalysis {
   supplierPrice: number;
-  sellerPrice: number;
+  salePrice: number;
   margin: number;
   marginPercentage: number;
   recommendedPrice: number;
@@ -121,13 +121,13 @@ export class SellerProductService {
       const supplierPrice = product.getCurrentPrice(seller.tier);
 
       // 판매 가격 검증 (공급가보다 높아야 함)
-      if (data.sellerPrice <= supplierPrice) {
+      if (data.salePrice <= supplierPrice) {
         throw new Error(`Seller price must be higher than supplier price (${supplierPrice})`);
       }
 
       // 권장 판매가 대비 너무 낮은 가격 경고
-      if (data.sellerPrice < product.recommendedPrice * 0.8) {
-        logger.warn(`Seller price significantly below recommended: ${data.sellerPrice} vs ${product.recommendedPrice}`);
+      if (data.salePrice < product.recommendedPrice * 0.8) {
+        logger.warn(`Seller price significantly below recommended: ${data.salePrice} vs ${product.recommendedPrice}`);
       }
 
       const sellerProduct = this.sellerProductRepository.create({
@@ -135,8 +135,8 @@ export class SellerProductService {
         status: SellerProductStatus.ACTIVE,
         sellerInventory: data.inventory || product.inventory,
         costPrice: supplierPrice,
-        profit: data.sellerPrice - supplierPrice,
-        profitMargin: ((data.sellerPrice - supplierPrice) / data.sellerPrice) * 100,
+        profit: data.salePrice - supplierPrice,
+        profitMargin: ((data.salePrice - supplierPrice) / data.salePrice) * 100,
         isActive: data.isActive !== false
       });
 
@@ -157,7 +157,7 @@ export class SellerProductService {
     try {
       const sellerProduct = await this.sellerProductRepository.findOne({
         where: { id: sellerProductId },
-        relations: ['product', 'seller']
+        relations: ['product']
       });
 
       if (!sellerProduct) {
@@ -165,10 +165,18 @@ export class SellerProductService {
       }
 
       // 가격 변경 시 검증
-      if (data.sellerPrice !== undefined) {
-        const supplierPrice = sellerProduct.product.getCurrentPrice(sellerProduct.seller.tier);
-        
-        if (data.sellerPrice <= supplierPrice) {
+      if (data.salePrice !== undefined) {
+        const seller = await this.sellerRepository.findOne({
+          where: { id: sellerProduct.sellerId }
+        });
+
+        if (!seller) {
+          throw new Error('Seller not found');
+        }
+
+        const supplierPrice = sellerProduct.product.getCurrentPrice(seller.tier);
+
+        if (data.salePrice <= supplierPrice) {
           throw new Error(`Seller price must be higher than supplier price (${supplierPrice})`);
         }
       }
@@ -268,11 +276,11 @@ export class SellerProductService {
       }
 
       if (priceMin !== undefined) {
-        queryBuilder.andWhere('sp.sellerPrice >= :priceMin', { priceMin });
+        queryBuilder.andWhere('sp.salePrice >= :priceMin', { priceMin });
       }
 
       if (priceMax !== undefined) {
-        queryBuilder.andWhere('sp.sellerPrice <= :priceMax', { priceMax });
+        queryBuilder.andWhere('sp.salePrice <= :priceMax', { priceMax });
       }
 
       if (search) {
@@ -444,18 +452,18 @@ export class SellerProductService {
 
         const supplierPrice = product.getCurrentPrice(seller.tier);
 
-        if (productData.sellerPrice <= supplierPrice) {
+        if (productData.salePrice <= supplierPrice) {
           throw new Error(`Invalid seller price for product ${product.name}: must be higher than ${supplierPrice}`);
         }
         
         const sellerProduct = this.sellerProductRepository.create({
           sellerId: data.sellerId,
           productId: productData.productId,
-          sellerPrice: productData.sellerPrice,
+          salePrice: productData.salePrice,
           sellerInventory: productData.inventory || product.inventory,
           costPrice: supplierPrice,
-          profit: productData.sellerPrice - supplierPrice,
-          profitMargin: ((productData.sellerPrice - supplierPrice) / productData.sellerPrice) * 100,
+          profit: productData.salePrice - supplierPrice,
+          profitMargin: ((productData.salePrice - supplierPrice) / productData.salePrice) * 100,
           status: SellerProductStatus.ACTIVE,
           isActive: true
         });
@@ -480,24 +488,32 @@ export class SellerProductService {
     try {
       const sellerProduct = await this.sellerProductRepository.findOne({
         where: { id: sellerProductId },
-        relations: ['product', 'seller']
+        relations: ['product']
       });
 
       if (!sellerProduct) {
         throw new Error('Seller product not found');
       }
 
-      const supplierPrice = sellerProduct.product.getCurrentPrice(sellerProduct.seller.tier);
-      const sellerPrice = sellerProduct.sellerPrice;
+      const seller = await this.sellerRepository.findOne({
+        where: { id: sellerProduct.sellerId }
+      });
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
+      const supplierPrice = sellerProduct.product.getCurrentPrice(seller.tier);
+      const salePrice = sellerProduct.salePrice;
       const recommendedPrice = sellerProduct.product.recommendedPrice;
 
-      const margin = sellerPrice - supplierPrice;
-      const marginPercentage = (margin / sellerPrice) * 100;
-      const belowRecommended = sellerPrice < recommendedPrice;
+      const margin = salePrice - supplierPrice;
+      const marginPercentage = (margin / salePrice) * 100;
+      const belowRecommended = salePrice < recommendedPrice;
 
       return {
         supplierPrice,
-        sellerPrice,
+        salePrice,
         margin: Math.round(margin * 100) / 100,
         marginPercentage: Math.round(marginPercentage * 100) / 100,
         recommendedPrice,
@@ -564,7 +580,7 @@ export class SellerProductService {
           'COUNT(CASE WHEN sp.status = :inactive THEN 1 END) as inactive',
           'COUNT(CASE WHEN sp.status = :outOfStock THEN 1 END) as outOfStock',
           'COUNT(CASE WHEN sp.sellerInventory <= 10 THEN 1 END) as lowStock',
-          'AVG(sp.sellerPrice) as averagePrice',
+          'AVG(sp.salePrice) as averagePrice',
           'SUM(sp.sellerInventory) as totalInventory',
           'SUM(sp.totalSold) as totalSales'
         ])
@@ -596,6 +612,15 @@ export class SellerProductService {
   // 판매자 제품 성과 분석 (베스트셀러, 수익성 등)
   async getSellerProductPerformance(sellerId: string, limit: number = 10) {
     try {
+      // 판매자 정보 조회
+      const seller = await this.sellerRepository.findOne({
+        where: { id: sellerId }
+      });
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
       // 베스트셀러 제품
       const bestSellers = await this.sellerProductRepository
         .createQueryBuilder('sp')
@@ -609,14 +634,14 @@ export class SellerProductService {
       // 가장 수익성 높은 제품 (마진율 기준)
       const sellerProducts = await this.sellerProductRepository.find({
         where: { sellerId, isActive: true },
-        relations: ['product', 'seller']
+        relations: ['product']
       });
 
       const profitableProducts = sellerProducts
         .map(sp => {
-          const supplierPrice = sp.product.getCurrentPrice(sp.seller.tier);
-          const margin = sp.sellerPrice - supplierPrice;
-          const marginPercentage = (margin / sp.sellerPrice) * 100;
+          const supplierPrice = sp.product.getCurrentPrice(seller.tier);
+          const margin = sp.salePrice - supplierPrice;
+          const marginPercentage = (margin / sp.salePrice) * 100;
           
           return {
             ...sp,
