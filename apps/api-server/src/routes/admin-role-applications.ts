@@ -200,7 +200,7 @@ router.post('/applications/:id/approve',
         const workspaceUrl = `${frontendUrl}/workspace/${application.role}`;
 
         emailService.sendRoleApplicationApprovedEmail(application.user.email, {
-          userName: application.user.name || application.user.username || 'User',
+          userName: application.user.name || application.user.email || 'User',
           roleName: roleNames[application.role] || application.role,
           businessName: application.businessName || 'N/A',
           approvedAt: application.decidedAt?.toLocaleString('ko-KR') || new Date().toLocaleString('ko-KR'),
@@ -295,7 +295,7 @@ router.post('/applications/:id/reject',
       // P4: Send rejection email to user (non-blocking, fire and forget)
       if (application.user) {
         emailService.sendRoleApplicationRejectedEmail(application.user.email, {
-          userName: application.user.name || application.user.username || 'User',
+          userName: application.user.name || application.user.email || 'User',
           roleName: roleNames[application.role] || application.role,
           businessName: application.businessName || 'N/A',
           appliedAt: application.appliedAt.toLocaleString('ko-KR'),

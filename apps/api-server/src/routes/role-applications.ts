@@ -104,7 +104,7 @@ router.post('/apply',
 
       if (user) {
         const emailData = {
-          userName: user.name || user.username || 'User',
+          userName: user.name || user.email || 'User',
           userEmail: user.email,
           roleName: roleNames[role] || role,
           businessName: businessName || 'N/A',
