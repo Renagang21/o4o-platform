@@ -38,7 +38,6 @@ export function loadTossPaymentsSDK(): Promise<void> {
     script.async = true;
 
     script.onload = () => {
-      console.log(' Toss Payments SDK loaded');
       resolve();
     };
 

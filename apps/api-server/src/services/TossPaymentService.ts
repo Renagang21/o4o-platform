@@ -9,6 +9,7 @@
 import AppDataSource from '../database/data-source.js';
 import { Order, OrderStatus, PaymentStatus, PaymentMethod } from '../entities/Order.js';
 import { tossConfig, getTossAuthHeader } from '../config/payment.config.js';
+import logger from '../utils/logger.js';
 
 /**
  * Toss Payments confirm request
@@ -59,7 +60,7 @@ export class TossPaymentService {
 
     // 3. Check if already paid
     if (order.paymentStatus === PaymentStatus.COMPLETED) {
-      console.log(`⚠️  Order ${request.orderId} already paid, returning existing order`);
+      logger.warn(`⚠️  Order ${request.orderId} already paid, returning existing order`);
       return order;
     }
 
@@ -84,7 +85,7 @@ export class TossPaymentService {
       // Save to database
       await this.orderRepository.save(order);
 
-      console.log(`✅ Payment confirmed for order ${request.orderId}`, {
+      logger.info(`✅ Payment confirmed for order ${request.orderId}`, {
         paymentKey: tossResponse.paymentKey,
         method: tossResponse.method,
         amount: tossResponse.totalAmount
@@ -93,7 +94,7 @@ export class TossPaymentService {
       return order;
     } catch (error: any) {
       // Handle failure
-      console.error(`❌ Payment confirmation failed for order ${request.orderId}:`, error);
+      logger.error(`❌ Payment confirmation failed for order ${request.orderId}:`, error);
 
       order.paymentStatus = PaymentStatus.FAILED;
       await this.orderRepository.save(order);
@@ -177,7 +178,7 @@ export class TossPaymentService {
 
     await this.orderRepository.save(order);
 
-    console.log(`⚠️  Payment marked as failed for order ${orderNumber}`);
+    logger.warn(`⚠️  Payment marked as failed for order ${orderNumber}`);
 
     return order;
   }
