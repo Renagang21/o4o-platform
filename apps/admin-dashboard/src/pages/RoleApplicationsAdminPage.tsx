@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { authClient } from '@o4o/auth-client';
+import axios from 'axios';
 import { CheckCircle, XCircle, User, Building, Hash, Calendar } from 'lucide-react';
 
 interface RoleApplication {
@@ -28,12 +28,31 @@ const RoleApplicationsAdminPage: FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Create axios instance for v2 API
+  const apiV2 = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // Add auth token to requests
+  apiV2.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken') ||
+                  localStorage.getItem('token') ||
+                  localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
   const fetchApplications = async (status: TabStatus) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get('/v2/admin/roles/applications', {
+      const response = await apiV2.get('/api/v2/admin/roles/applications', {
         params: { status }
       });
 
@@ -58,7 +77,7 @@ const RoleApplicationsAdminPage: FC = () => {
     try {
       setActionLoading(applicationId);
 
-      await authClient.api.post(`/v2/admin/roles/applications/${applicationId}/approve`);
+      await apiV2.post(`/api/v2/admin/roles/applications/${applicationId}/approve`);
 
       // Show success message
       alert('역할 신청이 승인되었습니다.');
@@ -83,7 +102,7 @@ const RoleApplicationsAdminPage: FC = () => {
     try {
       setActionLoading(applicationId);
 
-      await authClient.api.post(`/v2/admin/roles/applications/${applicationId}/reject`, {
+      await apiV2.post(`/api/v2/admin/roles/applications/${applicationId}/reject`, {
         reason: reason || undefined
       });
 
