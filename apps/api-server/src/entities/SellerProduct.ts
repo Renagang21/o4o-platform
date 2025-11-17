@@ -19,6 +19,13 @@ import type { Product } from './Product.js';
  * Tracks seller-specific pricing, margins, and sync policies.
  */
 
+export enum SellerProductStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  OUT_OF_STOCK = 'out_of_stock',
+  DISCONTINUED = 'discontinued'
+}
+
 export type SyncPolicy = 'auto' | 'manual';
 
 @Entity('seller_products')
