@@ -20,6 +20,24 @@ export interface ShortcodeProps {
 export type ShortcodeComponent = ComponentType<ShortcodeProps>;
 
 /**
+ * 숏코드 필드 타입 (Phase SC-3: UI 편집기용 확장)
+ */
+export type ShortcodeFieldType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'select'
+  | 'textarea';
+
+/**
+ * 숏코드 필드 옵션 (select 타입용)
+ */
+export interface ShortcodeFieldOption {
+  label: string;
+  value: string;
+}
+
+/**
  * 숏코드 속성 정의
  */
 export interface ShortcodeAttributeDefinition {
@@ -29,7 +47,21 @@ export interface ShortcodeAttributeDefinition {
 }
 
 /**
- * 숏코드 정의
+ * 숏코드 필드 정의 (Phase SC-3: UI 편집기용 확장)
+ */
+export interface ShortcodeFieldDefinition {
+  name: string;                             // 속성 키 (예: "tab")
+  label: string;                            // UI 레이블 (예: "탭 선택")
+  type: ShortcodeFieldType;
+  required?: boolean;
+  helpText?: string;                        // 도움말 텍스트
+  options?: ShortcodeFieldOption[];         // select일 경우 선택지
+  defaultValue?: string | number | boolean;
+  placeholder?: string;                     // 입력 필드 플레이스홀더
+}
+
+/**
+ * 숏코드 정의 (Phase SC-3: UI 메타데이터 추가)
  */
 export interface ShortcodeDefinition {
   name: string;
@@ -38,6 +70,11 @@ export interface ShortcodeDefinition {
   defaultAttributes?: ShortcodeAttributes;
   attributes?: Record<string, ShortcodeAttributeDefinition>;
   validate?: (attributes: ShortcodeAttributes) => boolean;
+
+  // Phase SC-3: UI 편집기용 메타데이터
+  label?: string;                           // 에디터 드롭다운에 표시할 이름
+  category?: string;                        // 카테고리 (예: "Dropshipping", "Commerce", "Layout")
+  fields?: ShortcodeFieldDefinition[];      // UI 편집기용 필드 정의
 }
 
 /**

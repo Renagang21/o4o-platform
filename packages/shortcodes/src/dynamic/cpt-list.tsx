@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { CPTListShortcodeAttributes, CPTPost } from './types.js';
-import { ShortcodeProps } from '../types.js';
+import { ShortcodeProps, ShortcodeDefinition } from '../types.js';
 import { shortcodeCache, CACHE_CONFIG } from './cache.js';
 import { ErrorMessage, Placeholder } from './components.js';
 
@@ -313,9 +313,13 @@ export const CPTListShortcode: React.FC<ShortcodeProps> = ({ attributes, context
 };
 
 // Register shortcode
-export const cptListShortcodeDefinition = {
+// Phase SC-3: Enhanced with UI metadata for editor
+export const cptListShortcodeDefinition: ShortcodeDefinition = {
   name: 'cpt_list',
   component: CPTListShortcode,
+  label: 'CPT 목록',
+  category: 'Dynamic Content',
+  description: 'Display a list of CPT posts',
   defaultAttributes: {
     type: 'post',
     count: 10,
@@ -324,6 +328,94 @@ export const cptListShortcodeDefinition = {
     show_excerpt: true,
     show_meta: true,
   },
-  description: 'Display a list of CPT posts',
-  example: '[cpt_list type="ds_product" count="6" template="grid" columns="3"]',
+  fields: [
+    {
+      name: 'type',
+      label: 'CPT 타입',
+      type: 'string',
+      required: true,
+      placeholder: 'ds_product',
+      helpText: '표시할 커스텀 포스트 타입 (예: ds_product, ds_supplier)',
+      defaultValue: 'post'
+    },
+    {
+      name: 'count',
+      label: '표시 개수',
+      type: 'number',
+      required: false,
+      defaultValue: 10,
+      helpText: '표시할 게시물 개수'
+    },
+    {
+      name: 'template',
+      label: '템플릿',
+      type: 'select',
+      required: false,
+      options: [
+        { label: '기본', value: 'default' },
+        { label: '그리드', value: 'grid' },
+        { label: '리스트', value: 'list' },
+        { label: '카드', value: 'card' }
+      ],
+      defaultValue: 'default',
+      helpText: '목록 표시 템플릿을 선택합니다.'
+    },
+    {
+      name: 'columns',
+      label: '열 개수',
+      type: 'number',
+      required: false,
+      defaultValue: 3,
+      helpText: '그리드/카드 템플릿 사용 시 열 개수 (2-4 권장)'
+    },
+    {
+      name: 'orderby',
+      label: '정렬 기준',
+      type: 'select',
+      required: false,
+      options: [
+        { label: '날짜', value: 'date' },
+        { label: '제목', value: 'title' },
+        { label: '수정일', value: 'modified' }
+      ],
+      defaultValue: 'date',
+      helpText: '게시물 정렬 기준'
+    },
+    {
+      name: 'order',
+      label: '정렬 순서',
+      type: 'select',
+      required: false,
+      options: [
+        { label: '내림차순', value: 'DESC' },
+        { label: '오름차순', value: 'ASC' }
+      ],
+      defaultValue: 'DESC',
+      helpText: '정렬 방향'
+    },
+    {
+      name: 'show_thumbnail',
+      label: '썸네일 표시',
+      type: 'boolean',
+      required: false,
+      defaultValue: true,
+      helpText: '대표 이미지 표시 여부'
+    },
+    {
+      name: 'show_excerpt',
+      label: '요약 표시',
+      type: 'boolean',
+      required: false,
+      defaultValue: true,
+      helpText: '게시물 요약 표시 여부'
+    },
+    {
+      name: 'show_meta',
+      label: '메타 정보 표시',
+      type: 'boolean',
+      required: false,
+      defaultValue: true,
+      helpText: '날짜, 작성자 등 메타 정보 표시 여부'
+    }
+  ]
 };
