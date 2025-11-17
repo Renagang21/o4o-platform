@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom'
-import { 
+import {
   X,
   ChevronDown,
   ChevronLeft
@@ -9,6 +9,7 @@ import {
 import { clsx } from 'clsx'
 import { MenuItem } from '@/config/wordpressMenuFinal'
 import { useAdminMenu } from '@/hooks/useAdminMenu'
+import { useRoleApplicationsCount } from '@/hooks/useRoleApplicationsCount'
 
 interface AdminSidebarProps {
   isOpen: boolean
@@ -19,9 +20,12 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation()
   const [expandedItems, setExpandedItems] = useState<any[]>([])
   const [isCollapsed, setIsCollapsed] = useState(false)
-  
+
   // Get menu items with role-based filtering automatically handled
   const { menuItems, isLoading: menuLoading } = useAdminMenu()
+
+  // Get role applications pending count for badge
+  const { count: roleApplicationsCount } = useRoleApplicationsCount()
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev: any) => 
@@ -109,9 +113,18 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
         )}
         onClick={onClose}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1">
           {item.icon}
-          {!isCollapsed && <span>{item.label}</span>}
+          {!isCollapsed && (
+            <div className="flex items-center gap-2 flex-1 justify-between">
+              <span>{item.label}</span>
+              {item.id === 'users-role-applications' && roleApplicationsCount > 0 && (
+                <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-red-500 text-white">
+                  {roleApplicationsCount}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </Link>
     )

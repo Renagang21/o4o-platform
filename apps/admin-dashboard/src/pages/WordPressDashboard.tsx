@@ -11,6 +11,7 @@ import {
   Package
 } from 'lucide-react';
 import { VERSION_DISPLAY } from '@/config/version';
+import PendingApplicationsWidget from '@/components/widgets/PendingApplicationsWidget';
 
 /**
  * WordPress 스타일 메인 대시보드
@@ -259,6 +260,9 @@ const WordPressDashboard: FC = () => {
             </div>
           </div>
         </div>
+
+        {/* 역할 신청 관리 위젯 */}
+        <PendingApplicationsWidget />
       </div>
 
       {/* WordPress 뉴스 피드 */}
