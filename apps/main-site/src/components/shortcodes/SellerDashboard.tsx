@@ -1,13 +1,11 @@
 /**
  * Seller Dashboard Component
- * Based on research from Shopify, Amazon Seller Central, and eBay Seller Hub
+ * Phase PD-1: Partner Dashboard v1 - Connected to real order/commission data
  *
- * Primary Features:
- * - Sales overview and analytics
- * - Product performance tracking
- * - Order management
- * - Inventory alerts
- * - Revenue and profit metrics
+ * Features:
+ * - Sales overview with real order data (Overview tab)
+ * - Commission tracking and breakdown (Settlements tab)
+ * - Period-based filtering (7d, 30d, 90d, 1y)
  */
 
 // Section types for internal navigation
@@ -21,6 +19,38 @@ import { useAuth } from '../../contexts/AuthContext';
 import { RoleDashboardMenu, useDashboardSection, type DashboardMenuItem } from '../dashboard/RoleDashboardMenu';
 import { Package, ShoppingCart, BarChart3, Warehouse, LayoutDashboard, DollarSign } from 'lucide-react';
 
+// Phase PD-1: Real API response types
+interface SellerDashboardSummary {
+  totalOrders: number;
+  totalSalesAmount: number;
+  totalItems: number;
+  totalCommissionAmount: number;
+  avgOrderAmount: number;
+}
+
+interface SellerOrderSummary {
+  orderId: string;
+  orderNumber: string;
+  orderDate: string;
+  buyerName: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: number;
+  sellerAmount: number;
+  commissionAmount: number;
+  itemCount: number;
+}
+
+interface CommissionDetail {
+  orderNumber: string;
+  orderDate: string;
+  salesAmount: number;
+  commissionAmount: number;
+  commissionRate: number;
+  status: string;
+}
+
+// Legacy interface (for non-PD-1 sections)
 interface SellerStats {
   totalSales: number;
   monthlySales: number;
@@ -79,10 +109,18 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
   showMenu = true
 }) => {
   const { user } = useAuth();
+
+  // Phase PD-1: Real data state
+  const [summary, setSummary] = useState<SellerDashboardSummary | null>(null);
+  const [recentOrders, setRecentOrders] = useState<SellerOrderSummary[]>([]);
+  const [commissionDetails, setCommissionDetails] = useState<CommissionDetail[]>([]);
+  const [totalCommission, setTotalCommission] = useState<number>(0);
+
+  // Legacy state (for non-PD-1 sections)
   const [stats, setStats] = useState<SellerStats | null>(null);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
-  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [salesData, setSalesData] = useState<SalesData[]>([]);
+
   const [period, setPeriod] = useState(defaultPeriod);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -92,35 +130,76 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
 
   useEffect(() => {
     loadDashboardData();
-  }, [period]);
+  }, [period, activeSection]);
+
+  // Convert period string to date range
+  const getDateRange = (periodStr: string): { from?: string; to?: string } => {
+    const now = new Date();
+    const from = new Date();
+
+    switch (periodStr) {
+      case '7d':
+        from.setDate(now.getDate() - 7);
+        break;
+      case '30d':
+        from.setDate(now.getDate() - 30);
+        break;
+      case '90d':
+        from.setDate(now.getDate() - 90);
+        break;
+      case '1y':
+        from.setFullYear(now.getFullYear() - 1);
+        break;
+      default:
+        from.setDate(now.getDate() - 30);
+    }
+
+    return {
+      from: from.toISOString(),
+      to: now.toISOString()
+    };
+  };
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const [statsRes, productsRes, ordersRes, salesRes] = await Promise.allSettled([
-        authClient.api.get(`/seller/dashboard/stats?period=${period}`),
-        authClient.api.get('/seller/products/top?limit=5'),
-        authClient.api.get('/seller/orders/recent?limit=5'),
-        authClient.api.get(`/seller/sales/chart?period=${period}`),
-      ]);
+      const dateRange = getDateRange(period);
+      const params = new URLSearchParams();
+      if (dateRange.from) params.append('from', dateRange.from);
+      if (dateRange.to) params.append('to', dateRange.to);
 
-      if (statsRes.status === 'fulfilled' && statsRes.value.data) {
-        setStats(statsRes.value.data);
+      // Phase PD-1: Load real data from new endpoints
+      if (activeSection === 'overview') {
+        const [summaryRes, ordersRes] = await Promise.allSettled([
+          authClient.api.get(`/api/v1/seller/dashboard/summary?${params.toString()}`),
+          authClient.api.get(`/api/v1/seller/dashboard/orders?page=1&limit=5&${params.toString()}`),
+        ]);
+
+        if (summaryRes.status === 'fulfilled' && summaryRes.value.data) {
+          setSummary(summaryRes.value.data);
+        }
+
+        if (ordersRes.status === 'fulfilled' && ordersRes.value.data?.orders) {
+          setRecentOrders(ordersRes.value.data.orders);
+        }
       }
 
-      if (productsRes.status === 'fulfilled' && productsRes.value.data) {
-        setTopProducts(productsRes.value.data);
+      if (activeSection === 'settlements') {
+        const commissionRes = await authClient.api.get(
+          `/api/v1/seller/dashboard/commissions?${params.toString()}`
+        );
+
+        if (commissionRes.data) {
+          setCommissionDetails(commissionRes.data.commissionByOrder || []);
+          setTotalCommission(commissionRes.data.totalCommission || 0);
+        }
       }
 
-      if (ordersRes.status === 'fulfilled' && ordersRes.value.data) {
-        setRecentOrders(ordersRes.value.data);
-      }
+      // Legacy: Load placeholder data for other sections
+      // TODO: PD-2 - Connect products/analytics/inventory to real APIs
 
-      if (salesRes.status === 'fulfilled' && salesRes.value.data) {
-        setSalesData(salesRes.value.data);
-      }
     } catch (err) {
       console.error('Failed to load seller dashboard:', err);
       setError('대시보드 정보를 불러오는데 실패했습니다.');
@@ -143,11 +222,11 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
   // Menu items for section navigation
   const menuItems: DashboardMenuItem<SellerSection>[] = [
     { key: 'overview', label: '개요', icon: <LayoutDashboard className="w-4 h-4" /> },
-    { key: 'products', label: '상품', icon: <Package className="w-4 h-4" />, badge: stats?.activeListings },
-    { key: 'orders', label: '주문', icon: <ShoppingCart className="w-4 h-4" />, badge: stats?.pendingOrders },
+    { key: 'products', label: '상품', icon: <Package className="w-4 h-4" /> },
+    { key: 'orders', label: '주문', icon: <ShoppingCart className="w-4 h-4" />, badge: summary?.totalOrders },
     { key: 'analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" /> },
-    { key: 'inventory', label: '재고', icon: <Warehouse className="w-4 h-4" />, badge: stats?.lowStockItems },
-    { key: 'settlements', label: '정산', icon: <DollarSign className="w-4 h-4" /> },
+    { key: 'inventory', label: '재고', icon: <Warehouse className="w-4 h-4" /> },
+    { key: 'settlements', label: '정산', icon: <DollarSign className="w-4 h-4" />, badge: commissionDetails.length || undefined },
   ];
 
   return (
@@ -204,33 +283,30 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
         </div>
       )}
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Phase PD-1: Real data from summary endpoint */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
-          title="이번 달 매출"
-          value={`${(stats?.monthlySales || 0).toLocaleString()}원`}
-          change="+12.5%"
-          changeType="increase"
+          title="총 주문 건수"
+          value={`${(summary?.totalOrders || 0).toLocaleString()}건`}
+          subtitle={`${period} 기간`}
+          icon="📋"
+        />
+        <StatCard
+          title="총 매출액"
+          value={`${(summary?.totalSalesAmount || 0).toLocaleString()}원`}
+          subtitle="판매 금액"
           icon="💰"
         />
         <StatCard
-          title="활성 상품"
-          value={`${stats?.activeListings || 0} / ${stats?.totalListings || 0}`}
-          subtitle="전체 상품"
-          icon="📦"
-        />
-        <StatCard
-          title="전환율"
-          value={`${(stats?.conversionRate || 0).toFixed(1)}%`}
-          change="+2.1%"
-          changeType="increase"
-          icon="📈"
+          title="총 커미션"
+          value={`${(summary?.totalCommissionAmount || 0).toLocaleString()}원`}
+          subtitle="예상 수익"
+          icon="💎"
         />
         <StatCard
           title="평균 주문액"
-          value={`${(stats?.averageOrderValue || 0).toLocaleString()}원`}
-          change="-3.2%"
-          changeType="decrease"
+          value={`${(summary?.avgOrderAmount || 0).toLocaleString()}원`}
+          subtitle="주문당 평균"
           icon="🎯"
         />
       </div>
@@ -348,7 +424,7 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
               )}
             </div>
 
-            {/* Recent Orders */}
+            {/* Recent Orders - Phase PD-1: Real order data */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">최근 주문</h2>
@@ -367,7 +443,7 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
               ) : (
                 <div className="space-y-3">
                   {recentOrders.map((order) => (
-                    <OrderCard key={order.id} order={order} />
+                    <SellerOrderCard key={order.orderId} order={order} />
                   ))}
                 </div>
               )}
@@ -509,14 +585,118 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
         </div>
       )}
 
-      {/* Settlements Section */}
+      {/* Settlements Section - Phase PD-1: Commission Details */}
       {activeSection === 'settlements' && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">정산 내역</h2>
-          <div className="text-center py-12">
-            <DollarSign className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-500 mb-2">정산 시스템 준비 중</p>
-            <p className="text-sm text-gray-400">곧 정산 내역을 확인할 수 있습니다</p>
+        <div className="space-y-6">
+          {/* Commission Summary */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">커미션 내역</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <StatCard
+                title="총 커미션"
+                value={`${totalCommission.toLocaleString()}원`}
+                subtitle={`${period} 기간`}
+                icon="💰"
+              />
+              <StatCard
+                title="주문 건수"
+                value={`${commissionDetails.length}건`}
+                subtitle="커미션 발생 주문"
+                icon="📋"
+              />
+              <StatCard
+                title="평균 커미션율"
+                value="20%"
+                subtitle="현재 고정 요율"
+                icon="📊"
+              />
+            </div>
+          </div>
+
+          {/* Commission Details Table */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">주문별 커미션 내역</h3>
+
+            {commissionDetails.length === 0 ? (
+              <div className="text-center py-12">
+                <DollarSign className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 mb-2">커미션 내역이 없습니다</p>
+                <p className="text-sm text-gray-400">{period} 기간 동안 발생한 커미션이 없습니다</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        주문번호
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        주문일시
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        판매금액
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        커미션율
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        커미션
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {commissionDetails.map((commission, index) => (
+                      <tr key={`${commission.orderNumber}-${index}`} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          #{commission.orderNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(commission.orderDate).toLocaleDateString('ko-KR')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {commission.salesAmount.toLocaleString()}원
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                          {(commission.commissionRate * 100).toFixed(0)}%
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 text-right">
+                          {commission.commissionAmount.toLocaleString()}원
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            {commission.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-gray-50">
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 text-sm font-semibold text-gray-900 text-right">
+                        총 커미션:
+                      </td>
+                      <td className="px-6 py-4 text-sm font-bold text-blue-600 text-right">
+                        {totalCommission.toLocaleString()}원
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+
+            {/* PD-1 Note */}
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>참고:</strong> 현재는 20% 고정 커미션율이 적용됩니다.
+                향후 업데이트에서 상품별/셀러별 커미션율 설정이 가능해집니다.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -600,7 +780,7 @@ const TopProductCard: React.FC<{ product: TopProduct; rank: number }> = ({
   </div>
 );
 
-// Order Card Component
+// Order Card Component (Legacy)
 const OrderCard: React.FC<{ order: RecentOrder }> = ({ order }) => (
   <div className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors">
     <div className="flex items-start justify-between mb-2">
@@ -623,6 +803,49 @@ const OrderCard: React.FC<{ order: RecentOrder }> = ({ order }) => (
       <span className="font-semibold text-gray-900">
         {order.total.toLocaleString()}원
       </span>
+    </div>
+  </div>
+);
+
+// Phase PD-1: Seller Order Card Component (real data)
+const SellerOrderCard: React.FC<{ order: SellerOrderSummary }> = ({ order }) => (
+  <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+    <div className="flex items-start justify-between mb-3">
+      <div>
+        <p className="font-medium text-gray-900">#{order.orderNumber}</p>
+        <p className="text-sm text-gray-600">{order.buyerName}</p>
+      </div>
+      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        {order.paymentStatus}
+      </span>
+    </div>
+
+    <div className="grid grid-cols-2 gap-3 text-sm mb-2">
+      <div>
+        <p className="text-gray-500 text-xs">주문일시</p>
+        <p className="text-gray-900">
+          {new Date(order.orderDate).toLocaleDateString('ko-KR')}
+        </p>
+      </div>
+      <div>
+        <p className="text-gray-500 text-xs">상품 수량</p>
+        <p className="text-gray-900">{order.itemCount}개</p>
+      </div>
+    </div>
+
+    <div className="border-t pt-2 mt-2 grid grid-cols-2 gap-3">
+      <div>
+        <p className="text-xs text-gray-500">판매금액</p>
+        <p className="font-semibold text-gray-900">
+          {order.sellerAmount.toLocaleString()}원
+        </p>
+      </div>
+      <div>
+        <p className="text-xs text-gray-500">예상 커미션</p>
+        <p className="font-semibold text-blue-600">
+          {order.commissionAmount.toLocaleString()}원
+        </p>
+      </div>
     </div>
   </div>
 );

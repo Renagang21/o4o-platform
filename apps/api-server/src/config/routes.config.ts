@@ -139,6 +139,9 @@ import supplierSettlementsRoutes from '../routes/supplier/settlements.routes.js'
 import sellerSettlementsRoutes from '../routes/seller/settlements.routes.js';
 import adminSettlementsRoutes from '../routes/admin/settlements.routes.js';
 
+// Phase PD-1 - Seller Dashboard Routes
+import sellerDashboardRoutes from '../routes/seller-dashboard.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -348,6 +351,9 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/supplier/settlements', standardLimiter, supplierSettlementsRoutes);
   app.use('/api/v1/seller/settlements', standardLimiter, sellerSettlementsRoutes);
   app.use('/api/v1/admin/settlements', standardLimiter, adminSettlementsRoutes);
+
+  // Phase PD-1 - Seller Dashboard
+  app.use('/api/v1/seller/dashboard', standardLimiter, sellerDashboardRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization
   app.use('/api/v1/ds/seller/authorizations', standardLimiter, dsSellerAuthorizationRoutes);
