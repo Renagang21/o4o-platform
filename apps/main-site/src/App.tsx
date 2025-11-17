@@ -43,6 +43,13 @@ import ApplyStatus from './pages/apply/ApplyStatus';
 import { SupplierLayout } from './components/dashboard/supplier/SupplierLayout';
 import { SellerLayout } from './components/dashboard/seller/SellerLayout';
 import { PartnerLayout } from './components/dashboard/partner/PartnerLayout';
+
+// P2: Workspace Redirect
+import { WorkspaceRedirect } from './pages/workspace/WorkspaceRedirect';
+
+// P2: Account Page (Customer Workspace)
+import { AccountPage } from './pages/account/AccountPage';
+
 import { SupplierDashboardPage } from './pages/dashboard/SupplierDashboardPage';
 import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
 import { SupplierProductCreatePage } from './pages/dashboard/SupplierProductCreatePage';
@@ -233,6 +240,20 @@ const App: FC = () => {
           <Route path="/apply/:role/status" element={
             <PrivateRoute>
               <ApplyStatus />
+            </PrivateRoute>
+          } />
+
+          {/* P2: Workspace Routes - Unified workspace entry point */}
+          <Route path="/workspace/:role" element={
+            <PrivateRoute>
+              <WorkspaceRedirect />
+            </PrivateRoute>
+          } />
+
+          {/* P2: Account Page - Customer Workspace */}
+          <Route path="/account" element={
+            <PrivateRoute>
+              <AccountPage />
             </PrivateRoute>
           } />
 

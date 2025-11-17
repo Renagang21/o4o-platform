@@ -1,14 +1,15 @@
 /**
- * P1: RoleSwitcher - assignments 기반 재작성
+ * P2: RoleSwitcher - Workspace-based navigation
  *
- * - RoleAssignment 기반으로 완전히 재작성
- * - deprecated role 필드 모두 제거
- * - /user/preferences API 호출 제거
- * - 실제 대시보드 라우트와 일치하는 URL 사용
+ * - Uses /workspace/{role} URLs for unified workspace entry
+ * - Detects current active role from URL
+ * - RoleAssignment-based role checking
+ * - No deprecated role fields
+ * - No /user/preferences API calls
  */
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, Check } from 'lucide-react';
 import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,84 +34,113 @@ interface RoleOption {
 /**
  * 역할 전환 버튼 (헤더용)
  *
- * P1: assignments 기반으로 재작성
+ * P2: Workspace 기반 라우팅
  * - 복수 active assignments를 가진 사용자에게만 표시
- * - 역할 선택 시 해당 대시보드로 SPA 라우팅
+ * - /workspace/{role} URL로 통일된 진입점 제공
+ * - URL 기반 현재 활성 역할 자동 감지
  * - 서버 API 호출 없이 클라이언트 사이드만 처리
  */
 export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const { showLabel = true, className = '' } = data;
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [currentSelection, setCurrentSelection] = useState<string | null>(null);
+  const location = useLocation();
+  const [activeRole, setActiveRole] = useState<string | null>(null);
 
   // P1: Get active assignments
   const activeAssignments = user?.assignments?.filter(a => a.active) ?? [];
   const roleList = activeAssignments.map(a => a.role);
+
+  // P2: Detect active role from current URL
+  useEffect(() => {
+    const pathname = location.pathname;
+
+    // Check workspace URLs
+    if (pathname.startsWith('/workspace/')) {
+      const role = pathname.split('/')[2];
+      setActiveRole(role);
+      return;
+    }
+
+    // Check dashboard URLs
+    if (pathname.startsWith('/dashboard/supplier')) {
+      setActiveRole('supplier');
+    } else if (pathname.startsWith('/dashboard/seller')) {
+      setActiveRole('seller');
+    } else if (pathname.startsWith('/dashboard/partner')) {
+      setActiveRole('partner');
+    } else if (pathname.startsWith('/dashboard/admin')) {
+      setActiveRole('admin');
+    } else if (pathname.startsWith('/account')) {
+      setActiveRole('customer');
+    } else if (pathname.startsWith('/store')) {
+      setActiveRole('customer');
+    } else {
+      // Default to first available role
+      setActiveRole(roleList[0] || null);
+    }
+  }, [location.pathname, roleList]);
 
   // P1: Not authenticated or single role - don't show
   if (!isAuthenticated || !user || activeAssignments.length <= 1) {
     return null;
   }
 
-  // P1: Role options with correct dashboard paths (matches App.tsx routes)
+  // P2: Role options with unified /workspace paths
   const roleOptions: Record<string, RoleOption> = {
     customer: {
       id: 'customer',
       name: 'Customer',
       description: 'Browse and purchase products',
-      path: '/store/products',
+      path: '/workspace/customer',
       icon: '👤'
     },
     seller: {
       id: 'seller',
       name: 'Seller',
       description: 'Manage products and orders',
-      path: '/dashboard/seller',
+      path: '/workspace/seller',
       icon: '🛒'
     },
     supplier: {
       id: 'supplier',
       name: 'Supplier',
       description: 'Supply and manage inventory',
-      path: '/dashboard/supplier',
+      path: '/workspace/supplier',
       icon: '🏭'
     },
     partner: {
       id: 'partner',
       name: 'Partner',
       description: 'Promote products and earn',
-      path: '/dashboard/partner',
+      path: '/workspace/partner',
       icon: '🤝'
     },
     admin: {
       id: 'admin',
       name: 'Admin',
       description: 'System administration',
-      path: '/dashboard/admin',
+      path: '/workspace/admin',
       icon: '⚙️'
     },
     administrator: {
       id: 'administrator',
       name: 'Administrator',
       description: 'System administration',
-      path: '/dashboard/admin',
+      path: '/workspace/admin',
       icon: '⚙️'
     }
   };
 
-  // P1: Simple role switch - navigate only (no API call)
+  // P2: Workspace-based role switch - navigate to /workspace/{role}
   const handleRoleSwitch = (newRole: string) => {
-    const previousRole = currentSelection || roleList[0];
+    const previousRole = activeRole || roleList[0];
 
     try {
-      // Update local selection
-      setCurrentSelection(newRole);
-
       // Track analytics
       trackRoleSwitch(previousRole, newRole);
 
-      // SPA routing only
+      // Navigate to workspace URL (will be redirected to actual dashboard)
       const targetPath = roleOptions[newRole]?.path || '/';
       navigate(targetPath);
 
@@ -149,7 +179,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
             const role = roleOptions[roleId];
             if (!role) return null;
 
-            const isCurrent = window.location.pathname.startsWith(role.path);
+            const isCurrent = activeRole === roleId;
 
             return (
               <div key={roleId} className="px-2">
