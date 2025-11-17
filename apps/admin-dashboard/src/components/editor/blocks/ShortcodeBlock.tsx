@@ -1,10 +1,10 @@
 /**
  * ShortcodeBlock Component
  * WordPress-compatible shortcode block with unified parser and live preview
- * ENHANCED: Now uses @o4o/shortcodes for parsing and rendering
+ * ENHANCED: Phase SC-3 - Now uses metadata-driven UI with dropdown selector
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Editor from '@monaco-editor/react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,8 @@ import {
   Book,
   FileText,
   Save,
-  Edit3
+  Edit3,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,11 +34,24 @@ import {
   globalRegistry,
   ShortcodeRenderer,
   ParsedShortcode,
-  dynamicShortcodeTemplates
+  dynamicShortcodeTemplates,
+  getAllShortcodes,
+  ShortcodeDefinition,
+  ShortcodeFieldDefinition
 } from '@o4o/shortcodes';
 import FileSelector, { FileItem } from './shared/FileSelector';
 import toast from 'react-hot-toast';
 import { ContentApi } from '@/api/contentApi';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ShortcodeBlockProps {
   id: string;
@@ -72,8 +86,68 @@ interface ShortcodeBlockProps {
   onChangeType?: (newType: string) => void;
 }
 
-// Use ParsedShortcode from @o4o/shortcodes instead of custom interface
+/**
+ * Phase SC-3: Group shortcodes by category
+ */
+interface ShortcodesByCategory {
+  [category: string]: Array<{
+    name: string;
+    definition: ShortcodeDefinition;
+  }>;
+}
 
+/**
+ * Phase SC-3: Group shortcodes from registry by category
+ */
+function groupShortcodesByCategory(): ShortcodesByCategory {
+  const allShortcodes = getAllShortcodes();
+  const grouped: ShortcodesByCategory = {};
+
+  allShortcodes.forEach((definition, name) => {
+    const category = definition.category || 'Other';
+    if (!grouped[category]) {
+      grouped[category] = [];
+    }
+    grouped[category].push({ name, definition });
+  });
+
+  // Sort shortcodes within each category by label
+  Object.keys(grouped).forEach(category => {
+    grouped[category].sort((a, b) => {
+      const labelA = a.definition.label || a.name;
+      const labelB = b.definition.label || b.name;
+      return labelA.localeCompare(labelB);
+    });
+  });
+
+  return grouped;
+}
+
+/**
+ * Phase SC-3: Generate shortcode string from name and attributes
+ */
+function generateShortcodeFromAttributes(
+  shortcodeName: string,
+  attributes: Record<string, any>
+): string {
+  let shortcode = `[${shortcodeName}`;
+
+  Object.entries(attributes).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      // Handle boolean values
+      if (typeof value === 'boolean') {
+        shortcode += ` ${key}="${value ? 'true' : 'false'}"`;
+      } else {
+        shortcode += ` ${key}="${value}"`;
+      }
+    }
+  });
+
+  shortcode += ']';
+  return shortcode;
+}
+
+// Keep old interfaces for backward compatibility with legacy templates
 interface ShortcodeParameter {
   name: string;
   required: boolean;
@@ -285,6 +359,17 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
   const [builderContent, setBuilderContent] = useState('');
   const [copied, setCopied] = useState(false);
 
+  // Phase SC-3: New metadata-driven state
+  const [selectedShortcodeName, setSelectedShortcodeName] = useState<string>('');
+  const [fieldAttributes, setFieldAttributes] = useState<Record<string, any>>({});
+  const [useMetadataBuilder, setUseMetadataBuilder] = useState(true);
+
+  // Phase SC-3: Memoize grouped shortcodes
+  const shortcodesByCategory = useMemo(() => groupShortcodesByCategory(), []);
+  const selectedShortcode = useMemo(() => {
+    return selectedShortcodeName ? getAllShortcodes().get(selectedShortcodeName) : undefined;
+  }, [selectedShortcodeName]);
+
   // Markdown editor states
   const [showMarkdownEditor, setShowMarkdownEditor] = useState(false);
   const [showFileSelector, setShowFileSelector] = useState(false);
@@ -368,6 +453,61 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
       setShowBuilder(false);
     }
   };
+
+  // Phase SC-3: Handle shortcode selection from dropdown
+  const handleShortcodeSelect = (shortcodeName: string) => {
+    setSelectedShortcodeName(shortcodeName);
+    const definition = getAllShortcodes().get(shortcodeName);
+
+    if (definition) {
+      // Initialize attributes with default values from fields
+      const initialAttrs: Record<string, any> = {};
+      definition.fields?.forEach(field => {
+        if (field.defaultValue !== undefined) {
+          initialAttrs[field.name] = field.defaultValue;
+        }
+      });
+      setFieldAttributes(initialAttrs);
+
+      // Generate initial shortcode
+      const generated = generateShortcodeFromAttributes(shortcodeName, initialAttrs);
+      setLocalShortcode(generated);
+    }
+  };
+
+  // Phase SC-3: Handle field attribute change
+  const handleFieldAttributeChange = (fieldName: string, value: any) => {
+    const updatedAttrs = {
+      ...fieldAttributes,
+      [fieldName]: value
+    };
+    setFieldAttributes(updatedAttrs);
+
+    // Auto-update shortcode string
+    if (selectedShortcodeName) {
+      const generated = generateShortcodeFromAttributes(selectedShortcodeName, updatedAttrs);
+      setLocalShortcode(generated);
+    }
+  };
+
+  // Phase SC-3: Parse existing shortcode to populate fields
+  useEffect(() => {
+    if (localShortcode && !selectedShortcodeName) {
+      const parsed = defaultParser.parseOne(localShortcode);
+      if (parsed) {
+        const definition = getAllShortcodes().get(parsed.name);
+        if (definition && definition.fields && definition.fields.length > 0) {
+          // This is a metadata-aware shortcode
+          setSelectedShortcodeName(parsed.name);
+          setFieldAttributes(parsed.attributes as Record<string, any>);
+          setUseMetadataBuilder(true);
+        } else {
+          // Fallback to legacy builder
+          setUseMetadataBuilder(false);
+        }
+      }
+    }
+  }, [localShortcode]);
 
   // Handle file selection and load content
   const handleFileSelect = async (file: FileItem | FileItem[]) => {
@@ -562,97 +702,236 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
       customSidebarContent={
         isSelected && showBuilder ? (
           <div className="space-y-4">
-            <div>
-              <Label className="text-sm font-medium">Shortcode Templates</Label>
-              <div className="space-y-2 mt-2">
-                {SHORTCODE_TEMPLATES.map((template) => (
-                  <Button
-                    key={template.name}
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start text-xs"
-                    onClick={() => handleTemplateSelect(template)}
-                  >
-                    <Code className="h-3 w-3 mr-2" />
-                    <div className="text-left">
-                      <div className="font-medium">{template.name}</div>
-                      <div className="text-gray-500">{template.description}</div>
-                    </div>
-                  </Button>
-                ))}
-              </div>
+            {/* Phase SC-3: Builder Mode Toggle */}
+            <div className="flex items-center gap-2 text-xs">
+              <Button
+                variant={useMetadataBuilder ? "default" : "ghost"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setUseMetadataBuilder(true)}
+              >
+                숏코드 선택
+              </Button>
+              <Button
+                variant={!useMetadataBuilder ? "default" : "ghost"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setUseMetadataBuilder(false)}
+              >
+                템플릿
+              </Button>
             </div>
 
-            {selectedTemplate && (
-              <div className="border-t pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <Label className="text-sm font-medium">Configure: {selectedTemplate.name}</Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedTemplate(null)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
+            {useMetadataBuilder ? (
+              /* Phase SC-3: Metadata-driven builder */
+              <div className="space-y-4">
+                {/* Shortcode Selector */}
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">숏코드 선택</Label>
+                  <Select value={selectedShortcodeName} onValueChange={handleShortcodeSelect}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="숏코드를 선택하세요..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(shortcodesByCategory).map(([category, shortcodes]) => (
+                        <SelectGroup key={category}>
+                          <SelectLabel>{category}</SelectLabel>
+                          {shortcodes.map(({ name, definition }) => (
+                            <SelectItem key={name} value={name}>
+                              <div className="flex items-center gap-2">
+                                <Code className="h-3 w-3" />
+                                <span>{definition.label || name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedShortcode?.description && (
+                    <p className="text-xs text-gray-500 mt-1">{selectedShortcode.description}</p>
+                  )}
                 </div>
 
-                <div className="space-y-3">
-                  {selectedTemplate.parameters.map((param) => (
-                    <div key={param.name}>
-                      <Label className="text-xs font-medium flex items-center">
-                        {param.name}
-                        {param.required && <span className="text-red-500 ml-1">*</span>}
-                      </Label>
+                {/* Field-based Attribute Form */}
+                {selectedShortcode?.fields && selectedShortcode.fields.length > 0 && (
+                  <div className="border-t pt-4 space-y-3">
+                    <Label className="text-sm font-medium">속성 설정</Label>
 
-                      {param.type === 'select' ? (
-                        <select
-                          value={builderParams[param.name] || param.default || ''}
-                          onChange={(e) => handleParamChange(param.name, e.target.value)}
-                          className="w-full mt-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        >
-                          {param.options?.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <Input
-                          type={param.type === 'number' ? 'number' : param.type === 'url' ? 'url' : 'text'}
-                          value={builderParams[param.name] || ''}
-                          onChange={(e) => handleParamChange(param.name, e.target.value)}
-                          placeholder={param.default || param.description}
-                          className="mt-1 text-xs"
-                        />
+                    {selectedShortcode.fields.map((field) => (
+                      <div key={field.name} className="space-y-1">
+                        <Label className="text-xs font-medium flex items-center">
+                          {field.label}
+                          {field.required && <span className="text-red-500 ml-1">*</span>}
+                        </Label>
+
+                        {/* Render field based on type */}
+                        {field.type === 'select' ? (
+                          <Select
+                            value={String(fieldAttributes[field.name] || field.defaultValue || '')}
+                            onValueChange={(value) => handleFieldAttributeChange(field.name, value)}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder={field.placeholder || `${field.label} 선택...`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {field.options?.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : field.type === 'textarea' ? (
+                          <Textarea
+                            value={String(fieldAttributes[field.name] || '')}
+                            onChange={(e) => handleFieldAttributeChange(field.name, e.target.value)}
+                            placeholder={field.placeholder || field.label}
+                            className="text-xs"
+                            rows={3}
+                          />
+                        ) : field.type === 'boolean' ? (
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`field-${field.name}`}
+                              checked={Boolean(fieldAttributes[field.name] ?? field.defaultValue)}
+                              onCheckedChange={(checked) => handleFieldAttributeChange(field.name, checked)}
+                            />
+                            <label
+                              htmlFor={`field-${field.name}`}
+                              className="text-xs text-gray-600 cursor-pointer"
+                            >
+                              {field.helpText || field.label}
+                            </label>
+                          </div>
+                        ) : field.type === 'number' ? (
+                          <Input
+                            type="number"
+                            value={fieldAttributes[field.name] ?? field.defaultValue ?? ''}
+                            onChange={(e) => handleFieldAttributeChange(field.name, Number(e.target.value))}
+                            placeholder={field.placeholder || field.label}
+                            className="text-xs"
+                          />
+                        ) : (
+                          <Input
+                            type="text"
+                            value={String(fieldAttributes[field.name] || '')}
+                            onChange={(e) => handleFieldAttributeChange(field.name, e.target.value)}
+                            placeholder={field.placeholder || field.label}
+                            className="text-xs"
+                          />
+                        )}
+
+                        {field.helpText && field.type !== 'boolean' && (
+                          <p className="text-xs text-gray-500">{field.helpText}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {selectedShortcodeName && (!selectedShortcode?.fields || selectedShortcode.fields.length === 0) && (
+                  <div className="text-xs text-gray-500 italic">
+                    이 숏코드에는 설정 가능한 속성이 없습니다.
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Legacy template builder */
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium">Shortcode Templates</Label>
+                  <div className="space-y-2 mt-2">
+                    {SHORTCODE_TEMPLATES.map((template) => (
+                      <Button
+                        key={template.name}
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start text-xs"
+                        onClick={() => handleTemplateSelect(template)}
+                      >
+                        <Code className="h-3 w-3 mr-2" />
+                        <div className="text-left">
+                          <div className="font-medium">{template.name}</div>
+                          <div className="text-gray-500">{template.description}</div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {selectedTemplate && (
+                  <div className="border-t pt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <Label className="text-sm font-medium">Configure: {selectedTemplate.name}</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedTemplate(null)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {selectedTemplate.parameters.map((param) => (
+                        <div key={param.name}>
+                          <Label className="text-xs font-medium flex items-center">
+                            {param.name}
+                            {param.required && <span className="text-red-500 ml-1">*</span>}
+                          </Label>
+
+                          {param.type === 'select' ? (
+                            <select
+                              value={builderParams[param.name] || param.default || ''}
+                              onChange={(e) => handleParamChange(param.name, e.target.value)}
+                              className="w-full mt-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            >
+                              {param.options?.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <Input
+                              type={param.type === 'number' ? 'number' : param.type === 'url' ? 'url' : 'text'}
+                              value={builderParams[param.name] || ''}
+                              onChange={(e) => handleParamChange(param.name, e.target.value)}
+                              placeholder={param.default || param.description}
+                              className="mt-1 text-xs"
+                            />
+                          )}
+
+                          <p className="text-xs text-gray-500 mt-1">{param.description}</p>
+                        </div>
+                      ))}
+
+                      {selectedTemplate.hasContent && (
+                        <div>
+                          <Label className="text-xs font-medium">Content</Label>
+                          <Textarea
+                            value={builderContent}
+                            onChange={(e) => setBuilderContent(e.target.value)}
+                            placeholder="Enter shortcode content..."
+                            className="mt-1 text-xs"
+                            rows={3}
+                          />
+                        </div>
                       )}
 
-                      <p className="text-xs text-gray-500 mt-1">{param.description}</p>
+                      <Button
+                        onClick={handleGenerateShortcode}
+                        className="w-full mt-3"
+                        size="sm"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Generate Shortcode
+                      </Button>
                     </div>
-                  ))}
-
-                  {selectedTemplate.hasContent && (
-                    <div>
-                      <Label className="text-xs font-medium">Content</Label>
-                      <Textarea
-                        value={builderContent}
-                        onChange={(e) => setBuilderContent(e.target.value)}
-                        placeholder="Enter shortcode content..."
-                        className="mt-1 text-xs"
-                        rows={3}
-                      />
-                    </div>
-                  )}
-
-                  <Button
-                    onClick={handleGenerateShortcode}
-                    className="w-full mt-3"
-                    size="sm"
-                  >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Generate Shortcode
-                  </Button>
-                </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
