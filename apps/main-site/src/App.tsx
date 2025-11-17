@@ -50,6 +50,11 @@ import { WorkspaceRedirect } from './pages/workspace/WorkspaceRedirect';
 // P2: Account Page (Customer Workspace)
 import { AccountPage } from './pages/account/AccountPage';
 
+// P3: Role Application Pages
+import { ApplyLandingPageP3 } from './pages/apply/ApplyLandingPageP3';
+import { ApplyRolePageP3 } from './pages/apply/ApplyRolePageP3';
+import { RoleApplicationsPageP3 } from './pages/admin/roles/RoleApplicationsPageP3';
+
 import { SupplierDashboardPage } from './pages/dashboard/SupplierDashboardPage';
 import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
 import { SupplierProductCreatePage } from './pages/dashboard/SupplierProductCreatePage';
@@ -221,22 +226,19 @@ const App: FC = () => {
           {/* Test Routes - For debugging purposes */}
           <Route path="/test/login" element={<LoginDebugPage />} />
 
-          {/* P0 RBAC: Application Routes */}
-          <Route path="/apply/supplier" element={
+          {/* P3: Role Application Routes */}
+          <Route path="/apply" element={
             <PrivateRoute>
-              <ApplySupplier />
+              <ApplyLandingPageP3 />
             </PrivateRoute>
           } />
-          <Route path="/apply/seller" element={
+          <Route path="/apply/:role" element={
             <PrivateRoute>
-              <ApplySeller />
+              <ApplyRolePageP3 />
             </PrivateRoute>
           } />
-          <Route path="/apply/partner" element={
-            <PrivateRoute>
-              <ApplyPartner />
-            </PrivateRoute>
-          } />
+
+          {/* P0 RBAC: Legacy application status route */}
           <Route path="/apply/:role/status" element={
             <PrivateRoute>
               <ApplyStatus />
@@ -308,6 +310,15 @@ const App: FC = () => {
             <Route path="settlements" element={<PartnerSettlementsPage />} />
             <Route path="settlements/:id" element={<PartnerSettlementDetailPage />} />
           </Route>
+
+          {/* P3: Admin Role Applications Management */}
+          <Route path="/dashboard/admin/role-applications" element={
+            <PrivateRoute>
+              <RoleGuard role="administrator">
+                <RoleApplicationsPageP3 />
+              </RoleGuard>
+            </PrivateRoute>
+          } />
 
           {/* Phase 4-2: Admin Settlement Management Routes */}
           <Route path="/dashboard/admin/settlements" element={
