@@ -40,17 +40,43 @@ export interface BusinessInfo {
 // 사용자 상태 타입
 export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'active' | 'inactive';
 
-// 메인 User 인터페이스
+/**
+ * P1: Main User interface
+ *
+ * PRIMARY: Use `assignments` array for all role checks
+ * DEPRECATED: role, roles, currentRole, defaultRole (kept for backward compatibility only)
+ */
 export interface User {
   _id?: string;                   // MongoDB 원본 ID (선택사항)
   id: string;                     // UUID ID
   email: string;
   name: string;
   phone?: string;
-  role?: UserRole;                // 강타입 UserRole (선택사항) - DEPRECATED: use assignments instead
-  roles?: UserRole[];             // 호환성을 위한 배열 형태 - DEPRECATED: use assignments instead
-  currentRole?: UserRole;         // 현재 활성 역할 (역할 전환용) - DEPRECATED: use assignments instead
-  defaultRole?: UserRole;         // 기본 역할 - DEPRECATED: use assignments instead
+
+  /**
+   * @deprecated Use assignments array instead. This field is kept for backward compatibility only.
+   * @see assignments
+   */
+  role?: UserRole;
+
+  /**
+   * @deprecated Use assignments array instead. This field is kept for backward compatibility only.
+   * @see assignments
+   */
+  roles?: UserRole[];
+
+  /**
+   * @deprecated Use assignments array instead. This field is kept for backward compatibility only.
+   * @see assignments
+   */
+  currentRole?: UserRole;
+
+  /**
+   * @deprecated Use assignments array instead. This field is kept for backward compatibility only.
+   * @see assignments
+   */
+  defaultRole?: UserRole;
+
   userType: 'admin' | 'supplier' | 'retailer' | 'customer'; // 프론트엔드 타입 (필수)
   status: UserStatus;
   businessInfo?: BusinessInfo;
@@ -59,7 +85,16 @@ export interface User {
   lastLoginAt?: Date | string;
   avatar?: string;
 
-  // P0 RBAC: assignments array (replaces role/roles/currentRole/defaultRole)
+  /**
+   * P0 RBAC: Active role assignments (PRIMARY)
+   *
+   * This is the primary source of truth for user roles.
+   * Use AuthContext.hasRole() to check if user has a specific role.
+   *
+   * @example
+   * const { hasRole } = useAuth();
+   * if (hasRole('seller')) { ... }
+   */
   assignments?: RoleAssignment[];
 }
 

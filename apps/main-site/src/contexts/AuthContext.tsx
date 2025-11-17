@@ -181,18 +181,18 @@ export const useAuth = () => {
   return context;
 };
 
-// 권한 확인 훅
+// 권한 확인 훅 (P1: assignments 기반으로 수정)
 export const usePermissions = (): UserPermissions => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
 
   return {
-    isAdmin: user?.role === 'admin',
-    isManager: user?.role === 'manager',
-    isPartner: user?.role === 'partner', 
-    isUser: user?.role === 'user',
-    isManagerOrAdmin: user?.role === 'admin' || user?.role === 'manager',
-    hasRole: (roles: UserRole[]) => user ? roles.includes(user.role) : false,
-    canAccessAdmin: user?.role === 'admin' || user?.role === 'manager',
+    isAdmin: hasRole('admin') || hasRole('administrator') || hasRole('super_admin'),
+    isManager: hasRole('manager'),
+    isPartner: hasRole('partner'),
+    isUser: hasRole('user') || hasRole('customer'),
+    isManagerOrAdmin: hasRole('admin') || hasRole('administrator') || hasRole('super_admin') || hasRole('manager'),
+    hasRole: (roles: UserRole[]) => roles.some(role => hasRole(role)),
+    canAccessAdmin: hasRole('admin') || hasRole('administrator') || hasRole('super_admin') || hasRole('manager'),
   };
 };
 
