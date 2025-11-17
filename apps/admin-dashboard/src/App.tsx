@@ -117,6 +117,10 @@ const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'));
 
+// PD-3: Seller Pages
+const SellerCatalog = lazy(() => import('@/pages/dashboard/seller/SellerCatalog'));
+const SellerProducts = lazy(() => import('@/pages/dashboard/seller/SellerProducts'));
+
 // Test Page - Minimal Editor
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
@@ -318,6 +322,22 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <AdminDashboardPageWrapper />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-3: Seller Dashboard Routes */}
+                    <Route path="/dashboard/seller/catalog" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerCatalog />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/dashboard/seller/products" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerProducts />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
