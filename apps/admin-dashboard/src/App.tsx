@@ -123,6 +123,7 @@ const AIBlockDebug = lazy(() => import('@/pages/test/AIBlockDebug'));
 const SeedPresets = lazy(() => import('@/pages/test/SeedPresets'));
 const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationTest'));
 const DeleteCustomizerTest = lazy(() => import('@/pages/test/DeleteCustomizerTest'));
+const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -729,6 +730,12 @@ function App() {
                     <Route path="/admin/test/delete-customizer" element={
                       <Suspense fallback={<PageLoader />}>
                         <DeleteCustomizerTest />
+                      </Suspense>
+                    } />
+                    {/* Test - Auth Debug */}
+                    <Route path="/admin/test/auth-debug" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AuthDebug />
                       </Suspense>
                     } />
 
