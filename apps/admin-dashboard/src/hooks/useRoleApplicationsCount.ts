@@ -9,7 +9,7 @@ export const useRoleApplicationsCount = () => {
   const fetchCount = async () => {
     try {
       setIsLoading(true);
-      const response = await authClient.api.get('/admin/roles/applications', {
+      const response = await authClient.api.get('/v2/admin/roles/applications', {
         params: { status: 'pending' }
       });
 

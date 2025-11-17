@@ -33,7 +33,7 @@ const RoleApplicationsAdminPage: FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get('/admin/roles/applications', {
+      const response = await authClient.api.get('/v2/admin/roles/applications', {
         params: { status }
       });
 
@@ -58,7 +58,7 @@ const RoleApplicationsAdminPage: FC = () => {
     try {
       setActionLoading(applicationId);
 
-      await authClient.api.post(`/admin/roles/applications/${applicationId}/approve`);
+      await authClient.api.post(`/v2/admin/roles/applications/${applicationId}/approve`);
 
       // Show success message
       alert('역할 신청이 승인되었습니다.');
@@ -83,7 +83,7 @@ const RoleApplicationsAdminPage: FC = () => {
     try {
       setActionLoading(applicationId);
 
-      await authClient.api.post(`/admin/roles/applications/${applicationId}/reject`, {
+      await authClient.api.post(`/v2/admin/roles/applications/${applicationId}/reject`, {
         reason: reason || undefined
       });
 
