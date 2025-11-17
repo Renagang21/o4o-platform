@@ -120,6 +120,9 @@ const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'
 // PD-3: Seller Pages
 const SellerCatalog = lazy(() => import('@/pages/dashboard/seller/SellerCatalog'));
 const SellerProducts = lazy(() => import('@/pages/dashboard/seller/SellerProducts'));
+// PD-4: Orders Pages
+const SellerOrders = lazy(() => import('@/pages/dashboard/seller/SellerOrders'));
+const SupplierOrders = lazy(() => import('@/pages/dashboard/supplier/SupplierOrders'));
 
 // Test Page - Minimal Editor
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
@@ -338,6 +341,24 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['seller']}>
                         <Suspense fallback={<PageLoader />}>
                           <SellerProducts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-4: Seller Orders */}
+                    <Route path="/dashboard/seller/orders" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerOrders />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-4: Supplier Orders */}
+                    <Route path="/dashboard/supplier/orders" element={
+                      <AdminProtectedRoute requiredRoles={['supplier']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierOrders />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

@@ -32,4 +32,10 @@ router.delete('/products/:id', SellerController.deleteSellerProduct);
 // Statistics
 router.get('/stats', SellerController.getSellerStats);
 
+// Phase PD-4: Orders
+router.get('/orders', SellerController.getSellerOrders);
+
+// Phase PD-4: Settlement preview (stub for PD-5)
+router.get('/settlements/preview', SellerController.getSettlementPreview);
+
 export default router;

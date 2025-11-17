@@ -1,15 +1,19 @@
 import { Request, Response } from 'express';
 import { SellerService } from '../services/SellerService.js';
+import { OrderService, OrderFilters } from '../services/OrderService.js';
+import { OrderStatus, PaymentStatus } from '../entities/Order.js';
 import logger from '../utils/logger.js';
 
 /**
  * SellerController
  * Phase PD-3: Dropshipping Seller Workflow
+ * Phase PD-4: Dropshipping Order Pipeline Integration
  *
  * Handles HTTP requests for seller operations
  */
 
 const sellerService = new SellerService();
+const orderService = new OrderService();
 
 export class SellerController {
   /**
@@ -353,6 +357,95 @@ export class SellerController {
       res.status(500).json({
         success: false,
         error: 'Failed to fetch statistics',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
+   * GET /api/v2/seller/orders
+   * Phase PD-4: Get orders for seller
+   */
+  static async getSellerOrders(req: Request, res: Response): Promise<void> {
+    try {
+      const sellerId = (req as any).user?.id;
+
+      if (!sellerId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+        return;
+      }
+
+      const filters: OrderFilters = {
+        status: req.query.status as OrderStatus,
+        paymentStatus: req.query.paymentStatus as PaymentStatus,
+        dateFrom: req.query.dateFrom as string,
+        dateTo: req.query.dateTo as string,
+        search: req.query.search as string,
+        page: req.query.page ? parseInt(req.query.page as string) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
+        sortBy: (req.query.sortBy as any) || 'orderDate',
+        sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
+      };
+
+      const result = await orderService.getOrdersForSeller(sellerId, filters);
+
+      res.json({
+        success: true,
+        orders: result.orders,
+        total: result.total,
+        page: filters.page,
+        limit: filters.limit,
+        totalPages: Math.ceil(result.total / (filters.limit || 20))
+      });
+
+    } catch (error) {
+      logger.error('[SellerController] Error fetching seller orders:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch orders',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
+   * GET /api/v2/seller/settlements/preview
+   * Phase PD-4: Preview settlement data (stub for PD-5)
+   */
+  static async getSettlementPreview(req: Request, res: Response): Promise<void> {
+    try {
+      const sellerId = (req as any).user?.id;
+
+      if (!sellerId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+        return;
+      }
+
+      // PD-4: Stub implementation
+      // PD-5 will implement actual settlement calculation
+      res.json({
+        success: true,
+        message: 'Settlement preview feature - Coming in PD-5',
+        data: {
+          sellerId,
+          pendingSettlement: 0,
+          totalSales: 0,
+          totalCommissions: 0,
+          note: 'This endpoint will be fully implemented in Phase PD-5'
+        }
+      });
+
+    } catch (error) {
+      logger.error('[SellerController] Error fetching settlement preview:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch settlement preview',
         details: error instanceof Error ? error.message : 'Unknown error'
       });
     }

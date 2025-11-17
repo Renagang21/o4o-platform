@@ -690,12 +690,158 @@ export class OrderService {
       await this.partnerRepository.save(partner);
 
       logger.info(`Referral click tracked: ${referralCode}`, metadata);
-      
+
       return true;
 
     } catch (error) {
       logger.error('Error tracking referral click:', error);
       return false;
+    }
+  }
+
+  /**
+   * Phase PD-4: Get orders for a specific seller
+   * Returns only orders where the seller sold products
+   */
+  async getOrdersForSeller(sellerId: string, filters: OrderFilters = {}): Promise<{ orders: Order[], total: number }> {
+    try {
+      // Get all orders that contain items from this seller
+      const query = this.orderRepository.createQueryBuilder('order')
+        .leftJoinAndSelect('order.buyer', 'buyer')
+        .where(`EXISTS (
+          SELECT 1 FROM jsonb_array_elements(order.items) AS item
+          WHERE item->>'sellerId' = :sellerId
+        )`, { sellerId });
+
+      // Apply filters (same as getOrders)
+      if (filters.status) {
+        query.andWhere('order.status = :status', { status: filters.status });
+      }
+
+      if (filters.paymentStatus) {
+        query.andWhere('order.paymentStatus = :paymentStatus', { paymentStatus: filters.paymentStatus });
+      }
+
+      if (filters.dateFrom) {
+        query.andWhere('order.orderDate >= :dateFrom', { dateFrom: filters.dateFrom });
+      }
+
+      if (filters.dateTo) {
+        query.andWhere('order.orderDate <= :dateTo', { dateTo: filters.dateTo });
+      }
+
+      if (filters.search) {
+        query.andWhere(
+          '(order.orderNumber ILIKE :search OR order.buyerName ILIKE :search)',
+          { search: `%${filters.search}%` }
+        );
+      }
+
+      // Sorting
+      const sortBy = filters.sortBy || 'orderDate';
+      const sortOrder = (filters.sortOrder || 'desc').toUpperCase() as 'ASC' | 'DESC';
+
+      switch (sortBy) {
+        case 'totalAmount':
+          query.orderBy('CAST(order.summary->>\'total\' AS DECIMAL)', sortOrder);
+          break;
+        case 'status':
+          query.orderBy('order.status', sortOrder);
+          break;
+        case 'buyerName':
+          query.orderBy('order.buyerName', sortOrder);
+          break;
+        default:
+          query.orderBy('order.orderDate', sortOrder);
+      }
+
+      // Pagination
+      const page = filters.page || 1;
+      const limit = filters.limit || 20;
+      const offset = (page - 1) * limit;
+      query.skip(offset).take(limit);
+
+      const [orders, total] = await query.getManyAndCount();
+
+      logger.debug(`[PD-4] Retrieved ${orders.length} orders for seller ${sellerId}`);
+
+      return { orders, total };
+    } catch (error) {
+      logger.error('[PD-4] Error fetching seller orders:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Phase PD-4: Get orders for a specific supplier
+   * Returns only orders where the supplier's products were purchased
+   */
+  async getOrdersForSupplier(supplierId: string, filters: OrderFilters = {}): Promise<{ orders: Order[], total: number }> {
+    try {
+      // Get all orders that contain products from this supplier
+      const query = this.orderRepository.createQueryBuilder('order')
+        .leftJoinAndSelect('order.buyer', 'buyer')
+        .where(`EXISTS (
+          SELECT 1 FROM jsonb_array_elements(order.items) AS item
+          WHERE item->>'supplierId' = :supplierId
+        )`, { supplierId });
+
+      // Apply filters
+      if (filters.status) {
+        query.andWhere('order.status = :status', { status: filters.status });
+      }
+
+      if (filters.paymentStatus) {
+        query.andWhere('order.paymentStatus = :paymentStatus', { paymentStatus: filters.paymentStatus });
+      }
+
+      if (filters.dateFrom) {
+        query.andWhere('order.orderDate >= :dateFrom', { dateFrom: filters.dateFrom });
+      }
+
+      if (filters.dateTo) {
+        query.andWhere('order.orderDate <= :dateTo', { dateTo: filters.dateTo });
+      }
+
+      if (filters.search) {
+        query.andWhere(
+          '(order.orderNumber ILIKE :search OR order.buyerName ILIKE :search)',
+          { search: `%${filters.search}%` }
+        );
+      }
+
+      // Sorting
+      const sortBy = filters.sortBy || 'orderDate';
+      const sortOrder = (filters.sortOrder || 'desc').toUpperCase() as 'ASC' | 'DESC';
+
+      switch (sortBy) {
+        case 'totalAmount':
+          query.orderBy('CAST(order.summary->>\'total\' AS DECIMAL)', sortOrder);
+          break;
+        case 'status':
+          query.orderBy('order.status', sortOrder);
+          break;
+        case 'buyerName':
+          query.orderBy('order.buyerName', sortOrder);
+          break;
+        default:
+          query.orderBy('order.orderDate', sortOrder);
+      }
+
+      // Pagination
+      const page = filters.page || 1;
+      const limit = filters.limit || 20;
+      const offset = (page - 1) * limit;
+      query.skip(offset).take(limit);
+
+      const [orders, total] = await query.getManyAndCount();
+
+      logger.debug(`[PD-4] Retrieved ${orders.length} orders for supplier ${supplierId}`);
+
+      return { orders, total };
+    } catch (error) {
+      logger.error('[PD-4] Error fetching supplier orders:', error);
+      throw error;
     }
   }
 }

@@ -269,6 +269,15 @@ export interface OrderItem {
   sellerId: string;
   sellerName: string;
 
+  // Phase PD-3/PD-4: SellerProduct integration
+  sellerProductId?: string; // Reference to SellerProduct.id if order is via dropshipping
+
+  // Phase PD-4: Immutable pricing snapshots (주문 생성 시 확정)
+  // IMPORTANT: These values are frozen at order creation time
+  basePriceSnapshot?: number; // 공급가 (supplier price) at order time
+  salePriceSnapshot?: number; // 판매가 (seller's price) at order time
+  marginAmountSnapshot?: number; // Margin (salePrice - basePrice)
+
   // Phase PD-2: Commission info (확정된 커미션 정보 - 주문 생성 시 확정)
   // IMPORTANT: Commission is fixed at order creation time
   // Product commission policy changes afterward do NOT affect this order
