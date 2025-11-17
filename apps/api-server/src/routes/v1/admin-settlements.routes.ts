@@ -2,11 +2,10 @@
  * Phase PD-5: Admin Settlement Routes
  *
  * Admin-only routes for managing settlements
- * Updated from Phase 6-5 stub to full implementation
  */
 
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth.js';
+import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
 import {
   getAllSettlements,
@@ -20,7 +19,7 @@ import {
 const router: Router = Router();
 
 // Apply auth and admin middleware to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 router.use(requireAdmin);
 
 /**
@@ -59,8 +58,5 @@ router.post('/', createSettlement);
  * Update settlement status
  */
 router.put('/:id/status', updateSettlementStatus);
-
-// Legacy PATCH endpoint for backward compatibility
-router.patch('/:id/status', updateSettlementStatus);
 
 export default router;

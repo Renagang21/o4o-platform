@@ -117,6 +117,16 @@ const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'));
 
+// PD-3: Seller Pages
+const SellerCatalog = lazy(() => import('@/pages/dashboard/seller/SellerCatalog'));
+const SellerProducts = lazy(() => import('@/pages/dashboard/seller/SellerProducts'));
+// PD-4: Orders Pages
+const SellerOrders = lazy(() => import('@/pages/dashboard/seller/SellerOrders'));
+const SupplierOrders = lazy(() => import('@/pages/dashboard/supplier/SupplierOrders'));
+// PD-5: Settlement Pages
+const SellerSettlements = lazy(() => import('@/pages/dashboard/seller/SellerSettlements'));
+const SupplierSettlements = lazy(() => import('@/pages/dashboard/supplier/SupplierSettlements'));
+
 // Test Page - Minimal Editor
 const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
@@ -318,6 +328,58 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <AdminDashboardPageWrapper />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-3: Seller Dashboard Routes */}
+                    <Route path="/dashboard/seller/catalog" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerCatalog />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/dashboard/seller/products" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerProducts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-4: Seller Orders */}
+                    <Route path="/dashboard/seller/orders" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerOrders />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-5: Seller Settlements */}
+                    <Route path="/dashboard/seller/settlements" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerSettlements />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-4: Supplier Orders */}
+                    <Route path="/dashboard/supplier/orders" element={
+                      <AdminProtectedRoute requiredRoles={['supplier']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierOrders />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-5: Supplier Settlements */}
+                    <Route path="/dashboard/supplier/settlements" element={
+                      <AdminProtectedRoute requiredRoles={['supplier']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierSettlements />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

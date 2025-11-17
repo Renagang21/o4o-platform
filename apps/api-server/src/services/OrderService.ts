@@ -7,6 +7,7 @@ import { CartItem } from '../entities/CartItem.js';
 import { Partner, PartnerStatus } from '../entities/Partner.js';
 import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
 import { Product } from '../entities/Product.js';
+import { CommissionCalculator } from './CommissionCalculator.js';
 import logger from '../utils/logger.js';
 
 export interface CreateOrderRequest {
@@ -55,6 +56,7 @@ export class OrderService {
   private partnerRepository: Repository<Partner>;
   private partnerCommissionRepository: Repository<PartnerCommission>;
   private productRepository: Repository<Product>;
+  private commissionCalculator: CommissionCalculator;
 
   constructor() {
     this.orderRepository = AppDataSource.getRepository(Order);
@@ -64,6 +66,7 @@ export class OrderService {
     this.partnerRepository = AppDataSource.getRepository(Partner);
     this.partnerCommissionRepository = AppDataSource.getRepository(PartnerCommission);
     this.productRepository = AppDataSource.getRepository(Product);
+    this.commissionCalculator = new CommissionCalculator();
   }
 
   /**
@@ -88,6 +91,39 @@ export class OrderService {
 
       // Calculate order summary
       const summary = this.calculateOrderSummary(request.items);
+
+      // Phase PD-2: Calculate commission for each order item
+      // Commission is calculated and stored at order creation time (immutable)
+      for (const item of request.items) {
+        if (!item.sellerId) {
+          logger.warn(`[PD-2] Order item missing sellerId: ${item.productId}`, {
+            productName: item.productName
+          });
+          continue;
+        }
+
+        const commissionResult = await this.commissionCalculator.calculateForItem(
+          item.productId,
+          item.sellerId,
+          item.unitPrice,
+          item.quantity
+        );
+
+        // Store commission info in order item (immutable)
+        item.commissionType = commissionResult.type;
+        item.commissionRate = commissionResult.rate;
+        item.commissionAmount = commissionResult.amount;
+
+        logger.debug(`[PD-2] Commission calculated for order item`, {
+          productId: item.productId,
+          productName: item.productName,
+          sellerId: item.sellerId,
+          type: commissionResult.type,
+          rate: commissionResult.rate,
+          amount: commissionResult.amount,
+          source: commissionResult.source
+        });
+      }
 
       // Create order
       const order = new Order();
@@ -654,12 +690,158 @@ export class OrderService {
       await this.partnerRepository.save(partner);
 
       logger.info(`Referral click tracked: ${referralCode}`, metadata);
-      
+
       return true;
 
     } catch (error) {
       logger.error('Error tracking referral click:', error);
       return false;
+    }
+  }
+
+  /**
+   * Phase PD-4: Get orders for a specific seller
+   * Returns only orders where the seller sold products
+   */
+  async getOrdersForSeller(sellerId: string, filters: OrderFilters = {}): Promise<{ orders: Order[], total: number }> {
+    try {
+      // Get all orders that contain items from this seller
+      const query = this.orderRepository.createQueryBuilder('order')
+        .leftJoinAndSelect('order.buyer', 'buyer')
+        .where(`EXISTS (
+          SELECT 1 FROM jsonb_array_elements(order.items) AS item
+          WHERE item->>'sellerId' = :sellerId
+        )`, { sellerId });
+
+      // Apply filters (same as getOrders)
+      if (filters.status) {
+        query.andWhere('order.status = :status', { status: filters.status });
+      }
+
+      if (filters.paymentStatus) {
+        query.andWhere('order.paymentStatus = :paymentStatus', { paymentStatus: filters.paymentStatus });
+      }
+
+      if (filters.dateFrom) {
+        query.andWhere('order.orderDate >= :dateFrom', { dateFrom: filters.dateFrom });
+      }
+
+      if (filters.dateTo) {
+        query.andWhere('order.orderDate <= :dateTo', { dateTo: filters.dateTo });
+      }
+
+      if (filters.search) {
+        query.andWhere(
+          '(order.orderNumber ILIKE :search OR order.buyerName ILIKE :search)',
+          { search: `%${filters.search}%` }
+        );
+      }
+
+      // Sorting
+      const sortBy = filters.sortBy || 'orderDate';
+      const sortOrder = (filters.sortOrder || 'desc').toUpperCase() as 'ASC' | 'DESC';
+
+      switch (sortBy) {
+        case 'totalAmount':
+          query.orderBy('CAST(order.summary->>\'total\' AS DECIMAL)', sortOrder);
+          break;
+        case 'status':
+          query.orderBy('order.status', sortOrder);
+          break;
+        case 'buyerName':
+          query.orderBy('order.buyerName', sortOrder);
+          break;
+        default:
+          query.orderBy('order.orderDate', sortOrder);
+      }
+
+      // Pagination
+      const page = filters.page || 1;
+      const limit = filters.limit || 20;
+      const offset = (page - 1) * limit;
+      query.skip(offset).take(limit);
+
+      const [orders, total] = await query.getManyAndCount();
+
+      logger.debug(`[PD-4] Retrieved ${orders.length} orders for seller ${sellerId}`);
+
+      return { orders, total };
+    } catch (error) {
+      logger.error('[PD-4] Error fetching seller orders:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Phase PD-4: Get orders for a specific supplier
+   * Returns only orders where the supplier's products were purchased
+   */
+  async getOrdersForSupplier(supplierId: string, filters: OrderFilters = {}): Promise<{ orders: Order[], total: number }> {
+    try {
+      // Get all orders that contain products from this supplier
+      const query = this.orderRepository.createQueryBuilder('order')
+        .leftJoinAndSelect('order.buyer', 'buyer')
+        .where(`EXISTS (
+          SELECT 1 FROM jsonb_array_elements(order.items) AS item
+          WHERE item->>'supplierId' = :supplierId
+        )`, { supplierId });
+
+      // Apply filters
+      if (filters.status) {
+        query.andWhere('order.status = :status', { status: filters.status });
+      }
+
+      if (filters.paymentStatus) {
+        query.andWhere('order.paymentStatus = :paymentStatus', { paymentStatus: filters.paymentStatus });
+      }
+
+      if (filters.dateFrom) {
+        query.andWhere('order.orderDate >= :dateFrom', { dateFrom: filters.dateFrom });
+      }
+
+      if (filters.dateTo) {
+        query.andWhere('order.orderDate <= :dateTo', { dateTo: filters.dateTo });
+      }
+
+      if (filters.search) {
+        query.andWhere(
+          '(order.orderNumber ILIKE :search OR order.buyerName ILIKE :search)',
+          { search: `%${filters.search}%` }
+        );
+      }
+
+      // Sorting
+      const sortBy = filters.sortBy || 'orderDate';
+      const sortOrder = (filters.sortOrder || 'desc').toUpperCase() as 'ASC' | 'DESC';
+
+      switch (sortBy) {
+        case 'totalAmount':
+          query.orderBy('CAST(order.summary->>\'total\' AS DECIMAL)', sortOrder);
+          break;
+        case 'status':
+          query.orderBy('order.status', sortOrder);
+          break;
+        case 'buyerName':
+          query.orderBy('order.buyerName', sortOrder);
+          break;
+        default:
+          query.orderBy('order.orderDate', sortOrder);
+      }
+
+      // Pagination
+      const page = filters.page || 1;
+      const limit = filters.limit || 20;
+      const offset = (page - 1) * limit;
+      query.skip(offset).take(limit);
+
+      const [orders, total] = await query.getManyAndCount();
+
+      logger.debug(`[PD-4] Retrieved ${orders.length} orders for supplier ${supplierId}`);
+
+      return { orders, total };
+    } catch (error) {
+      logger.error('[PD-4] Error fetching supplier orders:', error);
+      throw error;
     }
   }
 }

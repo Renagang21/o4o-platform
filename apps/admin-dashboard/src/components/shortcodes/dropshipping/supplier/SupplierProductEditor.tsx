@@ -36,6 +36,11 @@ interface ProductFormData {
   cost_price: number;
   msrp: number;
   partner_commission_rate: number;
+  // Phase PD-2: Commission policy fields
+  commission_type: 'rate' | 'fixed' | null;
+  commission_value: number | null;
+  seller_commission_rate: number | null;
+  platform_commission_rate: number | null;
   shipping_days_min: number;
   shipping_days_max: number;
   shipping_fee: number;
@@ -59,6 +64,11 @@ const SupplierProductEditor: React.FC<SupplierProductEditorProps> = ({
     cost_price: 0,
     msrp: 0,
     partner_commission_rate: 5,
+    // Phase PD-2: Default commission policy (null = use seller/global default)
+    commission_type: null,
+    commission_value: null,
+    seller_commission_rate: null,
+    platform_commission_rate: null,
     shipping_days_min: 3,
     shipping_days_max: 7,
     shipping_fee: 0
@@ -486,37 +496,152 @@ const SupplierProductEditor: React.FC<SupplierProductEditorProps> = ({
             </Alert>
           </div>
 
-          {/* Commission Settings */}
-          <div className="space-y-4">
+          {/* Commission Settings - Phase PD-2 */}
+          <div className="space-y-4 border-t pt-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Percent className="h-5 w-5" />
-              파트너 수수료 설정
+              커미션 정책 (Phase PD-2)
             </h3>
-            
-            <div>
-              <Label htmlFor="partner_commission_rate">
-                파트너 수수료율 (%) *
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="partner_commission_rate"
-                  type="number"
-                  min="0"
-                  max="50"
-                  step="0.5"
-                  value={formData.partner_commission_rate}
-                  onChange={(e) => handleInputChange('partner_commission_rate', Number(e.target.value))}
-                  className={`w-32 ${errors.partner_commission_rate ? 'border-red-500' : ''}`}
+
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                상품별 커미션 정책을 설정하지 않으면 판매자의 기본 커미션율 또는 글로벌 기본율(20%)이 적용됩니다.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="commission_type">커미션 타입</Label>
+                <select
+                  id="commission_type"
+                  value={formData.commission_type || ''}
+                  onChange={(e) => handleInputChange('commission_type', e.target.value || null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={pendingApproval}
-                />
-                <span className="text-gray-500">%</span>
+                >
+                  <option value="">기본값 사용 (판매자/글로벌)</option>
+                  <option value="rate">비율 기반 (%)</option>
+                  <option value="fixed">고정 금액 (₩)</option>
+                </select>
+                <p className="text-sm text-gray-500 mt-1">
+                  비율: 판매가의 %로 계산 / 고정: 개당 고정 금액
+                </p>
               </div>
-              {errors.partner_commission_rate && (
-                <p className="text-sm text-red-500 mt-1">{errors.partner_commission_rate}</p>
+
+              {formData.commission_type && (
+                <div>
+                  <Label htmlFor="commission_value">
+                    커미션 값 *
+                    {formData.commission_type === 'rate' && (
+                      <span className="text-xs text-gray-500 ml-2">(0~1 범위, 예: 0.20 = 20%)</span>
+                    )}
+                    {formData.commission_type === 'fixed' && (
+                      <span className="text-xs text-gray-500 ml-2">(원 단위)</span>
+                    )}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    {formData.commission_type === 'fixed' && (
+                      <span className="text-gray-500">₩</span>
+                    )}
+                    <Input
+                      id="commission_value"
+                      type="number"
+                      min="0"
+                      max={formData.commission_type === 'rate' ? '1' : undefined}
+                      step={formData.commission_type === 'rate' ? '0.01' : '100'}
+                      value={formData.commission_value || ''}
+                      onChange={(e) => handleInputChange('commission_value', e.target.value ? Number(e.target.value) : null)}
+                      className={`w-40 ${errors.commission_value ? 'border-red-500' : ''}`}
+                      disabled={pendingApproval}
+                      placeholder={formData.commission_type === 'rate' ? '0.20' : '5000'}
+                    />
+                    {formData.commission_type === 'rate' && (
+                      <span className="text-gray-500">({((formData.commission_value || 0) * 100).toFixed(0)}%)</span>
+                    )}
+                  </div>
+                  {errors.commission_value && (
+                    <p className="text-sm text-red-500 mt-1">{errors.commission_value}</p>
+                  )}
+                </div>
               )}
-              <p className="text-sm text-gray-500 mt-1">
-                판매 시 파트너에게 지급할 수수료율을 설정하세요
-              </p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="seller_commission_rate">
+                    판매자별 커미션율 (%)
+                    <span className="text-xs text-gray-500 ml-2">선택사항</span>
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="seller_commission_rate"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formData.seller_commission_rate || ''}
+                      onChange={(e) => handleInputChange('seller_commission_rate', e.target.value ? Number(e.target.value) : null)}
+                      className="w-32"
+                      disabled={pendingApproval}
+                      placeholder="미설정"
+                    />
+                    <span className="text-gray-500">%</span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">특정 판매자 전용</p>
+                </div>
+
+                <div>
+                  <Label htmlFor="platform_commission_rate">
+                    플랫폼 커미션율 (%)
+                    <span className="text-xs text-gray-500 ml-2">향후 사용</span>
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="platform_commission_rate"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formData.platform_commission_rate || ''}
+                      onChange={(e) => handleInputChange('platform_commission_rate', e.target.value ? Number(e.target.value) : null)}
+                      className="w-32"
+                      disabled={pendingApproval}
+                      placeholder="미설정"
+                    />
+                    <span className="text-gray-500">%</span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">플랫폼 수수료</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t">
+              <h4 className="text-sm font-medium mb-2">레거시 필드 (하위호환)</h4>
+              <div>
+                <Label htmlFor="partner_commission_rate">
+                  파트너 수수료율 (%) - 레거시
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="partner_commission_rate"
+                    type="number"
+                    min="0"
+                    max="50"
+                    step="0.5"
+                    value={formData.partner_commission_rate}
+                    onChange={(e) => handleInputChange('partner_commission_rate', Number(e.target.value))}
+                    className={`w-32 ${errors.partner_commission_rate ? 'border-red-500' : ''}`}
+                    disabled={pendingApproval}
+                  />
+                  <span className="text-gray-500">%</span>
+                </div>
+                {errors.partner_commission_rate && (
+                  <p className="text-sm text-red-500 mt-1">{errors.partner_commission_rate}</p>
+                )}
+                <p className="text-sm text-gray-500 mt-1">
+                  기존 파트너 시스템과의 호환성을 위해 유지됩니다
+                </p>
+              </div>
             </div>
           </div>
 
