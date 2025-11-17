@@ -269,6 +269,13 @@ export interface OrderItem {
   sellerId: string;
   sellerName: string;
 
+  // Phase PD-2: Commission info (확정된 커미션 정보 - 주문 생성 시 확정)
+  // IMPORTANT: Commission is fixed at order creation time
+  // Product commission policy changes afterward do NOT affect this order
+  commissionType?: 'rate' | 'fixed';
+  commissionRate?: number; // Effective commission rate (0-1, e.g., 0.20 = 20%)
+  commissionAmount?: number; // Confirmed commission amount in KRW
+
   // Product attributes at time of order
   attributes?: Record<string, string>;
   notes?: string;

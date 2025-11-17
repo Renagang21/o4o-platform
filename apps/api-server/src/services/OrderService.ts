@@ -7,6 +7,7 @@ import { CartItem } from '../entities/CartItem.js';
 import { Partner, PartnerStatus } from '../entities/Partner.js';
 import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
 import { Product } from '../entities/Product.js';
+import { CommissionCalculator } from './CommissionCalculator.js';
 import logger from '../utils/logger.js';
 
 export interface CreateOrderRequest {
@@ -55,6 +56,7 @@ export class OrderService {
   private partnerRepository: Repository<Partner>;
   private partnerCommissionRepository: Repository<PartnerCommission>;
   private productRepository: Repository<Product>;
+  private commissionCalculator: CommissionCalculator;
 
   constructor() {
     this.orderRepository = AppDataSource.getRepository(Order);
@@ -64,6 +66,7 @@ export class OrderService {
     this.partnerRepository = AppDataSource.getRepository(Partner);
     this.partnerCommissionRepository = AppDataSource.getRepository(PartnerCommission);
     this.productRepository = AppDataSource.getRepository(Product);
+    this.commissionCalculator = new CommissionCalculator();
   }
 
   /**
@@ -88,6 +91,39 @@ export class OrderService {
 
       // Calculate order summary
       const summary = this.calculateOrderSummary(request.items);
+
+      // Phase PD-2: Calculate commission for each order item
+      // Commission is calculated and stored at order creation time (immutable)
+      for (const item of request.items) {
+        if (!item.sellerId) {
+          logger.warn(`[PD-2] Order item missing sellerId: ${item.productId}`, {
+            productName: item.productName
+          });
+          continue;
+        }
+
+        const commissionResult = await this.commissionCalculator.calculateForItem(
+          item.productId,
+          item.sellerId,
+          item.unitPrice,
+          item.quantity
+        );
+
+        // Store commission info in order item (immutable)
+        item.commissionType = commissionResult.type;
+        item.commissionRate = commissionResult.rate;
+        item.commissionAmount = commissionResult.amount;
+
+        logger.debug(`[PD-2] Commission calculated for order item`, {
+          productId: item.productId,
+          productName: item.productName,
+          sellerId: item.sellerId,
+          type: commissionResult.type,
+          rate: commissionResult.rate,
+          amount: commissionResult.amount,
+          source: commissionResult.source
+        });
+      }
 
       // Create order
       const order = new Order();

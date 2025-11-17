@@ -133,7 +133,21 @@ export class Product {
   @Column({ type: 'varchar', length: 3, default: 'KRW' })
   currency!: string;
 
-  // Commission Settings (문서 #66: 공급자가 파트너 커미션 설정)
+  // Phase PD-2: Commission Policy (상품별 커미션 설정)
+  // If not set, falls back to Seller's defaultCommissionRate, then global default (20%)
+  @Column({ type: 'enum', enum: ['rate', 'fixed'], nullable: true })
+  commissionType?: 'rate' | 'fixed';
+
+  @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
+  commissionValue?: number; // For 'rate': 0-1 (e.g., 0.20 = 20%), For 'fixed': amount in KRW
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  sellerCommissionRate?: number; // Optional: Seller-specific override rate (0-100)
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  platformCommissionRate?: number; // Optional: Platform share (0-100) - for future use
+
+  // Legacy: Kept for backward compatibility (문서 #66)
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   partnerCommissionRate!: number; // 파트너 커미션 비율 (%)
 
@@ -225,6 +239,24 @@ export class Product {
     return this.supplierPrice;
   }
 
+  /**
+   * Get commission policy for this product
+   * Phase PD-2: Returns commission type and value if set
+   * Returns null if not set (will fallback to seller/global defaults)
+   */
+  getCommissionPolicy(): { type: 'rate' | 'fixed'; value: number } | null {
+    if (this.commissionType && this.commissionValue !== undefined && this.commissionValue !== null) {
+      return {
+        type: this.commissionType,
+        value: this.commissionValue
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Legacy method: Calculate partner commission (backward compatibility)
+   */
   calculatePartnerCommission(salePrice: number): number {
     if (this.partnerCommissionAmount) {
       return this.partnerCommissionAmount;

@@ -150,6 +150,12 @@ export class BusinessInfo {
   @Column({ type: 'varchar', length: 5, nullable: true })
   language?: string; // en-US, etc.
 
+  // Phase PD-2: Commission Settings (Seller/Partner default commission rate)
+  // If not set, falls back to GLOBAL_DEFAULT_COMMISSION_RATE (20%)
+  // Used when Product has no commission policy defined
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  defaultCommissionRate?: number; // Percentage (0-100), e.g., 20 = 20%
+
   // Verification Status
   @Column({ type: 'boolean', default: false })
   isVerified!: boolean;
