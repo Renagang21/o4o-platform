@@ -2,6 +2,7 @@
  * P3: Admin Role Applications Routes
  *
  * Endpoints for admins to review and approve/reject role applications
+ * P4: Added email notifications for approval/rejection
  */
 
 import { Router } from 'express';
@@ -9,9 +10,20 @@ import { body, query, param, validationResult } from 'express-validator';
 import { AppDataSource } from '../database/connection.js';
 import { RoleApplication, RoleApplicationStatus } from '../entities/RoleApplication.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { User } from '../entities/User.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { emailService } from '../services/email.service.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
+
+// Role display names for emails
+const roleNames: Record<string, string> = {
+  seller: 'Seller',
+  supplier: 'Supplier',
+  partner: 'Partner',
+  admin: 'Administrator'
+};
 
 /**
  * Admin authorization middleware
@@ -182,6 +194,26 @@ router.post('/applications/:id/approve',
         await transactionalEntityManager.save(RoleApplication, application);
       });
 
+      // P4: Send approval email to user (non-blocking, fire and forget)
+      if (application.user) {
+        const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+        const workspaceUrl = `${frontendUrl}/workspace/${application.role}`;
+
+        emailService.sendRoleApplicationApprovedEmail(application.user.email, {
+          userName: application.user.name || application.user.username || 'User',
+          roleName: roleNames[application.role] || application.role,
+          businessName: application.businessName || 'N/A',
+          approvedAt: application.decidedAt?.toLocaleString('ko-KR') || new Date().toLocaleString('ko-KR'),
+          workspaceUrl
+        })
+          .then(() => {
+            logger.info(`[P4] Role application approved email sent to ${application.user.email}`);
+          })
+          .catch((err) => {
+            logger.error('[P4] Failed to send application approved email:', err);
+          });
+      }
+
       res.json({
         success: true,
         message: 'Application approved successfully',
@@ -226,7 +258,8 @@ router.post('/applications/:id/reject',
       const applicationRepo = AppDataSource.getRepository(RoleApplication);
 
       const application = await applicationRepo.findOne({
-        where: { id }
+        where: { id },
+        relations: ['user']  // P4: Added to get user info for email
       });
 
       if (!application) {
@@ -258,6 +291,24 @@ router.post('/applications/:id/reject',
       }
 
       await applicationRepo.save(application);
+
+      // P4: Send rejection email to user (non-blocking, fire and forget)
+      if (application.user) {
+        emailService.sendRoleApplicationRejectedEmail(application.user.email, {
+          userName: application.user.name || application.user.username || 'User',
+          roleName: roleNames[application.role] || application.role,
+          businessName: application.businessName || 'N/A',
+          appliedAt: application.appliedAt.toLocaleString('ko-KR'),
+          rejectedAt: application.decidedAt?.toLocaleString('ko-KR') || new Date().toLocaleString('ko-KR'),
+          reason
+        })
+          .then(() => {
+            logger.info(`[P4] Role application rejected email sent to ${application.user.email}`);
+          })
+          .catch((err) => {
+            logger.error('[P4] Failed to send application rejected email:', err);
+          });
+      }
 
       res.json({
         success: true,

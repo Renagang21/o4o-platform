@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>역할 신청 거부</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Neture Platform</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">역할 신청 결과 안내</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                안녕하세요, {{userName}}님
+              </h2>
+
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                귀하의 <strong>{{roleName}}</strong> 역할 신청을 검토한 결과, 안타깝게도 현재 승인이 어려운 상황입니다.
+              </p>
+
+              <div style="background-color: #fee2e2; border-left: 4px solid #ef4444; border-radius: 0 6px 6px 0; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #991b1b; font-size: 18px;">신청 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #b91c1c; width: 120px;">역할:</td>
+                    <td style="padding: 5px 0; color: #7f1d1d; font-weight: 600;">{{roleName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #b91c1c;">사업자명:</td>
+                    <td style="padding: 5px 0; color: #7f1d1d; font-weight: 600;">{{businessName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #b91c1c;">신청일시:</td>
+                    <td style="padding: 5px 0; color: #7f1d1d; font-weight: 600;">{{appliedAt}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #b91c1c;">결정일시:</td>
+                    <td style="padding: 5px 0; color: #7f1d1d; font-weight: 600;">{{rejectedAt}}</td>
+                  </tr>
+                </table>
+              </div>
+
+              {{#if reason}}
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">거부 사유</h3>
+                <p style="margin: 0; color: #666666; font-size: 15px; line-height: 1.6;">
+                  {{reason}}
+                </p>
+              </div>
+              {{/if}}
+
+              <p style="margin: 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                필요한 조건을 충족하신 후 다시 신청하실 수 있습니다. 자세한 문의사항이 있으시면 지원팀에 연락 주시기 바랍니다.
+              </p>
+
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{supportUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  고객 지원팀 문의하기
+                </a>
+              </div>
+
+              <div style="background-color: #eff6ff; border-radius: 6px; padding: 16px; margin: 25px 0;">
+                <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.6;">
+                  <strong>💡 참고</strong><br>
+                  조건을 충족하시면 {{reapplyUrl}}에서 다시 신청하실 수 있습니다.
+                </p>
+              </div>
+
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                더 나은 서비스로 찾아뵙겠습니다. 감사합니다.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 Neture Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © 2024 Neture. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

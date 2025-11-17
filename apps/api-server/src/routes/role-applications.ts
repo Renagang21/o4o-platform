@@ -2,6 +2,7 @@
  * P3: Role Applications Routes (User-facing)
  *
  * Endpoints for users to apply for roles (seller, supplier, partner, etc.)
+ * P4: Added email notifications for application submissions
  */
 
 import { Router } from 'express';
@@ -9,9 +10,20 @@ import { body, query, validationResult } from 'express-validator';
 import { AppDataSource } from '../database/connection.js';
 import { RoleApplication, RoleApplicationStatus } from '../entities/RoleApplication.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { User } from '../entities/User.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { emailService } from '../services/email.service.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
+
+// Role display names for emails
+const roleNames: Record<string, string> = {
+  seller: 'Seller',
+  supplier: 'Supplier',
+  partner: 'Partner',
+  admin: 'Administrator'
+};
 
 /**
  * POST /api/v2/roles/apply
@@ -85,6 +97,41 @@ router.post('/apply',
       application.appliedAt = new Date();
 
       await applicationRepo.save(application);
+
+      // P4: Send email notifications (non-blocking)
+      const userRepo = AppDataSource.getRepository(User);
+      const user = await userRepo.findOne({ where: { id: userId } });
+
+      if (user) {
+        const emailData = {
+          userName: user.name || user.username || 'User',
+          userEmail: user.email,
+          roleName: roleNames[role] || role,
+          businessName: businessName || 'N/A',
+          businessNumber: businessNumber || 'N/A',
+          appliedAt: application.appliedAt.toLocaleString('ko-KR'),
+          note
+        };
+
+        // Send confirmation email to user (fire and forget)
+        emailService.sendRoleApplicationSubmittedEmail(user.email, emailData)
+          .then(() => {
+            logger.info(`[P4] Role application submitted email sent to ${user.email}`);
+          })
+          .catch((err) => {
+            logger.error('[P4] Failed to send application submitted email to user:', err);
+          });
+
+        // Send notification email to admin (fire and forget)
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@neture.co.kr';
+        emailService.sendRoleApplicationAdminNotificationEmail(adminEmail, emailData)
+          .then(() => {
+            logger.info(`[P4] Role application admin notification sent to ${adminEmail}`);
+          })
+          .catch((err) => {
+            logger.error('[P4] Failed to send application notification to admin:', err);
+          });
+      }
 
       res.status(201).json({
         success: true,

@@ -634,6 +634,166 @@ export class EmailService {
     }
   }
 
+  /**
+   * P4: Send role application submitted email to user
+   */
+  async sendRoleApplicationSubmittedEmail(to: string, data: {
+    userName: string;
+    roleName: string;
+    businessName: string;
+    businessNumber: string;
+    appliedAt: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/roleApplicationSubmitted.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{roleName}}/g, data.roleName)
+        .replace(/{{businessName}}/g, data.businessName)
+        .replace(/{{businessNumber}}/g, data.businessNumber)
+        .replace(/{{appliedAt}}/g, data.appliedAt)
+        .replace(/{{dashboardUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/apply`);
+
+      await this.sendEmail({
+        to,
+        subject: `[Neture] ${data.roleName} 역할 신청이 접수되었습니다`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send role application submitted email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * P4: Send role application notification to admin
+   */
+  async sendRoleApplicationAdminNotificationEmail(to: string, data: {
+    userName: string;
+    userEmail: string;
+    roleName: string;
+    businessName: string;
+    businessNumber: string;
+    appliedAt: string;
+    note?: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/roleApplicationAdminNotification.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{userEmail}}/g, data.userEmail)
+        .replace(/{{roleName}}/g, data.roleName)
+        .replace(/{{businessName}}/g, data.businessName)
+        .replace(/{{businessNumber}}/g, data.businessNumber)
+        .replace(/{{appliedAt}}/g, data.appliedAt)
+        .replace(/{{note}}/g, data.note || '')
+        .replace(/{{reviewUrl}}/g, `${process.env.ADMIN_URL || 'https://admin.neture.co.kr'}/dashboard/admin/role-applications`);
+
+      // Remove note section if no note provided
+      if (!data.note) {
+        htmlTemplate = htmlTemplate.replace(/{{#if note}}[\s\S]*?{{\/if}}/g, '');
+      }
+
+      await this.sendEmail({
+        to,
+        subject: `[Admin Alert] 새로운 ${data.roleName} 역할 신청 - ${data.userName}`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send role application admin notification email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * P4: Send role application approved email to user
+   */
+  async sendRoleApplicationApprovedEmail(to: string, data: {
+    userName: string;
+    roleName: string;
+    businessName: string;
+    approvedAt: string;
+    workspaceUrl: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/roleApplicationApproved.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{roleName}}/g, data.roleName)
+        .replace(/{{businessName}}/g, data.businessName)
+        .replace(/{{approvedAt}}/g, data.approvedAt)
+        .replace(/{{workspaceUrl}}/g, data.workspaceUrl);
+
+      await this.sendEmail({
+        to,
+        subject: `🎉 [Neture] ${data.roleName} 역할 신청이 승인되었습니다!`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send role application approved email:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * P4: Send role application rejected email to user
+   */
+  async sendRoleApplicationRejectedEmail(to: string, data: {
+    userName: string;
+    roleName: string;
+    businessName: string;
+    appliedAt: string;
+    rejectedAt: string;
+    reason?: string;
+  }): Promise<void> {
+    const templatePath = path.join(__dirname, '../templates/email/roleApplicationRejected.html');
+
+    try {
+      let htmlTemplate = await fs.readFile(templatePath, 'utf8');
+
+      // Replace placeholders
+      htmlTemplate = htmlTemplate
+        .replace(/{{userName}}/g, data.userName)
+        .replace(/{{roleName}}/g, data.roleName)
+        .replace(/{{businessName}}/g, data.businessName)
+        .replace(/{{appliedAt}}/g, data.appliedAt)
+        .replace(/{{rejectedAt}}/g, data.rejectedAt)
+        .replace(/{{reason}}/g, data.reason || '')
+        .replace(/{{supportUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`)
+        .replace(/{{reapplyUrl}}/g, `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/apply`);
+
+      // Remove reason section if no reason provided
+      if (!data.reason) {
+        htmlTemplate = htmlTemplate.replace(/{{#if reason}}[\s\S]*?{{\/if}}/g, '');
+      }
+
+      await this.sendEmail({
+        to,
+        subject: `[Neture] ${data.roleName} 역할 신청 결과 안내`,
+        html: htmlTemplate,
+        text: this.htmlToText(htmlTemplate)
+      });
+    } catch (error) {
+      logger.error('Failed to send role application rejected email:', error);
+      throw error;
+    }
+  }
+
   // Public method to check if email service is available
   isServiceAvailable(): boolean {
     return this.isEnabled && this.isInitialized && this.transporter !== null;

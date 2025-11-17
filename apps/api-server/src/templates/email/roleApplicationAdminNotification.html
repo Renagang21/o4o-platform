@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>새로운 역할 신청</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🔔 Admin Alert</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">새로운 역할 신청</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                새로운 {{roleName}} 신청이 있습니다
+              </h2>
+
+              <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
+                다음 사용자가 <strong>{{roleName}}</strong> 역할을 신청했습니다.
+              </p>
+
+              <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 6px 6px 0; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #b45309; font-size: 18px;">신청자 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #78350f; width: 120px;">이름:</td>
+                    <td style="padding: 5px 0; color: #451a03; font-weight: 600;">{{userName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #78350f;">이메일:</td>
+                    <td style="padding: 5px 0; color: #451a03; font-weight: 600;">{{userEmail}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #78350f;">역할:</td>
+                    <td style="padding: 5px 0; color: #451a03; font-weight: 600;">{{roleName}}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">사업자 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666; width: 120px;">사업자명:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{businessName}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">사업자번호:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{businessNumber}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666;">신청일시:</td>
+                    <td style="padding: 5px 0; color: #333333; font-weight: 600;">{{appliedAt}}</td>
+                  </tr>
+                  {{#if note}}
+                  <tr>
+                    <td style="padding: 5px 0; color: #666666; vertical-align: top;">메모:</td>
+                    <td style="padding: 5px 0; color: #333333;">{{note}}</td>
+                  </tr>
+                  {{/if}}
+                </table>
+              </div>
+
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{reviewUrl}}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  신청서 검토하기
+                </a>
+              </div>
+
+              <p style="margin: 20px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
+                관리자 대시보드에서 신청을 승인하거나 거부할 수 있습니다.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 Neture Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © 2024 Neture. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
