@@ -47,6 +47,8 @@ const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
 const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 // P0 RBAC: Enrollment Management
 const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
+// P4-Admin: Role Applications Management
+const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdminPage'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
@@ -393,6 +395,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['users:update']}>
                         <Suspense fallback={<PageLoader />}>
                           <EnrollmentManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* P4-Admin: 역할 신청 관리 */}
+                    <Route path="/admin/role-applications" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <RoleApplicationsAdminPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

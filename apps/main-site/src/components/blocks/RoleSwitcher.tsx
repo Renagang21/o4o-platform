@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+/**
+ * P2: RoleSwitcher - Workspace-based navigation
+ *
+ * - Uses /workspace/{role} URLs for unified workspace entry
+ * - Detects current active role from URL
+ * - RoleAssignment-based role checking
+ * - No deprecated role fields
+ * - No /user/preferences API calls
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, Check } from 'lucide-react';
 import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
-import { cookieAuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { trackRoleSwitch } from '../../utils/analytics';
 
@@ -25,99 +34,131 @@ interface RoleOption {
 /**
  * 역할 전환 버튼 (헤더용)
  *
- * - 복수 역할을 가진 사용자에게만 표시
- * - 드롭다운에서 역할 선택 및 기본 역할 설정
- * - 역할 전환 시 해당 허브로 SPA 라우팅
+ * P2: Workspace 기반 라우팅
+ * - 복수 active assignments를 가진 사용자에게만 표시
+ * - /workspace/{role} URL로 통일된 진입점 제공
+ * - URL 기반 현재 활성 역할 자동 감지
+ * - 서버 API 호출 없이 클라이언트 사이드만 처리
  */
 export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const { showLabel = true, className = '' } = data;
-  const { user, isAuthenticated, updateUser } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [isSwitching, setIsSwitching] = useState(false);
+  const location = useLocation();
+  const [activeRole, setActiveRole] = useState<string | null>(null);
 
-  // Not authenticated or single role - don't show
-  if (!isAuthenticated || !user || !user.roles || user.roles.length <= 1) {
+  // P1: Get active assignments
+  const activeAssignments = user?.assignments?.filter(a => a.active) ?? [];
+  const roleList = activeAssignments.map(a => a.role);
+
+  // P2: Detect active role from current URL
+  useEffect(() => {
+    const pathname = location.pathname;
+
+    // Check workspace URLs
+    if (pathname.startsWith('/workspace/')) {
+      const role = pathname.split('/')[2];
+      setActiveRole(role);
+      return;
+    }
+
+    // Check dashboard URLs
+    if (pathname.startsWith('/dashboard/supplier')) {
+      setActiveRole('supplier');
+    } else if (pathname.startsWith('/dashboard/seller')) {
+      setActiveRole('seller');
+    } else if (pathname.startsWith('/dashboard/partner')) {
+      setActiveRole('partner');
+    } else if (pathname.startsWith('/dashboard/admin')) {
+      setActiveRole('admin');
+    } else if (pathname.startsWith('/account')) {
+      setActiveRole('customer');
+    } else if (pathname.startsWith('/store')) {
+      setActiveRole('customer');
+    } else {
+      // Default to first available role
+      setActiveRole(roleList[0] || null);
+    }
+  }, [location.pathname, roleList]);
+
+  // P1: Not authenticated or single role - don't show
+  if (!isAuthenticated || !user || activeAssignments.length <= 1) {
     return null;
   }
 
+  // P2: Role options with unified /workspace paths
   const roleOptions: Record<string, RoleOption> = {
     customer: {
       id: 'customer',
-      name: '사용자',
-      description: '제품 구매 및 사용',
-      path: '/',
+      name: 'Customer',
+      description: 'Browse and purchase products',
+      path: '/workspace/customer',
       icon: '👤'
     },
     seller: {
       id: 'seller',
-      name: '판매자',
-      description: '제품 판매 관리',
-      path: '/seller',
+      name: 'Seller',
+      description: 'Manage products and orders',
+      path: '/workspace/seller',
       icon: '🛒'
     },
     supplier: {
       id: 'supplier',
-      name: '공급자',
-      description: '제품 공급 관리',
-      path: '/supplier',
+      name: 'Supplier',
+      description: 'Supply and manage inventory',
+      path: '/workspace/supplier',
       icon: '🏭'
     },
     partner: {
       id: 'partner',
-      name: '파트너',
-      description: '제품 추천 및 수익',
-      path: '/partner',
+      name: 'Partner',
+      description: 'Promote products and earn',
+      path: '/workspace/partner',
       icon: '🤝'
+    },
+    admin: {
+      id: 'admin',
+      name: 'Admin',
+      description: 'System administration',
+      path: '/workspace/admin',
+      icon: '⚙️'
+    },
+    administrator: {
+      id: 'administrator',
+      name: 'Administrator',
+      description: 'System administration',
+      path: '/workspace/admin',
+      icon: '⚙️'
     }
   };
 
-  const currentRole = user.currentRole || user.roles[0];
-  const defaultRole = user.defaultRole || user.roles[0];
-
-  const handleRoleSwitch = async (newRole: string) => {
-    if (isSwitching) return;
-
-    const previousRole = currentRole;
+  // P2: Workspace-based role switch - navigate to /workspace/{role}
+  const handleRoleSwitch = (newRole: string) => {
+    const previousRole = activeRole || roleList[0];
 
     try {
-      setIsSwitching(true);
+      // Track analytics
+      trackRoleSwitch(previousRole, newRole);
 
-      // API 호출 - PATCH /user/preferences
-      const response = await cookieAuthClient.api.patch('/user/preferences', { currentRole: newRole });
+      // Navigate to workspace URL (will be redirected to actual dashboard)
+      const targetPath = roleOptions[newRole]?.path || '/';
+      navigate(targetPath);
 
-      if (response.data.success) {
-        // 사용자 상태 업데이트
-        updateUser({
-          currentRole: response.data.data.currentRole,
-          defaultRole: response.data.data.defaultRole,
-          roles: response.data.data.availableRoles
-        });
-
-        // 분석 이벤트 추적
-        trackRoleSwitch(previousRole, newRole);
-
-        // SPA 라우팅
-        const targetPath = roleOptions[newRole]?.path || '/';
-        navigate(targetPath);
-
-        toast.success(`${roleOptions[newRole]?.name}로 전환되었습니다.`);
-      }
+      toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || '역할 전환에 실패했습니다.');
-    } finally {
-      setIsSwitching(false);
+      toast.error('Failed to switch role');
+      console.error('Role switch error:', error);
     }
   };
 
   const trigger = (
     <button
-      className="role-switcher-toggle flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      aria-label="역할 전환"
+      className="role-switcher-toggle flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+      aria-label="Switch role"
       tabIndex={0}
-      disabled={isSwitching}
     >
       <Users size={18} />
-      {showLabel && <span className="text-sm font-medium">역할 전환</span>}
+      {showLabel && <span className="text-sm font-medium">Switch Role</span>}
     </button>
   );
 
@@ -126,31 +167,30 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
       <Dropdown trigger={trigger} alignment="right">
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-100">
-          <div className="text-sm font-medium text-gray-900">역할 선택</div>
+          <div className="text-sm font-medium text-gray-900">Select Role</div>
           <div className="text-xs text-gray-500 mt-0.5">
-            현재: {roleOptions[currentRole]?.name || currentRole}
+            {activeAssignments.length} active role{activeAssignments.length > 1 ? 's' : ''}
           </div>
         </div>
 
         {/* Role List */}
         <div className="py-2">
-          {user.roles.map((roleId) => {
+          {roleList.map((roleId) => {
             const role = roleOptions[roleId];
             if (!role) return null;
 
-            const isCurrent = roleId === currentRole;
-            const isDefault = roleId === defaultRole;
+            const isCurrent = activeRole === roleId;
 
             return (
               <div key={roleId} className="px-2">
                 <button
                   onClick={() => handleRoleSwitch(roleId)}
-                  className={`w-full flex items-start gap-3 px-3 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`w-full flex items-start gap-3 px-3 py-2 rounded-md transition-colors ${
                     isCurrent
                       ? 'bg-blue-50 text-blue-900'
                       : 'hover:bg-gray-50 text-gray-700'
                   }`}
-                  disabled={isCurrent || isSwitching}
+                  disabled={isCurrent}
                 >
                   <span className="text-lg mt-0.5">{role.icon}</span>
                   <div className="flex-1 text-left">
@@ -158,11 +198,6 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
                       <span className="font-medium">{role.name}</span>
                       {isCurrent && (
                         <Check size={14} className="text-blue-600" />
-                      )}
-                      {isDefault && !isCurrent && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                          기본
-                        </span>
                       )}
                     </div>
                     <div className="text-xs text-gray-500 mt-0.5">
@@ -178,7 +213,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
         {/* Footer Note */}
         <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
           <p className="text-xs text-gray-500">
-            역할을 전환하면 해당 기능에 맞는 UI가 표시됩니다.
+            Switching roles will navigate to the appropriate dashboard.
           </p>
         </div>
       </Dropdown>

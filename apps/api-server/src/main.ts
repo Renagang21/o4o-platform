@@ -315,6 +315,14 @@ try {
 const startServer = async () => {
   logger.info('Starting server...');
 
+  // Validate payment configuration (Phase PG-1)
+  try {
+    const { validatePaymentConfig } = await import('./config/payment.config.js');
+    validatePaymentConfig();
+  } catch (paymentConfigError) {
+    logger.warn('Payment config validation skipped:', paymentConfigError);
+  }
+
   // Initialize CPT Registry (Phase 5)
   try {
     const { initializeCPT } = await import('./init/cpt.init.js');

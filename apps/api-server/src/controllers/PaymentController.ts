@@ -6,8 +6,11 @@ import paymentService, {
 } from '../services/PaymentService.js';
 import { WebhookEventType } from '../entities/PaymentWebhook.js';
 import logger from '../utils/logger.js';
+import { TossPaymentService, TossConfirmRequest } from '../services/TossPaymentService.js';
 
 export class PaymentController {
+  private tossPaymentService = new TossPaymentService();
+
   /**
    * POST /api/v1/payments/prepare
    * 결제 준비 - 결제 위젯으로 전달할 정보 생성
@@ -117,6 +120,96 @@ export class PaymentController {
       }
 
       next(error);
+    }
+  };
+
+  /**
+   * POST /api/v1/payments/toss/confirm
+   * Phase PG-1: Toss Payments 결제 승인 (Order-centric, simplified)
+   *
+   * 프론트엔드에서 Toss 결제 성공 콜백 후 호출
+   * Order 엔티티에 직접 결제 정보를 저장하는 간소화된 방식
+   */
+  confirmTossPayment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const request: TossConfirmRequest = {
+        paymentKey: req.body.paymentKey,
+        orderId: req.body.orderId,
+        amount: req.body.amount
+      };
+
+      // 입력 검증
+      if (!request.paymentKey || !request.orderId || !request.amount) {
+        res.status(400).json({
+          success: false,
+          message: 'Missing required fields: paymentKey, orderId, amount'
+        });
+        return;
+      }
+
+      const order = await this.tossPaymentService.confirmPayment(request);
+
+      res.json({
+        success: true,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          paymentKey: order.paymentKey,
+          paymentStatus: order.paymentStatus,
+          orderStatus: order.status,
+          amount: order.calculateTotal(),
+          paidAt: order.paidAt
+        }
+      });
+
+    } catch (error: any) {
+      logger.error('Error confirming Toss payment:', error);
+
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Payment confirmation failed'
+      });
+    }
+  };
+
+  /**
+   * POST /api/v1/payments/toss/fail
+   * Phase PG-1: Toss Payments 결제 실패 처리
+   *
+   * 프론트엔드에서 Toss 결제 실패 콜백 후 호출
+   */
+  failTossPayment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { orderNumber, errorCode, errorMessage } = req.body;
+
+      if (!orderNumber) {
+        res.status(400).json({
+          success: false,
+          message: 'Missing required field: orderNumber'
+        });
+        return;
+      }
+
+      const reason = errorMessage || errorCode || 'Payment failed';
+      const order = await this.tossPaymentService.failPayment(orderNumber, reason);
+
+      res.json({
+        success: true,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          paymentStatus: order.paymentStatus,
+          message: 'Payment marked as failed'
+        }
+      });
+
+    } catch (error: any) {
+      logger.error('Error handling Toss payment failure:', error);
+
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Failed to process payment failure'
+      });
     }
   };
 

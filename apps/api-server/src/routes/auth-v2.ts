@@ -121,10 +121,22 @@ router.post('/register',
       user.email = email;
       user.password = hashedPassword;
       user.name = name;
-      user.role = role as UserRole;
+      user.role = role as UserRole; // Keep for backward compatibility
       user.status = UserStatus.PENDING; // Requires admin approval
 
       await userRepository.save(user);
+
+      // P1: Create RoleAssignment for the new user
+      const assignmentRepository = AppDataSource.getRepository(RoleAssignment);
+      const assignment = new RoleAssignment();
+      assignment.userId = user.id;
+      assignment.role = role || 'customer';
+      assignment.isActive = true;
+      assignment.validFrom = new Date();
+      assignment.assignedAt = new Date();
+      // assignedBy is null for self-registration
+
+      await assignmentRepository.save(assignment);
 
       // Send email verification
       try {

@@ -87,6 +87,10 @@ import sellerProductsRoutes from '../routes/seller-products.js';
 import enrollmentsRoutes from '../routes/enrollments.routes.js';
 import adminEnrollmentsRoutes from '../routes/admin/enrollments.routes.js';
 
+// P3 - Role Applications Routes
+import roleApplicationsRoutes from '../routes/role-applications.js';
+import adminRoleApplicationsRoutes from '../routes/admin-role-applications.js';
+
 // Gutenberg Content Management Routes
 import postsApiRoutes from '../routes/api/posts.js';
 import pagesApiRoutes from '../routes/api/pages.js';
@@ -329,6 +333,10 @@ export function setupRoutes(app: Application): void {
   // P0 RBAC - Role Enrollments (Phase B)
   app.use('/api/enrollments', enrollmentLimiter, enrollmentsRoutes);
   app.use('/api/v1/enrollments', enrollmentLimiter, enrollmentsRoutes);
+
+  // P3 - Role Applications
+  app.use('/api/v2/roles', standardLimiter, roleApplicationsRoutes);
+  app.use('/api/v2/admin/roles', standardLimiter, adminRoleApplicationsRoutes);
 
   // Phase 7 - Partner Analytics (OLD PATH - Deprecated)
   app.use('/api/v1/analytics/partner', standardLimiter, partnerAnalyticsRoutes);

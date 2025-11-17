@@ -43,6 +43,18 @@ import ApplyStatus from './pages/apply/ApplyStatus';
 import { SupplierLayout } from './components/dashboard/supplier/SupplierLayout';
 import { SellerLayout } from './components/dashboard/seller/SellerLayout';
 import { PartnerLayout } from './components/dashboard/partner/PartnerLayout';
+
+// P2: Workspace Redirect
+import { WorkspaceRedirect } from './pages/workspace/WorkspaceRedirect';
+
+// P2: Account Page (Customer Workspace)
+import { AccountPage } from './pages/account/AccountPage';
+
+// P3: Role Application Pages
+import { ApplyLandingPageP3 } from './pages/apply/ApplyLandingPageP3';
+import { ApplyRolePageP3 } from './pages/apply/ApplyRolePageP3';
+import { RoleApplicationsPageP3 } from './pages/admin/roles/RoleApplicationsPageP3';
+
 import { SupplierDashboardPage } from './pages/dashboard/SupplierDashboardPage';
 import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
 import { SupplierProductCreatePage } from './pages/dashboard/SupplierProductCreatePage';
@@ -78,6 +90,9 @@ import { ProductDetailPage } from './pages/storefront/ProductDetailPage';
 import { CartPage } from './pages/storefront/CartPage';
 import { CheckoutPage } from './pages/storefront/CheckoutPage';
 import { OrderSuccessPage } from './pages/storefront/OrderSuccessPage';
+
+// Phase PG-1: Payment Callbacks
+import { PaymentSuccessPage, PaymentFailPage } from './pages/payment';
 
 // Phase 2-B: Cart Event Handler
 import { CartEventHandler } from './components/cart/CartEventHandler';
@@ -211,25 +226,36 @@ const App: FC = () => {
           {/* Test Routes - For debugging purposes */}
           <Route path="/test/login" element={<LoginDebugPage />} />
 
-          {/* P0 RBAC: Application Routes */}
-          <Route path="/apply/supplier" element={
+          {/* P3: Role Application Routes */}
+          <Route path="/apply" element={
             <PrivateRoute>
-              <ApplySupplier />
+              <ApplyLandingPageP3 />
             </PrivateRoute>
           } />
-          <Route path="/apply/seller" element={
+          <Route path="/apply/:role" element={
             <PrivateRoute>
-              <ApplySeller />
+              <ApplyRolePageP3 />
             </PrivateRoute>
           } />
-          <Route path="/apply/partner" element={
-            <PrivateRoute>
-              <ApplyPartner />
-            </PrivateRoute>
-          } />
+
+          {/* P0 RBAC: Legacy application status route */}
           <Route path="/apply/:role/status" element={
             <PrivateRoute>
               <ApplyStatus />
+            </PrivateRoute>
+          } />
+
+          {/* P2: Workspace Routes - Unified workspace entry point */}
+          <Route path="/workspace/:role" element={
+            <PrivateRoute>
+              <WorkspaceRedirect />
+            </PrivateRoute>
+          } />
+
+          {/* P2: Account Page - Customer Workspace */}
+          <Route path="/account" element={
+            <PrivateRoute>
+              <AccountPage />
             </PrivateRoute>
           } />
 
@@ -285,6 +311,15 @@ const App: FC = () => {
             <Route path="settlements/:id" element={<PartnerSettlementDetailPage />} />
           </Route>
 
+          {/* P3: Admin Role Applications Management */}
+          <Route path="/dashboard/admin/role-applications" element={
+            <PrivateRoute>
+              <RoleGuard role="administrator">
+                <RoleApplicationsPageP3 />
+              </RoleGuard>
+            </PrivateRoute>
+          } />
+
           {/* Phase 4-2: Admin Settlement Management Routes */}
           <Route path="/dashboard/admin/settlements" element={
             <PrivateRoute>
@@ -314,6 +349,10 @@ const App: FC = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/store/checkout" element={<CheckoutPage />} />
           <Route path="/order/success/:id" element={<OrderSuccessPage />} />
+
+          {/* Phase PG-1: Payment Callback Routes */}
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/fail" element={<PaymentFailPage />} />
 
           {/* Editor Routes (Protected) */}
           <Route path="/editor/page/:id?" element={
