@@ -15,6 +15,8 @@ import {
   createSettlement,
   updateSettlementStatus,
   previewSettlement,
+  updateMemo,
+  markSettlementAsPaid,
 } from '../../controllers/admin/AdminSettlementController.js';
 
 const router: Router = Router();
@@ -62,5 +64,17 @@ router.put('/:id/status', updateSettlementStatus);
 
 // Legacy PATCH endpoint for backward compatibility
 router.patch('/:id/status', updateSettlementStatus);
+
+/**
+ * PUT /api/v1/admin/settlements/:id/memo
+ * Update settlement memo (Phase SETTLE-ADMIN)
+ */
+router.put('/:id/memo', updateMemo);
+
+/**
+ * POST /api/v1/admin/settlements/:id/mark-paid
+ * Mark settlement as paid (Phase SETTLE-ADMIN)
+ */
+router.post('/:id/mark-paid', markSettlementAsPaid);
 
 export default router;

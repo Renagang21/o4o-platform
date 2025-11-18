@@ -24,6 +24,7 @@ export const getAllSettlements = async (req: Request, res: Response) => {
       partyType,
       periodStart,
       periodEnd,
+      search,
     } = req.query;
 
     const filters: any = {
@@ -47,11 +48,23 @@ export const getAllSettlements = async (req: Request, res: Response) => {
       filters.periodEnd = new Date(periodEnd as string);
     }
 
+    if (search) {
+      filters.search = search as string;
+    }
+
     const result = await settlementService.getAllSettlements(filters);
 
     res.json({
       success: true,
-      ...result,
+      data: {
+        settlements: result.settlements,
+        pagination: {
+          total: result.total,
+          page: filters.page,
+          limit: filters.limit,
+          total_pages: result.totalPages,
+        },
+      },
     });
   } catch (error: any) {
     logger.error('[PD-5] Error getting all settlements', { error: error.message });
@@ -82,7 +95,7 @@ export const getSettlementById = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      settlement,
+      data: settlement,
     });
   } catch (error: any) {
     logger.error('[PD-5] Error getting settlement by ID', { error: error.message });
@@ -306,6 +319,99 @@ export const previewSettlement = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'Failed to preview settlement',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PUT /api/v1/admin/settlements/:id/memo
+ * Update settlement memo (Phase SETTLE-ADMIN)
+ */
+export const updateMemo = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { memo_internal } = req.body;
+
+    if (memo_internal === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'memo_internal field is required',
+      });
+    }
+
+    const settlement = await settlementService.updateSettlementMemo(
+      id,
+      memo_internal
+    );
+
+    logger.info('[SETTLE-ADMIN] Settlement memo updated', {
+      settlementId: id,
+      adminId: (req as any).user?.id,
+    });
+
+    res.json({
+      success: true,
+      data: settlement,
+      message: 'Memo saved successfully',
+    });
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      return res.status(404).json({
+        success: false,
+        message: 'Settlement not found',
+      });
+    }
+
+    logger.error('[SETTLE-ADMIN] Error updating settlement memo', {
+      error: error.message,
+    });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update memo',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/v1/admin/settlements/:id/mark-paid
+ * Mark settlement as paid (Phase SETTLE-ADMIN)
+ */
+export const markSettlementAsPaid = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { paidAt } = req.body;
+
+    const paidDate = paidAt ? new Date(paidAt) : undefined;
+
+    const settlement = await settlementService.markAsPaid(id, paidDate);
+
+    logger.info('[SETTLE-ADMIN] Settlement marked as paid', {
+      settlementId: id,
+      paidAt: settlement.paidAt,
+      adminId: (req as any).user?.id,
+    });
+
+    res.json({
+      success: true,
+      data: settlement,
+      message: 'Settlement marked as paid successfully',
+    });
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      return res.status(404).json({
+        success: false,
+        message: 'Settlement not found',
+      });
+    }
+
+    logger.error('[SETTLE-ADMIN] Error marking settlement as paid', {
+      error: error.message,
+    });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to mark settlement as paid',
       error: error.message,
     });
   }

@@ -23,6 +23,7 @@ export interface SettlementFilters {
   partyType?: SettlementPartyType;
   periodStart?: Date;
   periodEnd?: Date;
+  search?: string; // Search by party name or ID
 }
 
 export interface SettlementPreview {
@@ -340,7 +341,9 @@ export class SettlementManagementService {
     const limit = filters.limit || 20;
     const skip = (page - 1) * limit;
 
-    const queryBuilder = this.settlementRepo.createQueryBuilder('settlement');
+    const queryBuilder = this.settlementRepo
+      .createQueryBuilder('settlement')
+      .leftJoinAndSelect('settlement.party', 'party');
 
     if (filters.partyType) {
       queryBuilder.andWhere('settlement.partyType = :partyType', {
@@ -364,6 +367,13 @@ export class SettlementManagementService {
       queryBuilder.andWhere('settlement.periodEnd <= :periodEnd', {
         periodEnd: filters.periodEnd,
       });
+    }
+
+    if (filters.search) {
+      queryBuilder.andWhere(
+        '(settlement.partyId ILIKE :search OR party.username ILIKE :search OR party.email ILIKE :search)',
+        { search: `%${filters.search}%` }
+      );
     }
 
     queryBuilder.orderBy('settlement.createdAt', 'DESC').skip(skip).take(limit);
@@ -561,5 +571,65 @@ export class SettlementManagementService {
     });
 
     return { created, errors };
+  }
+
+  /**
+   * Update settlement status (Admin only)
+   * Phase SETTLE-ADMIN
+   */
+  async updateSettlementStatus(
+    settlementId: string,
+    status: SettlementStatus,
+    notes?: string
+  ): Promise<Settlement> {
+    const settlement = await this.settlementRepo.findOne({
+      where: { id: settlementId },
+    });
+
+    if (!settlement) {
+      throw new Error(`Settlement ${settlementId} not found`);
+    }
+
+    settlement.status = status;
+    if (notes !== undefined) {
+      settlement.notes = notes;
+    }
+
+    const saved = await this.settlementRepo.save(settlement);
+
+    logger.info('[SETTLE-ADMIN] Settlement status updated', {
+      settlementId,
+      status,
+      hasNotes: !!notes,
+    });
+
+    return saved;
+  }
+
+  /**
+   * Update settlement memo (Admin only)
+   * Phase SETTLE-ADMIN
+   */
+  async updateSettlementMemo(
+    settlementId: string,
+    memo: string
+  ): Promise<Settlement> {
+    const settlement = await this.settlementRepo.findOne({
+      where: { id: settlementId },
+    });
+
+    if (!settlement) {
+      throw new Error(`Settlement ${settlementId} not found`);
+    }
+
+    settlement.memo = memo;
+    const saved = await this.settlementRepo.save(settlement);
+
+    logger.info('[SETTLE-ADMIN] Settlement memo updated', {
+      settlementId,
+      memoLength: memo.length,
+    });
+
+    return saved;
   }
 }

@@ -89,6 +89,9 @@ export class Settlement {
   @Column({ type: 'text', nullable: true })
   notes?: string;
 
+  @Column({ type: 'text', nullable: true, comment: 'Admin 내부용 메모' })
+  memo?: string | null;
+
   // Relations
   @OneToMany('SettlementItem', 'settlement')
   items?: SettlementItem[];
