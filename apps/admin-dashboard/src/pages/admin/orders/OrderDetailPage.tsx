@@ -28,6 +28,10 @@ interface OrderItem {
   supplierName: string;
   sellerId: string;
   sellerName: string;
+  // Phase PD-2: Commission info
+  commissionType?: 'rate' | 'fixed';
+  commissionRate?: number;
+  commissionAmount?: number;
 }
 
 interface Address {
@@ -433,6 +437,7 @@ const OrderDetailPage: React.FC = () => {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">수량</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">단가</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">합계</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">커미션 (PD-2)</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -463,6 +468,20 @@ const OrderDetailPage: React.FC = () => {
                       <td className="px-6 py-4 text-sm text-gray-900 text-right">{item.quantity}</td>
                       <td className="px-6 py-4 text-sm text-gray-900 text-right">{formatCurrency(item.unitPrice)}</td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900 text-right">{formatCurrency(item.totalPrice)}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-right">
+                        {item.commissionAmount != null ? (
+                          <div>
+                            <div className="font-medium text-green-700">{formatCurrency(item.commissionAmount)}</div>
+                            <div className="text-xs text-gray-500">
+                              {item.commissionType === 'rate'
+                                ? `${((item.commissionRate || 0) * 100).toFixed(1)}%`
+                                : '고정금액'}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
