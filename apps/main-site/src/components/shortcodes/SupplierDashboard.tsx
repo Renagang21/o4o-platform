@@ -14,7 +14,12 @@ import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '../../contexts/AuthContext';
 import { RoleDashboardMenu, useDashboardSection, type DashboardMenuItem } from '../dashboard/RoleDashboardMenu';
-import { Package, ShoppingCart, BarChart3, Warehouse, LayoutDashboard } from 'lucide-react';
+import { Package, ShoppingCart, BarChart3, Warehouse, LayoutDashboard, DollarSign, TrendingUp } from 'lucide-react';
+import { KPICard, KPIGrid } from '../dashboard/common/KPICard';
+import { LineChart } from '../charts/LineChart';
+import { BarChart } from '../charts/BarChart';
+import { PieChart } from '../charts/PieChart';
+import { DashboardSkeleton } from '../common/Skeleton';
 
 // Section types for internal navigation
 type SupplierSection = 'overview' | 'products' | 'orders' | 'analytics' | 'inventory';
@@ -133,14 +138,7 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">공급자 대시보드 로딩중...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   // Menu items for section navigation
@@ -214,37 +212,39 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
+      {/* KPI Grid - Phase PD-6: Enhanced with new KPICard component */}
+      <KPIGrid>
+        <KPICard
           title="총 제품"
           value={stats?.totalProducts || 0}
           subtitle={`승인: ${stats?.approvedProducts || 0} | 대기: ${stats?.pendingProducts || 0}`}
-          icon="📦"
+          icon={Package}
           color="blue"
+          badge={stats?.pendingProducts}
         />
-        <StatCard
+        <KPICard
           title="이번 달 매출"
           value={formatPrice(stats?.totalRevenue || 0)}
           subtitle={`${stats?.monthlyOrders || 0}건 주문`}
-          icon="💰"
+          icon={DollarSign}
           color="green"
         />
-        <StatCard
+        <KPICard
           title="이번 달 수익"
           value={formatPrice(stats?.totalProfit || 0)}
           subtitle={`평균: ${formatPrice(stats?.avgOrderValue || 0)}`}
-          icon="📈"
+          icon={TrendingUp}
           color="purple"
         />
-        <StatCard
+        <KPICard
           title="재고 부족"
           value={stats?.lowStockProducts || 0}
           subtitle={`품절: ${stats?.outOfStockProducts || 0}개`}
-          icon="⚠️"
+          icon={Warehouse}
           color="orange"
+          badge={stats?.lowStockProducts}
         />
-      </div>
+      </KPIGrid>
 
       {/* Alert Banners */}
       {(stats?.pendingFulfillment || 0) > 0 || (stats?.lowStockProducts || 0) > 0 ? (
@@ -451,74 +451,117 @@ export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
         </div>
       )}
 
-      {/* Analytics Section */}
+      {/* Analytics Section - Phase PD-6: Enhanced with Charts */}
       {activeSection === 'analytics' && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">수익 분석</h2>
-          <div className="space-y-6">
-            {/* Revenue Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard
-                title="총 매출"
-                value={formatPrice(stats?.totalRevenue || 0)}
-                icon="💰"
-                color="green"
-              />
-              <StatCard
-                title="총 수익"
-                value={formatPrice(stats?.totalProfit || 0)}
-                icon="📈"
-                color="purple"
-              />
-              <StatCard
-                title="평균 주문액"
-                value={formatPrice(stats?.avgOrderValue || 0)}
-                icon="🎯"
-                color="blue"
-              />
-            </div>
+        <div className="space-y-6">
+          {/* Revenue Stats */}
+          <KPIGrid>
+            <KPICard
+              title="총 매출"
+              value={formatPrice(stats?.totalRevenue || 0)}
+              icon={DollarSign}
+              color="green"
+            />
+            <KPICard
+              title="총 수익"
+              value={formatPrice(stats?.totalProfit || 0)}
+              icon={TrendingUp}
+              color="purple"
+            />
+            <KPICard
+              title="평균 주문액"
+              value={formatPrice(stats?.avgOrderValue || 0)}
+              icon={ShoppingCart}
+              color="blue"
+            />
+            <KPICard
+              title="월간 주문 건수"
+              value={stats?.monthlyOrders || 0}
+              icon={Package}
+              color="orange"
+            />
+          </KPIGrid>
 
-            {/* Chart Placeholder */}
-            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
-              <div className="text-center">
-                <BarChart3 className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                <p className="text-gray-500">수익 차트</p>
-                <p className="text-sm text-gray-400 mt-1">상세 분석 데이터 준비 중</p>
-              </div>
-            </div>
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <LineChart
+              title="매출 추이"
+              series={[
+                {
+                  name: '매출액',
+                  data: recentOrders.length > 0
+                    ? recentOrders.slice().reverse().map(order => order.total)
+                    : [0]
+                }
+              ]}
+              categories={
+                recentOrders.length > 0
+                  ? recentOrders.slice().reverse().map(order =>
+                      new Date(order.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+                    )
+                  : ['데이터 없음']
+              }
+              height={350}
+              yAxisFormatter={(value) => `${value.toLocaleString()}원`}
+              tooltipFormatter={(value) => `${value.toLocaleString()}원`}
+            />
+
+            <PieChart
+              title="주문 상태 분포"
+              series={
+                recentOrders.length > 0
+                  ? [
+                      recentOrders.filter(o => o.status === 'pending').length,
+                      recentOrders.filter(o => o.status === 'confirmed').length,
+                      recentOrders.filter(o => o.status === 'shipped').length,
+                      recentOrders.filter(o => o.status === 'delivered').length
+                    ]
+                  : [1]
+              }
+              labels={
+                recentOrders.length > 0
+                  ? ['확인대기', '확인완료', '배송중', '배송완료']
+                  : ['데이터 없음']
+              }
+              variant="donut"
+              height={350}
+              valueFormatter={(value) => `${value}건`}
+            />
           </div>
         </div>
       )}
 
-      {/* Inventory Section */}
+      {/* Inventory Section - Phase PD-6: Enhanced with KPICard */}
       {activeSection === 'inventory' && (
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">재고 관리</h2>
           <div className="space-y-6">
             {/* Inventory Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard
+            <KPIGrid>
+              <KPICard
                 title="재고 부족"
                 value={stats?.lowStockProducts || 0}
                 subtitle="10개 이하"
-                icon="⚠️"
+                icon={Warehouse}
                 color="orange"
+                badge={stats?.lowStockProducts}
               />
-              <StatCard
+              <KPICard
                 title="품절"
                 value={stats?.outOfStockProducts || 0}
                 subtitle="재입고 필요"
-                icon="🚫"
-                color="red" as any
+                icon={Package}
+                color="red"
+                badge={stats?.outOfStockProducts}
               />
-              <StatCard
+              <KPICard
                 title="정상 재고"
                 value={(stats?.totalProducts || 0) - (stats?.lowStockProducts || 0) - (stats?.outOfStockProducts || 0)}
                 subtitle="충분한 재고"
-                icon="✅"
+                icon={Package}
                 color="green"
               />
-            </div>
+            </KPIGrid>
 
             {/* Low Stock Products */}
             {topProducts.filter(p => p.stock < 10).length > 0 && (

@@ -17,7 +17,12 @@ import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '../../contexts/AuthContext';
 import { RoleDashboardMenu, useDashboardSection, type DashboardMenuItem } from '../dashboard/RoleDashboardMenu';
-import { Package, ShoppingCart, BarChart3, Warehouse, LayoutDashboard, DollarSign } from 'lucide-react';
+import { Package, ShoppingCart, BarChart3, Warehouse, LayoutDashboard, DollarSign, TrendingUp, ShoppingBag } from 'lucide-react';
+import { KPICard, KPIGrid } from '../dashboard/common/KPICard';
+import { LineChart } from '../charts/LineChart';
+import { BarChart } from '../charts/BarChart';
+import { PieChart } from '../charts/PieChart';
+import { DashboardSkeleton, KPICardSkeleton, ChartSkeleton } from '../common/Skeleton';
 
 // Phase PD-1: Real API response types
 interface SellerDashboardSummary {
@@ -209,14 +214,7 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">판매자 대시보드 로딩중...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   // Menu items for section navigation
@@ -283,33 +281,38 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
         </div>
       )}
 
-      {/* Stats Grid - Phase PD-1: Real data from summary endpoint */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
+      {/* KPI Grid - Phase PD-6: Enhanced with new KPICard component */}
+      <KPIGrid>
+        <KPICard
           title="총 주문 건수"
-          value={`${(summary?.totalOrders || 0).toLocaleString()}건`}
+          value={summary?.totalOrders || 0}
           subtitle={`${period} 기간`}
-          icon="📋"
+          icon={ShoppingCart}
+          color="blue"
+          badge={summary?.totalOrders && summary.totalOrders > 0 ? summary.totalOrders : undefined}
         />
-        <StatCard
+        <KPICard
           title="총 매출액"
           value={`${(summary?.totalSalesAmount || 0).toLocaleString()}원`}
           subtitle="판매 금액"
-          icon="💰"
+          icon={TrendingUp}
+          color="green"
         />
-        <StatCard
+        <KPICard
           title="총 커미션"
           value={`${(summary?.totalCommissionAmount || 0).toLocaleString()}원`}
           subtitle="예상 수익"
-          icon="💎"
+          icon={DollarSign}
+          color="purple"
         />
-        <StatCard
+        <KPICard
           title="평균 주문액"
           value={`${(summary?.avgOrderAmount || 0).toLocaleString()}원`}
           subtitle="주문당 평균"
-          icon="🎯"
+          icon={ShoppingBag}
+          color="orange"
         />
-      </div>
+      </KPIGrid>
 
       {/* Alert Banners */}
       {(stats?.pendingOrders || 0) > 0 || (stats?.lowStockItems || 0) > 0 ? (
@@ -450,20 +453,49 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
             </div>
           </div>
 
-          {/* Sales Chart */}
-          <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">매출 추이</h2>
-            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
-              <div className="text-center">
-                <BarChart3 className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                <p className="text-gray-500 mb-2">매출 차트</p>
-                <p className="text-sm text-gray-400">
-                  {salesData.length > 0
-                    ? `${salesData.length}일간의 판매 데이터`
-                    : '판매 데이터를 수집하는 중입니다'}
-                </p>
-              </div>
-            </div>
+          {/* Sales Chart - Phase PD-6: Real Line Chart */}
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <LineChart
+              title="매출 추이"
+              series={[
+                {
+                  name: '매출액',
+                  data: recentOrders.length > 0
+                    ? recentOrders.slice().reverse().map(order => order.totalAmount)
+                    : [0]
+                }
+              ]}
+              categories={
+                recentOrders.length > 0
+                  ? recentOrders.slice().reverse().map(order =>
+                      new Date(order.orderDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+                    )
+                  : ['데이터 없음']
+              }
+              height={300}
+              yAxisFormatter={(value) => `${value.toLocaleString()}원`}
+              tooltipFormatter={(value) => `${value.toLocaleString()}원`}
+            />
+
+            <BarChart
+              title="주문별 커미션"
+              series={[
+                {
+                  name: '커미션',
+                  data: recentOrders.length > 0
+                    ? recentOrders.slice().reverse().map(order => order.commissionAmount)
+                    : [0]
+                }
+              ]}
+              categories={
+                recentOrders.length > 0
+                  ? recentOrders.slice().reverse().map(order => `#${order.orderNumber.slice(-4)}`)
+                  : ['데이터 없음']
+              }
+              height={300}
+              yAxisFormatter={(value) => `${value.toLocaleString()}원`}
+              tooltipFormatter={(value) => `${value.toLocaleString()}원`}
+            />
           </div>
         </>
       )}
@@ -507,68 +539,117 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
         </div>
       )}
 
-      {/* Analytics Section */}
+      {/* Analytics Section - Phase PD-6: Enhanced with Charts */}
       {activeSection === 'analytics' && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">판매 분석</h2>
-          <div className="space-y-6">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard
-                title="이번 달 매출"
-                value={`${(stats?.monthlySales || 0).toLocaleString()}원`}
-                icon="💰"
-              />
-              <StatCard
-                title="전환율"
-                value={`${(stats?.conversionRate || 0).toFixed(1)}%`}
-                icon="📈"
-              />
-              <StatCard
-                title="평균 주문액"
-                value={`${(stats?.averageOrderValue || 0).toLocaleString()}원`}
-                icon="🎯"
-              />
-            </div>
+        <div className="space-y-6">
+          {/* Key Metrics */}
+          <KPIGrid>
+            <KPICard
+              title="이번 달 매출"
+              value={`${(stats?.monthlySales || summary?.totalSalesAmount || 0).toLocaleString()}원`}
+              icon={DollarSign}
+              color="green"
+            />
+            <KPICard
+              title="전환율"
+              value={`${(stats?.conversionRate || 0).toFixed(1)}%`}
+              icon={TrendingUp}
+              color="blue"
+            />
+            <KPICard
+              title="평균 주문액"
+              value={`${(summary?.avgOrderAmount || stats?.averageOrderValue || 0).toLocaleString()}원`}
+              icon={ShoppingBag}
+              color="orange"
+            />
+            <KPICard
+              title="총 주문 건수"
+              value={summary?.totalOrders || 0}
+              icon={ShoppingCart}
+              color="purple"
+            />
+          </KPIGrid>
 
-            {/* Chart */}
-            <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
-              <div className="text-center">
-                <BarChart3 className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-                <p className="text-gray-500">판매 추이 차트</p>
-                <p className="text-sm text-gray-400 mt-1">상세 분석 데이터 준비 중</p>
-              </div>
-            </div>
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <LineChart
+              title="매출 추이 분석"
+              series={[
+                {
+                  name: '매출액',
+                  data: recentOrders.length > 0
+                    ? recentOrders.slice().reverse().map(order => order.totalAmount)
+                    : [0]
+                }
+              ]}
+              categories={
+                recentOrders.length > 0
+                  ? recentOrders.slice().reverse().map(order =>
+                      new Date(order.orderDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+                    )
+                  : ['데이터 없음']
+              }
+              height={350}
+              showDataLabels={false}
+              yAxisFormatter={(value) => `${value.toLocaleString()}원`}
+              tooltipFormatter={(value) => `${value.toLocaleString()}원`}
+            />
+
+            <PieChart
+              title="주문 상태 분포"
+              series={
+                recentOrders.length > 0
+                  ? [
+                      recentOrders.filter(o => o.status === 'pending').length,
+                      recentOrders.filter(o => o.status === 'paid').length,
+                      recentOrders.filter(o => o.status === 'shipped').length,
+                      recentOrders.filter(o => o.status === 'delivered').length
+                    ]
+                  : [1]
+              }
+              labels={
+                recentOrders.length > 0
+                  ? ['대기중', '결제완료', '배송중', '배송완료']
+                  : ['데이터 없음']
+              }
+              variant="donut"
+              height={350}
+              valueFormatter={(value) => `${value}건`}
+            />
           </div>
         </div>
       )}
 
-      {/* Inventory Section */}
+      {/* Inventory Section - Phase PD-6: Enhanced with KPICard */}
       {activeSection === 'inventory' && (
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">재고 관리</h2>
           <div className="space-y-6">
             {/* Inventory Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard
+            <KPIGrid>
+              <KPICard
                 title="재고 부족"
                 value={stats?.lowStockItems || 0}
                 subtitle="10개 이하"
-                icon="⚠️"
+                icon={Warehouse}
+                color="red"
+                badge={stats?.lowStockItems}
               />
-              <StatCard
+              <KPICard
                 title="활성 상품"
                 value={stats?.activeListings || 0}
                 subtitle={`전체 ${stats?.totalListings || 0}개`}
-                icon="📦"
+                icon={Package}
+                color="blue"
               />
-              <StatCard
+              <KPICard
                 title="총 재고 가치"
                 value="계산 중"
                 subtitle="예상 가치"
-                icon="💎"
+                icon={DollarSign}
+                color="purple"
               />
-            </div>
+            </KPIGrid>
 
             {/* Low Stock Items */}
             {topProducts.filter(p => p.stock < 10).length > 0 && (
@@ -585,33 +666,37 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
         </div>
       )}
 
-      {/* Settlements Section - Phase PD-1: Commission Details */}
+      {/* Settlements Section - Phase PD-6: Enhanced with KPICard */}
       {activeSection === 'settlements' && (
         <div className="space-y-6">
           {/* Commission Summary */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">커미션 내역</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <StatCard
+            <KPIGrid>
+              <KPICard
                 title="총 커미션"
                 value={`${totalCommission.toLocaleString()}원`}
                 subtitle={`${period} 기간`}
-                icon="💰"
+                icon={DollarSign}
+                color="green"
               />
-              <StatCard
+              <KPICard
                 title="주문 건수"
                 value={`${commissionDetails.length}건`}
                 subtitle="커미션 발생 주문"
-                icon="📋"
+                icon={ShoppingCart}
+                color="blue"
+                badge={commissionDetails.length || undefined}
               />
-              <StatCard
+              <KPICard
                 title="평균 커미션율"
                 value="20%"
                 subtitle="현재 고정 요율"
-                icon="📊"
+                icon={BarChart3}
+                color="purple"
               />
-            </div>
+            </KPIGrid>
           </div>
 
           {/* Commission Details Table */}
