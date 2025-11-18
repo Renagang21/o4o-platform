@@ -39,7 +39,7 @@ echo "🔨 Building admin dashboard..."
 cd apps/admin-dashboard
 NODE_OPTIONS='--max-old-space-size=4096' \
 GENERATE_SOURCEMAP=false \
-VITE_API_URL=https://api.neture.co.kr/api/v1 \
+VITE_API_URL=https://api.neture.co.kr/api \
 VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
 pnpm run build
 
