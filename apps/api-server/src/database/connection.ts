@@ -31,6 +31,7 @@ import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
 import { UserActivityLog } from '../entities/UserActivityLog.js';
+import { Notification } from '../entities/Notification.js';
 import { Media } from '../entities/Media.js';
 import { MediaFile } from '../entities/MediaFile.js';
 import { MediaFolder } from '../entities/MediaFolder.js';
@@ -188,6 +189,7 @@ export const AppDataSource = new DataSource({
     LinkedAccount,
     AccountActivity,
     UserActivityLog,
+    Notification,
     Media,
     MediaFile,
     MediaFolder,

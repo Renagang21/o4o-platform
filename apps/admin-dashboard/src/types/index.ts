@@ -185,3 +185,30 @@ export interface AuthUser {
   role: string
   permissions: string[]
 }
+
+// Phase PD-7: Notification types
+export type NotificationChannel = 'in_app' | 'email'
+
+export type NotificationType =
+  | 'order.new'
+  | 'order.status_changed'
+  | 'settlement.new_pending'
+  | 'settlement.paid'
+  | 'price.changed'
+  | 'stock.low'
+  | 'role.approved'
+  | 'role.application_submitted'
+  | 'custom'
+
+export interface Notification {
+  id: string
+  userId: string
+  channel: NotificationChannel
+  type: NotificationType
+  title: string
+  message?: string
+  metadata?: Record<string, any>
+  isRead: boolean
+  createdAt: string
+  readAt?: string
+}
