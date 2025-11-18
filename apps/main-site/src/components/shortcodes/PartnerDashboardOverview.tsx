@@ -31,8 +31,23 @@ interface PartnerDashboardSummary {
   referralCode: string;
 }
 
+interface PartnerAnalytics {
+  metrics: {
+    earnings: {
+      data: number[];
+    };
+    clicks: {
+      data: number[];
+    };
+    conversions: {
+      data: number[];
+    };
+  };
+}
+
 export const PartnerDashboardOverview: React.FC = () => {
   const [summary, setSummary] = useState<PartnerDashboardSummary | null>(null);
+  const [analytics, setAnalytics] = useState<PartnerAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,13 +60,20 @@ export const PartnerDashboardOverview: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get('/dropshipping/partner/dashboard/summary');
-      const data = response.data;
+      // Fetch both summary and analytics data
+      const [summaryRes, analyticsRes] = await Promise.allSettled([
+        authClient.api.get('/v1/dropshipping/partner/dashboard/summary'),
+        authClient.api.get('/v1/dropshipping/partner/analytics?period=30d'),
+      ]);
 
-      if (data.success) {
-        setSummary(data.summary);
+      if (summaryRes.status === 'fulfilled' && summaryRes.value.data?.success) {
+        setSummary(summaryRes.value.data.summary);
       } else {
-        setError(data.message || 'Failed to load dashboard');
+        setError('Failed to load dashboard summary');
+      }
+
+      if (analyticsRes.status === 'fulfilled' && analyticsRes.value.data?.success) {
+        setAnalytics(analyticsRes.value.data.analytics);
       }
     } catch (err: any) {
       console.error('Dashboard fetch error:', err);
@@ -134,14 +156,18 @@ export const PartnerDashboardOverview: React.FC = () => {
       {/* Charts */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <LineChart
-          title="수익 추이 (최근 30일)"
+          title="수익 추이 (최근 7일)"
           series={[
             {
               name: '일별 수익',
-              data: [120, 150, 90, 180, 210, 170, 200] // Mock data
+              data: analytics?.metrics.earnings?.data || [0]
             }
           ]}
-          categories={['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7']}
+          categories={
+            analytics?.metrics.earnings?.data
+              ? analytics.metrics.earnings.data.map((_, idx) => `Day ${idx + 1}`)
+              : ['데이터 없음']
+          }
           height={300}
           yAxisFormatter={(value) => `${value.toLocaleString()}원`}
           tooltipFormatter={(value) => `${value.toLocaleString()}원`}
@@ -152,14 +178,18 @@ export const PartnerDashboardOverview: React.FC = () => {
           series={[
             {
               name: '클릭',
-              data: [45, 52, 38, 60, 48, 55, 42] // Mock data
+              data: analytics?.metrics.clicks?.data || [0]
             },
             {
               name: '전환',
-              data: [5, 7, 4, 8, 6, 7, 5] // Mock data
+              data: analytics?.metrics.conversions?.data || [0]
             }
           ]}
-          categories={['월', '화', '수', '목', '금', '토', '일']}
+          categories={
+            analytics?.metrics.clicks?.data
+              ? analytics.metrics.clicks.data.map((_, idx) => `Day ${idx + 1}`)
+              : ['데이터 없음']
+          }
           height={300}
           yAxisFormatter={(value) => `${value}회`}
           tooltipFormatter={(value) => `${value}회`}
