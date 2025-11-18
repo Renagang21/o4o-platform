@@ -272,7 +272,7 @@ export async function fetchRolesFromDatabase(): Promise<RoleConfig[]> {
  */
 export async function fetchUserPermissions(userId: string): Promise<string[]> {
   try {
-    const response = await authClient.api.get(`/users/${userId}/permissions`);
+    const response = await authClient.api.get(`/v1/userRole/${userId}/permissions`);
     return response.data?.permissions || [];
   } catch (error) {
     console.error('Failed to fetch user permissions:', error);
