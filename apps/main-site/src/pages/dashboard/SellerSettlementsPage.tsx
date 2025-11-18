@@ -13,6 +13,7 @@ import type { SettlementSummary, SettlementStatus } from '../../types/settlement
 import { sellerSettlementAPI } from '../../services/sellerSettlementApi';
 import { handleApiError } from '../../utils/apiErrorHandler';
 import { CreateSettlementModal } from '../../components/dashboard/partner/CreateSettlementModal';
+import { SettlementSummaryCards } from '../../components/SettlementSummaryCards';
 
 export const SellerSettlementsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export const SellerSettlementsPage: React.FC = () => {
 
   // 필터 상태
   const [statusFilter, setStatusFilter] = useState<SettlementStatus | 'ALL'>('ALL');
-  const [dateFilter, setDateFilter] = useState<'30' | '90' | 'year' | 'all'>('all');
+  const [dateFilter, setDateFilter] = useState<'thisMonth' | 'lastMonth' | '30' | '90' | 'year' | 'all'>('all');
 
   // 페이지네이션
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,7 +44,16 @@ export const SellerSettlementsPage: React.FC = () => {
       // 날짜 필터 계산
       let date_from: string | undefined;
       const today = new Date();
-      if (dateFilter === '30') {
+
+      if (dateFilter === 'thisMonth') {
+        // 이번 달 1일부터
+        date_from = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+      } else if (dateFilter === 'lastMonth') {
+        // 지난 달 1일부터
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        date_from = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}-01`;
+      } else if (dateFilter === '30') {
         const date = new Date(today);
         date.setDate(date.getDate() - 30);
         date_from = date.toISOString().split('T')[0];
@@ -58,7 +68,7 @@ export const SellerSettlementsPage: React.FC = () => {
       const response = await sellerSettlementAPI.fetchSellerSettlements({
         page: currentPage,
         limit,
-        status: statusFilter,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
         date_from,
       });
 
@@ -84,34 +94,39 @@ export const SellerSettlementsPage: React.FC = () => {
     fetchSettlements();
   }, [currentPage, statusFilter, dateFilter]);
 
-  // 상태 배지
-  const getStatusBadge = (status: SettlementStatus) => {
-    switch (status) {
-      case 'OPEN':
+  // 상태 배지 (PD-5 + legacy status support)
+  const getStatusBadge = (status: SettlementStatus | string) => {
+    // Normalize status to lowercase
+    const normalizedStatus = status.toLowerCase();
+
+    switch (normalizedStatus) {
+      case 'pending':
+      case 'open':
         return (
           <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
             정산 준비중
           </span>
         );
-      case 'PENDING_PAYOUT':
+      case 'processing':
+      case 'pending_payout':
         return (
           <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
             지급 대기
           </span>
         );
-      case 'PAID':
+      case 'paid':
         return (
           <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
             지급 완료
           </span>
         );
-      case 'CANCELLED':
+      case 'cancelled':
         return (
           <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
             취소됨
           </span>
         );
-      case 'DRAFT':
+      case 'draft':
         return (
           <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
             임시
@@ -122,19 +137,20 @@ export const SellerSettlementsPage: React.FC = () => {
     }
   };
 
-  // 금액 포맷
-  const formatCurrency = (amount: number | undefined | null, currency: string = 'KRW') => {
-    const value = amount ?? 0;
-    if (currency === 'KRW') {
+  // 금액 포맷 (PD-5 string amounts + legacy number support)
+  const formatCurrency = (amount: number | string | undefined | null, currency: string = 'KRW') => {
+    const value = typeof amount === 'string' ? parseFloat(amount) : (amount ?? 0);
+    if (currency === 'KRW' || !currency) {
       return `₩ ${value.toLocaleString()}`;
     }
     return `${value.toLocaleString()} ${currency}`;
   };
 
   // 날짜 포맷
-  const formatDate = (dateString: string | undefined | null) => {
+  const formatDate = (dateString: string | Date | undefined | null) => {
     if (!dateString) return '-';
-    return dateString.split('T')[0];
+    const dateStr = typeof dateString === 'string' ? dateString : dateString.toISOString();
+    return dateStr.split('T')[0];
   };
 
   // 정산 생성 완료 핸들러
@@ -166,7 +182,10 @@ export const SellerSettlementsPage: React.FC = () => {
         </button>
       </PageHeader>
 
-      {/* 필터 영역 */}
+      {/* Phase SETTLE-UI: Summary Cards */}
+      <SettlementSummaryCards settlements={settlements} loading={loading} />
+
+      {/* 필터 영역 (Phase SETTLE-UI: Enhanced with 이번 달/지난 달) */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           {/* 기간 필터 */}
@@ -182,14 +201,16 @@ export const SellerSettlementsPage: React.FC = () => {
               }}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
+              <option value="thisMonth">이번 달</option>
+              <option value="lastMonth">지난 달</option>
               <option value="30">최근 30일</option>
               <option value="90">최근 90일</option>
-              <option value="year">올해</option>
+              <option value="year">올해 전체</option>
               <option value="all">전체</option>
             </select>
           </div>
 
-          {/* 상태 필터 */}
+          {/* 상태 필터 (PD-5 lowercase values) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               상태
@@ -203,10 +224,10 @@ export const SellerSettlementsPage: React.FC = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="ALL">전체</option>
-              <option value="OPEN">정산 준비중</option>
-              <option value="PENDING_PAYOUT">지급 대기</option>
-              <option value="PAID">지급 완료</option>
-              <option value="CANCELLED">취소됨</option>
+              <option value="pending">정산 준비중</option>
+              <option value="processing">지급 대기</option>
+              <option value="paid">지급 완료</option>
+              <option value="cancelled">취소됨</option>
             </select>
           </div>
         </div>
@@ -282,19 +303,20 @@ export const SellerSettlementsPage: React.FC = () => {
                   {settlements.map((settlement) => (
                     <tr key={settlement.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatDate(settlement.period_start)} ~ {formatDate(settlement.period_end)}
+                        {formatDate(settlement.periodStart || settlement.period_start)} ~{' '}
+                        {formatDate(settlement.periodEnd || settlement.period_end)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">
                         {settlement.id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
-                        {formatCurrency(settlement.net_payout_amount, settlement.currency)}
+                        {formatCurrency(settlement.payableAmount || settlement.net_payout_amount, settlement.currency)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         {getStatusBadge(settlement.status)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {formatDate(settlement.created_at)}
+                        {formatDate(settlement.createdAt || settlement.created_at)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button

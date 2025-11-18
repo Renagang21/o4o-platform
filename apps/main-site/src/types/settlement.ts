@@ -9,45 +9,73 @@
 export type SettlementRole = 'partner' | 'seller' | 'supplier';
 
 /**
- * 정산 상태
+ * 정산 상태 (PD-5 Settlement 기준)
+ * Phase SETTLE-UI: Aligned with backend SettlementStatus enum
  */
 export type SettlementStatus =
-  | 'DRAFT'           // 임시 계산 상태 (선택사항)
-  | 'OPEN'            // 정산 생성, 미지급
-  | 'PENDING_PAYOUT'  // 지급 진행 중
-  | 'PAID'            // 지급 완료
-  | 'CANCELLED';      // 취소/무효
+  | 'pending'     // 정산 생성, 미지급
+  | 'processing'  // 지급 진행 중
+  | 'paid'        // 지급 완료
+  | 'cancelled';  // 취소/무효
+
+// Legacy status values for backward compatibility
+export type LegacySettlementStatus =
+  | 'DRAFT'
+  | 'OPEN'
+  | 'PENDING_PAYOUT'
+  | 'PAID'
+  | 'CANCELLED';
 
 /**
- * 공통 Settlement 요약
+ * 공통 Settlement 요약 (PD-5 Settlement 엔티티 기반)
+ * Phase SETTLE-UI: Updated to match backend Settlement entity with camelCase
  */
 export interface SettlementSummary {
   id: string;
-  role: SettlementRole;
 
-  // 역할별 ID (해당 역할일 때만 사용)
-  partner_id?: string;
-  seller_id?: string;
-  supplier_id?: string;
+  // Party information (PD-5 uses partyType/partyId)
+  partyType: 'seller' | 'supplier' | 'platform';
+  partyId: string;
 
   // 정산 기간
-  period_start: string;  // YYYY-MM-DD
-  period_end: string;    // YYYY-MM-DD
+  periodStart: string;  // ISO timestamp
+  periodEnd: string;    // ISO timestamp
 
   status: SettlementStatus;
 
-  // 금액
-  currency: string;                    // "KRW"
-  gross_commission_amount: number;     // 정산 대상 커미션 총액 (세전)
-  adjustment_amount: number;           // 조정(±), 수수료/보정 등
-  net_payout_amount: number;           // 실제 지급될 금액
+  // 금액 (PD-5 Settlement fields - all string for precision)
+  totalSaleAmount: string;       // 총 매출
+  totalBaseAmount: string;       // 총 공급가
+  totalCommissionAmount: string; // 총 커미션
+  totalMarginAmount: string;     // 총 마진
+  payableAmount: string;         // 실제 지급될 금액
 
   // 타임스탬프
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
+  paidAt?: string;
 
   // 메모
-  memo_internal?: string;  // 내부 메모 (회계/운영)
+  notes?: string;
+
+  // Metadata
+  metadata?: Record<string, any>;
+
+  // Legacy fields for backward compatibility
+  role?: SettlementRole;
+  partner_id?: string;
+  seller_id?: string;
+  supplier_id?: string;
+  period_start?: string;
+  period_end?: string;
+  currency?: string;
+  gross_commission_amount?: number;
+  adjustment_amount?: number;
+  net_payout_amount?: number;
+  created_at?: string;
+  updated_at?: string;
+  paid_at?: string;
+  memo_internal?: string;
 }
 
 /**
@@ -253,13 +281,64 @@ export interface UpdateSupplierSettlementMemoResponse {
 
 /**
  * Seller Settlement 관련 타입
+ * Phase SETTLE-UI: Updated to match PD-5 Settlement + SETTLE-1 Commission Integration
  */
 
-// 판매자 정산 라인 아이템
+// 판매자 정산 아이템 (SettlementItem 기반 - camelCase)
+export interface SellerSettlementItem {
+  id: string;
+  settlementId: string;
+
+  // Order information
+  orderId: string;
+  orderItemId: string;
+  productName: string;
+  quantity: number;
+
+  // Price snapshots (per unit)
+  salePriceSnapshot: string;    // 판매가 (per unit)
+  basePriceSnapshot?: string;   // 공급가 (per unit)
+  commissionAmountSnapshot?: string; // 커미션 total
+  marginAmountSnapshot?: string;     // 마진 total
+
+  // Phase SETTLE-1: Commission Policy Integration (PD-2)
+  commissionType?: 'rate' | 'fixed';  // Commission calculation method
+  commissionRate?: string;            // Commission rate (0-1, e.g., "0.20" = 20%)
+
+  // Calculated totals
+  totalSaleAmount: string;      // salePriceSnapshot × quantity
+  totalBaseAmount?: string;     // basePriceSnapshot × quantity
+
+  // Party IDs
+  sellerId?: string;
+  supplierId?: string;
+
+  // Additional metadata
+  metadata?: Record<string, any>;
+}
+
+// 판매자 정산 상세 (PD-5 Settlement 기반)
+export interface SellerSettlementDetail extends SettlementSummary {
+  // Settlement items (Phase SETTLE-1 structure)
+  items?: SellerSettlementItem[];
+
+  // Legacy compatibility (for old Phase 4-1 structure)
+  role?: 'seller';
+  seller_id?: string;
+  lines?: SellerSettlementLineItem[];
+  total_revenue?: number;
+  total_cost?: number;
+  total_margin_amount?: number;
+  average_margin_rate?: number;
+  total_orders?: number;
+  total_items?: number;
+}
+
+// Legacy type for backward compatibility
 export interface SellerSettlementLineItem {
   order_id: string;
   order_number: string;
-  order_date: string;         // YYYY-MM-DD
+  order_date: string;
 
   customer_name: string;
   customer_email?: string;
@@ -270,28 +349,12 @@ export interface SellerSettlementLineItem {
 
   quantity: number;
 
-  sale_price: number;         // 판매가(단가)
-  supply_price?: number;      // 공급가(선택)
-  line_revenue: number;       // sale_price × 수량
-  line_cost?: number;         // supply_price × 수량
-  line_margin_amount?: number; // line_revenue - line_cost
-  line_margin_rate?: number;   // margin_rate (0.15 = 15%)
-}
-
-// 판매자 정산 상세
-export interface SellerSettlementDetail extends SettlementSummary {
-  role: 'seller';
-  seller_id: string;
-
-  lines: SellerSettlementLineItem[];
-
-  // 요약 지표
-  total_revenue: number;        // Σ line_revenue
-  total_cost?: number;          // Σ line_cost
-  total_margin_amount?: number; // Σ line_margin_amount
-  average_margin_rate?: number; // 가중 평균 마진율
-  total_orders: number;
-  total_items: number;
+  sale_price: number;
+  supply_price?: number;
+  line_revenue: number;
+  line_cost?: number;
+  line_margin_amount?: number;
+  line_margin_rate?: number;
 }
 
 // 판매자 정산 목록 조회 쿼리
