@@ -45,9 +45,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
   
   const authClient = ssoClient || new AuthClient(
-    typeof window !== 'undefined' ? 
-      'https://api.neture.co.kr' : 
-      'https://api.neture.co.kr'
+    typeof window !== 'undefined' ?
+      'https://api.neture.co.kr/api' :
+      'https://api.neture.co.kr/api'
   );
 
   // 초기 인증 상태 확인 - 마운트 시 한 번만 실행
