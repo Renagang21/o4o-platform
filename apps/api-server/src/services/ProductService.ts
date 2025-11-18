@@ -641,7 +641,7 @@ export class ProductService {
     newStock: number,
     sellerId?: string
   ): Promise<Product> {
-    const product = await this.productRepo.findOne({
+    const product = await this.productRepository.findOne({
       where: { id: productId },
       relations: ['supplier'],
     });
@@ -656,7 +656,7 @@ export class ProductService {
     // Update stock
     product.inventory = Math.max(0, newStock);
 
-    const savedProduct = await this.productRepo.save(product);
+    const savedProduct = await this.productRepository.save(product);
 
     // CI-2.3: Send stock.low notification if:
     // 1. Stock dropped below threshold
