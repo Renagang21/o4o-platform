@@ -37,7 +37,8 @@ export const SupplierSettlementDetailPage: React.FC = () => {
       const response = await supplierSettlementAPI.fetchSupplierSettlementDetail(id);
       if (response.success) {
         setSettlement(response.data);
-        setMemoText(response.data.memo_internal || '');
+        // Phase SETTLE-UI-SUPPLIER: PD-5 compatible memo field access
+        setMemoText((response.data as any).memoInternal || (response.data as any).memo_internal || '');
       }
     } catch (err) {
       const errorMessage = handleApiError(err, '정산 상세 정보');
@@ -94,19 +95,33 @@ export const SupplierSettlementDetailPage: React.FC = () => {
     }
   };
 
-  // 금액 포맷
-  const formatCurrency = (amount: number | undefined | null, currency: string = 'KRW') => {
-    const value = amount ?? 0;
-    if (currency === 'KRW') {
+  // Phase SETTLE-UI-SUPPLIER: PD-5 compatible formatting (string + number support)
+  const formatCurrency = (amount: number | string | undefined | null, currency: string = 'KRW') => {
+    const value = typeof amount === 'string' ? parseFloat(amount) : (amount ?? 0);
+    if (currency === 'KRW' || !currency) {
       return `₩ ${value.toLocaleString()}`;
     }
     return `${value.toLocaleString()} ${currency}`;
   };
 
-  // 날짜 포맷
-  const formatDate = (dateString: string | undefined | null) => {
+  // Phase SETTLE-UI-SUPPLIER: PD-5 compatible date formatting (string + Date support)
+  const formatDate = (dateString: string | Date | undefined | null) => {
     if (!dateString) return '-';
-    return dateString.split('T')[0];
+    const dateStr = typeof dateString === 'string' ? dateString : dateString.toISOString();
+    return dateStr.split('T')[0];
+  };
+
+  // Commission type formatting
+  const formatCommissionType = (type: string | undefined) => {
+    if (!type) return '-';
+    return type === 'rate' ? '비율형' : type === 'fixed' ? '고정형' : type;
+  };
+
+  // Commission rate formatting (0.15 -> 15%)
+  const formatCommissionRate = (rate: number | string | undefined) => {
+    if (rate === undefined || rate === null) return '-';
+    const value = typeof rate === 'string' ? parseFloat(rate) : rate;
+    return (value * 100).toFixed(2) + '%';
   };
 
   // 상태 변경 가능 여부 확인
@@ -249,7 +264,7 @@ export const SupplierSettlementDetailPage: React.FC = () => {
           { label: '공급자 대시보드', href: '/dashboard/supplier' },
           { label: '정산', href: '/dashboard/supplier/settlements' },
           {
-            label: `${formatDate(settlement.period_start)} ~ ${formatDate(settlement.period_end)}`,
+            label: `${formatDate((settlement as any).periodStart || (settlement as any).period_start)} ~ ${formatDate((settlement as any).periodEnd || (settlement as any).period_end)}`,
             isCurrent: true,
           },
         ]}
@@ -267,12 +282,28 @@ export const SupplierSettlementDetailPage: React.FC = () => {
 
       <PageHeader
         title="정산 상세"
-        subtitle={`정산 기간: ${formatDate(settlement.period_start)} ~ ${formatDate(settlement.period_end)}`}
+        subtitle={`정산 기간: ${formatDate((settlement as any).periodStart || (settlement as any).period_start)} ~ ${formatDate((settlement as any).periodEnd || (settlement as any).period_end)}`}
       >
         {getStatusBadge(settlement.status)}
       </PageHeader>
 
       <div className="space-y-6">
+        {/* Phase SETTLE-UI-SUPPLIER: PD-2/SETTLE-1 Commission Integration Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-blue-900 mb-1">
+                PD-2/SETTLE-1 통합: 커미션 정책 자동 반영
+              </h3>
+              <p className="text-sm text-blue-800">
+                이 정산은 주문 생성 시점의 커미션 정책을 자동으로 스냅샷하여 적용합니다.
+                판매가, 공급가, 커미션 금액 등의 데이터는 정산 생성 시점에 고정됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* 정산 요약 카드 */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">정산 요약</h2>
@@ -287,33 +318,57 @@ export const SupplierSettlementDetailPage: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">생성일</div>
-              <div className="text-base text-gray-900">{formatDate(settlement.created_at)}</div>
+              <div className="text-base text-gray-900">{formatDate((settlement as any).createdAt || (settlement as any).created_at)}</div>
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">마지막 업데이트</div>
-              <div className="text-base text-gray-900">{formatDate(settlement.updated_at)}</div>
+              <div className="text-base text-gray-900">{formatDate((settlement as any).updatedAt || (settlement as any).updated_at)}</div>
+            </div>
+          </div>
+
+          {/* Phase SETTLE-UI-SUPPLIER: Enhanced financial summary with PD-5 amounts */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div>
+                <div className="text-sm text-gray-600 mb-1">총 판매 금액</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {formatCurrency((settlement as any).totalSaleAmount || (settlement as any).total_sale_amount, settlement.currency)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 mb-1">총 공급 금액 (기준가)</div>
+                <div className="text-2xl font-bold text-gray-700">
+                  {formatCurrency((settlement as any).totalBaseAmount || (settlement as any).total_base_amount || (settlement as any).total_supply_amount, settlement.currency)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 mb-1">총 커미션</div>
+                <div className="text-2xl font-bold text-orange-600">
+                  {formatCurrency((settlement as any).totalCommissionAmount || (settlement as any).total_commission_amount || 0, settlement.currency)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 mb-1">총 마진 금액</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {formatCurrency((settlement as any).totalMarginAmount || (settlement as any).total_margin_amount || 0, settlement.currency)}
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <div className="text-sm text-gray-600 mb-1">총 공급 금액</div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(settlement.total_supply_amount, settlement.currency)}
-                </div>
-              </div>
-              <div>
                 <div className="text-sm text-gray-600 mb-1">조정 금액</div>
-                <div className={`text-2xl font-bold ${settlement.adjustment_amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {settlement.adjustment_amount >= 0 ? '+' : ''}
-                  {formatCurrency(settlement.adjustment_amount, settlement.currency)}
+                <div className={`text-xl font-bold ${((settlement as any).adjustmentAmount || (settlement as any).adjustment_amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {((settlement as any).adjustmentAmount || (settlement as any).adjustment_amount || 0) >= 0 ? '+' : ''}
+                  {formatCurrency((settlement as any).adjustmentAmount || (settlement as any).adjustment_amount || 0, settlement.currency)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-600 mb-1">지급 예정 금액</div>
-                <div className="text-2xl font-bold text-blue-600">
-                  {formatCurrency(settlement.net_payout_amount, settlement.currency)}
+                <div className="text-sm text-gray-600 mb-1">최종 지급 예정 금액</div>
+                <div className="text-xl font-bold text-blue-600">
+                  {formatCurrency((settlement as any).payableAmount || (settlement as any).net_payout_amount, settlement.currency)}
                 </div>
               </div>
             </div>
@@ -327,28 +382,29 @@ export const SupplierSettlementDetailPage: React.FC = () => {
             <div>
               <div className="text-sm text-gray-600 mb-1">총 주문 수</div>
               <div className="text-xl font-bold text-gray-900">
-                {(settlement.total_orders ?? 0).toLocaleString()}
+                {((settlement as any).totalOrders || (settlement as any).total_orders || 0).toLocaleString()}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">총 판매 수량</div>
               <div className="text-xl font-bold text-gray-900">
-                {(settlement.total_items ?? 0).toLocaleString()}
+                {((settlement as any).totalItems || (settlement as any).total_items || 0).toLocaleString()}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">총 공급 금액</div>
               <div className="text-xl font-bold text-gray-900">
-                {formatCurrency(settlement.total_supply_amount, settlement.currency)}
+                {formatCurrency((settlement as any).totalBaseAmount || (settlement as any).total_base_amount || (settlement as any).total_supply_amount, settlement.currency)}
               </div>
             </div>
           </div>
         </div>
 
-        {/* 주문별 상세 테이블 */}
+        {/* Phase SETTLE-UI-SUPPLIER: Settlement items table with commission data */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">주문별 상세</h2>
+            <h2 className="text-lg font-semibold text-gray-900">정산 아이템 상세</h2>
+            <p className="text-sm text-gray-600 mt-1">주문별 공급 금액과 커미션 정보를 표시합니다.</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -370,7 +426,19 @@ export const SupplierSettlementDetailPage: React.FC = () => {
                     수량
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    공급가(단가)
+                    판매가
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    공급가(기준가)
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    커미션 타입
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    커미션율
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    커미션 금액
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     공급 금액
@@ -378,32 +446,60 @@ export const SupplierSettlementDetailPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {settlement.lines.map((line, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {line.order_number}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {formatDate(line.order_date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {line.seller_name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {line.product_name}
-                      {line.sku && <div className="text-xs text-gray-500">SKU: {line.sku}</div>}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {line.quantity.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {formatCurrency(line.supply_price, settlement.currency)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
-                      {formatCurrency(line.line_total, settlement.currency)}
-                    </td>
-                  </tr>
-                ))}
+                {((settlement as any).items || settlement.lines || []).map((line: any, index: number) => {
+                  // Support both PD-5 (camelCase) and legacy (snake_case) field names
+                  const orderNumber = line.orderNumber || line.order_number;
+                  const orderDate = line.orderDate || line.order_date;
+                  const sellerName = line.sellerName || line.seller_name;
+                  const productName = line.productName || line.product_name;
+                  const sku = line.sku;
+                  const quantity = line.quantity || 0;
+                  const salePrice = line.salePrice || line.salePriceSnapshot || line.sale_price || 0;
+                  const basePrice = line.basePrice || line.basePriceSnapshot || line.supply_price || 0;
+                  const commissionType = line.commissionType || line.commission_type;
+                  const commissionRate = line.commissionRate || line.commission_rate;
+                  const commissionAmount = line.commissionAmount || line.commissionAmountSnapshot || line.commission_amount || 0;
+                  const lineTotal = line.totalBaseAmount || line.lineTotal || line.line_total || (basePrice * quantity);
+
+                  return (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {orderNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {formatDate(orderDate)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {sellerName}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {productName}
+                        {sku && <div className="text-xs text-gray-500">SKU: {sku}</div>}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {quantity.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {formatCurrency(salePrice, settlement.currency)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                        {formatCurrency(basePrice, settlement.currency)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        {formatCommissionType(commissionType)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 text-right font-medium">
+                        {formatCommissionRate(commissionRate)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 text-right font-medium">
+                        {formatCurrency(commissionAmount, settlement.currency)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 text-right font-bold">
+                        {formatCurrency(lineTotal, settlement.currency)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -443,7 +539,7 @@ export const SupplierSettlementDetailPage: React.FC = () => {
                 <button
                   onClick={() => {
                     setEditingMemo(false);
-                    setMemoText(settlement.memo_internal || '');
+                    setMemoText((settlement as any).memoInternal || (settlement as any).memo_internal || '');
                   }}
                   disabled={savingMemo}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -454,7 +550,7 @@ export const SupplierSettlementDetailPage: React.FC = () => {
             </div>
           ) : (
             <div className="text-gray-700 whitespace-pre-wrap">
-              {settlement.memo_internal || '메모가 없습니다.'}
+              {(settlement as any).memoInternal || (settlement as any).memo_internal || '메모가 없습니다.'}
             </div>
           )}
         </div>

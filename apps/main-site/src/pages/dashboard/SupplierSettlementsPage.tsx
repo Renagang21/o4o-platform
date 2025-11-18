@@ -1,6 +1,6 @@
 /**
  * Supplier Settlements Page
- * Phase 4-1 Step 2: 공급자 정산 목록 페이지
+ * Phase 4-1 Step 2 + SETTLE-UI-SUPPLIER: 공급자 정산 목록 페이지 고도화
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,6 +13,7 @@ import type { SettlementSummary, SettlementStatus } from '../../types/settlement
 import { supplierSettlementAPI } from '../../services/supplierSettlementApi';
 import { handleApiError } from '../../utils/apiErrorHandler';
 import { CreateSettlementModal } from '../../components/dashboard/partner/CreateSettlementModal';
+import { SettlementSummaryCards } from '../../components/dashboard/SettlementSummaryCards';
 
 export const SupplierSettlementsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export const SupplierSettlementsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<SettlementStatus | 'ALL'>('ALL');
-  const [dateFilter, setDateFilter] = useState<'30' | '90' | 'year' | 'all'>('all');
+  const [dateFilter, setDateFilter] = useState<'thisMonth' | 'lastMonth' | '30' | '90' | 'year' | 'all'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -32,9 +33,19 @@ export const SupplierSettlementsPage: React.FC = () => {
     setError(null);
 
     try {
+      // Phase SETTLE-UI-SUPPLIER: Enhanced date filter (same as Seller)
       let date_from: string | undefined;
       const today = new Date();
-      if (dateFilter === '30') {
+
+      if (dateFilter === 'thisMonth') {
+        // 이번 달 1일부터
+        date_from = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+      } else if (dateFilter === 'lastMonth') {
+        // 지난 달 1일부터
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        date_from = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}-01`;
+      } else if (dateFilter === '30') {
         const date = new Date(today);
         date.setDate(date.getDate() - 30);
         date_from = date.toISOString().split('T')[0];
@@ -49,7 +60,7 @@ export const SupplierSettlementsPage: React.FC = () => {
       const response = await supplierSettlementAPI.fetchSupplierSettlements({
         page: currentPage,
         limit,
-        status: statusFilter,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
         date_from,
       });
 
@@ -86,17 +97,19 @@ export const SupplierSettlementsPage: React.FC = () => {
     return badges[status] || null;
   };
 
-  const formatCurrency = (amount: number | undefined | null, currency: string = 'KRW') => {
-    const value = amount ?? 0;
-    if (currency === 'KRW') {
+  // Phase SETTLE-UI-SUPPLIER: PD-5 compatible formatting (string + number support)
+  const formatCurrency = (amount: number | string | undefined | null, currency: string = 'KRW') => {
+    const value = typeof amount === 'string' ? parseFloat(amount) : (amount ?? 0);
+    if (currency === 'KRW' || !currency) {
       return `₩ ${value.toLocaleString()}`;
     }
     return `${value.toLocaleString()} ${currency}`;
   };
 
-  const formatDate = (dateString: string | undefined | null) => {
+  const formatDate = (dateString: string | Date | undefined | null) => {
     if (!dateString) return '-';
-    return dateString.split('T')[0];
+    const dateStr = typeof dateString === 'string' ? dateString : dateString.toISOString();
+    return dateStr.split('T')[0];
   };
 
   const handleSettlementCreated = (settlementId: string) => {
@@ -126,6 +139,10 @@ export const SupplierSettlementsPage: React.FC = () => {
         </button>
       </PageHeader>
 
+      {/* Phase SETTLE-UI-SUPPLIER: Summary Cards */}
+      <SettlementSummaryCards settlements={settlements} loading={loading} />
+
+      {/* Phase SETTLE-UI-SUPPLIER: Enhanced filters (same as Seller) */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           <div>
@@ -135,9 +152,11 @@ export const SupplierSettlementsPage: React.FC = () => {
               onChange={(e) => { setDateFilter(e.target.value as any); setCurrentPage(1); }}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
+              <option value="thisMonth">이번 달</option>
+              <option value="lastMonth">지난 달</option>
               <option value="30">최근 30일</option>
               <option value="90">최근 90일</option>
-              <option value="year">올해</option>
+              <option value="year">올해 전체</option>
               <option value="all">전체</option>
             </select>
           </div>
@@ -213,14 +232,14 @@ export const SupplierSettlementsPage: React.FC = () => {
                   {settlements.map((settlement) => (
                     <tr key={settlement.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatDate(settlement.period_start)} ~ {formatDate(settlement.period_end)}
+                        {formatDate((settlement as any).periodStart || (settlement as any).period_start)} ~ {formatDate((settlement as any).periodEnd || (settlement as any).period_end)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">{settlement.id}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
-                        {formatCurrency(settlement.net_payout_amount)}
+                        {formatCurrency((settlement as any).payableAmount || (settlement as any).net_payout_amount, settlement.currency)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">{getStatusBadge(settlement.status)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{formatDate(settlement.created_at)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{formatDate((settlement as any).createdAt || (settlement as any).created_at)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
                           onClick={() => navigate(`/dashboard/supplier/settlements/${settlement.id}`)}
