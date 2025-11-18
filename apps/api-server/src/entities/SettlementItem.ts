@@ -66,6 +66,17 @@ export class SettlementItem {
   @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
   marginAmountSnapshot?: string; // 마진 total
 
+  // Phase SETTLE-1: PD-2 Commission Policy Integration
+  @Column({
+    type: 'enum',
+    enum: ['rate', 'fixed'],
+    nullable: true
+  })
+  commissionType?: 'rate' | 'fixed'; // Commission calculation method
+
+  @Column({ type: 'numeric', precision: 5, scale: 4, nullable: true })
+  commissionRate?: string; // Commission rate (0-1, e.g., 0.20 = 20%) for rate type
+
   // Calculated totals
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   totalSaleAmount: string; // salePriceSnapshot * quantity
