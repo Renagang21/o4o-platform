@@ -248,6 +248,10 @@ export class SettlementManagementService {
           const commissionAmount = item.commissionAmount || 0;
           const marginAmount = item.marginAmountSnapshot || 0;
 
+          // Phase SETTLE-1: Extract PD-2 commission policy fields from OrderItem
+          const commissionType = item.commissionType || null;
+          const commissionRate = item.commissionRate || null;
+
           const settlementItem = this.settlementItemRepo.create({
             settlementId: settlement.id,
             orderId: order.id,
@@ -262,6 +266,9 @@ export class SettlementManagementService {
             totalBaseAmount: (basePrice * quantity).toString(),
             sellerId: item.sellerId,
             supplierId: item.supplierId,
+            // Phase SETTLE-1: Store commission policy for audit trail
+            commissionType: commissionType,
+            commissionRate: commissionRate ? commissionRate.toString() : null,
           });
 
           settlementItems.push(settlementItem);
