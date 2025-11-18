@@ -14,6 +14,7 @@ import {
 } from '../entities/Settlement.js';
 import { SettlementItem } from '../entities/SettlementItem.js';
 import { Order, OrderStatus } from '../entities/Order.js';
+import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 
 export interface SettlementFilters {
@@ -288,6 +289,37 @@ export class SettlementManagementService {
       payableAmount: settlement.payableAmount,
       itemCount: settlementItems.length,
     });
+
+    // Phase PD-7: Send settlement.new_pending notification
+    if (partyType !== 'platform') {
+      const partyTypeLabel = partyType === 'seller' ? '판매자' : '공급자';
+      const formattedPeriod = `${periodStart.toLocaleDateString('ko-KR')} ~ ${periodEnd.toLocaleDateString('ko-KR')}`;
+
+      notificationService.createNotification({
+        userId: partyId,
+        type: 'settlement.new_pending',
+        title: '새로운 정산 내역이 생성되었습니다',
+        message: `${partyTypeLabel} 정산 (${formattedPeriod}) - ${parseFloat(settlement.payableAmount).toLocaleString()}원`,
+        metadata: {
+          settlementId: settlement.id,
+          partyType,
+          periodStart: periodStart.toISOString(),
+          periodEnd: periodEnd.toISOString(),
+          payableAmount: settlement.payableAmount,
+          orderCount: preview.orderCount,
+          itemCount: settlementItems.length,
+        },
+        channel: 'in_app',
+      }).catch((err) => {
+        logger.error('[PD-7] Failed to send settlement notification:', err);
+      });
+
+      logger.info('[PD-7] Settlement notification sent', {
+        settlementId: settlement.id,
+        partyType,
+        partyId,
+      });
+    }
 
     return settlement;
   }

@@ -9,6 +9,7 @@ import { Partner, PartnerStatus } from '../entities/Partner.js';
 import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
 import { Product } from '../entities/Product.js';
 import { CommissionCalculator } from './CommissionCalculator.js';
+import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 
 export interface CreateOrderRequest {
@@ -169,6 +170,11 @@ export class OrderService {
         total: savedOrder.summary.total
       });
 
+      // Phase PD-7: Send order.new notifications to sellers and suppliers
+      this.sendOrderNotifications(savedOrder).catch((err) => {
+        logger.error('Failed to send order notifications:', err);
+      });
+
       return savedOrder;
 
     } catch (error) {
@@ -238,6 +244,11 @@ export class OrderService {
         orderId: order.id,
         buyerId,
         cartId: request.cartId
+      });
+
+      // Phase PD-7: Send order.new notifications to sellers and suppliers
+      this.sendOrderNotifications(order).catch((err) => {
+        logger.error('Failed to send order notifications:', err);
       });
 
       return order;
@@ -1028,5 +1039,87 @@ export class OrderService {
     }
 
     // Add more business rules as needed
+  }
+
+  /**
+   * Send order.new notifications (Phase PD-7)
+   * Notifies sellers and suppliers when a new order is created
+   */
+  private async sendOrderNotifications(order: Order): Promise<void> {
+    try {
+      // Collect unique seller and supplier IDs
+      const sellerIds = new Set<string>();
+      const supplierIds = new Set<string>();
+
+      for (const item of order.items) {
+        if (item.sellerId) {
+          sellerIds.add(item.sellerId);
+        }
+        if (item.supplierId) {
+          supplierIds.add(item.supplierId);
+        }
+      }
+
+      // Send notifications to sellers
+      for (const sellerId of sellerIds) {
+        const sellerItems = order.items.filter(item => item.sellerId === sellerId);
+        const itemCount = sellerItems.reduce((sum, item) => sum + item.quantity, 0);
+        const totalAmount = sellerItems.reduce((sum, item) => sum + item.totalPrice, 0);
+
+        await notificationService.createNotification({
+          userId: sellerId,
+          type: 'order.new',
+          title: '새로운 주문이 접수되었습니다',
+          message: `주문번호 ${order.orderNumber} - ${itemCount}개 상품, ${totalAmount.toLocaleString()}원`,
+          metadata: {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            itemCount,
+            totalAmount,
+            buyerName: order.buyerName,
+          },
+          channel: 'in_app',
+        });
+
+        logger.info('[PD-7] Order notification sent to seller', {
+          sellerId,
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+        });
+      }
+
+      // Send notifications to suppliers
+      for (const supplierId of supplierIds) {
+        const supplierItems = order.items.filter(item => item.supplierId === supplierId);
+        const itemCount = supplierItems.reduce((sum, item) => sum + item.quantity, 0);
+        const supplierAmount = supplierItems.reduce((sum, item) => {
+          return sum + (item.basePriceSnapshot || item.unitPrice) * item.quantity;
+        }, 0);
+
+        await notificationService.createNotification({
+          userId: supplierId,
+          type: 'order.new',
+          title: '새로운 공급 주문이 접수되었습니다',
+          message: `주문번호 ${order.orderNumber} - ${itemCount}개 상품, 공급 금액 ${supplierAmount.toLocaleString()}원`,
+          metadata: {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            itemCount,
+            supplierAmount,
+            buyerName: order.buyerName,
+          },
+          channel: 'in_app',
+        });
+
+        logger.info('[PD-7] Order notification sent to supplier', {
+          supplierId,
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+        });
+      }
+    } catch (error) {
+      // Log error but don't throw - notifications are not critical
+      logger.error('[PD-7] Error sending order notifications:', error);
+    }
   }
 }

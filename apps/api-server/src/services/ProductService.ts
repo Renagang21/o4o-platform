@@ -3,6 +3,8 @@ import { AppDataSource } from '../database/connection.js';
 import { Product, ProductStatus } from '../entities/Product.js';
 import { Supplier } from '../entities/Supplier.js';
 import { Category } from '../entities/Category.js';
+import { SellerProduct } from '../entities/SellerProduct.js';
+import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 import { cacheService } from './cache.service.js';
 import { prometheusMetrics } from './prometheus-metrics.service.js';
@@ -78,11 +80,13 @@ export class ProductService {
   private productRepository: Repository<Product>;
   private supplierRepository: Repository<Supplier>;
   private categoryRepository: Repository<Category>;
+  private sellerProductRepository: Repository<SellerProduct>;
 
   constructor() {
     this.productRepository = AppDataSource.getRepository(Product);
     this.supplierRepository = AppDataSource.getRepository(Supplier);
     this.categoryRepository = AppDataSource.getRepository(Category);
+    this.sellerProductRepository = AppDataSource.getRepository(SellerProduct);
   }
 
   // 제품 생성 (공급자용)
@@ -337,6 +341,11 @@ export class ProductService {
         }
       }
 
+      // Phase PD-7: Check if supplierPrice changed
+      const priceChanged = data.supplierPrice !== undefined && data.supplierPrice !== product.supplierPrice;
+      const oldPrice = product.supplierPrice;
+      const newPrice = data.supplierPrice;
+
       // 제품 업데이트
       const updatedProduct = await this.productRepository.save({
         ...product,
@@ -344,10 +353,17 @@ export class ProductService {
         updatedAt: new Date()
       });
 
+      // Phase PD-7: Send price.changed notifications to affected sellers
+      if (priceChanged) {
+        this.sendPriceChangeNotifications(id, product.name, oldPrice, newPrice!).catch((err) => {
+          logger.error('[PD-7] Failed to send price change notifications:', err);
+        });
+      }
+
       // 캐시 무효화 (상세 + 목록)
       await cacheService.invalidateProductCache(id);
 
-      logger.info(`Product updated: ${id}`);
+      logger.info(`Product updated: ${id}`, priceChanged ? { oldPrice, newPrice } : {});
 
       return updatedProduct;
 
@@ -551,6 +567,69 @@ export class ProductService {
       .replace(/\s+/g, '-') // 공백을 하이픈으로
       .replace(/-+/g, '-') // 연속 하이픈 제거
       .trim();
+  }
+
+  /**
+   * Send price.changed notifications (Phase PD-7)
+   * Notifies sellers when supplier changes product price
+   */
+  private async sendPriceChangeNotifications(
+    productId: string,
+    productName: string,
+    oldPrice: number,
+    newPrice: number
+  ): Promise<void> {
+    try {
+      // Find all sellers who have imported this product
+      const sellerProducts = await this.sellerProductRepository.find({
+        where: { productId: productId },
+        relations: ['seller'],
+      });
+
+      if (sellerProducts.length === 0) {
+        logger.debug('[PD-7] No sellers affected by price change', { productId });
+        return;
+      }
+
+      // Send notifications to each affected seller
+      for (const sellerProduct of sellerProducts) {
+        const priceDiff = newPrice - oldPrice;
+        const priceChange = priceDiff > 0 ? '인상' : '인하';
+        const priceChangePercent = Math.abs((priceDiff / oldPrice) * 100).toFixed(1);
+
+        await notificationService.createNotification({
+          userId: sellerProduct.sellerId,
+          type: 'price.changed',
+          title: '공급 상품 가격이 변경되었습니다',
+          message: `${productName} - ${priceChange} ${priceChangePercent}% (${oldPrice.toLocaleString()}원 → ${newPrice.toLocaleString()}원)`,
+          metadata: {
+            productId,
+            productName,
+            sellerProductId: sellerProduct.id,
+            oldPrice,
+            newPrice,
+            priceDiff,
+            priceChangePercent: parseFloat(priceChangePercent),
+          },
+          channel: 'in_app',
+        });
+
+        logger.info('[PD-7] Price change notification sent to seller', {
+          sellerId: sellerProduct.sellerId,
+          productId,
+          oldPrice,
+          newPrice,
+        });
+      }
+
+      logger.info('[PD-7] Price change notifications sent', {
+        productId,
+        affectedSellers: sellerProducts.length,
+      });
+    } catch (error) {
+      // Log error but don't throw - notifications are not critical
+      logger.error('[PD-7] Error sending price change notifications:', error);
+    }
   }
 }
 
