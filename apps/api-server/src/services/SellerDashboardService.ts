@@ -99,10 +99,13 @@ export class SellerDashboardService {
           );
           totalItems += sellerItemCount;
 
-          // Calculate commission (PD-1: Simple 20% rate)
-          // TODO: PD-2 - Get commission rate from product/seller config
-          const commissionRate = 0.2;
-          totalCommissionAmount += sellerOrderAmount * commissionRate;
+          // Phase PD-2: Use actual commission amount from order items
+          // Commission is calculated and stored at order creation time
+          const orderCommissionAmount = sellerItems.reduce(
+            (sum, item) => sum + (item.commissionAmount || 0),
+            0
+          );
+          totalCommissionAmount += orderCommissionAmount;
         }
       }
 
@@ -171,9 +174,11 @@ export class SellerDashboardService {
             0
           );
 
-          // Simple commission calculation (20%)
-          const commissionRate = 0.2;
-          const commissionAmount = sellerAmount * commissionRate;
+          // Phase PD-2: Use actual commission amount from order items
+          const commissionAmount = sellerItems.reduce(
+            (sum, item) => sum + (item.commissionAmount || 0),
+            0
+          );
 
           sellerOrders.push({
             orderId: order.id,
@@ -255,17 +260,25 @@ export class SellerDashboardService {
             0
           );
 
-          // Simple commission rate (20%)
-          const commissionRate = 0.2;
-          const commissionAmount = salesAmount * commissionRate;
+          // Phase PD-2: Use actual commission amount from order items
+          const commissionAmount = sellerItems.reduce(
+            (sum, item) => sum + (item.commissionAmount || 0),
+            0
+          );
           totalCommission += commissionAmount;
+
+          // Calculate weighted average commission rate for display
+          // (total commission / total sales amount)
+          const effectiveCommissionRate = salesAmount > 0
+            ? commissionAmount / salesAmount
+            : 0;
 
           commissionByOrder.push({
             orderNumber: order.orderNumber,
             orderDate: order.orderDate,
             salesAmount: Math.round(salesAmount),
             commissionAmount: Math.round(commissionAmount),
-            commissionRate,
+            commissionRate: effectiveCommissionRate,
             status: order.status
           });
         }

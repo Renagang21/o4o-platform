@@ -691,8 +691,16 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
               />
               <KPICard
                 title="평균 커미션율"
-                value="20%"
-                subtitle="현재 고정 요율"
+                value={
+                  commissionDetails.length > 0
+                    ? `${(
+                        (commissionDetails.reduce((sum, c) => sum + c.commissionRate, 0) /
+                          commissionDetails.length) *
+                        100
+                      ).toFixed(1)}%`
+                    : '0%'
+                }
+                subtitle="실제 적용 평균"
                 icon={BarChart3}
                 color="purple"
               />
@@ -775,11 +783,11 @@ export const SellerDashboard: React.FC<{ defaultPeriod?: string; defaultSection?
               </div>
             )}
 
-            {/* PD-1 Note */}
+            {/* PD-2 Note */}
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>참고:</strong> 현재는 20% 고정 커미션율이 적용됩니다.
-                향후 업데이트에서 상품별/셀러별 커미션율 설정이 가능해집니다.
+                <strong>Phase PD-2:</strong> 커미션율은 상품별, 판매자별로 개별 설정됩니다.
+                각 주문의 커미션은 주문 생성 시점에 확정되며, 소급 변경되지 않습니다.
               </p>
             </div>
           </div>
