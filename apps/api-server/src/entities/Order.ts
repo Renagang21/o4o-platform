@@ -10,6 +10,7 @@ import {
   Index
 } from 'typeorm';
 import type { User } from './User.js';
+import { OrderEvent } from './OrderEvent.js';
 
 // Enums
 export enum OrderStatus {
@@ -87,8 +88,11 @@ export class Order {
   @JoinColumn({ name: 'buyerId' })
   buyer: User;
 
-  @OneToMany('OrderEvent', 'order')
-  events: any[];
+  @OneToMany(() => OrderEvent, (event) => event.order, {
+    cascade: false,
+    eager: false,
+  })
+  events!: OrderEvent[];
 
   @Column({ nullable: true })
   buyerType: string; // UserRole

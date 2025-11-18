@@ -87,6 +87,10 @@ import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
 import { Order } from '../entities/Order.js';
+import { OrderEvent } from '../entities/OrderEvent.js';
+// Settlement entities
+import { Settlement } from '../entities/Settlement.js';
+import { SettlementItem } from '../entities/SettlementItem.js';
 // Dropshipping entities
 import { Product } from '../entities/Product.js';
 import { Supplier } from '../entities/Supplier.js';
@@ -248,6 +252,10 @@ export const AppDataSource = new DataSource({
     Cart,
     CartItem,
     Order,
+    OrderEvent,
+    // Settlement entities
+    Settlement,
+    SettlementItem,
     // Dropshipping entities
     Product,
     Supplier,
