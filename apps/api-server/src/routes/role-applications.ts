@@ -13,6 +13,7 @@ import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { User } from '../entities/User.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
 import { emailService } from '../services/email.service.js';
+import { notificationService } from '../services/NotificationService.js';
 import logger from '../utils/logger.js';
 
 const router: Router = Router();
@@ -131,6 +132,20 @@ router.post('/apply',
           .catch((err) => {
             logger.error('[P4] Failed to send application notification to admin:', err);
           });
+
+        // CI-2.5: Send in-app notification to user for application submission
+        const roleDisplayName = roleNames[role] || role;
+        notificationService.createNotification({
+          userId: userId,
+          type: 'role.application_submitted',
+          title: '역할 신청이 접수되었습니다',
+          message: `${roleDisplayName} 역할 신청이 접수되었습니다. 심사 후 결과를 알려드리겠습니다.`,
+          metadata: {
+            role: application.role,
+            applicationId: application.id,
+          },
+          channel: 'in_app',
+        }).catch(err => logger.error('[CI-2.5] Failed to send role.application_submitted notification:', err));
       }
 
       res.status(201).json({

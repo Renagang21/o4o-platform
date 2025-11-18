@@ -422,6 +422,49 @@ export class OrderService {
       newStatus: status
     });
 
+    // CI-2.1: Send notifications for order status change
+    // Only send if status actually changed
+    if (prevStatus !== status) {
+      // Notify buyer
+      await notificationService.createNotification({
+        userId: order.buyerId,
+        type: 'order.status_changed',
+        title: '주문 상태가 변경되었습니다',
+        message: `주문번호 ${order.orderNumber}가 '${this.getStatusDisplayName(status)}' 상태가 되었습니다.`,
+        metadata: {
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          oldStatus: prevStatus,
+          newStatus: status,
+        },
+        channel: 'in_app',
+      }).catch(err => logger.error('Failed to send order status notification to buyer:', err));
+
+      // Notify sellers (unique list)
+      const sellerIds = new Set<string>();
+      order.items.forEach(item => {
+        if (item.sellerId) {
+          sellerIds.add(item.sellerId);
+        }
+      });
+
+      for (const sellerId of sellerIds) {
+        await notificationService.createNotification({
+          userId: sellerId,
+          type: 'order.status_changed',
+          title: '주문 상태가 변경되었습니다',
+          message: `주문번호 ${order.orderNumber}가 '${this.getStatusDisplayName(status)}' 상태가 되었습니다.`,
+          metadata: {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            oldStatus: prevStatus,
+            newStatus: status,
+          },
+          channel: 'in_app',
+        }).catch(err => logger.error(`Failed to send order status notification to seller ${sellerId}:`, err));
+      }
+    }
+
     return savedOrder;
   }
 
@@ -1039,6 +1082,22 @@ export class OrderService {
     }
 
     // Add more business rules as needed
+  }
+
+  /**
+   * Get display name for order status (helper method - CI-2.1)
+   */
+  private getStatusDisplayName(status: OrderStatus): string {
+    const statusNames: Record<OrderStatus, string> = {
+      [OrderStatus.PENDING]: '대기중',
+      [OrderStatus.CONFIRMED]: '확정',
+      [OrderStatus.PROCESSING]: '처리중',
+      [OrderStatus.SHIPPED]: '배송중',
+      [OrderStatus.DELIVERED]: '배송완료',
+      [OrderStatus.CANCELLED]: '취소됨',
+      [OrderStatus.RETURNED]: '반품됨',
+    };
+    return statusNames[status] || status;
   }
 
   /**

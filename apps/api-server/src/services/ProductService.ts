@@ -631,6 +631,72 @@ export class ProductService {
       logger.error('[PD-7] Error sending price change notifications:', error);
     }
   }
+
+  /**
+   * CI-2.3: Update product stock and notify if low
+   * Simple implementation for stock.low notification trigger
+   */
+  async updateStock(
+    productId: string,
+    newStock: number,
+    sellerId?: string
+  ): Promise<Product> {
+    const product = await this.productRepo.findOne({
+      where: { id: productId },
+      relations: ['supplier'],
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    const oldStock = product.inventory;
+    const threshold = product.lowStockThreshold || 5;
+
+    // Update stock
+    product.inventory = Math.max(0, newStock);
+
+    const savedProduct = await this.productRepo.save(product);
+
+    // CI-2.3: Send stock.low notification if:
+    // 1. Stock dropped below threshold
+    // 2. Old stock was above threshold (to avoid duplicate notifications)
+    if (
+      savedProduct.isLowStock() &&
+      oldStock > threshold
+    ) {
+      // Notify seller if provided, otherwise notify supplier
+      const recipientId = sellerId || product.supplierId;
+
+      if (recipientId) {
+        await notificationService.createNotification({
+          userId: recipientId,
+          type: 'stock.low',
+          title: '재고 부족 알림',
+          message: `상품 '${product.name}'의 재고가 ${savedProduct.inventory}개 남았습니다.`,
+          metadata: {
+            productId: product.id,
+            productName: product.name,
+            stock: savedProduct.inventory,
+            threshold: threshold,
+            sellerId: sellerId,
+            supplierId: product.supplierId,
+          },
+          channel: 'in_app',
+        }).catch(err => logger.error('[CI-2.3] Failed to send stock.low notification:', err));
+
+        logger.info('[CI-2.3] Stock low notification sent', {
+          productId: product.id,
+          oldStock,
+          newStock: savedProduct.inventory,
+          threshold,
+          recipientId,
+        });
+      }
+    }
+
+    return savedProduct;
+  }
 }
 
 export default ProductService;

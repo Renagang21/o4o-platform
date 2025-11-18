@@ -13,6 +13,7 @@ import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { User } from '../entities/User.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
 import { emailService } from '../services/email.service.js';
+import { notificationService } from '../services/NotificationService.js';
 import logger from '../utils/logger.js';
 
 const router: Router = Router();
@@ -198,10 +199,11 @@ router.post('/applications/:id/approve',
       if (application.user) {
         const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
         const workspaceUrl = `${frontendUrl}/workspace/${application.role}`;
+        const roleDisplayName = roleNames[application.role] || application.role;
 
         emailService.sendRoleApplicationApprovedEmail(application.user.email, {
           userName: application.user.name || application.user.email || 'User',
-          roleName: roleNames[application.role] || application.role,
+          roleName: roleDisplayName,
           businessName: application.businessName || 'N/A',
           approvedAt: application.decidedAt?.toLocaleString('ko-KR') || new Date().toLocaleString('ko-KR'),
           workspaceUrl
@@ -212,6 +214,20 @@ router.post('/applications/:id/approve',
           .catch((err) => {
             logger.error('[P4] Failed to send application approved email:', err);
           });
+
+        // CI-2.4: Send in-app notification for role approval
+        notificationService.createNotification({
+          userId: application.userId,
+          type: 'role.approved',
+          title: '역할 신청이 승인되었습니다',
+          message: `${roleDisplayName} 역할 신청이 승인되었습니다. 이제 ${roleDisplayName} 대시보드에 접근할 수 있습니다.`,
+          metadata: {
+            role: application.role,
+            applicationId: application.id,
+            workspaceUrl,
+          },
+          channel: 'in_app',
+        }).catch(err => logger.error('[CI-2.4] Failed to send role.approved notification:', err));
       }
 
       res.json({

@@ -448,6 +448,9 @@ export class SettlementManagementService {
       throw new Error(`Settlement ${settlementId} not found`);
     }
 
+    // Prevent duplicate "paid" notifications
+    const wasPending = settlement.status === SettlementStatus.PENDING;
+
     settlement.markAsPaid(paidAt);
     const saved = await this.settlementRepo.save(settlement);
 
@@ -455,6 +458,25 @@ export class SettlementManagementService {
       settlementId,
       paidAt: saved.paidAt,
     });
+
+    // CI-2.2: Send notification when settlement is marked as paid
+    if (wasPending && saved.partyId) {
+      const periodLabel = `${saved.periodStart.toLocaleDateString('ko-KR')} ~ ${saved.periodEnd.toLocaleDateString('ko-KR')}`;
+      await notificationService.createNotification({
+        userId: saved.partyId,
+        type: 'settlement.paid',
+        title: '정산이 지급되었습니다',
+        message: `${periodLabel} 정산 ${saved.payableAmount.toLocaleString()}원이 지급 처리되었습니다.`,
+        metadata: {
+          settlementId: saved.id,
+          partyType: saved.partyType,
+          payableAmount: saved.payableAmount,
+          periodStart: saved.periodStart.toISOString(),
+          periodEnd: saved.periodEnd.toISOString(),
+        },
+        channel: 'in_app',
+      }).catch(err => logger.error(`Failed to send settlement.paid notification to ${saved.partyId}:`, err));
+    }
 
     return saved;
   }

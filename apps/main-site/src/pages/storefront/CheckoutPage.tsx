@@ -98,6 +98,7 @@ export const CheckoutPage: React.FC = () => {
         items: cartStore.items.map((item) => ({
           product_id: item.product_id,
           quantity: item.quantity,
+          seller_id: item.seller_id, // CI-1: Include seller_id for proper commission calculation
         })),
         payment_method: 'CARD',
       });
