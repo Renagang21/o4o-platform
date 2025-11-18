@@ -75,8 +75,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@tanstack/react-query',
       '@o4o/utils',
       '@o4o/ui',
-      '@o4o/auth-client',
-      '@o4o/auth-context',
       'date-fns',
       '@wordpress/blocks',
       '@wordpress/block-editor',
@@ -87,6 +85,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     ],
     exclude: [
       '@o4o/types', // ES Module import 순서 문제 방지
+      '@o4o/auth-client', // Workspace package - pre-bundling 방지 (항상 최신 빌드 사용)
+      '@o4o/auth-context', // Workspace package - pre-bundling 방지
       '@o4o/shortcodes', // Workspace package - pre-bundling 방지
       '@o4o/block-renderer', // Workspace package - pre-bundling 방지
       '@o4o/slide-app' // Workspace package - pre-bundling 방지
