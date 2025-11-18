@@ -7,8 +7,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { Order, OrderStatus } from './Order.js';
-import { User } from './User.js';
+import type { Order } from './Order.js';
+import { OrderStatus } from './Order.js';
+import type { User } from './User.js';
 
 // Event type enum
 export enum OrderEventType {
@@ -43,7 +44,7 @@ export class OrderEvent {
   @Column('uuid')
   orderId: string;
 
-  @ManyToOne(() => Order, (order) => order.events, { nullable: false })
+  @ManyToOne('Order', 'events', { nullable: false })
   @JoinColumn({ name: 'orderId' })
   order!: Order;
 
@@ -67,7 +68,7 @@ export class OrderEvent {
   @Column({ type: 'uuid', nullable: true })
   actorId: string;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'actorId' })
   actor?: User;
 
