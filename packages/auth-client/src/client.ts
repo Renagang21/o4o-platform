@@ -71,8 +71,8 @@ export class AuthClient {
             const refreshToken = localStorage.getItem('refreshToken');
 
             if (refreshToken) {
-              // Call refresh endpoint using baseURL
-              const response = await this.api.post('/v1/auth/refresh', { refreshToken });
+              // baseURL already includes /api/v1
+              const response = await this.api.post('/auth/refresh', { refreshToken });
               const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken: string; refreshToken?: string };
               
               // Update tokens
@@ -136,8 +136,8 @@ export class AuthClient {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Use baseURL /auth/login (will become /api/v1/auth/login)
-    const response = await this.api.post('/v1/auth/login', credentials);
+    // baseURL already includes /api/v1, so just add /auth/login
+    const response = await this.api.post('/auth/login', credentials);
     return response.data as AuthResponse;
   }
 
@@ -158,8 +158,8 @@ export class AuthClient {
 
   async logout(): Promise<void> {
     try {
-      // Use baseURL /auth/logout (will become /api/v1/auth/logout)
-      await this.api.post('/v1/auth/logout', {});
+      // baseURL already includes /api/v1
+      await this.api.post('/auth/logout', {});
     } catch (error) {
       // Even if logout fails (e.g., token expired), continue with local cleanup
       // This is normal if token expired
@@ -189,22 +189,22 @@ const getApiUrl = () => {
                       (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL);
 
     if (envApiUrl) {
-      // Add /api as the base path (version should be specified in each API call)
-      return envApiUrl.endsWith('/api') ? envApiUrl :
-             envApiUrl.endsWith('/api/v1') ? envApiUrl.slice(0, -3) : // Remove /v1
-             `${envApiUrl}/api`;
+      // Ensure /api/v1 suffix for all API calls
+      return envApiUrl.endsWith('/api/v1') ? envApiUrl :
+             envApiUrl.endsWith('/api') ? `${envApiUrl}/v1` :
+             `${envApiUrl}/api/v1`;
     }
 
     // Auto-detect based on current location for development
     if (window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1' ||
         window.location.hostname.includes('.local')) {
-      return 'http://localhost:3002/api';
+      return 'http://localhost:3002/api/v1';
     }
   }
 
-  // Default to production API server with /api path (version in each call)
-  return 'https://api.neture.co.kr/api';
+  // Default to production API server with /api/v1 path
+  return 'https://api.neture.co.kr/api/v1';
 };
 
 export const authClient = new AuthClient(getApiUrl());
