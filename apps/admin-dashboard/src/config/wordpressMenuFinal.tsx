@@ -100,7 +100,8 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       { id: 'header-builder', label: 'Header Builder', icon: <Layout className="w-4 h-4" />, path: '/appearance/header-builder' },
       { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/appearance/menus' },
-      { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' }
+      { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' },
+      { id: 'appearance-settings', label: '외모 설정', icon: <Settings className="w-4 h-4" />, path: '/appearance/settings' }
     ]
   },
   // 5. 사용자
