@@ -13,6 +13,7 @@ import socialAuthRoutes from '../routes/social-auth.js';
 import userRoutes from '../routes/user.js';
 import userManagementRoutes from '../routes/users.routes.js';
 import usersV1Routes from '../routes/v1/users.routes.js';
+import userRoleRoutes from '../routes/v1/userRole.routes.js';
 import adminRoutes from '../routes/admin.js';
 import ecommerceSettingsRoutes from '../routes/ecommerce/settingsRoutes.js';
 import cptRoutes from '../routes/cpt.js';
@@ -292,6 +293,9 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/users', userPermissionsLimiter, usersV1Routes);
   app.use('/v1/users', userPermissionsLimiter, usersV1Routes);
   app.use('/api/users', standardLimiter, userRoutes);
+
+  // User role and permissions management
+  app.use('/api/v1/userRole', userPermissionsLimiter, userRoleRoutes);
 
   // App System (NEW - Google AI, OpenAI, etc.)
   app.use('/api/v1/apps', standardLimiter, appsRoutes);
