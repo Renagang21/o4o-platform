@@ -26,7 +26,7 @@ export const useAdminMenu = () => {
 
       try {
         // Fetch user permissions from API with authentication (authClient handles baseURL)
-        const response = await authClient.api.get(`/v1/userRole/${user.id}/permissions`);
+        const response = await authClient.api.get(`/userRole/${user.id}/permissions`);
         if (response.data?.success) {
           setUserPermissions(response.data.data?.permissions || []);
         } else {

@@ -16,7 +16,7 @@ export class UserApi {
       )
     })
 
-    const response = await unifiedApi.raw.get(`/v1/users?${params}`)
+    const response = await unifiedApi.raw.get(`/users?${params}`)
     
     // Backend returns data in response.data.data structure
     if (response.data?.data?.users) {
@@ -46,22 +46,22 @@ export class UserApi {
       params.append('businessType', businessType)
     }
 
-    const response = await unifiedApi.raw.get(`/v1/users?${params}`)
+    const response = await unifiedApi.raw.get(`/users?${params}`)
     return response.data
   }
 
   static async getUser(userId: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.get(`/v1/users/${userId}`)
+    const response = await unifiedApi.raw.get(`/users/${userId}`)
     return response.data
   }
 
   static async createUser(userData: UserFormData): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post('/v1/users', userData)
+    const response = await unifiedApi.raw.post('/users', userData)
     return response.data
   }
 
   static async updateUser(userId: string, userData: Partial<UserFormData>): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.put(`/v1/users/${userId}`, userData)
+    const response = await unifiedApi.raw.put(`/users/${userId}`, userData)
     return response.data
   }
 
@@ -87,12 +87,12 @@ export class UserApi {
   // }
 
   static async deleteUser(userId: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete(`/v1/users/${userId}`)
+    const response = await unifiedApi.raw.delete(`/users/${userId}`)
     return response.data
   }
 
   static async bulkAction(action: UserBulkAction): Promise<ApiResponse<void>> {
-    const endpoint = action.action === 'approve' ? '/v1/users/bulk-approve' : '/v1/users/bulk-reject'
+    const endpoint = action.action === 'approve' ? '/users/bulk-approve' : '/users/bulk-reject'
     const response = await unifiedApi.raw.post(endpoint, {
       userIds: action.userIds,
       notes: action.reason || 'Bulk action via admin dashboard'
@@ -101,7 +101,7 @@ export class UserApi {
   }
 
   static async getUserStats(): Promise<ApiResponse<UserStats>> {
-    const response = await unifiedApi.raw.get('/v1/users/statistics')
+    const response = await unifiedApi.raw.get('/users/statistics')
     return response.data
   }
 
@@ -114,14 +114,14 @@ export class UserApi {
       )
     )
 
-    const response = await unifiedApi.raw.get(`/v1/users/export/csv?${params}`, {
+    const response = await unifiedApi.raw.get(`/users/export/csv?${params}`, {
       responseType: 'blob'
     })
     return response.data
   }
 
   static async getUserActivity(userId: string): Promise<ApiResponse<UserActivityLog[]>> {
-    const response = await unifiedApi.raw.get(`/v1/users/${userId}/approval-history`)
+    const response = await unifiedApi.raw.get(`/users/${userId}/approval-history`)
     return response.data
   }
 

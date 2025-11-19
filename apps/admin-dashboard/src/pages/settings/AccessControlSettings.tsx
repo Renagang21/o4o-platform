@@ -28,7 +28,7 @@ const AccessControlSettings: React.FC = () => {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const response = await authClient.api.get('/v1/admin/settings/access-control');
+      const response = await authClient.api.get('/admin/settings/access-control');
 
       if (response.data?.success && response.data?.data) {
         setSettings(response.data.data.value || settings);
@@ -47,7 +47,7 @@ const AccessControlSettings: React.FC = () => {
       setErrorMessage(null);
       setSuccessMessage(null);
 
-      await authClient.api.put('/v1/admin/settings/access-control', {
+      await authClient.api.put('/admin/settings/access-control', {
         value: settings,
         type: 'access-control',
         description: 'Global access control settings'

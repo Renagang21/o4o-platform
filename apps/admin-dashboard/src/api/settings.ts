@@ -239,7 +239,7 @@ class SettingsService {
   }
 
   async exportSettings(): Promise<Blob> {
-    const response = await unifiedApi.raw.get('/v1/settings/export', {
+    const response = await unifiedApi.raw.get('/settings/export', {
       responseType: 'blob',
     });
     return response.data;
@@ -250,7 +250,7 @@ class SettingsService {
     formData.append('file', file);
 
     const response = await unifiedApi.raw.post<{ success: boolean; message: string }>(
-      '/v1/settings/import',
+      '/settings/import',
       formData,
       {
         headers: {
@@ -263,13 +263,13 @@ class SettingsService {
 
   // Reset settings
   async resetSettings(section?: 'general' | 'appearance' | 'email' | 'integrations' | 'security'): Promise<void> {
-    const endpoint = section ? `/v1/settings/${section}/reset` : '/v1/settings/reset';
+    const endpoint = section ? `/settings/${section}/reset` : '/settings/reset';
     await unifiedApi.raw.post(endpoint);
   }
 
   // Cache management
   async clearCache(type?: 'all' | 'settings' | 'content' | 'users'): Promise<void> {
-    await unifiedApi.raw.post('/v1/settings/cache/clear', { type: type || 'all' });
+    await unifiedApi.raw.post('/settings/cache/clear', { type: type || 'all' });
   }
 }
 

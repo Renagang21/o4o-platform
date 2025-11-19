@@ -176,7 +176,7 @@ export const acfLocationApi = {
 
   // Get user roles for location rules
   async getUserRoles(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
-    const response = await authClient.api.get('/api/v1/roles');
+    const response = await authClient.api.get('/roles');
     // Transform role definitions to value/label pairs
     const roles = response.data?.data || response.data || [];
     return {
@@ -203,7 +203,7 @@ export const acfLocationApi = {
 
   // Get taxonomies for location rules
   async getTaxonomies(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
-    const response = await authClient.api.get('/api/v1/taxonomies');
+    const response = await authClient.api.get('/taxonomies');
     const taxonomies = response.data?.data || response.data || [];
     return {
       success: true,
@@ -218,7 +218,7 @@ export const acfLocationApi = {
   async getTaxonomyTerms(
     taxonomy: string
   ): Promise<ACFApiResponse<Array<{ value: string; label: string; parent?: string; count?: number }>>> {
-    const response = await authClient.api.get(`/api/v1/taxonomies/${taxonomy}/terms`);
+    const response = await authClient.api.get(`/taxonomies/${taxonomy}/terms`);
     const terms = response.data?.data || response.data || [];
     return {
       success: true,
@@ -233,7 +233,7 @@ export const acfLocationApi = {
 
   // Get categories for location rules (with hierarchical support)
   async getCategories(): Promise<ACFApiResponse<Array<{ value: string; label: string; parent?: string; count?: number }>>> {
-    const response = await authClient.api.get('/api/v1/posts/categories');
+    const response = await authClient.api.get('/posts/categories');
     const categories = response.data?.data || response.data || [];
     return {
       success: true,
@@ -250,7 +250,7 @@ export const acfLocationApi = {
   async getPageTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string; description?: string }>>> {
     try {
       // Try to fetch from backend first
-      const response = await authClient.api.get('/api/v1/templates/page');
+      const response = await authClient.api.get('/templates/page');
       const templates = response.data?.data || response.data || [];
 
       if (templates.length > 0) {
@@ -285,7 +285,7 @@ export const acfLocationApi = {
   async getPostTemplates(): Promise<ACFApiResponse<Array<{ value: string; label: string; description?: string }>>> {
     try {
       // Try to fetch from backend first
-      const response = await authClient.api.get('/api/v1/templates/post');
+      const response = await authClient.api.get('/templates/post');
       const templates = response.data?.data || response.data || [];
 
       if (templates.length > 0) {

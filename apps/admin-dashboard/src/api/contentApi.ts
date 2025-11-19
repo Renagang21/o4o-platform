@@ -54,37 +54,37 @@ export class ContentApi {
   }
 
   static async clonePost(id: string): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.raw.post(`/v1/content/posts/${id}/clone`)
+    const response = await unifiedApi.raw.post(`/content/posts/${id}/clone`)
     return response.data
   }
 
   static async bulkUpdatePosts(ids: string[], data: Partial<Post>): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.patch('/v1/content/posts/bulk', { ids, data })
+    const response = await unifiedApi.raw.patch('/content/posts/bulk', { ids, data })
     return response.data
   }
 
   static async bulkDeletePosts(ids: string[]): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete('/v1/content/posts/bulk', { data: { ids } })
+    const response = await unifiedApi.raw.delete('/content/posts/bulk', { data: { ids } })
     return response.data
   }
 
   static async getPostPreview(id: string): Promise<ApiResponse<{ url: string }>> {
-    const response = await unifiedApi.raw.get(`/v1/content/posts/${id}/preview`)
+    const response = await unifiedApi.raw.get(`/content/posts/${id}/preview`)
     return response.data
   }
 
   static async savePostDraft(id: string, content: TipTapJSONContent): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.post(`/v1/content/posts/${id}/autosave`, { content })
+    const response = await unifiedApi.raw.post(`/content/posts/${id}/autosave`, { content })
     return response.data
   }
 
   static async getPostRevisions(id: string): Promise<ApiResponse<Post[]>> {
-    const response = await unifiedApi.raw.get(`/v1/content/posts/${id}/revisions`)
+    const response = await unifiedApi.raw.get(`/content/posts/${id}/revisions`)
     return response.data
   }
 
   static async restorePostRevision(postId: string, revisionId: string): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.raw.post(`/v1/content/posts/${postId}/revisions/${revisionId}/restore`)
+    const response = await unifiedApi.raw.post(`/content/posts/${postId}/revisions/${revisionId}/restore`)
     return response.data
   }
 
@@ -100,67 +100,67 @@ export class ContentApi {
       ...filters
     }
     
-    const response = await unifiedApi.raw.get('/v1/content/pages', { params })
+    const response = await unifiedApi.raw.get('/content/pages', { params })
     return response.data
   }
 
   static async getPage(id: string): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.get(`/v1/content/pages/${id}`)
+    const response = await unifiedApi.raw.get(`/content/pages/${id}`)
     return response.data
   }
 
   static async createPage(page: Partial<Page>): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.post('/v1/content/pages', page)
+    const response = await unifiedApi.raw.post('/content/pages', page)
     return response.data
   }
 
   static async updatePage(id: string, page: Partial<Page>): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.put(`/v1/content/pages/${id}`, page)
+    const response = await unifiedApi.raw.put(`/content/pages/${id}`, page)
     return response.data
   }
 
   static async deletePage(id: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete(`/v1/content/pages/${id}`)
+    const response = await unifiedApi.raw.delete(`/content/pages/${id}`)
     return response.data
   }
 
   static async clonePage(id: string): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.post(`/v1/content/pages/${id}/clone`)
+    const response = await unifiedApi.raw.post(`/content/pages/${id}/clone`)
     return response.data
   }
 
   static async bulkUpdatePages(ids: string[], data: Partial<Page>): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.patch('/v1/content/pages/bulk', { ids, data })
+    const response = await unifiedApi.raw.patch('/content/pages/bulk', { ids, data })
     return response.data
   }
 
   static async bulkDeletePages(ids: string[]): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete('/v1/content/pages/bulk', { data: { ids } })
+    const response = await unifiedApi.raw.delete('/content/pages/bulk', { data: { ids } })
     return response.data
   }
 
   static async savePageDraft(id: string, content: TipTapJSONContent): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.post(`/v1/content/pages/${id}/autosave`, { content })
+    const response = await unifiedApi.raw.post(`/content/pages/${id}/autosave`, { content })
     return response.data
   }
 
   static async getPagePreview(id: string): Promise<ApiResponse<{ url: string }>> {
-    const response = await unifiedApi.raw.get(`/v1/content/pages/${id}/preview`)
+    const response = await unifiedApi.raw.get(`/content/pages/${id}/preview`)
     return response.data
   }
 
   static async getPageRevisions(id: string): Promise<ApiResponse<Page[]>> {
-    const response = await unifiedApi.raw.get(`/v1/content/pages/${id}/revisions`)
+    const response = await unifiedApi.raw.get(`/content/pages/${id}/revisions`)
     return response.data
   }
 
   static async restorePageRevision(pageId: string, revisionId: string): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.post(`/v1/content/pages/${pageId}/revisions/${revisionId}/restore`)
+    const response = await unifiedApi.raw.post(`/content/pages/${pageId}/revisions/${revisionId}/restore`)
     return response.data
   }
 
   static async getPageTree(): Promise<ApiResponse<Page[]>> {
-    const response = await unifiedApi.raw.get('/v1/content/pages/tree')
+    const response = await unifiedApi.raw.get('/content/pages/tree')
     return response.data
   }
 
@@ -268,7 +268,7 @@ export class ContentApi {
       formData.append('folderId', folderId)
     }
 
-    const response = await unifiedApi.raw.post('/v1/content/media/upload', formData, {
+    const response = await unifiedApi.raw.post('/content/media/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -292,7 +292,7 @@ export class ContentApi {
     formData.append('file', file);
 
     // Send to API
-    const response = await unifiedApi.raw.put(`/v1/content/media/${id}/content`, formData, {
+    const response = await unifiedApi.raw.put(`/content/media/${id}/content`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -307,28 +307,28 @@ export class ContentApi {
   }
 
   static async bulkDeleteMediaFiles(ids: string[]): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete('/v1/content/media/bulk', { data: { ids } })
+    const response = await unifiedApi.raw.delete('/content/media/bulk', { data: { ids } })
     return response.data
   }
 
   // Media Folders
   static async getMediaFolders(): Promise<ApiResponse<MediaFolder[]>> {
-    const response = await unifiedApi.raw.get('/v1/content/media/folders')
+    const response = await unifiedApi.raw.get('/content/media/folders')
     return response.data
   }
 
   static async createMediaFolder(folder: Partial<MediaFolder>): Promise<ApiResponse<MediaFolder>> {
-    const response = await unifiedApi.raw.post('/v1/content/media/folders', folder)
+    const response = await unifiedApi.raw.post('/content/media/folders', folder)
     return response.data
   }
 
   static async updateMediaFolder(id: string, folder: Partial<MediaFolder>): Promise<ApiResponse<MediaFolder>> {
-    const response = await unifiedApi.raw.put(`/v1/content/media/folders/${id}`, folder)
+    const response = await unifiedApi.raw.put(`/content/media/folders/${id}`, folder)
     return response.data
   }
 
   static async deleteMediaFolder(id: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete(`/v1/content/media/folders/${id}`)
+    const response = await unifiedApi.raw.delete(`/content/media/folders/${id}`)
     return response.data
   }
 

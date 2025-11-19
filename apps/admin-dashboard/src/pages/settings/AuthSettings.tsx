@@ -43,7 +43,7 @@ const AuthSettings = () => {
   const { data: settings, isLoading } = useQuery<AuthSettingsResponse>({
     queryKey: ['auth-settings'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/settings/auth');
+      const response = await authClient.api.get('/settings/auth');
       return response.data;
     },
   });
@@ -66,7 +66,7 @@ const AuthSettings = () => {
   // Update settings mutation
   const updateMutation = useMutation({
     mutationFn: async (data: { roleRedirects: RoleRedirectMap }) => {
-      const response = await authClient.api.put('/v1/settings/auth', data);
+      const response = await authClient.api.put('/settings/auth', data);
       return response.data;
     },
     onSuccess: () => {

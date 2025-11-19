@@ -24,7 +24,7 @@ export const useCategories = (): UseQueryResult<CategoriesResponse> => {
   return useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/categories');
+      const response = await authClient.api.get('/categories');
       return response.data as CategoriesResponse;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -38,7 +38,7 @@ export const useCategory = (id: string): UseQueryResult<Category> => {
   return useQuery({
     queryKey: ['category', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/categories/${id}`);
+      const response = await authClient.api.get(`/categories/${id}`);
       return response.data.data as Category;
     },
     enabled: !!id,

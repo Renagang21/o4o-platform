@@ -10,7 +10,7 @@ export interface AppInfo {
 export const appsApi = {
   // Get all app information
   getAppInfo: async (): Promise<AppInfo[]> => {
-    const response = await api.get('/v1/apps/info');
+    const response = await api.get('/apps/info');
     return response.data.data;
   }
 };

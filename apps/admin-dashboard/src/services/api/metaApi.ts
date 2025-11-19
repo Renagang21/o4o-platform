@@ -85,28 +85,28 @@ export interface MetaDeleteResponse {
  */
 export const metaApi = {
   async list(postId: string): Promise<MetaListResponse> {
-    const response = await apiClient.get<MetaListResponse>(`/v1/posts/${postId}/meta`);
+    const response = await apiClient.get<MetaListResponse>(`/posts/${postId}/meta`);
     return response.data;
   },
 
   async get(postId: string, key: string): Promise<MetaSingleResponse> {
-    const response = await apiClient.get<MetaSingleResponse>(`/v1/posts/${postId}/meta/${key}`);
+    const response = await apiClient.get<MetaSingleResponse>(`/posts/${postId}/meta/${key}`);
     return response.data;
   },
 
   async set(postId: string, payload: UpsertMetaDto): Promise<MetaSingleResponse> {
-    const response = await apiClient.put<MetaSingleResponse>(`/v1/posts/${postId}/meta`, payload);
+    const response = await apiClient.put<MetaSingleResponse>(`/posts/${postId}/meta`, payload);
     return response.data;
   },
 
   async delete(postId: string, key: string): Promise<MetaDeleteResponse> {
-    const response = await apiClient.delete<MetaDeleteResponse>(`/v1/posts/${postId}/meta/${key}`);
+    const response = await apiClient.delete<MetaDeleteResponse>(`/posts/${postId}/meta/${key}`);
     return response.data;
   },
 
   async increment(postId: string, key: string, by = 1): Promise<MetaSingleResponse> {
     const response = await apiClient.patch<MetaSingleResponse>(
-      `/v1/posts/${postId}/meta/${key}/increment`,
+      `/posts/${postId}/meta/${key}/increment`,
       { by }
     );
     return response.data;

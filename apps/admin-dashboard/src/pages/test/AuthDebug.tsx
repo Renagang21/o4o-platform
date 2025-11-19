@@ -38,7 +38,7 @@ const AuthDebug: React.FC = () => {
     }
 
     try {
-      const response = await authClient.api.get(`/v1/userRole/${user.id}/permissions`);
+      const response = await authClient.api.get(`/userRole/${user.id}/permissions`);
       setApiTestResults(prev => ({
         ...prev,
         userPermissions: {
