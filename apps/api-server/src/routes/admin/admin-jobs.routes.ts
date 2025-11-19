@@ -3,13 +3,13 @@
  * Manual triggers for automated jobs
  */
 
-import { Router } from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
 import { AdminJobController } from '../../controllers/admin/AdminJobController.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireRole } from '../../middleware/permission.middleware.js';
 import { UserRole } from '../../entities/User.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
 const adminJobController = new AdminJobController();
 
 // All routes require authentication and admin role
