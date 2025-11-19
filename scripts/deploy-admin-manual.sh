@@ -37,11 +37,11 @@ pnpm run build:packages
 # Build admin dashboard
 echo "🔨 Building admin dashboard..."
 cd apps/admin-dashboard
+NODE_ENV=production \
 NODE_OPTIONS='--max-old-space-size=4096' \
-GENERATE_SOURCEMAP=false \
 VITE_API_URL=https://api.neture.co.kr/api \
 VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
-pnpm run build
+pnpm run build:prod
 
 cd ../..
 

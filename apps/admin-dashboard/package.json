@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "npx vite --port 3001",
     "prebuild": "node scripts/update-version.cjs",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' vite build",
-    "build:with-typecheck": "bash -c 'tsc && NODE_OPTIONS=\"--max-old-space-size=8192\" npx vite build'",
+    "build": "vite build",
+    "build:prod": "NODE_OPTIONS='--max-old-space-size=4096' vite build --mode production",
+    "build:with-typecheck": "tsc --noEmit && vite build",
     "preview": "npx vite preview",
     "type-check": "bash -c 'tsc --noEmit'",
     "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true",

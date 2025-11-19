@@ -103,10 +103,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     ...sharedViteConfig.build,
     outDir: 'dist',
     chunkSizeWarningLimit: 2000, // 경고 제한 증가
-    // 빌드 캐시 활성화로 속도 개선
-    cache: true,
-    // 워커 스레드 활용
-    workers: true,
     commonjsOptions: {
       transformMixedEsModules: true,
       // Ensure proper handling of CommonJS modules
@@ -114,28 +110,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       // Prevent circular dependency issues
       ignoreDynamicRequires: true
     },
-    // 소스맵 비활성화 옵션 (프로덕션)
-    sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
-    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
-    // terser minify 옵션
-    terserOptions: {
-      compress: {
-        drop_console: process.env.NODE_ENV === 'production',
-        drop_debugger: process.env.NODE_ENV === 'production',
-        pure_funcs: process.env.NODE_ENV === 'production' ? ['console.log', 'console.info'] : [],
-      },
-      mangle: {
-        // Preserve class names to avoid minification issues
-        keep_classnames: false,
-        // Safari 10 compatibility
-        safari10: true,
-      },
-    },
-    // esbuild minify 옵션 (terser 사용 시 무시됨)
+    // 소스맵 - 개발환경에서만 생성
+    sourcemap: process.env.NODE_ENV === 'development',
+    // minify는 프로덕션에서 esbuild 사용 (더 빠름)
+    minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false,
+    // esbuild minify 옵션
     esbuildOptions: {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
-      // Use array concatenation to avoid grep detection
-      pure: process.env.NODE_ENV === 'production' ? ['console' + '.log', 'console' + '.info'] : [],
+      target: 'es2020'
     },
     // modulepreload 설정 추가 - WordPress 청크 제외
     modulePreload: {
