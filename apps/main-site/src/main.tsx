@@ -11,7 +11,7 @@ import { initializeIframeContext } from './utils/iframe-context';
 import App from './App';
 
 // Shortcode 등록
-import { registerLazyShortcode, globalRegistry } from '@o4o/shortcodes';
+import { registerLazyShortcode, globalRegistry, hasShortcode } from '@o4o/shortcodes';
 
 // React 시작 전에 iframe 컨텍스트 초기화
 initializeIframeContext();
@@ -98,6 +98,14 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
           ) {
             // Register all shortcodes from this array
             for (const shortcodeDef of exportValue as any[]) {
+              // Skip if already registered
+              if (hasShortcode(shortcodeDef.name)) {
+                if (import.meta.env.DEV) {
+                  console.log(`[Main-Site Shortcode] ⏭️  Skipped [${shortcodeDef.name}] (already registered)`);
+                }
+                continue;
+              }
+
               registerLazyShortcode({
                 name: shortcodeDef.name,
                 loader: async () => ({ default: shortcodeDef.component }),
@@ -127,6 +135,14 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
           ) {
             const shortcodeDef = exportValue as any;
 
+            // Skip if already registered
+            if (hasShortcode(shortcodeDef.name)) {
+              if (import.meta.env.DEV) {
+                console.log(`[Main-Site Shortcode] ⏭️  Skipped [${shortcodeDef.name}] (already registered)`);
+              }
+              continue;
+            }
+
             registerLazyShortcode({
               name: shortcodeDef.name,
               loader: async () => ({ default: shortcodeDef.component }),
@@ -150,6 +166,15 @@ const componentModules = import.meta.glob('./components/shortcodes/**/*.tsx', { 
         if (!componentName) continue;
 
         const shortcodeName = pascalToSnakeCase(componentName);
+
+        // Skip if already registered
+        if (hasShortcode(shortcodeName)) {
+          if (import.meta.env.DEV) {
+            console.log(`[Main-Site Shortcode] ⏭️  Skipped [${shortcodeName}] (already registered)`);
+          }
+          continue;
+        }
+
         const Component = (module as any)[componentName] || (module as any).default;
 
         if (!Component) {

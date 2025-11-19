@@ -38,9 +38,10 @@ export class DefaultShortcodeRegistry implements ShortcodeRegistry {
       throw new Error(`Invalid shortcode name: ${name}. Only alphanumeric characters, underscores, and hyphens are allowed.`);
     }
 
-    // 중복 검사
+    // 중복 검사 - 이미 등록된 shortcode는 건너뛰기
     if (this.shortcodes.has(name)) {
-      console.warn(`Shortcode "${name}" is already registered. It will be overwritten.`);
+      // 중복 등록 방지 - 조용하게 건너뛰기
+      return;
     }
 
     // 기본 속성 유효성 검사
