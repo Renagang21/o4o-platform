@@ -56,7 +56,6 @@ export * from './sessionSyncService.js';
 export * from './settingsService.js';
 export * from './signageService.js';
 export * from './socialAuthService.js';
-export * from './unified-auth.service.js';
 // export * from './webhookService.js';
 
 // Export crowdfunding services

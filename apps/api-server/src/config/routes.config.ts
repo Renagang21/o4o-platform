@@ -30,7 +30,6 @@ import emailAuthRoutes from '../routes/email-auth.routes.js';
 import forumRoutes from '../routes/forum.js';
 import linkedAccountsRoutes from '../routes/linked-accounts.js';
 import accountLinkingRoutes from '../routes/account-linking.routes.js';
-import unifiedAuthRoutes from '../routes/unified-auth.routes.js';
 import inventoryRoutes from '../routes/inventory.js';
 import formsRoutes from '../routes/forms.js';
 import monitoringRoutes from '../routes/monitoring.js';
@@ -223,19 +222,8 @@ export function setupRoutes(app: Application): void {
   // Account linking
   app.use('/api/auth/accounts', accountLinkingRoutes);
 
-  // Legacy: Unified auth routes - @deprecated Use /api/v1/authentication instead
-  app.use(
-    '/api/auth/unified',
-    deprecatedRoute('/api/v1/authentication', '2025-12-31T00:00:00Z'),
-    logDeprecatedUsage('/api/auth/unified'),
-    unifiedAuthRoutes
-  );
-  app.use(
-    '/api/v1/auth/unified',
-    deprecatedRoute('/api/v1/authentication', '2025-12-31T00:00:00Z'),
-    logDeprecatedUsage('/api/v1/auth/unified'),
-    unifiedAuthRoutes
-  );
+  // Legacy: Unified auth routes - @deprecated REMOVED (use /api/v1/authentication instead)
+  // Routes have been removed after deprecation period
 
   // Linked accounts
   app.use('/accounts', linkedAccountsRoutes);

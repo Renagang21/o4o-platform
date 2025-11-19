@@ -1,0 +1,419 @@
+{
+  "info": {
+    "name": "O4O Authentication API",
+    "_postman_id": "o4o-auth-api-v1",
+    "description": "Complete collection for O4O Platform Authentication API v1\n\nBase URL: https://api.neture.co.kr/api/v1/authentication\n\nDocumentation: See docs/API_AUTHENTICATION.md",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.neture.co.kr/api/v1/authentication",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Email Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Save tokens to environment",
+                  "const response = pm.response.json();",
+                  "if (response.success && response.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', response.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.tokens.refreshToken);",
+                  "    pm.collectionVariables.set('sessionId', response.sessionId);",
+                  "    console.log('✅ Tokens saved to collection variables');",
+                  "}",
+                  "",
+                  "// Test response",
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has tokens', () => {",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.tokens).to.exist;",
+                  "    pm.expect(response.tokens.accessToken).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"email\",\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Login with email and password"
+          },
+          "response": []
+        },
+        {
+          "name": "Email Login (Convenience)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.success && response.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', response.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.tokens.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "login"]
+            },
+            "description": "Simplified email/password login endpoint"
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Login (Google)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.success && response.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', response.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.tokens.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"google\",\n  \"oauthProfile\": {\n    \"id\": \"google-user-id\",\n    \"email\": \"user@gmail.com\",\n    \"displayName\": \"John Doe\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"emailVerified\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Login with Google OAuth profile"
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Login (Kakao)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"kakao\",\n  \"oauthProfile\": {\n    \"id\": \"kakao-user-id\",\n    \"email\": \"user@kakao.com\",\n    \"displayName\": \"홍길동\",\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"emailVerified\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Login with Kakao OAuth profile"
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Login (Naver)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"provider\": \"naver\",\n  \"oauthProfile\": {\n    \"id\": \"naver-user-id\",\n    \"email\": \"user@naver.com\",\n    \"displayName\": \"김철수\",\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"emailVerified\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Login with Naver OAuth profile"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for email and OAuth login"
+    },
+    {
+      "name": "Token Management",
+      "item": [
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.success && response.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', response.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', response.tokens.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["refresh"]
+            },
+            "description": "Refresh access token using refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Token",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{accessToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/verify-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["verify-token"]
+            },
+            "description": "Verify if access token is valid"
+          },
+          "response": []
+        }
+      ],
+      "description": "Token refresh and verification endpoints"
+    },
+    {
+      "name": "Session Management",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "description": "Get currently authenticated user's profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Authentication Status",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["status"]
+            },
+            "description": "Check if user is authenticated (optional auth)"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["logout"]
+            },
+            "description": "Logout from current session"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout from All Devices",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logout-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["logout-all"]
+            },
+            "description": "Logout from all devices and sessions"
+          },
+          "response": []
+        }
+      ],
+      "description": "Session management endpoints"
+    },
+    {
+      "name": "Password Management",
+      "item": [
+        {
+          "name": "Forgot Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["forgot-password"]
+            },
+            "description": "Request password reset email"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset-token-from-email\",\n  \"password\": \"newSecurePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["reset-password"]
+            },
+            "description": "Reset password with token from email"
+          },
+          "response": []
+        }
+      ],
+      "description": "Password reset endpoints"
+    }
+  ]
+}
