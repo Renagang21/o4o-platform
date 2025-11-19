@@ -176,12 +176,11 @@ export default function GeneralSettings() {
               placeholder="admin@example.com"
             />
           </div>
-        </div>
       </CardContent>
     </Card>
 
-      {/* Localization */ }
-  <Card>
+    {/* Localization */}
+    <Card>
     <CardHeader>
       <CardTitle className="flex items-center gap-2">
         <Clock className="w-5 h-5" />
