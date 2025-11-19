@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, Plus, Search, Filter, Edit, Trash2 } from 'lucide-react';
+import { Package, Plus, Search, Filter, Edit, Trash2, Upload, ExternalLink } from 'lucide-react';
 import { EmptyState } from '../../common/EmptyState';
 import { sellerProductAPI } from '../../../services/sellerProductApi';
 import {
@@ -14,6 +14,7 @@ import {
   SellerProductStatus,
 } from '../../../types/seller-product';
 import type { SectionMode } from '../supplier/SupplierProductsSection';
+import { ChannelApi, type SellerChannelAccount, type ChannelProductLink } from '../../../services/channelApi';
 
 export interface SellerProductsSectionProps {
   mode?: SectionMode;
@@ -33,6 +34,14 @@ export const SellerProductsSection: React.FC<SellerProductsSectionProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+
+  // Channel export state
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<SellerProductListItem | null>(null);
+  const [channelAccounts, setChannelAccounts] = useState<SellerChannelAccount[]>([]);
+  const [productLinks, setProductLinks] = useState<ChannelProductLink[]>([]);
+  const [selectedChannelAccountId, setSelectedChannelAccountId] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   const pageSize = mode === 'dashboard' ? 5 : 20;
 
@@ -98,6 +107,58 @@ export const SellerProductsSection: React.FC<SellerProductsSectionProps> = ({
     } catch (error) {
       console.error('Failed to delete product:', error);
       alert('삭제에 실패했습니다.');
+    }
+  };
+
+  const handleOpenExportModal = async (product: SellerProductListItem) => {
+    setSelectedProduct(product);
+    setShowExportModal(true);
+    setSelectedChannelAccountId('');
+
+    try {
+      // Load channel accounts
+      const accounts = await ChannelApi.getChannelAccounts();
+      setChannelAccounts(accounts.filter(acc => acc.isActive));
+
+      // Load existing product links for this product (if any)
+      // Note: We'll need to enhance the API to support filtering by sellerProductId
+      // For now, we'll load links when a channel account is selected
+      setProductLinks([]);
+    } catch (error) {
+      console.error('Failed to load channel accounts:', error);
+      alert('채널 계정을 불러오는데 실패했습니다.');
+    }
+  };
+
+  const handleExportToChannel = async () => {
+    if (!selectedProduct || !selectedChannelAccountId) {
+      alert('채널 계정을 선택해주세요.');
+      return;
+    }
+
+    try {
+      setExporting(true);
+
+      // First, create product link
+      const links = await ChannelApi.createProductLinks(selectedChannelAccountId, [selectedProduct.id]);
+
+      // Then export
+      const result = await ChannelApi.exportProducts(selectedChannelAccountId, {
+        sellerProductIds: [selectedProduct.id],
+        linkIds: links.map(l => l.id),
+      });
+
+      if (result.successful > 0) {
+        alert(`채널 내보내기 성공! (성공: ${result.successful}, 실패: ${result.failed})`);
+        setShowExportModal(false);
+      } else {
+        alert('채널 내보내기에 실패했습니다.');
+      }
+    } catch (error: any) {
+      console.error('Failed to export to channel:', error);
+      alert(error.response?.data?.message || '채널 내보내기에 실패했습니다.');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -326,6 +387,13 @@ export const SellerProductsSection: React.FC<SellerProductsSectionProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <div className="flex items-center justify-center gap-2">
                         <button
+                          onClick={() => handleOpenExportModal(product)}
+                          className="text-green-600 hover:text-green-900"
+                          title="채널 내보내기"
+                        >
+                          <Upload className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => navigate(`/dashboard/seller/products/${product.id}/edit`)}
                           className="text-blue-600 hover:text-blue-900"
                           title="수정"
@@ -372,6 +440,127 @@ export const SellerProductsSection: React.FC<SellerProductsSectionProps> = ({
             </div>
           )}
         </>
+      )}
+
+      {/* Channel Export Modal */}
+      {showExportModal && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">채널 내보내기</h3>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Product Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">상품 정보</h4>
+                <div className="flex items-center gap-3">
+                  {selectedProduct.thumbnail_url && (
+                    <img
+                      src={selectedProduct.thumbnail_url}
+                      alt={selectedProduct.title}
+                      className="w-16 h-16 rounded object-cover"
+                    />
+                  )}
+                  <div>
+                    <div className="font-medium text-gray-900">{selectedProduct.title}</div>
+                    <div className="text-sm text-gray-500">SKU: {selectedProduct.sku}</div>
+                    <div className="text-sm text-gray-900">
+                      판매가: {selectedProduct.sale_price.toLocaleString()}원
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Channel Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  내보낼 채널 선택
+                </label>
+                {channelAccounts.length === 0 ? (
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      연결된 채널 계정이 없습니다.{' '}
+                      <a
+                        href="/dashboard/seller/channels"
+                        className="font-medium underline hover:text-yellow-900"
+                      >
+                        채널 계정을 먼저 추가
+                      </a>
+                      해주세요.
+                    </p>
+                  </div>
+                ) : (
+                  <select
+                    value={selectedChannelAccountId}
+                    onChange={(e) => setSelectedChannelAccountId(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">채널을 선택하세요</option>
+                    {channelAccounts.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.channel?.name || account.channelCode} - {account.displayName}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Existing Links (if any) */}
+              {productLinks.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">기존 내보내기 정보</h4>
+                  <div className="space-y-2">
+                    {productLinks.map((link) => (
+                      <div
+                        key={link.id}
+                        className="p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {link.channelAccountId}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              상태: {link.status}
+                            </div>
+                            {link.externalUrl && (
+                              <a
+                                href={link.externalUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 mt-1"
+                              >
+                                채널에서 보기 <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleExportToChannel}
+                disabled={!selectedChannelAccountId || exporting || channelAccounts.length === 0}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {exporting ? '내보내는 중...' : '채널에 내보내기'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

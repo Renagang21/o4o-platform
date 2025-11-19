@@ -67,6 +67,7 @@ import { SellerProductCreatePage } from './pages/dashboard/SellerProductCreatePa
 import { SellerProductEditPage } from './pages/dashboard/SellerProductEditPage';
 import { SellerOrdersPage } from './pages/dashboard/SellerOrdersPage';
 import { SellerOrderDetailPage } from './pages/dashboard/SellerOrderDetailPage';
+import { SellerChannelsPage } from './pages/dashboard/SellerChannelsPage';
 import { PartnerDashboardPage } from './pages/dashboard/PartnerDashboardPage';
 import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
 import { PartnerLinkCreatePage } from './pages/dashboard/PartnerLinkCreatePage';
@@ -289,6 +290,7 @@ const App: FC = () => {
             <Route path="products" element={<SellerProductsPage />} />
             <Route path="products/new" element={<SellerProductCreatePage />} />
             <Route path="products/:id/edit" element={<SellerProductEditPage />} />
+            <Route path="channels" element={<SellerChannelsPage />} />
             <Route path="orders" element={<SellerOrdersPage />} />
             <Route path="orders/:id" element={<SellerOrderDetailPage />} />
             <Route path="settlements" element={<SellerSettlementsPage />} />
