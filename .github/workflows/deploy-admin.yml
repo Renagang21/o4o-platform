@@ -44,11 +44,22 @@ jobs:
       run: |
         echo "🔨 Building admin dashboard..."
         cd apps/admin-dashboard
+
+        # Run prebuild to generate version.json
+        pnpm run prebuild
+
+        # Build with production settings
         NODE_ENV=production \
         NODE_OPTIONS='--max-old-space-size=4096' \
         VITE_API_URL=https://api.neture.co.kr/api/v1 \
         VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
         pnpm run build:prod
+
+        # Ensure version.json is in dist/ (Vite should copy it, but verify)
+        if [ ! -f dist/version.json ] && [ -f public/version.json ]; then
+          echo "📋 Copying version.json to dist..."
+          cp public/version.json dist/version.json
+        fi
 
         echo "📋 Build output:"
         ls -lh dist/
