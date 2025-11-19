@@ -10,7 +10,7 @@ import { UserService } from '../services/UserService.js';
 import { RefreshTokenService } from '../services/RefreshTokenService.js';
 import { SessionSyncService } from '../services/sessionSyncService.js';
 import { PasswordResetService } from '../services/passwordResetService.js';
-import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
 

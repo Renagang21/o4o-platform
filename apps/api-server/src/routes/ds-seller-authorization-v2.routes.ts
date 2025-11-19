@@ -1,5 +1,5 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 import { sellerAuthorizationService } from '../services/SellerAuthorizationService.js';
 import { authorizationGateService } from '../services/AuthorizationGateService.js';
 import logger from '../utils/logger.js';

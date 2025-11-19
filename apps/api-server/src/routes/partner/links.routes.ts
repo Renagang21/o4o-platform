@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PartnerLinksController } from '../../controllers/partner/PartnerLinksController.js';
-import { authenticateToken } from '../../middleware/auth.js';
+import { authenticateToken } from '../../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const controller = new PartnerLinksController();

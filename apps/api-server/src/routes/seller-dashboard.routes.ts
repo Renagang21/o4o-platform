@@ -8,7 +8,7 @@
 import { Router, Request, Response } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { query } from 'express-validator';
-import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
 import { SellerDashboardService } from '../services/SellerDashboardService.js';
 import { OrderStatus } from '../entities/Order.js';
 import logger from '../utils/logger.js';

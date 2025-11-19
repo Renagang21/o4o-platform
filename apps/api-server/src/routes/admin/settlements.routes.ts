@@ -6,8 +6,7 @@
  */
 
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { authenticateToken, requireAdmin } from '../../middleware/auth.middleware.js';
 import {
   getAllSettlements,
   getSettlementById,

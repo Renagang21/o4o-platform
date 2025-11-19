@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { param, query, body } from 'express-validator';
 import { AdminOrderController } from '../../controllers/AdminOrderController.js';
-import { authenticate } from '../../middleware/auth.middleware.js';
-import { checkRole } from '../../middleware/checkRole.js';
+import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
 /**
@@ -17,7 +16,7 @@ const adminOrderController = new AdminOrderController();
 
 // Apply authentication and role check to all routes
 router.use(authenticate);
-router.use(checkRole(['administrator', 'operator']));
+router.use(requireRole(['administrator', 'operator']));
 
 // Validation middleware
 const validateOrderId = [

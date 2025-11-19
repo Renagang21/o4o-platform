@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { formController } from '../controllers/formController.js';
-import { authenticate } from '../middleware/auth.middleware.js';
-import { checkRole } from '../middleware/checkRole.js';
+import { authenticate, requireRole } from '../middleware/auth.middleware.js';
 import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,10 +38,10 @@ const upload = multer({
 });
 
 // Admin routes - require authentication and admin/business role
-router.post('/', authenticate, checkRole(['admin', 'business']), formController.createForm);
-router.put('/:id', authenticate, checkRole(['admin', 'business']), formController.updateForm);
-router.get('/', authenticate, checkRole(['admin', 'business']), formController.getForms);
-router.delete('/:id', authenticate, checkRole(['admin']), formController.deleteForm);
+router.post('/', authenticate, requireRole(['admin', 'business']), formController.createForm);
+router.put('/:id', authenticate, requireRole(['admin', 'business']), formController.updateForm);
+router.get('/', authenticate, requireRole(['admin', 'business']), formController.getForms);
+router.delete('/:id', authenticate, requireRole(['admin']), formController.deleteForm);
 
 // Public routes - get form for display
 router.get('/:id', formController.getForm);
@@ -51,11 +50,11 @@ router.get('/:id', formController.getForm);
 router.post('/:formId/submit', upload.array('files', 10) as any, formController.submitForm);
 
 // Submission management - require authentication
-router.get('/:formId/submissions', authenticate, checkRole(['admin', 'business']), formController.getSubmissions);
-router.put('/submissions/:id', authenticate, checkRole(['admin', 'business']), formController.updateSubmission);
-router.delete('/submissions/:id', authenticate, checkRole(['admin']), formController.deleteSubmission);
+router.get('/:formId/submissions', authenticate, requireRole(['admin', 'business']), formController.getSubmissions);
+router.put('/submissions/:id', authenticate, requireRole(['admin', 'business']), formController.updateSubmission);
+router.delete('/submissions/:id', authenticate, requireRole(['admin']), formController.deleteSubmission);
 
 // Reports
-router.get('/:formId/report', authenticate, checkRole(['admin', 'business']), formController.getFormReport);
+router.get('/:formId/report', authenticate, requireRole(['admin', 'business']), formController.getFormReport);
 
 export default router;

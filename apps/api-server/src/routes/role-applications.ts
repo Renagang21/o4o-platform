@@ -11,7 +11,7 @@ import { AppDataSource } from '../database/connection.js';
 import { RoleApplication, RoleApplicationStatus } from '../entities/RoleApplication.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { User } from '../entities/User.js';
-import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
 import { emailService } from '../services/email.service.js';
 import { notificationService } from '../services/NotificationService.js';
 import logger from '../utils/logger.js';

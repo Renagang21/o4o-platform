@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PartnerAnalyticsController } from '../../controllers/analytics/PartnerAnalyticsController.js';
-import { authenticateToken } from '../../middleware/auth.js';
+import { authenticateToken } from '../../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const analyticsController = new PartnerAnalyticsController();

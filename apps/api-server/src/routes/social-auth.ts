@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport, { getActiveStrategies } from '../config/passportDynamic.js';
 import { SocialAuthService } from '../services/socialAuthService.js';
-import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
 

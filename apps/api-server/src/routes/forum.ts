@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { optionalAuth } from '../middleware/auth.js';
+import { optionalAuth } from '../middleware/auth.middleware.js';
 import { addDeprecationHeaders } from '../middleware/deprecation.middleware.js';
 import { ForumController } from '../controllers/forumController.js';
 

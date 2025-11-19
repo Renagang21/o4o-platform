@@ -4,7 +4,7 @@ import { PartnerEntityController } from '../../controllers/entity/PartnerEntityC
 import { SupplierDashboardController } from '../../controllers/entity/SupplierDashboardController.js';
 import { PartnerDashboardController } from '../../controllers/entity/PartnerDashboardController.js';
 import { SettlementEntityController } from '../../controllers/entity/SettlementEntityController.js';
-import { authenticateToken } from '../../middleware/auth.js';
+import { authenticateToken } from '../../middleware/auth.middleware.js';
 
 const router: Router = Router();
 const supplierController = new SupplierEntityController();

@@ -1,6 +1,6 @@
 import { Router, type Router as IRouter } from 'express';
 import { presetController } from '../controllers/preset.controller.js';
-import { authenticateToken } from '../../../middleware/auth.js';
+import { authenticateToken } from '../../../middleware/auth.middleware.js';
 
 const router: IRouter = Router();
 

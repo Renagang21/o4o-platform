@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { SellerController } from '../../controllers/SellerController.js';
-import { authenticateToken } from '../../middleware/auth.js';
-import { requireRole } from '../../middleware/permission.middleware.js';
+import { authenticateToken, requireRole } from '../../middleware/auth.middleware.js';
 import { UserRole } from '../../entities/User.js';
 
 /**

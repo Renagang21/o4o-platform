@@ -1,6 +1,6 @@
 import { Application, Request, Response, RequestHandler } from 'express';
 import { standardLimiter, publicLimiter, settingsLimiter, ssoCheckLimiter, userPermissionsLimiter, enrollmentLimiter, adminReviewLimiter } from './rate-limiters.config.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 import { errorHandler, notFoundHandler } from '../middleware/error-handler.js';
 import { AppDataSource } from '../database/connection.js';
 import { Post } from '../entities/Post.js';

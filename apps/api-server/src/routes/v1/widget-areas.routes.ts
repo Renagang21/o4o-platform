@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../../middleware/auth.js';
+import { authenticateToken } from '../../middleware/auth.middleware.js';
 import { WidgetAreaService } from '../../services/WidgetAreaService.js';
 
 const router: Router = Router();

@@ -6,6 +6,9 @@ import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 
+// Re-export AuthRequest for backward compatibility
+export { AuthRequest };
+
 /**
  * Extract JWT token from Authorization header or httpOnly cookie
  */
@@ -128,12 +131,12 @@ export const requireAdmin = async (
 /**
  * P0 RBAC: requireRole - Role-based authorization check
  *
- * Requires user to have an active RoleAssignment for the specified role.
+ * Requires user to have an active RoleAssignment for one of the specified roles.
  * Uses new P0 role_assignments table as source of truth.
  *
- * @param role - Role name to check (e.g., 'supplier', 'seller', 'partner')
+ * @param roles - Role name(s) to check (e.g., 'supplier', ['admin', 'staff'])
  */
-export const requireRole = (role: string) => {
+export const requireRole = (roles: string | string[]) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     // First ensure user is authenticated
     await requireAuth(req, res, () => {});
@@ -143,28 +146,49 @@ export const requireRole = (role: string) => {
     }
 
     const user = req.user as User;
+    const roleList = Array.isArray(roles) ? roles : [roles];
 
     try {
-      // Check for active RoleAssignment in P0 table
-      const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
-      const assignment = await assignmentRepo.findOne({
-        where: {
-          userId: user.id,
-          role: role,
-          isActive: true
-        }
-      });
+      // Check if user has ANY of the required roles
+      let hasActiveRole = false;
+      let matchedAssignment: RoleAssignment | null = null;
 
-      // Also check validity period if assignment exists
-      const hasActiveRole = assignment && assignment.isValidNow();
+      // First check legacy role system (User.hasRole)
+      for (const role of roleList) {
+        if (user.hasRole(role)) {
+          hasActiveRole = true;
+          break;
+        }
+      }
+
+      // If not found in legacy system, check P0 role_assignments table
+      if (!hasActiveRole) {
+        const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
+
+        for (const role of roleList) {
+          const assignment = await assignmentRepo.findOne({
+            where: {
+              userId: user.id,
+              role: role,
+              isActive: true
+            }
+          });
+
+          // Check validity period if assignment exists
+          if (assignment && assignment.isValidNow()) {
+            hasActiveRole = true;
+            matchedAssignment = assignment;
+            break;
+          }
+        }
+      }
 
       if (!hasActiveRole) {
         // Log unauthorized role access attempt
         logger.warn('Unauthorized role access attempt', {
           userId: user.id,
           email: user.email,
-          wantedRole: role,
-          hasActiveAssignment: !!assignment,
+          requiredRoles: roleList,
           path: req.path,
           method: req.method,
           timestamp: new Date().toISOString()
@@ -172,21 +196,25 @@ export const requireRole = (role: string) => {
 
         return res.status(403).json({
           code: 'ROLE_REQUIRED',
-          message: `Active ${role} role required`,
+          message: roleList.length === 1
+            ? `Active ${roleList[0]} role required`
+            : `One of these roles required: ${roleList.join(', ')}`,
           details: {
-            requiredRole: role
+            requiredRoles: roleList
           }
         });
       }
 
-      // Attach assignment to request for downstream use
-      (req as any).roleAssignment = assignment;
+      // Attach assignment to request for downstream use (if found)
+      if (matchedAssignment) {
+        (req as any).roleAssignment = matchedAssignment;
+      }
       next();
     } catch (error) {
       logger.error('Error checking role assignment', {
         error: error instanceof Error ? error.message : String(error),
         userId: user.id,
-        role
+        roles: roleList
       });
 
       return res.status(500).json({
@@ -198,8 +226,56 @@ export const requireRole = (role: string) => {
 };
 
 /**
+ * Optional authentication - doesn't fail if no token
+ * Attaches user to request if valid token is present
+ */
+export const optionalAuth = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = extractToken(req);
+
+    if (!token) {
+      return next(); // No token, continue without authentication
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+
+    // Get user from database
+    const userRepo = AppDataSource.getRepository(User);
+    const user = await userRepo.findOne({
+      where: { id: decoded.userId || decoded.sub },
+      relations: ['linkedAccounts', 'dbRoles', 'dbRoles.permissions']
+    });
+
+    if (user && user.isActive) {
+      // Attach user to request
+      req.user = user as any;
+    }
+
+    next();
+  } catch (error) {
+    // Continue without authentication on error
+    next();
+  }
+};
+
+/**
  * Legacy authenticate middleware (deprecated)
  *
  * @deprecated Use requireAuth instead
  */
 export const authenticate = requireAuth;
+
+/**
+ * Alias for requireAuth - for compatibility with auth.ts
+ */
+export const authenticateToken = requireAuth;
+
+/**
+ * Alias for requireAuth - for auth-v2 compatibility
+ */
+export const authenticateCookie = requireAuth;
