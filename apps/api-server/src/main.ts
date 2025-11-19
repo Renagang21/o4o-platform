@@ -342,6 +342,16 @@ const startServer = async () => {
     }
   }
 
+  // Initialize Channel Connectors (Phase PD-9)
+  try {
+    const { initializeChannelConnectors } = await import('./channels/index.js');
+    initializeChannelConnectors();
+    logger.info('✅ Channel connectors initialized');
+  } catch (channelError) {
+    logger.error('Channel connectors initialization failed:', channelError);
+    // Continue server startup even if channel init fails
+  }
+
   // Initialize dynamic Passport strategies (AFTER database is initialized)
   try {
     await initializePassport();
