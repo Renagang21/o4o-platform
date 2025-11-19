@@ -2,6 +2,7 @@ import { Application, Request, Response, RequestHandler } from 'express';
 import { standardLimiter, publicLimiter, settingsLimiter, ssoCheckLimiter, userPermissionsLimiter, enrollmentLimiter, adminReviewLimiter } from './rate-limiters.config.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 import { errorHandler, notFoundHandler } from '../middleware/error-handler.js';
+import { deprecatedRoute, logDeprecatedUsage } from '../middleware/deprecated.middleware.js';
 import { AppDataSource } from '../database/connection.js';
 import { Post } from '../entities/Post.js';
 import logger from '../utils/logger.js';
@@ -206,7 +207,12 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/auth', authRoutes);
 
   // Legacy: Cookie-based auth routes - @deprecated Use /api/v1/authentication instead
-  app.use('/api/v1/auth/cookie', authV2Routes);
+  app.use(
+    '/api/v1/auth/cookie',
+    deprecatedRoute('/api/v1/authentication', '2025-12-31T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/auth/cookie'),
+    authV2Routes
+  );
 
   // Social auth
   app.use('/api/v1/social', socialAuthRoutes);
@@ -216,8 +222,20 @@ export function setupRoutes(app: Application): void {
 
   // Account linking
   app.use('/api/auth/accounts', accountLinkingRoutes);
-  app.use('/api/auth/unified', unifiedAuthRoutes);
-  app.use('/api/v1/auth/unified', unifiedAuthRoutes);
+
+  // Legacy: Unified auth routes - @deprecated Use /api/v1/authentication instead
+  app.use(
+    '/api/auth/unified',
+    deprecatedRoute('/api/v1/authentication', '2025-12-31T00:00:00Z'),
+    logDeprecatedUsage('/api/auth/unified'),
+    unifiedAuthRoutes
+  );
+  app.use(
+    '/api/v1/auth/unified',
+    deprecatedRoute('/api/v1/authentication', '2025-12-31T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/auth/unified'),
+    unifiedAuthRoutes
+  );
 
   // Linked accounts
   app.use('/accounts', linkedAccountsRoutes);
