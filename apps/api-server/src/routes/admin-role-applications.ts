@@ -11,7 +11,8 @@ import { AppDataSource } from '../database/connection.js';
 import { RoleApplication, RoleApplicationStatus } from '../entities/RoleApplication.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { User } from '../entities/User.js';
-import { authenticateCookie, AuthRequest } from '../middleware/auth.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
+import { AuthRequest } from '../types/auth.js';
 import { emailService } from '../services/email.service.js';
 import { notificationService } from '../services/NotificationService.js';
 import logger from '../utils/logger.js';
@@ -27,52 +28,11 @@ const roleNames: Record<string, string> = {
 };
 
 /**
- * Admin authorization middleware
- * Checks if user has admin/administrator role assignment
- */
-const requireAdmin = async (req: AuthRequest, res: any, next: any) => {
-  try {
-    const userId = (req.user as any)?.userId || (req.user as any)?.id;
-    if (!userId) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-        code: 'UNAUTHORIZED'
-      });
-    }
-
-    const assignmentRepo = AppDataSource.getRepository(RoleAssignment);
-    const adminAssignment = await assignmentRepo.findOne({
-      where: [
-        { userId, role: 'admin', isActive: true },
-        { userId, role: 'administrator', isActive: true },
-        { userId, role: 'super_admin', isActive: true },
-      ]
-    });
-
-    if (!adminAssignment) {
-      return res.status(403).json({
-        error: 'Forbidden',
-        code: 'FORBIDDEN',
-        message: 'Admin role required'
-      });
-    }
-
-    next();
-  } catch (error) {
-    console.error('[ADMIN CHECK ERROR]', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      code: 'INTERNAL_SERVER_ERROR'
-    });
-  }
-};
-
-/**
  * GET /api/v2/admin/roles/applications
  * Get all role applications (admin only)
  */
 router.get('/applications',
-  authenticateCookie,
+  requireAuth,
   requireAdmin,
   query('status').optional().isIn(['pending', 'approved', 'rejected']),
   query('page').optional().isInt({ min: 1 }),
@@ -138,7 +98,7 @@ router.get('/applications',
  * Approve a role application (admin only)
  */
 router.post('/applications/:id/approve',
-  authenticateCookie,
+  requireAuth,
   requireAdmin,
   param('id').isUUID(),
   async (req: AuthRequest, res) => {
@@ -148,7 +108,7 @@ router.post('/applications/:id/approve',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const adminUserId = (req.user as any)?.userId || (req.user as any)?.id;
+      const adminUserId = req.user?.id;
       const { id } = req.params;
 
       const applicationRepo = AppDataSource.getRepository(RoleApplication);
@@ -256,7 +216,7 @@ router.post('/applications/:id/approve',
  * Reject a role application (admin only)
  */
 router.post('/applications/:id/reject',
-  authenticateCookie,
+  requireAuth,
   requireAdmin,
   param('id').isUUID(),
   body('reason').optional().isString().isLength({ max: 500 }),
@@ -267,7 +227,7 @@ router.post('/applications/:id/reject',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const adminUserId = (req.user as any)?.userId || (req.user as any)?.id;
+      const adminUserId = req.user?.id;
       const { id } = req.params;
       const { reason } = req.body;
 
