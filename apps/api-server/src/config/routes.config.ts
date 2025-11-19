@@ -147,6 +147,9 @@ import adminSettlementsRoutes from '../routes/admin/settlements.routes.js';
 // Phase PD-1 - Seller Dashboard Routes
 import sellerDashboardRoutes from '../routes/seller-dashboard.routes.js';
 
+// Phase PD-8 - Admin Job Routes
+import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -458,6 +461,9 @@ export function setupRoutes(app: Application): void {
   // P0 RBAC - Admin Enrollment Review (Phase B)
   app.use('/api/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);
   app.use('/api/v1/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);
+
+  // Phase PD-8 - Admin Job Management
+  app.use('/api/v2/admin/jobs', standardLimiter, adminJobsRoutes);
 
   // ============================================================================
   // 7. DASHBOARD ENDPOINTS

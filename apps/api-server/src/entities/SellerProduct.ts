@@ -93,6 +93,10 @@ export class SellerProduct {
   @Column({ type: 'integer', default: 0, nullable: true })
   sellerInventory: number | null;
 
+  // Supplier inventory snapshot (for auto-sync tracking)
+  @Column({ type: 'integer', nullable: true })
+  supplierInventorySnapshot: number | null;
+
   // Sales Statistics
   @Column({ type: 'integer', default: 0 })
   salesCount: number; // Number of sales
