@@ -5,10 +5,10 @@ export class MediaFolder {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   slug!: string
 
   @Column({ type: 'uuid', nullable: true })
@@ -22,7 +22,7 @@ export class MediaFolder {
   // Use MediaFolderRepository.find({ where: { parentId: folder.id } }) to get children
   // Use MediaFileRepository.find({ where: { folderId: folder.id } }) to get files
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   fileCount!: number
 
   @Column({ type: 'bigint', default: 0 })

@@ -40,21 +40,21 @@ export class ContentUsageLog {
     zoneId?: string;
   };
 
-  @Column()
+  @Column({ type: 'varchar' })
   storeId!: string;
 
   @ManyToOne('Store')
   @JoinColumn({ name: 'storeId' })
   store!: Store;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   contentId?: string;
 
   @ManyToOne('SignageContent', { nullable: true })
   @JoinColumn({ name: 'contentId' })
   content?: SignageContent;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   playlistId?: string;
 
   @ManyToOne('StorePlaylist', { nullable: true })

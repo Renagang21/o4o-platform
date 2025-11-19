@@ -9,7 +9,7 @@ export class AutomationLog {
   @Column('uuid')
   ruleId!: string;
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   status!: string; // 'success', 'failed', 'partial'
 
   @Column({ type: 'text', nullable: true })

@@ -31,7 +31,7 @@ export class FieldGroup {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title!: string
 
   @Column({ type: 'text', nullable: true })
@@ -56,10 +56,10 @@ export class FieldGroup {
     description?: string
   }
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   active!: boolean
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   order!: number
 
   @Column({ 
@@ -81,10 +81,10 @@ export class CustomField {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   label!: string
 
   @Column({ 
@@ -105,7 +105,7 @@ export class CustomField {
   @Column({ type: 'text', nullable: true })
   description!: string
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   required!: boolean
 
   @Column({ type: 'text', nullable: true })
@@ -141,10 +141,10 @@ export class CustomField {
   @Column({ type: 'text', nullable: true })
   pattern!: string
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   multiple!: boolean
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   order!: number
 
   @Column({ type: 'uuid' })
@@ -176,7 +176,7 @@ export class CustomFieldValue {
   @Column({ type: 'uuid' })
   entityId!: string // ID of the page, post, user, etc.
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   entityType!: string // 'page', 'post', 'user', 'term', etc.
 
   @Column({ type: 'json' })

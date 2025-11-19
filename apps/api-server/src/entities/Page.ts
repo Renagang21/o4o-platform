@@ -38,10 +38,10 @@ export class Page {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   slug!: string
 
   @Column({ type: 'json', nullable: true })
@@ -57,10 +57,10 @@ export class Page {
   })
   status!: string
 
-  @Column({ default: 'page' })
+  @Column({ type: 'varchar', default: 'page' })
   type!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   template!: string
 
   @Column({ type: 'uuid', nullable: true })
@@ -73,13 +73,13 @@ export class Page {
   @OneToMany('Page', 'parent')
   children!: Page[]
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   menuOrder!: number
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   showInMenu!: boolean
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isHomepage!: boolean
 
   @Column({ type: 'json', nullable: true })
@@ -108,19 +108,19 @@ export class Page {
   @JoinColumn({ name: 'lastModifiedBy' })
   lastModifier!: User
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   views!: number
 
   @Column({ type: 'text', nullable: true })
   password!: string
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   passwordProtected!: boolean
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   allowComments!: boolean
 
-  @Column({ default: 'open' })
+  @Column({ type: 'varchar', default: 'open' })
   commentStatus!: string
 
   @Column({ type: 'json', nullable: true })

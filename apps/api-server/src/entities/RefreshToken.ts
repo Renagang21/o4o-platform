@@ -6,13 +6,13 @@ export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   token: string;
 
   @ManyToOne('User', { onDelete: 'CASCADE' })
   user: User;
 
-  @Column()
+  @Column({ type: 'uuid' })
   userId: string;
 
   @Column({ type: 'timestamp' })
@@ -27,7 +27,7 @@ export class RefreshToken {
   @Column({ type: 'varchar', nullable: true })
   ipAddress?: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   revoked: boolean;
 
   @Column({ type: 'timestamp', nullable: true })

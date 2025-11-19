@@ -29,7 +29,7 @@ export class AIReference {
    * Reference type - extensible for future AI services
    * Examples: 'blocks', 'shortcodes', 'image-prompts', 'video-prompts', 'audio-prompts'
    */
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   @Index()
   type!: string;
 
@@ -37,7 +37,7 @@ export class AIReference {
    * Reference name - unique within type
    * Examples: 'blocks-reference', 'shortcode-registry', 'style-guide'
    */
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -63,13 +63,13 @@ export class AIReference {
   /**
    * Version of the reference data
    */
-  @Column({ length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   version?: string;
 
   /**
    * Schema version for validation
    */
-  @Column({ length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   schemaVersion?: string;
 
   /**
@@ -77,7 +77,7 @@ export class AIReference {
    * NULL = available to all apps
    * 'google-gemini-text' = only for this app
    */
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   @Index()
   appSlug?: string | null;
 

@@ -33,7 +33,7 @@ export class WorkflowTransition {
   @JoinColumn({ name: 'from_state_id' })
   fromState: WorkflowState;
 
-  @Column({ name: 'from_state_id' })
+  @Column({ type: 'varchar', name: 'from_state_id' })
   fromStateId: string;
 
   // Target state
@@ -43,7 +43,7 @@ export class WorkflowTransition {
   @JoinColumn({ name: 'to_state_id' })
   toState: WorkflowState;
 
-  @Column({ name: 'to_state_id' })
+  @Column({ type: 'varchar', name: 'to_state_id' })
   toStateId: string;
 
   @Column({ 

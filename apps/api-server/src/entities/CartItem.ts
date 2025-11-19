@@ -27,22 +27,22 @@ export class CartItem {
   @Column('uuid')
   productId: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   productName: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   productSku: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   productImage: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   productBrand: string;
 
   @Column('uuid', { nullable: true })
   variationId: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   variationName: string;
 
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
@@ -66,7 +66,7 @@ export class CartItem {
   @Column('uuid', { nullable: true })
   supplierId: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   supplierName: string;
 
   // Product attributes

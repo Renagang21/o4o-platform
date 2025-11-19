@@ -9,10 +9,10 @@ export class CrowdfundingProject {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   description: string;
 
   // 참여 관련
@@ -38,7 +38,7 @@ export class CrowdfundingProject {
   status: CrowdfundingProjectStatus;
 
   // 생성자 (제품 개발사)
-  @Column({ name: 'creator_id' })
+  @Column({ type: 'varchar', name: 'creator_id' })
   creatorId: string;
 
   @ManyToOne('User', { eager: true })
@@ -46,7 +46,7 @@ export class CrowdfundingProject {
   creator: User;
 
   // 포럼 연동 (단순 링크)
-  @Column({ name: 'forum_link', length: 500, nullable: true })
+  @Column({ type: 'varchar', name: 'forum_link', length: 500, nullable: true })
   forumLink?: string;
 
   // Relations

@@ -6,17 +6,17 @@ export class ShipmentTrackingHistory {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'shipment_id' })
+  @Column({ type: 'integer', name: 'shipment_id' })
   shipmentId!: number;
 
   @ManyToOne('Shipment')
   @JoinColumn({ name: 'shipment_id' })
   shipment?: Shipment;
 
-  @Column()
+  @Column({ type: 'varchar' })
   status!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   location?: string;
 
   @Column({ type: 'text', nullable: true })

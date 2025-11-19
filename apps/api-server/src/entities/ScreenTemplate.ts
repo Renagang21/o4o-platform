@@ -10,7 +10,7 @@ export class ScreenTemplate {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -44,10 +44,10 @@ export class ScreenTemplate {
   })
   status!: TemplateStatus;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isDefault!: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   previewImage?: string;
 
   @CreateDateColumn()

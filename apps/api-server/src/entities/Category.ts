@@ -7,26 +7,26 @@ export class Category {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   slug!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   image?: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   sortOrder!: number;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
   // SEO
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   metaTitle?: string;
 
   @Column({ type: 'text', nullable: true })
@@ -39,7 +39,7 @@ export class Category {
   @TreeChildren()
   children!: Category[];
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   count!: number;
 
   // Relations

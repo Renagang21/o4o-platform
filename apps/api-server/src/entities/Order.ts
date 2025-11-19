@@ -77,7 +77,7 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   orderNumber: string;
 
   // Buyer information
@@ -94,16 +94,16 @@ export class Order {
   })
   events!: OrderEvent[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   buyerType: string; // UserRole
 
-  @Column()
+  @Column({ type: 'varchar' })
   buyerName: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   buyerEmail: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   buyerGrade: string; // RetailerGrade
 
   // Order items (stored as JSON for simplicity)
@@ -114,7 +114,7 @@ export class Order {
   @Column('jsonb')
   summary: OrderSummary;
 
-  @Column({ default: 'KRW' })
+  @Column({ type: 'varchar', default: 'KRW' })
   currency: string;
 
   // Status tracking
@@ -140,10 +140,10 @@ export class Order {
   paymentMethod: PaymentMethod;
 
   // Phase PG-1: Toss Payments integration fields
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   paymentKey: string; // Toss payment key from successful transaction
 
-  @Column({ default: 'tosspayments' })
+  @Column({ type: 'varchar', default: 'tosspayments' })
   paymentProvider: string; // Payment gateway provider
 
   @Column({ type: 'timestamp', nullable: true })
@@ -157,16 +157,16 @@ export class Order {
   shippingAddress: Address;
 
   // Shipping & tracking
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   shippingMethod: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   shippingCarrier: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   trackingNumber: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   trackingUrl: string;
 
   // Timestamps
@@ -223,10 +223,10 @@ export class Order {
   @Column({ type: 'uuid', nullable: true })
   partnerId: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   partnerName: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   referralCode: string | null;
 
   // Standard timestamps

@@ -33,10 +33,10 @@ export class Taxonomy {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true, length: 32 })
+  @Column({ type: 'varchar', unique: true, length: 32 })
   name!: string; // taxonomy key (e.g., 'category', 'post_tag', 'product_cat')
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   label!: string; // Human readable name
 
   @Column({ type: 'text', nullable: true })
@@ -72,34 +72,34 @@ export class Taxonomy {
   @Column({ type: 'jsonb', nullable: true })
   settings!: TaxonomySettings;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   hierarchical!: boolean; // Categories are hierarchical, tags are not
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   public!: boolean;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   showUI!: boolean;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   showInMenu!: boolean;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   showInNavMenus!: boolean;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   showTagcloud!: boolean;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   showInQuickEdit!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   showAdminColumn!: boolean;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   sortOrder!: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   createdBy!: string;
 
   @ManyToOne('User')
@@ -122,16 +122,16 @@ export class Term {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ length: 200 })
+  @Column({ type: 'varchar', length: 200 })
   name!: string;
 
-  @Column({ length: 200, unique: true })
+  @Column({ type: 'varchar', length: 200, unique: true })
   slug!: string;
 
   @Column({ type: 'text', nullable: true })
   description!: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   count!: number; // Number of posts using this term
 
   @Column({ type: 'uuid' })
@@ -150,7 +150,7 @@ export class Term {
   @Column({ type: 'jsonb', nullable: true })
   meta!: Record<string, any>; // Term metadata
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   termOrder!: number; // For custom ordering
 
   @CreateDateColumn()
@@ -177,7 +177,7 @@ export class TermRelationship {
   @Column({ type: 'uuid' })
   objectId!: string; // ID of post, page, custom post, etc.
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   objectType!: string; // 'post', 'page', 'product', etc.
 
   @Column({ type: 'uuid' })
@@ -187,7 +187,7 @@ export class TermRelationship {
   @JoinColumn({ name: 'termId' })
   term!: Term;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   termOrder!: number; // Order of terms for this object
 
   @CreateDateColumn()

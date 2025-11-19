@@ -21,11 +21,11 @@ export class ReusableBlock {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   title!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   @Index()
   slug!: string
 
@@ -44,8 +44,8 @@ export class ReusableBlock {
   status!: string
 
   // Category for organizing blocks
-  @Column({ nullable: true })
-  @Index()  
+  @Column({ type: 'varchar', nullable: true })
+  @Index()
   category!: string
 
   // Tags for better searchability
@@ -53,18 +53,18 @@ export class ReusableBlock {
   tags!: string[]
 
   // Usage tracking
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   usageCount!: number
 
   @Column({ type: 'timestamp', nullable: true })
   lastUsedAt!: Date
 
   // Whether this block is shared across the platform
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isGlobal!: boolean
 
   // Whether this block can be edited after creation
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isEditable!: boolean
 
   // Preview/thumbnail data
@@ -98,7 +98,7 @@ export class ReusableBlock {
   revisions!: ReusableBlockRevision[]
 
   // Access control
-  @Column({ default: 'private' })
+  @Column({ type: 'varchar', default: 'private' })
   visibility!: 'private' | 'public' | 'organization'
 
   // Block metadata

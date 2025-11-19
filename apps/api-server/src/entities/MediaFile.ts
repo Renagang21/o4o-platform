@@ -22,28 +22,28 @@ export class MediaFile {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   filename!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   originalName!: string
 
-  @Column({ length: 500 })
+  @Column({ type: 'varchar', length: 500 })
   url!: string
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   path!: string
 
-  @Column()
+  @Column({ type: 'varchar' })
   mimeType!: string
 
   @Column({ type: 'bigint' })
   size!: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'integer', nullable: true })
   width!: number
 
-  @Column({ nullable: true })
+  @Column({ type: 'integer', nullable: true })
   height!: number
 
   @Column({ type: 'json', nullable: true })
@@ -78,7 +78,7 @@ export class MediaFile {
   @Column({ type: 'json', nullable: true })
   metadata!: Record<string, unknown> // EXIF, color profile, etc.
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   downloads!: number
 
   @Column({ type: 'timestamp', nullable: true })

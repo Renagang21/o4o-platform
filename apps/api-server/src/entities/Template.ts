@@ -13,10 +13,10 @@ export class Template {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   slug!: string
 
   @Column({ type: 'text', nullable: true })
@@ -62,19 +62,19 @@ export class Template {
   @JoinColumn({ name: 'author_id' })
   author!: User
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   active!: boolean
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   featured!: boolean
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   usageCount!: number
 
   @Column({ type: 'simple-array', nullable: true })
   tags!: string[]
 
-  @Column({ length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   version!: string
 
   @Column({ type: 'json', nullable: true })

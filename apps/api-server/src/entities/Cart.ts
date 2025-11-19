@@ -45,7 +45,7 @@ export class Cart {
   @Column({ type: 'simple-array', nullable: true })
   discountCodes: string[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   sessionId: string;
 
   @Column({ type: 'timestamp', nullable: true })

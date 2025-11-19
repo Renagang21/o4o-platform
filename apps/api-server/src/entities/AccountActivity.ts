@@ -16,7 +16,7 @@ export class AccountActivity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userId!: string;
 
   @ManyToOne('User', { onDelete: 'CASCADE', lazy: true })
@@ -34,10 +34,10 @@ export class AccountActivity {
   })
   provider!: AuthProvider;
 
-  @Column()
+  @Column({ type: 'varchar' })
   ipAddress!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userAgent!: string;
 
   @Column({ type: 'json', nullable: true })

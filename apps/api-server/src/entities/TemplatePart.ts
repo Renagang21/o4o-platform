@@ -27,10 +27,10 @@ export class TemplatePart {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   slug!: string
 
   @Column({ type: 'text', nullable: true })
@@ -60,10 +60,10 @@ export class TemplatePart {
     customCss?: string
   }
 
-  @Column({ name: 'is_active', default: true })
+  @Column({ type: 'boolean', name: 'is_active', default: true })
   isActive!: boolean
 
-  @Column({ name: 'is_default', default: false })
+  @Column({ type: 'boolean', name: 'is_default', default: false })
   isDefault!: boolean // Default template part for the area
 
   @Column({ name: 'author_id', type: 'uuid', nullable: true })
@@ -73,7 +73,7 @@ export class TemplatePart {
   @JoinColumn({ name: 'author_id' })
   author!: User
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   priority!: number // For ordering multiple parts in same area
 
   @Column({ type: 'simple-array', nullable: true })

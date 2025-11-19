@@ -10,14 +10,14 @@ export class CrowdfundingParticipation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'project_id' })
+  @Column({ type: 'varchar', name: 'project_id' })
   projectId: string;
 
   @ManyToOne('CrowdfundingProject', 'participations', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'project_id' })
   project: CrowdfundingProject;
 
-  @Column({ name: 'vendor_id' })
+  @Column({ type: 'varchar', name: 'vendor_id' })
   vendorId: string;
 
   @ManyToOne('User', { eager: true })

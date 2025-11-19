@@ -6,17 +6,17 @@ export class Tag {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true, length: 100 })
+  @Column({ type: 'varchar', unique: true, length: 100 })
   name!: string;
 
-  @Column({ unique: true, length: 100 })
+  @Column({ type: 'varchar', unique: true, length: 100 })
   slug!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   count!: number; // Number of posts using this tag
 
   @Column({ type: 'json', nullable: true })

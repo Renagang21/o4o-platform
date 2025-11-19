@@ -7,13 +7,13 @@ export class EmailLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   recipient!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   sender?: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   subject!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -29,10 +29,10 @@ export class EmailLog {
   })
   status!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   messageId?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   provider?: string;
 
   @Column({ type: 'json', nullable: true })
@@ -44,13 +44,13 @@ export class EmailLog {
   @Column({ type: 'int', default: 0 })
   retryCount!: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   sentAt?: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   openedAt?: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   clickedAt?: Date;
 
   @Column({ type: 'json', nullable: true })
@@ -60,13 +60,13 @@ export class EmailLog {
     contentType: string;
   }>;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   emailType?: string; // welcome, reset-password, order-confirmation, etc.
 
-  @Column({ nullable: true })
+  @Column({ type: 'integer', nullable: true })
   userId?: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   orderId?: string;
 
   @Column({ type: 'json', nullable: true })

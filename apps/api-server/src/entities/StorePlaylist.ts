@@ -13,7 +13,7 @@ export class StorePlaylist {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -26,16 +26,16 @@ export class StorePlaylist {
   })
   status!: PlaylistStatus;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isDefault!: boolean; // Default playlist for the store
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   loop!: boolean; // Whether to loop the playlist
 
   @Column({ type: 'int', default: 0 })
   totalDuration!: number; // Total duration in seconds
 
-  @Column()
+  @Column({ type: 'varchar' })
   storeId!: string;
 
   @ManyToOne('Store', { lazy: true })

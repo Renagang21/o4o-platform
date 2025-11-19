@@ -33,24 +33,24 @@ export class PlaylistItem {
     endTime?: number;
   };
 
-  @Column()
+  @Column({ type: 'varchar' })
   playlistId!: string;
 
   @ManyToOne('StorePlaylist', { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'playlistId' })
   playlist!: Promise<StorePlaylist>;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   contentId?: string; // For video content
 
   @ManyToOne('SignageContent', { nullable: true })
   @JoinColumn({ name: 'contentId' })
   content?: SignageContent;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   imageUrl?: string; // For image content
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   title?: string; // Custom title override
 
   @CreateDateColumn()

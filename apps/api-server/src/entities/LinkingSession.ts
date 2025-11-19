@@ -16,7 +16,7 @@ export class LinkingSession {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userId!: string;
 
   @ManyToOne('User', { onDelete: 'CASCADE' })
@@ -35,7 +35,7 @@ export class LinkingSession {
   })
   status!: LinkingStatus;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   verificationToken?: string;
 
   @Column({ type: 'timestamp' })

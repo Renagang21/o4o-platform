@@ -46,13 +46,13 @@ export class PaymentWebhook {
   })
   eventType!: WebhookEventType;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   paymentKey?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   orderId?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   transactionKey?: string;
 
   // 페이로드
@@ -67,7 +67,7 @@ export class PaymentWebhook {
   })
   status!: WebhookStatus;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   processed!: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -95,7 +95,7 @@ export class PaymentWebhook {
   @Column({ type: 'text', nullable: true })
   signature?: string; // 웹훅 서명 검증
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   sourceIp?: string;
 
   @Column({ type: 'text', nullable: true })
@@ -106,11 +106,11 @@ export class PaymentWebhook {
   headers?: Record<string, string>;
 
   // 검증
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   signatureVerified!: boolean;
 
   // 중복 방지
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   idempotencyKey?: string;
 
   // Timestamps

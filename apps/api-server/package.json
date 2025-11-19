@@ -48,6 +48,7 @@
     "migration:revert": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
     "migration:run": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run",
     "migration:run:prod": "node scripts/run-migrations.mjs",
+    "migration:roles": "npx tsx src/scripts/migrate-user-roles-to-assignments.ts",
     "migration:show": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts migration:show",
     "migration:sync": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts schema:sync",
     "monitor": "node scripts/pm2-monitor.sh --once",

@@ -20,7 +20,7 @@ export class LinkedAccount {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userId!: string;
 
   @ManyToOne('User', 'linkedAccounts', { onDelete: 'CASCADE' })
@@ -32,22 +32,22 @@ export class LinkedAccount {
   })
   provider!: AuthProvider;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   providerId?: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   email!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   displayName?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   profileImage?: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isVerified!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isPrimary!: boolean;
 
   @Column({ type: 'json', nullable: true })

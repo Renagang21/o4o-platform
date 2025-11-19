@@ -59,14 +59,14 @@ export class PaymentSettlement {
   @Column({ type: 'uuid' })
   recipientId!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   recipientName!: string;
 
   // 금액 정보
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount!: number;
 
-  @Column({ default: 'KRW' })
+  @Column({ type: 'varchar', default: 'KRW' })
   currency!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })

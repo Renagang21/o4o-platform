@@ -11,10 +11,10 @@ export class Form {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   name: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   title: string;
 
   @Column({ type: 'text', nullable: true })
@@ -42,7 +42,7 @@ export class Form {
   })
   status: 'active' | 'inactive' | 'draft';
 
-  @Column()
+  @Column({ type: 'varchar' })
   createdBy: string;
 
   @ManyToOne('User')
@@ -55,7 +55,7 @@ export class Form {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   submissionCount: number;
 
   @Column({ type: 'timestamp', nullable: true })

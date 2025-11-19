@@ -88,10 +88,10 @@ export class Payment {
   order!: Order;
 
   // 토스페이먼츠 식별자
-  @Column({ unique: true, nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   paymentKey?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   transactionId?: string;
 
   // 금액 정보
@@ -107,7 +107,7 @@ export class Payment {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   vat!: number; // 부가세
 
-  @Column({ default: 'KRW' })
+  @Column({ type: 'varchar', default: 'KRW' })
   currency!: string;
 
   // 결제 수단
@@ -143,24 +143,24 @@ export class Payment {
   updatedAt!: Date;
 
   // 고객 정보
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   customerEmail?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   customerName?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   customerMobilePhone?: string;
 
   // 주문 정보
-  @Column()
+  @Column({ type: 'varchar' })
   orderName!: string;
 
   // 웹훅 및 응답 데이터
   @Column({ type: 'jsonb', nullable: true })
   gatewayResponse?: Record<string, any>;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   webhookReceived!: boolean;
 
   // 환불 정보
@@ -186,7 +186,7 @@ export class Payment {
   failureMessage?: string;
 
   // 메타데이터
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   customerIp?: string;
 
   @Column({ type: 'text', nullable: true })
@@ -200,11 +200,11 @@ export class Payment {
   failUrl?: string;
 
   // 멱등성 키 (중복 요청 방지)
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   @Index()
   confirmIdempotencyKey?: string; // 결제 승인 멱등성 키
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   @Index()
   cancelIdempotencyKey?: string; // 결제 취소 멱등성 키
 

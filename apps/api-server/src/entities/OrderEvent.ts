@@ -55,10 +55,10 @@ export class OrderEvent {
   })
   type: OrderEventType;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   prevStatus: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   newStatus: string;
 
   @Column({ type: 'text', nullable: true })
@@ -72,10 +72,10 @@ export class OrderEvent {
   @JoinColumn({ name: 'actorId' })
   actor?: User;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   actorName: string; // Cached name for display
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   actorRole: string; // Role at time of event
 
   // Additional data

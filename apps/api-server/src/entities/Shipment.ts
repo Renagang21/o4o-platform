@@ -6,20 +6,20 @@ export class Shipment {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'order_id' })
+  @Column({ type: 'integer', name: 'order_id' })
   orderId!: number;
 
   // @ManyToOne(() => Order)
   // @JoinColumn({ name: 'order_id' })
   // order?: Order; // Removed - Order entity deleted
 
-  @Column({ name: 'tracking_number', nullable: true })
+  @Column({ type: 'varchar', name: 'tracking_number', nullable: true })
   trackingNumber?: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   carrier!: string;
 
-  @Column({ name: 'carrier_code', nullable: true })
+  @Column({ type: 'varchar', name: 'carrier_code', nullable: true })
   carrierCode?: string;
 
   @Column({

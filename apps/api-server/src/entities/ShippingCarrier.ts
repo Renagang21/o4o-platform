@@ -5,34 +5,34 @@ export class ShippingCarrier {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   code!: string; // cj, hanjin, logen, koreanpost
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string; // CJ대한통운, 한진택배, 로젠택배, 우체국택배
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   apiUrl?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   apiKey?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   apiSecret?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   webhookUrl?: string;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   supportsCod!: boolean; // Cash on delivery
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   supportsInsurance!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   supportsInternational!: boolean;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
@@ -47,10 +47,10 @@ export class ShippingCarrier {
   @Column({ type: 'json', nullable: true })
   settings?: Record<string, any>;
 
-  @Column({ default: 999 })
+  @Column({ type: 'integer', default: 999 })
   priority!: number; // Lower number = higher priority
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   trackingUrlTemplate?: string; // e.g., https://www.cjlogistics.com/ko/tool/parcel/tracking?gnbInvcNo={{trackingNumber}}
 
   @Column({ type: 'json', nullable: true })
@@ -63,10 +63,10 @@ export class ShippingCarrier {
   @Column({ type: 'json', nullable: true })
   serviceAreas?: string[]; // List of supported regions
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   customerServicePhone?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   customerServiceEmail?: string;
 
   @CreateDateColumn()

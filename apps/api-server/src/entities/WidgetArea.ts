@@ -15,22 +15,22 @@ export class WidgetArea {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   slug!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   location?: string; // e.g., 'header', 'footer', 'sidebar', 'content'
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   sortOrder!: number;
 
   // Meta data for additional configuration (stored as JSON)

@@ -12,10 +12,10 @@ export class Store {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   description?: string;
 
   @Column({ type: 'json', nullable: true })
@@ -27,10 +27,10 @@ export class Store {
     country: string;
   };
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   phone?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   businessHours?: string; // JSON string or simple text
 
   @Column({
@@ -47,7 +47,7 @@ export class Store {
     defaultTemplate: string;
   };
 
-  @Column()
+  @Column({ type: 'varchar' })
   managerId!: string;
 
   @ManyToOne('User')

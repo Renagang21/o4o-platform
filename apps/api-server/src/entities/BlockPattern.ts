@@ -30,11 +30,11 @@ export class BlockPattern {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   title!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   @Index()
   slug!: string
 
@@ -82,12 +82,12 @@ export class BlockPattern {
   source!: string
 
   // Whether this pattern is featured/promoted
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   @Index()
   featured!: boolean
 
   // Usage tracking
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   @Index()
   usageCount!: number
 
@@ -104,7 +104,7 @@ export class BlockPattern {
   visibility!: string
 
   // Pro/Premium patterns
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isPremium!: boolean
 
   // Pattern metadata
@@ -121,7 +121,7 @@ export class BlockPattern {
   author!: User
 
   // Version control
-  @Column({ default: '1.0.0' })
+  @Column({ type: 'varchar', default: '1.0.0' })
   version!: string
 
   // Pattern dependencies (required blocks/plugins)

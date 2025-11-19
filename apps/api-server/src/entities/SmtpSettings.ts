@@ -5,20 +5,20 @@ export class SmtpSettings {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   enabled!: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   fromName?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   fromEmail?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   replyToEmail?: string;
 
   // SMTP Server Settings
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   host?: string;
 
   @Column({ type: 'int', nullable: true })
@@ -39,26 +39,26 @@ export class SmtpSettings {
   })
   authMethod!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   username?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   password?: string;
 
   // OAuth2 Settings (for Gmail, Outlook)
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   clientId?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   clientSecret?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   refreshToken?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   accessToken?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   tokenExpiry?: Date;
 
   // Email Provider Presets
@@ -70,14 +70,14 @@ export class SmtpSettings {
   provider!: string;
 
   // API Key for services like SendGrid, Mailgun
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   apiKey?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   apiSecret?: string;
 
   // AWS SES specific
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   region?: string;
 
   // Rate Limiting
@@ -88,33 +88,33 @@ export class SmtpSettings {
   maxEmailsPerMinute!: number;
 
   // Testing
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   testEmailAddress?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastTestDate?: Date;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   lastTestSuccess!: boolean;
 
   @Column({ type: 'text', nullable: true })
   lastTestError?: string;
 
   // Logging
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   enableLogging!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   logErrors!: boolean;
 
   // Email Templates Default Settings
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   headerHtml?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   footerHtml?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   signatureHtml?: string;
 
   // Metadata

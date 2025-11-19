@@ -60,18 +60,18 @@ export class App {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ length: 100, unique: true })
+  @Column({ type: 'varchar', length: 100, unique: true })
   @Index()
   slug!: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string;
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   @Index()
   provider!: string; // 'google', 'openai', 'naver', etc.
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   category!: string; // 'text-generation', 'image-generation', 'translation', etc.
 
   @Column({
@@ -84,10 +84,10 @@ export class App {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   icon?: string;
 
-  @Column({ length: 20, default: '1.0.0' })
+  @Column({ type: 'varchar', length: 20, default: '1.0.0' })
   version!: string;
 
   @Column({ type: 'jsonb', nullable: true })
@@ -101,13 +101,13 @@ export class App {
   @Index()
   status!: 'active' | 'inactive' | 'deprecated';
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isSystem!: boolean; // System apps cannot be deleted
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   author?: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   repositoryUrl?: string;
 
   @CreateDateColumn()

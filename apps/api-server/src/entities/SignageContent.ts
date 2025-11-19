@@ -18,7 +18,7 @@ export class SignageContent {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   title!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -30,13 +30,13 @@ export class SignageContent {
   })
   type!: ContentType;
 
-  @Column()
+  @Column({ type: 'varchar' })
   url!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   videoId?: string; // YouTube/Vimeo video ID extracted from URL
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   thumbnailUrl?: string;
 
   @Column({ type: 'int', nullable: true })
@@ -52,27 +52,27 @@ export class SignageContent {
   @Column({ type: 'json', nullable: true })
   tags?: string[];
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isPublic!: boolean; // Whether visible to all stores
 
-  @Column()
+  @Column({ type: 'varchar' })
   createdBy!: string;
 
   @ManyToOne('User')
   @JoinColumn({ name: 'createdBy' })
   creator!: User;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   approvedBy?: string;
 
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'approvedBy' })
   approver?: User;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   approvedAt?: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   rejectedReason?: string;
 
   @CreateDateColumn()

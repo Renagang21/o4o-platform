@@ -6,7 +6,7 @@ export class LoginAttempt {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   email: string;
 
   @Column({ type: 'varchar' })
@@ -15,7 +15,7 @@ export class LoginAttempt {
   @Column({ type: 'varchar', nullable: true })
   userAgent?: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   successful: boolean;
 
   @Column({ type: 'varchar', nullable: true })

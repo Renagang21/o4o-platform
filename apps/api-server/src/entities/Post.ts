@@ -20,10 +20,10 @@ export class Post {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   slug!: string
 
   @Column({ type: 'text', nullable: true })
@@ -56,10 +56,10 @@ export class Post {
   })
   tenant_id!: string | null
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   template!: string
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   featured_media!: string
 
   @Column({ 
@@ -69,14 +69,14 @@ export class Post {
   })
   comment_status!: 'open' | 'closed'
 
-  @Column({ 
+  @Column({
     type: 'enum',
     enum: ['open', 'closed'],
     default: 'open'
   })
   ping_status!: 'open' | 'closed'
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   sticky!: boolean
 
   // DEPRECATED: meta column removed from database schema (2025-11-06)

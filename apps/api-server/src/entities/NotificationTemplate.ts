@@ -5,10 +5,10 @@ export class NotificationTemplate {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string;
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   type!: string;
 
   @Column({ type: 'text' })

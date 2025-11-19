@@ -13,7 +13,7 @@ export class PostAutosave {
   @JoinColumn({ name: 'post_id' })
   post!: Post;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   title?: string;
 
   @Column({ type: 'text', nullable: true })

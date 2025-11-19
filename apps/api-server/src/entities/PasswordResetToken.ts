@@ -8,10 +8,10 @@ export class PasswordResetToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   token: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userId: string;
 
   @ManyToOne('User', { onDelete: 'CASCADE' })
@@ -20,7 +20,7 @@ export class PasswordResetToken {
   @Column({ type: 'timestamp' })
   expiresAt: Date;
 
-  @Column()
+  @Column({ type: 'varchar' })
   email: string;
 
   @Column({ type: 'timestamp', nullable: true })

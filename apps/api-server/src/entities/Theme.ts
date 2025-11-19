@@ -6,37 +6,37 @@ export class Theme {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   slug!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   description?: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   version!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   author?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   authorUrl?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   screenshot?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   demoUrl?: string;
 
-  @Column({ default: 'external' })
+  @Column({ type: 'varchar', default: 'external' })
   type!: 'builtin' | 'external' | 'custom';
 
-  @Column({ default: 'inactive' })
+  @Column({ type: 'varchar', default: 'inactive' })
   status!: 'active' | 'inactive' | 'maintenance';
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isPremium!: boolean;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
@@ -90,16 +90,16 @@ export class Theme {
     content?: string;
   }[];
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   downloads!: number;
 
   @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
   rating!: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   reviewCount!: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastUpdate?: Date;
 
   @Column({ type: 'json', nullable: true })
@@ -109,23 +109,23 @@ export class Theme {
     changes: string[];
   }[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   license?: string;
 
   @Column({ type: 'json', nullable: true })
   supportedLanguages?: string[];
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isChildTheme!: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   parentThemeId?: string;
 
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'uploadedById' })
   uploadedBy?: User;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   uploadedById?: string;
 
   @CreateDateColumn()
@@ -140,16 +140,16 @@ export class ThemeInstallation {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   themeId!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   siteId!: string;
 
-  @Column({ default: 'installed' })
+  @Column({ type: 'varchar', default: 'installed' })
   status!: 'installed' | 'active' | 'updating' | 'error';
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   activatedAt?: Date;
 
   @Column({ type: 'json', nullable: true })

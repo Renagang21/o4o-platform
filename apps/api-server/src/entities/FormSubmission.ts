@@ -13,34 +13,34 @@ export class FormSubmission {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   formId: string;
 
   @ManyToOne('Form', 'submissions', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'formId' })
   form: Form;
 
-  @Column()
+  @Column({ type: 'varchar' })
   formName: string;
 
   @Column({ type: 'jsonb' })
   data: Record<string, any>;
 
   // User info
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userId: string;
 
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userEmail: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userName: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   ipAddress: string;
 
   @Column({ type: 'text' })
@@ -64,16 +64,16 @@ export class FormSubmission {
   @Column({ type: 'text', nullable: true })
   referrer: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   source: string; // Where form was embedded (page URL, etc.)
 
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   starred: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   read: boolean;
 
   // Payment info
@@ -87,7 +87,7 @@ export class FormSubmission {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   paymentAmount: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   paymentId: string;
 
   // File uploads
@@ -118,13 +118,13 @@ export class FormSubmission {
   };
 
   // Device info
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   deviceType: string; // desktop, tablet, mobile
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   browser: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   os: string;
 
   // Spam detection
@@ -135,7 +135,7 @@ export class FormSubmission {
   spamReasons: string[];
 
   // Admin interaction
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   reviewedBy: string;
 
   @Column({ type: 'timestamp', nullable: true })

@@ -19,7 +19,7 @@ export class SignageSchedule {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name!: string;
 
   @Column({ type: 'text', nullable: true })
@@ -60,14 +60,14 @@ export class SignageSchedule {
   @Column({ type: 'int', default: 0 })
   priority!: number; // Higher number = higher priority
 
-  @Column()
+  @Column({ type: 'varchar' })
   storeId!: string;
 
   @ManyToOne('Store', { lazy: true })
   @JoinColumn({ name: 'storeId' })
   store!: Promise<Store>;
 
-  @Column()
+  @Column({ type: 'varchar' })
   playlistId!: string;
 
   @ManyToOne('StorePlaylist')
