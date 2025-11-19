@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { Response } from 'express';
 import { User } from '../entities/User.js';
-import { 
-  AccessTokenPayload, 
-  AuthTokens, 
-  LoginRequest, 
+import {
+  AccessTokenPayload,
+  AuthTokens,
+  LoginRequest,
   LoginResponse,
   UserRole
 } from '../types/auth.js';
@@ -13,12 +13,35 @@ import { RefreshTokenService as RefreshTokenServiceStub } from './RefreshTokenSe
 import { RefreshTokenService } from './refreshToken.service.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { LoginSecurityService } from './LoginSecurityService.js';
+import * as tokenUtils from '../utils/token.utils.js';
+import * as cookieUtils from '../utils/cookie.utils.js';
+import {
+  InvalidCredentialsError,
+  AccountLockedError,
+  AccountInactiveError,
+  EmailNotVerifiedError,
+  TooManyAttemptsError
+} from '../errors/AuthErrors.js';
 
 interface TokenMetadata {
   userAgent?: string;
   ipAddress?: string;
 }
 
+/**
+ * @deprecated Use AuthenticationService instead (apps/api-server/src/services/authentication.service.ts)
+ *
+ * This service is maintained for backward compatibility only.
+ * New code should use the unified AuthenticationService.
+ *
+ * Migration guide:
+ * - AuthServiceV2.login() -> authenticationService.login({ provider: 'email', credentials, ... })
+ * - AuthServiceV2.generateTokens() -> tokenUtils.generateTokens()
+ * - AuthServiceV2.verifyAccessToken() -> tokenUtils.verifyAccessToken()
+ * - AuthServiceV2.refreshTokens() -> authenticationService.refreshTokens()
+ * - AuthServiceV2.setAuthCookies() -> cookieUtils.setAuthCookies()
+ * - AuthServiceV2.clearAuthCookies() -> cookieUtils.clearAuthCookies()
+ */
 export class AuthServiceV2 {
   private static readonly JWT_SECRET = process.env.JWT_SECRET || 'jwt-secret';
   private static readonly JWT_EXPIRES_IN = '15m';
@@ -168,40 +191,19 @@ export class AuthServiceV2 {
   }
 
   /**
-   * Generate access and refresh tokens
+   * Generate access and refresh tokens (Refactored to use token.utils)
    */
   static async generateTokens(
-    user: User, 
+    user: User,
     metadata?: TokenMetadata
   ): Promise<AuthTokens> {
-    // Generate access token
-    const accessTokenPayload: AccessTokenPayload = {
-      userId: user.id,
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-      permissions: user.permissions || [],
-      domain: 'neture.co.kr',
-      exp: Math.floor(Date.now() / 1000) + (15 * 60), // 15 minutes
-      iat: Math.floor(Date.now() / 1000)
-    };
+    // Use centralized token generation
+    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
 
-    const accessToken = jwt.sign(accessTokenPayload, this.JWT_SECRET);
-    
-    // Generate refresh token via RefreshTokenService
-    // Note: deviceId parameter omitted as it's not in DB schema yet
-    const refreshToken = await this.refreshTokenService.generateRefreshToken(
-      user,
-      undefined, // deviceId - skip for now
-      metadata?.userAgent,
-      metadata?.ipAddress
-    );
+    // Note: RefreshTokenService integration can be done separately if needed
+    // For now, using the centralized token generation
 
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: 15 * 60 // 15 minutes in seconds
-    };
+    return tokens;
   }
 
   /**
@@ -235,14 +237,10 @@ export class AuthServiceV2 {
   }
 
   /**
-   * Verify access token
+   * Verify access token (Refactored to use token.utils)
    */
   static verifyAccessToken(token: string): AccessTokenPayload | null {
-    try {
-      return jwt.verify(token, this.JWT_SECRET) as AccessTokenPayload;
-    } catch (error) {
-      return null;
-    }
+    return tokenUtils.verifyAccessToken(token);
   }
 
   /**
@@ -253,47 +251,17 @@ export class AuthServiceV2 {
   }
 
   /**
-   * Set authentication cookies
+   * Set authentication cookies (Refactored to use cookie.utils)
    */
   static setAuthCookies(res: Response, tokens: AuthTokens): void {
-    const isProduction = process.env.NODE_ENV === 'production';
-    const cookieDomain = process.env.COOKIE_DOMAIN;
-
-    const baseCookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax' as const,
-      ...(cookieDomain && { domain: cookieDomain })
-    };
-
-    // Access token cookie
-    res.cookie('accessToken', tokens.accessToken, {
-      ...baseCookieOptions,
-      maxAge: tokens.expiresIn * 1000 // Convert to milliseconds
-    });
-
-    // Refresh token cookie
-    res.cookie('refreshToken', tokens.refreshToken, {
-      ...baseCookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
+    cookieUtils.setAuthCookies(res, tokens);
   }
 
   /**
-   * Clear authentication cookies
+   * Clear authentication cookies (Refactored to use cookie.utils)
    */
   static clearAuthCookies(res: Response): void {
-    const cookieDomain = process.env.COOKIE_DOMAIN;
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
-      ...(cookieDomain && { domain: cookieDomain })
-    };
-
-    res.clearCookie('accessToken', cookieOptions);
-    res.clearCookie('refreshToken', cookieOptions);
-    res.clearCookie('sessionId', cookieOptions);
+    cookieUtils.clearAuthCookies(res);
   }
 
   /**

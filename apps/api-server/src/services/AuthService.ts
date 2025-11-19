@@ -5,18 +5,38 @@ import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
 import { User } from '../entities/User.js';
 import { BusinessInfo } from '../types/user.js';
-import { 
-  AccessTokenPayload, 
-  RefreshTokenPayload, 
-  AuthTokens, 
-  LoginRequest, 
+import {
+  AccessTokenPayload,
+  RefreshTokenPayload,
+  AuthTokens,
+  LoginRequest,
   LoginResponse,
   UserRole,
   UserStatus,
-  CookieConfig 
+  CookieConfig
 } from '../types/auth.js';
 import { RefreshTokenService } from './RefreshTokenService.js';
+import * as tokenUtils from '../utils/token.utils.js';
+import * as cookieUtils from '../utils/cookie.utils.js';
+import {
+  InvalidCredentialsError,
+  AccountLockedError,
+  AccountInactiveError,
+  UserNotFoundError
+} from '../errors/AuthErrors.js';
 
+/**
+ * @deprecated Use AuthenticationService instead (apps/api-server/src/services/authentication.service.ts)
+ *
+ * This service is maintained for backward compatibility only.
+ * New code should use the unified AuthenticationService.
+ *
+ * Migration guide:
+ * - AuthService.login() -> authenticationService.login({ provider: 'email', credentials, ... })
+ * - AuthService.generateTokens() -> tokenUtils.generateTokens()
+ * - AuthService.verifyAccessToken() -> tokenUtils.verifyAccessToken()
+ * - AuthService.refreshTokens() -> authenticationService.refreshTokens()
+ */
 class AuthService {
   private userRepository: Repository<User>;
   private jwtSecret: string;
@@ -89,61 +109,26 @@ class AuthService {
     };
   }
 
-  // JWT 토큰 생성
+  // JWT 토큰 생성 (Refactored to use token.utils)
   async generateTokens(user: User, domain: string): Promise<AuthTokens> {
-    const tokenFamily = uuidv4();
-    
-    // Access Token (15분)
-    const accessTokenPayload: AccessTokenPayload = {
-      userId: user.id,
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-      permissions: user.permissions || [],
-      domain,
-      exp: Math.floor(Date.now() / 1000) + (15 * 60), // 15분
-      iat: Math.floor(Date.now() / 1000)
-    };
+    // Use centralized token generation
+    const tokens = tokenUtils.generateTokens(user, domain);
 
-    // Refresh Token (7일)
-    const refreshTokenPayload: RefreshTokenPayload = {
-      userId: user.id,
-      sub: user.id,
-      tokenVersion: 1,
-      tokenFamily,
-      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7일
-      iat: Math.floor(Date.now() / 1000)
-    };
-
-    const accessToken = jwt.sign(accessTokenPayload, this.jwtSecret);
-    const refreshToken = jwt.sign(refreshTokenPayload, this.jwtRefreshSecret);
+    // Extract token family from refresh token for backward compatibility
+    const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
 
     // 사용자 토큰 패밀리 업데이트
-    user.refreshTokenFamily = tokenFamily;
-    await this.userRepository.save(user);
+    if (tokenFamily) {
+      user.refreshTokenFamily = tokenFamily;
+      await this.userRepository.save(user);
+    }
 
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: 15 * 60 // 15분 (초)
-    };
+    return tokens;
   }
 
-  // Access Token 검증
+  // Access Token 검증 (Refactored to use token.utils)
   verifyAccessToken(token: string): AccessTokenPayload | null {
-    try {
-      const payload = jwt.verify(token, this.jwtSecret) as AccessTokenPayload;
-      
-      // Return the payload with all required fields
-      return {
-        userId: payload.userId || payload.sub || '',
-        email: payload.email || '',
-        role: payload.role || UserRole.CUSTOMER,
-        ...payload
-      };
-    } catch (error) {
-      return null;
-    }
+    return tokenUtils.verifyAccessToken(token);
   }
 
   // Refresh Token으로 새 토큰 발급
@@ -357,32 +342,14 @@ class AuthService {
     }
   }
 
-  // Set auth cookies
+  // Set auth cookies (Refactored to use cookie.utils)
   setAuthCookies(res: Response, tokens: AuthTokens): void {
-    const isProduction = process.env.NODE_ENV === 'production';
-    
-    // Access token cookie
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000 // 15 minutes
-    });
-
-    // Refresh token cookie
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
+    cookieUtils.setAuthCookies(res, tokens);
   }
 
-  // Clear auth cookies
+  // Clear auth cookies (Refactored to use cookie.utils)
   clearAuthCookies(res: Response): void {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
-    res.clearCookie('sessionId');
+    cookieUtils.clearAuthCookies(res);
   }
 
   // Revoke all user tokens

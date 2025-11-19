@@ -1,0 +1,632 @@
+import { Response } from 'express';
+import { Repository } from 'typeorm';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../entities/User.js';
+import { LinkedAccount } from '../entities/LinkedAccount.js';
+import { AccountActivity } from '../entities/AccountActivity.js';
+import {
+  AuthTokens,
+  LoginResponse,
+  UserRole,
+  UserStatus,
+  AccessTokenPayload
+} from '../types/auth.js';
+import {
+  AuthProvider,
+  OAuthProfile,
+  UnifiedLoginRequest,
+  UnifiedLoginResponse
+} from '../types/account-linking.js';
+import * as tokenUtils from '../utils/token.utils.js';
+import * as cookieUtils from '../utils/cookie.utils.js';
+import { hashPassword, comparePassword, generateRandomToken } from '../utils/auth.utils.js';
+import {
+  InvalidCredentialsError,
+  AccountInactiveError,
+  AccountLockedError,
+  EmailNotVerifiedError,
+  UserNotFoundError,
+  SocialLoginRequiredError,
+  EmailAlreadyExistsError,
+  InvalidPasswordResetTokenError
+} from '../errors/AuthErrors.js';
+import { SessionSyncService } from './sessionSyncService.js';
+import { LoginSecurityService } from './LoginSecurityService.js';
+import { AccountLinkingService } from './account-linking.service.js';
+import { emailService } from './email.service.js';
+import logger from '../utils/logger.js';
+
+/**
+ * Unified Authentication Service
+ *
+ * This service consolidates all authentication logic from:
+ * - AuthService (basic auth)
+ * - AuthServiceV2 (cookie-based auth)
+ * - UnifiedAuthService (email + OAuth)
+ *
+ * It provides a single, consistent API for all authentication operations.
+ */
+export class AuthenticationService {
+  private userRepository: Repository<User>;
+  private linkedAccountRepository: Repository<LinkedAccount>;
+  private activityRepository: Repository<AccountActivity>;
+
+  constructor() {
+    this.userRepository = AppDataSource.getRepository(User);
+    this.linkedAccountRepository = AppDataSource.getRepository(LinkedAccount);
+    this.activityRepository = AppDataSource.getRepository(AccountActivity);
+  }
+
+  /**
+   * Unified login method
+   *
+   * Handles both email/password and OAuth login.
+   *
+   * @param request - Login request (email or OAuth)
+   * @returns Login response with tokens and user data
+   */
+  async login(request: UnifiedLoginRequest): Promise<UnifiedLoginResponse> {
+    const { provider, credentials, oauthProfile, ipAddress, userAgent } = request;
+
+    try {
+      if (provider === 'email') {
+        if (!credentials) {
+          throw new InvalidCredentialsError();
+        }
+        return await this.handleEmailLogin(credentials, ipAddress, userAgent);
+      } else {
+        if (!oauthProfile) {
+          throw new InvalidCredentialsError();
+        }
+        return await this.handleOAuthLogin(provider, oauthProfile, ipAddress, userAgent);
+      }
+    } catch (error) {
+      logger.error('Login error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle email/password login
+   */
+  private async handleEmailLogin(
+    credentials: { email: string; password: string },
+    ipAddress: string,
+    userAgent: string
+  ): Promise<UnifiedLoginResponse> {
+    const { email, password } = credentials;
+
+    // Security check: Rate limiting
+    const loginCheck = await LoginSecurityService.isLoginAllowed(email, ipAddress);
+    if (!loginCheck.allowed) {
+      await this.logLoginAttempt(null, email, ipAddress, userAgent, false, loginCheck.reason);
+
+      if (loginCheck.reason === 'account_locked') {
+        throw new AccountLockedError();
+      } else {
+        throw new Error('Too many login attempts. Please try again later.');
+      }
+    }
+
+    // Find user
+    let user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['linkedAccounts']
+    });
+
+    // Check linked accounts if user not found
+    if (!user) {
+      const linkedAccount = await this.linkedAccountRepository.findOne({
+        where: { email, provider: 'email' },
+        relations: ['user', 'user.linkedAccounts']
+      });
+
+      if (linkedAccount) {
+        user = linkedAccount.user;
+      }
+    }
+
+    if (!user) {
+      await this.logLoginAttempt(null, email, ipAddress, userAgent, false, 'account_not_found');
+      throw new InvalidCredentialsError();
+    }
+
+    // Check if user has password (not social-only account)
+    if (!user.password) {
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'no_password');
+      throw new SocialLoginRequiredError();
+    }
+
+    // Check if account is locked
+    if (user.isLocked || (user.lockedUntil && user.lockedUntil > new Date())) {
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'account_locked');
+      throw new AccountLockedError(user.lockedUntil || undefined);
+    }
+
+    // Verify password
+    const isValidPassword = await comparePassword(password, user.password);
+    if (!isValidPassword) {
+      await this.handleFailedLogin(user);
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'invalid_password');
+      throw new InvalidCredentialsError();
+    }
+
+    // Check account status
+    if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'account_inactive');
+      throw new AccountInactiveError(user.status);
+    }
+
+    // Check email verification
+    if (!user.isEmailVerified && process.env.REQUIRE_EMAIL_VERIFICATION === 'true') {
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'email_not_verified');
+      throw new EmailNotVerifiedError();
+    }
+
+    // Login successful
+    await this.handleSuccessfulLogin(user);
+    await this.logLoginAttempt(user.id, email, ipAddress, userAgent, true);
+
+    // Check concurrent sessions
+    const sessionCheck = await SessionSyncService.checkConcurrentSessions(user.id);
+    if (!sessionCheck.allowed) {
+      await SessionSyncService.enforceSessionLimit(user.id);
+    }
+
+    // Generate session ID
+    const sessionId = SessionSyncService.generateSessionId();
+
+    // Create session
+    await SessionSyncService.createSession(user, sessionId, { userAgent, ipAddress });
+
+    // Generate tokens
+    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+
+    // Update token family in user
+    const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+    if (tokenFamily) {
+      user.refreshTokenFamily = tokenFamily;
+      await this.userRepository.save(user);
+    }
+
+    // Update last used for email linked account
+    const emailAccount = user.linkedAccounts?.find(acc => acc.provider === 'email');
+    if (emailAccount) {
+      emailAccount.lastUsedAt = new Date();
+      await this.linkedAccountRepository.save(emailAccount);
+    }
+
+    // Get merged profile
+    const mergedProfile = await AccountLinkingService.getMergedProfile(user.id);
+
+    return {
+      success: true,
+      user: user.toPublicData(),
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        expiresIn: tokens.expiresIn || 900 // 15 minutes
+      },
+      sessionId,
+      linkedAccounts: mergedProfile?.linkedAccounts || [],
+      isNewUser: false
+    };
+  }
+
+  /**
+   * Handle OAuth login
+   */
+  private async handleOAuthLogin(
+    provider: AuthProvider,
+    profile: OAuthProfile,
+    ipAddress: string,
+    userAgent: string
+  ): Promise<UnifiedLoginResponse> {
+    // Find existing linked account
+    const existingLinkedAccount = await this.linkedAccountRepository.findOne({
+      where: {
+        provider,
+        providerId: profile.id
+      },
+      relations: ['user', 'user.linkedAccounts']
+    });
+
+    if (existingLinkedAccount) {
+      // Existing user login
+      const user = existingLinkedAccount.user;
+
+      // Check account status
+      if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
+        throw new AccountInactiveError(user.status);
+      }
+
+      // Update profile info if changed
+      if (profile.displayName !== existingLinkedAccount.displayName ||
+          profile.avatar !== existingLinkedAccount.profileImage) {
+        existingLinkedAccount.displayName = profile.displayName;
+        existingLinkedAccount.profileImage = profile.avatar;
+        existingLinkedAccount.lastUsedAt = new Date();
+        await this.linkedAccountRepository.save(existingLinkedAccount);
+      }
+
+      // Generate tokens
+      const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+
+      // Log successful login
+      await this.logLoginAttempt(user.id, profile.email, ipAddress, userAgent, true, undefined, provider);
+
+      // Get merged profile
+      const mergedProfile = await AccountLinkingService.getMergedProfile(user.id);
+
+      return {
+        success: true,
+        user: user.toPublicData(),
+        tokens: {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          expiresIn: tokens.expiresIn || 900 // 15 minutes
+        },
+        sessionId: `oauth-${Date.now()}`,
+        linkedAccounts: mergedProfile?.linkedAccounts || [],
+        isNewUser: false
+      };
+    }
+
+    // Check if email is already used by another account
+    const existingUserByEmail = await this.userRepository.findOne({
+      where: { email: profile.email },
+      relations: ['linkedAccounts']
+    });
+
+    if (existingUserByEmail) {
+      // Auto-link if same email
+      const linkResult = await AccountLinkingService.linkOAuthAccount(
+        existingUserByEmail.id,
+        provider,
+        {
+          providerId: profile.id,
+          email: profile.email,
+          displayName: profile.displayName,
+          profileImage: profile.avatar
+        }
+      );
+
+      if (!linkResult.success) {
+        throw new Error(linkResult.message);
+      }
+
+      // Generate tokens
+      const tokens = tokenUtils.generateTokens(existingUserByEmail, 'neture.co.kr');
+
+      // Log successful login
+      await this.logLoginAttempt(existingUserByEmail.id, profile.email, ipAddress, userAgent, true, undefined, provider);
+
+      // Get merged profile
+      const mergedProfile = await AccountLinkingService.getMergedProfile(existingUserByEmail.id);
+
+      return {
+        success: true,
+        user: existingUserByEmail.toPublicData(),
+        tokens: {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          expiresIn: tokens.expiresIn || 900 // 15 minutes
+        },
+        sessionId: `oauth-${Date.now()}`,
+        linkedAccounts: mergedProfile?.linkedAccounts || [],
+        isNewUser: false,
+        autoLinked: true
+      };
+    }
+
+    // Create new user
+    const newUser = this.userRepository.create({
+      email: profile.email,
+      name: profile.displayName,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      avatar: profile.avatar,
+      password: await hashPassword(generateRandomToken()), // Random password for OAuth users
+      role: UserRole.CUSTOMER,
+      roles: [UserRole.CUSTOMER],
+      status: UserStatus.ACTIVE,
+      isEmailVerified: profile.emailVerified || false,
+      provider: provider,
+      provider_id: profile.id,
+      permissions: []
+    });
+
+    await this.userRepository.save(newUser);
+
+    // Create linked account
+    const linkedAccount = this.linkedAccountRepository.create({
+      userId: newUser.id,
+      user: newUser,
+      provider,
+      providerId: profile.id,
+      email: profile.email,
+      displayName: profile.displayName,
+      profileImage: profile.avatar,
+      isVerified: profile.emailVerified || false,
+      isPrimary: true,
+      lastUsedAt: new Date()
+    });
+
+    await this.linkedAccountRepository.save(linkedAccount);
+
+    // Generate tokens
+    const tokens = tokenUtils.generateTokens(newUser, 'neture.co.kr');
+
+    // Log new user creation and login
+    await this.logLoginAttempt(newUser.id, profile.email, ipAddress, userAgent, true, undefined, provider);
+
+    return {
+      success: true,
+      user: newUser.toPublicData(),
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        expiresIn: tokens.expiresIn || 900 // 15 minutes
+      },
+      sessionId: `oauth-${Date.now()}`,
+      linkedAccounts: [linkedAccount],
+      isNewUser: true
+    };
+  }
+
+  /**
+   * Refresh tokens
+   *
+   * @param refreshToken - Current refresh token
+   * @returns New tokens
+   */
+  async refreshTokens(refreshToken: string): Promise<AuthTokens | null> {
+    try {
+      const payload = tokenUtils.verifyRefreshToken(refreshToken);
+
+      if (!payload) {
+        return null;
+      }
+
+      const user = await this.userRepository.findOne({
+        where: {
+          id: payload.userId,
+          isActive: true,
+          refreshTokenFamily: payload.tokenFamily
+        }
+      });
+
+      if (!user) {
+        return null;
+      }
+
+      // Generate new tokens (with rotation)
+      const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+
+      // Update token family
+      const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+      if (tokenFamily) {
+        user.refreshTokenFamily = tokenFamily;
+        await this.userRepository.save(user);
+      }
+
+      return tokens;
+    } catch (error) {
+      logger.debug('Refresh token error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Verify access token
+   *
+   * @param token - Access token
+   * @returns Token payload or null
+   */
+  verifyAccessToken(token: string): AccessTokenPayload | null {
+    return tokenUtils.verifyAccessToken(token);
+  }
+
+  /**
+   * Logout user
+   *
+   * @param userId - User ID
+   */
+  async logout(userId: string, sessionId?: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (user) {
+      // Invalidate token family
+      user.refreshTokenFamily = null;
+      await this.userRepository.save(user);
+    }
+
+    // Remove SSO session
+    if (sessionId) {
+      await SessionSyncService.removeSession(sessionId, userId);
+    }
+  }
+
+  /**
+   * Logout from all devices
+   *
+   * @param userId - User ID
+   */
+  async logoutAll(userId: string): Promise<void> {
+    await this.logout(userId);
+    await SessionSyncService.removeAllUserSessions(userId);
+  }
+
+  /**
+   * Set authentication cookies
+   *
+   * @param res - Express Response
+   * @param tokens - Auth tokens
+   * @param sessionId - Session ID (optional)
+   */
+  setAuthCookies(res: Response, tokens: AuthTokens, sessionId?: string): void {
+    cookieUtils.setAuthCookies(res, tokens);
+
+    if (sessionId) {
+      cookieUtils.setSessionCookie(res, sessionId);
+    }
+  }
+
+  /**
+   * Clear authentication cookies
+   *
+   * @param res - Express Response
+   */
+  clearAuthCookies(res: Response): void {
+    cookieUtils.clearAuthCookies(res);
+  }
+
+  /**
+   * Get user by ID
+   *
+   * @param userId - User ID
+   * @returns User or null
+   */
+  async getUserById(userId: string): Promise<User | null> {
+    try {
+      return await this.userRepository.findOne({ where: { id: userId } });
+    } catch (error) {
+      logger.error('Get user by ID error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Request password reset
+   *
+   * @param email - User email
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      // Don't reveal if user exists
+      return;
+    }
+
+    // Generate reset token (expires in 10 minutes)
+    const resetToken = generateRandomToken(32);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Save token to user
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = expiresAt;
+    await this.userRepository.save(user);
+
+    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
+
+    await emailService.sendEmail({
+      to: email,
+      subject: '비밀번호 재설정',
+      html: `
+        <h2>비밀번호 재설정</h2>
+        <p>비밀번호 재설정을 요청하셨습니다.</p>
+        <p>아래 링크를 클릭하여 새 비밀번호를 설정해주세요:</p>
+        <p><a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">비밀번호 재설정하기</a></p>
+        <p>또는 다음 주소를 브라우저에 복사하여 붙여넣으세요:</p>
+        <p>${resetUrl}</p>
+        <br/>
+        <p style="color: #666; font-size: 12px;">이 링크는 10분간 유효합니다.</p>
+        <p style="color: #666; font-size: 12px;">본인이 요청하지 않은 경우 이 이메일을 무시하셔도 됩니다.</p>
+      `
+    });
+  }
+
+  /**
+   * Reset password with token
+   *
+   * @param token - Reset token
+   * @param newPassword - New password
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { resetPasswordToken: token }
+    });
+
+    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+      throw new InvalidPasswordResetTokenError();
+    }
+
+    // Hash new password
+    user.password = await hashPassword(newPassword);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await this.userRepository.save(user);
+  }
+
+  /**
+   * Handle failed login attempt
+   */
+  private async handleFailedLogin(user: User): Promise<void> {
+    user.loginAttempts = (user.loginAttempts || 0) + 1;
+
+    // Lock account after 5 failed attempts (30 minutes)
+    if (user.loginAttempts >= 5) {
+      user.lockedUntil = new Date(Date.now() + 30 * 60 * 1000);
+    }
+
+    await this.userRepository.save(user);
+  }
+
+  /**
+   * Handle successful login
+   */
+  private async handleSuccessfulLogin(user: User): Promise<void> {
+    user.loginAttempts = 0;
+    user.lockedUntil = null;
+    user.lastLoginAt = new Date();
+
+    await this.userRepository.save(user);
+  }
+
+  /**
+   * Log login attempt
+   */
+  private async logLoginAttempt(
+    userId: string | null,
+    email: string,
+    ipAddress: string,
+    userAgent: string,
+    success: boolean,
+    failureReason?: string,
+    provider: AuthProvider = 'email'
+  ): Promise<void> {
+    try {
+      await this.activityRepository.save(
+        this.activityRepository.create({
+          userId: userId || undefined,
+          action: 'login',
+          provider,
+          ipAddress,
+          userAgent,
+          metadata: {
+            email,
+            success,
+            ...(failureReason && { reason: failureReason })
+          }
+        })
+      );
+    } catch (error) {
+      logger.warn('Failed to log login attempt:', error);
+    }
+  }
+}
+
+// Create singleton instance
+let authenticationServiceInstance: AuthenticationService | null = null;
+
+export const getAuthenticationService = (): AuthenticationService => {
+  if (!authenticationServiceInstance) {
+    authenticationServiceInstance = new AuthenticationService();
+  }
+  return authenticationServiceInstance;
+};
+
+// Export singleton instance
+export const authenticationService = getAuthenticationService();

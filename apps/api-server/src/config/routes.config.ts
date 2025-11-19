@@ -10,6 +10,7 @@ import logger from '../utils/logger.js';
 import authRoutes from '../routes/auth.js';
 import authV2Routes from '../routes/auth-v2.js';
 import socialAuthRoutes from '../routes/social-auth.js';
+import authenticationRoutes from '../routes/authentication.routes.js'; // NEW: Unified authentication routes
 import userRoutes from '../routes/user.js';
 import userManagementRoutes from '../routes/users.routes.js';
 import usersV1Routes from '../routes/v1/users.routes.js';
@@ -197,11 +198,14 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 2. AUTHENTICATION ROUTES (Before rate limiting)
   // ============================================================================
-  // Basic auth routes (JWT-based)
+  // NEW: Unified authentication routes (recommended)
+  app.use('/api/v1/authentication', authenticationRoutes);
+
+  // Legacy: Basic auth routes (JWT-based) - @deprecated Use /api/v1/authentication instead
   app.use('/api/auth', authRoutes);
   app.use('/api/v1/auth', authRoutes);
 
-  // Cookie-based auth routes
+  // Legacy: Cookie-based auth routes - @deprecated Use /api/v1/authentication instead
   app.use('/api/v1/auth/cookie', authV2Routes);
 
   // Social auth

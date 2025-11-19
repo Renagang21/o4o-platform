@@ -20,7 +20,26 @@ import {
 } from '../types/auth.js';
 import { generateRandomToken, hashPassword, comparePassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
+import {
+  InvalidCredentialsError,
+  AccountInactiveError,
+  InvalidPasswordResetTokenError
+} from '../errors/AuthErrors.js';
 
+/**
+ * @deprecated Use AuthenticationService instead (apps/api-server/src/services/authentication.service.ts)
+ *
+ * This service is maintained for backward compatibility only.
+ * New code should use the unified AuthenticationService.
+ *
+ * The new AuthenticationService provides the same functionality with:
+ * - Better code organization
+ * - Centralized token and cookie management
+ * - Standardized error handling
+ * - Improved type safety
+ *
+ * Migration is straightforward - the API is largely the same.
+ */
 export class UnifiedAuthService {
   private authService: AuthService;
 
@@ -78,7 +97,7 @@ export class UnifiedAuthService {
     }
 
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsError();
     }
 
     // Verify password
@@ -97,12 +116,12 @@ export class UnifiedAuthService {
       } catch (logError) {
         logger.warn('Failed to log activity:', logError);
       }
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsError();
     }
 
     // Check account status
     if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
-      throw new Error('Account is not active');
+      throw new AccountInactiveError(user.status);
     }
 
     // Generate tokens
@@ -178,7 +197,7 @@ export class UnifiedAuthService {
 
       // Check account status
       if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
-        throw new Error('Account is not active');
+        throw new AccountInactiveError(user.status);
       }
 
       // Update profile info if changed
@@ -557,7 +576,7 @@ export class UnifiedAuthService {
     });
 
     if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
-      throw new Error('Invalid or expired token');
+      throw new InvalidPasswordResetTokenError();
     }
 
     // Hash new password
