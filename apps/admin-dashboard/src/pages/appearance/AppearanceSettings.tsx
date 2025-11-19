@@ -82,7 +82,7 @@ export default function AppearanceSettings() {
                         setSettings(prev => ({ ...prev, favicon: genResponse.data.data.favicon }));
                     }
                 } catch (e) {
-                    console.log('No existing settings found');
+                    // No existing settings found - this is expected for new installations
                 }
                 return null;
             }
