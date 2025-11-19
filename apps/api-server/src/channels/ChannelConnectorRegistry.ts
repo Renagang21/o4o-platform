@@ -1,4 +1,5 @@
 import type { IChannelConnector } from './IChannelConnector.js';
+import logger from '../utils/logger.js';
 
 /**
  * Channel Connector Registry
@@ -39,7 +40,7 @@ export class ChannelConnectorRegistry {
     }
 
     this.connectors.set(code, connector);
-    console.log(`[ChannelConnectorRegistry] Registered connector: ${code}`);
+    logger.info(`[ChannelConnectorRegistry] Registered connector: ${code}`);
   }
 
   /**
@@ -51,7 +52,7 @@ export class ChannelConnectorRegistry {
   public unregister(channelCode: string): boolean {
     const deleted = this.connectors.delete(channelCode);
     if (deleted) {
-      console.log(`[ChannelConnectorRegistry] Unregistered connector: ${channelCode}`);
+      logger.info(`[ChannelConnectorRegistry] Unregistered connector: ${channelCode}`);
     }
     return deleted;
   }
@@ -109,7 +110,7 @@ export class ChannelConnectorRegistry {
    */
   public clearAll(): void {
     this.connectors.clear();
-    console.log('[ChannelConnectorRegistry] Cleared all connectors');
+    logger.debug('[ChannelConnectorRegistry] Cleared all connectors');
   }
 }
 

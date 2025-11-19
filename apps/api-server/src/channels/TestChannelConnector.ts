@@ -7,6 +7,7 @@ import type {
   ExternalOrder,
   ExternalOrderItem
 } from './IChannelConnector.js';
+import logger from '../utils/logger.js';
 
 /**
  * Test Channel Connector
@@ -28,7 +29,7 @@ export class TestChannelConnector implements IChannelConnector {
   async exportProducts(params: ExportProductsParams): Promise<ExportResult> {
     const { account, links } = params;
 
-    console.log(`[TestChannelConnector] Exporting ${links.length} products for account ${account.id}`);
+    logger.info(`[TestChannelConnector] Exporting ${links.length} products for account ${account.id}`);
 
     const successful: ExportResult['successful'] = [];
     const failed: ExportResult['failed'] = [];
@@ -48,7 +49,7 @@ export class TestChannelConnector implements IChannelConnector {
           externalUrl,
         });
 
-        console.log(`[TestChannelConnector] Exported product ${link.sellerProductId} -> ${externalProductId}`);
+        logger.debug(`[TestChannelConnector] Exported product ${link.sellerProductId} -> ${externalProductId}`);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         failed.push({
@@ -56,7 +57,7 @@ export class TestChannelConnector implements IChannelConnector {
           error: errorMessage,
         });
 
-        console.error(`[TestChannelConnector] Failed to export product ${link.sellerProductId}:`, error);
+        logger.error(`[TestChannelConnector] Failed to export product ${link.sellerProductId}:`, error);
       }
     }
 
@@ -70,7 +71,7 @@ export class TestChannelConnector implements IChannelConnector {
   async importOrders(params: ImportOrdersParams): Promise<ImportOrdersResult> {
     const { account, since, limit = 10 } = params;
 
-    console.log(`[TestChannelConnector] Importing orders for account ${account.id}`, { since, limit });
+    logger.info(`[TestChannelConnector] Importing orders for account ${account.id}`, { since, limit });
 
     // Simulate API delay
     await this.delay(200);
@@ -84,7 +85,7 @@ export class TestChannelConnector implements IChannelConnector {
     // Apply limit
     const limitedOrders = orders.slice(0, limit);
 
-    console.log(`[TestChannelConnector] Found ${limitedOrders.length} orders`);
+    logger.debug(`[TestChannelConnector] Found ${limitedOrders.length} orders`);
 
     return {
       orders: limitedOrders,
@@ -128,7 +129,7 @@ export class TestChannelConnector implements IChannelConnector {
     };
 
     this.testOrders.push(completeOrder);
-    console.log(`[TestChannelConnector] Added test order: ${completeOrder.externalOrderId}`);
+    logger.debug(`[TestChannelConnector] Added test order: ${completeOrder.externalOrderId}`);
   }
 
   /**
@@ -137,7 +138,7 @@ export class TestChannelConnector implements IChannelConnector {
    */
   public clearTestOrders(): void {
     this.testOrders = [];
-    console.log('[TestChannelConnector] Cleared all test orders');
+    logger.debug('[TestChannelConnector] Cleared all test orders');
   }
 
   /**

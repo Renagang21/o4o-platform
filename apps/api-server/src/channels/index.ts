@@ -17,13 +17,14 @@ export * from './TestChannelConnector.js';
 // Initialization
 import { channelConnectorRegistry } from './ChannelConnectorRegistry.js';
 import { TestChannelConnector } from './TestChannelConnector.js';
+import logger from '../utils/logger.js';
 
 /**
  * Initialize and register all channel connectors
  * Should be called during application startup
  */
 export function initializeChannelConnectors(): void {
-  console.log('[Channels] Initializing channel connectors...');
+  logger.info('[Channels] Initializing channel connectors...');
 
   // Register TestChannelConnector
   const testConnector = new TestChannelConnector();
@@ -33,6 +34,6 @@ export function initializeChannelConnectors(): void {
   // const naverConnector = new NaverSmartStoreConnector();
   // channelConnectorRegistry.register(naverConnector);
 
-  console.log(`[Channels] Initialized ${channelConnectorRegistry.getConnectorCount()} connectors:`,
+  logger.info(`[Channels] Initialized ${channelConnectorRegistry.getConnectorCount()} connectors:`,
     channelConnectorRegistry.getRegisteredChannels());
 }
