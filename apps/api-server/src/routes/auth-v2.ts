@@ -4,10 +4,8 @@ import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
-import { authService } from '../services/AuthService.js';
-import { AuthServiceV2 } from '../services/AuthServiceV2.js';
+import { authenticationService } from '../services/authentication.service.js';
 import { UserService } from '../services/UserService.js';
-import { RefreshTokenService } from '../services/RefreshTokenService.js';
 import { SessionSyncService } from '../services/sessionSyncService.js';
 import { PasswordResetService } from '../services/passwordResetService.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
@@ -26,59 +24,44 @@ router.post('/login',
       }
 
       const { email, password } = req.body;
-      const { userAgent, ipAddress } = AuthServiceV2.getRequestMetadata(req);
+      const userAgent = req.headers['user-agent'] || 'Unknown';
+      const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
 
-      const result = await AuthServiceV2.login(email, password, userAgent, ipAddress);
-      
-      if (!result) {
-        return res.status(401).json({
-          error: 'Invalid credentials',
-          code: 'INVALID_CREDENTIALS'
-        });
-      }
-
-      // Set httpOnly cookies
-      AuthServiceV2.setAuthCookies(res, result.tokens);
-      
-      // Set session ID cookie for SSO
-      res.cookie('sessionId', result.sessionId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        domain: process.env.COOKIE_DOMAIN || undefined // For cross-subdomain SSO
+      const result = await authenticationService.login({
+        provider: 'email',
+        credentials: { email, password },
+        ipAddress,
+        userAgent
       });
 
-      // Create SSO session (we need to fetch full user for this)
-      const fullUser = await UserService.getUserById(result.user.id);
-      if (fullUser) {
-        await SessionSyncService.createSession(fullUser, result.sessionId!);
-      }
+      // Set httpOnly cookies (including sessionId)
+      authenticationService.setAuthCookies(res, result.tokens, result.sessionId);
 
       // Return user data (no tokens in response body)
       res.json({
         success: true,
         message: 'Login successful',
-        user: {
-          id: result.user.id,
-          email: result.user.email,
-          name: result.user.name,
-          role: result.user.role,
-          status: result.user.status,
-          businessInfo: result.user.businessInfo
-        }
+        user: result.user
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('[AUTH-V2 LOGIN ERROR]', error);
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
-      
-      if (errorMessage.includes('Account is')) {
-        return res.status(403).json({
-          error: errorMessage,
-          code: 'ACCOUNT_NOT_ACTIVE'
+
+      // Handle authentication errors
+      if (error.code === 'INVALID_CREDENTIALS') {
+        return res.status(401).json({
+          error: error.message,
+          code: error.code
         });
       }
-      
+
+      if (error.code === 'ACCOUNT_NOT_ACTIVE' || error.code === 'ACCOUNT_LOCKED') {
+        return res.status(403).json({
+          error: error.message,
+          code: error.code,
+          details: error.details
+        });
+      }
+
       res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_SERVER_ERROR'
@@ -171,7 +154,7 @@ router.post('/register',
 router.post('/refresh', async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-    
+
     if (!refreshToken) {
       return res.status(401).json({
         error: 'Refresh token not provided',
@@ -179,11 +162,10 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
-    const { userAgent, ipAddress } = AuthServiceV2.getRequestMetadata(req);
-    const tokens = await AuthServiceV2.refreshTokens(refreshToken, { userAgent, ipAddress });
-    
+    const tokens = await authenticationService.refreshTokens(refreshToken);
+
     if (!tokens) {
-      AuthServiceV2.clearAuthCookies(res);
+      authenticationService.clearAuthCookies(res);
       return res.status(401).json({
         error: 'Invalid refresh token',
         code: 'INVALID_REFRESH_TOKEN'
@@ -191,7 +173,7 @@ router.post('/refresh', async (req, res) => {
     }
 
     // Set new cookies
-    AuthServiceV2.setAuthCookies(res, tokens);
+    authenticationService.setAuthCookies(res, tokens);
 
     res.json({
       success: true,
@@ -199,7 +181,7 @@ router.post('/refresh', async (req, res) => {
     });
   } catch (error) {
     // Error log removed
-    AuthServiceV2.clearAuthCookies(res);
+    authenticationService.clearAuthCookies(res);
     res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR'
@@ -212,25 +194,17 @@ router.post('/logout', async (req, res) => {
   try {
     const accessToken = req.cookies.accessToken;
     const sessionId = req.cookies.sessionId;
-    
+
     if (accessToken) {
-      const payload = authService.verifyAccessToken(accessToken);
+      const payload = authenticationService.verifyAccessToken(accessToken);
       if (payload) {
-        // Revoke all refresh tokens for this user
-        await authService.revokeAllUserTokens(payload.userId || payload.sub || '');
-        
-        // Remove SSO session
-        if (sessionId) {
-          await SessionSyncService.removeSession(sessionId, payload.userId || payload.sub || '');
-        }
+        // Logout user (revokes tokens and removes session)
+        await authenticationService.logout(payload.userId || payload.id || '', sessionId);
       }
     }
 
     // Clear cookies
-    AuthServiceV2.clearAuthCookies(res);
-    res.clearCookie('sessionId', {
-      domain: process.env.COOKIE_DOMAIN || undefined
-    });
+    authenticationService.clearAuthCookies(res);
 
     res.json({
       success: true,
@@ -239,10 +213,7 @@ router.post('/logout', async (req, res) => {
   } catch (error) {
     // Error log removed
     // Still clear cookies even if error occurs
-    AuthServiceV2.clearAuthCookies(res);
-    res.clearCookie('sessionId', {
-      domain: process.env.COOKIE_DOMAIN || undefined
-    });
+    authenticationService.clearAuthCookies(res);
     res.json({
       success: true,
       message: 'Logout successful'
@@ -320,17 +291,13 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
       });
     }
 
-    // Revoke all refresh tokens
-    await authService.revokeAllUserTokens((req.user as any).userId || (req.user as any)!.id);
-    
-    // Remove all SSO sessions
-    await SessionSyncService.removeAllUserSessions((req.user as any).userId || (req.user as any)!.id);
+    const userId = (req.user as any).userId || (req.user as any)!.id;
+
+    // Logout from all devices (revokes all tokens and removes all sessions)
+    await authenticationService.logoutAll(userId);
 
     // Clear current session cookies
-    AuthServiceV2.clearAuthCookies(res);
-    res.clearCookie('sessionId', {
-      domain: process.env.COOKIE_DOMAIN || undefined
-    });
+    authenticationService.clearAuthCookies(res);
 
     res.json({
       success: true,
