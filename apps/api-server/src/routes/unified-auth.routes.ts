@@ -1,14 +1,12 @@
 import { Router } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { body, query, validationResult } from 'express-validator';
-import { UnifiedAuthService } from '../services/unified-auth.service.js';
+import { authenticationService } from '../services/authentication.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { AuthProvider, OAuthProfile } from '../types/account-linking.js';
-import { refreshTokenService } from '../services/refreshToken.service.js';
 import logger from '../utils/logger.js';
 
 const router: ExpressRouter = Router();
-const unifiedAuthService = new UnifiedAuthService();
 
 // Validation middleware
 const validateDto = (req: any, res: any, next: any) => {
@@ -61,7 +59,7 @@ router.post('/login', async (req, res) => {
         });
       }
 
-      result = await unifiedAuthService.login({
+      result = await authenticationService.login({
         provider: 'email',
         credentials: { email, password },
         ipAddress,
@@ -76,7 +74,7 @@ router.post('/login', async (req, res) => {
         });
       }
 
-      result = await unifiedAuthService.login({
+      result = await authenticationService.login({
         provider: provider as AuthProvider,
         oauthProfile: oauthProfile as OAuthProfile,
         ipAddress,
@@ -89,24 +87,8 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Set cookies if in production
-    if (process.env.NODE_ENV === 'production') {
-      res.cookie('accessToken', result.tokens.accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        domain: '.neture.co.kr',
-        maxAge: 15 * 60 * 1000 // 15 minutes
-      });
-
-      res.cookie('refreshToken', result.tokens.refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        domain: '.neture.co.kr',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-      });
-    }
+    // Set authentication cookies (handled by service)
+    authenticationService.setAuthCookies(res, result.tokens, result.sessionId);
 
     res.json(result);
   } catch (error: any) {
@@ -138,7 +120,7 @@ router.post('/email', emailLoginValidation, validateDto, async (req, res) => {
     const ipAddress = req.ip || req.socket.remoteAddress || '';
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await unifiedAuthService.login({
+    const result = await authenticationService.login({
       provider: 'email',
       credentials: { email, password },
       ipAddress,
@@ -174,7 +156,7 @@ router.post('/oauth', oauthLoginValidation, validateDto, async (req, res) => {
     const ipAddress = req.ip || req.socket.remoteAddress || '';
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await unifiedAuthService.login({
+    const result = await authenticationService.login({
       provider: provider as AuthProvider,
       oauthProfile: profile as OAuthProfile,
       ipAddress,
@@ -207,7 +189,7 @@ router.get('/check-email', async (req, res) => {
       });
     }
 
-    const providers = await unifiedAuthService.getAvailableProviders(email);
+    const providers = await authenticationService.getAvailableProviders(email);
 
     res.json({
       success: true,
@@ -240,7 +222,7 @@ router.get('/can-login', async (req, res) => {
       });
     }
 
-    const canLogin = await unifiedAuthService.canLogin(email, provider as AuthProvider);
+    const canLogin = await authenticationService.canLogin(email, provider as AuthProvider);
 
     res.json({
       success: true,
@@ -262,25 +244,16 @@ router.get('/can-login', async (req, res) => {
  */
 router.post('/logout', authenticate, async (req, res) => {
   try {
-    // Clear cookies
-    if (process.env.NODE_ENV === 'production') {
-      res.clearCookie('accessToken', {
-        domain: '.neture.co.kr'
-      });
-      res.clearCookie('refreshToken', {
-        domain: '.neture.co.kr'
-      });
-    }
-
-    // Invalidate refresh token
     const userId = (req as any).user?.userId || (req as any).user?.id;
-    const refreshToken = req.body.refreshToken || req.headers['x-refresh-token'];
+    const sessionId = req.cookies?.sessionId;
 
-    if (refreshToken) {
-      await refreshTokenService.revokeToken(refreshToken, 'Unified auth logout');
-    } else if (userId) {
-      await refreshTokenService.revokeAllUserTokens(userId, 'Unified auth logout');
+    if (userId) {
+      // Logout user (revokes tokens and removes session)
+      await authenticationService.logout(userId, sessionId);
     }
+
+    // Clear cookies
+    authenticationService.clearAuthCookies(res);
 
     res.json({
       success: true,
@@ -303,7 +276,7 @@ router.post('/logout', authenticate, async (req, res) => {
 router.get('/test-accounts', async (req, res) => {
   try {
     // Return sample test accounts from actual DB users with test role
-    const testAccounts = await unifiedAuthService.getTestAccounts();
+    const testAccounts = await authenticationService.getTestAccounts();
 
     res.json({
       success: true,
@@ -334,7 +307,7 @@ router.post('/find-id', async (req, res) => {
       });
     }
 
-    await unifiedAuthService.sendFindIdEmail(email);
+    await authenticationService.sendFindIdEmail(email);
 
     res.json({
       success: true,
@@ -367,7 +340,7 @@ router.post('/forgot-password', async (req, res) => {
       });
     }
 
-    await unifiedAuthService.sendPasswordResetEmail(email);
+    await authenticationService.requestPasswordReset(email);
 
     res.json({
       success: true,
@@ -407,7 +380,7 @@ router.post('/reset-password', async (req, res) => {
       });
     }
 
-    await unifiedAuthService.resetPassword(token, newPassword);
+    await authenticationService.resetPassword(token, newPassword);
 
     res.json({
       success: true,
@@ -416,7 +389,7 @@ router.post('/reset-password', async (req, res) => {
   } catch (error: any) {
     logger.error('Reset password error:', error);
 
-    if (error.message === 'Invalid or expired token') {
+    if (error.code === 'INVALID_PASSWORD_RESET_TOKEN' || error.message === 'Invalid or expired token') {
       return res.status(400).json({
         success: false,
         message: '유효하지 않거나 만료된 토큰입니다.'
