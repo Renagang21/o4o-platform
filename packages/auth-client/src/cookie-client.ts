@@ -38,7 +38,7 @@ export class CookieAuthClient {
         const originalRequest = error.config as any;
 
         // Skip retry for auth endpoints to avoid infinite loops
-        const skipRetryPaths = ['/v1/auth/cookie/me', '/v1/auth/cookie/refresh'];
+        const skipRetryPaths = ['/auth/cookie/me', '/auth/cookie/refresh'];
         const requestPath = originalRequest.url || '';
 
         if (skipRetryPaths.some(path => requestPath.includes(path))) {
@@ -73,7 +73,7 @@ export class CookieAuthClient {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await this.api.post('/v1/auth/cookie/login', credentials);
+    const response = await this.api.post('/auth/cookie/login', credentials);
     // Store token if returned (for WebSocket auth)
     if (response.data.token) {
       this.currentToken = response.data.token;
@@ -82,13 +82,13 @@ export class CookieAuthClient {
   }
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await this.api.post('/v1/auth/cookie/register', data);
+    const response = await this.api.post('/auth/cookie/register', data);
     return response.data;
   }
 
   async logout(): Promise<void> {
     try {
-      await this.api.post('/v1/auth/cookie/logout');
+      await this.api.post('/auth/cookie/logout');
     } catch (error) {
       // Even if logout fails, we should clear local state
     } finally {
@@ -97,7 +97,7 @@ export class CookieAuthClient {
   }
 
   async logoutAll(): Promise<void> {
-    await this.api.post('/v1/auth/cookie/logout-all');
+    await this.api.post('/auth/cookie/logout-all');
     this.currentToken = null;
   }
 
@@ -106,7 +106,7 @@ export class CookieAuthClient {
       const config = {
         validateStatus: (status: number) => status === 200 || status === 401
       } as AxiosRequestConfig;
-      const response = await this.api.post<RefreshResponse>('/v1/auth/cookie/refresh', {}, config);
+      const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh', {}, config);
 
       if (response.status === 401) {
         return false;
@@ -123,7 +123,7 @@ export class CookieAuthClient {
       const config = {
         validateStatus: (status: number) => status === 200 || status === 401
       } as AxiosRequestConfig;
-      const response = await this.api.get('/v1/auth/cookie/me', config);
+      const response = await this.api.get('/auth/cookie/me', config);
 
       if (response.status === 401) {
         return null;
@@ -261,10 +261,10 @@ function getApiUrl(): string {
     try {
       const envUrl = (import.meta as any).env?.VITE_API_URL;
       if (envUrl) {
-        // Add /api as the base path (version should be specified in each API call)
-        return envUrl.endsWith('/api') ? envUrl :
-               envUrl.endsWith('/api/v1') ? envUrl.slice(0, -3) : // Remove /v1
-               `${envUrl}/api`;
+        // Ensure baseURL includes /api/v1
+        return envUrl.endsWith('/api/v1') ? envUrl :
+               envUrl.endsWith('/api') ? `${envUrl}/v1` :
+               `${envUrl}/api/v1`;
       }
     } catch {
       // import.meta may not be available in all build contexts
@@ -272,12 +272,12 @@ function getApiUrl(): string {
 
     // Localhost development
     if (window.location.hostname === 'localhost') {
-      return 'http://localhost:4000/api';
+      return 'http://localhost:4000/api/v1';
     }
   }
 
   // Production default
-  return 'https://api.neture.co.kr/api';
+  return 'https://api.neture.co.kr/api/v1';
 }
 
 // Export singleton instance
