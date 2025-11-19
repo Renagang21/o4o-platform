@@ -1,3 +1,16 @@
+/**
+ * ⚠️ DEPRECATED - DO NOT USE
+ *
+ * This file is deprecated and will be removed in Phase 4 of auth refactoring.
+ * Use `middleware/auth.middleware.ts` for role-based access control.
+ *
+ * Status: DEAD CODE (0 routes using this)
+ * Replacement: auth.middleware.ts::requireRole
+ * Removal Date: TBD (Phase 4)
+ *
+ * @deprecated Since 2025-11-19
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { UserRole } from '../types/auth.js';
 import { hasPermission, ROLE_PERMISSIONS } from '../types/dropshipping.js';
@@ -13,11 +26,13 @@ interface AuthenticatedRequest extends Request {
 
 // Check if user has specific dropshipping role
 export const requireDropshippingRole = (allowedRoles: UserRole[]) => {
+  console.warn('[DEPRECATED] dropshipping-auth.ts is deprecated. Use auth.middleware.ts::requireRole instead.');
+
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Authentication required' 
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
       });
     }
 
@@ -36,11 +51,13 @@ export const requireDropshippingRole = (allowedRoles: UserRole[]) => {
 
 // Check if user has specific permission
 export const requirePermission = (permission: string) => {
+  console.warn('[DEPRECATED] dropshipping-auth.ts::requirePermission is deprecated. Use permission.middleware.ts::requirePermission instead.');
+
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Authentication required' 
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
       });
     }
 
@@ -66,7 +83,7 @@ export const requireAffiliate = requireDropshippingRole([UserRole.AFFILIATE]);
 
 // Middleware for supplier or seller routes
 export const requireSupplierOrSeller = requireDropshippingRole([
-  UserRole.SUPPLIER, 
+  UserRole.SUPPLIER,
   UserRole.SELLER
 ]);
 
@@ -83,9 +100,9 @@ export const requireBusinessRole = requireDropshippingRole([
 export const requireResourceOwner = (resourceIdParam: string = 'id') => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Authentication required' 
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
       });
     }
 
@@ -100,7 +117,7 @@ export const requireResourceOwner = (resourceIdParam: string = 'id') => {
     // Check ownership based on the route
     // This is a simplified version - you'd need to implement actual ownership checks
     // based on your database structure
-    
+
     // For now, we'll pass through and let the controller handle ownership
     req.body._requestUserId = userId;
     next();
@@ -110,9 +127,9 @@ export const requireResourceOwner = (resourceIdParam: string = 'id') => {
 // Validate role transition
 export const validateRoleTransition = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return res.status(401).json({ 
-      success: false, 
-      message: 'Authentication required' 
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication required'
     });
   }
 
@@ -167,9 +184,9 @@ export const validateRoleTransition = (req: AuthenticatedRequest, res: Response,
   }
 
   if (!canTransition && requestedRole) {
-    return res.status(403).json({ 
-      success: false, 
-      message: `Cannot transition from ${currentRoles.join(', ')} to ${requestedRole}` 
+    return res.status(403).json({
+      success: false,
+      message: `Cannot transition from ${currentRoles.join(', ')} to ${requestedRole}`
     });
   }
 
