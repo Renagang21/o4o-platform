@@ -164,10 +164,10 @@ export function logShortcodeSummary(stats: Awaited<ReturnType<typeof loadShortco
   if (!import.meta.env.DEV) return;
 
   console.group('📦 Shortcode Registry');
-  console.log(`✅ Registered: ${stats.registered} shortcodes`);
+  console.debug(`✅ Registered: ${stats.registered} shortcodes`);
 
   if (stats.skipped > 0) {
-    console.log(`⏭️  Skipped: ${stats.skipped} (already registered)`);
+    console.debug(`⏭️  Skipped: ${stats.skipped} (already registered)`);
   }
 
   if (stats.failed > 0) {
@@ -175,7 +175,7 @@ export function logShortcodeSummary(stats: Awaited<ReturnType<typeof loadShortco
   }
 
   if (stats.names.length > 0) {
-    console.log('📋 Available shortcodes:', stats.names.sort());
+    console.debug('📋 Available shortcodes:', stats.names.sort());
   }
 
   console.groupEnd();
