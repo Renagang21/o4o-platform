@@ -230,11 +230,8 @@ export function setupRoutes(app: Application): void {
 
   // Linked accounts
   app.use('/accounts', linkedAccountsRoutes);
+  app.use('/api/accounts', linkedAccountsRoutes);
   app.use('/api/v1/accounts', linkedAccountsRoutes);
-
-  // SSO check (with lenient rate limiting)
-  app.use('/api/v1/accounts/sso/check', ssoCheckLimiter);
-  app.use('/accounts/sso/check', ssoCheckLimiter);
 
   // ============================================================================
   // 3. PUBLIC ROUTES (Lenient rate limiting)
