@@ -42,6 +42,9 @@ import { Toast } from './components/Toast';
 // AI Chat Panel
 import { AIChatPanel } from './AIChatPanel';
 import { EditorContext, AIAction } from '@/services/ai/ConversationalAI';
+// Phase 1-C: New Block Request Panel
+import { NewBlockRequestPanel } from './NewBlockRequestPanel';
+import { NewBlockRequest } from '@/services/ai/types';
 // Custom hooks
 import { useBlockManagement } from './hooks/useBlockManagement';
 import { useBlockHistory } from './hooks/useBlockHistory';
@@ -221,6 +224,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+
+  // Phase 1-C: New Block Request Panel state
+  const [newBlocksRequest, setNewBlocksRequest] = useState<NewBlockRequest[]>([]);
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -1141,13 +1147,15 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
           updateBlocks(result.blocks);
 
-          // newBlocksRequest가 있으면 토스트 알림 표시 (Phase 1-A: UI 연동은 추후)
+          // Phase 1-C: newBlocksRequest 저장 및 표시
           if (result.newBlocksRequest && result.newBlocksRequest.length > 0) {
+            setNewBlocksRequest(result.newBlocksRequest);
             showToast(
               `AI 페이지가 생성되었습니다! (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`,
               'success'
             );
           } else {
+            setNewBlocksRequest([]);
             showToast('AI 페이지가 생성되었습니다!', 'success');
           }
         }}
@@ -1173,6 +1181,28 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           position={slashCommands.slashMenuPosition}
           recentBlocks={slashCommands.recentBlocks}
         />
+      )}
+
+      {/* Phase 1-C: New Block Request Panel */}
+      {newBlocksRequest.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg p-4">
+          <NewBlockRequestPanel
+            newBlocksRequest={newBlocksRequest}
+            variant="bottom"
+            onScrollToPlaceholder={(placeholderId) => {
+              // Scroll to placeholder block
+              const element = document.querySelector(`[data-placeholder-id="${placeholderId}"]`);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Flash highlight effect
+                element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+                setTimeout(() => {
+                  element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+                }, 2000);
+              }
+            }}
+          />
+        </div>
       )}
     </div>
   );

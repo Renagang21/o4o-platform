@@ -33,6 +33,7 @@ import conditionalBlockDefinition from './definitions/conditional';
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
 import shortcodeBlockDefinition from './definitions/shortcode';
+import placeholderBlockDefinition from './definitions/placeholder';
 
 // Embed blocks
 import youtubeBlockDefinition from './definitions/youtube';
@@ -79,6 +80,7 @@ export function registerAllBlocks(): void {
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
   blockRegistry.register(shortcodeBlockDefinition);
+  blockRegistry.register(placeholderBlockDefinition); // Phase 1-C: Placeholder for missing components
 
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);

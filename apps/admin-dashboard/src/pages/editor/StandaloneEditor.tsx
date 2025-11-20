@@ -14,6 +14,9 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
+// Phase 1-C: New Block Request Panel
+import { NewBlockRequestPanel } from '@/components/editor/NewBlockRequestPanel';
+import { NewBlockRequest } from '@/services/ai/types';
 import toast from 'react-hot-toast';
 import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
@@ -92,6 +95,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [blocksBackup, setBlocksBackup] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Phase 1-C: New Block Request Panel state
+  const [newBlocksRequest, setNewBlocksRequest] = useState<NewBlockRequest[]>([]);
 
   // Add refs to track latest state values for save operations
   const blocksRef = useRef<any[]>([]);
@@ -797,13 +802,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           blocksRef.current = result.blocks;
           setIsDirty(true);
 
-          // Show notification about new block requests if any
+          // Phase 1-C: newBlocksRequest 저장 및 표시
           if (result.newBlocksRequest && result.newBlocksRequest.length > 0) {
+            setNewBlocksRequest(result.newBlocksRequest);
             toast.success(
               `${isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!'} (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`,
               { duration: 6000 }
             );
           } else {
+            setNewBlocksRequest([]);
             toast.success(isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!');
           }
         }}
@@ -821,6 +828,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           }
         }}
       />
+
+      {/* Phase 1-C: New Block Request Panel */}
+      {newBlocksRequest.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg p-4">
+          <NewBlockRequestPanel
+            newBlocksRequest={newBlocksRequest}
+            variant="bottom"
+            onScrollToPlaceholder={(placeholderId) => {
+              const element = document.querySelector(`[data-placeholder-id="${placeholderId}"]`);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+                setTimeout(() => {
+                  element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+                }, 2000);
+              }
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
