@@ -29,6 +29,7 @@ import { SeparatorBlock } from './layout/SeparatorBlock';
 import { SpacerBlock } from './layout/SpacerBlock';
 import { TableBlock } from './layout/TableBlock';
 import { TimelineChartBlock } from './layout/TimelineChartBlock';
+import { IconFeatureListBlock } from './layout/IconFeatureListBlock';
 
 // Special blocks
 import { MarkdownBlock } from './special/MarkdownBlock';
@@ -129,6 +130,9 @@ export function registerAllBlocks() {
     'timeline-chart': TimelineChartBlock,
     'o4o/timeline-chart': TimelineChartBlock,
 
+    'icon-feature-list': IconFeatureListBlock,
+    'o4o/icon-feature-list': IconFeatureListBlock,
+
     // Special blocks
     'markdown': MarkdownBlock,
     'o4o/markdown': MarkdownBlock,
@@ -196,6 +200,7 @@ export * from './layout/SeparatorBlock';
 export * from './layout/SpacerBlock';
 export * from './layout/TableBlock';
 export * from './layout/TimelineChartBlock';
+export * from './layout/IconFeatureListBlock';
 
 export * from './special/MarkdownBlock';
 export * from './special/HtmlBlock';

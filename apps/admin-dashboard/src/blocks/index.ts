@@ -40,6 +40,7 @@ import { timelineChartBlockDefinition } from './generated/TimelineChart.definiti
 import accordionItemBlockDefinition from './definitions/accordion-item';
 import featureCardBlockDefinition from './definitions/feature-card';
 import roleCardBlockDefinition from './definitions/role-card';
+import iconFeatureListBlockDefinition from './definitions/icon-feature-list';
 
 // Embed blocks
 import youtubeBlockDefinition from './definitions/youtube';
@@ -93,6 +94,7 @@ export function registerAllBlocks(): void {
   blockRegistry.register(accordionItemBlockDefinition);
   blockRegistry.register(featureCardBlockDefinition);
   blockRegistry.register(roleCardBlockDefinition);
+  blockRegistry.register(iconFeatureListBlockDefinition);
 
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);

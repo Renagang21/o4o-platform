@@ -60,6 +60,7 @@ export * from './renderers/layout/SeparatorBlock';
 export * from './renderers/layout/SpacerBlock';
 export * from './renderers/layout/TableBlock';
 export * from './renderers/layout/TimelineChartBlock';
+export * from './renderers/layout/IconFeatureListBlock';
 
 export * from './renderers/special/MarkdownBlock';
 export * from './renderers/special/HtmlBlock';
