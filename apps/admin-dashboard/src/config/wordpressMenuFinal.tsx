@@ -98,6 +98,7 @@ export const wordpressMenuItems: MenuItem[] = [
     label: '외모',
     icon: <Palette className="w-5 h-5" />,
     children: [
+      { id: 'appearance-settings', label: '사이트 설정', icon: <Settings className="w-4 h-4" />, path: '/appearance/settings' },
       { id: 'header-builder', label: 'Header Builder', icon: <Layout className="w-4 h-4" />, path: '/appearance/header-builder' },
       { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/appearance/menus' },
       { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' }

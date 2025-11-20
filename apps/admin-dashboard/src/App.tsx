@@ -74,6 +74,7 @@ const NavigationMenus = lazy(() => import('@/pages/menus/Menus'));
 // Appearance Pages
 const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
 const TemplatePartEditor = lazy(() => import(/* webpackChunkName: "template-editor" */ '@/pages/appearance/TemplatePartEditor'));
+const GeneralSettings = lazy(() => import('@/pages/settings/GeneralSettings'));
 const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
@@ -535,6 +536,14 @@ function App() {
                     } />
                     
                     {/* 외모 관리 (WordPress Style) */}
+                    <Route path="/appearance/settings" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GeneralSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     <Route path="/appearance/header-builder" element={
                       <AdminProtectedRoute requiredPermissions={['templates:write']}>
                         <Suspense fallback={<PageLoader />}>
@@ -542,7 +551,7 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
+
                     <Route path="/appearance/menus/*" element={
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
@@ -550,8 +559,8 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
-                    
+
+
                     {/* Appearance - Template Parts */}
                     <Route path="/appearance/template-parts" element={
                       <AdminProtectedRoute requiredPermissions={['templates:read']}>
