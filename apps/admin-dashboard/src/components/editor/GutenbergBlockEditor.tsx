@@ -1407,18 +1407,19 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                   </BlockWrapper>
                 ))}
               </div>
-            )}
 
-            {/* Add block button - shown when blocks exist */}
-            {!isCodeView && blocks.length > 0 && (
-              <div className="mt-6 mb-4 text-center">
-                <button
-                  onClick={() => setIsBlockInserterOpen(true)}
-                  className="px-6 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors"
-                >
-                  + Add Block
-                </button>
-              </div>
+                {/* Add block button - shown when blocks exist */}
+                {blocks.length > 0 && (
+                  <div className="mt-6 mb-4 text-center">
+                    <button
+                      onClick={() => setIsBlockInserterOpen(true)}
+                      className="px-6 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors"
+                    >
+                      + Add Block
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
