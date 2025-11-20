@@ -2,13 +2,14 @@
  * PlaceholderBlock Component
  * Phase 1-C: Placeholder block for missing/requested components
  * Phase 2-A: Enabled block generation button
+ * Phase 1-D: Enhanced UX with better visuals, collapsible details, improved buttons
  * Displays a visual placeholder when AI requests a component that doesn't exist yet
  */
 
 import React, { useState } from 'react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { AlertCircle, Package, Loader2 } from 'lucide-react';
+import { AlertCircle, Package, Loader2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { blockCodeGenerator } from '@/services/ai/BlockCodeGenerator';
 import { NewBlockRequest } from '@/services/ai/types';
 import toast from 'react-hot-toast';
@@ -81,6 +82,8 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
 
   // Phase 2-A: Block generation state
   const [isGenerating, setIsGenerating] = useState(false);
+  // Phase 1-D: Collapsible details state
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
   // Phase 2-A: Handle block generation
   const handleGenerate = async () => {
@@ -118,6 +121,9 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
     }
   };
 
+  // Phase 1-D: Check if there are details to show
+  const hasDetails = reason || (props && props.length > 0) || style;
+
   return (
     <EnhancedBlockWrapper
       id={id}
@@ -144,84 +150,139 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
     >
       <div
         className={cn(
-          'border-2 border-dashed border-gray-400 bg-gray-50 rounded-lg p-4',
-          'transition-all duration-200',
-          isSelected && 'border-blue-500 bg-blue-50'
+          // Phase 1-D: Enhanced visual design with better colors and softer borders
+          'border-2 border-dashed rounded-xl p-5',
+          'transition-all duration-300 ease-in-out',
+          'bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50',
+          'border-amber-400',
+          'hover:border-amber-500 hover:shadow-lg',
+          isSelected && 'border-blue-500 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50 shadow-xl ring-2 ring-blue-200'
         )}
         data-placeholder-id={placeholderId}
       >
-        {/* Header */}
-        <div className="flex items-center gap-2 mb-3">
-          <AlertCircle className="w-5 h-5 text-amber-600" />
-          <h4 className="font-semibold text-gray-900 text-base">
-            새 블록 필요: {componentName}
-          </h4>
+        {/* Phase 1-D: AI Suggested Block Badge */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 border border-amber-300 rounded-full text-xs font-semibold text-amber-800">
+            <Sparkles className="w-3.5 h-3.5" />
+            AI Suggested Block
+          </div>
           {placeholderId && (
-            <span className="ml-auto px-2 py-1 bg-gray-200 text-gray-700 text-xs font-mono rounded">
+            <span className="ml-auto px-2 py-1 bg-white/80 text-gray-600 text-xs font-mono rounded border border-amber-200">
               {placeholderId}
             </span>
           )}
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-gray-300 mb-3" />
-
-        {/* Details */}
-        <div className="space-y-2 text-sm text-gray-700">
-          {reason && (
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-gray-600 min-w-[60px]">이유:</span>
-              <span className="flex-1">{reason}</span>
-            </div>
-          )}
-
-          {props && props.length > 0 && (
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-gray-600 min-w-[60px]">Props:</span>
-              <span className="flex-1 font-mono text-xs bg-white px-2 py-1 rounded border border-gray-200">
-                {props.join(', ')}
-              </span>
-            </div>
-          )}
-
-          {style && (
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-gray-600 min-w-[60px]">스타일:</span>
-              <span className="flex-1">{style}</span>
-            </div>
-          )}
+        {/* Phase 1-D: Enhanced Header with larger, more prominent component name */}
+        <div className="flex items-start gap-3 mb-4">
+          <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
+            <AlertCircle className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl font-bold text-gray-900 mb-1">
+              {componentName}
+            </h3>
+            <p className="text-sm text-gray-600">
+              This component is needed but not yet implemented
+            </p>
+          </div>
         </div>
 
-        {/* Phase 2-A: 블록 생성 버튼 (활성화됨) */}
-        <div className="mt-4 pt-3 border-t border-gray-300">
+        {/* Phase 1-D: Collapsible Details Section */}
+        {hasDetails && (
+          <>
+            <button
+              onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-2 mb-3",
+                "bg-white/60 hover:bg-white/80 rounded-lg transition-colors",
+                "border border-amber-200 hover:border-amber-300"
+              )}
+            >
+              <span className="text-sm font-medium text-gray-700">
+                {isDetailsExpanded ? 'Hide Details' : 'Show Details'}
+              </span>
+              {isDetailsExpanded ? (
+                <ChevronUp className="w-4 h-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              )}
+            </button>
+
+            {/* Details Content (Collapsible) */}
+            {isDetailsExpanded && (
+              <div className="space-y-3 mb-4 p-3 bg-white/60 rounded-lg border border-amber-200">
+                {reason && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Reason</span>
+                    <p className="text-sm text-gray-800">{reason}</p>
+                  </div>
+                )}
+
+                {props && props.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Props</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {props.map((prop, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 text-xs font-mono rounded border border-blue-200"
+                        >
+                          {prop}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {style && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Style</span>
+                    <p className="text-sm text-gray-800">{style}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Phase 1-D: Improved Action Button */}
+        <div className="mt-4">
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !onGenerateBlock}
             className={cn(
-              "w-full px-4 py-2 text-sm font-medium rounded transition-colors",
+              "w-full px-5 py-3 text-sm font-semibold rounded-lg transition-all duration-200",
+              "flex items-center justify-center gap-2",
               isGenerating || !onGenerateBlock
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
             )}
-            title={onGenerateBlock ? "AI가 이 블록을 자동 생성합니다" : "에디터에서 활성화 필요"}
+            title={onGenerateBlock ? "AI will automatically generate this block" : "Activation required in editor"}
           >
             {isGenerating ? (
               <>
-                <Loader2 className="w-4 h-4 inline mr-2 animate-spin" />
-                생성 중...
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Generating Block...</span>
               </>
             ) : (
               <>
-                <Package className="w-4 h-4 inline mr-2" />
-                블록 생성하기
+                <Package className="w-5 h-5" />
+                <span>AI 블록 생성하기</span>
               </>
             )}
           </button>
         </div>
 
-        {/* Info message */}
-        <div className="mt-3 text-xs text-gray-500 italic">
-          이 블록은 AI가 요청했지만 아직 구현되지 않은 컴포넌트입니다.
+        {/* Phase 1-D: Enhanced Info Footer */}
+        <div className="mt-4 pt-3 border-t border-amber-200">
+          <div className="flex items-start gap-2 text-xs text-amber-800">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <p className="flex-1">
+              Click the button above to let AI automatically generate this component for you.
+              Once generated, you can save it permanently to Git.
+            </p>
+          </div>
         </div>
       </div>
     </EnhancedBlockWrapper>
