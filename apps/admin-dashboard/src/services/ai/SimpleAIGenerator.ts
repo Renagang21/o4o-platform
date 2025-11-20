@@ -34,6 +34,8 @@ export const AI_MODELS = {
   'gemini-2.5-flash': 'Gemini 2.5 Flash (권장)',
   'gemini-2.5-pro': 'Gemini 2.5 Pro (최강력)',
   'gemini-2.0-flash': 'Gemini 2.0 Flash (멀티모달)',
+  'gemini-3-pro-preview': 'Gemini 3 Pro (Preview)',
+  'gemini-3-flash-preview': 'Gemini 3 Flash (Preview)',
 
   // Claude 2025 (Anthropic)
   'claude-sonnet-4.5': 'Claude Sonnet 4.5 (최신)',

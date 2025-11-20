@@ -107,7 +107,11 @@ class AIProxyService {
     const startTime = Date.now();
 
     try {
-      // 1. Validate request
+      // 1. Resolve and validate model
+      const resolvedModel = this.resolveModel(request.provider, request.model);
+      request = { ...request, model: resolvedModel };
+
+      // 2. Validate request
       this.validateRequest(request);
 
       // 2. Estimate prompt size for logging
@@ -179,6 +183,38 @@ class AIProxyService {
 
       throw error;
     }
+  }
+
+  /**
+   * Resolve and validate model
+   * Returns validated model name or default for provider
+   */
+  private resolveModel(provider: AIProvider, requestedModel?: string): string {
+    const defaults = {
+      openai: 'gpt-5-mini',
+      gemini: 'gemini-2.5-flash',
+      claude: 'claude-sonnet-4.5',
+    };
+
+    // If no model requested, use default
+    if (!requestedModel) {
+      return defaults[provider];
+    }
+
+    // Check if requested model is allowed
+    const allowedModels = MODEL_WHITELIST[provider] as readonly string[];
+    if ((allowedModels as string[]).includes(requestedModel)) {
+      return requestedModel;
+    }
+
+    // Model not allowed - use default
+    logger.warn('Requested model not allowed, using default', {
+      provider,
+      requestedModel,
+      defaultModel: defaults[provider],
+    });
+
+    return defaults[provider];
   }
 
   /**

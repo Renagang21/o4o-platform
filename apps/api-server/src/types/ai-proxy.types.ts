@@ -19,6 +19,8 @@ export const MODEL_WHITELIST = {
     'gemini-2.5-flash',
     'gemini-2.5-pro',
     'gemini-2.0-flash',
+    'gemini-3-pro-preview', // Future model (준비용)
+    'gemini-3-flash-preview', // Future model (준비용)
   ],
   claude: [
     'claude-sonnet-4.5',
