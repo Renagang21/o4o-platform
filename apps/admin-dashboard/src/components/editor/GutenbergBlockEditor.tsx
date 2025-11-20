@@ -1212,7 +1212,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     const blockContent = typeof block.content === 'string'
                       ? block.content
                       : block.content?.text || '';
-                    const preview = blockContent.replace(/<[^>]*>/g, '').substring(0, 50);
+                    const preview = (blockContent || '').replace(/<[^>]*>/g, '').substring(0, 50);
 
                     return (
                       <BlockListItem
