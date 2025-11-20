@@ -311,6 +311,119 @@ ${error?.message}
       etag: entry.etag
     }));
   }
+
+  /**
+   * Phase 1-B: Block Registry를 JSON 형식으로 반환
+   */
+  async fetchBlockRegistryJSON(): Promise<any> {
+    try {
+      // 서버에서 블록 참조 데이터 가져오기
+      const blocksData = await this.fetchFromServer('/ai/blocks/reference', 'blocks');
+
+      if (blocksData.success && blocksData.data.blocks) {
+        // 블록을 카테고리별로 그룹화
+        const blocksByCategory = this.groupByCategory(
+          blocksData.data.blocks,
+          blocksData.data.categories
+        );
+
+        return {
+          total: blocksData.data.total,
+          categories: blocksByCategory,
+          blocks: blocksData.data.blocks,
+        };
+      }
+
+      // 서버 실패 시 로컬 폴백
+      return this.fetchLocalBlockRegistryJSON();
+    } catch (error) {
+      console.warn('⚠️ 서버 블록 레지스트리 로드 실패, 로컬 사용:', error);
+      return this.fetchLocalBlockRegistryJSON();
+    }
+  }
+
+  /**
+   * Phase 1-B: 로컬 Block Registry를 JSON으로 반환
+   */
+  private fetchLocalBlockRegistryJSON(): any {
+    const { extractBlocksMetadata } = require('./block-registry-extractor');
+    const blocks = extractBlocksMetadata();
+
+    // 카테고리별로 그룹화
+    const grouped = blocks.reduce((acc: any, block: any) => {
+      const category = block.category;
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(block);
+      return acc;
+    }, {});
+
+    return {
+      total: blocks.length,
+      categories: grouped,
+      blocks: blocks,
+    };
+  }
+
+  /**
+   * Phase 1-B: Design Tokens를 JSON 형식으로 반환
+   */
+  async fetchDesignTokensJSON(): Promise<any> {
+    // Phase 1-B: 기본 Design Tokens 반환
+    // appearance-system은 아직 완전히 구축되지 않았으므로 기본값 사용
+    return {
+      colors: {
+        primary: '#007bff',
+        primaryHover: '#0056b3',
+        primaryActive: '#004085',
+        buttonBg: '#007bff',
+        buttonText: '#ffffff',
+        buttonBorder: '#007bff',
+        breadcrumbText: '#6c757d',
+        breadcrumbLink: '#007bff',
+        breadcrumbSeparator: '#6c757d',
+      },
+      spacing: {
+        xs: '0.25rem',
+        sm: '0.5rem',
+        md: '1rem',
+        lg: '1.5rem',
+        xl: '2rem',
+        'section-sm': '2rem',
+        'section-md': '4rem',
+        'section-lg': '6rem',
+      },
+      radius: {
+        sm: '0.125rem',
+        md: '0.25rem',
+        lg: '0.5rem',
+        full: '9999px',
+      },
+      typography: {
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: {
+          xs: '0.75rem',
+          sm: '0.875rem',
+          md: '1rem',
+          lg: '1.25rem',
+          xl: '1.5rem',
+          '2xl': '2rem',
+        },
+        fontWeight: {
+          normal: 400,
+          medium: 500,
+          semibold: 600,
+          bold: 700,
+        },
+        lineHeight: {
+          tight: '1.25',
+          normal: '1.5',
+          relaxed: '1.75',
+        },
+      },
+    };
+  }
 }
 
 export const referenceFetcher = ReferenceFetcherService.getInstance();

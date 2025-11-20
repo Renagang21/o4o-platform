@@ -122,12 +122,12 @@ export class SimpleAIGenerator {
     try {
       updateProgress(5, '서버에서 최신 참조 데이터 로드 중...');
 
-      // 서버 우선 전략으로 참조 데이터 가져오기
-      const availableBlocks = await this.fetchReferenceData();
+      // Phase 1-B: JSON 기반 참조 데이터 가져오기
+      const { blockRegistry, designTokens } = await this.fetchReferenceDataJSON();
 
       updateProgress(10, 'AI 프록시 서버에 연결 중...');
 
-      const systemPrompt = this.getSystemPrompt(template, availableBlocks);
+      const systemPrompt = this.getSystemPromptV2(template, blockRegistry, designTokens);
       const userPrompt = this.buildUserPrompt(prompt);
 
       updateProgress(30, 'AI 응답 생성 중...');
@@ -277,14 +277,199 @@ export class SimpleAIGenerator {
   }
 
   /**
-   * 서버 우선 전략으로 참조 데이터 가져오기
+   * Phase 1-B: JSON 기반 참조 데이터 가져오기
    */
-  private async fetchReferenceData(): Promise<string> {
-    return await referenceFetcher.fetchCompleteReference();
+  private async fetchReferenceDataJSON(): Promise<{
+    blockRegistry: any;
+    designTokens: any;
+  }> {
+    const [blockRegistry, designTokens] = await Promise.all([
+      referenceFetcher.fetchBlockRegistryJSON(),
+      referenceFetcher.fetchDesignTokensJSON(),
+    ]);
+
+    return {
+      blockRegistry,
+      designTokens,
+    };
   }
 
   /**
-   * 템플릿별 시스템 프롬프트
+   * Phase 1-B: V2 System Prompt (JSON 기반, 4개 섹션 구조)
+   */
+  private getSystemPromptV2(template: string, blockRegistry: any, designTokens: any): string {
+    // ═══════════════════════════════════════════════════════════════
+    // SECTION 1: 역할(Role), 스타일 가이드, 절대 규칙
+    // ═══════════════════════════════════════════════════════════════
+    const section1 = `당신은 o4o-platform의 UI/UX Architect이며, 구조화된 JSON 페이지 레이아웃을 생성하는 전문가입니다.
+
+**절대 규칙 (반드시 준수):**
+1. 출력은 순수 JSON 객체 1개만 반환해야 합니다
+2. HTML 코드 출력 금지
+3. Markdown 코드블록(\`\`\`json) 사용 금지
+4. 자연어 설명 금지 - JSON만 출력
+5. 이미지 URL 사용 금지 (placeholder 사이트 포함)
+6. 모든 블록 타입은 반드시 "o4o/" prefix 사용
+7. Shortcode는 그대로 사용 가능 (o4o/shortcode 타입)
+
+**Missing Block 정책 (중요):**
+사용자의 요구사항을 구현하기 위해 필요한 블록이 Block Registry에 없다면:
+- 절대로 기존 블록을 억지로 조합하지 마시오
+- 반드시:
+  1) layout.blocks[] 내에 "o4o/placeholder" 블록 배치
+  2) new_blocks_request[] 항목 생성
+  3) placeholderId로 두 결과를 연결하시오`;
+
+    // ═══════════════════════════════════════════════════════════════
+    // SECTION 2: Block Registry
+    // ═══════════════════════════════════════════════════════════════
+    const section2 = `
+[BLOCK_REGISTRY]
+${JSON.stringify(blockRegistry, null, 2)}
+
+**사용 가능한 블록 타입:**
+${this.formatBlockList(blockRegistry)}`;
+
+    // ═══════════════════════════════════════════════════════════════
+    // SECTION 3: Design Tokens
+    // ═══════════════════════════════════════════════════════════════
+    const section3 = `
+[DESIGN_TOKENS]
+${JSON.stringify(designTokens, null, 2)}
+
+**Design Token 사용법:**
+- 색상: colors.primary, colors.buttonBg 등
+- 간격: spacing.xs, spacing.md, spacing.lg 등
+- 타이포그래피: typography.fontSize.lg 등
+- 블록 attributes에 토큰 값을 직접 참조 가능`;
+
+    // ═══════════════════════════════════════════════════════════════
+    // SECTION 4: Output Format (AIResponseV2) + 생성 절차
+    // ═══════════════════════════════════════════════════════════════
+    const section4 = `
+[OUTPUT_FORMAT]
+반드시 다음 JSON 구조만 반환하시오:
+
+{
+  "layout": {
+    "blocks": [
+      {
+        "type": "o4o/heading",
+        "content": {},
+        "attributes": {"content": "제목", "level": 1}
+      },
+      {
+        "type": "o4o/paragraph",
+        "content": {},
+        "attributes": {"content": "내용"}
+      }
+    ]
+  },
+  "new_blocks_request": [
+    {
+      "placeholderId": "p1",
+      "componentName": "TimelineChart",
+      "reason": "시간 흐름을 시각화하기 위해 필요합니다",
+      "spec": {
+        "props": ["items", "orientation"],
+        "style": "vertical timeline with milestones",
+        "category": "widgets"
+      }
+    }
+  ]
+}
+
+**생성 절차:**
+1. 사용자 요구사항 분석
+2. Block Registry에서 사용 가능한 블록 확인
+3. 필요한 블록이 있으면 layout.blocks[]에 추가
+4. 필요한 블록이 없으면:
+   - o4o/placeholder 블록을 layout.blocks[]에 추가
+   - new_blocks_request[]에 상세 스펙 작성
+5. Design Tokens를 attributes에 반영
+
+**Placeholder 블록 예시:**
+{
+  "type": "o4o/placeholder",
+  "content": {},
+  "attributes": {
+    "componentName": "PricingTable",
+    "reason": "가격표를 표시하기 위해 필요",
+    "placeholderId": "p1"
+  }
+}`;
+
+    // ═══════════════════════════════════════════════════════════════
+    // 템플릿별 추가 지시사항
+    // ═══════════════════════════════════════════════════════════════
+    const templateGuidelines = this.getTemplateGuidelines(template);
+
+    // 전체 프롬프트 조립
+    return `${section1}
+
+${section2}
+
+${section3}
+
+${section4}
+
+${templateGuidelines}`;
+  }
+
+  /**
+   * Block Registry에서 블록 목록을 포맷팅
+   */
+  private formatBlockList(blockRegistry: any): string {
+    if (!blockRegistry || !blockRegistry.blocks) {
+      return '- o4o/heading\n- o4o/paragraph\n- o4o/button';
+    }
+
+    return blockRegistry.blocks
+      .map((block: any) => `- ${block.name}: ${block.description || block.title}`)
+      .join('\n');
+  }
+
+  /**
+   * 템플릿별 가이드라인
+   */
+  private getTemplateGuidelines(template: string): string {
+    const guidelines = {
+      landing: `**랜딩 페이지 구성 요소:**
+- 매력적인 헤드라인 (H1)
+- 부제목 설명 (H2)
+- 주요 기능/장점 3개 (단락 또는 리스트)
+- CTA 버튼
+- 이미지는 alt 텍스트만 (url은 빈 문자열)`,
+
+      about: `**회사 소개 페이지 구성:**
+- 회사 소개 헤드라인
+- 회사 비전/미션
+- 핵심 가치 3-4개 (리스트 사용)
+- 팀 소개 섹션
+- 연락처 정보`,
+
+      product: `**제품 소개 페이지 구성:**
+- 제품명과 한 줄 설명
+- 주요 기능 소개 (리스트 활용)
+- 제품 장점 3-5개
+- 사용법/활용 사례
+- 가격 정보 (PricingTable이 없으면 placeholder 사용)
+- CTA 버튼`,
+
+      blog: `**블로그 포스트 구성:**
+- 매력적인 제목 (H1)
+- 서론 (문제 제기)
+- 본문 3-4개 섹션 (H2 제목 + 단락)
+- 인용구나 코드 블록 활용 가능
+- 실용적인 팁이나 해결책 (리스트 활용)
+- 결론 및 요약`,
+    };
+
+    return guidelines[template as keyof typeof guidelines] || guidelines.landing;
+  }
+
+  /**
+   * 템플릿별 시스템 프롬프트 (Legacy - Phase 1-A 호환)
    */
   private getSystemPrompt(template: string, availableBlocks: string): string {
     const baseRules = `
