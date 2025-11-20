@@ -28,9 +28,44 @@ export interface ContainerSettings {
   };
 }
 
+export interface SiteIdentitySettings {
+  logo?: {
+    desktop?: string;
+    mobile?: string;
+    width?: {
+      desktop?: number;
+      tablet?: number;
+      mobile?: number;
+    };
+  };
+  siteTitle?: {
+    text?: string;
+    display?: boolean;
+  };
+  tagline?: {
+    text?: string;
+    display?: boolean;
+  };
+  favicon?: string;
+}
+
 export interface CustomizerSettings {
+  siteIdentity?: SiteIdentitySettings;
   container: ContainerSettings;
-  // Other customizer settings can be added here
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+    [key: string]: any;
+  };
+  typography?: {
+    fontFamily?: string;
+    [key: string]: any;
+  };
+  header?: any;
+  footer?: any;
+  blog?: any;
+  customCSS?: string;
   [key: string]: any;
 }
 
@@ -243,6 +278,12 @@ export const useCustomizerSettings = () => {
     }
   };
 
+  // Get current viewport width
+  const currentWidth = containerSettings.width[viewportMode];
+
+  // Get current viewport padding
+  const currentPadding = containerSettings.padding[viewportMode];
+
   return {
     settings,
     containerSettings,
@@ -250,6 +291,8 @@ export const useCustomizerSettings = () => {
     error,
     viewportMode,
     currentConfig,
+    currentWidth,
+    currentPadding,
     switchViewport,
     refresh,
   };

@@ -14,6 +14,7 @@ import { Block } from '@/types/post.types';
 import { ArrowLeft, ExternalLink, Eye, Monitor, Tablet, Smartphone } from 'lucide-react';
 import { postApi } from '@/services/api/postApi';
 import { BlockRenderer } from '@o4o/block-renderer';
+import { GlobalStyleInjector } from '@/components/GlobalStyleInjector';
 import './preview-styles.css';
 
 interface PreviewContent {
@@ -151,6 +152,9 @@ const PostPreview: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Inject appearance system styles and custom CSS */}
+      <GlobalStyleInjector />
+
       {/* Preview Header */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="px-4 py-3">
