@@ -56,6 +56,7 @@ export interface ThemeSettings {
   fontFamily: string;
   fontSize: string;
   darkMode: boolean;
+  designTokens?: any; // DesignTokens from @o4o/appearance-system
 }
 
 export interface EmailSettings {

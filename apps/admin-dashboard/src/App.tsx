@@ -75,6 +75,7 @@ const NavigationMenus = lazy(() => import('@/pages/menus/Menus'));
 const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
 const TemplatePartEditor = lazy(() => import(/* webpackChunkName: "template-editor" */ '@/pages/appearance/TemplatePartEditor'));
 const GeneralSettings = lazy(() => import('@/pages/settings/GeneralSettings'));
+const SiteThemeSettings = lazy(() => import('@/pages/appearance/SiteThemeSettings'));
 const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
@@ -536,6 +537,14 @@ function App() {
                     } />
                     
                     {/* 외모 관리 (WordPress Style) */}
+                    <Route path="/appearance/theme" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SiteThemeSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     <Route path="/appearance/settings" element={
                       <AdminProtectedRoute requiredPermissions={['settings:read']}>
                         <Suspense fallback={<PageLoader />}>

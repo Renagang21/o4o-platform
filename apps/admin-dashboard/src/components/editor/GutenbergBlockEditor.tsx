@@ -67,6 +67,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { devLog, devError } from '@/utils/logger';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
+import { useThemeTokens } from '@/hooks/useThemeTokens';
 import {
   saveEditorSession,
   loadEditorSession,
@@ -281,6 +282,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Viewport mode hook
   const { viewportMode, currentConfig, switchViewport, containerSettings } = useCustomizerSettings();
+
+  // Theme tokens hook
+  const { tokens } = useThemeTokens();
 
   // ⭐ AI Chat - EditorContext 생성
   const editorContext: EditorContext = useMemo(() => ({
@@ -1258,21 +1262,51 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
         {/* Editor Canvas */}
         <div
-          className={`flex-1 transition-all duration-300 overflow-y-auto bg-gray-100 ${
+          className={`flex-1 transition-all duration-300 overflow-y-auto ${
             showListView ? 'ml-64' : 'ml-0'
           } ${
             isBlockInserterOpen ? 'ml-80' : ''
           } ${
             sidebarOpen ? 'mr-80' : 'mr-0'
           }`}
-          style={{ paddingTop: '10px', maxHeight: hideHeader ? 'calc(100vh - 10px)' : 'calc(100vh - 70px)' }}
+          style={{
+            paddingTop: '10px',
+            maxHeight: hideHeader ? 'calc(100vh - 10px)' : 'calc(100vh - 70px)',
+            backgroundColor: tokens.colors.background
+          }}
         >
           <div
-            className="mx-auto p-8 bg-white shadow-md transition-all duration-300 ease-in-out"
+            className="mx-auto p-8 shadow-md transition-all duration-300 ease-in-out"
             style={{
               width: `${currentConfig.width}px`,
               maxWidth: '100%',
-            }}
+              backgroundColor: tokens.colors.surface,
+              fontFamily: tokens.typography.fontFamilyBody,
+              fontSize: tokens.typography.fontSizeBase,
+              lineHeight: tokens.typography.lineHeightBase,
+              color: tokens.colors.textPrimary,
+              // Apply theme tokens as CSS variables
+              '--o4o-color-primary': tokens.colors.primary,
+              '--o4o-color-primary-hover': tokens.colors.primaryHover,
+              '--o4o-color-primary-active': tokens.colors.primaryActive,
+              '--o4o-color-primary-soft': tokens.colors.primarySoft,
+              '--o4o-color-background': tokens.colors.background,
+              '--o4o-color-surface': tokens.colors.surface,
+              '--o4o-color-surface-muted': tokens.colors.surfaceMuted,
+              '--o4o-color-border-subtle': tokens.colors.borderSubtle,
+              '--o4o-color-text-primary': tokens.colors.textPrimary,
+              '--o4o-color-text-muted': tokens.colors.textMuted,
+              '--o4o-font-family-heading': tokens.typography.fontFamilyHeading,
+              '--o4o-font-family-body': tokens.typography.fontFamilyBody,
+              '--o4o-font-size-base': tokens.typography.fontSizeBase,
+              '--o4o-line-height-base': tokens.typography.lineHeightBase,
+              '--o4o-spacing-section-y': `${tokens.spacing.sectionY}px`,
+              '--o4o-spacing-block-gap': `${tokens.spacing.blockGap}px`,
+              '--o4o-spacing-grid-gap': `${tokens.spacing.gridGap}px`,
+              '--o4o-radius-sm': tokens.radius.sm,
+              '--o4o-radius-md': tokens.radius.md,
+              '--o4o-radius-lg': tokens.radius.lg,
+            } as React.CSSProperties}
           >
             {/* Title Section - WordPress-style two-tier design */}
             <div className="mb-10">

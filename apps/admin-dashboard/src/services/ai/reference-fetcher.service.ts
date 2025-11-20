@@ -368,22 +368,27 @@ ${error?.message}
 
   /**
    * Phase 1-B: Design Tokens를 JSON 형식으로 반환
-   * Phase 2-C: GeneralSettings 연동 - 사이트 색상/폰트를 AI 생성기에 반영
+   * Phase 2-C: Theme Settings 연동 - 사이트 색상/폰트/레이아웃을 AI 생성기에 반영
    */
   async fetchDesignTokensJSON(): Promise<any> {
-    // 기본값 정의 (폴백용)
+    // 기본값 정의 (폴백용) - @o4o/appearance-system의 defaultTokens와 동기화
     const defaults = {
       colors: {
-        primary: '#007bff',
-        primaryHover: '#0056b3',
-        primaryActive: '#004085',
-        secondary: '#10b981',
-        accent: '#f59e0b',
-        buttonBg: '#007bff',
+        primary: '#2563EB',
+        primaryHover: '#1D4ED8',
+        primaryActive: '#1E3A8A',
+        primarySoft: '#EFF6FF',
+        background: '#F9FAFB',
+        surface: '#FFFFFF',
+        surfaceMuted: '#F3F4F6',
+        borderSubtle: '#E5E7EB',
+        textPrimary: '#111827',
+        textMuted: '#6B7280',
+        buttonBg: '#2563EB',
         buttonText: '#ffffff',
-        buttonBorder: '#007bff',
+        buttonBorder: '#2563EB',
         breadcrumbText: '#6c757d',
-        breadcrumbLink: '#007bff',
+        breadcrumbLink: '#2563EB',
         breadcrumbSeparator: '#6c757d',
       },
       spacing: {
@@ -392,32 +397,29 @@ ${error?.message}
         md: '1rem',
         lg: '1.5rem',
         xl: '2rem',
-        'section-sm': '2rem',
-        'section-md': '4rem',
-        'section-lg': '6rem',
+        sectionY: 80,
+        blockGap: 24,
+        gridGap: 24,
       },
       radius: {
         sm: '0.125rem',
         md: '0.25rem',
         lg: '0.5rem',
-        full: '9999px',
       },
       typography: {
+        fontFamilyHeading: 'Inter, Pretendard, sans-serif',
+        fontFamilyBody: 'Inter, Pretendard, sans-serif',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        headingFontFamily: 'Pretendard, -apple-system, sans-serif',
-        bodyFontFamily: 'Pretendard, -apple-system, sans-serif',
+        fontSizeBase: '16px',
+        lineHeightBase: 1.6,
         fontSize: {
-          xs: '0.75rem',
           sm: '0.875rem',
           md: '1rem',
           lg: '1.25rem',
-          xl: '1.5rem',
-          '2xl': '2rem',
         },
         fontWeight: {
           normal: 400,
           medium: 500,
-          semibold: 600,
           bold: 700,
         },
         lineHeight: {
@@ -429,62 +431,29 @@ ${error?.message}
     };
 
     try {
-      // GeneralSettings에서 사이트 설정 가져오기
-      const response = await authClient.api.get('/settings/general');
+      // Theme Settings에서 DesignTokens 가져오기
+      const response = await authClient.api.get('/settings/theme');
       const settings = response.data?.data;
 
-      if (!settings) {
-        console.warn('⚠️ 사이트 설정을 불러올 수 없습니다. 기본 디자인 토큰을 사용합니다.');
-        return defaults;
+      // designTokens가 있으면 사용, 없으면 기본값
+      if (settings?.designTokens) {
+        return {
+          ...defaults,
+          ...settings.designTokens,
+          // Deep merge for nested objects
+          colors: { ...defaults.colors, ...settings.designTokens.colors },
+          spacing: { ...defaults.spacing, ...settings.designTokens.spacing },
+          radius: { ...defaults.radius, ...settings.designTokens.radius },
+          typography: { ...defaults.typography, ...settings.designTokens.typography },
+        };
       }
 
-      // GeneralSettings 값으로 디자인 토큰 구성
-      const designTokens = {
-        colors: {
-          // 사용자 정의 색상 (GeneralSettings에서)
-          primary: settings.primaryColor || defaults.colors.primary,
-          secondary: settings.secondaryColor || defaults.colors.secondary,
-          accent: settings.accentColor || defaults.colors.accent,
-
-          // 파생 색상 (primary 기반)
-          primaryHover: this.darkenColor(settings.primaryColor || defaults.colors.primary, 10),
-          primaryActive: this.darkenColor(settings.primaryColor || defaults.colors.primary, 20),
-
-          // 버튼 색상 (primary 사용)
-          buttonBg: settings.primaryColor || defaults.colors.primary,
-          buttonText: '#ffffff',
-          buttonBorder: settings.primaryColor || defaults.colors.primary,
-
-          // 링크 색상 (primary 사용)
-          breadcrumbText: '#6c757d',
-          breadcrumbLink: settings.primaryColor || defaults.colors.primary,
-          breadcrumbSeparator: '#6c757d',
-        },
-        spacing: defaults.spacing,
-        radius: defaults.radius,
-        typography: {
-          // 사용자 정의 폰트 (GeneralSettings에서)
-          fontFamily: settings.bodyFont
-            ? `${settings.bodyFont}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-            : defaults.typography.bodyFontFamily,
-          headingFontFamily: settings.headingFont
-            ? `${settings.headingFont}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-            : defaults.typography.headingFontFamily,
-          bodyFontFamily: settings.bodyFont
-            ? `${settings.bodyFont}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-            : defaults.typography.bodyFontFamily,
-
-          // 폰트 크기/굵기/행간은 기본값 유지
-          fontSize: defaults.typography.fontSize,
-          fontWeight: defaults.typography.fontWeight,
-          lineHeight: defaults.typography.lineHeight,
-        },
-      };
-
-      return designTokens;
+      // 기본값 사용
+      console.warn('⚠️ 테마 설정에 designTokens가 없습니다. 기본값을 사용합니다.');
+      return defaults;
 
     } catch (error) {
-      console.warn('⚠️ 사이트 설정 로드 실패, 기본 디자인 토큰을 사용합니다:', error);
+      console.warn('⚠️ 테마 설정 로드 실패, 기본 디자인 토큰을 사용합니다:', error);
       return defaults;
     }
   }
