@@ -5,6 +5,7 @@
 
 import React, { useState, useRef } from 'react';
 import { BlockDragHandle } from './BlockDragHandle';
+import { BlockAIToolbar } from './blocks/shared/BlockAIToolbar';
 // BlockControls removed - now handled by individual block components (e.g. ParagraphBlock)
 
 interface BlockWrapperProps {
@@ -24,6 +25,7 @@ interface BlockWrapperProps {
   onMoveDown?: (blockId: string) => void;
   onUpdate?: (updates: any) => void;
   onChangeType?: (newType: string) => void;
+  onOpenAIModal?: (blockId: string, actionType: 'edit' | 'improve' | 'translate') => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   className?: string;
@@ -46,6 +48,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   onMoveDown,
   onUpdate,
   onChangeType,
+  onOpenAIModal,
   canMoveUp = true,
   canMoveDown = true,
   className = ''
@@ -122,6 +125,7 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   const blockTypeClass = `wp-block-${blockType.replace('/', '-')}`;
 
   const classNames = [
+    'group',                           // Tailwind group class for group-hover utilities
     'block-editor-block-list__block',  // Gutenberg standard wrapper class
     'wp-block',                        // Generic block class
     'block-editor-block',              // Our existing class for compatibility
@@ -164,6 +168,16 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
         />
+
+        {/* Phase 2-C: AI Toolbar (appears on hover) */}
+        {onOpenAIModal && (
+          <BlockAIToolbar
+            blockId={blockId}
+            onAIEdit={() => onOpenAIModal(blockId, 'edit')}
+            onImprove={() => onOpenAIModal(blockId, 'improve')}
+            onTranslate={() => onOpenAIModal(blockId, 'translate')}
+          />
+        )}
 
         {/* Block Type Label */}
         <div className="block-editor-block__type-label">

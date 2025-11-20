@@ -45,6 +45,8 @@ import { EditorContext, AIAction } from '@/services/ai/ConversationalAI';
 // Phase 1-C: New Block Request Panel
 import { NewBlockRequestPanel } from './NewBlockRequestPanel';
 import { NewBlockRequest } from '@/services/ai/types';
+// Phase 2-C: Block-level AI editing
+import { BlockAIModal } from '../ai/BlockAIModal';
 // Phase 2-A: Runtime Block Generation
 import { blockCodeGenerator, BlockGenerationError, BlockGenerationErrorType } from '@/services/ai/BlockCodeGenerator';
 import { compileComponent } from '@/blocks/runtime/runtime-code-loader';
@@ -233,6 +235,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Phase 1-C: New Block Request Panel state
   const [newBlocksRequest, setNewBlocksRequest] = useState<NewBlockRequest[]>([]);
+
+  // Phase 2-C: Block AI editing state
+  const [isBlockAIModalOpen, setIsBlockAIModalOpen] = useState(false);
+  const [blockToEdit, setBlockToEdit] = useState<Block | null>(null);
+  const [initialAIAction, setInitialAIAction] = useState<'refine' | 'improve' | 'translate-ko'>('refine');
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -651,6 +658,32 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const handleDuplicate = blockManagement.handleDuplicate;
   const handleMoveUp = blockManagement.handleMoveUp;
   const handleMoveDown = blockManagement.handleMoveDown;
+
+  // Phase 2-C: Block AI editing handlers
+  const handleOpenBlockAIModal = useCallback((blockId: string, actionType: 'edit' | 'improve' | 'translate' = 'edit') => {
+    const block = blocks.find(b => b.id === blockId);
+    if (block) {
+      setBlockToEdit(block);
+
+      // Map action type to initial AI action
+      const actionMap: Record<'edit' | 'improve' | 'translate', 'refine' | 'improve' | 'translate-ko'> = {
+        'edit': 'refine',
+        'improve': 'improve',
+        'translate': 'translate-ko',
+      };
+      setInitialAIAction(actionMap[actionType]);
+
+      setIsBlockAIModalOpen(true);
+    }
+  }, [blocks]);
+
+  const handleApplyRefinedBlock = useCallback((refinedBlock: Block) => {
+    const newBlocks = blocks.map(b =>
+      b.id === refinedBlock.id ? refinedBlock : b
+    );
+    updateBlocks(newBlocks);
+    showToast('블록이 AI로 개선되었습니다!', 'success');
+  }, [blocks, updateBlocks, showToast]);
 
   // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
   const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
@@ -1189,6 +1222,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     onDelete={() => handleBlockDelete(block.id)}
                     onMoveUp={() => handleMoveUp(block.id)}
                     onMoveDown={() => handleMoveDown(block.id)}
+                    onOpenAIModal={handleOpenBlockAIModal}
                     canMoveUp={index > 0}
                     canMoveDown={index < blocks.length - 1}
                   >
@@ -1338,6 +1372,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           />
         </div>
       )}
+
+      {/* Phase 2-C: Block AI Edit Modal */}
+      <BlockAIModal
+        isOpen={isBlockAIModalOpen}
+        onClose={() => {
+          setIsBlockAIModalOpen(false);
+          setBlockToEdit(null);
+        }}
+        block={blockToEdit}
+        onApply={handleApplyRefinedBlock}
+        initialAction={initialAIAction}
+      />
     </div>
   );
 };
