@@ -26,6 +26,9 @@ interface BlockWrapperProps {
   onUpdate?: (updates: any) => void;
   onChangeType?: (newType: string) => void;
   onOpenAIModal?: (blockId: string, actionType: 'edit' | 'improve' | 'translate') => void;
+  // Phase 2-C Remaining: Section selection
+  isBlockSelected?: boolean;
+  onToggleSelection?: (blockId: string) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   className?: string;
@@ -49,6 +52,8 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
   onUpdate,
   onChangeType,
   onOpenAIModal,
+  isBlockSelected = false,
+  onToggleSelection,
   canMoveUp = true,
   canMoveDown = true,
   className = ''
@@ -160,6 +165,22 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({
         aria-selected={isSelected}
         aria-describedby={isSelected ? `block-desc-${blockId}` : undefined}
       >
+        {/* Phase 2-C Remaining: Selection Checkbox */}
+        {onToggleSelection && (
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-8 opacity-0 group-hover:opacity-100 transition-opacity">
+            <input
+              type="checkbox"
+              checked={isBlockSelected}
+              onChange={(e) => {
+                e.stopPropagation();
+                onToggleSelection(blockId);
+              }}
+              className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+              title="섹션에 포함"
+            />
+          </div>
+        )}
+
         {/* Drag Handle */}
         <BlockDragHandle
           blockId={blockId}

@@ -240,6 +240,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isBlockAIModalOpen, setIsBlockAIModalOpen] = useState(false);
   const [blockToEdit, setBlockToEdit] = useState<Block | null>(null);
   const [initialAIAction, setInitialAIAction] = useState<'refine' | 'improve' | 'translate-ko'>('refine');
+
+  // Phase 2-C Remaining: Section selection state
+  const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(new Set());
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -684,6 +687,42 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     updateBlocks(newBlocks);
     showToast('블록이 AI로 개선되었습니다!', 'success');
   }, [blocks, updateBlocks, showToast]);
+
+  // Phase 2-C Remaining: Section selection handlers
+  const handleToggleBlockSelection = useCallback((blockId: string) => {
+    setSelectedBlockIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(blockId)) {
+        newSet.delete(blockId);
+      } else {
+        newSet.add(blockId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Check if selected blocks are continuous
+  const areSelectedBlocksContinuous = useCallback((): boolean => {
+    if (selectedBlockIds.size < 2) return true;
+
+    const selectedIndices = Array.from(selectedBlockIds)
+      .map(id => blocks.findIndex(b => b.id === id))
+      .filter(index => index !== -1)
+      .sort((a, b) => a - b);
+
+    // Check if indices are consecutive
+    for (let i = 1; i < selectedIndices.length; i++) {
+      if (selectedIndices[i] !== selectedIndices[i - 1] + 1) {
+        return false;
+      }
+    }
+    return true;
+  }, [selectedBlockIds, blocks]);
+
+  // Get selected blocks in order
+  const getSelectedBlocksInOrder = useCallback((): Block[] => {
+    return blocks.filter(b => selectedBlockIds.has(b.id));
+  }, [blocks, selectedBlockIds]);
 
   // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
   const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
@@ -1223,6 +1262,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     onMoveUp={() => handleMoveUp(block.id)}
                     onMoveDown={() => handleMoveDown(block.id)}
                     onOpenAIModal={handleOpenBlockAIModal}
+                    isBlockSelected={selectedBlockIds.has(block.id)}
+                    onToggleSelection={handleToggleBlockSelection}
                     canMoveUp={index > 0}
                     canMoveDown={index < blocks.length - 1}
                   >
