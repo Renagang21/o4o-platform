@@ -49,6 +49,8 @@ import { NewBlockRequest } from '@/services/ai/types';
 import { BlockAIModal } from '../ai/BlockAIModal';
 // Phase 2-C Remaining: Section-level AI reconstruction
 import { SectionAIModal } from '../ai/SectionAIModal';
+// Phase 2-C Remaining: Page-level AI improvement
+import { PageImproveModal } from '../ai/PageImproveModal';
 // Phase 2-A: Runtime Block Generation
 import { blockCodeGenerator, BlockGenerationError, BlockGenerationErrorType } from '@/services/ai/BlockCodeGenerator';
 import { compileComponent } from '@/blocks/runtime/runtime-code-loader';
@@ -246,7 +248,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Phase 2-C Remaining: Section selection state
   const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(new Set());
   const [isSectionAIModalOpen, setIsSectionAIModalOpen] = useState(false);
-  
+
+  // Phase 2-C Remaining: Page-level AI improvement state
+  const [isPageImproveModalOpen, setIsPageImproveModalOpen] = useState(false);
+
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
@@ -775,6 +780,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     showToast(`섹션이 AI로 재구성되었습니다! (${refinedBlocks.length}개 블록)`, 'success');
   }, [blocks, selectedBlockIds, updateBlocks, showToast]);
 
+  // Apply improved page blocks
+  const handleApplyImprovedPage = useCallback((improvedBlocks: Block[]) => {
+    // Replace entire blocks array with improved version
+    updateBlocks(improvedBlocks);
+
+    // Clear selection
+    setSelectedBlockIds(new Set());
+
+    showToast(`페이지가 AI로 개선되었습니다! (${improvedBlocks.length}개 블록)`, 'success');
+  }, [updateBlocks, showToast]);
+
   // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
   const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
     actions.forEach(action => {
@@ -1126,6 +1142,22 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            {/* Phase 2-C Remaining: Page-level AI Improvement Button */}
+            <button
+              onClick={() => setIsPageImproveModalOpen(true)}
+              disabled={blocks.length === 0}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                blocks.length === 0
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-sm hover:shadow-md"
+              )}
+              title="페이지 전체 AI 개선"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>페이지 AI 개선</span>
+            </button>
+
             {/* ⭐ AI Chat Toggle Button */}
             <button
               onClick={() => setIsAIChatOpen(!isAIChatOpen)}
@@ -1538,6 +1570,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         }}
         blocks={getSelectedBlocksInOrder()}
         onApply={handleApplyRefinedSection}
+      />
+
+      {/* Phase 2-C Remaining: Page AI Improvement Modal */}
+      <PageImproveModal
+        isOpen={isPageImproveModalOpen}
+        onClose={() => {
+          setIsPageImproveModalOpen(false);
+        }}
+        blocks={blocks}
+        documentTitle={documentTitle}
+        onApply={handleApplyImprovedPage}
       />
     </div>
   );
