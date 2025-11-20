@@ -131,6 +131,16 @@ function getExampleContent(blockName: string): any {
       showWhenMet: true,
       innerBlocks: []
     },
+    'o4o/timeline-chart': {
+      steps: [
+        { title: '1단계', description: '프로세스를 시작합니다' },
+        { title: '2단계', description: '작업을 진행합니다' },
+        { title: '3단계', description: '작업을 완료합니다' }
+      ],
+      variant: 'vertical',
+      iconStyle: 'circle',
+      lineStyle: 'solid'
+    },
   };
 
   return examples[blockName] || {};
