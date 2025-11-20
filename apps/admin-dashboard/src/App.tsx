@@ -141,7 +141,6 @@ const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
 
 // Appearance Pages (WordPress Style)
 const HeaderBuilder = lazy(() => import('@/pages/appearance/header-builder/HeaderBuilderPage'));
-const AppearanceSettings = lazy(() => import('@/pages/appearance/AppearanceSettings'));
 
 // Shortcode Management - REMOVED
 
@@ -167,11 +166,11 @@ function App() {
     // SSO 체크 비활성화 - 로컬 인증만 사용
     // SSO는 백엔드 구현 완료 후 활성화
   }, []);
-
+  
   // 인증 오류 처리
   const handleAuthError = (error: string) => {
     // Error logging - use proper error handler
-
+    
     switch (error) {
       case 'token_refresh_failed':
         toast.error('세션이 만료되었습니다. 다시 로그인해 주세요.');
@@ -196,7 +195,7 @@ function App() {
     });
   };
 
-
+  
   return (
     <ErrorBoundary>
       <ThemeProvider>
@@ -211,662 +210,653 @@ function App() {
             onSessionExpiring={handleSessionExpiring}
           >
             <Routes>
-              {/* 공개 라우트 - 로그인 페이지 */}
-              <Route path="/login" element={
-                <Suspense fallback={<PageLoader />}>
-                  <Login />
-                </Suspense>
-              } />
+            {/* 공개 라우트 - 로그인 페이지 */}
+            <Route path="/login" element={
+              <Suspense fallback={<PageLoader />}>
+                <Login />
+              </Suspense>
+            } />
+            
+            {/* 비밀번호 재설정 페이지 */}
+            <Route path="/forgot-password" element={
+              <Suspense fallback={<PageLoader />}>
+                <ForgotPassword />
+              </Suspense>
+            } />
+            
+            <Route path="/reset-password" element={
+              <Suspense fallback={<PageLoader />}>
+                <ResetPassword />
+              </Suspense>
+            } />
+            
+            {/* 루트 경로 - 인증 상태에 따라 리다이렉트 */}
+            <Route path="/" element={<InitialRedirect />} />
+            
+            {/* 미리보기 페이지 - 인증 불필요 (sessionStorage 기반) */}
+            <Route path="/admin/preview" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostPreview />
+              </Suspense>
+            } />
 
-              {/* 비밀번호 재설정 페이지 */}
-              <Route path="/forgot-password" element={
-                <Suspense fallback={<PageLoader />}>
-                  <ForgotPassword />
-                </Suspense>
-              } />
+            
+            {/* 독립형 편집기 라우트 - 관리자 레이아웃 밖에서 실행 */}
+            <Route path="/editor/*" element={
+              <AdminProtectedRoute 
+                requiredRoles={['admin']}
+                requiredPermissions={['content:write']}
+              >
+                <EditorLayout>
+                  <Routes>
+                    <Route path="posts/new" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorRouteWrapper mode="post" />
+                      </Suspense>
+                    } />
+                    <Route path="posts/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorRouteWrapper mode="post" />
+                      </Suspense>
+                    } />
+                    <Route path="pages/new" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorRouteWrapper mode="page" />
+                      </Suspense>
+                    } />
+                    <Route path="pages/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorRouteWrapper mode="page" />
+                      </Suspense>
+                    } />
+                    <Route path="templates/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorRouteWrapper mode="template" />
+                      </Suspense>
+                    } />
+                    <Route path="patterns/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorRouteWrapper mode="pattern" />
+                      </Suspense>
+                    } />
+                  </Routes>
+                </EditorLayout>
+              </AdminProtectedRoute>
+            } />
+            
+            {/* Preview Routes */}
+            <Route path="/preview/posts/:id" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostPreview />
+              </Suspense>
+            } />
+            <Route path="/preview/pages/:id" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostPreview />
+              </Suspense>
+            } />
+            
+            {/* 보호된 관리자 라우트들 */}
+            <Route path="/*" element={
+              <AdminProtectedRoute 
+                requiredRoles={['admin']}
+                showContactAdmin={true}
+              >
+                <AdminLayout>
+                  <Routes>
+                    {/* WordPress 스타일 메인 대시보드 */}
+                    <Route path="/admin" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <WordPressDashboard />
+                      </Suspense>
+                    } />
+                    
+                    <Route path="/home" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminHome />
+                      </Suspense>
+                    } />
+                    
+                    <Route path="/dashboard" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <DashboardSimple />
+                      </Suspense>
+                    } />
 
-              <Route path="/reset-password" element={
-                <Suspense fallback={<PageLoader />}>
-                  <ResetPassword />
-                </Suspense>
-              } />
+                    {/* P1 Phase C: Widget-based Admin Dashboard */}
+                    <Route path="/admin/dashboard/widgets" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AdminDashboardPageWrapper />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
 
-              {/* 루트 경로 - 인증 상태에 따라 리다이렉트 */}
-              <Route path="/" element={<InitialRedirect />} />
+                    {/* PD-3: Seller Dashboard Routes */}
+                    <Route path="/dashboard/seller/catalog" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerCatalog />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/dashboard/seller/products" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerProducts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
 
-              {/* 미리보기 페이지 - 인증 불필요 (sessionStorage 기반) */}
-              <Route path="/admin/preview" element={
-                <Suspense fallback={<PageLoader />}>
-                  <PostPreview />
-                </Suspense>
-              } />
+                    {/* PD-4: Seller Orders */}
+                    <Route path="/dashboard/seller/orders" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerOrders />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
 
+                    {/* PD-5: Seller Settlements */}
+                    <Route path="/dashboard/seller/settlements" element={
+                      <AdminProtectedRoute requiredRoles={['seller']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SellerSettlements />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
 
-              {/* 독립형 편집기 라우트 - 관리자 레이아웃 밖에서 실행 */}
-              <Route path="/editor/*" element={
-                <AdminProtectedRoute
-                  requiredRoles={['admin']}
-                  requiredPermissions={['content:write']}
-                >
-                  <EditorLayout>
-                    <Routes>
-                      <Route path="posts/new" element={
+                    {/* PD-4: Supplier Orders */}
+                    <Route path="/dashboard/supplier/orders" element={
+                      <AdminProtectedRoute requiredRoles={['supplier']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierOrders />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* PD-5: Supplier Settlements */}
+                    <Route path="/dashboard/supplier/settlements" element={
+                      <AdminProtectedRoute requiredRoles={['supplier']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SupplierSettlements />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* 현재 접속자 */}
+                    <Route path="/active-users" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ActiveUsers />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* 사용자 관리 */}
+                    <Route path="/users" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UsersPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/users/add" element={
+                      <AdminProtectedRoute requiredPermissions={['users:create']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/users/new" element={
+                      <AdminProtectedRoute requiredPermissions={['users:create']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    <Route path="/users/roles" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <RoleManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/users/statistics" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserStatistics />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/users/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserDetail />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/users/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* P0 RBAC: 역할 신청 관리 */}
+                    <Route path="/enrollments" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EnrollmentManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/enrollments" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EnrollmentManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* P4-Admin: 역할 신청 관리 */}
+                    <Route path="/admin/role-applications" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <RoleApplicationsAdminPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* 글 관리 */}
+                    <Route path="/posts" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Posts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 카테고리 & 태그 */}
+                    <Route path="/posts/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Categories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Categories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/categories/new" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CategoryEdit />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/categories/edit/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CategoryEdit />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/posts/tags" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Tags />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 페이지 관리 */}
+                    <Route path="/pages/*" element={
+                      <AdminProtectedRoute requiredPermissions={['pages:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <PagesRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 재사용 블록 관리 */}
+                    <Route path="/reusable-blocks" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <div>Reusable Blocks - Coming Soon</div>
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 외모 관리 (WordPress Style) */}
+                    <Route path="/appearance/header-builder" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <HeaderBuilder />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/appearance/menus/*" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <NavigationMenus />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    
+                    {/* Appearance - Template Parts */}
+                    <Route path="/appearance/template-parts" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplateParts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/appearance/template-parts/new" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplatePartEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/appearance/template-parts/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplatePartEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 미디어 관리 */}
+                    <Route path="/media/*" element={
+                      <AdminProtectedRoute requiredPermissions={['media:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MediaLibrary />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* E-commerce 관리 */}
+                    
+                    
+                    
+                    {/* 분석 */}
+                    <Route path="/analytics/*" element={
+                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Analytics />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    
+                    {/* CPT Engine - New Unified Dashboard */}
+                    <Route path="/cpt-engine/*" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CPTEngine />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CPT Presets */}
+                    <Route path="/cpt-engine/presets/forms" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <FormPresets />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cpt-engine/presets/views" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ViewPresets />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/cpt-engine/presets/templates" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplatePresets />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CPT/ACF Archive & Forms */}
+                    <Route path="/admin/cpt-acf/*" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CPTACFRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Dropshipping Routes */}
+                    <Route path="/dropshipping/*" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DropshippingRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Admin Order Management (Phase 4) */}
+                    <Route path="/admin/orders" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OrderListPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/orders/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OrderDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* CPT & ACF - Legacy Routes - Removed (replaced by CPT Engine) */}
+                    
+                    <Route path="/acf/*" element={
+                      <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CustomFields />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/acf/groups" element={
+                      <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CustomFields />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 메일 관리 */}
+                    <Route path="/mail/*" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EmailSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Forum - App Guard 적용 */}
+                    <Route path="/forum/*" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ForumRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Digital Signage - App Guard 적용 */}
+                    <Route path="/signage/*" element={
+                      <AdminProtectedRoute requiredPermissions={['signage:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SignageRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Crowdfunding - App Guard 적용 */}
+                    <Route path="/crowdfunding/*" element={
+                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CrowdfundingRouter />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 도구 */}
+                    <Route path="/tools" element={
+                      <AdminProtectedRoute requiredPermissions={['tools:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ToolsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/tools/media-replace" element={
+                      <AdminProtectedRoute requiredPermissions={['tools:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <FileReplaceTools />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 설정 */}
+                    <Route path="/settings/*" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Settings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Test routes removed for production */}
+                    
+                    {/* Gutenberg Editor - Using Standalone Full Screen Editor */}
+                    <Route path="/gutenberg" element={
+                      <AdminProtectedRoute requiredPermissions={['content:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <EditorRouteWrapper mode="post" />
                         </Suspense>
-                      } />
-                      <Route path="posts/:id" element={
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* UI Showcase */}
+                    <Route path="/ui-showcase" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <EditorRouteWrapper mode="post" />
+                          <UIShowcase />
                         </Suspense>
-                      } />
-                      <Route path="pages/new" element={
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Test - Minimal Editor (inside AdminLayout, requires login) */}
+                    <Route path="/admin/test/minimal-editor" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <EditorTest />
+                      </Suspense>
+                    } />
+                    {/* Test - AI Page Generator */}
+                    <Route path="/admin/test/ai-page-generator-test" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AIPageGeneratorTest />
+                      </Suspense>
+                    } />
+                    {/* Test - Focus Restoration */}
+                    <Route path="/admin/test/focus-restoration" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <FocusRestorationTest />
+                      </Suspense>
+                    } />
+                    {/* Test - AI Block Debug */}
+                    <Route path="/admin/test/ai-block-debug" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AIBlockDebug />
+                      </Suspense>
+                    } />
+                    {/* Test - Seed Presets */}
+                    <Route path="/admin/test/seed-presets" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <SeedPresets />
+                      </Suspense>
+                    } />
+                    {/* Test - Preset Integration */}
+                    <Route path="/admin/test/preset-integration" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <PresetIntegrationTest />
+                      </Suspense>
+                    } />
+                    {/* Test - Delete Customizer */}
+                    <Route path="/admin/test/delete-customizer" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <DeleteCustomizerTest />
+                      </Suspense>
+                    } />
+                    {/* Test - Auth Debug */}
+                    <Route path="/admin/test/auth-debug" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AuthDebug />
+                      </Suspense>
+                    } />
+
+                    
+                    {/* System Monitoring */}
+                    <Route path="/monitoring" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <EditorRouteWrapper mode="page" />
+                          <IntegratedMonitoring />
                         </Suspense>
-                      } />
-                      <Route path="pages/:id" element={
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/monitoring/performance" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <EditorRouteWrapper mode="page" />
+                          <PerformanceDashboard />
                         </Suspense>
-                      } />
-                      <Route path="templates/:id" element={
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/monitoring/security" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <EditorRouteWrapper mode="template" />
+                          <IntegratedMonitoring />
                         </Suspense>
-                      } />
-                      <Route path="patterns/:id" element={
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Phase 2.4 - Operations Dashboard */}
+                    <Route path="/admin/dashboard/operations" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <EditorRouteWrapper mode="pattern" />
+                          <OperationsDashboard />
                         </Suspense>
-                      } />
-                    </Routes>
-                  </EditorLayout>
-                </AdminProtectedRoute>
-              } />
+                      </AdminProtectedRoute>
+                    } />
 
-              {/* Preview Routes */}
-              <Route path="/preview/posts/:id" element={
-                <Suspense fallback={<PageLoader />}>
-                  <PostPreview />
-                </Suspense>
-              } />
-              <Route path="/preview/pages/:id" element={
-                <Suspense fallback={<PageLoader />}>
-                  <PostPreview />
-                </Suspense>
-              } />
-
-              {/* 보호된 관리자 라우트들 */}
-              <Route path="/*" element={
-                <AdminProtectedRoute
-                  requiredRoles={['admin']}
-                  showContactAdmin={true}
-                >
-                  <AdminLayout>
-                    <Routes>
-                      {/* WordPress 스타일 메인 대시보드 */}
-                      <Route path="/admin" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <WordPressDashboard />
-                        </Suspense>
-                      } />
-
-                      <Route path="/home" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <AdminHome />
-                        </Suspense>
-                      } />
-
-                      <Route path="/dashboard" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <DashboardSimple />
-                        </Suspense>
-                      } />
-
-                      {/* P1 Phase C: Widget-based Admin Dashboard */}
-                      <Route path="/admin/dashboard/widgets" element={
-                        <AdminProtectedRoute requiredRoles={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <AdminDashboardPageWrapper />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* PD-3: Seller Dashboard Routes */}
-                      <Route path="/dashboard/seller/catalog" element={
-                        <AdminProtectedRoute requiredRoles={['seller']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SellerCatalog />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/dashboard/seller/products" element={
-                        <AdminProtectedRoute requiredRoles={['seller']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SellerProducts />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* PD-4: Seller Orders */}
-                      <Route path="/dashboard/seller/orders" element={
-                        <AdminProtectedRoute requiredRoles={['seller']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SellerOrders />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* PD-5: Seller Settlements */}
-                      <Route path="/dashboard/seller/settlements" element={
-                        <AdminProtectedRoute requiredRoles={['seller']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SellerSettlements />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* PD-4: Supplier Orders */}
-                      <Route path="/dashboard/supplier/orders" element={
-                        <AdminProtectedRoute requiredRoles={['supplier']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SupplierOrders />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* PD-5: Supplier Settlements */}
-                      <Route path="/dashboard/supplier/settlements" element={
-                        <AdminProtectedRoute requiredRoles={['supplier']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SupplierSettlements />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 현재 접속자 */}
-                      <Route path="/active-users" element={
-                        <AdminProtectedRoute requiredPermissions={['users:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <ActiveUsers />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 사용자 관리 */}
-                      <Route path="/users" element={
-                        <AdminProtectedRoute requiredPermissions={['users:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UsersPage />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/users/add" element={
-                        <AdminProtectedRoute requiredPermissions={['users:create']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UserForm />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/users/new" element={
-                        <AdminProtectedRoute requiredPermissions={['users:create']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UserForm />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      <Route path="/users/roles" element={
-                        <AdminProtectedRoute requiredPermissions={['users:update']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <RoleManagement />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/users/statistics" element={
-                        <AdminProtectedRoute requiredPermissions={['users:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UserStatistics />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/users/:id" element={
-                        <AdminProtectedRoute requiredPermissions={['users:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UserDetail />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/users/:id/edit" element={
-                        <AdminProtectedRoute requiredPermissions={['users:update']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UserForm />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* P0 RBAC: 역할 신청 관리 */}
-                      <Route path="/enrollments" element={
-                        <AdminProtectedRoute requiredPermissions={['users:update']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <EnrollmentManagement />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/admin/enrollments" element={
-                        <AdminProtectedRoute requiredPermissions={['users:update']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <EnrollmentManagement />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* P4-Admin: 역할 신청 관리 */}
-                      <Route path="/admin/role-applications" element={
-                        <AdminProtectedRoute requiredPermissions={['users:update']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <RoleApplicationsAdminPage />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 글 관리 */}
-                      <Route path="/posts" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <Posts />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 카테고리 & 태그 */}
-                      <Route path="/posts/categories" element={
-                        <AdminProtectedRoute requiredPermissions={['categories:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <Categories />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/categories" element={
-                        <AdminProtectedRoute requiredPermissions={['categories:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <Categories />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/categories/new" element={
-                        <AdminProtectedRoute requiredPermissions={['categories:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CategoryEdit />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/categories/edit/:id" element={
-                        <AdminProtectedRoute requiredPermissions={['categories:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CategoryEdit />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/posts/tags" element={
-                        <AdminProtectedRoute requiredPermissions={['categories:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <Tags />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 페이지 관리 */}
-                      <Route path="/pages/*" element={
-                        <AdminProtectedRoute requiredPermissions={['pages:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <PagesRouter />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 재사용 블록 관리 */}
-                      <Route path="/reusable-blocks" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <div>Reusable Blocks - Coming Soon</div>
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 외모 관리 (WordPress Style) */}
-                      <Route path="/appearance/header-builder" element={
-                        <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <HeaderBuilder />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      <Route path="/appearance/menus/*" element={
-                        <AdminProtectedRoute requiredRoles={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <NavigationMenus />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-
-                      {/* Appearance - Template Parts */}
-                      <Route path="/appearance/template-parts" element={
-                        <AdminProtectedRoute requiredPermissions={['templates:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <TemplateParts />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/appearance/template-parts/new" element={
-                        <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <TemplatePartEditor />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/appearance/template-parts/:id/edit" element={
-                        <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <TemplatePartEditor />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Appearance Settings */}
-                      <Route path="/appearance/settings" element={
-                        <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <AppearanceSettings />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 미디어 관리 */}
-                      <Route path="/media/*" element={
-                        <AdminProtectedRoute requiredPermissions={['media:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <MediaLibrary />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* E-commerce 관리 */}
-
-
-
-                      {/* 분석 */}
-                      <Route path="/analytics/*" element={
-                        <AdminProtectedRoute requiredPermissions={['analytics:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <Analytics />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-
-                      {/* CPT Engine - New Unified Dashboard */}
-                      <Route path="/cpt-engine/*" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CPTEngine />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* CPT Presets */}
-                      <Route path="/cpt-engine/presets/forms" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <FormPresets />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/cpt-engine/presets/views" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <ViewPresets />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/cpt-engine/presets/templates" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <TemplatePresets />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* CPT/ACF Archive & Forms */}
-                      <Route path="/admin/cpt-acf/*" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CPTACFRouter />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Dropshipping Routes */}
-                      <Route path="/dropshipping/*" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <DropshippingRouter />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Admin Order Management (Phase 4) */}
-                      <Route path="/admin/orders" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <OrderListPage />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/admin/orders/:id" element={
-                        <AdminProtectedRoute requiredPermissions={['content:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <OrderDetailPage />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* CPT & ACF - Legacy Routes - Removed (replaced by CPT Engine) */}
-
-                      <Route path="/acf/*" element={
-                        <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CustomFields />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      <Route path="/acf/groups" element={
-                        <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CustomFields />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 메일 관리 */}
-                      <Route path="/mail/*" element={
-                        <AdminProtectedRoute requiredPermissions={['settings:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <EmailSettings />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Forum - App Guard 적용 */}
-                      <Route path="/forum/*" element={
-                        <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <ForumRouter />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Digital Signage - App Guard 적용 */}
-                      <Route path="/signage/*" element={
-                        <AdminProtectedRoute requiredPermissions={['signage:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <SignageRouter />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Crowdfunding - App Guard 적용 */}
-                      <Route path="/crowdfunding/*" element={
-                        <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <CrowdfundingRouter />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 도구 */}
-                      <Route path="/tools" element={
-                        <AdminProtectedRoute requiredPermissions={['tools:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <ToolsPage />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-                      <Route path="/tools/media-replace" element={
-                        <AdminProtectedRoute requiredPermissions={['tools:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <FileReplaceTools />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 설정 */}
-                      <Route path="/settings/*" element={
-                        <AdminProtectedRoute requiredPermissions={['settings:read']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <Settings />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Test routes removed for production */}
-
-                      {/* Gutenberg Editor - Using Standalone Full Screen Editor */}
-                      <Route path="/gutenberg" element={
-                        <AdminProtectedRoute requiredPermissions={['content:write']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <EditorRouteWrapper mode="post" />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* UI Showcase */}
-                      <Route path="/ui-showcase" element={
-                        <AdminProtectedRoute requiredPermissions={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <UIShowcase />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Test - Minimal Editor (inside AdminLayout, requires login) */}
-                      <Route path="/admin/test/minimal-editor" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <EditorTest />
-                        </Suspense>
-                      } />
-                      {/* Test - AI Page Generator */}
-                      <Route path="/admin/test/ai-page-generator-test" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <AIPageGeneratorTest />
-                        </Suspense>
-                      } />
-                      {/* Test - Focus Restoration */}
-                      <Route path="/admin/test/focus-restoration" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <FocusRestorationTest />
-                        </Suspense>
-                      } />
-                      {/* Test - AI Block Debug */}
-                      <Route path="/admin/test/ai-block-debug" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <AIBlockDebug />
-                        </Suspense>
-                      } />
-                      {/* Test - Seed Presets */}
-                      <Route path="/admin/test/seed-presets" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <SeedPresets />
-                        </Suspense>
-                      } />
-                      {/* Test - Preset Integration */}
-                      <Route path="/admin/test/preset-integration" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <PresetIntegrationTest />
-                        </Suspense>
-                      } />
-                      {/* Test - Delete Customizer */}
-                      <Route path="/admin/test/delete-customizer" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <DeleteCustomizerTest />
-                        </Suspense>
-                      } />
-                      {/* Test - Auth Debug */}
-                      <Route path="/admin/test/auth-debug" element={
-                        <Suspense fallback={<PageLoader />}>
-                          <AuthDebug />
-                        </Suspense>
-                      } />
-
-
-                      {/* System Monitoring */}
-                      <Route path="/monitoring" element={
-                        <AdminProtectedRoute requiredPermissions={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <IntegratedMonitoring />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      <Route path="/monitoring/performance" element={
-                        <AdminProtectedRoute requiredPermissions={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <PerformanceDashboard />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      <Route path="/monitoring/security" element={
-                        <AdminProtectedRoute requiredPermissions={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <IntegratedMonitoring />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* Phase 2.4 - Operations Dashboard */}
-                      <Route path="/admin/dashboard/operations" element={
-                        <AdminProtectedRoute requiredPermissions={['admin']}>
-                          <Suspense fallback={<PageLoader />}>
-                            <OperationsDashboard />
-                          </Suspense>
-                        </AdminProtectedRoute>
-                      } />
-
-                      {/* 404 핸들링 */}
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </AdminLayout>
-                </AdminProtectedRoute>
-              } />
-            </Routes>
-          </SessionManager>
-        </AuthProvider>
-      </ThemeProvider>
+                    {/* 404 핸들링 */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </AdminLayout>
+              </AdminProtectedRoute>
+            } />
+        </Routes>
+      </SessionManager>
+    </AuthProvider>
+    </ThemeProvider>
     </ErrorBoundary>
   );
 }

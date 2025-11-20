@@ -176,208 +176,244 @@ export default function GeneralSettings() {
               placeholder="admin@example.com"
             />
           </div>
-      </CardContent>
-    </Card>
-
-    {/* Localization */}
-    <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2">
-        <Clock className="w-5 h-5" />
-        지역화 설정
-      </CardTitle>
-      <CardDescription>
-        시간대 및 날짜/시간 형식을 설정합니다
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="timezone">시간대</Label>
-          <Select
-            value={settings.timezone}
-            onValueChange={(value: string) => handleChange('timezone', value)}
-          >
-            <SelectTrigger id="timezone">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {timezones.map((tz: any) => (
-                <SelectItem key={tz.value} value={tz.value}>
-                  {tz.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="language">언어</Label>
-          <Select
-            value={settings.language}
-            onValueChange={(value: string) => handleChange('language', value)}
-          >
-            <SelectTrigger id="language">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ko">한국어</SelectItem>
-              <SelectItem value="en">English</SelectItem>
-              <SelectItem value="ja">日本語</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="dateFormat">날짜 형식</Label>
-          <Select
-            value={settings.dateFormat}
-            onValueChange={(value: string) => handleChange('dateFormat', value)}
-          >
-            <SelectTrigger id="dateFormat">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {dateFormats.map((format: any) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="timeFormat">시간 형식</Label>
-          <Select
-            value={settings.timeFormat}
-            onValueChange={(value: string) => handleChange('timeFormat', value)}
-          >
-            <SelectTrigger id="timeFormat">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {timeFormats.map((format: any) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-
-  {/* Security & Access */ }
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2">
-        <Shield className="w-5 h-5" />
-        보안 & 접근 설정
-      </CardTitle>
-      <CardDescription>
-        사용자 등록 및 API 접근을 관리합니다
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label>회원가입 허용</Label>
-            <p className="text-sm text-gray-500">
-              새로운 사용자의 회원가입을 허용합니다
-            </p>
-          </div>
-          <Switch
-            checked={settings.allowRegistration}
-            onCheckedChange={(checked: boolean) => handleChange('allowRegistration', checked)}
-          />
-        </div>
-        <Separator />
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label>이메일 인증 필수</Label>
-            <p className="text-sm text-gray-500">
-              회원가입 시 이메일 인증을 요구합니다
-            </p>
-          </div>
-          <Switch
-            checked={settings.requireEmailVerification}
-            onCheckedChange={(checked: boolean) => handleChange('requireEmailVerification', checked)}
-          />
-        </div>
-        <Separator />
-        <div className="space-y-2">
-          <Label htmlFor="defaultRole">기본 사용자 역할</Label>
-          <Select
-            value={settings.defaultUserRole}
-            onValueChange={(value: string) => handleChange('defaultUserRole', value)}
-          >
-            <SelectTrigger id="defaultRole">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="customer">일반 회원</SelectItem>
-              <SelectItem value="business">사업자 회원</SelectItem>
-              <SelectItem value="affiliate">제휴 회원</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-
-  {/* Maintenance Mode */ }
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2">
-        <Database className="w-5 h-5" />
-        유지보수 모드
-      </CardTitle>
-      <CardDescription>
-        사이트를 일시적으로 유지보수 모드로 전환합니다
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label>유지보수 모드 활성화</Label>
-          <p className="text-sm text-gray-500">
-            관리자를 제외한 모든 사용자의 접근을 차단합니다
-          </p>
-        </div>
-        <Switch
-          checked={settings.maintenanceMode}
-          onCheckedChange={(checked: boolean) => handleChange('maintenanceMode', checked)}
-        />
-      </div>
-      {settings.maintenanceMode && (
-        <>
-          <Separator />
           <div className="space-y-2">
-            <Label htmlFor="maintenanceMessage">유지보수 메시지</Label>
-            <Textarea
-              id="maintenanceMessage"
-              name="maintenanceMessage"
-              value={settings.maintenanceMessage}
-              onChange={(e: any) => handleChange('maintenanceMessage', e.target.value)}
-              placeholder="잠시 시스템 점검 중입니다. 곧 정상 서비스하겠습니다."
-              rows={3}
+            <Label htmlFor="favicon">파비콘 URL</Label>
+            <Input
+              id="favicon"
+              name="favicon"
+              type="url"
+              value={settings.favicon}
+              onChange={(e: any) => handleChange('favicon', e.target.value)}
+              placeholder="https://example.com/favicon.ico"
+            />
+            <p className="text-xs text-gray-500">
+              사이트 파비콘 이미지 URL을 입력하세요 (.ico, .png, .svg 지원)
+            </p>
+            {settings.favicon && (
+              <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <p className="text-xs font-medium text-gray-700 mb-2">미리보기:</p>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={settings.favicon}
+                    alt="Favicon preview"
+                    className="w-8 h-8"
+                    onError={(e: any) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <span
+                    className="text-xs text-red-500 hidden"
+                    style={{ display: 'none' }}
+                  >
+                    이미지를 불러올 수 없습니다
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Localization */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            지역화 설정
+          </CardTitle>
+          <CardDescription>
+            시간대 및 날짜/시간 형식을 설정합니다
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="timezone">시간대</Label>
+              <Select
+                value={settings.timezone}
+                onValueChange={(value: string) => handleChange('timezone', value)}
+              >
+                <SelectTrigger id="timezone">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timezones.map((tz: any) => (
+                    <SelectItem key={tz.value} value={tz.value}>
+                      {tz.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="language">언어</Label>
+              <Select
+                value={settings.language}
+                onValueChange={(value: string) => handleChange('language', value)}
+              >
+                <SelectTrigger id="language">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ko">한국어</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="ja">日本語</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateFormat">날짜 형식</Label>
+              <Select
+                value={settings.dateFormat}
+                onValueChange={(value: string) => handleChange('dateFormat', value)}
+              >
+                <SelectTrigger id="dateFormat">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {dateFormats.map((format: any) => (
+                    <SelectItem key={format.value} value={format.value}>
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="timeFormat">시간 형식</Label>
+              <Select
+                value={settings.timeFormat}
+                onValueChange={(value: string) => handleChange('timeFormat', value)}
+              >
+                <SelectTrigger id="timeFormat">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeFormats.map((format: any) => (
+                    <SelectItem key={format.value} value={format.value}>
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Security & Access */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            보안 & 접근 설정
+          </CardTitle>
+          <CardDescription>
+            사용자 등록 및 API 접근을 관리합니다
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>회원가입 허용</Label>
+                <p className="text-sm text-gray-500">
+                  새로운 사용자의 회원가입을 허용합니다
+                </p>
+              </div>
+              <Switch
+                checked={settings.allowRegistration}
+                onCheckedChange={(checked: boolean) => handleChange('allowRegistration', checked)}
+              />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>이메일 인증 필수</Label>
+                <p className="text-sm text-gray-500">
+                  회원가입 시 이메일 인증을 요구합니다
+                </p>
+              </div>
+              <Switch
+                checked={settings.requireEmailVerification}
+                onCheckedChange={(checked: boolean) => handleChange('requireEmailVerification', checked)}
+              />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Label htmlFor="defaultRole">기본 사용자 역할</Label>
+              <Select
+                value={settings.defaultUserRole}
+                onValueChange={(value: string) => handleChange('defaultUserRole', value)}
+              >
+                <SelectTrigger id="defaultRole">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="customer">일반 회원</SelectItem>
+                  <SelectItem value="business">사업자 회원</SelectItem>
+                  <SelectItem value="affiliate">제휴 회원</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Maintenance Mode */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="w-5 h-5" />
+            유지보수 모드
+          </CardTitle>
+          <CardDescription>
+            사이트를 일시적으로 유지보수 모드로 전환합니다
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>유지보수 모드 활성화</Label>
+              <p className="text-sm text-gray-500">
+                관리자를 제외한 모든 사용자의 접근을 차단합니다
+              </p>
+            </div>
+            <Switch
+              checked={settings.maintenanceMode}
+              onCheckedChange={(checked: boolean) => handleChange('maintenanceMode', checked)}
             />
           </div>
-        </>
-      )}
-    </CardContent>
-  </Card>
+          {settings.maintenanceMode && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <Label htmlFor="maintenanceMessage">유지보수 메시지</Label>
+                <Textarea
+                  id="maintenanceMessage"
+                  name="maintenanceMessage"
+                  value={settings.maintenanceMessage}
+                  onChange={(e: any) => handleChange('maintenanceMessage', e.target.value)}
+                  placeholder="잠시 시스템 점검 중입니다. 곧 정상 서비스하겠습니다."
+                  rows={3}
+                />
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
-  {/* Save Button */ }
-  <div className="flex justify-end">
-    <Button
-      onClick={handleSave}
-      disabled={saveMutation.isPending}
-    >
-      <Save className="w-4 h-4 mr-2" />
-      {saveMutation.isPending ? '저장 중...' : '설정 저장'}
-    </Button>
-  </div>
-    </div >
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleSave}
+          disabled={saveMutation.isPending}
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {saveMutation.isPending ? '저장 중...' : '설정 저장'}
+        </Button>
+      </div>
+    </div>
   );
 }
