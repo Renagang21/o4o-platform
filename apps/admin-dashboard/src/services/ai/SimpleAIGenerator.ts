@@ -453,6 +453,7 @@ ${templateGuidelines}`;
 - o4o/spacer (50-80px) - 섹션 구분
 - 주요 기능/장점 3개 (단락 또는 리스트)
 - o4o/spacer (50-80px) - 섹션 구분
+- **프로세스가 있다면 o4o/timeline-chart 사용** (단계별 과정 시각화)
 - CTA 버튼
 - 이미지는 alt 텍스트만 (url은 빈 문자열)`,
 
@@ -462,6 +463,7 @@ ${templateGuidelines}`;
 - o4o/spacer (60px) - 섹션 구분
 - 핵심 가치 3-4개 (리스트 사용)
 - o4o/spacer (60px) - 섹션 구분
+- **회사 연혁이 있다면 o4o/timeline-chart 사용** (시간 순서대로)
 - 팀 소개 섹션
 - 연락처 정보`,
 
@@ -472,6 +474,7 @@ ${templateGuidelines}`;
 - o4o/spacer (50px) - 섹션 구분
 - 제품 장점 3-5개
 - o4o/spacer (50px) - 섹션 구분
+- **사용 방법/프로세스가 있다면 o4o/timeline-chart 사용** (단계별 설명)
 - 사용법/활용 사례
 - 가격 정보 (PricingTable이 없으면 placeholder 사용)
 - o4o/spacer (50px) - 섹션 구분

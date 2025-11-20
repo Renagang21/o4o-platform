@@ -28,6 +28,7 @@ import { ButtonsBlock } from './layout/ButtonsBlock';
 import { SeparatorBlock } from './layout/SeparatorBlock';
 import { SpacerBlock } from './layout/SpacerBlock';
 import { TableBlock } from './layout/TableBlock';
+import { TimelineChartBlock } from './layout/TimelineChartBlock';
 
 // Special blocks
 import { MarkdownBlock } from './special/MarkdownBlock';
@@ -125,6 +126,9 @@ export function registerAllBlocks() {
     'core/table': TableBlock,
     'o4o/table': TableBlock,
 
+    'timeline-chart': TimelineChartBlock,
+    'o4o/timeline-chart': TimelineChartBlock,
+
     // Special blocks
     'markdown': MarkdownBlock,
     'o4o/markdown': MarkdownBlock,
@@ -191,6 +195,7 @@ export * from './layout/ButtonsBlock';
 export * from './layout/SeparatorBlock';
 export * from './layout/SpacerBlock';
 export * from './layout/TableBlock';
+export * from './layout/TimelineChartBlock';
 
 export * from './special/MarkdownBlock';
 export * from './special/HtmlBlock';
