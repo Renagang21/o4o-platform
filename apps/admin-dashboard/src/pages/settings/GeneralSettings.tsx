@@ -102,7 +102,14 @@ export default function GeneralSettings() {
       const response = await authClient.api.get('/settings/general');
       const data = response.data.data;
       if (data) {
-        setSettings(data);
+        setSettings((prev) => ({
+          ...prev,  // 기본값 유지
+          ...data,  // 서버 데이터로 덮어쓰기
+          // 색상 값이 없으면 기본값 유지 (빈 문자열 방지)
+          primaryColor: data.primaryColor || prev.primaryColor,
+          secondaryColor: data.secondaryColor || prev.secondaryColor,
+          accentColor: data.accentColor || prev.accentColor,
+        }));
       }
       return data;
     }
