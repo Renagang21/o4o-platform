@@ -1,15 +1,17 @@
 /**
  * NewBlockRequestPanel Component
  * Phase 1-C: Display AI-requested new blocks
+ * Phase 2-A: Enabled block generation buttons
  * Shows list of new_blocks_request from AI generation results
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, Package, ArrowRight } from 'lucide-react';
+import { AlertCircle, Package, ArrowRight, Loader2 } from 'lucide-react';
 import { NewBlockRequest } from '@/services/ai/types';
 import { cn } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 interface NewBlockRequestPanelProps {
   /** List of new block requests from AI */
@@ -20,6 +22,8 @@ interface NewBlockRequestPanelProps {
   variant?: 'sidebar' | 'bottom';
   /** Custom class name */
   className?: string;
+  /** Phase 2-A: Callback when block generation is requested */
+  onGenerateBlock?: (spec: NewBlockRequest) => Promise<void>;
 }
 
 /**
@@ -31,7 +35,11 @@ export const NewBlockRequestPanel: React.FC<NewBlockRequestPanelProps> = ({
   onScrollToPlaceholder,
   variant = 'sidebar',
   className,
+  onGenerateBlock,
 }) => {
+  // Phase 2-A: Track generating states for each request
+  const [generatingStates, setGeneratingStates] = useState<Record<string, boolean>>({});
+
   // If no requests, show empty state
   if (newBlocksRequest.length === 0) {
     return null;
@@ -51,6 +59,30 @@ export const NewBlockRequestPanel: React.FC<NewBlockRequestPanelProps> = ({
           element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
         }, 2000);
       }
+    }
+  };
+
+  // Phase 2-A: Handle block generation
+  const handleGenerateBlock = async (spec: NewBlockRequest) => {
+    if (!onGenerateBlock) {
+      toast.error('블록 생성 기능이 활성화되지 않았습니다');
+      return;
+    }
+
+    const key = spec.placeholderId || spec.componentName;
+    setGeneratingStates(prev => ({ ...prev, [key]: true }));
+    const loadingToast = toast.loading(`${spec.componentName} 블록 생성 중...`);
+
+    try {
+      await onGenerateBlock(spec);
+
+      toast.dismiss(loadingToast);
+      toast.success(`${spec.componentName} 블록이 생성되었습니다!`);
+    } catch (error: any) {
+      toast.dismiss(loadingToast);
+      toast.error(error.message || '블록 생성 중 오류가 발생했습니다');
+    } finally {
+      setGeneratingStates(prev => ({ ...prev, [key]: false }));
     }
   };
 
@@ -138,17 +170,30 @@ export const NewBlockRequestPanel: React.FC<NewBlockRequestPanelProps> = ({
                 </div>
               )}
 
-              {/* Phase 2 준비: 블록 생성 버튼 (UI만 존재, 동작 없음) */}
+              {/* Phase 2-A: 블록 생성 버튼 (활성화됨) */}
               <div className="mt-3 pt-2 border-t border-gray-200">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full text-xs"
-                  disabled
-                  title="Phase 2에서 구현 예정"
+                  className={cn(
+                    "w-full text-xs",
+                    onGenerateBlock && "hover:bg-blue-500 hover:text-white hover:border-blue-500"
+                  )}
+                  disabled={!onGenerateBlock || generatingStates[request.placeholderId || request.componentName]}
+                  onClick={() => handleGenerateBlock(request)}
+                  title={onGenerateBlock ? "AI가 이 블록을 자동 생성합니다" : "에디터에서 활성화 필요"}
                 >
-                  <Package className="w-3 h-3 mr-2" />
-                  블록 생성하기 (준비 중)
+                  {generatingStates[request.placeholderId || request.componentName] ? (
+                    <>
+                      <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                      생성 중...
+                    </>
+                  ) : (
+                    <>
+                      <Package className="w-3 h-3 mr-2" />
+                      블록 생성하기
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

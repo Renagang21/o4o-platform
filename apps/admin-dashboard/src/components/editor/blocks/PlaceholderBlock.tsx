@@ -1,13 +1,17 @@
 /**
  * PlaceholderBlock Component
  * Phase 1-C: Placeholder block for missing/requested components
+ * Phase 2-A: Enabled block generation button
  * Displays a visual placeholder when AI requests a component that doesn't exist yet
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { AlertCircle, Package } from 'lucide-react';
+import { AlertCircle, Package, Loader2 } from 'lucide-react';
+import { blockCodeGenerator } from '@/services/ai/BlockCodeGenerator';
+import { NewBlockRequest } from '@/services/ai/types';
+import toast from 'react-hot-toast';
 
 interface PlaceholderBlockProps {
   id: string;
@@ -37,6 +41,8 @@ interface PlaceholderBlockProps {
   onCopy?: () => void;
   onPaste?: () => void;
   onChangeType?: (newType: string) => void;
+  // Phase 2-A: Block generation callback
+  onGenerateBlock?: (blockId: string, spec: NewBlockRequest) => Promise<void>;
 }
 
 /**
@@ -63,6 +69,7 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
   onCopy,
   onPaste,
   onChangeType,
+  onGenerateBlock,
 }) => {
   const {
     componentName = 'Unknown Component',
@@ -71,6 +78,45 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
     style = '',
     placeholderId = '',
   } = attributes;
+
+  // Phase 2-A: Block generation state
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Phase 2-A: Handle block generation
+  const handleGenerate = async () => {
+    if (!onGenerateBlock) {
+      toast.error('블록 생성 기능이 활성화되지 않았습니다');
+      return;
+    }
+
+    setIsGenerating(true);
+    const loadingToast = toast.loading(`${componentName} 블록 생성 중...`);
+
+    try {
+      // Create spec from attributes
+      const spec: NewBlockRequest = {
+        placeholderId,
+        componentName,
+        reason,
+        spec: {
+          props,
+          style,
+          category: 'widgets',
+        },
+      };
+
+      // Call the generation callback
+      await onGenerateBlock(id, spec);
+
+      toast.dismiss(loadingToast);
+      toast.success(`${componentName} 블록이 생성되었습니다!`);
+    } catch (error: any) {
+      toast.dismiss(loadingToast);
+      toast.error(error.message || '블록 생성 중 오류가 발생했습니다');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <EnhancedBlockWrapper
@@ -146,15 +192,30 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
           )}
         </div>
 
-        {/* Phase 2 준비: 블록 생성 버튼 (UI만 존재, 동작 없음) */}
+        {/* Phase 2-A: 블록 생성 버튼 (활성화됨) */}
         <div className="mt-4 pt-3 border-t border-gray-300">
           <button
-            className="w-full px-4 py-2 bg-gray-200 text-gray-500 text-sm font-medium rounded cursor-not-allowed"
-            disabled
-            title="Phase 2에서 구현 예정"
+            onClick={handleGenerate}
+            disabled={isGenerating || !onGenerateBlock}
+            className={cn(
+              "w-full px-4 py-2 text-sm font-medium rounded transition-colors",
+              isGenerating || !onGenerateBlock
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            )}
+            title={onGenerateBlock ? "AI가 이 블록을 자동 생성합니다" : "에디터에서 활성화 필요"}
           >
-            <Package className="w-4 h-4 inline mr-2" />
-            블록 생성하기 (준비 중)
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 inline mr-2 animate-spin" />
+                생성 중...
+              </>
+            ) : (
+              <>
+                <Package className="w-4 h-4 inline mr-2" />
+                블록 생성하기
+              </>
+            )}
           </button>
         </div>
 

@@ -17,6 +17,11 @@ import {
 // Phase 1-C: New Block Request Panel
 import { NewBlockRequestPanel } from '@/components/editor/NewBlockRequestPanel';
 import { NewBlockRequest } from '@/services/ai/types';
+// Phase 2-A: Runtime Block Generation
+import { blockCodeGenerator } from '@/services/ai/BlockCodeGenerator';
+import { compileComponent } from '@/blocks/runtime/runtime-code-loader';
+import { runtimeBlockRegistry } from '@/blocks/runtime/runtime-block-registry';
+import { BlockDefinition } from '@/blocks/registry/types';
 import toast from 'react-hot-toast';
 import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
@@ -583,6 +588,78 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     await handleSave(true);
   };
 
+  // Phase 2-A: Handle block generation from placeholder
+  const handleGenerateBlock = async (spec: NewBlockRequest) => {
+    try {
+      console.log('🚀 Generating block from spec:', spec);
+
+      // Step 1: Generate code using AI
+      const generatedCode = await blockCodeGenerator.generate(spec);
+
+      // Step 2: Compile the component
+      const compileResult = compileComponent(generatedCode.componentCode);
+
+      if (!compileResult.success || !compileResult.component) {
+        throw new Error(compileResult.error || 'Failed to compile component');
+      }
+
+      // Step 3: Create block definition
+      const blockDefinition: BlockDefinition = {
+        name: generatedCode.blockName,
+        title: spec.componentName,
+        category: spec.spec.category || 'widgets',
+        icon: 'Package', // AI-generated blocks use Package icon
+        description: spec.reason,
+        component: compileResult.component,
+        attributes: (spec.spec.props || []).reduce((acc, prop) => {
+          acc[prop] = { type: 'string', default: '' };
+          return acc;
+        }, {} as any),
+      };
+
+      // Step 4: Register in runtime registry
+      runtimeBlockRegistry.registerRuntimeBlock(
+        blockDefinition,
+        compileResult.component,
+        {
+          componentName: spec.componentName,
+          reason: spec.reason,
+          props: spec.spec.props,
+          style: spec.spec.style,
+          category: spec.spec.category,
+        }
+      );
+
+      // Step 5: Replace placeholder with new block
+      if (spec.placeholderId) {
+        const newBlocks = blocks.map(block => {
+          if (block.type === 'o4o/placeholder' &&
+              block.attributes?.placeholderId === spec.placeholderId) {
+            return {
+              ...block,
+              type: generatedCode.blockName,
+              attributes: {},
+            };
+          }
+          return block;
+        });
+        setBlocks(newBlocks);
+        blocksRef.current = newBlocks;
+        setIsDirty(true);
+      }
+
+      // Step 6: Remove from newBlocksRequest list
+      setNewBlocksRequest(prev =>
+        prev.filter(req => req.placeholderId !== spec.placeholderId)
+      );
+
+      toast.success(`${spec.componentName} 블록이 생성되고 등록되었습니다!`);
+    } catch (error: any) {
+      toast.error(error.message || '블록 생성 중 오류가 발생했습니다');
+      throw error;
+    }
+  };
+
   const handlePreview = async () => {
     let postIdToPreview = currentPostId;
     
@@ -845,6 +922,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 }, 2000);
               }
             }}
+            onGenerateBlock={handleGenerateBlock}
           />
         </div>
       )}
