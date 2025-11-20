@@ -34,6 +34,7 @@ import conditionalBlockDefinition from './definitions/conditional';
 import socialBlockDefinition from './definitions/social';
 import shortcodeBlockDefinition from './definitions/shortcode';
 import placeholderBlockDefinition from './definitions/placeholder';
+import { timelineChartBlockDefinition } from './generated/TimelineChart.definition.tsx';
 
 // Embed blocks
 import youtubeBlockDefinition from './definitions/youtube';
@@ -81,6 +82,7 @@ export function registerAllBlocks(): void {
   blockRegistry.register(socialBlockDefinition);
   blockRegistry.register(shortcodeBlockDefinition);
   blockRegistry.register(placeholderBlockDefinition); // Phase 1-C: Placeholder for missing components
+  blockRegistry.register(timelineChartBlockDefinition);
 
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);
