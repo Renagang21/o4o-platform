@@ -590,6 +590,15 @@ class AIProxyService {
           // Ignore file write errors - not critical for AI generation
           logger.warn('Failed to save debug file', { requestId, error: debugError.message });
         }
+      } else if (parsed.layout?.blocks && Array.isArray(parsed.layout.blocks)) {
+        // Case 1-B: {layout: {blocks: [...]}} 형식 (Gemini 2.5+ 응답)
+        normalizedResult = { blocks: parsed.layout.blocks };
+
+        logger.info('Gemini AI response with layout wrapper', {
+          requestId,
+          totalBlocks: parsed.layout.blocks.length,
+          firstBlockType: parsed.layout.blocks[0]?.type,
+        });
       } else if (Array.isArray(parsed)) {
         // Case 2: [...] 형식 (배열을 blocks로 감싸기)
         normalizedResult = { blocks: parsed };
