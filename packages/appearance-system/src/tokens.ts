@@ -196,10 +196,78 @@ export const defaultTokens: DesignTokens = {
  * @returns CSS variables string
  */
 export function generateCSSVariables(tokens: DesignTokens): string {
-  // TODO: Phase 2 - Implement CSS variable generation
-  // This will replace generateButtonCSS, generateBreadcrumbCSS, etc.
   return `
-    /* O4O Design Tokens */
-    /* TODO: Generate from tokens object */
+:root {
+  /* Color Tokens */
+  --o4o-color-primary: ${tokens.colors.primary};
+  --o4o-color-primary-hover: ${tokens.colors.primaryHover};
+  --o4o-color-primary-active: ${tokens.colors.primaryActive};
+  --o4o-color-primary-soft: ${tokens.colors.primarySoft};
+
+  --o4o-color-background: ${tokens.colors.background};
+  --o4o-color-surface: ${tokens.colors.surface};
+  --o4o-color-surface-muted: ${tokens.colors.surfaceMuted};
+  --o4o-color-border-subtle: ${tokens.colors.borderSubtle};
+  --o4o-color-text-primary: ${tokens.colors.textPrimary};
+  --o4o-color-text-muted: ${tokens.colors.textMuted};
+
+  --o4o-color-button-bg: ${tokens.colors.buttonBg};
+  --o4o-color-button-text: ${tokens.colors.buttonText};
+  --o4o-color-button-border: ${tokens.colors.buttonBorder};
+
+  --o4o-color-breadcrumb-text: ${tokens.colors.breadcrumbText};
+  --o4o-color-breadcrumb-link: ${tokens.colors.breadcrumbLink};
+  --o4o-color-breadcrumb-separator: ${tokens.colors.breadcrumbSeparator};
+
+  /* Spacing Tokens */
+  --o4o-spacing-xs: ${tokens.spacing.xs};
+  --o4o-spacing-sm: ${tokens.spacing.sm};
+  --o4o-spacing-md: ${tokens.spacing.md};
+  --o4o-spacing-lg: ${tokens.spacing.lg};
+  --o4o-spacing-xl: ${tokens.spacing.xl};
+  --o4o-spacing-section-y: ${tokens.spacing.sectionY}px;
+  --o4o-spacing-block-gap: ${tokens.spacing.blockGap}px;
+  --o4o-spacing-grid-gap: ${tokens.spacing.gridGap}px;
+
+  /* Border Radius Tokens */
+  --o4o-radius-sm: ${tokens.radius.sm};
+  --o4o-radius-md: ${tokens.radius.md};
+  --o4o-radius-lg: ${tokens.radius.lg};
+
+  /* Typography Tokens */
+  --o4o-font-family-heading: ${tokens.typography.fontFamilyHeading};
+  --o4o-font-family-body: ${tokens.typography.fontFamilyBody};
+  --o4o-font-family: ${tokens.typography.fontFamily};
+  --o4o-font-size-base: ${tokens.typography.fontSizeBase};
+  --o4o-line-height-base: ${tokens.typography.lineHeightBase};
+
+  --o4o-font-size-sm: ${tokens.typography.fontSize.sm};
+  --o4o-font-size-md: ${tokens.typography.fontSize.md};
+  --o4o-font-size-lg: ${tokens.typography.fontSize.lg};
+
+  --o4o-font-weight-normal: ${tokens.typography.fontWeight.normal};
+  --o4o-font-weight-medium: ${tokens.typography.fontWeight.medium};
+  --o4o-font-weight-bold: ${tokens.typography.fontWeight.bold};
+
+  --o4o-line-height-tight: ${tokens.typography.lineHeight.tight};
+  --o4o-line-height-normal: ${tokens.typography.lineHeight.normal};
+  --o4o-line-height-relaxed: ${tokens.typography.lineHeight.relaxed};
+}
+
+/* Apply design tokens to body */
+body {
+  font-family: var(--o4o-font-family-body);
+  font-size: var(--o4o-font-size-base);
+  line-height: var(--o4o-line-height-base);
+  color: var(--o4o-color-text-primary);
+  background-color: var(--o4o-color-background);
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--o4o-font-family-heading);
+  font-weight: var(--o4o-font-weight-bold);
+  color: var(--o4o-color-text-primary);
+}
   `.trim();
 }

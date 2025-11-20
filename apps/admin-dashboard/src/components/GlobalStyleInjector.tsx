@@ -6,8 +6,9 @@
 
 import { useEffect } from 'react';
 import { useCustomizerSettings } from '../hooks/useCustomizerSettings';
+import { useThemeSettings } from '../hooks/useThemeSettings';
 import {
-  defaultTokens,
+  generateCSSVariables,
   generateButtonCSS,
   generateBreadcrumbCSS,
   generateScrollToTopCSS,
@@ -16,26 +17,31 @@ import {
 } from '@o4o/appearance-system';
 
 export function GlobalStyleInjector() {
-  const { settings, isLoading } = useCustomizerSettings();
+  const { settings, isLoading: customizerLoading } = useCustomizerSettings();
+  const { designTokens, isLoading: themeLoading } = useThemeSettings();
 
   useEffect(() => {
-    // Wait for settings to load
-    if (isLoading || !settings) {
+    // Wait for all settings to load
+    if (customizerLoading || themeLoading || !settings) {
       return;
     }
 
     try {
-      // Generate core component CSS using appearance-system
+      // 1. Inject CSS Variables (Design Tokens) first
+      const cssVariables = generateCSSVariables(designTokens);
+      injectCSS(cssVariables, 'o4o-css-variables');
+
+      // 2. Generate core component CSS using loaded design tokens
       const coreCSS = [
-        generateButtonCSS(defaultTokens),
-        generateBreadcrumbCSS(defaultTokens),
-        generateScrollToTopCSS(defaultTokens),
+        generateButtonCSS(designTokens),
+        generateBreadcrumbCSS(designTokens),
+        generateScrollToTopCSS(designTokens),
       ].join('\n\n');
 
       // Inject core CSS
       injectCSS(coreCSS, STYLE_IDS.APPEARANCE_SYSTEM);
 
-      // Inject Custom CSS if exists
+      // 3. Inject Custom CSS if exists
       if (settings.customCSS) {
         let customStyleEl = document.getElementById('custom-css') as HTMLStyleElement;
         if (!customStyleEl) {
@@ -50,7 +56,7 @@ export function GlobalStyleInjector() {
     } catch (error) {
       console.error('[GlobalStyleInjector] Failed to inject CSS:', error);
     }
-  }, [settings, isLoading]);
+  }, [settings, customizerLoading, themeLoading, designTokens]);
 
   // This component doesn't render anything
   return null;
