@@ -46,7 +46,7 @@ import { EditorContext, AIAction } from '@/services/ai/ConversationalAI';
 import { NewBlockRequestPanel } from './NewBlockRequestPanel';
 import { NewBlockRequest } from '@/services/ai/types';
 // Phase 2-A: Runtime Block Generation
-import { blockCodeGenerator } from '@/services/ai/BlockCodeGenerator';
+import { blockCodeGenerator, BlockGenerationError, BlockGenerationErrorType } from '@/services/ai/BlockCodeGenerator';
 import { compileComponent } from '@/blocks/runtime/runtime-code-loader';
 import { runtimeBlockRegistry } from '@/blocks/runtime/runtime-block-registry';
 import { BlockDefinition } from '@/blocks/registry/types';
@@ -522,17 +522,50 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Phase 2-A: Handle block generation from NewBlockRequest
   const handleGenerateBlock = useCallback(async (spec: NewBlockRequest) => {
+    let usedFallback = false;
+    let generatedCode;
+
     try {
       devLog('🚀 Generating block from spec:', spec);
 
       // Step 1: Generate code using AI
-      const generatedCode = await blockCodeGenerator.generate(spec);
+      try {
+        generatedCode = await blockCodeGenerator.generate(spec);
+      } catch (genError: any) {
+        // Phase 1-D: Handle categorized errors
+        if (genError instanceof BlockGenerationError) {
+          // Show detailed error toast with type
+          const errorMsg = `${genError.type}: ${genError.message}`;
+          showToast(errorMsg, 'error');
+
+          // If fallback code is attached, use it
+          if (genError.fallbackCode) {
+            usedFallback = true;
+            generatedCode = genError.fallbackCode;
+            // Show fallback warning
+            setTimeout(() => {
+              showToast('⚠️ Fallback 컴포넌트가 사용되었습니다', 'warning');
+            }, 500);
+          } else {
+            throw genError;
+          }
+        } else {
+          throw genError;
+        }
+      }
 
       // Step 2: Compile the component
       const compileResult = compileComponent(generatedCode.componentCode);
 
       if (!compileResult.success || !compileResult.component) {
-        throw new Error(compileResult.error || 'Failed to compile component');
+        // Phase 1-D: Compilation error
+        const compileError = new BlockGenerationError(
+          BlockGenerationErrorType.COMPILATION_ERROR,
+          'Failed to compile component',
+          compileResult.error
+        );
+        showToast(`${compileError.type}: ${compileError.message}`, 'error');
+        throw compileError;
       }
 
       // Step 3: Create block definition
@@ -578,6 +611,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 aiComponentName: spec.componentName,
                 aiGeneratedAt: new Date().toISOString(),
                 aiReason: spec.reason,
+                isFallback: usedFallback,
               },
             };
           }
@@ -591,11 +625,24 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         prev.filter(req => req.placeholderId !== spec.placeholderId)
       );
 
-      showToast(`${spec.componentName} 블록이 생성되고 등록되었습니다!`, 'success');
+      // Phase 1-D: Success message with fallback indicator
+      if (usedFallback) {
+        showToast(`${spec.componentName} 블록이 Fallback으로 생성되었습니다`, 'warning');
+      } else {
+        showToast(`${spec.componentName} 블록이 생성되고 등록되었습니다!`, 'success');
+      }
+
       devLog('✅ Block generation complete:', generatedCode.blockName);
     } catch (error: any) {
       devError('❌ Block generation failed:', error);
-      showToast(error.message || '블록 생성 중 오류가 발생했습니다', 'error');
+
+      // Phase 1-D: Enhanced error message
+      if (error instanceof BlockGenerationError) {
+        showToast(`${error.type}: ${error.message}`, 'error');
+      } else {
+        showToast(error.message || '블록 생성 중 오류가 발생했습니다', 'error');
+      }
+
       throw error;
     }
   }, [blocks, updateBlocks, showToast]);

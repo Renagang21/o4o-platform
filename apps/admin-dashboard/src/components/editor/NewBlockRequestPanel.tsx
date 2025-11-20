@@ -14,7 +14,7 @@ import { AlertCircle, Package, ArrowRight, Loader2, Save, HardDrive, ChevronDown
 import { NewBlockRequest } from '@/services/ai/types';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { blockCodeGenerator } from '@/services/ai/BlockCodeGenerator';
+import { blockCodeGenerator, BlockGenerationError } from '@/services/ai/BlockCodeGenerator';
 
 interface NewBlockRequestPanelProps {
   /** List of new block requests from AI */
@@ -146,7 +146,12 @@ export const NewBlockRequestPanel: React.FC<NewBlockRequestPanelProps> = ({
       toast.success(`${spec.componentName} 블록이 생성되었습니다!`);
     } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error(error.message || '블록 생성 중 오류가 발생했습니다');
+      // Phase 1-D: Enhanced error message with type
+      if (error instanceof BlockGenerationError) {
+        toast.error(`${error.type}: ${error.message}`);
+      } else {
+        toast.error(error.message || '블록 생성 중 오류가 발생했습니다');
+      }
     } finally {
       setGeneratingStates(prev => ({ ...prev, [key]: false }));
     }

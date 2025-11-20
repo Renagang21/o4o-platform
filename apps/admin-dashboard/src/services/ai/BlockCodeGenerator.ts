@@ -1,6 +1,7 @@
 /**
  * Block Code Generator
  * Phase 2-A: AI-powered block code generation
+ * Phase 1-D: Enhanced error handling with error types
  *
  * This service generates React block components from specifications
  * using AI (Gemini/GPT/Claude).
@@ -11,6 +12,32 @@ import { NewBlockRequest } from './types';
 import { devLog, devError } from '@/utils/logger';
 
 /**
+ * Phase 1-D: Error types for better user feedback
+ */
+export enum BlockGenerationErrorType {
+  NETWORK_ERROR = 'Network Error',
+  AI_EMPTY_RESPONSE = 'AI Empty Response',
+  SYNTAX_ERROR = 'Syntax Error',
+  COMPILATION_ERROR = 'Compilation Error',
+  PARSE_ERROR = 'Parse Error',
+  UNKNOWN_ERROR = 'Unknown Error',
+}
+
+/**
+ * Phase 1-D: Custom error with type
+ */
+export class BlockGenerationError extends Error {
+  constructor(
+    public type: BlockGenerationErrorType,
+    message: string,
+    public details?: string
+  ) {
+    super(message);
+    this.name = 'BlockGenerationError';
+  }
+}
+
+/**
  * Generated block code result
  */
 export interface GeneratedBlockCode {
@@ -18,6 +45,7 @@ export interface GeneratedBlockCode {
   definitionCode: string;
   componentName: string;
   blockName: string; // o4o/component-name
+  isFallback?: boolean; // Phase 1-D: Flag for fallback code
 }
 
 /**
@@ -56,23 +84,58 @@ class BlockCodeGenerator {
       const userPrompt = this.buildUserPrompt(spec);
 
       // Call AI via server proxy
-      const response = await authClient.api.post('/ai/generate', {
-        provider,
-        model,
-        systemPrompt,
-        userPrompt,
-        temperature: 0.3, // Lower temperature for code generation
-        maxTokens: 4096,
-      });
+      let response;
+      try {
+        response = await authClient.api.post('/ai/generate', {
+          provider,
+          model,
+          systemPrompt,
+          userPrompt,
+          temperature: 0.3, // Lower temperature for code generation
+          maxTokens: 4096,
+        });
+      } catch (networkError: any) {
+        // Phase 1-D: Network error categorization
+        throw new BlockGenerationError(
+          BlockGenerationErrorType.NETWORK_ERROR,
+          'Failed to connect to AI service',
+          networkError.message
+        );
+      }
 
       const data = response.data;
 
       if (!data.success) {
-        throw new Error(data.error || 'AI generation failed');
+        // Phase 1-D: AI service error
+        throw new BlockGenerationError(
+          BlockGenerationErrorType.AI_EMPTY_RESPONSE,
+          data.error || 'AI generation failed',
+          'The AI service returned an error'
+        );
+      }
+
+      // Check if AI returned empty response
+      if (!data.result || !data.result.blocks) {
+        // Phase 1-D: Empty response
+        throw new BlockGenerationError(
+          BlockGenerationErrorType.AI_EMPTY_RESPONSE,
+          'AI returned empty response',
+          'The AI did not generate any blocks'
+        );
       }
 
       // Parse AI response
-      const result = this.parseAIResponse(data.result.blocks, spec);
+      let result;
+      try {
+        result = this.parseAIResponse(data.result.blocks, spec);
+      } catch (parseError: any) {
+        // Phase 1-D: Parse error categorization
+        throw new BlockGenerationError(
+          BlockGenerationErrorType.PARSE_ERROR,
+          'Failed to parse AI response',
+          parseError.message
+        );
+      }
 
       devLog('✅ Block code generated successfully:', result.componentName);
 
@@ -80,8 +143,23 @@ class BlockCodeGenerator {
     } catch (error: any) {
       devError('❌ Block code generation failed:', error);
 
-      // Return fallback code on error
-      return this.getFallbackCode(spec);
+      // Phase 1-D: Categorize unknown errors
+      if (!(error instanceof BlockGenerationError)) {
+        error = new BlockGenerationError(
+          BlockGenerationErrorType.UNKNOWN_ERROR,
+          error.message || 'Unknown error occurred',
+          error.stack
+        );
+      }
+
+      // Phase 1-D: Return fallback code with error attached
+      const fallback = this.getFallbackCode(spec);
+      fallback.isFallback = true;
+
+      // Re-throw error with fallback code attached
+      const errorWithFallback: any = error;
+      errorWithFallback.fallbackCode = fallback;
+      throw errorWithFallback;
     }
   }
 
