@@ -29,6 +29,8 @@ import columnsBlockDefinition from './definitions/columns';
 import columnBlockDefinition from './definitions/column';
 import groupBlockDefinition from './definitions/group';
 import conditionalBlockDefinition from './definitions/conditional';
+import spacerBlockDefinition from './definitions/spacer';
+import separatorBlockDefinition from './definitions/separator';
 
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
@@ -77,6 +79,8 @@ export function registerAllBlocks(): void {
   blockRegistry.register(columnBlockDefinition);
   blockRegistry.register(groupBlockDefinition);
   blockRegistry.register(conditionalBlockDefinition);
+  blockRegistry.register(spacerBlockDefinition);
+  blockRegistry.register(separatorBlockDefinition);
 
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
