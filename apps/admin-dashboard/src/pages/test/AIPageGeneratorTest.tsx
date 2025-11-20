@@ -3,16 +3,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SimpleAIModal } from '@/components/ai/SimpleAIModal';
 import { Sparkles } from 'lucide-react';
-import type { Block } from '@/services/ai/SimpleAIGenerator';
+import type { Block, GenerateResult } from '@/services/ai/SimpleAIGenerator';
 
 export default function AIPageGeneratorTest() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [generatedBlocks, setGeneratedBlocks] = useState<Block[]>([]);
   const [testResult, setTestResult] = useState<string>('');
 
-  const handleAIGenerate = (blocks: Block[]) => {
-    setGeneratedBlocks(blocks);
-    setTestResult(`✅ 성공: ${blocks.length}개 블록 생성됨`);
+  const handleAIGenerate = (result: GenerateResult) => {
+    setGeneratedBlocks(result.blocks);
+    const message = result.newBlocksRequest && result.newBlocksRequest.length > 0
+      ? `✅ 성공: ${result.blocks.length}개 블록 생성됨 (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`
+      : `✅ 성공: ${result.blocks.length}개 블록 생성됨`;
+    setTestResult(message);
   };
 
   return (

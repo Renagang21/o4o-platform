@@ -791,12 +791,22 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           // Clear backup on close
           setBlocksBackup([]);
         }}
-        onGenerate={(generatedBlocks) => {
-          // Replace existing blocks with AI generated blocks (or merge if preferred)
-          setBlocks(generatedBlocks);
-          blocksRef.current = generatedBlocks;
+        onGenerate={(result) => {
+          // Phase 1-A: Handle GenerateResult (v1/v2 compatible)
+          setBlocks(result.blocks);
+          blocksRef.current = result.blocks;
           setIsDirty(true);
-          toast.success(isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!');
+
+          // Show notification about new block requests if any
+          if (result.newBlocksRequest && result.newBlocksRequest.length > 0) {
+            console.log('🔔 새로운 블록 요청:', result.newBlocksRequest);
+            toast.success(
+              `${isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!'} (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`,
+              { duration: 6000 }
+            );
+          } else {
+            toast.success(isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!');
+          }
         }}
         onBackup={() => {
           // Backup current blocks before AI generation

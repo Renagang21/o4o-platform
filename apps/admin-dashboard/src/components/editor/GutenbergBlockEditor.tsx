@@ -1134,11 +1134,23 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       <SimpleAIModal
         isOpen={isAIGeneratorOpen}
         onClose={() => setIsAIGeneratorOpen(false)}
-        onGenerate={(generatedBlocks) => {
-          // Replace existing blocks with AI generated blocks
-          // No conversion needed - use blocks as-is from SimpleAIGenerator
-          updateBlocks(generatedBlocks);
-          showToast('AI 페이지가 생성되었습니다!', 'success');
+        onGenerate={(result) => {
+          // Phase 1-A: GenerateResult 처리 (v1/v2 호환)
+          // result.blocks: 생성된 블록 배열
+          // result.newBlocksRequest: 새로운 블록 요청 (있는 경우만)
+
+          updateBlocks(result.blocks);
+
+          // newBlocksRequest가 있으면 콘솔에 로그 (Phase 1-A: UI 연동은 추후)
+          if (result.newBlocksRequest && result.newBlocksRequest.length > 0) {
+            console.log('🔔 새로운 블록 요청:', result.newBlocksRequest);
+            showToast(
+              `AI 페이지가 생성되었습니다! (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`,
+              'success'
+            );
+          } else {
+            showToast('AI 페이지가 생성되었습니다!', 'success');
+          }
         }}
       />
 

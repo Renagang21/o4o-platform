@@ -10,6 +10,16 @@
 
 import { authClient } from '@o4o/auth-client';
 import { referenceFetcher } from './reference-fetcher.service';
+import {
+  AIResponse,
+  AIResponseV1,
+  AIResponseV2,
+  isAIResponseV1,
+  isAIResponseV2,
+  NewBlockRequest,
+  ShortcodeBlockAttributes,
+  PlaceholderBlockAttributes,
+} from './types';
 
 // 2025년 최신 AI 모델 목록
 export const AI_MODELS = {
@@ -57,6 +67,11 @@ export interface GenerateRequest {
   signal?: AbortSignal;
 }
 
+export interface GenerateResult {
+  blocks: Block[];
+  newBlocksRequest?: NewBlockRequest[];
+}
+
 /**
  * AI Proxy Error Response
  */
@@ -94,9 +109,10 @@ interface AIProxyResponse {
  */
 export class SimpleAIGenerator {
   /**
-   * 메인 생성 메서드
+   * 메인 생성 메서드 (V2 지원)
+   * V1/V2 포맷을 모두 수용하며, new_blocks_request를 함께 반환
    */
-  async generatePage(request: GenerateRequest): Promise<Block[]> {
+  async generatePage(request: GenerateRequest): Promise<GenerateResult> {
     const { prompt, template = 'landing', config, onProgress, signal } = request;
 
     const updateProgress = (progress: number, message: string) => {
@@ -153,12 +169,15 @@ export class SimpleAIGenerator {
 
       updateProgress(80, '응답 처리 중...');
 
-      // 블록 검증 및 ID 추가
-      const validatedBlocks = this.validateBlocks(blocks);
+      // 블록 검증 및 ID 추가 (V1/V2 포맷 모두 수용)
+      const { validatedBlocks, newBlocksRequest } = this.validateAndNormalizeBlocks(blocks);
 
       updateProgress(100, '페이지 생성 완료!');
 
-      return validatedBlocks;
+      return {
+        blocks: validatedBlocks,
+        newBlocksRequest,
+      };
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -414,31 +433,57 @@ ${availableBlocks}
   }
 
   /**
-   * 블록 검증 및 ID 추가
-   * core/ prefix를 o4o/ prefix로 자동 변환
-   * AI가 잘못된 형식을 보낼 경우 올바른 형태로 자동 변환
+   * Phase 1-A: V1/V2 포맷 모두 수용하는 블록 검증 및 정규화
    *
-   * AI는 content 객체에 데이터를 넣지만, 편집기는 attributes에서 데이터를 읽음
-   *
-   * ⭐ Shortcode 블록 자동 제거 (품질 저하 방지)
-   * ⭐ innerBlocks 재귀 처리 (columns, column 등 컨테이너 블록)
+   * 변경 사항:
+   * - Shortcode 블록 제거 로직 삭제 (o4o/shortcode로 정상 통합)
+   * - V1/V2 포맷 자동 감지 및 정규화
+   * - Placeholder 블록 처리 로직 추가
+   * - new_blocks_request 반환 지원
    */
-  private validateBlocks(blocks: any[]): Block[] {
-    if (!Array.isArray(blocks)) {
-      throw new Error('유효하지 않은 블록 형식입니다');
+  private validateAndNormalizeBlocks(response: any): {
+    validatedBlocks: Block[];
+    newBlocksRequest?: NewBlockRequest[];
+  } {
+    // V2 포맷 감지
+    if (isAIResponseV2(response)) {
+      return {
+        validatedBlocks: this.normalizeBlocks(response.layout.blocks),
+        newBlocksRequest: response.new_blocks_request,
+      };
     }
 
-    // Shortcode 블록 필터링
-    const filteredBlocks = blocks.filter(block => {
-      const blockType = block.type || '';
-      return !blockType.includes('shortcode');
-    });
+    // V1 포맷 (legacy)
+    if (isAIResponseV1(response)) {
+      return {
+        validatedBlocks: this.normalizeBlocks(response.blocks),
+      };
+    }
 
-    return filteredBlocks.map((block, index) => {
+    // Unknown format - 에러 발생
+    throw new Error('유효하지 않은 AI 응답 형식입니다');
+  }
+
+  /**
+   * 블록 정규화 (core/ → o4o/, content → attributes 등)
+   * ⚠️ Shortcode 블록 제거 로직 삭제됨 (Phase 1-A)
+   */
+  private normalizeBlocks(blocks: any[]): Block[] {
+    if (!Array.isArray(blocks)) {
+      throw new Error('블록은 배열 형식이어야 합니다');
+    }
+
+    return blocks.map((block, index) => {
       // core/ prefix를 o4o/ prefix로 자동 변환
       let blockType = block.type || 'o4o/paragraph';
       if (blockType.startsWith('core/')) {
         blockType = blockType.replace('core/', 'o4o/');
+      }
+
+      // ⭐ Phase 1-A: shortcode 타입 정규화
+      // shortcode/xxx → o4o/shortcode로 통합
+      if (blockType.includes('shortcode') && blockType !== 'o4o/shortcode') {
+        blockType = 'o4o/shortcode';
       }
 
       let content = block.content || {};
@@ -565,6 +610,41 @@ ${availableBlocks}
         content = {};
       }
 
+      // ⭐ Phase 1-A: shortcode 블록 처리
+      if (blockType === 'o4o/shortcode') {
+        // shortcode는 attributes.code에 저장
+        if (typeof content === 'object' && content.shortcode) {
+          attributes = {
+            ...attributes,
+            code: content.shortcode,
+          };
+        } else if (typeof content === 'string') {
+          attributes = {
+            ...attributes,
+            code: content,
+          };
+        }
+        // content는 항상 빈 객체
+        content = {};
+      }
+
+      // ⭐ Phase 1-A: placeholder 블록 처리
+      if (blockType === 'o4o/placeholder') {
+        // placeholder는 attributes에 componentName, reason 등 저장
+        if (typeof content === 'object') {
+          attributes = {
+            ...attributes,
+            componentName: content.componentName || attributes.componentName || 'Unknown',
+            reason: content.reason || attributes.reason || '',
+            props: content.props || attributes.props,
+            style: content.style || attributes.style,
+            placeholderId: content.placeholderId || attributes.placeholderId,
+          };
+        }
+        // content는 항상 빈 객체
+        content = {};
+      }
+
       // ✨ UPDATED 2025-10-26: columns 블록 처리
       if (blockType === 'o4o/columns') {
         // columnCount 기본값 설정
@@ -599,8 +679,8 @@ ${availableBlocks}
       // innerBlocks 재귀 처리 (columns, column 등 컨테이너 블록)
       let innerBlocks: Block[] | undefined = undefined;
       if (block.innerBlocks && Array.isArray(block.innerBlocks)) {
-        // 재귀적으로 innerBlocks 검증
-        innerBlocks = this.validateBlocks(block.innerBlocks);
+        // 재귀적으로 innerBlocks 정규화
+        innerBlocks = this.normalizeBlocks(block.innerBlocks);
       }
 
       return {

@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
-import { simpleAIGenerator, AI_MODELS, type AIModel, type Block } from '@/services/ai/SimpleAIGenerator';
+import { simpleAIGenerator, AI_MODELS, type AIModel, type Block, type GenerateResult } from '@/services/ai/SimpleAIGenerator';
 import { AppSystemKeyService } from '@/services/app-system-keys.service';
 
 interface SimpleAIModalProps {
@@ -21,7 +21,7 @@ interface SimpleAIModalProps {
   mode?: 'new' | 'edit';
   currentBlocks?: Block[];
   onClose: () => void;
-  onGenerate: (blocks: Block[]) => void;
+  onGenerate: (result: GenerateResult) => void;
   onBackup?: () => void;
   onRestore?: () => void;
 }
@@ -134,7 +134,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         return;
       }
 
-      const blocks = await simpleAIGenerator.generatePage({
+      const result = await simpleAIGenerator.generatePage({
         prompt: finalPrompt,
         template: mode === 'new' ? template : 'blog', // Use blog template for edit mode
         config: {
@@ -151,11 +151,11 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
       clearInterval(intervalId);
 
-      if (!blocks || blocks.length === 0) {
+      if (!result.blocks || result.blocks.length === 0) {
         throw new Error('생성된 블록이 없습니다. AI 응답을 확인하세요.');
       }
 
-      onGenerate(blocks);
+      onGenerate(result);
       onClose();
 
       // 성공 후 초기화
