@@ -136,9 +136,9 @@ export class SimpleAIGenerator {
 
       // Sprint 2 - P1: Use server-side proxy (single call)
       // Sprint 3: Pro→Flash 자동 폴백 (500 에러 및 타임아웃 대응)
-      let blocks: Block[];
+      let aiResponse: any;
       try {
-        blocks = await this.generateWithProxy(
+        aiResponse = await this.generateWithProxy(
           systemPrompt,
           userPrompt,
           config,
@@ -157,7 +157,7 @@ export class SimpleAIGenerator {
           updateProgress(40, 'Flash 모델로 재시도 중...');
           console.warn('⚠️ Pro 모델 실패, Flash로 폴백:', error.message);
 
-          blocks = await this.generateWithProxy(
+          aiResponse = await this.generateWithProxy(
             systemPrompt,
             userPrompt,
             { ...config, model: 'gemini-2.5-flash' },
@@ -172,7 +172,7 @@ export class SimpleAIGenerator {
       updateProgress(80, '응답 처리 중...');
 
       // 블록 검증 및 ID 추가 (V1/V2 포맷 모두 수용)
-      const { validatedBlocks, newBlocksRequest } = this.validateAndNormalizeBlocks(blocks);
+      const { validatedBlocks, newBlocksRequest } = this.validateAndNormalizeBlocks(aiResponse);
 
       updateProgress(100, '페이지 생성 완료!');
 
@@ -205,7 +205,7 @@ export class SimpleAIGenerator {
     config: AIConfig,
     signal?: AbortSignal,
     updateProgress?: (progress: number, message: string) => void
-  ): Promise<Block[]> {
+  ): Promise<any> {
     try {
       const response = await authClient.api.post('/ai/generate', {
         provider: config.provider,
@@ -232,7 +232,8 @@ export class SimpleAIGenerator {
         updateProgress(70, `AI 응답 수신 완료 (토큰: ${successData.usage.totalTokens})`);
       }
 
-      return successData.result.blocks || [];
+      // Return the result object (not just blocks array) for validation
+      return successData.result || { blocks: [] };
     } catch (error: any) {
       // Handle authClient errors
       if (error.response) {
