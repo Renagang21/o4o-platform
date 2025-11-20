@@ -47,6 +47,8 @@ import { NewBlockRequestPanel } from './NewBlockRequestPanel';
 import { NewBlockRequest } from '@/services/ai/types';
 // Phase 2-C: Block-level AI editing
 import { BlockAIModal } from '../ai/BlockAIModal';
+// Phase 2-C Remaining: Section-level AI reconstruction
+import { SectionAIModal } from '../ai/SectionAIModal';
 // Phase 2-A: Runtime Block Generation
 import { blockCodeGenerator, BlockGenerationError, BlockGenerationErrorType } from '@/services/ai/BlockCodeGenerator';
 import { compileComponent } from '@/blocks/runtime/runtime-code-loader';
@@ -58,7 +60,7 @@ import { useBlockHistory } from './hooks/useBlockHistory';
 import { useSlashCommands } from './hooks/useSlashCommands';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { useKeyboardShortcuts } from './hooks/keyboard';
-import { CheckCircle, XCircle, Info, X } from 'lucide-react';
+import { CheckCircle, XCircle, Info, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { devLog, devError } from '@/utils/logger';
@@ -243,6 +245,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Phase 2-C Remaining: Section selection state
   const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(new Set());
+  const [isSectionAIModalOpen, setIsSectionAIModalOpen] = useState(false);
   
   // Sidebar states
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -723,6 +726,54 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const getSelectedBlocksInOrder = useCallback((): Block[] => {
     return blocks.filter(b => selectedBlockIds.has(b.id));
   }, [blocks, selectedBlockIds]);
+
+  // Handle section AI reconstruction
+  const handleOpenSectionAIModal = useCallback(() => {
+    // Validate: at least 2 blocks selected
+    if (selectedBlockIds.size < 2) {
+      showToast('섹션 재구성은 최소 2개 이상의 블록을 선택해야 합니다', 'error');
+      return;
+    }
+
+    // Validate: blocks must be continuous
+    if (!areSelectedBlocksContinuous()) {
+      showToast('섹션은 연속된 블록만 선택할 수 있습니다', 'error');
+      return;
+    }
+
+    // Open section AI modal
+    setIsSectionAIModalOpen(true);
+  }, [selectedBlockIds, areSelectedBlocksContinuous, showToast]);
+
+  // Apply refined section blocks
+  const handleApplyRefinedSection = useCallback((refinedBlocks: Block[]) => {
+    // Get indices of selected blocks
+    const selectedIndices = Array.from(selectedBlockIds)
+      .map(id => blocks.findIndex(b => b.id === id))
+      .filter(index => index !== -1)
+      .sort((a, b) => a - b);
+
+    if (selectedIndices.length === 0) {
+      showToast('선택된 블록을 찾을 수 없습니다', 'error');
+      return;
+    }
+
+    // Replace selected blocks with refined blocks
+    const firstIndex = selectedIndices[0];
+    const lastIndex = selectedIndices[selectedIndices.length - 1];
+    const newBlocks = [
+      ...blocks.slice(0, firstIndex),
+      ...refinedBlocks,
+      ...blocks.slice(lastIndex + 1),
+    ];
+
+    updateBlocks(newBlocks);
+
+    // Clear selection
+    setSelectedBlockIds(new Set());
+
+    showToast(`섹션이 AI로 재구성되었습니다! (${refinedBlocks.length}개 블록)`, 'success');
+  }, [blocks, selectedBlockIds, updateBlocks, showToast]);
 
   // ⭐ AI Chat - Execute AI actions (must be after all helper functions)
   const handleExecuteAIActions = useCallback((actions: AIAction[]) => {
@@ -1244,7 +1295,60 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 />
               </div>
             ) : (
-              <div className="blocks-container">
+              <>
+                {/* Phase 2-C Remaining: Section Reconstruction Toolbar */}
+                {selectedBlockIds.size >= 2 && (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-purple-100 border-2 border-purple-300 rounded-lg shadow-md animate-slideIn">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-8 h-8 bg-purple-600 text-white rounded-full font-bold text-sm">
+                          {selectedBlockIds.size}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-purple-900">
+                            {selectedBlockIds.size}개의 블록이 선택됨
+                          </p>
+                          <p className="text-xs text-purple-700">
+                            {areSelectedBlocksContinuous()
+                              ? '연속된 블록 섹션'
+                              : '⚠️ 연속되지 않은 블록 (섹션 재구성 불가)'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Section AI Reconstruction Button */}
+                        <Button
+                          onClick={handleOpenSectionAIModal}
+                          disabled={!areSelectedBlocksContinuous()}
+                          className={cn(
+                            "flex items-center gap-2 px-4 py-2",
+                            "bg-gradient-to-r from-purple-500 to-purple-600",
+                            "hover:from-purple-600 hover:to-purple-700",
+                            "text-white font-medium text-sm rounded-md",
+                            "shadow-md hover:shadow-lg transition-all",
+                            "disabled:opacity-50 disabled:cursor-not-allowed"
+                          )}
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          섹션 AI 재구성
+                        </Button>
+
+                        {/* Clear Selection Button */}
+                        <Button
+                          onClick={() => setSelectedBlockIds(new Set())}
+                          variant="outline"
+                          className="flex items-center gap-2 px-3 py-2 text-sm border-purple-300 text-purple-700 hover:bg-purple-50"
+                        >
+                          <X className="w-4 h-4" />
+                          선택 해제
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="blocks-container">
                 {/* Render all blocks */}
                 {blocks.map((block, index) => (
                   <BlockWrapper
@@ -1424,6 +1528,16 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         block={blockToEdit}
         onApply={handleApplyRefinedBlock}
         initialAction={initialAIAction}
+      />
+
+      {/* Phase 2-C Remaining: Section AI Reconstruction Modal */}
+      <SectionAIModal
+        isOpen={isSectionAIModalOpen}
+        onClose={() => {
+          setIsSectionAIModalOpen(false);
+        }}
+        blocks={getSelectedBlocksInOrder()}
+        onApply={handleApplyRefinedSection}
       />
     </div>
   );
