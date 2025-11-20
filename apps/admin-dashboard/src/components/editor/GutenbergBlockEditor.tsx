@@ -568,11 +568,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           // Find placeholder block by data attribute matching
           if (block.type === 'o4o/placeholder' &&
               block.attributes?.placeholderId === spec.placeholderId) {
-            // Replace with new block
+            // Phase 1-D: Replace with new block and mark as AI-generated
             return {
               ...block,
               type: generatedCode.blockName,
-              attributes: {},
+              attributes: {
+                // Phase 1-D: Add AI-generated metadata
+                isAIGenerated: true,
+                aiComponentName: spec.componentName,
+                aiGeneratedAt: new Date().toISOString(),
+                aiReason: spec.reason,
+              },
             };
           }
           return block;
