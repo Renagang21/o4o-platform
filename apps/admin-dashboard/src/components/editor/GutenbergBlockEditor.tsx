@@ -1141,9 +1141,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
           updateBlocks(result.blocks);
 
-          // newBlocksRequest가 있으면 콘솔에 로그 (Phase 1-A: UI 연동은 추후)
+          // newBlocksRequest가 있으면 토스트 알림 표시 (Phase 1-A: UI 연동은 추후)
           if (result.newBlocksRequest && result.newBlocksRequest.length > 0) {
-            console.log('🔔 새로운 블록 요청:', result.newBlocksRequest);
             showToast(
               `AI 페이지가 생성되었습니다! (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`,
               'success'

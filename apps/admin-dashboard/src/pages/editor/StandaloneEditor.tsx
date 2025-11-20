@@ -799,7 +799,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
 
           // Show notification about new block requests if any
           if (result.newBlocksRequest && result.newBlocksRequest.length > 0) {
-            console.log('🔔 새로운 블록 요청:', result.newBlocksRequest);
             toast.success(
               `${isNewPost ? 'AI 페이지가 성공적으로 생성되었습니다!' : 'AI 페이지 편집이 완료되었습니다!'} (${result.newBlocksRequest.length}개의 새 블록 요청 포함)`,
               { duration: 6000 }
