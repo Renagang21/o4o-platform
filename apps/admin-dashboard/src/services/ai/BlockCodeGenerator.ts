@@ -8,6 +8,7 @@
 
 import { authClient } from '@o4o/auth-client';
 import { NewBlockRequest } from './types';
+import { devLog, devError } from '@/utils/logger';
 
 /**
  * Generated block code result
@@ -46,7 +47,7 @@ class BlockCodeGenerator {
     } = options;
 
     try {
-      console.log('🤖 Generating block code for:', spec.componentName);
+      devLog('🤖 Generating block code for:', spec.componentName);
 
       // Build system prompt
       const systemPrompt = this.buildSystemPrompt();
@@ -73,11 +74,11 @@ class BlockCodeGenerator {
       // Parse AI response
       const result = this.parseAIResponse(data.result.blocks, spec);
 
-      console.log('✅ Block code generated successfully:', result.componentName);
+      devLog('✅ Block code generated successfully:', result.componentName);
 
       return result;
     } catch (error: any) {
-      console.error('❌ Block code generation failed:', error);
+      devError('❌ Block code generation failed:', error);
 
       // Return fallback code on error
       return this.getFallbackCode(spec);
@@ -210,7 +211,7 @@ Output the JSON with "component" and "definition" keys.`;
         blockName,
       };
     } catch (error: any) {
-      console.error('Failed to parse AI response:', error);
+      devError('Failed to parse AI response:', error);
       throw new Error(`Failed to parse AI response: ${error.message}`);
     }
   }

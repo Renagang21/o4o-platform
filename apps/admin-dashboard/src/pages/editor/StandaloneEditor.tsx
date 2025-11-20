@@ -23,6 +23,7 @@ import { compileComponent } from '@/blocks/runtime/runtime-code-loader';
 import { runtimeBlockRegistry } from '@/blocks/runtime/runtime-block-registry';
 import { BlockDefinition } from '@/blocks/registry/types';
 import toast from 'react-hot-toast';
+import { devLog } from '@/utils/logger';
 import '@/styles/editor-animations.css';
 import { postApi } from '@/services/api/postApi';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
@@ -591,7 +592,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   // Phase 2-A: Handle block generation from placeholder
   const handleGenerateBlock = async (spec: NewBlockRequest) => {
     try {
-      console.log('🚀 Generating block from spec:', spec);
+      devLog('🚀 Generating block from spec:', spec);
 
       // Step 1: Generate code using AI
       const generatedCode = await blockCodeGenerator.generate(spec);

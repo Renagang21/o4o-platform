@@ -59,6 +59,7 @@ import { useKeyboardShortcuts } from './hooks/keyboard';
 import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { devLog, devError } from '@/utils/logger';
 import { useCustomizerSettings } from '@/hooks/useCustomizerSettings';
 import {
   saveEditorSession,
@@ -522,7 +523,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Phase 2-A: Handle block generation from NewBlockRequest
   const handleGenerateBlock = useCallback(async (spec: NewBlockRequest) => {
     try {
-      console.log('🚀 Generating block from spec:', spec);
+      devLog('🚀 Generating block from spec:', spec);
 
       // Step 1: Generate code using AI
       const generatedCode = await blockCodeGenerator.generate(spec);
@@ -585,9 +586,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       );
 
       showToast(`${spec.componentName} 블록이 생성되고 등록되었습니다!`, 'success');
-      console.log('✅ Block generation complete:', generatedCode.blockName);
+      devLog('✅ Block generation complete:', generatedCode.blockName);
     } catch (error: any) {
-      console.error('❌ Block generation failed:', error);
+      devError('❌ Block generation failed:', error);
       showToast(error.message || '블록 생성 중 오류가 발생했습니다', 'error');
       throw error;
     }

@@ -7,6 +7,7 @@
  */
 
 import { BlockDefinition } from '../registry/types';
+import { devLog, devError } from '@/utils/logger';
 
 interface RuntimeBlockEntry {
   definition: BlockDefinition;
@@ -51,7 +52,7 @@ class RuntimeBlockRegistry {
     this.blocks.set(definition.name, entry);
     this.saveToStorage();
 
-    console.log(`✅ Runtime block registered: ${definition.name}`);
+    devLog(`✅ Runtime block registered: ${definition.name}`);
   }
 
   /**
@@ -89,7 +90,7 @@ class RuntimeBlockRegistry {
     const deleted = this.blocks.delete(blockName);
     if (deleted) {
       this.saveToStorage();
-      console.log(`🗑️ Runtime block removed: ${blockName}`);
+      devLog(`🗑️ Runtime block removed: ${blockName}`);
     }
     return deleted;
   }
@@ -100,7 +101,7 @@ class RuntimeBlockRegistry {
   clearAll(): void {
     this.blocks.clear();
     this.saveToStorage();
-    console.log('🗑️ All runtime blocks cleared');
+    devLog('🗑️ All runtime blocks cleared');
   }
 
   /**
@@ -127,7 +128,7 @@ class RuntimeBlockRegistry {
 
       localStorage.setItem(this.storageKey, JSON.stringify(data));
     } catch (error) {
-      console.error('Failed to save runtime blocks to localStorage:', error);
+      devError('Failed to save runtime blocks to localStorage:', error);
     }
   }
 
@@ -145,14 +146,14 @@ class RuntimeBlockRegistry {
       // We load the metadata, but components will need to be re-generated
       // This is just to track what blocks were previously generated
       Object.entries(data).forEach(([name, entry]: [string, any]) => {
-        console.log(`📦 Found stored runtime block metadata: ${name}`);
+        devLog(`📦 Found stored runtime block metadata: ${name}`);
         // Note: We don't register the block here because we don't have the component function
         // This is just for reference. Actual re-generation should be triggered by the UI.
       });
 
-      console.log(`📦 Loaded ${Object.keys(data).length} runtime block metadata from storage`);
+      devLog(`📦 Loaded ${Object.keys(data).length} runtime block metadata from storage`);
     } catch (error) {
-      console.error('Failed to load runtime blocks from localStorage:', error);
+      devError('Failed to load runtime blocks from localStorage:', error);
     }
   }
 
