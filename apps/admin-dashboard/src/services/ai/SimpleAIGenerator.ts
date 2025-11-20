@@ -313,6 +313,7 @@ export class SimpleAIGenerator {
 5. 이미지 URL 사용 금지 (placeholder 사이트 포함)
 6. 모든 블록 타입은 반드시 "o4o/" prefix 사용
 7. Shortcode는 그대로 사용 가능 (o4o/shortcode 타입)
+8. **섹션 간 여백**: 주요 섹션 사이에는 반드시 o4o/spacer 블록을 사용하여 충분한 여백(50-80px)을 확보하시오
 
 **Missing Block 정책 (중요):**
 사용자의 요구사항을 구현하기 위해 필요한 블록이 Block Registry에 없다면:
@@ -364,6 +365,16 @@ ${JSON.stringify(designTokens, null, 2)}
         "type": "o4o/paragraph",
         "content": {},
         "attributes": {"content": "내용"}
+      },
+      {
+        "type": "o4o/spacer",
+        "content": {},
+        "attributes": {"height": 60}
+      },
+      {
+        "type": "o4o/heading",
+        "content": {},
+        "attributes": {"content": "다음 섹션", "level": 2}
       }
     ]
   },
@@ -439,31 +450,41 @@ ${templateGuidelines}`;
       landing: `**랜딩 페이지 구성 요소:**
 - 매력적인 헤드라인 (H1)
 - 부제목 설명 (H2)
+- o4o/spacer (50-80px) - 섹션 구분
 - 주요 기능/장점 3개 (단락 또는 리스트)
+- o4o/spacer (50-80px) - 섹션 구분
 - CTA 버튼
 - 이미지는 alt 텍스트만 (url은 빈 문자열)`,
 
       about: `**회사 소개 페이지 구성:**
 - 회사 소개 헤드라인
 - 회사 비전/미션
+- o4o/spacer (60px) - 섹션 구분
 - 핵심 가치 3-4개 (리스트 사용)
+- o4o/spacer (60px) - 섹션 구분
 - 팀 소개 섹션
 - 연락처 정보`,
 
       product: `**제품 소개 페이지 구성:**
 - 제품명과 한 줄 설명
+- o4o/spacer (50px) - 섹션 구분
 - 주요 기능 소개 (리스트 활용)
+- o4o/spacer (50px) - 섹션 구분
 - 제품 장점 3-5개
+- o4o/spacer (50px) - 섹션 구분
 - 사용법/활용 사례
 - 가격 정보 (PricingTable이 없으면 placeholder 사용)
+- o4o/spacer (50px) - 섹션 구분
 - CTA 버튼`,
 
       blog: `**블로그 포스트 구성:**
 - 매력적인 제목 (H1)
 - 서론 (문제 제기)
-- 본문 3-4개 섹션 (H2 제목 + 단락)
+- o4o/spacer (60px) - 섹션 구분
+- 본문 3-4개 섹션 (H2 제목 + 단락, 각 섹션 사이에 o4o/spacer 사용)
 - 인용구나 코드 블록 활용 가능
 - 실용적인 팁이나 해결책 (리스트 활용)
+- o4o/spacer (60px) - 섹션 구분
 - 결론 및 요약`,
     };
 
