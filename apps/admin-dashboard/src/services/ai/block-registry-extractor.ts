@@ -141,6 +141,23 @@ function getExampleContent(blockName: string): any {
       iconStyle: 'circle',
       lineStyle: 'solid'
     },
+    'o4o/accordion-item': {
+      title: '자주 묻는 질문 1',
+      content: '답변 내용을 입력하세요',
+      defaultOpen: false
+    },
+    'o4o/feature-card': {
+      icon: 'star',
+      title: '빠른 배송',
+      description: '당일 출고 시스템으로 빠른 배송을 제공합니다',
+      iconColor: '#0073aa'
+    },
+    'o4o/role-card': {
+      name: '홍길동',
+      role: '팀장',
+      description: '팀 관리 및 전략 수립을 담당합니다',
+      imageUrl: ''
+    },
   };
 
   return examples[blockName] || {};

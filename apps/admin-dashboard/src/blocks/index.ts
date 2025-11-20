@@ -37,6 +37,9 @@ import socialBlockDefinition from './definitions/social';
 import shortcodeBlockDefinition from './definitions/shortcode';
 import placeholderBlockDefinition from './definitions/placeholder';
 import { timelineChartBlockDefinition } from './generated/TimelineChart.definition.tsx';
+import accordionItemBlockDefinition from './definitions/accordion-item';
+import featureCardBlockDefinition from './definitions/feature-card';
+import roleCardBlockDefinition from './definitions/role-card';
 
 // Embed blocks
 import youtubeBlockDefinition from './definitions/youtube';
@@ -87,6 +90,9 @@ export function registerAllBlocks(): void {
   blockRegistry.register(shortcodeBlockDefinition);
   blockRegistry.register(placeholderBlockDefinition); // Phase 1-C: Placeholder for missing components
   blockRegistry.register(timelineChartBlockDefinition);
+  blockRegistry.register(accordionItemBlockDefinition);
+  blockRegistry.register(featureCardBlockDefinition);
+  blockRegistry.register(roleCardBlockDefinition);
 
   // Register embed blocks
   blockRegistry.register(youtubeBlockDefinition);
