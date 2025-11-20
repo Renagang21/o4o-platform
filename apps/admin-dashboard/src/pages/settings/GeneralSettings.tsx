@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, Globe, Clock, Shield, Database } from 'lucide-react';
+import { Save, Globe, Clock, Shield, Database, Palette, Image as ImageIcon, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,12 @@ interface GeneralSettingsData {
   siteUrl: string;
   adminEmail: string;
   favicon?: string;
+  logo?: string; // Site logo URL
+  primaryColor?: string; // Primary color
+  secondaryColor?: string; // Secondary color
+  accentColor?: string; // Accent color
+  headingFont?: string; // Heading font
+  bodyFont?: string; // Body font
   timezone: string;
   dateFormat: string;
   timeFormat: string;
@@ -52,6 +58,15 @@ const timeFormats = [
   { value: 'hh:mm A', label: '02:30 PM (12시간)' },
 ];
 
+const fontOptions = [
+  { value: 'Inter', label: 'Inter' },
+  { value: 'Roboto', label: 'Roboto' },
+  { value: 'Open Sans', label: 'Open Sans' },
+  { value: 'Noto Sans KR', label: 'Noto Sans KR' },
+  { value: 'Pretendard', label: 'Pretendard' },
+  { value: 'Spoqa Han Sans Neo', label: 'Spoqa Han Sans Neo' },
+];
+
 export default function GeneralSettings() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
@@ -61,6 +76,12 @@ export default function GeneralSettings() {
     siteUrl: '',
     adminEmail: '',
     favicon: '',
+    logo: '',
+    primaryColor: '#3b82f6',
+    secondaryColor: '#10b981',
+    accentColor: '#f59e0b',
+    headingFont: 'Pretendard',
+    bodyFont: 'Pretendard',
     timezone: 'Asia/Seoul',
     dateFormat: 'YYYY-MM-DD',
     timeFormat: 'HH:mm',
@@ -211,6 +232,172 @@ export default function GeneralSettings() {
                 </div>
               </div>
             )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="logo">사이트 로고 URL</Label>
+            <Input
+              id="logo"
+              name="logo"
+              type="url"
+              value={settings.logo}
+              onChange={(e: any) => handleChange('logo', e.target.value)}
+              placeholder="https://example.com/logo.png"
+            />
+            <p className="text-xs text-gray-500">
+              헤더에 표시될 로고 이미지 URL을 입력하세요
+            </p>
+            {settings.logo && (
+              <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <p className="text-xs font-medium text-gray-700 mb-2">미리보기:</p>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={settings.logo}
+                    alt="Logo preview"
+                    className="h-8 w-auto max-w-[200px]"
+                    onError={(e: any) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <span
+                    className="text-xs text-red-500 hidden"
+                    style={{ display: 'none' }}
+                  >
+                    이미지를 불러올 수 없습니다
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Color Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="w-5 h-5" />
+            색상 설정
+          </CardTitle>
+          <CardDescription>
+            사이트의 주요 색상을 설정합니다
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="primaryColor">주 색상 (Primary)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="primaryColor"
+                  name="primaryColor"
+                  type="color"
+                  value={settings.primaryColor}
+                  onChange={(e: any) => handleChange('primaryColor', e.target.value)}
+                  className="w-20 h-10 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={settings.primaryColor}
+                  onChange={(e: any) => handleChange('primaryColor', e.target.value)}
+                  placeholder="#3b82f6"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="secondaryColor">보조 색상 (Secondary)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="secondaryColor"
+                  name="secondaryColor"
+                  type="color"
+                  value={settings.secondaryColor}
+                  onChange={(e: any) => handleChange('secondaryColor', e.target.value)}
+                  className="w-20 h-10 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={settings.secondaryColor}
+                  onChange={(e: any) => handleChange('secondaryColor', e.target.value)}
+                  placeholder="#10b981"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="accentColor">강조 색상 (Accent)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="accentColor"
+                  name="accentColor"
+                  type="color"
+                  value={settings.accentColor}
+                  onChange={(e: any) => handleChange('accentColor', e.target.value)}
+                  className="w-20 h-10 cursor-pointer"
+                />
+                <Input
+                  type="text"
+                  value={settings.accentColor}
+                  onChange={(e: any) => handleChange('accentColor', e.target.value)}
+                  placeholder="#f59e0b"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Typography */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Type className="w-5 h-5" />
+            타이포그래피
+          </CardTitle>
+          <CardDescription>
+            사이트의 글꼴을 설정합니다
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="headingFont">제목 글꼴</Label>
+              <Select
+                value={settings.headingFont}
+                onValueChange={(value: string) => handleChange('headingFont', value)}
+              >
+                <SelectTrigger id="headingFont">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontOptions.map((font: any) => (
+                    <SelectItem key={font.value} value={font.value}>
+                      {font.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bodyFont">본문 글꼴</Label>
+              <Select
+                value={settings.bodyFont}
+                onValueChange={(value: string) => handleChange('bodyFont', value)}
+              >
+                <SelectTrigger id="bodyFont">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontOptions.map((font: any) => (
+                    <SelectItem key={font.value} value={font.value}>
+                      {font.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>

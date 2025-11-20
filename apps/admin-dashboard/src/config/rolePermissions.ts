@@ -98,14 +98,16 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['admin.analytics']
   },
 
-  // Settings - Admin roles only
+  // Settings - Available to all authenticated users
+  // Note: Individual settings pages may still have their own permission checks
   {
-    menuId: 'settings',
-    roles: ['admin', 'super_admin', 'administrator', 'manager']
+    menuId: 'settings'
+    // No role restriction - menu visible to all authenticated users
+    // Each settings page should handle its own permission checks
   },
   {
-    menuId: 'general-settings',
-    roles: ['admin', 'super_admin', 'administrator', 'manager']
+    menuId: 'general-settings'
+    // No role restriction
   },
   {
     menuId: 'system-settings',
