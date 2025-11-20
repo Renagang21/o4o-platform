@@ -481,14 +481,6 @@ ${error?.message}
         },
       };
 
-      console.log('✅ AI 디자인 토큰이 사이트 설정과 연동되었습니다:', {
-        primaryColor: designTokens.colors.primary,
-        secondaryColor: designTokens.colors.secondary,
-        accentColor: designTokens.colors.accent,
-        headingFont: settings.headingFont,
-        bodyFont: settings.bodyFont,
-      });
-
       return designTokens;
 
     } catch (error) {
