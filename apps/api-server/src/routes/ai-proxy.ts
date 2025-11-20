@@ -26,6 +26,7 @@ import { aiJobQueue } from '../services/ai-job-queue.service.js';
 import { aiMetrics } from '../services/ai-metrics.service.js';
 import { aiDLQ } from '../services/ai-dlq.service.js';
 import { aiUsageReport } from '../services/ai-usage-report.service.js';
+import { aiBlockWriter } from '../services/ai-block-writer.service.js';
 import logger from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 import { AIProxyError } from '../types/ai-proxy.types.js';
@@ -970,6 +971,209 @@ router.get('/usage/last-n-days',
       res.status(500).json({
         success: false,
         error: 'Failed to generate last N days report',
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/ai/save-block
+ * Phase 2-B: Save AI-generated block to filesystem and Git
+ *
+ * Request body:
+ * - componentName: string (required, PascalCase)
+ * - componentCode: string (required, TypeScript React component code)
+ * - definitionCode: string (required, BlockDefinition code)
+ * - savePath: string (optional, defaults to apps/admin-dashboard/src/blocks/generated)
+ *
+ * Returns:
+ * - success: boolean
+ * - files: { component: string, definition: string }
+ * - git: { branch: string, commit: string }
+ * - renamedTo: string (if filename conflict occurred)
+ */
+router.post('/save-block',
+  authenticate,
+  aiProxyRateLimit,
+  body('componentName').isString().notEmpty().withMessage('Component name is required'),
+  body('componentCode').isString().notEmpty().withMessage('Component code is required'),
+  body('definitionCode').isString().notEmpty().withMessage('Definition code is required'),
+  body('savePath').optional().isString().withMessage('Save path must be a string'),
+  validateDto,
+  async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest;
+    const startTime = Date.now();
+
+    try {
+      const userId = authReq.user?.id;
+      const userEmail = authReq.user?.email;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+        });
+      }
+
+      // Check if user has admin permissions
+      // TODO: Add role-based access control if needed
+      // For now, only authenticated users can save blocks
+
+      const { componentName, componentCode, definitionCode, savePath } = req.body;
+
+      logger.info('🚀 AI block save request received', {
+        userId,
+        userEmail,
+        componentName,
+        savePath: savePath || 'default',
+      });
+
+      // Call AI block writer service
+      const result = await aiBlockWriter.saveBlock({
+        componentName,
+        componentCode,
+        definitionCode,
+        savePath,
+      });
+
+      const duration = Date.now() - startTime;
+
+      if (!result.success) {
+        logger.error('❌ Block save failed', {
+          userId,
+          userEmail,
+          componentName,
+          error: result.error,
+          duration: `${duration}ms`,
+        });
+
+        return res.status(400).json({
+          success: false,
+          error: result.error || 'Failed to save block',
+        });
+      }
+
+      logger.info('✅ Block save successful', {
+        userId,
+        userEmail,
+        componentName,
+        renamedTo: result.renamedTo,
+        files: result.files,
+        git: result.git,
+        duration: `${duration}ms`,
+      });
+
+      res.json({
+        success: true,
+        data: {
+          files: result.files,
+          git: result.git,
+          renamedTo: result.renamedTo,
+        },
+        message: result.renamedTo
+          ? `Block saved as ${result.renamedTo} (original name conflict)`
+          : 'Block saved successfully',
+      });
+
+    } catch (error: any) {
+      const duration = Date.now() - startTime;
+
+      logger.error('❌ Block save unexpected error', {
+        userId: authReq.user?.id,
+        userEmail: authReq.user?.email,
+        error: error.message,
+        stack: error.stack,
+        duration: `${duration}ms`,
+      });
+
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error while saving block',
+        message: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/ai/saved-blocks
+ * Phase 2-B: List all AI-generated blocks
+ */
+router.get('/saved-blocks',
+  authenticate,
+  async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest;
+
+    try {
+      const blocks = await aiBlockWriter.listGeneratedBlocks();
+
+      res.json({
+        success: true,
+        data: {
+          blocks,
+          total: blocks.length,
+        },
+      });
+
+    } catch (error: any) {
+      logger.error('Failed to list saved blocks', {
+        userId: authReq.user?.id,
+        error: error.message,
+      });
+
+      res.status(500).json({
+        success: false,
+        error: 'Failed to list saved blocks',
+      });
+    }
+  }
+);
+
+/**
+ * DELETE /api/ai/saved-blocks/:componentName
+ * Phase 2-B: Delete an AI-generated block
+ */
+router.delete('/saved-blocks/:componentName',
+  authenticate,
+  param('componentName').isString().notEmpty().withMessage('Component name is required'),
+  validateDto,
+  async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest;
+    const { componentName } = req.params;
+
+    try {
+      // Check admin permissions
+      // TODO: Add role-based access control if needed
+
+      const deleted = await aiBlockWriter.deleteBlock(componentName);
+
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          error: 'Block not found or failed to delete',
+        });
+      }
+
+      logger.info('🗑️ Block deleted via API', {
+        userId: authReq.user?.id,
+        componentName,
+      });
+
+      res.json({
+        success: true,
+        message: 'Block deleted successfully',
+      });
+
+    } catch (error: any) {
+      logger.error('Failed to delete block', {
+        userId: authReq.user?.id,
+        componentName,
+        error: error.message,
+      });
+
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete block',
       });
     }
   }

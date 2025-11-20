@@ -304,6 +304,85 @@ ${props.map(p => `    ${p}: { type: 'string', default: '' }`).join(',\n')}
       .replace(/([A-Z])([A-Z])([a-z])/g, '$1-$2$3')
       .toLowerCase();
   }
+
+  /**
+   * Phase 2-B: Save generated block to server (permanent storage + Git)
+   */
+  async saveToServer(
+    componentName: string,
+    componentCode: string,
+    definitionCode: string,
+    savePath?: string
+  ): Promise<{
+    success: boolean;
+    files?: { component: string; definition: string };
+    git?: { branch: string; commit: string };
+    renamedTo?: string;
+    error?: string;
+  }> {
+    try {
+      devLog('📤 Saving block to server:', componentName);
+
+      const response = await authClient.api.post('/ai/save-block', {
+        componentName,
+        componentCode,
+        definitionCode,
+        savePath,
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Server save failed');
+      }
+
+      devLog('✅ Block saved to server successfully:', componentName);
+
+      return {
+        success: true,
+        files: response.data.data.files,
+        git: response.data.data.git,
+        renamedTo: response.data.data.renamedTo,
+      };
+    } catch (error: any) {
+      devError('❌ Server save failed:', error);
+
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'Server save failed',
+      };
+    }
+  }
+
+  /**
+   * Phase 2-B: List all server-saved blocks
+   */
+  async listServerSavedBlocks(): Promise<string[]> {
+    try {
+      const response = await authClient.api.get('/ai/saved-blocks');
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to list blocks');
+      }
+
+      return response.data.data.blocks || [];
+    } catch (error: any) {
+      devError('Failed to list server-saved blocks:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Phase 2-B: Delete a server-saved block
+   */
+  async deleteServerSavedBlock(componentName: string): Promise<boolean> {
+    try {
+      const response = await authClient.api.delete(`/ai/saved-blocks/${componentName}`);
+
+      return response.data.success;
+    } catch (error: any) {
+      devError('Failed to delete server-saved block:', error);
+      return false;
+    }
+  }
 }
 
 // Singleton instance
