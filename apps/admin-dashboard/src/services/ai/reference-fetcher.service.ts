@@ -368,15 +368,17 @@ ${error?.message}
 
   /**
    * Phase 1-B: Design Tokens를 JSON 형식으로 반환
+   * Phase 2-C: GeneralSettings 연동 - 사이트 색상/폰트를 AI 생성기에 반영
    */
   async fetchDesignTokensJSON(): Promise<any> {
-    // Phase 1-B: 기본 Design Tokens 반환
-    // appearance-system은 아직 완전히 구축되지 않았으므로 기본값 사용
-    return {
+    // 기본값 정의 (폴백용)
+    const defaults = {
       colors: {
         primary: '#007bff',
         primaryHover: '#0056b3',
         primaryActive: '#004085',
+        secondary: '#10b981',
+        accent: '#f59e0b',
         buttonBg: '#007bff',
         buttonText: '#ffffff',
         buttonBorder: '#007bff',
@@ -402,6 +404,8 @@ ${error?.message}
       },
       typography: {
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        headingFontFamily: 'Pretendard, -apple-system, sans-serif',
+        bodyFontFamily: 'Pretendard, -apple-system, sans-serif',
         fontSize: {
           xs: '0.75rem',
           sm: '0.875rem',
@@ -423,6 +427,89 @@ ${error?.message}
         },
       },
     };
+
+    try {
+      // GeneralSettings에서 사이트 설정 가져오기
+      const response = await authClient.api.get('/settings/general');
+      const settings = response.data?.data;
+
+      if (!settings) {
+        console.warn('⚠️ 사이트 설정을 불러올 수 없습니다. 기본 디자인 토큰을 사용합니다.');
+        return defaults;
+      }
+
+      // GeneralSettings 값으로 디자인 토큰 구성
+      const designTokens = {
+        colors: {
+          // 사용자 정의 색상 (GeneralSettings에서)
+          primary: settings.primaryColor || defaults.colors.primary,
+          secondary: settings.secondaryColor || defaults.colors.secondary,
+          accent: settings.accentColor || defaults.colors.accent,
+
+          // 파생 색상 (primary 기반)
+          primaryHover: this.darkenColor(settings.primaryColor || defaults.colors.primary, 10),
+          primaryActive: this.darkenColor(settings.primaryColor || defaults.colors.primary, 20),
+
+          // 버튼 색상 (primary 사용)
+          buttonBg: settings.primaryColor || defaults.colors.primary,
+          buttonText: '#ffffff',
+          buttonBorder: settings.primaryColor || defaults.colors.primary,
+
+          // 링크 색상 (primary 사용)
+          breadcrumbText: '#6c757d',
+          breadcrumbLink: settings.primaryColor || defaults.colors.primary,
+          breadcrumbSeparator: '#6c757d',
+        },
+        spacing: defaults.spacing,
+        radius: defaults.radius,
+        typography: {
+          // 사용자 정의 폰트 (GeneralSettings에서)
+          fontFamily: settings.bodyFont
+            ? `${settings.bodyFont}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+            : defaults.typography.bodyFontFamily,
+          headingFontFamily: settings.headingFont
+            ? `${settings.headingFont}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+            : defaults.typography.headingFontFamily,
+          bodyFontFamily: settings.bodyFont
+            ? `${settings.bodyFont}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+            : defaults.typography.bodyFontFamily,
+
+          // 폰트 크기/굵기/행간은 기본값 유지
+          fontSize: defaults.typography.fontSize,
+          fontWeight: defaults.typography.fontWeight,
+          lineHeight: defaults.typography.lineHeight,
+        },
+      };
+
+      console.log('✅ AI 디자인 토큰이 사이트 설정과 연동되었습니다:', {
+        primaryColor: designTokens.colors.primary,
+        secondaryColor: designTokens.colors.secondary,
+        accentColor: designTokens.colors.accent,
+        headingFont: settings.headingFont,
+        bodyFont: settings.bodyFont,
+      });
+
+      return designTokens;
+
+    } catch (error) {
+      console.warn('⚠️ 사이트 설정 로드 실패, 기본 디자인 토큰을 사용합니다:', error);
+      return defaults;
+    }
+  }
+
+  /**
+   * 색상을 어둡게 만드는 유틸리티 함수
+   * @param hex - 16진수 색상 코드 (예: "#007bff")
+   * @param percent - 어두워질 비율 (0-100)
+   */
+  private darkenColor(hex: string, percent: number): string {
+    // #을 제거하고 RGB 추출
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.max(0, (num >> 16) - Math.round((num >> 16) * percent / 100));
+    const g = Math.max(0, ((num >> 8) & 0x00FF) - Math.round(((num >> 8) & 0x00FF) * percent / 100));
+    const b = Math.max(0, (num & 0x0000FF) - Math.round((num & 0x0000FF) * percent / 100));
+
+    return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
   }
 }
 
