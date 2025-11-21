@@ -79,7 +79,10 @@ export const RoleApplicationsList: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await cookieAuthClient.api.get('/api/v2/roles/applications/my');
+      // Override baseURL to avoid /api/v1/api/v2 duplication
+      const response = await cookieAuthClient.api.get('/api/v2/roles/applications/my', {
+        baseURL: 'https://api.neture.co.kr'
+      });
       setApplications(response.data.applications || []);
     } catch (err: any) {
       console.error('Failed to load applications:', err);

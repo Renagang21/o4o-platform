@@ -36,7 +36,10 @@ export const ApplyRolePageP3: React.FC = () => {
 
   const checkStatus = async () => {
     try {
-      const response = await cookieAuthClient.api.get('/api/v2/roles/applications/my');
+      // Override baseURL to avoid /api/v1/api/v2 duplication
+      const response = await cookieAuthClient.api.get('/api/v2/roles/applications/my', {
+        baseURL: 'https://api.neture.co.kr'
+      });
       const apps = response.data.applications || [];
       const pending = apps.find((a: any) => a.role === role && a.status === 'pending');
       setPendingApp(pending);
@@ -52,9 +55,12 @@ export const ApplyRolePageP3: React.FC = () => {
     setLoading(true);
 
     try {
+      // Override baseURL to avoid /api/v1/api/v2 duplication
       await cookieAuthClient.api.post('/api/v2/roles/apply', {
         role,
         ...formData,
+      }, {
+        baseURL: 'https://api.neture.co.kr'
       });
 
       toast.success('Application submitted successfully!');
