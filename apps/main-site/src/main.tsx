@@ -7,6 +7,7 @@ import './styles/markdown-reader.css';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastProvider';
 import { initializeIframeContext } from './utils/iframe-context';
 import App from './App';
 
@@ -39,9 +40,11 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ToastProvider>
     </QueryClientProvider>
   </StrictMode>
 ); 
