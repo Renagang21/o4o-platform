@@ -6,7 +6,7 @@
 import { FC, useState, FormEvent } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, CheckCircle, AlertCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { useToast } from '@/hooks/useToast';
 import { cookieAuthClient } from '@o4o/auth-client';
 
 const Signup: FC = () => {
@@ -20,6 +20,7 @@ const Signup: FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
 
   // Get redirect URL from query params or default to home
   const params = new URLSearchParams(location.search);

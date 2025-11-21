@@ -1,5 +1,7 @@
 import { FC, createContext, useContext, useEffect, useState, ReactNode  } from 'react';
-import toast from 'react-hot-toast';
+
+// HP-1: Toast System 전역화
+import { useToast } from '@/hooks/useToast';
 
 // P0 RBAC: cookieAuthClient 사용
 import { cookieAuthClient } from '@o4o/auth-client';
@@ -22,6 +24,9 @@ interface AuthProviderProps {
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // HP-1: Toast System
+  const toast = useToast();
 
   // Stage 1 Hotfix: Detect if running in iframe
   const isInIframe = typeof window !== 'undefined' && window.self !== window.top;

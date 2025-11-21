@@ -98,6 +98,10 @@ import { PaymentSuccessPage, PaymentFailPage } from './pages/payment';
 // Phase 2-B: Cart Event Handler
 import { CartEventHandler } from './components/cart/CartEventHandler';
 
+// HP-1: Toast System
+import { ToastProvider } from './contexts/ToastProvider';
+import { ToastContainer } from './components/toast/ToastContainer';
+
 // Lazy load pages
 import { lazy, Suspense } from 'react';
 const PageEditor = lazy(() => import('./pages/PageEditor'));
@@ -143,10 +147,12 @@ const App: FC = () => {
 
   return (
     <ErrorBoundary>
-      <GlobalStyleInjector />
-      <Router>
-        <CartEventHandler />
-        <Routes>
+      <ToastProvider>
+        <GlobalStyleInjector />
+        <ToastContainer />
+        <Router>
+          <CartEventHandler />
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           
@@ -401,6 +407,7 @@ const App: FC = () => {
           } />
         </Routes>
       </Router>
+      </ToastProvider>
     </ErrorBoundary>
   );
 };

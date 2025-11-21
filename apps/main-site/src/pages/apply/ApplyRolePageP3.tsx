@@ -7,7 +7,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Layout from '../../components/layout/Layout';
 import { cookieAuthClient } from '@o4o/auth-client';
-import toast from 'react-hot-toast';
+import { useToast } from '@/hooks/useToast';
 
 const ROLE_INFO: Record<string, { name: string; description: string }> = {
   supplier: { name: 'Supplier', description: 'Supply products to sellers' },
@@ -19,6 +19,7 @@ export const ApplyRolePageP3: React.FC = () => {
   const { role } = useParams<{ role: string }>();
   const { hasRole } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [formData, setFormData] = useState({
     businessName: '',
