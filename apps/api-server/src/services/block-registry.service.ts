@@ -518,6 +518,105 @@ class BlockRegistryService {
       aiPrompts: ['커스텀 쇼트코드를 사용할 때']
     });
 
+    this.register('o4o/feature-card', {
+      name: 'o4o/feature-card',
+      title: 'Feature Card',
+      description: '서비스 특징, 기능을 카드 형태로 표시',
+      category: 'widgets',
+      attributes: {
+        icon: { type: 'string', default: 'star', description: '아이콘' },
+        title: { type: 'string', default: '기능 제목', description: '제목' },
+        description: { type: 'string', default: '기능 설명', description: '설명' },
+        link: { type: 'string', description: '링크 URL (선택)' },
+        backgroundColor: { type: 'string', default: '#ffffff', description: '배경색' },
+        borderColor: { type: 'string', default: '#e5e7eb', description: '테두리색' },
+        iconColor: { type: 'string', default: '#0073aa', description: '아이콘 색상' },
+        titleColor: { type: 'string', default: '#111827', description: '제목 색상' },
+        descriptionColor: { type: 'string', default: '#6b7280', description: '설명 색상' },
+        iconSize: { type: 'number', default: 48, description: '아이콘 크기 (px)' }
+      },
+      example: {
+        json: JSON.stringify({
+          type: 'o4o/feature-card',
+          attributes: {
+            icon: 'star',
+            title: '놀라운 기능',
+            description: '이 기능은 정말 유용합니다.',
+            link: '#'
+          }
+        }, null, 2),
+        text: '기능 카드'
+      },
+      version: '1.0.0',
+      tags: ['feature', 'card', 'service', '기능', '특징', '카드'],
+      aiPrompts: ['서비스 특징을 카드로 표시할 때', '기능을 강조하고 싶을 때']
+    });
+
+    this.register('o4o/accordion-item', {
+      name: 'o4o/accordion-item',
+      title: 'Accordion Item',
+      description: 'FAQ, 접었다 펼치는 콘텐츠 항목',
+      category: 'widgets',
+      attributes: {
+        title: { type: 'string', default: '질문을 입력하세요', description: '질문' },
+        content: { type: 'string', default: '답변을 입력하세요', description: '답변' },
+        defaultOpen: { type: 'boolean', default: false, description: '기본 펼침 상태' },
+        borderColor: { type: 'string', default: '#e5e7eb', description: '테두리색' },
+        backgroundColor: { type: 'string', default: '#ffffff', description: '배경색' },
+        titleColor: { type: 'string', default: '#111827', description: '제목 색상' },
+        contentColor: { type: 'string', default: '#6b7280', description: '내용 색상' }
+      },
+      example: {
+        json: JSON.stringify({
+          type: 'o4o/accordion-item',
+          attributes: {
+            title: '이것은 무엇인가요?',
+            content: '이것은 아코디언 아이템입니다.',
+            defaultOpen: false
+          }
+        }, null, 2),
+        text: '아코디언 아이템'
+      },
+      version: '1.0.0',
+      tags: ['accordion', 'faq', 'collapse', '아코디언', '질문', '답변'],
+      aiPrompts: ['FAQ 항목을 추가할 때', '접었다 펼치는 콘텐츠가 필요할 때']
+    });
+
+    this.register('o4o/faq-accordion', {
+      name: 'o4o/faq-accordion',
+      title: 'FAQ Accordion',
+      description: '여러 개의 FAQ를 아코디언 형태로 표시',
+      category: 'widgets',
+      attributes: {
+        items: {
+          type: 'array',
+          description: 'FAQ 항목 배열 (각 항목: {question: string, answer: string, defaultOpen?: boolean})'
+        },
+        borderColor: { type: 'string', default: '#e5e7eb', description: '테두리색' },
+        backgroundColor: { type: 'string', default: '#ffffff', description: '배경색' },
+        titleColor: { type: 'string', default: '#111827', description: '제목 색상' },
+        contentColor: { type: 'string', default: '#6b7280', description: '내용 색상' },
+        spacing: { type: 'number', default: 16, description: '항목 간격 (px)' }
+      },
+      example: {
+        json: JSON.stringify({
+          type: 'o4o/faq-accordion',
+          attributes: {
+            items: [
+              { question: '자주 묻는 질문 1', answer: '답변 1', defaultOpen: true },
+              { question: '자주 묻는 질문 2', answer: '답변 2', defaultOpen: false },
+              { question: '자주 묻는 질문 3', answer: '답변 3', defaultOpen: false }
+            ],
+            spacing: 16
+          }
+        }, null, 2),
+        text: 'FAQ 아코디언'
+      },
+      version: '1.0.0',
+      tags: ['faq', 'accordion', 'question', 'answer', '질문', '답변', '아코디언'],
+      aiPrompts: ['자주 묻는 질문을 표시할 때', '여러 FAQ를 한 곳에 모아서 보여줄 때', 'Q&A 섹션이 필요할 때']
+    });
+
     // ============================================
     // 임베드 블록 (Embed Blocks)
     // ============================================

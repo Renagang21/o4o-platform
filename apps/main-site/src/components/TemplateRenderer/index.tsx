@@ -10,6 +10,9 @@ import SpacerBlock from './blocks/SpacerBlock';
 import ShortcodeBlock from './blocks/ShortcodeBlock';
 import TabsBlock from './blocks/TabsBlock';
 import ErrorBlock from './blocks/ErrorBlock';
+import FeatureCardBlock from './blocks/FeatureCardBlock';
+import AccordionItemBlock from './blocks/AccordionItemBlock';
+import FAQAccordionBlock from './blocks/FAQAccordionBlock';
 import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
 import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
 
@@ -35,6 +38,9 @@ const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key
   'o4o/spacer': SpacerBlock,
   'o4o/shortcode': ShortcodeBlock,
   'o4o/tabs': TabsBlock,
+  'o4o/feature-card': FeatureCardBlock,
+  'o4o/accordion-item': AccordionItemBlock,
+  'o4o/faq-accordion': FAQAccordionBlock,
 
   // Spectra blocks
   'uagb/call-to-action': CTABlock,

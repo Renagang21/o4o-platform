@@ -493,9 +493,11 @@ ${templateGuidelines}`;
 - 매력적인 헤드라인 (H1)
 - 부제목 설명 (H2)
 - o4o/spacer (50-80px) - 섹션 구분
-- 주요 기능/장점 3개 (단락 또는 리스트)
+- 주요 기능/장점: o4o/icon-feature-list 또는 o4o/feature-card 사용
 - o4o/spacer (50-80px) - 섹션 구분
 - **프로세스가 있다면 o4o/timeline-chart 사용** (단계별 과정 시각화)
+- **FAQ가 있다면 o4o/faq-accordion 사용** (자주 묻는 질문)
+- o4o/spacer (50-80px) - 섹션 구분
 - CTA 버튼
 - 이미지는 alt 텍스트만 (url은 빈 문자열)`,
 
@@ -512,11 +514,12 @@ ${templateGuidelines}`;
       product: `**제품 소개 페이지 구성:**
 - 제품명과 한 줄 설명
 - o4o/spacer (50px) - 섹션 구분
-- 주요 기능 소개 (리스트 활용)
+- 주요 기능: o4o/icon-feature-list 또는 o4o/feature-card 사용
 - o4o/spacer (50px) - 섹션 구분
-- 제품 장점 3-5개
+- 제품 장점 3-5개 (o4o/feature-card 활용 가능)
 - o4o/spacer (50px) - 섹션 구분
 - **사용 방법/프로세스가 있다면 o4o/timeline-chart 사용** (단계별 설명)
+- **자주 묻는 질문이 있다면 o4o/faq-accordion 사용**
 - 사용법/활용 사례
 - 가격 정보 (PricingTable이 없으면 placeholder 사용)
 - o4o/spacer (50px) - 섹션 구분
