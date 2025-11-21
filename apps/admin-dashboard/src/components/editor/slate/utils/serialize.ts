@@ -18,8 +18,14 @@ import { isListItemElement } from '../types/slate-types';
  *
  * Converts Slate JSON to HTML string for saving to Gutenberg
  */
-export const serialize = (nodes: Descendant[]): string => {
-  return nodes.map((node) => serializeNode(node)).join('');
+export const serialize = (nodes: Descendant[] | undefined | null): string => {
+  // Safely handle undefined/null nodes
+  if (!nodes || !Array.isArray(nodes)) {
+    return '';
+  }
+
+  const safeNodes = nodes.filter(Boolean);
+  return safeNodes.map((node) => serializeNode(node)).join('');
 };
 
 /**
@@ -31,7 +37,10 @@ const serializeNode = (node: Descendant): string => {
   }
 
   const element = node as CustomElement;
-  const children = element.children.map((n) => serializeNode(n)).join('');
+
+  // Safely handle children - provide default empty array if undefined
+  const safeChildren = (element.children ?? []).filter(Boolean);
+  const children = safeChildren.map((n) => serializeNode(n)).join('');
 
   switch (element.type) {
     case 'paragraph':
@@ -132,19 +141,47 @@ const serializeListItem = (element: ListItemElement, children: string): string =
 };
 
 /**
+ * Safely convert value to trimmed string
+ * Handles cases where value might not be a string
+ */
+const safeTrim = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (Array.isArray(value)) {
+    // List/tag data came in as array - join and trim
+    return value
+      .filter((v) => v != null)
+      .map((v) => String(v).trim())
+      .join(', ');
+  }
+
+  if (value == null) {
+    return '';
+  }
+
+  // Number/object - convert to string
+  return String(value).trim();
+};
+
+/**
  * Deserialize HTML to Slate value
  *
  * Converts HTML string from Gutenberg to Slate JSON.
  * Also handles plain text content (for new Paragraph/Heading blocks).
  */
 export const deserialize = (html: string): Descendant[] => {
+  // Safely trim input
+  const trimmedHtml = safeTrim(html);
+
   // If content doesn't contain HTML tags, treat as plain text
-  if (!html.trim().startsWith('<')) {
+  if (!trimmedHtml.startsWith('<')) {
     // Plain text content - wrap in text node
-    return [{ text: html }];
+    return [{ text: trimmedHtml }];
   }
 
-  const document = new DOMParser().parseFromString(html, 'text/html');
+  const document = new DOMParser().parseFromString(trimmedHtml, 'text/html');
   return Array.from(document.body.childNodes)
     .map((node) => deserializeNode(node))
     .filter((node): node is Descendant => node !== null);
