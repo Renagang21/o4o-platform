@@ -156,6 +156,37 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Listen for session expiry events from cookie-client
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleSessionExpiry = (event: StorageEvent) => {
+      if (event.key === 'auth-session-expired' && event.newValue) {
+        // Session expired - clear user state
+        setUser(null);
+        localStorage.removeItem('auth_session_hint');
+
+        // Show toast once
+        toast.info('로그인 세션이 만료되었습니다. 다시 로그인해 주세요.');
+
+        // Redirect to login with current URL as redirect param
+        const currentPath = window.location.pathname + window.location.search;
+        const redirectUrl = `/login?redirect=${encodeURIComponent(currentPath)}`;
+
+        // Small delay to ensure toast is visible
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 500);
+      }
+    };
+
+    window.addEventListener('storage', handleSessionExpiry);
+
+    return () => {
+      window.removeEventListener('storage', handleSessionExpiry);
+    };
+  }, [toast]);
+
   return (
     <AuthContext.Provider
       value={{

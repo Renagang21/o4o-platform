@@ -43,7 +43,7 @@ const roleInfo: Record<string, { name: string; description: string; icon: string
 export const RoleApplyForm: React.FC<RoleApplyFormProps> = ({ attributes }) => {
   const role = attributes?.role || '';
   const navigate = useNavigate();
-  const { hasRole } = useAuth();
+  const { hasRole, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     businessName: '',
@@ -56,13 +56,23 @@ export const RoleApplyForm: React.FC<RoleApplyFormProps> = ({ attributes }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (role) {
-      checkStatus();
-    } else {
+    if (!role) {
       setCheckingStatus(false);
       setError('Role parameter is required');
+      return;
     }
-  }, [role]);
+
+    // Skip API call if not authenticated
+    if (!authLoading && !isAuthenticated) {
+      setCheckingStatus(false);
+      return;
+    }
+
+    // Only check status if authenticated
+    if (!authLoading && isAuthenticated) {
+      checkStatus();
+    }
+  }, [role, isAuthenticated, authLoading]);
 
   const checkStatus = async () => {
     try {
@@ -74,7 +84,19 @@ export const RoleApplyForm: React.FC<RoleApplyFormProps> = ({ attributes }) => {
       const apps = response.data.applications || [];
       const pending = apps.find((a: any) => a.role === role && a.status === 'pending');
       setPendingApp(pending);
-    } catch (err) {
+    } catch (err: any) {
+      const status = err?.response?.status;
+
+      // Silently handle auth errors (session expiry will be handled by AuthContext)
+      if (status === 401 || status === 403) {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.debug('[RoleApplyForm] Unauthorized when checking status.', status);
+        }
+        return;
+      }
+
+      // Log other errors for debugging
       console.error('Failed to check status:', err);
     } finally {
       setCheckingStatus(false);
@@ -121,6 +143,33 @@ export const RoleApplyForm: React.FC<RoleApplyFormProps> = ({ attributes }) => {
               {role ? `Role "${role}" is not valid.` : 'Role parameter is required.'}
               {' '}Valid roles are: supplier, seller, partner.
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Login required
+  if (!authLoading && !isAuthenticated) {
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0">
+            <AlertCircle className="w-8 h-8 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-blue-900 mb-2">
+              로그인이 필요합니다
+            </h3>
+            <p className="text-blue-700 mb-4">
+              역할 신청은 로그인 후 이용하실 수 있습니다.
+            </p>
+            <Link
+              to={`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`}
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              로그인하기 →
+            </Link>
           </div>
         </div>
       </div>

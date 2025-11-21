@@ -20,6 +20,7 @@ export class CookieAuthClient {
   public api: AxiosInstance;
   private refreshPromise: Promise<boolean> | null = null;
   private currentToken: string | null = null;
+  private hasHandledSessionExpiry: boolean = false;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
@@ -78,6 +79,8 @@ export class CookieAuthClient {
     if (response.data.token) {
       this.currentToken = response.data.token;
     }
+    // Reset session expiry flag on successful login
+    this.resetSessionExpiryFlag();
     return response.data;
   }
 
@@ -109,13 +112,43 @@ export class CookieAuthClient {
       const response = await this.api.post<RefreshResponse>('/auth/cookie/refresh', {}, config);
 
       if (response.status === 401) {
+        // Session expired - broadcast event once
+        this.handleSessionExpiry();
         return false;
       }
 
       return response.data.success;
     } catch (error) {
+      // Network or other errors
       return false;
     }
+  }
+
+  /**
+   * Handle session expiry by broadcasting event
+   * Only happens once per session to avoid spam
+   */
+  private handleSessionExpiry(): void {
+    if (this.hasHandledSessionExpiry) {
+      return;
+    }
+
+    this.hasHandledSessionExpiry = true;
+
+    if (typeof window !== 'undefined') {
+      // Broadcast session-expired event
+      localStorage.setItem('auth-session-expired', Date.now().toString());
+
+      // Clean up after a moment
+      setTimeout(() => localStorage.removeItem('auth-session-expired'), 100);
+    }
+  }
+
+  /**
+   * Reset session expiry flag (called after successful login)
+   */
+  public resetSessionExpiryFlag(): void {
+    this.hasHandledSessionExpiry = false;
   }
 
   async getCurrentUser(): Promise<MeResponse | null> {

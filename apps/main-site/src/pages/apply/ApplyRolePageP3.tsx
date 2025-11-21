@@ -17,7 +17,7 @@ const ROLE_INFO: Record<string, { name: string; description: string }> = {
 
 export const ApplyRolePageP3: React.FC = () => {
   const { role } = useParams<{ role: string }>();
-  const { hasRole } = useAuth();
+  const { hasRole, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -31,8 +31,17 @@ export const ApplyRolePageP3: React.FC = () => {
   const [pendingApp, setPendingApp] = useState<any>(null);
 
   useEffect(() => {
-    checkStatus();
-  }, [role]);
+    // Skip API call if not authenticated
+    if (!authLoading && !isAuthenticated) {
+      setCheckingStatus(false);
+      return;
+    }
+
+    // Only check status if authenticated
+    if (!authLoading && isAuthenticated) {
+      checkStatus();
+    }
+  }, [role, isAuthenticated, authLoading]);
 
   const checkStatus = async () => {
     try {
@@ -43,7 +52,18 @@ export const ApplyRolePageP3: React.FC = () => {
       const apps = response.data.applications || [];
       const pending = apps.find((a: any) => a.role === role && a.status === 'pending');
       setPendingApp(pending);
-    } catch (error) {
+    } catch (error: any) {
+      const status = error?.response?.status;
+
+      // Silently handle auth errors (session expiry will be handled by AuthContext)
+      if (status === 401 || status === 403) {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.debug('[ApplyRolePage] Unauthorized when checking status.', status);
+        }
+        return;
+      }
+
       console.error('Failed to check status:', error);
     } finally {
       setCheckingStatus(false);

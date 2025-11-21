@@ -44,14 +44,23 @@ const ROLE_CARDS = [
 ];
 
 export const ApplyLandingPageP3: React.FC = () => {
-  const { user, hasRole } = useAuth();
+  const { user, hasRole, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [applications, setApplications] = useState<RoleApplication[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadApplications();
-  }, []);
+    // Skip API call if not authenticated
+    if (!authLoading && !isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
+    // Only load if authenticated
+    if (!authLoading && isAuthenticated) {
+      loadApplications();
+    }
+  }, [isAuthenticated, authLoading]);
 
   const loadApplications = async () => {
     try {
@@ -60,7 +69,18 @@ export const ApplyLandingPageP3: React.FC = () => {
         baseURL: 'https://api.neture.co.kr'
       });
       setApplications(response.data.applications || []);
-    } catch (error) {
+    } catch (error: any) {
+      const status = error?.response?.status;
+
+      // Silently handle auth errors (session expiry will be handled by AuthContext)
+      if (status === 401 || status === 403) {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.debug('[ApplyLandingPage] Unauthorized when loading applications.', status);
+        }
+        return;
+      }
+
       console.error('Failed to load applications:', error);
     } finally {
       setLoading(false);
