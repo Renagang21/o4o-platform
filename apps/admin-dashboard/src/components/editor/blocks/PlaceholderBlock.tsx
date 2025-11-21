@@ -9,9 +9,9 @@
 import React, { useState } from 'react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { AlertCircle, Package, Loader2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { AlertCircle, Package, Loader2, ChevronDown, ChevronUp, Sparkles, Lightbulb, Check } from 'lucide-react';
 import { blockCodeGenerator } from '@/services/ai/BlockCodeGenerator';
-import { NewBlockRequest } from '@/services/ai/types';
+import { NewBlockRequest, SuggestedBlock } from '@/services/ai/types';
 import toast from 'react-hot-toast';
 
 interface PlaceholderBlockProps {
@@ -31,6 +31,8 @@ interface PlaceholderBlockProps {
     props?: string[];
     style?: string;
     placeholderId?: string;
+    userIntent?: string;
+    suggestedAlternatives?: SuggestedBlock[];
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -44,6 +46,8 @@ interface PlaceholderBlockProps {
   onChangeType?: (newType: string) => void;
   // Phase 2-A: Block generation callback
   onGenerateBlock?: (blockId: string, spec: NewBlockRequest) => Promise<void>;
+  // Phase 3: Block replacement callback
+  onReplaceWithBlock?: (blockId: string, newBlockType: string, newAttributes: Record<string, any>) => void;
 }
 
 /**
@@ -71,6 +75,7 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
   onPaste,
   onChangeType,
   onGenerateBlock,
+  onReplaceWithBlock,
 }) => {
   const {
     componentName = 'Unknown Component',
@@ -78,12 +83,32 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
     props = [],
     style = '',
     placeholderId = '',
+    userIntent = '',
+    suggestedAlternatives = [],
   } = attributes;
 
   // Phase 2-A: Block generation state
   const [isGenerating, setIsGenerating] = useState(false);
   // Phase 1-D: Collapsible details state
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
+  // Phase 3: Alternative blocks state
+  const [showAlternatives, setShowAlternatives] = useState(suggestedAlternatives.length > 0);
+
+  // Phase 3: Handle alternative block selection
+  const handleUseAlternative = (alternative: SuggestedBlock) => {
+    if (!onReplaceWithBlock) {
+      toast.error('블록 교체 기능이 활성화되지 않았습니다');
+      return;
+    }
+
+    try {
+      // Replace placeholder with selected alternative block
+      onReplaceWithBlock(id, alternative.blockType, alternative.exampleConfig);
+      toast.success(`${alternative.blockType} 블록으로 교체되었습니다`);
+    } catch (error: any) {
+      toast.error(error.message || '블록 교체 중 오류가 발생했습니다');
+    }
+  };
 
   // Phase 2-A: Handle block generation
   const handleGenerate = async () => {
@@ -101,6 +126,8 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
         placeholderId,
         componentName,
         reason,
+        userIntent,
+        suggestedAlternatives,
         spec: {
           props,
           style,
@@ -244,6 +271,68 @@ const PlaceholderBlock: React.FC<PlaceholderBlockProps> = ({
               </div>
             )}
           </>
+        )}
+
+        {/* Phase 3: Alternative Blocks Section */}
+        {suggestedAlternatives.length > 0 && (
+          <div className="mt-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb className="w-5 h-5 text-blue-600" />
+              <h4 className="font-semibold text-blue-900">대체 가능한 블록</h4>
+            </div>
+
+            {userIntent && (
+              <p className="text-sm text-blue-700 mb-3 bg-white/60 px-3 py-2 rounded border border-blue-200">
+                <strong>목적:</strong> {userIntent}
+              </p>
+            )}
+
+            <div className="space-y-2">
+              {suggestedAlternatives.map((alt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleUseAlternative(alt)}
+                  disabled={!onReplaceWithBlock}
+                  className={cn(
+                    "w-full p-3 rounded-lg text-left transition-all duration-200",
+                    "border-2",
+                    onReplaceWithBlock
+                      ? "bg-white border-blue-200 hover:border-blue-400 hover:shadow-md cursor-pointer"
+                      : "bg-gray-100 border-gray-200 cursor-not-allowed opacity-60"
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-gray-900 text-sm">{alt.blockType}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
+                        {alt.matchScore}% 일치
+                      </span>
+                      {onReplaceWithBlock && (
+                        <Check className="w-4 h-4 text-blue-600" />
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600">{alt.reason}</p>
+
+                  {/* Preview of example config */}
+                  {alt.exampleConfig && Object.keys(alt.exampleConfig).length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-blue-100">
+                      <span className="text-xs text-gray-500 font-mono">
+                        {JSON.stringify(alt.exampleConfig).substring(0, 80)}...
+                      </span>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {!onReplaceWithBlock && (
+              <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                블록 교체 기능이 활성화되지 않았습니다
+              </p>
+            )}
+          </div>
         )}
 
         {/* Phase 1-D: Improved Action Button */}

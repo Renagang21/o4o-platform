@@ -315,13 +315,19 @@ export class SimpleAIGenerator {
 7. Shortcode는 그대로 사용 가능 (o4o/shortcode 타입)
 8. **섹션 간 여백**: 주요 섹션 사이에는 반드시 o4o/spacer 블록을 사용하여 충분한 여백(50-80px)을 확보하시오
 
-**Missing Block 정책 (중요):**
+**Missing Block 정책 (중요 - 2025-11-21 개선):**
 사용자의 요구사항을 구현하기 위해 필요한 블록이 Block Registry에 없다면:
-- 절대로 기존 블록을 억지로 조합하지 마시오
-- 반드시:
-  1) layout.blocks[] 내에 "o4o/placeholder" 블록 배치
-  2) new_blocks_request[] 항목 생성
-  3) placeholderId로 두 결과를 연결하시오`;
+1. **먼저 Block Registry에서 유사한 블록 2-3개를 찾으시오**
+   - 완전히 일치하지 않아도, 같은 목적으로 사용할 수 있는 블록을 찾으시오
+   - 예: "TimelineChart"가 없으면 → "o4o/list" (순서 있는 리스트로 단계 표현)
+   - 예: "PricingTable"이 없으면 → "o4o/table" (표로 가격 표시)
+   - 예: "FeatureGrid"가 없으면 → "o4o/columns" (다단 레이아웃으로 기능 나열)
+2. **찾은 유사 블록들을 new_blocks_request[]의 suggestedAlternatives에 포함**
+   - 각 블록에 matchScore (0-100), reason, exampleConfig 제공
+3. **Placeholder 블록 배치**
+   - layout.blocks[]에 "o4o/placeholder" 블록 배치
+   - placeholderId로 new_blocks_request[]와 연결
+4. **정말 대체 불가능한 경우에만** suggestedAlternatives를 비워두시오`;
 
     // ═══════════════════════════════════════════════════════════════
     // SECTION 2: Block Registry
@@ -383,6 +389,28 @@ ${JSON.stringify(designTokens, null, 2)}
       "placeholderId": "p1",
       "componentName": "TimelineChart",
       "reason": "시간 흐름을 시각화하기 위해 필요합니다",
+      "userIntent": "프로젝트 진행 단계를 시간 순서대로 표시",
+      "suggestedAlternatives": [
+        {
+          "blockType": "o4o/list",
+          "matchScore": 75,
+          "reason": "순서 있는 리스트로 단계를 명확하게 표현 가능",
+          "exampleConfig": {
+            "items": ["1단계: 기획 (2024-01)", "2단계: 개발 (2024-03)", "3단계: 출시 (2024-06)"],
+            "ordered": true,
+            "type": "ordered"
+          }
+        },
+        {
+          "blockType": "o4o/columns",
+          "matchScore": 60,
+          "reason": "다단 레이아웃으로 각 단계를 병렬 표시 가능",
+          "exampleConfig": {
+            "columnCount": 3,
+            "isStackedOnMobile": true
+          }
+        }
+      ],
       "spec": {
         "props": ["items", "orientation"],
         "style": "vertical timeline with milestones",
@@ -397,8 +425,10 @@ ${JSON.stringify(designTokens, null, 2)}
 2. Block Registry에서 사용 가능한 블록 확인
 3. 필요한 블록이 있으면 layout.blocks[]에 추가
 4. 필요한 블록이 없으면:
+   - Block Registry에서 유사한 블록 2-3개 찾기
    - o4o/placeholder 블록을 layout.blocks[]에 추가
-   - new_blocks_request[]에 상세 스펙 작성
+   - new_blocks_request[]에 상세 스펙 + suggestedAlternatives 작성
+   - userIntent 명확히 기술
 5. Design Tokens를 attributes에 반영
 
 **Placeholder 블록 예시:**
@@ -408,7 +438,19 @@ ${JSON.stringify(designTokens, null, 2)}
   "attributes": {
     "componentName": "PricingTable",
     "reason": "가격표를 표시하기 위해 필요",
-    "placeholderId": "p1"
+    "placeholderId": "p1",
+    "userIntent": "3가지 요금제를 비교 표시",
+    "suggestedAlternatives": [
+      {
+        "blockType": "o4o/table",
+        "matchScore": 80,
+        "reason": "표 형식으로 요금제 비교 가능",
+        "exampleConfig": {
+          "headers": ["기능", "Basic", "Pro", "Enterprise"],
+          "rows": [["가격", "$9", "$29", "$99"]]
+        }
+      }
+    ]
   }
 }`;
 

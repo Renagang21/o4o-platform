@@ -25,6 +25,31 @@ export interface AIResponseV2 {
 }
 
 /**
+ * Suggested alternative block when exact match not found
+ */
+export interface SuggestedBlock {
+  /**
+   * Block type from registry (e.g., "o4o/list", "o4o/columns")
+   */
+  blockType: string;
+
+  /**
+   * Match score (0-100) indicating how well this block fits the need
+   */
+  matchScore: number;
+
+  /**
+   * Explanation of why this block can be used as alternative
+   */
+  reason: string;
+
+  /**
+   * Pre-configured attributes for this use case
+   */
+  exampleConfig: Record<string, any>;
+}
+
+/**
  * New Block Request Specification
  * Generated when AI identifies need for a component not in block registry
  */
@@ -43,6 +68,17 @@ export interface NewBlockRequest {
    * Reason why this new block is needed
    */
   reason: string;
+
+  /**
+   * User's intent or goal (e.g., "시간 흐름 표시", "가격표 표시")
+   */
+  userIntent?: string;
+
+  /**
+   * Alternative blocks that can be used instead
+   * AI should suggest 1-3 alternatives from existing block registry
+   */
+  suggestedAlternatives?: SuggestedBlock[];
 
   /**
    * Block specification for future implementation
