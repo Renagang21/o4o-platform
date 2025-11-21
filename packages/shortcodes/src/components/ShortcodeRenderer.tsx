@@ -1,12 +1,14 @@
 /**
  * Universal Shortcode Renderer Component
  * Provides consistent shortcode rendering across Main Site and Admin Dashboard
+ * HP-2: Enhanced with Error Boundary for isolated error handling
  */
 
 import { FC, useState, useEffect, ReactNode } from 'react';
 import { globalRegistry } from '../registry.js';
 import { defaultParser } from '../parser.js';
 import type { ParsedShortcode } from '../types.js';
+import { ShortcodeErrorBoundary } from './ShortcodeErrorBoundary.js';
 
 export interface ShortcodeRendererProps {
   content: string;
@@ -84,31 +86,25 @@ export const ShortcodeRenderer: FC<ShortcodeRendererProps> = ({
     // Render shortcode
     const definition = globalRegistry.get(shortcode.name);
     if (definition) {
-      try {
-        const Component = definition.component;
-        elements.push(
+      // HP-2: Wrap each shortcode in Error Boundary for isolation
+      const Component = definition.component;
+      elements.push(
+        <ShortcodeErrorBoundary
+          key={`shortcode-${keyIndex++}`}
+          shortcodeName={shortcode.name}
+          shortcodeProps={shortcode.attributes}
+          ErrorComponent={ErrorComponent as any}
+          onError={(error) => {
+            onError?.(error);
+          }}
+        >
           <Component
-            key={`shortcode-${keyIndex++}`}
             attributes={shortcode.attributes}
             content={shortcode.content}
             context={context}
           />
-        );
-      } catch (err) {
-        // Shortcode render error
-        const error = err instanceof Error ? err : new Error('Shortcode render error');
-        console.error(`Error rendering shortcode [${shortcode.name}]:`, error);
-
-        if (ErrorComponent) {
-          elements.push(<ErrorComponent key={`error-${keyIndex++}`} error={error} />);
-        } else {
-          elements.push(
-            <span key={`error-${keyIndex++}`} style={{ color: 'red' }}>
-              [Error: {shortcode.name}]
-            </span>
-          );
-        }
-      }
+        </ShortcodeErrorBoundary>
+      );
     } else {
       // Unknown shortcode - not registered in globalRegistry
       // Phase SC-2: Add diagnostic warning (always in development, can be disabled in production)

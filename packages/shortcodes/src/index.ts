@@ -54,6 +54,10 @@ export {
   DefaultUnknownShortcodeComponent
 } from './components/ShortcodeRenderer.js';
 
+// HP-2: Error Boundary export
+export { ShortcodeErrorBoundary } from './components/ShortcodeErrorBoundary.js';
+export type { ShortcodeErrorBoundaryProps } from './components/ShortcodeErrorBoundary.js';
+
 // Preset shortcode
 export { PresetShortcode } from './components/PresetShortcode.js';
 export {
