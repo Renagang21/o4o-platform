@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { defaultTokens, type DesignTokens } from '@o4o/appearance-system';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ThemeSettingsResponse {
   id?: number;
@@ -15,6 +16,8 @@ interface ThemeSettingsResponse {
 }
 
 export function useThemeSettings() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
   const query = useQuery({
     queryKey: ['settings', 'theme'],
     queryFn: async () => {
@@ -41,6 +44,7 @@ export function useThemeSettings() {
         throw error;
       }
     },
+    enabled: !authLoading && isAuthenticated, // Only fetch if authenticated
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
     retry: false, // Don't retry on 401/403
