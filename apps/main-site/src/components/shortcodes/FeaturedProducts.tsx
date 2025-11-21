@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeComponentProps } from '@o4o/shortcodes';
+import { ShortcodeComponentProps, ShortcodeDefinition } from '@o4o/shortcodes';
 import { useProducts } from '@/hooks/useProducts';
 
 // Placeholder ProductGrid component
@@ -111,5 +111,33 @@ const FeaturedProductsShortcode: FC<ShortcodeComponentProps> = ({ attributes }) 
     </div>
   );
 };
+
+/**
+ * Featured Products Shortcode Definition
+ */
+export const featuredProductsShortcodes: ShortcodeDefinition[] = [
+  {
+    name: 'featured_products',
+    component: FeaturedProductsShortcode,
+    description: 'Featured products grid with configurable layout',
+    attributes: [
+      {
+        name: 'limit',
+        type: 'number',
+        description: 'Number of featured products to display (default: 4)',
+      },
+      {
+        name: 'columns',
+        type: 'number',
+        description: 'Number of columns in grid (default: 4)',
+      },
+      {
+        name: 'title',
+        type: 'string',
+        description: 'Section title (default: "추천 상품")',
+      },
+    ],
+  },
+];
 
 export default FeaturedProductsShortcode;

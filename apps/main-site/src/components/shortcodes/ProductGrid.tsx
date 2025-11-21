@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeComponentProps } from '@o4o/shortcodes';
+import { ShortcodeComponentProps, ShortcodeDefinition } from '@o4o/shortcodes';
 import { useProducts } from '@/hooks/useProducts';
 
 // Placeholder ProductGrid component
@@ -114,5 +114,48 @@ const ProductGridShortcode: FC<ShortcodeComponentProps> = ({ attributes }) => {
     </Suspense>
   );
 };
+
+/**
+ * Product Grid Shortcode Definition
+ */
+export const productGridShortcodes: ShortcodeDefinition[] = [
+  {
+    name: 'product_grid',
+    component: ProductGridShortcode,
+    description: 'Product grid display with filtering, sorting, and pagination',
+    attributes: [
+      {
+        name: 'category',
+        type: 'string',
+        description: 'Filter products by category',
+      },
+      {
+        name: 'limit',
+        type: 'number',
+        description: 'Number of products to display (default: 12)',
+      },
+      {
+        name: 'columns',
+        type: 'number',
+        description: 'Number of columns in grid (default: 4)',
+      },
+      {
+        name: 'featured',
+        type: 'boolean',
+        description: 'Show only featured products',
+      },
+      {
+        name: 'orderby',
+        type: 'string',
+        description: 'Sort by: price, name, created_at (default: created_at)',
+      },
+      {
+        name: 'order',
+        type: 'string',
+        description: 'Sort direction: asc, desc (default: desc)',
+      },
+    ],
+  },
+];
 
 export default ProductGridShortcode;

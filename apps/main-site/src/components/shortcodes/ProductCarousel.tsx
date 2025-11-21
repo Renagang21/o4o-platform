@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeComponentProps } from '@o4o/shortcodes';
+import { ShortcodeComponentProps, ShortcodeDefinition } from '@o4o/shortcodes';
 import { useProducts } from '@/hooks/useProducts';
 
 // Placeholder ProductCarousel component
@@ -66,5 +66,38 @@ const ProductCarouselShortcode: FC<ShortcodeComponentProps> = ({ attributes }) =
     </Suspense>
   );
 };
+
+/**
+ * Product Carousel Shortcode Definition
+ */
+export const productCarouselShortcodes: ShortcodeDefinition[] = [
+  {
+    name: 'product_carousel',
+    component: ProductCarouselShortcode,
+    description: 'Product carousel with horizontal scrolling and autoplay',
+    attributes: [
+      {
+        name: 'category',
+        type: 'string',
+        description: 'Filter products by category',
+      },
+      {
+        name: 'limit',
+        type: 'number',
+        description: 'Number of products to display (default: 10)',
+      },
+      {
+        name: 'autoplay',
+        type: 'boolean',
+        description: 'Enable auto-scrolling (default: true)',
+      },
+      {
+        name: 'title',
+        type: 'string',
+        description: 'Carousel section title',
+      },
+    ],
+  },
+];
 
 export default ProductCarouselShortcode;

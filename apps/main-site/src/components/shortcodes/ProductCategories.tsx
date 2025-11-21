@@ -6,7 +6,7 @@
  */
 
 import { FC, Suspense } from 'react';
-import { ShortcodeComponentProps } from '@o4o/shortcodes';
+import { ShortcodeComponentProps, ShortcodeDefinition } from '@o4o/shortcodes';
 import { useCategories } from '@/hooks/useCategories';
 import { FolderOpen } from 'lucide-react';
 
@@ -103,5 +103,33 @@ const ProductCategoriesShortcode: FC<ShortcodeComponentProps> = ({ attributes })
     </Suspense>
   );
 };
+
+/**
+ * Product Categories Shortcode Definition
+ */
+export const productCategoriesShortcodes: ShortcodeDefinition[] = [
+  {
+    name: 'product_categories',
+    component: ProductCategoriesShortcode,
+    description: 'Product categories grid with counts and filtering',
+    attributes: [
+      {
+        name: 'show_count',
+        type: 'boolean',
+        description: 'Show product count per category (default: true)',
+      },
+      {
+        name: 'hide_empty',
+        type: 'boolean',
+        description: 'Hide categories with no products (default: true)',
+      },
+      {
+        name: 'columns',
+        type: 'number',
+        description: 'Number of columns in grid (default: 3)',
+      },
+    ],
+  },
+];
 
 export default ProductCategoriesShortcode;
