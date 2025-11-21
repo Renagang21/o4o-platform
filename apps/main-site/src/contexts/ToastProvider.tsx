@@ -210,11 +210,37 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children, maxToast
 /**
  * Hook to access toast context
  * Must be used within ToastProvider
+ *
+ * DEV: Throws error to catch Provider issues early
+ * PROD: Returns no-op toast to prevent page crash
  */
 export function useToastContext(): ToastContextValue {
   const context = useContext(ToastContext);
+
   if (!context) {
-    throw new Error('useToastContext must be used within ToastProvider');
+    // Development: Throw error for debugging
+    if (import.meta.env.DEV) {
+      throw new Error('useToastContext must be used within ToastProvider');
+    }
+
+    // Production: Return no-op toast to prevent page crash
+    console.warn('[Toast] ToastProvider가 없는 환경에서 useToast()가 호출되었습니다.');
+
+    const noop = (..._args: any[]) => {
+      console.warn('[Toast] ToastProvider 없이 토스트가 호출됨:', _args);
+    };
+
+    return {
+      showToast: noop,
+      success: noop,
+      error: noop,
+      warning: noop,
+      info: noop,
+      dismiss: noop,
+      clearAll: noop,
+      toasts: [],
+    } as ToastContextValue;
   }
+
   return context;
 }
