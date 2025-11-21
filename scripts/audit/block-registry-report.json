@@ -1,0 +1,357 @@
+{
+  "timestamp": "2025-11-21T04:44:43.193Z",
+  "foundBlocks": [
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/accordion-item.tsx",
+      "fileName": "accordion-item.tsx",
+      "blockName": "o4o/accordion-item",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/button.tsx",
+      "fileName": "button.tsx",
+      "blockName": "o4o/button",
+      "category": "design"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/buttons.tsx",
+      "fileName": "buttons.tsx",
+      "blockName": "o4o/buttons",
+      "category": "design"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/code.tsx",
+      "fileName": "code.tsx",
+      "blockName": "o4o/code",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/column.tsx",
+      "fileName": "column.tsx",
+      "blockName": "o4o/column",
+      "category": "layout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/columns.tsx",
+      "fileName": "columns.tsx",
+      "blockName": "o4o/columns",
+      "category": "layout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/conditional.tsx",
+      "fileName": "conditional.tsx",
+      "blockName": "o4o/conditional",
+      "category": "layout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/cover.tsx",
+      "fileName": "cover.tsx",
+      "blockName": "o4o/cover",
+      "category": "media"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/faq-accordion.tsx",
+      "fileName": "faq-accordion.tsx",
+      "blockName": "o4o/faq-accordion",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/feature-card.tsx",
+      "fileName": "feature-card.tsx",
+      "blockName": "o4o/feature-card",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/file.tsx",
+      "fileName": "file.tsx",
+      "blockName": "o4o/file",
+      "category": "media"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/form-field.tsx",
+      "fileName": "form-field.tsx",
+      "blockName": "o4o/form-field",
+      "category": "dynamic"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/form-submit.tsx",
+      "fileName": "form-submit.tsx",
+      "blockName": "o4o/form-submit",
+      "category": "dynamic"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/gallery.tsx",
+      "fileName": "gallery.tsx",
+      "blockName": "o4o/gallery",
+      "category": "media"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/group.tsx",
+      "fileName": "group.tsx",
+      "blockName": "o4o/group",
+      "category": "layout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/heading.tsx",
+      "fileName": "heading.tsx",
+      "blockName": "o4o/heading",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/icon-feature-list.tsx",
+      "fileName": "icon-feature-list.tsx",
+      "blockName": "o4o/icon-feature-list",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/image.tsx",
+      "fileName": "image.tsx",
+      "blockName": "o4o/image",
+      "category": "media"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/list.tsx",
+      "fileName": "list.tsx",
+      "blockName": "o4o/list",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/markdown.tsx",
+      "fileName": "markdown.tsx",
+      "blockName": "o4o/markdown",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/paragraph.tsx",
+      "fileName": "paragraph.tsx",
+      "blockName": "o4o/paragraph",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/placeholder.tsx",
+      "fileName": "placeholder.tsx",
+      "blockName": "o4o/placeholder",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/quote.tsx",
+      "fileName": "quote.tsx",
+      "blockName": "o4o/quote",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/role-card.tsx",
+      "fileName": "role-card.tsx",
+      "blockName": "o4o/role-card",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/separator.tsx",
+      "fileName": "separator.tsx",
+      "blockName": "o4o/separator",
+      "category": "layout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/shortcode.tsx",
+      "fileName": "shortcode.tsx",
+      "blockName": "o4o/shortcode",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/social.tsx",
+      "fileName": "social.tsx",
+      "blockName": "o4o/social",
+      "category": "widgets"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/spacer.tsx",
+      "fileName": "spacer.tsx",
+      "blockName": "o4o/spacer",
+      "category": "layout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/table.tsx",
+      "fileName": "table.tsx",
+      "blockName": "o4o/table",
+      "category": "text"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/universal-form.tsx",
+      "fileName": "universal-form.tsx",
+      "blockName": "o4o/universal-form",
+      "category": "dynamic"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/video.tsx",
+      "fileName": "video.tsx",
+      "blockName": "o4o/video",
+      "category": "media"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/youtube.tsx",
+      "fileName": "youtube.tsx",
+      "blockName": "o4o/youtube",
+      "category": "media"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/generated/TimelineChart.definition.tsx",
+      "fileName": "TimelineChart.definition.tsx",
+      "blockName": "o4o/timeline-chart",
+      "category": "widgets"
+    }
+  ],
+  "registeredBlocks": [
+    {
+      "name": "o4o/paragraph",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (paragraphBlockDefinition)"
+    },
+    {
+      "name": "o4o/heading",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (headingBlockDefinition)"
+    },
+    {
+      "name": "o4o/quote",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (quoteBlockDefinition)"
+    },
+    {
+      "name": "o4o/code",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (codeBlockDefinition)"
+    },
+    {
+      "name": "o4o/markdown",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (markdownBlockDefinition)"
+    },
+    {
+      "name": "o4o/list",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (listBlockDefinition)"
+    },
+    {
+      "name": "o4o/table",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (tableBlockDefinition)"
+    },
+    {
+      "name": "o4o/image",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (imageBlockDefinition)"
+    },
+    {
+      "name": "o4o/cover",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (coverBlockDefinition)"
+    },
+    {
+      "name": "o4o/gallery",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (galleryBlockDefinition)"
+    },
+    {
+      "name": "o4o/slide",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (slideBlockDefinition)"
+    },
+    {
+      "name": "o4o/video",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (videoBlockDefinition)"
+    },
+    {
+      "name": "o4o/button",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (buttonBlockDefinition)"
+    },
+    {
+      "name": "o4o/columns",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (columnsBlockDefinition)"
+    },
+    {
+      "name": "o4o/column",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (columnBlockDefinition)"
+    },
+    {
+      "name": "o4o/group",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (groupBlockDefinition)"
+    },
+    {
+      "name": "o4o/conditional",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (conditionalBlockDefinition)"
+    },
+    {
+      "name": "o4o/spacer",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (spacerBlockDefinition)"
+    },
+    {
+      "name": "o4o/separator",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (separatorBlockDefinition)"
+    },
+    {
+      "name": "o4o/social",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (socialBlockDefinition)"
+    },
+    {
+      "name": "o4o/shortcode",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (shortcodeBlockDefinition)"
+    },
+    {
+      "name": "o4o/placeholder",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (placeholderBlockDefinition)"
+    },
+    {
+      "name": "o4o/timeline-chart",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (timelineChartBlockDefinition)"
+    },
+    {
+      "name": "o4o/accordion-item",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (accordionItemBlockDefinition)"
+    },
+    {
+      "name": "o4o/feature-card",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (featureCardBlockDefinition)"
+    },
+    {
+      "name": "o4o/role-card",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (roleCardBlockDefinition)"
+    },
+    {
+      "name": "o4o/icon-feature-list",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (iconFeatureListBlockDefinition)"
+    },
+    {
+      "name": "o4o/faq-accordion",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (faqAccordionBlockDefinition)"
+    },
+    {
+      "name": "o4o/youtube",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (youtubeBlockDefinition)"
+    },
+    {
+      "name": "o4o/file",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (fileBlockDefinition)"
+    },
+    {
+      "name": "o4o/universal-form",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (universalFormBlockDefinition)"
+    },
+    {
+      "name": "o4o/form-field",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (formFieldBlockDefinition)"
+    },
+    {
+      "name": "o4o/form-submit",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (formSubmitBlockDefinition)"
+    }
+  ],
+  "missingInRegistry": [
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/blocks/definitions/buttons.tsx",
+      "fileName": "buttons.tsx",
+      "blockName": "o4o/buttons",
+      "category": "design"
+    }
+  ],
+  "danglingRegistryEntries": [
+    {
+      "name": "o4o/slide",
+      "source": "apps/admin-dashboard/src/blocks/index.ts (slideBlockDefinition)"
+    }
+  ],
+  "summary": {
+    "totalFiles": 33,
+    "totalRegistered": 33,
+    "totalMissing": 1,
+    "totalDangling": 1
+  }
+}

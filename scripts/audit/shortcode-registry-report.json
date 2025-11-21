@@ -1,0 +1,643 @@
+{
+  "timestamp": "2025-11-21T04:44:34.866Z",
+  "foundComponents": [
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/AddToCart.tsx",
+      "fileName": "AddToCart.tsx",
+      "expectedName": "add_to_cart"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/CustomerDashboard.tsx",
+      "fileName": "CustomerDashboard.tsx",
+      "expectedName": "customer_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/FeaturedProducts.tsx",
+      "fileName": "FeaturedProducts.tsx",
+      "expectedName": "featured_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/Form.tsx",
+      "fileName": "Form.tsx",
+      "expectedName": "form"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/PartnerDashboard.tsx",
+      "fileName": "PartnerDashboard.tsx",
+      "expectedName": "partner_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/PartnerDashboardOverview.tsx",
+      "fileName": "PartnerDashboardOverview.tsx",
+      "expectedName": "partner_dashboard_overview"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/Product.tsx",
+      "fileName": "Product.tsx",
+      "expectedName": "product"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/ProductCarousel.tsx",
+      "fileName": "ProductCarousel.tsx",
+      "expectedName": "product_carousel"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/ProductCategories.tsx",
+      "fileName": "ProductCategories.tsx",
+      "expectedName": "product_categories"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/ProductGrid.tsx",
+      "fileName": "ProductGrid.tsx",
+      "expectedName": "product_grid"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/RoleApplicationsAdmin.tsx",
+      "fileName": "RoleApplicationsAdmin.tsx",
+      "expectedName": "role_applications_admin"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/RoleApplicationsList.tsx",
+      "fileName": "RoleApplicationsList.tsx",
+      "expectedName": "role_applications_list"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/RoleApplyForm.tsx",
+      "fileName": "RoleApplyForm.tsx",
+      "expectedName": "role_apply_form"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/SellerDashboard.tsx",
+      "fileName": "SellerDashboard.tsx",
+      "expectedName": "seller_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/SellerDashboardOverview.tsx",
+      "fileName": "SellerDashboardOverview.tsx",
+      "expectedName": "seller_dashboard_overview"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/SupplierDashboard.tsx",
+      "fileName": "SupplierDashboard.tsx",
+      "expectedName": "supplier_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/SupplierDashboardOverview.tsx",
+      "fileName": "SupplierDashboardOverview.tsx",
+      "expectedName": "supplier_dashboard_overview"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/TestErrorShortcode.tsx",
+      "fileName": "TestErrorShortcode.tsx",
+      "expectedName": "test_error"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/View.tsx",
+      "fileName": "View.tsx",
+      "expectedName": "view"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/auth/BusinessRegisterShortcode.tsx",
+      "fileName": "BusinessRegisterShortcode.tsx",
+      "expectedName": "business_register"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/auth/FindIdShortcode.tsx",
+      "fileName": "FindIdShortcode.tsx",
+      "expectedName": "find_id"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/auth/FindPasswordShortcode.tsx",
+      "fileName": "FindPasswordShortcode.tsx",
+      "expectedName": "find_password"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/auth/SignupShortcode.tsx",
+      "fileName": "SignupShortcode.tsx",
+      "expectedName": "signup"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/auth/SocialLoginShortcode.tsx",
+      "fileName": "SocialLoginShortcode.tsx",
+      "expectedName": "social_login"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/cart/CartShortcode.tsx",
+      "fileName": "CartShortcode.tsx",
+      "expectedName": "cart"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/cart/CheckoutShortcode.tsx",
+      "fileName": "CheckoutShortcode.tsx",
+      "expectedName": "checkout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/cart/OrderDetailShortcode.tsx",
+      "fileName": "OrderDetailShortcode.tsx",
+      "expectedName": "order_detail"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/VideoShortcodes.tsx",
+      "fileName": "VideoShortcodes.tsx",
+      "expectedName": "video_shortcodes"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/admin/ApprovalQueue.tsx",
+      "fileName": "ApprovalQueue.tsx",
+      "expectedName": "approval_queue"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/admin/PlatformStats.tsx",
+      "fileName": "PlatformStats.tsx",
+      "expectedName": "platform_stats"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/RoleVerification.tsx",
+      "fileName": "RoleVerification.tsx",
+      "expectedName": "role_verification"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/UserDashboard.tsx",
+      "fileName": "UserDashboard.tsx",
+      "expectedName": "user_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/affiliate/AffiliateCommissionDashboard.tsx",
+      "fileName": "AffiliateCommissionDashboard.tsx",
+      "expectedName": "affiliate_commission_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/affiliate/AffiliateLinkGenerator.tsx",
+      "fileName": "AffiliateLinkGenerator.tsx",
+      "expectedName": "affiliate_link_generator"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/affiliate/PayoutRequests.tsx",
+      "fileName": "PayoutRequests.tsx",
+      "expectedName": "payout_requests"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerCommissionDashboard.tsx",
+      "fileName": "PartnerCommissionDashboard.tsx",
+      "expectedName": "partner_commission_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerCommissions.tsx",
+      "fileName": "PartnerCommissions.tsx",
+      "expectedName": "partner_commissions"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerDashboard.tsx",
+      "fileName": "PartnerDashboard.tsx",
+      "expectedName": "partner_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerLinkGenerator.tsx",
+      "fileName": "PartnerLinkGenerator.tsx",
+      "expectedName": "partner_link_generator"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerProducts.tsx",
+      "fileName": "PartnerProducts.tsx",
+      "expectedName": "partner_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PayoutRequests.tsx",
+      "fileName": "PayoutRequests.tsx",
+      "expectedName": "payout_requests"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/ProductMarketplace.tsx",
+      "fileName": "ProductMarketplace.tsx",
+      "expectedName": "product_marketplace"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/SellerDashboard.tsx",
+      "fileName": "SellerDashboard.tsx",
+      "expectedName": "seller_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/SellerProducts.tsx",
+      "fileName": "SellerProducts.tsx",
+      "expectedName": "seller_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/SellerSettlement.tsx",
+      "fileName": "SellerSettlement.tsx",
+      "expectedName": "seller_settlement"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/shared/LinkGenerator.tsx",
+      "fileName": "LinkGenerator.tsx",
+      "expectedName": "link_generator"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/shared/SharedPayoutRequests.tsx",
+      "fileName": "SharedPayoutRequests.tsx",
+      "expectedName": "shared_payout_requests"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/supplier/SupplierProductEditor.tsx",
+      "fileName": "SupplierProductEditor.tsx",
+      "expectedName": "supplier_product_editor"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/supplier/SupplierProducts.tsx",
+      "fileName": "SupplierProducts.tsx",
+      "expectedName": "supplier_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/supplier/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/productShortcodes.tsx",
+      "fileName": "productShortcodes.tsx",
+      "expectedName": "product_shortcodes"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/auth/SocialLogin.tsx",
+      "fileName": "SocialLogin.tsx",
+      "expectedName": "social_login"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/dropshipping/AffiliateDashboard.tsx",
+      "fileName": "AffiliateDashboard.tsx",
+      "expectedName": "affiliate_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/dropshipping/SellerDashboard.tsx",
+      "fileName": "SellerDashboard.tsx",
+      "expectedName": "seller_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/dropshipping/SupplierDashboard.tsx",
+      "fileName": "SupplierDashboard.tsx",
+      "expectedName": "supplier_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/hooks/useUniversalBlock.ts",
+      "fileName": "useUniversalBlock.ts",
+      "expectedName": "use_universal_block"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/lucide-react.d.ts",
+      "fileName": "lucide-react.d.ts",
+      "expectedName": "lucide-react.d"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/utils/shortcodeNaming.ts",
+      "fileName": "shortcodeNaming.ts",
+      "expectedName": "shortcode_naming"
+    }
+  ],
+  "registeredShortcodes": [
+    {
+      "name": "social_login",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "login_form",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "oauth_login",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "find_id",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "find_password",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "signup",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "business_register",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "social_login",
+      "source": "packages/shortcodes/src/auth/index.ts"
+    },
+    {
+      "name": "login_form",
+      "source": "packages/shortcodes/src/auth/index.ts"
+    },
+    {
+      "name": "oauth_login",
+      "source": "packages/shortcodes/src/auth/index.ts"
+    },
+    {
+      "name": "seller_dashboard",
+      "source": "packages/shortcodes/src/dropshipping/index.ts"
+    },
+    {
+      "name": "supplier_dashboard",
+      "source": "packages/shortcodes/src/dropshipping/index.ts"
+    },
+    {
+      "name": "affiliate_dashboard",
+      "source": "packages/shortcodes/src/dropshipping/index.ts"
+    },
+    {
+      "name": "gallery",
+      "source": "apps/admin-dashboard/src/services/ai/shortcode-registry.ts"
+    },
+    {
+      "name": "product",
+      "source": "apps/admin-dashboard/src/services/ai/shortcode-registry.ts"
+    },
+    {
+      "name": "form",
+      "source": "apps/admin-dashboard/src/services/ai/shortcode-registry.ts"
+    }
+  ],
+  "missingInRegistry": [
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/AddToCart.tsx",
+      "fileName": "AddToCart.tsx",
+      "expectedName": "add_to_cart"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/CustomerDashboard.tsx",
+      "fileName": "CustomerDashboard.tsx",
+      "expectedName": "customer_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/FeaturedProducts.tsx",
+      "fileName": "FeaturedProducts.tsx",
+      "expectedName": "featured_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/PartnerDashboard.tsx",
+      "fileName": "PartnerDashboard.tsx",
+      "expectedName": "partner_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/PartnerDashboardOverview.tsx",
+      "fileName": "PartnerDashboardOverview.tsx",
+      "expectedName": "partner_dashboard_overview"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/ProductCarousel.tsx",
+      "fileName": "ProductCarousel.tsx",
+      "expectedName": "product_carousel"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/ProductCategories.tsx",
+      "fileName": "ProductCategories.tsx",
+      "expectedName": "product_categories"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/ProductGrid.tsx",
+      "fileName": "ProductGrid.tsx",
+      "expectedName": "product_grid"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/RoleApplicationsAdmin.tsx",
+      "fileName": "RoleApplicationsAdmin.tsx",
+      "expectedName": "role_applications_admin"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/RoleApplicationsList.tsx",
+      "fileName": "RoleApplicationsList.tsx",
+      "expectedName": "role_applications_list"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/RoleApplyForm.tsx",
+      "fileName": "RoleApplyForm.tsx",
+      "expectedName": "role_apply_form"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/SellerDashboardOverview.tsx",
+      "fileName": "SellerDashboardOverview.tsx",
+      "expectedName": "seller_dashboard_overview"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/SupplierDashboardOverview.tsx",
+      "fileName": "SupplierDashboardOverview.tsx",
+      "expectedName": "supplier_dashboard_overview"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/TestErrorShortcode.tsx",
+      "fileName": "TestErrorShortcode.tsx",
+      "expectedName": "test_error"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/View.tsx",
+      "fileName": "View.tsx",
+      "expectedName": "view"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/cart/CartShortcode.tsx",
+      "fileName": "CartShortcode.tsx",
+      "expectedName": "cart"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/cart/CheckoutShortcode.tsx",
+      "fileName": "CheckoutShortcode.tsx",
+      "expectedName": "checkout"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/main-site/src/components/shortcodes/cart/OrderDetailShortcode.tsx",
+      "fileName": "OrderDetailShortcode.tsx",
+      "expectedName": "order_detail"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/VideoShortcodes.tsx",
+      "fileName": "VideoShortcodes.tsx",
+      "expectedName": "video_shortcodes"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/admin/ApprovalQueue.tsx",
+      "fileName": "ApprovalQueue.tsx",
+      "expectedName": "approval_queue"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/admin/PlatformStats.tsx",
+      "fileName": "PlatformStats.tsx",
+      "expectedName": "platform_stats"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/RoleVerification.tsx",
+      "fileName": "RoleVerification.tsx",
+      "expectedName": "role_verification"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/UserDashboard.tsx",
+      "fileName": "UserDashboard.tsx",
+      "expectedName": "user_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/affiliate/AffiliateCommissionDashboard.tsx",
+      "fileName": "AffiliateCommissionDashboard.tsx",
+      "expectedName": "affiliate_commission_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/affiliate/AffiliateLinkGenerator.tsx",
+      "fileName": "AffiliateLinkGenerator.tsx",
+      "expectedName": "affiliate_link_generator"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/affiliate/PayoutRequests.tsx",
+      "fileName": "PayoutRequests.tsx",
+      "expectedName": "payout_requests"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerCommissionDashboard.tsx",
+      "fileName": "PartnerCommissionDashboard.tsx",
+      "expectedName": "partner_commission_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerCommissions.tsx",
+      "fileName": "PartnerCommissions.tsx",
+      "expectedName": "partner_commissions"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerDashboard.tsx",
+      "fileName": "PartnerDashboard.tsx",
+      "expectedName": "partner_dashboard"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerLinkGenerator.tsx",
+      "fileName": "PartnerLinkGenerator.tsx",
+      "expectedName": "partner_link_generator"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PartnerProducts.tsx",
+      "fileName": "PartnerProducts.tsx",
+      "expectedName": "partner_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/PayoutRequests.tsx",
+      "fileName": "PayoutRequests.tsx",
+      "expectedName": "payout_requests"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/partner/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/ProductMarketplace.tsx",
+      "fileName": "ProductMarketplace.tsx",
+      "expectedName": "product_marketplace"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/SellerProducts.tsx",
+      "fileName": "SellerProducts.tsx",
+      "expectedName": "seller_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/SellerSettlement.tsx",
+      "fileName": "SellerSettlement.tsx",
+      "expectedName": "seller_settlement"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/shared/LinkGenerator.tsx",
+      "fileName": "LinkGenerator.tsx",
+      "expectedName": "link_generator"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/shared/SharedPayoutRequests.tsx",
+      "fileName": "SharedPayoutRequests.tsx",
+      "expectedName": "shared_payout_requests"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/supplier/SupplierProductEditor.tsx",
+      "fileName": "SupplierProductEditor.tsx",
+      "expectedName": "supplier_product_editor"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/supplier/SupplierProducts.tsx",
+      "fileName": "SupplierProducts.tsx",
+      "expectedName": "supplier_products"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/dropshipping/supplier/index.tsx",
+      "fileName": "index.tsx",
+      "expectedName": "index"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/apps/admin-dashboard/src/components/shortcodes/productShortcodes.tsx",
+      "fileName": "productShortcodes.tsx",
+      "expectedName": "product_shortcodes"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/hooks/useUniversalBlock.ts",
+      "fileName": "useUniversalBlock.ts",
+      "expectedName": "use_universal_block"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/lucide-react.d.ts",
+      "fileName": "lucide-react.d.ts",
+      "expectedName": "lucide-react.d"
+    },
+    {
+      "filePath": "/home/dev/o4o-platform/packages/shortcodes/src/utils/shortcodeNaming.ts",
+      "fileName": "shortcodeNaming.ts",
+      "expectedName": "shortcode_naming"
+    }
+  ],
+  "danglingRegistryEntries": [
+    {
+      "name": "login_form",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "oauth_login",
+      "source": "apps/main-site/src/components/shortcodes/auth/index.ts (authShortcodes)"
+    },
+    {
+      "name": "login_form",
+      "source": "packages/shortcodes/src/auth/index.ts"
+    },
+    {
+      "name": "oauth_login",
+      "source": "packages/shortcodes/src/auth/index.ts"
+    },
+    {
+      "name": "gallery",
+      "source": "apps/admin-dashboard/src/services/ai/shortcode-registry.ts"
+    }
+  ],
+  "namingMismatches": [],
+  "summary": {
+    "totalFiles": 61,
+    "totalRegistered": 16,
+    "totalMissing": 47,
+    "totalDangling": 5,
+    "totalMismatches": 0
+  }
+}
