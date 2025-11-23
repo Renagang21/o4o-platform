@@ -2,9 +2,16 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { Supplier } from '../../entities/Supplier.js';
 import { Product } from '../../entities/Product.js';
+import {
+  SupplierDashboardSummaryDto,
+  createDashboardError,
+  createDashboardMeta
+} from '../../dto/dashboard.dto.js';
+import { dashboardRangeService } from '../../services/DashboardRangeService.js';
 
 /**
  * Supplier Dashboard Controller
+ * R-6-2: Updated with standard DTO and range service
  * Provides dashboard metrics and statistics for suppliers
  */
 export class SupplierDashboardController {
@@ -12,19 +19,22 @@ export class SupplierDashboardController {
   /**
    * GET /api/v1/suppliers/dashboard/stats
    * Get supplier dashboard statistics
-   * @query period - Time period: 7d, 30d, 90d, 1y (default: 30d)
+   * R-6-2: Supports both legacy (period) and new (range) parameters
+   *
+   * Query params:
+   * - New format: ?range=7d (or 30d, 90d, 1y, custom)
+   * - Custom range: ?range=custom&start=2025-01-01&end=2025-01-31
+   * - Legacy format: ?period=7d|30d|90d|1y (default: 30d)
    */
   async getStats(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
       const userRole = (req as any).user?.role;
-      const { period = '30d' } = req.query;
 
       if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Authentication required'
-        });
+        res.status(401).json(
+          createDashboardError('UNAUTHORIZED', 'Authentication required')
+        );
         return;
       }
 
@@ -35,10 +45,9 @@ export class SupplierDashboardController {
       });
 
       if (!supplier && userRole !== 'admin' && userRole !== 'super_admin') {
-        res.status(404).json({
-          success: false,
-          error: 'Supplier profile not found'
-        });
+        res.status(404).json(
+          createDashboardError('NOT_FOUND', 'Supplier profile not found')
+        );
         return;
       }
 
@@ -46,40 +55,23 @@ export class SupplierDashboardController {
       const targetSupplierId = (req.query.supplierId as string) || supplier?.id;
 
       if (!targetSupplierId) {
-        res.status(400).json({
-          success: false,
-          error: 'Supplier ID is required'
-        });
+        res.status(400).json(
+          createDashboardError('INVALID_PARAMS', 'Supplier ID is required')
+        );
         return;
       }
 
       // Authorization check: non-admin can only see own stats
       if (userRole !== 'admin' && userRole !== 'super_admin' && targetSupplierId !== supplier?.id) {
-        res.status(403).json({
-          success: false,
-          error: 'You do not have permission to view this supplier\'s stats'
-        });
+        res.status(403).json(
+          createDashboardError('UNAUTHORIZED', 'You do not have permission to view this supplier\'s stats')
+        );
         return;
       }
 
-      // Calculate date range based on period
-      const now = new Date();
-      let startDate = new Date();
-
-      switch (period) {
-        case '7d':
-          startDate.setDate(now.getDate() - 7);
-          break;
-        case '90d':
-          startDate.setDate(now.getDate() - 90);
-          break;
-        case '1y':
-          startDate.setFullYear(now.getFullYear() - 1);
-          break;
-        case '30d':
-        default:
-          startDate.setDate(now.getDate() - 30);
-      }
+      // R-6-2: Parse date range using standard service
+      // Supports both ?period=7d (legacy) and ?range=7d (new)
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
       // Get product statistics
       const productRepo = AppDataSource.getRepository(Product);
@@ -129,35 +121,63 @@ export class SupplierDashboardController {
         WHERE products.supplier_id = $1
           AND orders.created_at >= $2
           AND orders.status IN ('completed', 'delivered')
-      `, [targetSupplierId, startDate]);
+      `, [targetSupplierId, parsedRange.startDate]);
       */
+
+      // R-6-2: Create metadata
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
+      );
+
+      // R-6-2: Return standard DTO with legacy fields
+      const response: SupplierDashboardSummaryDto = {
+        // Standard fields
+        totalOrders: monthlyOrders,
+        totalRevenue,
+        averageOrderValue: avgOrderValue,
+        totalProducts,
+        approvedProducts: parseInt(approvedProducts),
+        pendingProducts: parseInt(pendingProducts),
+        rejectedProducts: parseInt(rejectedProducts),
+        lowStockProducts,
+        outOfStockProducts,
+        totalProfit,
+
+        // Legacy fields for backward compatibility
+        monthlyOrders,
+        avgOrderValue,
+        period: parsedRange.range,
+        startDate: parsedRange.startDate.toISOString(),
+        endDate: parsedRange.endDate.toISOString(),
+        calculatedAt: meta.calculatedAt
+      };
 
       res.json({
         success: true,
         data: {
-          totalProducts,
-          approvedProducts: parseInt(approvedProducts),
-          pendingProducts: parseInt(pendingProducts),
-          rejectedProducts: parseInt(rejectedProducts),
-          lowStockProducts,
-          outOfStockProducts,
-          totalRevenue,
-          totalProfit,
-          monthlyOrders,
-          avgOrderValue,
-          period: period as string,
-          startDate: startDate.toISOString(),
-          endDate: now.toISOString(),
-          calculatedAt: new Date().toISOString()
+          ...response,
+          meta
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching supplier stats:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch supplier statistics',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
+
+      // R-6-2: Standard error response
+      if (error.success === false) {
+        // Already formatted dashboard error
+        res.status(400).json(error);
+        return;
+      }
+
+      res.status(500).json(
+        createDashboardError(
+          'SERVER_ERROR',
+          'Failed to fetch supplier statistics',
+          error instanceof Error ? error.message : 'Unknown error'
+        )
+      );
     }
   }
 

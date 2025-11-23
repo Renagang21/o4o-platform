@@ -1,6 +1,7 @@
 /**
  * SellerDashboardService
  * Phase PD-1: Partner Dashboard v1 - Seller metrics and commission tracking
+ * R-6-2: Updated with standard DTO and range service
  *
  * Provides seller-specific statistics, orders, and commission calculations
  */
@@ -9,7 +10,17 @@ import AppDataSource from '../database/data-source.js';
 import { Order, OrderStatus, PaymentStatus, OrderItem } from '../entities/Order.js';
 import { Between, In } from 'typeorm';
 import logger from '../utils/logger.js';
+import {
+  SellerDashboardSummaryDto,
+  DashboardMetaDto,
+  createDashboardMeta
+} from '../dto/dashboard.dto.js';
+import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
 
+/**
+ * @deprecated Use SellerDashboardSummaryDto from dashboard.dto.ts
+ * Kept for backward compatibility
+ */
 export interface SellerDashboardSummary {
   totalOrders: number;
   totalSalesAmount: number;
@@ -47,23 +58,35 @@ export class SellerDashboardService {
   /**
    * Get dashboard summary for a seller
    * Aggregates orders where at least one item belongs to the seller
+   * R-6-2: Updated to use standard DTO and support both old and new query formats
    */
   async getSummaryForSeller(
     sellerId: string,
-    dateRange?: DateRangeFilter
-  ): Promise<SellerDashboardSummary> {
+    dateRange?: DateRangeFilter | ParsedDateRange
+  ): Promise<SellerDashboardSummaryDto> {
     try {
+      // Convert legacy DateRangeFilter to ParsedDateRange if needed
+      let parsedRange: ParsedDateRange;
+      if (dateRange && 'range' in dateRange) {
+        // Already parsed
+        parsedRange = dateRange as ParsedDateRange;
+      } else if (dateRange && ('from' in dateRange || 'to' in dateRange)) {
+        // Legacy format - convert
+        parsedRange = {
+          startDate: (dateRange as DateRangeFilter).from || new Date('2020-01-01'),
+          endDate: (dateRange as DateRangeFilter).to || new Date(),
+          range: 'custom'
+        };
+      } else {
+        // Default to 30 days
+        parsedRange = dashboardRangeService.parseDateRange({});
+      }
+
       // Build date filter
       const where: any = {
-        paymentStatus: In([PaymentStatus.COMPLETED])
+        paymentStatus: In([PaymentStatus.COMPLETED]),
+        orderDate: Between(parsedRange.startDate, parsedRange.endDate)
       };
-
-      if (dateRange?.from || dateRange?.to) {
-        where.orderDate = Between(
-          dateRange.from || new Date('2020-01-01'),
-          dateRange.to || new Date()
-        );
-      }
 
       // Get all paid orders
       const orders = await this.orderRepository.find({
@@ -111,12 +134,20 @@ export class SellerDashboardService {
 
       const avgOrderAmount = totalOrders > 0 ? totalSalesAmount / totalOrders : 0;
 
+      // R-6-2: Return standard DTO with legacy fields for backward compatibility
       return {
         totalOrders,
-        totalSalesAmount: Math.round(totalSalesAmount),
+        totalRevenue: Math.round(totalSalesAmount), // Standard field
+        averageOrderValue: Math.round(avgOrderAmount), // Standard field
         totalItems,
+        totalCommission: Math.round(totalCommissionAmount),
+        // Legacy fields (backward compatibility)
+        totalSalesAmount: Math.round(totalSalesAmount),
+        avgOrderAmount: Math.round(avgOrderAmount),
         totalCommissionAmount: Math.round(totalCommissionAmount),
-        avgOrderAmount: Math.round(avgOrderAmount)
+        orderCount: totalOrders,
+        salesAmount: Math.round(totalSalesAmount),
+        sellerAmount: Math.round(totalSalesAmount)
       };
     } catch (error) {
       logger.error('[SellerDashboardService] Failed to get summary:', error);

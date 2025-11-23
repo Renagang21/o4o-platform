@@ -2,9 +2,16 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { Partner } from '../../entities/Partner.js';
 import { PartnerCommission } from '../../entities/PartnerCommission.js';
+import {
+  PartnerDashboardSummaryDto,
+  createDashboardError,
+  createDashboardMeta
+} from '../../dto/dashboard.dto.js';
+import { dashboardRangeService } from '../../services/DashboardRangeService.js';
 
 /**
  * Partner Dashboard Controller
+ * R-6-2: Updated with standard DTO and range service
  * Provides dashboard metrics and statistics for partners
  */
 export class PartnerDashboardController {
@@ -12,6 +19,12 @@ export class PartnerDashboardController {
   /**
    * GET /api/v1/partners/dashboard/summary
    * Get partner dashboard summary with earnings and performance metrics
+   * R-6-2: Supports both legacy and new range parameters
+   *
+   * Query params:
+   * - New format: ?range=7d (or 30d, 90d, 1y, custom)
+   * - Custom range: ?range=custom&start=2025-01-01&end=2025-01-31
+   * - Legacy format: ?from=2025-01-01T00:00:00Z&to=2025-01-31T23:59:59Z
    */
   async getSummary(req: Request, res: Response): Promise<void> {
     try {
@@ -19,10 +32,9 @@ export class PartnerDashboardController {
       const userRole = (req as any).user?.role;
 
       if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Authentication required'
-        });
+        res.status(401).json(
+          createDashboardError('UNAUTHORIZED', 'Authentication required')
+        );
         return;
       }
 
@@ -33,10 +45,9 @@ export class PartnerDashboardController {
       });
 
       if (!partner && userRole !== 'admin' && userRole !== 'super_admin') {
-        res.status(404).json({
-          success: false,
-          error: 'Partner profile not found'
-        });
+        res.status(404).json(
+          createDashboardError('NOT_FOUND', 'Partner profile not found')
+        );
         return;
       }
 
@@ -44,19 +55,17 @@ export class PartnerDashboardController {
       const targetPartnerId = (req.query.partnerId as string) || partner?.id;
 
       if (!targetPartnerId) {
-        res.status(400).json({
-          success: false,
-          error: 'Partner ID is required'
-        });
+        res.status(400).json(
+          createDashboardError('INVALID_PARAMS', 'Partner ID is required')
+        );
         return;
       }
 
       // Authorization check
       if (userRole !== 'admin' && userRole !== 'super_admin' && targetPartnerId !== partner?.id) {
-        res.status(403).json({
-          success: false,
-          error: 'You do not have permission to view this partner\'s summary'
-        });
+        res.status(403).json(
+          createDashboardError('UNAUTHORIZED', 'You do not have permission to view this partner\'s summary')
+        );
         return;
       }
 
@@ -66,27 +75,35 @@ export class PartnerDashboardController {
       });
 
       if (!targetPartner) {
-        res.status(404).json({
-          success: false,
-          error: 'Partner not found'
-        });
+        res.status(404).json(
+          createDashboardError('NOT_FOUND', 'Partner not found')
+        );
         return;
       }
+
+      // R-6-2: Parse date range using standard service
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
       // Get commission statistics
       const commissionRepo = AppDataSource.getRepository(PartnerCommission);
 
-      // Total confirmed commissions (totalEarnings)
+      // Total confirmed commissions within date range (totalEarnings)
       const confirmedStats = await commissionRepo
         .createQueryBuilder('commission')
         .select('COALESCE(SUM(commission.commissionAmount), 0)', 'total')
+        .addSelect('COUNT(*)', 'count')
         .where('commission.partnerId = :partnerId', { partnerId: targetPartnerId })
         .andWhere('commission.status IN (:...statuses)', { statuses: ['confirmed', 'paid'] })
+        .andWhere('commission.convertedAt BETWEEN :startDate AND :endDate', {
+          startDate: parsedRange.startDate,
+          endDate: parsedRange.endDate
+        })
         .getRawOne();
 
       const totalEarnings = parseFloat(confirmedStats?.total || '0');
+      const totalOrders = parseInt(confirmedStats?.count || '0');
 
-      // Monthly earnings (current month)
+      // Monthly earnings (current month) - for backward compatibility
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -124,39 +141,71 @@ export class PartnerDashboardController {
       // Calculate next payout date based on tier
       const nextPayout = this.calculateNextPayoutDate(targetPartner);
 
+      // Calculate average order value
+      const averageOrderValue = totalOrders > 0 ? totalEarnings / totalOrders : 0;
+
+      // R-6-2: Create metadata
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
+      );
+
+      // R-6-2: Return standard DTO with partner-specific fields
+      const response: PartnerDashboardSummaryDto = {
+        // Standard fields
+        totalOrders,
+        totalRevenue: totalEarnings,
+        averageOrderValue: parseFloat(averageOrderValue.toFixed(2)),
+
+        // Partner-specific fields
+        totalEarnings,
+        monthlyEarnings,
+        pendingCommissions,
+        conversionRate: parseFloat(conversionRate.toFixed(2)),
+        totalClicks: targetPartner.totalClicks,
+        totalConversions: targetPartner.totalOrders,
+        activeLinks,
+        tierLevel: targetPartner.tier,
+        tierProgress,
+        referralCode: targetPartner.referralCode,
+        referralLink: targetPartner.referralLink,
+        nextPayout: nextPayout.toISOString(),
+        availableBalance: parseFloat(targetPartner.availableBalance.toString()),
+        minimumPayout: parseFloat(targetPartner.minimumPayout.toString())
+      };
+
       res.json({
         success: true,
         data: {
-          totalEarnings,
-          monthlyEarnings,
-          pendingCommissions,
-          conversionRate: parseFloat(conversionRate.toFixed(2)),
-          totalClicks: targetPartner.totalClicks,
-          totalConversions: targetPartner.totalOrders,
-          activeLinks,
-          tierLevel: targetPartner.tier,
-          tierProgress,
-          referralCode: targetPartner.referralCode,
-          referralLink: targetPartner.referralLink,
-          nextPayout: nextPayout.toISOString(),
-          availableBalance: parseFloat(targetPartner.availableBalance.toString()),
-          minimumPayout: parseFloat(targetPartner.minimumPayout.toString()),
-          calculatedAt: new Date().toISOString()
+          ...response,
+          meta
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching partner summary:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch partner summary',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
+
+      // R-6-2: Standard error response
+      if (error.success === false) {
+        // Already formatted dashboard error
+        res.status(400).json(error);
+        return;
+      }
+
+      res.status(500).json(
+        createDashboardError(
+          'SERVER_ERROR',
+          'Failed to fetch partner summary',
+          error instanceof Error ? error.message : 'Unknown error'
+        )
+      );
     }
   }
 
   /**
    * GET /api/v1/partners/dashboard/commissions
    * Get partner's commission history
+   * R-6-2: Updated with standard error responses
    */
   async getCommissions(req: Request, res: Response): Promise<void> {
     try {
@@ -170,10 +219,9 @@ export class PartnerDashboardController {
       } = req.query;
 
       if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Authentication required'
-        });
+        res.status(401).json(
+          createDashboardError('UNAUTHORIZED', 'Authentication required')
+        );
         return;
       }
 
@@ -183,10 +231,9 @@ export class PartnerDashboardController {
       });
 
       if (!partner) {
-        res.status(404).json({
-          success: false,
-          error: 'Partner profile not found'
-        });
+        res.status(404).json(
+          createDashboardError('NOT_FOUND', 'Partner profile not found')
+        );
         return;
       }
 
@@ -223,12 +270,18 @@ export class PartnerDashboardController {
           totalPages: Math.ceil(total / limitNum)
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching partner commissions:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch commissions'
-      });
+
+      // R-6-2: Standard error response
+      if (error.success === false) {
+        res.status(400).json(error);
+        return;
+      }
+
+      res.status(500).json(
+        createDashboardError('SERVER_ERROR', 'Failed to fetch commissions')
+      );
     }
   }
 

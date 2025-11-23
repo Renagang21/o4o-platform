@@ -1,6 +1,7 @@
 /**
  * Seller Dashboard Routes
  * Phase PD-1: Partner Dashboard v1 - Seller-specific endpoints
+ * R-6-2: Updated with standard range parameter support
  *
  * Provides seller dashboard statistics, orders, and commission data
  */
@@ -12,6 +13,8 @@ import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.j
 import { SellerDashboardService } from '../services/SellerDashboardService.js';
 import { OrderStatus } from '../entities/Order.js';
 import logger from '../utils/logger.js';
+import { dashboardRangeService } from '../services/DashboardRangeService.js';
+import { createDashboardError, createDashboardMeta } from '../dto/dashboard.dto.js';
 
 const router: ExpressRouter = Router();
 const sellerDashboardService = new SellerDashboardService();
@@ -48,42 +51,65 @@ const requireSellerRole = async (req: AuthRequest, res: Response, next: any) => 
 /**
  * GET /api/v1/seller/dashboard/summary
  * Get dashboard summary statistics for logged-in seller
+ * R-6-2: Supports both legacy (from/to) and new (range) parameters
+ *
+ * Query params:
+ * - New format: ?range=7d (or 30d, 90d, 1y, custom)
+ * - Custom range: ?range=custom&start=2025-01-01&end=2025-01-31
+ * - Legacy format: ?from=2025-01-01T00:00:00Z&to=2025-01-31T23:59:59Z
  */
 router.get(
   '/summary',
   authenticateCookie,
   requireSellerRole,
-  query('from').optional().isISO8601(),
-  query('to').optional().isISO8601(),
+  query('range').optional().isString(),
+  query('start').optional().isISO8601(),
+  query('end').optional().isISO8601(),
+  query('from').optional().isISO8601(), // Legacy
+  query('to').optional().isISO8601(),   // Legacy
   async (req: AuthRequest, res: Response) => {
     try {
       const user = req.user as any;
       const sellerId = user.userId;
 
-      // Parse date range
-      const dateRange: any = {};
-      if (req.query.from) {
-        dateRange.from = new Date(req.query.from as string);
-      }
-      if (req.query.to) {
-        dateRange.to = new Date(req.query.to as string);
-      }
+      // R-6-2: Parse date range using standard service
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
+      // Get summary
       const summary = await sellerDashboardService.getSummaryForSeller(
         sellerId,
-        Object.keys(dateRange).length > 0 ? dateRange : undefined
+        parsedRange
+      );
+
+      // R-6-2: Include metadata in response
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
       );
 
       res.json({
         success: true,
-        data: summary
+        data: {
+          ...summary,
+          meta
+        }
       });
     } catch (error: any) {
       logger.error('[GET /seller/dashboard/summary] Error:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to fetch dashboard summary'
-      });
+
+      // R-6-2: Standard error response
+      if (error.success === false) {
+        // Already formatted dashboard error
+        return res.status(400).json(error);
+      }
+
+      res.status(500).json(
+        createDashboardError(
+          'SERVER_ERROR',
+          error.message || 'Failed to fetch dashboard summary'
+        )
+      );
     }
   }
 );
