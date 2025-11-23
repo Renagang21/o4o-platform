@@ -2,19 +2,23 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { Supplier } from '../../entities/Supplier.js';
 import { Product } from '../../entities/Product.js';
+import { OrderStatus } from '../../entities/Order.js';
 import {
   SupplierDashboardSummaryDto,
   createDashboardError,
   createDashboardMeta
 } from '../../dto/dashboard.dto.js';
 import { dashboardRangeService } from '../../services/DashboardRangeService.js';
+import { SupplierDashboardService } from '../../services/SupplierDashboardService.js';
 
 /**
  * Supplier Dashboard Controller
  * R-6-2: Updated with standard DTO and range service
+ * R-8: Implemented order statistics using SupplierDashboardService
  * Provides dashboard metrics and statistics for suppliers
  */
 export class SupplierDashboardController {
+  private supplierDashboardService = new SupplierDashboardService();
 
   /**
    * GET /api/v1/suppliers/dashboard/stats
@@ -101,28 +105,16 @@ export class SupplierDashboardController {
       const lowStockProducts = parseInt(inventoryStats?.lowStock || '0');
       const outOfStockProducts = parseInt(inventoryStats?.outOfStock || '0');
 
-      // Revenue statistics (placeholder - requires Order entity integration)
-      // For now, return 0 values
-      const totalRevenue = 0;
-      const totalProfit = 0;
-      const monthlyOrders = 0;
-      const avgOrderValue = 0;
+      // R-8: Revenue statistics using SupplierDashboardService
+      const orderSummary = await this.supplierDashboardService.getSummaryForSupplier(
+        targetSupplierId,
+        parsedRange
+      );
 
-      // TODO: Implement when Order entity is integrated
-      /*
-      const orderStats = await AppDataSource.query(`
-        SELECT
-          COUNT(*) as monthlyOrders,
-          COALESCE(SUM(order_items.price * order_items.quantity), 0) as totalRevenue,
-          COALESCE(AVG(orders.total), 0) as avgOrderValue
-        FROM orders
-        JOIN order_items ON orders.id = order_items.order_id
-        JOIN products ON order_items.product_id = products.id
-        WHERE products.supplier_id = $1
-          AND orders.created_at >= $2
-          AND orders.status IN ('completed', 'delivered')
-      `, [targetSupplierId, parsedRange.startDate]);
-      */
+      const totalRevenue = orderSummary.totalRevenue;
+      const totalProfit = orderSummary.totalProfit || 0;
+      const monthlyOrders = orderSummary.totalOrders;
+      const avgOrderValue = orderSummary.averageOrderValue;
 
       // R-6-2: Create metadata
       const meta = createDashboardMeta(
@@ -261,6 +253,143 @@ export class SupplierDashboardController {
       res.status(500).json({
         success: false,
         error: 'Failed to fetch products'
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/entity/suppliers/dashboard/orders
+   * R-8: Get supplier's orders with pagination
+   */
+  async getOrders(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const {
+        status,
+        from,
+        to,
+        page = 1,
+        limit = 20
+      } = req.query;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+        return;
+      }
+
+      const supplierRepo = AppDataSource.getRepository(Supplier);
+      const supplier = await supplierRepo.findOne({
+        where: { userId }
+      });
+
+      if (!supplier) {
+        res.status(404).json({
+          success: false,
+          error: 'Supplier profile not found'
+        });
+        return;
+      }
+
+      // Parse status filter
+      const statusFilter = status
+        ? (status as string).split(',') as OrderStatus[]
+        : undefined;
+
+      // Parse date range
+      const dateRange: any = {};
+      if (from) {
+        dateRange.from = new Date(from as string);
+      }
+      if (to) {
+        dateRange.to = new Date(to as string);
+      }
+
+      const result = await this.supplierDashboardService.getOrdersForSupplier(supplier.id, {
+        dateRange: Object.keys(dateRange).length > 0 ? dateRange : undefined,
+        status: statusFilter,
+        pagination: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string)
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          orders: result.orders,
+          pagination: {
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+            total: result.total,
+            totalPages: Math.ceil(result.total / parseInt(limit as string))
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching supplier orders:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch orders'
+      });
+    }
+  }
+
+  /**
+   * GET /api/v1/entity/suppliers/dashboard/revenue
+   * R-8: Get supplier's revenue details
+   */
+  async getRevenue(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const { from, to } = req.query;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+        return;
+      }
+
+      const supplierRepo = AppDataSource.getRepository(Supplier);
+      const supplier = await supplierRepo.findOne({
+        where: { userId }
+      });
+
+      if (!supplier) {
+        res.status(404).json({
+          success: false,
+          error: 'Supplier profile not found'
+        });
+        return;
+      }
+
+      // Parse date range
+      const dateRange: any = {};
+      if (from) {
+        dateRange.from = new Date(from as string);
+      }
+      if (to) {
+        dateRange.to = new Date(to as string);
+      }
+
+      const revenueData = await this.supplierDashboardService.getRevenueDetailsForSupplier(
+        supplier.id,
+        Object.keys(dateRange).length > 0 ? dateRange : undefined
+      );
+
+      res.json({
+        success: true,
+        data: revenueData
+      });
+    } catch (error) {
+      console.error('Error fetching supplier revenue:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch revenue details'
       });
     }
   }

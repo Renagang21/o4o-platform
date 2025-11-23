@@ -169,6 +169,27 @@ router.get('/suppliers/dashboard/stats', supplierDashboardController.getStats.bi
 router.get('/suppliers/dashboard/products', supplierDashboardController.getProducts.bind(supplierDashboardController));
 
 /**
+ * @route GET /api/v1/entity/suppliers/dashboard/orders
+ * @desc Get supplier's orders with pagination (R-8)
+ * @query status - Filter by order status
+ * @query from - Start date filter
+ * @query to - End date filter
+ * @query page - Page number
+ * @query limit - Items per page
+ * @access Private (Owner only)
+ */
+router.get('/suppliers/dashboard/orders', supplierDashboardController.getOrders.bind(supplierDashboardController));
+
+/**
+ * @route GET /api/v1/entity/suppliers/dashboard/revenue
+ * @desc Get supplier's revenue details (R-8)
+ * @query from - Start date filter
+ * @query to - End date filter
+ * @access Private (Owner only)
+ */
+router.get('/suppliers/dashboard/revenue', supplierDashboardController.getRevenue.bind(supplierDashboardController));
+
+/**
  * @route GET /api/v1/entity/partners/dashboard/summary
  * @desc Get partner dashboard summary (earnings, clicks, conversions)
  * @query partnerId - Partner ID (admin only)

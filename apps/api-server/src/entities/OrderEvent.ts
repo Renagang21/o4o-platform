@@ -13,13 +13,24 @@ import type { User } from './User.js';
 
 // Event type enum
 export enum OrderEventType {
+  // Customer order events
   ORDER_CREATED = 'order_created',
   STATUS_CHANGE = 'status_change',
   SHIPPING_UPDATE = 'shipping_update',
   PAYMENT_UPDATE = 'payment_update',
   NOTE_ADDED = 'note_added',
   CANCELLATION = 'cancellation',
-  REFUND = 'refund'
+  REFUND = 'refund',
+
+  // R-8: Dropshipping events
+  SELLER_ORDER_CREATED = 'seller_order_created',
+  SELLER_PROCESSING = 'seller_processing',
+  SUPPLIER_ORDER_CREATED = 'supplier_order_created',
+  SUPPLIER_PROCESSING = 'supplier_processing',
+  SUPPLIER_SHIPPED = 'supplier_shipped',
+  COMMISSION_CALCULATED = 'commission_calculated',
+  SETTLEMENT_CREATED = 'settlement_created',
+  SETTLEMENT_COMPLETED = 'settlement_completed'
 }
 
 // Event payload interface (for additional data)
