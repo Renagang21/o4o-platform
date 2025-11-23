@@ -28,7 +28,6 @@ export const SocialLoginComponent: React.FC<{
   title?: string;
   subtitle?: string;
   providers?: string; // Comma-separated list: "google,naver,kakao"
-  showTestPanel?: string | boolean; // "env:dev", "true", "false"
   showSignupLink?: boolean; // Show signup link (default: true)
   signupUrl?: string; // Signup page URL (default: '/register')
   signupText?: string; // Signup prompt text (default: '계정이 없으신가요?')
@@ -39,7 +38,6 @@ export const SocialLoginComponent: React.FC<{
   title = '로그인',
   subtitle = '계정에 접속하여 서비스를 이용하세요',
   providers,
-  showTestPanel,
   showSignupLink = true,
   signupUrl = '/register',
   signupText = '계정이 없으신가요?',
@@ -54,30 +52,11 @@ export const SocialLoginComponent: React.FC<{
   const [error, setError] = useState('');
   const [oauthProviders, setOauthProviders] = useState<OAuthProviders | null>(null);
   const [providersLoading, setProvidersLoading] = useState(true);
-  const [testAccounts, setTestAccounts] = useState<Array<{role: string; email: string; password: string}>>([]);
 
   // Parse providers filter
   const allowedProviders = providers
     ? providers.split(',').map(p => p.trim() as 'google' | 'kakao' | 'naver')
     : null;
-
-  // Determine if test panel should show
-  const shouldShowTestPanel = (() => {
-    // Explicit true bypasses environment check (for development/testing)
-    if (showTestPanel === true || showTestPanel === 'true') return true;
-    // Explicit false always hides
-    if (showTestPanel === false || showTestPanel === 'false') return false;
-    // env:dev respects environment
-    if (showTestPanel === 'env:dev') {
-      return import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging';
-    }
-    // Default: show in dev/staging only
-    return import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging';
-  })();
-
-  // Only apply environment guard when showTestPanel is not explicitly true
-  const explicitTrue = showTestPanel === true || showTestPanel === 'true';
-  const showTestPanelSafe = explicitTrue ? shouldShowTestPanel : (shouldShowTestPanel && import.meta.env.MODE !== 'production');
 
   // Social login configuration
   const socialLoginConfig = {
@@ -107,7 +86,7 @@ export const SocialLoginComponent: React.FC<{
     }
   };
 
-  // Fetch OAuth providers and test accounts
+  // Fetch OAuth providers
   useEffect(() => {
     const fetchProviders = async () => {
       try {
@@ -123,32 +102,8 @@ export const SocialLoginComponent: React.FC<{
       }
     };
 
-    const fetchTestAccounts = async () => {
-      if (!showTestPanelSafe) {
-        return;
-      }
-
-      try {
-        // Treat 404 as valid response to prevent console errors
-        const response = await authClient.api.get('/auth/unified/test-accounts', {
-          validateStatus: (status) => status < 500
-        });
-
-        if (response.status === 200 && response.data.success) {
-          setTestAccounts(response.data.data);
-        }
-        // Silently ignore 404 or other 4xx errors
-      } catch (error) {
-        // Silent fail - test accounts API may not be available
-        if (import.meta.env.DEV) {
-          console.debug('[SocialLogin] Test accounts unavailable:', error);
-        }
-      }
-    };
-
     fetchProviders();
-    fetchTestAccounts();
-  }, [showTestPanelSafe, showTestPanel]);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -361,48 +316,6 @@ export const SocialLoginComponent: React.FC<{
         </form>
       )}
 
-      {/* Test Account Panel (dev/staging only) */}
-      {showTestPanelSafe && testAccounts.length > 0 && (
-        <div className="mt-6 border-t border-gray-200 pt-6">
-          <div className="text-sm font-medium text-gray-700 mb-3">테스트 계정 (개발용)</div>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-left text-gray-600">
-                  <th className="pb-2">역할</th>
-                  <th className="pb-2">이메일</th>
-                  <th className="pb-2">비밀번호</th>
-                  <th className="pb-2 text-center">자동입력</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {testAccounts.map((account, index) => (
-                  <tr key={index}>
-                    <td className="py-1">{account.role}</td>
-                    <td className="py-1 font-mono text-xs">{account.email}</td>
-                    <td className="py-1 font-mono text-xs">{account.password}</td>
-                    <td className="py-1 text-center">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData({ email: account.email, password: account.password });
-                        }}
-                        className="text-blue-600 hover:text-blue-800 text-xs underline"
-                      >
-                        입력
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="text-xs text-yellow-700 mt-2">
-              ⚠️ 테스트용 계정입니다. 사용 후 반드시 비활성화하세요.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Footer */}
       <div className="mt-6 text-center space-y-4">
         {/* Signup Link */}
@@ -433,12 +346,10 @@ const OAuthOnlyComponent: React.FC<{
   redirectUrl?: string;
   title?: string;
   providers?: string;
-  showTestPanel?: string | boolean;
 }> = ({
   redirectUrl = '/dashboard',
   title = '소셜 로그인',
-  providers,
-  showTestPanel
+  providers
 }) => {
   return (
     <SocialLoginComponent
@@ -447,7 +358,6 @@ const OAuthOnlyComponent: React.FC<{
       title={title}
       subtitle="소셜 계정으로 간편하게 로그인하세요"
       providers={providers}
-      showTestPanel={showTestPanel}
     />
   );
 };
@@ -461,11 +371,6 @@ export const socialLoginShortcode: ShortcodeDefinition = {
       type: 'string',
       required: false,
       default: 'google,naver,kakao'
-    },
-    showTestPanel: {
-      type: 'boolean',
-      required: false,
-      default: false
     },
     redirectUrl: {
       type: 'string',
