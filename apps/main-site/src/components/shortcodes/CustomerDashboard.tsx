@@ -76,13 +76,23 @@ export const CustomerDashboard: React.FC = () => {
       setError(null);
 
       // Helper to silently fetch data (ignore 404s)
+      // Treat 404 as valid response to prevent console errors
       const silentFetch = async (url: string) => {
         try {
-          const response = await authClient.api.get(url);
-          return response.data;
+          const response = await authClient.api.get(url, {
+            validateStatus: (status) => status < 500 // Accept all responses except 5xx
+          });
+
+          // Return data only if status is 2xx
+          if (response.status >= 200 && response.status < 300) {
+            return response.data;
+          }
+
+          // Silent return null for 4xx (including 404)
+          return null;
         } catch (error: any) {
-          // Silent fail for 404 - API endpoints may not be implemented yet
-          if (import.meta.env.DEV && error?.response?.status !== 404) {
+          // Only log 5xx errors in DEV
+          if (import.meta.env.DEV) {
             console.debug(`[CustomerDashboard] Failed to fetch ${url}:`, error);
           }
           return null;

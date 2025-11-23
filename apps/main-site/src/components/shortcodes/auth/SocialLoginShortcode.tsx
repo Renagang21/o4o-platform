@@ -129,12 +129,17 @@ export const SocialLoginComponent: React.FC<{
       }
 
       try {
-        const response = await authClient.api.get('/auth/unified/test-accounts');
-        if (response.data.success) {
+        // Treat 404 as valid response to prevent console errors
+        const response = await authClient.api.get('/auth/unified/test-accounts', {
+          validateStatus: (status) => status < 500
+        });
+
+        if (response.status === 200 && response.data.success) {
           setTestAccounts(response.data.data);
         }
+        // Silently ignore 404 or other 4xx errors
       } catch (error) {
-        // Silent fail in production - test accounts API may not be available
+        // Silent fail - test accounts API may not be available
         if (import.meta.env.DEV) {
           console.debug('[SocialLogin] Test accounts unavailable:', error);
         }
