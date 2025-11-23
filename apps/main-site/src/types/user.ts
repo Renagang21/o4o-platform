@@ -109,6 +109,10 @@ export interface AuthContextType {
   checkAuthStatus: () => Promise<void>;
   // P0 RBAC: role assignment checker
   hasRole: (role: string) => boolean;
+  // R-3-1: Active role management
+  activeRole: string | null;
+  setActiveRole: (role: string | null) => void;
+  getAvailableRoles: () => string[];
 }
 
 // 권한 확인 관련 타입

@@ -24,6 +24,8 @@ interface AuthProviderProps {
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // R-3-1: Active role state management
+  const [activeRole, setActiveRoleState] = useState<string | null>(null);
 
   // HP-1: Toast System
   const toast = useToast();
@@ -36,6 +38,21 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // P0 RBAC: hasRole helper - checks active assignments
   const hasRole = (role: string): boolean => {
     return user?.assignments?.some(a => a.role === role && a.active) ?? false;
+  };
+
+  // R-3-1: Set active role with localStorage persistence
+  const setActiveRole = (role: string | null) => {
+    setActiveRoleState(role);
+    if (role) {
+      localStorage.setItem('activeRole', role);
+    } else {
+      localStorage.removeItem('activeRole');
+    }
+  };
+
+  // R-3-1: Get available roles from assignments
+  const getAvailableRoles = (): string[] => {
+    return user?.assignments?.filter(a => a.active).map(a => a.role) ?? [];
   };
 
   // P0 RBAC: 로그인 - cookieAuthClient 사용
@@ -156,6 +173,31 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // R-3-1: Initialize activeRole when user changes
+  useEffect(() => {
+    if (!user) {
+      setActiveRole(null);
+      return;
+    }
+
+    const availableRoles = getAvailableRoles();
+    if (availableRoles.length === 0) {
+      setActiveRole(null);
+      return;
+    }
+
+    // Try to restore from localStorage
+    const savedRole = localStorage.getItem('activeRole');
+    if (savedRole && availableRoles.includes(savedRole)) {
+      setActiveRole(savedRole);
+      return;
+    }
+
+    // Default to first available role
+    setActiveRole(availableRoles[0]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   // Listen for session expiry events from cookie-client
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -198,6 +240,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         updateUser,
         checkAuthStatus,
         hasRole, // P0 RBAC: hasRole 추가
+        activeRole, // R-3-1: activeRole 추가
+        setActiveRole, // R-3-1: setActiveRole 추가
+        getAvailableRoles, // R-3-1: getAvailableRoles 추가
       }}
     >
       {children}
