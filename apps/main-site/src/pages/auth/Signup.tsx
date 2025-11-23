@@ -3,11 +3,12 @@
  * Email signup page with OAuth options
  */
 
-import { FC, useState, FormEvent } from 'react';
+import { FC, useState, FormEvent, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { cookieAuthClient } from '@o4o/auth-client';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Signup: FC = () => {
   const [email, setEmail] = useState('');
@@ -21,10 +22,18 @@ const Signup: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  // Get redirect URL from query params or default to home
+  // Get redirect URL from query params or default to account page
   const params = new URLSearchParams(location.search);
-  const redirectUrl = params.get('redirect') || '/';
+  const redirectUrl = params.get('redirect') || '/account';
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate(redirectUrl, { replace: true });
+    }
+  }, [isAuthenticated, authLoading, redirectUrl, navigate]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};

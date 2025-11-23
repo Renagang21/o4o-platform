@@ -3,8 +3,9 @@
  * Main login page with OAuth and email/password authentication
  */
 
-import { FC, lazy, Suspense } from 'react';
+import { FC, lazy, Suspense, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Lazy load SocialLoginComponent to avoid static import
 const SocialLoginComponent = lazy(() =>
@@ -25,10 +26,18 @@ const LoginLoading = () => (
 const Login: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  // Get redirect URL from query params or default to home
+  // Get redirect URL from query params or default to account page
   const params = new URLSearchParams(location.search);
-  const redirectUrl = params.get('redirect') || '/';
+  const redirectUrl = params.get('redirect') || '/account';
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate(redirectUrl, { replace: true });
+    }
+  }, [isAuthenticated, authLoading, redirectUrl, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
