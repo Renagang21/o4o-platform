@@ -89,6 +89,8 @@ import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
 import { Order } from '../entities/Order.js';
 import { OrderEvent } from '../entities/OrderEvent.js';
+// Wishlist entity (R-6-5)
+import { Wishlist } from '../entities/Wishlist.js';
 // Settlement entities
 import { Settlement } from '../entities/Settlement.js';
 import { SettlementItem } from '../entities/SettlementItem.js';
@@ -256,6 +258,8 @@ export const AppDataSource = new DataSource({
     CartItem,
     Order,
     OrderEvent,
+    // Wishlist entity (R-6-5)
+    Wishlist,
     // Settlement entities
     Settlement,
     SettlementItem,

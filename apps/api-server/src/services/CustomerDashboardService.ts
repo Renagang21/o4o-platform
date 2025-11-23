@@ -15,6 +15,7 @@ import {
   createDashboardMeta
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
+import { WishlistService } from './WishlistService.js';
 
 export interface DateRangeFilter {
   from?: Date;
@@ -23,6 +24,7 @@ export interface DateRangeFilter {
 
 export class CustomerDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);
+  private wishlistService = new WishlistService();
 
   /**
    * Get dashboard summary for a customer
@@ -67,6 +69,7 @@ export class CustomerDashboardService {
       let totalOrders = 0;
       let totalSpent = 0;
       let activeOrders = 0;
+      let rewardPointOrders = 0; // R-6-5: Orders that earn reward points
 
       for (const order of orders) {
         totalOrders++;
@@ -84,10 +87,22 @@ export class CustomerDashboardService {
         ) {
           activeOrders++;
         }
+
+        // R-6-5: Count orders that earn reward points (confirmed, processing, delivered)
+        if (
+          order.status === OrderStatus.CONFIRMED ||
+          order.status === OrderStatus.PROCESSING ||
+          order.status === OrderStatus.DELIVERED
+        ) {
+          rewardPointOrders++;
+        }
       }
 
-      // Reward points - placeholder for future implementation
-      const rewardPoints = 0;
+      // R-6-5: Calculate reward points (10 points per qualifying order)
+      const rewardPoints = rewardPointOrders * 10;
+
+      // R-6-5: Get real wishlist count
+      const wishlistItems = await this.wishlistService.countWishlistItems(userId);
 
       return {
         totalOrders,
@@ -96,7 +111,7 @@ export class CustomerDashboardService {
         totalSpent,
         activeOrders,
         rewardPoints,
-        wishlistItems: 0, // TODO: Implement wishlist count
+        wishlistItems,
       };
     } catch (error) {
       logger.error('[CustomerDashboardService] Failed to get summary:', error);
