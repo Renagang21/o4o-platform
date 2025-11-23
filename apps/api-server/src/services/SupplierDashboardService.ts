@@ -1,6 +1,7 @@
 /**
  * SupplierDashboardService
  * R-8: Dropshipping Refactor Phase 1 - Supplier metrics and revenue tracking
+ * R-8 Task 3: Refactored to use SettlementReadService for revenue reading
  *
  * Provides supplier-specific statistics, orders, and revenue calculations
  * Mirrors SellerDashboardService structure for consistency
@@ -16,6 +17,7 @@ import {
   createDashboardMeta
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
+import { SettlementReadService } from './SettlementReadService.js';
 
 /**
  * @deprecated Use SupplierDashboardSummaryDto from dashboard.dto.ts
@@ -52,6 +54,7 @@ export interface PaginationParams {
 
 export class SupplierDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);
+  private settlementReadService = new SettlementReadService();
 
   /**
    * Get dashboard summary for a supplier
@@ -230,7 +233,7 @@ export class SupplierDashboardService {
 
   /**
    * Get revenue details for a supplier
-   * Returns revenue breakdown by order
+   * R-8: Refactored to use SettlementReadService for centralized reading
    */
   async getRevenueDetailsForSupplier(
     supplierId: string,
@@ -246,55 +249,15 @@ export class SupplierDashboardService {
     }>;
   }> {
     try {
-      const where: any = {
-        paymentStatus: In([PaymentStatus.COMPLETED])
-      };
-
-      if (dateRange?.from || dateRange?.to) {
-        where.orderDate = Between(
-          dateRange.from || new Date('2020-01-01'),
-          dateRange.to || new Date()
-        );
-      }
-
-      const orders = await this.orderRepository.find({
-        where,
-        order: { orderDate: 'DESC' }
-      });
-
-      const revenueByOrder = [];
-      let totalRevenue = 0;
-
-      for (const order of orders) {
-        const supplierItems = order.items.filter(
-          (item: OrderItem) => item.supplierId === supplierId
-        );
-
-        if (supplierItems.length > 0) {
-          const revenueAmount = supplierItems.reduce(
-            (sum, item) => sum + (item.basePriceSnapshot || item.unitPrice) * item.quantity,
-            0
-          );
-          totalRevenue += revenueAmount;
-
-          const itemCount = supplierItems.reduce(
-            (sum, item) => sum + item.quantity,
-            0
-          );
-
-          revenueByOrder.push({
-            orderNumber: order.orderNumber,
-            orderDate: order.orderDate,
-            revenueAmount: Math.round(revenueAmount),
-            itemCount,
-            status: order.status
-          });
-        }
-      }
+      // R-8: Use SettlementReadService for centralized revenue reading
+      const summary = await this.settlementReadService.getSupplierCommissionSummary(
+        supplierId,
+        dateRange
+      );
 
       return {
-        totalRevenue: Math.round(totalRevenue),
-        revenueByOrder
+        totalRevenue: summary.totalRevenue,
+        revenueByOrder: summary.revenueByOrder
       };
     } catch (error) {
       logger.error('[SupplierDashboardService] Failed to get revenue details:', error);

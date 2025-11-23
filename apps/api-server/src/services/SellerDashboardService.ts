@@ -2,6 +2,7 @@
  * SellerDashboardService
  * Phase PD-1: Partner Dashboard v1 - Seller metrics and commission tracking
  * R-6-2: Updated with standard DTO and range service
+ * R-8: Refactored to use SettlementReadService for commission reading
  *
  * Provides seller-specific statistics, orders, and commission calculations
  */
@@ -16,6 +17,7 @@ import {
   createDashboardMeta
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
+import { SettlementReadService } from './SettlementReadService.js';
 
 /**
  * @deprecated Use SellerDashboardSummaryDto from dashboard.dto.ts
@@ -54,6 +56,7 @@ export interface PaginationParams {
 
 export class SellerDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);
+  private settlementReadService = new SettlementReadService();
 
   /**
    * Get dashboard summary for a seller
@@ -244,7 +247,7 @@ export class SellerDashboardService {
 
   /**
    * Get commission details for a seller
-   * Returns commission breakdown by order
+   * R-8: Refactored to use SettlementReadService for centralized reading
    */
   async getCommissionDetailsForSeller(
     sellerId: string,
@@ -261,63 +264,15 @@ export class SellerDashboardService {
     }>;
   }> {
     try {
-      const where: any = {
-        paymentStatus: In([PaymentStatus.COMPLETED])
-      };
-
-      if (dateRange?.from || dateRange?.to) {
-        where.orderDate = Between(
-          dateRange.from || new Date('2020-01-01'),
-          dateRange.to || new Date()
-        );
-      }
-
-      const orders = await this.orderRepository.find({
-        where,
-        order: { orderDate: 'DESC' }
-      });
-
-      const commissionByOrder = [];
-      let totalCommission = 0;
-
-      for (const order of orders) {
-        const sellerItems = order.items.filter(
-          (item: OrderItem) => item.sellerId === sellerId
-        );
-
-        if (sellerItems.length > 0) {
-          const salesAmount = sellerItems.reduce(
-            (sum, item) => sum + item.totalPrice,
-            0
-          );
-
-          // Phase PD-2: Use actual commission amount from order items
-          const commissionAmount = sellerItems.reduce(
-            (sum, item) => sum + (item.commissionAmount || 0),
-            0
-          );
-          totalCommission += commissionAmount;
-
-          // Calculate weighted average commission rate for display
-          // (total commission / total sales amount)
-          const effectiveCommissionRate = salesAmount > 0
-            ? commissionAmount / salesAmount
-            : 0;
-
-          commissionByOrder.push({
-            orderNumber: order.orderNumber,
-            orderDate: order.orderDate,
-            salesAmount: Math.round(salesAmount),
-            commissionAmount: Math.round(commissionAmount),
-            commissionRate: effectiveCommissionRate,
-            status: order.status
-          });
-        }
-      }
+      // R-8: Use SettlementReadService for centralized commission reading
+      const summary = await this.settlementReadService.getSellerCommissionSummary(
+        sellerId,
+        dateRange
+      );
 
       return {
-        totalCommission: Math.round(totalCommission),
-        commissionByOrder
+        totalCommission: summary.totalCommission,
+        commissionByOrder: summary.commissionByOrder
       };
     } catch (error) {
       logger.error('[SellerDashboardService] Failed to get commission details:', error);
