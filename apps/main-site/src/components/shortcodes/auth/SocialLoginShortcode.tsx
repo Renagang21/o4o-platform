@@ -1,13 +1,16 @@
 /**
  * Social Login Shortcodes
  * OAuth social login, email/password login
+ *
+ * R-5-2: Simplified login flow with AuthContext
  */
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Loader2 } from 'lucide-react';
 import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { authClient } from '@o4o/auth-client';
-import { getRedirectForRole } from '@/config/roleRedirects';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface OAuthProvider {
   enabled: boolean;
@@ -33,7 +36,7 @@ export const SocialLoginComponent: React.FC<{
   signupText?: string; // Signup prompt text (default: '계정이 없으신가요?')
   signupLinkText?: string; // Signup link text (default: '회원가입')
 }> = ({
-  redirectUrl = '/dashboard',
+  redirectUrl = '/account',
   showEmailLogin = true,
   title = '로그인',
   subtitle = '계정에 접속하여 서비스를 이용하세요',
@@ -43,6 +46,10 @@ export const SocialLoginComponent: React.FC<{
   signupText = '계정이 없으신가요?',
   signupLinkText = '회원가입'
 }) => {
+  // R-5-2: Use AuthContext for login
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -114,32 +121,28 @@ export const SocialLoginComponent: React.FC<{
     if (error) setError('');
   };
 
+  /**
+   * R-5-2: Simplified login handler
+   * - Uses AuthContext.login() for state management
+   * - Unified redirect logic: redirectUrl prop (from query param) → /account
+   * - Standardized error messages
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await authClient.api.post('/auth/login', formData);
+      const success = await login(formData.email, formData.password);
 
-      if (response.data.success) {
-        // Determine redirect based on user role
-        const userRole = response.data.user?.role || response.data.user?.currentRole;
-        const roleRedirect = userRole ? getRedirectForRole(userRole) : redirectUrl;
-
-        // Redirect on success (prefer role-based redirect over custom redirect)
-        window.location.href = roleRedirect;
-      } else {
-        setError(response.data.message || '로그인에 실패했습니다.');
+      if (success) {
+        // R-5-2: Unified redirect logic
+        const targetUrl = redirectUrl || '/account';
+        navigate(targetUrl, { replace: true });
       }
     } catch (err: any) {
-      // Handle validation errors from backend
-      if (err.response?.data?.details && Array.isArray(err.response.data.details)) {
-        const validationErrors = err.response.data.details.map((d: any) => d.msg).join(', ');
-        setError(validationErrors);
-      } else {
-        setError(err.response?.data?.error || err.response?.data?.message || err.message || '로그인에 실패했습니다.');
-      }
+      // R-5-2: Standardized error message
+      setError('이메일 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setLoading(false);
     }
@@ -354,7 +357,7 @@ const OAuthOnlyComponent: React.FC<{
   title?: string;
   providers?: string;
 }> = ({
-  redirectUrl = '/dashboard',
+  redirectUrl = '/account',
   title = '소셜 로그인',
   providers
 }) => {
@@ -382,7 +385,7 @@ export const socialLoginShortcode: ShortcodeDefinition = {
     redirectUrl: {
       type: 'string',
       required: false,
-      default: '/dashboard'
+      default: '/account'
     },
     title: {
       type: 'string',
@@ -427,7 +430,6 @@ export const socialLoginShortcode: ShortcodeDefinition = {
       title={attributes.title as string}
       subtitle={attributes.subtitle as string}
       providers={attributes.providers as string}
-      showTestPanel={attributes.showTestPanel as string | boolean}
       showSignupLink={attributes.show_signup_link !== false && attributes.showSignupLink !== false}
       signupUrl={attributes.signup_url as string || attributes.signupUrl as string}
       signupText={attributes.signup_text as string || attributes.signupText as string}
@@ -445,7 +447,6 @@ export const loginFormShortcode: ShortcodeDefinition = {
       title={attributes.title as string}
       subtitle={attributes.subtitle as string}
       providers={attributes.providers as string}
-      showTestPanel={attributes.showTestPanel as string | boolean}
     />
   )
 };
@@ -457,7 +458,6 @@ export const oauthLoginShortcode: ShortcodeDefinition = {
       redirectUrl={attributes.redirect_url as string || attributes.redirectUrl as string}
       title={attributes.title as string}
       providers={attributes.providers as string}
-      showTestPanel={attributes.showTestPanel as string | boolean}
     />
   )
 };
