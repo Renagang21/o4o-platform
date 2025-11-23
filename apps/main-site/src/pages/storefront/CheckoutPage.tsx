@@ -1,117 +1,194 @@
 /**
- * Checkout Page
- * Phase 5-1: Storefront Checkout & Order Creation
+ * Checkout Page (Modernized)
+ * R-6-8: Checkout Modernization with component composition
+ *
+ * Features:
+ * - Component-based architecture
+ * - Toast notifications
+ * - Skeleton loading states
+ * - Shipping/Payment options UI
+ * - Toss Payments integration
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { ArrowLeft, X, Trash2 } from 'lucide-react';
-import type { CustomerInfo } from '../../types/storefront';
-import { storefrontAPI } from '../../services/storefrontApi';
+import { ArrowLeft } from 'lucide-react';
 import { useCartStore } from '../../stores/cartStore';
+import { useToastContext } from '../../contexts/ToastProvider';
+import { storefrontAPI } from '../../services/storefrontApi';
 import { loadTossPaymentsSDK, requestTossPayment, generateOrderName } from '../../utils/tossPayments';
+
+// Checkout Components
+import { CheckoutProgress } from '../../components/checkout/CheckoutProgress';
+import { CustomerInfoForm, CustomerInfo } from '../../components/checkout/CustomerInfoForm';
+import { ShippingAddressForm, ShippingAddress } from '../../components/checkout/ShippingAddressForm';
+import { ShippingOptions, ShippingOption } from '../../components/checkout/ShippingOptions';
+import { PaymentMethodSelector, PaymentMethod } from '../../components/checkout/PaymentMethodSelector';
+import { OrderSummaryCheckout } from '../../components/checkout/OrderSummaryCheckout';
+import { CheckoutSkeleton } from '../../components/checkout/CheckoutSkeleton';
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const cartStore = useCartStore();
+  const toast = useToastContext();
 
-  // 고객 정보
+  // Loading States
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [tossSDKLoaded, setTossSDKLoaded] = useState(false);
+
+  // Form States
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     email: '',
     phone: '',
-    shipping_address: {
-      postcode: '',
-      address: '',
-      address_detail: '',
-    },
-    order_note: '',
   });
 
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [tossSDKLoaded, setTossSDKLoaded] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
+    postcode: '',
+    address: '',
+    address_detail: '',
+  });
 
-  // Load Toss Payments SDK on mount
+  const [orderNote, setOrderNote] = useState('');
+  const [shippingOption, setShippingOption] = useState<ShippingOption>('standard');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CARD');
+
+  // Validation Errors
+  const [customerErrors, setCustomerErrors] = useState<Partial<Record<keyof CustomerInfo, string>>>({});
+  const [addressErrors, setAddressErrors] = useState<Partial<Record<keyof ShippingAddress, string>>>({});
+
+  // Load Toss Payments SDK
   useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500);
+
     loadTossPaymentsSDK()
       .then(() => setTossSDKLoaded(true))
       .catch((err) => {
         console.error('Failed to load Toss SDK:', err);
-        setError('결제 시스템을 불러오는데 실패했습니다.');
+        toast.error('결제 시스템을 불러오는데 실패했습니다.');
       });
-  }, []);
 
-  // 금액 포맷
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (!loading && cartStore.items.length === 0) {
+      toast.warning('장바구니가 비어있습니다.');
+      navigate('/cart');
+    }
+  }, [loading, cartStore.items.length, navigate, toast]);
+
+  // Format Currency
   const formatCurrency = (amount: number, currency: string = 'KRW') => {
     if (currency === 'KRW') {
-      return `₩ ${amount.toLocaleString()}`;
+      return `₩${amount.toLocaleString()}`;
     }
     return `${amount.toLocaleString()} ${currency}`;
   };
 
-  // 배송비 계산 (임시: 최대 배송비 적용)
+  // Calculate Shipping Fee
   const calculateShippingFee = (): number => {
-    // 실제로는 seller별로 다를 수 있지만, 임시로 3000원 고정
-    return cartStore.items.length > 0 ? 3000 : 0;
+    const freeShippingThreshold = 30000;
+    if (cartStore.total_amount >= freeShippingThreshold) {
+      return 0;
+    }
+    return shippingOption === 'express' ? 6000 : 3000;
   };
 
   const shippingFee = calculateShippingFee();
   const totalAmount = cartStore.total_amount + shippingFee;
 
-  // Phase PG-1: 주문 생성 및 Toss Payments 결제 시작
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  // Validate Form
+  const validateForm = (): boolean => {
+    const custErrors: Partial<Record<keyof CustomerInfo, string>> = {};
+    const addrErrors: Partial<Record<keyof ShippingAddress, string>> = {};
 
-    // 유효성 검사
-    if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
-      setError('고객 정보를 모두 입력해주세요.');
-      return;
+    // Customer Info Validation
+    if (!customerInfo.name.trim()) {
+      custErrors.name = '이름을 입력해주세요.';
     }
 
-    if (
-      !customerInfo.shipping_address.postcode ||
-      !customerInfo.shipping_address.address
-    ) {
-      setError('배송 주소를 입력해주세요.');
+    if (!customerInfo.email.trim()) {
+      custErrors.email = '이메일을 입력해주세요.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      custErrors.email = '올바른 이메일 형식이 아닙니다.';
+    }
+
+    if (!customerInfo.phone.trim()) {
+      custErrors.phone = '전화번호를 입력해주세요.';
+    } else {
+      const phoneDigits = customerInfo.phone.replace(/[^0-9]/g, '');
+      if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+        custErrors.phone = '올바른 전화번호 형식이 아닙니다.';
+      }
+    }
+
+    // Shipping Address Validation
+    if (!shippingAddress.postcode.trim()) {
+      addrErrors.postcode = '우편번호를 입력해주세요.';
+    }
+
+    if (!shippingAddress.address.trim()) {
+      addrErrors.address = '주소를 입력해주세요.';
+    }
+
+    setCustomerErrors(custErrors);
+    setAddressErrors(addrErrors);
+
+    const hasErrors = Object.keys(custErrors).length > 0 || Object.keys(addrErrors).length > 0;
+
+    if (hasErrors) {
+      toast.error('필수 정보를 정확히 입력해주세요.');
+    }
+
+    return !hasErrors;
+  };
+
+  // Handle Submit
+  const handleSubmit = async () => {
+    if (!validateForm()) {
       return;
     }
 
     if (cartStore.items.length === 0) {
-      setError('장바구니가 비어있습니다.');
+      toast.error('장바구니가 비어있습니다.');
       return;
     }
 
     if (!tossSDKLoaded) {
-      setError('결제 시스템이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      toast.error('결제 시스템이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
       return;
     }
 
     setSubmitting(true);
 
     try {
-      // 1. 주문 생성 (status: PENDING, paymentStatus: PENDING)
+      // Create Order (PENDING status)
       const response = await storefrontAPI.createOrder({
-        customer: customerInfo,
+        customer: {
+          ...customerInfo,
+          shipping_address: shippingAddress,
+          order_note: orderNote,
+        },
         items: cartStore.items.map((item) => ({
           product_id: item.product_id,
           quantity: item.quantity,
-          seller_id: item.seller_id, // CI-1: Include seller_id for proper commission calculation
+          seller_id: item.seller_id,
         })),
-        payment_method: 'CARD',
+        payment_method: paymentMethod,
       });
 
       if (response.success) {
         const order = response.data;
-
-        // 2. Toss Payments 결제 위젯 실행
         const orderName = generateOrderName(cartStore.items);
         const baseUrl = window.location.origin;
 
+        // Initiate Toss Payment
         await requestTossPayment({
-          orderId: order.orderNumber, // Use orderNumber as orderId
+          orderId: order.orderNumber,
           orderName,
           amount: totalAmount,
           customerName: customerInfo.name,
@@ -120,276 +197,101 @@ export const CheckoutPage: React.FC = () => {
           failUrl: `${baseUrl}/payment/fail`,
         });
 
-        // requestTossPayment will redirect to Toss checkout page
-        // User will be redirected back to successUrl or failUrl
-
+        // User will be redirected to Toss checkout page
+      } else {
+        throw new Error(response.message || '주문 생성에 실패했습니다.');
       }
     } catch (err: any) {
       console.error('결제 시작 실패:', err);
-      setError(err.message || '결제를 시작할 수 없습니다.');
+      toast.error(err.message || '결제를 시작할 수 없습니다.');
       setSubmitting(false);
     }
   };
 
-  if (cartStore.items.length === 0) {
+  // Loading State
+  if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-gray-600 mb-4">장바구니가 비어있습니다.</div>
-            <button
-              onClick={() => navigate('/store/products')}
-              className="text-blue-600 hover:underline"
-            >
-              상품 목록으로 이동
-            </button>
-          </div>
-        </div>
+        <CheckoutSkeleton />
       </Layout>
     );
+  }
+
+  // Empty Cart (should redirect, but render for safety)
+  if (cartStore.items.length === 0) {
+    return null;
   }
 
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 뒤로가기 */}
+          {/* Progress Indicator */}
+          <CheckoutProgress currentStep="checkout" />
+
+          {/* Back Button */}
           <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+            onClick={() => navigate('/cart')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            돌아가기
+            장바구니로 돌아가기
           </button>
 
           <h1 className="text-3xl font-bold text-gray-900 mb-8">주문하기</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* 좌측: 고객 정보 입력 */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* 고객 정보 */}
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    주문자 정보
-                  </h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이름 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={customerInfo.name}
-                        onChange={(e) =>
-                          setCustomerInfo({ ...customerInfo, name: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이메일 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        value={customerInfo.email}
-                        onChange={(e) =>
-                          setCustomerInfo({ ...customerInfo, email: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        전화번호 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        value={customerInfo.phone}
-                        onChange={(e) =>
-                          setCustomerInfo({ ...customerInfo, phone: e.target.value })
-                        }
-                        placeholder="010-0000-0000"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Forms */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Customer Info */}
+              <CustomerInfoForm
+                value={customerInfo}
+                onChange={setCustomerInfo}
+                errors={customerErrors}
+              />
 
-                {/* 배송 주소 */}
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    배송 주소
-                  </h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        우편번호 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={customerInfo.shipping_address.postcode}
-                        onChange={(e) =>
-                          setCustomerInfo({
-                            ...customerInfo,
-                            shipping_address: {
-                              ...customerInfo.shipping_address,
-                              postcode: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="12345"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        주소 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={customerInfo.shipping_address.address}
-                        onChange={(e) =>
-                          setCustomerInfo({
-                            ...customerInfo,
-                            shipping_address: {
-                              ...customerInfo.shipping_address,
-                              address: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="서울시 강남구 테헤란로"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        상세 주소
-                      </label>
-                      <input
-                        type="text"
-                        value={customerInfo.shipping_address.address_detail || ''}
-                        onChange={(e) =>
-                          setCustomerInfo({
-                            ...customerInfo,
-                            shipping_address: {
-                              ...customerInfo.shipping_address,
-                              address_detail: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="101동 202호"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
+              {/* Shipping Address */}
+              <ShippingAddressForm
+                value={shippingAddress}
+                onChange={setShippingAddress}
+                orderNote={orderNote}
+                onOrderNoteChange={setOrderNote}
+                errors={addressErrors}
+              />
 
-                {/* 배송 요청사항 */}
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    배송 요청사항
-                  </h2>
-                  <textarea
-                    value={customerInfo.order_note || ''}
-                    onChange={(e) =>
-                      setCustomerInfo({ ...customerInfo, order_note: e.target.value })
-                    }
-                    rows={3}
-                    placeholder="배송 시 요청사항을 입력해주세요."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  />
-                </div>
-              </div>
+              {/* Shipping Options */}
+              <ShippingOptions
+                selected={shippingOption}
+                onChange={setShippingOption}
+              />
 
-              {/* 우측: 주문 요약 */}
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-lg shadow p-6 sticky top-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    주문 요약
-                  </h2>
-
-                  {/* 장바구니 아이템 */}
-                  <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-                    {cartStore.items.map((item) => (
-                      <div key={item.product_id} className="flex gap-3">
-                        <div className="w-16 h-16 bg-gray-100 rounded flex-shrink-0">
-                          {item.main_image ? (
-                            <img
-                              src={item.main_image}
-                              alt={item.product_name}
-                              className="w-full h-full object-cover rounded"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                              No Img
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">
-                            {item.product_name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {item.quantity}개 × {formatCurrency(item.price, item.currency)}
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => cartStore.removeItem(item.product_id)}
-                          className="text-gray-400 hover:text-red-600"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* 금액 요약 */}
-                  <div className="border-t border-gray-200 pt-4 space-y-2">
-                    <div className="flex justify-between text-gray-600">
-                      <span>상품 금액</span>
-                      <span>{formatCurrency(cartStore.total_amount)}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>배송비</span>
-                      <span>{formatCurrency(shippingFee)}</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-2 flex justify-between text-lg font-bold text-gray-900">
-                      <span>총 결제 금액</span>
-                      <span>{formatCurrency(totalAmount)}</span>
-                    </div>
-                  </div>
-
-                  {/* 에러 메시지 */}
-                  {error && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-                      {error}
-                    </div>
-                  )}
-
-                  {/* 주문하기 버튼 */}
-                  <button
-                    type="submit"
-                    disabled={submitting || cartStore.items.length === 0}
-                    className="w-full mt-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {submitting ? '주문 처리 중...' : `${formatCurrency(totalAmount)} 결제하기`}
-                  </button>
-
-                  <div className="mt-3 text-xs text-gray-500 text-center">
-                    주문 완료 시 개인정보 수집 및 이용에 동의한 것으로 간주됩니다.
-                  </div>
-                </div>
-              </div>
+              {/* Payment Method */}
+              <PaymentMethodSelector
+                selected={paymentMethod}
+                onChange={setPaymentMethod}
+              />
             </div>
-          </form>
+
+            {/* Right Column: Order Summary */}
+            <div className="lg:col-span-1">
+              <OrderSummaryCheckout
+                items={cartStore.items}
+                subtotal={cartStore.total_amount}
+                shippingFee={shippingFee}
+                discount={0}
+                formatCurrency={formatCurrency}
+                onRemoveItem={(productId) => {
+                  const result = cartStore.removeItem(productId);
+                  if (result.success) {
+                    toast.success('상품을 제거했습니다.');
+                  }
+                }}
+                onSubmit={handleSubmit}
+                isSubmitting={submitting}
+                isDisabled={!tossSDKLoaded}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
