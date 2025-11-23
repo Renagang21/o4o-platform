@@ -149,6 +149,9 @@ import adminSettlementsRoutes from '../routes/admin/settlements.routes.js';
 // Phase PD-1 - Seller Dashboard Routes
 import sellerDashboardRoutes from '../routes/seller-dashboard.routes.js';
 
+// R-6-4 - Customer Dashboard Routes
+import customerDashboardRoutes from '../routes/customer-dashboard.routes.js';
+
 // Phase PD-8 - Admin Job Routes
 import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 
@@ -385,6 +388,9 @@ export function setupRoutes(app: Application): void {
 
   // Phase PD-1 - Seller Dashboard
   app.use('/api/v1/seller/dashboard', standardLimiter, sellerDashboardRoutes);
+
+  // R-6-4 - Customer Dashboard
+  app.use('/api/v1/customer/dashboard', standardLimiter, customerDashboardRoutes);
 
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);

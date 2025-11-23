@@ -274,3 +274,42 @@ export function createDashboardMeta(
     calculatedAt: new Date().toISOString()
   };
 }
+
+/**
+ * R-6-4: Customer-specific dashboard summary DTO
+ * Extends base summary with customer-specific fields
+ */
+export interface CustomerDashboardSummaryDto extends Omit<DashboardSummaryDto, 'meta'> {
+  /** Total orders placed by customer */
+  totalOrders: number;
+  /** Total amount spent */
+  totalSpent: number;
+  /** Active/pending orders count */
+  activeOrders: number;
+  /** Reward points balance */
+  rewardPoints: number;
+  /** Wishlist items count (optional) */
+  wishlistItems?: number;
+}
+
+/**
+ * R-6-4: Customer recent order DTO
+ */
+export interface CustomerRecentOrderDto {
+  /** Order ID */
+  id: string;
+  /** Order number (display) */
+  orderNumber: string;
+  /** Order creation date (ISO8601) */
+  createdAt: string;
+  /** Order status */
+  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  /** Total order amount */
+  totalAmount: number;
+  /** Currency code */
+  currency: string;
+  /** Number of items in order */
+  itemCount: number;
+  /** Estimated delivery date (ISO8601, optional) */
+  estimatedDelivery?: string;
+}

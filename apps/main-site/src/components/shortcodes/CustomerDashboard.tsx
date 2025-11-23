@@ -80,11 +80,55 @@ export const CustomerDashboard: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // TODO: R-6-4 - Implement backend API endpoints:
-      // - GET /api/v1/customer/dashboard/stats
-      // - GET /api/v1/customer/orders/recent
+      // R-6-4: Fetch data from backend APIs
+      const [statsRes, ordersRes] = await Promise.allSettled([
+        authClient.api.get('/api/v1/customer/dashboard/stats?range=90d'),
+        authClient.api.get('/api/v1/customer/orders/recent?limit=5')
+      ]);
 
-      // Placeholder data for now
+      // Process stats response
+      if (statsRes.status === 'fulfilled' && statsRes.value?.data?.data) {
+        const statsData = statsRes.value.data.data;
+        setStats({
+          totalOrders: statsData.totalOrders || 0,
+          pendingOrders: statsData.activeOrders || 0,
+          totalSpent: statsData.totalSpent || 0,
+          rewardPoints: statsData.rewardPoints || 0,
+          wishlistItems: statsData.wishlistItems || 0,
+          savedItems: 0,
+        });
+      } else {
+        // Fallback to empty data
+        setStats({
+          totalOrders: 0,
+          pendingOrders: 0,
+          totalSpent: 0,
+          rewardPoints: 0,
+          wishlistItems: 0,
+          savedItems: 0,
+        });
+      }
+
+      // Process recent orders response
+      if (ordersRes.status === 'fulfilled' && ordersRes.value?.data?.data) {
+        const ordersData = ordersRes.value.data.data;
+        setRecentOrders(ordersData.map((order: any) => ({
+          id: order.id,
+          orderNumber: order.orderNumber,
+          date: order.createdAt,
+          status: order.status,
+          total: order.totalAmount,
+          items: order.itemCount,
+          estimatedDelivery: order.estimatedDelivery
+        })));
+      } else {
+        setRecentOrders([]);
+      }
+
+    } catch (err: any) {
+      console.error('Failed to load customer dashboard:', err);
+      setError('대시보드 데이터를 불러오는데 실패했습니다.');
+      // Set empty data on error
       setStats({
         totalOrders: 0,
         pendingOrders: 0,
@@ -94,10 +138,6 @@ export const CustomerDashboard: React.FC = () => {
         savedItems: 0,
       });
       setRecentOrders([]);
-
-    } catch (err: any) {
-      console.error('Failed to load customer dashboard:', err);
-      setError('대시보드 데이터를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -160,22 +200,24 @@ export const CustomerDashboard: React.FC = () => {
         />
       </KPIGrid>
 
-      {/* API not implemented notice */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 mt-0.5">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-blue-900 mb-1">
-              고객 대시보드 기능 준비 중
-            </h3>
-            <p className="text-sm text-blue-800">
-              주문 내역, 리워드 포인트, 위시리스트 등의 기능이 곧 제공될 예정입니다.
-            </p>
+      {/* Show info notice only if no orders yet */}
+      {stats?.totalOrders === 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-0.5">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-blue-900 mb-1">
+                주문을 시작해 보세요!
+              </h3>
+              <p className="text-sm text-blue-800">
+                아직 주문 내역이 없습니다. 상품을 둘러보고 첫 주문을 해보세요.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
