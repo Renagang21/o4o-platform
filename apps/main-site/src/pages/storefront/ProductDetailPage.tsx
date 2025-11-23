@@ -12,12 +12,14 @@ import { storefrontAPI } from '../../services/storefrontApi';
 import { useCartStore } from '../../stores/cartStore';
 import { useAuth } from '../../contexts/AuthContext';
 import { wishlistService } from '../../services/wishlistService';
+import { useToastContext } from '../../contexts/ToastProvider';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const cartStore = useCartStore();
   const { user } = useAuth();
+  const toast = useToastContext();
 
   const [product, setProduct] = useState<StorefrontProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,7 +140,7 @@ export const ProductDetailPage: React.FC = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    cartStore.addItem(
+    const result = cartStore.addItem(
       {
         product_id: product.id,
         product_name: product.name,
@@ -152,9 +154,17 @@ export const ProductDetailPage: React.FC = () => {
       quantity
     );
 
-    if (confirm(`${product.name} ${quantity}개가 장바구니에 담겼습니다.\n장바구니로 이동하시겠습니까?`)) {
-      navigate('/checkout');
+    if (!result.success) {
+      toast.error(result.error || '장바구니에 추가하는데 실패했습니다.');
+      return;
     }
+
+    toast.success(`${product.name} ${quantity}개가 장바구니에 담겼습니다.`, {
+      action: {
+        label: '장바구니로 이동',
+        onClick: () => navigate('/cart'),
+      },
+    });
   };
 
   // 바로 구매
@@ -162,7 +172,7 @@ export const ProductDetailPage: React.FC = () => {
     if (!product) return;
 
     cartStore.clearCart();
-    cartStore.addItem(
+    const result = cartStore.addItem(
       {
         product_id: product.id,
         product_name: product.name,
@@ -175,6 +185,11 @@ export const ProductDetailPage: React.FC = () => {
       },
       quantity
     );
+
+    if (!result.success) {
+      toast.error(result.error || '구매를 진행할 수 없습니다.');
+      return;
+    }
 
     navigate('/checkout');
   };

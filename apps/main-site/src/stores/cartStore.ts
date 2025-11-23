@@ -1,17 +1,27 @@
 /**
  * Cart Store (Zustand)
  * Phase 5-1: Shopping Cart State Management
+ * R-6-7-A: Removed alert(), actions now return validation results
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartItem, Cart } from '../types/storefront';
 
+/**
+ * Cart action result
+ */
+export interface CartActionResult {
+  success: boolean;
+  error?: string;
+  errorCode?: 'OUT_OF_STOCK' | 'INVALID_QUANTITY' | 'NOT_FOUND';
+}
+
 interface CartStore extends Cart {
   // Actions
-  addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => CartActionResult;
+  removeItem: (productId: string) => CartActionResult;
+  updateQuantity: (productId: string, quantity: number) => CartActionResult;
   clearCart: () => void;
   getItemQuantity: (productId: string) => number;
 }
@@ -37,100 +47,133 @@ export const useCartStore = create<CartStore>()(
 
       // Add item to cart
       addItem: (item, quantity = 1) => {
-        set((state) => {
-          const existingItemIndex = state.items.findIndex(
-            (i) => i.product_id === item.product_id
-          );
+        const state = get();
+        const existingItemIndex = state.items.findIndex(
+          (i) => i.product_id === item.product_id
+        );
 
-          let newItems: CartItem[];
+        let newItems: CartItem[];
 
-          if (existingItemIndex >= 0) {
-            // 이미 있는 상품: 수량 증가
-            newItems = [...state.items];
-            const newQuantity = newItems[existingItemIndex].quantity + quantity;
+        if (existingItemIndex >= 0) {
+          // 이미 있는 상품: 수량 증가
+          newItems = [...state.items];
+          const newQuantity = newItems[existingItemIndex].quantity + quantity;
 
-            // 재고 체크
-            if (newQuantity > item.available_stock) {
-              alert(`재고가 부족합니다. (최대 ${item.available_stock}개)`);
-              return state;
-            }
-
-            newItems[existingItemIndex] = {
-              ...newItems[existingItemIndex],
-              quantity: newQuantity,
+          // 재고 체크
+          if (newQuantity > item.available_stock) {
+            return {
+              success: false,
+              error: `재고가 부족합니다. (최대 ${item.available_stock}개)`,
+              errorCode: 'OUT_OF_STOCK' as const,
             };
-          } else {
-            // 새로운 상품: 추가
-            if (quantity > item.available_stock) {
-              alert(`재고가 부족합니다. (최대 ${item.available_stock}개)`);
-              return state;
-            }
-
-            newItems = [
-              ...state.items,
-              {
-                ...item,
-                quantity,
-              },
-            ];
           }
 
-          return {
-            items: newItems,
-            total_items: calculateTotalItems(newItems),
-            total_amount: calculateTotal(newItems),
-            currency: 'KRW',
+          newItems[existingItemIndex] = {
+            ...newItems[existingItemIndex],
+            quantity: newQuantity,
           };
+        } else {
+          // 새로운 상품: 추가
+          if (quantity > item.available_stock) {
+            return {
+              success: false,
+              error: `재고가 부족합니다. (최대 ${item.available_stock}개)`,
+              errorCode: 'OUT_OF_STOCK' as const,
+            };
+          }
+
+          newItems = [
+            ...state.items,
+            {
+              ...item,
+              quantity,
+            },
+          ];
+        }
+
+        set({
+          items: newItems,
+          total_items: calculateTotalItems(newItems),
+          total_amount: calculateTotal(newItems),
+          currency: 'KRW',
         });
+
+        return { success: true };
       },
 
       // Remove item from cart
       removeItem: (productId) => {
-        set((state) => {
-          const newItems = state.items.filter((i) => i.product_id !== productId);
+        const state = get();
+        const itemExists = state.items.some((i) => i.product_id === productId);
 
+        if (!itemExists) {
           return {
-            items: newItems,
-            total_items: calculateTotalItems(newItems),
-            total_amount: calculateTotal(newItems),
-            currency: 'KRW',
+            success: false,
+            error: '상품을 찾을 수 없습니다.',
+            errorCode: 'NOT_FOUND' as const,
           };
+        }
+
+        const newItems = state.items.filter((i) => i.product_id !== productId);
+
+        set({
+          items: newItems,
+          total_items: calculateTotalItems(newItems),
+          total_amount: calculateTotal(newItems),
+          currency: 'KRW',
         });
+
+        return { success: true };
       },
 
       // Update item quantity
       updateQuantity: (productId, quantity) => {
-        set((state) => {
-          if (quantity <= 0) {
-            // 수량이 0 이하면 삭제
-            const newItems = state.items.filter((i) => i.product_id !== productId);
-            return {
-              items: newItems,
-              total_items: calculateTotalItems(newItems),
-              total_amount: calculateTotal(newItems),
-              currency: 'KRW',
-            };
-          }
+        const state = get();
 
-          const newItems = state.items.map((item) => {
-            if (item.product_id === productId) {
-              // 재고 체크
-              if (quantity > item.available_stock) {
-                alert(`재고가 부족합니다. (최대 ${item.available_stock}개)`);
-                return item;
-              }
-              return { ...item, quantity };
-            }
-            return item;
-          });
-
+        if (quantity < 0) {
           return {
-            items: newItems,
-            total_items: calculateTotalItems(newItems),
-            total_amount: calculateTotal(newItems),
-            currency: 'KRW',
+            success: false,
+            error: '유효하지 않은 수량입니다.',
+            errorCode: 'INVALID_QUANTITY' as const,
           };
+        }
+
+        if (quantity === 0) {
+          // 수량이 0이면 삭제
+          return get().removeItem(productId);
+        }
+
+        const item = state.items.find((i) => i.product_id === productId);
+
+        if (!item) {
+          return {
+            success: false,
+            error: '상품을 찾을 수 없습니다.',
+            errorCode: 'NOT_FOUND' as const,
+          };
+        }
+
+        // 재고 체크
+        if (quantity > item.available_stock) {
+          return {
+            success: false,
+            error: `재고가 부족합니다. (최대 ${item.available_stock}개)`,
+            errorCode: 'OUT_OF_STOCK' as const,
+          };
+        }
+
+        const newItems = state.items.map((i) =>
+          i.product_id === productId ? { ...i, quantity } : i
+        );
+
+        set({
+          items: newItems,
+          total_items: calculateTotalItems(newItems),
+          total_amount: calculateTotal(newItems),
+          currency: 'KRW',
         });
+
+        return { success: true };
       },
 
       // Clear cart

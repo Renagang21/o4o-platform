@@ -1,6 +1,7 @@
 /**
  * Cart Page (Modernized)
  * R-6-7: Shopping Cart with Modern UI/UX
+ * R-6-7-A: Toast notifications + debounced quantity updates
  *
  * Features:
  * - Component-based architecture (CartItemCard, CartSummary)
@@ -8,9 +9,11 @@
  * - Responsive design
  * - Pre-checkout validation
  * - Free shipping progress indicator
+ * - Toast notifications for user actions
+ * - 300ms debounced quantity updates
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
@@ -18,10 +21,13 @@ import { useCartStore } from '../../stores/cartStore';
 import { CartItemCard } from '../../components/cart/CartItemCard';
 import { CartSummary } from '../../components/cart/CartSummary';
 import { CartSkeleton } from '../../components/cart/CartSkeleton';
+import { useToastContext } from '../../contexts/ToastProvider';
+import { debounce } from '../../utils/debounce';
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const cartStore = useCartStore();
+  const toast = useToastContext();
   const [loading, setLoading] = useState(true);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
@@ -31,6 +37,36 @@ export const CartPage: React.FC = () => {
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Debounced quantity update (300ms)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedUpdateQuantity = useCallback(
+    debounce((productId: string, quantity: number) => {
+      const result = cartStore.updateQuantity(productId, quantity);
+
+      if (!result.success) {
+        toast.error(result.error || '수량 변경에 실패했습니다.');
+      }
+    }, 300),
+    []
+  );
+
+  // Handle quantity change with debouncing
+  const handleQuantityChange = useCallback((productId: string, quantity: number) => {
+    debouncedUpdateQuantity(productId, quantity);
+  }, [debouncedUpdateQuantity]);
+
+  // Handle remove item with Toast
+  const handleRemoveItem = useCallback((productId: string) => {
+    const item = cartStore.items.find(i => i.product_id === productId);
+    const result = cartStore.removeItem(productId);
+
+    if (result.success) {
+      toast.success(`${item?.product_name || '상품'}을(를) 장바구니에서 제거했습니다.`);
+    } else {
+      toast.error(result.error || '상품 제거에 실패했습니다.');
+    }
+  }, [cartStore, toast]);
 
   // Format currency helper
   const formatCurrency = (amount: number, currency: string = 'KRW') => {
@@ -66,7 +102,7 @@ export const CartPage: React.FC = () => {
   // Handle checkout
   const handleCheckout = () => {
     if (!validateCart()) {
-      alert('장바구니에 문제가 있습니다. 확인 후 다시 시도해주세요.');
+      toast.error('장바구니에 문제가 있습니다. 확인 후 다시 시도해주세요.');
       return;
     }
 
@@ -156,8 +192,8 @@ export const CartPage: React.FC = () => {
                 <CartItemCard
                   key={item.product_id}
                   item={item}
-                  onQuantityChange={cartStore.updateQuantity}
-                  onRemove={cartStore.removeItem}
+                  onQuantityChange={handleQuantityChange}
+                  onRemove={handleRemoveItem}
                   formatCurrency={formatCurrency}
                 />
               ))}
@@ -168,6 +204,7 @@ export const CartPage: React.FC = () => {
                   onClick={() => {
                     if (confirm('장바구니를 비우시겠습니까?')) {
                       cartStore.clearCart();
+                      toast.success('장바구니를 비웠습니다.');
                     }
                   }}
                   className="w-full py-2 text-sm text-gray-600 hover:text-red-600 transition-colors"
