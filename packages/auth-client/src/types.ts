@@ -44,11 +44,15 @@ export interface LoginCredentials {
   password: string;
 }
 
+/**
+ * R-5-1: Simplified registration data
+ * - Users are created with 'customer' role by default
+ * - Additional roles (seller, supplier, partner) require enrollment
+ */
 export interface RegisterData {
   email: string;
   password: string;
   name: string;
-  role?: 'customer' | 'seller' | 'supplier';
 }
 
 /**

@@ -81,24 +81,18 @@ const Signup: FC = () => {
     setErrors({});
 
     try {
+      // R-5-1: Simplified registration - only send email, password, name
       const response = await cookieAuthClient.register({
         email,
         password,
-        passwordConfirm,
-        name: name || undefined,
-        tos: true
+        name
       });
 
-      const { user, redirectUrl: apiRedirectUrl } = response.data;
+      // Registration successful (status: pending, requires admin approval)
+      toast.success('회원가입이 완료되었습니다! 관리자 승인 후 이용하실 수 있습니다.');
 
-      // 쿠키에 토큰 자동 저장됨 (localStorage 불필요)
-      // Set auth hint for future sessions
-      localStorage.setItem('auth_session_hint', '1');
-
-      toast.success('회원가입이 완료되었습니다!');
-
-      // 리다이렉트 (우선순위: URL 파라미터 > API 응답 > 기본 경로)
-      const targetUrl = redirectUrl || apiRedirectUrl || '/';
+      // R-5-1: Unified redirect logic - query param > default /account
+      const targetUrl = redirectUrl || '/account';
       setTimeout(() => {
         navigate(targetUrl, { replace: true });
       }, 500);
