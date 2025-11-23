@@ -75,27 +75,35 @@ export const CustomerDashboard: React.FC = () => {
       setLoading(true);
       setError(null);
 
+      // Helper to silently fetch data (ignore 404s)
+      const silentFetch = async (url: string) => {
+        try {
+          const response = await authClient.api.get(url);
+          return response.data;
+        } catch (error: any) {
+          // Silent fail for 404 - API endpoints may not be implemented yet
+          if (import.meta.env.DEV && error?.response?.status !== 404) {
+            console.debug(`[CustomerDashboard] Failed to fetch ${url}:`, error);
+          }
+          return null;
+        }
+      };
+
       // Fetch dashboard stats and recent activity in parallel
-      const [statsRes, ordersRes, viewedRes] = await Promise.allSettled([
-        authClient.api.get('/customer/dashboard/stats'),
-        authClient.api.get('/customer/orders/recent?limit=5'),
-        authClient.api.get('/customer/recently-viewed?limit=6'),
+      const [statsData, ordersData, viewedData] = await Promise.all([
+        silentFetch('/customer/dashboard/stats'),
+        silentFetch('/customer/orders/recent?limit=5'),
+        silentFetch('/customer/recently-viewed?limit=6'),
       ]);
 
-      if (statsRes.status === 'fulfilled' && statsRes.value.data) {
-        setStats(statsRes.value.data);
-      }
-
-      if (ordersRes.status === 'fulfilled' && ordersRes.value.data) {
-        setRecentOrders(ordersRes.value.data);
-      }
-
-      if (viewedRes.status === 'fulfilled' && viewedRes.value.data) {
-        setRecentlyViewed(viewedRes.value.data);
-      }
+      if (statsData) setStats(statsData);
+      if (ordersData) setRecentOrders(ordersData);
+      if (viewedData) setRecentlyViewed(viewedData);
     } catch (err) {
-      console.error('Failed to load dashboard data:', err);
-      setError('대시보드 정보를 불러오는데 실패했습니다.');
+      if (import.meta.env.DEV) {
+        console.debug('[CustomerDashboard] Failed to load dashboard data:', err);
+      }
+      // Don't show error to user - just show empty state
     } finally {
       setLoading(false);
     }
