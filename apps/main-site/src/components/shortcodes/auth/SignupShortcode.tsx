@@ -1,13 +1,12 @@
 /**
  * Signup Shortcode
- * User registration with email/password and optional social signup
+ * R-5-3: User registration with simplified redirect logic
  */
 
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, AlertCircle, Loader2, Mail, User, Lock, CheckCircle } from 'lucide-react';
 import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { authClient } from '@o4o/auth-client';
-import { getRedirectForRole } from '@/config/roleRedirects';
 
 interface OAuthProvider {
   enabled: boolean;
@@ -33,7 +32,7 @@ export const SignupComponent: React.FC<{
 }> = ({
   title = '회원가입',
   subtitle = '이메일로 가입하거나 소셜 계정으로 가입하세요',
-  redirectUrl = '/',
+  redirectUrl = '/account',
   showSocialSignup = true,
   loginUrl = '/login',
   loginText = '이미 계정이 있으신가요?',
@@ -122,12 +121,8 @@ export const SignupComponent: React.FC<{
       });
 
       if (response.data.success) {
-        // Determine redirect based on user role
-        const userRole = response.data.user?.role || response.data.user?.currentRole;
-        const roleRedirect = userRole ? getRedirectForRole(userRole) : redirectUrl;
-
-        // Redirect on success
-        window.location.href = roleRedirect;
+        // R-5-3: Unified redirect logic - always use redirectUrl prop
+        window.location.href = redirectUrl;
       } else {
         setErrors({ general: response.data.message || '회원가입에 실패했습니다.' });
       }

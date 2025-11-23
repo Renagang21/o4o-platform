@@ -19,9 +19,11 @@ import {
 } from 'lucide-react';
 import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { authClient } from '@o4o/auth-client';
-import { getRedirectForRole } from '@/config/roleRedirects';
 
-// Business Register Component (Multi-step registration for businesses)
+/**
+ * R-5-3: Business Register Component - Simplified redirect
+ * Multi-step registration for businesses (individual or corporate)
+ */
 export const BusinessRegisterComponent: React.FC<{
   title?: string;
   subtitle?: string;
@@ -32,7 +34,7 @@ export const BusinessRegisterComponent: React.FC<{
 }> = ({
   title = '사업자 등록',
   subtitle = '사업자로 등록하여 서비스를 이용하세요',
-  redirectUrl = '/',
+  redirectUrl = '/account',
   loginUrl = '/login',
   loginText = '이미 계정이 있으신가요?',
   loginLinkText = '로그인'
@@ -192,12 +194,8 @@ export const BusinessRegisterComponent: React.FC<{
       });
 
       if (response.data.success) {
-        // Determine redirect based on user role
-        const userRole = response.data.user?.role || response.data.user?.currentRole;
-        const roleRedirect = userRole ? getRedirectForRole(userRole) : redirectUrl;
-
-        // Redirect on success
-        window.location.href = roleRedirect;
+        // R-5-3: Unified redirect logic - always use redirectUrl prop
+        window.location.href = redirectUrl;
       } else {
         setErrors({ general: response.data.message || '등록에 실패했습니다.' });
       }

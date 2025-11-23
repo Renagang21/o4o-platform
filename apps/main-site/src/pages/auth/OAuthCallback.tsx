@@ -1,3 +1,9 @@
+/**
+ * R-5-3: OAuth Callback - Simplified redirect logic
+ * - No role-based redirects
+ * - Uses redirect query param or defaults to /account
+ */
+
 import { FC, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
@@ -5,7 +11,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cookieAuthClient } from '@o4o/auth-client';
 import { Card, CardContent } from '@o4o/ui';
 import { Button } from '@o4o/ui';
-import { getRedirectForRole } from '@/config/roleRedirects';
 
 interface OAuthCallbackResponse {
   success: boolean;
@@ -155,17 +160,17 @@ export const OAuthCallback: FC = () => {
     }
   };
 
+  /**
+   * R-5-3: Unified redirect logic
+   * - Checks redirect query param first
+   * - Defaults to /account
+   */
   const navigateToDestination = () => {
-    if (!currentUser) {
-      navigate('/');
-      return;
-    }
+    // Get redirect param from URL query (preserved from social login)
+    const redirectParam = searchParams.get('redirect');
+    const redirectPath = redirectParam || '/account';
 
-    // Use role-based redirect map
-    const userRole = currentUser.role || currentUser.currentRole;
-    const redirectPath = userRole ? getRedirectForRole(userRole) : '/';
-
-    navigate(redirectPath);
+    navigate(redirectPath, { replace: true });
   };
 
   const providerInfo = getProviderInfo();
