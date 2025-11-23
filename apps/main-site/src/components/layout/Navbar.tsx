@@ -1,11 +1,40 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Home, Settings, Briefcase, ShoppingCart, Users } from 'lucide-react';
+import { User, LogOut, Home, Settings, Briefcase, ShoppingCart, Users, Heart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { wishlistService } from '../../services/wishlistService';
 
 const Navbar: FC = () => {
   const navigate = useNavigate();
   const { user, hasRole, logout } = useAuth();
+
+  // R-6-6: Wishlist count state
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  // R-6-6: Load wishlist count
+  const loadWishlistCount = async () => {
+    if (!user) {
+      setWishlistCount(0);
+      return;
+    }
+
+    try {
+      const count = await wishlistService.getWishlistCount();
+      setWishlistCount(count);
+    } catch (error) {
+      console.error('Failed to load wishlist count:', error);
+      setWishlistCount(0);
+    }
+  };
+
+  // R-6-6: Load wishlist count when user changes
+  useEffect(() => {
+    loadWishlistCount();
+
+    // Refresh count every 30 seconds (optional)
+    const interval = setInterval(loadWishlistCount, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -103,6 +132,23 @@ const Navbar: FC = () => {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
+            {/* R-6-6: Wishlist Link with Badge */}
+            {user && (
+              <Link
+                to="/my-account/wishlist"
+                className="relative flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
+                title="위시리스트"
+              >
+                <Heart className="w-5 h-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
+                  </span>
+                )}
+                <span className="hidden md:inline">위시리스트</span>
+              </Link>
+            )}
+
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-indigo-600" />

@@ -6,15 +6,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { ArrowLeft, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Minus, Heart } from 'lucide-react';
 import type { StorefrontProduct } from '../../types/storefront';
 import { storefrontAPI } from '../../services/storefrontApi';
 import { useCartStore } from '../../stores/cartStore';
+import { useAuth } from '../../contexts/AuthContext';
+import { wishlistService } from '../../services/wishlistService';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const cartStore = useCartStore();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState<StorefrontProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,10 @@ export const ProductDetailPage: React.FC = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string>('');
+
+  // R-6-6: Wishlist state
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   // 상품 상세 조회
   const fetchProductDetail = async () => {
@@ -47,6 +54,56 @@ export const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     fetchProductDetail();
   }, [id]);
+
+  // R-6-6: Load wishlist status
+  const loadWishlistStatus = async () => {
+    if (!user || !id) {
+      setIsInWishlist(false);
+      return;
+    }
+
+    try {
+      const inWishlist = await wishlistService.isInWishlist(id);
+      setIsInWishlist(inWishlist);
+    } catch (error) {
+      console.error('Failed to load wishlist status:', error);
+      setIsInWishlist(false);
+    }
+  };
+
+  // R-6-6: Load wishlist status when user or product changes
+  useEffect(() => {
+    loadWishlistStatus();
+  }, [user, id]);
+
+  // R-6-6: Toggle wishlist
+  const toggleWishlist = async () => {
+    if (!user) {
+      // Redirect to login if not authenticated
+      navigate(`/login?redirect=/product/${id}`);
+      return;
+    }
+
+    if (!id) return;
+
+    setWishlistLoading(true);
+    try {
+      if (isInWishlist) {
+        await wishlistService.removeFromWishlist(id);
+        setIsInWishlist(false);
+        console.log('Removed from wishlist');
+      } else {
+        await wishlistService.addToWishlist(id);
+        setIsInWishlist(true);
+        console.log('Added to wishlist');
+      }
+    } catch (error) {
+      console.error('Failed to toggle wishlist:', error);
+      alert('위시리스트 처리에 실패했습니다.');
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   // 금액 포맷
   const formatCurrency = (amount: number, currency: string = 'KRW') => {
@@ -191,6 +248,26 @@ export const ProductDetailPage: React.FC = () => {
                       {discountRate}% OFF
                     </div>
                   )}
+
+                  {/* R-6-6: Wishlist Heart Button */}
+                  <button
+                    onClick={toggleWishlist}
+                    disabled={wishlistLoading}
+                    className="absolute top-4 right-4 p-3 bg-white rounded-full shadow-lg hover:scale-110 transition-transform disabled:opacity-50"
+                    title={isInWishlist ? '위시리스트에서 제거' : '위시리스트에 추가'}
+                  >
+                    {wishlistLoading ? (
+                      <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Heart
+                        className={`w-6 h-6 transition-colors ${
+                          isInWishlist
+                            ? 'text-red-500 fill-current'
+                            : 'text-gray-400 hover:text-red-500'
+                        }`}
+                      />
+                    )}
+                  </button>
                 </div>
 
                 {/* 썸네일 이미지 */}
