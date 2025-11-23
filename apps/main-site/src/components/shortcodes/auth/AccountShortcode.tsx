@@ -1,5 +1,5 @@
 /**
- * R-3-4: Account Shortcode - Enhanced Role-Based UX
+ * R-6-3: Account Shortcode - Modernized Role-Based Dashboard
  * User account/dashboard with full activeRole integration
  *
  * Usage: [account]
@@ -8,98 +8,116 @@
  *
  * Features:
  * - Query parameter support for role selection
- * - Role-based dashboard headers with unified UX
+ * - Modernized role-based dashboard headers with unified UX
  * - Instant role switching without page reload
  * - Graceful fallback when role-specific dashboard is not available
  * - Login required guard for unauthenticated users
+ * - Consistent styling with Seller/Supplier/Partner dashboards
  */
 
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShortcodeDefinition } from '@o4o/shortcodes';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle, Layers, User, ShoppingCart, Package, Handshake } from 'lucide-react';
+import {
+  AlertCircle,
+  User,
+  ShoppingCart,
+  Package,
+  Handshake,
+  Shield,
+  Briefcase
+} from 'lucide-react';
+import { DashboardSkeleton } from '../../common/Skeleton';
 
-// R-3-3: Import all role-based dashboard components
+// Import all role-based dashboard components
 import CustomerDashboard from '../../shortcodes/CustomerDashboard';
 import SellerDashboard from '../../shortcodes/SellerDashboard';
 import SupplierDashboard from '../../shortcodes/SupplierDashboard';
 import { PartnerDashboard } from '../../shortcodes/PartnerDashboard';
 
-// R-3-4: Role configuration with display info
+// R-6-3: Modernized role configuration with Lucide icons
 const ROLE_CONFIG: Record<string, {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
+  bgColor: string;
+  borderColor: string;
   description: string;
 }> = {
   customer: {
     label: '고객',
     icon: User,
-    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
     description: '고객 계정으로 로그인되어 있습니다'
   },
   seller: {
     label: '판매자',
     icon: ShoppingCart,
-    color: 'bg-green-100 text-green-800 border-green-200',
+    color: 'text-green-700',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
     description: '판매자 계정으로 로그인되어 있습니다'
   },
   supplier: {
     label: '공급자',
     icon: Package,
-    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    color: 'text-purple-700',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
     description: '공급자 계정으로 로그인되어 있습니다'
   },
   partner: {
     label: '파트너',
     icon: Handshake,
-    color: 'bg-orange-100 text-orange-800 border-orange-200',
+    color: 'text-orange-700',
+    bgColor: 'bg-orange-50',
+    borderColor: 'border-orange-200',
     description: '파트너 계정으로 로그인되어 있습니다'
   },
   admin: {
     label: '관리자',
-    icon: User,
-    color: 'bg-red-100 text-red-800 border-red-200',
+    icon: Shield,
+    color: 'text-red-700',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
     description: '관리자 계정으로 로그인되어 있습니다'
   },
   administrator: {
     label: '관리자',
-    icon: User,
-    color: 'bg-red-100 text-red-800 border-red-200',
+    icon: Shield,
+    color: 'text-red-700',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
     description: '관리자 계정으로 로그인되어 있습니다'
   },
   manager: {
     label: '매니저',
-    icon: User,
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    icon: Briefcase,
+    color: 'text-yellow-700',
+    bgColor: 'bg-yellow-50',
+    borderColor: 'border-yellow-200',
     description: '매니저 계정으로 로그인되어 있습니다'
   },
 };
 
-// R-3-3: Role to Dashboard mapping
+// Role to Dashboard mapping
 const ROLE_DASHBOARD_MAP: Record<string, React.ComponentType | null> = {
   customer: CustomerDashboard,
   seller: SellerDashboard,
   supplier: SupplierDashboard,
   partner: PartnerDashboard,
-  // Admin role can use customer dashboard for now
+  // Admin role uses customer dashboard for now
   admin: CustomerDashboard,
   administrator: CustomerDashboard,
   manager: CustomerDashboard,
 };
 
 /**
- * R-3-3: Resolve dashboard component based on activeRole and user roles
- *
- * Priority:
- * 1. activeRole - if it has a mapped dashboard, use it
- * 2. user.assignments - find first role that has a dashboard
- * 3. Fallback to null (will show "Coming Soon" UI)
- */
-/**
- * R-4-2: Resolve dashboard component based on activeRole and user roles
- * Updated to use isActive instead of active
+ * R-6-3: Resolve dashboard component based on activeRole and user roles
+ * Updated to use isActive instead of active (R-4-2)
  */
 function resolveDashboardComponent({
   activeRole,
@@ -114,7 +132,6 @@ function resolveDashboardComponent({
   }
 
   // 2) Find first role from assignments that has a dashboard
-  // R-4-2: use isActive instead of active
   if (userAssignments && userAssignments.length > 0) {
     for (const assignment of userAssignments) {
       if (assignment.isActive && ROLE_DASHBOARD_MAP[assignment.role]) {
@@ -128,39 +145,37 @@ function resolveDashboardComponent({
 }
 
 /**
- * R-3-3: LoginRequiredFallback UI
+ * R-6-3: LoginRequiredFallback UI (Modernized)
  * Shown when user is not authenticated
  */
 const LoginRequiredFallback: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-      <div className="flex items-start gap-4">
-        <div className="flex-shrink-0">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-8">
+      <div className="flex flex-col items-center text-center">
+        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
           <AlertCircle className="w-8 h-8 text-blue-600" />
         </div>
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-blue-900 mb-2">
-            로그인이 필요합니다
-          </h3>
-          <p className="text-blue-700 mb-4">
-            계정 페이지는 로그인 후 이용하실 수 있습니다.
-          </p>
-          <Link
-            to={`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`}
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            로그인하기 →
-          </Link>
-        </div>
+        <h3 className="text-2xl font-bold text-blue-900 mb-2">
+          로그인이 필요합니다
+        </h3>
+        <p className="text-blue-700 mb-6 max-w-md">
+          계정 페이지는 로그인 후 이용하실 수 있습니다.
+        </p>
+        <Link
+          to={`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`}
+          className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
+        >
+          로그인하기 →
+        </Link>
       </div>
     </div>
   );
 };
 
 /**
- * R-3-4: DashboardHeader - Common header for all role dashboards
+ * R-6-3: DashboardHeader - Modernized header for all role dashboards
  * Shows current role with icon and description
  */
 const DashboardHeader: React.FC<{ role: string }> = ({ role }) => {
@@ -171,45 +186,51 @@ const DashboardHeader: React.FC<{ role: string }> = ({ role }) => {
   const Icon = config.icon;
 
   return (
-    <div className={`mb-6 p-4 rounded-lg border ${config.color}`}>
-      <div className="flex items-center gap-3">
-        <Icon className="w-6 h-6" />
-        <div>
-          <h2 className="text-lg font-bold">현재 역할: {config.label}</h2>
-          <p className="text-sm mt-1">{config.description}</p>
+    <div className={`mb-6 p-6 rounded-lg border ${config.bgColor} ${config.borderColor}`}>
+      <div className="flex items-center gap-4">
+        <div className={`flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-sm flex items-center justify-center ${config.color}`}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">
+            현재 역할: {config.label}
+          </h2>
+          <p className="text-sm text-gray-600">{config.description}</p>
         </div>
       </div>
-      <p className="text-xs mt-3 opacity-80">
-        다른 역할로 전환하려면 오른쪽 상단 계정 메뉴를 이용하세요.
-      </p>
+      <div className={`mt-4 pt-4 border-t ${config.borderColor}`}>
+        <p className="text-xs text-gray-600">
+          💡 다른 역할로 전환하려면 오른쪽 상단 계정 메뉴를 이용하세요.
+        </p>
+      </div>
     </div>
   );
 };
 
 /**
- * R-3-4: AccountComingSoon UI (Enhanced)
+ * R-6-3: AccountComingSoon UI (Modernized)
  * Shown when user's role doesn't have a dashboard yet
  */
 const AccountComingSoon: React.FC<{ role?: string | null }> = ({ role }) => {
   const config = role ? ROLE_CONFIG[role] : null;
-  const Icon = config?.icon || Layers;
+  const Icon = config?.icon || User;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Role header if available */}
       {role && <DashboardHeader role={role} />}
 
       {/* Coming soon message */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-            <Icon className="w-8 h-8 text-gray-500" />
+      <div className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-12 text-center">
+        <div className="flex justify-center mb-6">
+          <div className="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center">
+            <Icon className="w-10 h-10 text-gray-400" />
           </div>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3">
           {config?.label} 대시보드 준비 중
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-2 max-w-md mx-auto">
           이 역할의 전용 대시보드는 아직 연결되지 않았습니다.
         </p>
         <p className="text-sm text-gray-500">
@@ -220,7 +241,7 @@ const AccountComingSoon: React.FC<{ role?: string | null }> = ({ role }) => {
   );
 };
 
-// R-3-4: Account Component with enhanced UX
+// R-6-3: Account Component with modernized UX
 export const AccountComponent: React.FC<{
   dashboardType?: 'customer' | 'seller' | 'supplier' | 'partner';
 }> = ({
@@ -229,7 +250,7 @@ export const AccountComponent: React.FC<{
   const { user, isAuthenticated, isLoading: authLoading, activeRole, setActiveRole, getAvailableRoles } = useAuth();
   const location = useLocation();
 
-  // R-3-4: Parse query parameters for role selection
+  // Parse query parameters for role selection
   useEffect(() => {
     if (!isAuthenticated || authLoading) return;
 
@@ -247,24 +268,25 @@ export const AccountComponent: React.FC<{
     }
   }, [location.search, isAuthenticated, authLoading, getAvailableRoles, setActiveRole]);
 
-  // Loading state
+  // Loading state with skeleton
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
+      <div className="space-y-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
         </div>
+        <DashboardSkeleton />
       </div>
     );
   }
 
-  // R-3-3: Login required guard
+  // Login required guard
   if (!authLoading && !isAuthenticated) {
     return <LoginRequiredFallback />;
   }
 
-  // R-3-4: Resolve dashboard component
+  // Resolve dashboard component
   // Priority: 1) dashboardType attribute, 2) activeRole from context
   const roleToUse = dashboardType || activeRole;
 
@@ -273,22 +295,22 @@ export const AccountComponent: React.FC<{
     userAssignments: user?.assignments,
   });
 
-  // R-3-4: Wrap dashboard with role header
+  // Wrap dashboard with role header
   const DashboardWithHeader = DashboardComponent
     ? () => (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {roleToUse && <DashboardHeader role={roleToUse} />}
           <DashboardComponent />
         </div>
       )
     : null;
 
-  // R-3-4: Show "Coming Soon" if no dashboard available
+  // Show "Coming Soon" if no dashboard available
   if (!DashboardWithHeader) {
     return <AccountComingSoon role={roleToUse} />;
   }
 
-  // R-3-4: Render the resolved dashboard with header
+  // Render the resolved dashboard with header
   return <DashboardWithHeader />;
 };
 

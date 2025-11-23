@@ -132,7 +132,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
     }
   };
 
-  // P2: Workspace-based role switch - navigate to /workspace/{role}
+  // P2/R-6-3: Role switch with Account page support
   const handleRoleSwitch = (newRole: string) => {
     const previousRole = activeRole || roleList[0];
 
@@ -140,7 +140,14 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
       // Track analytics
       trackRoleSwitch(previousRole, newRole);
 
-      // Navigate to workspace URL (will be redirected to actual dashboard)
+      // R-6-3: If currently on /account page, stay on /account with dashboard param
+      if (location.pathname.startsWith('/account')) {
+        navigate(`/account?dashboard=${newRole}`);
+        toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
+        return;
+      }
+
+      // Otherwise, navigate to workspace URL (will be redirected to actual dashboard)
       const targetPath = roleOptions[newRole]?.path || '/';
       navigate(targetPath);
 
