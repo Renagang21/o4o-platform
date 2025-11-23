@@ -146,8 +146,15 @@ export const SocialLoginComponent: React.FC<{
   };
 
   const handleSocialLogin = (provider: 'google' | 'kakao' | 'naver') => {
+    // R-3-2: Use authClient.api.defaults.baseURL safely
     const baseUrl = authClient.api.defaults.baseURL || '';
-    window.location.href = `${baseUrl}/social/${provider}`;
+
+    // R-3-2: Add redirect parameter (unified to /account)
+    const redirect = redirectUrl || '/account';
+    const redirectParam = encodeURIComponent(redirect);
+
+    // Navigate to social login endpoint
+    window.location.href = `${baseUrl}/social/${provider}?redirect=${redirectParam}`;
   };
 
   const renderSocialIcon = (provider: string) => {
