@@ -37,15 +37,17 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
   const wsClientRef = useRef<WebSocketSessionClient | null>(null);
 
   // Check authentication status
+  // R-4-2: Use flat MeResponse structure
   const checkAuth = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const meResponse = await cookieAuthClient.getCurrentUser();
-      const currentUser = meResponse?.user || null;
-      setUser(currentUser);
-      onAuthChange?.(currentUser);
-      
+      // R-4-2: meResponse is now flat structure (MeResponse)
+      const currentUser = meResponse || null;
+      setUser(currentUser as any);
+      onAuthChange?.(currentUser as any);
+
       // Initialize WebSocket if user is authenticated and token exists
       if (currentUser && enableSessionSync) {
         const token = cookieAuthClient.getAccessToken();
