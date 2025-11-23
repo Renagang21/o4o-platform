@@ -159,3 +159,39 @@ export interface CustomerOrderListQuery {
   sortBy?: 'createdAt' | 'totalAmount';
   sortOrder?: 'asc' | 'desc';
 }
+
+// ===========================
+// R-7-1: Order Actions DTOs
+// ===========================
+
+export type CustomerOrderActionType = 'cancel' | 'return';
+
+export type CustomerOrderActionErrorCode =
+  | 'ORDER_NOT_FOUND'
+  | 'NOT_OWNED_BY_CUSTOMER'
+  | 'INVALID_STATUS'
+  | 'PAYMENT_COMPLETED_CANNOT_CANCEL'
+  | 'ALREADY_CANCELLED'
+  | 'ALREADY_RETURNED'
+  | 'SERVER_ERROR';
+
+export interface CustomerOrderActionResponseDto {
+  orderId: string;
+  action: CustomerOrderActionType;
+  status: string; // Final status (e.g., 'cancelled', 'return_requested')
+  message: string; // Customer-facing message
+}
+
+export interface CustomerOrderActionSuccessDto {
+  success: true;
+  data: CustomerOrderActionResponseDto;
+}
+
+export interface CustomerOrderActionErrorDto {
+  success: false;
+  error: {
+    code: CustomerOrderActionErrorCode;
+    message: string;
+    details?: any;
+  };
+}

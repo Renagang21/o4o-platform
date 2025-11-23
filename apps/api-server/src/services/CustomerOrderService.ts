@@ -8,19 +8,36 @@
 
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual, In } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
-import { Order, OrderStatus } from '../entities/Order.js';
+import { Order, OrderStatus, PaymentStatus } from '../entities/Order.js';
+import { OrderEvent, OrderEventType } from '../entities/OrderEvent.js';
 import type {
   CustomerOrderListItemDto,
   CustomerOrderDetailDto,
   CustomerOrderListQuery,
+  CustomerOrderActionResponseDto,
+  CustomerOrderActionErrorCode,
 } from '../dto/customer-orders.dto.js';
 import logger from '../utils/logger.js';
 
+// Custom error for order action failures
+class OrderActionError extends Error {
+  constructor(
+    public code: CustomerOrderActionErrorCode,
+    message: string,
+    public details?: any
+  ) {
+    super(message);
+    this.name = 'OrderActionError';
+  }
+}
+
 export class CustomerOrderService {
   private orderRepository: Repository<Order>;
+  private orderEventRepository: Repository<OrderEvent>;
 
   constructor() {
     this.orderRepository = AppDataSource.getRepository(Order);
+    this.orderEventRepository = AppDataSource.getRepository(OrderEvent);
   }
 
   /**
@@ -135,6 +152,217 @@ export class CustomerOrderService {
       });
       throw error;
     }
+  }
+
+  /**
+   * R-7-1: Request order cancellation
+   * Security: Enforces buyerId filtering
+   */
+  async requestCancelOrderForCustomer(
+    orderId: string,
+    customerId: string
+  ): Promise<CustomerOrderActionResponseDto> {
+    try {
+      // Load order with buyerId check
+      const order = await this.loadOrderForCustomerOrThrow(orderId, customerId);
+
+      // Check if already cancelled
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new OrderActionError(
+          'ALREADY_CANCELLED',
+          '이미 취소된 주문입니다.'
+        );
+      }
+
+      // Check if already returned
+      if (order.status === OrderStatus.RETURNED) {
+        throw new OrderActionError(
+          'ALREADY_RETURNED',
+          '이미 반품 처리된 주문입니다.'
+        );
+      }
+
+      // Check if order can be cancelled (business rules)
+      if (!order.canBeCancelled()) {
+        throw new OrderActionError(
+          'INVALID_STATUS',
+          '이미 처리 중이거나 배송된 주문은 취소할 수 없습니다.'
+        );
+      }
+
+      // Check payment status - Phase 1: Only allow cancellation for pending payments
+      if (order.paymentStatus === PaymentStatus.COMPLETED) {
+        throw new OrderActionError(
+          'PAYMENT_COMPLETED_CANNOT_CANCEL',
+          '결제가 완료된 주문은 온라인에서 취소할 수 없습니다. 고객센터로 문의해주세요.'
+        );
+      }
+
+      // Save previous status before updating
+      const prevStatus = order.status;
+
+      // Update order status
+      order.status = OrderStatus.CANCELLED;
+      order.cancelledDate = new Date();
+
+      // Create order event
+      const event = this.orderEventRepository.create({
+        order,
+        type: OrderEventType.CANCELLATION,
+        message: '고객이 주문을 취소했습니다.',
+        actorId: customerId,
+        prevStatus,
+        newStatus: OrderStatus.CANCELLED,
+        source: 'web',
+      });
+
+      // Save both in transaction
+      await AppDataSource.transaction(async (manager) => {
+        await manager.save(Order, order);
+        await manager.save(OrderEvent, event);
+      });
+
+      logger.info('Order cancelled by customer:', {
+        orderId,
+        customerId,
+        orderNumber: order.orderNumber,
+      });
+
+      return {
+        orderId: order.id,
+        action: 'cancel',
+        status: 'cancelled',
+        message: '주문이 취소되었습니다.',
+      };
+    } catch (error) {
+      if (error instanceof OrderActionError) {
+        throw error;
+      }
+
+      logger.error('Failed to cancel order for customer:', {
+        orderId,
+        customerId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      throw new OrderActionError(
+        'SERVER_ERROR',
+        '주문 취소 처리 중 오류가 발생했습니다.',
+        error
+      );
+    }
+  }
+
+  /**
+   * R-7-1: Request order return
+   * Security: Enforces buyerId filtering
+   */
+  async requestReturnOrderForCustomer(
+    orderId: string,
+    customerId: string
+  ): Promise<CustomerOrderActionResponseDto> {
+    try {
+      // Load order with buyerId check
+      const order = await this.loadOrderForCustomerOrThrow(orderId, customerId);
+
+      // Check if already cancelled
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new OrderActionError(
+          'ALREADY_CANCELLED',
+          '이미 취소된 주문입니다.'
+        );
+      }
+
+      // Check if already returned
+      if (order.status === OrderStatus.RETURNED) {
+        throw new OrderActionError(
+          'ALREADY_RETURNED',
+          '이미 반품 처리된 주문입니다.'
+        );
+      }
+
+      // Check if order can be returned (only DELIVERED status)
+      if (order.status !== OrderStatus.DELIVERED) {
+        throw new OrderActionError(
+          'INVALID_STATUS',
+          '배송이 완료된 주문만 반품을 요청할 수 있습니다.'
+        );
+      }
+
+      // Update order status to RETURNED (Phase 1: Simple status change)
+      order.status = OrderStatus.RETURNED;
+
+      // Create order event (using STATUS_CHANGE for returns in Phase 1)
+      const event = this.orderEventRepository.create({
+        order,
+        type: OrderEventType.STATUS_CHANGE,
+        message: '고객이 반품을 요청했습니다.',
+        actorId: customerId,
+        prevStatus: OrderStatus.DELIVERED,
+        newStatus: OrderStatus.RETURNED,
+        source: 'web',
+      });
+
+      // Save both in transaction
+      await AppDataSource.transaction(async (manager) => {
+        await manager.save(Order, order);
+        await manager.save(OrderEvent, event);
+      });
+
+      logger.info('Return requested by customer:', {
+        orderId,
+        customerId,
+        orderNumber: order.orderNumber,
+      });
+
+      return {
+        orderId: order.id,
+        action: 'return',
+        status: 'return_requested',
+        message: '반품 요청이 접수되었습니다.',
+      };
+    } catch (error) {
+      if (error instanceof OrderActionError) {
+        throw error;
+      }
+
+      logger.error('Failed to request return for customer:', {
+        orderId,
+        customerId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      throw new OrderActionError(
+        'SERVER_ERROR',
+        '반품 요청 처리 중 오류가 발생했습니다.',
+        error
+      );
+    }
+  }
+
+  /**
+   * R-7-1: Helper to load order for customer or throw error
+   * Security: Always filters by buyerId
+   */
+  private async loadOrderForCustomerOrThrow(
+    orderId: string,
+    customerId: string
+  ): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: {
+        id: orderId,
+        buyerId: customerId, // SECURITY: Always filter by customer ID
+      },
+    });
+
+    if (!order) {
+      throw new OrderActionError(
+        'ORDER_NOT_FOUND',
+        '주문을 찾을 수 없거나 접근 권한이 없습니다.'
+      );
+    }
+
+    return order;
   }
 
   /**
@@ -296,5 +524,6 @@ export class CustomerOrderService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance and error class
 export const customerOrderService = new CustomerOrderService();
+export { OrderActionError };

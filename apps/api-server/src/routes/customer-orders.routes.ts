@@ -73,4 +73,46 @@ router.get(
   }
 );
 
+/**
+ * POST /api/v1/customer/orders/:orderId/cancel
+ * R-7-1: Cancel order for authenticated customer
+ *
+ * Path params:
+ * - orderId: UUID (required)
+ *
+ * Business rules:
+ * - Order status must be PENDING, CONFIRMED, or PROCESSING
+ * - Payment status must be PENDING (not COMPLETED)
+ * - Only order owner can cancel
+ */
+router.post(
+  '/:orderId/cancel',
+  authenticateCookie,
+  param('orderId').isUUID().withMessage('orderId must be a valid UUID'),
+  async (req: AuthRequest, res: Response) => {
+    await customerOrderController.cancelOrder(req, res, () => {});
+  }
+);
+
+/**
+ * POST /api/v1/customer/orders/:orderId/return
+ * R-7-1: Request order return for authenticated customer
+ *
+ * Path params:
+ * - orderId: UUID (required)
+ *
+ * Business rules:
+ * - Order status must be DELIVERED
+ * - Only order owner can request return
+ * - Phase 1: Simple status change (no refund processing)
+ */
+router.post(
+  '/:orderId/return',
+  authenticateCookie,
+  param('orderId').isUUID().withMessage('orderId must be a valid UUID'),
+  async (req: AuthRequest, res: Response) => {
+    await customerOrderController.requestReturn(req, res, () => {});
+  }
+);
+
 export default router;

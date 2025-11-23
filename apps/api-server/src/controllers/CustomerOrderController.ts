@@ -8,7 +8,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { customerOrderService } from '../services/CustomerOrderService.js';
+import { customerOrderService, OrderActionError } from '../services/CustomerOrderService.js';
 import type { CustomerOrderListQuery } from '../dto/customer-orders.dto.js';
 import logger from '../utils/logger.js';
 
@@ -119,6 +119,140 @@ export class CustomerOrderController {
       });
     } catch (error) {
       logger.error('Error in CustomerOrderController.getOrderDetail:', {
+        userId: req.user?.id,
+        orderId: req.params.orderId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      next(error);
+    }
+  };
+
+  /**
+   * POST /api/v1/customer/orders/:orderId/cancel
+   * R-7-1: Cancel order for authenticated customer
+   */
+  cancelOrder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // Validate request
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array(),
+        });
+        return;
+      }
+
+      // Check authentication
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
+
+      const { orderId } = req.params;
+
+      // Request cancellation
+      const result = await customerOrderService.requestCancelOrderForCustomer(
+        orderId,
+        userId
+      );
+
+      // Return success response
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      // Handle known OrderActionError
+      if (error instanceof OrderActionError) {
+        const statusCode =
+          error.code === 'ORDER_NOT_FOUND' ? 404 :
+          error.code === 'NOT_OWNED_BY_CUSTOMER' ? 403 : 400;
+
+        res.status(statusCode).json({
+          success: false,
+          error: {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+          },
+        });
+        return;
+      }
+
+      logger.error('Error in CustomerOrderController.cancelOrder:', {
+        userId: req.user?.id,
+        orderId: req.params.orderId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      next(error);
+    }
+  };
+
+  /**
+   * POST /api/v1/customer/orders/:orderId/return
+   * R-7-1: Request order return for authenticated customer
+   */
+  requestReturn = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // Validate request
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array(),
+        });
+        return;
+      }
+
+      // Check authentication
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
+
+      const { orderId } = req.params;
+
+      // Request return
+      const result = await customerOrderService.requestReturnOrderForCustomer(
+        orderId,
+        userId
+      );
+
+      // Return success response
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      // Handle known OrderActionError
+      if (error instanceof OrderActionError) {
+        const statusCode =
+          error.code === 'ORDER_NOT_FOUND' ? 404 :
+          error.code === 'NOT_OWNED_BY_CUSTOMER' ? 403 : 400;
+
+        res.status(statusCode).json({
+          success: false,
+          error: {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+          },
+        });
+        return;
+      }
+
+      logger.error('Error in CustomerOrderController.requestReturn:', {
         userId: req.user?.id,
         orderId: req.params.orderId,
         error: error instanceof Error ? error.message : String(error),
