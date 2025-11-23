@@ -97,12 +97,16 @@ const ROLE_DASHBOARD_MAP: Record<string, React.ComponentType | null> = {
  * 2. user.assignments - find first role that has a dashboard
  * 3. Fallback to null (will show "Coming Soon" UI)
  */
+/**
+ * R-4-2: Resolve dashboard component based on activeRole and user roles
+ * Updated to use isActive instead of active
+ */
 function resolveDashboardComponent({
   activeRole,
   userAssignments,
 }: {
   activeRole?: string | null;
-  userAssignments?: Array<{ role: string; active: boolean }> | null;
+  userAssignments?: Array<{ role: string; isActive: boolean }> | null;
 }): React.ComponentType | null {
   // 1) activeRole priority
   if (activeRole && ROLE_DASHBOARD_MAP[activeRole]) {
@@ -110,9 +114,10 @@ function resolveDashboardComponent({
   }
 
   // 2) Find first role from assignments that has a dashboard
+  // R-4-2: use isActive instead of active
   if (userAssignments && userAssignments.length > 0) {
     for (const assignment of userAssignments) {
-      if (assignment.active && ROLE_DASHBOARD_MAP[assignment.role]) {
+      if (assignment.isActive && ROLE_DASHBOARD_MAP[assignment.role]) {
         return ROLE_DASHBOARD_MAP[assignment.role];
       }
     }

@@ -33,11 +33,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // Stage 1 Hotfix: Detect if running in iframe
   const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
 
-  const isAuthenticated = !!user && user.status === 'approved';
+  // R-4-2: isAuthenticated check (active or approved status)
+  const isAuthenticated = !!user && (user.status === 'active' || user.status === 'approved');
 
-  // P0 RBAC: hasRole helper - checks active assignments
+  // R-4-2: hasRole helper - checks active assignments (using isActive)
   const hasRole = (role: string): boolean => {
-    return user?.assignments?.some(a => a.role === role && a.active) ?? false;
+    return user?.assignments?.some(a => a.role === role && a.isActive) ?? false;
   };
 
   // R-3-1: Set active role with localStorage persistence
@@ -50,25 +51,23 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // R-3-1: Get available roles from assignments
+  // R-4-2: Get available roles from assignments (using isActive)
   const getAvailableRoles = (): string[] => {
-    return user?.assignments?.filter(a => a.active).map(a => a.role) ?? [];
+    return user?.assignments?.filter(a => a.isActive).map(a => a.role) ?? [];
   };
 
-  // P0 RBAC: 로그인 - cookieAuthClient 사용
+  // R-4-2: 로그인 - cookieAuthClient 사용 (MeResponse flat 구조)
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       // 1. 로그인 요청
       await cookieAuthClient.login({ email, password });
 
-      // 2. /me 호출하여 사용자 정보 + assignments 가져오기
+      // 2. /me 호출하여 사용자 정보 가져오기 (R-4-2: flat 구조)
       const meResponse = await cookieAuthClient.getCurrentUser();
 
       if (meResponse) {
-        setUser({
-          ...meResponse.user,
-          assignments: meResponse.assignments
-        });
+        // R-4-2: meResponse is now flat structure (MeResponse)
+        setUser(meResponse as any); // Type cast to User for backward compatibility
         // Set auth hint for future sessions
         localStorage.setItem('auth_session_hint', '1');
         toast.success('로그인되었습니다.');
@@ -123,7 +122,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // P0 RBAC: 인증 상태 확인 - /me 기반
+  // R-4-2: 인증 상태 확인 - /me 기반 (MeResponse flat 구조)
   const checkAuthStatus = async (retryCount = 0) => {
     // CRITICAL: Skip ALL auth checks in iframe (no retries)
     // This prevents cross-origin auth calls from admin.neture.co.kr → neture.co.kr
@@ -144,14 +143,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
 
-      // /me 호출하여 사용자 정보 + assignments 가져오기
+      // R-4-2: /me 호출하여 사용자 정보 가져오기 (flat 구조)
       const meResponse = await cookieAuthClient.getCurrentUser();
 
       if (meResponse) {
-        setUser({
-          ...meResponse.user,
-          assignments: meResponse.assignments
-        });
+        // R-4-2: meResponse is now flat structure (MeResponse)
+        setUser(meResponse as any); // Type cast to User for backward compatibility
       } else {
         setUser(null);
         // Clear hint if session is invalid

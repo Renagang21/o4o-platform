@@ -1,15 +1,20 @@
-// P0 RBAC: Role Assignment Type
+/**
+ * R-4-2: Role Assignment DTO (aligned with backend MeResponseDto)
+ *
+ * Matches /api/v1/auth/cookie/me response structure
+ */
 export interface RoleAssignment {
-  role: 'supplier' | 'seller' | 'partner' | 'admin';
-  active: boolean;
-  activated_at: string | null;
-  deactivated_at: string | null;
-  valid_from: string;
-  valid_until: string | null;
-  assigned_by: string | null;
-  assigned_at: string;
+  id: string;
+  role: 'customer' | 'seller' | 'supplier' | 'partner' | 'admin' | 'administrator' | 'manager';
+  isActive: boolean;
+  validFrom: string | null;
+  validUntil: string | null;
+  assignedAt?: string;
 }
 
+/**
+ * @deprecated Use MeResponse directly. This User type is kept for backward compatibility only.
+ */
 export interface User {
   id: string;
   email: string;
@@ -46,11 +51,22 @@ export interface RegisterData {
   role?: 'customer' | 'seller' | 'supplier';
 }
 
-// P0 RBAC: /me Response Type
+/**
+ * R-4-2: /me Response Type (aligned with backend MeResponseDto)
+ *
+ * Standard response structure from /api/v1/auth/cookie/me
+ * This is the single source of truth for user identity.
+ */
 export interface MeResponse {
-  success: boolean;
-  user: User;
+  id: string;
+  email: string;
+  name: string | null;
+  status: 'pending' | 'active' | 'approved' | 'rejected' | 'suspended' | 'inactive';
   assignments: RoleAssignment[];
+  avatar?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
 }
 
 // P0 RBAC: Enrollment Types

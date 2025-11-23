@@ -47,8 +47,8 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const location = useLocation();
   const [activeRole, setActiveRole] = useState<string | null>(null);
 
-  // P1: Get active assignments
-  const activeAssignments = user?.assignments?.filter(a => a.active) ?? [];
+  // R-4-2: Get active assignments (using isActive)
+  const activeAssignments = user?.assignments?.filter(a => a.isActive) ?? [];
   const roleList = activeAssignments.map(a => a.role);
 
   // P2: Detect active role from current URL
