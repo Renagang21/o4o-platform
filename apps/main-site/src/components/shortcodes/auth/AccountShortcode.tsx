@@ -8,10 +8,9 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShortcodeDefinition } from '@o4o/shortcodes';
+import { ShortcodeDefinition, ShortcodeRenderer } from '@o4o/shortcodes';
 import { useAuth } from '@/contexts/AuthContext';
 import { AlertCircle } from 'lucide-react';
-import CustomerDashboard from '../CustomerDashboard';
 
 // Account Component with auth guard
 export const AccountComponent: React.FC<{
@@ -61,10 +60,14 @@ export const AccountComponent: React.FC<{
     );
   }
 
-  // Authenticated - show dashboard
+  // Authenticated - show dashboard using ShortcodeRenderer
   // For now, we only support customer dashboard
   // In the future, we can add seller/supplier/partner dashboards
-  return <CustomerDashboard />;
+  const dashboardContent = dashboardType === 'customer'
+    ? '[customer_dashboard]'
+    : `[${dashboardType}_dashboard]`;
+
+  return <ShortcodeRenderer content={dashboardContent} />;
 };
 
 // Account Shortcode Definition

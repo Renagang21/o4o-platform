@@ -134,7 +134,10 @@ export const SocialLoginComponent: React.FC<{
           setTestAccounts(response.data.data);
         }
       } catch (error) {
-        console.error('Failed to fetch test accounts:', error);
+        // Silent fail in production - test accounts API may not be available
+        if (import.meta.env.DEV) {
+          console.debug('[SocialLogin] Test accounts unavailable:', error);
+        }
       }
     };
 

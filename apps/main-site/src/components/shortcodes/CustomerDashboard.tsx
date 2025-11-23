@@ -13,6 +13,7 @@
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '../../contexts/AuthContext';
+import { ShortcodeDefinition } from '@o4o/shortcodes';
 
 interface OrderSummary {
   id: string;
@@ -392,5 +393,15 @@ const AccountLink: React.FC<{
     </div>
   </a>
 );
+
+// Shortcode definition for customer dashboard
+export const customerDashboardShortcode: ShortcodeDefinition = {
+  name: 'customer_dashboard',
+  description: '사용자 계정 대시보드',
+  component: () => <CustomerDashboard />
+};
+
+// Export as array for auto-registration
+export const customerShortcodes = [customerDashboardShortcode];
 
 export default CustomerDashboard;
