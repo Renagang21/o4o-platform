@@ -9,6 +9,7 @@ import { UserService } from '../services/UserService.js';
 import { SessionSyncService } from '../services/sessionSyncService.js';
 import { PasswordResetService } from '../services/passwordResetService.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
+import { mapUserToMeResponse } from '../dto/auth/me-response.dto.js';
 
 const router: Router = Router();
 
@@ -221,13 +222,18 @@ router.post('/logout', async (req, res) => {
   }
 });
 
-// Verify current session (P0 extended with assignments)
+/**
+ * R-4-1: /me endpoint - Standardized response structure
+ *
+ * Returns user identity with role assignments.
+ * Legacy fields (businessInfo, permissions, isActive, isEmailVerified) removed.
+ */
 router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: (req.user as any)?.userId || (req.user as any)?.id },
-      select: ['id', 'email', 'name', 'status', 'businessInfo', 'permissions', 'isActive', 'isEmailVerified', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'status', 'avatar', 'createdAt', 'updatedAt']
     });
 
     if (!user) {
@@ -237,43 +243,18 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
       });
     }
 
-    // P0: Fetch active role assignments
+    // Fetch role assignments
     const assignmentRepository = AppDataSource.getRepository(RoleAssignment);
     const assignments = await assignmentRepository.find({
       where: { userId: user.id },
-      order: { createdAt: 'DESC' }
+      order: { assignedAt: 'DESC' }
     });
 
-    // Format assignments response
-    const assignmentsResponse = assignments.map(assignment => ({
-      role: assignment.role,
-      active: assignment.isActive,
-      activated_at: assignment.isActive ? assignment.validFrom : null,
-      deactivated_at: !assignment.isActive && assignment.validUntil ? assignment.validUntil : null,
-      valid_from: assignment.validFrom,
-      valid_until: assignment.validUntil,
-      assigned_by: assignment.assignedBy,
-      assigned_at: assignment.assignedAt
-    }));
+    // R-4-1: Use standard DTO mapper
+    const response = mapUserToMeResponse(user, assignments);
 
-    res.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        status: user.status,
-        businessInfo: user.businessInfo,
-        permissions: user.permissions,
-        isActive: user.isActive,
-        isEmailVerified: user.isEmailVerified,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
-      },
-      assignments: assignmentsResponse
-    });
+    res.json(response);
   } catch (error) {
-    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR'
