@@ -117,6 +117,12 @@ router.get(
 /**
  * GET /api/v1/seller/dashboard/orders
  * Get orders for logged-in seller with pagination
+ * R-8: Standardized date parameters
+ *
+ * Query params:
+ * - New format: ?range=7d (or 30d, 90d, 1y, custom)
+ * - Custom range: ?range=custom&startDate=2025-01-01&endDate=2025-01-31
+ * - Legacy format: ?from=2025-01-01&to=2025-01-31 (converted automatically)
  */
 router.get(
   '/orders',
@@ -125,8 +131,11 @@ router.get(
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 100 }),
   query('status').optional().isString(),
-  query('from').optional().isISO8601(),
-  query('to').optional().isISO8601(),
+  query('range').optional().isString(),
+  query('startDate').optional().isISO8601(),
+  query('endDate').optional().isISO8601(),
+  query('from').optional().isISO8601(), // Legacy
+  query('to').optional().isISO8601(),   // Legacy
   async (req: AuthRequest, res: Response) => {
     try {
       const user = req.user as any;
@@ -141,20 +150,24 @@ router.get(
         ? (req.query.status as string).split(',') as OrderStatus[]
         : undefined;
 
-      // Parse date range
-      const dateRange: any = {};
-      if (req.query.from) {
-        dateRange.from = new Date(req.query.from as string);
-      }
-      if (req.query.to) {
-        dateRange.to = new Date(req.query.to as string);
-      }
+      // R-8: Parse date range using standard service
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
       const result = await sellerDashboardService.getOrdersForSeller(sellerId, {
-        dateRange: Object.keys(dateRange).length > 0 ? dateRange : undefined,
+        dateRange: {
+          from: parsedRange.startDate,
+          to: parsedRange.endDate
+        },
         status: statusFilter,
         pagination: { page, limit }
       });
+
+      // R-8: Include metadata in response
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
+      );
 
       res.json({
         success: true,
@@ -165,7 +178,8 @@ router.get(
             limit,
             total: result.total,
             totalPages: Math.ceil(result.total / limit)
-          }
+          },
+          meta
         }
       });
     } catch (error: any) {
@@ -181,35 +195,51 @@ router.get(
 /**
  * GET /api/v1/seller/dashboard/commissions
  * Get commission details for logged-in seller
+ * R-8: Standardized date parameters
+ *
+ * Query params:
+ * - New format: ?range=7d (or 30d, 90d, 1y, custom)
+ * - Custom range: ?range=custom&startDate=2025-01-01&endDate=2025-01-31
+ * - Legacy format: ?from=2025-01-01&to=2025-01-31 (converted automatically)
  */
 router.get(
   '/commissions',
   authenticateCookie,
   requireSellerRole,
-  query('from').optional().isISO8601(),
-  query('to').optional().isISO8601(),
+  query('range').optional().isString(),
+  query('startDate').optional().isISO8601(),
+  query('endDate').optional().isISO8601(),
+  query('from').optional().isISO8601(), // Legacy
+  query('to').optional().isISO8601(),   // Legacy
   async (req: AuthRequest, res: Response) => {
     try {
       const user = req.user as any;
       const sellerId = user.userId;
 
-      // Parse date range
-      const dateRange: any = {};
-      if (req.query.from) {
-        dateRange.from = new Date(req.query.from as string);
-      }
-      if (req.query.to) {
-        dateRange.to = new Date(req.query.to as string);
-      }
+      // R-8: Parse date range using standard service
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
       const commissionData = await sellerDashboardService.getCommissionDetailsForSeller(
         sellerId,
-        Object.keys(dateRange).length > 0 ? dateRange : undefined
+        {
+          from: parsedRange.startDate,
+          to: parsedRange.endDate
+        }
+      );
+
+      // R-8: Include metadata in response
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
       );
 
       res.json({
         success: true,
-        data: commissionData
+        data: {
+          ...commissionData,
+          meta
+        }
       });
     } catch (error: any) {
       logger.error('[GET /seller/dashboard/commissions] Error:', error);

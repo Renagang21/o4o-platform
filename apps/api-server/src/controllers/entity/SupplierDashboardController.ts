@@ -260,14 +260,13 @@ export class SupplierDashboardController {
   /**
    * GET /api/v1/entity/suppliers/dashboard/orders
    * R-8: Get supplier's orders with pagination
+   * Standardized date parameters
    */
   async getOrders(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
       const {
         status,
-        from,
-        to,
         page = 1,
         limit = 20
       } = req.query;
@@ -298,23 +297,27 @@ export class SupplierDashboardController {
         ? (status as string).split(',') as OrderStatus[]
         : undefined;
 
-      // Parse date range
-      const dateRange: any = {};
-      if (from) {
-        dateRange.from = new Date(from as string);
-      }
-      if (to) {
-        dateRange.to = new Date(to as string);
-      }
+      // R-8: Parse date range using standard service
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
       const result = await this.supplierDashboardService.getOrdersForSupplier(supplier.id, {
-        dateRange: Object.keys(dateRange).length > 0 ? dateRange : undefined,
+        dateRange: {
+          from: parsedRange.startDate,
+          to: parsedRange.endDate
+        },
         status: statusFilter,
         pagination: {
           page: parseInt(page as string),
           limit: parseInt(limit as string)
         }
       });
+
+      // R-8: Include metadata in response
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
+      );
 
       res.json({
         success: true,
@@ -325,7 +328,8 @@ export class SupplierDashboardController {
             limit: parseInt(limit as string),
             total: result.total,
             totalPages: Math.ceil(result.total / parseInt(limit as string))
-          }
+          },
+          meta
         }
       });
     } catch (error) {
@@ -340,11 +344,11 @@ export class SupplierDashboardController {
   /**
    * GET /api/v1/entity/suppliers/dashboard/revenue
    * R-8: Get supplier's revenue details
+   * Standardized date parameters
    */
   async getRevenue(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const { from, to } = req.query;
 
       if (!userId) {
         res.status(401).json({
@@ -367,23 +371,30 @@ export class SupplierDashboardController {
         return;
       }
 
-      // Parse date range
-      const dateRange: any = {};
-      if (from) {
-        dateRange.from = new Date(from as string);
-      }
-      if (to) {
-        dateRange.to = new Date(to as string);
-      }
+      // R-8: Parse date range using standard service
+      const parsedRange = dashboardRangeService.parseDateRange(req.query);
 
       const revenueData = await this.supplierDashboardService.getRevenueDetailsForSupplier(
         supplier.id,
-        Object.keys(dateRange).length > 0 ? dateRange : undefined
+        {
+          from: parsedRange.startDate,
+          to: parsedRange.endDate
+        }
+      );
+
+      // R-8: Include metadata in response
+      const meta = createDashboardMeta(
+        { range: parsedRange.range },
+        parsedRange.startDate,
+        parsedRange.endDate
       );
 
       res.json({
         success: true,
-        data: revenueData
+        data: {
+          ...revenueData,
+          meta
+        }
       });
     } catch (error) {
       console.error('Error fetching supplier revenue:', error);
