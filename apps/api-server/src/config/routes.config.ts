@@ -155,6 +155,9 @@ import customerDashboardRoutes from '../routes/customer-dashboard.routes.js';
 // R-6-5 - Wishlist Routes
 import wishlistRoutes from '../routes/wishlist.routes.js';
 
+// R-6-9 - Customer Orders Routes
+import customerOrdersRoutes from '../routes/customer-orders.routes.js';
+
 // Phase PD-8 - Admin Job Routes
 import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 
@@ -397,6 +400,9 @@ export function setupRoutes(app: Application): void {
 
   // R-6-5 - Wishlist
   app.use('/api/v1/customer/wishlist', standardLimiter, wishlistRoutes);
+
+  // R-6-9 - Customer Orders
+  app.use('/api/v1/customer/orders', standardLimiter, customerOrdersRoutes);
 
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);
