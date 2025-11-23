@@ -56,9 +56,6 @@ export const Wishlist: React.FC = () => {
 
       // Update local state
       setItems(items.filter(item => item.productId !== productId));
-
-      // Show success message (you can add a toast here)
-      console.log('Removed from wishlist');
     } catch (err) {
       console.error('Failed to remove from wishlist:', err);
       alert('위시리스트에서 삭제하는데 실패했습니다.');

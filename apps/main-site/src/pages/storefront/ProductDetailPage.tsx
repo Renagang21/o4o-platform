@@ -91,11 +91,9 @@ export const ProductDetailPage: React.FC = () => {
       if (isInWishlist) {
         await wishlistService.removeFromWishlist(id);
         setIsInWishlist(false);
-        console.log('Removed from wishlist');
       } else {
         await wishlistService.addToWishlist(id);
         setIsInWishlist(true);
-        console.log('Added to wishlist');
       }
     } catch (error) {
       console.error('Failed to toggle wishlist:', error);
