@@ -67,57 +67,15 @@ export const CustomerDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadDashboardData();
+    // TODO: R-2-4 - Re-enable after backend API implementation
+    // Backend endpoints not yet implemented:
+    // - GET /api/v1/customer/dashboard/stats
+    // - GET /api/v1/customer/orders/recent
+    // - GET /api/v1/customer/recently-viewed
+
+    // Simulate loading complete with empty data
+    setLoading(false);
   }, []);
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Helper to silently fetch data (ignore 404s)
-      // Treat 404 as valid response to prevent console errors
-      const silentFetch = async (url: string) => {
-        try {
-          const response = await authClient.api.get(url, {
-            validateStatus: (status) => status < 500 // Accept all responses except 5xx
-          });
-
-          // Return data only if status is 2xx
-          if (response.status >= 200 && response.status < 300) {
-            return response.data;
-          }
-
-          // Silent return null for 4xx (including 404)
-          return null;
-        } catch (error: any) {
-          // Only log 5xx errors in DEV
-          if (import.meta.env.DEV) {
-            console.debug(`[CustomerDashboard] Failed to fetch ${url}:`, error);
-          }
-          return null;
-        }
-      };
-
-      // Fetch dashboard stats and recent activity in parallel
-      const [statsData, ordersData, viewedData] = await Promise.all([
-        silentFetch('/customer/dashboard/stats'),
-        silentFetch('/customer/orders/recent?limit=5'),
-        silentFetch('/customer/recently-viewed?limit=6'),
-      ]);
-
-      if (statsData) setStats(statsData);
-      if (ordersData) setRecentOrders(ordersData);
-      if (viewedData) setRecentlyViewed(viewedData);
-    } catch (err) {
-      if (import.meta.env.DEV) {
-        console.debug('[CustomerDashboard] Failed to load dashboard data:', err);
-      }
-      // Don't show error to user - just show empty state
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -138,6 +96,13 @@ export const CustomerDashboard: React.FC = () => {
           안녕하세요, {user?.name || '고객'}님!
         </h1>
         <p className="text-gray-600 mt-2">쇼핑 활동과 주문 현황을 확인하세요</p>
+
+        {/* TODO: Remove after backend implementation */}
+        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-blue-800 text-sm">
+            💡 고객 대시보드 기능은 현재 준비 중입니다. 주문 내역, 리워드 포인트 등의 기능이 곧 제공될 예정입니다.
+          </p>
+        </div>
       </div>
 
       {/* Error Display */}
