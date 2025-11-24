@@ -6,14 +6,14 @@
 import { Request, Response } from 'express';
 import { triggerPriceSync, isPriceSyncRunning, getLastRunStats as getPriceSyncStats } from '../../jobs/price-sync.job.js';
 import { triggerStockSync, isStockSyncRunning, getLastRunStats as getStockSyncStats } from '../../jobs/stock-sync.job.js';
-import { SettlementManagementService } from '../../services/SettlementManagementService.js';
+import { SettlementBatchService } from '../../services/SettlementBatchService.js';
 import logger from '../../utils/logger.js';
 
 export class AdminJobController {
-  private settlementService: SettlementManagementService;
+  private settlementBatchService: SettlementBatchService;
 
   constructor() {
-    this.settlementService = new SettlementManagementService();
+    this.settlementBatchService = new SettlementBatchService();
   }
 
   /**
@@ -83,6 +83,7 @@ export class AdminJobController {
 
   /**
    * POST /api/v2/admin/jobs/run-monthly
+   * [DEPRECATED] This endpoint is deprecated. Use the new daily settlement batch system.
    * Run monthly jobs: settlement generation
    */
   async runMonthlyJobs(req: Request, res: Response): Promise<void> {
@@ -99,56 +100,16 @@ export class AdminJobController {
         return;
       }
 
-      logger.info('[PD-8] Monthly jobs triggered manually', { userId, userRole });
+      logger.warn('[PD-8] DEPRECATED: runMonthlyJobs called', { userId, userRole });
 
-      // Get date range from request, or use last month as default
-      const { periodStart, periodEnd } = req.body;
-
-      let startDate: Date;
-      let endDate: Date;
-
-      if (periodStart && periodEnd) {
-        startDate = new Date(periodStart);
-        endDate = new Date(periodEnd);
-      } else {
-        // Default to last month
-        const now = new Date();
-        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1); // First day of last month
-        endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999); // Last day of last month
-      }
-
-      logger.info('[PD-8] Creating settlements for period', {
-        periodStart: startDate.toISOString(),
-        periodEnd: endDate.toISOString()
-      });
-
-      // Run settlement batch creation
-      const result = await this.settlementService.batchCreateSettlements(
-        startDate,
-        endDate
-      );
-
-      res.json({
-        success: true,
-        message: 'Monthly settlement creation completed',
-        result: {
-          created: result.created.length,
-          failed: result.errors.length,
-          settlements: result.created.map(s => ({
-            id: s.id,
-            partyType: s.partyType,
-            partyId: s.partyId,
-            payableAmount: s.payableAmount,
-            status: s.status
-          })),
-          errors: result.errors
-        },
-        period: {
-          start: startDate.toISOString(),
-          end: endDate.toISOString()
-        },
-        triggeredAt: new Date().toISOString(),
-        triggeredBy: userId
+      res.status(410).json({
+        success: false,
+        message: 'This endpoint is deprecated. Settlements are now created automatically by SettlementEngine (R-8-8).',
+        deprecationNotice: {
+          reason: 'Replaced by automatic settlement generation (SettlementEngine)',
+          replacement: 'SettlementEngine automatically creates settlements when orders complete. Use the CLI script for batch processing: npm run batch:settlement:daily',
+          migrationGuide: 'See R-8-8 documentation for the new settlement system'
+        }
       });
 
     } catch (error) {

@@ -109,114 +109,38 @@ export const getSettlementById = async (req: Request, res: Response) => {
 
 /**
  * POST /api/v1/admin/settlements/batch
+ * [DEPRECATED] This endpoint is deprecated. Use the new daily settlement batch system.
  * Run batch settlement creation for a period
  */
 export const createBatchSettlements = async (req: Request, res: Response) => {
-  try {
-    const { periodStart, periodEnd } = req.body;
-
-    if (!periodStart || !periodEnd) {
-      return res.status(400).json({
-        success: false,
-        message: 'periodStart and periodEnd are required',
-      });
+  logger.warn('[PD-5] DEPRECATED: createBatchSettlements endpoint called');
+  res.status(410).json({
+    success: false,
+    message: 'This endpoint is deprecated. Settlement generation is now automatic via SettlementEngine (R-8-8). Use the daily settlement batch CLI script instead: npm run batch:settlement:daily',
+    deprecationNotice: {
+      reason: 'Replaced by automatic settlement generation (SettlementEngine)',
+      replacement: 'SettlementEngine handles settlement creation automatically when orders complete. Use the CLI script for batch processing: npm run batch:settlement:daily',
+      migrationGuide: 'See R-8-8 documentation for the new settlement system'
     }
-
-    const start = new Date(periodStart);
-    const end = new Date(periodEnd);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format',
-      });
-    }
-
-    if (start >= end) {
-      return res.status(400).json({
-        success: false,
-        message: 'periodStart must be before periodEnd',
-      });
-    }
-
-    logger.info('[PD-5] Batch settlement creation requested', {
-      periodStart: start,
-      periodEnd: end,
-      adminId: (req as any).user?.id,
-    });
-
-    const result = await settlementService.batchCreateSettlements(start, end);
-
-    res.json({
-      success: true,
-      created: result.created.length,
-      errors: result.errors.length,
-      settlements: result.created,
-      errorDetails: result.errors,
-    });
-  } catch (error: any) {
-    logger.error('[PD-5] Error creating batch settlements', { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create batch settlements',
-      error: error.message,
-    });
-  }
+  });
 };
 
 /**
  * POST /api/v1/admin/settlements
+ * [DEPRECATED] This endpoint is deprecated. Use the new automatic settlement system.
  * Create a single settlement for a specific party
  */
 export const createSettlement = async (req: Request, res: Response) => {
-  try {
-    const { partyType, partyId, periodStart, periodEnd, notes } = req.body;
-
-    if (!partyType || !partyId || !periodStart || !periodEnd) {
-      return res.status(400).json({
-        success: false,
-        message: 'partyType, partyId, periodStart, and periodEnd are required',
-      });
+  logger.warn('[PD-5] DEPRECATED: createSettlement endpoint called');
+  res.status(410).json({
+    success: false,
+    message: 'This endpoint is deprecated. Settlements are now created automatically by SettlementEngine when orders complete (R-8-8).',
+    deprecationNotice: {
+      reason: 'Replaced by automatic settlement generation (SettlementEngine)',
+      replacement: 'SettlementEngine automatically creates settlements when orders reach DELIVERED status',
+      migrationGuide: 'See R-8-8 documentation for the new settlement system'
     }
-
-    const start = new Date(periodStart);
-    const end = new Date(periodEnd);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format',
-      });
-    }
-
-    const settlement = await settlementService.createSettlement({
-      partyType,
-      partyId,
-      periodStart: start,
-      periodEnd: end,
-      notes,
-    });
-
-    res.status(201).json({
-      success: true,
-      settlement,
-    });
-  } catch (error: any) {
-    logger.error('[PD-5] Error creating settlement', { error: error.message });
-
-    if (error.message.includes('already exists')) {
-      return res.status(409).json({
-        success: false,
-        message: error.message,
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create settlement',
-      error: error.message,
-    });
-  }
+  });
 };
 
 /**
@@ -280,48 +204,20 @@ export const updateSettlementStatus = async (req: Request, res: Response) => {
 
 /**
  * GET /api/v1/admin/settlements/preview
+ * [DEPRECATED] This endpoint is deprecated. Use the automatic settlement system.
  * Preview settlement calculation without creating record
  */
 export const previewSettlement = async (req: Request, res: Response) => {
-  try {
-    const { partyType, partyId, periodStart, periodEnd } = req.query;
-
-    if (!partyType || !partyId || !periodStart || !periodEnd) {
-      return res.status(400).json({
-        success: false,
-        message: 'partyType, partyId, periodStart, and periodEnd are required',
-      });
+  logger.warn('[PD-5] DEPRECATED: previewSettlement endpoint called');
+  res.status(410).json({
+    success: false,
+    message: 'This endpoint is deprecated. Settlements are now created automatically by SettlementEngine (R-8-8). View settlements in the dashboard or use getAllSettlements endpoint.',
+    deprecationNotice: {
+      reason: 'Replaced by automatic settlement generation (SettlementEngine)',
+      replacement: 'SettlementEngine automatically creates settlement records when orders complete. Query existing settlements instead of previewing.',
+      migrationGuide: 'See R-8-8 documentation for the new settlement system'
     }
-
-    const start = new Date(periodStart as string);
-    const end = new Date(periodEnd as string);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format',
-      });
-    }
-
-    const preview = await settlementService.calculateSettlementPreview(
-      partyType as any,
-      partyId as string,
-      start,
-      end
-    );
-
-    res.json({
-      success: true,
-      preview,
-    });
-  } catch (error: any) {
-    logger.error('[PD-5] Error previewing settlement', { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: 'Failed to preview settlement',
-      error: error.message,
-    });
-  }
+  });
 };
 
 /**

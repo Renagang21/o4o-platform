@@ -72,57 +72,20 @@ export const getSupplierSettlements = async (req: Request, res: Response) => {
 
 /**
  * GET /api/v1/supplier/settlements/preview
+ * [DEPRECATED] This endpoint is deprecated. Use the automatic settlement system.
  * Preview settlement calculation for current period
  */
 export const previewSupplierSettlement = async (req: Request, res: Response) => {
-  try {
-    const supplierId = (req as any).user?.id;
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-      });
+  logger.warn('[PD-5] DEPRECATED: previewSupplierSettlement endpoint called');
+  res.status(410).json({
+    success: false,
+    message: 'This endpoint is deprecated. Settlements are now created automatically by SettlementEngine (R-8-8). View your settlements at /api/v1/supplier/settlements instead.',
+    deprecationNotice: {
+      reason: 'Replaced by automatic settlement generation (SettlementEngine)',
+      replacement: 'SettlementEngine automatically creates settlement records when orders complete. Use getSupplierSettlements endpoint to view existing settlements.',
+      migrationGuide: 'See R-8-8 documentation for the new settlement system'
     }
-
-    const { periodStart, periodEnd } = req.query;
-
-    if (!periodStart || !periodEnd) {
-      return res.status(400).json({
-        success: false,
-        message: 'periodStart and periodEnd are required',
-      });
-    }
-
-    const start = new Date(periodStart as string);
-    const end = new Date(periodEnd as string);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format',
-      });
-    }
-
-    const preview = await settlementService.calculateSettlementPreview(
-      'supplier',
-      supplierId,
-      start,
-      end
-    );
-
-    res.json({
-      success: true,
-      preview,
-    });
-  } catch (error: any) {
-    logger.error('[PD-5] Error previewing supplier settlement', { error: error.message });
-    res.status(500).json({
-      success: false,
-      message: 'Failed to preview settlement',
-      error: error.message,
-    });
-  }
+  });
 };
 
 /**
