@@ -12,6 +12,7 @@ import { Product } from '../entities/Product.js';
 import { CommissionCalculator } from './CommissionCalculator.js';
 import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
+import { invalidateOrderRelatedCaches } from '../utils/cache-invalidation.js';
 
 export interface CreateOrderRequest {
   items?: OrderItem[];
@@ -173,6 +174,18 @@ export class OrderService {
         orderId: savedOrder.id,
         buyerId,
         total: savedOrder.summary.total
+      });
+
+      // R-8-7: Invalidate caches for affected sellers and suppliers
+      // Extract seller and supplier IDs from order items
+      const sellerIds = new Set<string>();
+      const supplierIds = new Set<string>();
+      for (const item of request.items) {
+        if (item.sellerId) sellerIds.add(item.sellerId);
+        if (item.supplierId) supplierIds.add(item.supplierId);
+      }
+      invalidateOrderRelatedCaches(Array.from(sellerIds), Array.from(supplierIds)).catch((err) => {
+        logger.error('[R-8-7] Failed to invalidate caches after order creation:', err);
       });
 
       // Phase PD-7: Send order.new notifications to sellers and suppliers
@@ -412,6 +425,19 @@ export class OrderService {
 
     const savedOrder = await this.orderRepository.save(order);
 
+    // R-8-7: Invalidate caches for affected sellers and suppliers when status changes
+    const sellerIds = new Set<string>();
+    const supplierIds = new Set<string>();
+    if (order.itemsRelation) {
+      for (const item of order.itemsRelation) {
+        if (item.sellerId) sellerIds.add(item.sellerId);
+        if (item.supplierId) supplierIds.add(item.supplierId);
+      }
+      invalidateOrderRelatedCaches(Array.from(sellerIds), Array.from(supplierIds)).catch((err) => {
+        logger.error('[R-8-7] Failed to invalidate caches after status update:', err);
+      });
+    }
+
     // Create status change event
     await this.createOrderEvent(
       this.orderEventRepository.manager,
@@ -517,8 +543,12 @@ export class OrderService {
    * Cancel order
    */
   async cancelOrder(orderId: string, reason?: string): Promise<Order> {
-    const order = await this.orderRepository.findOne({ where: { id: orderId } });
-    
+    // R-8-7: Load order with itemsRelation for cache invalidation
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['itemsRelation']
+    });
+
     if (!order) {
       throw new Error('Order not found');
     }
@@ -532,6 +562,19 @@ export class OrderService {
     order.cancellationReason = reason;
 
     const savedOrder = await this.orderRepository.save(order);
+
+    // R-8-7: Invalidate caches for affected sellers and suppliers
+    const sellerIds = new Set<string>();
+    const supplierIds = new Set<string>();
+    if (order.itemsRelation) {
+      for (const item of order.itemsRelation) {
+        if (item.sellerId) sellerIds.add(item.sellerId);
+        if (item.supplierId) supplierIds.add(item.supplierId);
+      }
+      invalidateOrderRelatedCaches(Array.from(sellerIds), Array.from(supplierIds)).catch((err) => {
+        logger.error('[R-8-7] Failed to invalidate caches after order cancellation:', err);
+      });
+    }
 
     logger.info(`Order cancelled: ${order.orderNumber}`, {
       orderId,

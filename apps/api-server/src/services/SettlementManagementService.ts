@@ -16,6 +16,7 @@ import { SettlementItem } from '../entities/SettlementItem.js';
 import { Order, OrderStatus } from '../entities/Order.js';
 import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
+import { invalidateSettlementCache } from '../utils/cache-invalidation.js';
 
 export interface SettlementFilters {
   page?: number;
@@ -328,6 +329,11 @@ export class SettlementManagementService {
         partyId,
       });
     }
+
+    // R-8-7: Invalidate settlement caches for this party
+    invalidateSettlementCache(partyType, partyId).catch((err) => {
+      logger.error('[R-8-7] Failed to invalidate settlement cache:', err);
+    });
 
     return settlement;
   }
@@ -643,6 +649,32 @@ export class SettlementManagementService {
       createdCount: created.length,
       errorCount: errors.length,
     });
+
+    // R-8-7: Invalidate settlement caches for all affected parties
+    const invalidationPromises: Promise<void>[] = [];
+    for (const sellerId of sellerIds) {
+      invalidationPromises.push(
+        invalidateSettlementCache('seller', sellerId).catch((err) => {
+          logger.error(`[R-8-7] Failed to invalidate seller cache ${sellerId}:`, err);
+        })
+      );
+    }
+    for (const supplierId of supplierIds) {
+      invalidationPromises.push(
+        invalidateSettlementCache('supplier', supplierId).catch((err) => {
+          logger.error(`[R-8-7] Failed to invalidate supplier cache ${supplierId}:`, err);
+        })
+      );
+    }
+    // Invalidate platform cache
+    invalidationPromises.push(
+      invalidateSettlementCache('platform', 'platform').catch((err) => {
+        logger.error('[R-8-7] Failed to invalidate platform cache:', err);
+      })
+    );
+
+    await Promise.all(invalidationPromises);
+    logger.debug('[R-8-7] Batch settlement cache invalidation completed');
 
     return { created, errors };
   }
