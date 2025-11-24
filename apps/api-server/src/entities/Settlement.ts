@@ -19,7 +19,7 @@ import type { SettlementItem } from './SettlementItem.js';
  * Represents settlement/payout records for sellers, suppliers, and platform
  */
 
-export type SettlementPartyType = 'seller' | 'supplier' | 'platform';
+export type SettlementPartyType = 'seller' | 'supplier' | 'platform' | 'partner';
 
 export enum SettlementStatus {
   PENDING = 'pending',

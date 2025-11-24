@@ -10,6 +10,7 @@ import { Partner, PartnerStatus } from '../entities/Partner.js';
 import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
 import { Product } from '../entities/Product.js';
 import { CommissionCalculator } from './CommissionCalculator.js';
+import { SettlementEngine } from './settlement-engine/index.js';
 import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 import { invalidateOrderRelatedCaches } from '../utils/cache-invalidation.js';
@@ -62,6 +63,7 @@ export class OrderService {
   private partnerCommissionRepository: Repository<PartnerCommission>;
   private productRepository: Repository<Product>;
   private commissionCalculator: CommissionCalculator;
+  private settlementEngine: SettlementEngine; // R-8-8-2: Automatic settlement generation
 
   constructor() {
     this.orderRepository = AppDataSource.getRepository(Order);
@@ -73,6 +75,7 @@ export class OrderService {
     this.partnerCommissionRepository = AppDataSource.getRepository(PartnerCommission);
     this.productRepository = AppDataSource.getRepository(Product);
     this.commissionCalculator = new CommissionCalculator();
+    this.settlementEngine = new SettlementEngine(); // R-8-8-2
   }
 
   /**
@@ -502,6 +505,28 @@ export class OrderService {
           },
           channel: 'in_app',
         }).catch(err => logger.error(`Failed to send order status notification to seller ${sellerId}:`, err));
+      }
+    }
+
+    // R-8-8-2: Generate settlements when order is delivered
+    if (status === OrderStatus.DELIVERED) {
+      try {
+        await this.settlementEngine.runOnOrderCompleted(orderId);
+        logger.info(`[OrderService] Settlements generated for order ${orderId}`);
+      } catch (error) {
+        // Log error but don't fail the order status update
+        logger.error(`[OrderService] Failed to generate settlements for order ${orderId}:`, error);
+      }
+    }
+
+    // R-8-8-4: Reverse settlements when order is cancelled or refunded
+    if (status === OrderStatus.CANCELLED || status === OrderStatus.RETURNED) {
+      try {
+        await this.settlementEngine.runOnRefund(orderId);
+        logger.info(`[OrderService] Settlement reversal applied for order ${orderId}`);
+      } catch (error) {
+        // Log error but don't fail the order status update
+        logger.error(`[OrderService] Failed to reverse settlements for order ${orderId}:`, error);
       }
     }
 

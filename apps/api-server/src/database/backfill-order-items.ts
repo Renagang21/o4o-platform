@@ -135,7 +135,7 @@ class OrderItemBackfillService {
     orderItemRepo: any,
     dryRun: boolean
   ): Promise<void> {
-    const items: OrderItemInterface[] = order.items || [];
+    const items: OrderItemInterface[] = (order as any).items || [];
 
     if (items.length === 0) {
       logger.info(`⚠️  Order ${order.orderNumber} has no items, skipping`);

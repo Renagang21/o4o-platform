@@ -18,6 +18,7 @@
     "clean:dist": "rimraf dist",
     "create-admin": "npx tsx src/scripts/create-admin-user.ts",
     "create-test-users": "npx ts-node src/scripts/create-test-users.ts",
+    "batch:settlement:daily": "npx tsx src/scripts/run-daily-settlement.ts",
     "ai:admin": "npx ts-node scripts/ai-admin-cli.ts",
     "db:logs": "sudo journalctl -u postgresql -f",
     "db:reset": "pnpm run migration:drop && pnpm run migration:run && pnpm run db:seed",

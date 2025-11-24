@@ -141,7 +141,7 @@ class OrderItemPresentationFieldsBackfillService {
     orderItemRepo: any,
     dryRun: boolean
   ): Promise<void> {
-    const jsonbItems: OrderItemInterface[] = order.items || [];
+    const jsonbItems: OrderItemInterface[] = (order as any).items || [];
 
     if (jsonbItems.length === 0) {
       return;
