@@ -25,6 +25,7 @@ import { AppDataSource } from './connection.js';
 import { Order } from '../entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { OrderItem as OrderItemInterface } from '../entities/Order.js';
+import logger from '../utils/logger.js';
 
 interface BackfillStats {
   totalOrders: number;
@@ -57,18 +58,18 @@ class OrderItemBackfillService {
    * Main backfill execution
    */
   async backfillAll(options: BackfillOptions): Promise<void> {
-    console.log('\n╔═══════════════════════════════════════════════════════════╗');
-    console.log('║         R-8-3-1: OrderItem Backfill Script              ║');
-    console.log('╚═══════════════════════════════════════════════════════════╝\n');
+    logger.info('\n╔═══════════════════════════════════════════════════════════╗');
+    logger.info('║         R-8-3-1: OrderItem Backfill Script              ║');
+    logger.info('╚═══════════════════════════════════════════════════════════╝\n');
 
     if (options.dryRun) {
-      console.log('🔍 DRY RUN MODE - No data will be written\n');
+      logger.info('🔍 DRY RUN MODE - No data will be written\n');
     }
 
     try {
       // Initialize database
       if (!AppDataSource.isInitialized) {
-        console.log('📡 Initializing database connection...');
+        logger.info('📡 Initializing database connection...');
         await AppDataSource.initialize();
       }
 
@@ -77,10 +78,10 @@ class OrderItemBackfillService {
 
       // Count total orders
       this.stats.totalOrders = await orderRepo.count();
-      console.log(`📊 Total orders in database: ${this.stats.totalOrders}\n`);
+      logger.info(`📊 Total orders in database: ${this.stats.totalOrders}\n`);
 
       if (this.stats.totalOrders === 0) {
-        console.log('✅ No orders found. Nothing to backfill.');
+        logger.info('✅ No orders found. Nothing to backfill.');
         return;
       }
 
@@ -91,7 +92,7 @@ class OrderItemBackfillService {
 
       for (let offset = 0; offset < this.stats.totalOrders; offset += batchSize) {
         currentBatch++;
-        console.log(`\n📦 Processing batch ${currentBatch}/${totalBatches} (offset: ${offset}, size: ${batchSize})`);
+        logger.info(`\n📦 Processing batch ${currentBatch}/${totalBatches} (offset: ${offset}, size: ${batchSize})`);
 
         // Fetch batch of orders
         const orders = await orderRepo.find({
@@ -106,22 +107,22 @@ class OrderItemBackfillService {
             await this.backfillOrder(order, orderItemRepo, options.dryRun);
             this.stats.processedOrders++;
           } catch (error: any) {
-            console.error(`❌ Error processing order ${order.orderNumber}:`, error.message);
+            logger.error(`❌ Error processing order ${order.orderNumber}:`, error.message);
             this.stats.errors++;
           }
         }
 
         // Progress update
         const progress = ((offset + batchSize) / this.stats.totalOrders * 100).toFixed(1);
-        console.log(`   Progress: ${progress}% (${this.stats.processedOrders}/${this.stats.totalOrders} orders)`);
+        logger.info(`   Progress: ${progress}% (${this.stats.processedOrders}/${this.stats.totalOrders} orders)`);
       }
 
       this.stats.endTime = new Date();
       this.printSummary();
 
     } catch (error: any) {
-      console.error('\n❌ Backfill failed:', error.message);
-      console.error(error.stack);
+      logger.error('\n❌ Backfill failed:', error.message);
+      logger.error(error.stack);
       throw error;
     }
   }
@@ -137,7 +138,7 @@ class OrderItemBackfillService {
     const items: OrderItemInterface[] = order.items || [];
 
     if (items.length === 0) {
-      console.log(`⚠️  Order ${order.orderNumber} has no items, skipping`);
+      logger.info(`⚠️  Order ${order.orderNumber} has no items, skipping`);
       return;
     }
 
@@ -200,7 +201,7 @@ class OrderItemBackfillService {
         await queryRunner.rollbackTransaction();
       }
 
-      console.log(`   ✅ Order ${order.orderNumber}: ${items.length} items ${dryRun ? '(simulated)' : 'created'}`);
+      logger.info(`   ✅ Order ${order.orderNumber}: ${items.length} items ${dryRun ? '(simulated)' : 'created'}`);
 
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -218,22 +219,22 @@ class OrderItemBackfillService {
       ? ((this.stats.endTime.getTime() - this.stats.startTime.getTime()) / 1000).toFixed(2)
       : '0';
 
-    console.log('\n╔═══════════════════════════════════════════════════════════╗');
-    console.log('║                    Backfill Summary                      ║');
-    console.log('╚═══════════════════════════════════════════════════════════╝');
-    console.log(`\n📊 Statistics:`);
-    console.log(`   Total orders:      ${this.stats.totalOrders}`);
-    console.log(`   Processed orders:  ${this.stats.processedOrders}`);
-    console.log(`   Total items:       ${this.stats.totalItems}`);
-    console.log(`   Created items:     ${this.stats.createdItems}`);
-    console.log(`   Skipped items:     ${this.stats.skippedItems} (already exist)`);
-    console.log(`   Errors:            ${this.stats.errors}`);
-    console.log(`\n⏱️  Duration:          ${duration} seconds`);
+    logger.info('\n╔═══════════════════════════════════════════════════════════╗');
+    logger.info('║                    Backfill Summary                      ║');
+    logger.info('╚═══════════════════════════════════════════════════════════╝');
+    logger.info(`\n📊 Statistics:`);
+    logger.info(`   Total orders:      ${this.stats.totalOrders}`);
+    logger.info(`   Processed orders:  ${this.stats.processedOrders}`);
+    logger.info(`   Total items:       ${this.stats.totalItems}`);
+    logger.info(`   Created items:     ${this.stats.createdItems}`);
+    logger.info(`   Skipped items:     ${this.stats.skippedItems} (already exist)`);
+    logger.info(`   Errors:            ${this.stats.errors}`);
+    logger.info(`\n⏱️  Duration:          ${duration} seconds`);
 
     if (this.stats.errors === 0) {
-      console.log('\n✅ Backfill completed successfully!');
+      logger.info('\n✅ Backfill completed successfully!');
     } else {
-      console.log(`\n⚠️  Backfill completed with ${this.stats.errors} errors`);
+      logger.info(`\n⚠️  Backfill completed with ${this.stats.errors} errors`);
     }
   }
 }
@@ -256,7 +257,7 @@ async function main() {
     } else if (arg.startsWith('--batch-size=')) {
       options.batchSize = parseInt(arg.split('=')[1], 10);
     } else if (arg === '--help') {
-      console.log(`
+      logger.info(`
 OrderItem Backfill Script
 =========================
 
@@ -282,7 +283,7 @@ Examples:
     await service.backfillAll(options);
     process.exit(0);
   } catch (error) {
-    console.error('\n❌ Fatal error:', error);
+    logger.error('\n❌ Fatal error:', error);
     process.exit(1);
   }
 }
