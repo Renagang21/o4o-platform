@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import type { User } from './User.js';
 import { OrderEvent } from './OrderEvent.js';
-import { OrderItem as OrderItemEntity } from './OrderItem.js';
+import type { OrderItem as OrderItemEntity } from './OrderItem.js';
 
 // Enums
 export enum OrderStatus {
@@ -122,7 +122,7 @@ export class Order {
    * Dashboard services will gradually migrate to use itemsRelation
    * for better query performance (JOIN instead of JSONB parsing)
    */
-  @OneToMany(() => OrderItemEntity, (item) => item.order, {
+  @OneToMany('OrderItem', 'order', {
     cascade: false,
     eager: false
   })
