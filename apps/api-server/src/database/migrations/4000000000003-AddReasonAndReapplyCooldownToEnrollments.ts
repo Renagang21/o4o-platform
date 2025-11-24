@@ -16,21 +16,21 @@ export class AddReasonAndReapplyCooldownToEnrollments1731129600000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Add reason column
+    // Add reason column if it doesn't exist
     await queryRunner.query(`
       ALTER TABLE "role_enrollments"
-      ADD COLUMN "reason" TEXT NULL
+      ADD COLUMN IF NOT EXISTS "reason" TEXT NULL
     `);
 
-    // Add reapply_after_at column
+    // Add reapply_after_at column if it doesn't exist
     await queryRunner.query(`
       ALTER TABLE "role_enrollments"
-      ADD COLUMN "reapply_after_at" TIMESTAMP NULL
+      ADD COLUMN IF NOT EXISTS "reapply_after_at" TIMESTAMP NULL
     `);
 
-    // Add index on reapply_after_at for efficient cooldown queries
+    // Add index on reapply_after_at for efficient cooldown queries (if not exists)
     await queryRunner.query(`
-      CREATE INDEX "IDX_role_enrollments_reapply_after_at"
+      CREATE INDEX IF NOT EXISTS "IDX_role_enrollments_reapply_after_at"
       ON "role_enrollments" ("reapply_after_at")
       WHERE "reapply_after_at" IS NOT NULL
     `);
