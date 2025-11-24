@@ -2,8 +2,11 @@
  * Shortcode Registry
  * 숏코드 중앙 관리 레지스트리
  *
- * 새 숏코드를 추가하려면 이 파일에 등록하면 AI가 자동으로 인식합니다.
+ * Phase P0-B: Now uses @o4o/shortcodes metadata as SSOT
  */
+
+// Phase P0-B: Import metadata from SSOT
+import { shortcodeMetadata, type ShortcodeMetadata } from '@o4o/shortcodes';
 
 export interface ShortcodeConfig {
   description: string;
@@ -19,9 +22,47 @@ export interface ShortcodeConfig {
 }
 
 /**
- * 일반 컨텐츠 숏코드 레지스트리
+ * Phase P0-B: Convert ShortcodeMetadata to ShortcodeConfig
  */
-export const contentShortcodes: Record<string, ShortcodeConfig> = {
+function metadataToConfig(meta: ShortcodeMetadata): ShortcodeConfig {
+  const attributes: Record<string, any> = {};
+
+  if (meta.parameters) {
+    for (const [key, param] of Object.entries(meta.parameters)) {
+      attributes[key] = {
+        type: param.type,
+        required: param.required,
+        default: param.default,
+        options: param.options,
+        description: param.description,
+      };
+    }
+  }
+
+  return {
+    description: meta.description,
+    attributes,
+    category: meta.category,
+    requiresAuth: meta.requiresAuth,
+  };
+}
+
+/**
+ * Phase P0-B: Load shortcodes from @o4o/shortcodes metadata
+ */
+export const generalShortcodes: Record<string, ShortcodeConfig> = shortcodeMetadata.reduce(
+  (acc, meta) => {
+    acc[meta.name] = metadataToConfig(meta);
+    return acc;
+  },
+  {} as Record<string, ShortcodeConfig>
+);
+
+/**
+ * DEPRECATED: Old hardcoded shortcodes (kept for reference)
+ * Phase P0-B: No longer used
+ */
+export const contentShortcodes_DEPRECATED: Record<string, ShortcodeConfig> = {
   // WordPress 기본 숏코드
   'gallery': {
     description: '이미지 갤러리를 표시합니다',
@@ -99,9 +140,10 @@ export const contentShortcodes: Record<string, ShortcodeConfig> = {
 };
 
 /**
- * E-commerce 숏코드 레지스트리
+ * DEPRECATED: E-commerce 숏코드 레지스트리
+ * Phase P0-B: No longer used
  */
-export const ecommerceShortcodes: Record<string, ShortcodeConfig> = {
+const ecommerceShortcodes_OLD: Record<string, ShortcodeConfig> = {
   'product': {
     description: '단일 상품을 표시합니다',
     category: 'E-commerce',
@@ -174,9 +216,10 @@ export const ecommerceShortcodes: Record<string, ShortcodeConfig> = {
 };
 
 /**
- * Forms 숏코드 레지스트리
+ * DEPRECATED: Forms 숏코드 레지스트리
+ * Phase P0-B: No longer used
  */
-export const formShortcodes: Record<string, ShortcodeConfig> = {
+const formShortcodes_OLD: Record<string, ShortcodeConfig> = {
   'form': {
     description: '폼을 삽입합니다',
     category: 'Forms',
@@ -203,13 +246,12 @@ export const formShortcodes: Record<string, ShortcodeConfig> = {
 };
 
 /**
- * 모든 일반 숏코드 통합
+ * Phase P0-B: Legacy exports for backward compatibility
+ * These are now empty, all shortcodes are in generalShortcodes
  */
-export const generalShortcodes: Record<string, ShortcodeConfig> = {
-  ...contentShortcodes,
-  ...ecommerceShortcodes,
-  ...formShortcodes
-};
+export const contentShortcodes = {};
+export const ecommerceShortcodes = {};
+export const formShortcodes = {};
 
 /**
  * 숏코드 레지스트리에서 메타데이터 추출

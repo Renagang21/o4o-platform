@@ -83,3 +83,13 @@ export {
   loadACFFieldShortcode,
   loadMetaFieldShortcode
 } from './dynamic/index.js';
+
+// Metadata (Phase P0-B: SSOT for AI/Registry)
+export {
+  shortcodeMetadata,
+  getShortcodeMetadata,
+  getShortcodesByCategory,
+  getAllCategories,
+  getAllShortcodeNames
+} from './metadata.js';
+export type { ShortcodeMetadata } from './metadata.js';

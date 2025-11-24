@@ -2,9 +2,9 @@
  * Shortcode Registry Service
  * AI 페이지 생성을 위한 shortcode 관리 시스템
  *
- * V2: Database-driven registry
+ * V3 (Phase P0-B): Uses @o4o/shortcodes metadata as SSOT
  * - Reads from ai_references table (type='shortcodes')
- * - Fallback to built-in shortcodes if DB fails
+ * - Fallback to metadata from @o4o/shortcodes package
  * - Returns markdown reference directly to AI
  */
 
@@ -17,6 +17,8 @@ import {
 import { AppDataSource } from '../database/connection.js';
 import { AIReference } from '../entities/AIReference.js';
 import logger from '../utils/logger.js';
+// Phase P0-B: Import metadata from SSOT
+import { shortcodeMetadata, type ShortcodeMetadata } from '@o4o/shortcodes';
 
 class ShortcodeRegistryService {
   private static instance: ShortcodeRegistryService;
@@ -92,9 +94,39 @@ class ShortcodeRegistryService {
   }
 
   /**
-   * 내장 shortcode 등록
+   * Phase P0-B: Convert ShortcodeMetadata to ShortcodeInfo
+   */
+  private metadataToInfo(meta: ShortcodeMetadata): ShortcodeInfo {
+    return {
+      name: meta.name,
+      description: meta.description,
+      category: meta.category,
+      parameters: meta.parameters || {},
+      examples: meta.examples || [],
+      version: meta.version || '1.0.0',
+      tags: meta.tags || [],
+      aiPrompts: meta.aiPrompts || [],
+    };
+  }
+
+  /**
+   * Phase P0-B: Register shortcodes from @o4o/shortcodes metadata (SSOT)
    */
   private registerBuiltinShortcodes() {
+    // Load from @o4o/shortcodes metadata package
+    for (const meta of shortcodeMetadata) {
+      const info = this.metadataToInfo(meta);
+      this.register(meta.name, info);
+    }
+
+    logger.info(`✅ ${this.shortcodes.size} shortcodes registered from @o4o/shortcodes metadata`);
+  }
+
+  /**
+   * DEPRECATED: Old hardcoded registration (kept for reference)
+   * Phase P0-B: This method is no longer used
+   */
+  private registerBuiltinShortcodes_DEPRECATED() {
     // 이커머스 관련
     this.register('products', {
       name: 'products',
