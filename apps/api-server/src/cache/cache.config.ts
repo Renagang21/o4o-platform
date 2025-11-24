@@ -108,3 +108,18 @@ export const CacheKeys = {
       `settlement:*:${partyType}:${partyId}*`
   }
 } as const;
+
+/**
+ * Helper: Generate range key for date filters
+ * Converts date range to consistent cache key suffix
+ */
+export function generateRangeKey(dateRange?: { from?: Date; to?: Date }): string {
+  if (!dateRange?.from && !dateRange?.to) {
+    return 'all';
+  }
+
+  const fromStr = dateRange.from?.toISOString().split('T')[0] || '2020-01-01';
+  const toStr = dateRange.to?.toISOString().split('T')[0] || 'now';
+
+  return `${fromStr}_${toStr}`;
+}

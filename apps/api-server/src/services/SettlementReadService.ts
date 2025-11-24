@@ -19,6 +19,7 @@ import { Order, OrderStatus, PaymentStatus } from '../entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { Settlement, SettlementStatus } from '../entities/Settlement.js';
 import logger from '../utils/logger.js';
+import { cacheService, CacheKeys, getCacheConfig, generateRangeKey } from '../cache/index.js';
 
 export interface DateRangeFilter {
   from?: Date;
@@ -86,12 +87,27 @@ export class SettlementReadService {
    * Consolidates logic from SellerDashboardService.getCommissionDetailsForSeller()
    *
    * R-8-6: Load orders with itemsRelation
+   * R-8-7: Added caching with 5-minute TTL
    */
   async getSellerCommissionSummary(
     sellerId: string,
     dateRange?: DateRangeFilter
   ): Promise<SellerCommissionSummary> {
     try {
+      // R-8-7: Check cache first
+      const rangeKey = generateRangeKey(dateRange);
+      const cacheKey = CacheKeys.SELLER_COMMISSION_SUMMARY(
+        sellerId,
+        dateRange?.from?.toISOString().split('T')[0],
+        dateRange?.to?.toISOString().split('T')[0]
+      );
+
+      const cached = await cacheService.get<SellerCommissionSummary>(cacheKey);
+      if (cached) {
+        logger.debug(`[SettlementReadService] Cache HIT for seller commission: ${sellerId}`);
+        return cached;
+      }
+
       // Build where clause
       const where: any = {
         paymentStatus: In([PaymentStatus.COMPLETED])
@@ -175,7 +191,7 @@ export class SettlementReadService {
         totalOrders
       });
 
-      return {
+      const summary: SellerCommissionSummary = {
         totalCommission: Math.round(totalCommission),
         totalSales: Math.round(totalSales),
         totalOrders,
@@ -183,6 +199,13 @@ export class SettlementReadService {
         averageCommissionRate,
         commissionByOrder
       };
+
+      // R-8-7: Cache the result (5 minutes TTL)
+      const config = getCacheConfig();
+      await cacheService.set(cacheKey, summary, config.ttl.medium);
+      logger.debug(`[SettlementReadService] Cached seller commission: ${sellerId}`);
+
+      return summary;
     } catch (error) {
       logger.error('[SettlementReadService] Failed to get seller commission summary:', error);
       throw error;
@@ -194,12 +217,27 @@ export class SettlementReadService {
    * Consolidates logic from SupplierDashboardService.getRevenueDetailsForSupplier()
    *
    * R-8-6: Load orders with itemsRelation
+   * R-8-7: Added caching with 5-minute TTL
    */
   async getSupplierCommissionSummary(
     supplierId: string,
     dateRange?: DateRangeFilter
   ): Promise<SupplierCommissionSummary> {
     try {
+      // R-8-7: Check cache first
+      const rangeKey = generateRangeKey(dateRange);
+      const cacheKey = CacheKeys.SUPPLIER_COMMISSION_SUMMARY(
+        supplierId,
+        dateRange?.from?.toISOString().split('T')[0],
+        dateRange?.to?.toISOString().split('T')[0]
+      );
+
+      const cached = await cacheService.get<SupplierCommissionSummary>(cacheKey);
+      if (cached) {
+        logger.debug(`[SettlementReadService] Cache HIT for supplier commission: ${supplierId}`);
+        return cached;
+      }
+
       // Build where clause
       const where: any = {
         paymentStatus: In([PaymentStatus.COMPLETED])
@@ -277,13 +315,20 @@ export class SettlementReadService {
         totalOrders
       });
 
-      return {
+      const summary: SupplierCommissionSummary = {
         totalRevenue: Math.round(totalRevenue),
         totalMargin: Math.round(totalMargin),
         totalOrders,
         totalItems,
         revenueByOrder
       };
+
+      // R-8-7: Cache the result (5 minutes TTL)
+      const config = getCacheConfig();
+      await cacheService.set(cacheKey, summary, config.ttl.medium);
+      logger.debug(`[SettlementReadService] Cached supplier commission: ${supplierId}`);
+
+      return summary;
     } catch (error) {
       logger.error('[SettlementReadService] Failed to get supplier commission summary:', error);
       throw error;
@@ -293,6 +338,7 @@ export class SettlementReadService {
   /**
    * Get settlement summary statistics for a party
    * Useful for dashboard overview cards
+   * R-8-7: Added caching with 5-minute TTL
    */
   async getSettlementSummary(
     partyType: 'seller' | 'supplier' | 'platform',
@@ -300,6 +346,16 @@ export class SettlementReadService {
     dateRange?: DateRangeFilter
   ): Promise<SettlementSummary> {
     try {
+      // R-8-7: Check cache first
+      const rangeKey = generateRangeKey(dateRange);
+      const cacheKey = `${CacheKeys.SETTLEMENT_SUMMARY(partyType, partyId)}:${rangeKey}`;
+
+      const cached = await cacheService.get<SettlementSummary>(cacheKey);
+      if (cached) {
+        logger.debug(`[SettlementReadService] Cache HIT for settlement summary: ${partyType}:${partyId}`);
+        return cached;
+      }
+
       // Build where clause
       const where: any = {
         partyType,
@@ -352,13 +408,20 @@ export class SettlementReadService {
         settlementCount: settlements.length
       });
 
-      return {
+      const summary: SettlementSummary = {
         totalPending: Math.round(totalPending),
         totalPaid: Math.round(totalPaid),
         totalProcessing: Math.round(totalProcessing),
         settlementCount: settlements.length,
         lastSettlementDate
       };
+
+      // R-8-7: Cache the result (5 minutes TTL)
+      const config = getCacheConfig();
+      await cacheService.set(cacheKey, summary, config.ttl.medium);
+      logger.debug(`[SettlementReadService] Cached settlement summary: ${partyType}:${partyId}`);
+
+      return summary;
     } catch (error) {
       logger.error('[SettlementReadService] Failed to get settlement summary:', error);
       throw error;

@@ -16,5 +16,6 @@ export {
 export {
   getCacheConfig,
   CacheKeys,
+  generateRangeKey,
   type CacheConfig
 } from './cache.config.js';
