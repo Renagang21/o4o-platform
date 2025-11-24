@@ -9,13 +9,12 @@
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { Role } from '../entities/Role.js';
-import { UserRoleAssignment } from '../entities/UserRoleAssignment.js';
+import { UserRole } from '../types/auth.js';
 import bcrypt from 'bcrypt';
 import logger from '../utils/logger.js';
 
 interface CreateAdminOptions {
   email?: string;
-  username?: string;
   password?: string;
   name?: string;
 }
@@ -30,11 +29,9 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
 
     const userRepo = AppDataSource.getRepository(User);
     const roleRepo = AppDataSource.getRepository(Role);
-    const roleAssignmentRepo = AppDataSource.getRepository(UserRoleAssignment);
 
     // Default admin credentials
     const adminEmail = options.email || 'admin@neture.co.kr';
-    const adminUsername = options.username || 'admin';
     const adminPassword = options.password || 'Admin123!';
     const adminName = options.name || 'System Administrator';
 
@@ -44,32 +41,30 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
 
     // Check if user already exists
     const existingUser = await userRepo.findOne({
-      where: [
-        { email: adminEmail },
-        { username: adminUsername }
-      ]
+      where: { email: adminEmail }
     });
 
     if (existingUser) {
       logger.info(`⚠️  User already exists:`);
       logger.info(`   Email: ${existingUser.email}`);
-      logger.info(`   Username: ${existingUser.username}`);
+      logger.info(`   Name: ${existingUser.name}`);
       logger.info(`   ID: ${existingUser.id}`);
 
-      // Check roles
-      const assignments = await roleAssignmentRepo.find({
-        where: { userId: existingUser.id },
-        relations: ['role']
+      // Load user with roles
+      const userWithRoles = await userRepo.findOne({
+        where: { id: existingUser.id },
+        relations: ['dbRoles']
       });
 
-      if (assignments.length > 0) {
+      if (userWithRoles?.dbRoles && userWithRoles.dbRoles.length > 0) {
         logger.info(`\n   Current roles:`);
-        for (const assignment of assignments) {
-          logger.info(`   - ${assignment.role.name} (${assignment.role.slug})`);
+        for (const role of userWithRoles.dbRoles) {
+          logger.info(`   - ${role.name} (${role.displayName})`);
         }
       } else {
         logger.info(`\n   ⚠️  User has no roles assigned!`);
-        logger.info(`   Would you like to assign admin role? (Run with --assign-role flag)`);
+        logger.info(`   Legacy role: ${existingUser.role}`);
+        logger.info(`   Legacy roles array: ${existingUser.roles?.join(', ')}`);
       }
 
       return existingUser;
@@ -83,10 +78,11 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
     logger.info('👤 Creating user...');
     const newUser = userRepo.create({
       email: adminEmail,
-      username: adminUsername,
       password: hashedPassword,
       name: adminName,
-      emailVerified: true,
+      role: UserRole.SUPER_ADMIN,
+      roles: [UserRole.SUPER_ADMIN],
+      isEmailVerified: true,
       isActive: true
     });
 
@@ -94,44 +90,42 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
     logger.info(`✅ User created successfully!`);
     logger.info(`   ID: ${newUser.id}`);
     logger.info(`   Email: ${newUser.email}`);
-    logger.info(`   Username: ${newUser.username}`);
+    logger.info(`   Name: ${newUser.name}`);
 
     // Find or create admin role
     logger.info('\n🔍 Finding admin role...');
     let adminRole = await roleRepo.findOne({
-      where: { slug: 'super_admin' }
+      where: { name: 'super_admin' }
     });
 
     if (!adminRole) {
       adminRole = await roleRepo.findOne({
-        where: { slug: 'admin' }
+        where: { name: 'admin' }
       });
     }
 
     if (!adminRole) {
       logger.info('⚠️  No admin role found. Creating super_admin role...');
       adminRole = roleRepo.create({
-        name: 'Super Admin',
-        slug: 'super_admin',
+        name: 'super_admin',
+        displayName: 'Super Admin',
         description: 'Full system access',
-        isActive: true
+        isActive: true,
+        isSystem: true
       });
       await roleRepo.save(adminRole);
       logger.info('✅ Super admin role created');
     } else {
-      logger.info(`✅ Found role: ${adminRole.name} (${adminRole.slug})`);
+      logger.info(`✅ Found role: ${adminRole.name} (${adminRole.displayName})`);
     }
 
-    // Assign role to user
+    // Assign role to user via dbRoles relation
     logger.info('\n🔗 Assigning role to user...');
-    const roleAssignment = roleAssignmentRepo.create({
-      userId: newUser.id,
-      roleId: adminRole.id,
-      assignedBy: newUser.id, // Self-assigned for first admin
-      assignedAt: new Date()
-    });
-
-    await roleAssignmentRepo.save(roleAssignment);
+    if (!newUser.dbRoles) {
+      newUser.dbRoles = [];
+    }
+    newUser.dbRoles.push(adminRole);
+    await userRepo.save(newUser);
     logger.info('✅ Role assigned successfully!');
 
     // Summary
@@ -139,9 +133,9 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
     logger.info('║         Admin User Created Successfully                  ║');
     logger.info('╚═══════════════════════════════════════════════════════════╝\n');
     logger.info('📧 Email:    ' + adminEmail);
-    logger.info('👤 Username: ' + adminUsername);
+    logger.info('👤 Name:     ' + adminName);
     logger.info('🔑 Password: ' + adminPassword);
-    logger.info('🛡️  Role:     ' + adminRole.name);
+    logger.info('🛡️  Role:     ' + adminRole.displayName + ' (' + adminRole.name + ')');
     logger.info('\n⚠️  IMPORTANT: Change the password after first login!\n');
 
     return newUser;
@@ -164,8 +158,6 @@ const options: CreateAdminOptions = {};
 for (const arg of args) {
   if (arg.startsWith('--email=')) {
     options.email = arg.split('=')[1];
-  } else if (arg.startsWith('--username=')) {
-    options.username = arg.split('=')[1];
   } else if (arg.startsWith('--password=')) {
     options.password = arg.split('=')[1];
   } else if (arg.startsWith('--name=')) {
@@ -180,7 +172,6 @@ Usage:
 
 Options:
   --email=<email>       Admin email (default: admin@neture.co.kr)
-  --username=<username> Admin username (default: admin)
   --password=<password> Admin password (default: Admin123!)
   --name=<name>         Admin name (default: System Administrator)
   --help                Show this help message
