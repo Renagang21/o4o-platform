@@ -8,9 +8,13 @@ import logger from '../utils/logger.js';
 
 // Import all schema definitions
 import { dsProductSchema } from '../schemas/ds_product.schema.js';
-// Add more schemas here as you create them:
-// import { eventSchema } from '../schemas/event.schema.js';
-// import { portfolioSchema } from '../schemas/portfolio.schema.js';
+import { productsSchema } from '../schemas/products.schema.js';
+import { portfolioSchema } from '../schemas/portfolio.schema.js';
+import { testimonialsSchema } from '../schemas/testimonials.schema.js';
+import { teamSchema } from '../schemas/team.schema.js';
+import { dsSupplierSchema } from '../schemas/ds_supplier.schema.js';
+import { dsPartnerSchema } from '../schemas/ds_partner.schema.js';
+import { dsCommissionPolicySchema } from '../schemas/ds_commission_policy.schema.js';
 
 /**
  * Initialize CPT Registry
@@ -20,10 +24,16 @@ export async function initializeCPT(): Promise<void> {
   logger.info('[CPT Registry] Initializing...');
 
   try {
-    // Register all CPT schemas
+    // Register all CPT schemas (Phase P0-A: 8/8 CPTs registered)
     const schemas = [
       dsProductSchema,
-      // Add more schemas here
+      productsSchema,
+      portfolioSchema,
+      testimonialsSchema,
+      teamSchema,
+      dsSupplierSchema,
+      dsPartnerSchema,
+      dsCommissionPolicySchema,
     ];
 
     for (const schema of schemas) {
