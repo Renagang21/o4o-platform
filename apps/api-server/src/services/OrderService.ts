@@ -218,13 +218,16 @@ export class OrderService {
       }
 
       // Convert cart items to order items
+      // R-8-5: Ensure presentation fields consistency (productImage, productBrand, variationName)
       const orderItems: OrderItem[] = cart.items.map((cartItem: CartItem) => ({
         id: cartItem.id,
         productId: cartItem.productId,
         productName: cartItem.product?.name || 'Unknown Product',
         productSku: cartItem.product?.sku || '',
+        // R-8-5: Presentation fields (SSOT: Product entity + CartItem)
         productImage: cartItem.product?.getMainImage() || '',
         productBrand: cartItem.product?.brand,
+        variationName: cartItem.variationName, // R-8-5: Added missing field
         quantity: cartItem.quantity,
         unitPrice: cartItem.unitPrice || 0,
         totalPrice: (cartItem.unitPrice || 0) * cartItem.quantity,

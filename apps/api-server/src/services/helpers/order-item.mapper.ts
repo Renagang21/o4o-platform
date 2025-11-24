@@ -89,8 +89,10 @@ function entityToInterface(entity: OrderItemEntity): OrderItemInterface {
  * Map order items to customer-facing DTO
  * Supports both OrderItem entities and JSONB items
  *
- * Note: When using OrderItem entities, some fields may be undefined
- * (productImage, productBrand, variationName are not stored in entity)
+ * R-8-5: Presentation field normalization rules:
+ * - Required fields (productSku, productImage): Fallback to '' (empty string)
+ * - Optional fields (productBrand, variationName): Preserved as-is (undefined allowed)
+ * - All presentation fields should be consistent across JSONB and OrderItem entity
  *
  * @param order - Order entity
  * @returns Array of CustomerOrderItemDto
@@ -102,8 +104,10 @@ export function mapOrderItemsForCustomer(order: Order): CustomerOrderItemDto[] {
     id: item.id,
     productId: item.productId,
     productName: item.productName,
-    productSku: item.productSku || '', // R-8-3-3: Default to empty string for DTO compatibility
-    productImage: item.productImage || '', // R-8-3-3: Default to empty string for DTO compatibility
+    // R-8-5: Required fields - default to empty string
+    productSku: item.productSku || '',
+    productImage: item.productImage || '',
+    // R-8-5: Optional presentation fields - preserved as-is
     productBrand: item.productBrand,
     variationName: item.variationName,
     quantity: item.quantity,
