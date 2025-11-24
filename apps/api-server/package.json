@@ -52,6 +52,7 @@
     "migration:show": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts migration:show",
     "migration:sync": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts schema:sync",
     "backfill:order-items": "npx tsx src/database/backfill-order-items.ts",
+    "backfill:order-item-presentation": "npx tsx src/database/backfill-order-item-presentation-fields.ts",
     "monitor": "node scripts/pm2-monitor.sh --once",
     "pm2:delete": "pm2 delete ecosystem.config.apiserver.cjs",
     "pm2:logs": "pm2 logs o4o-api",

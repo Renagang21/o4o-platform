@@ -1219,6 +1219,12 @@ export class OrderService {
       orderItemEntity.productId = item.productId;
       orderItemEntity.productName = item.productName;
       orderItemEntity.productSku = item.productSku;
+
+      // R-8-4: Frontend presentation fields
+      orderItemEntity.productImage = item.productImage;
+      orderItemEntity.productBrand = item.productBrand;
+      orderItemEntity.variationName = item.variationName;
+
       orderItemEntity.quantity = item.quantity;
       orderItemEntity.unitPrice = item.unitPrice;
       orderItemEntity.totalPrice = item.totalPrice;

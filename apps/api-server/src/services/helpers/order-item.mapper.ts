@@ -54,8 +54,8 @@ export function getOrderItems(order: Order): OrderItemInterface[] {
  * Convert OrderItem entity to legacy JSONB interface format
  * Used for backward compatibility
  *
- * Note: OrderItem entity doesn't have productImage, productBrand, variationName
- * These fields are only in JSONB legacy data and will be undefined for entity-based items
+ * R-8-4: Updated to include presentation fields (productImage, productBrand, variationName)
+ * These fields are now stored in OrderItem entity after R-8-4 migration
  */
 function entityToInterface(entity: OrderItemEntity): OrderItemInterface {
   return {
@@ -63,9 +63,9 @@ function entityToInterface(entity: OrderItemEntity): OrderItemInterface {
     productId: entity.productId,
     productName: entity.productName,
     productSku: entity.productSku,
-    productImage: undefined, // R-8-3-3: Not stored in OrderItem entity
-    productBrand: undefined, // R-8-3-3: Not stored in OrderItem entity
-    variationName: undefined, // R-8-3-3: Not stored in OrderItem entity
+    productImage: entity.productImage, // R-8-4: Now stored in entity
+    productBrand: entity.productBrand, // R-8-4: Now stored in entity
+    variationName: entity.variationName, // R-8-4: Now stored in entity
     quantity: entity.quantity,
     unitPrice: entity.unitPrice,
     totalPrice: entity.totalPrice,

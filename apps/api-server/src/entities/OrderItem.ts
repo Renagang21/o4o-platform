@@ -70,6 +70,20 @@ export class OrderItem {
   @Column('varchar', { length: 100, nullable: true })
   productSku?: string;
 
+  /**
+   * Frontend Presentation Fields
+   * R-8-4: Added for JSONB removal preparation
+   * These fields are UI metadata for product display
+   */
+  @Column('varchar', { nullable: true })
+  productImage?: string; // Product thumbnail URL
+
+  @Column('varchar', { nullable: true })
+  productBrand?: string; // Brand name
+
+  @Column('varchar', { nullable: true })
+  variationName?: string; // Product variation/option name (e.g., "Red, Large")
+
   @Column('int')
   quantity!: number;
 
@@ -189,6 +203,9 @@ export class OrderItem {
       productId: this.productId,
       productName: this.productName,
       productSku: this.productSku,
+      productImage: this.productImage, // R-8-4: Added presentation field
+      productBrand: this.productBrand, // R-8-4: Added presentation field
+      variationName: this.variationName, // R-8-4: Added presentation field
       quantity: this.quantity,
       unitPrice: parseFloat(this.unitPrice.toString()),
       totalPrice: parseFloat(this.totalPrice.toString()),
