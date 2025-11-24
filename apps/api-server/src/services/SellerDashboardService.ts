@@ -9,6 +9,7 @@
 
 import AppDataSource from '../database/data-source.js';
 import { Order, OrderStatus, PaymentStatus, OrderItem } from '../entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { Between, In } from 'typeorm';
 import logger from '../utils/logger.js';
 import {
@@ -56,10 +57,12 @@ export interface PaginationParams {
 
 export class SellerDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);
+  private orderItemRepository = AppDataSource.getRepository(OrderItemEntity);
   private settlementReadService = new SettlementReadService();
 
   /**
    * Get dashboard summary for a seller
+   * R-8-3-2: Refactored to use OrderItem entity instead of JSONB filtering
    * Aggregates orders where at least one item belongs to the seller
    * R-6-2: Updated to use standard DTO and support both old and new query formats
    */
@@ -85,56 +88,30 @@ export class SellerDashboardService {
         parsedRange = dashboardRangeService.parseDateRange({});
       }
 
-      // Build date filter
-      const where: any = {
-        paymentStatus: In([PaymentStatus.COMPLETED]),
-        orderDate: Between(parsedRange.startDate, parsedRange.endDate)
-      };
+      // R-8-3-2: Use OrderItem-based query instead of JSONB filtering
+      // This significantly improves performance by leveraging database indexes
+      const result = await this.orderItemRepository
+        .createQueryBuilder('item')
+        .innerJoin('item.order', 'order')
+        .select('COUNT(DISTINCT order.id)', 'totalOrders')
+        .addSelect('SUM(item.totalPrice)', 'totalSalesAmount')
+        .addSelect('SUM(item.quantity)', 'totalItems')
+        .addSelect('SUM(item.commissionAmount)', 'totalCommissionAmount')
+        .where('item.sellerId = :sellerId', { sellerId })
+        .andWhere('order.paymentStatus IN (:...statuses)', {
+          statuses: [PaymentStatus.COMPLETED]
+        })
+        .andWhere('order.orderDate BETWEEN :startDate AND :endDate', {
+          startDate: parsedRange.startDate,
+          endDate: parsedRange.endDate
+        })
+        .getRawOne();
 
-      // Get all paid orders
-      const orders = await this.orderRepository.find({
-        where,
-        order: { orderDate: 'DESC' }
-      });
-
-      // Filter orders that contain seller's items and calculate metrics
-      let totalOrders = 0;
-      let totalSalesAmount = 0;
-      let totalItems = 0;
-      let totalCommissionAmount = 0;
-
-      for (const order of orders) {
-        const sellerItems = order.items.filter(
-          (item: OrderItem) => item.sellerId === sellerId
-        );
-
-        if (sellerItems.length > 0) {
-          totalOrders++;
-
-          // Calculate seller's portion of this order
-          const sellerOrderAmount = sellerItems.reduce(
-            (sum, item) => sum + item.totalPrice,
-            0
-          );
-          totalSalesAmount += sellerOrderAmount;
-
-          // Count items
-          const sellerItemCount = sellerItems.reduce(
-            (sum, item) => sum + item.quantity,
-            0
-          );
-          totalItems += sellerItemCount;
-
-          // Phase PD-2: Use actual commission amount from order items
-          // Commission is calculated and stored at order creation time
-          const orderCommissionAmount = sellerItems.reduce(
-            (sum, item) => sum + (item.commissionAmount || 0),
-            0
-          );
-          totalCommissionAmount += orderCommissionAmount;
-        }
-      }
-
+      // Extract aggregated values from query result
+      const totalOrders = parseInt(result?.totalOrders || '0', 10);
+      const totalSalesAmount = parseFloat(result?.totalSalesAmount || '0');
+      const totalItems = parseInt(result?.totalItems || '0', 10);
+      const totalCommissionAmount = parseFloat(result?.totalCommissionAmount || '0');
       const avgOrderAmount = totalOrders > 0 ? totalSalesAmount / totalOrders : 0;
 
       // R-6-2: Return standard DTO with legacy fields for backward compatibility
@@ -160,6 +137,7 @@ export class SellerDashboardService {
 
   /**
    * Get orders for a seller with pagination
+   * R-8-3-2: Refactored to use OrderItem entity with database-level pagination
    */
   async getOrdersForSeller(
     sellerId: string,
@@ -172,71 +150,132 @@ export class SellerDashboardService {
     try {
       const { dateRange, status, pagination } = filters;
 
-      // Build where clause
-      const where: any = {
-        paymentStatus: In([PaymentStatus.COMPLETED])
-      };
+      // Build base query to find orders with seller's items
+      const baseQuery = this.orderItemRepository
+        .createQueryBuilder('item')
+        .innerJoin('item.order', 'order')
+        .where('item.sellerId = :sellerId', { sellerId })
+        .andWhere('order.paymentStatus IN (:...statuses)', {
+          statuses: [PaymentStatus.COMPLETED]
+        });
 
+      // Apply status filter
       if (status && status.length > 0) {
-        where.status = In(status);
+        baseQuery.andWhere('order.status IN (:...orderStatuses)', {
+          orderStatuses: status
+        });
+      }
+
+      // Apply date range filter
+      if (dateRange?.from || dateRange?.to) {
+        baseQuery.andWhere('order.orderDate BETWEEN :startDate AND :endDate', {
+          startDate: dateRange.from || new Date('2020-01-01'),
+          endDate: dateRange.to || new Date()
+        });
+      }
+
+      // R-8-3-2: Get aggregated data per order using GROUP BY
+      // This is more efficient than fetching all orders and filtering in memory
+      const { page, limit } = pagination;
+      const skip = (page - 1) * limit;
+
+      // Get aggregated order data with seller-specific metrics
+      const aggregatedQuery = this.orderItemRepository
+        .createQueryBuilder('item')
+        .innerJoin('item.order', 'order')
+        .select('order.id', 'orderId')
+        .addSelect('order.orderNumber', 'orderNumber')
+        .addSelect('order.orderDate', 'orderDate')
+        .addSelect('order.buyerName', 'buyerName')
+        .addSelect('order.status', 'status')
+        .addSelect('order.paymentStatus', 'paymentStatus')
+        .addSelect('SUM(item.totalPrice)', 'sellerAmount')
+        .addSelect('SUM(item.commissionAmount)', 'commissionAmount')
+        .addSelect('SUM(item.quantity)', 'itemCount')
+        .where('item.sellerId = :sellerId', { sellerId })
+        .andWhere('order.paymentStatus IN (:...statuses)', {
+          statuses: [PaymentStatus.COMPLETED]
+        });
+
+      // Apply same filters as base query
+      if (status && status.length > 0) {
+        aggregatedQuery.andWhere('order.status IN (:...orderStatuses)', {
+          orderStatuses: status
+        });
       }
 
       if (dateRange?.from || dateRange?.to) {
-        where.orderDate = Between(
-          dateRange.from || new Date('2020-01-01'),
-          dateRange.to || new Date()
-        );
+        aggregatedQuery.andWhere('order.orderDate BETWEEN :startDate AND :endDate', {
+          startDate: dateRange.from || new Date('2020-01-01'),
+          endDate: dateRange.to || new Date()
+        });
       }
 
-      // Get all matching orders
-      const allOrders = await this.orderRepository.find({
-        where,
-        order: { orderDate: 'DESC' }
-      });
+      // Group by order and apply pagination at database level
+      aggregatedQuery
+        .groupBy('order.id')
+        .addGroupBy('order.orderNumber')
+        .addGroupBy('order.orderDate')
+        .addGroupBy('order.buyerName')
+        .addGroupBy('order.status')
+        .addGroupBy('order.paymentStatus')
+        .orderBy('order.orderDate', 'DESC')
+        .skip(skip)
+        .take(limit);
 
-      // Filter orders with seller's items
-      const sellerOrders: SellerOrderSummary[] = [];
+      const results = await aggregatedQuery.getRawMany();
 
-      for (const order of allOrders) {
-        const sellerItems = order.items.filter(
-          (item: OrderItem) => item.sellerId === sellerId
-        );
+      // Get total count of distinct orders (for pagination)
+      const totalQuery = this.orderItemRepository
+        .createQueryBuilder('item')
+        .innerJoin('item.order', 'order')
+        .select('COUNT(DISTINCT order.id)', 'total')
+        .where('item.sellerId = :sellerId', { sellerId })
+        .andWhere('order.paymentStatus IN (:...statuses)', {
+          statuses: [PaymentStatus.COMPLETED]
+        });
 
-        if (sellerItems.length > 0) {
-          const sellerAmount = sellerItems.reduce(
-            (sum, item) => sum + item.totalPrice,
-            0
-          );
-
-          // Phase PD-2: Use actual commission amount from order items
-          const commissionAmount = sellerItems.reduce(
-            (sum, item) => sum + (item.commissionAmount || 0),
-            0
-          );
-
-          sellerOrders.push({
-            orderId: order.id,
-            orderNumber: order.orderNumber,
-            orderDate: order.orderDate,
-            buyerName: order.buyerName,
-            status: order.status,
-            paymentStatus: order.paymentStatus,
-            totalAmount: order.calculateTotal(),
-            sellerAmount: Math.round(sellerAmount),
-            commissionAmount: Math.round(commissionAmount),
-            itemCount: sellerItems.reduce((sum, item) => sum + item.quantity, 0)
-          });
-        }
+      if (status && status.length > 0) {
+        totalQuery.andWhere('order.status IN (:...orderStatuses)', {
+          orderStatuses: status
+        });
       }
 
-      // Apply pagination
-      const total = sellerOrders.length;
-      const { page, limit } = pagination;
-      const start = (page - 1) * limit;
-      const paginatedOrders = sellerOrders.slice(start, start + limit);
+      if (dateRange?.from || dateRange?.to) {
+        totalQuery.andWhere('order.orderDate BETWEEN :startDate AND :endDate', {
+          startDate: dateRange.from || new Date('2020-01-01'),
+          endDate: dateRange.to || new Date()
+        });
+      }
+
+      const totalResult = await totalQuery.getRawOne();
+      const total = parseInt(totalResult?.total || '0', 10);
+
+      // For totalAmount, we need to get the full order summary
+      // We'll fetch the orders to get their calculated totals
+      const orderIds = results.map(r => r.orderId);
+      const orders = orderIds.length > 0
+        ? await this.orderRepository.findByIds(orderIds)
+        : [];
+
+      const orderMap = new Map(orders.map(o => [o.id, o]));
+
+      // Map results to SellerOrderSummary DTOs
+      const sellerOrders: SellerOrderSummary[] = results.map(result => ({
+        orderId: result.orderId,
+        orderNumber: result.orderNumber,
+        orderDate: new Date(result.orderDate),
+        buyerName: result.buyerName,
+        status: result.status as OrderStatus,
+        paymentStatus: result.paymentStatus as PaymentStatus,
+        totalAmount: orderMap.get(result.orderId)?.calculateTotal() || 0,
+        sellerAmount: Math.round(parseFloat(result.sellerAmount || '0')),
+        commissionAmount: Math.round(parseFloat(result.commissionAmount || '0')),
+        itemCount: parseInt(result.itemCount || '0', 10)
+      }));
 
       return {
-        orders: paginatedOrders,
+        orders: sellerOrders,
         total
       };
     } catch (error) {
