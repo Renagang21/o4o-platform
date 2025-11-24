@@ -46,7 +46,7 @@ async function checkAdminPermissions() {
         if (role.permissions && role.permissions.length > 0) {
           logger.info(`     Permissions from role:`);
           for (const perm of role.permissions) {
-            logger.info(`       • ${perm.key} - ${perm.name}`);
+            logger.info(`       • ${perm.key} - ${perm.description}`);
           }
         } else {
           logger.info(`     ⚠️  No permissions assigned to this role`);

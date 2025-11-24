@@ -143,7 +143,7 @@ class OrderItemConsistencyChecker {
     orderItemRepo: any,
     verbose: boolean
   ): Promise<void> {
-    const jsonbItems: OrderItemInterface[] = order.items || [];
+    const jsonbItems: OrderItemInterface[] = (order as any).items || [];
 
     if (jsonbItems.length === 0) {
       // Order has no JSONB items (unusual but not an error)
