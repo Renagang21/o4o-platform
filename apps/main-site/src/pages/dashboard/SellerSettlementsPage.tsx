@@ -8,11 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { PageHeader } from '../../components/common/PageHeader';
 import { EmptyState } from '../../components/common/EmptyState';
-import { Plus, Eye, AlertCircle, RefreshCw, FileText } from 'lucide-react';
+import { Eye, AlertCircle, RefreshCw, FileText, Info } from 'lucide-react';
 import type { SettlementSummary, SettlementStatus } from '../../types/settlement';
 import { sellerSettlementAPI } from '../../services/sellerSettlementApi';
 import { handleApiError } from '../../utils/apiErrorHandler';
-import { CreateSettlementModal } from '../../components/dashboard/partner/CreateSettlementModal';
 import { SettlementSummaryCards } from '../../components/SettlementSummaryCards';
 
 export const SellerSettlementsPage: React.FC = () => {
@@ -31,9 +30,6 @@ export const SellerSettlementsPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 20;
-
-  // 정산 생성 모달
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // 정산 목록 조회
   const fetchSettlements = async () => {
@@ -153,13 +149,6 @@ export const SellerSettlementsPage: React.FC = () => {
     return dateStr.split('T')[0];
   };
 
-  // 정산 생성 완료 핸들러
-  const handleSettlementCreated = (settlementId: string) => {
-    setIsCreateModalOpen(false);
-    // 상세 페이지로 이동
-    navigate(`/dashboard/seller/settlements/${settlementId}`);
-  };
-
   return (
     <>
       <Breadcrumb
@@ -172,15 +161,21 @@ export const SellerSettlementsPage: React.FC = () => {
       <PageHeader
         title="정산 내역"
         subtitle="판매 주문을 기준으로 정산 금액과 지급 상태를 확인합니다."
-      >
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          새 정산 생성
-        </button>
-      </PageHeader>
+      />
+
+      {/* R-8-9: Auto-settlement system info */}
+      <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-blue-900 mb-1">
+            자동 정산 시스템
+          </h3>
+          <p className="text-sm text-blue-700">
+            주문이 <strong>배송 완료</strong> 상태가 되면 정산이 자동으로 생성됩니다.
+            매일 자동으로 전날 배송 완료된 주문에 대한 정산이 확정됩니다.
+          </p>
+        </div>
+      </div>
 
       {/* Phase SETTLE-UI: Summary Cards */}
       <SettlementSummaryCards settlements={settlements} loading={loading} />
@@ -260,17 +255,8 @@ export const SellerSettlementsPage: React.FC = () => {
           <div className="p-12">
             <EmptyState
               icon={<FileText className="w-16 h-16 text-gray-400" />}
-              title="아직 생성된 판매자 정산 내역이 없습니다"
-              description="정산을 생성하면 판매 주문을 기간별로 관리할 수 있습니다."
-              action={
-                <button
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                  첫 정산 생성하기
-                </button>
-              }
+              title="아직 생성된 정산 내역이 없습니다"
+              description="배송 완료된 주문이 있으면 자동으로 정산이 생성됩니다. 주문이 배송 완료되면 다음날 정산 내역이 확정됩니다."
             />
           </div>
         ) : (
@@ -364,14 +350,6 @@ export const SellerSettlementsPage: React.FC = () => {
           </>
         )}
       </div>
-
-      {/* 정산 생성 모달 */}
-      {isCreateModalOpen && (
-        <CreateSettlementModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onSettlementCreated={handleSettlementCreated}
-        />
-      )}
     </>
   );
 };
