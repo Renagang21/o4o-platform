@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import productSeederController from '../controllers/dev/productSeederController.js';
+import { performanceMonitor } from '../utils/performance.js';
 
 const router: Router = Router();
 
@@ -136,8 +137,80 @@ router.get('/health', (req, res) => {
     features: {
       productSeeder: true,
       dataValidation: true,
-      mockData: true
+      mockData: true,
+      performanceMonitoring: true
     }
+  });
+});
+
+/**
+ * @swagger
+ * /api/v1/dev/perf/summary:
+ *   get:
+ *     summary: 성능 모니터링 요약
+ *     description: R-8-7 - 현재 성능 모니터링 상태 요약
+ *     tags: [Development, Performance]
+ *     responses:
+ *       200:
+ *         description: 성능 모니터링 요약 조회 성공
+ */
+router.get('/perf/summary', (req, res) => {
+  const summary = performanceMonitor.getSummary();
+
+  res.json({
+    success: true,
+    data: summary,
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * @swagger
+ * /api/v1/dev/perf/slow-queries:
+ *   get:
+ *     summary: 느린 쿼리 로그 조회
+ *     description: R-8-7 - 기록된 느린 쿼리 목록을 조회합니다
+ *     tags: [Development, Performance]
+ *     responses:
+ *       200:
+ *         description: 느린 쿼리 로그 조회 성공
+ */
+router.get('/perf/slow-queries', (req, res) => {
+  const slowQueries = performanceMonitor.getSlowQueries();
+
+  res.json({
+    success: true,
+    data: {
+      count: slowQueries.length,
+      queries: slowQueries.map(q => ({
+        query: q.query.substring(0, 200), // Truncate for readability
+        duration: `${q.duration.toFixed(2)}ms`,
+        timestamp: q.timestamp,
+        parameters: q.parameters
+      }))
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * @swagger
+ * /api/v1/dev/perf/slow-queries:
+ *   delete:
+ *     summary: 느린 쿼리 로그 삭제
+ *     description: R-8-7 - 기록된 느린 쿼리 로그를 초기화합니다
+ *     tags: [Development, Performance]
+ *     responses:
+ *       200:
+ *         description: 느린 쿼리 로그 삭제 성공
+ */
+router.delete('/perf/slow-queries', (req, res) => {
+  performanceMonitor.clearSlowQueries();
+
+  res.json({
+    success: true,
+    message: 'Slow query logs cleared',
+    timestamp: new Date().toISOString()
   });
 });
 

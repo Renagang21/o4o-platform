@@ -19,6 +19,7 @@ import {
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
 import { SettlementReadService } from './SettlementReadService.js';
+import { cacheService, CacheKeys, getCacheConfig } from '../cache/index.js';
 
 /**
  * @deprecated Use SellerDashboardSummaryDto from dashboard.dto.ts
@@ -65,6 +66,7 @@ export class SellerDashboardService {
    * R-8-3-2: Refactored to use OrderItem entity instead of JSONB filtering
    * Aggregates orders where at least one item belongs to the seller
    * R-6-2: Updated to use standard DTO and support both old and new query formats
+   * R-8-7: Added caching with 60-second TTL
    */
   async getSummaryForSeller(
     sellerId: string,
@@ -86,6 +88,14 @@ export class SellerDashboardService {
       } else {
         // Default to 30 days
         parsedRange = dashboardRangeService.parseDateRange({});
+      }
+
+      // R-8-7: Check cache first
+      const cacheKey = CacheKeys.SELLER_DASHBOARD_SUMMARY(sellerId);
+      const cached = await cacheService.get<SellerDashboardSummaryDto>(cacheKey);
+      if (cached) {
+        logger.debug(`[SellerDashboardService] Cache HIT for summary: ${sellerId}`);
+        return cached;
       }
 
       // R-8-3-2: Use OrderItem-based query instead of JSONB filtering
@@ -115,7 +125,7 @@ export class SellerDashboardService {
       const avgOrderAmount = totalOrders > 0 ? totalSalesAmount / totalOrders : 0;
 
       // R-6-2: Return standard DTO with legacy fields for backward compatibility
-      return {
+      const summary: SellerDashboardSummaryDto = {
         totalOrders,
         totalRevenue: Math.round(totalSalesAmount), // Standard field
         averageOrderValue: Math.round(avgOrderAmount), // Standard field
@@ -129,6 +139,13 @@ export class SellerDashboardService {
         salesAmount: Math.round(totalSalesAmount),
         sellerAmount: Math.round(totalSalesAmount)
       };
+
+      // R-8-7: Cache the result (60 seconds TTL)
+      const config = getCacheConfig();
+      await cacheService.set(cacheKey, summary, config.ttl.short);
+      logger.debug(`[SellerDashboardService] Cached summary for: ${sellerId}`);
+
+      return summary;
     } catch (error) {
       logger.error('[SellerDashboardService] Failed to get summary:', error);
       throw error;
