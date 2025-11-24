@@ -1,6 +1,7 @@
 /**
  * Customer Order Service
  * R-6-9: Customer order viewing functionality
+ * R-8-3-3: Migrated to OrderItem-based queries with JSONB fallback
  *
  * Provides read-only access to orders for customers
  * Security: All queries filtered by buyerId
@@ -9,6 +10,7 @@
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual, In } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { Order, OrderStatus, PaymentStatus } from '../entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { OrderEvent, OrderEventType } from '../entities/OrderEvent.js';
 import type {
   CustomerOrderListItemDto,
@@ -18,6 +20,7 @@ import type {
   CustomerOrderActionErrorCode,
 } from '../dto/customer-orders.dto.js';
 import logger from '../utils/logger.js';
+import { mapOrderItemsForCustomer, getOrderItemCount } from './helpers/order-item.mapper.js';
 
 // Custom error for order action failures
 class OrderActionError extends Error {
@@ -84,8 +87,10 @@ export class CustomerOrderService {
       }
 
       // Execute query with pagination
+      // R-8-3-3: Load itemsRelation for OrderItem-based access
       const [orders, totalItems] = await this.orderRepository.findAndCount({
         where,
+        relations: ['itemsRelation'], // Load OrderItem entities
         order: {
           [sortBy]: sortOrder.toUpperCase() as 'ASC' | 'DESC',
         },
@@ -122,6 +127,7 @@ export class CustomerOrderService {
 
   /**
    * Get detailed order information for a customer
+   * R-8-3-3: Loads OrderItem entities with JSONB fallback
    * Security: Enforces buyerId filtering
    */
   async getOrderDetailForCustomer(
@@ -130,12 +136,13 @@ export class CustomerOrderService {
   ): Promise<CustomerOrderDetailDto | null> {
     try {
       // Find order with relations
+      // R-8-3-3: Load itemsRelation for OrderItem-based access
       const order = await this.orderRepository.findOne({
         where: {
           id: orderId,
           buyerId: userId, // SECURITY: Always filter by authenticated user
         },
-        relations: ['buyer', 'events'],
+        relations: ['buyer', 'events', 'itemsRelation'], // R-8-3-3: Added itemsRelation
       });
 
       if (!order) {
@@ -367,6 +374,7 @@ export class CustomerOrderService {
 
   /**
    * Transform Order entity to CustomerOrderListItemDto
+   * R-8-3-3: Uses OrderItem-based helper with JSONB fallback
    */
   private transformToListItemDto(order: Order): CustomerOrderListItemDto {
     return {
@@ -376,7 +384,7 @@ export class CustomerOrderService {
       status: order.status as any,
       totalAmount: order.summary.total,
       currency: order.currency,
-      itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+      itemCount: getOrderItemCount(order), // R-8-3-3: OrderItem-first, JSONB fallback
       paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus as any,
       isCancellable: order.canBeCancelled(),
@@ -386,6 +394,7 @@ export class CustomerOrderService {
 
   /**
    * Transform Order entity to CustomerOrderDetailDto
+   * R-8-3-3: Uses OrderItem-based helper with JSONB fallback
    */
   private transformToDetailDto(order: Order): CustomerOrderDetailDto {
     // Build status timeline from order timestamps
@@ -474,20 +483,8 @@ export class CustomerOrderService {
         deliveryRequest: order.shippingAddress.deliveryRequest,
       },
 
-      items: order.items.map((item) => ({
-        id: item.id,
-        productId: item.productId,
-        productName: item.productName,
-        productSku: item.productSku,
-        productImage: item.productImage,
-        productBrand: item.productBrand,
-        variationName: item.variationName,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
-        sellerId: item.sellerId,
-        sellerName: item.sellerName,
-      })),
+      // R-8-3-3: Use helper function for OrderItem-first, JSONB fallback
+      items: mapOrderItemsForCustomer(order),
 
       summary: {
         subtotal: order.summary.subtotal,

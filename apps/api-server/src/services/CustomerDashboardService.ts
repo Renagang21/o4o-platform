@@ -1,6 +1,7 @@
 /**
  * CustomerDashboardService
  * R-6-4: Customer Dashboard v1 - Customer metrics and order tracking
+ * R-8-3-3: Light touch - OrderItem-based item counting with JSONB fallback
  *
  * Provides customer-specific statistics and recent orders
  */
@@ -16,6 +17,7 @@ import {
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
 import { WishlistService } from './WishlistService.js';
+import { getOrderItemCount } from './helpers/order-item.mapper.js';
 
 export interface DateRangeFilter {
   from?: Date;
@@ -122,6 +124,7 @@ export class CustomerDashboardService {
   /**
    * Get recent orders for a customer
    * R-6-4: Returns recent orders with limited data
+   * R-8-3-3: Uses OrderItem-based counting with JSONB fallback
    */
   async getRecentOrdersForCustomer(
     userId: string,
@@ -131,8 +134,10 @@ export class CustomerDashboardService {
       // Limit max to 10
       const safeLimit = Math.min(limit, 10);
 
+      // R-8-3-3: Load itemsRelation for OrderItem-based access
       const orders = await this.orderRepository.find({
         where: { buyerId: userId },
+        relations: ['itemsRelation'], // R-8-3-3: Added itemsRelation
         order: { orderDate: 'DESC' },
         take: safeLimit
       });
@@ -144,7 +149,7 @@ export class CustomerDashboardService {
         status: this.mapOrderStatus(order.status),
         totalAmount: order.calculateTotal(),
         currency: 'KRW',
-        itemCount: order.items.length,
+        itemCount: getOrderItemCount(order), // R-8-3-3: OrderItem-first, JSONB fallback
         estimatedDelivery: order.status === OrderStatus.SHIPPED
           ? new Date(order.orderDate.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString() // +3 days
           : undefined
