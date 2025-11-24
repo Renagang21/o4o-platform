@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import type { User } from './User.js';
 import { OrderEvent } from './OrderEvent.js';
+import { OrderItem as OrderItemEntity } from './OrderItem.js';
 
 // Enums
 export enum OrderStatus {
@@ -109,6 +110,23 @@ export class Order {
   // Order items (stored as JSON for simplicity)
   @Column('jsonb')
   items: OrderItem[];
+
+  /**
+   * R-8-3-1: OrderItem Normalization
+   * Relational order items (new entity-based storage)
+   *
+   * Dual-write strategy:
+   * - items (JSONB): Primary source of truth (backward compatibility)
+   * - itemsRelation (Entity): New relational storage for efficient queries
+   *
+   * Dashboard services will gradually migrate to use itemsRelation
+   * for better query performance (JOIN instead of JSONB parsing)
+   */
+  @OneToMany(() => OrderItemEntity, (item) => item.order, {
+    cascade: false,
+    eager: false
+  })
+  itemsRelation?: OrderItemEntity[];
 
   // Financial info
   @Column('jsonb')

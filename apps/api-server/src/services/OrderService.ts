@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, Address, OrderSummary } from '../entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { OrderEvent, OrderEventType, OrderEventPayload } from '../entities/OrderEvent.js';
 import { User } from '../entities/User.js';
 import { Cart } from '../entities/Cart.js';
@@ -147,6 +148,17 @@ export class OrderService {
       order.paymentStatus = PaymentStatus.PENDING;
 
       const savedOrder = await queryRunner.manager.save(Order, order);
+
+      // R-8-3-1: Dual-write OrderItem entities
+      // Create relational OrderItem entities alongside JSONB storage
+      try {
+        await this.createOrderItemEntities(queryRunner.manager, savedOrder, request.items);
+        logger.debug(`[R-8-3-1] Created ${request.items.length} OrderItem entities for order ${savedOrder.orderNumber}`);
+      } catch (orderItemError) {
+        // Graceful degradation: Log error but don't fail the entire order
+        // JSONB items remain as source of truth
+        logger.error(`[R-8-3-1] Failed to create OrderItem entities (non-critical):`, orderItemError);
+      }
 
       // Create ORDER_CREATED event
       await this.createOrderEvent(
@@ -1179,6 +1191,63 @@ export class OrderService {
     } catch (error) {
       // Log error but don't throw - notifications are not critical
       logger.error('[PD-7] Error sending order notifications:', error);
+    }
+  }
+
+  /**
+   * R-8-3-1: Create OrderItem entities from JSONB items (Dual-write helper)
+   *
+   * Creates relational OrderItem entities alongside JSONB storage
+   * for better query performance and dashboard aggregations
+   *
+   * @param manager - Transaction manager (ensures atomicity with order creation)
+   * @param order - The saved order entity
+   * @param items - OrderItem interfaces from request (with commission data)
+   */
+  private async createOrderItemEntities(
+    manager: any,
+    order: Order,
+    items: OrderItem[]
+  ): Promise<void> {
+    for (const item of items) {
+      const orderItemEntity = new OrderItemEntity();
+
+      // Order reference
+      orderItemEntity.orderId = order.id;
+
+      // Product information (snapshot)
+      orderItemEntity.productId = item.productId;
+      orderItemEntity.productName = item.productName;
+      orderItemEntity.productSku = item.productSku;
+      orderItemEntity.quantity = item.quantity;
+      orderItemEntity.unitPrice = item.unitPrice;
+      orderItemEntity.totalPrice = item.totalPrice;
+
+      // Supplier information
+      orderItemEntity.supplierId = item.supplierId;
+      orderItemEntity.supplierName = item.supplierName;
+
+      // Seller information
+      orderItemEntity.sellerId = item.sellerId;
+      orderItemEntity.sellerName = item.sellerName;
+      orderItemEntity.sellerProductId = item.sellerProductId;
+
+      // Pricing snapshots (immutable)
+      orderItemEntity.basePriceSnapshot = item.basePriceSnapshot;
+      orderItemEntity.salePriceSnapshot = item.salePriceSnapshot;
+      orderItemEntity.marginAmountSnapshot = item.marginAmountSnapshot;
+
+      // Commission information (immutable, calculated at order creation)
+      orderItemEntity.commissionType = item.commissionType;
+      orderItemEntity.commissionRate = item.commissionRate;
+      orderItemEntity.commissionAmount = item.commissionAmount;
+
+      // Flexible metadata
+      orderItemEntity.attributes = item.attributes;
+      orderItemEntity.notes = item.notes;
+
+      // Save within transaction
+      await manager.save(OrderItemEntity, orderItemEntity);
     }
   }
 }

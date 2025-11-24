@@ -88,6 +88,7 @@ import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
 import { Order } from '../entities/Order.js';
+import { OrderItem } from '../entities/OrderItem.js';
 import { OrderEvent } from '../entities/OrderEvent.js';
 // Wishlist entity (R-6-5)
 import { Wishlist } from '../entities/Wishlist.js';
@@ -257,6 +258,7 @@ export const AppDataSource = new DataSource({
     Cart,
     CartItem,
     Order,
+    OrderItem,
     OrderEvent,
     // Wishlist entity (R-6-5)
     Wishlist,
