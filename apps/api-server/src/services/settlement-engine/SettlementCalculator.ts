@@ -1,21 +1,25 @@
 /**
  * SettlementCalculator
  * R-8-8-2: SettlementEngine v1 - Calculate settlement items from order items
+ * R-8-8-4: Add refund/reversal settlement calculation
  *
  * Purpose:
  * - Converts OrderItem entities into SettlementItem records
  * - Calculates gross, commission, and net amounts for each party
  * - Supports seller, supplier, platform, and partner settlements
+ * - Supports refund/reversal settlements
  *
  * Business Rules:
  * - Seller: gross = totalPrice, commission = calculated, net = gross - commission
  * - Supplier: gross = basePriceSnapshot * quantity, commission = 0, net = gross
  * - Platform: gross = commission from seller, net = gross
  * - Partner: gross = totalPrice, commission = partner share, net = commission
+ * - Refund: All amounts are negated from original settlement
  */
 
 import { OrderItem as OrderItemEntity } from '../../entities/OrderItem.js';
 import { Order } from '../../entities/Order.js';
+import { SettlementItem } from '../../entities/SettlementItem.js';
 import logger from '../../utils/logger.js';
 
 export interface SettlementItemInput {
@@ -239,5 +243,81 @@ export class SettlementCalculator {
     // This will be added when partner commission policy is defined
     logger.debug(`[SettlementCalculator] Partner settlement not yet implemented for order ${orderId}, partner ${partnerId}`);
     return null;
+  }
+
+  /**
+   * R-8-8-4: Calculate reversal settlement items for refund/cancellation
+   * Creates negative settlement items to reverse the original settlements
+   *
+   * @param order - The order being refunded
+   * @param originalItems - Original SettlementItems from order_completed
+   * @returns Array of reversal SettlementItemInputs
+   */
+  calculateReversalForOrder(
+    order: Order,
+    originalItems: SettlementItem[]
+  ): SettlementItemInput[] {
+    logger.debug(`[SettlementCalculator] Creating reversal for ${originalItems.length} original items`);
+
+    const reversalItems: SettlementItemInput[] = [];
+
+    for (const original of originalItems) {
+      const reversalItem = this.createReversalItem(order, original);
+      if (reversalItem) {
+        reversalItems.push(reversalItem);
+      }
+    }
+
+    logger.debug(`[SettlementCalculator] Generated ${reversalItems.length} reversal items for order ${order.id}`);
+    return reversalItems;
+  }
+
+  /**
+   * Create a single reversal settlement item from an original item
+   * All amounts are negated to reverse the original settlement
+   */
+  private createReversalItem(
+    order: Order,
+    original: SettlementItem
+  ): SettlementItemInput | null {
+    const grossAmount = original.grossAmount
+      ? -parseFloat(original.grossAmount.toString())
+      : 0;
+    const commissionAmount = original.commissionAmountSnapshot
+      ? -parseFloat(original.commissionAmountSnapshot.toString())
+      : 0;
+    const netAmount = original.netAmount
+      ? -parseFloat(original.netAmount.toString())
+      : 0;
+
+    return {
+      settlementId: null,
+      orderId: original.orderId,
+      orderItemId: original.orderItemId,
+      partyType: original.partyType!,
+      partyId: original.partyId!,
+      grossAmount,
+      commissionAmount,
+      netAmount,
+      reasonCode: 'refund',
+      metadata: {
+        reversedSettlementItemId: original.id,
+        originalReasonCode: original.reasonCode || 'order_completed',
+        refundedAt: new Date().toISOString(),
+        ...original.metadata,
+      },
+      productName: original.productName,
+      quantity: original.quantity,
+      salePriceSnapshot: parseFloat(original.salePriceSnapshot.toString()),
+      basePriceSnapshot: original.basePriceSnapshot
+        ? parseFloat(original.basePriceSnapshot.toString())
+        : undefined,
+      commissionType: original.commissionType,
+      commissionRate: original.commissionRate
+        ? parseFloat(original.commissionRate.toString())
+        : undefined,
+      sellerId: original.sellerId,
+      supplierId: original.supplierId,
+    };
   }
 }

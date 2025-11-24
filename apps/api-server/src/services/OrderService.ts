@@ -493,6 +493,17 @@ export class OrderService {
       }
     }
 
+    // R-8-8-4: Reverse settlements when order is cancelled or refunded
+    if (status === OrderStatus.CANCELLED || status === OrderStatus.RETURNED) {
+      try {
+        await this.settlementEngine.runOnRefund(orderId);
+        logger.info(`[OrderService] Settlement reversal applied for order ${orderId}`);
+      } catch (error) {
+        // Log error but don't fail the order status update
+        logger.error(`[OrderService] Failed to reverse settlements for order ${orderId}:`, error);
+      }
+    }
+
     return savedOrder;
   }
 

@@ -294,4 +294,146 @@ export class SettlementAggregator {
 
     return item;
   }
+
+  /**
+   * R-8-8-4: Apply reversal settlement items for refund/cancellation
+   * Updates existing settlements by adding negative (reversal) items
+   *
+   * @param order - The order being refunded
+   * @param reversalItems - Reversal SettlementItemInputs with negative amounts
+   */
+  async applyReversalForOrder(
+    order: Order,
+    reversalItems: SettlementItemInput[]
+  ): Promise<Settlement[]> {
+    if (reversalItems.length === 0) {
+      logger.warn('[SettlementAggregator] No reversal items to apply');
+      return [];
+    }
+
+    // Group reversal items by party (partyType + partyId)
+    const groups = this.groupReversalItems(order, reversalItems);
+
+    logger.debug(
+      `[SettlementAggregator] Applying ${reversalItems.length} reversal items across ${groups.length} settlements`
+    );
+
+    const updatedSettlements: Settlement[] = [];
+
+    for (const group of groups) {
+      const settlement = await this.applyReversalToSettlement(group);
+      updatedSettlements.push(settlement);
+    }
+
+    return updatedSettlements;
+  }
+
+  /**
+   * Group reversal items by party and period
+   */
+  private groupReversalItems(
+    order: Order,
+    items: SettlementItemInput[]
+  ): SettlementGroup[] {
+    const groupMap = new Map<string, SettlementGroup>();
+
+    // Calculate period from order date (same as original settlement)
+    const { periodStart, periodEnd } = this.calculatePeriod(order.orderDate);
+
+    for (const item of items) {
+      const key = `${item.partyType}:${item.partyId}:${periodStart.toISOString()}`;
+
+      if (!groupMap.has(key)) {
+        groupMap.set(key, {
+          partyType: item.partyType,
+          partyId: item.partyId,
+          periodStart,
+          periodEnd,
+          items: [],
+        });
+      }
+
+      groupMap.get(key)!.items.push(item);
+    }
+
+    return Array.from(groupMap.values());
+  }
+
+  /**
+   * Apply reversal items to existing settlement
+   * If settlement doesn't exist, create a new one
+   */
+  private async applyReversalToSettlement(group: SettlementGroup): Promise<Settlement> {
+    // Try to find existing settlement for this party and period
+    const existing = await this.settlementRepository.findOne({
+      where: {
+        partyType: group.partyType,
+        partyId: group.partyId,
+        periodStart: group.periodStart,
+        periodEnd: group.periodEnd,
+      },
+      relations: ['items'],
+    });
+
+    if (existing) {
+      logger.debug(
+        `[SettlementAggregator] Applying reversal to existing settlement ${existing.id} for ${group.partyType}:${group.partyId}`
+      );
+      return await this.updateSettlementWithReversal(existing, group.items);
+    } else {
+      // If no existing settlement, create a new one with reversal items
+      // This can happen if the order was completed in a previous period
+      logger.debug(
+        `[SettlementAggregator] Creating new settlement for reversal ${group.partyType}:${group.partyId}`
+      );
+      return await this.createSettlement(group);
+    }
+  }
+
+  /**
+   * Update existing settlement with reversal items
+   * Adds reversal items and recalculates totals
+   */
+  private async updateSettlementWithReversal(
+    settlement: Settlement,
+    reversalItems: SettlementItemInput[]
+  ): Promise<Settlement> {
+    // Create reversal settlement items
+    const settlementItems = reversalItems.map((item) => {
+      return this.createSettlementItem(settlement.id, item);
+    });
+
+    await this.settlementItemRepository.save(settlementItems);
+
+    // Update settlement totals by adding reversal amounts (which are negative)
+    for (const item of reversalItems) {
+      const currentPayable = parseFloat(settlement.payableAmount.toString());
+      const currentCommission = parseFloat(settlement.totalCommissionAmount.toString());
+
+      settlement.payableAmount = (currentPayable + item.netAmount).toFixed(2);
+      settlement.totalCommissionAmount = (currentCommission + item.commissionAmount).toFixed(2);
+
+      // Update party-specific amounts
+      if (settlement.partyType === 'seller') {
+        const currentSale = parseFloat(settlement.totalSaleAmount.toString());
+        const currentMargin = parseFloat(settlement.totalMarginAmount.toString());
+        settlement.totalSaleAmount = (currentSale + item.grossAmount).toFixed(2);
+        settlement.totalMarginAmount = (currentMargin + item.netAmount).toFixed(2);
+      } else if (settlement.partyType === 'supplier') {
+        const currentBase = parseFloat(settlement.totalBaseAmount.toString());
+        settlement.totalBaseAmount = (currentBase + item.grossAmount).toFixed(2);
+      } else if (settlement.partyType === 'platform') {
+        // Platform's commission is already updated above
+      }
+    }
+
+    // Save updated settlement
+    const updatedSettlement = await this.settlementRepository.save(settlement);
+
+    logger.info(
+      `[SettlementAggregator] Applied ${reversalItems.length} reversal items to settlement ${settlement.id}`
+    );
+
+    return updatedSettlement;
+  }
 }
