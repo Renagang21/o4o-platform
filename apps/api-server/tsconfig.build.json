@@ -23,6 +23,8 @@
     "src/modules/cpt-acf/**/*",
     "scripts/ai-admin-cli.ts",
     "scripts/seed-roles-permissions.ts",
-    "src/scripts/**/*"
+    "src/scripts/**/*",
+    "src/database/backfill-*.ts",
+    "src/database/check-*.ts"
   ]
 }
