@@ -8,9 +8,11 @@
 import AppDataSource from '../database/data-source.js';
 import { ChannelOrderLink, ChannelOrderStatus } from '../entities/ChannelOrderLink.js';
 import { Order, type OrderItem } from '../entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { channelConnectorRegistry } from '../channels/index.js';
 import { channelManagementService } from './ChannelManagementService.js';
 import type { ExternalOrder } from '../channels/IChannelConnector.js';
+import { OrderService } from './OrderService.js';
 
 export interface ImportOrdersDto {
   sellerId: string;
@@ -35,6 +37,8 @@ export interface ImportOrdersResult {
 export class ChannelOrderService {
   private linkRepository = AppDataSource.getRepository(ChannelOrderLink);
   private orderRepository = AppDataSource.getRepository(Order);
+  private orderItemRepository = AppDataSource.getRepository(OrderItemEntity);
+  private orderService = new OrderService();
 
   /**
    * Import orders from channel
@@ -123,9 +127,11 @@ export class ChannelOrderService {
 
   /**
    * Create internal order from external order data
+   *
+   * R-8-6: Use OrderService to create order with OrderItem entities
    */
   private async createInternalOrder(sellerId: string, externalOrder: ExternalOrder): Promise<Order> {
-    // Map external items to OrderItem format
+    // Map external items to OrderItem interface format
     const orderItems: OrderItem[] = externalOrder.items.map(item => ({
       id: crypto.randomUUID(),
       productId: '', // No product mapping yet
@@ -142,26 +148,14 @@ export class ChannelOrderService {
       attributes: item.options,
     }));
 
-    // Generate order number
-    const orderNumber = this.generateOrderNumber();
-
-    // Create main order with items
-    const order = this.orderRepository.create({
-      orderNumber,
-      buyerId: sellerId, // Temp: map to seller
-      buyerName: externalOrder.buyerName,
-      buyerEmail: externalOrder.buyerEmail,
+    // R-8-6: Use OrderService.createOrder() which handles OrderItem entity creation
+    const order = await this.orderService.createOrder(sellerId, {
       items: orderItems,
-      summary: externalOrder.summary,
       billingAddress: externalOrder.shippingAddress,
       shippingAddress: externalOrder.shippingAddress,
       paymentMethod: this.mapPaymentMethod(externalOrder.paymentMethod),
-      paymentStatus: this.mapPaymentStatus(externalOrder.paymentStatus),
-      status: 'PENDING' as any,
-      orderDate: externalOrder.externalOrderDate,
+      notes: `Imported from channel: ${externalOrder.externalOrderId}`,
     });
-
-    await this.orderRepository.save(order);
 
     return order;
   }

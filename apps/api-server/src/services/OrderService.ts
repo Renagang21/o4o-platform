@@ -137,7 +137,7 @@ export class OrderService {
       order.buyerType = buyer.role;
       order.buyerName = buyer.name;
       order.buyerEmail = buyer.email;
-      order.items = request.items;
+      // R-8-6: JSONB items field removed - items now stored only in OrderItem entities
       order.summary = summary;
       order.billingAddress = request.billingAddress;
       order.shippingAddress = request.shippingAddress;
@@ -149,16 +149,9 @@ export class OrderService {
 
       const savedOrder = await queryRunner.manager.save(Order, order);
 
-      // R-8-3-1: Dual-write OrderItem entities
-      // Create relational OrderItem entities alongside JSONB storage
-      try {
-        await this.createOrderItemEntities(queryRunner.manager, savedOrder, request.items);
-        logger.debug(`[R-8-3-1] Created ${request.items.length} OrderItem entities for order ${savedOrder.orderNumber}`);
-      } catch (orderItemError) {
-        // Graceful degradation: Log error but don't fail the entire order
-        // JSONB items remain as source of truth
-        logger.error(`[R-8-3-1] Failed to create OrderItem entities (non-critical):`, orderItemError);
-      }
+      // R-8-6: Create OrderItem entities (single source of truth)
+      await this.createOrderItemEntities(queryRunner.manager, savedOrder, request.items);
+      logger.debug(`[R-8-6] Created ${request.items.length} OrderItem entities for order ${savedOrder.orderNumber}`);
 
       // Create ORDER_CREATED event
       await this.createOrderEvent(
@@ -385,7 +378,11 @@ export class OrderService {
       source?: string;
     }
   ): Promise<Order> {
-    const order = await this.orderRepository.findOne({ where: { id: orderId } });
+    // R-8-6: Load order with itemsRelation for seller notifications
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['itemsRelation']
+    });
 
     if (!order) {
       throw new Error('Order not found');
@@ -455,13 +452,15 @@ export class OrderService {
         channel: 'in_app',
       }).catch(err => logger.error('Failed to send order status notification to buyer:', err));
 
-      // Notify sellers (unique list)
+      // R-8-6: Notify sellers (from OrderItem entities)
       const sellerIds = new Set<string>();
-      order.items.forEach(item => {
-        if (item.sellerId) {
-          sellerIds.add(item.sellerId);
-        }
-      });
+      if (order.itemsRelation) {
+        order.itemsRelation.forEach(item => {
+          if (item.sellerId) {
+            sellerIds.add(item.sellerId);
+          }
+        });
+      }
 
       for (const sellerId of sellerIds) {
         await notificationService.createNotification({
@@ -639,6 +638,8 @@ export class OrderService {
 
   /**
    * Create partner commissions for order (문서 #66: 주문 완료 시 커미션 생성)
+   *
+   * R-8-6: Load order items from OrderItem entities
    */
   async createPartnerCommissions(order: Order, referralCode?: string): Promise<PartnerCommission[]> {
     if (!referralCode) {
@@ -657,10 +658,23 @@ export class OrderService {
         return [];
       }
 
+      // R-8-6: Load order with items if not already loaded
+      if (!order.itemsRelation) {
+        const orderWithItems = await this.orderRepository.findOne({
+          where: { id: order.id },
+          relations: ['itemsRelation']
+        });
+        if (!orderWithItems || !orderWithItems.itemsRelation) {
+          logger.warn(`No order items found for order ${order.id}`);
+          return [];
+        }
+        order.itemsRelation = orderWithItems.itemsRelation;
+      }
+
       const commissions: PartnerCommission[] = [];
 
-      // 각 주문 항목에 대해 커미션 생성
-      for (const item of order.items) {
+      // 각 주문 항목에 대해 커미션 생성 (from OrderItem entities)
+      for (const item of order.itemsRelation) {
         // 제품 정보 조회
         const product = await this.productRepository.findOne({
           where: { id: item.productId }
@@ -819,16 +833,17 @@ export class OrderService {
   /**
    * Phase PD-4: Get orders for a specific seller
    * Returns only orders where the seller sold products
+   *
+   * R-8-6: Use JOIN on OrderItem entity instead of JSONB query
    */
   async getOrdersForSeller(sellerId: string, filters: OrderFilters = {}): Promise<{ orders: Order[], total: number }> {
     try {
-      // Get all orders that contain items from this seller
+      // R-8-6: Get all orders that contain items from this seller (via OrderItem entity)
       const query = this.orderRepository.createQueryBuilder('order')
         .leftJoinAndSelect('order.buyer', 'buyer')
-        .where(`EXISTS (
-          SELECT 1 FROM jsonb_array_elements(order.items) AS item
-          WHERE item->>'sellerId' = :sellerId
-        )`, { sellerId });
+        .innerJoin('order.itemsRelation', 'orderItem')
+        .where('orderItem.sellerId = :sellerId', { sellerId })
+        .distinct(true); // Avoid duplicates when order has multiple items from same seller
 
       // Apply filters (same as getOrders)
       if (filters.status) {
@@ -892,16 +907,17 @@ export class OrderService {
   /**
    * Phase PD-4: Get orders for a specific supplier
    * Returns only orders where the supplier's products were purchased
+   *
+   * R-8-6: Use JOIN on OrderItem entity instead of JSONB query
    */
   async getOrdersForSupplier(supplierId: string, filters: OrderFilters = {}): Promise<{ orders: Order[], total: number }> {
     try {
-      // Get all orders that contain products from this supplier
+      // R-8-6: Get all orders that contain products from this supplier (via OrderItem entity)
       const query = this.orderRepository.createQueryBuilder('order')
         .leftJoinAndSelect('order.buyer', 'buyer')
-        .where(`EXISTS (
-          SELECT 1 FROM jsonb_array_elements(order.items) AS item
-          WHERE item->>'supplierId' = :supplierId
-        )`, { supplierId });
+        .innerJoin('order.itemsRelation', 'orderItem')
+        .where('orderItem.supplierId = :supplierId', { supplierId })
+        .distinct(true); // Avoid duplicates when order has multiple items from same supplier
 
       // Apply filters
       if (filters.status) {
@@ -1118,14 +1134,29 @@ export class OrderService {
   /**
    * Send order.new notifications (Phase PD-7)
    * Notifies sellers and suppliers when a new order is created
+   *
+   * R-8-6: Load order items from OrderItem entities
    */
   private async sendOrderNotifications(order: Order): Promise<void> {
     try {
+      // R-8-6: Load order with items if not already loaded
+      if (!order.itemsRelation) {
+        const orderWithItems = await this.orderRepository.findOne({
+          where: { id: order.id },
+          relations: ['itemsRelation']
+        });
+        if (!orderWithItems || !orderWithItems.itemsRelation) {
+          logger.warn(`[PD-7] No order items found for order ${order.id}`);
+          return;
+        }
+        order.itemsRelation = orderWithItems.itemsRelation;
+      }
+
       // Collect unique seller and supplier IDs
       const sellerIds = new Set<string>();
       const supplierIds = new Set<string>();
 
-      for (const item of order.items) {
+      for (const item of order.itemsRelation) {
         if (item.sellerId) {
           sellerIds.add(item.sellerId);
         }
@@ -1136,7 +1167,7 @@ export class OrderService {
 
       // Send notifications to sellers
       for (const sellerId of sellerIds) {
-        const sellerItems = order.items.filter(item => item.sellerId === sellerId);
+        const sellerItems = order.itemsRelation.filter(item => item.sellerId === sellerId);
         const itemCount = sellerItems.reduce((sum, item) => sum + item.quantity, 0);
         const totalAmount = sellerItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
@@ -1164,7 +1195,7 @@ export class OrderService {
 
       // Send notifications to suppliers
       for (const supplierId of supplierIds) {
-        const supplierItems = order.items.filter(item => item.supplierId === supplierId);
+        const supplierItems = order.itemsRelation.filter(item => item.supplierId === supplierId);
         const itemCount = supplierItems.reduce((sum, item) => sum + item.quantity, 0);
         const supplierAmount = supplierItems.reduce((sum, item) => {
           return sum + (item.basePriceSnapshot || item.unitPrice) * item.quantity;

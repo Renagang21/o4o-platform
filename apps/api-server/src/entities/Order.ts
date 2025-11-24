@@ -107,20 +107,13 @@ export class Order {
   @Column({ type: 'varchar', nullable: true })
   buyerGrade: string; // RetailerGrade
 
-  // Order items (stored as JSON for simplicity)
-  @Column('jsonb')
-  items: OrderItem[];
-
   /**
-   * R-8-3-1: OrderItem Normalization
-   * Relational order items (new entity-based storage)
+   * R-8-6: OrderItem - Single Source of Truth
    *
-   * Dual-write strategy:
-   * - items (JSONB): Primary source of truth (backward compatibility)
-   * - itemsRelation (Entity): New relational storage for efficient queries
+   * Order items are now ONLY stored in the OrderItem entity (relational storage).
+   * The legacy JSONB `items` field has been removed.
    *
-   * Dashboard services will gradually migrate to use itemsRelation
-   * for better query performance (JOIN instead of JSONB parsing)
+   * All services must use this relation to access order items.
    */
   @OneToMany('OrderItem', 'order', {
     cascade: false,
@@ -275,7 +268,13 @@ export class Order {
   }
 }
 
-// OrderItem interface (stored as JSON in Order.items)
+/**
+ * OrderItem interface
+ *
+ * R-8-6: This interface is kept for type compatibility.
+ * Data is now stored in OrderItem entity, not in JSONB.
+ * Use this interface when working with order item data structures.
+ */
 export interface OrderItem {
   id: string;
   productId: string;

@@ -63,6 +63,8 @@ export class SettlementManagementService {
   /**
    * Calculate settlement preview for a party and period
    * Does NOT create settlement record, just calculates what it would be
+   *
+   * R-8-6: Load orders with itemsRelation
    */
   async calculateSettlementPreview(
     partyType: SettlementPartyType,
@@ -70,12 +72,13 @@ export class SettlementManagementService {
     periodStart: Date,
     periodEnd: Date
   ): Promise<SettlementPreview> {
-    // Fetch orders in the period that have been delivered (settleable)
+    // R-8-6: Fetch orders in the period that have been delivered (with itemsRelation loaded)
     const orders = await this.orderRepo.find({
       where: {
         status: In([OrderStatus.DELIVERED]),
         createdAt: Between(periodStart, periodEnd),
       },
+      relations: ['itemsRelation'],
     });
 
     // Filter orders and items relevant to this party
@@ -91,7 +94,9 @@ export class SettlementManagementService {
     for (const order of orders) {
       let hasRelevantItems = false;
 
-      for (const item of order.items) {
+      // R-8-6: Use itemsRelation instead of items
+      const orderItems = order.itemsRelation || [];
+      for (const item of orderItems) {
         // Check if item belongs to this party
         let isRelevant = false;
 
@@ -220,18 +225,21 @@ export class SettlementManagementService {
 
     await this.settlementRepo.save(settlement);
 
-    // Create SettlementItem records
+    // R-8-6: Create SettlementItem records (load orders with itemsRelation)
     const orders = await this.orderRepo.find({
       where: {
         status: In([OrderStatus.DELIVERED]),
         createdAt: Between(periodStart, periodEnd),
       },
+      relations: ['itemsRelation'],
     });
 
     const settlementItems: SettlementItem[] = [];
 
     for (const order of orders) {
-      for (const item of order.items) {
+      // R-8-6: Use itemsRelation instead of items
+      const orderItems = order.itemsRelation || [];
+      for (const item of orderItems) {
         // Check if item belongs to this party
         let isRelevant = false;
 
@@ -532,6 +540,8 @@ export class SettlementManagementService {
   /**
    * Batch create settlements for all parties in a period
    * Used by admin to run monthly settlements
+   *
+   * R-8-6: Load orders with itemsRelation
    */
   async batchCreateSettlements(
     periodStart: Date,
@@ -543,12 +553,13 @@ export class SettlementManagementService {
     const created: Settlement[] = [];
     const errors: { partyId: string; error: string }[] = [];
 
-    // Get all orders in period
+    // R-8-6: Get all orders in period (with itemsRelation loaded)
     const orders = await this.orderRepo.find({
       where: {
         status: In([OrderStatus.DELIVERED]),
         createdAt: Between(periodStart, periodEnd),
       },
+      relations: ['itemsRelation'],
     });
 
     // Collect unique party IDs
@@ -556,7 +567,9 @@ export class SettlementManagementService {
     const supplierIds = new Set<string>();
 
     for (const order of orders) {
-      for (const item of order.items) {
+      // R-8-6: Use itemsRelation instead of items
+      const orderItems = order.itemsRelation || [];
+      for (const item of orderItems) {
         if (item.sellerId) {
           sellerIds.add(item.sellerId);
         }

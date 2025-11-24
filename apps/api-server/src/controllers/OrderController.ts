@@ -3,6 +3,7 @@ import { OrderService, CreateOrderRequest, CreateOrderFromCartRequest, OrderFilt
 import { OrderStatus, PaymentStatus } from '../entities/Order.js';
 import { validationResult } from 'express-validator';
 import logger from '../utils/logger.js';
+import { getOrderItems } from '../services/helpers/order-item.mapper.js';
 
 export class OrderController {
   private orderService: OrderService;
@@ -351,6 +352,8 @@ export class OrderController {
   /**
    * POST /api/orders/:id/reorder
    * Create new order based on existing order
+   *
+   * R-8-6: Load order with itemsRelation and use mapper
    */
   reorder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -362,12 +365,29 @@ export class OrderController {
         return;
       }
 
-      // Get original order
-      const originalOrder = await this.orderService.getOrderById(id, userId);
+      // R-8-6: Get original order with itemsRelation loaded
+      const originalOrder = await this.orderService['orderRepository'].findOne({
+        where: { id },
+        relations: ['itemsRelation']
+      });
+
+      if (!originalOrder) {
+        res.status(404).json({ success: false, message: 'Order not found' });
+        return;
+      }
+
+      // Verify ownership for non-admin users
+      if (req.user?.role !== 'admin' && originalOrder.buyerId !== userId) {
+        res.status(403).json({ success: false, message: 'Forbidden' });
+        return;
+      }
+
+      // R-8-6: Convert OrderItem entities to OrderItem interfaces using mapper
+      const orderItems = getOrderItems(originalOrder);
 
       // Create new order with same items and addresses
       const newOrderRequest: CreateOrderRequest = {
-        items: originalOrder.items,
+        items: orderItems,
         billingAddress: originalOrder.billingAddress,
         shippingAddress: originalOrder.shippingAddress,
         paymentMethod: originalOrder.paymentMethod,
@@ -491,6 +511,8 @@ export class OrderController {
   /**
    * GET /api/orders/:id/invoice
    * Download order invoice
+   *
+   * R-8-6: Load order with itemsRelation and use mapper
    */
   downloadInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -502,14 +524,30 @@ export class OrderController {
         return;
       }
 
-      const buyerId = req.user?.role === 'admin' ? undefined : userId;
-      const order = await this.orderService.getOrderById(id, buyerId);
+      // R-8-6: Load order with itemsRelation
+      const whereClause: any = { id };
+      if (req.user?.role !== 'admin') {
+        whereClause.buyerId = userId;
+      }
+
+      const order = await this.orderService['orderRepository'].findOne({
+        where: whereClause,
+        relations: ['itemsRelation']
+      });
+
+      if (!order) {
+        res.status(404).json({ success: false, message: 'Order not found' });
+        return;
+      }
+
+      // R-8-6: Convert OrderItem entities to OrderItem interfaces using mapper
+      const orderItems = getOrderItems(order);
 
       // TODO: Generate PDF invoice
       // For now, return order data as JSON
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Content-Disposition', `attachment; filename="invoice-${order.orderNumber}.json"`);
-      
+
       res.json({
         invoice: {
           orderNumber: order.orderNumber,
@@ -518,7 +556,7 @@ export class OrderController {
             name: order.buyerName,
             email: order.buyerEmail
           },
-          items: order.items,
+          items: orderItems,
           summary: order.summary,
           billingAddress: order.billingAddress
         }

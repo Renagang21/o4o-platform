@@ -533,6 +533,8 @@ export class PaymentService {
 
   /**
    * 정산 생성
+   *
+   * R-8-6: Load order with itemsRelation
    */
   private async createSettlements(paymentId: string): Promise<void> {
     const queryRunner = AppDataSource.createQueryRunner();
@@ -540,10 +542,10 @@ export class PaymentService {
     await queryRunner.startTransaction();
 
     try {
-      // Payment 조회
+      // R-8-6: Payment 조회 (order와 order.itemsRelation 로드)
       const payment = await this.paymentRepository.findOne({
         where: { id: paymentId },
-        relations: ['order']
+        relations: ['order', 'order.itemsRelation']
       });
 
       if (!payment || !payment.order) {
@@ -584,13 +586,15 @@ export class PaymentService {
 
   /**
    * 공급자별 정산 계산
+   *
+   * R-8-6: Use itemsRelation instead of JSONB items
    */
   private calculateSupplierSettlements(order: any, payment: Payment): PaymentSettlement[] {
     const settlements: PaymentSettlement[] = [];
     const supplierMap = new Map<string, { totalAmount: number; name: string }>();
 
-    // OrderItem에서 공급자별 금액 집계
-    order.items?.forEach((item: any) => {
+    // R-8-6: OrderItem 엔티티에서 공급자별 금액 집계
+    order.itemsRelation?.forEach((item: any) => {
       const supplierId = item.supplierId;
       const supplierName = item.supplierName;
       const amount = item.unitPrice * item.quantity; // 공급가 기준

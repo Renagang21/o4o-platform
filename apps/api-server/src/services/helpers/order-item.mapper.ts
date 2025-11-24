@@ -1,12 +1,12 @@
 /**
- * R-8-3-3: Order Item Mapper
+ * R-8-6: Order Item Mapper (OrderItem Entity Only)
  *
- * Common helper functions for OrderItem-based data access with JSONB fallback
+ * Helper functions for OrderItem-based data access
  *
  * Strategy:
- * 1. Prefer OrderItem entities (order.itemsRelation)
- * 2. Fallback to JSONB (order.items) for legacy orders
- * 3. Maintain 100% backward compatibility
+ * - All order items are accessed via OrderItem entities (order.itemsRelation)
+ * - JSONB fallback has been removed (R-8-6 migration)
+ * - Maintains consistent interface for backward compatibility
  */
 
 import type { Order, OrderItem as OrderItemInterface } from '../../entities/Order.js';
@@ -15,16 +15,13 @@ import type { OrderItem as OrderItemEntity } from '../../entities/OrderItem.js';
 /**
  * Customer-facing order item DTO
  * Used in CustomerOrderService for list and detail views
- *
- * Note: productSku and productImage are required in CustomerOrderDetailDto
- * but may be empty strings when using OrderItem entities (not stored)
  */
 export interface CustomerOrderItemDto {
   id: string;
   productId: string;
   productName: string;
-  productSku: string; // R-8-3-3: Required (empty string fallback)
-  productImage: string; // R-8-3-3: Required (empty string fallback)
+  productSku: string;
+  productImage: string;
   productBrand?: string;
   variationName?: string;
   quantity: number;
@@ -35,27 +32,26 @@ export interface CustomerOrderItemDto {
 }
 
 /**
- * Get order items with OrderItem-first, JSONB-fallback strategy
+ * Get order items from OrderItem entities
  *
- * @param order - Order entity (with or without itemsRelation loaded)
- * @returns Array of items from OrderItem entities or JSONB
+ * @param order - Order entity (must have itemsRelation loaded)
+ * @returns Array of items from OrderItem entities
  */
 export function getOrderItems(order: Order): OrderItemInterface[] {
-  // Strategy 1: Use OrderItem entities if available
-  if (order.itemsRelation && order.itemsRelation.length > 0) {
-    return order.itemsRelation.map(entityToInterface);
+  // Return items from OrderItem entities
+  if (!order.itemsRelation || order.itemsRelation.length === 0) {
+    return [];
   }
 
-  // Strategy 2: Fallback to JSONB
-  return order.items || [];
+  return order.itemsRelation.map(entityToInterface);
 }
 
 /**
- * Convert OrderItem entity to legacy JSONB interface format
- * Used for backward compatibility
+ * Convert OrderItem entity to interface format
  *
- * R-8-4: Updated to include presentation fields (productImage, productBrand, variationName)
- * These fields are now stored in OrderItem entity after R-8-4 migration
+ * R-8-4: Includes presentation fields (productImage, productBrand, variationName)
+ * R-8-5: Presentation field normalization applied
+ * R-8-6: Only source is OrderItem entity (JSONB removed)
  */
 function entityToInterface(entity: OrderItemEntity): OrderItemInterface {
   return {
@@ -63,9 +59,9 @@ function entityToInterface(entity: OrderItemEntity): OrderItemInterface {
     productId: entity.productId,
     productName: entity.productName,
     productSku: entity.productSku,
-    productImage: entity.productImage, // R-8-4: Now stored in entity
-    productBrand: entity.productBrand, // R-8-4: Now stored in entity
-    variationName: entity.variationName, // R-8-4: Now stored in entity
+    productImage: entity.productImage,
+    productBrand: entity.productBrand,
+    variationName: entity.variationName,
     quantity: entity.quantity,
     unitPrice: entity.unitPrice,
     totalPrice: entity.totalPrice,
@@ -87,14 +83,12 @@ function entityToInterface(entity: OrderItemEntity): OrderItemInterface {
 
 /**
  * Map order items to customer-facing DTO
- * Supports both OrderItem entities and JSONB items
  *
  * R-8-5: Presentation field normalization rules:
  * - Required fields (productSku, productImage): Fallback to '' (empty string)
  * - Optional fields (productBrand, variationName): Preserved as-is (undefined allowed)
- * - All presentation fields should be consistent across JSONB and OrderItem entity
  *
- * @param order - Order entity
+ * @param order - Order entity (must have itemsRelation loaded)
  * @returns Array of CustomerOrderItemDto
  */
 export function mapOrderItemsForCustomer(order: Order): CustomerOrderItemDto[] {
@@ -120,9 +114,8 @@ export function mapOrderItemsForCustomer(order: Order): CustomerOrderItemDto[] {
 
 /**
  * Calculate total item count from order
- * Supports both OrderItem entities and JSONB items
  *
- * @param order - Order entity
+ * @param order - Order entity (must have itemsRelation loaded)
  * @returns Total quantity of all items
  */
 export function getOrderItemCount(order: Order): number {
@@ -132,9 +125,8 @@ export function getOrderItemCount(order: Order): number {
 
 /**
  * Get first item from order (for list view representative item)
- * Supports both OrderItem entities and JSONB items
  *
- * @param order - Order entity
+ * @param order - Order entity (must have itemsRelation loaded)
  * @returns First item or undefined
  */
 export function getFirstOrderItem(order: Order): OrderItemInterface | undefined {

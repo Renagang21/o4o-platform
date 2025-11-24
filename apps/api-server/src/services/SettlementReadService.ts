@@ -15,7 +15,8 @@
 
 import { Repository, Between, In } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
-import { Order, OrderStatus, PaymentStatus, OrderItem } from '../entities/Order.js';
+import { Order, OrderStatus, PaymentStatus } from '../entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { Settlement, SettlementStatus } from '../entities/Settlement.js';
 import logger from '../utils/logger.js';
 
@@ -83,6 +84,8 @@ export class SettlementReadService {
   /**
    * Get commission summary for a seller
    * Consolidates logic from SellerDashboardService.getCommissionDetailsForSeller()
+   *
+   * R-8-6: Load orders with itemsRelation
    */
   async getSellerCommissionSummary(
     sellerId: string,
@@ -101,10 +104,11 @@ export class SettlementReadService {
         );
       }
 
-      // Fetch completed orders
+      // R-8-6: Fetch completed orders (with itemsRelation loaded)
       const orders = await this.orderRepository.find({
         where,
-        order: { orderDate: 'DESC' }
+        order: { orderDate: 'DESC' },
+        relations: ['itemsRelation']
       });
 
       // Process orders with seller's items
@@ -115,8 +119,10 @@ export class SettlementReadService {
       let totalItems = 0;
 
       for (const order of orders) {
-        const sellerItems = order.items.filter(
-          (item: OrderItem) => item.sellerId === sellerId
+        // R-8-6: Use itemsRelation instead of items
+        const orderItems = order.itemsRelation || [];
+        const sellerItems = orderItems.filter(
+          (item: OrderItemEntity) => item.sellerId === sellerId
         );
 
         if (sellerItems.length > 0) {
@@ -186,6 +192,8 @@ export class SettlementReadService {
   /**
    * Get revenue/commission summary for a supplier
    * Consolidates logic from SupplierDashboardService.getRevenueDetailsForSupplier()
+   *
+   * R-8-6: Load orders with itemsRelation
    */
   async getSupplierCommissionSummary(
     supplierId: string,
@@ -204,10 +212,11 @@ export class SettlementReadService {
         );
       }
 
-      // Fetch completed orders
+      // R-8-6: Fetch completed orders (with itemsRelation loaded)
       const orders = await this.orderRepository.find({
         where,
-        order: { orderDate: 'DESC' }
+        order: { orderDate: 'DESC' },
+        relations: ['itemsRelation']
       });
 
       // Process orders with supplier's items
@@ -218,8 +227,10 @@ export class SettlementReadService {
       let totalItems = 0;
 
       for (const order of orders) {
-        const supplierItems = order.items.filter(
-          (item: OrderItem) => item.supplierId === supplierId
+        // R-8-6: Use itemsRelation instead of items
+        const orderItems = order.itemsRelation || [];
+        const supplierItems = orderItems.filter(
+          (item: OrderItemEntity) => item.supplierId === supplierId
         );
 
         if (supplierItems.length > 0) {
