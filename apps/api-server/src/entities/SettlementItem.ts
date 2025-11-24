@@ -91,6 +91,25 @@ export class SettlementItem {
   @Column({ type: 'uuid', nullable: true })
   supplierId?: string;
 
+  // R-8-8-2: SettlementEngine v1 fields
+  // Party information for settlement aggregation
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  partyType?: 'seller' | 'supplier' | 'platform' | 'partner';
+
+  @Column({ type: 'uuid', nullable: true })
+  partyId?: string;
+
+  // Settlement amounts
+  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  grossAmount?: string; // Total amount before commission
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  netAmount?: string; // Amount after commission deduction
+
+  // Reason for settlement item creation
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  reasonCode?: string; // e.g., 'order_completed', 'refund', 'adjustment'
+
   // Additional metadata
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
