@@ -16,7 +16,7 @@
     "clean": "rimraf dist",
     "clean:all": "pnpm run clean && rimraf node_modules",
     "clean:dist": "rimraf dist",
-    "create-admin": "npx ts-node ../../scripts/create-admin.ts",
+    "create-admin": "npx tsx src/scripts/create-admin-user.ts",
     "create-test-users": "npx ts-node src/scripts/create-test-users.ts",
     "ai:admin": "npx ts-node scripts/ai-admin-cli.ts",
     "db:logs": "sudo journalctl -u postgresql -f",
