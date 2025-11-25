@@ -5,7 +5,9 @@ export interface User {
   id: string | number;  // Support both string and number IDs
   email: string;
   name?: string;
-  role?: string;  // Optional to match auth-client User type
+  role?: string;  // Legacy single role (optional to match auth-client User type)
+  roles?: string[];  // Multiple roles support (from User entity)
+  currentRole?: string;  // Active role for role switching
   isApproved?: boolean;
   permissions?: string[];
   createdAt?: Date;

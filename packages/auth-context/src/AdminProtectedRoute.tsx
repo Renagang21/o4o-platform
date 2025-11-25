@@ -125,10 +125,21 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
 
   // 역할 기반 접근 제어
   if (requiredRoles.length > 0) {
+    // Check both user.role (single) and user.roles (array) for backward compatibility
     const userRole = user.role;
-    const hasRequiredRole = userRole ? requiredRoles.includes(userRole) : false;
+    const userRoles = (user as any).roles || []; // roles array from User entity
+
+    const hasRequiredRole =
+      (userRole && requiredRoles.includes(userRole)) ||
+      (Array.isArray(userRoles) && userRoles.some(r => requiredRoles.includes(r)));
 
     if (!hasRequiredRole) {
+      console.warn('[AdminProtectedRoute] Access denied:', {
+        requiredRoles,
+        userRole,
+        userRoles,
+        userId: user.id
+      });
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
   }
@@ -137,9 +148,20 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   if (requiredPermissions.length > 0) {
     // 향후 확장을 위한 구조 유지
     // 현재는 admin 역할이면 모든 권한을 가진 것으로 간주
-    const isAdmin = user.role === 'admin';
-    
+    const userRole = user.role;
+    const userRoles = (user as any).roles || [];
+    const isAdmin =
+      userRole === 'admin' ||
+      userRole === 'administrator' ||
+      (Array.isArray(userRoles) && (userRoles.includes('admin') || userRoles.includes('administrator')));
+
     if (!isAdmin) {
+      console.warn('[AdminProtectedRoute] Insufficient permissions:', {
+        requiredPermissions,
+        userRole,
+        userRoles,
+        userId: user.id
+      });
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
   }
