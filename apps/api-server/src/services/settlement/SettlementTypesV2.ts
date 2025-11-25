@@ -47,8 +47,19 @@ export interface SettlementPartyContext {
 }
 
 /**
+ * Commission tier definition
+ * Phase C-4: Defines a single tier in tiered commission structure
+ */
+export interface CommissionTier {
+  minAmount: number;      // Minimum amount (inclusive)
+  maxAmount?: number;     // Maximum amount (exclusive), undefined = no upper bound
+  percentageRate: number; // Commission rate for this tier (e.g., 5 for 5%)
+}
+
+/**
  * Commission rule definition
  * Defines how commission is calculated for specific conditions
+ * Phase C-4: Added tiered commission support
  */
 export interface CommissionRule {
   id: string;
@@ -72,8 +83,8 @@ export interface CommissionRule {
   // For fixed type
   fixedAmount?: number;       // e.g., 1000 for ₩1,000
 
-  // For tiered type (future extension)
-  // tieredRates?: Array<{ minAmount: number; maxAmount: number; rate: number }>;
+  // For tiered type (Phase C-4)
+  tiers?: CommissionTier[];   // Array of tiers, applied based on gross amount
 }
 
 /**
@@ -97,6 +108,7 @@ export interface CommissionRuleSet {
 /**
  * SettlementEngine v2 configuration
  * Complete configuration for running v2 settlement engine
+ * Phase C-4: Added duplicate prevention and comparison options
  */
 export interface SettlementV2Config {
   // Settlement period
@@ -113,11 +125,42 @@ export interface SettlementV2Config {
   dryRun?: boolean;                 // If true, don't persist to DB
   logLevel?: 'none' | 'summary' | 'verbose';
   tag?: string;                     // Execution tag (e.g., 'v2-shadow-run-2025Q1')
+
+  // Phase C-4: Duplicate prevention
+  preventDuplicates?: boolean;      // If true, throw error if v1/v2 settlements already exist
+
+  // Phase C-4: Shadow-run comparison
+  compareWithV1?: boolean;          // If true, include v1 vs v2 diff in diagnostics
+}
+
+/**
+ * Settlement difference summary for v1 vs v2 comparison
+ * Phase C-4: Shadow-run comparison result
+ */
+export interface SettlementDiffSummary {
+  partyKey: string;         // 'seller:123', 'partner:456', etc.
+  v1Amount: string;         // v1 settlement payable amount
+  v2Amount: string;         // v2 settlement payable amount
+  difference: string;       // v2 - v1
+  diffPercentage: number;   // (v2 - v1) / v1 * 100
+}
+
+/**
+ * Duplicate settlement information
+ * Phase C-4: Duplicate detection result
+ */
+export interface DuplicateSettlementInfo {
+  partyKey: string;
+  settlementId: string;
+  periodStart: Date;
+  periodEnd: Date;
+  engineVersion: string;    // 'v1' or 'v2' or unknown
 }
 
 /**
  * SettlementEngine v2 execution result
  * Contains generated settlements and diagnostic information
+ * Phase C-4: Enhanced diagnostics with duplicates, tiers, and v1 comparison
  */
 export interface SettlementEngineV2Result {
   // Generated entities (not yet persisted if dryRun=true)
@@ -132,5 +175,15 @@ export interface SettlementEngineV2Result {
 
     // Total amounts by party
     totalsByParty: Record<string, string>; // partyKey -> amount as string
+
+    // Phase C-4: Duplicate detection
+    duplicatesDetected: boolean;
+    duplicates?: DuplicateSettlementInfo[];
+
+    // Phase C-4: Tiered rules application tracking
+    tiersApplied?: Record<string, number>; // ruleId -> count
+
+    // Phase C-4: v1 vs v2 comparison (optional, if compareWithV1=true)
+    v1vsV2Diff?: SettlementDiffSummary[];
   };
 }

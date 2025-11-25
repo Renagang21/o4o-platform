@@ -34,6 +34,7 @@ import {
   SettlementEngineV2Result,
   SettlementPartyContext,
   CommissionRule,
+  CommissionTier,
 } from './SettlementTypesV2.js';
 import logger from '../../utils/logger.js';
 import { AppDataSource } from '../../database/connection.js';
@@ -115,13 +116,15 @@ export class SettlementEngineV2 {
       // 3. Calculate settlements for each party
       const settlementItems: SettlementItem[] = [];
       const ruleHits: Record<string, number> = {};
+      const tiersApplied: Record<string, number> = {}; // Phase C-4: Track tiered rule usage
 
       for (const party of config.parties) {
         const partyItems = await this.calculatePartySettlements(
           orders,
           party,
           config.ruleSet.rules,
-          ruleHits
+          ruleHits,
+          tiersApplied // Phase C-4: Pass tiersApplied tracking
         );
         settlementItems.push(...partyItems);
       }
@@ -174,6 +177,9 @@ export class SettlementEngineV2 {
         diagnostics: {
           ruleHits,
           totalsByParty,
+          duplicatesDetected: false, // Phase C-4: Will be set by duplicate detection logic
+          tiersApplied, // Phase C-4: Tiered rule usage tracking
+          // Phase C-4: v1vsV2Diff will be populated if compareWithV1=true
         },
       };
     } catch (error) {
@@ -230,13 +236,14 @@ export class SettlementEngineV2 {
 
   /**
    * Calculate settlements for a specific party
-   * Phase C-3: Supports seller, supplier, partner, and platform
+   * Phase C-4: Supports seller, supplier, partner, platform + tiered rules
    */
   private async calculatePartySettlements(
     orders: Order[],
     party: SettlementPartyContext,
     rules: CommissionRule[],
-    ruleHits: Record<string, number>
+    ruleHits: Record<string, number>,
+    tiersApplied: Record<string, number> // Phase C-4: Track tiered rule usage
   ): Promise<SettlementItem[]> {
     const items: SettlementItem[] = [];
 
@@ -265,7 +272,8 @@ export class SettlementEngineV2 {
         const { grossAmount, commissionAmount, netAmount } = this.calculateAmounts(
           orderItem,
           party,
-          rule
+          rule,
+          tiersApplied // Phase C-4: Pass tiersApplied for tracking
         );
 
         // Create SettlementItem structure
@@ -349,12 +357,13 @@ export class SettlementEngineV2 {
 
   /**
    * Calculate gross, commission, and net amounts
-   * Phase C-3: Supports percentage and fixed rules (seller/supplier/partner/platform)
+   * Phase C-4: Supports percentage, fixed, and tiered rules (seller/supplier/partner/platform)
    */
   private calculateAmounts(
     item: OrderItemEntity,
     party: SettlementPartyContext,
-    rule: CommissionRule
+    rule: CommissionRule,
+    tiersApplied: Record<string, number> // Phase C-4: Track tiered rule usage
   ): { grossAmount: number; commissionAmount: number; netAmount: number } {
     let grossAmount = 0;
     let commissionAmount = 0;
@@ -367,6 +376,13 @@ export class SettlementEngineV2 {
         commissionAmount = (grossAmount * rule.percentageRate) / 100;
       } else if (rule.type === 'fixed' && rule.fixedAmount !== undefined) {
         commissionAmount = rule.fixedAmount * item.quantity;
+      } else if (rule.type === 'tiered' && rule.tiers && rule.tiers.length > 0) {
+        // Phase C-4: Tiered commission calculation
+        const tier = this.findApplicableTier(grossAmount, rule.tiers);
+        if (tier) {
+          commissionAmount = (grossAmount * tier.percentageRate) / 100;
+          tiersApplied[rule.id] = (tiersApplied[rule.id] || 0) + 1;
+        }
       }
     } else if (party.partyType === 'supplier') {
       // Supplier: gross = basePrice * quantity, commission = 0, net = gross
@@ -380,6 +396,13 @@ export class SettlementEngineV2 {
         grossAmount = (sellerGross * rule.percentageRate) / 100;
       } else if (rule.type === 'fixed' && rule.fixedAmount !== undefined) {
         grossAmount = rule.fixedAmount * item.quantity;
+      } else if (rule.type === 'tiered' && rule.tiers && rule.tiers.length > 0) {
+        // Phase C-4: Tiered commission for platform
+        const tier = this.findApplicableTier(sellerGross, rule.tiers);
+        if (tier) {
+          grossAmount = (sellerGross * tier.percentageRate) / 100;
+          tiersApplied[rule.id] = (tiersApplied[rule.id] || 0) + 1;
+        }
       }
       commissionAmount = 0; // Platform doesn't pay commission
     } else if (party.partyType === 'partner') {
@@ -391,6 +414,13 @@ export class SettlementEngineV2 {
         grossAmount = (sellerGross * rule.percentageRate) / 100;
       } else if (rule.type === 'fixed' && rule.fixedAmount !== undefined) {
         grossAmount = rule.fixedAmount * item.quantity;
+      } else if (rule.type === 'tiered' && rule.tiers && rule.tiers.length > 0) {
+        // Phase C-4: Tiered commission for partner
+        const tier = this.findApplicableTier(sellerGross, rule.tiers);
+        if (tier) {
+          grossAmount = (sellerGross * tier.percentageRate) / 100;
+          tiersApplied[rule.id] = (tiersApplied[rule.id] || 0) + 1;
+        }
       }
 
       commissionAmount = 0; // Partner doesn't pay commission (receives it)
@@ -547,8 +577,32 @@ export class SettlementEngineV2 {
       diagnostics: {
         ruleHits: {},
         totalsByParty: {},
+        duplicatesDetected: false,
+        tiersApplied: {},
       },
     };
+  }
+
+  /**
+   * Find applicable tier for given amount
+   * Phase C-4: Tiered commission helper
+   *
+   * @param amount - Gross amount to match against tiers
+   * @param tiers - Array of commission tiers
+   * @returns Matching tier or null
+   */
+  private findApplicableTier(
+    amount: number,
+    tiers: CommissionTier[]
+  ): CommissionTier | null {
+    for (const tier of tiers) {
+      const minOk = amount >= tier.minAmount;
+      const maxOk = tier.maxAmount == null || amount < tier.maxAmount;
+      if (minOk && maxOk) {
+        return tier;
+      }
+    }
+    return null;
   }
 
   /**

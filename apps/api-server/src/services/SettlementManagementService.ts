@@ -21,7 +21,13 @@ import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 import { invalidateSettlementCache } from '../utils/cache-invalidation.js';
 import { SettlementEngineV2 } from './settlement/SettlementEngineV2.js';
-import type { SettlementV2Config, SettlementEngineV2Result } from './settlement/SettlementTypesV2.js';
+import type {
+  SettlementV2Config,
+  SettlementEngineV2Result,
+  SettlementPartyContext,
+  DuplicateSettlementInfo,
+  SettlementDiffSummary,
+} from './settlement/SettlementTypesV2.js';
 
 export interface SettlementFilters {
   page?: number;
@@ -320,16 +326,15 @@ export class SettlementManagementService {
   }
 
   /**
-   * P2-C Phase C-1: SettlementEngine v2 entry point
+   * P2-C Phase C-4: SettlementEngine v2 entry point with duplicate detection
    *
    * Generate settlements using v2 engine with policy-based rules
-   * Currently returns skeleton response (Phase C-1)
-   * Actual implementation in Phase C-2+
    *
    * Usage:
    * - Shadow mode testing (compare v1 vs v2)
    * - Policy-based settlement calculation
    * - Versioned rule sets
+   * - Duplicate detection and prevention
    *
    * @param config - SettlementV2Config with period, parties, rules
    * @returns Promise<SettlementEngineV2Result> with settlements and diagnostics
@@ -337,18 +342,196 @@ export class SettlementManagementService {
   async generateSettlementsV2(
     config: SettlementV2Config
   ): Promise<SettlementEngineV2Result> {
-    logger.info('[SettlementManagement] generateSettlementsV2 called (Phase C-1 skeleton)', {
+    logger.info('[SettlementManagement] generateSettlementsV2 called', {
       periodStart: config.periodStart,
       periodEnd: config.periodEnd,
       partiesCount: config.parties.length,
       ruleSetId: config.ruleSet.id,
       dryRun: config.dryRun ?? true,
+      preventDuplicates: config.preventDuplicates ?? false,
     });
 
-    // TODO P2-C Phase C-2: Add validation logic
-    // TODO P2-C Phase C-2: Add cache invalidation after settlement generation
+    // Phase C-4: Detect duplicate settlements
+    const duplicates = await this.detectDuplicateSettlements(
+      config.periodStart,
+      config.periodEnd,
+      config.parties
+    );
+
+    if (duplicates.length > 0) {
+      logger.warn('[SettlementManagement] ⚠️  Duplicate settlements detected for same period/party', {
+        duplicatesCount: duplicates.length,
+        duplicates: duplicates.map(d => d.partyKey),
+      });
+
+      if (config.preventDuplicates) {
+        logger.error('[SettlementManagement] ❌ preventDuplicates=true, aborting v2 run');
+        throw new Error(
+          `Duplicate settlements detected for period ${config.periodStart.toISOString()} - ${config.periodEnd.toISOString()}. ` +
+          `Found ${duplicates.length} existing settlements. Set preventDuplicates=false to override.`
+        );
+      }
+    }
+
+    // TODO P2-C Phase C-4+: Add cache invalidation after settlement generation
 
     // Delegate to SettlementEngineV2
-    return this.settlementEngineV2.generateSettlements(config);
+    const result = await this.settlementEngineV2.generateSettlements(config);
+
+    // Phase C-4: Attach duplicate information to diagnostics
+    if (result.diagnostics) {
+      result.diagnostics.duplicatesDetected = duplicates.length > 0;
+      result.diagnostics.duplicates = duplicates;
+    }
+
+    return result;
+  }
+
+  /**
+   * Detect duplicate settlements for given period and parties
+   * Phase C-4: Helper method for duplicate detection
+   *
+   * @param periodStart - Settlement period start
+   * @param periodEnd - Settlement period end
+   * @param parties - Target parties to check
+   * @returns Array of duplicate settlement information
+   */
+  private async detectDuplicateSettlements(
+    periodStart: Date,
+    periodEnd: Date,
+    parties: SettlementPartyContext[]
+  ): Promise<DuplicateSettlementInfo[]> {
+    const duplicates: DuplicateSettlementInfo[] = [];
+
+    for (const party of parties) {
+      // Query existing settlements for this party in the same period
+      const existing = await this.settlementRepo.find({
+        where: {
+          partyType: party.partyType,
+          partyId: party.partyId,
+          periodStart,
+          periodEnd,
+        },
+      });
+
+      for (const settlement of existing) {
+        // Determine engine version from metadata
+        let engineVersion = 'v1'; // Default assumption
+        if (settlement.metadata && typeof settlement.metadata === 'object') {
+          const meta = settlement.metadata as Record<string, unknown>;
+          engineVersion = (meta.settlementEngineVersion as string) || 'v1';
+        }
+
+        duplicates.push({
+          partyKey: `${party.partyType}:${party.partyId}`,
+          settlementId: settlement.id,
+          periodStart: settlement.periodStart,
+          periodEnd: settlement.periodEnd,
+          engineVersion,
+        });
+      }
+    }
+
+    return duplicates;
+  }
+
+  /**
+   * Compare v1 and v2 settlement results (shadow-run diagnostic tool)
+   * Phase C-4: Internal tool for v1 vs v2 comparison
+   *
+   * Usage:
+   * - Shadow mode testing
+   * - Validation before switching from v1 to v2
+   * - Identifying discrepancies
+   *
+   * @param config - SettlementV2Config (will run v2 in dryRun mode)
+   * @returns Array of differences between v1 and v2 results
+   */
+  async compareV1AndV2(
+    config: SettlementV2Config
+  ): Promise<SettlementDiffSummary[]> {
+    logger.info('[SettlementManagement] compareV1AndV2 called', {
+      periodStart: config.periodStart,
+      periodEnd: config.periodEnd,
+      partiesCount: config.parties.length,
+    });
+
+    const diffs: SettlementDiffSummary[] = [];
+
+    try {
+      // 1. Query existing v1 settlements for same period/parties
+      const v1Settlements = new Map<string, Settlement>();
+      for (const party of config.parties) {
+        const existing = await this.settlementRepo.find({
+          where: {
+            partyType: party.partyType,
+            partyId: party.partyId,
+            periodStart: config.periodStart,
+            periodEnd: config.periodEnd,
+          },
+        });
+
+        for (const settlement of existing) {
+          // Filter for v1 settlements only (no v2 metadata)
+          let isV1 = true;
+          if (settlement.metadata && typeof settlement.metadata === 'object') {
+            const meta = settlement.metadata as Record<string, unknown>;
+            if (meta.settlementEngineVersion === 'v2') {
+              isV1 = false;
+            }
+          }
+
+          if (isV1) {
+            const key = `${settlement.partyType}:${settlement.partyId}`;
+            v1Settlements.set(key, settlement);
+          }
+        }
+      }
+
+      // 2. Run v2 in dryRun mode
+      const v2Config = { ...config, dryRun: true };
+      const v2Result = await this.settlementEngineV2.generateSettlements(v2Config);
+
+      // 3. Compare results
+      for (const party of config.parties) {
+        const partyKey = `${party.partyType}:${party.partyId}`;
+        const v1Settlement = v1Settlements.get(partyKey);
+        const v2Settlement = v2Result.settlements.find(
+          s => s.partyType === party.partyType && s.partyId === party.partyId
+        );
+
+        const v1Amount = v1Settlement ? parseFloat(v1Settlement.payableAmount || '0') : 0;
+        const v2Amount = v2Settlement ? parseFloat(v2Settlement.payableAmount || '0') : 0;
+        const difference = v2Amount - v1Amount;
+        const diffPercentage = v1Amount !== 0 ? (difference / v1Amount) * 100 : 0;
+
+        diffs.push({
+          partyKey,
+          v1Amount: v1Amount.toString(),
+          v2Amount: v2Amount.toString(),
+          difference: difference.toString(),
+          diffPercentage,
+        });
+
+        logger.debug(`[SettlementManagement] compareV1AndV2 - ${partyKey}`, {
+          v1Amount,
+          v2Amount,
+          difference,
+          diffPercentage,
+        });
+      }
+
+      logger.info('[SettlementManagement] compareV1AndV2 completed', {
+        diffsCount: diffs.length,
+        hasSignificantDiffs: diffs.some(d => Math.abs(d.diffPercentage) > 1),
+      });
+
+      return diffs;
+    } catch (error) {
+      logger.error('[SettlementManagement] compareV1AndV2 failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 }
