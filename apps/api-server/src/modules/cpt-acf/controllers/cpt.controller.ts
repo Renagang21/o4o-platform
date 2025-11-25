@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { cptService } from '../services/cpt.service.js';
+import { cptService } from '../../../services/cpt/cpt.service.js';
 import { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { CPT_PAGINATION, CPT_QUERY_DEFAULTS } from '../../../config/cpt.constants.js';

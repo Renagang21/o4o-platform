@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { acfService } from '../services/acf.service.js';
+import { cptService } from '../../../services/cpt/cpt.service.js';
+import { acfService } from '../services/acf.service.js'; // TODO P1-B: Migrate getFieldValues/saveFieldValues to unified service
 import { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 
@@ -13,7 +14,7 @@ export class ACFController {
    */
   static async getFieldGroups(req: Request, res: Response) {
     try {
-      const result = await acfService.getFieldGroups();
+      const result = await cptService.getFieldGroups();
 
       if (!result.success) {
         return res.status(400).json(result);
@@ -36,7 +37,7 @@ export class ACFController {
   static async getFieldGroup(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const result = await acfService.getFieldGroup(id);
+      const result = await cptService.getFieldGroup(id);
 
       if (!result.success) {
         return res.status(404).json(result);
@@ -58,7 +59,7 @@ export class ACFController {
    */
   static async createFieldGroup(req: AuthRequest, res: Response) {
     try {
-      const result = await acfService.createFieldGroup(req.body);
+      const result = await cptService.createFieldGroup(req.body);
 
       if (!result.success) {
         return res.status(400).json(result);
@@ -81,7 +82,7 @@ export class ACFController {
   static async updateFieldGroup(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const result = await acfService.updateFieldGroup(id, req.body);
+      const result = await cptService.updateFieldGroup(id, req.body);
 
       if (!result.success) {
         return res.status(404).json(result);
@@ -104,7 +105,7 @@ export class ACFController {
   static async deleteFieldGroup(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const result = await acfService.deleteFieldGroup(id);
+      const result = await cptService.deleteFieldGroup(id);
 
       if (!result.success) {
         return res.status(404).json(result);
@@ -173,7 +174,7 @@ export class ACFController {
   static async exportFieldGroups(req: AuthRequest, res: Response) {
     try {
       const { groupIds } = req.body;
-      const result = await acfService.exportFieldGroups(groupIds);
+      const result = await cptService.exportFieldGroups(groupIds);
 
       if (!result.success) {
         return res.status(400).json(result);
@@ -195,7 +196,7 @@ export class ACFController {
    */
   static async importFieldGroups(req: AuthRequest, res: Response) {
     try {
-      const result = await acfService.importFieldGroups(req.body);
+      const result = await cptService.importFieldGroups(req.body);
 
       if (!result.success) {
         return res.status(400).json(result);

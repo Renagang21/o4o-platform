@@ -8,8 +8,18 @@ export { CPTController } from './controllers/cpt.controller.js';
 export { ACFController } from './controllers/acf.controller.js';
 
 // Services
+/**
+ * @deprecated Use unified service from services/cpt/cpt.service.ts instead
+ * This export is kept for backward compatibility only
+ */
 export { cptService } from './services/cpt.service.js';
+
+/**
+ * @deprecated Use unified service from services/cpt/cpt.service.ts instead
+ * This export is kept for backward compatibility only
+ */
 export { acfService } from './services/acf.service.js';
+
 export { blockDataService } from './services/block-data.service.js';
 
 // Routes

@@ -503,8 +503,8 @@ router.get('/posts/:type/:slug', async (req, res) => {
 // Get CPT types (public) - for admin dashboard
 router.get('/cpt/types', async (req, res) => {
   try {
-    // Import CPT service
-    const { cptService } = await import('../modules/cpt-acf/services/cpt.service.js');
+    // Import unified CPT service
+    const { cptService } = await import('../services/cpt/cpt.service.js');
 
     const result = await cptService.getAllCPTs(true);
     

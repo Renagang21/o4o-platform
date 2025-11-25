@@ -3,12 +3,25 @@ import { CustomPostType } from '../../../entities/CustomPostType.js';
 import { cptService as unifiedCPTService } from '../../../services/cpt/cpt.service.js';
 
 /**
- * Legacy CPT Service - Delegates to unified service
+ * ⚠️ DEPRECATED - Legacy CPT Service
  *
- * Phase 2 Migration: This service now delegates all operations to the unified
- * cpt.service.ts to maintain backward compatibility while consolidating logic.
+ * **DO NOT USE THIS SERVICE IN NEW CODE**
  *
- * DO NOT add new methods here. Use the unified service directly instead.
+ * This service is deprecated and maintained only for backward compatibility.
+ * All methods delegate to the unified CPT service.
+ *
+ * **Migration Path:**
+ * Instead of:
+ *   import { cptService } from './modules/cpt-acf/services/cpt.service.js';
+ *
+ * Use:
+ *   import { cptService } from './services/cpt/cpt.service.js';
+ *
+ * The unified service provides the same API with better performance and maintainability.
+ *
+ * **Removal Timeline:** This service will be removed in Phase P2.
+ *
+ * @deprecated Use unified CPT service from services/cpt/cpt.service.ts instead
  */
 export class CPTService {
   /**

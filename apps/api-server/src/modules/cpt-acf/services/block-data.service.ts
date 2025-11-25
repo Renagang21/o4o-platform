@@ -3,8 +3,6 @@ import { Post } from '../../../entities/Post.js';
 import { CustomPost } from '../../../entities/CustomPost.js';
 import { PostMeta } from '../../../entities/PostMeta.js';
 import { metaDataService } from '../../../services/MetaDataService.js';
-import { cptService } from './cpt.service.js';
-import { acfService } from './acf.service.js';
 import logger from '../../../utils/logger.js';
 import { CACHE_CONFIG, BLOCK_DYNAMIC_FIELDS } from '../../../config/editor.constants.js';
 

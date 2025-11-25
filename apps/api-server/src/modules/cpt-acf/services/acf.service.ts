@@ -2,12 +2,27 @@ import { cptService as unifiedCPTService } from '../../../services/cpt/cpt.servi
 import { metaDataService } from '../../../services/MetaDataService.js';
 
 /**
- * Legacy ACF Service - Delegates to unified service
+ * ⚠️ DEPRECATED - Legacy ACF Service
  *
- * Phase 2 Migration: This service now delegates all operations to the unified
- * cpt.service.ts (acf module) to maintain backward compatibility while consolidating logic.
+ * **DO NOT USE THIS SERVICE IN NEW CODE**
  *
- * DO NOT add new methods here. Use the unified service directly instead.
+ * This service is deprecated and maintained only for backward compatibility.
+ * All methods delegate to the unified CPT service (cptService.acf or cptService methods).
+ *
+ * **Migration Path:**
+ * Instead of:
+ *   import { acfService } from './modules/cpt-acf/services/acf.service.js';
+ *   acfService.getFieldGroups();
+ *
+ * Use:
+ *   import { cptService } from './services/cpt/cpt.service.js';
+ *   cptService.getFieldGroups();  // or cptService.acf.method()
+ *
+ * The unified service provides the same API with better performance and maintainability.
+ *
+ * **Removal Timeline:** This service will be removed in Phase P2.
+ *
+ * @deprecated Use unified CPT service from services/cpt/cpt.service.ts instead
  */
 export class ACFService {
   /**
