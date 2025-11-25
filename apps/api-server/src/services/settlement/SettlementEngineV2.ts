@@ -1,6 +1,6 @@
 /**
  * SettlementEngine v2
- * P2-C Phase C-2: Minimal Logic Implementation
+ * P2-C Phase C-3: Partner Commission + DB Persistence
  *
  * Purpose:
  * - Entry point for SettlementEngine v2
@@ -11,17 +11,19 @@
  * - docs/dev/R-8-8-1-SettlementEngine-v2-Design.md
  * - docs/dev/P2-C-SettlementEngine-v2-Implementation-Guide.md
  *
- * Phase C-2 Status: MINIMAL LOGIC IMPLEMENTED
+ * Phase C-3 Status: PARTNER COMMISSION + DB PERSISTENCE
  * - Repository dependencies injected
- * - Basic settlement calculation (seller/supplier)
+ * - Settlement calculation (seller/supplier/partner/platform)
  * - RuleSet application (percentage/fixed only)
  * - dryRun mode implemented
+ * - DB persistence implemented (dryRun=false)
+ * - Transaction handling for atomic DB writes
  * - Diagnostics populated
  *
- * Updated: 2025-11-25 (P2-C Phase C-2)
+ * Updated: 2025-11-25 (P2-C Phase C-3)
  */
 
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, DataSource } from 'typeorm';
 import { Order } from '../../entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../../entities/OrderItem.js';
 import { Settlement, SettlementStatus } from '../../entities/Settlement.js';
@@ -34,6 +36,7 @@ import {
   CommissionRule,
 } from './SettlementTypesV2.js';
 import logger from '../../utils/logger.js';
+import { AppDataSource } from '../../database/connection.js';
 
 /**
  * SettlementEngine v2 - Main orchestrator
@@ -62,18 +65,19 @@ export class SettlementEngineV2 {
     this.settlementItemRepository = settlementItemRepository;
     this.commissionRepository = commissionRepository;
 
-    logger.info('[SettlementEngineV2] Initialized (Phase C-2)');
+    logger.info('[SettlementEngineV2] Initialized (Phase C-3: Partner + DB Persistence)');
   }
 
   /**
    * Generate settlements based on v2 configuration
    *
-   * Phase C-2 Implementation:
+   * Phase C-3 Implementation:
    * 1. Validate config
    * 2. Query orders in period
-   * 3. Calculate per-party settlements using RuleSet
+   * 3. Calculate per-party settlements using RuleSet (seller/supplier/partner/platform)
    * 4. Generate Settlement/SettlementItem structures
-   * 5. dryRun mode: Return without persisting
+   * 5. dryRun=true: Return without persisting
+   * 6. dryRun=false: Persist to DB with transaction
    *
    * @param config - SettlementV2Config with period, parties, rules
    * @returns Promise<SettlementEngineV2Result> with settlements and diagnostics
@@ -134,24 +138,39 @@ export class SettlementEngineV2 {
       const totalsByParty = this.calculateTotalsByParty(settlements);
 
       // 6. Persist to DB if not dryRun
+      // Phase C-3: DB persistence implementation
+      let persistedSettlements = settlements;
+      let persistedItems = settlementItems;
+
       if (!config.dryRun) {
-        // TODO P2-C Phase C-3: Implement actual DB persistence
-        logger.warn('[SettlementEngineV2] dryRun=false but DB persistence not yet implemented');
-        logger.warn('[SettlementEngineV2] Returning results without persisting (Phase C-2)');
+        logger.warn('[SettlementEngineV2] ⚠️  dryRun=false - PERSISTING TO DATABASE');
+        logger.warn('[SettlementEngineV2] ⚠️  This will write Settlement and SettlementItem records');
+
+        // TODO P2-C Phase C-4: Check for duplicate settlements (v1/v2 conflict)
+        // For now, we assume no conflicts in shadow mode testing
+
+        const persisted = await this.persistSettlementsToDb(settlements, settlementItems);
+        persistedSettlements = persisted.settlements;
+        persistedItems = persisted.items;
+
+        logger.info('[SettlementEngineV2] ✅ DB persistence completed', {
+          settlementsCount: persistedSettlements.length,
+          itemsCount: persistedItems.length,
+        });
       }
 
       const duration = Date.now() - startTime;
       logger.info('[SettlementEngineV2] generateSettlements completed', {
         duration,
-        settlementsCount: settlements.length,
-        settlementItemsCount: settlementItems.length,
+        settlementsCount: persistedSettlements.length,
+        settlementItemsCount: persistedItems.length,
         dryRun: config.dryRun ?? true,
       });
 
       return {
-        settlements,
-        settlementItems,
-        commissions: [], // Phase C-2: Partner commissions not yet implemented
+        settlements: persistedSettlements,
+        settlementItems: persistedItems,
+        commissions: [], // Phase C-3: Commission entity integration to be added if needed
         diagnostics: {
           ruleHits,
           totalsByParty,
@@ -211,7 +230,7 @@ export class SettlementEngineV2 {
 
   /**
    * Calculate settlements for a specific party
-   * Phase C-2: Supports seller and supplier only
+   * Phase C-3: Supports seller, supplier, partner, and platform
    */
   private async calculatePartySettlements(
     orders: Order[],
@@ -270,6 +289,7 @@ export class SettlementEngineV2 {
 
   /**
    * Check if OrderItem is relevant to the party
+   * Phase C-3: Includes partner logic
    */
   private isItemRelevantToParty(
     item: OrderItemEntity,
@@ -283,7 +303,12 @@ export class SettlementEngineV2 {
       case 'platform':
         return true; // Platform gets commission from all items
       case 'partner':
-        // Phase C-2: Partner logic not yet implemented
+        // Phase C-3: Partner gets commission based on referral or partnership
+        // Check if item attributes (JSONB) contains partnerId
+        if (item.attributes && typeof item.attributes === 'object') {
+          const attrs = item.attributes as Record<string, unknown>;
+          return attrs.partnerId === party.partyId || attrs.referralPartnerId === party.partyId;
+        }
         return false;
       default:
         return false;
@@ -324,7 +349,7 @@ export class SettlementEngineV2 {
 
   /**
    * Calculate gross, commission, and net amounts
-   * Phase C-2: Supports percentage and fixed rules only
+   * Phase C-3: Supports percentage and fixed rules (seller/supplier/partner/platform)
    */
   private calculateAmounts(
     item: OrderItemEntity,
@@ -357,6 +382,18 @@ export class SettlementEngineV2 {
         grossAmount = rule.fixedAmount * item.quantity;
       }
       commissionAmount = 0; // Platform doesn't pay commission
+    } else if (party.partyType === 'partner') {
+      // Phase C-3: Partner commission calculation
+      // Partner: gross = referral commission based on seller's sale amount
+      const sellerGross = parseFloat(item.totalPrice.toString());
+
+      if (rule.type === 'percentage' && rule.percentageRate !== undefined) {
+        grossAmount = (sellerGross * rule.percentageRate) / 100;
+      } else if (rule.type === 'fixed' && rule.fixedAmount !== undefined) {
+        grossAmount = rule.fixedAmount * item.quantity;
+      }
+
+      commissionAmount = 0; // Partner doesn't pay commission (receives it)
     }
 
     const netAmount = grossAmount - commissionAmount;
@@ -515,8 +552,66 @@ export class SettlementEngineV2 {
   }
 
   /**
-   * TODO P2-C Phase C-3: Calculate partner commission
+   * Persist settlements to database with transaction
+   * Phase C-3: Atomic DB write with rollback on error
+   *
+   * @param settlements - Settlement entities to persist
+   * @param items - SettlementItem entities to persist
+   * @returns Persisted entities with DB-generated IDs
+   */
+  private async persistSettlementsToDb(
+    settlements: Settlement[],
+    items: SettlementItem[]
+  ): Promise<{ settlements: Settlement[]; items: SettlementItem[] }> {
+    return await AppDataSource.transaction(async (transactionalEntityManager) => {
+      logger.info('[SettlementEngineV2] Starting DB transaction for persistence');
+
+      // 1. Save Settlements first
+      const savedSettlements: Settlement[] = [];
+      for (const settlement of settlements) {
+        const saved = await transactionalEntityManager.save(Settlement, settlement);
+        savedSettlements.push(saved);
+        logger.debug(`[SettlementEngineV2] Saved Settlement: ${saved.id} for ${saved.partyType}:${saved.partyId}`);
+      }
+
+      // 2. Link SettlementItems to saved Settlements and save
+      const savedItems: SettlementItem[] = [];
+      for (const item of items) {
+        // Find corresponding settlement
+        const settlement = savedSettlements.find(
+          s => s.partyType === item.partyType && s.partyId === item.partyId
+        );
+
+        if (!settlement || !settlement.id) {
+          throw new Error(
+            `Cannot find saved Settlement for SettlementItem (${item.partyType}:${item.partyId})`
+          );
+        }
+
+        // Link to settlement
+        item.settlementId = settlement.id;
+
+        // Save item
+        const saved = await transactionalEntityManager.save(SettlementItem, item);
+        savedItems.push(saved);
+      }
+
+      logger.info('[SettlementEngineV2] Transaction committed', {
+        settlementsCount: savedSettlements.length,
+        itemsCount: savedItems.length,
+      });
+
+      return {
+        settlements: savedSettlements,
+        items: savedItems,
+      };
+    });
+  }
+
+  /**
+   * TODO P2-C Phase C-4: Calculate partner commission (standalone method)
    * Partner-specific commission calculation using v2 rules
+   * This is a convenience method - actual logic is in calculatePartySettlements
    */
   // async calculatePartnerCommission(
   //   partnerId: string,
