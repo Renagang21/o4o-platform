@@ -17,6 +17,12 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./metadata": {
+      "import": "./dist/metadata.js",
+      "require": "./dist/metadata.js",
+      "types": "./dist/metadata.d.ts",
+      "default": "./dist/metadata.js"
+    },
     "./dynamic": {
       "import": "./dist/dynamic/index.js",
       "require": "./dist/dynamic/index.js",

@@ -18,7 +18,13 @@ import { AppDataSource } from '../database/connection.js';
 import { AIReference } from '../entities/AIReference.js';
 import logger from '../utils/logger.js';
 // Phase P0-C: Import metadata from SSOT
-import { blockMetadata, type BlockMetadata } from '@o4o/block-renderer';
+// TEMP FIX: Commented out to prevent server crash during deployment
+// TODO: Re-enable once package exports are properly configured
+// import { blockMetadata, type BlockMetadata } from '@o4o/block-renderer/metadata';
+
+// Temporary fallback - AI block features disabled
+const blockMetadata: any[] = [];
+type BlockMetadata = any;
 
 class BlockRegistryService {
   private static instance: BlockRegistryService;

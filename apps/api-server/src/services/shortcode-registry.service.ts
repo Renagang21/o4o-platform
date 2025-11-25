@@ -18,7 +18,13 @@ import { AppDataSource } from '../database/connection.js';
 import { AIReference } from '../entities/AIReference.js';
 import logger from '../utils/logger.js';
 // Phase P0-B: Import metadata from SSOT
-import { shortcodeMetadata, type ShortcodeMetadata } from '@o4o/shortcodes';
+// TEMP FIX: Commented out to prevent server crash during deployment
+// TODO: Re-enable once package exports are properly configured
+// import { shortcodeMetadata, type ShortcodeMetadata } from '@o4o/shortcodes/metadata';
+
+// Temporary fallback - AI shortcode features disabled
+const shortcodeMetadata: any[] = [];
+type ShortcodeMetadata = any;
 
 class ShortcodeRegistryService {
   private static instance: ShortcodeRegistryService;
