@@ -1,15 +1,28 @@
 /**
  * Partner Layout
  * Nested layout for all partner dashboard pages
+ *
+ * H2-3-3: Integrated with HubLayout for role-aware functionality
+ * H2-3-4: Uses dashboards.ts config instead of hardcoded menuItems
  */
 
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Layout from '../../layout/Layout';
-import { RoleDashboardMenu, DashboardMenuItem } from '../RoleDashboardMenu';
+import HubLayout from '../../layout/HubLayout';
+import { RoleDashboardMenu, type DashboardMenuItem } from '../RoleDashboardMenu';
 import { LayoutDashboard, BarChart3, DollarSign, Link2, Megaphone } from 'lucide-react';
+import { getDashboardForRole } from '../../../config/roles/dashboards';
 
 type PartnerSection = 'overview' | 'analytics' | 'settlements' | 'links' | 'marketing';
+
+// Icon mapping for dashboard navigation
+const iconMap = {
+  overview: <LayoutDashboard className="w-4 h-4" />,
+  analytics: <BarChart3 className="w-4 h-4" />,
+  settlements: <DollarSign className="w-4 h-4" />,
+  links: <Link2 className="w-4 h-4" />,
+  marketing: <Megaphone className="w-4 h-4" />
+};
 
 // Helper to determine active section from current path
 const getActiveSectionFromPath = (pathname: string): PartnerSection => {
@@ -24,61 +37,30 @@ export const PartnerLayout: React.FC = () => {
   const location = useLocation();
   const activeSection = getActiveSectionFromPath(location.pathname);
 
-  const menuItems: DashboardMenuItem<PartnerSection>[] = [
-    {
-      key: 'overview',
-      label: '개요',
-      icon: <LayoutDashboard className="w-4 h-4" />,
-      type: 'route',
-      href: '/dashboard/partner'
-    },
-    {
-      key: 'analytics',
-      label: '분석',
-      icon: <BarChart3 className="w-4 h-4" />,
-      type: 'route',
-      href: '/dashboard/partner/analytics'
-    },
-    {
-      key: 'settlements',
-      label: '정산',
-      icon: <DollarSign className="w-4 h-4" />,
-      type: 'route',
-      href: '/dashboard/partner/settlements'
-    },
-    {
-      key: 'links',
-      label: '링크 관리',
-      icon: <Link2 className="w-4 h-4" />,
-      type: 'route',
-      href: '/dashboard/partner/links'
-    },
-    {
-      key: 'marketing',
-      label: '마케팅 자료',
-      icon: <Megaphone className="w-4 h-4" />,
-      type: 'route',
-      href: '/dashboard/partner/marketing'
-    },
-  ];
+  // H2-3-4: Get navigation config from dashboards.ts
+  const dashboardConfig = getDashboardForRole('partner');
+
+  // Inject actual icons into navigation items
+  const menuItems: DashboardMenuItem<PartnerSection>[] = dashboardConfig.navigation.map(item => ({
+    ...item,
+    icon: iconMap[item.key as PartnerSection] || item.icon
+  })) as DashboardMenuItem<PartnerSection>[];
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Role Dashboard Menu */}
-        <RoleDashboardMenu
-          items={menuItems}
-          active={activeSection}
-          variant="tabs"
-          orientation="horizontal"
-        />
+    <HubLayout requiredRole="partner" showPersonalization={false}>
+      {/* Role Dashboard Menu */}
+      <RoleDashboardMenu
+        items={menuItems}
+        active={activeSection}
+        variant="tabs"
+        orientation="horizontal"
+      />
 
-        {/* Child Routes */}
-        <div className="mt-6">
-          <Outlet />
-        </div>
+      {/* Child Routes */}
+      <div className="mt-6">
+        <Outlet />
       </div>
-    </Layout>
+    </HubLayout>
   );
 };
 

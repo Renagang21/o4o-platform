@@ -12,6 +12,7 @@
  */
 
 import { UserRole } from '../../types/user';
+import React from 'react';
 
 export interface DashboardCard {
   id: string;
@@ -34,10 +35,21 @@ export interface DashboardCard {
   order?: number; // 표시 순서
 }
 
+// H2-3-4: Dashboard navigation item configuration
+export interface DashboardNavigationItem {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  type: 'route';
+  href: string;
+  badge?: number | string;
+}
+
 export interface DashboardConfig {
   title: string;
   subtitle?: string;
   cards: DashboardCard[];
+  navigation: DashboardNavigationItem[];  // H2-3-4: Navigation items for dashboard tabs
 }
 
 /**
@@ -47,6 +59,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
   customer: {
     title: '마이페이지',
     subtitle: '주문 내역과 관심 상품을 확인하세요',
+    navigation: [],  // H2-3-4: Customer uses AccountPage, not dashboard layout
     cards: [
       {
         id: 'recent-orders',
@@ -90,6 +103,50 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
   seller: {
     title: '판매자 대시보드',
     subtitle: '매출과 주문을 한눈에 확인하세요',
+    navigation: [
+      {
+        key: 'overview',
+        label: '개요',
+        icon: React.createElement('div'), // Placeholder, will be replaced in Layout
+        type: 'route',
+        href: '/dashboard/seller'
+      },
+      {
+        key: 'products',
+        label: '상품',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/seller/products'
+      },
+      {
+        key: 'orders',
+        label: '주문',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/seller/orders'
+      },
+      {
+        key: 'analytics',
+        label: '분석',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/seller/analytics'
+      },
+      {
+        key: 'inventory',
+        label: '재고',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/seller/inventory'
+      },
+      {
+        key: 'settlements',
+        label: '정산',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/seller/settlements'
+      }
+    ],
     cards: [
       {
         id: 'today-sales',
@@ -152,6 +209,57 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
   supplier: {
     title: '공급자 대시보드',
     subtitle: '재고와 파트너 주문을 관리하세요',
+    navigation: [
+      {
+        key: 'overview',
+        label: '개요',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier'
+      },
+      {
+        key: 'products',
+        label: '제품',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier/products'
+      },
+      {
+        key: 'product-applications',
+        label: '판매자 신청 관리',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier/product-applications'
+      },
+      {
+        key: 'orders',
+        label: '주문',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier/orders'
+      },
+      {
+        key: 'settlements',
+        label: '정산',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier/settlements'
+      },
+      {
+        key: 'analytics',
+        label: '분석',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier/analytics'
+      },
+      {
+        key: 'inventory',
+        label: '재고',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/supplier/inventory'
+      }
+    ],
     cards: [
       {
         id: 'inventory-status',
@@ -212,6 +320,43 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
   partner: {
     title: '파트너 대시보드',
     subtitle: '링크 성과와 수익을 확인하세요',
+    navigation: [
+      {
+        key: 'overview',
+        label: '개요',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner'
+      },
+      {
+        key: 'analytics',
+        label: '분석',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/analytics'
+      },
+      {
+        key: 'settlements',
+        label: '정산',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/settlements'
+      },
+      {
+        key: 'links',
+        label: '링크 관리',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/links'
+      },
+      {
+        key: 'marketing',
+        label: '마케팅 자료',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/marketing'
+      }
+    ],
     cards: [
       {
         id: 'earnings-month',
@@ -275,6 +420,43 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
   affiliate: {
     title: '파트너 대시보드',
     subtitle: '링크 성과와 수익을 확인하세요',
+    navigation: [
+      {
+        key: 'overview',
+        label: '개요',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner'
+      },
+      {
+        key: 'analytics',
+        label: '분석',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/analytics'
+      },
+      {
+        key: 'settlements',
+        label: '정산',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/settlements'
+      },
+      {
+        key: 'links',
+        label: '링크 관리',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/links'
+      },
+      {
+        key: 'marketing',
+        label: '마케팅 자료',
+        icon: React.createElement('div'),
+        type: 'route',
+        href: '/dashboard/partner/marketing'
+      }
+    ],
     cards: [
       {
         id: 'earnings-month',
