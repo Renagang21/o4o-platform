@@ -8,8 +8,10 @@ import { authenticate } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../middleware/error-handler.js';
 import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error.js';
 import { env } from '../utils/env-validator.js';
+import { RefreshTokenService } from '../services/refreshToken.service.js';
 
 const router: Router = Router();
+const refreshTokenService = new RefreshTokenService();
 
 // 로그인
 router.post('/login',
@@ -59,11 +61,19 @@ router.post('/login',
       );
     }
 
-    // JWT 토큰 생성
-    const token = jwt.sign(
+    // JWT 액세스 토큰 생성 (15분 만료)
+    const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      env.getString('JWT_SECRET'),
-      { expiresIn: '7d' }
+      env.getString('JWT_SECRET') as jwt.Secret,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '15m' } as jwt.SignOptions
+    );
+
+    // Refresh 토큰 생성 (30일 만료)
+    const refreshToken = await refreshTokenService.generateRefreshToken(
+      user,
+      req.body.deviceId,
+      req.headers['user-agent'],
+      req.ip
     );
 
       // 마지막 로그인 시간 업데이트
@@ -76,7 +86,9 @@ router.post('/login',
       return res.json({
         success: true,
         message: 'Login successful',
-        token,
+        accessToken,
+        refreshToken,
+        token: accessToken, // Legacy field for backward compatibility
         user: {
           id: user.id,
           email: user.email,
@@ -151,11 +163,19 @@ const signupHandler = asyncHandler(async (req, res, next) => {
 
   await userRepository.save(user);
 
-  // JWT 토큰 생성 (즉시 로그인)
-  const token = jwt.sign(
+  // JWT 액세스 토큰 생성 (15분 만료)
+  const accessToken = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
-    env.getString('JWT_SECRET'),
-    { expiresIn: '7d' }
+    env.getString('JWT_SECRET') as jwt.Secret,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '15m' } as jwt.SignOptions
+  );
+
+  // Refresh 토큰 생성 (30일 만료)
+  const refreshToken = await refreshTokenService.generateRefreshToken(
+    user,
+    req.body.deviceId,
+    req.headers['user-agent'],
+    req.ip
   );
 
   // 역할별 기본 리다이렉트 경로
@@ -179,7 +199,9 @@ const signupHandler = asyncHandler(async (req, res, next) => {
   return res.status(201).json({
     success: true,
     message: 'Signup successful',
-    token,
+    accessToken,
+    refreshToken,
+    token: accessToken, // Legacy field for backward compatibility
     user: {
       id: user.id,
       email: user.email,
@@ -280,6 +302,29 @@ router.get('/status', authenticate, asyncHandler(async (req: Request, res) => {
       issuedAt: (req.user as any).iat ? new Date((req.user as any).iat * 1000).toISOString() : null,
       expiresAt: (req.user as any).exp ? new Date((req.user as any).exp * 1000).toISOString() : null
     }
+  });
+}));
+
+// 토큰 갱신 (Refresh Token)
+router.post('/refresh', asyncHandler(async (req: Request, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    throw new UnauthorizedError('Refresh token not provided', 'NO_REFRESH_TOKEN');
+  }
+
+  // Verify and refresh access token
+  const result = await refreshTokenService.refreshAccessToken(refreshToken);
+
+  if (result.error || !result.accessToken) {
+    throw new UnauthorizedError(result.error || 'Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+  }
+
+  return res.json({
+    success: true,
+    message: 'Token refreshed successfully',
+    accessToken: result.accessToken,
+    refreshToken // Return same refresh token (unless rotation is implemented)
   });
 }));
 
