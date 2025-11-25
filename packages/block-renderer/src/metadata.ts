@@ -1,9 +1,11 @@
 /**
  * Block Metadata Registry
- * Phase P0-C: Single Source of Truth for AI-facing block metadata
+ * Phase P0-E: Single Source of Truth for AI-facing block metadata
  *
  * This file contains metadata ONLY (no React components).
  * Components are registered separately in each app.
+ *
+ * Updated to match actual implementations in admin-dashboard.
  */
 
 export interface BlockAttributeConfig {
@@ -32,7 +34,7 @@ export interface BlockMetadata {
 
 /**
  * All block metadata for AI/Registry consumption
- * Phase P0-C: 43 blocks from API Server block-registry.service.ts
+ * Phase P0-E: Updated to match actual implementations (admin-dashboard)
  */
 export const blockMetadata: BlockMetadata[] = [
   // ============================================
@@ -124,22 +126,6 @@ export const blockMetadata: BlockMetadata[] = [
     version: '1.0.0',
     tags: ['마크다운', 'markdown', 'md'],
     aiPrompts: ['마크다운 문법으로 작성할 때']
-  },
-  {
-    name: 'o4o/markdown-reader',
-    title: '마크다운 뷰어',
-    description: '마크다운을 렌더링합니다',
-    category: 'text',
-    attributes: {
-      content: { type: 'string', default: '', description: '마크다운 내용' }
-    },
-    example: {
-      json: JSON.stringify({ type: 'o4o/markdown-reader', attributes: { content: '# 제목' } }, null, 2),
-      text: '마크다운 뷰어'
-    },
-    version: '1.0.0',
-    tags: ['마크다운', 'viewer'],
-    aiPrompts: ['마크다운을 읽기 전용으로 표시할 때']
   },
   {
     name: 'o4o/list',
@@ -249,39 +235,6 @@ export const blockMetadata: BlockMetadata[] = [
     version: '1.0.0',
     tags: ['비디오', 'video'],
     aiPrompts: ['비디오를 추가할 때']
-  },
-  {
-    name: 'o4o/slider',
-    title: '슬라이더',
-    description: '이미지 슬라이더/캐러셀',
-    category: 'media',
-    attributes: {
-      autoplay: { type: 'boolean', default: false },
-      interval: { type: 'number', default: 3000 }
-    },
-    example: {
-      json: JSON.stringify({ type: 'o4o/slider', innerBlocks: [] }, null, 2),
-      text: '슬라이더 컨테이너'
-    },
-    version: '1.0.0',
-    tags: ['슬라이더', 'slider', 'carousel'],
-    aiPrompts: ['이미지 슬라이더가 필요할 때']
-  },
-  {
-    name: 'o4o/slider-slide',
-    title: '슬라이드',
-    description: '슬라이더 내부의 개별 슬라이드',
-    category: 'media',
-    attributes: {
-      imageUrl: { type: 'string', description: '슬라이드 이미지' }
-    },
-    example: {
-      json: JSON.stringify({ type: 'o4o/slider-slide', attributes: { imageUrl: '' } }, null, 2),
-      text: '슬라이드'
-    },
-    version: '1.0.0',
-    tags: ['슬라이드', 'slide'],
-    aiPrompts: ['슬라이더 안에 사용']
   },
   {
     name: 'o4o/slide',
@@ -399,6 +352,41 @@ export const blockMetadata: BlockMetadata[] = [
     tags: ['조건부', 'conditional'],
     aiPrompts: ['특정 조건에서만 표시할 때']
   },
+  {
+    name: 'o4o/spacer',
+    title: '공백',
+    description: '높이 조절 가능한 공백 블록',
+    category: 'layout',
+    attributes: {
+      height: { type: 'number', default: 50, description: '높이 (px)' }
+    },
+    example: {
+      json: JSON.stringify({ type: 'o4o/spacer', attributes: { height: 50 } }, null, 2),
+      text: '공백 블록'
+    },
+    version: '1.0.0',
+    tags: ['공백', 'spacer', '여백'],
+    aiPrompts: ['블록 사이에 공백이 필요할 때', '레이아웃 간격을 조정할 때']
+  },
+  {
+    name: 'o4o/separator',
+    title: '구분선',
+    description: '구분선 블록',
+    category: 'layout',
+    attributes: {
+      style: { type: 'string', default: 'solid', enum: ['solid', 'dashed', 'dotted', 'double'], description: '선 스타일' },
+      color: { type: 'string', default: '#dddddd', description: '색상' },
+      thickness: { type: 'number', default: 1, description: '두께 (px)' },
+      width: { type: 'number', default: 100, description: '너비 (%)' }
+    },
+    example: {
+      json: JSON.stringify({ type: 'o4o/separator', attributes: { style: 'solid', thickness: 1 } }, null, 2),
+      text: '구분선'
+    },
+    version: '1.0.0',
+    tags: ['구분선', 'separator', 'hr'],
+    aiPrompts: ['섹션을 구분하는 선이 필요할 때']
+  },
 
   // ============================================
   // 위젯 블록 (Widget Blocks)
@@ -447,10 +435,7 @@ export const blockMetadata: BlockMetadata[] = [
       link: { type: 'string', description: '링크 URL (선택)' },
       backgroundColor: { type: 'string', default: '#ffffff', description: '배경색' },
       borderColor: { type: 'string', default: '#e5e7eb', description: '테두리색' },
-      iconColor: { type: 'string', default: '#0073aa', description: '아이콘 색상' },
-      titleColor: { type: 'string', default: '#111827', description: '제목 색상' },
-      descriptionColor: { type: 'string', default: '#6b7280', description: '설명 색상' },
-      iconSize: { type: 'number', default: 48, description: '아이콘 크기 (px)' }
+      iconColor: { type: 'string', default: '#0073aa', description: '아이콘 색상' }
     },
     example: {
       json: JSON.stringify({
@@ -458,8 +443,7 @@ export const blockMetadata: BlockMetadata[] = [
         attributes: {
           icon: 'star',
           title: '놀라운 기능',
-          description: '이 기능은 정말 유용합니다.',
-          link: '#'
+          description: '이 기능은 정말 유용합니다.'
         }
       }, null, 2),
       text: '기능 카드'
@@ -476,19 +460,14 @@ export const blockMetadata: BlockMetadata[] = [
     attributes: {
       title: { type: 'string', default: '질문을 입력하세요', description: '질문' },
       content: { type: 'string', default: '답변을 입력하세요', description: '답변' },
-      defaultOpen: { type: 'boolean', default: false, description: '기본 펼침 상태' },
-      borderColor: { type: 'string', default: '#e5e7eb', description: '테두리색' },
-      backgroundColor: { type: 'string', default: '#ffffff', description: '배경색' },
-      titleColor: { type: 'string', default: '#111827', description: '제목 색상' },
-      contentColor: { type: 'string', default: '#6b7280', description: '내용 색상' }
+      defaultOpen: { type: 'boolean', default: false, description: '기본 펼침 상태' }
     },
     example: {
       json: JSON.stringify({
         type: 'o4o/accordion-item',
         attributes: {
           title: '이것은 무엇인가요?',
-          content: '이것은 아코디언 아이템입니다.',
-          defaultOpen: false
+          content: '이것은 아코디언 아이템입니다.'
         }
       }, null, 2),
       text: '아코디언 아이템'
@@ -507,10 +486,6 @@ export const blockMetadata: BlockMetadata[] = [
         type: 'array',
         description: 'FAQ 항목 배열 (각 항목: {question: string, answer: string, defaultOpen?: boolean})'
       },
-      borderColor: { type: 'string', default: '#e5e7eb', description: '테두리색' },
-      backgroundColor: { type: 'string', default: '#ffffff', description: '배경색' },
-      titleColor: { type: 'string', default: '#111827', description: '제목 색상' },
-      contentColor: { type: 'string', default: '#6b7280', description: '내용 색상' },
       spacing: { type: 'number', default: 16, description: '항목 간격 (px)' }
     },
     example: {
@@ -519,17 +494,109 @@ export const blockMetadata: BlockMetadata[] = [
         attributes: {
           items: [
             { question: '자주 묻는 질문 1', answer: '답변 1', defaultOpen: true },
-            { question: '자주 묻는 질문 2', answer: '답변 2', defaultOpen: false },
-            { question: '자주 묻는 질문 3', answer: '답변 3', defaultOpen: false }
-          ],
-          spacing: 16
+            { question: '자주 묻는 질문 2', answer: '답변 2', defaultOpen: false }
+          ]
         }
       }, null, 2),
       text: 'FAQ 아코디언'
     },
     version: '1.0.0',
-    tags: ['faq', 'accordion', 'question', 'answer', '질문', '답변', '아코디언'],
-    aiPrompts: ['자주 묻는 질문을 표시할 때', '여러 FAQ를 한 곳에 모아서 보여줄 때', 'Q&A 섹션이 필요할 때']
+    tags: ['faq', 'accordion', 'question', 'answer', '질문', '답변'],
+    aiPrompts: ['자주 묻는 질문을 표시할 때', 'Q&A 섹션이 필요할 때']
+  },
+  {
+    name: 'o4o/placeholder',
+    title: '플레이스홀더',
+    description: 'AI가 요청한 미구현 컴포넌트의 플레이스홀더',
+    category: 'widgets',
+    attributes: {
+      componentName: { type: 'string', description: '컴포넌트 이름' },
+      reason: { type: 'string', description: '필요 이유' },
+      props: { type: 'array', description: 'Props 목록' }
+    },
+    example: {
+      json: JSON.stringify({
+        type: 'o4o/placeholder',
+        attributes: {
+          componentName: 'CustomWidget',
+          reason: 'AI requested but not implemented yet'
+        }
+      }, null, 2),
+      text: 'AI 플레이스홀더 블록'
+    },
+    version: '1.0.0',
+    tags: ['placeholder', 'ai', 'missing'],
+    aiPrompts: ['AI가 자동으로 사용 (사용자가 직접 선택하지 않음)']
+  },
+  {
+    name: 'o4o/timeline-chart',
+    title: 'Timeline Chart',
+    description: '타임라인 차트 (AI 생성 블록 예시)',
+    category: 'widgets',
+    attributes: {
+      items: { type: 'array', description: '타임라인 항목' }
+    },
+    example: {
+      json: JSON.stringify({ type: 'o4o/timeline-chart', attributes: { items: [] } }, null, 2),
+      text: '타임라인 차트'
+    },
+    version: '1.0.0',
+    tags: ['timeline', 'chart', 'ai-generated'],
+    aiPrompts: ['타임라인을 표시할 때']
+  },
+  {
+    name: 'o4o/role-card',
+    title: 'Role Card',
+    description: '팀원, 역할, 담당자 소개 카드',
+    category: 'widgets',
+    attributes: {
+      imageUrl: { type: 'string', description: '프로필 이미지 URL' },
+      name: { type: 'string', default: '이름', description: '이름' },
+      role: { type: 'string', default: '직책', description: '직책/역할' },
+      description: { type: 'string', default: '', description: '설명' },
+      email: { type: 'string', description: '이메일' }
+    },
+    example: {
+      json: JSON.stringify({
+        type: 'o4o/role-card',
+        attributes: {
+          name: '홍길동',
+          role: '팀장',
+          description: '프로젝트 총괄'
+        }
+      }, null, 2),
+      text: '역할 카드'
+    },
+    version: '1.0.0',
+    tags: ['role', 'team', 'profile', '역할', '팀원', '프로필'],
+    aiPrompts: ['팀원 소개가 필요할 때', '담당자 정보를 표시할 때']
+  },
+  {
+    name: 'o4o/icon-feature-list',
+    title: 'Icon Feature List',
+    description: '여러 개의 기능/특징을 아이콘과 함께 표시',
+    category: 'widgets',
+    attributes: {
+      items: { type: 'array', description: '기능 항목 배열' },
+      columns: { type: 'number', default: 3, description: '컬럼 수' },
+      layout: { type: 'string', default: 'grid', enum: ['grid', 'list'], description: '레이아웃' },
+      iconPosition: { type: 'string', default: 'top', enum: ['top', 'left'], description: '아이콘 위치' }
+    },
+    example: {
+      json: JSON.stringify({
+        type: 'o4o/icon-feature-list',
+        attributes: {
+          items: [
+            { icon: 'check-circle', title: '기능 1', description: '설명 1' }
+          ],
+          columns: 3
+        }
+      }, null, 2),
+      text: '아이콘 기능 리스트'
+    },
+    version: '1.0.0',
+    tags: ['icon', 'feature', 'list', '아이콘', '기능', '리스트'],
+    aiPrompts: ['여러 기능을 아이콘과 함께 나열할 때', '특징을 그리드로 표시할 때']
   },
 
   // ============================================
@@ -587,20 +654,17 @@ export const blockMetadata: BlockMetadata[] = [
         attributes: { postType: 'product' },
         innerBlocks: [
           { type: 'o4o/form-field', attributes: { name: 'title', label: '제품명', fieldType: 'text' } },
-          { type: 'o4o/form-field', attributes: { name: 'content', label: '설명', fieldType: 'textarea' } },
           { type: 'o4o/form-submit', attributes: { text: '등록' } }
         ]
       }, null, 2),
-      text: 'Product 등록 폼 예시'
+      text: 'Product 등록 폼'
     },
     version: '1.0.0',
     tags: ['폼', 'form', 'universal', 'post', 'cpt'],
     aiPrompts: [
-      '사용자가 블로그 포스트를 작성할 수 있는 폼 → postType="post"',
-      '사용자가 상품을 등록할 수 있는 폼 → postType="product"',
-      '사용자가 이벤트를 등록할 수 있는 폼 → postType="event"',
-      'Post나 CPT의 생성/편집 폼이 필요할 때',
-      'innerBlocks로 form-field와 form-submit 포함 필수'
+      '사용자가 블로그 포스트를 작성할 수 있는 폼',
+      '사용자가 상품을 등록할 수 있는 폼',
+      'Post나 CPT의 생성/편집 폼이 필요할 때'
     ]
   },
   {
@@ -636,24 +700,6 @@ export const blockMetadata: BlockMetadata[] = [
     version: '1.0.0',
     tags: ['폼', 'submit', 'button'],
     aiPrompts: ['폼 제출 버튼이 필요할 때']
-  },
-
-  // ============================================
-  // 기타 블록 (Common Blocks)
-  // ============================================
-  {
-    name: 'o4o/block-appender',
-    title: '블록 추가',
-    description: '블록 추가 버튼 (편집기 전용)',
-    category: 'common',
-    attributes: {},
-    example: {
-      json: JSON.stringify({ type: 'o4o/block-appender' }, null, 2),
-      text: '블록 추가 버튼'
-    },
-    version: '1.0.0',
-    tags: ['편집기', 'editor'],
-    aiPrompts: ['편집기 내부에서만 사용 - AI가 직접 사용하지 않음']
   }
 ];
 

@@ -62,6 +62,12 @@ async function getSchemaFiles(): Promise<Set<string>> {
     const filePath = path.join(schemasDir, file);
     const content = fs.readFileSync(filePath, 'utf-8');
 
+    // Skip non-CPT schema files (e.g., JSON Schema definitions)
+    // CPT schemas should have CPTSchema type and registry.register usage
+    if (!content.includes('CPTSchema') && !content.includes('FieldDefinition')) {
+      continue; // Not a CPT schema file
+    }
+
     // Extract CPT name from schema export
     // Example: export const dsProductSchema: CPTSchema = { name: 'ds_product', ...
     const nameMatch = content.match(/name:\s*['"]([^'"]+)['"]/);
@@ -71,7 +77,10 @@ async function getSchemaFiles(): Promise<Set<string>> {
     } else {
       // Try to infer from filename (e.g., ds_product.schema.ts -> ds_product)
       const cptName = file.replace('.schema.ts', '');
-      cptNames.add(cptName);
+      // Only add if it looks like it could be a CPT schema (has export const ...Schema)
+      if (content.match(/export const \w+Schema/)) {
+        cptNames.add(cptName);
+      }
     }
   }
 

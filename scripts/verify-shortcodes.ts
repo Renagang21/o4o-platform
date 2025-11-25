@@ -80,8 +80,8 @@ async function getImplementedShortcodes(): Promise<Set<string>> {
     return new Set();
   }
 
-  // Find all .tsx files in shortcodes directory
-  const files = await glob('**/*.tsx', { cwd: shortcodesDir });
+  // Find all .tsx and .ts files in shortcodes directory
+  const files = await glob('**/*.{ts,tsx}', { cwd: shortcodesDir });
 
   const implementedShortcodes = new Set<string>();
 
@@ -90,22 +90,41 @@ async function getImplementedShortcodes(): Promise<Set<string>> {
     const content = fs.readFileSync(filePath, 'utf-8');
 
     // Look for shortcode name patterns:
-    // 1. export const ProductShortcode = ... (component name)
+    // 1. ShortcodeDefinition with name property
     // 2. registerShortcode('product', ...) (explicit registration)
+    // 3. export const ProductShortcode = ... (component name)
 
-    const componentMatch = content.match(/export\s+(?:const|function)\s+(\w+Shortcode)/);
-    const registerMatch = content.match(/registerShortcode\(['"]([^'"]+)['"]/);
+    // First try to find ShortcodeDefinition with name property
+    const shortcodeDefRegex = /name:\s*['"]([^'"]+)['"]/g;
+    let match;
+    let foundAny = false;
 
-    if (registerMatch) {
-      implementedShortcodes.add(registerMatch[1]);
-    } else if (componentMatch) {
-      // Convert ProductShortcode -> product (snake_case convention)
-      const name = componentMatch[1]
-        .replace(/Shortcode$/, '')
-        .replace(/([A-Z])/g, '_$1')
-        .toLowerCase()
-        .replace(/^_/, '');
-      implementedShortcodes.add(name);
+    while ((match = shortcodeDefRegex.exec(content)) !== null) {
+      // Skip if this is just a parameter name or nested object property
+      // Only count if it's in a ShortcodeDefinition context
+      const beforeMatch = content.substring(Math.max(0, match.index - 200), match.index);
+      if (beforeMatch.includes('ShortcodeDefinition') || beforeMatch.includes(': ShortcodeDefinition')) {
+        implementedShortcodes.add(match[1]);
+        foundAny = true;
+      }
+    }
+
+    // If no ShortcodeDefinition found, try other patterns
+    if (!foundAny) {
+      const componentMatch = content.match(/export\s+(?:const|function)\s+(\w+Shortcode)/);
+      const registerMatch = content.match(/registerShortcode\(['"]([^'"]+)['"]/);
+
+      if (registerMatch) {
+        implementedShortcodes.add(registerMatch[1]);
+      } else if (componentMatch) {
+        // Convert ProductShortcode -> product (snake_case convention)
+        const name = componentMatch[1]
+          .replace(/Shortcode$/, '')
+          .replace(/([A-Z])/g, '_$1')
+          .toLowerCase()
+          .replace(/^_/, '');
+        implementedShortcodes.add(name);
+      }
     }
   }
 
