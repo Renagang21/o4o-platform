@@ -84,15 +84,6 @@ const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 
 // Affiliate Management Pages
 
-// Forum Pages
-const ForumRouter = lazy(() => import('@/pages/forum/ForumRouter'));
-
-// Digital Signage Pages
-const SignageRouter = lazy(() => import('@/pages/signage/SignageRouter'));
-
-// Crowdfunding Pages
-const CrowdfundingRouter = lazy(() => import('@/pages/crowdfunding/CrowdfundingRouter'));
-
 // App Pages
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
@@ -708,34 +699,7 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
-                    {/* Forum - App Guard 적용 */}
-                    <Route path="/forum/*" element={
-                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ForumRouter />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* Digital Signage - App Guard 적용 */}
-                    <Route path="/signage/*" element={
-                      <AdminProtectedRoute requiredPermissions={['signage:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <SignageRouter />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* Crowdfunding - App Guard 적용 */}
-                    <Route path="/crowdfunding/*" element={
-                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <CrowdfundingRouter />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
+
                     {/* 도구 */}
                     <Route path="/tools" element={
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>

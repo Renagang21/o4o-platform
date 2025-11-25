@@ -10,16 +10,14 @@ const options: swaggerJsdoc.Options = {
       version: '1.0.0',
       description: `
         O4O Platform REST API Documentation
-        
+
         ## Overview
         This API provides endpoints for managing the O4O platform including:
         - Content Management (Posts, Pages, Media)
         - E-commerce (Products, Orders, Customers)
         - User Management & Authentication
         - Platform Settings & Configuration
-        - Forum & Community Features
-        - Crowdfunding Campaigns
-        
+
         ## Authentication
         Most endpoints require authentication using JWT tokens.
         Include the token in the Authorization header:
@@ -253,10 +251,6 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Platform',
         description: 'Platform management endpoints'
-      },
-      {
-        name: 'Forum',
-        description: 'Forum and community endpoints'
       },
       {
         name: 'Settings',

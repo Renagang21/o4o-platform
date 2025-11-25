@@ -442,11 +442,6 @@ Authorization: Bearer <your-jwt-token>
         'x-displayName': '⚙️ 플랫폼'
       },
       {
-        name: 'Forum',
-        description: '포럼 및 커뮤니티',
-        'x-displayName': '💬 포럼'
-      },
-      {
         name: 'Settings',
         description: '시스템 설정',
         'x-displayName': '⚙️ 설정'
@@ -466,10 +461,6 @@ Authorization: Bearer <your-jwt-token>
       {
         name: '비즈니스',
         tags: ['E-commerce', 'Dropshipping']
-      },
-      {
-        name: '커뮤니티',
-        tags: ['Forum']
       },
       {
         name: '시스템',

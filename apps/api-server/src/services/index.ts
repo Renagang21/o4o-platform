@@ -46,7 +46,6 @@ export * from './UserService.js';
 export * from './account-linking.service.js';
 export * from './betaUserService.js';
 export * from './email.service.js';
-export * from './forumService.js';
 export * from './imageProcessingService.js';
 // export * from './inventoryService.js';
 export * from './passwordResetService.js';
@@ -54,13 +53,8 @@ export * from './passwordResetService.js';
 export * from './realtimeFeedbackService.js';
 export * from './sessionSyncService.js';
 export * from './settingsService.js';
-export * from './signageService.js';
 export * from './socialAuthService.js';
 // export * from './webhookService.js';
-
-// Export crowdfunding services
-export * from './crowdfunding/BackingService.js';
-export * from './crowdfunding/FundingProjectService.js';
 
 // Export shipping services
 // export * from './shipping/ShippingService.js';

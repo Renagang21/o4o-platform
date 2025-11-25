@@ -21,13 +21,11 @@ import ecommerceSettingsRoutes from '../routes/ecommerce/settingsRoutes.js';
 import cptRoutes from '../routes/cpt.js';
 import postCreationRoutes from '../routes/post-creation/index.js';
 import servicesRoutes from '../routes/services.js';
-import signageRoutes from '../routes/signage.js';
 import contentRoutes from '../routes/content.js';
 import cmsRoutes from '../routes/content/index.js';
 import publicRoutes from '../routes/public.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
 import emailAuthRoutes from '../routes/email-auth.routes.js';
-import forumRoutes from '../routes/forum.js';
 import linkedAccountsRoutes from '../routes/linked-accounts.js';
 import accountLinkingRoutes from '../routes/account-linking.routes.js';
 import inventoryRoutes from '../routes/inventory.js';
@@ -49,11 +47,10 @@ import healthRoutes from '../routes/health.js';
 import metricsRoutes from '../routes/metrics.js';
 import contentV1Routes from '../routes/v1/content.routes.js';
 import platformV1Routes from '../routes/v1/platform.routes.js';
-import forumV1Routes from '../routes/v1/forum.routes.js';
 import adminV1Routes from '../routes/v1/admin.routes.js';
 import mediaV1Routes from '../routes/v1/media.routes.js';
 import themeRoutes from '../routes/v1/theme.routes.js';
-import platformAppsV1Routes from '../routes/v1/apps.routes.js'; // Platform modules (ecommerce, forum, etc.)
+import platformAppsV1Routes from '../routes/v1/apps.routes.js'; // Platform modules (ecommerce, etc.)
 import pluginsV1Routes from '../routes/v1/plugins.routes.js';
 import settingsV1Routes from '../routes/v1/settings.routes.js';
 import customizerV1Routes from '../routes/v1/customizer.routes.js';
@@ -76,7 +73,6 @@ import migrationRoutes from '../routes/migration.routes.js';
 import tagRoutes from '../routes/content/tagRoutes.js';
 import previewProxyRoutes from '../routes/v1/preview.routes.js';
 import dropshippingAdminRoutes from '../routes/admin/dropshipping.routes.js';
-import forumAdminRoutes from '../routes/admin/forum.routes.js';
 import userAdminRoutes from '../routes/admin/users.routes.js';
 import supplierAdminRoutes from '../routes/admin/suppliers.routes.js';
 import adminOrdersRoutes from '../routes/admin/orders.routes.js';
@@ -423,10 +419,6 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/approval/admin', adminManagementRoutes);
   app.use('/api/v1/approval', approvalV1Routes);
 
-  // Forum
-  app.use('/api/forum', standardLimiter, forumRoutes);
-  app.use('/api/v1/forum', forumV1Routes);
-
   // Email & SMTP
   app.use('/api/v1/email', emailSettingsRoutes);
   app.use('/api/v1/smtp', smtpRoutes);
@@ -469,7 +461,6 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/cpt', standardLimiter, cptRoutes);
   app.use('/api/post-creation', standardLimiter, postCreationRoutes);
   app.use('/api/services', standardLimiter, servicesRoutes);
-  app.use('/api/signage', standardLimiter, signageRoutes);
   app.use('/api/content', contentRoutes);
   app.use('/api/cms', cmsRoutes);
   app.use('/api/reusable-blocks', reusableBlocksRoutes);
@@ -481,14 +472,12 @@ export function setupRoutes(app: Application): void {
 
   // Admin sub-routes (v1)
   app.use('/api/v1/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
-  app.use('/api/v1/admin/forum', standardLimiter, forumAdminRoutes);
   app.use('/api/v1/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/v1/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/v1/admin/orders', standardLimiter, adminOrdersRoutes);
 
   // Admin sub-routes (legacy)
   app.use('/api/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
-  app.use('/api/admin/forum', standardLimiter, forumAdminRoutes);
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/admin/orders', standardLimiter, adminOrdersRoutes);
@@ -568,7 +557,6 @@ export function setupRoutes(app: Application): void {
         cpt: '/api/cpt',
         postCreation: '/api/post-creation',
         services: '/api/services',
-        signage: '/api/signage',
         content: {
           pages: '/api/admin/pages',
           media: '/api/admin/media',

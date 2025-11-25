@@ -38,23 +38,6 @@ import { MediaFolder } from '../entities/MediaFolder.js';
 import { Category } from '../entities/Category.js';
 import { Settings } from '../entities/Settings.js';
 import { Theme, ThemeInstallation } from '../entities/Theme.js';
-import { FundingProject } from '../entities/crowdfunding/FundingProject.js';
-import { FundingReward } from '../entities/crowdfunding/FundingReward.js';
-import { FundingBacking } from '../entities/crowdfunding/FundingBacking.js';
-import { BackerReward } from '../entities/crowdfunding/BackerReward.js';
-import { FundingUpdate } from '../entities/crowdfunding/FundingUpdate.js';
-import { ForumCategory } from '../entities/ForumCategory.js';
-import { ForumComment } from '../entities/ForumComment.js';
-import { ForumPost } from '../entities/ForumPost.js';
-import { ForumTag } from '../entities/ForumTag.js';
-// Digital Signage entities
-import { SignageContent } from '../entities/SignageContent.js';
-import { SignageSchedule } from '../entities/SignageSchedule.js';
-import { Store } from '../entities/Store.js';
-import { StorePlaylist } from '../entities/StorePlaylist.js';
-import { PlaylistItem } from '../entities/PlaylistItem.js';
-import { ScreenTemplate } from '../entities/ScreenTemplate.js';
-import { ContentUsageLog } from '../entities/ContentUsageLog.js';
 import { Post } from '../entities/Post.js';
 import { PostMeta } from '../entities/PostMeta.js';
 import { Tag } from '../entities/Tag.js';
@@ -201,25 +184,6 @@ export const AppDataSource = new DataSource({
     Settings,
     Theme,
     ThemeInstallation,
-    // Crowdfunding entities
-    FundingProject,
-    FundingReward,
-    FundingBacking,
-    BackerReward,
-    FundingUpdate,
-    // Forum entities
-    ForumCategory,
-    ForumPost,
-    ForumComment,
-    ForumTag,
-    // Digital Signage entities
-    SignageContent,
-    SignageSchedule,
-    Store,
-    StorePlaylist,
-    PlaylistItem,
-    ScreenTemplate,
-    ContentUsageLog,
     // Content entities
     Post,
     PostMeta,
