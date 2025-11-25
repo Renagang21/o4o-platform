@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { cptService } from '../../../services/cpt/cpt.service.js';
-import { acfService } from '../services/acf.service.js'; // TODO P1-B: Migrate getFieldValues/saveFieldValues to unified service
+import { metaDataService } from '../../../services/MetaDataService.js';
 import { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 
@@ -124,17 +124,20 @@ export class ACFController {
 
   /**
    * Get field values for an entity
+   * Phase P1-B: Uses metaDataService.getManyMeta directly
    */
   static async getFieldValues(req: Request, res: Response) {
     try {
       const { entityType, entityId } = req.params;
-      const result = await acfService.getFieldValues(entityType, entityId);
 
-      if (!result.success) {
-        return res.status(404).json(result);
-      }
+      // Get all meta values for this entity
+      const metaResult = await metaDataService.getManyMeta(entityType, [entityId]);
+      const fieldValues = metaResult[entityId] || {};
 
-      res.json(result);
+      res.json({
+        success: true,
+        data: fieldValues
+      });
     } catch (error: any) {
       logger.error('Controller error - getFieldValues:', error);
       res.status(500).json({
@@ -147,17 +150,32 @@ export class ACFController {
 
   /**
    * Save field values for an entity
+   * Phase P1-B: Uses metaDataService.setManyMeta directly (transactional)
    */
   static async saveFieldValues(req: AuthRequest, res: Response) {
     try {
       const { entityType, entityId } = req.params;
-      const result = await acfService.saveFieldValues(entityType, entityId, req.body);
+      const fieldValues = req.body;
 
-      if (!result.success) {
-        return res.status(400).json(result);
+      // Use setManyMeta for transactional batch update
+      const success = await metaDataService.setManyMeta(entityType, entityId, fieldValues);
+
+      if (!success) {
+        return res.status(400).json({
+          success: false,
+          error: 'Failed to save field values'
+        });
       }
 
-      res.json(result);
+      res.json({
+        success: true,
+        message: 'Field values saved successfully',
+        data: {
+          entityType,
+          entityId,
+          fieldsUpdated: Object.keys(fieldValues).length
+        }
+      });
     } catch (error: any) {
       logger.error('Controller error - saveFieldValues:', error);
       res.status(500).json({

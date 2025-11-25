@@ -9,9 +9,9 @@ export interface MetaValue {
   value: string | number | boolean | Date | null | string[] | Record<string, unknown>;
 }
 
-export interface ManyMetaResult {
+export interface ManyMetaResult<T = unknown> {
   [entityId: string]: {
-    [fieldName: string]: string | number | boolean | Date | null | string[] | Record<string, unknown>;
+    [fieldName: string]: T;
   };
 }
 
@@ -29,12 +29,16 @@ export class MetaDataService {
    * @param entityId 엔티티 ID
    * @param fieldId 필드 ID 또는 필드명
    * @returns 필드 값 또는 undefined
+   *
+   * @example
+   * const price = await metaDataService.getMeta<number>('post', postId, 'price');
+   * const sku = await metaDataService.getMeta<string>('post', postId, 'sku');
    */
-  async getMeta(
-    entityType: string, 
-    entityId: string, 
+  async getMeta<T = unknown>(
+    entityType: string,
+    entityId: string,
     fieldId: string
-  ): Promise<string | number | boolean | Date | null | string[] | Record<string, unknown> | undefined> {
+  ): Promise<T | undefined> {
     try {
       // fieldId가 UUID인지 필드명인지 확인
       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(fieldId);
@@ -67,7 +71,7 @@ export class MetaDataService {
         }
       }
 
-      return fieldValue?.value;
+      return fieldValue?.value as T | undefined;
     } catch (error) {
       logger.error('Failed to get meta value:', error);
       return undefined;
@@ -143,12 +147,15 @@ export class MetaDataService {
    * @param entityIds 엔티티 ID 배열
    * @param fieldIds 필드 ID 또는 필드명 배열 (선택사항, 없으면 모든 필드)
    * @returns 중첩된 객체 형태의 결과
+   *
+   * @example
+   * const metaBatch = await metaDataService.getManyMeta<number>('post', postIds, ['price', 'stock']);
    */
-  async getManyMeta(
-    entityType: string, 
-    entityIds: string[], 
+  async getManyMeta<T = unknown>(
+    entityType: string,
+    entityIds: string[],
     fieldIds?: string[]
-  ): Promise<ManyMetaResult> {
+  ): Promise<ManyMetaResult<T>> {
     try {
       if (entityIds.length === 0) {
         return {};
@@ -191,7 +198,7 @@ export class MetaDataService {
       const fieldValues = await queryBuilder.getMany();
 
       // 결과를 중첩 객체로 변환
-      const result: ManyMetaResult = {};
+      const result: ManyMetaResult<T> = {};
 
       for (const entityId of entityIds) {
         result[entityId] = {};
@@ -201,8 +208,8 @@ export class MetaDataService {
         if (!result[fieldValue.entityId]) {
           result[fieldValue.entityId] = {};
         }
-        
-        result[fieldValue.entityId][fieldValue.field.name] = fieldValue.value;
+
+        result[fieldValue.entityId][fieldValue.field.name] = fieldValue.value as T;
       }
 
       return result;
@@ -264,15 +271,118 @@ export class MetaDataService {
    * @returns 게시물 ID를 키로 하는 메타 데이터 맵
    *
    * @example
-   * const metaBatch = await metaDataService.getPostMetaBatch(['post-1', 'post-2']);
-   * const post1Meta = metaBatch['post-1'];
+   * const metaBatch = await metaDataService.getPostMetaBatch<number>(['post-1', 'post-2'], ['price']);
+   * const post1Price = metaBatch['post-1']['price'];
    */
-  async getPostMetaBatch(
+  async getPostMetaBatch<T = unknown>(
     postIds: string[],
     fieldIds?: string[]
-  ): Promise<ManyMetaResult> {
-    return this.getManyMeta('post', postIds, fieldIds);
+  ): Promise<ManyMetaResult<T>> {
+    return this.getManyMeta<T>('post', postIds, fieldIds);
   }
+
+  // ============================================================================
+  // Type-Safe Helper Methods (Phase P1-B)
+  // ============================================================================
+
+  /**
+   * 숫자 타입 메타 값을 가져옵니다
+   * @param entityType 엔티티 타입
+   * @param entityId 엔티티 ID
+   * @param fieldId 필드 ID 또는 필드명
+   * @returns 숫자 값 또는 undefined
+   *
+   * @example
+   * const price = await metaDataService.getNumberMeta('post', postId, 'price');
+   * const stock = await metaDataService.getNumberMeta('post', postId, 'stock_quantity');
+   */
+  async getNumberMeta(
+    entityType: string,
+    entityId: string,
+    fieldId: string
+  ): Promise<number | undefined> {
+    return this.getMeta<number>(entityType, entityId, fieldId);
+  }
+
+  /**
+   * 문자열 타입 메타 값을 가져옵니다
+   * @param entityType 엔티티 타입
+   * @param entityId 엔티티 ID
+   * @param fieldId 필드 ID 또는 필드명
+   * @returns 문자열 값 또는 undefined
+   *
+   * @example
+   * const sku = await metaDataService.getStringMeta('post', postId, 'sku');
+   * const productCode = await metaDataService.getStringMeta('post', postId, 'product_code');
+   */
+  async getStringMeta(
+    entityType: string,
+    entityId: string,
+    fieldId: string
+  ): Promise<string | undefined> {
+    return this.getMeta<string>(entityType, entityId, fieldId);
+  }
+
+  /**
+   * 불리언 타입 메타 값을 가져옵니다
+   * @param entityType 엔티티 타입
+   * @param entityId 엔티티 ID
+   * @param fieldId 필드 ID 또는 필드명
+   * @returns 불리언 값 또는 undefined
+   *
+   * @example
+   * const isFeatured = await metaDataService.getBooleanMeta('post', postId, 'featured');
+   * const isAvailable = await metaDataService.getBooleanMeta('post', postId, 'in_stock');
+   */
+  async getBooleanMeta(
+    entityType: string,
+    entityId: string,
+    fieldId: string
+  ): Promise<boolean | undefined> {
+    return this.getMeta<boolean>(entityType, entityId, fieldId);
+  }
+
+  /**
+   * 객체 타입 메타 값을 가져옵니다
+   * @param entityType 엔티티 타입
+   * @param entityId 엔티티 ID
+   * @param fieldId 필드 ID 또는 필드명
+   * @returns 객체 값 또는 undefined
+   *
+   * @example
+   * const dimensions = await metaDataService.getObjectMeta('post', postId, 'dimensions');
+   * const settings = await metaDataService.getObjectMeta('post', postId, 'product_settings');
+   */
+  async getObjectMeta<T extends Record<string, unknown> = Record<string, unknown>>(
+    entityType: string,
+    entityId: string,
+    fieldId: string
+  ): Promise<T | undefined> {
+    return this.getMeta<T>(entityType, entityId, fieldId);
+  }
+
+  /**
+   * 배열 타입 메타 값을 가져옵니다
+   * @param entityType 엔티티 타입
+   * @param entityId 엔티티 ID
+   * @param fieldId 필드 ID 또는 필드명
+   * @returns 배열 값 또는 undefined
+   *
+   * @example
+   * const tags = await metaDataService.getArrayMeta<string>('post', postId, 'tags');
+   * const relatedIds = await metaDataService.getArrayMeta<string>('post', postId, 'related_products');
+   */
+  async getArrayMeta<T = string>(
+    entityType: string,
+    entityId: string,
+    fieldId: string
+  ): Promise<T[] | undefined> {
+    return this.getMeta<T[]>(entityType, entityId, fieldId);
+  }
+
+  // ============================================================================
+  // Bulk Operations
+  // ============================================================================
 
   /**
    * 여러 필드 값을 한 번에 저장합니다 (트랜잭션 사용)
