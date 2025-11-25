@@ -1,0 +1,553 @@
+/**
+ * SettlementEngine v2
+ * P2-C Phase C-2: Minimal Logic Implementation
+ *
+ * Purpose:
+ * - Entry point for SettlementEngine v2
+ * - Policy-based, versioned settlement calculation
+ * - Runs in parallel with v1 (shadow mode initially)
+ *
+ * Design Reference:
+ * - docs/dev/R-8-8-1-SettlementEngine-v2-Design.md
+ * - docs/dev/P2-C-SettlementEngine-v2-Implementation-Guide.md
+ *
+ * Phase C-2 Status: MINIMAL LOGIC IMPLEMENTED
+ * - Repository dependencies injected
+ * - Basic settlement calculation (seller/supplier)
+ * - RuleSet application (percentage/fixed only)
+ * - dryRun mode implemented
+ * - Diagnostics populated
+ *
+ * Updated: 2025-11-25 (P2-C Phase C-2)
+ */
+
+import { Repository, Between } from 'typeorm';
+import { Order } from '../../entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../../entities/OrderItem.js';
+import { Settlement, SettlementStatus } from '../../entities/Settlement.js';
+import { SettlementItem } from '../../entities/SettlementItem.js';
+import { Commission } from '../../entities/Commission.js';
+import {
+  SettlementV2Config,
+  SettlementEngineV2Result,
+  SettlementPartyContext,
+  CommissionRule,
+} from './SettlementTypesV2.js';
+import logger from '../../utils/logger.js';
+
+/**
+ * SettlementEngine v2 - Main orchestrator
+ *
+ * Responsibilities:
+ * 1. Accept v2 configuration (period, parties, ruleSet)
+ * 2. Query orders/events within period
+ * 3. Calculate settlements using CommissionRuleSet
+ * 4. Generate Settlement/SettlementItem entities
+ * 5. Return results (optionally persist if dryRun=false)
+ */
+export class SettlementEngineV2 {
+  private readonly orderRepository: Repository<Order>;
+  private readonly settlementRepository: Repository<Settlement>;
+  private readonly settlementItemRepository: Repository<SettlementItem>;
+  private readonly commissionRepository: Repository<Commission>;
+
+  constructor(
+    orderRepository: Repository<Order>,
+    settlementRepository: Repository<Settlement>,
+    settlementItemRepository: Repository<SettlementItem>,
+    commissionRepository: Repository<Commission>
+  ) {
+    this.orderRepository = orderRepository;
+    this.settlementRepository = settlementRepository;
+    this.settlementItemRepository = settlementItemRepository;
+    this.commissionRepository = commissionRepository;
+
+    logger.info('[SettlementEngineV2] Initialized (Phase C-2)');
+  }
+
+  /**
+   * Generate settlements based on v2 configuration
+   *
+   * Phase C-2 Implementation:
+   * 1. Validate config
+   * 2. Query orders in period
+   * 3. Calculate per-party settlements using RuleSet
+   * 4. Generate Settlement/SettlementItem structures
+   * 5. dryRun mode: Return without persisting
+   *
+   * @param config - SettlementV2Config with period, parties, rules
+   * @returns Promise<SettlementEngineV2Result> with settlements and diagnostics
+   */
+  async generateSettlements(
+    config: SettlementV2Config
+  ): Promise<SettlementEngineV2Result> {
+    const startTime = Date.now();
+    logger.info('[SettlementEngineV2] generateSettlements started (Phase C-2)', {
+      periodStart: config.periodStart,
+      periodEnd: config.periodEnd,
+      partiesCount: config.parties.length,
+      ruleSetId: config.ruleSet.id,
+      dryRun: config.dryRun ?? true,
+      tag: config.tag,
+    });
+
+    try {
+      // 1. Validate configuration
+      this.validateConfig(config);
+
+      // 2. Query orders in period
+      const orders = await this.queryOrdersInPeriod(config.periodStart, config.periodEnd);
+
+      if (orders.length === 0) {
+        logger.info('[SettlementEngineV2] No orders found in period', {
+          periodStart: config.periodStart,
+          periodEnd: config.periodEnd,
+        });
+        return this.emptyResult();
+      }
+
+      logger.debug(`[SettlementEngineV2] Found ${orders.length} orders in period`);
+
+      // 3. Calculate settlements for each party
+      const settlementItems: SettlementItem[] = [];
+      const ruleHits: Record<string, number> = {};
+
+      for (const party of config.parties) {
+        const partyItems = await this.calculatePartySettlements(
+          orders,
+          party,
+          config.ruleSet.rules,
+          ruleHits
+        );
+        settlementItems.push(...partyItems);
+      }
+
+      // 4. Aggregate SettlementItems into Settlements
+      const settlements = this.aggregateSettlements(
+        config.periodStart,
+        config.periodEnd,
+        settlementItems,
+        config.parties
+      );
+
+      // 5. Calculate diagnostics
+      const totalsByParty = this.calculateTotalsByParty(settlements);
+
+      // 6. Persist to DB if not dryRun
+      if (!config.dryRun) {
+        // TODO P2-C Phase C-3: Implement actual DB persistence
+        logger.warn('[SettlementEngineV2] dryRun=false but DB persistence not yet implemented');
+        logger.warn('[SettlementEngineV2] Returning results without persisting (Phase C-2)');
+      }
+
+      const duration = Date.now() - startTime;
+      logger.info('[SettlementEngineV2] generateSettlements completed', {
+        duration,
+        settlementsCount: settlements.length,
+        settlementItemsCount: settlementItems.length,
+        dryRun: config.dryRun ?? true,
+      });
+
+      return {
+        settlements,
+        settlementItems,
+        commissions: [], // Phase C-2: Partner commissions not yet implemented
+        diagnostics: {
+          ruleHits,
+          totalsByParty,
+        },
+      };
+    } catch (error) {
+      logger.error('[SettlementEngineV2] generateSettlements failed', {
+        error: error instanceof Error ? error.message : String(error),
+        config,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Validate configuration before processing
+   */
+  private validateConfig(config: SettlementV2Config): void {
+    if (!config.periodStart || !config.periodEnd) {
+      throw new Error('Period start and end dates are required');
+    }
+
+    if (config.periodEnd < config.periodStart) {
+      throw new Error('Period end must be after period start');
+    }
+
+    if (!config.parties || config.parties.length === 0) {
+      throw new Error('At least one party must be specified');
+    }
+
+    if (!config.ruleSet || !config.ruleSet.rules || config.ruleSet.rules.length === 0) {
+      throw new Error('RuleSet must contain at least one rule');
+    }
+
+    logger.debug('[SettlementEngineV2] Config validation passed');
+  }
+
+  /**
+   * Query orders within the specified period
+   * Phase C-2: Query DELIVERED orders only
+   */
+  private async queryOrdersInPeriod(
+    periodStart: Date,
+    periodEnd: Date
+  ): Promise<Order[]> {
+    const orders = await this.orderRepository.find({
+      where: {
+        orderDate: Between(periodStart, periodEnd),
+        // Phase C-2: Only DELIVERED orders are settled
+        // status: OrderStatus.DELIVERED, // TODO: Uncomment if OrderStatus enum exists
+      },
+      relations: ['itemsRelation'], // Load OrderItem entities
+    });
+
+    return orders;
+  }
+
+  /**
+   * Calculate settlements for a specific party
+   * Phase C-2: Supports seller and supplier only
+   */
+  private async calculatePartySettlements(
+    orders: Order[],
+    party: SettlementPartyContext,
+    rules: CommissionRule[],
+    ruleHits: Record<string, number>
+  ): Promise<SettlementItem[]> {
+    const items: SettlementItem[] = [];
+
+    for (const order of orders) {
+      if (!order.itemsRelation || order.itemsRelation.length === 0) {
+        continue;
+      }
+
+      for (const orderItem of order.itemsRelation) {
+        // Filter items relevant to this party
+        if (!this.isItemRelevantToParty(orderItem, party)) {
+          continue;
+        }
+
+        // Find applicable rule
+        const rule = this.findApplicableRule(orderItem, party, rules);
+        if (!rule) {
+          logger.warn(`[SettlementEngineV2] No applicable rule found for party ${party.partyType}:${party.partyId}`);
+          continue;
+        }
+
+        // Track rule usage
+        ruleHits[rule.id] = (ruleHits[rule.id] || 0) + 1;
+
+        // Calculate amounts based on rule
+        const { grossAmount, commissionAmount, netAmount } = this.calculateAmounts(
+          orderItem,
+          party,
+          rule
+        );
+
+        // Create SettlementItem structure
+        const item = this.createSettlementItem(
+          order,
+          orderItem,
+          party,
+          rule,
+          grossAmount,
+          commissionAmount,
+          netAmount
+        );
+
+        items.push(item);
+      }
+    }
+
+    logger.debug(`[SettlementEngineV2] Calculated ${items.length} items for party ${party.partyType}:${party.partyId}`);
+    return items;
+  }
+
+  /**
+   * Check if OrderItem is relevant to the party
+   */
+  private isItemRelevantToParty(
+    item: OrderItemEntity,
+    party: SettlementPartyContext
+  ): boolean {
+    switch (party.partyType) {
+      case 'seller':
+        return item.sellerId === party.partyId;
+      case 'supplier':
+        return item.supplierId === party.partyId;
+      case 'platform':
+        return true; // Platform gets commission from all items
+      case 'partner':
+        // Phase C-2: Partner logic not yet implemented
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Find applicable rule for the item and party
+   * Phase C-2: Simple matching - first applicable rule wins
+   */
+  private findApplicableRule(
+    item: OrderItemEntity,
+    party: SettlementPartyContext,
+    rules: CommissionRule[]
+  ): CommissionRule | null {
+    for (const rule of rules) {
+      // Check partyType match
+      if (rule.appliesTo.partyType && rule.appliesTo.partyType !== party.partyType) {
+        continue;
+      }
+
+      // Check productId match
+      if (rule.appliesTo.productIds && rule.appliesTo.productIds.length > 0) {
+        if (!rule.appliesTo.productIds.includes(item.productId)) {
+          continue;
+        }
+      }
+
+      // Phase C-2: categoryId and channelId not yet implemented
+
+      // Rule matches
+      return rule;
+    }
+
+    // No specific rule found, return default if exists
+    return rules.find(r => !r.appliesTo.partyType && !r.appliesTo.productIds) || null;
+  }
+
+  /**
+   * Calculate gross, commission, and net amounts
+   * Phase C-2: Supports percentage and fixed rules only
+   */
+  private calculateAmounts(
+    item: OrderItemEntity,
+    party: SettlementPartyContext,
+    rule: CommissionRule
+  ): { grossAmount: number; commissionAmount: number; netAmount: number } {
+    let grossAmount = 0;
+    let commissionAmount = 0;
+
+    if (party.partyType === 'seller') {
+      // Seller: gross = totalPrice, commission = calculated, net = gross - commission
+      grossAmount = parseFloat(item.totalPrice.toString());
+
+      if (rule.type === 'percentage' && rule.percentageRate !== undefined) {
+        commissionAmount = (grossAmount * rule.percentageRate) / 100;
+      } else if (rule.type === 'fixed' && rule.fixedAmount !== undefined) {
+        commissionAmount = rule.fixedAmount * item.quantity;
+      }
+    } else if (party.partyType === 'supplier') {
+      // Supplier: gross = basePrice * quantity, commission = 0, net = gross
+      const basePrice = item.basePriceSnapshot ? parseFloat(item.basePriceSnapshot.toString()) : 0;
+      grossAmount = basePrice * item.quantity;
+      commissionAmount = 0;
+    } else if (party.partyType === 'platform') {
+      // Platform: gross = commission from seller, net = gross
+      const sellerGross = parseFloat(item.totalPrice.toString());
+      if (rule.type === 'percentage' && rule.percentageRate !== undefined) {
+        grossAmount = (sellerGross * rule.percentageRate) / 100;
+      } else if (rule.type === 'fixed' && rule.fixedAmount !== undefined) {
+        grossAmount = rule.fixedAmount * item.quantity;
+      }
+      commissionAmount = 0; // Platform doesn't pay commission
+    }
+
+    const netAmount = grossAmount - commissionAmount;
+
+    return { grossAmount, commissionAmount, netAmount };
+  }
+
+  /**
+   * Create SettlementItem structure
+   * Phase C-2: Memory object only (not persisted)
+   */
+  private createSettlementItem(
+    order: Order,
+    orderItem: OrderItemEntity,
+    party: SettlementPartyContext,
+    rule: CommissionRule,
+    grossAmount: number,
+    commissionAmount: number,
+    netAmount: number
+  ): SettlementItem {
+    const item = new SettlementItem();
+
+    // Basic fields
+    item.settlementId = ''; // Will be set when Settlement is created
+    item.orderId = order.id;
+    item.orderItemId = orderItem.id;
+    item.partyType = party.partyType;
+    item.partyId = party.partyId;
+
+    // Amounts
+    item.grossAmount = grossAmount.toString();
+    item.commissionAmountSnapshot = commissionAmount.toString();
+    item.netAmount = netAmount.toString();
+
+    // Product info
+    item.productName = orderItem.productName;
+    item.quantity = orderItem.quantity;
+    item.salePriceSnapshot = orderItem.salePriceSnapshot?.toString() || orderItem.unitPrice.toString();
+    item.basePriceSnapshot = orderItem.basePriceSnapshot?.toString();
+
+    // Commission info
+    item.commissionType = orderItem.commissionType;
+    item.commissionRate = orderItem.commissionRate?.toString();
+
+    // Reason and metadata
+    item.reasonCode = 'order_completed';
+    item.metadata = {
+      ruleId: rule.id,
+      ruleName: rule.name,
+      ruleType: rule.type,
+      productId: orderItem.productId,
+    };
+
+    // Seller/Supplier IDs
+    item.sellerId = orderItem.sellerId;
+    item.supplierId = orderItem.supplierId;
+
+    // Phase C-2: Timestamps not set (memory object only)
+    // item.createdAt = new Date();
+
+    return item;
+  }
+
+  /**
+   * Aggregate SettlementItems into Settlements by party
+   */
+  private aggregateSettlements(
+    periodStart: Date,
+    periodEnd: Date,
+    items: SettlementItem[],
+    parties: SettlementPartyContext[]
+  ): Settlement[] {
+    const settlements: Settlement[] = [];
+
+    for (const party of parties) {
+      const partyKey = `${party.partyType}:${party.partyId}`;
+      const partyItems = items.filter(
+        item => item.partyType === party.partyType && item.partyId === party.partyId
+      );
+
+      if (partyItems.length === 0) {
+        continue;
+      }
+
+      // Calculate totals
+      const totals = partyItems.reduce(
+        (acc, item) => ({
+          grossAmount: acc.grossAmount + parseFloat(item.grossAmount || '0'),
+          commissionAmount: acc.commissionAmount + parseFloat(item.commissionAmountSnapshot || '0'),
+          netAmount: acc.netAmount + parseFloat(item.netAmount || '0'),
+        }),
+        { grossAmount: 0, commissionAmount: 0, netAmount: 0 }
+      );
+
+      // Create Settlement structure
+      const settlement = new Settlement();
+      settlement.partyType = party.partyType;
+      settlement.partyId = party.partyId;
+      settlement.periodStart = periodStart;
+      settlement.periodEnd = periodEnd;
+
+      // Amounts (stored as strings for precision)
+      settlement.totalSaleAmount = totals.grossAmount.toString();
+      settlement.totalBaseAmount = '0'; // Phase C-2: Simple calculation
+      settlement.totalCommissionAmount = totals.commissionAmount.toString();
+      settlement.totalMarginAmount = (totals.grossAmount - totals.commissionAmount).toString();
+      settlement.payableAmount = totals.netAmount.toString();
+
+      // Status
+      settlement.status = SettlementStatus.PENDING;
+
+      // Metadata
+      settlement.metadata = {
+        settlementEngineVersion: 'v2',
+        itemsCount: partyItems.length,
+        currency: party.currency,
+      };
+
+      // Phase C-2: Timestamps not set (memory object only)
+      // settlement.createdAt = new Date();
+      // settlement.updatedAt = new Date();
+
+      settlements.push(settlement);
+    }
+
+    return settlements;
+  }
+
+  /**
+   * Calculate totals by party for diagnostics
+   */
+  private calculateTotalsByParty(settlements: Settlement[]): Record<string, string> {
+    const totals: Record<string, string> = {};
+
+    for (const settlement of settlements) {
+      const key = `${settlement.partyType}:${settlement.partyId}`;
+      totals[key] = settlement.payableAmount;
+    }
+
+    return totals;
+  }
+
+  /**
+   * Return empty result structure
+   */
+  private emptyResult(): SettlementEngineV2Result {
+    return {
+      settlements: [],
+      settlementItems: [],
+      commissions: [],
+      diagnostics: {
+        ruleHits: {},
+        totalsByParty: {},
+      },
+    };
+  }
+
+  /**
+   * TODO P2-C Phase C-3: Calculate partner commission
+   * Partner-specific commission calculation using v2 rules
+   */
+  // async calculatePartnerCommission(
+  //   partnerId: string,
+  //   period: { start: Date; end: Date },
+  //   ruleSet: CommissionRuleSet
+  // ): Promise<SettlementEngineV2Result> {
+  //   // Implementation in Phase C-3
+  // }
+
+  /**
+   * TODO P2-C Phase C-3: Calculate platform fees
+   * Platform-specific fee calculation using v2 rules
+   */
+  // async calculatePlatformFees(
+  //   period: { start: Date; end: Date },
+  //   ruleSet: CommissionRuleSet
+  // ): Promise<SettlementEngineV2Result> {
+  //   // Implementation in Phase C-3
+  // }
+
+  /**
+   * TODO P2-C Phase C-4: Compare v1 vs v2 results
+   * Diagnostic method to compare v1 and v2 settlement results
+   */
+  // async compareWithV1(
+  //   period: { start: Date; end: Date }
+  // ): Promise<{
+  //   v1Results: any;
+  //   v2Results: SettlementEngineV2Result;
+  //   differences: any[];
+  // }> {
+  //   // Implementation in Phase C-4
+  // }
+}

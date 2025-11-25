@@ -3,6 +3,8 @@
  *
  * Handles settlement calculation and management for sellers, suppliers, and platform
  * This is separate from SettlementService which handles commission calculation
+ *
+ * P2-C Phase C-1: Added v2 entry point for SettlementEngine v2
  */
 
 import { Repository } from 'typeorm';
@@ -12,9 +14,14 @@ import {
   SettlementPartyType,
   SettlementStatus,
 } from '../entities/Settlement.js';
+import { Order } from '../entities/Order.js';
+import { SettlementItem } from '../entities/SettlementItem.js';
+import { Commission } from '../entities/Commission.js';
 import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 import { invalidateSettlementCache } from '../utils/cache-invalidation.js';
+import { SettlementEngineV2 } from './settlement/SettlementEngineV2.js';
+import type { SettlementV2Config, SettlementEngineV2Result } from './settlement/SettlementTypesV2.js';
 
 export interface SettlementFilters {
   page?: number;
@@ -28,9 +35,23 @@ export interface SettlementFilters {
 
 export class SettlementManagementService {
   private settlementRepo: Repository<Settlement>;
+  private settlementEngineV2: SettlementEngineV2;
 
   constructor() {
     this.settlementRepo = AppDataSource.getRepository(Settlement);
+
+    // P2-C Phase C-2: Initialize SettlementEngine v2 with repository dependencies
+    const orderRepo = AppDataSource.getRepository(Order);
+    const settlementRepo = AppDataSource.getRepository(Settlement);
+    const settlementItemRepo = AppDataSource.getRepository(SettlementItem);
+    const commissionRepo = AppDataSource.getRepository(Commission);
+
+    this.settlementEngineV2 = new SettlementEngineV2(
+      orderRepo,
+      settlementRepo,
+      settlementItemRepo,
+      commissionRepo
+    );
   }
 
   /**
@@ -296,5 +317,38 @@ export class SettlementManagementService {
     });
 
     return saved;
+  }
+
+  /**
+   * P2-C Phase C-1: SettlementEngine v2 entry point
+   *
+   * Generate settlements using v2 engine with policy-based rules
+   * Currently returns skeleton response (Phase C-1)
+   * Actual implementation in Phase C-2+
+   *
+   * Usage:
+   * - Shadow mode testing (compare v1 vs v2)
+   * - Policy-based settlement calculation
+   * - Versioned rule sets
+   *
+   * @param config - SettlementV2Config with period, parties, rules
+   * @returns Promise<SettlementEngineV2Result> with settlements and diagnostics
+   */
+  async generateSettlementsV2(
+    config: SettlementV2Config
+  ): Promise<SettlementEngineV2Result> {
+    logger.info('[SettlementManagement] generateSettlementsV2 called (Phase C-1 skeleton)', {
+      periodStart: config.periodStart,
+      periodEnd: config.periodEnd,
+      partiesCount: config.parties.length,
+      ruleSetId: config.ruleSet.id,
+      dryRun: config.dryRun ?? true,
+    });
+
+    // TODO P2-C Phase C-2: Add validation logic
+    // TODO P2-C Phase C-2: Add cache invalidation after settlement generation
+
+    // Delegate to SettlementEngineV2
+    return this.settlementEngineV2.generateSettlements(config);
   }
 }
