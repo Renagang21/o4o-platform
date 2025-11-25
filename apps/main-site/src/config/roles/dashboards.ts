@@ -2,6 +2,13 @@
  * 역할별 대시보드 카드 설정 레지스트리
  *
  * 각 역할별 허브 대시보드에 표시할 카드들을 정의합니다.
+ *
+ * H2-3-1: URL 패턴 업데이트
+ * - Dashboard 하위 페이지: /dashboard/{role}/{page} 패턴 사용
+ *
+ * H2-3-2: Partner/Affiliate 통합
+ * - 실제 역할: 'partner'
+ * - 'affiliate'는 호환성을 위한 별칭으로 유지
  */
 
 import { UserRole } from '../../types/user';
@@ -89,7 +96,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '오늘의 매출',
         description: '실시간 매출 현황',
         icon: 'DollarSign',
-        url: '/seller/sales',
+        url: '/dashboard/seller/sales',
         stat: {
           value: '0원',
           label: '오늘 매출',
@@ -103,7 +110,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '처리 대기 주문',
         description: '확인이 필요한 주문이 있습니다',
         icon: 'ShoppingBag',
-        url: '/seller/orders',
+        url: '/dashboard/seller/orders',
         stat: {
           value: 0,
           label: '대기 중',
@@ -117,13 +124,13 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '상품 관리',
         description: '등록된 상품을 관리하세요',
         icon: 'Package',
-        url: '/seller/products',
+        url: '/dashboard/seller/products',
         stat: {
           value: 0,
           label: '등록 상품'
         },
         actions: [
-          { label: '상품 추가', url: '/seller/products/new', variant: 'primary' }
+          { label: '상품 추가', url: '/dashboard/seller/products/new', variant: 'primary' }
         ],
         order: 3
       },
@@ -132,7 +139,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '고객 관리',
         description: '고객 문의와 리뷰를 확인하세요',
         icon: 'Users',
-        url: '/seller/customers',
+        url: '/dashboard/seller/customers',
         stat: {
           value: 0,
           label: '신규 문의'
@@ -151,7 +158,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '재고 현황',
         description: '전체 재고 상태를 확인하세요',
         icon: 'Package',
-        url: '/supplier/inventory',
+        url: '/dashboard/supplier/inventory',
         stat: {
           value: 0,
           label: '품목',
@@ -164,7 +171,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '처리 대기 주문',
         description: '파트너사 주문을 확인하세요',
         icon: 'ClipboardList',
-        url: '/supplier/orders',
+        url: '/dashboard/supplier/orders',
         stat: {
           value: 0,
           label: '신규 주문',
@@ -178,7 +185,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '재고 부족 알림',
         description: '발주가 필요한 품목들',
         icon: 'AlertTriangle',
-        url: '/supplier/inventory?filter=low',
+        url: '/dashboard/supplier/inventory?filter=low',
         stat: {
           value: 0,
           label: '경고 품목'
@@ -191,7 +198,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '파트너 관리',
         description: '파트너사와의 거래 내역',
         icon: 'Handshake',
-        url: '/supplier/partners',
+        url: '/dashboard/supplier/partners',
         stat: {
           value: 0,
           label: '활성 파트너'
@@ -201,16 +208,17 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
     ]
   },
 
-  affiliate: {
-    title: '제휴자 대시보드',
-    subtitle: '캠페인 성과와 수익을 확인하세요',
+  // H2-3-2: Changed from 'affiliate' to 'partner' to match actual implementation
+  partner: {
+    title: '파트너 대시보드',
+    subtitle: '링크 성과와 수익을 확인하세요',
     cards: [
       {
         id: 'earnings-month',
         title: '이번 달 수익',
         description: '현재까지의 누적 수익',
         icon: 'DollarSign',
-        url: '/affiliate/earnings',
+        url: '/dashboard/partner/settlements',
         stat: {
           value: '0원',
           label: '이번 달',
@@ -220,17 +228,17 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         order: 1
       },
       {
-        id: 'active-campaigns',
-        title: '활성 캠페인',
-        description: '진행 중인 마케팅 캠페인',
-        icon: 'Megaphone',
-        url: '/affiliate/campaigns',
+        id: 'active-links',
+        title: '활성 링크',
+        description: '진행 중인 프로모션 링크',
+        icon: 'Link',
+        url: '/dashboard/partner/links',
         stat: {
           value: 0,
           label: '진행 중'
         },
         actions: [
-          { label: '캠페인 생성', url: '/affiliate/campaigns/new', variant: 'primary' }
+          { label: '링크 생성', url: '/dashboard/partner/links/new', variant: 'primary' }
         ],
         order: 2
       },
@@ -239,7 +247,7 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '클릭 수',
         description: '생성한 링크의 클릭 현황',
         icon: 'MousePointer',
-        url: '/affiliate/analytics',
+        url: '/dashboard/partner/analytics',
         stat: {
           value: 0,
           label: '이번 주 클릭',
@@ -253,7 +261,70 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
         title: '전환율',
         description: '클릭 대비 구매 전환율',
         icon: 'PieChart',
-        url: '/affiliate/analytics',
+        url: '/dashboard/partner/analytics',
+        stat: {
+          value: '0%',
+          label: '전환율',
+          trend: 'neutral'
+        },
+        order: 4
+      }
+    ]
+  },
+  // H2-3-2: Keep 'affiliate' as alias for future compatibility
+  affiliate: {
+    title: '파트너 대시보드',
+    subtitle: '링크 성과와 수익을 확인하세요',
+    cards: [
+      {
+        id: 'earnings-month',
+        title: '이번 달 수익',
+        description: '현재까지의 누적 수익',
+        icon: 'DollarSign',
+        url: '/dashboard/partner/settlements',
+        stat: {
+          value: '0원',
+          label: '이번 달',
+          trend: 'up',
+          trendValue: '+0%'
+        },
+        order: 1
+      },
+      {
+        id: 'active-links',
+        title: '활성 링크',
+        description: '진행 중인 프로모션 링크',
+        icon: 'Link',
+        url: '/dashboard/partner/links',
+        stat: {
+          value: 0,
+          label: '진행 중'
+        },
+        actions: [
+          { label: '링크 생성', url: '/dashboard/partner/links/new', variant: 'primary' }
+        ],
+        order: 2
+      },
+      {
+        id: 'clicks',
+        title: '클릭 수',
+        description: '생성한 링크의 클릭 현황',
+        icon: 'MousePointer',
+        url: '/dashboard/partner/analytics',
+        stat: {
+          value: 0,
+          label: '이번 주 클릭',
+          trend: 'up',
+          trendValue: '+0%'
+        },
+        order: 3
+      },
+      {
+        id: 'conversions',
+        title: '전환율',
+        description: '클릭 대비 구매 전환율',
+        icon: 'PieChart',
+        url: '/dashboard/partner/analytics',
         stat: {
           value: '0%',
           label: '전환율',

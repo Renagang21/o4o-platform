@@ -1,10 +1,13 @@
 /**
  * R-3-1: Refactored AccountModule with Active Role Management
+ * H2-3-1: Updated to use /workspace/{role} entry points
  *
  * Features:
  * - Guest: Login | Signup buttons
  * - Authenticated: User avatar + activeRole badge
  * - Dropdown: Profile, Role Switcher, Logout
+ * - H2-2-3: Role-based dropdown menu items
+ * - H2-3-1: Unified /workspace/{role} dashboard entry URLs
  */
 
 import React from 'react';
@@ -63,19 +66,19 @@ const getRoleBasedMenuItems = (role: string | null): MenuItem[] => {
       { key: 'support', label: '고객지원', url: '/support', icon: <HelpCircle size={18} className="text-gray-600" /> },
     ],
     seller: [
-      { key: 'dashboard', label: 'Seller 대시보드', url: '/dashboard/seller', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'dashboard', label: 'Seller 대시보드', url: '/workspace/seller', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
       { key: 'products', label: '상품 관리', url: '/dashboard/seller/products', icon: <Package size={18} className="text-gray-600" /> },
       { key: 'orders', label: '주문 관리', url: '/dashboard/seller/orders', icon: <ShoppingBag size={18} className="text-gray-600" /> },
       { key: 'settlements', label: '정산 내역', url: '/dashboard/seller/settlements', icon: <DollarSign size={18} className="text-gray-600" /> },
     ],
     supplier: [
-      { key: 'dashboard', label: 'Supplier 대시보드', url: '/dashboard/supplier', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'dashboard', label: 'Supplier 대시보드', url: '/workspace/supplier', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
       { key: 'inventory', label: '재고 관리', url: '/dashboard/supplier/inventory', icon: <Warehouse size={18} className="text-gray-600" /> },
       { key: 'orders', label: '주문 관리', url: '/dashboard/supplier/orders', icon: <Package size={18} className="text-gray-600" /> },
       { key: 'settlements', label: '정산 내역', url: '/dashboard/supplier/settlements', icon: <DollarSign size={18} className="text-gray-600" /> },
     ],
     partner: [
-      { key: 'dashboard', label: 'Partner 대시보드', url: '/dashboard/partner', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'dashboard', label: 'Partner 대시보드', url: '/workspace/partner', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
       { key: 'links', label: '링크 관리', url: '/dashboard/partner/links', icon: <LinkIcon size={18} className="text-gray-600" /> },
       { key: 'analytics', label: '분석', url: '/dashboard/partner/analytics', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
       { key: 'settlements', label: '정산 내역', url: '/dashboard/partner/settlements', icon: <DollarSign size={18} className="text-gray-600" /> },

@@ -21,7 +21,8 @@
 - **customer** (사용자): 일반 고객, 제품 구매 및 사용
 - **seller** (판매자): 제품 판매 및 주문 관리
 - **supplier** (공급자): 재고 및 파트너 관리
-- **affiliate** (제휴자): 마케팅 캠페인 및 수익 관리
+- **partner** (파트너): 제휴 링크 관리 및 수익 관리
+  - _참고: 'affiliate'는 호환성을 위한 별칭으로 유지됨 (H2-3-2)_
 
 ### 3. HubLayout 컴포넌트
 
@@ -69,19 +70,31 @@ import { RoleGuard } from '../../components/guards/RoleGuard';
 - 접근 거부 시 `hub_access_denied` 분석 이벤트 전송
 - 커스텀 fallback UI 지원
 
-### 5. 허브 페이지
+### 5. 역할별 대시보드 라우팅 (H2-3-1 업데이트)
 
-각 역할별 전용 허브 페이지가 구현되어 있습니다.
+각 역할별 대시보드는 2단계 URL 구조를 사용합니다:
+
+**URL 구조:**
+- **공개 진입점**: `/workspace/{role}` - 역할 검증 및 리다이렉트 계층
+  - 역할 권한 검증
+  - 실제 대시보드로 자동 리다이렉트
+  - WorkspaceRedirect 컴포넌트 사용
+- **실제 라우트**: `/dashboard/{role}` - 대시보드 구현 계층
+  - RoleGuard로 보호
+  - Dashboard Layout 컴포넌트 사용
+  - 중첩 라우팅 지원 (products, orders, settings 등)
+
+**라우팅 예시:**
+- `/workspace/seller` → `/dashboard/seller` (SellerLayout)
+- `/workspace/supplier` → `/dashboard/supplier` (SupplierLayout)
+- `/workspace/partner` → `/dashboard/partner` (PartnerLayout)
+- `/workspace/customer` → `/account` (AccountPage)
 
 **파일 위치:**
-- `apps/main-site/src/pages/hubs/SellerHub.tsx` - 판매자 허브
-- `apps/main-site/src/pages/hubs/SupplierHub.tsx` - 공급자 허브
-- `apps/main-site/src/pages/hubs/AffiliateHub.tsx` - 제휴자 허브
-
-**라우팅:**
-- `/seller` → SellerHub
-- `/supplier` → SupplierHub
-- `/affiliate` → AffiliateHub
+- `apps/main-site/src/pages/workspace/WorkspaceRedirect.tsx` - 역할별 라우팅 로직
+- `apps/main-site/src/components/dashboard/seller/SellerLayout.tsx` - 판매자 대시보드
+- `apps/main-site/src/components/dashboard/supplier/SupplierLayout.tsx` - 공급자 대시보드
+- `apps/main-site/src/components/dashboard/partner/PartnerLayout.tsx` - 파트너 대시보드
 
 ## 역할 전환 플로우
 
@@ -198,24 +211,27 @@ const roleOptions: Record<string, RoleOption> = {
 - [ ] 권한 없는 허브 접근 시 리디렉션
 - [ ] 미인증 사용자 허브 접근 시 로그인 페이지로 이동
 
-### 역할별 허브 테스트
+### 역할별 대시보드 테스트 (H2-3-1 업데이트)
 
-**Seller Hub (`/seller`):**
+**Seller Dashboard (`/workspace/seller` → `/dashboard/seller`):**
 - [ ] RoleGuard로 seller 역할만 접근 가능
+- [ ] `/workspace/seller` 접근 시 `/dashboard/seller`로 자동 리다이렉트
 - [ ] 판매자 전용 배너 표시
 - [ ] 판매자 전용 대시보드 카드 표시 (오늘의 매출, 처리 대기 주문, 상품 관리, 고객 관리)
 - [ ] 카드 클릭 시 해당 페이지로 이동
 
-**Supplier Hub (`/supplier`):**
+**Supplier Dashboard (`/workspace/supplier` → `/dashboard/supplier`):**
 - [ ] RoleGuard로 supplier 역할만 접근 가능
+- [ ] `/workspace/supplier` 접근 시 `/dashboard/supplier`로 자동 리다이렉트
 - [ ] 공급자 전용 배너 표시
 - [ ] 공급자 전용 대시보드 카드 표시 (재고 현황, 처리 대기 주문, 재고 부족 알림, 파트너 관리)
 - [ ] 경고 배지 표시 확인 (재고 부족 알림)
 
-**Affiliate Hub (`/affiliate`):**
-- [ ] RoleGuard로 affiliate 역할만 접근 가능
-- [ ] 제휴자 전용 배너 표시
-- [ ] 제휴자 전용 대시보드 카드 표시 (이번 달 수익, 활성 캠페인, 클릭 수, 전환율)
+**Partner Dashboard (`/workspace/partner` → `/dashboard/partner`):**
+- [ ] RoleGuard로 partner 역할만 접근 가능
+- [ ] `/workspace/partner` 접근 시 `/dashboard/partner`로 자동 리다이렉트
+- [ ] 파트너 전용 배너 표시
+- [ ] 파트너 전용 대시보드 카드 표시 (이번 달 수익, 활성 링크, 클릭 수, 전환율)
 - [ ] 통계 트렌드 표시 확인 (up/down/neutral)
 
 ### 분석 이벤트 테스트
