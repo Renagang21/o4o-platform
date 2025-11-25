@@ -85,6 +85,7 @@
   },
   "dependencies": {
     "@o4o/auth-client": "file:../../packages/auth-client",
+    "@o4o/block-renderer": "file:../../packages/block-renderer",
     "@o4o/cpt-registry": "file:../../packages/cpt-registry",
     "@o4o/crowdfunding-types": "file:../../packages/crowdfunding-types",
     "@o4o/types": "file:../../packages/types",
