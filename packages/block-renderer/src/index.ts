@@ -73,3 +73,13 @@ export * from './renderers/product/ProductPriceBlock';
 export * from './renderers/product/ProductGalleryBlock';
 export * from './renderers/product/ProductDescriptionBlock';
 export * from './renderers/product/AddToCartPanelBlock';
+
+// Phase P0-C: Block Metadata (SSOT for AI/Registry)
+export {
+  blockMetadata,
+  getBlockMetadata,
+  getBlocksByCategory,
+  getAllBlockCategories,
+  getAllBlockNames
+} from './metadata';
+export type { BlockMetadata, BlockAttributeConfig } from './metadata';

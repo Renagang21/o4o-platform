@@ -2,9 +2,9 @@
  * Block Registry Service
  * AI 페이지 생성을 위한 블록 관리 시스템 (SSOT)
  *
- * V2: Database-driven registry
+ * V3 (Phase P0-C): Uses @o4o/block-renderer metadata as SSOT
  * - Reads from ai_references table (type='blocks')
- * - Fallback to built-in blocks if DB fails
+ * - Fallback to metadata from @o4o/block-renderer package
  * - Returns markdown reference directly to AI
  */
 
@@ -17,6 +17,8 @@ import {
 import { AppDataSource } from '../database/connection.js';
 import { AIReference } from '../entities/AIReference.js';
 import logger from '../utils/logger.js';
+// Phase P0-C: Import metadata from SSOT
+import { blockMetadata, type BlockMetadata } from '@o4o/block-renderer';
 
 class BlockRegistryService {
   private static instance: BlockRegistryService;
@@ -92,9 +94,42 @@ class BlockRegistryService {
   }
 
   /**
-   * 내장 블록 등록 (Frontend와 동기화 - o4o/* 네이밍)
+   * Phase P0-C: Convert BlockMetadata to BlockInfo
+   */
+  private metadataToInfo(meta: BlockMetadata): BlockInfo {
+    return {
+      name: meta.name,
+      title: meta.title,
+      description: meta.description,
+      category: meta.category,
+      attributes: meta.attributes || {},
+      example: meta.example || { json: '', text: '' },
+      version: meta.version || '1.0.0',
+      tags: meta.tags || [],
+      aiPrompts: meta.aiPrompts || [],
+      deprecated: meta.deprecated,
+      replacedBy: meta.replacedBy
+    };
+  }
+
+  /**
+   * Phase P0-C: Register blocks from @o4o/block-renderer metadata (SSOT)
    */
   private registerBuiltinBlocks() {
+    // Load from @o4o/block-renderer metadata package
+    for (const meta of blockMetadata) {
+      const info = this.metadataToInfo(meta);
+      this.register(meta.name, info);
+    }
+
+    logger.info(`✅ ${this.blocks.size} blocks registered from @o4o/block-renderer metadata (o4o/* naming)`);
+  }
+
+  /**
+   * DEPRECATED: Old hardcoded registration (kept for reference)
+   * Phase P0-C: This method is no longer used
+   */
+  private registerBuiltinBlocks_DEPRECATED() {
     // ============================================
     // 텍스트 블록 (Text Blocks)
     // ============================================
