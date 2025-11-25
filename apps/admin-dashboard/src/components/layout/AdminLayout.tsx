@@ -78,12 +78,11 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       
       {/* Main content wrapper with proper positioning */}
       <div className={`wordpress-admin-content ${!isMobile && !isFullscreenMode ? 'with-sidebar' : ''}`}>
-        {/* Header with menu button for mobile */}
-        {/* Mobile header toggle (hidden in fullscreen customizer) */}
-        {isMobile && !isFullscreenMode && (
-          <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        {/* Header - show on both mobile and desktop (hidden in fullscreen customizer) */}
+        {!isFullscreenMode && (
+          <AdminHeader onMenuClick={isMobile ? () => setSidebarOpen(!sidebarOpen) : undefined} />
         )}
-        
+
         {/* Page content */}
         <main>
           <AdminNotices />

@@ -387,7 +387,7 @@ function App() {
 
                     {/* 현재 접속자 */}
                     <Route path="/active-users" element={
-                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <ActiveUsers />
                         </Suspense>
