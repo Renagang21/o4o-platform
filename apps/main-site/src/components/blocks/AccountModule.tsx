@@ -114,6 +114,15 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
   const { user, isAuthenticated, logout, activeRole, setActiveRole, getAvailableRoles } = useAuth();
   const navigate = useNavigate();
 
+  // 🔍 DEBUG: 인증 상태 확인
+  console.log('[AccountModule] 인증 상태:', {
+    isAuthenticated,
+    hasUser: !!user,
+    userStatus: user?.status,
+    userEmail: user?.email,
+    activeRole
+  });
+
   const handleLogout = () => {
     try {
       logout();
