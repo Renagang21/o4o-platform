@@ -9,7 +9,10 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Settings, Package, LogOut, Bell, HelpCircle, Heart, Check, Users } from 'lucide-react';
+import {
+  User, Settings, Package, LogOut, Bell, HelpCircle, Heart, Check, Users,
+  LayoutDashboard, ShoppingBag, Warehouse, Link as LinkIcon, DollarSign
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Dropdown } from '../common/Dropdown';
 import './AccountModule.css';
@@ -36,6 +39,59 @@ const ROLE_CONFIG: Record<string, { label: string; color: string; icon: string }
   admin: { label: '관리자', color: 'bg-red-100 text-red-800', icon: '⚙️' },
   administrator: { label: '관리자', color: 'bg-red-100 text-red-800', icon: '⚙️' },
   manager: { label: '매니저', color: 'bg-yellow-100 text-yellow-800', icon: '📊' },
+};
+
+// H2-2-3: Role-based menu items configuration
+interface MenuItem {
+  key: string;
+  label: string;
+  url: string;
+  icon: React.ReactNode;
+}
+
+const getRoleBasedMenuItems = (role: string | null): MenuItem[] => {
+  const commonItems: MenuItem[] = [
+    { key: 'account', label: '내 계정', url: '/account', icon: <User size={18} className="text-gray-600" /> },
+    { key: 'settings', label: '설정', url: '/account/settings', icon: <Settings size={18} className="text-gray-600" /> },
+  ];
+
+  const roleSpecificItems: Record<string, MenuItem[]> = {
+    customer: [
+      { key: 'orders', label: '주문 내역', url: '/account/orders', icon: <Package size={18} className="text-gray-600" /> },
+      { key: 'wishlist', label: '위시리스트', url: '/account/wishlist', icon: <Heart size={18} className="text-gray-600" /> },
+      { key: 'notifications', label: '알림', url: '/account/notifications', icon: <Bell size={18} className="text-gray-600" /> },
+      { key: 'support', label: '고객지원', url: '/support', icon: <HelpCircle size={18} className="text-gray-600" /> },
+    ],
+    seller: [
+      { key: 'dashboard', label: 'Seller 대시보드', url: '/dashboard/seller', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'products', label: '상품 관리', url: '/dashboard/seller/products', icon: <Package size={18} className="text-gray-600" /> },
+      { key: 'orders', label: '주문 관리', url: '/dashboard/seller/orders', icon: <ShoppingBag size={18} className="text-gray-600" /> },
+      { key: 'settlements', label: '정산 내역', url: '/dashboard/seller/settlements', icon: <DollarSign size={18} className="text-gray-600" /> },
+    ],
+    supplier: [
+      { key: 'dashboard', label: 'Supplier 대시보드', url: '/dashboard/supplier', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'inventory', label: '재고 관리', url: '/dashboard/supplier/inventory', icon: <Warehouse size={18} className="text-gray-600" /> },
+      { key: 'orders', label: '주문 관리', url: '/dashboard/supplier/orders', icon: <Package size={18} className="text-gray-600" /> },
+      { key: 'settlements', label: '정산 내역', url: '/dashboard/supplier/settlements', icon: <DollarSign size={18} className="text-gray-600" /> },
+    ],
+    partner: [
+      { key: 'dashboard', label: 'Partner 대시보드', url: '/dashboard/partner', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'links', label: '링크 관리', url: '/dashboard/partner/links', icon: <LinkIcon size={18} className="text-gray-600" /> },
+      { key: 'analytics', label: '분석', url: '/dashboard/partner/analytics', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+      { key: 'settlements', label: '정산 내역', url: '/dashboard/partner/settlements', icon: <DollarSign size={18} className="text-gray-600" /> },
+    ],
+    admin: [
+      { key: 'dashboard', label: 'Admin 콘솔', url: 'https://admin.neture.co.kr', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+    ],
+    administrator: [
+      { key: 'dashboard', label: 'Admin 콘솔', url: 'https://admin.neture.co.kr', icon: <LayoutDashboard size={18} className="text-gray-600" /> },
+    ],
+  };
+
+  const specificItems = role ? (roleSpecificItems[role] || roleSpecificItems.customer) : roleSpecificItems.customer;
+
+  // Return: common items first, then role-specific items
+  return [...commonItems, ...specificItems];
 };
 
 export const AccountModule: React.FC<AccountModuleProps> = ({
@@ -101,6 +157,9 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
   // R-3-1: Authenticated state - show avatar + activeRole badge
   const roleConfig = activeRole ? ROLE_CONFIG[activeRole] : null;
 
+  // H2-2-3: Get role-based menu items
+  const menuItems = getRoleBasedMenuItems(activeRole);
+
   const trigger = (
     <button
       className="account-toggle flex items-center gap-2"
@@ -159,55 +218,37 @@ export const AccountModule: React.FC<AccountModuleProps> = ({
           </div>
         </div>
 
-        {/* Menu Items */}
+        {/* H2-2-3: Role-based Menu Items */}
         <div className="account-dropdown-menu py-2">
-          <Link
-            to={accountUrl}
-            className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            <User size={18} className="text-gray-600" />
-            <span>내 계정</span>
-          </Link>
+          {menuItems.map((item) => {
+            // External link (e.g., Admin console)
+            if (item.url.startsWith('http')) {
+              return (
+                <a
+                  key={item.key}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </a>
+              );
+            }
 
-          <Link
-            to={`${accountUrl}/orders`}
-            className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            <Package size={18} className="text-gray-600" />
-            <span>주문 내역</span>
-          </Link>
-
-          <Link
-            to={`${accountUrl}/wishlist`}
-            className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            <Heart size={18} className="text-gray-600" />
-            <span>위시리스트</span>
-          </Link>
-
-          <Link
-            to={`${accountUrl}/notifications`}
-            className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            <Bell size={18} className="text-gray-600" />
-            <span>알림</span>
-          </Link>
-
-          <Link
-            to={`${accountUrl}/settings`}
-            className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            <Settings size={18} className="text-gray-600" />
-            <span>설정</span>
-          </Link>
-
-          <Link
-            to="/support"
-            className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            <HelpCircle size={18} className="text-gray-600" />
-            <span>고객지원</span>
-          </Link>
+            // Internal link
+            return (
+              <Link
+                key={item.key}
+                to={item.url}
+                className="account-menu-item flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
 
           {/* R-3-1: Role Switcher (only if multiple roles) */}
           {hasMultipleRoles && (

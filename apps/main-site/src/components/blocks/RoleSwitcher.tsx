@@ -1,11 +1,11 @@
 /**
- * P2: RoleSwitcher - Workspace-based navigation
+ * H2-2-5: RoleSwitcher - Enhanced with API integration
  *
  * - Uses /workspace/{role} URLs for unified workspace entry
  * - Detects current active role from URL
  * - RoleAssignment-based role checking
- * - No deprecated role fields
- * - No /user/preferences API calls
+ * - Calls /user/preferences API to persist role preference
+ * - Updates AuthContext to maintain role state
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,6 +13,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, Check } from 'lucide-react';
 import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
+import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { trackRoleSwitch } from '../../utils/analytics';
 
@@ -132,13 +133,18 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
     }
   };
 
-  // P2/R-6-3: Role switch with Account page support
-  const handleRoleSwitch = (newRole: string) => {
+  // H2-2-5: Role switch with API integration
+  const handleRoleSwitch = async (newRole: string) => {
     const previousRole = activeRole || roleList[0];
 
     try {
       // Track analytics
       trackRoleSwitch(previousRole, newRole);
+
+      // Call API to persist role preference
+      await authClient.api.patch('/user/preferences', {
+        currentRole: newRole
+      });
 
       // R-6-3: If currently on /account page, stay on /account with dashboard param
       if (location.pathname.startsWith('/account')) {

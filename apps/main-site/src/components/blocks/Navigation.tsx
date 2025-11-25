@@ -1,14 +1,23 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Home, ShoppingBag, HelpCircle, LucideIcon } from 'lucide-react';
+import {
+  ChevronDown, Home, ShoppingBag, HelpCircle, LucideIcon,
+  LayoutDashboard, Package, ShoppingCart, TrendingUp, Users, Heart,
+  MessageCircle, ClipboardList, Box, Handshake, BarChart, Megaphone,
+  Tag, DollarSign, Link as LinkIcon, PieChart, Warehouse
+} from 'lucide-react';
 import HamburgerMenu from '../layout/HamburgerMenu';
 import { useMenu } from '../../hooks/useMenu';
+import { useAuth } from '../../contexts/AuthContext';
+import { getMenuForRole } from '../../config/roles/menus';
 
 interface MenuItem {
   id: string;
   title: string;
   url: string;
+  icon?: string;
   target?: string;
+  badge?: string;
   children?: MenuItem[];
 }
 
@@ -43,6 +52,14 @@ const Navigation: FC<NavigationProps> = ({
   const finalOrientation = data?.orientation || orientation || 'horizontal';
   const finalShowSubmenuIcon = data?.showSubmenuIcon !== undefined ? data.showSubmenuIcon : (showSubmenuIcon ?? true);
 
+  // Get current user role
+  const { user, isAuthenticated } = useAuth();
+  const currentRole = user?.activeRole || user?.currentRole || (user?.roles && user.roles.length > 0 ? user.roles[0] : null);
+
+  // Get role-based menu configuration
+  const roleMenuConfig = getMenuForRole(currentRole);
+  const roleMenuItems: MenuItem[] = roleMenuConfig.primary || [];
+
   // Fetch menu data using the hook
   const { items: fetchedItems, isLoading, error } = useMenu({
     location: finalMenuRef,
@@ -51,8 +68,21 @@ const Navigation: FC<NavigationProps> = ({
     enabled: !propMenuItems, // Only fetch if menuItems not provided
   });
 
-  // Use provided menuItems (legacy) or fetched items
-  const menuItems = propMenuItems || fetchedItems;
+  // Menu merging strategy: Role menus take priority, DB menus as fallback
+  // For authenticated users with roles: use role menu
+  // For guest users or no role menu: use DB menu
+  let menuItems: MenuItem[];
+
+  if (propMenuItems) {
+    // Legacy: use provided menuItems
+    menuItems = propMenuItems;
+  } else if (roleMenuItems.length > 0) {
+    // Priority: Use role-based menu if available
+    menuItems = roleMenuItems;
+  } else {
+    // Fallback: Use DB menu
+    menuItems = fetchedItems;
+  }
 
   // Loading state
   if (isLoading && !propMenuItems) {
@@ -74,21 +104,42 @@ const Navigation: FC<NavigationProps> = ({
     return null;
   }
 
-  // Icon mapping for menu items
+  // Icon mapping for menu items (expanded for role-based menus)
   const iconMap: Record<string, LucideIcon> = {
     'Home': Home,
     'Shop': ShoppingBag,
+    'ShoppingBag': ShoppingBag,
+    'ShoppingCart': ShoppingCart,
     'Support': HelpCircle,
+    'HelpCircle': HelpCircle,
+    'LayoutDashboard': LayoutDashboard,
+    'Package': Package,
+    'TrendingUp': TrendingUp,
+    'Users': Users,
+    'Heart': Heart,
+    'MessageCircle': MessageCircle,
+    'ClipboardList': ClipboardList,
+    'Box': Box,
+    'Handshake': Handshake,
+    'BarChart': BarChart,
+    'Megaphone': Megaphone,
+    'Tag': Tag,
+    'DollarSign': DollarSign,
+    'Link': LinkIcon,
+    'PieChart': PieChart,
+    'Warehouse': Warehouse,
   };
 
-  const getMenuIcon = (title: string) => {
-    const IconComponent = iconMap[title];
+  const getMenuIcon = (title: string, iconName?: string) => {
+    // Priority: iconName (from role menu) > title (fallback)
+    const key = iconName || title;
+    const IconComponent = iconMap[key];
     return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
   };
 
   const renderMenuItem = (item: MenuItem, depth = 0): React.ReactNode => {
     const hasChildren = item.children && item.children.length > 0;
-    const icon = depth === 0 ? getMenuIcon(item.title) : null;
+    const icon = depth === 0 ? getMenuIcon(item.title, item.icon) : null;
 
     return (
       <li key={item.id} className={`menu-item menu-item-depth-${depth} ${hasChildren ? 'has-children' : ''}`}>
