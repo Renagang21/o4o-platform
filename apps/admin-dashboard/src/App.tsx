@@ -129,6 +129,7 @@ const SeedPresets = lazy(() => import('@/pages/test/SeedPresets'));
 const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationTest'));
 const DeleteCustomizerTest = lazy(() => import('@/pages/test/DeleteCustomizerTest'));
 const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
+const AuthInspector = lazy(() => import('@/pages/test/AuthInspector'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -222,7 +223,14 @@ function App() {
                 <ResetPassword />
               </Suspense>
             } />
-            
+
+            {/* Auth Inspector - Public test page for debugging auth issues */}
+            <Route path="/auth-inspector" element={
+              <Suspense fallback={<PageLoader />}>
+                <AuthInspector />
+              </Suspense>
+            } />
+
             {/* 루트 경로 - 인증 상태에 따라 리다이렉트 */}
             <Route path="/" element={<InitialRedirect />} />
             
