@@ -164,11 +164,20 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   };
 
   // Check both user.role and user.roles array for admin access
+  // Support both string roles and object roles with name field
+  const adminRoleNames = ['admin', 'administrator', 'super_admin'];
+
   const isAdmin = user ? (
-    user.role === 'admin' ||
-    user.role === 'administrator' ||
-    (Array.isArray((user as any).roles) &&
-      ((user as any).roles.includes('admin') || (user as any).roles.includes('administrator')))
+    // Check user.role (string)
+    (user.role && adminRoleNames.includes(user.role)) ||
+    // Check user.activeRole.name (object)
+    ((user as any).activeRole?.name && adminRoleNames.includes((user as any).activeRole.name)) ||
+    // Check user.roles array (can be strings or objects)
+    (Array.isArray((user as any).roles) && (user as any).roles.some((r: any) =>
+      typeof r === 'string'
+        ? adminRoleNames.includes(r)
+        : r?.name && adminRoleNames.includes(r.name)
+    ))
   ) : false;
 
   const value = {

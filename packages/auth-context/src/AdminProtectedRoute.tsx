@@ -126,17 +126,28 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   // 역할 기반 접근 제어
   if (requiredRoles.length > 0) {
     // Check both user.role (single) and user.roles (array) for backward compatibility
+    // Support both string roles and object roles with name field
     const userRole = user.role;
+    const userActiveRole = (user as any).activeRole?.name;
     const userRoles = (user as any).roles || []; // roles array from User entity
 
     const hasRequiredRole =
+      // Check user.role (string)
       (userRole && requiredRoles.includes(userRole)) ||
-      (Array.isArray(userRoles) && userRoles.some(r => requiredRoles.includes(r)));
+      // Check user.activeRole.name (object)
+      (userActiveRole && requiredRoles.includes(userActiveRole)) ||
+      // Check user.roles array (can be strings or objects)
+      (Array.isArray(userRoles) && userRoles.some((r: any) =>
+        typeof r === 'string'
+          ? requiredRoles.includes(r)
+          : r?.name && requiredRoles.includes(r.name)
+      ));
 
     if (!hasRequiredRole) {
       console.warn('[AdminProtectedRoute] Access denied:', {
         requiredRoles,
         userRole,
+        userActiveRole,
         userRoles,
         userId: user.id
       });
@@ -148,17 +159,28 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   if (requiredPermissions.length > 0) {
     // 향후 확장을 위한 구조 유지
     // 현재는 admin 역할이면 모든 권한을 가진 것으로 간주
+    const adminRoleNames = ['admin', 'administrator', 'super_admin'];
     const userRole = user.role;
+    const userActiveRole = (user as any).activeRole?.name;
     const userRoles = (user as any).roles || [];
+
     const isAdmin =
-      userRole === 'admin' ||
-      userRole === 'administrator' ||
-      (Array.isArray(userRoles) && (userRoles.includes('admin') || userRoles.includes('administrator')));
+      // Check user.role (string)
+      (userRole && adminRoleNames.includes(userRole)) ||
+      // Check user.activeRole.name (object)
+      (userActiveRole && adminRoleNames.includes(userActiveRole)) ||
+      // Check user.roles array (can be strings or objects)
+      (Array.isArray(userRoles) && userRoles.some((r: any) =>
+        typeof r === 'string'
+          ? adminRoleNames.includes(r)
+          : r?.name && adminRoleNames.includes(r.name)
+      ));
 
     if (!isAdmin) {
       console.warn('[AdminProtectedRoute] Insufficient permissions:', {
         requiredPermissions,
         userRole,
+        userActiveRole,
         userRoles,
         userId: user.id
       });
