@@ -623,6 +623,9 @@ importers:
       '@o4o/auth-client':
         specifier: file:../../packages/auth-client
         version: link:../../packages/auth-client
+      '@o4o/block-renderer':
+        specifier: file:../../packages/block-renderer
+        version: file:packages/block-renderer(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@o4o/cpt-registry':
         specifier: file:../../packages/cpt-registry
         version: link:../../packages/cpt-registry
@@ -12596,6 +12599,17 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
+  '@o4o/block-renderer@file:packages/block-renderer(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@o4o/shortcodes': link:packages/shortcodes
+      '@o4o/slide-app': link:packages/slide-app
+      '@o4o/types': link:packages/types
+      clsx: 2.1.1
+      dompurify: 3.2.6
+      marked: 11.2.0
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@o4o/crowdfunding-types@file:packages/crowdfunding-types(react@18.2.0)':
     dependencies:
       '@o4o/types': file:packages/types(react@18.2.0)
@@ -15403,7 +15417,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.2.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.1(@types/node@24.2.1)(typescript@5.4.5))(terser@5.43.1)
+      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.2(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.0)
 
   '@vitest/utils@3.2.4':
     dependencies:
