@@ -97,11 +97,26 @@ class ShortcodeRegistryService {
    * Phase P0-B: Convert ShortcodeMetadata to ShortcodeInfo
    */
   private metadataToInfo(meta: ShortcodeMetadata): ShortcodeInfo {
+    // Convert metadata parameters to ShortcodeParameter format
+    const parameters: Record<string, any> = {};
+    if (meta.parameters) {
+      for (const [key, param] of Object.entries(meta.parameters)) {
+        const p = param as any;
+        parameters[key] = {
+          type: p.type,
+          required: p.required,
+          default: p.default,
+          description: p.description || '',
+          options: p.options,
+        };
+      }
+    }
+
     return {
       name: meta.name,
       description: meta.description,
       category: meta.category,
-      parameters: meta.parameters || {},
+      parameters,
       examples: meta.examples || [],
       version: meta.version || '1.0.0',
       tags: meta.tags || [],
