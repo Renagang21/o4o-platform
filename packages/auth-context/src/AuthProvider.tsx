@@ -163,12 +163,20 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     };
   };
 
+  // Check both user.role and user.roles array for admin access
+  const isAdmin = user ? (
+    user.role === 'admin' ||
+    user.role === 'administrator' ||
+    (Array.isArray((user as any).roles) &&
+      ((user as any).roles.includes('admin') || (user as any).roles.includes('administrator')))
+  ) : false;
+
   const value = {
     user,
     isAuthenticated: !!user,
     isLoading,
     error,
-    isAdmin: user?.role === 'admin',
+    isAdmin,
     login,
     logout,
     clearError,
