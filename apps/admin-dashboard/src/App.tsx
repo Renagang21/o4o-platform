@@ -658,7 +658,7 @@ function App() {
 
                     {/* Dropshipping Routes */}
                     <Route path="/dropshipping/*" element={
-                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'supplier', 'seller', 'partner']}>
                         <Suspense fallback={<PageLoader />}>
                           <DropshippingRouter />
                         </Suspense>
