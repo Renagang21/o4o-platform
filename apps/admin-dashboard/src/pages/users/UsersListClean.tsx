@@ -94,22 +94,36 @@ const UsersListClean = () => {
         // Check for both direct data and nested data structure
         const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
 
-        if (Array.isArray(userData) && userData.length > 0) {
-          const transformedUsers = userData.map((user: any) => ({
-            id: user.id || user._id,
-            name: user.name || 'Unknown',
-            username: user.username || user.email?.split('@')[0] || 'unknown',
-            email: user.email || '',
-            role: user.role || 'subscriber',
-            posts: user.postsCount || 0,
-            registeredDate: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : '',
-            lastLogin: user.lastLogin || user.lastLoginAt ? new Date(user.lastLogin || user.lastLoginAt).toISOString().split('T')[0] : undefined,
-            status: user.status || 'active',
-            avatar: user.avatar
-          }));
+        console.log('[UsersListClean] API Response:', response.data);
+        console.log('[UsersListClean] User Data:', userData);
+        console.log('[UsersListClean] Is Array:', Array.isArray(userData), 'Length:', userData?.length);
 
+        if (Array.isArray(userData)) {
+          const transformedUsers = userData.map((user: any) => {
+            // Construct fullName from firstName and lastName, fallback to name field
+            const fullName = user.name ||
+                           (user.firstName || user.lastName
+                             ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                             : 'Unknown');
+
+            return {
+              id: user.id || user._id,
+              name: fullName,
+              username: user.username || user.email?.split('@')[0] || 'unknown',
+              email: user.email || '',
+              role: user.role || 'customer',
+              posts: user.postsCount || 0,
+              registeredDate: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : '',
+              lastLogin: user.lastLogin || user.lastLoginAt ? new Date(user.lastLogin || user.lastLoginAt).toISOString().split('T')[0] : undefined,
+              status: user.status || 'active',
+              avatar: user.avatar
+            };
+          });
+
+          console.log('[UsersListClean] Transformed Users:', transformedUsers.length, 'users');
           setUsers(transformedUsers);
         } else {
+          console.log('[UsersListClean] userData is not an array, setting empty');
           setUsers([]);
         }
       } catch (err: any) {
