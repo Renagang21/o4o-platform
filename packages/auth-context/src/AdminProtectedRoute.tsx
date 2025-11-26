@@ -56,23 +56,12 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
     let timeoutId: number | undefined;
 
     if (!isLoading && !isAuthenticated) {
-      console.log('[AdminProtectedRoute] Not authenticated, checking stored auth...', {
-        isLoading,
-        isAuthenticated,
-        hasStoredAuth: hasStoredAuth(),
-        path: location.pathname
-      });
-
       // 저장된 인증 정보가 있으면 더 기다림
       const delay = hasStoredAuth() ? 500 : 100;
 
       timeoutId = window.setTimeout(() => {
         // 다시 한 번 인증 상태와 저장된 토큰 확인
         if (!isAuthenticated && !hasStoredAuth()) {
-          console.error('[AdminProtectedRoute] Redirecting to login - no auth found', {
-            path: location.pathname,
-            user
-          });
           navigate('/login', {
             replace: true,
             state: { from: location.pathname }
@@ -155,15 +144,6 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
       ));
 
     if (!hasRequiredRole) {
-      console.error('[AdminProtectedRoute] Access denied:', {
-        requiredRoles,
-        userRole,
-        userActiveRole,
-        userRoles,
-        userId: user.id,
-        path: window.location.pathname,
-        fullUser: user
-      });
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
   }
@@ -190,13 +170,6 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
       ));
 
     if (!isAdmin) {
-      console.warn('[AdminProtectedRoute] Insufficient permissions:', {
-        requiredPermissions,
-        userRole,
-        userActiveRole,
-        userRoles,
-        userId: user.id
-      });
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
   }
