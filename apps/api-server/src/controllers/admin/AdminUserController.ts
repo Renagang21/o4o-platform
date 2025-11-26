@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../entities/User.js';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
@@ -19,7 +19,7 @@ export class AdminUserController {
         sortOrder = 'DESC'
       } = req.query;
 
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
       const queryBuilder = userRepo.createQueryBuilder('user');
 
       // Apply search filter
@@ -83,7 +83,7 @@ export class AdminUserController {
   getUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
       
       const user = await userRepo.findOne({ where: { id } });
       
@@ -135,7 +135,7 @@ export class AdminUserController {
         isActive = true
       } = req.body;
 
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
 
       // Check if email already exists
       const existingUser = await userRepo.findOne({ where: { email } });
@@ -196,7 +196,7 @@ export class AdminUserController {
       }
 
       const { id } = req.params;
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
 
       const user = await userRepo.findOne({ where: { id } });
       if (!user) {
@@ -272,7 +272,7 @@ export class AdminUserController {
       const { id } = req.params;
       const { status } = req.body;
 
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
       const user = await userRepo.findOne({ where: { id } });
 
       if (!user) {
@@ -303,7 +303,7 @@ export class AdminUserController {
   deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
 
       const user = await userRepo.findOne({ where: { id } });
       if (!user) {
@@ -332,7 +332,7 @@ export class AdminUserController {
   // Get user statistics
   getUserStatistics = async (req: Request, res: Response): Promise<void> => {
     try {
-      const userRepo = getRepository(User);
+      const userRepo = AppDataSource.getRepository(User);
 
       const [
         totalUsers,
