@@ -1,36 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@o4o/auth-context';
-import { UserApi } from '../../api/userApi';
-import { unifiedApi } from '../../api/unified-client';
+import axios from 'axios';
 
 const DropshippingUsersTest: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const [tokenInfo, setTokenInfo] = useState<any>({});
   const [testResults, setTestResults] = useState<any>({});
-  const [autoRedirect, setAutoRedirect] = useState(false);
 
   useEffect(() => {
-    // Override window.location.href to prevent redirect
-    const originalLocationHref = Object.getOwnPropertyDescriptor(window.location, 'href');
-
-    Object.defineProperty(window.location, 'href', {
-      set: function(newValue) {
-        console.log('🚫 Prevented redirect to:', newValue);
-        setAutoRedirect(true);
-        setTestResults(prev => ({
-          ...prev,
-          redirectAttempt: {
-            status: 'BLOCKED',
-            targetUrl: newValue,
-            timestamp: new Date().toISOString()
-          }
-        }));
-      },
-      get: function() {
-        return originalLocationHref?.get?.call(window.location) || '';
-      }
-    });
-
     // Check localStorage for tokens
     const accessToken = localStorage.getItem('accessToken');
     const authToken = localStorage.getItem('authToken');
@@ -76,21 +53,51 @@ const DropshippingUsersTest: React.FC = () => {
     });
   }, []);
 
+  const getToken = () => {
+    // Get token from multiple sources
+    let token = localStorage.getItem('authToken');
+    if (!token) {
+      token = localStorage.getItem('accessToken');
+    }
+    if (!token) {
+      const adminStorage = localStorage.getItem('admin-auth-storage');
+      if (adminStorage) {
+        try {
+          const parsed = JSON.parse(adminStorage);
+          token = parsed.state?.token;
+        } catch (e) {
+          console.error('Failed to parse admin-auth-storage:', e);
+        }
+      }
+    }
+    return token;
+  };
+
   const testSellersAPI = async () => {
     console.log('🔍 Testing Sellers API...');
     setTestResults(prev => ({ ...prev, sellers: { status: 'Loading...' } }));
 
+    const token = getToken();
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+
     try {
-      const response = await UserApi.getUsers(1, 20, { role: 'seller' });
+      const response = await axios.get(`${baseURL}/api/v1/users`, {
+        params: { page: 1, limit: 20, role: 'seller' },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
       console.log('✅ Sellers API Success:', response);
 
       setTestResults(prev => ({
         ...prev,
         sellers: {
           status: 'Success',
-          data: response,
-          total: response?.total || 0,
-          users: response?.data?.length || 0
+          data: response.data,
+          statusCode: response.status,
+          headers: response.headers
         }
       }));
     } catch (error: any) {
@@ -117,17 +124,27 @@ const DropshippingUsersTest: React.FC = () => {
     console.log('🔍 Testing Suppliers API...');
     setTestResults(prev => ({ ...prev, suppliers: { status: 'Loading...' } }));
 
+    const token = getToken();
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+
     try {
-      const response = await UserApi.getUsers(1, 20, { role: 'supplier' });
+      const response = await axios.get(`${baseURL}/api/v1/users`, {
+        params: { page: 1, limit: 20, role: 'supplier' },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
       console.log('✅ Suppliers API Success:', response);
 
       setTestResults(prev => ({
         ...prev,
         suppliers: {
           status: 'Success',
-          data: response,
-          total: response?.total || 0,
-          users: response?.data?.length || 0
+          data: response.data,
+          statusCode: response.status,
+          headers: response.headers
         }
       }));
     } catch (error: any) {
@@ -152,17 +169,27 @@ const DropshippingUsersTest: React.FC = () => {
     console.log('🔍 Testing Partners API...');
     setTestResults(prev => ({ ...prev, partners: { status: 'Loading...' } }));
 
+    const token = getToken();
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+
     try {
-      const response = await UserApi.getUsers(1, 20, { role: 'partner' });
+      const response = await axios.get(`${baseURL}/api/v1/users`, {
+        params: { page: 1, limit: 20, role: 'partner' },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
       console.log('✅ Partners API Success:', response);
 
       setTestResults(prev => ({
         ...prev,
         partners: {
           status: 'Success',
-          data: response,
-          total: response?.total || 0,
-          users: response?.data?.length || 0
+          data: response.data,
+          statusCode: response.status,
+          headers: response.headers
         }
       }));
     } catch (error: any) {
@@ -187,8 +214,18 @@ const DropshippingUsersTest: React.FC = () => {
     console.log('🔍 Testing Raw API...');
     setTestResults(prev => ({ ...prev, raw: { status: 'Loading...' } }));
 
+    const token = getToken();
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+
     try {
-      const response = await unifiedApi.raw.get('/users?page=1&limit=20&role=seller');
+      const response = await axios.get(`${baseURL}/api/v1/users`, {
+        params: { page: 1, limit: 20, role: 'seller' },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
       console.log('✅ Raw API Success:', response);
 
       setTestResults(prev => ({
@@ -196,8 +233,8 @@ const DropshippingUsersTest: React.FC = () => {
         raw: {
           status: 'Success',
           data: response.data,
-          headers: response.headers,
-          statusCode: response.status
+          statusCode: response.status,
+          headers: response.headers
         }
       }));
     } catch (error: any) {
@@ -222,11 +259,9 @@ const DropshippingUsersTest: React.FC = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">드롭쉬핑 유저 API 테스트</h1>
 
-      {autoRedirect && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          ⚠️ 자동 리다이렉트가 차단되었습니다! 아래 결과를 확인하세요.
-        </div>
-      )}
+      <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+        ℹ️ 이 페이지는 unified-client를 우회하여 직접 API를 호출합니다. 401 에러가 발생해도 로그인 페이지로 리다이렉트되지 않습니다.
+      </div>
 
       {/* User Info */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -329,11 +364,12 @@ const DropshippingUsersTest: React.FC = () => {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="font-semibold mb-2">사용 방법:</h3>
         <ol className="list-decimal list-inside space-y-1 text-sm">
-          <li>브라우저 개발자 도구를 열고 Console 탭을 확인하세요</li>
-          <li>Network 탭도 함께 확인하면 더 상세한 정보를 볼 수 있습니다</li>
+          <li>브라우저 개발자 도구를 열고 <strong>Console 탭</strong>을 확인하세요</li>
+          <li><strong>Network 탭</strong>도 함께 확인하면 더 상세한 정보를 볼 수 있습니다</li>
           <li>위 버튼들을 클릭하여 API를 테스트하세요</li>
-          <li>에러가 발생하면 자동 리다이렉트가 차단되고 여기에 결과가 표시됩니다</li>
+          <li>에러가 발생해도 로그인 페이지로 리다이렉트되지 않고 여기에 결과가 표시됩니다</li>
           <li>모든 요청/응답은 콘솔에도 자세히 기록됩니다</li>
+          <li>특히 <strong>Network 탭</strong>에서 요청 헤더의 Authorization 토큰을 확인하세요</li>
         </ol>
       </div>
     </div>
