@@ -92,7 +92,7 @@ const UsersListClean = () => {
         const response = await authClient.api.get('/users');
 
         // Check for both direct data and nested data structure
-        const userData = response.data?.data?.users || response.data?.data || response.data || [];
+        const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
 
         if (Array.isArray(userData) && userData.length > 0) {
           const transformedUsers = userData.map((user: any) => ({
