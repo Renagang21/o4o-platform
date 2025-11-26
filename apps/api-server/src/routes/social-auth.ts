@@ -8,11 +8,20 @@ const router: Router = Router();
 // Success/Failure redirect URLs (with dynamic redirect_url support)
 const getRedirectUrls = (redirectUrl?: string) => {
   const defaultUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
-  const baseRedirect = redirectUrl || defaultUrl;
 
+  // If specific redirect URL provided, use it directly
+  if (redirectUrl) {
+    const frontendUrl = defaultUrl;
+    return {
+      success: `${frontendUrl}${redirectUrl}`,
+      failure: `${frontendUrl}${redirectUrl}?auth_error=social_login_failed`
+    };
+  }
+
+  // Otherwise use home page with query params
   return {
-    success: `${baseRedirect}?social_auth=success`,
-    failure: `${baseRedirect}?social_auth=error`
+    success: `${defaultUrl}?social_auth=success`,
+    failure: `${defaultUrl}?social_auth=error`
   };
 };
 
@@ -40,7 +49,7 @@ router.get('/status', (req, res) => {
 
 // Google OAuth routes
 router.get('/google', (req, res, next) => {
-  const redirectUrl = req.query.redirect_url as string;
+  const redirectUrl = (req.query.redirect || req.query.redirect_url) as string;
   const state = redirectUrl ? Buffer.from(JSON.stringify({ redirect_url: redirectUrl })).toString('base64') : undefined;
 
   passport.authenticate('google', {
@@ -91,7 +100,7 @@ router.get('/google/callback',
 
 // Kakao OAuth routes
 router.get('/kakao', (req, res, next) => {
-  const redirectUrl = req.query.redirect_url as string;
+  const redirectUrl = (req.query.redirect || req.query.redirect_url) as string;
   const state = redirectUrl ? Buffer.from(JSON.stringify({ redirect_url: redirectUrl })).toString('base64') : undefined;
 
   passport.authenticate('kakao', { state })(req, res, next);
@@ -140,7 +149,7 @@ router.get('/kakao/callback',
 
 // Naver OAuth routes
 router.get('/naver', (req, res, next) => {
-  const redirectUrl = req.query.redirect_url as string;
+  const redirectUrl = (req.query.redirect || req.query.redirect_url) as string;
   const state = redirectUrl ? Buffer.from(JSON.stringify({ redirect_url: redirectUrl })).toString('base64') : undefined;
 
   passport.authenticate('naver', { state })(req, res, next);
