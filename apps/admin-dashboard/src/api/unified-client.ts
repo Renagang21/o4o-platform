@@ -151,23 +151,37 @@ class UnifiedApiClient {
 
   private handleUnauthorized() {
     const currentPath = window.location.pathname;
+    const token = this.getAuthToken();
 
-    console.error('[UnifiedAPI] Unauthorized - Redirecting to login', {
+    const debugInfo = {
       currentPath,
       hasAuthStorage: !!localStorage.getItem('admin-auth-storage'),
-      hasToken: !!this.getAuthToken()
-    });
+      hasToken: !!token,
+      tokenPreview: token ? `${token.substring(0, 30)}...` : 'none',
+      authStoreToken: useAuthStore.getState().token || 'none',
+      localStorageKeys: Object.keys(localStorage)
+    };
 
-    if (currentPath !== '/login') {
-      // Clear all auth data
-      localStorage.removeItem('auth-storage');
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('admin-auth-storage');
+    console.error('[UnifiedAPI] Unauthorized - Redirecting to login', debugInfo);
 
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
-      toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
-    }
+    // Show alert with debug info for 3 seconds before redirecting
+    const alertMessage = `401 Unauthorized!\n\nPath: ${currentPath}\nHas Token: ${!!token}\nToken Preview: ${debugInfo.tokenPreview}\n\nRedirecting to login in 3 seconds...`;
+
+    // Don't block - just show error
+    toast.error('인증 실패: ' + currentPath);
+
+    setTimeout(() => {
+      if (currentPath !== '/login') {
+        // Clear all auth data
+        localStorage.removeItem('auth-storage');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('admin-auth-storage');
+
+        useAuthStore.getState().logout();
+        alert(alertMessage);
+        window.location.href = '/login';
+      }
+    }, 100);
   }
 
   // Versioned API methods
