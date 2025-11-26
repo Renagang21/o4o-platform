@@ -65,20 +65,31 @@ export function handleAuthFailure(req: Request, error: string, userEmail?: strin
  * SQL injection detection middleware
  */
 export function sqlInjectionDetection(req: Request, res: Response, next: NextFunction) {
+  // Whitelist OAuth callback routes - they contain authorization codes that look suspicious
+  const oauthCallbackRoutes = [
+    '/api/v1/social/google/callback',
+    '/api/v1/social/kakao/callback',
+    '/api/v1/social/naver/callback'
+  ];
+
+  if (oauthCallbackRoutes.includes(req.path)) {
+    return next();
+  }
+
   const sqlPatterns = [
     /(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b.*\b(from|into|where|table)\b)/i,
     /(\b(or|and)\b.*=.*)/i,
     /(--|\||;|\/\*|\*\/|xp_|sp_)/i,
     /('|")\s*(or|and)\s*('|")\s*=/i
   ];
-  
+
   const checkValue = (value: any): boolean => {
     if (typeof value === 'string') {
       return sqlPatterns.some((pattern: any) => pattern.test(value));
     }
     return false;
   };
-  
+
   // Check query params, body, and params
   const suspicious = 
     Object.values(req.query || {}).some(checkValue) ||
