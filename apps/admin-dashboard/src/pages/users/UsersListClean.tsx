@@ -41,7 +41,7 @@ const UsersListClean = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Filters - persist in sessionStorage
-  const [activeTab, setActiveTab] = useState<'all' | 'super_admin' | 'admin' | 'seller' | 'partner' | 'supplier' | 'user'>(() => {
+  const [activeTab, setActiveTab] = useState<'all' | 'super_admin' | 'admin' | 'seller' | 'partner' | 'supplier' | 'customer'>(() => {
     const saved = sessionStorage.getItem('users-active-tab');
     return (saved as any) || 'all';
   });
@@ -60,7 +60,7 @@ const UsersListClean = () => {
   const [quickEditData, setQuickEditData] = useState({
     name: '',
     email: '',
-    role: 'user',
+    role: 'customer',
     username: ''
   });
 
@@ -89,7 +89,7 @@ const UsersListClean = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await authClient.api.get('/users');
+        const response = await authClient.api.get('/admin/users');
 
         // Check for both direct data and nested data structure
         const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
@@ -200,7 +200,7 @@ const UsersListClean = () => {
       seller: users.filter(u => u.role === 'seller').length,
       partner: users.filter(u => u.role === 'partner').length,
       supplier: users.filter(u => u.role === 'supplier').length,
-      user: users.filter(u => u.role === 'user').length
+      customer: users.filter(u => u.role === 'customer').length
     };
   };
 
@@ -256,7 +256,7 @@ const UsersListClean = () => {
       }
     } else if (selectedBulkAction === 'change-role') {
       // Show role change dialog
-      const newRole = prompt('Enter new role (super_admin, admin, seller, partner, supplier, user):');
+      const newRole = prompt('Enter new role (super_admin, admin, seller, partner, supplier, customer):');
       if (!newRole) return;
 
       try {
@@ -349,7 +349,7 @@ const UsersListClean = () => {
       seller: { label: 'Seller', color: 'text-green-600' },
       partner: { label: 'Partner', color: 'text-orange-600' },
       supplier: { label: 'Supplier', color: 'text-purple-600' },
-      user: { label: 'User', color: 'text-gray-600' }
+      customer: { label: 'Customer', color: 'text-gray-600' }
     };
 
     return roleMap[role] || { label: role, color: 'text-gray-600' };
@@ -503,10 +503,10 @@ const UsersListClean = () => {
           <li className="text-gray-400">|</li>
           <li>
             <button
-              onClick={() => setActiveTab('user')}
-              className={activeTab === 'user' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+              onClick={() => setActiveTab('customer')}
+              className={activeTab === 'customer' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
             >
-              User ({counts.user})
+              Customer ({counts.customer})
             </button>
           </li>
         </ul>
@@ -782,7 +782,7 @@ const UsersListClean = () => {
                                 <option value="seller">Seller</option>
                                 <option value="partner">Partner</option>
                                 <option value="supplier">Supplier</option>
-                                <option value="user">User</option>
+                                <option value="customer">Customer</option>
                               </select>
                             </div>
                             <div className="flex items-end gap-2">
