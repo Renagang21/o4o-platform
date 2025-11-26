@@ -89,7 +89,13 @@ const UsersListClean = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await authClient.api.get('/admin/users');
+        // Fetch all users (limit=1000 to get all users at once for client-side pagination)
+        const response = await authClient.api.get('/admin/users', {
+          params: {
+            limit: 1000,
+            page: 1
+          }
+        });
 
         // Check for both direct data and nested data structure
         const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
