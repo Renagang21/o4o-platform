@@ -140,15 +140,6 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Skip API call if no auth session hint (prevents 401 on first visit)
-    const hasAuthHint = typeof window !== 'undefined' && localStorage.getItem('auth_session_hint');
-
-    if (!hasAuthHint) {
-      setIsLoading(false);
-      setUser(null);
-      return;
-    }
-
     try {
       setIsLoading(true);
 
@@ -158,6 +149,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       if (meResponse) {
         // R-4-2: meResponse is now flat structure (MeResponse)
         setUser(meResponse as any); // Type cast to User for backward compatibility
+        // Set hint for future sessions
+        localStorage.setItem('auth_session_hint', '1');
       } else {
         setUser(null);
         // Clear hint if session is invalid
