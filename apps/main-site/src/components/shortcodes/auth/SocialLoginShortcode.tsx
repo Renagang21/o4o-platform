@@ -129,22 +129,28 @@ export const SocialLoginComponent: React.FC<{
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[SocialLoginShortcode] 📝 Form submit 시작:', formData);
     setLoading(true);
     setError('');
 
     try {
+      console.log('[SocialLoginShortcode] 🔐 login 함수 호출 전');
       const success = await login(formData.email, formData.password);
+      console.log('[SocialLoginShortcode] ✅ login 결과:', success);
 
       if (success) {
         // R-5-2: Unified redirect logic
         const targetUrl = redirectUrl || '/account';
+        console.log('[SocialLoginShortcode] 🚀 리다이렉트:', targetUrl);
         navigate(targetUrl, { replace: true });
       }
     } catch (err: any) {
+      console.error('[SocialLoginShortcode] ❌ 로그인 실패:', err);
       // R-5-2: Standardized error message
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setLoading(false);
+      console.log('[SocialLoginShortcode] ✅ Form submit 완료');
     }
   };
 
