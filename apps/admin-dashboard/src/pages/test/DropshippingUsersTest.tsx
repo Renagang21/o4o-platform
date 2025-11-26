@@ -78,10 +78,11 @@ const DropshippingUsersTest: React.FC = () => {
     setTestResults(prev => ({ ...prev, sellers: { status: 'Loading...' } }));
 
     const token = getToken();
-    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+    // VITE_API_URL already includes /api, so we just add /v1/users
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
 
     try {
-      const response = await axios.get(`${baseURL}/api/v1/users`, {
+      const response = await axios.get(`${baseURL}/v1/users`, {
         params: { page: 1, limit: 20, role: 'seller' },
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -125,10 +126,10 @@ const DropshippingUsersTest: React.FC = () => {
     setTestResults(prev => ({ ...prev, suppliers: { status: 'Loading...' } }));
 
     const token = getToken();
-    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
 
     try {
-      const response = await axios.get(`${baseURL}/api/v1/users`, {
+      const response = await axios.get(`${baseURL}/v1/users`, {
         params: { page: 1, limit: 20, role: 'supplier' },
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -170,10 +171,10 @@ const DropshippingUsersTest: React.FC = () => {
     setTestResults(prev => ({ ...prev, partners: { status: 'Loading...' } }));
 
     const token = getToken();
-    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
 
     try {
-      const response = await axios.get(`${baseURL}/api/v1/users`, {
+      const response = await axios.get(`${baseURL}/v1/users`, {
         params: { page: 1, limit: 20, role: 'partner' },
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -215,10 +216,10 @@ const DropshippingUsersTest: React.FC = () => {
     setTestResults(prev => ({ ...prev, raw: { status: 'Loading...' } }));
 
     const token = getToken();
-    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+    const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
 
     try {
-      const response = await axios.get(`${baseURL}/api/v1/users`, {
+      const response = await axios.get(`${baseURL}/v1/users`, {
         params: { page: 1, limit: 20, role: 'seller' },
         headers: {
           'Authorization': `Bearer ${token}`,
