@@ -100,10 +100,6 @@ const UsersListClean = () => {
         // Check for both direct data and nested data structure
         const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
 
-        console.log('[UsersListClean] API Response:', response.data);
-        console.log('[UsersListClean] User Data:', userData);
-        console.log('[UsersListClean] Is Array:', Array.isArray(userData), 'Length:', userData?.length);
-
         if (Array.isArray(userData)) {
           const transformedUsers = userData.map((user: any) => {
             // Construct fullName from firstName and lastName, fallback to name field
@@ -126,10 +122,8 @@ const UsersListClean = () => {
             };
           });
 
-          console.log('[UsersListClean] Transformed Users:', transformedUsers.length, 'users');
           setUsers(transformedUsers);
         } else {
-          console.log('[UsersListClean] userData is not an array, setting empty');
           setUsers([]);
         }
       } catch (err: any) {
