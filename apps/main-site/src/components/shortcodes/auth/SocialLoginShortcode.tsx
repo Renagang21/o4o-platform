@@ -468,5 +468,12 @@ export const oauthLoginShortcode: ShortcodeDefinition = {
   )
 };
 
+// Export shortcodes as array for auto-registration
+export const authShortcodes: ShortcodeDefinition[] = [
+  socialLoginShortcode,
+  loginFormShortcode,
+  oauthLoginShortcode
+];
+
 // Default export for auto-registration (SocialLoginShortcode.tsx → SocialLogin)
 export default SocialLoginComponent;
