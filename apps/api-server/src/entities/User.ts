@@ -59,7 +59,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.CUSTOMER
+    default: UserRole.USER
   })
   // @IsEnum(UserRole)
   role!: UserRole;
@@ -74,7 +74,7 @@ export class User {
    */
   @Column({
     type: 'simple-array',
-    default: () => `'${UserRole.CUSTOMER}'`
+    default: () => `'${UserRole.USER}'`
   })
   roles!: string[];
 

@@ -185,7 +185,7 @@ class AuthService {
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.CUSTOMER
+      role: userData.role || UserRole.USER
     });
 
     return await this.userRepository.save(user);

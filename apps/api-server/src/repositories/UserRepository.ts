@@ -229,7 +229,7 @@ export class UserRepository extends Repository<User> {
 
     user.roles = roles;
     // Keep primary role in sync
-    user.role = roles[0] || UserRole.CUSTOMER;
+    user.role = roles[0] || UserRole.USER;
 
     return this.save(user);
   }

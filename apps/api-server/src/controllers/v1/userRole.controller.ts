@@ -70,7 +70,7 @@ export const ROLE_PERMISSIONS_LEGACY: Record<UserRole, string[]> = {
     'content.view', 'content.create',
     'api.access'
   ],
-  [UserRole.CUSTOMER]: [
+  [UserRole.USER]: [
     'content.view',
     'api.access'
   ],

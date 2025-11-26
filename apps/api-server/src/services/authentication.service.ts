@@ -327,8 +327,8 @@ export class AuthenticationService {
       lastName: profile.lastName,
       avatar: profile.avatar,
       password: await hashPassword(generateRandomToken()), // Random password for OAuth users
-      role: UserRole.CUSTOMER,
-      roles: [UserRole.CUSTOMER],
+      role: UserRole.USER,
+      roles: [UserRole.USER],
       status: UserStatus.ACTIVE,
       isEmailVerified: profile.emailVerified || false,
       provider: provider,
@@ -674,7 +674,7 @@ export class AuthenticationService {
       UserRole.SELLER,
       UserRole.SUPPLIER,
       UserRole.PARTNER,
-      UserRole.CUSTOMER
+      UserRole.USER
     ];
     const testAccounts: Array<{role: string; email: string; password: string}> = [];
 

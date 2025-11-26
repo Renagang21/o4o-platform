@@ -247,7 +247,7 @@ export const ROLE_PERMISSIONS = {
     'analytics.view.affiliate',
     'payout.request'
   ],
-  CUSTOMER: [
+  USER: [
     'products.view.public',
     'orders.create',
     'orders.view.own',

@@ -273,7 +273,7 @@ class PassportManager {
           lastName: profile.name?.familyName,
           provider: 'google',
           provider_id: profile.id,
-          role: UserRole.CUSTOMER,
+          role: UserRole.USER,
           status: UserStatus.ACTIVE,
           isEmailVerified: true,
           password: ''
@@ -323,7 +323,7 @@ class PassportManager {
           name: profile.displayName || profile.username || profile._json?.properties?.nickname || '',
           provider: 'kakao',
           provider_id: String(profile.id),
-          role: UserRole.CUSTOMER,
+          role: UserRole.USER,
           status: UserStatus.ACTIVE,
           isEmailVerified: true,
           password: ''
@@ -373,7 +373,7 @@ class PassportManager {
           name: profile.displayName || profile.nickname,
           provider: 'naver',
           provider_id: profile.id,
-          role: UserRole.CUSTOMER,
+          role: UserRole.USER,
           status: UserStatus.ACTIVE,
           isEmailVerified: true,
           password: ''

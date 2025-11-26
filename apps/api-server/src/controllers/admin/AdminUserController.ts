@@ -130,7 +130,7 @@ export class AdminUserController {
         firstName,
         lastName,
         name,
-        role = UserRole.CUSTOMER,
+        role = UserRole.USER,
         status = UserStatus.APPROVED,
         isActive = true
       } = req.body;

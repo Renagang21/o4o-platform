@@ -48,9 +48,9 @@ export class UserService {
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.CUSTOMER,
+      role: userData.role || UserRole.USER,
       status: UserStatus.PENDING,
-      permissions: this.getDefaultPermissions(userData.role || UserRole.CUSTOMER),
+      permissions: this.getDefaultPermissions(userData.role || UserRole.USER),
       isActive: true,
       isEmailVerified: false,
       loginAttempts: 0

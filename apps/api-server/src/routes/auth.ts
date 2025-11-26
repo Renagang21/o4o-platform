@@ -158,7 +158,7 @@ const signupHandler = asyncHandler(async (req, res, next) => {
   user.email = email;
   user.password = hashedPassword;
   user.name = name || email.split('@')[0]; // 이름이 없으면 이메일 앞부분 사용
-  user.role = UserRole.CUSTOMER; // 기본 역할
+  user.role = UserRole.USER; // 기본 역할
   user.status = UserStatus.ACTIVE; // 즉시 활성화 (승인 대기 없음)
 
   await userRepository.save(user);

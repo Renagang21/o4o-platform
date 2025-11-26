@@ -253,7 +253,7 @@ router.post('/login',
       const jwtPayload: JwtPayload = {
         userId: user.id,
         email: user.email,
-        role: user.role || UserRole.CUSTOMER,
+        role: user.role || UserRole.USER,
         emailVerified: true
       };
 
@@ -274,7 +274,7 @@ router.post('/login',
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role || UserRole.CUSTOMER,
+            role: user.role || UserRole.USER,
             emailVerified: true,
             createdAt: user.createdAt
           },

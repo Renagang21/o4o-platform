@@ -8,7 +8,7 @@ export enum UserRole {
   VENDOR = 'vendor',
   VENDOR_MANAGER = 'vendor_manager',
   SELLER = 'seller',
-  CUSTOMER = 'customer',
+  USER = 'user',  // General user role (previously CUSTOMER)
   BUSINESS = 'business',
   MODERATOR = 'moderator',
   PARTNER = 'partner',
@@ -17,7 +17,8 @@ export enum UserRole {
   SUPPLIER = 'supplier',  // 공급자: 상품 제공, 재고 관리
   AFFILIATE = 'affiliate', // 제휴자: 제휴 마케팅, 커미션
   // Legacy roles kept for backward compatibility
-  MANAGER = 'manager'
+  MANAGER = 'manager',
+  CUSTOMER = 'customer'  // Deprecated: Use USER instead
 }
 
 export enum UserStatus {

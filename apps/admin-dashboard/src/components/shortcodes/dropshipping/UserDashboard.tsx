@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 // Define UserRole enum locally since import path is not available
 enum UserRole {
-  CUSTOMER = 'customer',
+  USER = 'user',
   SUPPLIER = 'supplier',
   SELLER = 'seller',
   AFFILIATE = 'affiliate',
@@ -33,7 +33,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ role }) => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   
   // Determine the actual role to display
-  const displayRole = role || user?.role || UserRole.CUSTOMER;
+  const displayRole = role || user?.role || UserRole.USER;
 
   useEffect(() => {
     fetchDashboardData();
