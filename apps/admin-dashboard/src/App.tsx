@@ -130,6 +130,7 @@ const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationT
 const DeleteCustomizerTest = lazy(() => import('@/pages/test/DeleteCustomizerTest'));
 const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
 const AuthInspector = lazy(() => import('@/pages/test/AuthInspector'));
+const DropshippingUsersTest = lazy(() => import('@/pages/test/DropshippingUsersTest'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -801,8 +802,14 @@ function App() {
                         <AuthDebug />
                       </Suspense>
                     } />
+                    {/* Test - Dropshipping Users */}
+                    <Route path="/admin/test/dropshipping-users" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <DropshippingUsersTest />
+                      </Suspense>
+                    } />
 
-                    
+
                     {/* System Monitoring */}
                     <Route path="/monitoring" element={
                       <AdminProtectedRoute requiredPermissions={['admin']}>
