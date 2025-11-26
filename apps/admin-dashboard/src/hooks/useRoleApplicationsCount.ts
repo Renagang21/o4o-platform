@@ -19,7 +19,7 @@ export const useRoleApplicationsCount = () => {
 
     try {
       setIsLoading(true);
-      const response = await authClient.api.get('/v2/admin/roles/applications', {
+      const response = await authClient.api.get('/admin/roles/applications', {
         params: { status: 'pending' },
         validateStatus: (status) => status < 500 // Don't throw on 401/403
       });
