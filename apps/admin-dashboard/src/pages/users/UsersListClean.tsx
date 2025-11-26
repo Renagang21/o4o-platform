@@ -41,7 +41,7 @@ const UsersListClean = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Filters - persist in sessionStorage
-  const [activeTab, setActiveTab] = useState<'all' | 'administrator' | 'editor' | 'subscriber'>(() => {
+  const [activeTab, setActiveTab] = useState<'all' | 'super_admin' | 'admin' | 'seller' | 'partner' | 'supplier' | 'user'>(() => {
     const saved = sessionStorage.getItem('users-active-tab');
     return (saved as any) || 'all';
   });
@@ -60,7 +60,7 @@ const UsersListClean = () => {
   const [quickEditData, setQuickEditData] = useState({
     name: '',
     email: '',
-    role: 'subscriber',
+    role: 'user',
     username: ''
   });
 
@@ -195,9 +195,12 @@ const UsersListClean = () => {
   const getCounts = () => {
     return {
       all: users.length,
-      administrator: users.filter(u => u.role === 'administrator').length,
-      editor: users.filter(u => u.role === 'editor').length,
-      subscriber: users.filter(u => u.role === 'subscriber').length
+      super_admin: users.filter(u => u.role === 'super_admin').length,
+      admin: users.filter(u => u.role === 'admin').length,
+      seller: users.filter(u => u.role === 'seller').length,
+      partner: users.filter(u => u.role === 'partner').length,
+      supplier: users.filter(u => u.role === 'supplier').length,
+      user: users.filter(u => u.role === 'user').length
     };
   };
 
@@ -253,7 +256,7 @@ const UsersListClean = () => {
       }
     } else if (selectedBulkAction === 'change-role') {
       // Show role change dialog
-      const newRole = prompt('Enter new role (administrator, editor, subscriber):');
+      const newRole = prompt('Enter new role (super_admin, admin, seller, partner, supplier, user):');
       if (!newRole) return;
 
       try {
@@ -341,13 +344,14 @@ const UsersListClean = () => {
   // Role display helper
   const getRoleDisplay = (role: string) => {
     const roleMap: Record<string, { label: string; color: string }> = {
-      administrator: { label: 'Administrator', color: 'text-red-600' },
-      editor: { label: 'Editor', color: 'text-blue-600' },
-      author: { label: 'Author', color: 'text-green-600' },
-      contributor: { label: 'Contributor', color: 'text-purple-600' },
-      subscriber: { label: 'Subscriber', color: 'text-gray-600' }
+      super_admin: { label: 'Super Admin', color: 'text-red-700' },
+      admin: { label: 'Admin', color: 'text-red-600' },
+      seller: { label: 'Seller', color: 'text-green-600' },
+      partner: { label: 'Partner', color: 'text-orange-600' },
+      supplier: { label: 'Supplier', color: 'text-purple-600' },
+      user: { label: 'User', color: 'text-gray-600' }
     };
-    
+
     return roleMap[role] || { label: role, color: 'text-gray-600' };
   };
 
@@ -441,8 +445,8 @@ const UsersListClean = () => {
           </button>
         </div>
 
-        {/* Status Filter Tabs */}
-        <ul className="flex gap-2 text-sm mb-4">
+        {/* Role Filter Tabs */}
+        <ul className="flex gap-2 text-sm mb-4 flex-wrap">
           <li>
             <button
               onClick={() => setActiveTab('all')}
@@ -454,28 +458,55 @@ const UsersListClean = () => {
           <li className="text-gray-400">|</li>
           <li>
             <button
-              onClick={() => setActiveTab('administrator')}
-              className={activeTab === 'administrator' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+              onClick={() => setActiveTab('super_admin')}
+              className={activeTab === 'super_admin' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
             >
-              Administrator ({counts.administrator})
+              Super Admin ({counts.super_admin})
             </button>
           </li>
           <li className="text-gray-400">|</li>
           <li>
             <button
-              onClick={() => setActiveTab('editor')}
-              className={activeTab === 'editor' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+              onClick={() => setActiveTab('admin')}
+              className={activeTab === 'admin' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
             >
-              Editor ({counts.editor})
+              Admin ({counts.admin})
             </button>
           </li>
           <li className="text-gray-400">|</li>
           <li>
             <button
-              onClick={() => setActiveTab('subscriber')}
-              className={activeTab === 'subscriber' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+              onClick={() => setActiveTab('seller')}
+              className={activeTab === 'seller' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
             >
-              Subscriber ({counts.subscriber})
+              Seller ({counts.seller})
+            </button>
+          </li>
+          <li className="text-gray-400">|</li>
+          <li>
+            <button
+              onClick={() => setActiveTab('partner')}
+              className={activeTab === 'partner' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+            >
+              Partner ({counts.partner})
+            </button>
+          </li>
+          <li className="text-gray-400">|</li>
+          <li>
+            <button
+              onClick={() => setActiveTab('supplier')}
+              className={activeTab === 'supplier' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+            >
+              Supplier ({counts.supplier})
+            </button>
+          </li>
+          <li className="text-gray-400">|</li>
+          <li>
+            <button
+              onClick={() => setActiveTab('user')}
+              className={activeTab === 'user' ? 'font-medium' : 'text-blue-600 hover:text-blue-800'}
+            >
+              User ({counts.user})
             </button>
           </li>
         </ul>
@@ -746,11 +777,12 @@ const UsersListClean = () => {
                                 onChange={(e) => setQuickEditData({ ...quickEditData, role: e.target.value })}
                                 className="px-2 py-1 border border-gray-300 rounded text-sm"
                               >
-                                <option value="administrator">Administrator</option>
-                                <option value="editor">Editor</option>
-                                <option value="author">Author</option>
-                                <option value="contributor">Contributor</option>
-                                <option value="subscriber">Subscriber</option>
+                                <option value="super_admin">Super Admin</option>
+                                <option value="admin">Admin</option>
+                                <option value="seller">Seller</option>
+                                <option value="partner">Partner</option>
+                                <option value="supplier">Supplier</option>
+                                <option value="user">User</option>
                               </select>
                             </div>
                             <div className="flex items-end gap-2">
