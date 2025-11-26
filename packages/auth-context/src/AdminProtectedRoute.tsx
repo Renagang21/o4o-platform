@@ -46,22 +46,33 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
     // 로딩이 완전히 완료되고 인증되지 않은 경우에만 리다이렉트
     // localStorage에 저장된 토큰이 있는지 먼저 확인
     const hasStoredAuth = () => {
-      const token = localStorage.getItem('accessToken') || 
-                   localStorage.getItem('token') || 
+      const token = localStorage.getItem('accessToken') ||
+                   localStorage.getItem('token') ||
                    localStorage.getItem('authToken');
       const adminStorage = localStorage.getItem('admin-auth-storage');
       return !!(token || adminStorage);
     };
-    
+
     let timeoutId: number | undefined;
-    
+
     if (!isLoading && !isAuthenticated) {
+      console.log('[AdminProtectedRoute] Not authenticated, checking stored auth...', {
+        isLoading,
+        isAuthenticated,
+        hasStoredAuth: hasStoredAuth(),
+        path: location.pathname
+      });
+
       // 저장된 인증 정보가 있으면 더 기다림
       const delay = hasStoredAuth() ? 500 : 100;
-      
+
       timeoutId = window.setTimeout(() => {
         // 다시 한 번 인증 상태와 저장된 토큰 확인
         if (!isAuthenticated && !hasStoredAuth()) {
+          console.error('[AdminProtectedRoute] Redirecting to login - no auth found', {
+            path: location.pathname,
+            user
+          });
           navigate('/login', {
             replace: true,
             state: { from: location.pathname }
@@ -73,7 +84,7 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isAuthenticated, isLoading, navigate, location]);
+  }, [isAuthenticated, isLoading, navigate, location, user]);
 
   // 로딩 중인 경우 - 더 나은 UX를 위한 로딩 화면
   if (isLoading) {
@@ -144,12 +155,14 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
       ));
 
     if (!hasRequiredRole) {
-      console.warn('[AdminProtectedRoute] Access denied:', {
+      console.error('[AdminProtectedRoute] Access denied:', {
         requiredRoles,
         userRole,
         userActiveRole,
         userRoles,
-        userId: user.id
+        userId: user.id,
+        path: window.location.pathname,
+        fullUser: user
       });
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
