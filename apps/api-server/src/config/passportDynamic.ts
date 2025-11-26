@@ -128,7 +128,8 @@ class PassportManager {
   }
 
   private static getEnvSettings(): OAuthSettingsData {
-    const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+    // Use API URL for OAuth callbacks (not frontend URL)
+    const apiUrl = process.env.API_URL || 'https://api.neture.co.kr';
 
     return {
       google: {
@@ -136,7 +137,7 @@ class PassportManager {
         enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
         clientId: process.env.GOOGLE_CLIENT_ID || '',
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-        callbackUrl: `${frontendUrl}/api/v1/social/google/callback`,
+        callbackUrl: `${apiUrl}/api/v1/social/google/callback`,
         scope: ['profile', 'email']
       },
       kakao: {
@@ -144,7 +145,7 @@ class PassportManager {
         enabled: !!(process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET),
         clientId: process.env.KAKAO_CLIENT_ID || '',
         clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
-        callbackUrl: `${frontendUrl}/api/v1/social/kakao/callback`,
+        callbackUrl: `${apiUrl}/api/v1/social/kakao/callback`,
         scope: []
       },
       naver: {
@@ -152,7 +153,7 @@ class PassportManager {
         enabled: !!(process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET),
         clientId: process.env.NAVER_CLIENT_ID || '',
         clientSecret: process.env.NAVER_CLIENT_SECRET || '',
-        callbackUrl: `${frontendUrl}/api/v1/social/naver/callback`,
+        callbackUrl: `${apiUrl}/api/v1/social/naver/callback`,
         scope: []
       }
     };
