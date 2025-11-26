@@ -1,7 +1,6 @@
 import { Router, Request } from 'express';
 import { UserManagementController } from '../controllers/UserManagementController.js';
-import { authenticate } from '../middleware/auth.middleware.js';
-import { requireAdmin } from '../middleware/permission.middleware.js';
+import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
 import { UserRole } from '../types/auth.js';
 import { validationResult } from 'express-validator';
 import { body, param, query } from 'express-validator';
