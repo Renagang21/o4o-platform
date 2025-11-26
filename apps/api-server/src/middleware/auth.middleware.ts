@@ -41,7 +41,14 @@ export const requireAuth = async (
   try {
     const token = extractToken(req);
 
+    logger.info('[requireAuth] Checking authentication', {
+      path: req.path,
+      method: req.method,
+      hasToken: !!token
+    });
+
     if (!token) {
+      logger.warn('[requireAuth] No token found');
       return res.status(401).json({
         code: 'AUTH_REQUIRED',
         message: 'Authentication required'
@@ -50,6 +57,7 @@ export const requireAuth = async (
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+    logger.info('[requireAuth] Token verified', { userId: decoded.userId || decoded.sub });
 
     // Get user from database
     const userRepo = AppDataSource.getRepository(User);
@@ -59,6 +67,7 @@ export const requireAuth = async (
     });
 
     if (!user) {
+      logger.warn('[requireAuth] User not found in database', { userId: decoded.userId || decoded.sub });
       return res.status(401).json({
         code: 'INVALID_USER',
         message: 'User account not found or has been deactivated'
@@ -66,16 +75,21 @@ export const requireAuth = async (
     }
 
     if (!user.isActive) {
+      logger.warn('[requireAuth] User is inactive', { userId: user.id });
       return res.status(401).json({
         code: 'USER_INACTIVE',
         message: 'User account is inactive'
       });
     }
 
+    logger.info('[requireAuth] Authentication successful', { userId: user.id, role: user.role });
     // Attach user to request
     req.user = user as any;
     next();
   } catch (error) {
+    logger.error('[requireAuth] Token verification failed', {
+      error: error instanceof Error ? error.message : String(error)
+    });
     return res.status(401).json({
       code: 'INVALID_TOKEN',
       message: 'Access token is invalid or has expired'
