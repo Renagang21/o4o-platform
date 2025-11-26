@@ -18,16 +18,6 @@ import { loadShortcodes, logShortcodeSummary } from './utils/shortcode-loader';
 // React 시작 전에 iframe 컨텍스트 초기화
 initializeIframeContext();
 
-// Load and register all shortcodes
-loadShortcodes().then((stats) => {
-  logShortcodeSummary(stats);
-});
-
-// Debug: Expose globalRegistry to window (development only)
-if (import.meta.env.DEV) {
-  (window as any).__shortcodeRegistry = globalRegistry;
-}
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -37,14 +27,30 @@ const queryClient = new QueryClient({
   },
 });
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </ToastProvider>
-    </QueryClientProvider>
-  </StrictMode>
-); 
+// Initialize app with async shortcode loading
+async function initializeApp() {
+  // Load and register all shortcodes BEFORE rendering React
+  const stats = await loadShortcodes();
+  logShortcodeSummary(stats);
+
+  // Debug: Expose globalRegistry to window (development only)
+  if (import.meta.env.DEV) {
+    (window as any).__shortcodeRegistry = globalRegistry;
+  }
+
+  // Render React app after shortcodes are loaded
+  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </ToastProvider>
+      </QueryClientProvider>
+    </StrictMode>
+  );
+}
+
+// Start app initialization
+initializeApp(); 

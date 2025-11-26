@@ -22,7 +22,8 @@ export function useThemeSettings() {
     queryKey: ['settings', 'theme'],
     queryFn: async () => {
       try {
-        const response = await authClient.api.get<ThemeSettingsResponse>('/settings/theme');
+        // authClient.baseURL already includes /api/v1, so use relative path
+        const response = await authClient.api.get<ThemeSettingsResponse>('settings/theme');
         return response.data;
       } catch (error: any) {
         const status = error?.response?.status;

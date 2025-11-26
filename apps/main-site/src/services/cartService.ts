@@ -21,7 +21,8 @@ export interface Cart {
 }
 
 class CartService {
-  private baseUrl = '/api/cart';
+  // authClient.baseURL already includes /api/v1, so use relative path
+  private baseUrl = 'cart';
 
   /**
    * Get current user's cart
