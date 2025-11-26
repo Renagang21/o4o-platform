@@ -126,10 +126,22 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   // 사용자 정보 업데이트
   const updateUser = (userData: Partial<User>) => {
+    console.log('[AuthContext] 📝 updateUser called with:', userData);
+
+    // Handle both update existing user AND set new user (for OAuth callback)
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
+      console.log('[AuthContext] ✅ User updated:', updatedUser);
+    } else {
+      // First login via OAuth - set user directly
+      setUser(userData as User);
+      console.log('[AuthContext] ✅ User set (first login):', userData);
     }
+
+    // CRITICAL: Set auth hint for session persistence (same as login function)
+    localStorage.setItem('auth_session_hint', '1');
+    console.log('[AuthContext] 💾 auth_session_hint 저장됨');
   };
 
   // R-4-2: 인증 상태 확인 - /me 기반 (MeResponse flat 구조)
