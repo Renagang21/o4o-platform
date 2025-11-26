@@ -564,6 +564,34 @@ router.get('/permalink', async (req: Request, res: Response) => {
 });
 
 /**
+ * @route   GET /api/v1/settings/general
+ * @desc    Get general settings (public endpoint for frontend)
+ * @access  Public
+ */
+router.get('/general', async (req: Request, res: Response) => {
+  try {
+    const generalSettings = settingsStore.get('general') || {
+      siteName: 'O4O Platform',
+      siteDescription: '올인원 비즈니스 플랫폼',
+      siteUrl: 'https://neture.co.kr',
+      timezone: 'Asia/Seoul',
+      language: 'ko'
+    };
+
+    res.json({
+      success: true,
+      data: generalSettings
+    });
+  } catch (error) {
+    logger.error('Failed to get general settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get general settings'
+    });
+  }
+});
+
+/**
  * @route GET /v1/settings/auth
  * @desc Get authentication settings (role redirect map)
  * @access Public
