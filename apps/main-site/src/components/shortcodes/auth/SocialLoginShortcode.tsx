@@ -97,13 +97,17 @@ export const SocialLoginComponent: React.FC<{
   useEffect(() => {
     const fetchProviders = async () => {
       try {
+        console.log('[SocialLoginShortcode] 📡 OAuth 설정 가져오는 중...');
         const response = await authClient.api.get('/settings/oauth');
+
+        console.log('[SocialLoginShortcode] 📥 OAuth 설정 응답:', response.data);
 
         if (response.data.success) {
           setOauthProviders(response.data.data);
+          console.log('[SocialLoginShortcode] ✅ OAuth providers 설정됨:', response.data.data);
         }
       } catch (error) {
-        console.error('Failed to fetch OAuth providers:', error);
+        console.error('[SocialLoginShortcode] ❌ OAuth providers 가져오기 실패:', error);
       } finally {
         setProvidersLoading(false);
       }
@@ -162,8 +166,18 @@ export const SocialLoginComponent: React.FC<{
     const redirect = redirectUrl || '/account';
     const redirectParam = encodeURIComponent(redirect);
 
+    // Build social login URL
+    const socialLoginUrl = `${baseUrl}/social/${provider}?redirect=${redirectParam}`;
+
+    console.log('[SocialLoginShortcode] 🔐 소셜 로그인 시작:', {
+      provider,
+      baseUrl,
+      redirect,
+      socialLoginUrl
+    });
+
     // Navigate to social login endpoint
-    window.location.href = `${baseUrl}/social/${provider}?redirect=${redirectParam}`;
+    window.location.href = socialLoginUrl;
   };
 
   const renderSocialIcon = (provider: string) => {
@@ -202,6 +216,16 @@ export const SocialLoginComponent: React.FC<{
       return isEnabled && isAllowed;
     }
   );
+
+  // Debug log for enabled providers
+  useEffect(() => {
+    console.log('[SocialLoginShortcode] 📋 활성화된 providers:', {
+      allowedProviders,
+      enabledProviders: enabledProviders.map(([name]) => name),
+      oauthProviders,
+      providersLoading
+    });
+  }, [oauthProviders, providersLoading]);
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
