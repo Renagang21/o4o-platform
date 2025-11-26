@@ -296,7 +296,8 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
           <AdminBreadcrumb
             items={[
               { label: 'Admin', path: '/admin' },
-              { label: '자체 글', path: '/cpt-engine/content' },
+              { label: '드롭쉬핑', path: '/dropshipping/products' },
+              { label: 'CPT 콘텐츠 관리', path: '/cpt-engine/content' },
               { label: cptName, path: `/cpt-engine/content/${effectiveType}` },
               { label: `모든 ${cptName}` }
             ]}
