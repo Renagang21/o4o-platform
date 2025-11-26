@@ -36,7 +36,7 @@ export class UserRepository extends Repository<User> {
     filters: UserFilters,
     pagination?: PaginationOptions
   ): Promise<{ users: User[]; total: number }> {
-    const query = this.createQueryBuilderWithRelations();
+    const query = this.createQueryBuilder('user');
 
     // Apply search filter
     if (filters.search) {
