@@ -97,17 +97,13 @@ export const SocialLoginComponent: React.FC<{
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        console.log('[SocialLoginShortcode] 📡 OAuth 설정 가져오는 중...');
         const response = await authClient.api.get('/settings/oauth');
-
-        console.log('[SocialLoginShortcode] 📥 OAuth 설정 응답:', response.data);
 
         if (response.data.success) {
           setOauthProviders(response.data.data);
-          console.log('[SocialLoginShortcode] ✅ OAuth providers 설정됨:', response.data.data);
         }
       } catch (error) {
-        console.error('[SocialLoginShortcode] ❌ OAuth providers 가져오기 실패:', error);
+        // OAuth provider fetch error handled silently
       } finally {
         setProvidersLoading(false);
       }
@@ -133,28 +129,22 @@ export const SocialLoginComponent: React.FC<{
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('[SocialLoginShortcode] 📝 Form submit 시작:', formData);
     setLoading(true);
     setError('');
 
     try {
-      console.log('[SocialLoginShortcode] 🔐 login 함수 호출 전');
       const success = await login(formData.email, formData.password);
-      console.log('[SocialLoginShortcode] ✅ login 결과:', success);
 
       if (success) {
         // R-5-2: Unified redirect logic
         const targetUrl = redirectUrl || '/account';
-        console.log('[SocialLoginShortcode] 🚀 리다이렉트:', targetUrl);
         navigate(targetUrl, { replace: true });
       }
     } catch (err: any) {
-      console.error('[SocialLoginShortcode] ❌ 로그인 실패:', err);
       // R-5-2: Standardized error message
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setLoading(false);
-      console.log('[SocialLoginShortcode] ✅ Form submit 완료');
     }
   };
 
@@ -168,13 +158,6 @@ export const SocialLoginComponent: React.FC<{
 
     // Build social login URL
     const socialLoginUrl = `${baseUrl}/social/${provider}?redirect=${redirectParam}`;
-
-    console.log('[SocialLoginShortcode] 🔐 소셜 로그인 시작:', {
-      provider,
-      baseUrl,
-      redirect,
-      socialLoginUrl
-    });
 
     // Navigate to social login endpoint
     window.location.href = socialLoginUrl;
@@ -217,15 +200,6 @@ export const SocialLoginComponent: React.FC<{
     }
   );
 
-  // Debug log for enabled providers
-  useEffect(() => {
-    console.log('[SocialLoginShortcode] 📋 활성화된 providers:', {
-      allowedProviders,
-      enabledProviders: enabledProviders.map(([name]) => name),
-      oauthProviders,
-      providersLoading
-    });
-  }, [oauthProviders, providersLoading]);
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">

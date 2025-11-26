@@ -58,24 +58,14 @@ export const OAuthCallback: FC = () => {
 
   const handleOAuthCallback = async () => {
     try {
-      console.log('[OAuthCallback] 🔍 OAuth 콜백 처리 시작');
-
       // URL 파라미터 확인
       const code = searchParams.get('code');
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
       const state = searchParams.get('state');
 
-      console.log('[OAuthCallback] 📋 URL 파라미터:', {
-        provider,
-        hasCode: !!code,
-        hasError: !!error,
-        hasState: !!state
-      });
-
       // OAuth 에러 처리
       if (error) {
-        console.error('[OAuthCallback] ❌ OAuth 에러:', { error, errorDescription });
         const errorMessage = getOAuthErrorMessage(error, errorDescription);
         setError(errorMessage);
         setStatus('error');
@@ -84,7 +74,6 @@ export const OAuthCallback: FC = () => {
 
       // 인가 코드 확인
       if (!code) {
-        console.error('[OAuthCallback] ❌ 인증 코드 없음');
         setError('인증 코드가 없습니다. 다시 시도해주세요.');
         setStatus('error');
         return;
@@ -92,14 +81,12 @@ export const OAuthCallback: FC = () => {
 
       // Provider 확인
       if (!provider || !['google', 'kakao', 'naver'].includes(provider)) {
-        console.error('[OAuthCallback] ❌ 잘못된 provider:', provider);
         setError('지원하지 않는 로그인 방식입니다.');
         setStatus('error');
         return;
       }
 
       // 백엔드에 인가 코드 전송하여 토큰 교환
-      console.log('[OAuthCallback] 📡 API 호출 시작:', `/auth/oauth/${provider}/callback`);
       const response = await cookieAuthClient.api.post<OAuthCallbackResponse>(
         `/auth/oauth/${provider}/callback`,
         {
@@ -109,37 +96,19 @@ export const OAuthCallback: FC = () => {
         }
       );
 
-      console.log('[OAuthCallback] 📥 API 응답:', {
-        success: response.data.success,
-        hasUser: !!response.data.user,
-        user: response.data.user,
-        message: response.data.message
-      });
-
       if (response.data.success && response.data.user) {
-        console.log('[OAuthCallback] ✅ OAuth 성공 - updateUser 호출');
-
         // 사용자 정보 저장
         updateUser(response.data.user);
 
-        console.log('[OAuthCallback] 🔍 checkAuthStatus 호출');
         // 인증 상태 체크
         await checkAuthStatus();
 
-        console.log('[OAuthCallback] ✅ 로그인 완료 - success 상태 설정');
         setStatus('success');
       } else {
-        console.error('[OAuthCallback] ❌ 로그인 실패:', response.data.message);
         setError(response.data.message || '로그인에 실패했습니다.');
         setStatus('error');
       }
     } catch (error: any) {
-      console.error('[OAuthCallback] ❌ Exception 발생:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
-
       let errorMessage = '로그인 처리 중 오류가 발생했습니다.';
 
       if (error.response?.data?.message) {

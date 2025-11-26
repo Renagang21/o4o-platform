@@ -59,34 +59,26 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // R-4-2: 로그인 - cookieAuthClient 사용 (MeResponse flat 구조)
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      console.log('[AuthContext] 🔐 로그인 시작:', { email });
-
       // 1. 로그인 요청
       await cookieAuthClient.login({ email, password });
-      console.log('[AuthContext] ✅ cookieAuthClient.login 성공');
 
       // 2. /me 호출하여 사용자 정보 가져오기 (R-4-2: flat 구조)
       const meResponse = await cookieAuthClient.getCurrentUser();
-      console.log('[AuthContext] 📥 /me 응답:', meResponse);
 
       if (meResponse) {
         // R-4-2: meResponse is now flat structure (MeResponse)
         setUser(meResponse as any); // Type cast to User for backward compatibility
-        console.log('[AuthContext] 👤 User state 설정됨:', meResponse);
 
         // Set auth hint for future sessions
         localStorage.setItem('auth_session_hint', '1');
-        console.log('[AuthContext] 💾 auth_session_hint 저장됨');
 
         toast.success('로그인되었습니다.');
         return true;
       } else {
-        console.error('[AuthContext] ❌ /me 응답이 null/undefined');
         toast.error('사용자 정보를 가져올 수 없습니다.');
         return false;
       }
     } catch (error: any) {
-      console.error('[AuthContext] ❌ 로그인 실패:', error);
       const errorMessage = error.response?.data?.message || '로그인에 실패했습니다.';
       const errorCode = error.response?.data?.code;
 
@@ -126,42 +118,32 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   // 사용자 정보 업데이트
   const updateUser = (userData: Partial<User>) => {
-    console.log('[AuthContext] 📝 updateUser called with:', userData);
-
     // Handle both update existing user AND set new user (for OAuth callback)
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
-      console.log('[AuthContext] ✅ User updated:', updatedUser);
     } else {
       // First login via OAuth - set user directly
       setUser(userData as User);
-      console.log('[AuthContext] ✅ User set (first login):', userData);
     }
 
     // CRITICAL: Set auth hint for session persistence (same as login function)
     localStorage.setItem('auth_session_hint', '1');
-    console.log('[AuthContext] 💾 auth_session_hint 저장됨');
   };
 
   // R-4-2: 인증 상태 확인 - /me 기반 (MeResponse flat 구조)
   const checkAuthStatus = async (retryCount = 0) => {
-    console.log('[AuthContext] 🔍 인증 상태 확인 시작');
-
     // CRITICAL: Skip ALL auth checks in iframe (no retries)
     // This prevents cross-origin auth calls from admin.neture.co.kr → neture.co.kr
     if (isInIframe) {
-      console.warn('[AuthContext] ⚠️ iframe에서 실행 중 - 인증 체크 건너뜀');
       setIsLoading(false);
       return;
     }
 
     // Skip API call if no auth session hint (prevents 401 on first visit)
     const hasAuthHint = typeof window !== 'undefined' && localStorage.getItem('auth_session_hint');
-    console.log('[AuthContext] 💾 auth_session_hint 확인:', hasAuthHint);
 
     if (!hasAuthHint) {
-      console.log('[AuthContext] ℹ️ auth_session_hint 없음 - 게스트 상태 유지');
       setIsLoading(false);
       setUser(null);
       return;
@@ -169,43 +151,28 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
     try {
       setIsLoading(true);
-      console.log('[AuthContext] 📡 /me API 호출 중...');
 
       // R-4-2: /me 호출하여 사용자 정보 가져오기 (flat 구조)
       const meResponse = await cookieAuthClient.getCurrentUser();
-      console.log('[AuthContext] 📥 /me 응답:', meResponse);
 
       if (meResponse) {
         // R-4-2: meResponse is now flat structure (MeResponse)
         setUser(meResponse as any); // Type cast to User for backward compatibility
-        console.log('[AuthContext] ✅ User state 업데이트됨:', meResponse);
       } else {
-        console.warn('[AuthContext] ⚠️ /me 응답이 null - 세션 무효화');
         setUser(null);
         // Clear hint if session is invalid
         localStorage.removeItem('auth_session_hint');
       }
     } catch (error: any) {
-      console.error('[AuthContext] ❌ /me API 호출 실패:', error);
       // Auth check error handled silently
       setUser(null);
       // Clear hint on error
       localStorage.removeItem('auth_session_hint');
     } finally {
       setIsLoading(false);
-      console.log('[AuthContext] ✅ 인증 상태 확인 완료');
     }
   };
 
-  // 🔍 DEBUG: User state 변경 추적
-  useEffect(() => {
-    console.log('[AuthContext] 🔄 User state 변경됨:', {
-      user,
-      isAuthenticated,
-      status: user?.status,
-      email: user?.email
-    });
-  }, [user, isAuthenticated]);
 
   // 컴포넌트 마운트 시 인증 상태 확인
   useEffect(() => {
