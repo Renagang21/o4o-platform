@@ -156,8 +156,8 @@ export const SocialLoginComponent: React.FC<{
     const redirect = redirectUrl || '/account';
     const redirectParam = encodeURIComponent(redirect);
 
-    // Build social login URL (correct path: /v1/social/{provider})
-    const socialLoginUrl = `${baseUrl}/v1/social/${provider}?redirect=${redirectParam}`;
+    // Build social login URL (baseURL already includes /api/v1)
+    const socialLoginUrl = `${baseUrl}/social/${provider}?redirect=${redirectParam}`;
 
     // Navigate to social login endpoint
     window.location.href = socialLoginUrl;
