@@ -43,11 +43,30 @@ class UnifiedApiClient {
         // Get token from multiple sources
         let token = this.getAuthToken();
 
+        // Decode JWT token to check expiration
+        let tokenInfo = null;
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const now = Math.floor(Date.now() / 1000);
+            tokenInfo = {
+              exp: payload.exp,
+              iat: payload.iat,
+              userId: payload.sub || payload.userId,
+              isExpired: payload.exp ? payload.exp < now : false,
+              expiresIn: payload.exp ? payload.exp - now : null
+            };
+          } catch (e) {
+            tokenInfo = { error: 'Failed to decode token' };
+          }
+        }
+
         console.log('[UnifiedAPI] Request:', {
           url: config.url,
           method: config.method,
           hasToken: !!token,
-          tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+          tokenPreview: token ? `${token.substring(0, 20)}...` : 'none',
+          tokenInfo
         });
 
         if (token) {
@@ -164,8 +183,26 @@ class UnifiedApiClient {
 
     console.error('[UnifiedAPI] Unauthorized - Redirecting to login', debugInfo);
 
+    // Decode token for alert
+    let tokenDecoded = null;
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+        tokenDecoded = {
+          userId: payload.sub || payload.userId || payload.id,
+          role: payload.role || 'unknown',
+          exp: payload.exp,
+          isExpired: payload.exp ? payload.exp < now : false,
+          expiresIn: payload.exp ? Math.floor((payload.exp - now) / 60) : null
+        };
+      } catch (e) {
+        tokenDecoded = { error: 'decode failed' };
+      }
+    }
+
     // Show alert with debug info for 3 seconds before redirecting
-    const alertMessage = `401 Unauthorized!\n\nPath: ${currentPath}\nHas Token: ${!!token}\nToken Preview: ${debugInfo.tokenPreview}\n\nRedirecting to login in 3 seconds...`;
+    const alertMessage = `401 Unauthorized!\n\nPath: ${currentPath}\nHas Token: ${!!token}\nToken Preview: ${debugInfo.tokenPreview}\n\nToken Info:\nUser ID: ${tokenDecoded?.userId || 'N/A'}\nRole: ${tokenDecoded?.role || 'N/A'}\nExpired: ${tokenDecoded?.isExpired ? 'YES' : 'NO'}\nExpires in: ${tokenDecoded?.expiresIn ? `${tokenDecoded.expiresIn} minutes` : 'N/A'}\n\nRedirecting to login in 3 seconds...`;
 
     // Don't block - just show error
     toast.error('인증 실패: ' + currentPath);
