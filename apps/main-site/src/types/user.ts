@@ -22,11 +22,10 @@ export type UserRole =
   | 'contributor'
   | 'vendor'
   | 'supplier'
-  | 'retailer'
-  | 'customer';
+  | 'retailer';
 
 // PrivateRoute에서 사용하는 userType
-export type UserType = 'admin' | 'supplier' | 'retailer' | 'customer' | 'manager';
+export type UserType = 'admin' | 'supplier' | 'retailer' | 'user' | 'manager';
 
 // 비즈니스 정보 인터페이스
 export interface BusinessInfo {
@@ -77,7 +76,7 @@ export interface User {
    */
   defaultRole?: UserRole;
 
-  userType: 'admin' | 'supplier' | 'retailer' | 'customer'; // 프론트엔드 타입 (필수)
+  userType: 'admin' | 'supplier' | 'retailer' | 'user'; // 프론트엔드 타입 (필수)
   status: UserStatus;
   businessInfo?: BusinessInfo;
   createdAt: Date | string;       // Date 객체 또는 문자열
@@ -180,7 +179,7 @@ export interface RegisterRequest {
   password: string;
   name: string;
   phone: string;
-  userType: 'supplier' | 'retailer' | 'customer';
+  userType: 'supplier' | 'retailer' | 'user';
   // 공급자 추가 정보
   companyName?: string;
   businessNumber?: string;

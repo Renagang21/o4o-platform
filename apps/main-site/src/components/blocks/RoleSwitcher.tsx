@@ -89,11 +89,11 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
 
   // P2: Role options with unified /workspace paths
   const roleOptions: Record<string, RoleOption> = {
-    customer: {
-      id: 'customer',
+    user: {
+      id: 'user',
       name: 'Customer',
       description: 'Browse and purchase products',
-      path: '/workspace/customer',
+      path: '/workspace/user',
       icon: '👤'
     },
     seller: {

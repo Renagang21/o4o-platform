@@ -22,7 +22,7 @@ export interface BannerConfig {
  * 역할별 배너 설정
  */
 export const ROLE_BANNERS: Record<string, BannerConfig[]> = {
-  customer: [
+  user: [
     {
       id: 'welcome-customer',
       title: '환영합니다! 🎉',
@@ -120,10 +120,10 @@ export const ROLE_BANNERS: Record<string, BannerConfig[]> = {
  */
 export function getBannersForRole(role: UserRole | string | null | undefined): BannerConfig[] {
   if (!role) {
-    return ROLE_BANNERS.customer;
+    return ROLE_BANNERS.user;
   }
 
-  const banners = ROLE_BANNERS[role] || ROLE_BANNERS.customer;
+  const banners = ROLE_BANNERS[role] || ROLE_BANNERS.user;
   return banners.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 }
 

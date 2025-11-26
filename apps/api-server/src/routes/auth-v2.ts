@@ -76,7 +76,7 @@ router.post('/register',
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('name').isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
-  body('role').optional().isIn(['customer', 'seller', 'supplier']).withMessage('Invalid role'),
+  body('role').optional().isIn(['user', 'seller', 'supplier']).withMessage('Invalid role'),
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -84,7 +84,7 @@ router.post('/register',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, password, name, role = 'customer' } = req.body;
+      const { email, password, name, role = 'user' } = req.body;
       
       const userRepository = AppDataSource.getRepository(User);
       
@@ -114,7 +114,7 @@ router.post('/register',
       const assignmentRepository = AppDataSource.getRepository(RoleAssignment);
       const assignment = new RoleAssignment();
       assignment.userId = user.id;
-      assignment.role = role || 'customer';
+      assignment.role = role || 'user';
       assignment.isActive = true;
       assignment.validFrom = new Date();
       assignment.assignedAt = new Date();

@@ -5,7 +5,7 @@ export interface User {
   id: string
   email: string
   name: string
-  role: 'admin' | 'customer' | 'business' | 'affiliate'
+  role: 'admin' | 'user' | 'business' | 'affiliate'
   status: 'pending' | 'approved' | 'rejected' | 'suspended'
   businessInfo?: {
     businessName: string

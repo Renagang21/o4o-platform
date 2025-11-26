@@ -17,7 +17,7 @@ export class Role {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Role name (e.g., 'admin', 'vendor', 'customer')
+  // Role name (e.g., 'admin', 'vendor', 'user')
   @Column({ type: 'varchar', length: 50, unique: true })
   name!: string;
 

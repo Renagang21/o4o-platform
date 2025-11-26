@@ -43,7 +43,7 @@ export const CONDITION_TYPE_DEFINITIONS: Record<ConditionType, ConditionTypeDefi
       { value: 'author', label: 'Author' },
       { value: 'contributor', label: 'Contributor' },
       { value: 'subscriber', label: 'Subscriber' },
-      { value: 'customer', label: 'Customer' },
+      { value: 'user', label: 'User' },
       { value: 'supplier', label: 'Supplier' },
       { value: 'retailer', label: 'Retailer' },
     ],

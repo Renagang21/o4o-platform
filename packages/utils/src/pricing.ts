@@ -4,11 +4,11 @@
 // 가격 계산, 포맷팅, 검증을 위한 유틸리티 함수들
 
 // Temporarily define types locally until @o4o/types build issue is resolved
-export type UserRole = 'customer' | 'business' | 'affiliate' | 'retailer' | 'supplier' | 'admin';
+export type UserRole = 'user' | 'business' | 'affiliate' | 'retailer' | 'supplier' | 'admin';
 export type RetailerGrade = 'gold' | 'premium' | 'vip';
 
 export interface PriceByRole {
-  customer: number;
+  user: number;
   business: number;
   affiliate: number;
   retailer: {
@@ -139,35 +139,35 @@ export function getRoleBasedPrice(
   retailerGrade?: RetailerGrade
 ): number {
   switch (userRole) {
-    case 'customer':
-      return pricing.customer;
-    
+    case 'user':
+      return pricing.user;
+
     case 'business':
       return pricing.business;
-    
+
     case 'affiliate':
       return pricing.affiliate;
-    
+
     case 'retailer':
       if (!retailerGrade) {
         return pricing.retailer.gold; // 기본값
       }
       return pricing.retailer[retailerGrade];
-    
+
     case 'supplier':
     case 'admin':
       // 관리자는 가장 낮은 가격 확인 가능
       return Math.min(
-        pricing.customer,
+        pricing.user,
         pricing.business,
         pricing.affiliate,
         pricing.retailer.gold,
         pricing.retailer.premium,
         pricing.retailer.vip
       );
-    
+
     default:
-      return pricing.customer;
+      return pricing.user;
   }
 }
 
@@ -180,7 +180,7 @@ export function getAllRolePrices(pricing: PriceByRole): Array<{
   label: string;
 }> {
   return [
-    { role: 'customer', price: pricing.customer, label: '일반 고객' },
+    { role: 'user', price: pricing.user, label: '일반 고객' },
     { role: 'business', price: pricing.business, label: '비즈니스' },
     { role: 'affiliate', price: pricing.affiliate, label: '제휴사' },
     { role: 'retailer-gold', price: pricing.retailer.gold, label: '골드 리테일러' },
@@ -297,7 +297,7 @@ export function calculatePrice(
 ): CalculatedPrice {
   // 1. 역할별 기본 가격 계산
   const basePrice = getRoleBasedPrice(pricing, context.userRole, context.retailerGrade);
-  const originalPrice = pricing.customer; // 일반 고객 가격을 원가로 설정
+  const originalPrice = pricing.user; // 일반 사용자 가격을 원가로 설정
 
   // 2. 역할별 할인 계산
   const roleSavings = calculateSavings(originalPrice, basePrice);
@@ -466,7 +466,7 @@ export function formatPriceDisplay(
  */
 export function getRoleLabel(role: UserRole, grade?: RetailerGrade): string {
   switch (role) {
-    case 'customer':
+    case 'user':
       return '일반 고객';
     case 'business':
       return '비즈니스';

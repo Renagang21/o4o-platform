@@ -46,7 +46,7 @@ export default function UserForm() {
       password: '',
       firstName: '',
       lastName: '',
-      roles: ['customer'],
+      roles: ['user'],
       status: 'pending',
     },
   });

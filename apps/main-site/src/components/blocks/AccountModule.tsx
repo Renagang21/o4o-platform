@@ -35,7 +35,7 @@ interface AccountModuleProps {
 
 // Role display configuration
 const ROLE_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  customer: { label: '고객', color: 'bg-blue-100 text-blue-800', icon: '👤' },
+  user: { label: '고객', color: 'bg-blue-100 text-blue-800', icon: '👤' },
   seller: { label: '판매자', color: 'bg-green-100 text-green-800', icon: '🛒' },
   supplier: { label: '공급자', color: 'bg-purple-100 text-purple-800', icon: '🏭' },
   partner: { label: '파트너', color: 'bg-orange-100 text-orange-800', icon: '🤝' },
@@ -59,7 +59,7 @@ const getRoleBasedMenuItems = (role: string | null): MenuItem[] => {
   ];
 
   const roleSpecificItems: Record<string, MenuItem[]> = {
-    customer: [
+    user: [
       { key: 'orders', label: '주문 내역', url: '/account/orders', icon: <Package size={18} className="text-gray-600" /> },
       { key: 'wishlist', label: '위시리스트', url: '/account/wishlist', icon: <Heart size={18} className="text-gray-600" /> },
       { key: 'notifications', label: '알림', url: '/account/notifications', icon: <Bell size={18} className="text-gray-600" /> },
@@ -91,7 +91,7 @@ const getRoleBasedMenuItems = (role: string | null): MenuItem[] => {
     ],
   };
 
-  const specificItems = role ? (roleSpecificItems[role] || roleSpecificItems.customer) : roleSpecificItems.customer;
+  const specificItems = role ? (roleSpecificItems[role] || roleSpecificItems.user) : roleSpecificItems.user;
 
   // Return: common items first, then role-specific items
   return [...commonItems, ...specificItems];

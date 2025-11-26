@@ -164,7 +164,7 @@ export class SettingsService {
           maintenanceMode: process.env.DEFAULT_MAINTENANCE_MODE === 'true' || false,
           maintenanceMessage: process.env.DEFAULT_MAINTENANCE_MESSAGE || '',
           allowRegistration: process.env.DEFAULT_ALLOW_REGISTRATION !== 'false',
-          defaultUserRole: process.env.DEFAULT_USER_ROLE || 'customer',
+          defaultUserRole: process.env.DEFAULT_USER_ROLE || 'user',
           requireEmailVerification: process.env.DEFAULT_REQUIRE_EMAIL_VERIFICATION !== 'false',
           enableApiAccess: process.env.DEFAULT_ENABLE_API_ACCESS === 'true' || false,
           apiRateLimit: parseInt(process.env.DEFAULT_API_RATE_LIMIT || '100', 10)

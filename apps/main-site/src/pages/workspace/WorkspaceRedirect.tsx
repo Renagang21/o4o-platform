@@ -7,7 +7,7 @@
  * Example:
  * - /workspace/supplier → /dashboard/supplier (if user has supplier role)
  * - /workspace/seller → /dashboard/seller (if user has seller role)
- * - /workspace/customer → /account (if user has customer role)
+ * - /workspace/user → /account (if user has user role)
  */
 
 import React from 'react';
@@ -19,7 +19,7 @@ import { useAuth } from '../../contexts/AuthContext';
  * Maps role identifiers to their actual dashboard routes
  */
 const workspacePaths: Record<string, string> = {
-  customer: '/account',
+  user: '/account',
   seller: '/dashboard/seller',
   supplier: '/dashboard/supplier',
   partner: '/dashboard/partner',

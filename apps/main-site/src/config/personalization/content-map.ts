@@ -193,48 +193,48 @@ export const AFFILIATE_CARDS: ContentCard[] = [
 ];
 
 /**
- * 고객 카드
+ * 일반 사용자 카드
  */
-export const CUSTOMER_CARDS: ContentCard[] = [
+export const USER_CARDS: ContentCard[] = [
   {
-    id: 'customer-recent-orders',
+    id: 'user-recent-orders',
     type: 'info',
     title: '최근 주문',
     description: '배송 현황을 확인하세요',
     icon: 'Package',
     action: { label: '주문 보기', url: '/orders', variant: 'primary' },
-    conditions: { roles: ['customer'] },
+    conditions: { roles: ['user'] },
     baseWeight: 80
   },
   {
-    id: 'customer-wishlist',
+    id: 'user-wishlist',
     type: 'info',
     title: '위시리스트',
     description: '관심 상품을 확인하세요',
     icon: 'Heart',
     action: { label: '위시리스트', url: '/wishlist' },
-    conditions: { roles: ['customer'] },
+    conditions: { roles: ['user'] },
     baseWeight: 50
   },
   {
-    id: 'customer-new-arrivals',
+    id: 'user-new-arrivals',
     type: 'promotion',
     title: '신상품 입고',
     description: '이번 주 새로 입고된 제품',
     icon: 'Sparkles',
     badge: { text: '신규', variant: 'new' },
     action: { label: '둘러보기', url: '/shop/new' },
-    conditions: { roles: ['customer'] },
+    conditions: { roles: ['user'] },
     baseWeight: 60
   },
   {
-    id: 'customer-points',
+    id: 'user-points',
     type: 'info',
     title: '적립금',
     description: '사용 가능한 적립금 확인',
     icon: 'Gift',
     action: { label: '적립금 보기', url: '/points' },
-    conditions: { roles: ['customer'] },
+    conditions: { roles: ['user'] },
     baseWeight: 40
   }
 ];
@@ -246,7 +246,7 @@ export const ROLE_CONTENT_CARDS: Record<string, ContentCard[]> = {
   seller: SELLER_CARDS,
   supplier: SUPPLIER_CARDS,
   affiliate: AFFILIATE_CARDS,
-  customer: CUSTOMER_CARDS
+  user: USER_CARDS
 };
 
 /**
@@ -405,9 +405,9 @@ export const ROLE_SUGGESTIONS: Record<string, Suggestion[]> = {
       weight: 45
     }
   ],
-  customer: [
+  user: [
     {
-      id: 'customer-order-tracking',
+      id: 'user-order-tracking',
       title: '배송 조회',
       description: '주문 배송 현황',
       icon: 'Truck',

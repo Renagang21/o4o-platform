@@ -56,10 +56,10 @@ export interface DashboardConfig {
  * 역할별 대시보드 설정
  */
 export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
-  customer: {
+  user: {
     title: '마이페이지',
     subtitle: '주문 내역과 관심 상품을 확인하세요',
-    navigation: [],  // H2-3-4: Customer uses AccountPage, not dashboard layout
+    navigation: [],  // H2-3-4: User uses AccountPage, not dashboard layout
     cards: [
       {
         id: 'recent-orders',
@@ -523,10 +523,10 @@ export const ROLE_DASHBOARDS: Record<string, DashboardConfig> = {
  */
 export function getDashboardForRole(role: UserRole | string | null | undefined): DashboardConfig {
   if (!role) {
-    return ROLE_DASHBOARDS.customer;
+    return ROLE_DASHBOARDS.user;
   }
 
-  return ROLE_DASHBOARDS[role] || ROLE_DASHBOARDS.customer;
+  return ROLE_DASHBOARDS[role] || ROLE_DASHBOARDS.user;
 }
 
 /**
