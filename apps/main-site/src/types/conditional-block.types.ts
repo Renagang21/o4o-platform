@@ -108,7 +108,7 @@ export type UserRoleValue =
   | 'author'
   | 'contributor'
   | 'subscriber'
-  | 'user'
+  | 'customer'
   | 'supplier'
   | 'retailer';
 

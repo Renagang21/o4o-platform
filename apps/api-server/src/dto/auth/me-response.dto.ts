@@ -17,7 +17,7 @@ export interface RoleAssignmentDto {
   id: string;
 
   /** Role name */
-  role: 'user' | 'seller' | 'supplier' | 'partner' | 'admin' | 'administrator' | 'manager';
+  role: 'customer' | 'seller' | 'supplier' | 'partner' | 'admin' | 'administrator' | 'manager';
 
   /** Whether this assignment is currently active */
   isActive: boolean;
@@ -44,7 +44,7 @@ export interface RoleAssignmentDto {
  *   "assignments": [
  *     {
  *       "id": "assign-uuid",
- *       "role": "user",
+ *       "role": "customer",
  *       "isActive": true,
  *       "validFrom": null,
  *       "validUntil": null

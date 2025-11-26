@@ -270,7 +270,7 @@ export const usePermissions = (): UserPermissions => {
     isAdmin: hasRole('admin') || hasRole('administrator') || hasRole('super_admin'),
     isManager: hasRole('manager'),
     isPartner: hasRole('partner'),
-    isUser: hasRole('user'),
+    isUser: hasRole('user') || hasRole('customer'),
     isManagerOrAdmin: hasRole('admin') || hasRole('administrator') || hasRole('super_admin') || hasRole('manager'),
     hasRole: (roles: UserRole[]) => roles.some(role => hasRole(role)),
     canAccessAdmin: hasRole('admin') || hasRole('administrator') || hasRole('super_admin') || hasRole('manager'),

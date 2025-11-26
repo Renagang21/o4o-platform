@@ -71,7 +71,7 @@ export const ROLE_SLOT_PRIORITY: Record<string, string[]> = {
   seller: ['topNotice', 'mainFeed', 'sideSuggestions', 'bottomBanners'],
   supplier: ['topNotice', 'mainFeed', 'sideSuggestions', 'bottomBanners'],
   affiliate: ['topNotice', 'mainFeed', 'sideSuggestions', 'bottomBanners'],
-  user: ['mainFeed', 'topNotice', 'bottomBanners', 'sideSuggestions']
+  customer: ['mainFeed', 'topNotice', 'bottomBanners', 'sideSuggestions']
 };
 
 /**
@@ -81,5 +81,5 @@ export const DEFAULT_CARD_IDS: Record<string, string[]> = {
   seller: ['seller-add-product', 'seller-sales-report', 'seller-onboarding-guide'],
   supplier: ['supplier-add-product', 'supplier-partners', 'supplier-api-integration'],
   affiliate: ['affiliate-earnings', 'affiliate-create-campaign', 'affiliate-tracking-guide'],
-  user: ['customer-recent-orders', 'customer-new-arrivals', 'customer-wishlist']
+  customer: ['customer-recent-orders', 'customer-new-arrivals', 'customer-wishlist']
 };

@@ -3,7 +3,7 @@
  * User account/dashboard with full activeRole integration
  *
  * Usage: [account]
- *        [account dashboard_type="user"]
+ *        [account dashboard_type="customer"]
  *        /account?dashboard=seller (query parameter support)
  *
  * Features:
@@ -45,7 +45,7 @@ const ROLE_CONFIG: Record<string, {
   borderColor: string;
   description: string;
 }> = {
-  user: {
+  customer: {
     label: '고객',
     icon: User,
     color: 'text-blue-700',
@@ -105,11 +105,11 @@ const ROLE_CONFIG: Record<string, {
 
 // Role to Dashboard mapping
 const ROLE_DASHBOARD_MAP: Record<string, React.ComponentType | null> = {
-  user: CustomerDashboard,
+  customer: CustomerDashboard,
   seller: SellerDashboard,
   supplier: SupplierDashboard,
   partner: PartnerDashboard,
-  // Admin role uses user dashboard for now
+  // Admin role uses customer dashboard for now
   admin: CustomerDashboard,
   administrator: CustomerDashboard,
   manager: CustomerDashboard,
@@ -243,7 +243,7 @@ const AccountComingSoon: React.FC<{ role?: string | null }> = ({ role }) => {
 
 // R-6-3: Account Component with modernized UX
 export const AccountComponent: React.FC<{
-  dashboardType?: 'user' | 'seller' | 'supplier' | 'partner';
+  dashboardType?: 'customer' | 'seller' | 'supplier' | 'partner';
 }> = ({
   dashboardType
 }) => {
@@ -322,7 +322,7 @@ export const accountShortcode: ShortcodeDefinition = {
     dashboardType: {
       type: 'string',
       required: false,
-      default: 'user'
+      default: 'customer'
     }
   },
   component: ({ attributes }) => (

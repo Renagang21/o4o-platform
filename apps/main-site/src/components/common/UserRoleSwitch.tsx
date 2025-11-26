@@ -1,6 +1,6 @@
 import { useState, FC } from 'react';
 
-type UserRole = 'supplier' | 'reseller' | 'partner' | 'user' | 'expert';
+type UserRole = 'supplier' | 'reseller' | 'partner' | 'customer' | 'expert';
 
 interface RoleInfo {
   id: UserRole;
@@ -51,13 +51,13 @@ const UserRoleSwitch: FC<UserRoleSwitchProps> = ({
       features: ['제품 추천', '콘텐츠 제작', '수수료 수익', '성과 분석'],
       color: 'role-partner'
     },
-    user: {
-      id: 'user',
+    customer: {
+      id: 'customer',
       name: '구매자',
       icon: '👤',
       description: '제품을 구매하고 사용하는 역할',
       features: ['제품 구매', '리뷰 작성', 'Q&A 참여', '혜택 활용'],
-      color: 'role-user'
+      color: 'role-customer'
     },
     expert: {
       id: 'expert',
@@ -208,9 +208,9 @@ const UserRoleSwitch: FC<UserRoleSwitchProps> = ({
                 <div className="flex items-center justify-between">
                   <span>고객 데이터:</span>
                   <span className={`text-xs px-2 py-0.5 rounded ${
-                    hoveredRole === 'user' ? 'text-trust-unverified bg-trust-unverified bg-opacity-10' : 'text-trust-verified bg-trust-verified bg-opacity-10'
+                    hoveredRole === 'customer' ? 'text-trust-unverified bg-trust-unverified bg-opacity-10' : 'text-trust-verified bg-trust-verified bg-opacity-10'
                   }`}>
-                    {hoveredRole === 'user' ? '개인정보만' : '허가된 범위'}
+                    {hoveredRole === 'customer' ? '개인정보만' : '허가된 범위'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

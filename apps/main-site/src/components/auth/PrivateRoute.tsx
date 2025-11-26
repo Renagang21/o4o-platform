@@ -33,7 +33,7 @@ export default function PrivateRoute({ children, allowedUserTypes }: PrivateRout
         return <Navigate to="/supplier/dashboard" replace />;
       case 'retailer':
         return <Navigate to="/retailer/dashboard" replace />;
-      case 'user':
+      case 'customer':
         return <Navigate to="/shop" replace />;
       default:
         return <Navigate to="/" replace />;

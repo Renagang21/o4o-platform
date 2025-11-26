@@ -175,8 +175,8 @@ export const schemas = {
       },
       role: {
         type: 'string',
-        enum: ['user', 'vendor', 'business'],
-        default: 'user'
+        enum: ['customer', 'vendor', 'business'],
+        default: 'customer'
       },
       businessInfo: {
         type: 'object',
@@ -216,9 +216,9 @@ export const schemas = {
         format: 'uri',
         description: '프로필 이미지 URL'
       },
-      role: {
+      role: { 
         type: 'string',
-        enum: ['super_admin', 'admin', 'vendor', 'seller', 'user', 'business'],
+        enum: ['super_admin', 'admin', 'vendor', 'seller', 'customer', 'business'],
         description: '사용자 역할'
       },
       status: { 

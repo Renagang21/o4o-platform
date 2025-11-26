@@ -63,11 +63,11 @@ export interface EcommerceStatsResponse {
       outOfStockProducts: number;    // 품절 상품
       newProductsToday: number;      // 오늘 신규 등록 상품
     };
-    users: {
-      totalUsers: number;            // 총 사용자 수
-      newUsersToday: number;         // 오늘 신규 사용자
-      activeUsers: number;           // 활성 사용자 (최근 30일)
-      userRetentionRate: number;     // 사용자 유지율 (%)
+    customers: {
+      totalCustomers: number;        // 총 고객 수
+      newCustomersToday: number;     // 오늘 신규 고객
+      activeCustomers: number;       // 활성 고객 (최근 30일)
+      customerRetentionRate: number; // 고객 유지율 (%)
     };
     inventory: {
       totalInventoryValue: number;   // 총 재고 가치
@@ -129,7 +129,7 @@ export interface UserStatsResponse {
     };
     byRole: {
       admins: number;                // 관리자 수
-      users: number;                 // 일반 사용자 수
+      customers: number;             // 고객 수  
       business: number;              // 비즈니스 사용자 수
       affiliates: number;            // 제휴 파트너 수
     };
@@ -184,11 +184,11 @@ export const SAMPLE_ECOMMERCE_STATS: EcommerceStatsResponse = {
       outOfStockProducts: 12,
       newProductsToday: 5
     },
-    users: {
-      totalUsers: 12847,
-      newUsersToday: 28,
-      activeUsers: 3456,
-      userRetentionRate: 78.5
+    customers: {
+      totalCustomers: 12847,
+      newCustomersToday: 28,
+      activeCustomers: 3456,
+      customerRetentionRate: 78.5
     },
     inventory: {
       totalInventoryValue: 890450000, // 8억 9045만원
@@ -242,7 +242,7 @@ export const SAMPLE_USER_STATS: UserStatsResponse = {
     },
     byRole: {
       admins: 12,
-      users: 25634,
+      customers: 25634,
       business: 2456,
       affiliates: 354
     },
@@ -350,7 +350,7 @@ export interface UserOnlineEvent {
     action: 'joined' | 'left';
     currentOnlineCount: number;
     userInfo: {
-      role: 'admin' | 'user' | 'business' | 'affiliate';
+      role: 'admin' | 'customer' | 'business' | 'affiliate';
       location: string;
     };
   };
@@ -381,7 +381,7 @@ export interface NewRegistrationEvent {
   timestamp: string;
   data: {
     userId: number;
-    userType: 'user' | 'business' | 'affiliate';
+    userType: 'customer' | 'business' | 'affiliate';
     location: string;
     registrationSource: 'website' | 'mobile' | 'api';
     userName: string; // 익명화된 이름 (예: "김**")
@@ -516,7 +516,7 @@ export const SAMPLE_SOCKET_EVENTS = {
       action: 'joined' as const,
       currentOnlineCount: 1248,
       userInfo: {
-        role: 'user' as const,
+        role: 'customer' as const,
         location: '서울'
       }
     }
@@ -545,7 +545,7 @@ export const SAMPLE_SOCKET_EVENTS = {
     timestamp: "2025-07-12T09:17:34.000Z",
     data: {
       userId: 28457,
-      userType: 'user' as const,
+      userType: 'customer' as const,
       location: "부산",
       registrationSource: 'website' as const,
       userName: "이**"
@@ -648,7 +648,7 @@ export interface ActivityItem {
   actor?: {
     id: number;
     name: string;                 // 익명화된 이름 (예: "김**", "관리자")
-    role: 'admin' | 'user' | 'business' | 'affiliate' | 'system';
+    role: 'admin' | 'customer' | 'business' | 'affiliate' | 'system';
     avatar?: string;
   };
 
@@ -656,7 +656,7 @@ export interface ActivityItem {
   targetUser?: {
     id: number;
     name: string;
-    role: 'user' | 'business' | 'affiliate';
+    role: 'customer' | 'business' | 'affiliate';
   };
 
   // 메타데이터
@@ -695,7 +695,7 @@ export interface ActivityFilters {
     from: string;
     to: string;
   };
-  actorRoles?: Array<'admin' | 'user' | 'business' | 'affiliate' | 'system'>;
+  actorRoles?: Array<'admin' | 'customer' | 'business' | 'affiliate' | 'system'>;
   relatedEntityTypes?: Array<'order' | 'user' | 'product' | 'post' | 'page' | 'comment'>;
 }
 
@@ -721,7 +721,7 @@ export const SAMPLE_RECENT_ACTIVITIES: RecentActivitiesResponse = {
         actor: {
           id: 12847,
           name: "김**",
-          role: "user"
+          role: "customer"
         },
         metadata: {
           amount: 245000,
@@ -796,7 +796,7 @@ export const SAMPLE_RECENT_ACTIVITIES: RecentActivitiesResponse = {
         actor: {
           id: 9876,
           name: "박**",
-          role: "user"
+          role: "customer"
         },
         metadata: {
           location: "대구",
@@ -872,7 +872,7 @@ export const SAMPLE_RECENT_ACTIVITIES: RecentActivitiesResponse = {
         actor: {
           id: 12846,
           name: "최**",
-          role: "user"
+          role: "customer"
         },
         metadata: {
           amount: 127000,

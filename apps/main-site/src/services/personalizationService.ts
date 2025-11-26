@@ -43,7 +43,7 @@ export function generatePersonalizedFeed(
   const slotConfig = getSlotConfigForDevice(signals.device.isMobile);
 
   // 1. 카드 수집 및 정렬
-  const roleCards = ROLE_CONTENT_CARDS[role] || ROLE_CONTENT_CARDS['user'];
+  const roleCards = ROLE_CONTENT_CARDS[role] || ROLE_CONTENT_CARDS['customer'];
   const sortedCards = sortCardsByWeight(roleCards, signals);
   const mainCards = sortedCards.slice(0, slotConfig.mainFeed.defaultCount);
 
@@ -83,8 +83,8 @@ export function generatePersonalizedFeed(
  * 디폴트 피드 생성 (개인화 OFF 시)
  */
 function generateDefaultFeed(role: string): PersonalizedFeed {
-  const defaultCardIds = DEFAULT_CARD_IDS[role] || DEFAULT_CARD_IDS['user'];
-  const roleCards = ROLE_CONTENT_CARDS[role] || ROLE_CONTENT_CARDS['user'];
+  const defaultCardIds = DEFAULT_CARD_IDS[role] || DEFAULT_CARD_IDS['customer'];
+  const roleCards = ROLE_CONTENT_CARDS[role] || ROLE_CONTENT_CARDS['customer'];
 
   const mainCards = defaultCardIds
     .map(id => roleCards.find(card => card.id === id))

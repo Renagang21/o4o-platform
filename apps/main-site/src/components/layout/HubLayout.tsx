@@ -31,7 +31,7 @@ interface HubLayoutProps {
  */
 export const HubLayout: React.FC<HubLayoutProps> = ({ requiredRole, children, showPersonalization = true }) => {
   const { user } = useAuth();
-  const currentRole = user?.currentRole || user?.roles?.[0] || 'user';
+  const currentRole = user?.currentRole || user?.roles?.[0] || 'customer';
   const [personalizedFeed, setPersonalizedFeed] = useState<PersonalizedFeedType | null>(null);
 
   // 역할별 설정 로드

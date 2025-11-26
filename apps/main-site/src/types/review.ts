@@ -28,7 +28,7 @@ export interface Review {
   productName: string;
   userId: string;
   userName: string;
-  userType: 'user' | 'retailer';
+  userType: 'customer' | 'retailer';
   orderId?: string;
   orderItemId?: string;
   

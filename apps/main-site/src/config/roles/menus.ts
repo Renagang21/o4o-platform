@@ -32,7 +32,7 @@ export interface RoleMenuConfig {
  * 역할별 메뉴 설정
  */
 export const ROLE_MENUS: Record<string, RoleMenuConfig> = {
-  user: {
+  customer: {
     primary: [
       { id: 'home', title: '홈', url: '/', icon: 'Home' },
       { id: 'shop', title: '쇼핑', url: '/shop', icon: 'ShoppingCart' },
@@ -109,10 +109,10 @@ export const ROLE_MENUS: Record<string, RoleMenuConfig> = {
  */
 export function getMenuForRole(role: UserRole | string | null | undefined): RoleMenuConfig {
   if (!role) {
-    return ROLE_MENUS.user; // 기본값: user 메뉴
+    return ROLE_MENUS.customer; // 기본값: customer 메뉴
   }
 
-  return ROLE_MENUS[role] || ROLE_MENUS.user;
+  return ROLE_MENUS[role] || ROLE_MENUS.customer;
 }
 
 /**

@@ -5,7 +5,7 @@
  */
 export interface RoleAssignment {
   id: string;
-  role: 'user' | 'seller' | 'supplier' | 'partner' | 'admin' | 'administrator' | 'manager';
+  role: 'customer' | 'seller' | 'supplier' | 'partner' | 'admin' | 'administrator' | 'manager';
   isActive: boolean;
   validFrom: string | null;
   validUntil: string | null;
@@ -19,7 +19,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role?: 'admin' | 'business' | 'affiliate' | 'user' | 'seller' | 'supplier'; // Legacy - deprecated
+  role?: 'admin' | 'business' | 'affiliate' | 'customer' | 'seller' | 'supplier'; // Legacy - deprecated
   isApproved?: boolean;
   avatar?: string;
   lastLoginAt?: Date;
@@ -46,7 +46,7 @@ export interface LoginCredentials {
 
 /**
  * R-5-1: Simplified registration data
- * - Users are created with 'user' role by default
+ * - Users are created with 'customer' role by default
  * - Additional roles (seller, supplier, partner) require enrollment
  */
 export interface RegisterData {

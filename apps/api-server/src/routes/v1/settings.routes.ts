@@ -51,7 +51,7 @@ const settingsStore: Map<string, any> = new Map([
     maintenanceMode: false,
     maintenanceMessage: '잠시 시스템 점검 중입니다.',
     allowRegistration: true,
-    defaultUserRole: 'user',
+    defaultUserRole: 'customer',
     requireEmailVerification: true,
     enableApiAccess: false,
     apiRateLimit: 100
@@ -1388,7 +1388,7 @@ router.post('/reset/:section',
           maintenanceMode: false,
           maintenanceMessage: '잠시 시스템 점검 중입니다.',
           allowRegistration: true,
-          defaultUserRole: 'user',
+          defaultUserRole: 'customer',
           requireEmailVerification: true,
           enableApiAccess: false,
           apiRateLimit: 100

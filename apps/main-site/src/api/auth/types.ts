@@ -1,5 +1,5 @@
 // UserRole 타입 정의 - SSO 시스템과 통합
-export type UserRole = 'user' | 'admin' | 'seller' | 'supplier' | 'manager' | 'administrator' | 'partner' | 'operator' | 'member' | 'affiliate' | 'contributor' | 'vendor';
+export type UserRole = 'customer' | 'admin' | 'seller' | 'supplier' | 'manager' | 'user' | 'administrator' | 'partner' | 'operator' | 'member' | 'affiliate' | 'contributor' | 'vendor';
 
 // 새 SSO 사용자 인터페이스
 export interface SSOUser {
@@ -8,7 +8,7 @@ export interface SSOUser {
   firstName?: string;
   lastName?: string;
   fullName: string;
-  role: 'user' | 'admin' | 'seller' | 'supplier' | 'manager';
+  role: 'customer' | 'admin' | 'seller' | 'supplier' | 'manager';
   permissions: string[];
   isActive: boolean;
   isEmailVerified: boolean;
@@ -35,8 +35,8 @@ export function ssoUserToLegacyUser(ssoUser: SSOUser): User {
     id: ssoUser.id,
     email: ssoUser.email,
     name: ssoUser.fullName || ssoUser.email,
-    role: ssoUser.role,
-    roles: [ssoUser.role],
+    role: ssoUser.role === 'customer' ? 'user' : ssoUser.role,
+    roles: [ssoUser.role === 'customer' ? 'user' : ssoUser.role],
     isApproved: ssoUser.isActive && ssoUser.isEmailVerified,
     createdAt: ssoUser.createdAt,
     updatedAt: ssoUser.updatedAt,

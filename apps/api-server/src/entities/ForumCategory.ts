@@ -63,12 +63,12 @@ export class ForumCategory {
   // Methods
   canUserAccess(userRole: string): boolean {
     if (!this.isActive) return false;
-
+    
     switch (this.accessLevel) {
       case 'all':
         return true;
       case 'member':
-        return ['user', 'business', 'affiliate', 'admin', 'manager'].includes(userRole);
+        return ['customer', 'business', 'affiliate', 'admin', 'manager'].includes(userRole);
       case 'business':
         return ['business', 'affiliate', 'admin', 'manager'].includes(userRole);
       case 'admin':
