@@ -50,7 +50,31 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback',
-  passport.authenticate('google', { session: false }),
+  (req, res, next) => {
+    console.log('[Google OAuth] Callback received:', {
+      query: req.query,
+      hasCode: !!req.query.code,
+      hasError: !!req.query.error
+    });
+
+    passport.authenticate('google', { session: false }, (err, user, info) => {
+      console.log('[Google OAuth] Passport authenticate result:', {
+        hasError: !!err,
+        hasUser: !!user,
+        error: err?.message,
+        user: user ? { id: user.id, email: user.email } : null,
+        info
+      });
+
+      if (err) {
+        console.error('[Google OAuth] Authentication error:', err);
+        return next(err);
+      }
+
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
   async (req, res) => {
     try {
       const user = req.user as any;
@@ -68,13 +92,16 @@ router.get('/google/callback',
       }
 
       if (!user) {
+        console.error('[Google OAuth] No user returned from passport.authenticate');
         return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
+      console.log('[Google OAuth] Completing social login for user:', user.email);
       await SocialAuthService.completeSocialLogin(user, res);
+      console.log('[Google OAuth] Login completed successfully');
       res.redirect(getRedirectUrls(redirectUrl).success);
     } catch (error: any) {
-      // Error log removed
+      console.error('[Google OAuth] Callback error:', error);
       const state = req.query.state as string;
       let redirectUrl: string | undefined;
       if (state) {
