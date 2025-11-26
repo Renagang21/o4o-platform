@@ -42,15 +42,22 @@ class UnifiedApiClient {
       (config) => {
         // Get token from multiple sources
         let token = this.getAuthToken();
-        
+
+        console.log('[UnifiedAPI] Request:', {
+          url: config.url,
+          method: config.method,
+          hasToken: !!token,
+          tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+        });
+
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-        
+
         // Dev environment logging
         // if (import.meta.env.DEV) {
         // }
-        
+
         return config;
       },
       (error) => {
@@ -107,6 +114,14 @@ class UnifiedApiClient {
   private handleError(error: AxiosError): Promise<never> {
     const status = error.response?.status;
 
+    console.error('[UnifiedAPI] Error:', {
+      status,
+      url: error.config?.url,
+      method: error.config?.method,
+      responseData: error.response?.data,
+      message: error.message
+    });
+
     switch (status) {
       case 401:
         this.handleUnauthorized();
@@ -136,13 +151,19 @@ class UnifiedApiClient {
 
   private handleUnauthorized() {
     const currentPath = window.location.pathname;
-    
+
+    console.error('[UnifiedAPI] Unauthorized - Redirecting to login', {
+      currentPath,
+      hasAuthStorage: !!localStorage.getItem('admin-auth-storage'),
+      hasToken: !!this.getAuthToken()
+    });
+
     if (currentPath !== '/login') {
       // Clear all auth data
       localStorage.removeItem('auth-storage');
       localStorage.removeItem('authToken');
       localStorage.removeItem('admin-auth-storage');
-      
+
       useAuthStore.getState().logout();
       window.location.href = '/login';
       toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
