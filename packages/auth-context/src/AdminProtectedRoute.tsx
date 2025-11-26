@@ -53,15 +53,30 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
       return !!(token || adminStorage);
     };
 
+    console.log('[AdminProtectedRoute] Auth state:', {
+      isLoading,
+      isAuthenticated,
+      hasUser: !!user,
+      userRole: user?.role,
+      hasStoredAuth: hasStoredAuth(),
+      location: location.pathname
+    });
+
     let timeoutId: number | undefined;
 
     if (!isLoading && !isAuthenticated) {
+      console.log('[AdminProtectedRoute] Setting redirect timer');
       // 저장된 인증 정보가 있으면 더 기다림
       const delay = hasStoredAuth() ? 500 : 100;
 
       timeoutId = window.setTimeout(() => {
         // 다시 한 번 인증 상태와 저장된 토큰 확인
+        console.log('[AdminProtectedRoute] Timer fired:', {
+          isAuthenticated,
+          hasStoredAuth: hasStoredAuth()
+        });
         if (!isAuthenticated && !hasStoredAuth()) {
+          console.log('[AdminProtectedRoute] REDIRECTING TO LOGIN');
           navigate('/login', {
             replace: true,
             state: { from: location.pathname }
