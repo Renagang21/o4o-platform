@@ -83,7 +83,7 @@ export class UserRepository extends Repository<User> {
 
     // Apply pagination and sorting
     if (pagination) {
-      const { page, limit, sortBy = 'created_at', sortOrder = 'DESC' } = pagination;
+      const { page, limit, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
       query
         .orderBy(`user.${sortBy}`, sortOrder)
         .skip((page - 1) * limit)

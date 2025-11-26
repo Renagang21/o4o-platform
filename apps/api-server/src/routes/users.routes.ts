@@ -31,7 +31,7 @@ const updateUserValidation = [
 const paginationValidation = [
   query('page').optional().isInt({ min: 1 }).toInt(),
   query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
-  query('sortBy').optional().isIn(['created_at', 'email', 'firstName', 'lastName']),
+  query('sortBy').optional().isIn(['createdAt', 'email', 'firstName', 'lastName']),
   query('sortOrder').optional().isIn(['ASC', 'DESC'])
 ];
 
