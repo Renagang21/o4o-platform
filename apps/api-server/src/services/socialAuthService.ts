@@ -1,6 +1,6 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
-import { authService } from './AuthService.js';
+import { getAuthService } from './AuthService.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { emailService } from './emailService.js';
 import { Response } from 'express';
@@ -84,16 +84,19 @@ export class SocialAuthService {
     user: User;
     sessionId: string;
   }> {
+    // Get authService instance
+    const authService = await getAuthService();
+
     // Generate tokens
     const tokens = await authService.generateTokens(user, 'neture.co.kr');
-    
+
     // Create SSO session
     const sessionId = SessionSyncService.generateSessionId();
     await SessionSyncService.createSession(user, sessionId);
-    
+
     // Set cookies
     authService.setAuthCookies(res, tokens);
-    
+
     // Set session ID cookie for SSO
     res.cookie('sessionId', sessionId, {
       httpOnly: true,
