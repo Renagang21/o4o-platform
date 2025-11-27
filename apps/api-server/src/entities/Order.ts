@@ -95,9 +95,6 @@ export class Order {
   })
   events!: OrderEvent[];
 
-  @Column({ type: 'varchar', nullable: true })
-  buyerType: string; // UserRole
-
   @Column({ type: 'varchar' })
   buyerName: string;
 

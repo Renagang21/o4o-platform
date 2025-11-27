@@ -138,7 +138,6 @@ export class OrderService {
       const order = new Order();
       order.orderNumber = this.generateOrderNumber();
       order.buyerId = buyerId;
-      order.buyerType = buyer.role;
       order.buyerName = buyer.name;
       order.buyerEmail = buyer.email;
       // R-8-6: JSONB items field removed - items now stored only in OrderItem entities
