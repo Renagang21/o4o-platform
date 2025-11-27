@@ -26,7 +26,6 @@ import { User } from './User.js';
  */
 @Entity('kyc_documents')
 @Index(['userId'])
-@Index(['enrollmentId'])
 @Index(['verificationStatus'])
 @Index(['documentType'])
 export class KycDocument {
@@ -42,21 +41,6 @@ export class KycDocument {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
-
-  /**
-   * 연결된 신청 (옵션)
-   *
-   * 특정 역할 신청과 연결된 경우 설정됩니다.
-   */
-  @Column({ name: 'enrollment_id', type: 'uuid', nullable: true })
-  enrollmentId?: string;
-
-  @ManyToOne('RoleEnrollment', 'documents', {
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'enrollment_id' })
-  enrollment?: any;
 
   /**
    * 문서 타입

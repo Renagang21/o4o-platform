@@ -10,7 +10,6 @@ import {
   Unique,
 } from 'typeorm';
 import { User } from './User.js';
-import { RoleEnrollment } from './RoleEnrollment.js';
 
 /**
  * 역할 할당 (Assignment)
@@ -43,19 +42,6 @@ export class RoleAssignment {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
-
-  /**
-   * 신청 기록 (옵션)
-   *
-   * enrollment을 통해 승인된 경우 연결됩니다.
-   * 관리자가 직접 할당한 경우 null일 수 있습니다.
-   */
-  @Column({ name: 'enrollment_id', type: 'uuid', nullable: true })
-  enrollmentId?: string;
-
-  @ManyToOne(() => RoleEnrollment, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'enrollment_id' })
-  enrollment?: RoleEnrollment;
 
   /**
    * 역할

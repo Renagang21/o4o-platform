@@ -1,5 +1,5 @@
 import { Application, Request, Response, RequestHandler } from 'express';
-import { standardLimiter, publicLimiter, settingsLimiter, ssoCheckLimiter, userPermissionsLimiter, enrollmentLimiter, adminReviewLimiter } from './rate-limiters.config.js';
+import { standardLimiter, publicLimiter, settingsLimiter, ssoCheckLimiter, userPermissionsLimiter } from './rate-limiters.config.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 import { errorHandler, notFoundHandler } from '../middleware/error-handler.js';
 import { deprecatedRoute, logDeprecatedUsage } from '../middleware/deprecated.middleware.js';
@@ -80,10 +80,6 @@ import productsRoutes from '../routes/products.js';
 import storefrontRoutes from '../routes/storefront.routes.js';
 import partnersRoutes from '../routes/partners.js';
 import sellerProductsRoutes from '../routes/seller-products.js';
-
-// P0 RBAC - Role Enrollment Routes (Phase B)
-import enrollmentsRoutes from '../routes/enrollments.routes.js';
-import adminEnrollmentsRoutes from '../routes/admin/enrollments.routes.js';
 
 // P3 - Role Applications Routes
 import roleApplicationsRoutes from '../routes/role-applications.js';
@@ -370,10 +366,6 @@ export function setupRoutes(app: Application): void {
   // Phase 5 - Role Applications (Supplier, Seller, Partner)
   app.use('/api/v1/applications', standardLimiter, applicationsRoutes);
 
-  // P0 RBAC - Role Enrollments (Phase B)
-  app.use('/api/enrollments', enrollmentLimiter, enrollmentsRoutes);
-  app.use('/api/v1/enrollments', enrollmentLimiter, enrollmentsRoutes);
-
   // P3 - Role Applications
   app.use('/api/v2/roles', standardLimiter, roleApplicationsRoutes);
   app.use('/api/v2/admin/roles', standardLimiter, adminRoleApplicationsRoutes);
@@ -482,10 +474,6 @@ export function setupRoutes(app: Application): void {
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/admin/orders', standardLimiter, adminOrdersRoutes);
-
-  // P0 RBAC - Admin Enrollment Review (Phase B)
-  app.use('/api/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);
-  app.use('/api/v1/admin/enrollments', adminReviewLimiter, adminEnrollmentsRoutes);
 
   // Phase PD-8 - Admin Job Management
   app.use('/api/v2/admin/jobs', standardLimiter, adminJobsRoutes);

@@ -102,7 +102,6 @@ import { FormPreset } from '../entities/FormPreset.js';
 import { ViewPreset } from '../entities/ViewPreset.js';
 import { TemplatePreset } from '../entities/TemplatePreset.js';
 // P0 Zero-Data Role Management entities
-import { RoleEnrollment } from '../entities/RoleEnrollment.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
@@ -253,7 +252,6 @@ export const AppDataSource = new DataSource({
     ViewPreset,
     TemplatePreset,
     // P0 Zero-Data Role Management entities
-    RoleEnrollment,
     RoleAssignment,
     RoleApplication,
     KycDocument,
