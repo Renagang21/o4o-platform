@@ -28,6 +28,39 @@ const roleNames: Record<string, string> = {
 };
 
 /**
+ * GET /api/v2/admin/roles/metrics/pending
+ * Get count of pending role applications (admin only)
+ * Phase 2-4: Admin notification widget backend
+ */
+router.get('/metrics/pending',
+  requireAuth,
+  requireAdmin,
+  async (req: AuthRequest, res) => {
+    try {
+      const applicationRepo = AppDataSource.getRepository(RoleApplication);
+
+      const pendingCount = await applicationRepo.count({
+        where: { status: RoleApplicationStatus.PENDING }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          pendingCount,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('[GET METRICS ERROR]', error);
+      res.status(500).json({
+        error: 'Internal server error',
+        code: 'INTERNAL_SERVER_ERROR'
+      });
+    }
+  }
+);
+
+/**
  * GET /api/v2/admin/roles/applications
  * Get all role applications (admin only)
  */

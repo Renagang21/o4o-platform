@@ -19,8 +19,8 @@ export const useRoleApplicationsCount = () => {
 
     try {
       setIsLoading(true);
-      const response = await authClient.api.get('/admin/roles/applications', {
-        params: { status: 'pending' },
+      // Phase 2-4: Use dedicated metrics endpoint for better performance
+      const response = await authClient.api.get('/admin/roles/metrics/pending', {
         validateStatus: (status) => status < 500 // Don't throw on 401/403
       });
 
@@ -35,8 +35,8 @@ export const useRoleApplicationsCount = () => {
         return;
       }
 
-      const applications = response.data?.data || [];
-      setCount(Array.isArray(applications) ? applications.length : 0);
+      const pendingCount = response.data?.data?.pendingCount || 0;
+      setCount(pendingCount);
       setError(null);
     } catch (err: any) {
       // Stop polling on auth errors
