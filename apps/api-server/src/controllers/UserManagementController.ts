@@ -133,10 +133,13 @@ export class UserManagementController {
     try {
       const { id } = req.params;
 
-      const user = await this.userRepository.findOne({
-        where: { id },
-        relations: ['approvalLogs', 'approvalLogs.admin']
-      });
+      // Use QueryBuilder for nested relations to avoid TypeORM issues
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.approvalLogs', 'approvalLog')
+        .leftJoinAndSelect('approvalLog.admin', 'admin')
+        .where('user.id = :id', { id })
+        .getOne();
 
       if (!user) {
         res.status(404).json({
@@ -155,7 +158,7 @@ export class UserManagementController {
       res.status(500).json({
         success: false,
         error: 'Failed to get user',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
       });
     }
   };
