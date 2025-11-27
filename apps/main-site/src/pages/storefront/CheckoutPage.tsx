@@ -16,6 +16,7 @@ import Layout from '../../components/layout/Layout';
 import { ArrowLeft } from 'lucide-react';
 import { useCartStore } from '../../stores/cartStore';
 import { useToastContext } from '../../contexts/ToastProvider';
+import { useAuth } from '../../contexts/AuthContext';
 import { storefrontAPI } from '../../services/storefrontApi';
 import { loadTossPaymentsSDK, requestTossPayment, generateOrderName } from '../../utils/tossPayments';
 
@@ -32,6 +33,7 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const cartStore = useCartStore();
   const toast = useToastContext();
+  const { user, isAuthenticated } = useAuth();
 
   // Loading States
   const [loading, setLoading] = useState(true);
@@ -80,6 +82,16 @@ export const CheckoutPage: React.FC = () => {
       navigate('/cart');
     }
   }, [loading, cartStore.items.length, navigate, toast]);
+
+  // Phase 3-3: Auto-fill phone number from user profile
+  useEffect(() => {
+    if (isAuthenticated && user?.phone) {
+      setCustomerInfo(prev => ({
+        ...prev,
+        phone: user.phone || ''
+      }));
+    }
+  }, [isAuthenticated, user]);
 
   // Format Currency
   const formatCurrency = (amount: number, currency: string = 'KRW') => {
