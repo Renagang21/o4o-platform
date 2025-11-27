@@ -16,7 +16,7 @@ const adminOrderController = new AdminOrderController();
 
 // Apply authentication and role check to all routes
 router.use(authenticate);
-router.use(requireRole(['administrator', 'operator']));
+router.use(requireRole(['super_admin', 'administrator', 'operator']));
 
 // Validation middleware
 const validateOrderId = [
