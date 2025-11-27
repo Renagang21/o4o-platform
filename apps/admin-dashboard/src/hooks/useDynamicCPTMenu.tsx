@@ -184,8 +184,18 @@ export const injectCPTMenuItems = (
         dropshippingMenu.children = [];
       }
 
-      // 드롭쉬핑 CPT 메뉴를 드롭쉬핑 메뉴의 마지막에 추가
-      dropshippingMenu.children.push(dropshippingCPTMenu);
+      // 이미 추가된 CPT 콘텐츠 관리 메뉴가 있는지 확인
+      const existingCPTMenuIndex = dropshippingMenu.children.findIndex(
+        child => child.id === 'dropshipping-cpt-content'
+      );
+
+      if (existingCPTMenuIndex !== -1) {
+        // 기존 메뉴를 새 메뉴로 교체
+        dropshippingMenu.children[existingCPTMenuIndex] = dropshippingCPTMenu;
+      } else {
+        // 없으면 추가
+        dropshippingMenu.children.push(dropshippingCPTMenu);
+      }
     }
   }
 
