@@ -18,6 +18,7 @@ import { BarChart } from '../charts/BarChart';
 import { KPICardSkeleton } from '../common/Skeleton';
 import { ShoppingCart, TrendingUp, DollarSign, ShoppingBag } from 'lucide-react';
 import { ProfileCompletenessWidget } from '../dashboard/ProfileCompletenessWidget';
+import { OnboardingGuideModal } from '../dashboard/OnboardingGuideModal';
 
 interface SellerDashboardSummary {
   totalOrders: number;
@@ -45,10 +46,28 @@ export const SellerDashboardOverview: React.FC = () => {
   const [recentOrders, setRecentOrders] = useState<SellerOrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
+    checkOnboardingStatus();
   }, []);
+
+  const checkOnboardingStatus = async () => {
+    try {
+      // Phase 3-2: Check if user has completed onboarding
+      const response = await authClient.api.get('/api/user/profile');
+
+      if (response.data?.success && response.data?.data) {
+        const { onboardingCompleted } = response.data.data;
+        // Show onboarding modal if not completed
+        setShowOnboarding(!onboardingCompleted);
+      }
+    } catch (err) {
+      console.error('Failed to check onboarding status:', err);
+      // Don't show onboarding on error
+    }
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -111,15 +130,24 @@ export const SellerDashboardOverview: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">판매자 대시보드 개요</h2>
-        <p className="text-gray-600 mt-1">최근 30일 판매 성과</p>
-      </div>
+    <>
+      {/* Phase 3-2: Onboarding Guide Modal */}
+      {showOnboarding && (
+        <OnboardingGuideModal
+          role="seller"
+          onClose={() => setShowOnboarding(false)}
+        />
+      )}
 
-      {/* Phase 3-1: Profile Completeness Widget */}
-      <ProfileCompletenessWidget />
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">판매자 대시보드 개요</h2>
+          <p className="text-gray-600 mt-1">최근 30일 판매 성과</p>
+        </div>
+
+        {/* Phase 3-1: Profile Completeness Widget */}
+        <ProfileCompletenessWidget />
 
       {/* KPI Cards */}
       <KPIGrid>
@@ -264,7 +292,8 @@ export const SellerDashboardOverview: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

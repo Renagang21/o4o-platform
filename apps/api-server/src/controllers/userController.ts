@@ -38,7 +38,8 @@ export class UserController {
           status: user.status,
           businessInfo: user.businessInfo,
           createdAt: user.createdAt,
-          lastLoginAt: user.lastLoginAt
+          lastLoginAt: user.lastLoginAt,
+          onboardingCompleted: user.onboardingCompleted // Phase 3-2
         }
       });
     } catch (error) {
@@ -324,6 +325,48 @@ export class UserController {
       res.json({
         success: true,
         data: completeness
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Internal server error'
+      });
+    }
+  }
+
+  // Phase 3-2: 온보딩 완료 처리
+  async completeOnboarding(req: Request, res: Response) {
+    try {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { id: (authReq.user as any).id || (authReq.user as any).userId }
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      // Update onboarding completion flag
+      user.onboardingCompleted = true;
+      await userRepository.save(user);
+
+      res.json({
+        success: true,
+        message: 'Onboarding completed successfully',
+        data: {
+          onboardingCompleted: user.onboardingCompleted
+        }
       });
     } catch (error) {
       res.status(500).json({

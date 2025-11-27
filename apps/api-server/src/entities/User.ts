@@ -179,6 +179,10 @@ export class User {
   @Column({ type: 'timestamp', nullable: true, name: 'reset_password_expires' })
   resetPasswordExpires?: Date | null;
 
+  // Phase 3-2: Onboarding completion flag
+  @Column({ type: 'boolean', default: false, name: 'onboarding_completed' })
+  onboardingCompleted!: boolean;
+
   // 계정 잠금 상태 확인
   get isLocked(): boolean {
     return !!(this.lockedUntil && this.lockedUntil > new Date());

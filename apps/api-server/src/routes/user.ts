@@ -13,6 +13,9 @@ router.get('/profile', authenticate, userController.getProfile.bind(userControll
 // Phase 3-1: 프로필 완성도 조회
 router.get('/completeness', authenticate, userController.getProfileCompleteness.bind(userController));
 
+// Phase 3-2: 온보딩 완료 처리
+router.put('/onboarding/complete', authenticate, userController.completeOnboarding.bind(userController));
+
 // 비즈니스 정보 업데이트
 router.put('/business-info', authenticate, userController.updateBusinessInfo.bind(userController));
 
