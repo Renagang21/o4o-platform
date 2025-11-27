@@ -17,6 +17,7 @@ import { LineChart } from '../charts/LineChart';
 import { PieChart } from '../charts/PieChart';
 import { KPICardSkeleton } from '../common/Skeleton';
 import { Package, TrendingUp, Clock, ShoppingCart } from 'lucide-react';
+import { ProfileCompletenessWidget } from '../dashboard/ProfileCompletenessWidget';
 
 interface SupplierDashboardSummary {
   totalOrders: number;
@@ -114,6 +115,9 @@ export const SupplierDashboardOverview: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900">공급자 대시보드 개요</h2>
         <p className="text-gray-600 mt-1">최근 30일 공급 성과</p>
       </div>
+
+      {/* Phase 3-1: Profile Completeness Widget */}
+      <ProfileCompletenessWidget />
 
       {/* KPI Cards */}
       <KPIGrid>

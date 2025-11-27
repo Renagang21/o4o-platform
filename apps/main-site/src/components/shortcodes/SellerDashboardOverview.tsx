@@ -17,6 +17,7 @@ import { LineChart } from '../charts/LineChart';
 import { BarChart } from '../charts/BarChart';
 import { KPICardSkeleton } from '../common/Skeleton';
 import { ShoppingCart, TrendingUp, DollarSign, ShoppingBag } from 'lucide-react';
+import { ProfileCompletenessWidget } from '../dashboard/ProfileCompletenessWidget';
 
 interface SellerDashboardSummary {
   totalOrders: number;
@@ -116,6 +117,9 @@ export const SellerDashboardOverview: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900">판매자 대시보드 개요</h2>
         <p className="text-gray-600 mt-1">최근 30일 판매 성과</p>
       </div>
+
+      {/* Phase 3-1: Profile Completeness Widget */}
+      <ProfileCompletenessWidget />
 
       {/* KPI Cards */}
       <KPIGrid>
