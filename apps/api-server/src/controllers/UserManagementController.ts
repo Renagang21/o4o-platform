@@ -133,13 +133,10 @@ export class UserManagementController {
     try {
       const { id } = req.params;
 
-      // Use QueryBuilder for nested relations to avoid TypeORM issues
-      const user = await this.userRepository
-        .createQueryBuilder('user')
-        .leftJoinAndSelect('user.approvalLogs', 'approvalLog')
-        .leftJoinAndSelect('approvalLog.admin', 'admin')
-        .where('user.id = :id', { id })
-        .getOne();
+      // Simple findOne without approvalLogs relation (table doesn't exist yet)
+      const user = await this.userRepository.findOne({
+        where: { id }
+      });
 
       if (!user) {
         res.status(404).json({
