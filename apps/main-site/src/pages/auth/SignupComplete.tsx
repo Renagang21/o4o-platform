@@ -275,7 +275,10 @@ export const SignupComplete: FC = () => {
                     disabled={isLoading}
                   />
                   <span className="text-sm text-gray-700">
-                    마케팅 정보 수신에 동의합니다 (선택)
+                    <a href="/marketing" target="_blank" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                      마케팅 정보 수신
+                    </a>
+                    에 동의합니다 (선택)
                   </span>
                 </label>
                 <p className="mt-1 ml-7 text-xs text-gray-500">
