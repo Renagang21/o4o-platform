@@ -36,6 +36,10 @@ export class User {
   @Column({ type: 'varchar', length: 500, nullable: true })
   avatar?: string;
 
+  // Phase 3-3: Phone number for checkout auto-fill
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phone?: string;
+
   @Column({ 
     type: 'enum', 
     enum: UserStatus,
@@ -372,6 +376,7 @@ export class User {
       firstName: this.firstName,
       lastName: this.lastName,
       fullName: this.fullName,
+      phone: this.phone, // Phase 3-3: Include phone for checkout auto-fill
       role: this.role,
       roles: this.getRoleNames(), // Return role names as string array
       activeRole: activeRole ? {
