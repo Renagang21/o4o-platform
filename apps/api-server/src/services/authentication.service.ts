@@ -168,16 +168,27 @@ export class AuthenticationService {
     await this.logLoginAttempt(user.id, email, ipAddress, userAgent, true);
 
     // Check concurrent sessions
-    const sessionCheck = await SessionSyncService.checkConcurrentSessions(user.id);
-    if (!sessionCheck.allowed) {
-      await SessionSyncService.enforceSessionLimit(user.id);
+    try {
+      const sessionCheck = await SessionSyncService.checkConcurrentSessions(user.id);
+      if (!sessionCheck.allowed) {
+        await SessionSyncService.enforceSessionLimit(user.id);
+      }
+    } catch (sessionError) {
+      logger.warn('Failed to check/enforce session limits (non-critical):', sessionError);
+      // Continue login even if session check fails
     }
 
     // Generate session ID
     const sessionId = SessionSyncService.generateSessionId();
 
     // Create session
-    await SessionSyncService.createSession(user, sessionId, { userAgent, ipAddress });
+    try {
+      await SessionSyncService.createSession(user, sessionId, { userAgent, ipAddress });
+    } catch (sessionCreateError) {
+      logger.error('Failed to create session in Redis:', sessionCreateError);
+      // Depending on requirements, we might want to fail here or continue
+      // For now, we'll log it but allow the login to proceed (token-based auth still works)
+    }
 
     // Generate tokens
     const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
@@ -242,7 +253,7 @@ export class AuthenticationService {
 
       // Update profile info if changed
       if (profile.displayName !== existingLinkedAccount.displayName ||
-          profile.avatar !== existingLinkedAccount.profileImage) {
+        profile.avatar !== existingLinkedAccount.profileImage) {
         existingLinkedAccount.displayName = profile.displayName;
         existingLinkedAccount.profileImage = profile.avatar;
         existingLinkedAccount.lastUsedAt = new Date();
@@ -667,7 +678,7 @@ export class AuthenticationService {
    *
    * @returns Array of test account credentials
    */
-  async getTestAccounts(): Promise<Array<{role: string; email: string; password: string}>> {
+  async getTestAccounts(): Promise<Array<{ role: string; email: string; password: string }>> {
     // Define roles we want to show in test panel
     const targetRoles: UserRole[] = [
       UserRole.ADMIN,
@@ -676,7 +687,7 @@ export class AuthenticationService {
       UserRole.PARTNER,
       UserRole.USER
     ];
-    const testAccounts: Array<{role: string; email: string; password: string}> = [];
+    const testAccounts: Array<{ role: string; email: string; password: string }> = [];
 
     // All test accounts use the same password for convenience
     const testPassword = 'test123!@#';

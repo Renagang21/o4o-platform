@@ -10,6 +10,7 @@ import { SessionSyncService } from '../services/sessionSyncService.js';
 import { PasswordResetService } from '../services/passwordResetService.js';
 import { authenticateCookie, AuthRequest } from '../middleware/auth.middleware.js';
 import { mapUserToMeResponse } from '../dto/auth/me-response.dto.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 
@@ -45,7 +46,11 @@ router.post('/login',
         user: result.user
       });
     } catch (error: any) {
-      console.error('[AUTH-V2 LOGIN ERROR]', error);
+      logger.error('[AUTH-V2 LOGIN ERROR]', {
+        error: error.message,
+        stack: error.stack,
+        code: error.code
+      });
 
       // Handle authentication errors
       if (error.code === 'USER_NOT_FOUND') {
@@ -67,6 +72,16 @@ router.post('/login',
           error: error.message,
           code: error.code,
           details: error.details
+        });
+      }
+
+      // In development, return detailed error
+      if (process.env.NODE_ENV !== 'production') {
+        return res.status(500).json({
+          error: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
+          stack: error.stack
         });
       }
 
@@ -92,9 +107,9 @@ router.post('/register',
       }
 
       const { email, password, name, role = 'customer' } = req.body;
-      
+
       const userRepository = AppDataSource.getRepository(User);
-      
+
       // Check if email exists
       const existingUser = await userRepository.findOne({ where: { email } });
       if (existingUser) {
@@ -311,7 +326,7 @@ router.post('/forgot-password',
       }
 
       const { email } = req.body;
-      
+
       await PasswordResetService.requestPasswordReset(email);
 
       // Always return success to prevent email enumeration
@@ -341,7 +356,7 @@ router.post('/reset-password',
       }
 
       const { token, password } = req.body;
-      
+
       await PasswordResetService.resetPassword(token, password);
 
       res.json({
@@ -395,10 +410,10 @@ router.post('/resend-verification',
 
       const { email } = req.body;
       const userRepository = AppDataSource.getRepository(User);
-      
+
       // Find user by email
       const user = await userRepository.findOne({ where: { email } });
-      
+
       if (!user) {
         // Don't reveal if email exists
         return res.json({
@@ -451,7 +466,7 @@ router.post('/verify-email',
       }
 
       const { token } = req.body;
-      
+
       await PasswordResetService.verifyEmail(token);
 
       res.json({
@@ -472,14 +487,14 @@ router.post('/verify-email',
 router.get('/verify-email', async (req, res) => {
   try {
     const { token } = req.query;
-    
+
     if (!token || typeof token !== 'string') {
       return res.status(400).json({
         error: 'Verification token is required',
         code: 'MISSING_TOKEN'
       });
     }
-    
+
     await PasswordResetService.verifyEmail(token);
 
     res.json({
@@ -488,7 +503,7 @@ router.get('/verify-email', async (req, res) => {
     });
   } catch (error) {
     // Error log removed
-    
+
     // Provide specific error codes based on error message
     const errorMessage = error instanceof Error ? error.message : '';
     let errorCode = 'VERIFICATION_FAILED';
@@ -499,7 +514,7 @@ router.get('/verify-email', async (req, res) => {
     } else if (errorMessage.includes('already verified')) {
       errorCode = 'ALREADY_VERIFIED';
     }
-    
+
     res.status(400).json({
       error: error instanceof Error ? error.message : 'Failed to verify email',
       code: errorCode
