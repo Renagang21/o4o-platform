@@ -55,8 +55,15 @@ export const useCPTData = ({
           order: 'desc'
         });
 
-        const postsArray = response.data || [];
-        const transformedPosts = postsArray.map((post: any) => {
+        // Handle both response formats: { data: [...] } or { success: true, data: [...] }
+        const postsArray = Array.isArray(response.data)
+          ? response.data
+          : (response.data?.data || response.data || []);
+
+        // Ensure postsArray is actually an array
+        const safePostsArray = Array.isArray(postsArray) ? postsArray : [];
+
+        const transformedPosts = safePostsArray.map((post: any) => {
           let date = new Date().toISOString().split('T')[0];
           try {
             if (post.publishedAt && post.publishedAt !== null) {
