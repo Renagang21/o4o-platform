@@ -708,6 +708,43 @@ router.get('/oauth/admin', authenticate, requireAdmin, async (req: Request, res:
 });
 
 /**
+ * @route   GET /api/v1/settings/theme
+ * @desc    Get theme settings (Public - for frontend theme rendering)
+ * @access  Public
+ */
+router.get('/theme', async (req: Request, res: Response) => {
+  try {
+    const settings = await settingsService.getSettings('theme');
+
+    if (!settings) {
+      // Return default theme settings if not found
+      return res.json({
+        success: true,
+        data: {
+          name: 'default',
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#64748b',
+            accent: '#f59e0b'
+          }
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    logger.error('Failed to fetch theme settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch theme settings'
+    });
+  }
+});
+
+/**
  * @route   GET /api/v1/settings/oauth
  * @desc    Get OAuth settings (Public - for login form to display providers)
  * @access  Public
