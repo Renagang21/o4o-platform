@@ -53,7 +53,7 @@ export class PostModule {
         );
       }
 
-      queryBuilder.orderBy(`post.${orderBy}`, order);
+      queryBuilder.orderBy(`post.${orderBy}`, order.toUpperCase() as 'ASC' | 'DESC');
       queryBuilder.skip((page - 1) * limit);
       queryBuilder.take(limit);
 
