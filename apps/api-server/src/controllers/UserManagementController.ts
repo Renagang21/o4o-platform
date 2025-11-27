@@ -426,16 +426,11 @@ export class UserManagementController {
     try {
       const { id } = req.params;
 
-      const approvalLogRepo = AppDataSource.getRepository(ApprovalLog);
-      const logs = await approvalLogRepo.find({
-        where: { user_id: id },
-        relations: ['admin'],
-        order: { created_at: 'DESC' }
-      });
-
+      // Return empty array until approval_logs table is created
+      // TODO: Create approval_logs table via migration
       res.json({
         success: true,
-        data: logs
+        data: []
       });
     } catch (error) {
       console.error('Error getting approval history:', error);
