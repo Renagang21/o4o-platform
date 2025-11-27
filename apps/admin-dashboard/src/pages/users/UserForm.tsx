@@ -90,15 +90,21 @@ export default function UserForm() {
       const response = await UserApi.getUser(id);
       const responseAny = response as any;
 
-      if (responseAny.data?.success) {
-        const userData = responseAny.data.data;
-        
+      // Handle various response structures from API
+      const userData = responseAny.data?.data ||
+                      responseAny.data ||
+                      responseAny.user ||
+                      responseAny;
+
+      if (userData && userData.email) {
         // Set form values
         setValue('email', userData.email);
         setValue('firstName', userData.firstName || '');
         setValue('lastName', userData.lastName || '');
-        setValue('roles', userData.roles);
-        setValue('status', userData.status);
+        setValue('roles', userData.roles || [userData.role] || ['customer']);
+        setValue('status', userData.status || 'pending');
+      } else {
+        throw new Error('Invalid user data received');
       }
     } catch (error) {
     // Error logging - use proper error handler

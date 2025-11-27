@@ -49,17 +49,22 @@ export default function UserDetail() {
       // Fetch user details
       const userResponse = await UserApi.getUser(id!);
       if (userResponse) {
-        const userData = (userResponse as any).data || userResponse;
+        // Handle various response structures from API
+        const userData = (userResponse as any).data?.data ||
+                        (userResponse as any).data ||
+                        (userResponse as any).user ||
+                        userResponse;
         setUser(userData as User);
       }
 
       // Fetch approval history
       const historyResponse = await UserApi.getUserActivity(id!);
-      if (Array.isArray(historyResponse)) {
-        setApprovalHistory(historyResponse);
-      } else if ((historyResponse as any).success) {
-        setApprovalHistory((historyResponse as any).data);
-      }
+      // Handle various response structures for array data
+      const historyData = Array.isArray(historyResponse) ? historyResponse :
+                         Array.isArray((historyResponse as any)?.data) ? (historyResponse as any).data :
+                         Array.isArray((historyResponse as any)?.activities) ? (historyResponse as any).activities :
+                         [];
+      setApprovalHistory(historyData);
     } catch (error: any) {
     // Error logging - use proper error handler
       toast.error('Failed to load user details');
