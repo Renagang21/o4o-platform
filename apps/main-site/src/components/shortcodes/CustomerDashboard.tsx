@@ -81,9 +81,10 @@ export const CustomerDashboard: React.FC = () => {
       setError(null);
 
       // R-6-4: Fetch data from backend APIs
+      // authClient.baseURL already includes /api/v1, so use relative paths
       const [statsRes, ordersRes] = await Promise.allSettled([
-        authClient.api.get('/api/v1/customer/dashboard/stats?range=90d'),
-        authClient.api.get('/api/v1/customer/orders/recent?limit=5')
+        authClient.api.get('customer/dashboard/stats?range=90d'),
+        authClient.api.get('customer/orders/recent?limit=5')
       ]);
 
       // Process stats response

@@ -145,7 +145,8 @@ class OrderService {
       if (query.sortOrder) params.append('sortOrder', query.sortOrder);
 
       const queryString = params.toString();
-      const url = `/api/v1/customer/orders${queryString ? `?${queryString}` : ''}`;
+      // authClient.baseURL already includes /api/v1, so use relative path
+      const url = `customer/orders${queryString ? `?${queryString}` : ''}`;
 
       const response = await authClient.api.get<OrderListResponse>(url);
       return response.data;
@@ -160,8 +161,9 @@ class OrderService {
    */
   async getOrderDetail(orderId: string): Promise<OrderDetailResponse> {
     try {
+      // authClient.baseURL already includes /api/v1, so use relative path
       const response = await authClient.api.get<OrderDetailResponse>(
-        `/api/v1/customer/orders/${orderId}`
+        `customer/orders/${orderId}`
       );
       return response.data;
     } catch (error: any) {
