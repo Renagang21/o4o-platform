@@ -37,8 +37,9 @@ router.post('/login',
       relations: ['dbRoles', 'activeRole']
     });
 
+    // 미가입 사용자 구분을 위한 에러 코드 분리
     if (!user) {
-      throw new UnauthorizedError('Invalid credentials', 'INVALID_CREDENTIALS');
+      throw new UnauthorizedError('User not found', 'USER_NOT_FOUND');
     }
 
     // 비밀번호가 설정되지 않은 사용자 (소셜 로그인 전용)
@@ -327,5 +328,71 @@ router.post('/refresh', asyncHandler(async (req: Request, res) => {
     refreshToken // Return same refresh token (unless rotation is implemented)
   });
 }));
+
+// 소셜 로그인 회원가입 완료 (추가 정보 입력)
+router.post('/signup-complete',
+  authenticate,
+  body('phone').optional().matches(/^01[0-9]{8,9}$/).withMessage('Valid phone number is required'),
+  body('tosAccepted').isBoolean().withMessage('Terms of service acceptance is required'),
+  body('privacyAccepted').isBoolean().withMessage('Privacy policy acceptance is required'),
+  body('marketingAccepted').optional().isBoolean(),
+  asyncHandler(async (req: Request, res) => {
+    // Validation check
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Validation failed', errors.array());
+    }
+
+    const { phone, tosAccepted, privacyAccepted, marketingAccepted, shippingAddress } = req.body;
+
+    // Check if TOS and Privacy are accepted
+    if (!tosAccepted || !privacyAccepted) {
+      throw new BadRequestError('Terms of service and privacy policy must be accepted', 'TOS_NOT_ACCEPTED');
+    }
+
+    // Check if database is initialized
+    if (!AppDataSource.isInitialized) {
+      throw new ServiceUnavailableError('Database service unavailable', 'DATABASE_UNAVAILABLE');
+    }
+
+    const userRepository = AppDataSource.getRepository(User);
+
+    // Get authenticated user
+    const userId = (req.user as any).id || (req.user as any).userId;
+    const user = await userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new UnauthorizedError('User not found', 'USER_NOT_FOUND');
+    }
+
+    // Update user with additional information
+    if (phone) {
+      // Store phone in appropriate field (adjust based on your User entity structure)
+      // user.phone = phone; // Add this field to your User entity if needed
+    }
+
+    // Store consent flags (you may want to add these fields to User entity or create a separate consent table)
+    // user.tosAccepted = tosAccepted;
+    // user.privacyAccepted = privacyAccepted;
+    // user.marketingAccepted = marketingAccepted || false;
+
+    // Store shipping address if provided (adjust based on your data model)
+    // This might go into a separate address table or user.defaultAddress field
+
+    await userRepository.save(user);
+
+    return res.json({
+      success: true,
+      message: 'Signup completed successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        status: user.status
+      }
+    });
+  })
+);
 
 export default router;

@@ -8,6 +8,7 @@ import { useAuth } from './contexts/AuthContext';
 // Auth Pages
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
+import SignupComplete from './pages/auth/SignupComplete';
 import Logout from './pages/auth/Logout';
 import FindId from './pages/auth/FindId';
 import FindPassword from './pages/auth/FindPassword';
@@ -189,6 +190,13 @@ const App: FC = () => {
           <Route path="/register" element={<Signup />} />
           <Route path="/auth/signup" element={<Signup />} />
           <Route path="/auth/register" element={<Signup />} />
+
+          {/* Signup Complete - Protected route for social login users */}
+          <Route path="/auth/signup-complete" element={
+            <PrivateRoute>
+              <SignupComplete />
+            </PrivateRoute>
+          } />
 
           {/* Logout - Hardcoded (auto-processing page, no customization needed) */}
           <Route path="/logout" element={<Logout />} />

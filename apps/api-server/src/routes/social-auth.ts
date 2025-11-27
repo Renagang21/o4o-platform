@@ -62,7 +62,7 @@ router.get('/google/callback',
   passport.authenticate('google', { session: false }),
   async (req, res) => {
     try {
-      const user = req.user as any;
+      const { user, isNewUser } = req.user as any;
 
       // Extract redirect_url from state
       let redirectUrl: string | undefined;
@@ -81,7 +81,14 @@ router.get('/google/callback',
       }
 
       await SocialAuthService.completeSocialLogin(user, res);
-      res.redirect(getRedirectUrls(redirectUrl).success);
+
+      // Redirect to signup-complete if new user, otherwise to intended destination
+      const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+      if (isNewUser) {
+        res.redirect(`${frontendUrl}/auth/signup-complete`);
+      } else {
+        res.redirect(getRedirectUrls(redirectUrl).success);
+      }
     } catch (error: any) {
       const state = req.query.state as string;
       let redirectUrl: string | undefined;
@@ -110,7 +117,7 @@ router.get('/kakao/callback',
   passport.authenticate('kakao', { session: false }),
   async (req, res) => {
     try {
-      const user = req.user as any;
+      const { user, isNewUser } = req.user as any;
 
       // Extract redirect_url from state
       let redirectUrl: string | undefined;
@@ -129,7 +136,14 @@ router.get('/kakao/callback',
       }
 
       await SocialAuthService.completeSocialLogin(user, res);
-      res.redirect(getRedirectUrls(redirectUrl).success);
+
+      // Redirect to signup-complete if new user, otherwise to intended destination
+      const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+      if (isNewUser) {
+        res.redirect(`${frontendUrl}/auth/signup-complete`);
+      } else {
+        res.redirect(getRedirectUrls(redirectUrl).success);
+      }
     } catch (error: any) {
       // Error log removed
       const state = req.query.state as string;
@@ -159,7 +173,7 @@ router.get('/naver/callback',
   passport.authenticate('naver', { session: false }),
   async (req, res) => {
     try {
-      const user = req.user as any;
+      const { user, isNewUser } = req.user as any;
 
       // Extract redirect_url from state
       let redirectUrl: string | undefined;
@@ -178,7 +192,14 @@ router.get('/naver/callback',
       }
 
       await SocialAuthService.completeSocialLogin(user, res);
-      res.redirect(getRedirectUrls(redirectUrl).success);
+
+      // Redirect to signup-complete if new user, otherwise to intended destination
+      const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
+      if (isNewUser) {
+        res.redirect(`${frontendUrl}/auth/signup-complete`);
+      } else {
+        res.redirect(getRedirectUrls(redirectUrl).success);
+      }
     } catch (error: any) {
       // Error log removed
       const state = req.query.state as string;

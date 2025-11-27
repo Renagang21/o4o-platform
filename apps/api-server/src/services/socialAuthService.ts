@@ -18,10 +18,11 @@ interface SocialProfile {
 export class SocialAuthService {
   /**
    * Handle social login/registration
+   * Returns user and isNewUser flag for signup flow detection
    */
-  static async handleSocialAuth(profile: SocialProfile): Promise<User> {
+  static async handleSocialAuth(profile: SocialProfile): Promise<{ user: User; isNewUser: boolean }> {
     const userRepo = AppDataSource.getRepository(User);
-    
+
     // Check if user exists by email or provider ID
     let user = await userRepo.findOne({
       where: [
@@ -38,15 +39,15 @@ export class SocialAuthService {
         user.provider_id = profile.providerId;
         user.isEmailVerified = true; // Social emails are pre-verified
       }
-      
+
       // Update user info
       user.lastLoginAt = new Date();
       if (profile.avatar && !user.avatar) {
         user.avatar = profile.avatar;
       }
-      
+
       await userRepo.save(user);
-      return user;
+      return { user, isNewUser: false };
     }
 
     // Create new user
@@ -74,7 +75,7 @@ export class SocialAuthService {
       // Error log removed
     }
 
-    return user;
+    return { user, isNewUser: true };
   }
 
   /**

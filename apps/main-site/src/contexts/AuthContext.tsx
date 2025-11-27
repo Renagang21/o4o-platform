@@ -83,6 +83,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const errorCode = error.response?.data?.code;
 
       switch (errorCode) {
+        case 'USER_NOT_FOUND':
+          toast.info('가입되지 않은 이메일입니다. 회원가입 페이지로 이동합니다.');
+          // Redirect to signup page with email pre-filled
+          setTimeout(() => {
+            window.location.href = `/auth/signup?email=${encodeURIComponent(email)}`;
+          }, 1000);
+          break;
         case 'INVALID_CREDENTIALS':
           toast.error('이메일 또는 비밀번호가 올바르지 않습니다.');
           break;

@@ -18,6 +18,7 @@ import { emailService } from '../services/emailService.js';
 import { Settings as Setting } from '../entities/Settings.js';
 import { decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
+import { SocialAuthService } from '../services/socialAuthService.js';
 
 interface OAuthConfig {
   provider: string;
@@ -251,38 +252,19 @@ class PassportManager {
       scope: config.scope
     }, async (accessToken, refreshToken, profile, done) => {
       try {
-        const userRepo = AppDataSource.getRepository(User);
-        
-        let user = await userRepo.findOne({
-          where: [
-            { email: profile.emails?.[0]?.value },
-            { provider: 'google', provider_id: profile.id }
-          ]
-        });
-
-        if (user) {
-          user.lastLoginAt = new Date();
-          await userRepo.save(user);
-          return done(null, user as any);
-        }
-
-        user = userRepo.create({
+        // Use SocialAuthService to handle user creation/login
+        const result = await SocialAuthService.handleSocialAuth({
+          provider: 'google',
+          providerId: profile.id,
           email: profile.emails?.[0]?.value || '',
           name: profile.displayName,
           firstName: profile.name?.givenName,
           lastName: profile.name?.familyName,
-          provider: 'google',
-          provider_id: profile.id,
-          role: UserRole.USER,
-          status: UserStatus.ACTIVE,
-          isEmailVerified: true,
-          password: ''
+          avatar: profile.photos?.[0]?.value
         });
 
-        await userRepo.save(user);
-        await emailService.sendWelcomeEmail(user.email, user.name || user.email);
-
-        done(null, user as any);
+        // Return both user and isNewUser flag
+        done(null, result as any);
       } catch (error: any) {
         done(error as Error, undefined);
       }
@@ -298,41 +280,23 @@ class PassportManager {
       callbackURL: config.callbackUrl
     }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
-        const userRepo = AppDataSource.getRepository(User);
         const email = profile._json.kakao_account?.email;
-        
+
         if (!email) {
           return done(new Error('Email not provided by Kakao'), undefined);
         }
 
-        let user = await userRepo.findOne({
-          where: [
-            { email },
-            { provider: 'kakao', provider_id: String(profile.id) }
-          ]
-        });
-
-        if (user) {
-          user.lastLoginAt = new Date();
-          await userRepo.save(user);
-          return done(null, user as any);
-        }
-
-        user = userRepo.create({
+        // Use SocialAuthService to handle user creation/login
+        const result = await SocialAuthService.handleSocialAuth({
+          provider: 'kakao',
+          providerId: String(profile.id),
           email,
           name: profile.displayName || profile.username || profile._json?.properties?.nickname || '',
-          provider: 'kakao',
-          provider_id: String(profile.id),
-          role: UserRole.USER,
-          status: UserStatus.ACTIVE,
-          isEmailVerified: true,
-          password: ''
+          avatar: profile._json?.kakao_account?.profile?.thumbnail_image_url
         });
 
-        await userRepo.save(user);
-        await emailService.sendWelcomeEmail(user.email, user.name || user.email);
-
-        done(null, user as any);
+        // Return both user and isNewUser flag
+        done(null, result as any);
       } catch (error: any) {
         done(error as Error, undefined);
       }
@@ -348,41 +312,23 @@ class PassportManager {
       callbackURL: config.callbackUrl
     }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
-        const userRepo = AppDataSource.getRepository(User);
         const email = profile.email;
-        
+
         if (!email) {
           return done(new Error('Email not provided by Naver'), undefined);
         }
 
-        let user = await userRepo.findOne({
-          where: [
-            { email },
-            { provider: 'naver', provider_id: profile.id }
-          ]
-        });
-
-        if (user) {
-          user.lastLoginAt = new Date();
-          await userRepo.save(user);
-          return done(null, user as any);
-        }
-
-        user = userRepo.create({
+        // Use SocialAuthService to handle user creation/login
+        const result = await SocialAuthService.handleSocialAuth({
+          provider: 'naver',
+          providerId: profile.id,
           email,
           name: profile.displayName || profile.nickname,
-          provider: 'naver',
-          provider_id: profile.id,
-          role: UserRole.USER,
-          status: UserStatus.ACTIVE,
-          isEmailVerified: true,
-          password: ''
+          avatar: profile.profileImage
         });
 
-        await userRepo.save(user);
-        await emailService.sendWelcomeEmail(user.email, user.name || user.email);
-
-        done(null, user as any);
+        // Return both user and isNewUser flag
+        done(null, result as any);
       } catch (error: any) {
         done(error as Error, undefined);
       }
