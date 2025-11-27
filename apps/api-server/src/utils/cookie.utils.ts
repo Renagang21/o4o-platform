@@ -21,7 +21,7 @@ function getCookieConfig() {
     baseOptions: {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax' as const,
+      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax', // Use 'none' in production for cross-subdomain requests
       ...(cookieDomain && { domain: cookieDomain })
     }
   };
@@ -143,7 +143,7 @@ export function getCookieConfigInfo() {
     isProduction,
     cookieDomain: cookieDomain || 'not set',
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true
   };
 }
