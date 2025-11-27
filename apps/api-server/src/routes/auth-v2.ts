@@ -52,23 +52,40 @@ router.post('/login',
         code: error.code
       });
 
-      // Handle authentication errors
-      if (error.code === 'USER_NOT_FOUND') {
+      // Handle authentication errors (401 - Unauthorized)
+      if (error.code === 'INVALID_USER' || error.code === 'INVALID_CREDENTIALS') {
         return res.status(401).json({
           error: error.message,
           code: error.code
         });
       }
 
-      if (error.code === 'INVALID_CREDENTIALS') {
-        return res.status(401).json({
-          error: error.message,
-          code: error.code
-        });
-      }
-
-      if (error.code === 'ACCOUNT_NOT_ACTIVE' || error.code === 'ACCOUNT_LOCKED') {
+      // Handle authorization errors (403 - Forbidden)
+      if (
+        error.code === 'ACCOUNT_NOT_ACTIVE' ||
+        error.code === 'ACCOUNT_LOCKED' ||
+        error.code === 'ACCOUNT_SUSPENDED' ||
+        error.code === 'EMAIL_NOT_VERIFIED'
+      ) {
         return res.status(403).json({
+          error: error.message,
+          code: error.code,
+          details: error.details
+        });
+      }
+
+      // Handle social login required (400 - Bad Request)
+      if (error.code === 'SOCIAL_LOGIN_REQUIRED') {
+        return res.status(400).json({
+          error: error.message,
+          code: error.code,
+          details: error.details
+        });
+      }
+
+      // Handle rate limiting (429 - Too Many Requests)
+      if (error.code === 'TOO_MANY_ATTEMPTS') {
+        return res.status(429).json({
           error: error.message,
           code: error.code,
           details: error.details
