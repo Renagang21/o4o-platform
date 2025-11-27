@@ -308,6 +308,7 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/users', userPermissionsLimiter, usersV1Routes);
   app.use('/v1/users', userPermissionsLimiter, usersV1Routes);
   app.use('/api/users', standardLimiter, userManagementRoutes);
+  app.use('/api/user', standardLimiter, userRoutes); // Authenticated user endpoints (profile, completeness, etc.)
 
   // User role and permissions management
   app.use('/api/v1/userRole', userPermissionsLimiter, userRoleRoutes);

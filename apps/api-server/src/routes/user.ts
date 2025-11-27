@@ -10,6 +10,9 @@ const userController = new UserController();
 // 현재 사용자 프로필 조회
 router.get('/profile', authenticate, userController.getProfile.bind(userController));
 
+// Phase 3-1: 프로필 완성도 조회
+router.get('/completeness', authenticate, userController.getProfileCompleteness.bind(userController));
+
 // 비즈니스 정보 업데이트
 router.put('/business-info', authenticate, userController.updateBusinessInfo.bind(userController));
 

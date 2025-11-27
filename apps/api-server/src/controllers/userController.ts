@@ -3,6 +3,7 @@ import { authService } from '../services/AuthService.js';
 import { UserRole, AuthRequest } from '../types/auth.js';
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
+import { ProfileCompletenessService } from '../services/profileCompletenessService.js';
 
 export class UserController {
   constructor() {
@@ -286,6 +287,43 @@ export class UserController {
           canSwitchRoles: user.hasMultipleRoles()
         },
         message: 'Role switched successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Internal server error'
+      });
+    }
+  }
+
+  // Phase 3-1: 프로필 완성도 조회
+  async getProfileCompleteness(req: Request, res: Response) {
+    try {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({
+        where: { id: (authReq.user as any).id || (authReq.user as any).userId }
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      const completeness = ProfileCompletenessService.calculateCompleteness(user);
+
+      res.json({
+        success: true,
+        data: completeness
       });
     } catch (error) {
       res.status(500).json({
