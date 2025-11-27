@@ -75,9 +75,23 @@ const RoleApplicationsAdminPage: FC = () => {
   };
 
   const handleReject = async (applicationId: string) => {
-    const reason = prompt('거부 사유를 입력하세요 (선택사항):');
+    // Phase 2-3: Rejection reason is now mandatory
+    let reason = prompt('거부 사유를 입력하세요 (필수, 최소 10자):');
+
     if (reason === null) {
       // User cancelled
+      return;
+    }
+
+    // Validate reason
+    reason = reason.trim();
+    if (!reason || reason.length < 10) {
+      alert('거부 사유는 최소 10자 이상 입력해야 합니다.');
+      return;
+    }
+
+    if (reason.length > 500) {
+      alert('거부 사유는 최대 500자까지 입력 가능합니다.');
       return;
     }
 
@@ -85,7 +99,7 @@ const RoleApplicationsAdminPage: FC = () => {
       setActionLoading(applicationId);
 
       await authClient.api.post(`/admin/roles/applications/${applicationId}/reject`, {
-        reason: reason || undefined
+        reason
       });
 
       // Show success message
@@ -95,7 +109,8 @@ const RoleApplicationsAdminPage: FC = () => {
       await fetchApplications(activeTab);
     } catch (err: any) {
       console.error('Failed to reject application:', err);
-      alert(err.response?.data?.message || '역할 신청 거부에 실패했습니다.');
+      const errorMessage = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || '역할 신청 거부에 실패했습니다.';
+      alert(errorMessage);
     } finally {
       setActionLoading(null);
     }

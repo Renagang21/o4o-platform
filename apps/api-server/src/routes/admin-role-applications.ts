@@ -232,12 +232,16 @@ router.post('/applications/:id/approve',
 /**
  * POST /api/v2/admin/roles/applications/:id/reject
  * Reject a role application (admin only)
+ * Phase 2-3: Rejection reason is now mandatory
  */
 router.post('/applications/:id/reject',
   requireAuth,
   requireAdmin,
   param('id').isUUID(),
-  body('reason').optional().isString().isLength({ max: 500 }),
+  body('reason')
+    .notEmpty().withMessage('Rejection reason is required')
+    .isString()
+    .isLength({ min: 10, max: 500 }).withMessage('Rejection reason must be between 10 and 500 characters'),
   async (req: AuthRequest, res) => {
     try {
       const errors = validationResult(req);
