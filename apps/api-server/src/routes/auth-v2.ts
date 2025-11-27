@@ -48,6 +48,13 @@ router.post('/login',
       console.error('[AUTH-V2 LOGIN ERROR]', error);
 
       // Handle authentication errors
+      if (error.code === 'USER_NOT_FOUND') {
+        return res.status(401).json({
+          error: error.message,
+          code: error.code
+        });
+      }
+
       if (error.code === 'INVALID_CREDENTIALS') {
         return res.status(401).json({
           error: error.message,

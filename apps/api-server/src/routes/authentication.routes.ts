@@ -97,6 +97,14 @@ router.post(
     } catch (error: any) {
       logger.error('Login error:', error);
 
+      if (error.code === 'USER_NOT_FOUND') {
+        return res.status(401).json({
+          success: false,
+          message: error.message,
+          code: error.code
+        });
+      }
+
       if (error.code === 'INVALID_CREDENTIALS') {
         return res.status(401).json({
           success: false,

@@ -23,6 +23,8 @@ export class SocialAuthService {
   static async handleSocialAuth(profile: SocialProfile): Promise<{ user: User; isNewUser: boolean }> {
     const userRepo = AppDataSource.getRepository(User);
 
+    console.log('[SOCIAL AUTH] Checking user:', profile.provider, profile.email);
+
     // Check if user exists by email or provider ID
     let user = await userRepo.findOne({
       where: [
@@ -32,9 +34,12 @@ export class SocialAuthService {
     });
 
     if (user) {
+      console.log('[SOCIAL AUTH] Existing user found:', user.id, 'provider:', user.provider, 'provider_id:', user.provider_id);
+
       // Existing user - check if we need to link accounts
       if (user.provider === 'local' && !user.provider_id) {
         // This is a local account with same email - link it
+        console.log('[SOCIAL AUTH] Linking local account to', profile.provider);
         user.provider = profile.provider;
         user.provider_id = profile.providerId;
         user.isEmailVerified = true; // Social emails are pre-verified
@@ -47,8 +52,11 @@ export class SocialAuthService {
       }
 
       await userRepo.save(user);
+      console.log('[SOCIAL AUTH] Returning existing user, isNewUser: false');
       return { user, isNewUser: false };
     }
+
+    console.log('[SOCIAL AUTH] No existing user, creating new user');
 
     // Create new user
     user = userRepo.create({
@@ -67,6 +75,7 @@ export class SocialAuthService {
     });
 
     await userRepo.save(user);
+    console.log('[SOCIAL AUTH] New user created:', user.id, 'isNewUser: true');
 
     // Send welcome email
     try {

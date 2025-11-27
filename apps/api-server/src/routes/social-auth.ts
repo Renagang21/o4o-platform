@@ -64,6 +64,9 @@ router.get('/google/callback',
     try {
       const { user, isNewUser } = req.user as any;
 
+      // Debug logging
+      console.log('[GOOGLE OAUTH] User:', user?.id, 'Email:', user?.email, 'isNewUser:', isNewUser);
+
       // Extract redirect_url from state
       let redirectUrl: string | undefined;
       const state = req.query.state as string;
@@ -77,6 +80,7 @@ router.get('/google/callback',
       }
 
       if (!user) {
+        console.log('[GOOGLE OAUTH] No user in req.user, redirecting to failure');
         return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
@@ -85,11 +89,16 @@ router.get('/google/callback',
       // Redirect to signup-complete if new user, otherwise to intended destination
       const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
       if (isNewUser) {
-        res.redirect(`${frontendUrl}/auth/signup-complete`);
+        const signupCompleteUrl = `${frontendUrl}/auth/signup-complete`;
+        console.log('[GOOGLE OAUTH] New user detected, redirecting to:', signupCompleteUrl);
+        res.redirect(signupCompleteUrl);
       } else {
-        res.redirect(getRedirectUrls(redirectUrl).success);
+        const successUrl = getRedirectUrls(redirectUrl).success;
+        console.log('[GOOGLE OAUTH] Existing user, redirecting to:', successUrl);
+        res.redirect(successUrl);
       }
     } catch (error: any) {
+      console.error('[GOOGLE OAUTH ERROR]', error);
       const state = req.query.state as string;
       let redirectUrl: string | undefined;
       if (state) {
@@ -119,6 +128,9 @@ router.get('/kakao/callback',
     try {
       const { user, isNewUser } = req.user as any;
 
+      // Debug logging
+      console.log('[KAKAO OAUTH] User:', user?.id, 'Email:', user?.email, 'isNewUser:', isNewUser);
+
       // Extract redirect_url from state
       let redirectUrl: string | undefined;
       const state = req.query.state as string;
@@ -132,6 +144,7 @@ router.get('/kakao/callback',
       }
 
       if (!user) {
+        console.log('[KAKAO OAUTH] No user in req.user, redirecting to failure');
         return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
@@ -140,12 +153,16 @@ router.get('/kakao/callback',
       // Redirect to signup-complete if new user, otherwise to intended destination
       const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
       if (isNewUser) {
-        res.redirect(`${frontendUrl}/auth/signup-complete`);
+        const signupCompleteUrl = `${frontendUrl}/auth/signup-complete`;
+        console.log('[KAKAO OAUTH] New user detected, redirecting to:', signupCompleteUrl);
+        res.redirect(signupCompleteUrl);
       } else {
-        res.redirect(getRedirectUrls(redirectUrl).success);
+        const successUrl = getRedirectUrls(redirectUrl).success;
+        console.log('[KAKAO OAUTH] Existing user, redirecting to:', successUrl);
+        res.redirect(successUrl);
       }
     } catch (error: any) {
-      // Error log removed
+      console.error('[KAKAO OAUTH ERROR]', error);
       const state = req.query.state as string;
       let redirectUrl: string | undefined;
       if (state) {
@@ -175,6 +192,9 @@ router.get('/naver/callback',
     try {
       const { user, isNewUser } = req.user as any;
 
+      // Debug logging
+      console.log('[NAVER OAUTH] User:', user?.id, 'Email:', user?.email, 'isNewUser:', isNewUser);
+
       // Extract redirect_url from state
       let redirectUrl: string | undefined;
       const state = req.query.state as string;
@@ -188,6 +208,7 @@ router.get('/naver/callback',
       }
 
       if (!user) {
+        console.log('[NAVER OAUTH] No user in req.user, redirecting to failure');
         return res.redirect(getRedirectUrls(redirectUrl).failure);
       }
 
@@ -196,12 +217,16 @@ router.get('/naver/callback',
       // Redirect to signup-complete if new user, otherwise to intended destination
       const frontendUrl = process.env.FRONTEND_URL || 'https://neture.co.kr';
       if (isNewUser) {
-        res.redirect(`${frontendUrl}/auth/signup-complete`);
+        const signupCompleteUrl = `${frontendUrl}/auth/signup-complete`;
+        console.log('[NAVER OAUTH] New user detected, redirecting to:', signupCompleteUrl);
+        res.redirect(signupCompleteUrl);
       } else {
-        res.redirect(getRedirectUrls(redirectUrl).success);
+        const successUrl = getRedirectUrls(redirectUrl).success;
+        console.log('[NAVER OAUTH] Existing user, redirecting to:', successUrl);
+        res.redirect(successUrl);
       }
     } catch (error: any) {
-      // Error log removed
+      console.error('[NAVER OAUTH ERROR]', error);
       const state = req.query.state as string;
       let redirectUrl: string | undefined;
       if (state) {

@@ -128,7 +128,7 @@ export class AuthenticationService {
 
     if (!user) {
       await this.logLoginAttempt(null, email, ipAddress, userAgent, false, 'account_not_found');
-      throw new InvalidCredentialsError();
+      throw new UserNotFoundError();
     }
 
     // Check if user has password (not social-only account)
