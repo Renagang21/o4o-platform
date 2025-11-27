@@ -5,6 +5,7 @@ import { AppDataSource } from '../database/connection.js';
 import { Product } from '../entities/Product.js';
 import { SellerProduct } from '../entities/SellerProduct.js';
 import { Seller } from '../entities/Seller.js';
+import { User } from '../entities/User.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -43,6 +44,7 @@ export class StorefrontController {
   private productRepository = AppDataSource.getRepository(Product);
   private sellerProductRepository = AppDataSource.getRepository(SellerProduct);
   private sellerRepository = AppDataSource.getRepository(Seller);
+  private userRepository = AppDataSource.getRepository(User);
 
   constructor() {
     this.orderService = new OrderService();
@@ -169,6 +171,20 @@ export class StorefrontController {
         paymentMethod: (requestData.payment_method as PaymentMethod) || PaymentMethod.CARD,
         customerNotes: ''
       });
+
+      // Phase 3-3: Update user profile with phone number for future auto-fill
+      if (req.user?.id && requestData.customer.phone) {
+        try {
+          await this.userRepository.update(
+            { id: req.user.id },
+            { phone: requestData.customer.phone }
+          );
+          logger.info(`Updated phone for user ${req.user.id}`);
+        } catch (error) {
+          // Don't fail order creation if phone update fails
+          logger.error('Failed to update user phone:', error);
+        }
+      }
 
       res.status(201).json({
         success: true,
