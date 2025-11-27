@@ -194,7 +194,7 @@ export class CreateAccountLinkingTables1738000000000 implements MigrationInterfa
           {
             name: 'userId',
             type: 'uuid',
-            isNullable: false,
+            isNullable: true,  // Allow null for failed login attempts from unregistered users
           },
           {
             name: 'action',
@@ -244,9 +244,9 @@ export class CreateAccountLinkingTables1738000000000 implements MigrationInterfa
       `CREATE INDEX "IDX_account_activities_action_provider" ON "account_activities" ("action", "provider")`
     );
 
-    // Create foreign key to users table
+    // Create foreign key to users table (nullable for unregistered user login attempts)
     await queryRunner.query(
-      `ALTER TABLE "account_activities" ADD CONSTRAINT "FK_account_activities_userId" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE`
+      `ALTER TABLE "account_activities" ADD CONSTRAINT "FK_account_activities_userId" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL`
     );
   }
 
