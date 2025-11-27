@@ -4,6 +4,7 @@ import { getAuthService } from './AuthService.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { emailService } from './emailService.js';
 import { Response } from 'express';
+import logger from '../utils/logger.js';
 
 interface SocialProfile {
   provider: 'google' | 'kakao' | 'naver';
@@ -23,7 +24,7 @@ export class SocialAuthService {
   static async handleSocialAuth(profile: SocialProfile): Promise<{ user: User; isNewUser: boolean }> {
     const userRepo = AppDataSource.getRepository(User);
 
-    console.log('[SOCIAL AUTH] Checking user:', profile.provider, profile.email);
+    logger.info('[SOCIAL AUTH] Checking user', { provider: profile.provider, email: profile.email });
 
     // Check if user exists by email or provider ID
     let user = await userRepo.findOne({
@@ -34,12 +35,16 @@ export class SocialAuthService {
     });
 
     if (user) {
-      console.log('[SOCIAL AUTH] Existing user found:', user.id, 'provider:', user.provider, 'provider_id:', user.provider_id);
+      logger.info('[SOCIAL AUTH] Existing user found', {
+        userId: user.id,
+        provider: user.provider,
+        providerId: user.provider_id
+      });
 
       // Existing user - check if we need to link accounts
       if (user.provider === 'local' && !user.provider_id) {
         // This is a local account with same email - link it
-        console.log('[SOCIAL AUTH] Linking local account to', profile.provider);
+        logger.info('[SOCIAL AUTH] Linking local account', { provider: profile.provider });
         user.provider = profile.provider;
         user.provider_id = profile.providerId;
         user.isEmailVerified = true; // Social emails are pre-verified
@@ -52,11 +57,11 @@ export class SocialAuthService {
       }
 
       await userRepo.save(user);
-      console.log('[SOCIAL AUTH] Returning existing user, isNewUser: false');
+      logger.info('[SOCIAL AUTH] Returning existing user', { isNewUser: false });
       return { user, isNewUser: false };
     }
 
-    console.log('[SOCIAL AUTH] No existing user, creating new user');
+    logger.info('[SOCIAL AUTH] No existing user, creating new user');
 
     // Create new user
     user = userRepo.create({
@@ -75,7 +80,7 @@ export class SocialAuthService {
     });
 
     await userRepo.save(user);
-    console.log('[SOCIAL AUTH] New user created:', user.id, 'isNewUser: true');
+    logger.info('[SOCIAL AUTH] New user created', { userId: user.id, isNewUser: true });
 
     // Send welcome email
     try {
