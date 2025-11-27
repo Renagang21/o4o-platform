@@ -84,7 +84,7 @@ export const CustomerDashboard: React.FC = () => {
       // authClient.baseURL already includes /api/v1, so use relative paths
       const [statsRes, ordersRes] = await Promise.allSettled([
         authClient.api.get('customer/dashboard/stats?range=90d'),
-        authClient.api.get('customer/orders/recent?limit=5')
+        authClient.api.get('customer/dashboard/orders/recent?limit=5')
       ]);
 
       // Process stats response
