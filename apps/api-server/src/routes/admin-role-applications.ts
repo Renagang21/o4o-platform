@@ -147,6 +147,24 @@ router.post('/applications/:id/approve',
 
         await transactionalEntityManager.save(RoleAssignment, assignment);
 
+        // Phase 2-5: Sync businessInfo to User entity
+        const user = await transactionalEntityManager.findOne(User, {
+          where: { id: application.userId }
+        });
+
+        if (user) {
+          // Map application data to BusinessInfo interface (Korean localized)
+          user.businessInfo = {
+            businessName: application.businessName || undefined,
+            businessNumber: application.businessNumber || undefined,
+            businessType: application.role, // Use role as business type (seller/supplier/partner)
+            // Additional fields can be added from application.metadata if available
+            ...(application.metadata || {})
+          };
+
+          await transactionalEntityManager.save(User, user);
+        }
+
         // Update application status
         application.status = RoleApplicationStatus.APPROVED;
         application.decidedAt = new Date();
