@@ -301,10 +301,6 @@ export class OrderService {
       query.andWhere('order.paymentStatus = :paymentStatus', { paymentStatus: filters.paymentStatus });
     }
 
-    if (filters.buyerType) {
-      query.andWhere('order.buyerType = :buyerType', { buyerType: filters.buyerType });
-    }
-
     if (filters.dateFrom) {
       query.andWhere('order.orderDate >= :dateFrom', { dateFrom: filters.dateFrom });
     }
