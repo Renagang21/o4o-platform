@@ -127,7 +127,7 @@ const OrderListPage: React.FC = () => {
       params.append('sortOrder', 'desc');
 
       const response = await authClient.api.get<OrdersResponse>(
-        `/api/v1/admin/orders?${params.toString()}`
+        `/admin/orders?${params.toString()}`
       );
 
       if (response.data.success) {

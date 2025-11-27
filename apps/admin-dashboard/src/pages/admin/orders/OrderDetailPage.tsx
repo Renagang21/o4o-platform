@@ -143,7 +143,7 @@ const OrderDetailPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await authClient.api.get<OrderResponse>(
-        `/api/v1/admin/orders/${id}`
+        `/admin/orders/${id}`
       );
 
       if (response.data.success) {
@@ -167,7 +167,7 @@ const OrderDetailPage: React.FC = () => {
     try {
       setStatusChanging(true);
       const response = await authClient.api.patch(
-        `/api/v1/admin/orders/${order.id}/status`,
+        `/admin/orders/${order.id}/status`,
         {
           status: newStatus,
           message: statusMessage || undefined
@@ -195,7 +195,7 @@ const OrderDetailPage: React.FC = () => {
     try {
       setShippingUpdating(true);
       const response = await authClient.api.patch(
-        `/api/v1/admin/orders/${order.id}/shipping`,
+        `/admin/orders/${order.id}/shipping`,
         shippingData
       );
 
