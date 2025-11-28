@@ -181,8 +181,8 @@ export class UserManagementController {
         password,
         firstName,
         lastName,
-        role: role || 'user',
-        roles: roles || [role || 'user'],
+        role: role || 'customer',
+        roles: roles || [role || 'customer'],
         status: status || 'pending'
       });
 

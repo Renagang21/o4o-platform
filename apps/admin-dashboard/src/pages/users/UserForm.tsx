@@ -46,7 +46,7 @@ export default function UserForm() {
       password: '',
       firstName: '',
       lastName: '',
-      roles: ['user'],
+      roles: ['customer'],
       status: 'pending',
     },
   });
@@ -101,7 +101,7 @@ export default function UserForm() {
         setValue('email', userData.email);
         setValue('firstName', userData.firstName || '');
         setValue('lastName', userData.lastName || '');
-        setValue('roles', userData.roles || [userData.role] || ['user']);
+        setValue('roles', userData.roles || [userData.role] || ['customer']);
         setValue('status', userData.status || 'pending');
       } else {
         throw new Error('Invalid user data received');

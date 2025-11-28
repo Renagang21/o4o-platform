@@ -60,12 +60,6 @@ export const ROLE_PERMISSIONS_LEGACY: Record<UserRole, string[]> = {
     'content.view', 'content.create', 'content.edit',
     'api.access'
   ],
-  [UserRole.VENDOR_MANAGER]: [
-    'users.view', 'users.create', 'users.edit',
-    'content.view', 'content.create', 'content.edit', 'content.publish',
-    'admin.analytics',
-    'api.access'
-  ],
   [UserRole.SELLER]: [
     'content.view', 'content.create',
     'api.access'

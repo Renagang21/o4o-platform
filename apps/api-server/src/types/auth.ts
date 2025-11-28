@@ -6,7 +6,6 @@ export enum UserRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
   VENDOR = 'vendor',
-  VENDOR_MANAGER = 'vendor_manager',
   SELLER = 'seller',
   USER = 'user',  // General user role (previously CUSTOMER)
   BUSINESS = 'business',
