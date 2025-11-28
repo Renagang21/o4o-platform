@@ -20,8 +20,8 @@ export default function ApiResponseChecker() {
 
       console.log('🔍 Searching for:', email);
 
-      // Search users by email
-      const searchResponse = await authClient.api.get(`/v1/users?search=${email}`);
+      // Search users by email (authClient.api already adds /v1/)
+      const searchResponse = await authClient.api.get(`/users?search=${email}`);
 
       console.log('📦 Search Response:', searchResponse.data);
 
@@ -30,7 +30,7 @@ export default function ApiResponseChecker() {
         setUserId(user.id);
 
         // Get full user details
-        const userResponse = await authClient.api.get(`/v1/users/${user.id}`);
+        const userResponse = await authClient.api.get(`/users/${user.id}`);
 
         console.log('👤 User Response:', userResponse.data);
         setResponse(userResponse.data);
@@ -59,7 +59,7 @@ export default function ApiResponseChecker() {
 
       console.log('🔍 Fetching user:', userId);
 
-      const userResponse = await authClient.api.get(`/v1/users/${userId}`);
+      const userResponse = await authClient.api.get(`/users/${userId}`);
 
       console.log('👤 User Response:', userResponse.data);
       setResponse(userResponse.data);
