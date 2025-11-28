@@ -78,7 +78,8 @@
       "Read(//var/**)",
       "Bash(pm2 restart:*)",
       "Read(//home/sohae21/.ssh/**)",
-      "Bash(./scripts/deploy-admin-manual.sh:*)"
+      "Bash(./scripts/deploy-admin-manual.sh:*)",
+      "Bash(xargs:*)"
     ],
     "deny": []
   }

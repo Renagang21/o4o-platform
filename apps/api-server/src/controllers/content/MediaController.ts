@@ -9,6 +9,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import sharp from 'sharp';
 
+// Cross-platform base directory configuration
+const getPublicDir = () => path.resolve(process.cwd(), 'public');
+const getUploadDir = (...subPaths: string[]) => path.join(getPublicDir(), 'uploads', ...subPaths);
+
 export class MediaController {
   private get mediaRepository() {
     return AppDataSource.getRepository(Media);
@@ -59,7 +63,7 @@ export class MediaController {
 
           // Determine file category and upload path
           const fileCategory = this.getFileCategory(file.mimetype);
-          const uploadDir = path.join(process.cwd(), 'public', 'uploads', fileCategory);
+          const uploadDir = getUploadDir(fileCategory);
           
           // Ensure upload directory exists
           if (!fs.existsSync(uploadDir)) {
@@ -436,10 +440,11 @@ export class MediaController {
         return;
       }
 
-      // Delete physical files if requested
+      // Delete physical files if requested (cross-platform compatible)
       if (deleteFiles === 'true') {
         try {
-          const filePath = path.join(process.cwd(), 'public', 'uploads', media.folderPath?.substring(1) || '', media.filename);
+          const folderPath = media.folderPath?.replace(/^\//, '') || '';
+          const filePath = getUploadDir(folderPath, media.filename);
           if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
           }
@@ -447,7 +452,7 @@ export class MediaController {
           // Delete variants
           if (media.variants) {
             for (const [size, url] of Object.entries(media.variants)) {
-              const variantPath = path.join(process.cwd(), 'public', 'uploads', url.replace('/uploads/', ''));
+              const variantPath = path.join(getPublicDir(), (url as string).replace(/^\//, ''));
               if (fs.existsSync(variantPath)) {
                 fs.unlinkSync(variantPath);
               }
@@ -512,8 +517,9 @@ export class MediaController {
         return;
       }
 
-      // Build file path (keep original filename and location)
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads', media.folderPath?.substring(1) || '');
+      // Build file path (keep original filename and location) - cross-platform
+      const folderPath = media.folderPath?.replace(/^\//, '') || '';
+      const uploadDir = getUploadDir(folderPath);
       const filePath = path.join(uploadDir, media.filename);
 
       // Ensure directory exists
@@ -595,7 +601,7 @@ export class MediaController {
     try {
       for (const [sizeName, dimensions] of Object.entries(sizes)) {
         const variantFileName = `${baseName}-${sizeName}${extension}`;
-        const variantPath = path.join(process.cwd(), 'public', 'uploads', category, variantFileName);
+        const variantPath = getUploadDir(category, variantFileName);
 
         await sharp(originalPath)
           .resize(dimensions.width, dimensions.height, {

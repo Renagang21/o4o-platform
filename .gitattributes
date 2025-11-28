@@ -1,0 +1,146 @@
+# =============================================================================
+# Git Attributes for Cross-Platform Development (Windows + Linux/AWS Lightsail)
+# =============================================================================
+
+# Default behavior: Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# =============================================================================
+# Explicit Text Files - Force LF line endings
+# =============================================================================
+
+# Source Code
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.vue text eol=lf
+*.svelte text eol=lf
+
+# Web Files
+*.html text eol=lf
+*.htm text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+
+# Data & Config
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.xml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.env text eol=lf
+*.env.* text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+
+# Shell Scripts (Critical for Linux execution)
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Windows Batch Files (Keep CRLF for Windows compatibility)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Git & CI/CD
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.editorconfig text eol=lf
+.prettierrc text eol=lf
+.eslintrc text eol=lf
+.eslintrc.* text eol=lf
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+Makefile text eol=lf
+.npmrc text eol=lf
+.nvmrc text eol=lf
+
+# Lock Files
+package-lock.json text eol=lf
+pnpm-lock.yaml text eol=lf
+yarn.lock text eol=lf
+
+# SQL Files
+*.sql text eol=lf
+
+# =============================================================================
+# Binary Files - Do not modify
+# =============================================================================
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg text eol=lf
+*.bmp binary
+*.tiff binary
+*.tif binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.rar binary
+*.7z binary
+
+# Media
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.wav binary
+*.ogg binary
+*.webm binary
+
+# Documents
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+
+# Executables
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# Node native addons
+*.node binary
+
+# =============================================================================
+# Linguist Settings (GitHub language detection)
+# =============================================================================
+
+# Exclude vendor/generated files from language stats
+node_modules/** linguist-vendored
+dist/** linguist-generated
+build/** linguist-generated
+*.min.js linguist-generated
+*.min.css linguist-generated
+
+# Documentation
+docs/** linguist-documentation
+*.md linguist-documentation

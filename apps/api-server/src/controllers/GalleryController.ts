@@ -8,10 +8,16 @@ import fs from 'fs/promises';
 import sharp from 'sharp';
 import crypto from 'crypto';
 
+// Cross-platform base directory configuration
+const getPublicDir = () => path.resolve(process.cwd(), 'public');
+const getUploadDir = (...subPaths: string[]) => path.join(getPublicDir(), 'uploads', ...subPaths);
+
 // Configure multer for gallery image uploads
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'gallery', new Date().getFullYear().toString(), (new Date().getMonth() + 1).toString().padStart(2, '0'));
+    const year = new Date().getFullYear().toString();
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+    const uploadDir = getUploadDir('gallery', year, month);
     
     try {
       await fs.mkdir(uploadDir, { recursive: true });
@@ -63,7 +69,7 @@ export class GalleryController {
    */
   private async generateImageVariants(imagePath: string, filename: string): Promise<any> {
     const variants: any = {};
-    const baseDir = path.join(process.cwd(), 'public', 'uploads', 'gallery');
+    const baseDir = getUploadDir('gallery');
     
     const sizes = [
       { name: 'thumbnail', width: 150, height: 150 },
@@ -129,8 +135,8 @@ export class GalleryController {
           // Generate thumbnails and variants
           const variants = await this.generateImageVariants(file.path, file.filename);
 
-          // Generate URL path
-          const uploadPath = file.path.replace(process.cwd() + '/public', '').replace(/\\/g, '/');
+          // Generate URL path (cross-platform compatible)
+          const uploadPath = '/' + path.relative(getPublicDir(), file.path).replace(/\\/g, '/');
           const fileUrl = uploadPath;
           const thumbnailUrl = variants.thumbnail || fileUrl;
 
@@ -357,9 +363,9 @@ export class GalleryController {
         });
       }
 
-      // Delete physical files
+      // Delete physical files (cross-platform compatible)
       try {
-        const filePath = path.join(process.cwd(), 'public', mediaFile.url);
+        const filePath = path.join(getPublicDir(), mediaFile.url.replace(/^\//, ''));
         await fs.unlink(filePath).catch(() => {});
 
         // Delete variants if they exist
@@ -367,7 +373,7 @@ export class GalleryController {
         if (metadata?.variants) {
           for (const variant of Object.values(metadata.variants)) {
             if (variant) {
-              const variantPath = path.join(process.cwd(), 'public', variant as string);
+              const variantPath = path.join(getPublicDir(), (variant as string).replace(/^\//, ''));
               await fs.unlink(variantPath).catch(() => {});
             }
           }
