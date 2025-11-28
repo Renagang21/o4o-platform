@@ -90,43 +90,43 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
   const roleOptions: Record<string, RoleOption> = {
     customer: {
       id: 'customer',
-      name: 'Customer',
-      description: 'Browse and purchase products',
+      name: '고객',
+      description: '상품을 둘러보고 주문 및 구매하세요.',
       path: '/workspace/customer',
       icon: '👤'
     },
     seller: {
       id: 'seller',
-      name: 'Seller',
-      description: 'Manage products and orders',
+      name: '판매자',
+      description: '상품과 주문을 관리하세요.',
       path: '/workspace/seller',
       icon: '🛒'
     },
     supplier: {
       id: 'supplier',
-      name: 'Supplier',
-      description: 'Supply and manage inventory',
+      name: '공급자',
+      description: '상품을 공급하고 재고를 관리하세요.',
       path: '/workspace/supplier',
       icon: '🏭'
     },
     partner: {
       id: 'partner',
-      name: 'Partner',
-      description: 'Promote products and earn',
+      name: '파트너',
+      description: '상품/서비스를 홍보하고 수익을 얻으세요.',
       path: '/workspace/partner',
       icon: '🤝'
     },
     admin: {
       id: 'admin',
-      name: 'Admin',
-      description: 'System administration',
+      name: '관리자',
+      description: '시스템 관리 및 운영',
       path: '/workspace/admin',
       icon: '⚙️'
     },
     administrator: {
       id: 'administrator',
-      name: 'Administrator',
-      description: 'System administration',
+      name: '관리자',
+      description: '시스템 관리 및 운영',
       path: '/workspace/admin',
       icon: '⚙️'
     }
@@ -142,7 +142,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
     // R-6-3: If currently on /account page, stay on /account with dashboard param
     if (location.pathname.startsWith('/account')) {
       navigate(`/account?dashboard=${newRole}`);
-      toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
+      toast.success(`${roleOptions[newRole]?.name || newRole}(으)로 전환되었습니다`);
       return;
     }
 
@@ -150,17 +150,17 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
     const targetPath = roleOptions[newRole]?.path || '/';
     navigate(targetPath);
 
-    toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
+    toast.success(`${roleOptions[newRole]?.name || newRole}(으)로 전환되었습니다`);
   };
 
   const trigger = (
     <button
       className="role-switcher-toggle flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-      aria-label="Switch role"
+      aria-label="역할 전환"
       tabIndex={0}
     >
       <Users size={18} />
-      {showLabel && <span className="text-sm font-medium">Switch Role</span>}
+      {showLabel && <span className="text-sm font-medium">역할 전환</span>}
     </button>
   );
 
@@ -169,9 +169,9 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
       <Dropdown trigger={trigger} alignment="right">
         {/* Header */}
         <div className="px-4 py-3 border-b border-gray-100">
-          <div className="text-sm font-medium text-gray-900">Select Role</div>
+          <div className="text-sm font-medium text-gray-900">역할 전환</div>
           <div className="text-xs text-gray-500 mt-0.5">
-            {activeAssignments.length} active role{activeAssignments.length > 1 ? 's' : ''}
+            {activeAssignments.length}개의 활동 중인 역할
           </div>
         </div>
 
@@ -215,7 +215,7 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
         {/* Footer Note */}
         <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
           <p className="text-xs text-gray-500">
-            Switching roles will navigate to the appropriate dashboard.
+            역할을 전환하면 해당 역할의 전용 워크스페이스(대시보드)로 이동합니다.
           </p>
         </div>
       </Dropdown>
