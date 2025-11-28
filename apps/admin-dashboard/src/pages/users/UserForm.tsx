@@ -223,6 +223,7 @@ export default function UserForm() {
                   <Input
                     id="email"
                     type="email"
+                    autoComplete="email"
                     {...register('email')}
                     placeholder="john.doe@example.com"
                     disabled={isEdit}
