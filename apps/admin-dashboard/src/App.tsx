@@ -819,7 +819,7 @@ function App() {
                       </Suspense>
                     } />
                     {/* Test - API Response Checker */}
-                    <Route path="/admin/test/api-check" element={
+                    <Route path="/test/api-response-checker" element={
                       <Suspense fallback={<PageLoader />}>
                         <ApiResponseChecker />
                       </Suspense>
