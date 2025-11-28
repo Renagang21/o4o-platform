@@ -4,6 +4,7 @@ import { AuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { useEffect, Suspense, lazy } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { EnvBadge } from '@/components/EnvBadge';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/stores/authStore';
 import '@/styles/wordpress-theme.css';
@@ -191,9 +192,10 @@ function App() {
     });
   };
 
-  
+
   return (
     <ErrorBoundary>
+      <EnvBadge />
       <ThemeProvider>
         <AuthProvider
           ssoClient={ssoClient}

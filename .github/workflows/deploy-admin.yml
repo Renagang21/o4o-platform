@@ -6,7 +6,7 @@ concurrency:
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]  # develop 브랜치도 자동 배포
     paths:
       - 'apps/admin-dashboard/**'
       - 'packages/**'
@@ -17,7 +17,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # main과 develop 둘 다 배포하므로 브랜치 제한 제거
+    # if: github.ref == 'refs/heads/main'
 
     steps:
     - name: Checkout code
@@ -50,10 +51,14 @@ jobs:
 
         # Build with production settings
         # Note: Do NOT include /v1 in VITE_API_URL - unified-client.ts adds it automatically
+        # Extract branch name from GITHUB_REF (refs/heads/main -> main)
+        BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+
         NODE_ENV=production \
         NODE_OPTIONS='--max-old-space-size=4096' \
         VITE_API_URL=https://api.neture.co.kr/api \
         VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
+        VITE_GIT_BRANCH="$BRANCH_NAME" \
         pnpm run build:prod
 
         # Ensure version.json is in dist/ (Vite should copy it, but verify)

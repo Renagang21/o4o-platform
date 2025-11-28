@@ -3,7 +3,7 @@ import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
 import { hasMenuPermission, getAccessibleMenus } from '@/config/rolePermissions';
 import { useEffect, useState } from 'react';
-import { authClient } from '@o4o/auth-client';
+import { unifiedApi } from '@/api/unified-client';
 
 /**
  * Admin menu hook that dynamically filters menus based on user roles and permissions
@@ -14,7 +14,7 @@ export const useAdminMenu = () => {
   const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [permissionsLoading, setPermissionsLoading] = useState(true);
-  
+
   // Fetch user permissions from API
   useEffect(() => {
     const fetchPermissions = async () => {
@@ -25,8 +25,14 @@ export const useAdminMenu = () => {
       }
 
       try {
-        // Fetch user permissions from API with authentication (authClient handles baseURL)
-        const response = await authClient.api.get(`/userRole/${user.id}/permissions`);
+        // Fetch user permissions from API with authentication (unifiedApi handles token)
+        // unifiedApi.raw uses the base API URL (e.g. /api), so we need to add /v1 if needed
+        // But unifiedApi.raw is just the axios instance.
+        // Let's check unifiedApi implementation again.
+        // unifiedApi.client.baseURL is set to .../api
+        // And v1 method adds /v1 prefix.
+        // So we should probably use unifiedApi.raw.get('/v1/userRole/...')
+        const response = await unifiedApi.raw.get(`/v1/userRole/${user.id}/permissions`);
         if (response.data?.success) {
           setUserPermissions(response.data.data?.permissions || []);
         } else {
@@ -50,13 +56,13 @@ export const useAdminMenu = () => {
 
     fetchPermissions();
   }, [user]);
-  
+
   // Inject CPT menus into static menu
   const allMenuItems = injectCPTMenuItems([...wordpressMenuItems], cptMenuItems);
-  
+
   // Get user roles (support multiple roles)
   const userRoles = (user as any)?.roles || (user?.role ? [user.role] : []);
-  
+
   // Filter menu items based on permissions
   const filterMenuItems = (items: any[]): any[] => {
     return items.map(item => {
@@ -102,7 +108,7 @@ export const useAdminMenu = () => {
   if (process.env.NODE_ENV === 'development') {
     console.debug(`[Menu] Showing ${filteredMenuItems.length}/${allMenuItems.length} menu items`);
   }
-  
+
   return {
     menuItems: filteredMenuItems,
     isLoading: cptLoading || permissionsLoading,
