@@ -817,12 +817,6 @@ function App() {
                         <UserEditTest />
                       </Suspense>
                     } />
-                    {/* Test - User Role Update */}
-                    <Route path="/admin/test/user-role-update" element={
-                      <Suspense fallback={<PageLoader />}>
-                        <UserRoleUpdateTest />
-                      </Suspense>
-                    } />
 
 
                     {/* System Monitoring */}
