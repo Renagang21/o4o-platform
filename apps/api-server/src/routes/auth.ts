@@ -190,7 +190,6 @@ const signupHandler = asyncHandler(async (req, res, next) => {
         return '/supplier/dashboard';
       case UserRole.ADMIN:
       case UserRole.SUPER_ADMIN:
-      case UserRole.MODERATOR:
         return '/admin';
       default:
         return '/';

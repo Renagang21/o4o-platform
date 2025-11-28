@@ -9,9 +9,7 @@ export enum UserRole {
   SELLER = 'seller',
   USER = 'user',  // General user role (previously CUSTOMER)
   BUSINESS = 'business',
-  MODERATOR = 'moderator',
   PARTNER = 'partner',
-  BETA_USER = 'beta_user',
   // Dropshipping roles
   SUPPLIER = 'supplier',  // 공급자: 상품 제공, 재고 관리
   AFFILIATE = 'affiliate', // 제휴자: 제휴 마케팅, 커미션
@@ -40,7 +38,6 @@ export interface JWTPayload {
   createdAt?: Date;
   updatedAt?: Date;
   lastLoginAt?: Date;
-  betaUserId?: string;
   iat?: number;
   exp?: number;
 }
@@ -65,7 +62,6 @@ export interface AuthRequest extends Request {
     lastLoginAt?: Date;
     vendorId?: string;
     supplierId?: string;
-    betaUserId?: string;
     domain?: string;
     // Add other User properties as needed
     validatePassword?(password: string): Promise<boolean>;
@@ -138,7 +134,6 @@ export interface AccessTokenPayload {
   permissions?: string[];
   domain?: string;
   sub?: string; // JWT standard claim
-  betaUserId?: string; // Beta user ID for beta features
   createdAt?: Date | string;
   updatedAt?: Date | string;
   lastLoginAt?: Date | string;

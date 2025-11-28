@@ -144,10 +144,6 @@ export class User {
   // @IsOptional()
   lockedUntil?: Date;
 
-  // Beta user ID for beta features
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  betaUserId?: string;
-
   // Domain for multi-tenant support
   @Column({ type: 'varchar', length: 255, nullable: true })
   domain?: string;

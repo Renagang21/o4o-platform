@@ -214,7 +214,17 @@ router.put('/:id', authenticate, requireAdmin, async (req: Request, res: Respons
         ? `${req.body.firstName} ${req.body.lastName}`
         : req.body.firstName || req.body.lastName || user.name;
     }
-    if (req.body.role) user.role = req.body.role;
+
+    // Handle both single role and roles array
+    if (req.body.roles && Array.isArray(req.body.roles) && req.body.roles.length > 0) {
+      // Update both role (first one) and roles array for backward compatibility
+      user.roles = req.body.roles;
+      user.role = req.body.roles[0]; // Set first role as primary
+    } else if (req.body.role) {
+      user.role = req.body.role;
+      user.roles = [req.body.role];
+    }
+
     if (req.body.status) user.status = req.body.status;
 
     const updatedUser = await userRepository.save(user);

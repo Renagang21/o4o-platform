@@ -44,12 +44,6 @@ export const PERMISSIONS_LEGACY = {
 export const ROLE_PERMISSIONS_LEGACY: Record<UserRole, string[]> = {
   [UserRole.SUPER_ADMIN]: Object.keys(PERMISSIONS_LEGACY),
   [UserRole.ADMIN]: Object.keys(PERMISSIONS_LEGACY),
-  [UserRole.MODERATOR]: [
-    'users.view', 'users.suspend', 'users.approve',
-    'content.view', 'content.edit', 'content.moderate', 'content.publish',
-    'admin.analytics', 'admin.logs',
-    'api.access'
-  ],
   [UserRole.MANAGER]: [
     'users.view',
     'content.view', 'content.create', 'content.edit', 'content.publish',
@@ -73,10 +67,6 @@ export const ROLE_PERMISSIONS_LEGACY: Record<UserRole, string[]> = {
     'api.access'
   ],
   [UserRole.PARTNER]: [
-    'content.view', 'content.create',
-    'api.access'
-  ],
-  [UserRole.BETA_USER]: [
     'content.view', 'content.create',
     'api.access'
   ],
