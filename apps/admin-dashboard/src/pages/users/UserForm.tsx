@@ -118,25 +118,36 @@ export default function UserForm() {
   const onSubmit = async (data: UserFormData) => {
     try {
       setLoading(true);
-      
-      const payload: any = {
-        ...data,
-        role: data.roles[0], // Primary role
-        name: `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.email
+
+      // Backend expects: email, firstName, lastName, status, roles
+      // Do NOT send: role (single), name, or empty password
+      const payload: Partial<UserFormData> = {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        status: data.status,
+        roles: data.roles
       };
 
       if (isEdit) {
         // Don't send password if it's empty
-        if (!payload.password) {
-          delete payload.password;
+        if (data.password && data.password.trim()) {
+          payload.password = data.password;
         }
-        
+
         await UserApi.updateUser(id, payload);
-        
+
         toast.success('User updated successfully');
       } else {
+        // For new users, password is required
+        if (!data.password || !data.password.trim()) {
+          toast.error('Password is required for new users');
+          return;
+        }
+        payload.password = data.password;
+
         await UserApi.createUser(payload);
-        
+
         toast.success('User created successfully');
       }
       
