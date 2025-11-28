@@ -1,5 +1,49 @@
 # Claude 작업 규칙
 
+## 브랜치 전략 (2025-11-28 업데이트)
+
+### 작업 브랜치
+- **`develop`**: 일상 개발 & 테스트 브랜치 (자동 배포됨)
+- **`main`**: 프로덕션 안정 브랜치 (검증된 코드만)
+- **`feature/*`**: 기능별 개발 (선택적, develop에 머지)
+
+### 작업 흐름
+```bash
+# 1. 작업 시작 (항상 develop에서)
+git checkout develop
+git pull origin develop
+
+# 2. 코드 수정 및 커밋
+git add .
+git commit -m "feat: 새 기능"
+
+# 3. develop 푸시 → 자동 배포
+git push origin develop
+# → 1-2분 후 https://admin.neture.co.kr 자동 업데이트
+# → 화면 상단에 "⚠️ 테스트 버전" 배지 표시
+
+# 4. 충분히 테스트 후 main 머지
+git checkout main
+git merge develop
+git push origin main
+# → 프로덕션 배포 완료
+```
+
+### 작업 환경 이동 시
+```bash
+# 새 환경에서 작업 시작 (PC → Laptop → Cafe PC)
+git checkout develop
+git pull origin develop  # ← 최신 코드 동기화
+
+# 코드 수정 후
+git push origin develop  # ← 자동 배포
+
+# 테스트
+https://admin.neture.co.kr  # ← 1-2분 후 업데이트됨
+```
+
+---
+
 ## 필수 작업 절차
 
 ### 1. 브라우저 테스트 우선
@@ -49,6 +93,38 @@
 - **방법**: `/admin/test/[기능명]` 경로에 최소 재현 페이지 생성
 - **목적**: 문제 발생 지점을 정확히 파악 (추측 없이)
 
+### 6. 로컬 테스트 (선택적)
+
+로컬 개발 서버는 **작업 환경이 고정되어 있을 때만** 유용합니다.
+작업 공간이 자주 바뀌면 **develop 브랜치 자동 배포**를 사용하세요.
+
+#### Admin Dashboard 로컬 서버
+```bash
+cd apps/admin-dashboard
+pnpm dev
+# → http://localhost:5173
+```
+
+#### Main Site 로컬 서버
+```bash
+cd apps/main-site
+pnpm dev
+# → http://localhost:5174
+```
+
+#### API 서버 로컬 실행 (선택적)
+```bash
+cd apps/api-server
+pnpm start:dev
+# → http://localhost:4000
+```
+
+**로컬 테스트의 한계:**
+- ❌ 작업 환경 이동 시마다 재설정 필요
+- ❌ node, pnpm 설치 필요
+- ❌ 패키지 설치 시간 소요
+- ✅ **권장**: develop 브랜치 푸시 → 웹 테스트
+
 ---
 
 # 인프라 구조
@@ -70,10 +146,25 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 - Main Site: `/var/www/neture.co.kr` (on o4o-web)
 
 ## 자동 배포
+
+### Admin Dashboard 배포
+- **Workflow**: `.github/workflows/deploy-admin.yml`
+- **Trigger**: `develop` 또는 `main` 브랜치 푸시
+- **시간**: 1-2분
+- **URL**: https://admin.neture.co.kr
+- **환경 구분**:
+  - `develop` 푸시: 화면 상단에 "⚠️ 테스트 버전" 배지 표시
+  - `main` 푸시: 배지 없음 (프로덕션)
+
+### API 서버 배포
 - **Workflow**: `.github/workflows/deploy-api.yml`
 - **Trigger**: `main` 브랜치 푸시
 - **시간**: 2-3분
 - **프로세스**: git pull → pnpm install → build → pm2 restart
+
+### Main Site 배포
+- **수동 배포**: `ssh o4o-web "cd /home/ubuntu/o4o-platform && ./scripts/deploy-main-site.sh"`
+- **URL**: https://neture.co.kr
 
 ---
 
@@ -92,4 +183,4 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 
 ---
 
-*최종 업데이트: 2025-11-06*
+*최종 업데이트: 2025-11-28*
