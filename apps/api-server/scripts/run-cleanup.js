@@ -33,16 +33,18 @@ async function cleanup() {
 
     // Step 1: Find users with vendor_manager
     console.log('\n📋 Step 1: Finding users with vendor_manager role...');
+    // Note: roles column is simple-array (comma-separated string), not PostgreSQL array
     const findQuery = `
       SELECT id, email, role, roles
       FROM users
-      WHERE 'vendor_manager' = ANY(roles) OR role = 'vendor_manager'
+      WHERE roles LIKE '%vendor_manager%' OR role = 'vendor_manager'
     `;
     const usersResult = await client.query(findQuery);
 
     console.log(`Found ${usersResult.rows.length} users with vendor_manager role:`);
     usersResult.rows.forEach(user => {
-      console.log(`  - ${user.email}: role=${user.role}, roles=[${user.roles.join(', ')}]`);
+      const rolesArray = user.roles ? user.roles.split(',') : [];
+      console.log(`  - ${user.email}: role=${user.role}, roles=[${rolesArray.join(', ')}]`);
     });
 
     if (usersResult.rows.length === 0) {
@@ -51,22 +53,33 @@ async function cleanup() {
       return;
     }
 
-    // Step 2: Remove vendor_manager from roles array
-    console.log('\n🔧 Step 2: Removing vendor_manager from roles arrays...');
+    // Step 2: Remove vendor_manager from roles string (simple-array)
+    console.log('\n🔧 Step 2: Removing vendor_manager from roles strings...');
+    // Simple-array format: "role1,role2,role3"
+    // Need to handle: ",vendor_manager", "vendor_manager,", and standalone "vendor_manager"
     const removeFromArrayQuery = `
       UPDATE users
-      SET roles = array_remove(roles, 'vendor_manager')
-      WHERE 'vendor_manager' = ANY(roles)
+      SET roles = CASE
+        -- Remove vendor_manager and clean up commas
+        WHEN roles = 'vendor_manager' THEN 'customer'
+        WHEN roles LIKE 'vendor_manager,%' THEN REPLACE(roles, 'vendor_manager,', '')
+        WHEN roles LIKE '%,vendor_manager' THEN REPLACE(roles, ',vendor_manager', '')
+        WHEN roles LIKE '%,vendor_manager,%' THEN REPLACE(roles, ',vendor_manager,', ',')
+        ELSE roles
+      END
+      WHERE roles LIKE '%vendor_manager%'
     `;
     const result1 = await client.query(removeFromArrayQuery);
-    console.log(`✅ Updated ${result1.rowCount} users' roles arrays`);
+    console.log(`✅ Updated ${result1.rowCount} users' roles strings`);
 
     // Step 3: Update primary role if it was vendor_manager
     console.log('\n🔧 Step 3: Updating primary role for vendor_manager users...');
     const updatePrimaryRoleQuery = `
       UPDATE users
       SET role = CASE
-        WHEN array_length(roles, 1) > 0 THEN roles[1]
+        -- Extract first role from simple-array string
+        WHEN roles LIKE '%,%' THEN SPLIT_PART(roles, ',', 1)
+        WHEN roles IS NOT NULL AND roles != '' THEN roles
         ELSE 'customer'
       END
       WHERE role = 'vendor_manager'
@@ -74,15 +87,15 @@ async function cleanup() {
     const result2 = await client.query(updatePrimaryRoleQuery);
     console.log(`✅ Updated ${result2.rowCount} users' primary role`);
 
-    // Step 4: Fix empty roles arrays
-    console.log('\n🔧 Step 4: Fixing empty roles arrays...');
+    // Step 4: Fix empty roles strings
+    console.log('\n🔧 Step 4: Fixing empty roles strings...');
     const fixEmptyArraysQuery = `
       UPDATE users
-      SET roles = ARRAY['customer']::text[]
-      WHERE array_length(roles, 1) IS NULL OR array_length(roles, 1) = 0
+      SET roles = 'customer'
+      WHERE roles IS NULL OR roles = '' OR roles = ','
     `;
     const result3 = await client.query(fixEmptyArraysQuery);
-    console.log(`✅ Fixed ${result3.rowCount} users with empty roles arrays`);
+    console.log(`✅ Fixed ${result3.rowCount} users with empty roles strings`);
 
     // Step 5: Verify cleanup
     console.log('\n✅ Step 5: Verifying cleanup...');
@@ -96,7 +109,8 @@ async function cleanup() {
 
     console.log('After cleanup:');
     verifyResult.rows.forEach(user => {
-      console.log(`  - ${user.email}: role=${user.role}, roles=[${user.roles.join(', ')}]`);
+      const rolesArray = user.roles ? user.roles.split(',') : [];
+      console.log(`  - ${user.email}: role=${user.role}, roles=[${rolesArray.join(', ')}]`);
     });
 
     console.log('\n🎉 Cleanup completed successfully!');
