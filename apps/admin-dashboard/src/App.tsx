@@ -133,7 +133,6 @@ const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
 const AuthInspector = lazy(() => import('@/pages/test/AuthInspector'));
 const DropshippingUsersTest = lazy(() => import('@/pages/test/DropshippingUsersTest'));
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
-const UserRoleUpdateTest = lazy(() => import('@/pages/test/UserRoleUpdateTest'));
 
 // Removed Apps Manager - using WordPress style menu
 

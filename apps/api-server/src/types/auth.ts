@@ -9,10 +9,9 @@ export enum UserRole {
   SELLER = 'seller',
   USER = 'user',  // General user role (previously CUSTOMER)
   BUSINESS = 'business',
-  PARTNER = 'partner',
+  PARTNER = 'partner',  // 파트너: 제휴 마케팅, 커미션 (AFFILIATE와 통합)
   // Dropshipping roles
   SUPPLIER = 'supplier',  // 공급자: 상품 제공, 재고 관리
-  AFFILIATE = 'affiliate', // 제휴자: 제휴 마케팅, 커미션
   // Legacy roles kept for backward compatibility
   MANAGER = 'manager',
   CUSTOMER = 'customer'  // Deprecated: Use USER instead

@@ -74,10 +74,6 @@ export const ROLE_PERMISSIONS_LEGACY: Record<UserRole, string[]> = {
     'content.view', 'content.create',
     'api.access'
   ],
-  [UserRole.AFFILIATE]: [
-    'content.view',
-    'api.access'
-  ],
   [UserRole.CUSTOMER]: [
     'content.view',
     'api.access'
