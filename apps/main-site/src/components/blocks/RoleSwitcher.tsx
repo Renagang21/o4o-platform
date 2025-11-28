@@ -1,11 +1,11 @@
 /**
- * H2-2-5: RoleSwitcher - Enhanced with API integration
+ * H2-2-5: RoleSwitcher - Client-side role switching
  *
  * - Uses /workspace/{role} URLs for unified workspace entry
  * - Detects current active role from URL
  * - RoleAssignment-based role checking
- * - Calls /user/preferences API to persist role preference
- * - Updates AuthContext to maintain role state
+ * - Client-side only (no server persistence)
+ * - URL-based navigation for role switching
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,7 +13,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, Check } from 'lucide-react';
 import { Dropdown } from '../common/Dropdown';
 import { useAuth } from '../../contexts/AuthContext';
-import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { trackRoleSwitch } from '../../utils/analytics';
 
@@ -133,35 +132,25 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ data = {} }) => {
     }
   };
 
-  // H2-2-5: Role switch with API integration
-  const handleRoleSwitch = async (newRole: string) => {
+  // H2-2-5: Role switch (client-side only, no server persistence)
+  const handleRoleSwitch = (newRole: string) => {
     const previousRole = activeRole || roleList[0];
 
-    try {
-      // Track analytics
-      trackRoleSwitch(previousRole, newRole);
+    // Track analytics
+    trackRoleSwitch(previousRole, newRole);
 
-      // Call API to persist role preference
-      await authClient.api.patch('/user/preferences', {
-        currentRole: newRole
-      });
-
-      // R-6-3: If currently on /account page, stay on /account with dashboard param
-      if (location.pathname.startsWith('/account')) {
-        navigate(`/account?dashboard=${newRole}`);
-        toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
-        return;
-      }
-
-      // Otherwise, navigate to workspace URL (will be redirected to actual dashboard)
-      const targetPath = roleOptions[newRole]?.path || '/';
-      navigate(targetPath);
-
+    // R-6-3: If currently on /account page, stay on /account with dashboard param
+    if (location.pathname.startsWith('/account')) {
+      navigate(`/account?dashboard=${newRole}`);
       toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
-    } catch (error: any) {
-      toast.error('Failed to switch role');
-      console.error('Role switch error:', error);
+      return;
     }
+
+    // Otherwise, navigate to workspace URL (will be redirected to actual dashboard)
+    const targetPath = roleOptions[newRole]?.path || '/';
+    navigate(targetPath);
+
+    toast.success(`Switched to ${roleOptions[newRole]?.name || newRole}`);
   };
 
   const trigger = (
