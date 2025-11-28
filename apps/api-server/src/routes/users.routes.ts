@@ -84,7 +84,7 @@ router.get('/new', (req, res) => {
     success: true,
     data: {
       user: null,
-      roles: ['admin', 'editor', 'author', 'customer', 'vendor']
+      roles: ['admin', 'moderator', 'manager', 'vendor', 'seller', 'user', 'business', 'partner']
     }
   });
 });
