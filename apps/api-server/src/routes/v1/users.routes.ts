@@ -206,6 +206,15 @@ router.put('/:id', authenticate, requireAdmin, async (req: Request, res: Respons
       });
     }
 
+    // Debug logging
+    logger.info('Update user request body:', {
+      userId: req.params.id,
+      roles: req.body.roles,
+      role: req.body.role,
+      isArray: Array.isArray(req.body.roles),
+      rolesLength: req.body.roles?.length
+    });
+
     // Update allowed fields
     if (req.body.email) user.email = req.body.email;
     if (req.body.password) user.password = req.body.password; // Will be hashed in entity
@@ -218,12 +227,19 @@ router.put('/:id', authenticate, requireAdmin, async (req: Request, res: Respons
     // Handle both single role and roles array
     if (req.body.roles && Array.isArray(req.body.roles) && req.body.roles.length > 0) {
       // Update both role (first one) and roles array for backward compatibility
+      logger.info('Setting user roles:', { roles: req.body.roles });
       user.roles = req.body.roles;
       user.role = req.body.roles[0]; // Set first role as primary
     } else if (req.body.role) {
+      logger.info('Setting single role:', { role: req.body.role });
       user.role = req.body.role;
       user.roles = [req.body.role];
     }
+
+    logger.info('User before save:', {
+      roles: user.roles,
+      role: user.role
+    });
 
     if (req.body.status) user.status = req.body.status;
 
