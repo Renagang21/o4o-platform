@@ -97,6 +97,11 @@ const ForumCategories = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/Fo
 const ForumPostDetail = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostDetail'));
 const ForumPostForm = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostForm'));
 
+// Yaksa Community Pages (from @o4o-apps/forum-yaksa package - source imports)
+const YaksaCommunityList = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityList'));
+const YaksaCommunityDetail = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
+const YaksaCommunityFeed = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
+
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
@@ -798,6 +803,35 @@ function App() {
                         <AppRouteGuard appId="forum">
                           <Suspense fallback={<PageLoader />}>
                             <ForumPostForm />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Yaksa Community - App-based routes with AppRouteGuard */}
+                    <Route path="/yaksa/communities" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum-yaksa">
+                          <Suspense fallback={<PageLoader />}>
+                            <YaksaCommunityList />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/yaksa/communities/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum-yaksa">
+                          <Suspense fallback={<PageLoader />}>
+                            <YaksaCommunityDetail />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/yaksa/communities/:id/feed" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum-yaksa">
+                          <Suspense fallback={<PageLoader />}>
+                            <YaksaCommunityFeed />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

@@ -168,6 +168,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'forum-posts', label: '게시글 관리', icon: <FileText className="w-4 h-4" />, path: '/forum/posts' },
       { id: 'forum-comments', label: '댓글 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/comments' },
       { id: 'forum-reports', label: '신고 관리', icon: <Shield className="w-4 h-4" />, path: '/forum/reports' },
+      { id: 'yaksa-communities', label: 'Yaksa 커뮤니티', icon: <Users className="w-4 h-4" />, path: '/yaksa/communities', appId: 'forum-yaksa' },
       { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
     ]
   },

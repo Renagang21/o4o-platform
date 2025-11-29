@@ -157,6 +157,10 @@ import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 // Phase PD-9 - Multichannel RPA Routes
 import channelsRoutes from '../routes/v1/channels.routes.js';
 
+// Yaksa Community Routes
+import yaksaCommunityRoutes from '../routes/yaksa/community.routes.js';
+import yaksaPostRoutes from '../routes/yaksa/post.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -396,6 +400,10 @@ export function setupRoutes(app: Application): void {
 
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);
+
+  // Yaksa Community Routes
+  app.use('/api/v1/yaksa/forum/communities', standardLimiter, yaksaCommunityRoutes);
+  app.use('/api/v1/yaksa/forum/posts', standardLimiter, yaksaPostRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization
   app.use('/api/v1/ds/seller/authorizations', standardLimiter, dsSellerAuthorizationRoutes);

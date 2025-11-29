@@ -1,0 +1,66 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index
+} from 'typeorm';
+import type { User } from '../../../../../apps/api-server/src/entities/User.js';
+
+export enum CommunityType {
+  PERSONAL = 'personal',
+  BRANCH = 'branch',
+  DIVISION = 'division',
+  GLOBAL = 'global'
+}
+
+@Entity('yaksa_forum_community')
+@Index(['type', 'ownerUserId'])
+export class YaksaCommunity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column({ type: 'varchar', length: 200 })
+  name!: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
+
+  @Column({ type: 'enum', enum: CommunityType, default: CommunityType.PERSONAL })
+  type!: CommunityType;
+
+  @Column({ type: 'uuid' })
+  ownerUserId!: string;
+
+  @Column({ type: 'boolean', default: false })
+  requireApproval!: boolean;
+
+  @Column({ type: 'json', nullable: true })
+  metadata?: Record<string, unknown>;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
+
+  // Relations
+  @ManyToOne('User')
+  @JoinColumn({ name: 'ownerUserId' })
+  owner?: User;
+
+  // Methods
+  canUserManage(userId: string, userRole: string): boolean {
+    if (['Super Administrator', 'Administrator'].includes(userRole)) return true;
+    if (this.ownerUserId === userId) return true;
+    return false;
+  }
+
+  canUserView(): boolean {
+    // All authenticated users can view communities
+    return true;
+  }
+}

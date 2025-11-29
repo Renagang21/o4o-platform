@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "description": "Forum Extension for Yaksa Organization - Drug database, case studies, and pharmacy management",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/packages/forum-yaksa/src/index.js",
+  "types": "dist/packages/forum-yaksa/src/index.d.ts",
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
