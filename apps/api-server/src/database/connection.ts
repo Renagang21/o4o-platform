@@ -110,7 +110,7 @@ import { SupplierProfile } from '../entities/SupplierProfile.js';
 import { SellerProfile } from '../entities/SellerProfile.js';
 import { PartnerProfile } from '../entities/PartnerProfile.js';
 // Forum App entities (from @o4o-apps/forum package)
-import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum/src/backend/entities/index.js';
+import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';

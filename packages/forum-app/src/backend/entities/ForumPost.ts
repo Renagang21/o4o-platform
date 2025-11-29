@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory.js';
-import type { User } from './User.js';
+import type { User } from '../../../../../apps/api-server/src/entities/User.js';
 
 export enum PostStatus {
   DRAFT = 'draft',

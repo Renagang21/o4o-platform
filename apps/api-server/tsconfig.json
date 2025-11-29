@@ -27,6 +27,10 @@
     "noImplicitReturns": false,
     "strictPropertyInitialization": false,
     "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@o4o-apps/forum": ["../../packages/forum-app"]
+    },
     "types": [
       "node"
     ],
