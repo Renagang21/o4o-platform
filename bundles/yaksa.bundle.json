@@ -1,0 +1,75 @@
+{
+  "bundleId": "yaksa-organization-v1",
+  "name": "약사 조직 관리 플랫폼",
+  "version": "1.0.0",
+  "description": "약사 조직 및 지점 관리에 최적화된 앱 조합 (B2B, 포럼, 교육)",
+  "type": "service-bundle",
+  "targetService": "yaksa.site",
+
+  "apps": [
+    {
+      "appId": "b2b-core",
+      "version": ">=3.0.0",
+      "required": true,
+      "description": "B2B 거래 관리 코어 엔진"
+    },
+    {
+      "appId": "b2b-yaksa",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "약사 조직 특화 B2B (도매, 거래처 관리)"
+    },
+    {
+      "appId": "forum-core",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "커뮤니티 포럼 코어 엔진"
+    },
+    {
+      "appId": "forum-yaksa",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "약사 특화 포럼 (복약지도, 케이스 스터디)"
+    },
+    {
+      "appId": "education-core",
+      "version": ">=1.0.0",
+      "required": false,
+      "description": "교육 관리 시스템 (선택사항)"
+    },
+    {
+      "appId": "attendance-core",
+      "version": ">=1.0.0",
+      "required": false,
+      "description": "출퇴근 관리 (선택사항)"
+    }
+  ],
+
+  "bundleConfig": {
+    "theme": "yaksa",
+    "brandColor": "#1E40AF",
+    "accentColor": "#3B82F6",
+    "features": {
+      "branchManagement": true,
+      "drugDatabase": true,
+      "caseStudySharing": true,
+      "educationTracking": true,
+      "requireApproval": true
+    }
+  },
+
+  "installOrder": [
+    "b2b-core",
+    "b2b-yaksa",
+    "forum-core",
+    "forum-yaksa",
+    "education-core",
+    "attendance-core"
+  ],
+
+  "metadata": {
+    "author": "O4O Platform Team",
+    "createdAt": "2025-11-29",
+    "tags": ["pharmacy", "b2b", "healthcare", "organization"]
+  }
+}

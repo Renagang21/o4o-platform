@@ -1,0 +1,74 @@
+{
+  "bundleId": "neture-cosmetics-v1",
+  "name": "Neture 화장품 매장 플랫폼",
+  "version": "1.0.0",
+  "description": "화장품 쇼핑몰에 최적화된 앱 조합 (카탈로그, 포럼, 리뷰 시스템)",
+  "type": "service-bundle",
+  "targetService": "neture.co.kr",
+
+  "apps": [
+    {
+      "appId": "catalog-core",
+      "version": ">=2.0.0",
+      "required": true,
+      "description": "상품 카탈로그 코어 엔진"
+    },
+    {
+      "appId": "catalog-neture",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "Neture 화장품 특화 카탈로그 (성분 분석, 피부타입 필터)"
+    },
+    {
+      "appId": "forum-core",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "커뮤니티 포럼 코어 엔진"
+    },
+    {
+      "appId": "forum-neture",
+      "version": ">=1.0.0",
+      "required": true,
+      "description": "Neture 화장품 특화 포럼 (사용후기, 루틴 공유)"
+    },
+    {
+      "appId": "review-core",
+      "version": ">=1.0.0",
+      "required": false,
+      "description": "리뷰 시스템 (선택사항)"
+    },
+    {
+      "appId": "wishlist-core",
+      "version": ">=1.0.0",
+      "required": false,
+      "description": "위시리스트 (선택사항)"
+    }
+  ],
+
+  "bundleConfig": {
+    "theme": "neture",
+    "brandColor": "#8B7355",
+    "accentColor": "#E8B4B8",
+    "features": {
+      "skinTypeFilter": true,
+      "ingredientAnalysis": true,
+      "routineBuilder": true,
+      "productRecommendation": true
+    }
+  },
+
+  "installOrder": [
+    "catalog-core",
+    "catalog-neture",
+    "forum-core",
+    "forum-neture",
+    "review-core",
+    "wishlist-core"
+  ],
+
+  "metadata": {
+    "author": "O4O Platform Team",
+    "createdAt": "2025-11-29",
+    "tags": ["cosmetics", "beauty", "retail", "b2c"]
+  }
+}
