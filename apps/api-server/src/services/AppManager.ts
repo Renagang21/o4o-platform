@@ -7,8 +7,14 @@ import { isNewerVersion } from '../utils/semver.js';
 import { AppDependencyResolver, DependencyError } from './AppDependencyResolver.js';
 import { AppDataCleaner } from './AppDataCleaner.js';
 import { AppTableOwnershipResolver, OwnershipValidationError } from './AppTableOwnershipResolver.js';
-import type { AppManifest } from '@o4o/types';
+import { PermissionService } from './PermissionService.js';
+import { acfRegistry } from './ACFRegistry.js';
+import { registry as cptRegistry } from '@o4o/cpt-registry';
+import type { AppManifest, InstallContext, ActivateContext, DeactivateContext, UninstallContext } from '@o4o/types';
 import logger from '../utils/logger.js';
+import { pathToFileURL } from 'url';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * AppManager Service
@@ -22,12 +28,14 @@ export class AppManager {
   private dependencyResolver: AppDependencyResolver;
   private dataCleaner: AppDataCleaner;
   private ownershipResolver: AppTableOwnershipResolver;
+  private permissionService: PermissionService;
 
   constructor() {
     this.repo = AppDataSource.getRepository(AppRegistry);
     this.dependencyResolver = new AppDependencyResolver();
     this.dataCleaner = new AppDataCleaner();
     this.ownershipResolver = new AppTableOwnershipResolver();
+    this.permissionService = new PermissionService();
   }
 
   /**
@@ -133,7 +141,54 @@ export class AppManager {
 
     await this.repo.save(entry);
 
-    // TODO: Run lifecycle.install hook
+    // Register Permissions
+    if (manifest.permissions && manifest.permissions.length > 0) {
+      logger.info(`[AppManager] Registering ${manifest.permissions.length} permissions for ${appId}`);
+      await this.permissionService.registerPermissions(appId, manifest.permissions);
+    }
+
+    // Register CPT definitions
+    if (manifest.cpt && manifest.cpt.length > 0) {
+      logger.info(`[AppManager] Registering ${manifest.cpt.length} CPT types for ${appId}`);
+      for (const cptDef of manifest.cpt) {
+        try {
+          // Convert manifest CPT definition to CPT Registry schema format
+          const cptSchema = {
+            name: cptDef.name,
+            storage: cptDef.storage || 'entity',
+            fields: [], // Will be populated from entity or schema file
+            metadata: {
+              label: cptDef.label,
+              supports: cptDef.supports,
+              appId,
+            },
+          };
+          cptRegistry.register(cptSchema as any);
+          logger.info(`[AppManager] ✓ Registered CPT: ${cptDef.name}`);
+        } catch (error) {
+          logger.error(`[AppManager] Failed to register CPT "${cptDef.name}":`, error);
+        }
+      }
+    }
+
+    // Register ACF field groups
+    if (manifest.acf && manifest.acf.length > 0) {
+      logger.info(`[AppManager] Registering ${manifest.acf.length} ACF groups for ${appId}`);
+      acfRegistry.registerMultiple(appId, manifest.acf);
+    }
+
+    // Run lifecycle.install hook
+    if (manifest.lifecycle?.install) {
+      logger.info(`[AppManager] Running install hook for ${appId}`);
+      try {
+        await this.runLifecycleHook(appId, manifest, manifest.lifecycle.install, 'install');
+        logger.info(`[AppManager] ✓ Install hook completed for ${appId}`);
+      } catch (error) {
+        logger.error(`[AppManager] Install hook failed for ${appId}:`, error);
+        throw new Error(`Installation failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
     // TODO: Run migrations (if core app)
   }
 
@@ -161,12 +216,27 @@ export class AppManager {
       throw new Error(`App ${appId} is not installed`);
     }
 
+    // Load manifest
+    const manifest = hasManifest(appId) ? loadLocalManifest(appId) : null;
+
+    // Run lifecycle.activate hook
+    if (manifest?.lifecycle?.activate) {
+      logger.info(`[AppManager] Running activate hook for ${appId}`);
+      try {
+        await this.runLifecycleHook(appId, manifest, manifest.lifecycle.activate, 'activate');
+        logger.info(`[AppManager] ✓ Activate hook completed for ${appId}`);
+      } catch (error) {
+        logger.error(`[AppManager] Activate hook failed for ${appId}:`, error);
+        throw new Error(`Activation failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
     entry.status = 'active';
     entry.updatedAt = new Date();
 
     await this.repo.save(entry);
 
-    // TODO: Future - Update route/menu registration based on app status
+    logger.info(`[AppManager] ✓ App ${appId} activated successfully`);
   }
 
   /**
@@ -182,12 +252,27 @@ export class AppManager {
       throw new Error(`App ${appId} is not installed`);
     }
 
+    // Load manifest
+    const manifest = hasManifest(appId) ? loadLocalManifest(appId) : null;
+
+    // Run lifecycle.deactivate hook
+    if (manifest?.lifecycle?.deactivate) {
+      logger.info(`[AppManager] Running deactivate hook for ${appId}`);
+      try {
+        await this.runLifecycleHook(appId, manifest, manifest.lifecycle.deactivate, 'deactivate');
+        logger.info(`[AppManager] ✓ Deactivate hook completed for ${appId}`);
+      } catch (error) {
+        logger.error(`[AppManager] Deactivate hook failed for ${appId}:`, error);
+        // Don't throw - allow deactivation to proceed
+      }
+    }
+
     entry.status = 'inactive';
     entry.updatedAt = new Date();
 
     await this.repo.save(entry);
 
-    // TODO: Future - Update route/menu registration based on app status
+    logger.info(`[AppManager] ✓ App ${appId} deactivated successfully`);
   }
 
   /**
@@ -318,10 +403,33 @@ export class AppManager {
       logger.info(`[AppManager] Keeping data for ${appId} (keep-data mode)`);
     }
 
-    // TODO: Run lifecycle.uninstall hook
+    // Run lifecycle.uninstall hook
+    if (manifest?.lifecycle?.uninstall) {
+      logger.info(`[AppManager] Running uninstall hook for ${appId}`);
+      try {
+        await this.runLifecycleHook(appId, manifest, manifest.lifecycle.uninstall, 'uninstall', { purgeData: shouldPurge });
+        logger.info(`[AppManager] ✓ Uninstall hook completed for ${appId}`);
+      } catch (error) {
+        logger.error(`[AppManager] Uninstall hook failed for ${appId}:`, error);
+        // Don't throw - allow uninstall to proceed
+      }
+    }
+
+    // Remove Permissions
+    logger.info(`[AppManager] Removing permissions for ${appId}`);
+    await this.permissionService.deletePermissionsByApp(appId);
+
+    // Unregister ACF groups
+    logger.info(`[AppManager] Unregistering ACF groups for ${appId}`);
+    acfRegistry.unregisterByApp(appId);
+
+    // Note: CPT unregistration is complex (may be shared), skip for now
+    // TODO: Add CPT reference counting or ownership management
 
     // Remove from registry
     await this.repo.remove(entry);
+
+    logger.info(`[AppManager] ✓ App ${appId} uninstalled successfully`);
   }
 
   /**
@@ -401,5 +509,83 @@ export class AppManager {
         installedAt: 'DESC',
       },
     });
+  }
+
+  /**
+   * Run a lifecycle hook from an app's manifest
+   *
+   * @param appId - App identifier
+   * @param manifest - App manifest
+   * @param hookPath - Relative path to hook module (from app package)
+   * @param hookType - Type of hook (install/activate/deactivate/uninstall)
+   * @param options - Additional options to pass to hook
+   * @private
+   */
+  private async runLifecycleHook(
+    appId: string,
+    manifest: AppManifest,
+    hookPath: string,
+    hookType: 'install' | 'activate' | 'deactivate' | 'uninstall',
+    options?: Record<string, any>
+  ): Promise<void> {
+    try {
+      // Resolve hook module path
+      // Hook path is relative to the app package (e.g., './lifecycle/install.js')
+      // For now, we'll import from the published @o4o-apps/{app-name} package
+      const packageName = this.getAppPackageName(appId);
+      const hookModule = hookPath.replace(/^\.\//, '').replace(/\.js$/, '.js');
+      const modulePath = `${packageName}/${hookModule}`;
+
+      logger.info(`[AppManager] Loading lifecycle hook: ${modulePath}`);
+
+      // Dynamic import
+      const module = await import(modulePath);
+
+      // Determine hook function name based on type
+      const hookFunctionName = hookType; // e.g., 'install', 'activate', etc.
+      const hookFunction = module[hookFunctionName] || module.default;
+
+      if (typeof hookFunction !== 'function') {
+        throw new Error(
+          `Lifecycle hook "${hookFunctionName}" not found or not a function in module: ${modulePath}`
+        );
+      }
+
+      // Prepare context based on hook type
+      const baseContext = {
+        appId,
+        manifest,
+        dataSource: AppDataSource,
+        logger,
+        options: options || {},
+      };
+
+      // Call the hook function
+      await hookFunction(baseContext);
+
+    } catch (error) {
+      logger.error(`[AppManager] Failed to run ${hookType} hook for ${appId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the npm package name for an app
+   * Maps appId to package name (e.g., 'forum-core' -> '@o4o-apps/forum')
+   *
+   * @param appId - App identifier
+   * @returns Package name
+   * @private
+   */
+  private getAppPackageName(appId: string): string {
+    // Map common app IDs to package names
+    const packageMap: Record<string, string> = {
+      'forum-core': '@o4o-apps/forum',
+      'forum-neture': '@o4o-apps/forum-neture',
+      'forum-yaksa': '@o4o-apps/forum-yaksa',
+      // Add more mappings as needed
+    };
+
+    return packageMap[appId] || `@o4o-apps/${appId}`;
   }
 }

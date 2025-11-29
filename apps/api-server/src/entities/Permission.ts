@@ -13,6 +13,7 @@ import type { Role } from './Role.js';
 @Index(['key'], { unique: true })
 @Index(['category'])
 @Index(['isActive'])
+@Index(['appId'])
 export class Permission {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -28,6 +29,10 @@ export class Permission {
   // Permission category (e.g., 'users', 'content', 'admin')
   @Column({ type: 'varchar', length: 50 })
   category!: string;
+
+  // App that owns this permission (nullable for system permissions)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  appId?: string;
 
   // Active status
   @Column({ type: 'boolean', default: true })

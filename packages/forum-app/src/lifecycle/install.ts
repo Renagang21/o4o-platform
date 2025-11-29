@@ -8,49 +8,41 @@
  * - Initialize default categories (optional)
  */
 
-export interface InstallContext {
-  appId: string;
-  version: string;
-  db: any; // TypeORM connection
-  options?: {
-    adoptExistingTables?: boolean;
-    seedDefaultData?: boolean;
-  };
-}
+import type { InstallContext } from '@o4o/types';
 
 export async function install(context: InstallContext): Promise<void> {
-  const { db, options = {} } = context;
+  const { dataSource, options = {}, logger } = context;
   const { adoptExistingTables = true, seedDefaultData = false } = options;
 
-  console.log('[forum-core] Installing...');
+  logger.info('[forum-core] Installing...');
 
   // 1. Check for existing tables
   if (adoptExistingTables) {
-    const hasForumTables = await checkForumTablesExist(db);
+    const hasForumTables = await checkForumTablesExist(dataSource);
     if (hasForumTables) {
-      console.log('[forum-core] Existing forum tables found. Adopting them.');
+      logger.info('[forum-core] Existing forum tables found. Adopting them.');
     } else {
-      console.log('[forum-core] No existing tables. Will create during migration.');
+      logger.info('[forum-core] No existing tables. Will create during migration.');
     }
   }
 
   // 2. Seed forum permissions
-  await seedForumPermissions(db);
+  await seedForumPermissions(dataSource, logger);
 
   // 3. Seed default categories (optional)
   if (seedDefaultData) {
-    await seedDefaultCategories(db);
+    await seedDefaultCategories(dataSource, logger);
   }
 
-  console.log('[forum-core] Installation completed successfully.');
+  logger.info('[forum-core] Installation completed successfully.');
 }
 
 /**
  * Check if forum tables exist in the database
  */
-async function checkForumTablesExist(db: any): Promise<boolean> {
+async function checkForumTablesExist(dataSource: any): Promise<boolean> {
   try {
-    const queryRunner = db.createQueryRunner();
+    const queryRunner = dataSource.createQueryRunner();
     const tables = await queryRunner.getTables();
     await queryRunner.release();
 
@@ -65,60 +57,61 @@ async function checkForumTablesExist(db: any): Promise<boolean> {
       tables.some((table: any) => table.name === tableName)
     );
   } catch (error) {
-    console.error('[forum-core] Error checking tables:', error);
     return false;
   }
 }
 
 /**
  * Seed forum-core permissions
+ * Note: Permissions are now managed by PermissionService in AppManager
+ * This function is kept for backward compatibility
  */
-async function seedForumPermissions(db: any): Promise<void> {
-  const permissionRepository = db.getRepository('Permission');
+async function seedForumPermissions(dataSource: any, logger: any): Promise<void> {
+  const permissionRepository = dataSource.getRepository('Permission');
 
   const forumPermissions = [
     {
-      name: 'forum.read',
+      key: 'forum.read',
       description: '포럼 게시글 읽기',
-      resource: 'forum',
-      action: 'read',
+      category: 'forum',
+      appId: 'forum-core',
     },
     {
-      name: 'forum.write',
+      key: 'forum.write',
       description: '포럼 게시글 작성',
-      resource: 'forum',
-      action: 'write',
+      category: 'forum',
+      appId: 'forum-core',
     },
     {
-      name: 'forum.comment',
+      key: 'forum.comment',
       description: '포럼 댓글 작성',
-      resource: 'forum',
-      action: 'comment',
+      category: 'forum',
+      appId: 'forum-core',
     },
     {
-      name: 'forum.moderate',
+      key: 'forum.moderate',
       description: '포럼 모더레이션',
-      resource: 'forum',
-      action: 'moderate',
+      category: 'forum',
+      appId: 'forum-core',
     },
     {
-      name: 'forum.admin',
+      key: 'forum.admin',
       description: '포럼 관리',
-      resource: 'forum',
-      action: 'admin',
+      category: 'forum',
+      appId: 'forum-core',
     },
   ];
 
   for (const perm of forumPermissions) {
     const exists = await permissionRepository.findOne({
-      where: { name: perm.name },
+      where: { key: perm.key },
     });
 
     if (!exists) {
       await permissionRepository.save(perm);
-      console.log(`[forum-core] Permission created: ${perm.name}`);
+      logger.info(`[forum-core] Permission created: ${perm.key}`);
     } else {
-      console.log(`[forum-core] Permission exists: ${perm.name}`);
+      logger.info(`[forum-core] Permission exists: ${perm.key}`);
     }
   }
 }
@@ -126,8 +119,8 @@ async function seedForumPermissions(db: any): Promise<void> {
 /**
  * Seed default forum categories
  */
-async function seedDefaultCategories(db: any): Promise<void> {
-  const categoryRepository = db.getRepository('ForumCategory');
+async function seedDefaultCategories(dataSource: any, logger: any): Promise<void> {
+  const categoryRepository = dataSource.getRepository('ForumCategory');
 
   const defaultCategories = [
     {
@@ -160,7 +153,7 @@ async function seedDefaultCategories(db: any): Promise<void> {
 
     if (!exists) {
       await categoryRepository.save(cat);
-      console.log(`[forum-core] Category created: ${cat.name}`);
+      logger.info(`[forum-core] Category created: ${cat.name}`);
     }
   }
 }

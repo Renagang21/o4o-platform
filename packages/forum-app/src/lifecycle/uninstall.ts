@@ -5,72 +5,41 @@
  * Responsibilities:
  * - Check for extension apps that depend on forum-core
  * - Optionally purge forum data (keep-data by default)
- * - Remove forum permissions
+ *
+ * Note: Permissions removal is now handled by AppManager's PermissionService
  *
  * SAFETY: By default, data is KEPT. Only purge if explicitly requested.
  */
 
-export interface UninstallContext {
-  appId: string;
-  version: string;
-  db: any;
-  appManager?: any;
-  options?: {
-    purgeData?: boolean;
-    force?: boolean;
-  };
-}
+import type { UninstallContext } from '@o4o/types';
 
 export async function uninstall(context: UninstallContext): Promise<void> {
-  const { db, appManager, options = {} } = context;
-  const { purgeData = false, force = false } = options;
+  const { dataSource, logger, options = {} } = context;
+  const { purgeData = false } = options;
 
-  console.log('[forum-core] Uninstalling...');
+  logger.info('[forum-core] Uninstalling...');
 
-  // 1. Check for dependent extension apps
-  if (!force && appManager) {
-    await checkDependencies(appManager);
-  }
+  // Note: Dependency checks are handled by AppManager before calling this hook
 
-  // 2. Deactivate first (if still active)
-  // This is handled by AppManager before calling uninstall
-
-  // 3. Optionally purge data
+  // Optionally purge data
   if (purgeData) {
-    console.warn('[forum-core] PURGE MODE - Deleting all forum data!');
-    await purgeForumData(db);
+    logger.warn('[forum-core] PURGE MODE - Deleting all forum data!');
+    await purgeForumData(dataSource, logger);
   } else {
-    console.log('[forum-core] Keep-data mode - Forum data will be preserved');
+    logger.info('[forum-core] Keep-data mode - Forum data will be preserved');
   }
 
-  // 4. Remove forum permissions (always)
-  await removeForumPermissions(db);
+  // Note: Permissions removal is now handled by AppManager's PermissionService
 
-  console.log('[forum-core] Uninstallation completed successfully.');
-}
-
-/**
- * Check if any extension apps depend on forum-core
- */
-async function checkDependencies(appManager: any): Promise<void> {
-  const dependentApps = await appManager.findDependentApps('forum-core');
-
-  if (dependentApps.length > 0) {
-    const appNames = dependentApps.map((app: any) => app.appId).join(', ');
-    throw new Error(
-      `Cannot uninstall forum-core: The following apps depend on it: ${appNames}. ` +
-        `Please uninstall these apps first, or use --force to override.`
-    );
-  }
-
-  console.log('[forum-core] No dependent apps found');
+  logger.info('[forum-core] Uninstallation completed successfully.');
 }
 
 /**
  * Purge all forum data from the database
+ * Note: This is handled by AppManager's AppDataCleaner, but kept here for reference
  */
-async function purgeForumData(db: any): Promise<void> {
-  const queryRunner = db.createQueryRunner();
+async function purgeForumData(dataSource: any, logger: any): Promise<void> {
+  const queryRunner = dataSource.createQueryRunner();
 
   try {
     await queryRunner.connect();
@@ -89,44 +58,20 @@ async function purgeForumData(db: any): Promise<void> {
     for (const tableName of forumTables) {
       try {
         await queryRunner.query(`DROP TABLE IF EXISTS "${tableName}" CASCADE`);
-        console.log(`[forum-core] Table dropped: ${tableName}`);
+        logger.info(`[forum-core] Table dropped: ${tableName}`);
       } catch (error) {
-        console.error(`[forum-core] Error dropping table ${tableName}:`, error);
+        logger.error(`[forum-core] Error dropping table ${tableName}:`, error);
       }
     }
 
     await queryRunner.commitTransaction();
-    console.log('[forum-core] All forum data purged');
+    logger.info('[forum-core] All forum data purged');
   } catch (error) {
     await queryRunner.rollbackTransaction();
-    console.error('[forum-core] Error purging data:', error);
+    logger.error('[forum-core] Error purging data:', error);
     throw error;
   } finally {
     await queryRunner.release();
-  }
-}
-
-/**
- * Remove forum permissions
- */
-async function removeForumPermissions(db: any): Promise<void> {
-  const permissionRepository = db.getRepository('Permission');
-
-  const forumPermissionNames = [
-    'forum.read',
-    'forum.write',
-    'forum.comment',
-    'forum.moderate',
-    'forum.admin',
-  ];
-
-  for (const permName of forumPermissionNames) {
-    try {
-      await permissionRepository.delete({ name: permName });
-      console.log(`[forum-core] Permission removed: ${permName}`);
-    } catch (error) {
-      console.error(`[forum-core] Error removing permission ${permName}:`, error);
-    }
   }
 }
 

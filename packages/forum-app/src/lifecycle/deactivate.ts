@@ -10,49 +10,44 @@
  * NOTE: Does NOT delete data - only disables the app functionality
  */
 
-export interface DeactivateContext {
-  appId: string;
-  version: string;
-  menuManager?: any;
-  routeManager?: any;
-  cacheManager?: any;
-}
+import type { DeactivateContext } from '@o4o/types';
 
 export async function deactivate(context: DeactivateContext): Promise<void> {
-  const { menuManager, routeManager, cacheManager } = context;
+  const { logger, options = {} } = context;
+  const { menuManager, routeManager, cacheManager } = options;
 
-  console.log('[forum-core] Deactivating...');
+  logger.info('[forum-core] Deactivating...');
 
   // 1. Unregister admin menu
   if (menuManager) {
-    await unregisterForumMenu(menuManager);
+    await unregisterForumMenu(menuManager, logger);
   }
 
   // 2. Disable forum routes
   if (routeManager) {
-    await disableForumRoutes(routeManager);
+    await disableForumRoutes(routeManager, logger);
   }
 
   // 3. Clear caches
   if (cacheManager) {
-    await clearForumCaches(cacheManager);
+    await clearForumCaches(cacheManager, logger);
   }
 
-  console.log('[forum-core] Deactivation completed successfully.');
+  logger.info('[forum-core] Deactivation completed successfully.');
 }
 
 /**
  * Unregister forum menu from admin dashboard
  */
-async function unregisterForumMenu(menuManager: any): Promise<void> {
+async function unregisterForumMenu(menuManager: any, logger: any): Promise<void> {
   await menuManager.unregister('forum');
-  console.log('[forum-core] Menu unregistered');
+  logger.info('[forum-core] Menu unregistered');
 }
 
 /**
  * Disable forum routes
  */
-async function disableForumRoutes(routeManager: any): Promise<void> {
+async function disableForumRoutes(routeManager: any, logger: any): Promise<void> {
   const forumRoutes = [
     '/admin/forum',
     '/admin/forum/posts',
@@ -67,13 +62,13 @@ async function disableForumRoutes(routeManager: any): Promise<void> {
     await routeManager.disable(route);
   }
 
-  console.log('[forum-core] Routes disabled');
+  logger.info('[forum-core] Routes disabled');
 }
 
 /**
  * Clear forum-related caches
  */
-async function clearForumCaches(cacheManager: any): Promise<void> {
+async function clearForumCaches(cacheManager: any, logger: any): Promise<void> {
   const cacheKeys = [
     'forum:categories',
     'forum:stats',
@@ -85,7 +80,7 @@ async function clearForumCaches(cacheManager: any): Promise<void> {
     await cacheManager.delete(key);
   }
 
-  console.log('[forum-core] Caches cleared');
+  logger.info('[forum-core] Caches cleared');
 }
 
 export default deactivate;

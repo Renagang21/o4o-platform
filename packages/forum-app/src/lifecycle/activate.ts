@@ -8,41 +8,36 @@
  * - Clear relevant caches
  */
 
-export interface ActivateContext {
-  appId: string;
-  version: string;
-  menuManager?: any;
-  routeManager?: any;
-  cacheManager?: any;
-}
+import type { ActivateContext } from '@o4o/types';
 
 export async function activate(context: ActivateContext): Promise<void> {
-  const { menuManager, routeManager, cacheManager } = context;
+  const { logger, options = {} } = context;
+  const { menuManager, routeManager, cacheManager } = options;
 
-  console.log('[forum-core] Activating...');
+  logger.info('[forum-core] Activating...');
 
   // 1. Register admin menu
   if (menuManager) {
-    await registerForumMenu(menuManager);
+    await registerForumMenu(menuManager, logger);
   }
 
   // 2. Enable forum routes
   if (routeManager) {
-    await enableForumRoutes(routeManager);
+    await enableForumRoutes(routeManager, logger);
   }
 
   // 3. Clear caches
   if (cacheManager) {
-    await clearForumCaches(cacheManager);
+    await clearForumCaches(cacheManager, logger);
   }
 
-  console.log('[forum-core] Activation completed successfully.');
+  logger.info('[forum-core] Activation completed successfully.');
 }
 
 /**
  * Register forum menu in admin dashboard
  */
-async function registerForumMenu(menuManager: any): Promise<void> {
+async function registerForumMenu(menuManager: any, logger: any): Promise<void> {
   const forumMenu = {
     id: 'forum',
     label: '포럼',
@@ -82,13 +77,13 @@ async function registerForumMenu(menuManager: any): Promise<void> {
   };
 
   await menuManager.register(forumMenu);
-  console.log('[forum-core] Menu registered');
+  logger.info('[forum-core] Menu registered');
 }
 
 /**
  * Enable forum routes
  */
-async function enableForumRoutes(routeManager: any): Promise<void> {
+async function enableForumRoutes(routeManager: any, logger: any): Promise<void> {
   const forumRoutes = [
     '/admin/forum',
     '/admin/forum/posts',
@@ -103,13 +98,13 @@ async function enableForumRoutes(routeManager: any): Promise<void> {
     await routeManager.enable(route);
   }
 
-  console.log('[forum-core] Routes enabled');
+  logger.info('[forum-core] Routes enabled');
 }
 
 /**
  * Clear forum-related caches
  */
-async function clearForumCaches(cacheManager: any): Promise<void> {
+async function clearForumCaches(cacheManager: any, logger: any): Promise<void> {
   const cacheKeys = [
     'forum:categories',
     'forum:stats',
@@ -120,7 +115,7 @@ async function clearForumCaches(cacheManager: any): Promise<void> {
     await cacheManager.delete(key);
   }
 
-  console.log('[forum-core] Caches cleared');
+  logger.info('[forum-core] Caches cleared');
 }
 
 export default activate;

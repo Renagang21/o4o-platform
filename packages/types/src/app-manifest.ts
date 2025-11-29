@@ -6,10 +6,111 @@
  */
 
 /**
+ * CPT Field Type
+ */
+export type CPTFieldType =
+  | 'string'
+  | 'text'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'datetime'
+  | 'select'
+  | 'multiselect'
+  | 'array'
+  | 'object'
+  | 'json';
+
+/**
+ * CPT Definition in Manifest
+ */
+export interface ManifestCPTDefinition {
+  /** CPT name (e.g., 'forum_post') */
+  name: string;
+
+  /** Storage type */
+  storage: 'entity' | 'json-cpt';
+
+  /** Primary key field */
+  primaryKey: string;
+
+  /** Display label */
+  label: string;
+
+  /** Supported features */
+  supports?: string[];
+
+  /** Additional metadata */
+  [key: string]: any;
+}
+
+/**
+ * ACF Field Definition
+ */
+export interface ACFFieldDefinition {
+  /** Field key */
+  key: string;
+
+  /** Field type */
+  type: CPTFieldType;
+
+  /** Field label */
+  label: string;
+
+  /** Field options (for select/multiselect) */
+  options?: string[] | Record<string, string>;
+
+  /** Required field */
+  required?: boolean;
+
+  /** Default value */
+  defaultValue?: any;
+
+  /** Additional metadata */
+  [key: string]: any;
+}
+
+/**
+ * ACF Group Definition
+ */
+export interface ACFGroupDefinition {
+  /** Group ID */
+  groupId: string;
+
+  /** Group label */
+  label: string;
+
+  /** Fields in this group */
+  fields: ACFFieldDefinition[];
+
+  /** CPT this group applies to (optional) */
+  appliesTo?: string;
+
+  /** Additional metadata */
+  [key: string]: any;
+}
+
+/**
+ * Lifecycle Hooks Definition
+ */
+export interface LifecycleHooks {
+  /** Install hook - relative path to module */
+  install?: string;
+
+  /** Activate hook - relative path to module */
+  activate?: string;
+
+  /** Deactivate hook - relative path to module */
+  deactivate?: string;
+
+  /** Uninstall hook - relative path to module */
+  uninstall?: string;
+}
+
+/**
  * App Manifest for Feature-Level Apps
  *
- * V1: Minimal fields for app registry
- * Future: Can extend with CPT definitions, ACF schemas, migrations, etc.
+ * V2: Extended with CPT/ACF definitions and lifecycle hooks
  */
 export interface AppManifest {
   /** Unique app identifier (e.g., 'forum-core', 'forum-neture') */
@@ -52,17 +153,16 @@ export interface AppManifest {
   /** Permissions this app requires (e.g., ['forum.read', 'forum.write']) */
   permissions?: string[];
 
-  /** Future extensions (not used in V1) */
-  cpt?: {
-    /** Custom Post Type definitions */
-    types?: any[];
-  };
+  /** CPT definitions (V2) */
+  cpt?: ManifestCPTDefinition[];
 
-  acf?: {
-    /** ACF field group definitions */
-    fieldGroups?: any[];
-  };
+  /** ACF field group definitions (V2) */
+  acf?: ACFGroupDefinition[];
 
+  /** Lifecycle hooks (V2) */
+  lifecycle?: LifecycleHooks;
+
+  /** Migration scripts */
   migrations?: {
     /** Migration scripts */
     scripts?: string[];
