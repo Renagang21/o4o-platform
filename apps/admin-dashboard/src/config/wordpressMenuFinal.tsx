@@ -35,7 +35,8 @@ import {
   Plus,
   Code,
   ChevronLeft,
-  ShoppingBag
+  ShoppingBag,
+  Sparkles
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -169,6 +170,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'forum-comments', label: '댓글 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/comments' },
       { id: 'forum-reports', label: '신고 관리', icon: <Shield className="w-4 h-4" />, path: '/forum/reports' },
       { id: 'yaksa-communities', label: 'Yaksa 커뮤니티', icon: <Users className="w-4 h-4" />, path: '/yaksa/communities', appId: 'forum-yaksa' },
+      { id: 'neture-forum', label: 'Neture 화장품 포럼', icon: <Sparkles className="w-4 h-4" />, path: '/neture/forum', appId: 'forum-neture' },
       { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
     ]
   },

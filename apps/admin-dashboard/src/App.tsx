@@ -102,6 +102,11 @@ const YaksaCommunityList = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui
 const YaksaCommunityDetail = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityDetail'));
 const YaksaCommunityFeed = lazy(() => import('@o4o-apps/forum-yaksa/src/admin-ui/pages/YaksaCommunityFeed'));
 
+// Neture Forum Pages (from @o4o-apps/forum-neture package - source imports)
+const NetureForumDashboard = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumDashboard'));
+const NetureForumPostDetail = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumPostDetail'));
+const NetureForumPostForm = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumPostForm'));
+
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
@@ -832,6 +837,44 @@ function App() {
                         <AppRouteGuard appId="forum-yaksa">
                           <Suspense fallback={<PageLoader />}>
                             <YaksaCommunityFeed />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Neture Forum - App-based routes with AppRouteGuard */}
+                    <Route path="/neture/forum" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum-neture">
+                          <Suspense fallback={<PageLoader />}>
+                            <NetureForumDashboard />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/neture/forum/new" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:write']}>
+                        <AppRouteGuard appId="forum-neture">
+                          <Suspense fallback={<PageLoader />}>
+                            <NetureForumPostForm />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/neture/forum/posts/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum-neture">
+                          <Suspense fallback={<PageLoader />}>
+                            <NetureForumPostDetail />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/neture/forum/posts/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:write']}>
+                        <AppRouteGuard appId="forum-neture">
+                          <Suspense fallback={<PageLoader />}>
+                            <NetureForumPostForm />
                           </Suspense>
                         </AppRouteGuard>
                       </AdminProtectedRoute>

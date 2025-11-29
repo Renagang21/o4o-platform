@@ -161,6 +161,9 @@ import channelsRoutes from '../routes/v1/channels.routes.js';
 import yaksaCommunityRoutes from '../routes/yaksa/community.routes.js';
 import yaksaPostRoutes from '../routes/yaksa/post.routes.js';
 
+// Neture Forum Routes
+import netureForumRoutes from '../routes/neture/forum.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -404,6 +407,9 @@ export function setupRoutes(app: Application): void {
   // Yaksa Community Routes
   app.use('/api/v1/yaksa/forum/communities', standardLimiter, yaksaCommunityRoutes);
   app.use('/api/v1/yaksa/forum/posts', standardLimiter, yaksaPostRoutes);
+
+  // Neture Forum Routes
+  app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization
   app.use('/api/v1/ds/seller/authorizations', standardLimiter, dsSellerAuthorizationRoutes);
