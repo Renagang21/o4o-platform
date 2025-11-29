@@ -47,6 +47,47 @@ export class YaksaCommunityController {
   }
 
   /**
+   * GET /yaksa/forum/communities/feed/all
+   * Get unified feed from all communities where user is a member
+   */
+  async getAllCommunityFeed(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      const communityType = req.query.type as any;
+
+      if (!userId) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+
+      const feed = await this.communityService.getAllCommunityFeed(userId, {
+        limit,
+        offset,
+        communityType,
+      });
+
+      res.json({
+        success: true,
+        data: feed,
+        count: feed.length,
+        pagination: {
+          limit,
+          offset,
+          hasMore: feed.length === limit,
+        },
+      });
+    } catch (error: any) {
+      console.error('Error getting all community feed:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to get community feed',
+      });
+    }
+  }
+
+  /**
    * GET /yaksa/forum/communities/:id
    * Get community details
    */

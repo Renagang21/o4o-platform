@@ -131,6 +131,65 @@ export class YaksaCommunityService {
   }
 
   /**
+   * Get unified feed from all communities where user is a member
+   * This is used for the dashboard view
+   */
+  async getAllCommunityFeed(userId: string, options?: {
+    limit?: number;
+    offset?: number;
+    communityType?: CommunityType;
+  }): Promise<ForumPost[]> {
+    const limit = options?.limit || 20;
+    const offset = options?.offset || 0;
+    const communityType = options?.communityType;
+
+    // Get user's communities
+    const communities = await this.listMyCommunities(userId);
+
+    if (communities.length === 0) {
+      return [];
+    }
+
+    const communityIds = communities
+      .filter(c => !communityType || c.type === communityType)
+      .map(c => c.id);
+
+    if (communityIds.length === 0) {
+      return [];
+    }
+
+    // Check if user is admin/owner of any community
+    const userRoles = await Promise.all(
+      communityIds.map(id => this.getUserRole(id, userId))
+    );
+    const isAdminOrOwnerInAny = userRoles.some(
+      role => role === CommunityMemberRole.ADMIN || role === CommunityMemberRole.OWNER
+    );
+
+    // Query all posts from user's communities
+    const queryBuilder = this.forumPostRepository
+      .createQueryBuilder('post')
+      .where("post.metadata->'yaksa'->>'communityId' IN (:...communityIds)", { communityIds });
+
+    // Filter by status based on user role
+    if (!isAdminOrOwnerInAny) {
+      // Regular members only see published posts
+      queryBuilder.andWhere("post.status = :status", { status: 'publish' });
+    }
+    // Admins/owners see all posts (no status filter)
+
+    const posts = await queryBuilder
+      .orderBy("CASE WHEN post.metadata->'yaksa'->>'pinned' = 'true' THEN 0 ELSE 1 END", 'ASC')
+      .addOrderBy("CASE WHEN post.metadata->'yaksa'->>'isAnnouncement' = 'true' THEN 1 ELSE 2 END", 'ASC')
+      .addOrderBy('post.createdAt', 'DESC')
+      .skip(offset)
+      .take(limit)
+      .getMany();
+
+    return posts;
+  }
+
+  /**
    * List communities by type (e.g., branch communities)
    */
   async listCommunitiesByType(type: CommunityType): Promise<YaksaCommunity[]> {

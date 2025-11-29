@@ -14,6 +14,9 @@ const controller = new YaksaCommunityController();
 // List my communities
 router.get('/mine', authenticate, controller.listMyCommunities.bind(controller));
 
+// Get unified feed from all communities
+router.get('/feed/all', authenticate, controller.getAllCommunityFeed.bind(controller));
+
 // Get community details
 router.get('/:id', authenticate, controller.getCommunity.bind(controller));
 

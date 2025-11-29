@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
-import { ArrowLeft, MessageSquare, Heart, Eye, Plus, X } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Heart, Eye, Plus, X, Pin, Megaphone, Clock } from 'lucide-react';
 
 interface Community {
   id: string;
@@ -22,6 +22,13 @@ interface FeedPost {
   commentCount: number;
   status: string;
   type: string;
+  metadata?: {
+    yaksa?: {
+      communityId?: string;
+      pinned?: boolean;
+      isAnnouncement?: boolean;
+    };
+  };
 }
 
 export default function YaksaCommunityFeed() {
@@ -35,8 +42,11 @@ export default function YaksaCommunityFeed() {
     title: '',
     content: '',
     categoryId: '', // Will need to fetch categories
+    isAnnouncement: false,
+    pinned: false,
   });
   const [creating, setCreating] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -87,11 +97,23 @@ export default function YaksaCommunityFeed() {
         content: newPost.content,
         categoryId,
         type: 'discussion',
+        isAnnouncement: newPost.isAnnouncement,
+        // Note: pinned will be set via separate API after post creation if needed
       });
 
       if (response.data.success) {
+        // If pinned option was selected, pin the post
+        if (newPost.pinned && response.data.data?.id) {
+          try {
+            await authClient.api.post(`/yaksa/forum/posts/${response.data.data.id}/pin`);
+          } catch (pinErr) {
+            console.error('Error pinning post:', pinErr);
+            // Continue even if pinning fails
+          }
+        }
+
         setShowCreatePost(false);
-        setNewPost({ title: '', content: '', categoryId: '' });
+        setNewPost({ title: '', content: '', categoryId: '', isAnnouncement: false, pinned: false });
         // Reload feed
         await loadFeedData();
       } else {
@@ -183,41 +205,73 @@ export default function YaksaCommunityFeed() {
         </div>
       ) : (
         <div className="space-y-4">
-          {feed.map((post) => (
-            <div
-              key={post.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => {
-                // Navigate to post detail
-                window.location.href = `/admin/forum/posts/${post.id}`;
-              }}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {post.title}
-              </h3>
-              <p className="text-gray-600 mb-4 line-clamp-2">
-                {post.excerpt || post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '')}
-              </p>
+          {feed.map((post) => {
+            const isPinned = post.metadata?.yaksa?.pinned;
+            const isAnnouncement = post.metadata?.yaksa?.isAnnouncement;
+            const isPending = post.status === 'pending';
 
-              <div className="flex items-center gap-6 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  <span>{post.viewCount}</span>
+            return (
+              <div
+                key={post.id}
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => {
+                  // Navigate to post detail
+                  window.location.href = `/admin/forum/posts/${post.id}`;
+                }}
+              >
+                {/* Status Badges */}
+                {(isPinned || isAnnouncement || isPending) && (
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    {isPinned && (
+                      <span className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <Pin className="w-3 h-3" />
+                        고정
+                      </span>
+                    )}
+
+                    {isAnnouncement && (
+                      <span className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+                        <Megaphone className="w-3 h-3" />
+                        공지
+                      </span>
+                    )}
+
+                    {isPending && (
+                      <span className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                        <Clock className="w-3 h-3" />
+                        승인 대기
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {post.title}
+                </h3>
+                <p className="text-gray-600 mb-4 line-clamp-2">
+                  {post.excerpt || post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '')}
+                </p>
+
+                <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    <span>{post.viewCount}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-4 h-4" />
+                    <span>{post.likeCount}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>{post.commentCount}</span>
+                  </div>
+                  <span className="ml-auto">
+                    {new Date(post.createdAt).toLocaleDateString('ko-KR')}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Heart className="w-4 h-4" />
-                  <span>{post.likeCount}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{post.commentCount}</span>
-                </div>
-                <span className="ml-auto">
-                  {new Date(post.createdAt).toLocaleDateString('ko-KR')}
-                </span>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -260,6 +314,37 @@ export default function YaksaCommunityFeed() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="내용을 입력하세요"
                 />
+              </div>
+
+              {/* Admin Options */}
+              <div className="border-t border-gray-200 pt-4">
+                <p className="text-sm font-medium text-gray-700 mb-3">관리자 옵션</p>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newPost.isAnnouncement}
+                      onChange={(e) => setNewPost({ ...newPost, isAnnouncement: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">공지로 등록</span>
+                    <Megaphone className="w-4 h-4 text-red-600" />
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newPost.pinned}
+                      onChange={(e) => setNewPost({ ...newPost, pinned: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">상단에 고정</span>
+                    <Pin className="w-4 h-4 text-yellow-600" />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  * 관리자/소유자만 사용 가능한 기능입니다
+                </p>
               </div>
 
               <div className="flex justify-end gap-3">
