@@ -34,7 +34,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   {
     appId: 'digitalsignage',
     name: 'Digital Signage',
-    version: '1.0.0',
+    version: '1.1.0',
     description: '매장용 디지털 사이니지 콘텐츠 관리 및 스케줄링',
     category: 'display',
     author: 'O4O Platform',
