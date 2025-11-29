@@ -96,6 +96,14 @@ import acfRoutes from '../routes/acf.js';
 // CPT-ACF Preset Routes
 import presetRoutes from '../modules/cpt-acf/routes/preset.routes.js';
 
+// Dropshipping Core Routes (from package)
+import {
+  sellerRoutes as coreSellerRoutes,
+  supplierRoutes as coreSupplierRoutes,
+  adminDropshippingRoutes as coreAdminDropshippingRoutes,
+  sellerAuthorizationRoutes as coreSellerAuthorizationRoutes
+} from '@o4o/dropshipping-core';
+
 // V2 API Routes
 import queryV2Routes from '../routes/v2/query.routes.js';
 import sellerV2Routes from '../routes/v2/seller.routes.js';
@@ -344,11 +352,11 @@ export function setupRoutes(app: Application): void {
   // V2 API - Advanced Query System
   app.use('/api/v2', standardLimiter, queryV2Routes);
 
-  // V2 API - Seller Workflow (PD-3)
-  app.use('/api/v2/seller', standardLimiter, sellerV2Routes);
+  // V2 API - Seller Workflow (PD-3) - Now using dropshipping-core package
+  app.use('/api/v2/seller', standardLimiter, coreSellerRoutes);
 
-  // V2 API - Supplier Orders (PD-4)
-  app.use('/api/v2/supplier', standardLimiter, supplierV2Routes);
+  // V2 API - Supplier Orders (PD-4) - Now using dropshipping-core package
+  app.use('/api/v2/supplier', standardLimiter, coreSupplierRoutes);
 
   // V2 API - Notifications (PD-7)
   app.use('/api/v2/notifications', standardLimiter, notificationsRoutes);
@@ -411,8 +419,8 @@ export function setupRoutes(app: Application): void {
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
 
-  // Phase 8/9 - Supplier Policy & Seller Authorization
-  app.use('/api/v1/ds/seller/authorizations', standardLimiter, dsSellerAuthorizationRoutes);
+  // Phase 8/9 - Supplier Policy & Seller Authorization - Now using dropshipping-core package
+  app.use('/api/v1/ds/seller/authorizations', standardLimiter, coreSellerAuthorizationRoutes);
   app.use('/api/v1/ds/seller/products', standardLimiter, dsSellerProductRoutes);
   app.use('/api/v1/ds/settlements', standardLimiter, dsSettlementsRoutes);
 
@@ -478,15 +486,15 @@ export function setupRoutes(app: Application): void {
   app.use('/api', tagRoutes);
   app.use('/api/acf', acfRoutes);
 
-  // Admin sub-routes (v1)
-  app.use('/api/v1/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
+  // Admin sub-routes (v1) - Now using dropshipping-core package
+  app.use('/api/v1/admin/dropshipping', standardLimiter, coreAdminDropshippingRoutes);
   app.use('/api/v1/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/v1/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/v1/admin/orders', standardLimiter, adminOrdersRoutes);
   app.use('/api/v1/admin/apps', standardLimiter, adminAppsRoutes);
 
-  // Admin sub-routes (legacy)
-  app.use('/api/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
+  // Admin sub-routes (legacy) - Now using dropshipping-core package
+  app.use('/api/admin/dropshipping', standardLimiter, coreAdminDropshippingRoutes);
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/admin/orders', standardLimiter, adminOrdersRoutes);

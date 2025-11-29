@@ -79,19 +79,19 @@ import { Wishlist } from '../entities/Wishlist.js';
 // Settlement entities
 import { Settlement } from '../entities/Settlement.js';
 import { SettlementItem } from '../entities/SettlementItem.js';
-// Dropshipping entities
-import { Product } from '../entities/Product.js';
-import { Supplier } from '../entities/Supplier.js';
-import { Seller } from '../entities/Seller.js';
-import { Partner } from '../entities/Partner.js';
-import { SellerProduct } from '../entities/SellerProduct.js';
-import { PartnerCommission } from '../entities/PartnerCommission.js';
+// Dropshipping entities - Now imported from @o4o/dropshipping-core package
+// import { Product } from '../entities/Product.js';
+// import { Supplier } from '../entities/Supplier.js';
+// import { Seller } from '../entities/Seller.js';
+// import { Partner } from '../entities/Partner.js';
+// import { SellerProduct } from '../entities/SellerProduct.js';
+// import { PartnerCommission } from '../entities/PartnerCommission.js';
 import { BusinessInfo } from '../entities/BusinessInfo.js';
-import { CommissionPolicy } from '../entities/CommissionPolicy.js';
-import { Commission } from '../entities/Commission.js';
+// import { CommissionPolicy } from '../entities/CommissionPolicy.js';
+// import { Commission } from '../entities/Commission.js';
 import { ConversionEvent } from '../entities/ConversionEvent.js';
 import { ReferralClick } from '../entities/ReferralClick.js';
-import { SellerAuthorization } from '../entities/SellerAuthorization.js';
+// import { SellerAuthorization } from '../entities/SellerAuthorization.js';
 // Form entities
 import { Form } from '../entities/Form.js';
 import { FormSubmission } from '../entities/FormSubmission.js';
@@ -111,6 +111,8 @@ import { SellerProfile } from '../entities/SellerProfile.js';
 import { PartnerProfile } from '../entities/PartnerProfile.js';
 // Forum App entities (from @o4o-apps/forum package)
 import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum';
+// Dropshipping Core entities (from @o4o/dropshipping-core package)
+import { dropshippingEntities } from '@o4o/dropshipping-core';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -232,19 +234,12 @@ export const AppDataSource = new DataSource({
     // Settlement entities
     Settlement,
     SettlementItem,
-    // Dropshipping entities
-    Product,
-    Supplier,
-    Seller,
-    Partner,
-    SellerProduct,
-    PartnerCommission,
+    // Dropshipping Core entities (from @o4o/dropshipping-core package)
+    ...dropshippingEntities,
+    // Additional dropshipping entities (not in core package)
     BusinessInfo,
-    CommissionPolicy,
-    Commission,
     ConversionEvent,
     ReferralClick,
-    SellerAuthorization,
     // Form entities
     Form,
     FormSubmission,
