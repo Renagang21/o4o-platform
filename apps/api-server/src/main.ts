@@ -62,7 +62,7 @@ const io = new Server(httpServer, {
         "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003",
         "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177",
         "http://13.125.144.8:3000", "http://13.125.144.8:3001", "http://13.125.144.8", "https://13.125.144.8",
-        "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "http://admin.neture.co.kr",
+        "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr", "http://admin.neture.co.kr",
         "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
         "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr", "http://api.neture.co.kr"
       ];
@@ -150,7 +150,7 @@ const corsOptions: CorsOptions = {
     ] : [];
 
     const prodOrigins = [
-      "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr",
+      "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
       "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
       "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     ];
