@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AppManager } from '../../services/AppManager.js';
+import { DependencyError } from '../../services/AppDependencyResolver.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
 import { APPS_CATALOG, getCatalogItem } from '../../app-manifests/appsCatalog.js';
@@ -151,23 +152,33 @@ router.post('/deactivate', async (req: Request, res: Response, next: NextFunctio
  * POST /api/admin/apps/uninstall
  * Uninstall an app
  *
- * Body: { appId: string }
+ * Body: { appId: string, force?: boolean }
  */
 router.post('/uninstall', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { appId } = req.body;
+    const { appId, force = false } = req.body;
 
     if (!appId) {
       return res.status(400).json({ error: 'appId is required' });
     }
 
-    await appManager.uninstall(appId);
+    await appManager.uninstall(appId, { force });
 
     res.json({
       ok: true,
       message: `App ${appId} uninstalled successfully`,
     });
   } catch (error) {
+    // Handle dependency errors
+    if (error instanceof DependencyError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'DEPENDENTS_EXIST',
+        message: error.message,
+        dependents: error.dependents,
+      });
+    }
+
     next(error);
   }
 });

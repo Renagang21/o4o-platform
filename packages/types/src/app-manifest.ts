@@ -12,7 +12,7 @@
  * Future: Can extend with CPT definitions, ACF schemas, migrations, etc.
  */
 export interface AppManifest {
-  /** Unique app identifier (e.g., 'forum', 'digitalsignage') */
+  /** Unique app identifier (e.g., 'forum-core', 'forum-neture') */
   appId: string;
 
   /** Display name */
@@ -20,6 +20,9 @@ export interface AppManifest {
 
   /** Semver version */
   version: string;
+
+  /** App type (for Core/Extension pattern) */
+  type?: 'core' | 'extension' | 'standalone';
 
   /** Short description */
   description?: string;
@@ -46,12 +49,20 @@ export interface AppManifest {
     scripts?: string[];
   };
 
+  /**
+   * Dependencies (supports two formats):
+   * 1. Legacy format: { apps?: string[], minVersions?: Record<string, string> }
+   * 2. Core/Extension format: { "app-id": "version-range" }
+   */
   dependencies?: {
-    /** Other apps this app depends on */
+    /** Other apps this app depends on (legacy format) */
     apps?: string[];
-    /** Minimum version requirements */
+    /** Minimum version requirements (legacy format) */
     minVersions?: Record<string, string>;
-  };
+  } | Record<string, string>;
+
+  /** Any additional properties for extensibility */
+  [key: string]: any;
 }
 
 /**

@@ -30,11 +30,22 @@ export class AppRegistry {
 
   @Column({
     type: 'enum',
+    enum: ['core', 'extension', 'standalone'],
+    default: 'standalone'
+  })
+  @Index()
+  type!: 'core' | 'extension' | 'standalone';
+
+  @Column({
+    type: 'enum',
     enum: ['installed', 'active', 'inactive'],
     default: 'installed'
   })
   @Index()
   status!: 'installed' | 'active' | 'inactive';
+
+  @Column({ type: 'jsonb', nullable: true })
+  dependencies?: Record<string, string>; // { "app-id": "version-range" }
 
   @Column({ type: 'varchar', length: 50, default: 'local' })
   source!: string; // 'local' for now, can be 'remote' later

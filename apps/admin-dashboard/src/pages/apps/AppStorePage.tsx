@@ -96,9 +96,21 @@ const AppStorePage: FC = () => {
       await adminAppsApi.uninstallApp(appId);
       await loadData();
       alert(`${appId} 앱이 삭제되었습니다.`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to uninstall app:', error);
-      alert('앱 삭제에 실패했습니다.');
+
+      // Handle dependency errors
+      if (error.response?.data?.error === 'DEPENDENTS_EXIST') {
+        const dependents = error.response.data.dependents || [];
+        alert(
+          `${appId} 앱을 삭제할 수 없습니다.\n\n` +
+          `다음 앱들이 이 앱에 의존하고 있습니다:\n` +
+          `${dependents.map((d: string) => `  • ${d}`).join('\n')}\n\n` +
+          `의존 앱들을 먼저 삭제해주세요.`
+        );
+      } else {
+        alert('앱 삭제에 실패했습니다.');
+      }
     } finally {
       setActionLoading(null);
     }

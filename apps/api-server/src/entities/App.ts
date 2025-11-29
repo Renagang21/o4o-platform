@@ -9,9 +9,15 @@ import {
 
 export interface AppManifest {
   // Basic info
+  appId?: string;
+  name?: string;
   displayName?: string;
+  version?: string;
   icon?: string;
   category?: string;
+
+  // App type (for Core/Extension pattern)
+  type?: 'core' | 'extension' | 'standalone';
 
   // Capabilities
   provides?: {
@@ -31,12 +37,15 @@ export interface AppManifest {
     }>;
   };
 
-  // Dependencies
+  // Dependencies (supports both formats)
+  // - Legacy format: { apps?: string[], services?: string[], minVersion?: string }
+  // - New format: { "app-id": "version-range" }
   dependencies?: {
     apps?: string[];
     services?: string[];
     minVersion?: string;
-  };
+    minVersions?: Record<string, string>;
+  } | Record<string, string>;
 
   // Permissions
   permissions?: {
@@ -53,6 +62,9 @@ export interface AppManifest {
     styleUrl?: string;
     assetsUrl?: string;
   };
+
+  // Additional manifest properties for Core/Extension pattern
+  [key: string]: any;
 }
 
 @Entity('apps')

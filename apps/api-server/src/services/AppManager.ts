@@ -4,6 +4,7 @@ import { AppRegistry } from '../entities/AppRegistry.js';
 import { loadLocalManifest, hasManifest } from '../app-manifests/index.js';
 import { getCatalogItem } from '../app-manifests/appsCatalog.js';
 import { isNewerVersion } from '../utils/semver.js';
+import { AppDependencyResolver, DependencyError } from './AppDependencyResolver.js';
 import type { AppManifest } from '@o4o/types';
 
 /**
@@ -11,21 +12,60 @@ import type { AppManifest } from '@o4o/types';
  *
  * Manages feature-level app installation, activation, deactivation, and uninstallation
  * Works with AppRegistry entity and local manifests
+ * Supports Core/Extension pattern with dependency management
  */
 export class AppManager {
   private repo: Repository<AppRegistry>;
+  private dependencyResolver: AppDependencyResolver;
 
   constructor() {
     this.repo = AppDataSource.getRepository(AppRegistry);
+    this.dependencyResolver = new AppDependencyResolver();
   }
 
   /**
-   * Install an app
-   * If app is already installed, updates version from manifest
+   * Install an app with dependency resolution
+   * Automatically installs dependencies in correct order
    *
-   * @param appId - App identifier (e.g., 'forum', 'digitalsignage')
+   * @param appId - App identifier (e.g., 'forum-neture')
+   * @param options - Installation options
    */
-  async install(appId: string): Promise<void> {
+  async install(
+    appId: string,
+    options?: { autoActivate?: boolean; skipDependencies?: boolean }
+  ): Promise<void> {
+    // Resolve installation order (includes dependencies)
+    const installOrder = options?.skipDependencies
+      ? [appId]
+      : await this.dependencyResolver.resolveInstallOrder(appId);
+
+    // Install apps in dependency order
+    for (const targetAppId of installOrder) {
+      const isInstalled = await this.isInstalled(targetAppId);
+
+      if (!isInstalled) {
+        await this.installSingleApp(targetAppId);
+      }
+    }
+
+    // Auto-activate if requested (default: true)
+    if (options?.autoActivate !== false) {
+      for (const targetAppId of installOrder) {
+        const app = await this.repo.findOne({ where: { appId: targetAppId } });
+        if (app && app.status !== 'active') {
+          await this.activate(targetAppId);
+        }
+      }
+    }
+  }
+
+  /**
+   * Install a single app (internal method)
+   * Does not handle dependencies - use install() for public API
+   *
+   * @param appId - App identifier
+   */
+  private async installSingleApp(appId: string): Promise<void> {
     // Load manifest - throws if not found
     if (!hasManifest(appId)) {
       throw new Error(`No manifest found for app: ${appId}`);
@@ -35,19 +75,34 @@ export class AppManager {
 
     let entry = await this.repo.findOne({ where: { appId } });
 
+    // Get dependencies in correct format
+    const manifestDeps = manifest.dependencies || {};
+    let dependencies: Record<string, string> | undefined;
+    if (typeof manifestDeps === 'object' && !Array.isArray(manifestDeps)) {
+      if ('apps' in manifestDeps || 'services' in manifestDeps) {
+        dependencies = undefined;
+      } else {
+        dependencies = manifestDeps as Record<string, string>;
+      }
+    }
+
     if (!entry) {
-      // Create new entry
+      // Create new entry with type and dependencies from manifest
       entry = this.repo.create({
-        appId: manifest.appId,
-        name: manifest.name,
-        version: manifest.version,
+        appId: manifest.appId || appId,
+        name: manifest.name || appId,
+        version: manifest.version || '1.0.0',
+        type: manifest.type || 'standalone',
+        dependencies,
         status: 'installed',
         source: 'local',
       });
     } else {
       // Update existing entry
-      entry.name = manifest.name;
-      entry.version = manifest.version;
+      entry.name = manifest.name || entry.name;
+      entry.version = manifest.version || entry.version;
+      entry.type = manifest.type || entry.type || 'standalone';
+      entry.dependencies = dependencies;
       entry.updatedAt = new Date();
 
       // If status was not set, set to installed
@@ -57,6 +112,20 @@ export class AppManager {
     }
 
     await this.repo.save(entry);
+
+    // TODO: Run lifecycle.install hook
+    // TODO: Run migrations (if core app)
+  }
+
+  /**
+   * Check if an app is installed
+   *
+   * @param appId - App identifier
+   * @returns true if app is installed
+   */
+  private async isInstalled(appId: string): Promise<boolean> {
+    const entry = await this.repo.findOne({ where: { appId } });
+    return !!entry;
   }
 
   /**
@@ -102,12 +171,28 @@ export class AppManager {
   }
 
   /**
-   * Uninstall an app
-   * Removes the app from registry (logical delete for V1)
+   * Check if an app can be uninstalled
+   * Returns list of dependent apps if any
    *
    * @param appId - App identifier
+   * @returns Array of dependent appIds (empty if can uninstall)
    */
-  async uninstall(appId: string): Promise<void> {
+  async canUninstall(appId: string): Promise<string[]> {
+    return this.dependencyResolver.findDependents(appId);
+  }
+
+  /**
+   * Uninstall an app
+   * Checks for dependents and prevents uninstall if found
+   *
+   * @param appId - App identifier
+   * @param options - Uninstall options
+   * @throws DependencyError if app has dependents and force is not set
+   */
+  async uninstall(
+    appId: string,
+    options?: { force?: boolean; purgeData?: boolean }
+  ): Promise<void> {
     const entry = await this.repo.findOne({ where: { appId } });
 
     if (!entry) {
@@ -115,9 +200,58 @@ export class AppManager {
       return;
     }
 
-    await this.repo.remove(entry);
+    // Check for dependents
+    const dependents = await this.canUninstall(appId);
 
-    // TODO: Future - Handle data cleanup (CPT records, ACF data, etc.)
+    if (dependents.length > 0 && !options?.force) {
+      throw new DependencyError(
+        `Cannot uninstall ${appId}: The following apps depend on it: ${dependents.join(', ')}. ` +
+        `Please uninstall these apps first, or use force option to cascade uninstall.`,
+        dependents
+      );
+    }
+
+    // If force, uninstall dependents first (cascade)
+    if (options?.force && dependents.length > 0) {
+      const uninstallOrder = await this.dependencyResolver.resolveUninstallOrder([
+        appId,
+        ...dependents
+      ]);
+
+      for (const targetAppId of uninstallOrder) {
+        await this.uninstallSingleApp(targetAppId, options);
+      }
+    } else {
+      await this.uninstallSingleApp(appId, options);
+    }
+  }
+
+  /**
+   * Uninstall a single app (internal method)
+   *
+   * @param appId - App identifier
+   * @param options - Uninstall options
+   */
+  private async uninstallSingleApp(
+    appId: string,
+    options?: { purgeData?: boolean }
+  ): Promise<void> {
+    const entry = await this.repo.findOne({ where: { appId } });
+
+    if (!entry) {
+      return;
+    }
+
+    // Deactivate first if active
+    if (entry.status === 'active') {
+      await this.deactivate(appId);
+    }
+
+    // TODO: Run lifecycle.uninstall hook
+    // TODO: Handle data cleanup if purgeData (CPT records, ACF data, etc.)
+
+    // Remove from registry
+    await this.repo.remove(entry);
   }
 
   /**
