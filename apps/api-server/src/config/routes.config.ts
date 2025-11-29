@@ -76,6 +76,7 @@ import dropshippingAdminRoutes from '../routes/admin/dropshipping.routes.js';
 import userAdminRoutes from '../routes/admin/users.routes.js';
 import supplierAdminRoutes from '../routes/admin/suppliers.routes.js';
 import adminOrdersRoutes from '../routes/admin/orders.routes.js';
+import adminAppsRoutes from '../routes/admin/apps.routes.js';
 import productsRoutes from '../routes/products.js';
 import storefrontRoutes from '../routes/storefront.routes.js';
 import partnersRoutes from '../routes/partners.js';
@@ -468,12 +469,14 @@ export function setupRoutes(app: Application): void {
   app.use('/api/v1/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/v1/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/v1/admin/orders', standardLimiter, adminOrdersRoutes);
+  app.use('/api/v1/admin/apps', standardLimiter, adminAppsRoutes);
 
   // Admin sub-routes (legacy)
   app.use('/api/admin/dropshipping', standardLimiter, dropshippingAdminRoutes);
   app.use('/api/admin/users', standardLimiter, userAdminRoutes);
   app.use('/api/admin/suppliers', standardLimiter, supplierAdminRoutes);
   app.use('/api/admin/orders', standardLimiter, adminOrdersRoutes);
+  app.use('/api/admin/apps', standardLimiter, adminAppsRoutes);
 
   // Phase PD-8 - Admin Job Management
   app.use('/api/v2/admin/jobs', standardLimiter, adminJobsRoutes);
