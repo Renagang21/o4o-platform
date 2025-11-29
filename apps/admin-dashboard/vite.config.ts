@@ -38,6 +38,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/shortcodes': path.resolve(__dirname, '../../packages/shortcodes/dist'),
       '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
       '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist'),
+      // Forum app packages - map to source directories for lazy loading
+      '@o4o-apps/forum': path.resolve(__dirname, '../../packages/forum-app'),
+      '@o4o-apps/forum-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
+      '@o4o-apps/forum-neture': path.resolve(__dirname, '../../packages/forum-neture'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
@@ -89,7 +93,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/auth-context', // Workspace package - pre-bundling 방지
       '@o4o/shortcodes', // Workspace package - pre-bundling 방지
       '@o4o/block-renderer', // Workspace package - pre-bundling 방지
-      '@o4o/slide-app' // Workspace package - pre-bundling 방지
+      '@o4o/slide-app', // Workspace package - pre-bundling 방지
+      '@o4o-apps/forum', // Forum app packages - source imports
+      '@o4o-apps/forum-yaksa',
+      '@o4o-apps/forum-neture'
     ],
     esbuildOptions: {
       define: {
