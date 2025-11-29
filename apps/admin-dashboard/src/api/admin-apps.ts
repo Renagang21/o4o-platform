@@ -44,7 +44,7 @@ export const adminAppsApi = {
    * Get all installed apps
    */
   getInstalledApps: async (): Promise<AppRegistryEntry[]> => {
-    const response = await api.get('/api/admin/apps');
+    const response = await api.get('/admin/apps');
     return response.data.apps;
   },
 
@@ -52,7 +52,7 @@ export const adminAppsApi = {
    * Get app catalog (available apps)
    */
   getMarketApps: async (): Promise<AppCatalogItem[]> => {
-    const response = await api.get('/api/admin/apps/market');
+    const response = await api.get('/admin/apps/market');
     return response.data.apps;
   },
 
@@ -60,7 +60,7 @@ export const adminAppsApi = {
    * Get specific app status
    */
   getAppStatus: async (appId: string): Promise<AppRegistryEntry> => {
-    const response = await api.get(`/api/admin/apps/${appId}`);
+    const response = await api.get(`/admin/apps/${appId}`);
     return response.data.app;
   },
 
@@ -68,34 +68,34 @@ export const adminAppsApi = {
    * Install an app
    */
   installApp: async (appId: string): Promise<void> => {
-    await api.post('/api/admin/apps/install', { appId });
+    await api.post('/admin/apps/install', { appId });
   },
 
   /**
    * Activate an app
    */
   activateApp: async (appId: string): Promise<void> => {
-    await api.post('/api/admin/apps/activate', { appId });
+    await api.post('/admin/apps/activate', { appId });
   },
 
   /**
    * Deactivate an app
    */
   deactivateApp: async (appId: string): Promise<void> => {
-    await api.post('/api/admin/apps/deactivate', { appId });
+    await api.post('/admin/apps/deactivate', { appId });
   },
 
   /**
    * Uninstall an app
    */
   uninstallApp: async (appId: string): Promise<void> => {
-    await api.post('/api/admin/apps/uninstall', { appId });
+    await api.post('/admin/apps/uninstall', { appId });
   },
 
   /**
    * Update an app to the latest version
    */
   updateApp: async (appId: string): Promise<void> => {
-    await api.post('/api/admin/apps/update', { appId });
+    await api.post('/admin/apps/update', { appId });
   },
 };
