@@ -6,6 +6,7 @@ import { getCatalogItem } from '../app-manifests/appsCatalog.js';
 import { isNewerVersion } from '../utils/semver.js';
 import { AppDependencyResolver, DependencyError } from './AppDependencyResolver.js';
 import { AppDataCleaner } from './AppDataCleaner.js';
+import { AppTableOwnershipResolver, OwnershipValidationError } from './AppTableOwnershipResolver.js';
 import type { AppManifest } from '@o4o/types';
 import logger from '../utils/logger.js';
 
@@ -20,11 +21,13 @@ export class AppManager {
   private repo: Repository<AppRegistry>;
   private dependencyResolver: AppDependencyResolver;
   private dataCleaner: AppDataCleaner;
+  private ownershipResolver: AppTableOwnershipResolver;
 
   constructor() {
     this.repo = AppDataSource.getRepository(AppRegistry);
     this.dependencyResolver = new AppDependencyResolver();
     this.dataCleaner = new AppDataCleaner();
+    this.ownershipResolver = new AppTableOwnershipResolver();
   }
 
   /**
@@ -76,6 +79,19 @@ export class AppManager {
     }
 
     const manifest = loadLocalManifest(appId);
+
+    // Validate ownership claims before installation
+    logger.info(`[AppManager] Validating ownership for ${appId}...`);
+    try {
+      await this.ownershipResolver.validateOwnership(manifest);
+      logger.info(`[AppManager] ✓ Ownership validation passed for ${appId}`);
+    } catch (error) {
+      if (error instanceof OwnershipValidationError) {
+        logger.error(`[AppManager] ✗ Ownership validation failed for ${appId}:`, error.violations);
+        throw error;
+      }
+      throw error;
+    }
 
     let entry = await this.repo.findOne({ where: { appId } });
 
@@ -267,13 +283,33 @@ export class AppManager {
       logger.info(`[AppManager] Purging data for ${appId}`);
 
       try {
+        // Verify which resources actually exist before purging
+        const verifiedResources = await this.ownershipResolver.getVerifiedOwnedResources(manifest);
+
+        logger.info(
+          `[AppManager] Verified owned resources for ${appId}:`,
+          `${verifiedResources.tables.length} tables, ` +
+          `${verifiedResources.cpt.length} CPTs, ` +
+          `${verifiedResources.acf.length} ACFs`
+        );
+
+        if (verifiedResources.missingTables.length > 0) {
+          logger.warn(
+            `[AppManager] Skipping non-existent tables for ${appId}:`,
+            verifiedResources.missingTables
+          );
+        }
+
+        // Purge only verified resources
         await this.dataCleaner.purge({
           appId,
           appType: entry.type,
-          ownsTables: manifest.ownsTables || [],
-          ownsCPT: manifest.ownsCPT || [],
-          ownsACF: manifest.ownsACF || [],
+          ownsTables: verifiedResources.tables,
+          ownsCPT: verifiedResources.cpt,
+          ownsACF: verifiedResources.acf,
         });
+
+        logger.info(`[AppManager] ✓ Data purge completed for ${appId}`);
       } catch (error) {
         logger.error(`[AppManager] Failed to purge data for ${appId}:`, error);
         throw error;

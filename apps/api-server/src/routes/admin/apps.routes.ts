@@ -1,9 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AppManager } from '../../services/AppManager.js';
 import { DependencyError } from '../../services/AppDependencyResolver.js';
+import { OwnershipValidationError } from '../../services/AppTableOwnershipResolver.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
 import { APPS_CATALOG, getCatalogItem } from '../../app-manifests/appsCatalog.js';
+import { loadLocalManifest, hasManifest } from '../../app-manifests/index.js';
 import { isNewerVersion } from '../../utils/semver.js';
 
 const router: Router = Router();
@@ -35,16 +37,25 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const apps = await appManager.listInstalled();
 
-    // Enrich each app with update information
+    // Enrich each app with update information and ownership data
     const enrichedApps = apps.map(app => {
       const catalogItem = getCatalogItem(app.appId);
       const availableVersion = catalogItem?.version || app.version;
       const hasUpdate = catalogItem ? isNewerVersion(app.version, catalogItem.version) : false;
 
+      // Load manifest to get ownership information
+      const manifest = hasManifest(app.appId) ? loadLocalManifest(app.appId) : null;
+      const ownsTables = manifest?.ownsTables || [];
+      const ownsCPT = manifest?.ownsCPT || [];
+      const ownsACF = manifest?.ownsACF || [];
+
       return {
         ...app,
         availableVersion,
         hasUpdate,
+        ownsTables,
+        ownsCPT,
+        ownsACF,
       };
     });
 
@@ -94,6 +105,16 @@ router.post('/install', async (req: Request, res: Response, next: NextFunction) 
       message: `App ${appId} installed successfully`,
     });
   } catch (error) {
+    // Handle ownership validation errors
+    if (error instanceof OwnershipValidationError) {
+      return res.status(400).json({
+        ok: false,
+        error: 'OWNERSHIP_VIOLATION',
+        message: error.message,
+        violations: error.violations,
+      });
+    }
+
     next(error);
   }
 });

@@ -20,6 +20,9 @@ export interface AppRegistryEntry {
   updatedAt: string;
   availableVersion?: string; // Latest version from catalog
   hasUpdate?: boolean;       // Whether an update is available
+  ownsTables?: string[];     // Tables owned by this app
+  ownsCPT?: string[];        // CPTs owned by this app
+  ownsACF?: string[];        // ACF groups owned by this app
 }
 
 /**

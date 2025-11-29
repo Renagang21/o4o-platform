@@ -50,9 +50,21 @@ const AppStorePage: FC = () => {
       await adminAppsApi.installApp(appId);
       await loadData();
       alert(`${appId} 앱이 설치되었습니다.`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to install app:', error);
-      alert('앱 설치에 실패했습니다.');
+
+      // Handle ownership validation errors
+      if (error.response?.data?.error === 'OWNERSHIP_VIOLATION') {
+        const violations = error.response.data.violations || [];
+        alert(
+          `${appId} 앱을 설치할 수 없습니다.\n\n` +
+          `소유권 충돌:\n` +
+          `${violations.map((v: any) => `  • ${v.reason}`).join('\n')}\n\n` +
+          `앱 manifest를 확인해주세요.`
+        );
+      } else {
+        alert('앱 설치에 실패했습니다.');
+      }
     } finally {
       setActionLoading(null);
     }
@@ -87,10 +99,34 @@ const AppStorePage: FC = () => {
   };
 
   const handleUninstall = async (appId: string, purge: boolean = false) => {
+    // Find app to get ownership information
+    const app = installedApps.find(a => a.appId === appId);
+    const ownsTables = app?.ownsTables || [];
+    const ownsCPT = app?.ownsCPT || [];
+    const ownsACF = app?.ownsACF || [];
+    const hasOwnedData = ownsTables.length > 0 || ownsCPT.length > 0 || ownsACF.length > 0;
+
     // Confirm with appropriate message based on purge option
-    const confirmMessage = purge
-      ? `${appId} 앱과 데이터를 완전히 삭제하시겠습니까?\n\n⚠️ 경고: 이 작업은 되돌릴 수 없습니다.\n이 앱이 생성한 모든 데이터가 삭제됩니다.`
-      : `${appId} 앱을 삭제하시겠습니까?\n\n(데이터는 유지됩니다)`;
+    let confirmMessage = '';
+    if (purge) {
+      confirmMessage = `${appId} 앱과 데이터를 완전히 삭제하시겠습니까?\n\n⚠️ 경고: 이 작업은 되돌릴 수 없습니다.\n`;
+      if (hasOwnedData) {
+        confirmMessage += `\n삭제될 데이터:\n`;
+        if (ownsTables.length > 0) {
+          confirmMessage += `\n테이블 (${ownsTables.length}개):\n${ownsTables.map(t => `  • ${t}`).join('\n')}`;
+        }
+        if (ownsCPT.length > 0) {
+          confirmMessage += `\n\nCPT (${ownsCPT.length}개):\n${ownsCPT.map(c => `  • ${c}`).join('\n')}`;
+        }
+        if (ownsACF.length > 0) {
+          confirmMessage += `\n\nACF 그룹 (${ownsACF.length}개):\n${ownsACF.map(a => `  • ${a}`).join('\n')}`;
+        }
+      } else {
+        confirmMessage += `\n이 앱은 소유한 데이터가 없습니다.`;
+      }
+    } else {
+      confirmMessage = `${appId} 앱을 삭제하시겠습니까?\n\n(데이터는 유지됩니다)`;
+    }
 
     if (!confirm(confirmMessage)) {
       return;
@@ -295,6 +331,33 @@ const AppStorePage: FC = () => {
                         설치일:{' '}
                         {new Date(app.installedAt).toLocaleDateString('ko-KR')}
                       </div>
+
+                      {/* Ownership data section */}
+                      {(app.ownsTables && app.ownsTables.length > 0) ||
+                       (app.ownsCPT && app.ownsCPT.length > 0) ||
+                       (app.ownsACF && app.ownsACF.length > 0) ? (
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <div className="font-medium text-gray-700 mb-1">소유 데이터:</div>
+                          {app.ownsTables && app.ownsTables.length > 0 && (
+                            <div className="text-xs">
+                              <span className="font-medium">테이블:</span>{' '}
+                              {app.ownsTables.join(', ')}
+                            </div>
+                          )}
+                          {app.ownsCPT && app.ownsCPT.length > 0 && (
+                            <div className="text-xs">
+                              <span className="font-medium">CPT:</span>{' '}
+                              {app.ownsCPT.join(', ')}
+                            </div>
+                          )}
+                          {app.ownsACF && app.ownsACF.length > 0 && (
+                            <div className="text-xs">
+                              <span className="font-medium">ACF:</span>{' '}
+                              {app.ownsACF.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
                     </div>
                     {app.hasUpdate && (
                       <Button
