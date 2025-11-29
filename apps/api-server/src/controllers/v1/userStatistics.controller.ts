@@ -2,13 +2,14 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../entities/User.js';
 import { UserActivityLog, ActivityType, ActivityCategory } from '../../entities/UserActivityLog.js';
-import { BetaUser, BetaUserStatus } from '../../entities/BetaUser.js';
+// NOTE: BetaUser entity removed - beta feature deprecated
+// import { BetaUser, BetaUserStatus } from '../../entities/BetaUser.js';
 import { Between, In } from 'typeorm';
 
 export class UserStatisticsController {
   private static userRepository = AppDataSource.getRepository(User);
   private static activityRepository = AppDataSource.getRepository(UserActivityLog);
-  private static betaUserRepository = AppDataSource.getRepository(BetaUser);
+  // private static betaUserRepository = AppDataSource.getRepository(BetaUser); // Removed - beta feature deprecated
 
   static async getUserStatistics(req: Request, res: Response): Promise<void> {
     try {
@@ -36,13 +37,8 @@ export class UserStatisticsController {
       );
 
       // Beta user statistics
-      const betaUsersByStatus = await Promise.all(
-        Object.values(BetaUserStatus).map(async (status) => ({
-          status,
-          count: await UserStatisticsController.betaUserRepository.count({ where: { status } }),
-          label: status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')
-        }))
-      );
+      // NOTE: BetaUser statistics removed - beta feature deprecated
+      const betaUsersByStatus: any[] = []; // Removed - beta feature deprecated
 
       // New user registrations over time
       const registrations = await UserStatisticsController.getUserRegistrationStats(daysNum);
@@ -61,7 +57,8 @@ export class UserStatisticsController {
 
       // Totals
       const totalUsers = await UserStatisticsController.userRepository.count();
-      const totalBetaUsers = await UserStatisticsController.betaUserRepository.count();
+      // NOTE: BetaUser statistics removed - beta feature deprecated
+      const totalBetaUsers = 0; // await UserStatisticsController.betaUserRepository.count();
       const totalActivities = await UserStatisticsController.activityRepository.count({
         where: { createdAt: Between(startDate, new Date()) }
       });

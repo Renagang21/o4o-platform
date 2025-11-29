@@ -7,7 +7,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import { BetaUser } from './BetaUser.js';
+// NOTE: BetaUser entity removed - beta feature deprecated
+// import { BetaUser } from './BetaUser.js';
 import { UserSession } from './UserSession.js';
 
 // Type definition for action metadata
@@ -133,9 +134,10 @@ export class UserAction {
   @Column({ type: 'uuid' })
   betaUserId!: string;
 
-  @ManyToOne('BetaUser')
-  @JoinColumn({ name: 'betaUserId' })
-  betaUser!: BetaUser;
+  // NOTE: BetaUser relation removed - beta feature deprecated
+  // @ManyToOne('BetaUser')
+  // @JoinColumn({ name: 'betaUserId' })
+  // betaUser!: BetaUser;
 
   @Column({ type: 'uuid' })
   sessionId!: string;

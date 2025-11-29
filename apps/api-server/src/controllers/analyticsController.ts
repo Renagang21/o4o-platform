@@ -7,7 +7,8 @@ import { UserAction, ActionType } from '../entities/UserAction.js';
 import { SystemMetrics, MetricType } from '../entities/SystemMetrics.js';
 import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport.js';
 import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert.js';
-import { BetaUser } from '../entities/BetaUser.js';
+// NOTE: BetaUser entity removed - beta feature deprecated
+// import { BetaUser } from '../entities/BetaUser.js';
 import { AuthRequest } from '../types/auth.js';
 
 export class AnalyticsController {
@@ -17,7 +18,7 @@ export class AnalyticsController {
   private systemMetricsRepo: Repository<SystemMetrics>;
   private analyticsReportRepo: Repository<AnalyticsReport>;
   private alertRepo: Repository<Alert>;
-  private betaUserRepo: Repository<BetaUser>;
+  // private betaUserRepo: Repository<BetaUser>; // Removed - beta feature deprecated
 
   constructor() {
     this.analyticsService = new AnalyticsService();
@@ -26,7 +27,7 @@ export class AnalyticsController {
     this.systemMetricsRepo = AppDataSource.getRepository(SystemMetrics);
     this.analyticsReportRepo = AppDataSource.getRepository(AnalyticsReport);
     this.alertRepo = AppDataSource.getRepository(Alert);
-    this.betaUserRepo = AppDataSource.getRepository(BetaUser);
+    // this.betaUserRepo = AppDataSource.getRepository(BetaUser); // Removed - beta feature deprecated
   }
 
   // Overview Dashboard
@@ -64,16 +65,15 @@ export class AnalyticsController {
         userActions,
         engagementMetrics
       ] = await Promise.all([
-        this.betaUserRepo.count(),
-        this.betaUserRepo.count({ 
-          where: { lastActiveAt: MoreThan(startDate) }
-        }),
-        this.betaUserRepo.count({
-          where: { createdAt: MoreThan(startDate) }
-        }),
+        // this.betaUserRepo.count(), // Removed - beta feature deprecated
+        Promise.resolve(0),
+        // this.betaUserRepo.count({ where: { lastActiveAt: MoreThan(startDate) } }), // Removed
+        Promise.resolve(0),
+        // this.betaUserRepo.count({ where: { createdAt: MoreThan(startDate) } }), // Removed
+        Promise.resolve(0),
         this.userSessionRepo.find({
           where: { createdAt: MoreThan(startDate) },
-          relations: ['betaUser'],
+          // relations: ['betaUser'], // Removed - beta feature deprecated
           order: { createdAt: 'DESC' }
         }),
         this.userActionRepo.count({
@@ -83,19 +83,9 @@ export class AnalyticsController {
       ]);
 
       // User demographics
-      const userTypes = await this.betaUserRepo
-        .createQueryBuilder('user')
-        .select('user.type', 'type')
-        .addSelect('COUNT(*)', 'count')
-        .groupBy('user.type')
-        .getRawMany();
-
-      const interestAreas = await this.betaUserRepo
-        .createQueryBuilder('user')
-        .select('user.interestArea', 'area')
-        .addSelect('COUNT(*)', 'count')
-        .groupBy('user.interestArea')
-        .getRawMany();
+      // NOTE: BetaUser queries removed - beta feature deprecated
+      const userTypes: any[] = []; // await this.betaUserRepo.createQueryBuilder...
+      const interestAreas: any[] = []; // await this.betaUserRepo.createQueryBuilder...
 
       // User activity trends (daily active users)
       const dailyActiveUsers = await this.getDailyActiveUsers(days);

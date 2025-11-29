@@ -5,8 +5,9 @@ import { UserAction, ActionType, ActionCategory } from '../entities/UserAction.j
 import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics.js';
 import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport.js';
 import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert.js';
-import { BetaUser } from '../entities/BetaUser.js';
-import { BetaFeedback } from '../entities/BetaFeedback.js';
+// NOTE: BetaUser and BetaFeedback entities removed - beta feature deprecated
+// import { BetaUser } from '../entities/BetaUser.js';
+// import { BetaFeedback } from '../entities/BetaFeedback.js';
 import { ContentUsageLog } from '../entities/ContentUsageLog.js';
 import type { AnalyticsMetadata, MetricTags, ErrorContext } from '../types/index.js';
 
@@ -68,8 +69,9 @@ export class AnalyticsService {
   private systemMetricsRepo: Repository<SystemMetrics>;
   private analyticsReportRepo: Repository<AnalyticsReport>;
   private alertRepo: Repository<Alert>;
-  private betaUserRepo: Repository<BetaUser>;
-  private betaFeedbackRepo: Repository<BetaFeedback>;
+  // NOTE: BetaUser and BetaFeedback repositories removed - beta feature deprecated
+  // private betaUserRepo: Repository<BetaUser>;
+  // private betaFeedbackRepo: Repository<BetaFeedback>;
   private contentUsageLogRepo: Repository<ContentUsageLog>;
 
   constructor() {
@@ -78,8 +80,8 @@ export class AnalyticsService {
     this.systemMetricsRepo = AppDataSource.getRepository(SystemMetrics);
     this.analyticsReportRepo = AppDataSource.getRepository(AnalyticsReport);
     this.alertRepo = AppDataSource.getRepository(Alert);
-    this.betaUserRepo = AppDataSource.getRepository(BetaUser);
-    this.betaFeedbackRepo = AppDataSource.getRepository(BetaFeedback);
+    // this.betaUserRepo = AppDataSource.getRepository(BetaUser); // Removed - beta feature deprecated
+    // this.betaFeedbackRepo = AppDataSource.getRepository(BetaFeedback); // Removed - beta feature deprecated
     this.contentUsageLogRepo = AppDataSource.getRepository(ContentUsageLog);
   }
 
@@ -261,22 +263,17 @@ export class AnalyticsService {
       avgResponseTime,
       errorRate
     ] = await Promise.all([
-      this.betaUserRepo.count(),
-      this.betaUserRepo.createQueryBuilder('user')
-        .where('user.lastActiveAt >= :startDate', { startDate })
-        .getCount(),
-      this.betaUserRepo.createQueryBuilder('user')
-        .where('user.createdAt >= :startDate', { startDate })
-        .getCount(),
+      // NOTE: BetaUser statistics removed - beta feature deprecated
+      Promise.resolve(0), // this.betaUserRepo.count(),
+      Promise.resolve(0), // this.betaUserRepo.createQueryBuilder...
+      Promise.resolve(0), // this.betaUserRepo.createQueryBuilder...
       this.userSessionRepo.createQueryBuilder('session')
         .where('session.createdAt >= :startDate', { startDate })
         .getCount(),
       this.getAverageSessionDuration(startDate),
       this.getTotalPageViews(startDate),
       this.getTotalActions(startDate),
-      this.betaFeedbackRepo.createQueryBuilder('feedback')
-        .where('feedback.createdAt >= :startDate', { startDate })
-        .getCount(),
+      Promise.resolve(0), // this.betaFeedbackRepo.createQueryBuilder...
       this.getTotalErrors(startDate),
       this.getAverageResponseTime(startDate),
       this.getErrorRate(startDate)

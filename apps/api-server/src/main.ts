@@ -432,5 +432,5 @@ process.on('SIGINT', async () => {
 });
 
 // Export services for other modules
-export { RealtimeFeedbackService } from './services/realtimeFeedbackService.js';
+// NOTE: RealtimeFeedbackService removed in v1 - beta feature deprecated
 export { io };

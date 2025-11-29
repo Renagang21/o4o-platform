@@ -6,7 +6,8 @@ import { AnalyticsReport, ReportType, ReportCategory } from '../entities/Analyti
 import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert.js';
 import { UserSession, SessionStatus } from '../entities/UserSession.js';
 import { SystemMetrics, MetricCategory, MetricType } from '../entities/SystemMetrics.js';
-import { BetaUser } from '../entities/BetaUser.js';
+// NOTE: BetaUser entity removed - beta feature deprecated
+// import { BetaUser } from '../entities/BetaUser.js';
 
 export interface SmtpConfig {
   host: string;
@@ -58,8 +59,9 @@ export class ScheduledReportingService {
   private alertRepo: Repository<Alert>;
   private userSessionRepo: Repository<UserSession>;
   private systemMetricsRepo: Repository<SystemMetrics>;
-  private betaUserRepo: Repository<BetaUser>;
-  
+  // NOTE: BetaUser repository removed - beta feature deprecated
+  // private betaUserRepo: Repository<BetaUser>;
+
   private isRunning: boolean = false;
   private notificationConfig: NotificationConfig;
 
@@ -69,7 +71,7 @@ export class ScheduledReportingService {
     this.alertRepo = AppDataSource.getRepository(Alert);
     this.userSessionRepo = AppDataSource.getRepository(UserSession);
     this.systemMetricsRepo = AppDataSource.getRepository(SystemMetrics);
-    this.betaUserRepo = AppDataSource.getRepository(BetaUser);
+    // this.betaUserRepo = AppDataSource.getRepository(BetaUser); // Removed - beta feature deprecated
     this.notificationConfig = notificationConfig;
   }
 
@@ -515,6 +517,7 @@ export class ScheduledReportingService {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
+    // NOTE: BetaUser statistics removed - beta feature deprecated
     const [
       totalUsers,
       activeUsers,
@@ -522,10 +525,10 @@ export class ScheduledReportingService {
       lowEngagementUsers,
       averageEngagement
     ] = await Promise.all([
-      this.betaUserRepo.count(),
-      this.betaUserRepo.count({ where: { lastActiveAt: MoreThanOrEqual(threeDaysAgo) } }),
-      this.betaUserRepo.count({ where: { createdAt: MoreThanOrEqual(threeDaysAgo) } }),
-      this.betaUserRepo.count({ where: { feedbackCount: LessThanOrEqual(1), loginCount: LessThanOrEqual(2) } }),
+      Promise.resolve(0), // this.betaUserRepo.count(),
+      Promise.resolve(0), // this.betaUserRepo.count({ where: { lastActiveAt: MoreThanOrEqual(threeDaysAgo) } }),
+      Promise.resolve(0), // this.betaUserRepo.count({ where: { createdAt: MoreThanOrEqual(threeDaysAgo) } }),
+      Promise.resolve(0), // this.betaUserRepo.count({ where: { feedbackCount: LessThanOrEqual(1), loginCount: LessThanOrEqual(2) } }),
       this.calculateAverageEngagement()
     ]);
 
@@ -548,14 +551,14 @@ export class ScheduledReportingService {
   }
 
   private async calculateAverageEngagement(): Promise<number> {
-    const users = await this.betaUserRepo.find();
-    if (users.length === 0) return 0;
-
-    const totalEngagement = users.reduce((sum, user) => {
-      return sum + user.getEngagementLevel() === 'high' ? 3 : user.getEngagementLevel() === 'medium' ? 2 : 1;
-    }, 0);
-
-    return Math.round((totalEngagement / users.length) * 100) / 100;
+    // NOTE: BetaUser engagement calculation removed - beta feature deprecated
+    return 0;
+    // const users = await this.betaUserRepo.find();
+    // if (users.length === 0) return 0;
+    // const totalEngagement = users.reduce((sum, user) => {
+    //   return sum + user.getEngagementLevel() === 'high' ? 3 : user.getEngagementLevel() === 'medium' ? 2 : 1;
+    // }, 0);
+    // return Math.round((totalEngagement / users.length) * 100) / 100;
   }
 
   // Public methods for manual triggering
