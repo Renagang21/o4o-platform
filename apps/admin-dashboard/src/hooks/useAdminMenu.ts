@@ -63,7 +63,10 @@ export const useAdminMenu = () => {
   const allMenuItems = injectCPTMenuItems([...wordpressMenuItems], cptMenuItems);
 
   // Get user roles (support multiple roles)
-  const userRoles = (user as any)?.roles || (user?.role ? [user.role] : []);
+  // user.roles is array of objects with {id, name, displayName}
+  // Extract name strings for permission checking
+  const rawRoles = (user as any)?.roles || (user?.role ? [{ name: user.role }] : []);
+  const userRoles = rawRoles.map((r: any) => typeof r === 'string' ? r : r.name).filter(Boolean);
 
   // Filter menu items based on permissions and app status
   const filterMenuItems = (items: any[]): any[] => {

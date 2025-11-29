@@ -28,8 +28,13 @@ export default function MenuDebug() {
           <div><strong>ID:</strong> {user?.id}</div>
           <div><strong>Email:</strong> {user?.email}</div>
           <div><strong>user.role:</strong> {JSON.stringify((user as any)?.role)}</div>
-          <div><strong>user.roles:</strong> {JSON.stringify((user as any)?.roles)}</div>
-          <div><strong>Computed userRoles:</strong> {JSON.stringify(userRoles)}</div>
+          <div><strong>user.roles (raw objects):</strong> {JSON.stringify((user as any)?.roles)}</div>
+          <div className="text-lg font-bold text-green-600">
+            <strong>✅ Computed userRoles (strings):</strong> {JSON.stringify(userRoles)}
+          </div>
+          <div className="text-xs text-gray-600">
+            (Should be string array like ["super_admin"] for permission checking to work)
+          </div>
         </div>
       </div>
 
