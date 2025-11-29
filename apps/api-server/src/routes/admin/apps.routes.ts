@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { AppManager } from '../../services/AppManager.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { APPS_CATALOG } from '../../app-manifests/appsCatalog.js';
 
 const router: Router = Router();
 
@@ -11,6 +12,18 @@ router.use(requireAdmin);
 
 // Create singleton instance
 const appManager = new AppManager();
+
+/**
+ * GET /api/admin/apps/market
+ * Get app catalog (available apps that can be installed)
+ */
+router.get('/market', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    res.json({ apps: APPS_CATALOG });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * GET /api/admin/apps

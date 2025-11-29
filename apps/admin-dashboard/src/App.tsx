@@ -88,6 +88,7 @@ const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 // App Pages
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
+const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 
 
 // UI Showcase
@@ -728,7 +729,16 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
+
+                    {/* 앱 장터 */}
+                    <Route path="/apps/store" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AppStorePage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 설정 */}
                     <Route path="/settings/*" element={
                       <AdminProtectedRoute requiredPermissions={['settings:read']}>
