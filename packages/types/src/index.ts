@@ -37,6 +37,9 @@ export * from './dashboard.js';
 // Export partner types (replacing old affiliate module)
 export * from './partner.js';
 
+// Export app manifest types (App Market V1)
+export * from './app-manifest.js';
+
 // For backward compatibility, re-export partner types with affiliate names
 export type {
   PartnerUser as AffiliateUser,

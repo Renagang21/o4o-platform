@@ -67,6 +67,7 @@ import { AIUsageLog } from '../entities/AIUsageLog.js';
 import { App } from '../entities/App.js';
 import { AppInstance } from '../entities/AppInstance.js';
 import { AppUsageLog } from '../entities/AppUsageLog.js';
+import { AppRegistry } from '../entities/AppRegistry.js';
 // Cart and Order entities
 import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
@@ -217,6 +218,7 @@ export const AppDataSource = new DataSource({
     App,
     AppInstance,
     AppUsageLog,
+    AppRegistry,
     // Cart and Order entities
     Cart,
     CartItem,
