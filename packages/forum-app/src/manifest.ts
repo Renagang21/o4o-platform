@@ -12,6 +12,13 @@ export const forumManifest = {
   version: '1.0.0',
   description: '커뮤니티 포럼 코어 엔진 (게시글/댓글/카테고리/태그)',
 
+  // Uninstall policy
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true,
+  },
+
   // Data ownership - forum-core owns these tables
   ownsTables: [
     'forum_post',

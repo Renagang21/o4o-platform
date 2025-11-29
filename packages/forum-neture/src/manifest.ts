@@ -20,6 +20,18 @@ export const forumNetureManifest = {
     'forum-core': '>=1.0.0',
   },
 
+  // Uninstall policy
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: false, // Extension data is less critical
+  },
+
+  // Extension tables (NOT core tables)
+  ownsTables: [
+    // Extension apps should not own core tables
+  ],
+
   // Extend forum_post CPT with cosmetics metadata
   extendsCPT: [
     {

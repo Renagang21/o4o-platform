@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw } from 'lucide-react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -86,16 +86,24 @@ const AppStorePage: FC = () => {
     }
   };
 
-  const handleUninstall = async (appId: string) => {
-    if (!confirm(`${appId} 앱을 삭제하시겠습니까?`)) {
+  const handleUninstall = async (appId: string, purge: boolean = false) => {
+    // Confirm with appropriate message based on purge option
+    const confirmMessage = purge
+      ? `${appId} 앱과 데이터를 완전히 삭제하시겠습니까?\n\n⚠️ 경고: 이 작업은 되돌릴 수 없습니다.\n이 앱이 생성한 모든 데이터가 삭제됩니다.`
+      : `${appId} 앱을 삭제하시겠습니까?\n\n(데이터는 유지됩니다)`;
+
+    if (!confirm(confirmMessage)) {
       return;
     }
 
     setActionLoading(appId);
     try {
-      await adminAppsApi.uninstallApp(appId);
+      await adminAppsApi.uninstallApp(appId, purge);
       await loadData();
-      alert(`${appId} 앱이 삭제되었습니다.`);
+      const successMessage = purge
+        ? `${appId} 앱과 데이터가 완전히 삭제되었습니다.`
+        : `${appId} 앱이 삭제되었습니다. (데이터는 유지됨)`;
+      alert(successMessage);
     } catch (error: any) {
       console.error('Failed to uninstall app:', error);
 
@@ -321,13 +329,33 @@ const AppStorePage: FC = () => {
                           활성화
                         </Button>
                       )}
-                      <Button
-                        onClick={() => handleUninstall(app.appId)}
-                        disabled={actionLoading === app.appId}
-                        variant="destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="relative group">
+                        <Button
+                          onClick={() => handleUninstall(app.appId, false)}
+                          disabled={actionLoading === app.appId}
+                          variant="destructive"
+                          title="앱 삭제 (데이터 유지)"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        {/* Dropdown menu for purge option */}
+                        <div className="absolute right-0 bottom-full mb-1 hidden group-hover:block bg-white border border-gray-200 rounded shadow-lg z-10 min-w-[180px]">
+                          <button
+                            onClick={() => handleUninstall(app.appId, false)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            데이터 유지 삭제
+                          </button>
+                          <button
+                            onClick={() => handleUninstall(app.appId, true)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600 flex items-center border-t"
+                          >
+                            <AlertTriangle className="w-4 h-4 mr-2" />
+                            완전 삭제 (데이터 포함)
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

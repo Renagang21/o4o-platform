@@ -20,6 +20,19 @@ export const forumYaksaManifest = {
     'forum-core': '>=1.0.0',
   },
 
+  // Uninstall policy
+  uninstallPolicy: {
+    defaultMode: 'keep-data' as const,
+    allowPurge: true,
+    autoBackup: true, // Yaksa communities are important
+  },
+
+  // Extension tables (yaksa-specific)
+  ownsTables: [
+    'yaksa_forum_community',
+    'yaksa_forum_community_member',
+  ],
+
   // Extend forum_post CPT with pharmacy metadata
   extendsCPT: [
     {

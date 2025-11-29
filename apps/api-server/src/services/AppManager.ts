@@ -5,7 +5,9 @@ import { loadLocalManifest, hasManifest } from '../app-manifests/index.js';
 import { getCatalogItem } from '../app-manifests/appsCatalog.js';
 import { isNewerVersion } from '../utils/semver.js';
 import { AppDependencyResolver, DependencyError } from './AppDependencyResolver.js';
+import { AppDataCleaner } from './AppDataCleaner.js';
 import type { AppManifest } from '@o4o/types';
+import logger from '../utils/logger.js';
 
 /**
  * AppManager Service
@@ -17,10 +19,12 @@ import type { AppManifest } from '@o4o/types';
 export class AppManager {
   private repo: Repository<AppRegistry>;
   private dependencyResolver: AppDependencyResolver;
+  private dataCleaner: AppDataCleaner;
 
   constructor() {
     this.repo = AppDataSource.getRepository(AppRegistry);
     this.dependencyResolver = new AppDependencyResolver();
+    this.dataCleaner = new AppDataCleaner();
   }
 
   /**
@@ -242,13 +246,43 @@ export class AppManager {
       return;
     }
 
+    // Load manifest to get uninstall policy
+    const manifest = hasManifest(appId) ? loadLocalManifest(appId) : null;
+    const uninstallPolicy = manifest?.uninstallPolicy || {
+      defaultMode: 'keep-data',
+      allowPurge: true,
+      autoBackup: false,
+    };
+
+    // Determine if we should purge data
+    const shouldPurge = options?.purgeData ?? (uninstallPolicy.defaultMode === 'purge-data');
+
     // Deactivate first if active
     if (entry.status === 'active') {
       await this.deactivate(appId);
     }
 
+    // Purge data if requested
+    if (shouldPurge && uninstallPolicy.allowPurge && manifest) {
+      logger.info(`[AppManager] Purging data for ${appId}`);
+
+      try {
+        await this.dataCleaner.purge({
+          appId,
+          appType: entry.type,
+          ownsTables: manifest.ownsTables || [],
+          ownsCPT: manifest.ownsCPT || [],
+          ownsACF: manifest.ownsACF || [],
+        });
+      } catch (error) {
+        logger.error(`[AppManager] Failed to purge data for ${appId}:`, error);
+        throw error;
+      }
+    } else {
+      logger.info(`[AppManager] Keeping data for ${appId} (keep-data mode)`);
+    }
+
     // TODO: Run lifecycle.uninstall hook
-    // TODO: Handle data cleanup if purgeData (CPT records, ACF data, etc.)
 
     // Remove from registry
     await this.repo.remove(entry);

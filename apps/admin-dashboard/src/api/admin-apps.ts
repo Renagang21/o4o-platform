@@ -88,8 +88,8 @@ export const adminAppsApi = {
   /**
    * Uninstall an app
    */
-  uninstallApp: async (appId: string): Promise<void> => {
-    await api.post('/admin/apps/uninstall', { appId });
+  uninstallApp: async (appId: string, purge: boolean = false): Promise<void> => {
+    await api.post('/admin/apps/uninstall', { appId, purge });
   },
 
   /**

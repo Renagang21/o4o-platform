@@ -27,6 +27,25 @@ export interface AppManifest {
   /** Short description */
   description?: string;
 
+  /** Uninstall policy */
+  uninstallPolicy?: {
+    /** Default mode when uninstalling */
+    defaultMode?: 'keep-data' | 'purge-data';
+    /** Allow users to purge data */
+    allowPurge?: boolean;
+    /** Auto backup before purge */
+    autoBackup?: boolean;
+  };
+
+  /** Database tables this app owns (for purge) */
+  ownsTables?: string[];
+
+  /** CPT types this app owns */
+  ownsCPT?: string[];
+
+  /** ACF field groups this app owns */
+  ownsACF?: string[];
+
   /** Routes this app handles (e.g., ['/forum', '/forum/:id']) */
   routes?: string[];
 

@@ -152,21 +152,24 @@ router.post('/deactivate', async (req: Request, res: Response, next: NextFunctio
  * POST /api/admin/apps/uninstall
  * Uninstall an app
  *
- * Body: { appId: string, force?: boolean }
+ * Body: { appId: string, force?: boolean, purge?: boolean }
  */
 router.post('/uninstall', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { appId, force = false } = req.body;
+    const { appId, force = false, purge = false } = req.body;
 
     if (!appId) {
       return res.status(400).json({ error: 'appId is required' });
     }
 
-    await appManager.uninstall(appId, { force });
+    await appManager.uninstall(appId, { force, purgeData: purge });
 
     res.json({
       ok: true,
-      message: `App ${appId} uninstalled successfully`,
+      message: purge
+        ? `App ${appId} and its data uninstalled successfully`
+        : `App ${appId} uninstalled successfully (data kept)`,
+      purged: purge,
     });
   } catch (error) {
     // Handle dependency errors
