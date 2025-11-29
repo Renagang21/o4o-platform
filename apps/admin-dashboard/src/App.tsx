@@ -155,6 +155,7 @@ const AuthInspector = lazy(() => import('@/pages/test/AuthInspector'));
 const DropshippingUsersTest = lazy(() => import('@/pages/test/DropshippingUsersTest'));
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
 const ApiResponseChecker = lazy(() => import('@/pages/test/ApiResponseChecker'));
+const MenuDebug = lazy(() => import('@/pages/test/MenuDebug'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -973,6 +974,11 @@ function App() {
                     <Route path="/test/api-response-checker" element={
                       <Suspense fallback={<PageLoader />}>
                         <ApiResponseChecker />
+                      </Suspense>
+                    } />
+                    <Route path="/test/menu-debug" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <MenuDebug />
                       </Suspense>
                     } />
 
