@@ -45,6 +45,7 @@ export interface MenuItem {
   path?: string;
   separator?: boolean;
   children?: MenuItem[];
+  appId?: string; // Optional app identifier for app-based menu items
 }
 
 export const wordpressMenuItems: MenuItem[] = [
@@ -160,6 +161,7 @@ export const wordpressMenuItems: MenuItem[] = [
     id: 'forum',
     label: '포럼',
     icon: <MessageSquare className="w-5 h-5" />,
+    appId: 'forum', // App-based menu item
     children: [
       { id: 'forum-boards', label: '게시판 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/boards' },
       { id: 'forum-categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/forum/categories' },

@@ -151,4 +151,18 @@ export class AppManager {
     const entry = await this.repo.findOne({ where: { appId } });
     return entry?.status === 'active';
   }
+
+  /**
+   * List all active apps
+   *
+   * @returns Array of active AppRegistry entries
+   */
+  async listActiveApps(): Promise<AppRegistry[]> {
+    return this.repo.find({
+      where: { status: 'active' },
+      order: {
+        installedAt: 'DESC',
+      },
+    });
+  }
 }

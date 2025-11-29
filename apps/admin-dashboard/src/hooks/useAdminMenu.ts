@@ -4,6 +4,7 @@ import { useAuth } from '@o4o/auth-context';
 import { hasMenuPermission, getAccessibleMenus } from '@/config/rolePermissions';
 import { useEffect, useState } from 'react';
 import { unifiedApi } from '@/api/unified-client';
+import { useAppStatus } from './useAppStatus';
 
 /**
  * Admin menu hook that dynamically filters menus based on user roles and permissions
@@ -12,6 +13,7 @@ import { unifiedApi } from '@/api/unified-client';
 export const useAdminMenu = () => {
   const { user } = useAuth();
   const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
+  const { isActive: isAppActive, isLoading: appStatusLoading } = useAppStatus();
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [permissionsLoading, setPermissionsLoading] = useState(true);
 
@@ -63,7 +65,7 @@ export const useAdminMenu = () => {
   // Get user roles (support multiple roles)
   const userRoles = (user as any)?.roles || (user?.role ? [user.role] : []);
 
-  // Filter menu items based on permissions
+  // Filter menu items based on permissions and app status
   const filterMenuItems = (items: any[]): any[] => {
     return items.map(item => {
       // Skip separators - always show
@@ -76,12 +78,20 @@ export const useAdminMenu = () => {
         return item;
       }
 
+      // Check app status - if menu has appId, only show if app is active
+      if (item.appId && !isAppActive(item.appId)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.debug(`[Menu Filter] App inactive: ${item.id} (appId: ${item.appId})`);
+        }
+        return null;
+      }
+
       // Check if user has permission for this menu item
       const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id || item.key);
 
       // Debug logging for menu filtering (can be removed in production)
       if (!hasAccess && process.env.NODE_ENV === 'development') {
-        console.debug(`[Menu Filter] Hidden: ${item.id} - User roles:`, userRoles, 'Permissions:', userPermissions);
+        console.debug(`[Menu Filter] No permission: ${item.id} - User roles:`, userRoles, 'Permissions:', userPermissions);
       }
 
       if (!hasAccess) {
@@ -111,7 +121,7 @@ export const useAdminMenu = () => {
 
   return {
     menuItems: filteredMenuItems,
-    isLoading: cptLoading || permissionsLoading,
+    isLoading: cptLoading || permissionsLoading || appStatusLoading,
     userRoles,
     userPermissions
   };
