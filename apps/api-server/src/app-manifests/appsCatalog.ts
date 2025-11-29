@@ -39,6 +39,22 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'display',
     author: 'O4O Platform',
   },
+  {
+    appId: 'forum-neture',
+    name: 'Forum Extension – Neture Cosmetics',
+    version: '1.0.0',
+    description: '화장품 매장 특화 포럼 (피부타입, 루틴, 제품 연동)',
+    category: 'community',
+    author: 'O4O Platform',
+  },
+  {
+    appId: 'forum-yaksa',
+    name: 'Forum Extension – Yaksa Organization',
+    version: '1.0.0',
+    description: '약사 조직 특화 포럼 (복약지도, 케이스 스터디, 약물 정보)',
+    category: 'community',
+    author: 'O4O Platform',
+  },
   // Future: Add more apps as they become available
   // - dropshipping
   // - b2c-catalog

@@ -1,15 +1,23 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
 import { digitalsignageManifest } from './digitalsignage.manifest.js';
+import { forumNetureManifest } from '@o4o-apps/forum-neture';
+import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
 
 /**
  * App Manifest Registry
  *
  * Central registry of all available app manifests
+ *
+ * Note: Extension app manifests (forum-neture, forum-yaksa) have extended properties
+ * beyond the base AppManifest type. Type assertions are used here to accommodate
+ * the extended manifest schema documented in docs/dev/spec/extension_app_pattern.md
  */
 const manifestRegistry: Record<string, AppManifest> = {
-  forum: forumManifest,
+  forum: forumManifest as any,
   digitalsignage: digitalsignageManifest,
+  'forum-neture': forumNetureManifest as any,
+  'forum-yaksa': forumYaksaManifest as any,
 };
 
 /**
