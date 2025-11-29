@@ -111,27 +111,27 @@ export const menuPermissions: MenuPermission[] = [
   },
   {
     menuId: 'system-settings',
-    roles: ['Super Administrator', 'Administrator', 'Manager']
+    roles: ['super_admin', 'admin', 'manager']
   },
   {
     menuId: 'integrations',
-    roles: ['Super Administrator', 'Administrator', 'Manager']
+    roles: ['super_admin', 'admin', 'manager']
   },
 
   // Appearance - No restriction (allow all)
 
-  // Tools - Admin roles only
+  // Tools - 관리자만 접근 가능 (앱 장터, 파일 교체 등)
   {
     menuId: 'tools',
-    roles: ['Super Administrator', 'Administrator', 'Manager']
+    roles: ['super_admin', 'admin', 'manager']
   },
   {
     menuId: 'import-export',
-    roles: ['Super Administrator', 'Administrator', 'Manager']
+    roles: ['super_admin', 'admin', 'manager']
   },
   {
     menuId: 'database',
-    roles: ['Super Administrator', 'Administrator', 'Manager']
+    roles: ['super_admin', 'admin', 'manager']
   },
   {
     menuId: 'logs',
