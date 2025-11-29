@@ -90,6 +90,8 @@
     "@o4o/types": "file:../../packages/types",
     "@o4o/utils": "file:../../packages/utils",
     "@o4o-apps/forum": "file:../../packages/forum-app",
+    "@o4o-apps/forum-neture": "file:../../packages/forum-neture",
+    "@o4o-apps/forum-yaksa": "file:../../packages/forum-yaksa",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.65.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.206.0",
