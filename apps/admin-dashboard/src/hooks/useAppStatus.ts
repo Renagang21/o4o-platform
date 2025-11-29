@@ -31,15 +31,13 @@ export interface UseAppStatusReturn {
  * @returns App status utilities
  */
 export function useAppStatus(): UseAppStatusReturn {
-  const { data, isLoading, error } = useQuery(
-    ['installedApps'],
-    adminAppsApi.getInstalledApps,
-    {
-      staleTime: 30 * 1000, // 30 seconds
-      cacheTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['installedApps'],
+    queryFn: adminAppsApi.getInstalledApps,
+    staleTime: 30 * 1000, // 30 seconds
+    gcTime: 5 * 60 * 1000, // 5 minutes (cacheTime renamed to gcTime in v5)
+    refetchOnWindowFocus: false,
+  });
 
   const apps = data ?? [];
 
