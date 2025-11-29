@@ -2,6 +2,8 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { AppRegistry } from '../entities/AppRegistry.js';
 import { loadLocalManifest, hasManifest } from '../app-manifests/index.js';
+import { getCatalogItem } from '../app-manifests/appsCatalog.js';
+import { isNewerVersion } from '../utils/semver.js';
 import type { AppManifest } from '@o4o/types';
 
 /**
@@ -116,6 +118,37 @@ export class AppManager {
     await this.repo.remove(entry);
 
     // TODO: Future - Handle data cleanup (CPT records, ACF data, etc.)
+  }
+
+  /**
+   * Update an app to the latest version from catalog
+   * Updates the version field in the registry
+   *
+   * @param appId - App identifier
+   */
+  async update(appId: string): Promise<void> {
+    // Get catalog item
+    const catalogItem = getCatalogItem(appId);
+    if (!catalogItem) {
+      throw new Error(`App ${appId} not found in catalog`);
+    }
+
+    // Check if app is installed
+    const entry = await this.repo.findOne({ where: { appId } });
+    if (!entry) {
+      throw new Error(`App ${appId} is not installed`);
+    }
+
+    // Check if update is actually available
+    if (!isNewerVersion(entry.version, catalogItem.version)) {
+      throw new Error(`No update available for ${appId}. Current: ${entry.version}, Available: ${catalogItem.version}`);
+    }
+
+    // Update version
+    entry.version = catalogItem.version;
+    entry.updatedAt = new Date();
+
+    await this.repo.save(entry);
   }
 
   /**

@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { Package, Download, Power, PowerOff, Trash2, CheckCircle } from 'lucide-react';
+import { Package, Download, Power, PowerOff, Trash2, CheckCircle, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -104,6 +104,20 @@ const AppStorePage: FC = () => {
     }
   };
 
+  const handleUpdate = async (appId: string) => {
+    setActionLoading(appId);
+    try {
+      await adminAppsApi.updateApp(appId);
+      await loadData();
+      alert(`${appId} 앱이 업데이트되었습니다.`);
+    } catch (error) {
+      console.error('Failed to update app:', error);
+      alert('앱 업데이트에 실패했습니다.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Check if app is installed
   const isInstalled = (appId: string): boolean => {
     return installedApps.some((app) => app.appId === appId);
@@ -179,9 +193,18 @@ const AppStorePage: FC = () => {
                       {app.author && <div>개발자: {app.author}</div>}
                     </div>
                     {installed ? (
-                      <div className="flex items-center text-green-600 text-sm">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        설치됨 ({installed.status})
+                      <div className="space-y-2">
+                        <div className="flex items-center text-green-600 text-sm">
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          설치됨 ({installed.status})
+                        </div>
+                        {installed.hasUpdate && (
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="default" className="bg-orange-500">
+                              업데이트 가능: {installed.availableVersion}
+                            </Badge>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <Button
@@ -214,33 +237,56 @@ const AppStorePage: FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{app.name}</span>
-                    <Badge
-                      variant={
-                        app.status === 'active'
-                          ? 'default'
+                    <div className="flex items-center space-x-2">
+                      {app.hasUpdate && (
+                        <Badge variant="default" className="bg-orange-500">
+                          업데이트 가능
+                        </Badge>
+                      )}
+                      <Badge
+                        variant={
+                          app.status === 'active'
+                            ? 'default'
+                            : app.status === 'inactive'
+                            ? 'secondary'
+                            : 'outline'
+                        }
+                      >
+                        {app.status === 'active'
+                          ? '활성'
                           : app.status === 'inactive'
-                          ? 'secondary'
-                          : 'outline'
-                      }
-                    >
-                      {app.status === 'active'
-                        ? '활성'
-                        : app.status === 'inactive'
-                        ? '비활성'
-                        : '설치됨'}
-                    </Badge>
+                          ? '비활성'
+                          : '설치됨'}
+                      </Badge>
+                    </div>
                   </CardTitle>
                   <CardDescription>App ID: {app.appId}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="text-sm text-gray-600">
-                      <div>버전: {app.version}</div>
+                      <div>현재 버전: {app.version}</div>
+                      {app.hasUpdate && app.availableVersion && (
+                        <div className="text-orange-600 font-medium">
+                          최신 버전: {app.availableVersion}
+                        </div>
+                      )}
                       <div>
                         설치일:{' '}
                         {new Date(app.installedAt).toLocaleDateString('ko-KR')}
                       </div>
                     </div>
+                    {app.hasUpdate && (
+                      <Button
+                        onClick={() => handleUpdate(app.appId)}
+                        disabled={actionLoading === app.appId}
+                        variant="default"
+                        className="w-full bg-orange-500 hover:bg-orange-600"
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        {actionLoading === app.appId ? '업데이트 중...' : '업데이트'}
+                      </Button>
+                    )}
                     <div className="flex space-x-2">
                       {app.status === 'active' ? (
                         <Button

@@ -18,6 +18,8 @@ export interface AppRegistryEntry {
   source: string;
   installedAt: string;
   updatedAt: string;
+  availableVersion?: string; // Latest version from catalog
+  hasUpdate?: boolean;       // Whether an update is available
 }
 
 /**
@@ -88,5 +90,12 @@ export const adminAppsApi = {
    */
   uninstallApp: async (appId: string): Promise<void> => {
     await api.post('/api/admin/apps/uninstall', { appId });
+  },
+
+  /**
+   * Update an app to the latest version
+   */
+  updateApp: async (appId: string): Promise<void> => {
+    await api.post('/api/admin/apps/update', { appId });
   },
 };

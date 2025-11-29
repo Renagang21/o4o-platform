@@ -2,7 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { AppManager } from '../../services/AppManager.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
-import { APPS_CATALOG } from '../../app-manifests/appsCatalog.js';
+import { APPS_CATALOG, getCatalogItem } from '../../app-manifests/appsCatalog.js';
+import { isNewerVersion } from '../../utils/semver.js';
 
 const router: Router = Router();
 
@@ -27,12 +28,26 @@ router.get('/market', async (req: Request, res: Response, next: NextFunction) =>
 
 /**
  * GET /api/admin/apps
- * List all installed apps
+ * List all installed apps with update detection
  */
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const apps = await appManager.listInstalled();
-    res.json({ apps });
+
+    // Enrich each app with update information
+    const enrichedApps = apps.map(app => {
+      const catalogItem = getCatalogItem(app.appId);
+      const availableVersion = catalogItem?.version || app.version;
+      const hasUpdate = catalogItem ? isNewerVersion(app.version, catalogItem.version) : false;
+
+      return {
+        ...app,
+        availableVersion,
+        hasUpdate,
+      };
+    });
+
+    res.json({ apps: enrichedApps });
   } catch (error) {
     next(error);
   }
@@ -151,6 +166,31 @@ router.post('/uninstall', async (req: Request, res: Response, next: NextFunction
     res.json({
       ok: true,
       message: `App ${appId} uninstalled successfully`,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/admin/apps/update
+ * Update an app to the latest version from catalog
+ *
+ * Body: { appId: string }
+ */
+router.post('/update', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { appId } = req.body;
+
+    if (!appId) {
+      return res.status(400).json({ error: 'appId is required' });
+    }
+
+    await appManager.update(appId);
+
+    res.json({
+      ok: true,
+      message: `App ${appId} updated successfully`,
     });
   } catch (error) {
     next(error);
