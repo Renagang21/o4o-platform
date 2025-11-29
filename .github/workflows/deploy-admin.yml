@@ -30,8 +30,25 @@ jobs:
         echo "🚀 Admin Dashboard Deployment"
         echo "📝 Commit: ${{ github.sha }}"
         echo "👤 Author: ${{ github.actor }}"
+        echo "🌿 Branch: ${{ github.ref }}"
         echo ""
-        echo "✅ Deploying latest version to production"
+
+        # Determine deployment target based on branch
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "✅ Deploying to PRODUCTION (admin.neture.co.kr)"
+          echo "deploy_target=production" >> $GITHUB_OUTPUT
+          echo "web_root=/var/www/admin.neture.co.kr" >> $GITHUB_OUTPUT
+          echo "domain=admin.neture.co.kr" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          echo "⚠️ Deploying to DEVELOPMENT (dev-admin.neture.co.kr)"
+          echo "deploy_target=development" >> $GITHUB_OUTPUT
+          echo "web_root=/var/www/dev-admin.neture.co.kr" >> $GITHUB_OUTPUT
+          echo "domain=dev-admin.neture.co.kr" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Unknown branch, skipping deployment"
+          echo "deploy_target=skip" >> $GITHUB_OUTPUT
+        fi
+
         echo "deploy=true" >> $GITHUB_OUTPUT
 
     - name: Setup build environment
@@ -80,20 +97,27 @@ jobs:
         cp nginx-configs/admin.neture.co.kr.conf apps/admin-dashboard/dist/nginx-config/
 
     - name: Deploy to web server
-      if: steps.check_changes.outputs.deploy == 'true'
+      if: steps.check_changes.outputs.deploy == 'true' && steps.check_changes.outputs.deploy_target != 'skip'
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.WEB_HOST }}
         username: ${{ secrets.WEB_USER }}
         key: ${{ secrets.WEB_SSH_KEY }}
         script: |
-          echo "🔧 Preparing deployment..."
+          WEB_ROOT="${{ steps.check_changes.outputs.web_root }}"
+          DOMAIN="${{ steps.check_changes.outputs.domain }}"
+
+          echo "🔧 Preparing deployment to $DOMAIN..."
+          echo "📁 Target directory: $WEB_ROOT"
+
+          # Create web root if it doesn't exist
+          sudo mkdir -p "$WEB_ROOT"
 
           # Backup current deployment
-          if [ -d /var/www/admin.neture.co.kr ] && [ "$(ls -A /var/www/admin.neture.co.kr 2>/dev/null)" ]; then
-            BACKUP_DIR="/var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S)"
+          if [ -d "$WEB_ROOT" ] && [ "$(ls -A $WEB_ROOT 2>/dev/null)" ]; then
+            BACKUP_DIR="${WEB_ROOT}.backup.$(date +%Y%m%d_%H%M%S)"
             echo "💾 Backing up to $BACKUP_DIR"
-            sudo cp -r /var/www/admin.neture.co.kr "$BACKUP_DIR"
+            sudo cp -r "$WEB_ROOT" "$BACKUP_DIR"
           fi
 
           # Clear temp directory
@@ -114,14 +138,17 @@ jobs:
         strip_components: 3
 
     - name: Move files to web directory
-      if: steps.check_changes.outputs.deploy == 'true'
+      if: steps.check_changes.outputs.deploy == 'true' && steps.check_changes.outputs.deploy_target != 'skip'
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.WEB_HOST }}
         username: ${{ secrets.WEB_USER }}
         key: ${{ secrets.WEB_SSH_KEY }}
         script: |
-          echo "📦 Deploying build files..."
+          WEB_ROOT="${{ steps.check_changes.outputs.web_root }}"
+          DOMAIN="${{ steps.check_changes.outputs.domain }}"
+
+          echo "📦 Deploying build files to $DOMAIN..."
 
           # Verify files were copied
           if [ ! -f "/tmp/admin-build/version.json" ]; then
@@ -137,54 +164,54 @@ jobs:
 
           # Clear current deployment
           echo "🗑️  Clearing current deployment..."
-          sudo rm -rf /var/www/admin.neture.co.kr/*
+          sudo rm -rf "$WEB_ROOT"/*
 
           # Move files from temp to web directory
           echo "📦 Moving files to web directory..."
-          sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
+          sudo cp -r /tmp/admin-build/* "$WEB_ROOT"/
 
-          # Update Nginx configuration
-          if [ -f /var/www/admin.neture.co.kr/nginx-config/admin.neture.co.kr.conf ]; then
-            echo "🔧 Updating Nginx configuration..."
+          # Update Nginx configuration (only for production - main branch)
+          if [ -f "$WEB_ROOT/nginx-config/$DOMAIN.conf" ]; then
+            echo "🔧 Updating Nginx configuration for $DOMAIN..."
 
             # Backup current nginx config
-            if [ -f /etc/nginx/sites-available/admin.neture.co.kr ]; then
-              sudo cp /etc/nginx/sites-available/admin.neture.co.kr \
-                /etc/nginx/sites-available/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S)
+            if [ -f "/etc/nginx/sites-available/$DOMAIN" ]; then
+              sudo cp "/etc/nginx/sites-available/$DOMAIN" \
+                "/etc/nginx/sites-available/$DOMAIN.backup.$(date +%Y%m%d_%H%M%S)"
             fi
 
             # Copy new config
-            sudo cp /var/www/admin.neture.co.kr/nginx-config/admin.neture.co.kr.conf \
-              /etc/nginx/sites-available/admin.neture.co.kr
+            sudo cp "$WEB_ROOT/nginx-config/$DOMAIN.conf" \
+              "/etc/nginx/sites-available/$DOMAIN"
 
             # Test nginx configuration
             if sudo nginx -t; then
               echo "✅ Nginx configuration is valid"
             else
               echo "❌ Nginx configuration test failed, restoring backup"
-              latest_backup=$(ls -t /etc/nginx/sites-available/admin.neture.co.kr.backup.* 2>/dev/null | head -1)
+              latest_backup=$(ls -t "/etc/nginx/sites-available/$DOMAIN.backup."* 2>/dev/null | head -1)
               if [ -n "$latest_backup" ]; then
-                sudo cp "$latest_backup" /etc/nginx/sites-available/admin.neture.co.kr
+                sudo cp "$latest_backup" "/etc/nginx/sites-available/$DOMAIN"
               fi
               exit 1
             fi
 
             # Clean up nginx config from web directory
-            sudo rm -rf /var/www/admin.neture.co.kr/nginx-config
+            sudo rm -rf "$WEB_ROOT/nginx-config"
           else
-            echo "⚠️  Nginx config not found, skipping update"
+            echo "⚠️  Nginx config not found for $DOMAIN, skipping update"
           fi
 
           # Set permissions
           echo "🔐 Setting permissions..."
-          sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
-          sudo chmod -R 755 /var/www/admin.neture.co.kr/
+          sudo chown -R www-data:www-data "$WEB_ROOT"/
+          sudo chmod -R 755 "$WEB_ROOT"/
 
           # Verify deployment
           echo "✅ Verifying deployment..."
-          if [ -f /var/www/admin.neture.co.kr/version.json ]; then
+          if [ -f "$WEB_ROOT/version.json" ]; then
             echo "📄 Deployed version:"
-            cat /var/www/admin.neture.co.kr/version.json
+            cat "$WEB_ROOT/version.json"
           else
             echo "❌ Error: version.json not found!"
             exit 1
@@ -201,6 +228,6 @@ jobs:
           echo "=========================================="
           echo "✅ Admin Dashboard Deployed Successfully!"
           echo "=========================================="
-          echo "🌐 URL: https://admin.neture.co.kr"
+          echo "🌐 URL: https://$DOMAIN"
           echo "📅 Time: $(date)"
           echo ""
