@@ -27,6 +27,7 @@ import '@/utils/aiMigration';
 import AdminLayout from '@/components/layout/AdminLayout';
 import EditorLayout from '@/layouts/EditorLayout';
 import InitialRedirect from '@/components/InitialRedirect';
+import { AppRouteGuard } from '@/components/AppRouteGuard';
 
 // Import EditorRouteWrapper to handle route-based remounting
 import EditorRouteWrapper from '@/pages/editor/EditorRouteWrapper';
@@ -90,9 +91,18 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 
+// Forum Pages
+const ForumBoardList = lazy(() => import('@/pages/apps/forum/ForumBoardList'));
+const ForumCategories = lazy(() => import('@/pages/apps/forum/ForumCategories'));
+const ForumPostDetail = lazy(() => import('@/pages/apps/forum/ForumPostDetail'));
+const ForumPostForm = lazy(() => import('@/pages/apps/forum/ForumPostForm'));
+
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
+
+// Error Pages
+const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
@@ -311,6 +321,13 @@ function App() {
               >
                 <AdminLayout>
                   <Routes>
+                    {/* Error Pages - No permission required */}
+                    <Route path="/error/app-disabled" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AppDisabled />
+                      </Suspense>
+                    } />
+
                     {/* WordPress 스타일 메인 대시보드 */}
                     <Route path="/admin" element={
                       <Suspense fallback={<PageLoader />}>
@@ -736,6 +753,53 @@ function App() {
                         <Suspense fallback={<PageLoader />}>
                           <AppStorePage />
                         </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* 포럼 - App-based routes with AppRouteGuard */}
+                    <Route path="/forum/boards" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumBoardList />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/forum/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumCategories />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/forum/posts/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <AppRouteGuard appId="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumPostDetail />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/forum/posts/new" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:write']}>
+                        <AppRouteGuard appId="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumPostForm />
+                          </Suspense>
+                        </AppRouteGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/forum/posts/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:write']}>
+                        <AppRouteGuard appId="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumPostForm />
+                          </Suspense>
+                        </AppRouteGuard>
                       </AdminProtectedRoute>
                     } />
 
