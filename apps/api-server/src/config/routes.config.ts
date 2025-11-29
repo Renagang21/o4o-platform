@@ -561,30 +561,6 @@ export function setupRoutes(app: Application): void {
     });
   });
 
-  // ===== TEMPORARY: Migration endpoint for app_registry table =====
-  app.post('/api/v1/migrate-app-registry', async (req, res) => {
-    try {
-      const { AppDataSource } = await import('../database/connection.js');
-      await AppDataSource.query(`
-        CREATE TABLE IF NOT EXISTS app_registry (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          "appId" VARCHAR(100) UNIQUE NOT NULL,
-          name VARCHAR(255) NOT NULL,
-          version VARCHAR(50) NOT NULL,
-          status VARCHAR(20) DEFAULT 'installed' CHECK (status IN ('installed', 'active', 'inactive')),
-          source VARCHAR(50) DEFAULT 'local',
-          "installedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-        CREATE INDEX IF NOT EXISTS "IDX_app_registry_appId" ON app_registry("appId");
-        CREATE INDEX IF NOT EXISTS "IDX_app_registry_status" ON app_registry(status);
-      `);
-      res.json({ ok: true, message: 'app_registry table created successfully' });
-    } catch (error: any) {
-      res.status(500).json({ ok: false, message: error.message });
-    }
-  });
-
   // ============================================================================
   // 9. STUB ROUTES FOR ADMIN DASHBOARD COMPATIBILITY
   // ============================================================================
