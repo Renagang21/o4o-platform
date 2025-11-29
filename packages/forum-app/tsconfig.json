@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
     "composite": false,
     "declaration": true,
     "declarationMap": true,
@@ -15,11 +14,8 @@
     "strict": false,
     "skipLibCheck": true,
     "isolatedModules": false,
-    "lib": ["ES2022", "DOM"],
-    "paths": {
-      "@/*": ["../../apps/admin-dashboard/src/*"]
-    }
+    "lib": ["ES2022", "DOM"]
   },
-  "include": ["src/backend/entities/**/*", "src/manifest.ts", "src/index.ts"],
+  "include": ["src/backend/entities/**/*", "src/manifest.ts", "src/index.ts", "src/lifecycle/**/*", "src/migrations/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "src/admin-ui/**/*", "src/backend/services/**/*"]
 }

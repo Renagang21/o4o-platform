@@ -28,11 +28,6 @@
     "strictPropertyInitialization": false,
     "composite": true,
     "baseUrl": ".",
-    "paths": {
-      "@o4o-apps/forum": ["../../packages/forum-app"],
-      "@o4o-apps/forum-neture": ["../../packages/forum-neture"],
-      "@o4o-apps/forum-yaksa": ["../../packages/forum-yaksa"]
-    },
     "types": [
       "node"
     ],
