@@ -91,11 +91,11 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 
-// Forum Pages
-const ForumBoardList = lazy(() => import('@/pages/apps/forum/ForumBoardList'));
-const ForumCategories = lazy(() => import('@/pages/apps/forum/ForumCategories'));
-const ForumPostDetail = lazy(() => import('@/pages/apps/forum/ForumPostDetail'));
-const ForumPostForm = lazy(() => import('@/pages/apps/forum/ForumPostForm'));
+// Forum Pages (from @o4o-apps/forum package)
+const ForumBoardList = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumBoardList'));
+const ForumCategories = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumCategories'));
+const ForumPostDetail = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostDetail'));
+const ForumPostForm = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumPostForm'));
 
 
 // UI Showcase

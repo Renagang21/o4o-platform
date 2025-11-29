@@ -89,6 +89,7 @@
     "@o4o/cpt-registry": "file:../../packages/cpt-registry",
     "@o4o/types": "file:../../packages/types",
     "@o4o/utils": "file:../../packages/utils",
+    "@o4o-apps/forum": "file:../../packages/forum-app",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.65.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.206.0",

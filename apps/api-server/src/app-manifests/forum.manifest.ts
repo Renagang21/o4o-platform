@@ -1,34 +1,7 @@
-import { AppManifest } from '@o4o/types';
-
 /**
- * Forum App Manifest
+ * Forum App Manifest (Re-export from @o4o-apps/forum package)
  *
- * Defines the forum feature as an installable/activatable app
+ * This file now acts as a bridge between the core API server and the forum-app package.
+ * The actual manifest definition is in packages/forum-app/src/manifest.ts
  */
-export const forumManifest: AppManifest = {
-  appId: 'forum',
-  name: 'Forum',
-  version: '1.0.0',
-  description: 'Community forum with posts, comments, categories, and tags',
-
-  routes: [
-    '/forum',
-    '/forum/posts',
-    '/forum/posts/:id',
-    '/forum/categories',
-    '/forum/categories/:id',
-    '/admin/forum',
-    '/admin/forum/posts',
-    '/admin/forum/categories',
-    '/admin/forum/comments',
-  ],
-
-  permissions: [
-    'forum.read',
-    'forum.write',
-    'forum.moderate',
-    'forum.admin',
-  ],
-
-  // Future: CPT/ACF definitions, migrations, etc.
-};
+export { forumManifest } from '@o4o-apps/forum/src/manifest.js';
