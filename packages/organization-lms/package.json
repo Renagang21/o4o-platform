@@ -1,0 +1,26 @@
+{
+  "name": "@o4o-extensions/organization-lms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Organization-LMS Integration Extension - Organization-scoped courses and training",
+  "main": "dist/packages/organization-lms/src/index.js",
+  "types": "dist/packages/organization-lms/src/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/organization-core": "workspace:*",
+    "@o4o/lms-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  }
+}

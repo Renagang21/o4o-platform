@@ -1,0 +1,28 @@
+{
+  "name": "@o4o/lms-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LMS (Learning Management System) Core for O4O Platform",
+  "main": "dist/packages/lms-core/src/index.js",
+  "types": "dist/packages/lms-core/src/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*",
+    "@o4o/organization-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0",
+    "class-validator": "^0.14.0",
+    "class-transformer": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  }
+}
