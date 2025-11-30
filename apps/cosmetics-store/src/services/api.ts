@@ -225,6 +225,61 @@ export async function recommendInfluencerRoutine(id: string) {
   return response.json();
 }
 
+export interface CreateRoutineData {
+  partnerId: string;
+  title: string;
+  description?: string;
+  skinType: string[];
+  concerns: string[];
+  timeOfUse: 'morning' | 'evening' | 'both';
+  routine: Array<{
+    step: number;
+    productId: string;
+    category?: string;
+    description?: string;
+  }>;
+  tags?: string[];
+  isPublished?: boolean;
+}
+
+export async function createInfluencerRoutine(data: CreateRoutineData) {
+  const response = await fetch(`${API_BASE}/influencer-routines`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create routine');
+  }
+  return response.json();
+}
+
+export async function updateInfluencerRoutine(id: string, data: Partial<CreateRoutineData>) {
+  const response = await fetch(`${API_BASE}/influencer-routines/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update routine');
+  }
+  return response.json();
+}
+
+export async function deleteInfluencerRoutine(id: string) {
+  const response = await fetch(`${API_BASE}/influencer-routines/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete routine');
+  }
+  return response.json();
+}
+
 /**
  * Partner API Functions
  */
