@@ -15,7 +15,11 @@
     "rootDir": "./src",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../../apps/admin-dashboard/src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
