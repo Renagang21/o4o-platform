@@ -116,6 +116,11 @@ const CourseList = lazy(() => import('@/pages/lms/CourseList'));
 const EnrollmentList = lazy(() => import('@/pages/lms/EnrollmentList'));
 const EventList = lazy(() => import('@/pages/lms/EventList'));
 
+// Groupbuy Pages
+const GroupbuyCampaignList = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignList'));
+const GroupbuyCampaignForm = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignForm'));
+const GroupbuyParticipantsPage = lazy(() => import('@/pages/groupbuy/GroupbuyParticipantsPage'));
+const GroupbuySettlementReport = lazy(() => import('@/pages/groupbuy/GroupbuySettlementReport'));
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
@@ -759,6 +764,43 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <EventList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Groupbuy Management */}
+                    <Route path="/admin/groupbuy/campaigns" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyCampaignList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/groupbuy/campaigns/new" element={
+                      <AdminProtectedRoute requiredPermissions={['content:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyCampaignForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/groupbuy/campaigns/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['content:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyCampaignForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/groupbuy/campaigns/:campaignId/participants" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyParticipantsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/groupbuy/settlement" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuySettlementReport />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

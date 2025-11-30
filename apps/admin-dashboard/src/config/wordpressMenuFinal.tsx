@@ -41,7 +41,8 @@ import {
   GraduationCap,
   BookOpen,
   Calendar,
-  Award
+  Award,
+  BarChart2
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -189,6 +190,17 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'lms-certificates', label: '수료증', icon: <Award className="w-4 h-4" />, path: '/admin/lms/certificates' }
     ]
   },
+  // 10. 공동구매
+  {
+    id: 'groupbuy',
+    label: '공동구매',
+    icon: <ShoppingBag className="w-5 h-5" />,
+    appId: 'groupbuy-core',
+    children: [
+      { id: 'groupbuy-campaigns', label: '캠페인 관리', icon: <ShoppingBag className="w-4 h-4" />, path: '/admin/groupbuy/campaigns' },
+      { id: 'groupbuy-settlement', label: '정산 관리', icon: <BarChart2 className="w-4 h-4" />, path: '/admin/groupbuy/settlement' }
+    ]
+  },
   // 구분선 2
   {
     id: 'separator-2',
@@ -196,7 +208,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 9. CPT 엔진
+  // 11. CPT 엔진
   {
     id: 'cpt-engine',
     label: 'CPT 엔진',
@@ -212,7 +224,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-template-presets', label: '템플릿 프리셋', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/presets/templates' }
     ]
   },
-  // 10. 도구
+  // 12. 도구
   {
     id: 'tools',
     label: '도구',
@@ -225,14 +237,14 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
     ]
   },
-  // 11. 설정
+  // 13. 설정
   {
     id: 'settings',
     label: '설정',
     icon: <Settings className="w-5 h-5" />,
     path: '/settings'
   },
-  // 12. 시스템 모니터링
+  // 14. 시스템 모니터링
   {
     id: 'monitoring',
     label: '시스템 모니터링',
