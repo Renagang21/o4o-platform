@@ -5,14 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { EmptyState } from '../../components/common/EmptyState';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { EmptyState } from '@/components/common/EmptyState';
 import { Eye, AlertCircle, RefreshCw, FileText, Info } from 'lucide-react';
-import type { SettlementSummary, SettlementStatus } from '../../types/settlement';
-import { sellerSettlementAPI } from '../../services/sellerSettlementApi';
-import { handleApiError } from '../../utils/apiErrorHandler';
-import { SettlementSummaryCards } from '../../components/SettlementSummaryCards';
+import type { SettlementSummary, SettlementStatus } from '@/types/settlement';
+import { sellerSettlementAPI } from '@/services/sellerSettlementApi';
+import { handleApiError } from '@/utils/apiErrorHandler';
+import { SettlementSummaryCards } from '@/components/SettlementSummaryCards';
 
 export const SellerSettlementsPage: React.FC = () => {
   const navigate = useNavigate();

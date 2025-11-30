@@ -6,15 +6,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Copy, TrendingUp } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { partnerLinkAPI, generateFinalUrl } from '../../services/partnerLinkApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { partnerLinkAPI, generateFinalUrl } from '@/services/partnerLinkApi';
 import {
   PartnerLinkDetail,
   PartnerLinkUpdateRequest,
   AnalyticsPeriod,
   PartnerLinkSummary,
-} from '../../types/partner-link';
+} from '@/types/partner-link';
 
 export const PartnerLinkEditPage: React.FC = () => {
   const navigate = useNavigate();

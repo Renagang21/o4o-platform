@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import Layout from '../../components/layout/Layout';
-import { PartnerDashboard as PartnerDashboardComponent } from '../../components/shortcodes/PartnerDashboard';
+import Layout from '@/components/layout/Layout';
+import { PartnerDashboard as PartnerDashboardComponent } from '@/components/shortcodes/PartnerDashboard';
 
 /**
  * P0 RBAC: Partner Dashboard Page

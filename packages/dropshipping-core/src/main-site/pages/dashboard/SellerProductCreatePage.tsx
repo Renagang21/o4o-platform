@@ -6,16 +6,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Package, Check, AlertCircle, Clock, XCircle, Send } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { EmptyState } from '../../components/common/EmptyState';
-import { sellerProductAPI } from '../../services/sellerProductApi';
-import { authorizationAPI } from '../../services/authorizationApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { EmptyState } from '@/components/common/EmptyState';
+import { sellerProductAPI } from '@/services/sellerProductApi';
+import { authorizationAPI } from '@/services/authorizationApi';
 import {
   SupplierProductForSelection,
   SellerProductCreateRequest,
-} from '../../types/seller-product';
-import { AuthorizationStatus } from '../../types/dropshipping-authorization';
+} from '@/types/seller-product';
+import { AuthorizationStatus } from '@/types/dropshipping-authorization';
 
 export const SellerProductCreatePage: React.FC = () => {
   const navigate = useNavigate();

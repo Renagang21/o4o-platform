@@ -17,17 +17,17 @@ import {
   RefreshCw,
   BarChart3,
 } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { EmptyState } from '../../components/common/EmptyState';
-import { partnerLinkAPI } from '../../services/partnerLinkApi';
-import { handleApiError } from '../../utils/apiErrorHandler';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { EmptyState } from '@/components/common/EmptyState';
+import { partnerLinkAPI } from '@/services/partnerLinkApi';
+import { handleApiError } from '@/utils/apiErrorHandler';
 import {
   AnalyticsPeriod,
   PartnerAnalyticsSummary,
   PartnerAnalyticsTimeseries,
   PartnerLinkSummary,
-} from '../../types/partner-link';
+} from '@/types/partner-link';
 
 export const PartnerAnalyticsPage: React.FC = () => {
   const navigate = useNavigate();

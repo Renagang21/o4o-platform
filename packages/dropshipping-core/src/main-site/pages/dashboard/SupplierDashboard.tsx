@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import Layout from '../../components/layout/Layout';
-import { SupplierDashboard as SupplierDashboardComponent } from '../../components/shortcodes/SupplierDashboard';
+import Layout from '@/components/layout/Layout';
+import { SupplierDashboard as SupplierDashboardComponent } from '@/components/shortcodes/SupplierDashboard';
 
 /**
  * P0 RBAC: Supplier Dashboard Page

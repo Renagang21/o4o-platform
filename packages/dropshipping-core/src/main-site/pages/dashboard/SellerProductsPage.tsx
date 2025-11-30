@@ -6,9 +6,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { SellerProductsSection } from '../../components/dashboard/seller/SellerProductsSection';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { SellerProductsSection } from '@/components/dashboard/seller/SellerProductsSection';
 
 export const SellerProductsPage: React.FC = () => {
   const navigate = useNavigate();

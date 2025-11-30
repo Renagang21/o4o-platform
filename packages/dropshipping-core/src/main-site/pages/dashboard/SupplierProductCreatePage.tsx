@@ -5,11 +5,11 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { SupplierProductForm } from '../../components/dashboard/supplier/SupplierProductForm';
-import { SupplierProductFormValues } from '../../types/supplier-product';
-import { supplierProductAPI } from '../../services/supplierProductApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { SupplierProductForm } from '@/components/dashboard/supplier/SupplierProductForm';
+import { SupplierProductFormValues } from '@/types/supplier-product';
+import { supplierProductAPI } from '@/services/supplierProductApi';
 
 export const SupplierProductCreatePage: React.FC = () => {
   const navigate = useNavigate();

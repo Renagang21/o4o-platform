@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { SupplierProductsSection } from '../../components/dashboard/supplier/SupplierProductsSection';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { SupplierProductsSection } from '@/components/dashboard/supplier/SupplierProductsSection';
 
 export const SupplierProductsPage: React.FC = () => {
   return (

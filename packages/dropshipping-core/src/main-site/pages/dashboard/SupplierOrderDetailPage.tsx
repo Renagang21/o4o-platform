@@ -14,14 +14,14 @@ import {
   Mail,
   XCircle,
 } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { supplierOrderAPI } from '../../services/supplierOrderApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { supplierOrderAPI } from '@/services/supplierOrderApi';
 import {
   SupplierOrderDetail,
   SupplierOrderStatus,
   UpdateOrderStatusRequest,
-} from '../../types/supplier-order';
+} from '@/types/supplier-order';
 
 export const SupplierOrderDetailPage: React.FC = () => {
   const navigate = useNavigate();

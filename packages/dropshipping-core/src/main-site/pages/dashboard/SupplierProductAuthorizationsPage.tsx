@@ -6,14 +6,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Filter, Check, X, Clock, AlertCircle } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { EmptyState } from '../../components/common/EmptyState';
-import { authorizationAPI } from '../../services/authorizationApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { EmptyState } from '@/components/common/EmptyState';
+import { authorizationAPI } from '@/services/authorizationApi';
 import {
   ProductAuthorizationSummary,
   AuthorizationStatus,
-} from '../../types/dropshipping-authorization';
+} from '@/types/dropshipping-authorization';
 
 export const SupplierProductAuthorizationsPage: React.FC = () => {
   const navigate = useNavigate();

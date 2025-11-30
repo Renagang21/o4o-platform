@@ -6,10 +6,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Copy } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { partnerLinkAPI, generateFinalUrl } from '../../services/partnerLinkApi';
-import { PartnerLinkCreateRequest } from '../../types/partner-link';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { partnerLinkAPI, generateFinalUrl } from '@/services/partnerLinkApi';
+import { PartnerLinkCreateRequest } from '@/types/partner-link';
 
 export const PartnerLinkCreatePage: React.FC = () => {
   const navigate = useNavigate();

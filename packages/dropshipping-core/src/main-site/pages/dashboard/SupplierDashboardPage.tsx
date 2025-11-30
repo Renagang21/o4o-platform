@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { SupplierDashboard } from '../../components/shortcodes/SupplierDashboard';
+import { SupplierDashboard } from '@/components/shortcodes/SupplierDashboard';
 
 export const SupplierDashboardPage: React.FC = () => {
   return <SupplierDashboard defaultSection="overview" showMenu={false} />;

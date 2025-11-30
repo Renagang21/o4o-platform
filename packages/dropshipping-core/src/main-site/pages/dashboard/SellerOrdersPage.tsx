@@ -6,10 +6,10 @@
 
 import React, { useState } from 'react';
 import { Download } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { SellerOrdersSection } from '../../components/dashboard/seller/SellerOrdersSection';
-import { ChannelApi, type SellerChannelAccount } from '../../services/channelApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { SellerOrdersSection } from '@/components/dashboard/seller/SellerOrdersSection';
+import { ChannelApi, type SellerChannelAccount } from '@/services/channelApi';
 
 export const SellerOrdersPage: React.FC = () => {
   const [showImportModal, setShowImportModal] = useState(false);

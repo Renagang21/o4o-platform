@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import Layout from '../../components/layout/Layout';
+import Layout from '@/components/layout/Layout';
 
 /**
  * P0 RBAC: Seller Dashboard Page

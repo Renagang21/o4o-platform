@@ -5,13 +5,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { EmptyState } from '../../components/common/EmptyState';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { EmptyState } from '@/components/common/EmptyState';
 import { ArrowLeft, Save, AlertCircle, RefreshCw, FileText } from 'lucide-react';
-import type { SupplierSettlementDetail, SettlementStatus } from '../../types/settlement';
-import { supplierSettlementAPI } from '../../services/supplierSettlementApi';
-import { handleApiError } from '../../utils/apiErrorHandler';
+import type { SupplierSettlementDetail, SettlementStatus } from '@/types/settlement';
+import { supplierSettlementAPI } from '@/services/supplierSettlementApi';
+import { handleApiError } from '@/utils/apiErrorHandler';
 
 export const SupplierSettlementDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

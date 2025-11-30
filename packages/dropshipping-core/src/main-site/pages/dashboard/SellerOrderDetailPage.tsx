@@ -17,13 +17,13 @@ import {
   X,
   Clock,
 } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { sellerOrderAPI } from '../../services/sellerOrderApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { sellerOrderAPI } from '@/services/sellerOrderApi';
 import {
   SellerOrderDetail,
   SellerOrderStatus,
-} from '../../types/seller-order';
+} from '@/types/seller-order';
 
 export const SellerOrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

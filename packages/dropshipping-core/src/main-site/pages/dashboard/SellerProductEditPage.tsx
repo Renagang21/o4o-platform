@@ -6,13 +6,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { sellerProductAPI } from '../../services/sellerProductApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { sellerProductAPI } from '@/services/sellerProductApi';
 import {
   SellerProductDetail,
   SellerProductUpdateRequest,
-} from '../../types/seller-product';
+} from '@/types/seller-product';
 
 export const SellerProductEditPage: React.FC = () => {
   const navigate = useNavigate();

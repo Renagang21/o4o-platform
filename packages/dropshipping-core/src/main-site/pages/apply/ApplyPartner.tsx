@@ -1,8 +1,8 @@
 import { FC, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cookieAuthClient } from '@o4o/auth-client';
-import { useAuth } from '../../contexts/AuthContext';
-import Layout from '../../components/layout/Layout';
+import { useAuth } from '@o4o/auth-context';
+import Layout from '@/components/layout/Layout';
 import toast from 'react-hot-toast';
 
 /**

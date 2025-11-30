@@ -5,14 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { SupplierProductForm } from '../../components/dashboard/supplier/SupplierProductForm';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { SupplierProductForm } from '@/components/dashboard/supplier/SupplierProductForm';
 import {
   SupplierProductFormValues,
   SupplierProductDetail,
-} from '../../types/supplier-product';
-import { supplierProductAPI } from '../../services/supplierProductApi';
+} from '@/types/supplier-product';
+import { supplierProductAPI } from '@/services/supplierProductApi';
 
 export const SupplierProductEditPage: React.FC = () => {
   const navigate = useNavigate();

@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PartnerLinksSection } from '../../components/dashboard/partner/PartnerLinksSection';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PartnerLinksSection } from '@/components/dashboard/partner/PartnerLinksSection';
 
 export const PartnerLinksPage: React.FC = () => {
   return (

@@ -7,9 +7,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, ExternalLink, AlertCircle } from 'lucide-react';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import { PageHeader } from '../../components/common/PageHeader';
-import { ChannelApi, type SellerChannelAccount, type ExternalChannel } from '../../services/channelApi';
+import Breadcrumb from '@/components/common/Breadcrumb';
+import { PageHeader } from '@/components/common/PageHeader';
+import { ChannelApi, type SellerChannelAccount, type ExternalChannel } from '@/services/channelApi';
 
 export const SellerChannelsPage: React.FC = () => {
   const [accounts, setAccounts] = useState<SellerChannelAccount[]>([]);
