@@ -22,5 +22,11 @@ export * from './types';
 // Lifecycle
 export * from './lifecycle';
 
+// Guards
+export * from './guards';
+
+// Utils
+export * from './utils';
+
 // Manifest
 export { manifest } from './manifest';
