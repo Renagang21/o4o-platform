@@ -88,6 +88,9 @@
     },
     {
       "path": "./packages/utils"
+    },
+    {
+      "path": "./packages/organization-core"
     }
   ]
 }
