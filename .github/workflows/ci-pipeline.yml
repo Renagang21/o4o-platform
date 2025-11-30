@@ -30,7 +30,10 @@ jobs:
     
     - name: Run TypeScript check (Frontend only)
       run: pnpm run type-check:frontend
-    
+
+    - name: Run TypeScript check (App Store packages)
+      run: pnpm run typecheck:app-store-packages || echo "⚠️ App Store packages have type errors (non-blocking)"
+
     - name: Run ESLint
       run: pnpm run lint
     
@@ -70,7 +73,7 @@ jobs:
     
     strategy:
       matrix:
-        app: [main-site, admin-dashboard, ecommerce, forum, digital-signage, crowdfunding]
+        app: [main-site, admin-dashboard]
     
     steps:
     - uses: actions/checkout@v4

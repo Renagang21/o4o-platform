@@ -9,6 +9,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
+    "prebuild": "echo '🔨 Building Forum entities...' && pnpm --filter '@o4o-apps/forum*' run build",
     "build": "pnpm run clean:dist && tsc -p tsconfig.build.json",
     "build:optimized": "bash ../../scripts/build-api-optimized.sh",
     "build:prod": "NODE_ENV=production pnpm run build",
