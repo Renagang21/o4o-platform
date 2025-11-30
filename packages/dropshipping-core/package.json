@@ -31,7 +31,8 @@
     "reflect-metadata": "^0.1.13",
     "pg": "^8.10.0",
     "@o4o/types": "workspace:*",
-    "@o4o/cpt-registry": "workspace:*"
+    "@o4o/cpt-registry": "workspace:*",
+    "@o4o/organization-core": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

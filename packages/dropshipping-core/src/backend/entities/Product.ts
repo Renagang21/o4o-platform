@@ -71,6 +71,7 @@ export interface ShippingInfo {
 @Entity('products')
 @Index(['supplierId', 'status'])
 @Index(['categoryId', 'status'])
+@Index(['organizationId', 'scope', 'status'])
 @Index(['sku'], { unique: true })
 @Index(['slug'], { unique: true })
 @Index(['status', 'createdAt'])
@@ -85,6 +86,17 @@ export class Product {
   @ManyToOne('Supplier', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'supplierId' })
   supplier!: Supplier;
+
+  // Organization relationship (for organization-scoped products/groupbuys)
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  @ManyToOne('Organization', { nullable: true })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: any; // Type will be resolved at runtime
+
+  @Column({ type: 'varchar', length: 20, default: 'global' })
+  scope!: 'global' | 'organization'; // Product visibility scope
 
   // Category relationship
   @Column({ type: 'uuid', nullable: true })
@@ -207,6 +219,14 @@ export class Product {
     gold?: number;
     platinum?: number;
   };
+
+  // Organization-specific pricing (조직별 특가)
+  @Column({ type: 'jsonb', nullable: true })
+  organizationPricing?: Record<string, {
+    price: number;
+    minQuantity?: number;
+    deadline?: Date;
+  }>;
 
   // Additional Information
   @Column({ type: 'varchar', length: 100, nullable: true })

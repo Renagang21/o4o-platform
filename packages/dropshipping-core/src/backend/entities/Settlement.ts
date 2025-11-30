@@ -30,6 +30,7 @@ export enum SettlementStatus {
 
 @Entity('settlements')
 @Index(['partyType', 'partyId'])
+@Index(['organizationId'])
 @Index(['status'])
 @Index(['periodStart', 'periodEnd'])
 @Index(['createdAt'])
@@ -47,6 +48,14 @@ export class Settlement {
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'partyId' })
   party?: User;
+
+  // Organization relationship (for organization-scoped settlements)
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  @ManyToOne('Organization', { nullable: true })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: any; // Type will be resolved at runtime
 
   // Settlement period
   @Column({ type: 'timestamp with time zone' })

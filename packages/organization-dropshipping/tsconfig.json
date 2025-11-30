@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/packages/organization-dropshipping",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../organization-core" },
+    { "path": "../dropshipping-core" }
+  ]
+}
