@@ -64,7 +64,7 @@ https://admin.neture.co.kr  # ← 1-2분 후 업데이트됨
 
 - 수동 배포 스크립트:
   - Admin: `./scripts/deploy-admin-manual.sh`
-  - Main Site: `ssh o4o-web "cd /home/ubuntu/o4o-platform && ./scripts/deploy-main-site.sh"`
+  - Main Site: `./scripts/deploy-main-site-manual.sh`
 
 - 배포 확인:
   - Admin: `curl -s https://admin.neture.co.kr/version.json`
@@ -163,7 +163,7 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 - **프로세스**: git pull → pnpm install → build → pm2 restart
 
 ### Main Site 배포
-- **수동 배포**: `ssh o4o-web "cd /home/ubuntu/o4o-platform && ./scripts/deploy-main-site.sh"`
+- **수동 배포**: `./scripts/deploy-main-site-manual.sh`
 - **URL**: https://neture.co.kr
 
 ---
@@ -172,7 +172,7 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 
 ### 배포 스크립트
 - Admin 수동 배포: `./scripts/deploy-admin-manual.sh`
-- Main Site 수동 배포: `ssh o4o-web` 후 `./scripts/deploy-main-site.sh`
+- Main Site 수동 배포: `./scripts/deploy-main-site-manual.sh`
 - 배포 확인:
   - Admin: `curl -s https://admin.neture.co.kr/version.json`
   - Main Site: `curl -s https://neture.co.kr/version.json`
@@ -183,4 +183,4 @@ DNS: api.neture.co.kr → 웹서버 (13.125.144.8)
 
 ---
 
-*최종 업데이트: 2025-11-28*
+*최종 업데이트: 2025-11-30*
