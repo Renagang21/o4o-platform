@@ -1,0 +1,22 @@
+# Capacitor
+.DS_Store
+node_modules/
+dist/
+
+# iOS
+ios/App/Podfile.lock
+ios/App/Pods/
+ios/App/App.xcworkspace
+DerivedData/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.iml
+
+# Web
+www/assets/
+www/build/

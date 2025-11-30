@@ -1,0 +1,26 @@
+{
+  "name": "@o4o/mobile-app",
+  "version": "0.1.0",
+  "description": "O4O Platform Mobile App (Capacitor + React)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Mobile app development server'",
+    "build": "echo 'Build mobile app'",
+    "sync": "npx cap sync",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.4"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "pnpm": ">=9.0.0"
+  }
+}
