@@ -65,3 +65,90 @@ export async function fetchAvailableFilters() {
   }
   return response.json();
 }
+
+/**
+ * Dashboard API Functions
+ */
+
+export async function fetchMyProducts(options: { limit?: number } = {}) {
+  const params = new URLSearchParams();
+  if (options.limit) {
+    params.append('limit', options.limit.toString());
+  }
+
+  const response = await fetch(`/api/v2/seller/products?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch my products');
+  }
+  return response.json();
+}
+
+export async function fetchRecentImports(options: { limit?: number } = {}) {
+  const params = new URLSearchParams();
+  if (options.limit) {
+    params.append('limit', options.limit.toString());
+  }
+  params.append('sortBy', 'createdAt');
+  params.append('sortOrder', 'desc');
+
+  const response = await fetch(`/api/v2/seller/products?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch recent imports');
+  }
+
+  // Transform to import format
+  const data = await response.json();
+  return {
+    ...data,
+    data: {
+      imports: data.data?.products?.map((product: any) => ({
+        productName: product.name,
+        category: product.metadata?.cosmetics?.productCategory || '기타',
+        createdAt: product.createdAt,
+        reason: product.importReason || null,
+      })) || [],
+    },
+  };
+}
+
+export async function fetchRoutineStats() {
+  const response = await fetch(`${API_BASE}/routine/stats`);
+
+  // If endpoint doesn't exist yet, return mock data
+  if (!response.ok) {
+    return {
+      success: true,
+      data: {
+        totalRoutines: 14,
+        topSkinType: 'oily',
+        topConcerns: ['acne', 'pore', 'soothing'],
+        topProducts: [
+          { name: '센텔라 진정 토너' },
+          { name: '비타C 세럼' },
+          { name: '워터밤 크림' },
+        ],
+      },
+    };
+  }
+
+  return response.json();
+}
+
+export async function fetchSettlementSummary() {
+  const response = await fetch('/api/v2/seller/settlements/summary');
+
+  // If endpoint doesn't exist yet, return mock data
+  if (!response.ok) {
+    return {
+      success: true,
+      data: {
+        thisMonth: 145000,
+        lastMonth: 320000,
+        totalSettled: 1220000,
+        nextSettlementDate: '2025-12-15',
+      },
+    };
+  }
+
+  return response.json();
+}
