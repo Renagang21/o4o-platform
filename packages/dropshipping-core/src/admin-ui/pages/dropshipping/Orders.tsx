@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, Clock, DollarSign, ShoppingCart } from 'lucide-react';
-import { dropshippingAPI } from '../../api/dropshipping-cpt';
+import { dropshippingAPI } from '@/api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 
 interface OrderItem {

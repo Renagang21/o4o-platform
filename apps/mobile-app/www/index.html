@@ -72,21 +72,26 @@
   <body>
     <div class="container">
       <h1>✨ O4O Mobile App</h1>
-      <div class="status">Phase 1 초기화 완료</div>
+      <div class="status">Phase 3 네이티브 기능 통합 완료</div>
 
-      <div class="success">✅ Capacitor WebView 정상 작동</div>
+      <div class="success">✅ 네이티브 플러그인 준비 완료</div>
 
       <div>
-        <span class="badge">iOS 준비 완료</span>
-        <span class="badge">Android 준비 완료</span>
+        <span class="badge">카메라</span>
+        <span class="badge">푸시 알림</span>
+        <span class="badge">GPS</span>
+        <span class="badge">바코드</span>
       </div>
 
       <div class="info">
-        <p>이 화면은 Capacitor WebView에서 실행되고 있습니다.</p>
+        <p>네이티브 기능이 window.O4O.mobile로 제공됩니다.</p>
         <p style="margin-top: 10px;">
-          다음 단계: React 웹 앱 통합
+          <a href="app-settings.html" style="color: white; text-decoration: underline;">앱 설정 화면 →</a>
         </p>
       </div>
     </div>
+
+    <!-- Mobile Bridge 로드 -->
+    <script type="module" src="../src/main.ts"></script>
   </body>
 </html>

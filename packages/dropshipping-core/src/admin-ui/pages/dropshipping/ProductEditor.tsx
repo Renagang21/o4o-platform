@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Calculator, Package, Truck, DollarSign } from 'lucide-react';
-import { dropshippingAPI } from '../../api/dropshipping-cpt';
+import { dropshippingAPI } from '@/api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 
 interface ProductEditorProps {

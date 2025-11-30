@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Clock, CheckCircle, CreditCard, Building } from 'lucide-react';
-import { dropshippingAPI } from '../../api/dropshipping-cpt';
+import { dropshippingAPI } from '@/api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 
 interface Settlement {

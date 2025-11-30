@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock, AlertCircle, Filter, Search } from 'lucide-react';
-import { dropshippingAPI } from '../../api/dropshipping-cpt';
+import { dropshippingAPI } from '@/api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 import { authClient } from '@o4o/auth-client';
 

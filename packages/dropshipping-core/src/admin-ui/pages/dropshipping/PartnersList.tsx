@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Users, Award, TrendingUp, DollarSign, UserPlus, Mail, Phone, Calendar } from 'lucide-react';
-import { UserApi } from '../../api/userApi';
+import { UserApi } from '@/api/userApi';
 import { User, UserRole } from '../../types/user';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';

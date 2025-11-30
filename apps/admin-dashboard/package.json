@@ -39,6 +39,7 @@
     "@o4o/auth-client": "file:../../packages/auth-client",
     "@o4o/auth-context": "file:../../packages/auth-context",
     "@o4o/block-renderer": "file:../../packages/block-renderer",
+    "@o4o/dropshipping-core": "file:../../packages/dropshipping-core",
     "@o4o/shortcodes": "file:../../packages/shortcodes",
     "@o4o/slide-app": "file:../../packages/slide-app",
     "@o4o/types": "file:../../packages/types",

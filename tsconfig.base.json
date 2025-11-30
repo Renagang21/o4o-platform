@@ -23,9 +23,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@o4o/*": ["./packages/*/src", "./packages/*"],
-      "@o4o/appearance": ["./packages/appearance-system/src"],
-      "@o4o/appearance-system": ["./packages/appearance-system/src"]
+      "@o4o/*": ["./packages/*/dist", "./packages/*"],
+      "@o4o/appearance": ["./packages/appearance-system/dist", "./packages/appearance-system/src"],
+      "@o4o/appearance-system": ["./packages/appearance-system/dist", "./packages/appearance-system/src"]
     }
   },
   "include": [
