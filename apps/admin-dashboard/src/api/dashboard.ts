@@ -7,7 +7,7 @@ import { unifiedApi } from './unified-client';
 // import { EcommerceApi } from './ecommerceApi'; // Removed - ecommerce system deleted
 import { SalesDataItem, Notification, Activity, OrderStatusData, UserChartData, SystemHealthStatus } from '../types/dashboard';
 // Note: App services would be imported if available
-// import { forumService, signageService, crowdfundingService } from './apps';
+// import { forumService } from './apps';
 
 // Dashboard Stats type
 interface DashboardStats {
@@ -64,16 +64,6 @@ interface DashboardStats {
       activeUsers: number;
       pendingModeration: number;
     };
-    signage: {
-      displays: number;
-      activeDisplays: number;
-      content: number;
-    };
-    crowdfunding: {
-      campaigns: number;
-      totalRaised: number;
-      backers: number;
-    };
   };
 }
 
@@ -82,9 +72,7 @@ export const dashboardApi = {
   // 통계 데이터 조회
   async getStats(): Promise<DashboardStats> {
     let forumStats: any = null;
-    let signageStats: any = null;
-    let crowdfundingStats: any = null;
-    
+
     try {
       // Ecommerce removed - using default values
       const [usersResponse] = await Promise.all([
@@ -96,15 +84,11 @@ export const dashboardApi = {
           return { data: { total: 0, pending: 0, todayCount: 0, activeRate: 0 } };
         })
         // Note: App services would be called here if available
-        // forumService.getStats().catch(() => null),
-        // signageService.getStats().catch(() => null),
-        // crowdfundingService.getStats().catch(() => null)
+        // forumService.getStats().catch(() => null)
       ]);
-      
+
       // Set default values for app stats since services are not available
       forumStats = null;
-      signageStats = null;
-      crowdfundingStats = null;
 
       const ecommerceStats = { totalCustomers: 0, todaySales: 0 }; // Default values after ecommerce removal
 
@@ -154,17 +138,7 @@ export const dashboardApi = {
             posts: forumStats.totalPosts,
             activeUsers: forumStats.activeUsers,
             pendingModeration: forumStats.pendingModeration
-          } : { posts: 0, activeUsers: 0, pendingModeration: 0 },
-          signage: signageStats ? {
-            displays: signageStats.totalDisplays,
-            activeDisplays: signageStats.activeDisplays,
-            content: signageStats.totalContent
-          } : { displays: 0, activeDisplays: 0, content: 0 },
-          crowdfunding: crowdfundingStats ? {
-            campaigns: crowdfundingStats.totalCampaigns,
-            totalRaised: crowdfundingStats.totalRaised,
-            backers: crowdfundingStats.totalBackers
-          } : { campaigns: 0, totalRaised: 0, backers: 0 }
+          } : { posts: 0, activeUsers: 0, pendingModeration: 0 }
         }
       };
     } catch (error: any) {
@@ -215,17 +189,7 @@ export const dashboardApi = {
             posts: forumStats.totalPosts,
             activeUsers: forumStats.activeUsers,
             pendingModeration: forumStats.pendingModeration
-          } : { posts: 0, activeUsers: 0, pendingModeration: 0 },
-          signage: signageStats ? {
-            displays: signageStats.totalDisplays,
-            activeDisplays: signageStats.activeDisplays,
-            content: signageStats.totalContent
-          } : { displays: 0, activeDisplays: 0, content: 0 },
-          crowdfunding: crowdfundingStats ? {
-            campaigns: crowdfundingStats.totalCampaigns,
-            totalRaised: crowdfundingStats.totalRaised,
-            backers: crowdfundingStats.totalBackers
-          } : { campaigns: 0, totalRaised: 0, backers: 0 }
+          } : { posts: 0, activeUsers: 0, pendingModeration: 0 }
         }
       };
     }
