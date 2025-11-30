@@ -1,0 +1,54 @@
+{
+  "name": "o4o-integration",
+  "displayName": "O4O Platform Integration",
+  "description": "AI-powered React to O4O Block converter and page creator",
+  "version": "1.0.0",
+  "publisher": "o4o-platform",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:o4o.login",
+    "onCommand:o4o.convertAndSave"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "o4o.login",
+        "title": "O4O: Login to Platform"
+      },
+      {
+        "command": "o4o.convertAndSave",
+        "title": "O4O: Convert & Save Page"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.28.0",
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^10.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.3.8",
+    "typescript": "^5.3.3",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.23.6",
+    "@babel/traverse": "^7.23.6",
+    "@babel/types": "^7.23.6",
+    "axios": "^1.6.2",
+    "uuid": "^9.0.1"
+  }
+}
