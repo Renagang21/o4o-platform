@@ -7,13 +7,6 @@ export const appsConfig = {
     icon: 'MessageSquare',
     color: 'primary',
   },
-  signage: {
-    name: 'Digital Signage',
-    url: import.meta.env.VITE_SIGNAGE_URL || 'https://signage.neture.co.kr',
-    apiEndpoint: '/api/v1/signage',
-    icon: 'Monitor',
-    color: 'secondary',
-  },
 } as const;
 
 // SSO Configuration
@@ -71,15 +64,6 @@ export const apiEndpoints = {
     categories: '/forum/categories',
     users: '/forum/users',
     moderation: '/forum/moderation',
-  },
-  
-  // Signage integration
-  signage: {
-    stats: '/signage/stats',
-    displays: '/signage/displays',
-    content: '/signage/content',
-    schedules: '/signage/schedules',
-    playlists: '/signage/playlists',
   },
 
   // Dashboard
