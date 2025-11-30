@@ -36,7 +36,12 @@ import {
   Code,
   ChevronLeft,
   ShoppingBag,
-  Sparkles
+  Sparkles,
+  Building2,
+  GraduationCap,
+  BookOpen,
+  Calendar,
+  Award
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -128,7 +133,18 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 6. 드롭쉬핑
+  // 6. 조직 관리
+  {
+    id: 'organization',
+    label: '조직 관리',
+    icon: <Building2 className="w-5 h-5" />,
+    children: [
+      { id: 'organization-list', label: '조직 목록', icon: <FolderTree className="w-4 h-4" />, path: '/admin/organization' },
+      { id: 'organization-members', label: '멤버 관리', icon: <Users className="w-4 h-4" />, path: '/admin/organization/members' },
+      { id: 'organization-roles', label: '역할 관리', icon: <Shield className="w-4 h-4" />, path: '/admin/organization/roles' }
+    ]
+  },
+  // 7. 드롭쉬핑
   {
     id: 'dropshipping',
     label: '드롭쉬핑',
@@ -143,7 +159,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'ds-setup', label: '시스템 설정', icon: <Settings className="w-4 h-4" />, path: '/dropshipping/setup' }
     ]
   },
-  // 7. 포럼
+  // 8. 포럼
   {
     id: 'forum',
     label: '포럼',
@@ -158,6 +174,19 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'yaksa-communities', label: 'Yaksa 커뮤니티', icon: <Users className="w-4 h-4" />, path: '/yaksa/communities', appId: 'forum-yaksa' },
       { id: 'neture-forum', label: 'Neture 화장품 포럼', icon: <Sparkles className="w-4 h-4" />, path: '/neture/forum', appId: 'forum-neture' },
       { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
+    ]
+  },
+  // 9. LMS (교육/연수)
+  {
+    id: 'lms',
+    label: 'LMS (교육/연수)',
+    icon: <GraduationCap className="w-5 h-5" />,
+    appId: 'lms-core',
+    children: [
+      { id: 'lms-courses', label: '교육 과정', icon: <BookOpen className="w-4 h-4" />, path: '/admin/lms/courses' },
+      { id: 'lms-enrollments', label: '수강 관리', icon: <Users className="w-4 h-4" />, path: '/admin/lms/enrollments' },
+      { id: 'lms-events', label: '일정/출석', icon: <Calendar className="w-4 h-4" />, path: '/admin/lms/events' },
+      { id: 'lms-certificates', label: '수료증', icon: <Award className="w-4 h-4" />, path: '/admin/lms/certificates' }
     ]
   },
   // 구분선 2
