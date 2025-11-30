@@ -32,8 +32,6 @@ apps/mobile-app/
 │   ├── bridge/
 │   │   └── mobileBridge.ts
 │   └── main.ts
-├── docs/                    # 문서
-│   └── APPSTORE_PREPARATION.md
 ├── capacitor.config.ts
 └── package.json
 ```
@@ -99,7 +97,7 @@ pnpm run open:android
 ## 📖 참고 문서
 
 - [모바일 앱 개발 조사 보고서](../../docs/dev/mobile/mobile_app_investigation_report.md)
-- [앱스토어 제출 준비 가이드](./docs/APPSTORE_PREPARATION.md)
+- [앱스토어 제출 준비 가이드](../../docs/dev/mobile/mobile_app_appstore_preparation.md)
 - [Capacitor 공식 문서](https://capacitorjs.com/docs)
 - [Apple App Store Guidelines](https://developer.apple.com/app-store/review/guidelines/)
 - [Google Play Console Help](https://support.google.com/googleplay/android-developer)
@@ -107,7 +105,7 @@ pnpm run open:android
 ## 📋 Phase 4 작업 가이드
 
 Phase 4는 대부분 Xcode와 Android Studio에서 직접 작업해야 합니다.
-자세한 내용은 [앱스토어 제출 준비 가이드](./docs/APPSTORE_PREPARATION.md)를 참고하세요.
+자세한 내용은 [앱스토어 제출 준비 가이드](../../docs/dev/mobile/mobile_app_appstore_preparation.md)를 참고하세요.
 
 ### 필수 작업
 
