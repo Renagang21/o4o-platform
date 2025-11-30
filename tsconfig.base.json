@@ -2,7 +2,11 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,10 +26,21 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@o4o/*": ["./packages/*/src", "./packages/*"],
-      "@o4o/appearance": ["./packages/appearance-system/src"],
-      "@o4o/appearance-system": ["./packages/appearance-system/src"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@o4o/*": [
+        "./packages/*/dist",
+        "./packages/*"
+      ],
+      "@o4o/appearance": [
+        "./packages/appearance-system/dist",
+        "./packages/appearance-system/src"
+      ],
+      "@o4o/appearance-system": [
+        "./packages/appearance-system/dist",
+        "./packages/appearance-system/src"
+      ]
     }
   },
   "include": [
@@ -44,15 +59,35 @@
     "**/build"
   ],
   "references": [
-    { "path": "./apps/api-server" },
-    { "path": "./apps/main-site" },
-    { "path": "./apps/admin-dashboard" },
-    { "path": "./packages/appearance-system" },
-    { "path": "./packages/auth-client" },
-    { "path": "./packages/auth-context" },
-    { "path": "./packages/cpt-registry" },
-    { "path": "./packages/types" },
-    { "path": "./packages/ui" },
-    { "path": "./packages/utils" }
+    {
+      "path": "./apps/api-server"
+    },
+    {
+      "path": "./apps/main-site"
+    },
+    {
+      "path": "./apps/admin-dashboard"
+    },
+    {
+      "path": "./packages/appearance-system"
+    },
+    {
+      "path": "./packages/auth-client"
+    },
+    {
+      "path": "./packages/auth-context"
+    },
+    {
+      "path": "./packages/cpt-registry"
+    },
+    {
+      "path": "./packages/types"
+    },
+    {
+      "path": "./packages/ui"
+    },
+    {
+      "path": "./packages/utils"
+    }
   ]
 }

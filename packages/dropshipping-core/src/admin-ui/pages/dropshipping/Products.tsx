@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, DollarSign, TrendingUp, Package, BarChart, Upload } from 'lucide-react';
-import { dropshippingAPI } from '../../api/dropshipping-cpt';
+import { dropshippingAPI } from '@/api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 import ProductEditor from './ProductEditor';
 import { useNavigate } from 'react-router-dom';
