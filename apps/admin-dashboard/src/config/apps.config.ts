@@ -14,13 +14,6 @@ export const appsConfig = {
     icon: 'Monitor',
     color: 'secondary',
   },
-  crowdfunding: {
-    name: 'Crowdfunding',
-    url: import.meta.env.VITE_FUNDING_URL || 'https://funding.neture.co.kr',
-    apiEndpoint: '/api/v1/crowdfunding',
-    icon: 'DollarSign',
-    color: 'success',
-  },
 } as const;
 
 // SSO Configuration
@@ -88,16 +81,7 @@ export const apiEndpoints = {
     schedules: '/signage/schedules',
     playlists: '/signage/playlists',
   },
-  
-  // Crowdfunding integration
-  crowdfunding: {
-    stats: '/crowdfunding/stats',
-    campaigns: '/crowdfunding/campaigns',
-    contributions: '/crowdfunding/contributions',
-    users: '/crowdfunding/users',
-    payouts: '/crowdfunding/payouts',
-  },
-  
+
   // Dashboard
   dashboard: {
     overview: '/dashboard/overview',

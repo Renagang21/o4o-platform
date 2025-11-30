@@ -28,9 +28,6 @@ export * from './ecommerce.js';
 // Export pricing types
 export * from './pricing.js';
 
-// Export crowdfunding types
-export * from './crowdfunding.js';
-
 // Export dashboard types (P1 Phase C)
 export * from './dashboard.js';
 
