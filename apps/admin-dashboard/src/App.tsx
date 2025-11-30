@@ -107,6 +107,11 @@ const NetureForumDashboard = lazy(() => import('@o4o-apps/forum-neture/src/admin
 const NetureForumPostDetail = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumPostDetail'));
 const NetureForumPostForm = lazy(() => import('@o4o-apps/forum-neture/src/admin-ui/pages/NetureForumPostForm'));
 
+// Groupbuy Pages
+const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
+const GroupbuyCampaignDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignDetailPage'));
+const GroupbuyParticipantsPage = lazy(() => import('@/pages/groupbuy/GroupbuyParticipantsPage'));
+
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -710,6 +715,29 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <OrderDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Groupbuy Management */}
+                    <Route path="/admin/groupbuy" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyCampaignListPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/groupbuy/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyCampaignDetailPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/groupbuy/:id/participants" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuyParticipantsPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

@@ -1,0 +1,240 @@
+import { FC, ReactNode, useState } from 'react';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+
+export interface Column<T> {
+  key: string;
+  title: string;
+  dataIndex?: keyof T | string[];
+  render?: (value: any, record: T, index: number) => ReactNode;
+  sortable?: boolean;
+  width?: string;
+  align?: 'left' | 'center' | 'right';
+}
+
+interface DataTableProps<T> {
+  columns: Column<T>[];
+  dataSource: T[];
+  rowKey: keyof T | ((record: T) => string);
+  loading?: boolean;
+  pagination?: {
+    current: number;
+    pageSize: number;
+    total: number;
+    onChange: (page: number, pageSize: number) => void;
+  };
+  onRow?: (record: T) => {
+    onClick?: () => void;
+    className?: string;
+  };
+  emptyText?: string;
+  className?: string;
+}
+
+export function DataTable<T extends Record<string, any>>({
+  columns,
+  dataSource,
+  rowKey,
+  loading = false,
+  pagination,
+  onRow,
+  emptyText = '데이터가 없습니다',
+  className = ''
+}: DataTableProps<T>) {
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+
+  const getRowKey = (record: T, index: number): string => {
+    if (typeof rowKey === 'function') {
+      return rowKey(record);
+    }
+    return String(record[rowKey]) || `row-${index}`;
+  };
+
+  const getValue = (record: T, dataIndex: keyof T | string[] | undefined): any => {
+    if (!dataIndex) return record;
+
+    if (Array.isArray(dataIndex)) {
+      return dataIndex.reduce((obj, key) => obj?.[key], record as any);
+    }
+
+    return record[dataIndex];
+  };
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      if (sortOrder === 'asc') {
+        setSortOrder('desc');
+      } else if (sortOrder === 'desc') {
+        setSortKey(null);
+        setSortOrder(null);
+      }
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
+    }
+  };
+
+  const sortedData = [...dataSource];
+  if (sortKey && sortOrder) {
+    const column = columns.find(col => col.key === sortKey);
+    if (column) {
+      sortedData.sort((a, b) => {
+        const aValue = getValue(a, column.dataIndex);
+        const bValue = getValue(b, column.dataIndex);
+
+        if (aValue === bValue) return 0;
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+
+        const comparison = aValue < bValue ? -1 : 1;
+        return sortOrder === 'asc' ? comparison : -comparison;
+      });
+    }
+  }
+
+  const renderSortIcon = (columnKey: string, sortable?: boolean) => {
+    if (!sortable) return null;
+
+    if (sortKey === columnKey) {
+      return sortOrder === 'asc' ? (
+        <ChevronUp className="w-4 h-4" />
+      ) : (
+        <ChevronDown className="w-4 h-4" />
+      );
+    }
+
+    return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
+  };
+
+  const getAlignClass = (align?: 'left' | 'center' | 'right') => {
+    switch (align) {
+      case 'center':
+        return 'text-center';
+      case 'right':
+        return 'text-right';
+      default:
+        return 'text-left';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full">
+        <div className="animate-pulse">
+          <div className="h-12 bg-gray-200 rounded mb-2"></div>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 bg-gray-100 rounded mb-2"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`w-full ${className}`}>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map(column => (
+                <th
+                  key={column.key}
+                  style={{ width: column.width }}
+                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignClass(column.align)} ${
+                    column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
+                  }`}
+                  onClick={() => column.sortable && handleSort(column.key)}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>{column.title}</span>
+                    {renderSortIcon(column.key, column.sortable)}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {sortedData.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-6 py-12 text-center text-sm text-gray-500"
+                >
+                  {emptyText}
+                </td>
+              </tr>
+            ) : (
+              sortedData.map((record, index) => {
+                const rowProps = onRow?.(record) || {};
+                return (
+                  <tr
+                    key={getRowKey(record, index)}
+                    onClick={rowProps.onClick}
+                    className={`hover:bg-gray-50 ${rowProps.onClick ? 'cursor-pointer' : ''} ${
+                      rowProps.className || ''
+                    }`}
+                  >
+                    {columns.map(column => {
+                      const value = getValue(record, column.dataIndex);
+                      const content = column.render
+                        ? column.render(value, record, index)
+                        : value;
+
+                      return (
+                        <td
+                          key={column.key}
+                          className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${getAlignClass(
+                            column.align
+                          )}`}
+                        >
+                          {content}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {pagination && pagination.total > 0 && (
+        <div className="flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200">
+          <div className="text-sm text-gray-700">
+            전체 <span className="font-medium">{pagination.total}</span>개 중{' '}
+            <span className="font-medium">
+              {(pagination.current - 1) * pagination.pageSize + 1}
+            </span>
+            ~
+            <span className="font-medium">
+              {Math.min(pagination.current * pagination.pageSize, pagination.total)}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => pagination.onChange(pagination.current - 1, pagination.pageSize)}
+              disabled={pagination.current === 1}
+              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              이전
+            </button>
+            <span className="px-3 py-1 text-sm">
+              {pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}
+            </span>
+            <button
+              onClick={() => pagination.onChange(pagination.current + 1, pagination.pageSize)}
+              disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}
+              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              다음
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default DataTable;
