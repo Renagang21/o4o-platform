@@ -6,11 +6,13 @@ import { ForumComment, CommentStatus } from '../entities/ForumComment.js';
 import { ForumTag } from '../entities/ForumTag.js';
 import { User } from '../../../../apps/api-server/src/entities/User.js';
 import { cacheService } from '../../../../apps/api-server/src/services/CacheService.js';
+import { canCreatePost, canManagePost, canCreateCategory, canManageCategory, canCreateComment, canManageComment } from '../utils/forumPermissions.js';
 
 export interface ForumSearchOptions {
   query?: string;
   categoryId?: string;
   authorId?: string;
+  organizationId?: string;
   tags?: string[];
   type?: PostType;
   status?: PostStatus;
@@ -43,6 +45,18 @@ export class ForumService {
 
   // Category Methods
   async createCategory(data: Partial<ForumCategory>, creatorId: string): Promise<ForumCategory> {
+    // Permission check: can user create category in this organization?
+    const hasPermission = await canCreateCategory(
+      AppDataSource,
+      creatorId,
+      data.organizationId
+    );
+    if (!hasPermission) {
+      throw new Error(
+        `Permission denied: cannot create category${data.organizationId ? ` in organization ${data.organizationId}` : ''}`
+      );
+    }
+
     const category = this.categoryRepository.create({
       ...data,
       createdBy: creatorId,
@@ -50,10 +64,10 @@ export class ForumService {
     });
 
     const savedCategory = await this.categoryRepository.save(category);
-    
+
     // 캐시 무효화
     await this.invalidateCategoryCache();
-    
+
     return savedCategory;
   }
 
@@ -77,10 +91,13 @@ export class ForumService {
     return updatedCategory;
   }
 
-  async getCategories(includeInactive: boolean = false): Promise<ForumCategory[]> {
-    const cacheKey = `forum_categories_${includeInactive}`;
+  async getCategories(
+    includeInactive: boolean = false,
+    organizationId?: string
+  ): Promise<ForumCategory[]> {
+    const cacheKey = `forum_categories_${includeInactive}_${organizationId || 'all'}`;
     const cached = await cacheService.get(cacheKey) as ForumCategory[] | null;
-    
+
     if (cached) {
       return cached;
     }
@@ -95,6 +112,14 @@ export class ForumService {
 
     if (!includeInactive) {
       queryBuilder.where('category.isActive = :isActive', { isActive: true });
+    }
+
+    // Organization filter
+    if (organizationId) {
+      queryBuilder.andWhere(
+        '(category.organizationId = :organizationId OR category.organizationId IS NULL)',
+        { organizationId }
+      );
     }
 
     const categories = await queryBuilder.getMany();
@@ -114,12 +139,21 @@ export class ForumService {
 
   // Post Methods
   async createPost(data: Partial<ForumPost>, authorId: string): Promise<ForumPost> {
-    const category = await this.categoryRepository.findOne({ 
-      where: { id: data.categoryId } 
+    const category = await this.categoryRepository.findOne({
+      where: { id: data.categoryId }
     });
 
     if (!category) {
       throw new Error('Category not found');
+    }
+
+    // Permission check: can user create post in this organization?
+    if (data.organizationId || category.organizationId) {
+      const orgId = data.organizationId || category.organizationId;
+      const hasPermission = await canCreatePost(AppDataSource, authorId, orgId);
+      if (!hasPermission) {
+        throw new Error(`Permission denied: cannot create post in organization ${orgId}`);
+      }
     }
 
     const post = this.postRepository.create({
@@ -149,14 +183,21 @@ export class ForumService {
   }
 
   async updatePost(postId: string, data: Partial<ForumPost>, userId: string, userRole: string): Promise<ForumPost | null> {
-    const post = await this.postRepository.findOne({ 
+    const post = await this.postRepository.findOne({
       where: { id: postId },
       relations: ['category', 'author']
     });
 
     if (!post) return null;
 
-    if (!post.canUserEdit(userId, userRole)) {
+    // Permission check: can user manage this post?
+    const hasPermission = await canManagePost(
+      AppDataSource,
+      userId,
+      post.authorId,
+      post.organizationId
+    );
+    if (!hasPermission) {
       throw new Error('Insufficient permissions to edit this post');
     }
 
@@ -245,6 +286,11 @@ export class ForumService {
       queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId: options.categoryId });
     }
 
+    // 조직 필터
+    if (options.organizationId) {
+      queryBuilder.andWhere('post.organizationId = :organizationId', { organizationId: options.organizationId });
+    }
+
     // 작성자 필터
     if (options.authorId) {
       queryBuilder.andWhere('post.authorId = :authorId', { authorId: options.authorId });
@@ -328,6 +374,18 @@ export class ForumService {
 
     if (!post) {
       throw new Error('Post not found');
+    }
+
+    // Permission check: can user create comment in this organization?
+    const hasPermission = await canCreateComment(
+      AppDataSource,
+      authorId,
+      post.organizationId
+    );
+    if (!hasPermission) {
+      throw new Error(
+        `Permission denied: cannot create comment${post.organizationId ? ` in organization ${post.organizationId}` : ''}`
+      );
     }
 
     // Await the lazy-loaded category to check requireApproval

@@ -19,6 +19,7 @@ export enum CommunityType {
 
 @Entity('yaksa_forum_community')
 @Index(['type', 'ownerUserId'])
+@Index(['organizationId'])
 export class YaksaCommunity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -32,8 +33,11 @@ export class YaksaCommunity {
   @Column({ type: 'enum', enum: CommunityType, default: CommunityType.PERSONAL })
   type!: CommunityType;
 
-  @Column({ type: 'uuid' })
-  ownerUserId!: string;
+  @Column({ type: 'uuid', nullable: true })
+  ownerUserId?: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string;
 
   @Column({ type: 'boolean', default: false })
   requireApproval!: boolean;
@@ -48,9 +52,13 @@ export class YaksaCommunity {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne('User')
+  @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'ownerUserId' })
   owner?: User;
+
+  @ManyToOne('Organization', { nullable: true })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: any; // Type will be resolved at runtime
 
   // Methods
   canUserManage(userId: string, userRole: string): boolean {

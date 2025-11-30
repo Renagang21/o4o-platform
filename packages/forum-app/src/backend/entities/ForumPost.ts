@@ -29,6 +29,7 @@ export enum PostType {
 
 @Entity('forum_post')
 @Index(['categoryId', 'status', 'isPinned', 'createdAt'])
+@Index(['organizationId', 'status', 'createdAt'])
 export class ForumPost {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -56,6 +57,12 @@ export class ForumPost {
 
   @Column({ type: 'uuid' })
   authorId!: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  @Column({ type: 'boolean', default: false })
+  isOrganizationExclusive!: boolean;
 
   @Column({ type: 'boolean', default: false })
   isPinned!: boolean;
@@ -108,6 +115,10 @@ export class ForumPost {
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'lastCommentBy' })
   lastCommenter?: User;
+
+  @ManyToOne('Organization', { nullable: true })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumComment removed to prevent circular dependency
   // Use ForumCommentRepository.find({ where: { postId: post.id } }) to get comments

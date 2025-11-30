@@ -1,0 +1,26 @@
+{
+  "name": "@o4o-extensions/organization-forum",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Organization-Forum Integration Extension - Auto-create forum categories for organizations",
+  "main": "dist/packages/organization-forum/src/index.js",
+  "types": "dist/packages/organization-forum/src/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/organization-core": "workspace:*",
+    "@o4o-apps/forum": "workspace:*"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "rimraf": "^5.0.0"
+  }
+}

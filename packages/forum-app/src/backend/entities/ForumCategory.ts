@@ -12,6 +12,7 @@ import type { User } from '../../../../../apps/api-server/src/entities/User.js';
 
 @Entity('forum_category')
 @Index(['isActive', 'sortOrder'])
+@Index(['organizationId', 'isActive'])
 export class ForumCategory {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -46,6 +47,12 @@ export class ForumCategory {
   @Column({ type: 'uuid', nullable: true })
   createdBy?: string;
 
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  @Column({ type: 'boolean', default: false })
+  isOrganizationExclusive!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 
@@ -56,6 +63,10 @@ export class ForumCategory {
   @ManyToOne('User', { nullable: true })
   @JoinColumn({ name: 'createdBy' })
   creator?: User;
+
+  @ManyToOne('Organization', { nullable: true })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: any; // Type will be resolved at runtime
 
   // Note: OneToMany relationship with ForumPost removed to prevent circular dependency
   // Use ForumPostRepository.find({ where: { categoryId: category.id } }) to get posts
