@@ -12,18 +12,20 @@ declare global {
 }
 
 async function initMobileApp() {
-  console.log('O4O Mobile App Initializing...');
+  // Initialize O4O global object
   (window as any).O4O = { mobile: MobileBridge, version: '1.0.0', buildDate: new Date().toISOString() };
-  console.log('Platform:', MobileBridge.platform.getPlatform());
-  console.log('Is Native:', MobileBridge.platform.isNative());
-  if (MobileBridge.platform.isNative()) {
+
+  // Platform detection
+  const platform = MobileBridge.platform.getPlatform();
+  const isNative = MobileBridge.platform.isNative();
+
+  // Get app info for native platforms
+  if (isNative) {
     const appInfo = await MobileBridge.utils.getAppInfo();
-    if (appInfo) {
-      console.log('App Version:', appInfo.version);
-      console.log('Build:', appInfo.build);
-    }
+    // App info loaded successfully
   }
-  console.log('O4O Mobile App Ready');
+
+  // Mobile app initialized
 }
 
 if (document.readyState === 'loading') {
