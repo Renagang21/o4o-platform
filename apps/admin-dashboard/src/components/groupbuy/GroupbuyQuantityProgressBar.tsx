@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { Progress } from 'antd';
 
 interface GroupbuyQuantityProgressBarProps {
   currentQuantity: number;
@@ -20,31 +19,32 @@ export const GroupbuyQuantityProgressBar: FC<GroupbuyQuantityProgressBarProps> =
   const percentage = Math.min(100, Math.round((currentQuantity / minQuantity) * 100));
 
   // Determine status color
-  const getStatus = () => {
+  const getColorClass = () => {
     if (currentQuantity >= minQuantity) {
-      return 'success';
+      return 'bg-green-500';
     } else if (currentQuantity >= minQuantity * 0.7) {
-      return 'active';
+      return 'bg-blue-500';
     } else {
-      return 'normal';
+      return 'bg-gray-400';
     }
   };
 
-  const status = getStatus();
+  const heightClass = size === 'small' ? 'h-2' : 'h-4';
 
   return (
     <div className="flex flex-col gap-1">
-      <Progress
-        percent={percentage}
-        status={status === 'success' ? 'success' : status === 'active' ? 'active' : 'normal'}
-        size={size === 'small' ? 'small' : 'default'}
-        showInfo={showText}
-      />
+      <div className={`w-full bg-gray-200 rounded-full overflow-hidden ${heightClass}`}>
+        <div
+          className={`${getColorClass()} ${heightClass} transition-all duration-300`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
       {showText && (
         <div className="text-xs text-gray-600">
           <span className="font-medium">{currentQuantity}</span>
           <span> / {minQuantity}</span>
           {maxQuantity && <span> (최대 {maxQuantity})</span>}
+          <span className="ml-2 text-gray-500">({percentage}%)</span>
         </div>
       )}
     </div>

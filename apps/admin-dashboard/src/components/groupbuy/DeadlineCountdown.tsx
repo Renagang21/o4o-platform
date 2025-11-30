@@ -1,13 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { Tag } from 'antd';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/ko';
-
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
-dayjs.locale('ko');
 
 interface DeadlineCountdownProps {
   deadline: string | Date;
@@ -25,9 +16,9 @@ export const DeadlineCountdown: FC<DeadlineCountdownProps> = ({
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const now = dayjs();
-      const end = dayjs(deadline);
-      const diff = end.diff(now);
+      const now = new Date().getTime();
+      const end = new Date(deadline).getTime();
+      const diff = end - now;
 
       if (diff <= 0) {
         setIsExpired(true);
@@ -35,10 +26,9 @@ export const DeadlineCountdown: FC<DeadlineCountdownProps> = ({
         return;
       }
 
-      const duration = dayjs.duration(diff);
-      const days = Math.floor(duration.asDays());
-      const hours = duration.hours();
-      const minutes = duration.minutes();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
       if (format === 'compact') {
         if (days > 0) {
@@ -65,24 +55,24 @@ export const DeadlineCountdown: FC<DeadlineCountdownProps> = ({
     return () => clearInterval(interval);
   }, [deadline, format]);
 
-  const getColor = () => {
-    if (isExpired) return 'default';
+  const getColorClass = () => {
+    if (isExpired) return 'bg-gray-100 text-gray-800';
 
-    const now = dayjs();
-    const end = dayjs(deadline);
-    const diff = end.diff(now);
-    const hoursLeft = dayjs.duration(diff).asHours();
+    const now = new Date().getTime();
+    const end = new Date(deadline).getTime();
+    const diff = end - now;
+    const hoursLeft = diff / (1000 * 60 * 60);
 
-    if (hoursLeft <= 24) return 'red';
-    if (hoursLeft <= 72) return 'orange';
-    return 'green';
+    if (hoursLeft <= 24) return 'bg-red-100 text-red-800';
+    if (hoursLeft <= 72) return 'bg-orange-100 text-orange-800';
+    return 'bg-green-100 text-green-800';
   };
 
   return (
-    <Tag color={getColor()} className="font-medium">
+    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getColorClass()}`}>
       {showIcon && <span className="mr-1">⏰</span>}
       {timeLeft}
-    </Tag>
+    </span>
   );
 };
 

@@ -35,14 +35,7 @@ import {
   Plus,
   Code,
   ChevronLeft,
-  ShoppingBag,
-  Sparkles,
-  Building2,
-  GraduationCap,
-  BookOpen,
-  Calendar,
-  Award,
-  BarChart2
+  Sparkles
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -134,17 +127,6 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 6. 조직 관리
-  {
-    id: 'organization',
-    label: '조직 관리',
-    icon: <Building2 className="w-5 h-5" />,
-    children: [
-      { id: 'organization-list', label: '조직 목록', icon: <FolderTree className="w-4 h-4" />, path: '/admin/organization' },
-      { id: 'organization-members', label: '멤버 관리', icon: <Users className="w-4 h-4" />, path: '/admin/organization/members' },
-      { id: 'organization-roles', label: '역할 관리', icon: <Shield className="w-4 h-4" />, path: '/admin/organization/roles' }
-    ]
-  },
   // 7. 드롭쉬핑
   {
     id: 'dropshipping',
@@ -175,30 +157,6 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'yaksa-communities', label: 'Yaksa 커뮤니티', icon: <Users className="w-4 h-4" />, path: '/yaksa/communities', appId: 'forum-yaksa' },
       { id: 'neture-forum', label: 'Neture 화장품 포럼', icon: <Sparkles className="w-4 h-4" />, path: '/neture/forum', appId: 'forum-neture' },
       { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
-    ]
-  },
-  // 9. LMS (교육/연수)
-  {
-    id: 'lms',
-    label: 'LMS (교육/연수)',
-    icon: <GraduationCap className="w-5 h-5" />,
-    appId: 'lms-core',
-    children: [
-      { id: 'lms-courses', label: '교육 과정', icon: <BookOpen className="w-4 h-4" />, path: '/admin/lms/courses' },
-      { id: 'lms-enrollments', label: '수강 관리', icon: <Users className="w-4 h-4" />, path: '/admin/lms/enrollments' },
-      { id: 'lms-events', label: '일정/출석', icon: <Calendar className="w-4 h-4" />, path: '/admin/lms/events' },
-      { id: 'lms-certificates', label: '수료증', icon: <Award className="w-4 h-4" />, path: '/admin/lms/certificates' }
-    ]
-  },
-  // 10. 공동구매
-  {
-    id: 'groupbuy',
-    label: '공동구매',
-    icon: <ShoppingBag className="w-5 h-5" />,
-    appId: 'groupbuy-core',
-    children: [
-      { id: 'groupbuy-campaigns', label: '캠페인 관리', icon: <ShoppingBag className="w-4 h-4" />, path: '/admin/groupbuy/campaigns' },
-      { id: 'groupbuy-settlement', label: '정산 관리', icon: <BarChart2 className="w-4 h-4" />, path: '/admin/groupbuy/settlement' }
     ]
   },
   // 구분선 2
