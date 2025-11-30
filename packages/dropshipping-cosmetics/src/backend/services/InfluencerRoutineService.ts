@@ -278,4 +278,90 @@ export class InfluencerRoutineService {
     routine.metadata.recommendCount = (routine.metadata.recommendCount || 0) + 1;
     await routineRepo.save(routine);
   }
+
+  /**
+   * Increment conversion count
+   */
+  async incrementConversionCount(id: string): Promise<void> {
+    const routineRepo = this.dataSource.getRepository('cosmetics_influencer_routine');
+
+    const routine = await routineRepo.findOne({ where: { id } });
+    if (!routine) {
+      throw new Error('Routine not found');
+    }
+
+    routine.metadata.conversionCount = (routine.metadata.conversionCount || 0) + 1;
+    await routineRepo.save(routine);
+  }
+
+  /**
+   * Get partner performance summary
+   */
+  async getPartnerPerformance(partnerId: string): Promise<any> {
+    const routineRepo = this.dataSource.getRepository('cosmetics_influencer_routine');
+
+    const routines = await routineRepo
+      .createQueryBuilder('routine')
+      .where("routine.metadata->>'partnerId' = :partnerId", { partnerId })
+      .getMany();
+
+    const totalRoutines = routines.length;
+    const totalViews = routines.reduce((sum, r) => sum + (r.metadata?.viewCount || 0), 0);
+    const totalRecommends = routines.reduce((sum, r) => sum + (r.metadata?.recommendCount || 0), 0);
+    const totalConversions = routines.reduce((sum, r) => sum + (r.metadata?.conversionCount || 0), 0);
+
+    // Find top performing routine
+    const topRoutine = routines.reduce((top, r) => {
+      const score = (r.metadata?.viewCount || 0) + (r.metadata?.recommendCount || 0) * 2 + (r.metadata?.conversionCount || 0) * 5;
+      const topScore = (top?.metadata?.viewCount || 0) + (top?.metadata?.recommendCount || 0) * 2 + (top?.metadata?.conversionCount || 0) * 5;
+      return score > topScore ? r : top;
+    }, routines[0]);
+
+    const conversionRate = totalViews > 0 ? ((totalConversions / totalViews) * 100).toFixed(2) : '0.00';
+
+    return {
+      totalRoutines,
+      totalViews,
+      totalRecommends,
+      totalConversions,
+      conversionRate: parseFloat(conversionRate),
+      topRoutine: topRoutine
+        ? {
+            id: topRoutine.id,
+            title: topRoutine.metadata?.title,
+            views: topRoutine.metadata?.viewCount || 0,
+            recommends: topRoutine.metadata?.recommendCount || 0,
+            conversions: topRoutine.metadata?.conversionCount || 0,
+          }
+        : null,
+    };
+  }
+
+  /**
+   * Get partner routines with performance
+   */
+  async getPartnerRoutines(partnerId: string): Promise<any[]> {
+    const routineRepo = this.dataSource.getRepository('cosmetics_influencer_routine');
+
+    const routines = await routineRepo
+      .createQueryBuilder('routine')
+      .where("routine.metadata->>'partnerId' = :partnerId", { partnerId })
+      .orderBy('routine.createdAt', 'DESC')
+      .getMany();
+
+    return routines.map((routine) => ({
+      id: routine.id,
+      title: routine.metadata?.title || 'Untitled',
+      description: routine.metadata?.description || '',
+      skinType: routine.metadata?.skinType || [],
+      concerns: routine.metadata?.concerns || [],
+      timeOfUse: routine.metadata?.timeOfUse || 'morning',
+      isPublished: routine.metadata?.isPublished || false,
+      viewCount: routine.metadata?.viewCount || 0,
+      recommendCount: routine.metadata?.recommendCount || 0,
+      conversionCount: routine.metadata?.conversionCount || 0,
+      createdAt: routine.createdAt,
+      updatedAt: routine.updatedAt,
+    }));
+  }
 }

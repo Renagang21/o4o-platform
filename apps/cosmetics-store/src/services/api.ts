@@ -224,3 +224,61 @@ export async function recommendInfluencerRoutine(id: string) {
   }
   return response.json();
 }
+
+/**
+ * Partner API Functions
+ */
+
+const PARTNER_API_BASE = '/api/v1/partner';
+
+export async function fetchPartnerDashboard(partnerId?: string) {
+  const params = new URLSearchParams();
+  if (partnerId) {
+    params.append('partnerId', partnerId);
+  }
+
+  const response = await fetch(`${PARTNER_API_BASE}/dashboard?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch partner dashboard');
+  }
+  return response.json();
+}
+
+export async function fetchPartnerRoutines(partnerId?: string) {
+  const params = new URLSearchParams();
+  if (partnerId) {
+    params.append('partnerId', partnerId);
+  }
+
+  const response = await fetch(`${PARTNER_API_BASE}/routines?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch partner routines');
+  }
+  return response.json();
+}
+
+export async function fetchPartnerCommissionSummary(partnerId?: string) {
+  const params = new URLSearchParams();
+  if (partnerId) {
+    params.append('partnerId', partnerId);
+  }
+
+  const response = await fetch(`${PARTNER_API_BASE}/commission-summary?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch commission summary');
+  }
+  return response.json();
+}
+
+export async function fetchPartnerEngagement(partnerId?: string) {
+  const params = new URLSearchParams();
+  if (partnerId) {
+    params.append('partnerId', partnerId);
+  }
+
+  const response = await fetch(`${PARTNER_API_BASE}/engagement?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch engagement metrics');
+  }
+  return response.json();
+}

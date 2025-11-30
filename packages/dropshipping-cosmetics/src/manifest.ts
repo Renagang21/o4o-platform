@@ -328,7 +328,7 @@ export const cosmeticsExtensionManifest: AppManifest = {
   },
 
   // Routes - extending core routes
-  routes: ['/api/v1/cosmetics'],
+  routes: ['/api/v1/cosmetics', '/api/v1/partner'],
 
   // Permissions (extending core permissions)
   permissions: [

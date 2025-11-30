@@ -40,6 +40,12 @@ export default function Layout() {
               >
                 인플루언서
               </Link>
+              <Link
+                to="/partner/dashboard"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-primary-500"
+              >
+                파트너
+              </Link>
             </div>
           </div>
         </div>

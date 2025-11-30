@@ -7,6 +7,8 @@ import RoutineBuilderPage from './pages/RoutineBuilderPage';
 import MyProductsPage from './pages/MyProductsPage';
 import InfluencerListPage from './pages/InfluencerListPage';
 import InfluencerRoutineDetailPage from './pages/InfluencerRoutineDetailPage';
+import PartnerDashboardPage from './pages/PartnerDashboardPage';
+import PartnerRoutinesPage from './pages/PartnerRoutinesPage';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="my-products" element={<MyProductsPage />} />
         <Route path="influencers" element={<InfluencerListPage />} />
         <Route path="influencer-routine/:id" element={<InfluencerRoutineDetailPage />} />
+        <Route path="partner/dashboard" element={<PartnerDashboardPage />} />
+        <Route path="partner/routines" element={<PartnerRoutinesPage />} />
       </Route>
     </Routes>
   );
