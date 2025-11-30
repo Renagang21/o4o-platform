@@ -143,21 +143,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'ds-setup', label: '시스템 설정', icon: <Settings className="w-4 h-4" />, path: '/dropshipping/setup' }
     ]
   },
-  // 7. 크라우드펀딩
-  {
-    id: 'crowdfunding',
-    label: '크라우드펀딩',
-    icon: <DollarSign className="w-5 h-5" />,
-    children: [
-      { id: 'crowdfunding-projects', label: '프로젝트 관리', icon: <FileText className="w-4 h-4" />, path: '/crowdfunding/projects' },
-      { id: 'crowdfunding-backers', label: '후원자 관리', icon: <Users className="w-4 h-4" />, path: '/crowdfunding/backers' },
-      { id: 'crowdfunding-rewards', label: '리워드 관리', icon: <Package className="w-4 h-4" />, path: '/crowdfunding/rewards' },
-      { id: 'crowdfunding-payments', label: '결제 관리', icon: <CreditCard className="w-4 h-4" />, path: '/crowdfunding/payments' },
-      { id: 'crowdfunding-reports', label: '보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/crowdfunding/reports' },
-      { id: 'crowdfunding-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/crowdfunding/settings' }
-    ]
-  },
-  // 8. 포럼
+  // 7. 포럼
   {
     id: 'forum',
     label: '포럼',
