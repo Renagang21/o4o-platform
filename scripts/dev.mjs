@@ -98,6 +98,18 @@ function runTypeCheck() {
     }
   }
 
+  // Type check App Store packages
+  log.info('Type checking App Store packages...');
+  const appStorePackages = ['dropshipping-core', 'dropshipping-cosmetics', 'forum-app', 'forum-neture', 'forum-yaksa'];
+
+  for (const pkg of appStorePackages) {
+    const pkgPath = join('packages', pkg);
+    if (existsSync(join(ROOT_DIR, pkgPath))) {
+      console.log(`  - Checking @o4o/${pkg}`);
+      exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath));
+    }
+  }
+
   // Type check apps
   log.info('Type checking apps...');
   const apps = ['api-server', 'main-site', 'admin-dashboard', 'ecommerce'];
@@ -125,6 +137,18 @@ function runTypeCheckFrontend() {
     if (existsSync(join(ROOT_DIR, pkgPath))) {
       console.log(`  - Building @o4o/${pkg}`);
       exec('npx tsc', join(ROOT_DIR, pkgPath));
+    }
+  }
+
+  // Type check App Store packages
+  log.info('Type checking App Store packages...');
+  const appStorePackages = ['dropshipping-core', 'dropshipping-cosmetics', 'forum-app', 'forum-neture', 'forum-yaksa'];
+
+  for (const pkg of appStorePackages) {
+    const pkgPath = join('packages', pkg);
+    if (existsSync(join(ROOT_DIR, pkgPath))) {
+      console.log(`  - Checking @o4o/${pkg}`);
+      exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath));
     }
   }
 
