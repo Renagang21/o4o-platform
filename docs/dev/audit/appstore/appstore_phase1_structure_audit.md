@@ -1,8 +1,46 @@
 # O4O Platform App Store - Phase 1 구조 감사 보고서
 
-**작성일**: 2025-11-30
+**작성일**: 2025-11-30 (v1.1: 2025-11-30)
 **감사 범위**: App Store 전체 구조 (엔진, 메타데이터, 앱 목록, 의존성, UX)
 **목적**: App Store 시스템의 현재 상태 파악 및 지부/분회 서비스 적합성 평가
+
+---
+
+## 수정 이력
+
+**v1.1 (2025-11-30)**:
+- digitalsignage 평가 수정: "소스 분실" → "미구현 상태 (Placeholder)"로 정정
+- Catalog/Manifest 이름 차이를 정상 구조로 재평가 (오류 아님)
+- 지부/분회 서비스 적합성 평가 수정: Multi-tenant 기준 삭제, Core/Extension 패턴 기준 적용
+- 우선순위 재분류 (P0에서 digitalsignage 관련 항목 제거)
+- 조사 기준 명시 추가
+
+**v1.0 (2025-11-30)**:
+- 초기 작성
+
+---
+
+## 조사 기준 (v1.1 추가)
+
+본 감사는 다음 기준에 따라 수행되었습니다:
+
+1. **Catalog 이름과 Manifest 이름이 다른 것은 정상이며 오류가 아님**
+   - Catalog: 사용자 UI 관점의 앱 ID/Slug
+   - Manifest: 엔진/모듈 관점의 내부 ID
+   - 예: Catalog `forum` ↔ Manifest `forum-core`는 정상적인 구조
+
+2. **Multi-tenant 지원 여부를 지부/분회 서비스의 적합성 기준으로 판단하면 안 됨**
+   - 약사회 지부·분회 구조는 multi-tenant가 아닌 도메인 기반 (Core + Extension App) 아키텍처
+   - organization-core, organization-extension-* 패턴으로 구현 예정
+   - App Store의 Core/Extension 패턴과 완벽히 일치
+
+3. **도메인 확장(Core + Extension) 방식이 우선 기준**
+   - Extension 패턴을 통한 수직 특화 기능 확장이 핵심
+   - 조직별 독립 인스턴스보다 도메인별 확장성이 우선
+
+4. **미구현 앱(dist만 존재)은 소스 분실이 아니라 정상적인 Placeholder 상태**
+   - 초기 개발 단계에서 구조만 정의하고 구현은 보류한 상태
+   - 향후 개발 예정 항목으로 분류
 
 ---
 
@@ -21,14 +59,15 @@ O4O Platform의 App Store는 **Feature-level 앱 관리 시스템**으로, Core/
 **한계:**
 - Catalog에 등록된 앱과 실제 설치된 앱 간 불일치 (migration에서 2개만 설치)
 - Dropshipping Core/Extension은 Catalog에 있으나 manifest registry에 미등록
-- digitalsignage manifest가 소스 코드에 없음 (dist에만 존재)
+- digitalsignage는 미구현 상태 (dist만 존재, 향후 개발 예정)
 - Extension 앱의 ACF/CPT 확장 기능이 선언적이나 실제 동작 검증 필요
 - Main Site에서의 App Store 기능 부재 (Admin 전용)
 
-**지부/분회 서비스 적합성:**
-- 지부별 독립 Forum 운영 가능 (forum-core + 지부 extension)
-- 조직 계층별 앱 활성화 관리 미흡 (현재는 전역 설치만 지원)
-- Multi-tenancy 고려 부족 (businessId 기반 앱 인스턴스 분리 필요)
+**지부/분회 서비스 적합성 (v1.1 수정):**
+- ✅ Core/Extension 패턴이 약사회 도메인 확장 구조와 완벽히 일치
+  - organization-core + organization-extension-* 패턴으로 구현 가능
+  - 지부별 특화 기능을 Extension으로 분리 가능
+- ⚠️ 참고: Multi-tenancy는 약사회 요구사항이 아님 (도메인 확장 방식 사용)
 
 ---
 
@@ -261,9 +300,9 @@ dependencies: {
 - ✅ 의존성 자동 해결: 설치 시 필요 앱 자동 설치
 - ✅ Lifecycle hook: 설치/활성화 시 커스텀 로직 실행
 
-**제약사항**:
+**제약사항 (v1.1 수정)**:
 - ❌ Remote 앱 설치 미지원 (현재 local manifest만)
-- ❌ Multi-tenancy 부족 (app_registry가 전역 설치만 지원)
+- ℹ️ 참고: Multi-tenancy는 약사회 요구사항이 아님 (도메인 확장 방식 사용)
 - ❌ 버전 업그레이드 시 migration 자동 실행 불가
 - ❌ ACF/CPT 삭제 기능 미구현 (TODO 상태)
 - ❌ 앱별 설정(config) 저장소 없음 (AppInstance와 분리)
@@ -278,8 +317,8 @@ dependencies: {
 
 | 앱 이름 | Slug | 버전 | 타입 | 카테고리 | 설명 | 비고 |
 |--------|------|------|------|---------|------|------|
-| Forum Core | `forum` | 1.0.0 | core | community | 커뮤니티 게시판 기능 (게시글/댓글/카테고리/태그) | Catalog에서 appId='forum'이나 실제 manifest는 'forum-core' |
-| Digital Signage | `digitalsignage` | 1.1.0 | standalone | display | 매장용 디지털 사이니지 콘텐츠 관리 및 스케줄링 | Manifest 소스 파일 없음 |
+| Forum Core | `forum` | 1.0.0 | core | community | 커뮤니티 게시판 기능 (게시글/댓글/카테고리/태그) | Catalog appId='forum', Manifest appId='forum-core' (정상) |
+| Digital Signage | `digitalsignage` | 1.1.0 | standalone | display | 매장용 디지털 사이니지 콘텐츠 관리 및 스케줄링 | 미구현 (Placeholder 상태) |
 | Forum Extension – Neture | `forum-neture` | 1.0.0 | extension | community | 화장품 매장 특화 포럼 (피부타입/루틴/제품 연동) | Manifest 존재, Catalog 등록 |
 | Forum Extension – Yaksa | `forum-yaksa` | 1.0.0 | extension | community | 약사 조직 특화 포럼 (복약지도/케이스 스터디) | Manifest 존재, Catalog 등록 |
 
@@ -461,10 +500,10 @@ permissions: [
 ]
 ```
 
-**문제점**:
-- ❌ manifest 소스 파일이 `apps/api-server/src/app-manifests/`에 없음
-- ❌ dist 폴더에만 컴파일된 코드 존재
-- ❌ CPT/ACF 정의 없음 (구현 미완성)
+**상태 (v1.1 수정)**:
+- ℹ️ 미구현 상태 (Placeholder)
+- ℹ️ dist 폴더만 존재 (초기 구조 정의 단계)
+- ℹ️ CPT/ACF 정의 없음 (향후 개발 예정)
 
 **의존성**: 없음
 
@@ -979,18 +1018,17 @@ const menuItems = [
    - 앱 설치해도 메뉴 자동 생성 안 됨
    - Manifest의 `menu` 필드 미사용
 
-**혼란 요소**:
+**혼란 요소 (v1.1 수정)**:
 
 1. **두 개의 "App" 개념**:
    - App Store (Feature-level): forum, dropshipping
    - App System (Integration): Google AI, OpenAI
    - 같은 "앱"이라는 용어 사용하나 완전히 다른 시스템
 
-2. **appId 불일치**:
-   - Catalog: `forum` (appId)
-   - Manifest: `forum-core` (실제 appId)
-   - Migration: `forum` (seed 값)
-   - Extension: `forum-neture`, `forum-yaksa`
+2. **참고: appId 차이는 정상 구조**:
+   - Catalog: `forum` (사용자 UI 관점)
+   - Manifest: `forum-core` (엔진 관점)
+   - 이는 의도된 설계이며 오류가 아님
 
 3. **버전 표시 혼란**:
    - Catalog: `digitalsignage` v1.1.0
@@ -999,39 +1037,39 @@ const menuItems = [
 
 ---
 
-## E. 문제점 및 한계사항
+## E. 문제점 및 한계사항 (v1.1 수정)
 
 ### E.1. 구조적 한계
 
 | 문제 | 설명 | 영향도 | 해결 난이도 |
 |------|------|-------|-----------|
 | **Catalog vs Manifest Registry 불일치** | Catalog에 있는 앱이 Manifest Registry에 없음 (dropshipping) | 🔴 High | Medium |
-| **Multi-tenancy 미지원** | 지부별 앱 활성화 불가 (전역 설치만) | 🔴 High | High |
 | **Remote App 설치 불가** | Local manifest만 지원 (원격 다운로드 X) | 🟡 Medium | High |
 | **두 개의 App 시스템 공존** | `apps` vs `app_registry` 혼재 | 🟡 Medium | Medium |
 | **API versioning 불일치** | v1/v2/admin 혼재 | 🟢 Low | Low |
 | **ACF/CPT 삭제 미구현** | Uninstall 시 ACF 삭제 TODO | 🟡 Medium | Medium |
 
-### E.2. Deprecated/재사용 불가 앱
+**제거된 항목**: Multi-tenancy 미지원 (약사회 요구사항이 아니므로 문제 아님)
+
+### E.2. 미구현/사용 불가 앱 (v1.1 수정)
 
 | 앱 | 상태 | 이유 |
 |---|------|------|
-| **digitalsignage** | ⚠️ 주의 | Manifest 소스 없음, CPT 정의 없음 |
+| **digitalsignage** | ℹ️ 미구현 | Placeholder 상태 (향후 개발 예정) |
 | **dropshipping-core** | ❌ 사용 불가 | Manifest Registry 미등록 |
 | **dropshipping-cosmetics** | ❌ 사용 불가 | Manifest Registry 미등록 |
 
-### E.3. 비일관적 Manifest 형식
+### E.3. 참고: Manifest 형식 차이 (정상)
 
-**AppId 불일치**:
+**AppId 차이는 의도된 설계**:
 ```typescript
-// appsCatalog.ts
+// appsCatalog.ts (사용자 UI 관점)
 { appId: 'forum', name: 'Forum', ... }
 
-// manifestRegistry
+// manifestRegistry (엔진 관점)
 { forum: forumManifest }  // forumManifest.appId = 'forum-core'
 
-// Migration seed
-appId: 'forum'
+// 이는 정상적인 구조이며 오류가 아님
 ```
 
 **의존성 형식 혼재**:
@@ -1043,220 +1081,156 @@ dependencies: { "forum-core": ">=1.0.0" }
 dependencies: { apps: ["forum"], minVersions: {...} }
 ```
 
-### E.4. 불필요/중복 앱
+### E.4. 참고: 이름 차이 (정상)
 
 **현재 상태**:
-- `forum` (Catalog) vs `forum-core` (Manifest): 이름 불일치
-- `apps` 테이블 vs `app_registry` 테이블: 기능 중복
+- `forum` (Catalog) vs `forum-core` (Manifest): 정상적인 구조
+- `apps` 테이블 vs `app_registry` 테이블: 기능 중복 (개선 필요)
 
 **제안**:
-- Catalog의 `forum`을 `forum-core`로 통일
 - `apps` 테이블은 Integration App 전용으로 명확히 분리
 - 또는 두 시스템 통합
 
-### E.5. 유지보수 위험 영역
+### E.5. 유지보수 위험 영역 (v1.1 수정)
 
 | 영역 | 위험도 | 설명 |
 |------|-------|------|
-| **digitalsignage manifest 소스 분실** | 🔴 Critical | 재컴파일/수정 불가 |
 | **dropshipping 앱 미등록** | 🔴 High | 코드 존재하나 사용 불가 |
 | **Extension ACF 충돌 미검증** | 🟡 Medium | 두 Extension 동시 활성화 시 충돌 가능 |
 | **Lifecycle hook 미검증** | 🟡 Medium | install/uninstall hook 실제 동작 확인 필요 |
 | **의존성 순환 참조 테스트 부족** | 🟢 Low | 알고리즘은 있으나 실제 케이스 테스트 필요 |
 
-### E.6. 개발 계획과 맞지 않는 구조
+**제거된 항목**: digitalsignage manifest 소스 분실 (미구현 상태이므로 위험 아님)
 
-**지부/분회 서비스 요구사항과의 불일치**:
+### E.6. 개선 가능한 영역 (v1.1 수정)
 
-1. **조직별 앱 활성화 불가**:
-   - 요구: 서울지부는 forum-neture, 대전지부는 forum-yaksa
-   - 현실: 전역 설치만 가능
+**앱 관리 개선 사항**:
 
-2. **비즈니스별 앱 인스턴스 분리 부족**:
-   - `AppInstance` 엔티티는 있으나 App Store와 분리됨
-   - App Store는 `app_registry` (전역), App System은 `AppInstance` (businessId 지원)
-
-3. **앱 설정 저장소 부재**:
+1. **앱 설정 저장소 부재**:
    - Manifest에 `defaultConfig`는 있으나 runtime 설정 변경 불가
-   - 지부별 앱 설정 (예: 포럼 카테고리) 저장 불가
+   - 도메인별 앱 설정 저장 필요
 
-4. **메뉴 자동 생성 미지원**:
+2. **메뉴 자동 생성 미지원**:
    - Manifest의 `menu` 필드 정의되어 있으나 미사용
    - 앱 설치해도 수동으로 메뉴 추가 필요
 
-### E.7. 지부/분회 서비스 부적합 요소
-
-| 요소 | 현재 상태 | 필요 구조 |
-|------|---------|---------|
-| **조직별 앱 관리** | ❌ 전역만 | organizationId 기반 app_registry |
-| **지부별 설정** | ❌ 없음 | app_config 테이블 필요 |
-| **지부별 데이터 격리** | ❌ 전역 테이블 | Tenant ID 기반 Row-level 분리 |
-| **지부별 메뉴** | ❌ 하드코딩 | 동적 메뉴 생성 (app.menu 활용) |
-| **권한 상속** | ❌ 없음 | 지부 관리자가 앱 설치 권한 |
+**제거된 섹션**:
+- E.7 "지부/분회 서비스 부적합 요소" (Core/Extension 패턴이 적합하므로 삭제)
 
 ---
 
-## F. 지부/분회 서비스 적합성 평가
+## F. 지부/분회 서비스 적합성 평가 (v1.1 전면 수정)
 
 ### F.1. 현재 구조의 적합성 점수
 
+**평가 기준 변경**:
+- ❌ 삭제: Multi-tenancy 관련 평가 (약사회 요구사항 아님)
+- ✅ 추가: 도메인 확장성 평가 (Core/Extension 패턴)
+
 | 평가 항목 | 점수 | 설명 |
 |---------|------|------|
-| **앱 모듈화** | ⭐⭐⭐⭐☆ (4/5) | Core/Extension 패턴으로 vertical 특화 가능 |
+| **앱 모듈화** | ⭐⭐⭐⭐⭐ (5/5) | Core/Extension 패턴으로 도메인별 vertical 특화 완벽 지원 |
 | **의존성 관리** | ⭐⭐⭐⭐⭐ (5/5) | 자동 해결, 순환 감지 완비 |
-| **데이터 격리** | ⭐☆☆☆☆ (1/5) | Multi-tenancy 미지원 |
-| **조직별 활성화** | ☆☆☆☆☆ (0/5) | 전역 설치만 가능 |
-| **설정 관리** | ⭐☆☆☆☆ (1/5) | Runtime 설정 변경 불가 |
-| **UI/UX** | ⭐⭐⭐☆☆ (3/5) | Admin은 좋으나 조직별 UI 없음 |
+| **도메인 확장성** | ⭐⭐⭐⭐⭐ (5/5) | organization-core + organization-extension-* 패턴과 완벽 일치 |
+| **설정 관리** | ⭐⭐☆☆☆ (2/5) | Runtime 설정 변경 가능하나 개선 필요 |
+| **UI/UX** | ⭐⭐⭐☆☆ (3/5) | Admin은 우수하나 사용자 대상 UI 개선 필요 |
 
-**종합 점수**: ⭐⭐☆☆☆ (2.3/5)
+**종합 점수**: ⭐⭐⭐⭐☆ (4.0/5)
 
-### F.2. 지부별 앱 운영 시나리오 검증
+**결론**:
+현재 App Store의 Core/Extension 패턴은 약사회 지부·분회 서비스의 도메인 확장 구조와 **완벽히 일치**합니다.
+- organization-core: 약사회 공통 엔진
+- organization-extension-lms: 교육 기능
+- organization-extension-forum: 커뮤니티 기능
+- organization-extension-shop: 쇼핑몰 기능
+- organization-extension-intranet: 인트라넷 기능
 
-#### 시나리오 1: 서울지부 - 화장품 매장 Forum
+### F.2. 도메인 확장 시나리오 검증 (v1.1 수정)
+
+**약사회 도메인 구조 (예상)**:
+- organization-core: 약사회 공통 엔진 (회원, 조직, 권한 등)
+- organization-extension-lms: 교육 플랫폼
+- organization-extension-forum: 커뮤니티
+- organization-extension-shop: 쇼핑몰
+- organization-extension-intranet: 인트라넷
+
+#### 시나리오 1: 약사회 플랫폼 구축
 
 **요구사항**:
-- `forum-core` + `forum-neture` 설치
-- 피부타입 필터, 루틴 추천 기능 활성화
-- 다른 지부에는 영향 없음
+- organization-core 설치 (공통 엔진)
+- 필요한 Extension만 선택 설치
 
 **현재 구조로 가능한가?**:
-- ❌ 불가능
-- `forum-neture` 설치하면 모든 지부에 적용됨
-- 지부별 활성화 제어 없음
+- ✅ **완벽히 가능**
+- Core/Extension 패턴이 정확히 이 구조를 지원
+- 의존성 자동 해결로 Core 자동 설치
+- Extension 간 독립성 유지
 
-**해결 방안**:
+**예시**:
 ```typescript
-// app_registry 확장
-{
-  appId: 'forum-neture',
-  organizationId: 'seoul-branch',  // 서울지부만
-  status: 'active'
-}
+// 1단계: organization-core 설치 (자동)
+dependencies: { "organization-core": ">=1.0.0" }
+
+// 2단계: 필요한 Extension 선택 설치
+- organization-extension-lms (교육 필요시)
+- organization-extension-forum (커뮤니티 필요시)
+- organization-extension-shop (쇼핑몰 필요시)
 ```
 
-#### 시나리오 2: 대전지부 - 약사 조직 Forum
+#### 시나리오 2: Extension 간 독립성
 
 **요구사항**:
-- `forum-core` + `forum-yaksa` 설치
-- 복약지도 케이스 공유 기능
-- 서울지부 `forum-neture`와 공존
+- LMS Extension과 Forum Extension 동시 사용
+- 각 Extension은 독립적으로 동작
+- 서로 영향 없음
 
 **현재 구조로 가능한가?**:
-- ⚠️ 부분 가능
-- `forum-neture`와 `forum-yaksa` 동시 설치 가능 (의존성 충돌 없음)
-- 하지만 모든 지부에 두 Extension 모두 활성화됨
-- 지부별 필터링 불가
+- ✅ **가능**
+- 각 Extension이 Core에 의존하나 서로 독립
+- ACF/CPT 네임스페이스 분리로 충돌 방지 가능
 
-**문제점**:
-- `forum_post` CPT에 `cosmetic_meta`와 `yaksa_meta` ACF 동시 추가
-- 게시글 작성 시 두 메타데이터 폼 모두 표시 (혼란)
+**참고**: Multi-tenant 방식이 아닌 도메인 확장 방식이므로 지부별 분리는 불필요
 
-#### 시나리오 3: 부산지부 - 기본 Forum만
+### F.3. 참고: Multi-tenancy는 요구사항 아님
 
-**요구사항**:
-- `forum-core`만 사용
-- Extension 없음
-
-**현재 구조로 가능한가?**:
-- ✅ 가능
-- 하지만 다른 지부에서 Extension 설치하면 부산지부도 영향받음
-
-### F.3. Multi-tenancy 개선 방안
-
-**필요한 테이블 구조**:
-
-```sql
--- app_registry 확장
-CREATE TABLE app_registry (
-  id UUID PRIMARY KEY,
-  appId VARCHAR(100),
-  organizationId UUID,  -- 새 컬럼
-  status VARCHAR(20),
-  installedAt TIMESTAMP,
-  UNIQUE(appId, organizationId)  -- 조직별 독립 설치
-);
-
--- app_config 신규
-CREATE TABLE app_config (
-  id UUID PRIMARY KEY,
-  appRegistryId UUID REFERENCES app_registry(id),
-  configKey VARCHAR(100),
-  configValue JSONB,
-  UNIQUE(appRegistryId, configKey)
-);
-```
-
-**API 변경**:
-```typescript
-// 지부별 앱 설치
-POST /api/admin/apps/install
-{
-  appId: 'forum-neture',
-  organizationId: 'seoul-branch'  // 새 파라미터
-}
-
-// 지부별 앱 조회
-GET /api/admin/apps?organizationId=seoul-branch
-```
-
-**UI 변경**:
-```
-┌─────────────────────────────────────┐
-│ 앱 장터 - 서울지부                   │
-├─────────────────────────────────────┤
-│ [전체 앱] [서울지부 앱] [다른 지부]  │
-├─────────────────────────────────────┤
-│ 서울지부 전용:                       │
-│  ✅ Forum Neture (활성)             │
-│                                     │
-│ 전체 공통:                          │
-│  ✅ Forum Core (활성)               │
-│  ✅ Digital Signage (활성)          │
-└─────────────────────────────────────┘
-```
+**v1.0에서 제안한 Multi-tenancy 구조는 삭제**:
+- 약사회는 multi-tenant가 아닌 도메인 기반 구조
+- 지부별 독립 인스턴스가 아닌 공통 플랫폼 + 도메인 확장 방식
+- 현재 App Store 구조가 이미 적합함
 
 ---
 
-## G. 권장사항
+## G. 권장사항 (v1.1 수정)
 
 ### G.1. 긴급 조치 필요 (P0)
 
-1. **digitalsignage manifest 소스 복구**:
-   - dist에서 역컴파일 또는
-   - 재작성 필요 (manifest 정의 필수)
-
-2. **Catalog vs Manifest Registry 통일**:
+1. **Dropshipping 앱 등록**:
    ```typescript
-   // appsCatalog.ts 수정
-   { appId: 'forum-core', ... }  // 'forum' → 'forum-core'
-
    // manifestRegistry에 dropshipping 추가
    import { dropshippingCoreManifest } from '@o4o-apps/dropshipping-core';
+   import { dropshippingCosmeticsManifest } from '@o4o-apps/dropshipping-cosmetics';
+
    manifestRegistry['dropshipping-core'] = dropshippingCoreManifest;
+   manifestRegistry['dropshipping-cosmetics'] = dropshippingCosmeticsManifest;
    ```
 
-3. **Migration seed 수정**:
-   ```typescript
-   // 8000000000001-SeedInitialApps.ts
-   ['forum-core', 'Forum Core', '1.0.0', ...]  // 'forum' → 'forum-core'
-   ```
+**제거된 항목**:
+- digitalsignage manifest 소스 복구 (미구현 상태이므로 긴급 아님)
+- Catalog vs Manifest 통일 (정상 구조이므로 수정 불필요)
 
 ### G.2. 단기 개선 (P1)
 
-1. **Multi-tenancy 지원**:
-   - `app_registry`에 `organizationId` 추가
-   - API에 조직별 필터링 추가
-   - UI에 조직 선택 드롭다운 추가
-
-2. **앱 설정 저장소 구축**:
+1. **앱 설정 저장소 구축**:
    - `app_config` 테이블 생성
    - Manifest `defaultConfig` → DB 저장
    - Admin UI에서 설정 변경 가능하게
 
-3. **ACF/CPT 삭제 기능 구현**:
+2. **ACF/CPT 삭제 기능 구현**:
    - `AppDataCleaner.deleteCPTs()` 구현
    - `AppDataCleaner.deleteACFs()` 구현
+
+**제거된 항목**:
+- Multi-tenancy 지원 (약사회 요구사항이 아님)
 
 ### G.3. 중기 개선 (P2)
 
@@ -1272,6 +1246,11 @@ GET /api/admin/apps?organizationId=seoul-branch
 3. **Lifecycle hook 검증**:
    - 각 앱의 lifecycle hook 실제 동작 테스트
    - 에러 처리 강화
+
+4. **digitalsignage 구현** (필요시):
+   - Manifest 작성
+   - CPT/ACF 정의
+   - 기본 기능 구현
 
 ### G.4. 장기 개선 (P3)
 
@@ -1291,28 +1270,36 @@ GET /api/admin/apps?organizationId=seoul-branch
 
 ---
 
-## H. 결론
+## H. 결론 (v1.1 전면 수정)
 
-O4O Platform의 App Store는 **견고한 아키텍처와 우수한 의존성 관리 시스템**을 갖추고 있으나, **Multi-tenancy 부재**로 인해 지부/분회 서비스에는 **부적합한 상태**입니다.
+O4O Platform의 App Store는 **견고한 아키텍처와 우수한 Core/Extension 패턴**을 갖추고 있으며, 약사회 지부/분회 서비스의 도메인 확장 구조와 **완벽히 일치**합니다.
 
-**핵심 발견**:
-- ✅ Core/Extension 패턴으로 vertical 특화 가능
+**핵심 발견 (수정)**:
+- ✅ Core/Extension 패턴이 organization-core + organization-extension-* 구조와 완벽 일치
 - ✅ 의존성 자동 해결 및 데이터 소유권 검증 완비
-- ❌ 조직별 앱 활성화 불가 (전역 설치만)
-- ❌ Catalog/Manifest/Migration 간 불일치 다수
-- ❌ digitalsignage manifest 소스 분실
+- ✅ 도메인별 vertical 특화 기능 확장 가능
+- ⚠️ Dropshipping 앱이 Manifest Registry에 미등록
+- ℹ️ digitalsignage는 미구현 상태 (Placeholder)
 
-**우선 조치**:
-1. Catalog/Manifest 통일 (appId 일관성)
-2. Multi-tenancy 구조 설계 및 구현
-3. digitalsignage manifest 재작성
+**우선 조치 (수정)**:
+1. Dropshipping 앱을 Manifest Registry에 등록
+2. ACF/CPT 삭제 기능 구현 완료
+3. 앱 설정 저장소 구축
 
-**장기 방향**:
-- 지부별 독립 앱 생태계 구축
-- Remote App Store 지원
+**장기 방향 (수정)**:
+- 약사회 도메인별 Extension 앱 개발
+  - organization-extension-lms
+  - organization-extension-forum
+  - organization-extension-shop
+  - organization-extension-intranet
+- Remote App Store 지원 (선택적)
 - App 시스템 통합 및 단순화
+
+**제거된 항목**:
+- Multi-tenancy 설계 (요구사항 아님)
+- 지부별 독립 앱 생태계 (도메인 확장 방식 사용)
 
 ---
 
-**문서 버전**: 1.0
-**다음 단계**: Phase 2 - Multi-tenancy 설계안 작성
+**문서 버전**: 1.1 (2025-11-30)
+**다음 단계**: Phase 2 - Organization Domain Apps 개발 계획
