@@ -1,6 +1,4 @@
-import type { CoreManifest } from '@o4o/types';
-
-export const manifest: CoreManifest = {
+export const manifest = {
   id: 'lms-core',
   name: 'LMS Core',
   version: '0.1.0',

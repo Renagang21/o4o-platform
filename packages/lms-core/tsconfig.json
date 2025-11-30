@@ -3,7 +3,14 @@
   "compilerOptions": {
     "outDir": "../../dist/packages/lms-core",
     "rootDir": "src",
-    "composite": true
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "references": [
