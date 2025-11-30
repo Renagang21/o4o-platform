@@ -21,6 +21,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/src'),
       '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist'),
       '@o4o/config': path.resolve(__dirname, '../../packages/config'),
+      '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
     },
   },
   define: {
@@ -28,7 +29,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     'process.env': {},
   },
   optimizeDeps: {
-    exclude: ['@o4o/shortcodes', '@o4o/supplier-connector', '@o4o/block-renderer', '@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']
+    exclude: ['@o4o/shortcodes', '@o4o/supplier-connector', '@o4o/block-renderer', '@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context', '@o4o/dropshipping-core']
   },
   server: {
     host: '0.0.0.0',

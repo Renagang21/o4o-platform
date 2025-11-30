@@ -42,6 +42,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o-apps/forum': path.resolve(__dirname, '../../packages/forum-app'),
       '@o4o-apps/forum-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
       '@o4o-apps/forum-neture': path.resolve(__dirname, '../../packages/forum-neture'),
+      // Dropshipping core - map to source for subpath imports
+      '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
@@ -94,6 +96,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/shortcodes', // Workspace package - pre-bundling 방지
       '@o4o/block-renderer', // Workspace package - pre-bundling 방지
       '@o4o/slide-app', // Workspace package - pre-bundling 방지
+      '@o4o/dropshipping-core', // Dropshipping core - source imports
       '@o4o-apps/forum', // Forum app packages - source imports
       '@o4o-apps/forum-yaksa',
       '@o4o-apps/forum-neture'

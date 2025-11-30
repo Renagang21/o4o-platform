@@ -4,5 +4,5 @@
  * Public-facing components and pages
  */
 
-export * from './pages/index.js';
-export * from './components/index.js';
+export * from './pages/index';
+export * from './components/index';
