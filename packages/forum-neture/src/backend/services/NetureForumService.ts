@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import type { ForumPost } from '@o4o-apps/forum/src/backend/entities/ForumPost.js';
+import type { ForumPost } from '@o4o-apps/forum';
 
 /**
  * Neture Forum Service

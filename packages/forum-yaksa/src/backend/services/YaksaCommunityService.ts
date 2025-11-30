@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { YaksaCommunity, CommunityType } from '../entities/YaksaCommunity.js';
 import { YaksaCommunityMember, CommunityMemberRole } from '../entities/YaksaCommunityMember.js';
-import type { ForumPost } from '@o4o-apps/forum/src/backend/entities/ForumPost.js';
+import type { ForumPost } from '@o4o-apps/forum';
 
 /**
  * YaksaCommunityService

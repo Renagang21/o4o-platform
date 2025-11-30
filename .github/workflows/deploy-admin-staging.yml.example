@@ -1,0 +1,34 @@
+name: Deploy Admin Staging (develop)
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'apps/admin-dashboard/**'
+      - 'packages/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install pnpm
+        run: npm install -g pnpm
+      
+      - name: Build Admin Dashboard
+        run: |
+          cd apps/admin-dashboard
+          pnpm build
+      
+      - name: Deploy to Staging
+        run: |
+          rsync -avz --delete \
+            apps/admin-dashboard/dist/ \
+            ubuntu@13.125.144.8:/var/www/dev.admin.neture.co.kr/
