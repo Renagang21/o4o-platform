@@ -1,14 +1,62 @@
-# O4O Platform 회원/조직/인증 구조 전수 조사 - Phase 2 요약
+# O4O Platform 회원/조직/인증 구조 조사 보고서 (v1.1)
 
-**작성일**: 2025-11-30
-**조사자**: Claude (Anthropic)
-**조사 목적**: 약사회 지부·분회 서비스 구현을 위한 현재 시스템 구조 파악 및 개선 방안 도출
+> **작성일**: 2025-11-30
+> **버전**: 1.1 (정정판)
+> **목적**: 약사회 조직 도메인 개발을 위한 현재 구조 확장 가능성 평가
+
+---
+
+## 수정 이력
+
+### v1.1 (2025-11-30)
+- **평가 기준 정정**: "부재 = 문제" 평가 방식 폐기
+- **전제 조건 변경**: 약사회 도메인을 organization-core App으로 신규 개발 예정
+- **평가 기준**: 확장 가능성 중심 평가 (Multi-tenant 기준 제외)
+- **최종 평가**: 1/5 (v1.0) → 4/5 (v1.1)
+
+### v1.0 (2025-11-30 초안)
+- 초기 조사 (부재 = 문제 방식으로 평가)
+
+---
+
+## 요약
+
+O4O Platform은 **도메인 확장에 적합한 기반 구조**를 갖추고 있습니다. 현재 User/RBAC 구조는 organization-core 앱 추가 시 큰 변경 없이 통합 가능하며, 확장 포인트가 명확하게 설계되어 있습니다.
+
+### 전체 평가: 4/5 (도메인 확장 준비 완료)
+
+| 영역 | 현재 상태 | 확장 가능성 | 권장 조치 |
+|-----|---------|-----------|---------|
+| **User 구조** | ✅ 우수 | 도메인 프로필 확장 가능 | P1: metadata 패턴 표준화 |
+| **Organization** | 🟡 부재 (예정) | organization-core 개발 필요 | P0: Core App 개발 |
+| **RBAC** | ✅ 우수 | scopeType/scopeId 추가 가능 | P1: 조직 범위 확장 |
+| **통합** | ✅ 양호 | User ↔ Organization 연결 설계 | P1: 관계 정의 |
+
+**평가 이유**:
+- ✅ User 엔티티는 확장 메커니즘 보유 (metadata, businessInfo)
+- ✅ RoleAssignment는 조직 기반 권한 지원 가능 (scopeType/scopeId 추가)
+- ✅ YaksaCommunity는 organization-core의 레퍼런스 구현
+- 🟡 Organization 엔티티는 신규 개발 필요 (예정됨)
 
 ---
 
 ## 1. 조사 개요
 
-### 1.1 조사 범위
+### 1.1 조사 배경
+
+약사회 도메인 개발을 위해 다음을 평가:
+1. 현재 User/Member 구조가 조직 멤버십을 지원할 수 있는가?
+2. Organization 구조를 신규 개발할 때 기존 구조와 호환되는가?
+3. RBAC 구조가 조직 기반 권한을 확장할 수 있는가?
+
+### 1.2 조사 방법
+
+- **엔티티 분석**: User, Role, Permission, RoleAssignment 구조 검토
+- **레퍼런스 확인**: YaksaCommunity 구현 패턴 분석
+- **확장성 평가**: organization-core 추가 시나리오 검증
+- **평가 기준**: "확장 가능" vs "구조 재설계 필요"
+
+### 1.3 조사 범위
 
 | 영역 | 조사 대상 | 문서 |
 |------|-----------|------|
@@ -16,154 +64,221 @@
 | **조직 구조** | Organization/Branch/Division 엔티티, 계층 구조 | `02_organization_structure_audit.md` |
 | **RBAC** | Role/Permission/RoleAssignment, 권한 시스템 | `03_rbac_structure_audit.md` |
 
-### 1.2 핵심 발견 사항
-
-**긍정적 발견**:
-- ✅ 견고한 User 엔티티 구조
-- ✅ P0 RBAC 시스템 (RoleAssignment) 구현 완료
-- ✅ 역할 신청/승인 프로세스 (RoleEnrollment) 존재
-- ✅ 멀티테넌트 기반 준비 (tenant_id)
-- ✅ Forum 패키지에 조직 유사 구조 (YaksaCommunity)
-
-**문제점 발견**:
-- ❌ **Organization 엔티티 부재** (P0)
-- ❌ **조직 계층 구조 미지원** (P0)
-- ❌ **조직 기반 권한 제어 불가** (P0)
-- ❌ 약사 필수 필드 부재 (면허번호 등)
-- ❌ 회원-조직 연결 구조 없음
-
 ---
 
-## 2. 현재 시스템 구조 분석
+## 2. 핵심 발견사항
 
-### 2.1 User (회원) 구조
+### 2.1 User 엔티티 (apps/api-server/src/entities/User.ts)
 
-#### 핵심 필드
+#### 장점: 확장 가능한 구조
+
+✅ **도메인별 프로필 확장 메커니즘 보유**
 ```typescript
 @Entity('users')
 class User {
-  id: string
-  email: string
-  password: string
-  name?: string
-  phone?: string
+  // 도메인 확장 필드
+  businessInfo?: BusinessInfo;  // JSON - 사업자 정보
+  domain?: string;               // Multi-tenant 지원
+  // metadata?: Record<string, any>; // 주석 처리됨 (확장 가능)
 
-  // 상태
-  status: UserStatus  // ACTIVE | PENDING | APPROVED | SUSPENDED
-  isActive: boolean
-  isEmailVerified: boolean
-
-  // 역할 (DEPRECATED - 하위 호환용)
-  role: UserRole
-  roles: string[]
-  dbRoles?: Role[]
-
-  // 직접 권한
-  permissions: string[]
-
-  // 비즈니스 정보 (JSON)
-  businessInfo?: BusinessInfo
-
-  // 멀티테넌트
-  domain?: string
-
-  // 타임스탬프
-  createdAt: Date
-  updatedAt: Date
+  // 도메인 프로필 패턴 (Dropshipping 예시)
+  supplier?: any;  // OneToOne in Supplier entity
+  seller?: any;    // OneToOne in Seller entity
+  partner?: any;   // OneToOne in Partner entity
 }
 ```
 
-#### 문제점
-| 문제 | 우선순위 |
-|------|----------|
-| 약사 면허번호 필드 없음 | **P0** |
-| 조직(지부/분회) 참조 필드 없음 | **P0** |
-| 회원 등급 필드 없음 | P1 |
-| 회원 탈퇴 처리 메커니즘 없음 | P1 |
+✅ **약사회 도메인 추가 시 확장 시나리오**
+```typescript
+// User 엔티티는 변경 불필요
+// organization-core 앱에서 정의:
+@Entity('pharmacist_profiles')
+export class PharmacistProfile {
+  @OneToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
 
-### 2.2 Organization (조직) 구조
+  @Column()
+  licenseNumber!: string;
+
+  @Column()
+  licenseDate!: Date;
+}
+```
+
+#### 확장 가능성 평가: ✅ 우수
+- 도메인 프로필 OneToOne 패턴 활용 가능
+- businessInfo JSON 필드로 도메인 메타데이터 저장
+- 기존 User 구조 변경 없이 확장 가능
+
+### 2.2 Organization 구조
 
 #### 현재 상태
-**결론**: Organization 엔티티 **존재하지 않음**
+🟡 **Organization 엔티티 부재** (신규 개발 예정)
 
-**발견된 조직 관련 구조**:
-1. **tenant_id** (Post 엔티티)
-   - 멀티테넌트 격리용
-   - 단순 문자열 (FK 아님)
-   - 조직 메타데이터 없음
+#### 레퍼런스 구현 존재: YaksaCommunity
 
-2. **YaksaCommunity** (Forum 패키지)
-   - 포럼 커뮤니티 전용
-   - 지부/분회 개념 존재 (type: BRANCH | DIVISION)
-   - **계층 구조 미지원** (parentId 없음)
+YaksaCommunity (packages/forum-yaksa/src/backend/entities/)는 조직 구조의 레퍼런스 구현:
 
-#### 문제점
-| 문제 | 영향 | 우선순위 |
-|------|------|----------|
-| Organization 엔티티 없음 | 조직 정보 저장 불가 | **P0** |
-| 계층 구조 미지원 | 지부-분회 관계 표현 불가 | **P0** |
-| 회원-조직 연결 없음 | 소속 조직 조회 불가 | **P0** |
-| 조직 설정 저장 불가 | 지부/분회별 정책 설정 불가 | P1 |
+```typescript
+@Entity('yaksa_forum_community')
+export class YaksaCommunity {
+  id: string;
+  name: string;
+  type: CommunityType; // PERSONAL | BRANCH | DIVISION | GLOBAL
+  ownerUserId: string;
+  requireApproval: boolean;
+  metadata: Record<string, unknown>;
+}
 
-### 2.3 RBAC (역할/권한) 구조
-
-#### 현재 구조
-```
-User ──1:N──> RoleAssignment ──N:1──> Role ──N:N──> Permission
+@Entity('yaksa_forum_community_member')
+export class YaksaCommunityMember {
+  communityId: string;
+  userId: string;
+  role: CommunityMemberRole; // OWNER | ADMIN | MEMBER
+  joinedAt: Date;
+}
 ```
 
-**RoleAssignment** (신규 P0 시스템):
+#### 권장 패턴
+organization-core 앱 개발 시 YaksaCommunity 패턴 활용:
+1. **Organization 엔티티**: 조직 기본 정보
+2. **OrganizationMember 엔티티**: User ↔ Organization 관계
+3. **OrganizationHierarchy**: 상하위 조직 관계 (선택)
+
+#### 확장 가능성 평가: ✅ 레퍼런스 구현 활용 가능
+- YaksaCommunity 패턴을 organization-core로 일반화
+- 기존 시스템과 충돌 없이 신규 앱으로 개발 가능
+- User 엔티티 변경 불필요 (OneToMany 관계)
+
+### 2.3 RBAC 구조
+
+#### 우수한 확장 가능성
+
+✅ **RoleAssignment 구조** (apps/api-server/src/entities/RoleAssignment.ts)
+
+현재:
 ```typescript
 @Entity('role_assignments')
 class RoleAssignment {
-  id: string
-  userId: string
-  role: string  // 'admin', 'supplier', 'seller'
-
-  isActive: boolean
-  validFrom: Date
-  validUntil?: Date
-
-  assignedAt: Date
-  assignedBy?: string
+  userId: string;
+  role: string;
+  isActive: boolean;
+  validFrom: Date;
+  validUntil?: Date;
+  assignedBy?: string;
 }
 ```
 
-**Role**:
+✅ **조직 기반 권한 확장 시나리오**
 ```typescript
-@Entity('roles')
-class Role {
-  id: string
-  name: string  // 'admin', 'supplier'
-  displayName: string
-  isActive: boolean
-  isSystem: boolean
-  permissions: Permission[]  // N:N
+@Entity('role_assignments')
+class RoleAssignment {
+  userId: string;
+  role: string;
+
+  // 조직 범위 추가 (P1)
+  scopeType?: string; // 'global' | 'organization' | 'branch'
+  scopeId?: string;   // organizationId or branchId
+
+  isActive: boolean;
+  validFrom: Date;
+  validUntil?: Date;
 }
 ```
 
-**Permission**:
+**예시**:
+```typescript
+// 전국약사회 회장: global scope
+{ userId: 'user1', role: 'president', scopeType: 'global', scopeId: null }
+
+// 서울시약사회 지부장: organization scope
+{ userId: 'user2', role: 'branch_president', scopeType: 'organization', scopeId: 'org-seoul' }
+
+// 강남구분회 총무: branch scope
+{ userId: 'user3', role: 'secretary', scopeType: 'branch', scopeId: 'branch-gangnam' }
+```
+
+✅ **Permission 구조**: App 기반 권한 관리
 ```typescript
 @Entity('permissions')
 class Permission {
-  id: string
-  key: string  // 'users.view', 'content.create'
-  category: string
-  appId?: string  // 앱 기반 격리
+  key: string;        // 'users.view', 'content.create'
+  description: string;
+  category: string;
+  appId?: string;     // 앱 소유권 명시
 }
 ```
 
-#### 문제점
-| 문제 | 영향 | 우선순위 |
-|------|------|----------|
-| RoleAssignment에 조직 범위 없음 | "서울지부 관리자" 표현 불가 | **P0** |
-| Permission에 조직 격리 없음 | 조직별 권한 제어 불가 | **P0** |
-| 약사 역할 없음 | 약사 회원 구분 불가 | P1 |
-| 권한 상속 미지원 | 상위 조직 관리자 권한 상속 불가 | P2 |
+organization-core 앱 개발 시 전용 권한 정의 가능:
+- `organization.view`
+- `organization.manage`
+- `members.approve`
+
+#### 확장 가능성 평가: ✅ 우수
+- RoleAssignment에 scopeType/scopeId 추가만으로 조직 범위 지원
+- 기존 RBAC 로직 하위 호환 유지 가능
+- Permission의 appId로 도메인별 권한 격리 지원
 
 ---
 
-## 3. 약사회 서비스 요구사항 분석
+## 3. 통합 평가
+
+### 3.1 User + Organization 통합 시나리오
+
+**약사회 회원 가입 플로우**:
+
+1. **회원가입**: User 엔티티 생성 (기존 로직)
+2. **약사 인증**: PharmacistProfile 생성 (organization-core)
+3. **지부/분회 가입**: OrganizationMember 생성
+4. **권한 부여**: RoleAssignment 생성 (scopeType: 'organization')
+
+```typescript
+// 1. User 생성 (기존)
+const user = await userRepository.create({
+  email: 'pharmacist@example.com',
+  name: '홍길동',
+  role: UserRole.USER
+});
+
+// 2. 약사 프로필 생성 (organization-core)
+const profile = await pharmacistProfileRepository.create({
+  userId: user.id,
+  licenseNumber: '12345',
+  licenseDate: new Date('2020-01-01')
+});
+
+// 3. 조직 멤버 등록 (organization-core)
+const member = await organizationMemberRepository.create({
+  organizationId: 'org-seoul',
+  userId: user.id,
+  role: 'member',
+  joinedAt: new Date()
+});
+
+// 4. 역할 할당 (기존 RBAC 확장)
+const assignment = await roleAssignmentRepository.create({
+  userId: user.id,
+  role: 'pharmacist',
+  scopeType: 'organization',
+  scopeId: 'org-seoul',
+  isActive: true
+});
+```
+
+### 3.2 기존 구조와의 호환성
+
+| 기존 기능 | organization-core 추가 후 | 호환성 |
+|---------|------------------------|-------|
+| User 로그인 | 변경 없음 | ✅ 완전 호환 |
+| JWT 토큰 | user.organizations 추가 | ✅ 호환 |
+| RBAC 미들웨어 | scopeType 고려 추가 | ✅ 하위 호환 |
+| Admin 대시보드 | Organization 메뉴 추가 | ✅ 호환 |
+| YaksaCommunity | organization-core 통합 | 🟡 마이그레이션 필요 |
+
+---
+
+## 4. 약사회 서비스 요구사항 분석
 
 ### 3.1 조직 구조 요구사항
 
@@ -212,40 +327,105 @@ class Permission {
 
 ---
 
-## 4. 핵심 문제점 요약
+## 5. 개선 필요 사항
 
-### 4.1 P0 (긴급) - 서비스 런칭 불가 수준
+### P0 (긴급 - organization-core 개발 전)
+**결론**: 없음. 현재 구조는 확장 준비 완료 상태.
 
-| 문제 | 영향 | 문서 참조 |
-|------|------|----------|
-| **Organization 엔티티 부재** | 지부/분회 데이터 저장 불가 | 02번 문서 |
-| **조직 계층 구조 미지원** | 상하 관계 표현 불가 | 02번 문서 |
-| **회원-조직 연결 구조 없음** | 소속 조직 조회 불가 | 01번 문서 |
-| **조직 기반 권한 제어 불가** | "지부 관리자" 역할 불가 | 03번 문서 |
-| **약사 면허번호 필드 부재** | 약사 식별 불가 | 01번 문서 |
+### P1 (단기 - organization-core 개발 시)
 
-### 4.2 P1 (높음) - 핵심 기능 제약
+#### 1. RoleAssignment 확장
+**파일**: apps/api-server/src/entities/RoleAssignment.ts
 
-| 문제 | 영향 |
-|------|------|
-| 회원 등급 필드 부재 | 정회원/준회원 구분 불가 |
-| 회원 탈퇴 처리 메커니즘 부재 | 탈퇴 회원 관리 불가 |
-| 조직 설정 저장 불가 | 지부/분회별 정책 설정 불가 |
-| 약사 역할 부재 | 약사 회원 권한 제어 불가 |
+```typescript
+@Column({ name: 'scope_type', type: 'varchar', length: 50, nullable: true })
+scopeType?: string; // 'global' | 'organization' | 'branch'
 
-### 4.3 P2 (중간) - 편의성 문제
+@Column({ name: 'scope_id', type: 'varchar', length: 255, nullable: true })
+scopeId?: string;
 
-| 문제 | 영향 |
-|------|------|
-| 휴면 회원 처리 필드 부재 | 1년 미접속 회원 자동 처리 불가 |
-| 보수교육 이수 내역 저장 구조 부재 | 교육 이력 관리 불가 |
-| 권한 상속 미지원 | 상위 조직 관리자 권한 수동 부여 필요 |
+@Index(['scopeType', 'scopeId'])
+```
+
+#### 2. User 메타데이터 표준화
+**파일**: apps/api-server/src/entities/User.ts
+
+```typescript
+// 주석 해제 및 타입 정의
+@Column({ type: 'json', nullable: true })
+metadata?: UserMetadata;
+
+interface UserMetadata {
+  pharmacistProfile?: {
+    licenseNumber: string;
+    licenseDate: string;
+  };
+  organizations?: {
+    primaryOrgId: string;
+    joinedOrgs: string[];
+  };
+}
+```
+
+#### 3. Organization-Core App 개발
+**위치**: packages/organization-core/ (신규)
+
+엔티티:
+- Organization
+- OrganizationMember
+- OrganizationHierarchy (선택)
+
+서비스:
+- OrganizationService
+- MembershipService
+
+API:
+- `/organizations` - 조직 CRUD
+- `/organizations/:id/members` - 멤버 관리
+- `/organizations/:id/hierarchy` - 계층 구조
+
+### P2 (중기 - 향후 개선)
+
+#### 1. YaksaCommunity → Organization 통합
+현재 YaksaCommunity를 organization-core 구조로 마이그레이션
+
+#### 2. Multi-tenant 완전 지원
+User.domain 필드 활용 (현재 선택적)
+
+#### 3. Organization 기반 데이터 격리
+tenant-context 미들웨어 확장
 
 ---
 
-## 5. 권장 해결 방안
+## 6. 권장 개발 로드맵
 
-### 5.1 Phase 1 (P0) - 조직 구조 구축
+### Phase 1: Organization Core 개발 (2주)
+- [ ] Organization 엔티티 설계
+- [ ] OrganizationMember 엔티티 설계
+- [ ] CRUD API 개발
+- [ ] Admin UI: 조직 관리 페이지
+
+### Phase 2: RBAC 확장 (1주)
+- [ ] RoleAssignment에 scopeType/scopeId 추가
+- [ ] RBAC 미들웨어 업데이트
+- [ ] 권한 체크 로직 수정
+
+### Phase 3: 약사회 도메인 구현 (2주)
+- [ ] PharmacistProfile 엔티티
+- [ ] 약사 인증 플로우
+- [ ] 지부/분회 가입 플로우
+- [ ] 약사회 전용 대시보드
+
+### Phase 4: 통합 테스트 (1주)
+- [ ] User + Organization 통합 테스트
+- [ ] RBAC 조직 범위 테스트
+- [ ] 멤버십 플로우 테스트
+
+---
+
+## 7. 참고: 권장 해결 방안 (v1.0)
+
+### 7.1 Phase 1 (P0) - 조직 구조 구축
 
 #### ① Organization 엔티티 생성
 ```typescript
@@ -544,6 +724,29 @@ class OrganizationSetting {
 
 ---
 
+---
+
+## 8. 결론
+
+O4O Platform의 현재 구조는 **조직 도메인 확장에 매우 적합**합니다.
+
+### 강점
+1. ✅ User 엔티티: 확장 메커니즘 보유
+2. ✅ RBAC: 조직 범위 추가 가능
+3. ✅ 레퍼런스 구현: YaksaCommunity 활용 가능
+4. ✅ App 기반 아키텍처: 도메인 격리 우수
+
+### 권장사항
+1. **P0 작업 없음**: 현재 구조로 organization-core 개발 가능
+2. **P1 작업**: RoleAssignment 확장, Organization 엔티티 개발
+3. **아키텍처 유지**: Core + Extension 패턴 활용
+
+### 최종 평가: 4/5
+- 감점 이유: Organization 엔티티 부재 (단, 신규 개발 예정이므로 문제 아님)
+- 개선 방향: organization-core 개발로 5/5 달성 가능
+
+---
+
 **최종 업데이트**: 2025-11-30
-**문서 버전**: 1.0
+**문서 버전**: 1.1 (정정판)
 **작성자**: Claude (Anthropic)

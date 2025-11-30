@@ -1,6 +1,9 @@
-# RBAC (Role-Based Access Control) 구조 전수 조사
+# RBAC 구조 조사 (v1.1)
 
-**작성일**: 2025-11-30
+> **작성일**: 2025-11-30
+> **버전**: 1.1 (정정판)
+> **평가 기준**: 확장 가능성 중심 평가
+
 **조사 범위**: Role/Permission 엔티티, RoleAssignment, 권한 시스템
 **조사 대상 파일**:
 - `/apps/api-server/src/entities/Role.ts`
