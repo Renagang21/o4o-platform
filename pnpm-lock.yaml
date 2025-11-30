@@ -282,6 +282,9 @@ importers:
       '@o4o/block-renderer':
         specifier: file:../../packages/block-renderer
         version: file:packages/block-renderer(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@o4o/dropshipping-core':
+        specifier: file:../../packages/dropshipping-core
+        version: file:packages/dropshipping-core(@tanstack/react-query@5.87.1(react@18.2.0))(babel-plugin-macros@3.1.0)(ioredis@5.7.0)(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(redis@5.8.2)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
         version: file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1529,7 +1532,7 @@ importers:
         version: 5.4.5
       vitest:
         specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.24)(@vitest/ui@3.2.4(vitest@3.2.4))(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0)
+        version: 1.6.1(@types/node@20.19.24)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0)
 
   packages/dropshipping-cosmetics:
     dependencies:
@@ -1569,7 +1572,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.24)(@vitest/ui@3.2.4(vitest@3.2.4))(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0)
+        version: 1.6.1(@types/node@20.19.24)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0)
 
   packages/forum-app:
     dependencies:
@@ -3265,6 +3268,13 @@ packages:
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
+
+  '@o4o/dropshipping-core@file:packages/dropshipping-core':
+    resolution: {directory: packages/dropshipping-core, type: directory}
+    peerDependencies:
+      '@tanstack/react-query': ^5.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-router-dom: ^6.0.0
 
   '@o4o/shortcodes@file:packages/shortcodes':
     resolution: {directory: packages/shortcodes, type: directory}
@@ -12029,12 +12039,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
+  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
-      '@emotion/react': 11.14.0(@types/react@18.2.79)(react@18.2.0)
+      '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.2.0)
       '@emotion/utils': 1.4.2
@@ -13106,6 +13116,35 @@ snapshots:
       marked: 11.2.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@o4o/dropshipping-core@file:packages/dropshipping-core(@tanstack/react-query@5.87.1(react@18.2.0))(babel-plugin-macros@3.1.0)(ioredis@5.7.0)(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)(redis@5.8.2)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))':
+    dependencies:
+      '@o4o/cpt-registry': link:packages/cpt-registry
+      '@o4o/types': link:packages/types
+      '@tanstack/react-query': 5.87.1(react@18.2.0)
+      pg: 8.16.3
+      react: 18.2.0
+      react-router-dom: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      reflect-metadata: 0.1.14
+      typeorm: 0.3.26(babel-plugin-macros@3.1.0)(ioredis@5.7.0)(pg@8.16.3)(redis@5.8.2)(reflect-metadata@0.1.14)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.2.1)(typescript@5.4.5))
+    transitivePeerDependencies:
+      - '@google-cloud/spanner'
+      - '@sap/hana-client'
+      - babel-plugin-macros
+      - better-sqlite3
+      - ioredis
+      - mongodb
+      - mssql
+      - mysql2
+      - oracledb
+      - pg-native
+      - pg-query-stream
+      - redis
+      - sql.js
+      - sqlite3
+      - supports-color
+      - ts-node
+      - typeorm-aurora-data-api-driver
 
   '@o4o/shortcodes@file:packages/shortcodes(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -15949,7 +15988,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.2.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.2(@types/node@24.2.1)(typescript@5.4.5))(terser@5.44.0)
+      vitest: 3.2.4(@types/node@24.2.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(msw@2.11.1(@types/node@24.2.1)(typescript@5.4.5))(terser@5.43.1)
 
   '@vitest/utils@1.6.1':
     dependencies:
@@ -16111,7 +16150,7 @@ snapshots:
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
       '@emotion/utils': 1.4.2
       '@floating-ui/react-dom': 2.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/gradient-parser': 0.1.3
@@ -22833,7 +22872,7 @@ snapshots:
       terser: 5.44.0
       yaml: 2.8.1
 
-  vitest@1.6.1(@types/node@20.19.24)(@vitest/ui@3.2.4(vitest@3.2.4))(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0):
+  vitest@1.6.1(@types/node@20.19.24)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
