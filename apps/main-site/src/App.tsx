@@ -34,10 +34,12 @@ import { GlobalStyleInjector } from './components/GlobalStyleInjector';
 // P0 RBAC: Role-based components
 import RoleGuard from './components/auth/RoleGuard';
 
-// P0 RBAC: Application pages
-import ApplySupplier from './pages/apply/ApplySupplier';
-import ApplySeller from './pages/apply/ApplySeller';
-import ApplyPartner from './pages/apply/ApplyPartner';
+// P0 RBAC: Application pages - Now from dropshipping-core package
+import {
+  ApplySupplier,
+  ApplySeller,
+  ApplyPartner
+} from '@o4o/dropshipping-core/main-site';
 import ApplyStatus from './pages/apply/ApplyStatus';
 
 // P0 RBAC: Dashboard layouts and pages
@@ -56,31 +58,34 @@ import { ApplyLandingPageP3 } from './pages/apply/ApplyLandingPageP3';
 import { ApplyRolePageP3 } from './pages/apply/ApplyRolePageP3';
 import { RoleApplicationsPageP3 } from './pages/admin/roles/RoleApplicationsPageP3';
 
-import { SupplierDashboardPage } from './pages/dashboard/SupplierDashboardPage';
-import { SupplierProductsPage } from './pages/dashboard/SupplierProductsPage';
-import { SupplierProductCreatePage } from './pages/dashboard/SupplierProductCreatePage';
-import { SupplierProductEditPage } from './pages/dashboard/SupplierProductEditPage';
-import { SupplierOrdersPage } from './pages/dashboard/SupplierOrdersPage';
-import { SupplierOrderDetailPage } from './pages/dashboard/SupplierOrderDetailPage';
-import { SellerDashboardPage } from './pages/dashboard/SellerDashboardPage';
-import { SellerProductsPage } from './pages/dashboard/SellerProductsPage';
-import { SellerProductCreatePage } from './pages/dashboard/SellerProductCreatePage';
-import { SellerProductEditPage } from './pages/dashboard/SellerProductEditPage';
-import { SellerOrdersPage } from './pages/dashboard/SellerOrdersPage';
-import { SellerOrderDetailPage } from './pages/dashboard/SellerOrderDetailPage';
-import { SellerChannelsPage } from './pages/dashboard/SellerChannelsPage';
-import { PartnerDashboardPage } from './pages/dashboard/PartnerDashboardPage';
-import { PartnerLinksPage } from './pages/dashboard/PartnerLinksPage';
-import { PartnerLinkCreatePage } from './pages/dashboard/PartnerLinkCreatePage';
-import { PartnerLinkEditPage } from './pages/dashboard/PartnerLinkEditPage';
-import { PartnerAnalyticsPage } from './pages/dashboard/PartnerAnalyticsPage';
-import { PartnerSettlementsPage } from './pages/dashboard/PartnerSettlementsPage';
-import { PartnerSettlementDetailPage } from './pages/dashboard/PartnerSettlementDetailPage';
-import { SupplierSettlementsPage } from './pages/dashboard/SupplierSettlementsPage';
-import { SupplierSettlementDetailPage } from './pages/dashboard/SupplierSettlementDetailPage';
-import { SellerSettlementsPage } from './pages/dashboard/SellerSettlementsPage';
-import { SellerSettlementDetailPage } from './pages/dashboard/SellerSettlementDetailPage';
-import { SupplierProductAuthorizationsPage } from './pages/dashboard/SupplierProductAuthorizationsPage';
+// Dropshipping Dashboard Pages - Now from dropshipping-core package
+import {
+  SupplierDashboardPage,
+  SupplierProductsPage,
+  SupplierProductCreatePage,
+  SupplierProductEditPage,
+  SupplierOrdersPage,
+  SupplierOrderDetailPage,
+  SellerDashboardPage,
+  SellerProductsPage,
+  SellerProductCreatePage,
+  SellerProductEditPage,
+  SellerOrdersPage,
+  SellerOrderDetailPage,
+  SellerChannelsPage,
+  PartnerDashboardPage,
+  PartnerLinksPage,
+  PartnerLinkCreatePage,
+  PartnerLinkEditPage,
+  PartnerAnalyticsPage,
+  PartnerSettlementsPage,
+  PartnerSettlementDetailPage,
+  SupplierSettlementsPage,
+  SupplierSettlementDetailPage,
+  SellerSettlementsPage,
+  SellerSettlementDetailPage,
+  SupplierProductAuthorizationsPage
+} from '@o4o/dropshipping-core/main-site';
 
 // Phase 4-2: Admin Settlement Management
 import { AdminSettlementsPage } from './pages/dashboard/admin/AdminSettlementsPage';

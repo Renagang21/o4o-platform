@@ -3,7 +3,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 // Import all shortcode components
-import { dropshippingShortcodes } from './dropshipping';
+import { dropshippingShortcodes } from '@o4o/dropshipping-core/admin-ui';
 import {
   PartnerMainDashboard,
   PartnerProducts,
@@ -13,7 +13,7 @@ import {
   PayoutRequests,
   UserDashboard,
   RoleVerification
-} from './dropshipping';
+} from '@o4o/dropshipping-core/admin-ui';
 import adminComponents from './admin';
 
 // Shortcode component map (Legacy support for old manual registration)

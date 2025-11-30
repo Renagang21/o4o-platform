@@ -125,8 +125,8 @@ const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePr
 // CPT/ACF Router
 const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
-// Dropshipping Pages
-const DropshippingRouter = lazy(() => import('@/pages/dropshipping'));
+// Dropshipping Pages - Now from dropshipping-core package
+const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
 // Admin Order Pages (Phase 4)
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
