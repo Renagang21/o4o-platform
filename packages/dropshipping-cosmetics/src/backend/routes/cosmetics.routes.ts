@@ -219,6 +219,51 @@ router.post('/influencer-routines', async (req: Request, res: Response) => {
       });
     }
 
+    // Additional validation
+    if (!Array.isArray(skinType) || skinType.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'skinType must be a non-empty array',
+        },
+      });
+    }
+
+    if (!Array.isArray(concerns) || concerns.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'concerns must be a non-empty array',
+        },
+      });
+    }
+
+    if (!Array.isArray(routine) || routine.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'routine must have at least 2 steps',
+        },
+      });
+    }
+
+    // Validate routine steps structure
+    for (let i = 0; i < routine.length; i++) {
+      const step = routine[i];
+      if (!step.productId || typeof step.step !== 'number') {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: `Step ${i + 1} must have productId and step number`,
+          },
+        });
+      }
+    }
+
     const dataSource = (req as any).app.get('dataSource');
     const routineService = new InfluencerRoutineService(dataSource);
 
@@ -364,6 +409,53 @@ router.put('/influencer-routines/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, skinType, concerns, timeOfUse, routine, tags, isPublished } = req.body;
+
+    // Validate provided fields
+    if (skinType !== undefined && (!Array.isArray(skinType) || skinType.length === 0)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'skinType must be a non-empty array',
+        },
+      });
+    }
+
+    if (concerns !== undefined && (!Array.isArray(concerns) || concerns.length === 0)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'concerns must be a non-empty array',
+        },
+      });
+    }
+
+    if (routine !== undefined) {
+      if (!Array.isArray(routine) || routine.length < 2) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'routine must have at least 2 steps',
+          },
+        });
+      }
+
+      // Validate routine steps structure
+      for (let i = 0; i < routine.length; i++) {
+        const step = routine[i];
+        if (!step.productId || typeof step.step !== 'number') {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: `Step ${i + 1} must have productId and step number`,
+            },
+          });
+        }
+      }
+    }
 
     const dataSource = (req as any).app.get('dataSource');
     const routineService = new InfluencerRoutineService(dataSource);

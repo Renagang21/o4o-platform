@@ -80,17 +80,23 @@ export default function PartnerRoutinesPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-900">내 루틴 관리</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+        <Link
+          to="/partner/routines/new"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+        >
           새 루틴 만들기
-        </button>
+        </Link>
       </div>
 
       {routines.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <div className="text-gray-400 text-lg mb-4">아직 생성한 루틴이 없습니다</div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+          <Link
+            to="/partner/routines/new"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors inline-block"
+          >
             첫 루틴 만들기
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -176,9 +182,12 @@ export default function PartnerRoutinesPage() {
                         >
                           보기
                         </Link>
-                        <button className="text-gray-600 hover:text-gray-900">
+                        <Link
+                          to={`/partner/routine/${routine.id}/edit`}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
                           수정
-                        </button>
+                        </Link>
                         <button className="text-red-600 hover:text-red-900">
                           삭제
                         </button>
