@@ -48,7 +48,6 @@ import youtubeBlockDefinition from './definitions/youtube';
 import fileBlockDefinition from './definitions/file';
 
 // Form blocks
-import universalFormBlockDefinition from './definitions/universal-form';
 import formFieldBlockDefinition from './definitions/form-field';
 import formSubmitBlockDefinition from './definitions/form-submit';
 
@@ -103,7 +102,6 @@ export function registerAllBlocks(): void {
   blockRegistry.register(fileBlockDefinition);
 
   // Register form blocks
-  blockRegistry.register(universalFormBlockDefinition); // ⭐ Unified form block (replaces post-form and cpt-form)
   blockRegistry.register(formFieldBlockDefinition);
   blockRegistry.register(formSubmitBlockDefinition);
 }
