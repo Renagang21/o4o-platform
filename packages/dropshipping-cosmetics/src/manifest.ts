@@ -23,6 +23,17 @@ export const cosmeticsExtensionManifest: AppManifest = {
   // Extend existing CPTs with cosmetics metadata
   extendsCPT: ['ds_product'],
 
+  // Custom Post Types owned by this extension
+  cpt: [
+    {
+      name: 'cosmetics_influencer_routine',
+      storage: 'entity',
+      primaryKey: 'id',
+      label: 'Influencer Routine',
+      supports: ['title', 'metadata'],
+    },
+  ],
+
   // ACF field groups for cosmetics metadata
   acf: [
     {
@@ -198,7 +209,114 @@ export const cosmeticsExtensionManifest: AppManifest = {
           instructions: '개봉 후 사용 기한 (예: 12개월)'
         }
       ]
-    }
+    },
+    // Influencer Routine metadata
+    {
+      groupId: 'influencer_routine_metadata',
+      label: 'Influencer Routine Information',
+      appliesTo: 'cosmetics_influencer_routine',
+      fields: [
+        {
+          key: 'partnerId',
+          label: 'Partner ID',
+          type: 'string',
+          required: true,
+        },
+        {
+          key: 'title',
+          label: 'Routine Title',
+          type: 'string',
+          required: true,
+        },
+        {
+          key: 'description',
+          label: 'Description',
+          type: 'text',
+          required: false,
+        },
+        {
+          key: 'skinType',
+          label: 'Skin Type',
+          type: 'multiselect',
+          required: true,
+          choices: {
+            dry: '건성',
+            oily: '지성',
+            combination: '복합성',
+            sensitive: '민감성',
+            normal: '정상',
+          },
+        },
+        {
+          key: 'concerns',
+          label: 'Skin Concerns',
+          type: 'multiselect',
+          required: true,
+          choices: {
+            acne: '여드름',
+            whitening: '미백',
+            wrinkle: '주름',
+            pore: '모공',
+            soothing: '진정',
+            moisturizing: '보습',
+            elasticity: '탄력',
+            trouble: '트러블',
+          },
+        },
+        {
+          key: 'timeOfUse',
+          label: 'Time of Use',
+          type: 'select',
+          required: true,
+          choices: {
+            morning: '아침',
+            evening: '저녁',
+            both: '아침/저녁 모두',
+          },
+        },
+        {
+          key: 'routine',
+          label: 'Routine Steps',
+          type: 'array',
+          required: true,
+        },
+        {
+          key: 'tags',
+          label: 'Tags',
+          type: 'multiselect',
+          required: false,
+          choices: {
+            beginner: '초보자 추천',
+            sensitive: '민감성',
+            budget: '가성비',
+            premium: '프리미엄',
+            simple: '간단한 루틴',
+            complete: '완전한 루틴',
+          },
+        },
+        {
+          key: 'isPublished',
+          label: 'Published',
+          type: 'boolean',
+          required: true,
+          defaultValue: false,
+        },
+        {
+          key: 'viewCount',
+          label: 'View Count',
+          type: 'number',
+          required: false,
+          defaultValue: 0,
+        },
+        {
+          key: 'recommendCount',
+          label: 'Recommend Count',
+          type: 'number',
+          required: false,
+          defaultValue: 0,
+        },
+      ],
+    },
   ],
 
   // Lifecycle hooks

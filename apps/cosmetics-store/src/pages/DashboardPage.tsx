@@ -59,7 +59,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">빠른 작업</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Link
             to="/sourcing"
             className="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all"
@@ -87,6 +87,13 @@ export default function DashboardPage() {
           >
             <span className="text-2xl mb-2">📦</span>
             <span className="text-sm font-medium text-gray-900">내 상품 보기</span>
+          </Link>
+          <Link
+            to="/influencers"
+            className="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all"
+          >
+            <span className="text-2xl mb-2">✨</span>
+            <span className="text-sm font-medium text-gray-900">인플루언서 루틴</span>
           </Link>
         </div>
       </div>

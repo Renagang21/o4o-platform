@@ -152,3 +152,75 @@ export async function fetchSettlementSummary() {
 
   return response.json();
 }
+
+/**
+ * Influencer Routine API Functions
+ */
+
+export interface InfluencerRoutineFilters {
+  skinType?: string[];
+  concerns?: string[];
+  timeOfUse?: string;
+  tags?: string[];
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export async function fetchInfluencerRoutines(filters: InfluencerRoutineFilters = {}) {
+  const params = new URLSearchParams();
+
+  if (filters.skinType?.length) {
+    filters.skinType.forEach((type) => params.append('skinType', type));
+  }
+  if (filters.concerns?.length) {
+    filters.concerns.forEach((concern) => params.append('concerns', concern));
+  }
+  if (filters.tags?.length) {
+    filters.tags.forEach((tag) => params.append('tags', tag));
+  }
+  if (filters.timeOfUse) {
+    params.append('timeOfUse', filters.timeOfUse);
+  }
+  if (filters.search) {
+    params.append('search', filters.search);
+  }
+  if (filters.page) {
+    params.append('page', filters.page.toString());
+  }
+  if (filters.limit) {
+    params.append('limit', filters.limit.toString());
+  }
+  if (filters.sortBy) {
+    params.append('sortBy', filters.sortBy);
+  }
+  if (filters.sortOrder) {
+    params.append('sortOrder', filters.sortOrder);
+  }
+
+  const response = await fetch(`${API_BASE}/influencer-routines?${params}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch influencer routines');
+  }
+  return response.json();
+}
+
+export async function fetchInfluencerRoutine(id: string) {
+  const response = await fetch(`${API_BASE}/influencer-routines/${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch influencer routine');
+  }
+  return response.json();
+}
+
+export async function recommendInfluencerRoutine(id: string) {
+  const response = await fetch(`${API_BASE}/influencer-routines/${id}/recommend`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to recommend routine');
+  }
+  return response.json();
+}

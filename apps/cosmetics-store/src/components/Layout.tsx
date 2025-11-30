@@ -34,6 +34,12 @@ export default function Layout() {
               >
                 루틴 빌더
               </Link>
+              <Link
+                to="/influencers"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-primary-500"
+              >
+                인플루언서
+              </Link>
             </div>
           </div>
         </div>

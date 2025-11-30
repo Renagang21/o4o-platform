@@ -5,6 +5,8 @@ import ProductSourcingPage from './pages/ProductSourcingPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import RoutineBuilderPage from './pages/RoutineBuilderPage';
 import MyProductsPage from './pages/MyProductsPage';
+import InfluencerListPage from './pages/InfluencerListPage';
+import InfluencerRoutineDetailPage from './pages/InfluencerRoutineDetailPage';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="product/:id" element={<ProductDetailPage />} />
         <Route path="routine-builder" element={<RoutineBuilderPage />} />
         <Route path="my-products" element={<MyProductsPage />} />
+        <Route path="influencers" element={<InfluencerListPage />} />
+        <Route path="influencer-routine/:id" element={<InfluencerRoutineDetailPage />} />
       </Route>
     </Routes>
   );
