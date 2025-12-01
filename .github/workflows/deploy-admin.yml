@@ -128,7 +128,7 @@ jobs:
 
     - name: Copy build files
       if: steps.check_changes.outputs.deploy == 'true'
-      uses: appleboy/scp-action@v0.1.7
+      uses: appleboy/scp-action@v1.0.0
       with:
         host: ${{ secrets.WEB_HOST }}
         username: ${{ secrets.WEB_USER }}
