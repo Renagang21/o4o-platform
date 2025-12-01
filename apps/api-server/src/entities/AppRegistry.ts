@@ -28,12 +28,14 @@ export class AppRegistry {
   @Column({ type: 'varchar', length: 50 })
   version!: string; // semver format
 
+  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
   @Column({
     type: 'enum',
     enum: ['core', 'extension', 'standalone'],
-    default: 'standalone'
+    default: 'standalone',
+    select: false
   })
-  @Index()
+  // @Index() // TEMPORARY: Disabled until type column is added to DB
   type!: 'core' | 'extension' | 'standalone';
 
   @Column({
