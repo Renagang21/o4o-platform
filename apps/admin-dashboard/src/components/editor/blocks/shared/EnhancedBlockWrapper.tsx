@@ -4,6 +4,7 @@ interface EnhancedBlockWrapperProps {
   id?: string;
   type?: string;
   title?: string;
+  label?: string;
   icon?: React.ComponentType;
   isSelected?: boolean;
   customToolbar?: React.ReactNode;
