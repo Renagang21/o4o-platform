@@ -17,6 +17,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { AnimationEditor } from './AnimationEditor';
 
 interface Panel {
   title: string;
@@ -73,6 +74,15 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange }) => 
   );
 };
 
+interface AnimationSettings {
+  enabled: boolean;
+  type: 'scale' | 'translate' | 'rotate' | 'glow' | 'bounce' | 'pulse' | 'shake' | 'flip';
+  duration: number;
+  intensity: number;
+  timingFunction: 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'linear';
+  delay: number;
+}
+
 interface ButtonInspectorControlsProps {
   attributes: {
     text?: string;
@@ -94,6 +104,7 @@ interface ButtonInspectorControlsProps {
     paddingRight?: number;
     paddingBottom?: number;
     paddingLeft?: number;
+    animation?: AnimationSettings;
   };
   updateAttribute: (key: string, value: any) => void;
 }
@@ -355,6 +366,14 @@ export const ButtonInspectorControls: React.FC<ButtonInspectorControlsProps> = (
             onChange={(value) => updateAttribute('borderColor', value)}
           />
         </div>
+      </Panel>
+
+      {/* Animation */}
+      <Panel title="Hover Animation" defaultOpen={false}>
+        <AnimationEditor
+          currentAnimation={attributes.animation}
+          onAnimationChange={(animation) => updateAttribute('animation', animation)}
+        />
       </Panel>
 
       {/* Advanced */}

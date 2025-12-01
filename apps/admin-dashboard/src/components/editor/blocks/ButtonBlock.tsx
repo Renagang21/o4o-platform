@@ -28,6 +28,15 @@ import { Switch } from '@/components/ui/switch';
 import { URLInput, normalizeURL } from '@/components/common';
 import { EnhancedLinkControl, type LinkData } from '@/components/editor/controls/EnhancedLinkControl';
 
+interface AnimationSettings {
+  enabled: boolean;
+  type: 'scale' | 'translate' | 'rotate' | 'glow' | 'bounce' | 'pulse' | 'shake' | 'flip';
+  duration: number;
+  intensity: number;
+  timingFunction: 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'linear';
+  delay: number;
+}
+
 interface ButtonBlockProps {
   id: string;
   content: string;
@@ -65,6 +74,8 @@ interface ButtonBlockProps {
     paddingRight?: number;
     paddingBottom?: number;
     paddingLeft?: number;
+    // Animation
+    animation?: AnimationSettings;
   };
 }
 
@@ -114,6 +125,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
     target: linkTarget,
     rel: rel,
   });
+  const [isHovered, setIsHovered] = useState(false);
 
   // Sync text when attributes change
   useEffect(() => {
@@ -223,6 +235,43 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
       styles.backgroundColor = 'transparent';
       styles.color = borderColor || backgroundColor;
       styles.border = `${borderWidth}px solid ${borderColor || backgroundColor}`;
+    }
+
+    // Add animation transition and effects if enabled
+    if (attributes.animation?.enabled) {
+      const { type, duration, intensity, timingFunction, delay } = attributes.animation;
+      styles.transition = `all ${duration}ms ${timingFunction} ${delay}ms`;
+
+      // Apply hover effects when hovered
+      if (isHovered) {
+        switch (type) {
+          case 'scale':
+            styles.transform = `scale(${1 + (intensity * 0.02)})`;
+            break;
+          case 'translate':
+            styles.transform = `translateY(-${intensity}px)`;
+            break;
+          case 'rotate':
+            styles.transform = `rotate(${intensity * 2}deg)`;
+            break;
+          case 'glow':
+            styles.transform = 'scale(1.02)';
+            styles.boxShadow = `0 0 ${intensity * 3}px rgba(59, 130, 246, 0.6)`;
+            break;
+          case 'bounce':
+            styles.transform = 'scale(1.05)';
+            break;
+          case 'pulse':
+            styles.transform = `scale(${1 + (intensity * 0.01)})`;
+            break;
+          case 'shake':
+            styles.transform = `translateX(${intensity}px)`;
+            break;
+          case 'flip':
+            styles.transform = `rotateY(${intensity * 10}deg)`;
+            break;
+        }
+      }
     }
 
     return styles;
@@ -336,11 +385,12 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
             display: 'inline-block',
             textDecoration: 'none',
             cursor: 'pointer',
-            transition: 'all 0.2s',
           }}
           onClick={(e) => {
             e.preventDefault(); // Prevent navigation in editor
           }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           <RichText
             tagName="span"
