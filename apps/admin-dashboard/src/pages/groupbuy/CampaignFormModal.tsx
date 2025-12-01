@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useGroupbuyCampaigns, GroupbuyCampaign } from '@/hooks/groupbuy';
 import { OrganizationSelector } from '@/components/organization/OrganizationSelector';
+import { ProductSelector } from '@/components/product/ProductSelector';
 
 interface CampaignFormModalProps {
   campaign: GroupbuyCampaign | null;
@@ -159,19 +160,16 @@ export const CampaignFormModal: FC<CampaignFormModalProps> = ({ campaign, onClos
             </p>
           </div>
 
-          {/* Product ID */}
+          {/* Product Selector */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              상품 ID <span className="text-red-500">*</span>
+              상품 선택 <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              name="productId"
+            <ProductSelector
               value={formData.productId}
-              onChange={handleChange}
+              onChange={(productId) => setFormData(prev => ({ ...prev, productId }))}
+              placeholder="상품을 검색하거나 선택하세요"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="상품 ID"
             />
           </div>
 

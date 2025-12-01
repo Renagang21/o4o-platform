@@ -6,6 +6,7 @@ import { useEffect, Suspense, lazy } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { EnvBadge } from '@/components/EnvBadge';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ToastProvider } from '@/contexts/ToastContext';
 import { useAuthStore } from '@/stores/authStore';
 import '@/styles/wordpress-theme.css';
 import '@/styles/wordpress-sidebar.css';
@@ -111,6 +112,7 @@ const NetureForumPostForm = lazy(() => import('@o4o-apps/forum-neture/src/admin-
 const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
 const GroupbuyCampaignDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignDetailPage'));
 const GroupbuyParticipantsPage = lazy(() => import('@/pages/groupbuy/GroupbuyParticipantsPage'));
+const GroupbuySettlementPage = lazy(() => import('@/pages/groupbuy/GroupbuySettlementPage'));
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
@@ -224,12 +226,13 @@ function App() {
     <ErrorBoundary>
       <EnvBadge />
       <ThemeProvider>
-        <AuthProvider
-          ssoClient={ssoClient}
-          autoRefresh={true}
-          onAuthError={handleAuthError}
-          onSessionExpiring={handleSessionExpiring}
-        >
+        <ToastProvider>
+          <AuthProvider
+            ssoClient={ssoClient}
+            autoRefresh={true}
+            onAuthError={handleAuthError}
+            onSessionExpiring={handleSessionExpiring}
+          >
           <SessionManager
             warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
             onSessionExpiring={handleSessionExpiring}
@@ -727,6 +730,13 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
+                    <Route path="/admin/groupbuy/settlement" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GroupbuySettlementPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
                     <Route path="/admin/groupbuy/:id" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
@@ -1053,6 +1063,7 @@ function App() {
         </Routes>
       </SessionManager>
     </AuthProvider>
+        </ToastProvider>
     </ThemeProvider>
     </ErrorBoundary>
   );
