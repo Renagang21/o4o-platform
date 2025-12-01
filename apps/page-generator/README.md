@@ -102,9 +102,14 @@ pnpm build
 
 - **Typography**: `text-lg`, `text-xl`, etc. → fontSize
 - **Colors**: `text-blue-600`, `bg-gray-100` → color tokens
+- **Alpha Colors**: `bg-white/50`, `text-black/60` → rgba() *(Phase 5)*
 - **Spacing**: `p-4`, `px-6`, `gap-4` → spacing values
 - **Layout**: `flex`, `grid`, `grid-cols-3` → layout properties
+- **Flex Wrap**: `flex-wrap`, `flex-nowrap` → flexWrap *(Phase 5)*
 - **Borders**: `rounded-lg`, `border` → border properties
+- **Opacity**: `opacity-0` ~ `opacity-100` → 0 ~ 1 *(Phase 5)*
+- **Shadow**: `shadow-sm` ~ `shadow-2xl` → CSS box-shadow *(Phase 5)*
+- **Backdrop**: `backdrop-blur-md` → blur(12px) *(Phase 5)*
 
 ## 📚 관련 문서
 
@@ -152,9 +157,19 @@ pnpm build
 - [ ] API 연동 수동 테스트 (예정)
 - [ ] Admin Dashboard 통합 테스트 (예정)
 
-**Phase 5: 고도화** (예정)
-- [ ] Tailwind 확장 (Opacity, Shadow, Flex Wrap, Alpha Colors)
+**Phase 5: Tailwind 고도화 & Block 품질 개선** ✅ **완료**
+- [x] Opacity 지원 (`opacity-0` ~ `opacity-100` → 0 ~ 1)
+- [x] Shadow 지원 (`shadow-sm` ~ `shadow-2xl` → CSS box-shadow)
+- [x] Flex Wrap 지원 (`flex-wrap`, `flex-nowrap`)
+- [x] Alpha Colors 지원 (`bg-white/50` → rgba)
+- [x] Backdrop Blur 지원 (`backdrop-blur-*` → blur())
+- [x] 빈 padding 객체 제거 (cleanAttributes)
+- [x] Width 소수점 정리 (roundTo2)
+
+**Phase 6: 추가 개선** (예정)
 - [ ] Image/List/Quote 블록 실전 테스트
+- [ ] Positioning 지원 (relative, absolute, fixed)
+- [ ] Grid Areas 지원 (col-span-*, row-span-*)
 - [ ] Placeholder 자동 제안 (AI)
 - [ ] 템플릿 라이브러리
 - [ ] 변환 히스토리
@@ -163,5 +178,5 @@ pnpm build
 ---
 
 **작성일**: 2025-12-01
-**버전**: 1.0.0
-**상태**: ✅ 실전 사용 가능 (Phase 1-4 완료)
+**버전**: 1.1.0
+**상태**: ✅ 실전 사용 준비 완료 (Phase 1-5 완료)
