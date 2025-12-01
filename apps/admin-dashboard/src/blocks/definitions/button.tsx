@@ -150,6 +150,17 @@ export const buttonBlockDefinition: BlockDefinition = {
     iconColor: {
       type: 'string',
     },
+    animation: {
+      type: 'object',
+      default: {
+        enabled: false,
+        type: 'scale',
+        duration: 300,
+        intensity: 5,
+        timingFunction: 'ease',
+        delay: 0,
+      },
+    },
   },
   supports: {
     align: true,
