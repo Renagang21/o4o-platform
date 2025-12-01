@@ -13,7 +13,7 @@ import type { Role } from './Role.js';
 @Index(['key'], { unique: true })
 @Index(['category'])
 @Index(['isActive'])
-@Index(['appId'])
+// @Index(['appId']) // TEMPORARY: Disabled until appId column is added to DB
 export class Permission {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -31,7 +31,8 @@ export class Permission {
   category!: string;
 
   // App that owns this permission (nullable for system permissions)
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
+  @Column({ type: 'varchar', length: 100, nullable: true, select: false })
   appId?: string;
 
   // Active status
