@@ -9,8 +9,8 @@
 // Export manifest
 export { dropshippingCoreManifest, dropshippingCoreManifest as default } from './manifest.js';
 
-// Export backend
-export * from './backend/index.js';
+// Export backend entities (imported directly by API server from src/backend/entities)
+// export * from './backend/index.js';
 
 // Export lifecycle hooks
 export * from './lifecycle/index.js';

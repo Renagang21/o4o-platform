@@ -7,26 +7,17 @@
  * @version 1.0.0
  */
 
-// Entities
-export * from './entities';
-
-// Services
-export * from './services';
-
-// Controllers
-export * from './controllers';
-
-// Types
-export * from './types';
-
-// Lifecycle
-export * from './lifecycle';
-
-// Guards
-export * from './guards';
-
-// Utils
-export * from './utils';
-
 // Manifest
-export { manifest } from './manifest';
+export { manifest } from './manifest.js';
+export { manifest as default } from './manifest.js';
+
+// Types (needed by manifest)
+export * from './types/index.js';
+
+// Backend code (imported directly by API server from src/)
+// export * from './entities';
+// export * from './services';
+// export * from './controllers';
+// export * from './lifecycle';
+// export * from './guards';
+// export * from './utils';

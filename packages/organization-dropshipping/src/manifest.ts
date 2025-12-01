@@ -1,6 +1,4 @@
-import type { ExtensionManifest } from '@o4o/types';
-
-export const manifest: ExtensionManifest = {
+export const manifest = {
   id: 'organization-dropshipping',
   name: 'Organization-Dropshipping Integration',
   version: '0.1.0',

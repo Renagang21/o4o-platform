@@ -1,0 +1,250 @@
+[
+  {
+    "name": "SupplierDashboard",
+    "path": "packages/shortcodes/src/dropshipping/SupplierDashboard.tsx",
+    "props": ["defaultPeriod", "defaultSection", "showMenu"],
+    "hasLayout": true,
+    "category": "dropshipping",
+    "notes": "Section-based navigation (overview, products, orders, analytics, inventory). Uses KPICard, LineChart, PieChart. Hash-based routing with useDashboardSection."
+  },
+  {
+    "name": "SellerDashboard",
+    "path": "packages/shortcodes/src/dropshipping/SellerDashboard.tsx",
+    "props": ["defaultPeriod", "defaultSection", "showMenu"],
+    "hasLayout": true,
+    "category": "dropshipping",
+    "notes": "Seller-focused dashboard with sales tracking, commission management, and settlement views."
+  },
+  {
+    "name": "AffiliateDashboard",
+    "path": "packages/shortcodes/src/dropshipping/AffiliateDashboard.tsx",
+    "props": ["defaultSection", "showMenu"],
+    "hasLayout": true,
+    "category": "dropshipping",
+    "notes": "Partner/affiliate dashboard for commission and link tracking."
+  },
+  {
+    "name": "SocialLogin",
+    "path": "packages/shortcodes/src/auth/SocialLogin.tsx",
+    "props": ["providers", "redirectUrl", "showDivider"],
+    "hasLayout": true,
+    "category": "auth",
+    "notes": "Social authentication integration with multiple provider support."
+  },
+  {
+    "name": "DynamicComponents",
+    "path": "packages/shortcodes/src/dynamic/components.tsx",
+    "props": [],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "Component registry for dynamic shortcode system. Infrastructure component."
+  },
+  {
+    "name": "MetaField",
+    "path": "packages/shortcodes/src/dynamic/meta-field.tsx",
+    "props": ["postId", "metaKey", "format", "defaultValue"],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "WordPress meta field rendering template. Dynamic content component."
+  },
+  {
+    "name": "ACFField",
+    "path": "packages/shortcodes/src/dynamic/acf-field.tsx",
+    "props": ["postId", "fieldKey", "format"],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "Advanced Custom Fields integration template. Dynamic content component."
+  },
+  {
+    "name": "CPTField",
+    "path": "packages/shortcodes/src/dynamic/cpt-field.tsx",
+    "props": ["postId", "postType", "fieldKey"],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "Custom Post Type field rendering template. Dynamic content component."
+  },
+  {
+    "name": "CPTList",
+    "path": "packages/shortcodes/src/dynamic/cpt-list.tsx",
+    "props": ["postType", "limit", "orderBy", "order", "categoryId"],
+    "hasLayout": true,
+    "category": "ui",
+    "notes": "Custom Post Type list rendering template with query support."
+  },
+  {
+    "name": "ShortcodeProvider",
+    "path": "packages/shortcodes/src/provider.tsx",
+    "props": ["children", "value"],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "Context provider for shortcode system. Infrastructure component."
+  },
+  {
+    "name": "PresetShortcode",
+    "path": "packages/shortcodes/src/components/PresetShortcode.tsx",
+    "props": ["preset", "overrides"],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "Preset shortcode wrapper component. HOC pattern."
+  },
+  {
+    "name": "ShortcodeRenderer",
+    "path": "packages/shortcodes/src/components/ShortcodeRenderer.tsx",
+    "props": ["name", "attributes", "content"],
+    "hasLayout": false,
+    "category": "ui",
+    "notes": "Main shortcode rendering engine. Infrastructure component."
+  },
+  {
+    "name": "ShortcodeErrorBoundary",
+    "path": "packages/shortcodes/src/components/ShortcodeErrorBoundary.tsx",
+    "props": ["children", "fallback", "onError"],
+    "hasLayout": true,
+    "category": "ui",
+    "notes": "Error boundary for shortcode rendering. Infrastructure component with styled error UI."
+  },
+  {
+    "name": "LoginShortcode",
+    "path": "apps/main-site/src/components/shortcodes/auth/LoginShortcode.tsx",
+    "props": ["redirectUrl", "showSignupLink"],
+    "hasLayout": true,
+    "category": "auth",
+    "notes": "Login form with social auth integration. Container with centered layout."
+  },
+  {
+    "name": "SignupShortcode",
+    "path": "apps/main-site/src/components/shortcodes/auth/SignupShortcode.tsx",
+    "props": ["redirectUrl", "defaultRole"],
+    "hasLayout": true,
+    "category": "auth",
+    "notes": "User registration form with role selection. Centered card layout."
+  },
+  {
+    "name": "AccountShortcode",
+    "path": "apps/main-site/src/components/shortcodes/auth/AccountShortcode.tsx",
+    "props": [],
+    "hasLayout": true,
+    "category": "customer",
+    "notes": "Customer account management dashboard. Section-based navigation."
+  },
+  {
+    "name": "CartShortcode",
+    "path": "apps/main-site/src/components/shortcodes/cart/CartShortcode.tsx",
+    "props": [],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Shopping cart with item management and checkout CTA."
+  },
+  {
+    "name": "CheckoutShortcode",
+    "path": "apps/main-site/src/components/shortcodes/cart/CheckoutShortcode.tsx",
+    "props": [],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Multi-step checkout flow with payment integration."
+  },
+  {
+    "name": "OrderDetailShortcode",
+    "path": "apps/main-site/src/components/shortcodes/cart/OrderDetailShortcode.tsx",
+    "props": ["orderId"],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Order detail view with tracking and status updates."
+  },
+  {
+    "name": "OrderList",
+    "path": "apps/main-site/src/components/shortcodes/orders/OrderList.tsx",
+    "props": ["status", "limit"],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Customer order history list with filtering."
+  },
+  {
+    "name": "OrderDetail",
+    "path": "apps/main-site/src/components/shortcodes/orders/OrderDetail.tsx",
+    "props": ["orderId"],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Detailed order view with line items and tracking."
+  },
+  {
+    "name": "Product",
+    "path": "apps/main-site/src/components/shortcodes/Product.tsx",
+    "props": ["productId", "showRelated"],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Single product detail page with add to cart."
+  },
+  {
+    "name": "ProductGrid",
+    "path": "apps/main-site/src/components/shortcodes/ProductGrid.tsx",
+    "props": ["category", "limit", "columns"],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "Product listing grid with category filtering. Main-site version."
+  },
+  {
+    "name": "CustomerDashboard",
+    "path": "apps/main-site/src/components/shortcodes/CustomerDashboard.tsx",
+    "props": ["defaultSection"],
+    "hasLayout": true,
+    "category": "customer",
+    "notes": "Main customer account dashboard with order history and profile management."
+  },
+  {
+    "name": "Wishlist",
+    "path": "apps/main-site/src/components/shortcodes/Wishlist.tsx",
+    "props": [],
+    "hasLayout": true,
+    "category": "customer",
+    "notes": "Customer wishlist page (R-6-6). Responsive grid layout with product cards."
+  },
+  {
+    "name": "SupplierDashboard",
+    "path": "apps/main-site/src/components/shortcodes/SupplierDashboard.tsx",
+    "props": ["defaultPeriod", "defaultSection", "showMenu"],
+    "hasLayout": true,
+    "category": "dropshipping",
+    "notes": "Main-site supplier dashboard with RoleDashboardMenu integration. KPICard, LineChart, PieChart support."
+  },
+  {
+    "name": "SellerDashboard",
+    "path": "apps/main-site/src/components/shortcodes/SellerDashboard.tsx",
+    "props": ["defaultPeriod", "defaultSection", "showMenu"],
+    "hasLayout": true,
+    "category": "dropshipping",
+    "notes": "Main-site seller dashboard with real API integration (Phase PD-1). Commission tracking and settlements."
+  },
+  {
+    "name": "PartnerDashboard",
+    "path": "apps/main-site/src/components/shortcodes/PartnerDashboard.tsx",
+    "props": ["defaultSection", "showMenu"],
+    "hasLayout": true,
+    "category": "dropshipping",
+    "notes": "Main-site partner/affiliate dashboard with link tracking and marketing tools."
+  },
+  {
+    "name": "SellerDashboard",
+    "path": "apps/admin-dashboard/src/components/shortcodes/dropshipping/seller/SellerDashboard.tsx",
+    "props": ["attributes", "content"],
+    "hasLayout": true,
+    "category": "admin",
+    "notes": "Admin view of seller dashboard with pricing management and margin rate tracking. Pricing alerts and settlement management."
+  },
+  {
+    "name": "PlatformStats",
+    "path": "apps/admin-dashboard/src/components/shortcodes/admin/PlatformStats.tsx",
+    "props": ["autoRefresh", "refreshInterval"],
+    "hasLayout": true,
+    "category": "admin",
+    "notes": "Platform-wide statistics for admin. AreaChart, PieChart, BarChart integration. Revenue analytics and user statistics."
+  },
+  {
+    "name": "ProductGrid",
+    "path": "apps/ecommerce/src/components/shortcodes/ProductGrid.tsx",
+    "props": ["category", "limit", "sort", "columns", "showPrice", "showRating"],
+    "hasLayout": true,
+    "category": "commerce",
+    "notes": "E-commerce product grid with dynamic column support and sorting. Responsive grid layout."
+  }
+]

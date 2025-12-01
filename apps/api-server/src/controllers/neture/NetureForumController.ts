@@ -4,45 +4,54 @@ import { NetureForumService } from '@o4o-apps/forum-neture';
 import { ForumPost } from '@o4o-apps/forum';
 
 export class NetureForumController {
-  private netureForumService: NetureForumService;
+  private forumService: NetureForumService;
 
   constructor() {
     const forumPostRepository = AppDataSource.getRepository(ForumPost);
-    this.netureForumService = new NetureForumService(forumPostRepository);
+    this.forumService = new NetureForumService(forumPostRepository);
+  }
+
+  /**
+   * GET /neture/forum/health
+   * Health check endpoint
+   */
+  async health(req: Request, res: Response): Promise<void> {
+    res.json({
+      success: true,
+      service: 'neture-forum',
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    });
   }
 
   /**
    * GET /neture/forum/posts
-   * List posts with filtering
+   * List posts with Neture-specific filtering
    */
   async listPosts(req: Request, res: Response): Promise<void> {
     try {
-      const { category, skinType, productId, page, limit } = req.query;
+      const filter = {
+        category: req.query.category as string,
+        skinType: req.query.skinType as string,
+        concerns: req.query.concerns ? (req.query.concerns as string).split(',') : undefined,
+        productId: req.query.productId as string,
+        page: parseInt(req.query.page as string) || 1,
+        limit: parseInt(req.query.limit as string) || 20,
+      };
 
-      // Parse concerns from query (can be array or single value)
-      let concerns: string[] | undefined;
-      if (req.query.concerns) {
-        concerns = Array.isArray(req.query.concerns)
-          ? req.query.concerns as string[]
-          : [req.query.concerns as string];
-      }
-
-      const posts = await this.netureForumService.listPosts({
-        category: category as string,
-        skinType: skinType as string,
-        concerns,
-        productId: productId as string,
-        page: page ? parseInt(page as string) : undefined,
-        limit: limit ? parseInt(limit as string) : undefined,
-      });
+      const posts = await this.forumService.listPosts(filter);
 
       res.json({
         success: true,
         data: posts,
         count: posts.length,
+        pagination: {
+          page: filter.page,
+          limit: filter.limit,
+        },
       });
     } catch (error: any) {
-      console.error('Error listing posts:', error);
+      console.error('Error listing Neture forum posts:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to list posts',
@@ -52,13 +61,12 @@ export class NetureForumController {
 
   /**
    * GET /neture/forum/posts/:id
-   * Get a single post
+   * Get post details
    */
   async getPost(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-
-      const post = await this.netureForumService.getPost(id);
+      const post = await this.forumService.getPost(id);
 
       if (!post) {
         res.status(404).json({
@@ -73,7 +81,7 @@ export class NetureForumController {
         data: post,
       });
     } catch (error: any) {
-      console.error('Error getting post:', error);
+      console.error('Error getting Neture forum post:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to get post',
@@ -83,7 +91,7 @@ export class NetureForumController {
 
   /**
    * POST /neture/forum/posts
-   * Create a new post
+   * Create new post with Neture metadata
    */
   async createPost(req: Request, res: Response): Promise<void> {
     try {
@@ -94,33 +102,19 @@ export class NetureForumController {
         return;
       }
 
-      const { title, content, categoryId, netureMeta, type, tags } = req.body;
-
-      if (!title || !content || !categoryId) {
-        res.status(400).json({
-          success: false,
-          error: 'Title, content, and categoryId are required',
-        });
-        return;
-      }
-
-      const post = await this.netureForumService.createPost({
-        title,
-        content,
-        categoryId,
+      const postData = {
+        ...req.body,
         authorId: userId,
-        netureMeta,
-        type,
-        tags,
-      });
+      };
+
+      const post = await this.forumService.createPost(postData);
 
       res.status(201).json({
         success: true,
         data: post,
-        message: 'Post created successfully',
       });
     } catch (error: any) {
-      console.error('Error creating post:', error);
+      console.error('Error creating Neture forum post:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to create post',
@@ -129,143 +123,26 @@ export class NetureForumController {
   }
 
   /**
-   * PUT /neture/forum/posts/:id
-   * Update a post
+   * GET /neture/forum/posts/product/:productId
+   * Get posts related to a specific product
    */
-  async updatePost(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Unauthorized' });
-        return;
-      }
-
-      const { id } = req.params;
-      const { title, content, categoryId, netureMeta, type, tags } = req.body;
-
-      const post = await this.netureForumService.updatePost(id, {
-        title,
-        content,
-        categoryId,
-        netureMeta,
-        type,
-        tags,
-      });
-
-      res.json({
-        success: true,
-        data: post,
-        message: 'Post updated successfully',
-      });
-    } catch (error: any) {
-      console.error('Error updating post:', error);
-
-      if (error.message === 'Post not found') {
-        res.status(404).json({
-          success: false,
-          error: error.message,
-        });
-        return;
-      }
-
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to update post',
-      });
-    }
-  }
-
-  /**
-   * DELETE /neture/forum/posts/:id
-   * Delete a post (soft delete)
-   */
-  async deletePost(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Unauthorized' });
-        return;
-      }
-
-      const { id } = req.params;
-
-      await this.netureForumService.deletePost(id);
-
-      res.json({
-        success: true,
-        message: 'Post deleted successfully',
-      });
-    } catch (error: any) {
-      console.error('Error deleting post:', error);
-
-      if (error.message === 'Post not found') {
-        res.status(404).json({
-          success: false,
-          error: error.message,
-        });
-        return;
-      }
-
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to delete post',
-      });
-    }
-  }
-
-  /**
-   * GET /neture/forum/products/:productId/posts
-   * Get posts for a specific product
-   */
-  async listProductPosts(req: Request, res: Response): Promise<void> {
+  async getProductPosts(req: Request, res: Response): Promise<void> {
     try {
       const { productId } = req.params;
       const limit = parseInt(req.query.limit as string) || 20;
-      const offset = parseInt(req.query.offset as string) || 0;
 
-      const posts = await this.netureForumService.listProductPosts(productId, {
-        limit,
-        offset,
-      });
+      const posts = await this.forumService.listProductPosts(productId, { limit });
 
       res.json({
         success: true,
         data: posts,
         count: posts.length,
-        pagination: {
-          limit,
-          offset,
-          hasMore: posts.length === limit,
-        },
       });
     } catch (error: any) {
-      console.error('Error listing product posts:', error);
+      console.error('Error getting product posts:', error);
       res.status(500).json({
         success: false,
-        error: error.message || 'Failed to list product posts',
-      });
-    }
-  }
-
-  /**
-   * GET /neture/forum/stats
-   * Get forum statistics
-   */
-  async getStats(req: Request, res: Response): Promise<void> {
-    try {
-      const stats = await this.netureForumService.getStats();
-
-      res.json({
-        success: true,
-        data: stats,
-      });
-    } catch (error: any) {
-      console.error('Error getting stats:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to get stats',
+        error: error.message || 'Failed to get product posts',
       });
     }
   }

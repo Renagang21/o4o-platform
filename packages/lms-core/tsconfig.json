@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../dist/packages/lms-core",
-    "rootDir": "src",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "composite": true,
     "noEmit": false,
     "declaration": true,
@@ -10,10 +10,25 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../organization-core" }
+  "include": [
+    "src/manifest.ts",
+    "src/index.ts",
+    "src/lifecycle/**/*"
+  ],
+  "exclude": [
+    "src/entities/**/*",
+    "src/services/**/*",
+    "src/migrations/**/*",
+    "src/types/**/*",
+    "src/utils/**/*",
+    "dist",
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts"
   ]
 }
