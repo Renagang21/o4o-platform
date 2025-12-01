@@ -55,11 +55,54 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'community',
     author: 'O4O Platform',
   },
-  // Future: Add more apps as they become available
-  // - dropshipping
-  // - b2c-catalog
-  // - reviews
-  // etc.
+  {
+    appId: 'dropshipping-core',
+    name: 'Dropshipping Core',
+    version: '1.0.0',
+    description: '멀티벤더 드랍쉬핑 마켓플레이스 코어 엔진',
+    category: 'commerce',
+    author: 'O4O Platform',
+  },
+  {
+    appId: 'dropshipping-cosmetics',
+    name: 'Dropshipping Cosmetics Extension',
+    version: '1.0.0',
+    description: '화장품 특화 드랍쉬핑 기능 - 피부타입, 성분, 루틴 추천',
+    category: 'commerce',
+    author: 'O4O Platform',
+  },
+  {
+    appId: 'lms-core',
+    name: 'LMS Core',
+    version: '0.1.0',
+    description: '학습 관리 시스템 - 강좌, 수강, 진도, 수료증 관리',
+    category: 'education',
+    author: 'O4O Platform',
+  },
+  {
+    appId: 'organization-core',
+    name: 'Organization Core',
+    version: '1.0.0',
+    description: '전사 조직 관리 시스템 - 계층 구조, 멤버 관리, 조직 스코프 권한',
+    category: 'organization',
+    author: 'O4O Platform',
+  },
+  {
+    appId: 'organization-dropshipping',
+    name: 'Organization-Dropshipping Integration',
+    version: '0.1.0',
+    description: '조직 단위 드랍쉬핑 통합 - 조직별 공동구매, 조직 가격 정책',
+    category: 'integration',
+    author: 'O4O Platform',
+  },
+  {
+    appId: 'organization-forum',
+    name: 'Organization-Forum Integration',
+    version: '0.1.0',
+    description: '조직 단위 포럼 통합 - 조직별 게시판, 계층 권한 관리',
+    category: 'integration',
+    author: 'O4O Platform',
+  },
 ];
 
 /**

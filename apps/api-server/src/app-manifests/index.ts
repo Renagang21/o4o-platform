@@ -1,6 +1,6 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
-import { forumNetureManifest } from '@o4o-apps/forum-neture';
+// import { forumNetureManifest } from '@o4o-apps/forum-neture';
 import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
 
 /**
@@ -11,11 +11,21 @@ import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
  * Note: Extension app manifests (forum-neture, forum-yaksa) have extended properties
  * beyond the base AppManifest type. Type assertions are used here to accommodate
  * the extended manifest schema documented in docs/dev/spec/extension_app_pattern.md
+ *
+ * TODO: Add manifests for dropshipping-core, dropshipping-cosmetics, lms-core,
+ * organization-core, organization-dropshipping, organization-forum after packages are built
  */
 const manifestRegistry: Record<string, AppManifest> = {
   forum: forumManifest as any,
-  'forum-neture': forumNetureManifest as any,
+  // 'forum-neture': forumNetureManifest as any,
   'forum-yaksa': forumYaksaManifest as any,
+  // TODO: Enable after packages are built and exported properly
+  // 'dropshipping-core': dropshippingCoreManifest as any,
+  // 'dropshipping-cosmetics': cosmeticsExtensionManifest as any,
+  // 'lms-core': lmsCoreManifest as any,
+  // 'organization-core': organizationCoreManifest as any,
+  // 'organization-dropshipping': organizationDropshippingManifest as any,
+  // 'organization-forum': organizationForumManifest as any,
 };
 
 /**
