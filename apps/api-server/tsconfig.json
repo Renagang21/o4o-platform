@@ -28,6 +28,11 @@
     "strictPropertyInitialization": false,
     "composite": true,
     "baseUrl": ".",
+    "paths": {
+      "@o4o/*": ["../../packages/*/dist"],
+      "@o4o-apps/*": ["../../packages/*/dist"],
+      "@o4o-extensions/*": ["../../packages/*/dist"]
+    },
     "types": [
       "node"
     ],

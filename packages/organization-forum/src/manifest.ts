@@ -1,6 +1,4 @@
-import type { ExtensionManifest } from '@o4o/types';
-
-export const manifest: ExtensionManifest = {
+export const manifest = {
   id: 'organization-forum',
   name: 'Organization-Forum Integration',
   version: '0.1.0',

@@ -5,26 +5,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
-    },
-    "./admin-ui": {
-      "import": "./src/admin-ui/index.ts",
-      "types": "./src/admin-ui/index.ts"
-    },
-    "./main-site": {
-      "import": "./src/main-site/index.ts",
-      "types": "./src/main-site/index.ts"
-    },
-    "./backend": {
-      "import": "./src/backend/index.ts",
-      "types": "./src/backend/index.ts"
-    }
+    ".": "./dist/index.js",
+    "./admin-ui": "./src/admin-ui/index.ts",
+    "./main-site": "./src/main-site/index.ts",
+    "./backend": "./src/backend/index.ts"
   },
   "files": ["dist", "src"],
   "scripts": {
-    "build": "echo 'Skipping TypeScript build - will be bundled by Vite or consumed by API server' && mkdir -p dist && echo 'export {};' > dist/index.js",
+    "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

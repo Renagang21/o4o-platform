@@ -13,7 +13,11 @@
  * @version 0.1.0
  */
 
-export { OrganizationDropshippingService } from './services/OrganizationDropshippingService.js';
-export * from './entities';
+// Manifest
 export { manifest } from './manifest.js';
-export { onInstall, onUninstall } from './lifecycle/install.js';
+export { manifest as default } from './manifest.js';
+
+// Backend code (imported directly by API server from src/)
+// export { OrganizationDropshippingService } from './services/OrganizationDropshippingService.js';
+// export * from './entities';
+// export { onInstall, onUninstall } from './lifecycle/install.js';

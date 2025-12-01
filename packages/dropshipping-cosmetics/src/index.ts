@@ -4,5 +4,6 @@
  */
 
 export { cosmeticsExtensionManifest } from './manifest.js';
-export * from './backend/index.js';
+// Backend entities imported directly by API server from src/backend
+// export * from './backend/index.js';
 export * from './types.js';

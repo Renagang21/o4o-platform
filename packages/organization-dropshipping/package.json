@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "description": "Organization-Dropshipping Integration Extension - Organization-scoped groupbuys and dropshipping",
-  "main": "dist/packages/organization-dropshipping/src/index.js",
-  "types": "dist/packages/organization-dropshipping/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist", "src"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",

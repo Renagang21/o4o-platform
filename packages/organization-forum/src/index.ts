@@ -12,6 +12,10 @@
  * @version 0.1.0
  */
 
-export { OrganizationForumService } from './services/OrganizationForumService.js';
+// Manifest
 export { manifest } from './manifest.js';
-export { onInstall, onUninstall } from './lifecycle/install.js';
+export { manifest as default } from './manifest.js';
+
+// Backend code (imported directly by API server from src/)
+// export { OrganizationForumService } from './services/OrganizationForumService.js';
+// export { onInstall, onUninstall } from './lifecycle/install.js';

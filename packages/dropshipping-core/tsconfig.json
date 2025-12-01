@@ -9,18 +9,24 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "../../apps/admin-dashboard/src/*",
-        "../../apps/main-site/src/*"
-      ]
-    }
+    "noEmit": false,
+    "emitDeclarationOnly": false,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false
   },
   "include": [
-    "src/**/*"
+    "src/manifest.ts",
+    "src/index.ts",
+    "src/lifecycle/**/*"
   ],
   "exclude": [
+    "src/admin-ui/**/*",
+    "src/main-site/**/*",
+    "src/backend/acf/**/*",
+    "src/backend/cpt/**/*",
+    "src/backend/services/**/*",
     "dist",
     "node_modules",
     "**/*.test.ts",

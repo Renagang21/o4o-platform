@@ -1,20 +1,9 @@
 /**
  * Dropshipping Core - Backend
  *
- * Exports all backend components (entities, services, routes, etc.)
+ * Exports backend entities for TypeORM
+ * Note: Services, routes, CPT, and ACF are imported directly by API server
  */
 
-// Export entities
+// Export entities only (for TypeORM registration)
 export * from './entities/index.js';
-
-// Export services
-export * from './services/index.js';
-
-// Export routes
-export * from './routes/index.js';
-
-// Export CPT definitions
-export * from './cpt/index.js';
-
-// Export ACF definitions
-export * from './acf/index.js';
