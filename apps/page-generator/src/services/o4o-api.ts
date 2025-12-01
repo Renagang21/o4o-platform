@@ -69,9 +69,9 @@ export class O4OApiClient {
     const url = `${API_BASE_URL}${endpoint}`;
 
     // Prepare headers
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string>),
     };
 
     // Add JWT token if authenticated

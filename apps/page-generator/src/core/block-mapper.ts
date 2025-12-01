@@ -346,7 +346,7 @@ function createColumnsBlock(
   // Convert children to column blocks
   const innerBlocks = element.children
     .filter((child): child is ReactElement => typeof child !== 'string')
-    .map((child, index) => {
+    .map((child) => {
       const columnId = uuidv4();
       const childClassName = child.props.className || '';
       const childBlock = mapReactElementToBlock(child);
