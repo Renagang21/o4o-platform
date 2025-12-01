@@ -46,11 +46,13 @@ export class AppRegistry {
   @Index()
   status!: 'installed' | 'active' | 'inactive';
 
-  @Column({ type: 'jsonb', nullable: true })
+  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
+  @Column({ type: 'jsonb', nullable: true, select: false })
   dependencies?: Record<string, string>; // { "app-id": "version-range" }
 
-  @Column({ type: 'varchar', length: 50, default: 'local' })
-  source!: string; // 'local' for now, can be 'remote' later
+  // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
+  @Column({ type: 'varchar', length: 50, default: 'local', select: false })
+  source?: string; // 'local' for now, can be 'remote' later
 
   @CreateDateColumn()
   installedAt!: Date;
