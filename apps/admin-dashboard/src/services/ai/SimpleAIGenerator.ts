@@ -673,11 +673,16 @@ ${availableBlocks}
           ]
         }
       ]
+    },
+    {
+      "type": "o4o/shortcode",
+      "content": {},
+      "attributes": {"shortcode": "[product-list category='electronics']"}
     }
   ]
 }
 
-중요 규칙 (⚠️ 2025-10-26 업데이트됨):
+중요 규칙 (⚠️ 2025-12-01 업데이트됨):
 1. 모든 블록 타입은 "o4o/" prefix를 사용하세요 (core/ 사용 금지)
 2. ✨ heading 블록: content는 빈 객체 {}, attributes에 {"content": "텍스트", "level": 2}
 3. ✨ paragraph 블록: content는 빈 객체 {}, attributes에 {"content": "텍스트"}
@@ -685,7 +690,8 @@ ${availableBlocks}
 5. button/image 블록: content는 빈 객체 {}, 데이터는 attributes에 넣으세요
 6. ✨ columns 블록: innerBlocks 배열에 column 블록들을 넣으세요
 7. ✨ column 블록: innerBlocks 배열에 다른 블록들을 넣을 수 있습니다
-8. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;
+8. ✨ shortcode 블록: content는 빈 객체 {}, attributes에 {"shortcode": "[product-list category='electronics']"}
+9. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;
   }
 
   /**
@@ -868,16 +874,16 @@ ${availableBlocks}
 
       // ⭐ Phase 1-A: shortcode 블록 처리
       if (blockType === 'o4o/shortcode') {
-        // shortcode는 attributes.code에 저장
+        // shortcode는 attributes.shortcode에 저장
         if (typeof content === 'object' && content.shortcode) {
           attributes = {
             ...attributes,
-            code: content.shortcode,
+            shortcode: content.shortcode,
           };
         } else if (typeof content === 'string') {
           attributes = {
             ...attributes,
-            code: content,
+            shortcode: content,
           };
         }
         // content는 항상 빈 객체
