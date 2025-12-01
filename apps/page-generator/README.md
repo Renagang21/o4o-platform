@@ -123,23 +123,24 @@ pnpm build
 
 ## ⚠️ 현재 상태
 
-**Phase 1: Core 변환 엔진** (진행 중)
+**Phase 1: Core 변환 엔진** ✅ **완료**
 - [x] 프로젝트 구조 생성
-- [ ] JSX Parser 이식
-- [ ] Block Mapper 이식
-- [ ] Tailwind Parser 이식
-- [ ] Placeholder 처리
+- [x] JSX Parser 이식 (Babel 기반)
+- [x] Block Mapper 이식 (완전한 매핑 규칙)
+- [x] Tailwind Parser 이식 (Typography, Color, Spacing, Layout, Border)
+- [x] Placeholder 처리 (직렬화, 추출, 통계)
 
-**Phase 2: UI 개발** (예정)
-- [ ] JSX 에디터 컴포넌트
-- [ ] Block 뷰어 컴포넌트
-- [ ] 페이지 폼 컴포넌트
-- [ ] 미리보기 기능
+**Phase 2: UI 개발** ✅ **완료**
+- [x] JSX 에디터 컴포넌트
+- [x] Block 뷰어 컴포넌트 (JSON 포맷팅)
+- [x] 페이지 폼 컴포넌트 (title, slug, status, type)
+- [x] Placeholder 목록 컴포넌트
+- [x] 메인 App 통합
 
-**Phase 3: API 연동** (예정)
-- [ ] Browser Auth 구현
-- [ ] O4O API 클라이언트
-- [ ] 페이지 생성 기능
+**Phase 3: API 연동** ✅ **완료**
+- [x] Browser Auth 구현 (localStorage + httpOnly cookie)
+- [x] O4O API 클라이언트 (자동 JWT 갱신)
+- [x] 페이지 생성 기능
 
 **Phase 4: 고도화** (예정)
 - [ ] Placeholder 자동 제안
