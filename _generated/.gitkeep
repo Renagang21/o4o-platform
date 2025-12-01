@@ -1,0 +1,5 @@
+# Generated UI Files Storage
+
+이 폴더는 AI 및 수동으로 생성된 UI 파일을 저장합니다.
+
+구조: {source}/ui/{timestamp}/
