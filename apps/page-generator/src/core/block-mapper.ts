@@ -43,6 +43,24 @@ function roundTo2(num: number): number {
 }
 
 /**
+ * Merge inset and position values
+ * Individual position values (top-4, left-6) override inset values (inset-0)
+ */
+function mergePositioning(
+  inset: { top?: number; right?: number; bottom?: number; left?: number } | undefined,
+  positionValues: { top?: number; right?: number; bottom?: number; left?: number } | undefined
+): { top?: number; right?: number; bottom?: number; left?: number } {
+  if (!inset && !positionValues) return {};
+
+  return {
+    top: positionValues?.top ?? inset?.top,
+    right: positionValues?.right ?? inset?.right,
+    bottom: positionValues?.bottom ?? inset?.bottom,
+    left: positionValues?.left ?? inset?.left,
+  };
+}
+
+/**
  * Convert ReactElement tree to O4O Block array
  */
 export function convertReactToBlocks(elements: ReactElement[]): Block[] {
@@ -175,13 +193,17 @@ function createImageBlock(id: string, element: ReactElement, className: string):
   return {
     id,
     type: 'o4o/image',
-    attributes: {
+    attributes: cleanAttributes({
       url: element.props.src || '',
       alt: element.props.alt || '',
       width: element.props.width || TailwindMapper.parseWidth(className),
       height: element.props.height || TailwindMapper.parseHeight(className),
       align: TailwindMapper.parseTextAlign(className),
-    },
+      objectFit: TailwindMapper.parseObjectFit(className),
+      borderRadius: TailwindMapper.parseBorderRadius(className),
+      shadow: TailwindMapper.parseShadow(className),
+      opacity: TailwindMapper.parseOpacity(className),
+    }),
   };
 }
 
@@ -231,12 +253,17 @@ function createListBlock(
   return {
     id,
     type: 'o4o/list',
-    attributes: {
+    attributes: cleanAttributes({
       type,
       content: items.join('\n'),
-      textColor: TailwindMapper.parseTextColor(className),
+      textColor: TailwindMapper.parseAlphaColor(className, 'text') || TailwindMapper.parseTextColor(className),
       fontSize: TailwindMapper.parseFontSize(className),
-    },
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
+      padding: TailwindMapper.parsePadding(className),
+      borderRadius: TailwindMapper.parseBorderRadius(className),
+      shadow: TailwindMapper.parseShadow(className),
+      opacity: TailwindMapper.parseOpacity(className),
+    }),
   };
 }
 
@@ -247,12 +274,18 @@ function createQuoteBlock(id: string, element: ReactElement, className: string):
   return {
     id,
     type: 'o4o/quote',
-    attributes: {
+    attributes: cleanAttributes({
       quote: extractTextContent(element.children),
       align: TailwindMapper.parseTextAlign(className),
-      textColor: TailwindMapper.parseTextColor(className),
+      textColor: TailwindMapper.parseAlphaColor(className, 'text') || TailwindMapper.parseTextColor(className),
       fontSize: TailwindMapper.parseFontSize(className),
-    },
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
+      padding: TailwindMapper.parsePadding(className),
+      borderLeft: TailwindMapper.parseBorderLeft(className),
+      borderRadius: TailwindMapper.parseBorderRadius(className),
+      shadow: TailwindMapper.parseShadow(className),
+      opacity: TailwindMapper.parseOpacity(className),
+    }),
   };
 }
 
@@ -295,13 +328,23 @@ function createColumnsBlock(
     .filter((child): child is ReactElement => typeof child !== 'string')
     .map((child, index) => {
       const columnId = uuidv4();
+      const childClassName = child.props.className || '';
       const childBlock = mapReactElementToBlock(child);
+
+      // Parse col-span and row-span from child element
+      const colSpan = TailwindMapper.parseColSpan(childClassName);
+      const rowSpan = TailwindMapper.parseRowSpan(childClassName);
+
+      // Calculate width based on column span
+      const width = colSpan ? roundTo2((colSpan / columnCount) * 100) : roundTo2(100 / columnCount);
 
       return {
         id: columnId,
         type: 'o4o/column',
         attributes: cleanAttributes({
-          width: roundTo2(100 / columnCount),
+          width,
+          columnSpan: colSpan,
+          rowSpan: rowSpan,
         }),
         innerBlocks: childBlock ? [childBlock] : [],
       };
@@ -333,6 +376,12 @@ function createFlexGroupBlock(
     )
     .filter(Boolean) as Block[];
 
+  // Merge inset and position values (individual values override inset)
+  const positioning = mergePositioning(
+    TailwindMapper.parseInset(className),
+    TailwindMapper.parsePositionValues(className)
+  );
+
   return {
     id,
     type: 'o4o/group',
@@ -349,6 +398,10 @@ function createFlexGroupBlock(
       opacity: TailwindMapper.parseOpacity(className),
       shadow: TailwindMapper.parseShadow(className),
       backdropBlur: TailwindMapper.parseBackdropBlur(className),
+      // Positioning attributes
+      position: TailwindMapper.parsePosition(className),
+      ...positioning,
+      zIndex: TailwindMapper.parseZIndex(className),
     }),
     innerBlocks,
   };
@@ -368,6 +421,12 @@ function createFlowGroupBlock(
     )
     .filter(Boolean) as Block[];
 
+  // Merge inset and position values (individual values override inset)
+  const positioning = mergePositioning(
+    TailwindMapper.parseInset(className),
+    TailwindMapper.parsePositionValues(className)
+  );
+
   return {
     id,
     type: 'o4o/group',
@@ -379,6 +438,10 @@ function createFlowGroupBlock(
       opacity: TailwindMapper.parseOpacity(className),
       shadow: TailwindMapper.parseShadow(className),
       backdropBlur: TailwindMapper.parseBackdropBlur(className),
+      // Positioning attributes
+      position: TailwindMapper.parsePosition(className),
+      ...positioning,
+      zIndex: TailwindMapper.parseZIndex(className),
     }),
     innerBlocks,
   };

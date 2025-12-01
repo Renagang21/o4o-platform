@@ -10,7 +10,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "24ef7b52-2a87-46c2-9ffe-6c2df85bf957",
+        "id": "ed65e4c2-a8eb-491d-ba83-6489394cce98",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -23,7 +23,7 @@
         },
         "innerBlocks": [
           {
-            "id": "bd2997c8-f2dc-4e30-85e3-9d9740d226bb",
+            "id": "9e6069b3-0a64-4ad7-84bd-211c85fc13c1",
             "type": "o4o/heading",
             "attributes": {
               "content": "Welcome to O4O Platform",
@@ -33,7 +33,7 @@
             }
           },
           {
-            "id": "ee439886-788b-4fb5-bad1-6c17d4379b15",
+            "id": "9ac97ee5-e7c0-4be9-86ea-5b560fb9ac05",
             "type": "o4o/paragraph",
             "attributes": {
               "content": "Build amazing websites with AI-powered page generation",
@@ -42,7 +42,7 @@
             }
           },
           {
-            "id": "fbaf6c46-f867-4e6f-b8a0-3c1c79209f2f",
+            "id": "cb5d0166-8190-4a20-9cd4-aee7d21bc879",
             "type": "o4o/group",
             "attributes": {
               "layout": "flex",
@@ -50,7 +50,7 @@
             },
             "innerBlocks": [
               {
-                "id": "18395a36-1cde-46a8-9676-1eab0403c6dd",
+                "id": "eb69b200-fa8f-4a2e-88fc-445d9807d8b7",
                 "type": "o4o/button",
                 "attributes": {
                   "text": "Get Started",
@@ -84,7 +84,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "2699e9a1-cdea-4ad3-b37c-c94290ed21c9",
+        "id": "4eb11b08-7c5f-4e56-be4a-59971c3253eb",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -92,7 +92,7 @@
         },
         "innerBlocks": [
           {
-            "id": "54e1376d-7600-4642-aee5-5bd8823a88cc",
+            "id": "a5fb84bd-b9c1-47b2-8f1e-6263f170d105",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -105,7 +105,7 @@
             },
             "innerBlocks": [
               {
-                "id": "438666ee-e0cd-4c18-b94f-2b53380e4ba0",
+                "id": "4cf09a7a-9c56-407c-b668-eba5dd978b6b",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Revolutionary Platform",
@@ -115,7 +115,7 @@
                 }
               },
               {
-                "id": "8dfee8a8-5ba9-45f8-8821-93bda791ffbb",
+                "id": "a57b6c4a-5373-4db6-bea3-f3cbedce93f2",
                 "type": "o4o/paragraph",
                 "attributes": {
                   "content": "Transform your workflow with cutting-edge technology",
@@ -124,7 +124,7 @@
                 }
               },
               {
-                "id": "733f0981-cdc3-4ece-ac5f-9573cd09bab8",
+                "id": "182b070b-65d6-426b-9965-f3b554b389de",
                 "type": "o4o/columns",
                 "attributes": {
                   "columnCount": 3,
@@ -133,14 +133,14 @@
                 },
                 "innerBlocks": [
                   {
-                    "id": "925a5d3f-df56-4e7e-90b0-0ded8bc3a368",
+                    "id": "2c931eae-0418-49ad-a250-5d5a15522eb1",
                     "type": "o4o/column",
                     "attributes": {
                       "width": 33.33
                     },
                     "innerBlocks": [
                       {
-                        "id": "3218a2a7-1f59-40b4-9451-0c5014200645",
+                        "id": "2f6af937-d282-46c3-b080-6c1bec3f734a",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flow",
@@ -155,7 +155,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "bf10f42b-2e78-435b-a265-9441ecc9fb3f",
+                            "id": "19281278-c7d8-449b-9109-4f57c0f7677e",
                             "type": "o4o/heading",
                             "attributes": {
                               "content": "Fast",
@@ -164,7 +164,7 @@
                             }
                           },
                           {
-                            "id": "7c48f135-a7ce-4fcc-92db-924b6b37220b",
+                            "id": "7e9df51c-6055-428f-89d0-6fbebe8a7c5c",
                             "type": "o4o/paragraph",
                             "attributes": {
                               "content": "Lightning-fast performance for your users",
@@ -176,14 +176,14 @@
                     ]
                   },
                   {
-                    "id": "0e63d9c5-7de9-46d2-9fca-80c38cc3116c",
+                    "id": "fe79ba0f-3532-4e20-9281-a25a28fdce56",
                     "type": "o4o/column",
                     "attributes": {
                       "width": 33.33
                     },
                     "innerBlocks": [
                       {
-                        "id": "e7ec5e51-cd15-4978-8a8b-3f20b1074cfa",
+                        "id": "fad17ad8-68b9-4c91-8bf1-6846e4ebb084",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flow",
@@ -198,7 +198,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "699f902a-52e4-4b2b-844f-384369956f43",
+                            "id": "f72c5333-6b1c-44b3-b273-83864a92b4fb",
                             "type": "o4o/heading",
                             "attributes": {
                               "content": "Secure",
@@ -207,7 +207,7 @@
                             }
                           },
                           {
-                            "id": "551596aa-e045-474b-abec-23bac9eb32a2",
+                            "id": "a4748925-034f-4401-9644-4787b770c668",
                             "type": "o4o/paragraph",
                             "attributes": {
                               "content": "Enterprise-grade security built-in",
@@ -219,14 +219,14 @@
                     ]
                   },
                   {
-                    "id": "d86c6ac2-5db6-43c2-8e69-878b2ca11ce2",
+                    "id": "8ced4afc-ee56-4733-907a-643728a2cf4a",
                     "type": "o4o/column",
                     "attributes": {
                       "width": 33.33
                     },
                     "innerBlocks": [
                       {
-                        "id": "05fb18b7-88c9-416a-a89b-b394fb58ceb6",
+                        "id": "32302ab5-3b58-4268-b3cf-7b4c0ea3ac4e",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flow",
@@ -241,7 +241,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "7f1ea3ee-451b-4ba7-98f9-a24b551c2c13",
+                            "id": "3cfcf835-77f2-4b12-878f-964c43c08da8",
                             "type": "o4o/heading",
                             "attributes": {
                               "content": "Scalable",
@@ -250,7 +250,7 @@
                             }
                           },
                           {
-                            "id": "7fecf81b-1442-48ee-8e59-d078eeca0053",
+                            "id": "96231e4a-bb76-4533-9716-155896d11e6a",
                             "type": "o4o/paragraph",
                             "attributes": {
                               "content": "Grows with your business needs",
@@ -264,7 +264,7 @@
                 ]
               },
               {
-                "id": "b847997b-c527-442d-ae54-e0e4ded67f2d",
+                "id": "d94a1b4f-c863-458f-b13e-6bd6bb9ea4b6",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flex",
@@ -272,7 +272,7 @@
                 },
                 "innerBlocks": [
                   {
-                    "id": "56c66cdf-71d3-4e2c-bc99-0e74c07b7074",
+                    "id": "8f61dd0b-06c8-4af7-9d2d-b65e3a55406a",
                     "type": "o4o/button",
                     "attributes": {
                       "text": "Start Free Trial",
@@ -321,7 +321,7 @@
     ],
     "blocks": [
       {
-        "id": "6e4b0a96-bf37-4592-9425-97e314077e9b",
+        "id": "a980cdc0-f725-4b5f-accb-5fae6387e427",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -334,7 +334,7 @@
         },
         "innerBlocks": [
           {
-            "id": "b7ce5014-1926-4eec-a2b0-4f78558311f6",
+            "id": "a900a9e7-0457-40f5-8f5e-246c719ecf33",
             "type": "o4o/heading",
             "attributes": {
               "content": "Our Products",
@@ -344,7 +344,7 @@
             }
           },
           {
-            "id": "ce0041fb-f6f2-46f5-890c-6343140b946b",
+            "id": "78fa2aef-b93e-437a-a604-a82a492947a1",
             "type": "o4o/placeholder",
             "attributes": {
               "componentName": "Carousel",
@@ -358,7 +358,7 @@
             }
           },
           {
-            "id": "4fe02c2d-b397-444e-8409-1e3cf8b8066e",
+            "id": "7733af23-fe46-4d72-8be1-4a83a147e2a3",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 3,
@@ -367,14 +367,14 @@
             },
             "innerBlocks": [
               {
-                "id": "6bbd5556-96db-42d4-ace1-58154bad5c3d",
+                "id": "42464ab1-97ba-4143-918a-33c946d56deb",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 33.33
                 },
                 "innerBlocks": [
                   {
-                    "id": "b4d65316-45c1-4357-b04d-08ac0b496f3c",
+                    "id": "ee864464-f2d3-4bff-a353-5e6143315f56",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "PricingCard",
@@ -390,14 +390,14 @@
                 ]
               },
               {
-                "id": "4f4cf372-a4ba-491c-ac6f-f9578dc14ceb",
+                "id": "e873cd4d-4bc8-405b-a141-cf4c6191691f",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 33.33
                 },
                 "innerBlocks": [
                   {
-                    "id": "d1e8805a-5942-4dd3-b5ba-eb5fd8fb208b",
+                    "id": "4bf7b4e6-836f-4057-8e47-0f440d2fae90",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "PricingCard",
@@ -414,14 +414,14 @@
                 ]
               },
               {
-                "id": "ceb4f8b2-1a7a-45d0-8761-7cdd3236995c",
+                "id": "9bbb010b-d9b4-4c96-8108-35b64e3c84d4",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 33.33
                 },
                 "innerBlocks": [
                   {
-                    "id": "264f3cb3-b5fe-4be1-a91d-eb99311d67d9",
+                    "id": "ad547162-f458-4a1f-9157-5ed89a1b8599",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "PricingCard",
@@ -439,7 +439,7 @@
             ]
           },
           {
-            "id": "bbb2cd5d-8ded-4474-a3c1-c32c370199a9",
+            "id": "9a7a8eef-8212-4eb0-837b-58a0751eab25",
             "type": "o4o/group",
             "attributes": {
               "layout": "flex",
@@ -447,14 +447,14 @@
             },
             "innerBlocks": [
               {
-                "id": "1d8f5427-9979-47ad-a8f5-9c69ce9f3981",
+                "id": "19f1a141-41bf-4928-8a3a-c9f5d9f7a7d9",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow"
                 },
                 "innerBlocks": [
                   {
-                    "id": "1fe5b832-dd72-4e2f-864c-34107ced1522",
+                    "id": "549ff87f-dd66-4c84-b360-8a89952906c1",
                     "type": "o4o/heading",
                     "attributes": {
                       "content": "Our Users",
@@ -463,7 +463,7 @@
                     }
                   },
                   {
-                    "id": "99737e43-5b6f-4d25-a16f-06daba1851cf",
+                    "id": "80be7ba1-be44-46fb-b1b9-92b164497c44",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "AnimatedCounter",
@@ -494,7 +494,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "9701a48f-0b3c-4c59-8d6d-d8d7ad4ae78b",
+        "id": "11c4466f-629c-4f4c-baea-1a4784a49c31",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -507,7 +507,7 @@
         },
         "innerBlocks": [
           {
-            "id": "cc7c1de2-2df4-4f6e-9b41-474550ea13f5",
+            "id": "54aafaa3-7086-4619-b5e7-9d66187fee40",
             "type": "o4o/heading",
             "attributes": {
               "content": "Features",
@@ -517,7 +517,7 @@
             }
           },
           {
-            "id": "6cf0855d-1b1b-4a5b-be2d-bff36d5ed613",
+            "id": "103ae8e7-0b34-4688-bb41-1ae53036f654",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 2,
@@ -526,14 +526,14 @@
             },
             "innerBlocks": [
               {
-                "id": "3049b2ae-d29a-488f-a255-b3a0bf39b3a5",
+                "id": "d2b438c7-8079-4394-adb7-62467e8d237d",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 50
                 },
                 "innerBlocks": [
                   {
-                    "id": "ffe5f79d-f705-42c9-a4a9-ae9e10277fb7",
+                    "id": "fa91cbdf-ad29-440f-bbe5-bda554e193bc",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flex",
@@ -550,7 +550,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "191bffb0-3266-4516-97c5-442bed7dddce",
+                        "id": "8ec9cd93-d5d9-4359-bd89-f7e65a864775",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Design Tools",
@@ -559,7 +559,7 @@
                         }
                       },
                       {
-                        "id": "beb2742d-f377-4faf-b992-e741de7c4ebd",
+                        "id": "def8e68d-acc6-4e17-b490-731f926e77ff",
                         "type": "o4o/paragraph",
                         "attributes": {
                           "content": "Create stunning designs with our intuitive tools",
@@ -567,7 +567,7 @@
                         }
                       },
                       {
-                        "id": "924ca27d-b500-41f3-82b2-95a194b71f54",
+                        "id": "4ffd88b6-0fa6-4543-8a0e-be15dee297ec",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flex",
@@ -576,7 +576,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "d542da37-c89f-45e8-974b-f0effe0b2332",
+                            "id": "6b9d1e6a-7204-4407-ac82-385dff945536",
                             "type": "o4o/button",
                             "attributes": {
                               "text": "Learn More",
@@ -593,7 +593,7 @@
                             }
                           },
                           {
-                            "id": "afaf674e-1683-410f-8172-41e727858c46",
+                            "id": "9938e212-bd66-457b-8477-c90110fd6115",
                             "type": "o4o/button",
                             "attributes": {
                               "text": "Watch Demo",
@@ -616,14 +616,14 @@
                 ]
               },
               {
-                "id": "553b5f09-a405-4a62-99d4-c26171211630",
+                "id": "059c4e32-5799-4fbc-b29c-6898767b9906",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 50
                 },
                 "innerBlocks": [
                   {
-                    "id": "a8defb8c-d20c-40aa-a807-ac543751c8ab",
+                    "id": "d6edc3ea-f6b7-46a2-a0c6-5e7510c580f9",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flex",
@@ -641,7 +641,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "74397c91-e2c3-4da2-a965-c855957132f0",
+                        "id": "3dfc85f9-2f11-44f3-af36-ba4bdcd14bf7",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Analytics",
@@ -650,7 +650,7 @@
                         }
                       },
                       {
-                        "id": "43d6309b-5940-47d2-8cf7-5e48867f7c21",
+                        "id": "829fb209-bbf9-45dc-81ae-64954169e4f7",
                         "type": "o4o/paragraph",
                         "attributes": {
                           "content": "Track your performance with real-time analytics",
@@ -658,7 +658,7 @@
                         }
                       },
                       {
-                        "id": "a6183ca6-5cc4-49b9-8e51-d57c243d6c1e",
+                        "id": "05ff5598-14e8-40aa-9f77-3df8dc03d41c",
                         "type": "o4o/button",
                         "attributes": {
                           "text": "View Dashboard",
@@ -681,7 +681,7 @@
             ]
           },
           {
-            "id": "0106427d-6bc3-4f37-9a2c-66ffb77fd527",
+            "id": "be5af1cc-a74e-4e77-8638-d47cb16593e6",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 4,
@@ -690,14 +690,14 @@
             },
             "innerBlocks": [
               {
-                "id": "57f02c0b-49ec-4ce8-92a5-eab849b1fd2e",
+                "id": "f4a04feb-f4e6-442c-a390-672e0ac725ce",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "3c6b1122-bf8f-4605-b415-3904998e4c92",
+                    "id": "9d12529d-fdde-45df-8545-bfdd3adb02c5",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -712,7 +712,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "ffaaca14-c5e7-4e79-8283-a055ed6ee05b",
+                        "id": "6edf6716-8045-4466-9406-124fa27a3bea",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 1",
@@ -724,14 +724,14 @@
                 ]
               },
               {
-                "id": "d89befc2-ff9a-4f47-aa27-53b25f7fba08",
+                "id": "af94b70d-2525-481e-9de8-23992de65df1",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "b7012474-6eb1-425a-a3d4-e216a3a431f7",
+                    "id": "c2f6062b-ea37-4443-a25a-dbdc6667f148",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -746,7 +746,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "7b523095-0551-45da-9a40-2810b55651d0",
+                        "id": "92026e5b-c79a-4413-a0b0-c6c552452c46",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 2",
@@ -758,14 +758,14 @@
                 ]
               },
               {
-                "id": "34a1192f-0c5b-4e17-b350-ef52c0fed768",
+                "id": "9a8c0688-c303-48eb-ad0f-5691eb88c068",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "8839fa3c-704f-44f8-bff0-9bbea2da7c5d",
+                    "id": "fa73cd76-18d7-46e1-a510-e4d6b86898fe",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -780,7 +780,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "f84d56aa-09d8-4b2d-a78d-51d1af40fb0d",
+                        "id": "bea4074c-d144-49e3-aab0-c41ba471f196",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 3",
@@ -792,14 +792,14 @@
                 ]
               },
               {
-                "id": "c932a001-c5ed-4197-91c9-f9ae5b4202c0",
+                "id": "5266d98a-18e2-47f1-9ad1-815522a91a11",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "2f6cd402-cbef-4d92-af9e-6c59cd249d90",
+                    "id": "b46f6284-804b-4a82-8b12-64889855f104",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -814,7 +814,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "4f2e8f8f-4a5f-4754-8c4f-7f8f751e7b2b",
+                        "id": "978d6077-999d-4c8e-bb20-bbd09d364c94",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 4",
@@ -842,7 +842,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "df1f43a1-97c1-44e7-a70c-6864b8ef91dc",
+        "id": "45fb226c-aebe-4ed4-b318-e39da32555aa",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -855,7 +855,7 @@
         },
         "innerBlocks": [
           {
-            "id": "f9b0f0fe-f675-4d65-859b-24ee575aa4cc",
+            "id": "a05a318d-ed91-45f5-b68c-6647243c0c9a",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -870,7 +870,7 @@
             },
             "innerBlocks": [
               {
-                "id": "800fe55b-249d-43dc-899b-5cdb1296c87f",
+                "id": "7fbbfc2d-66be-4cc9-9a45-bb57d726c8a0",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Opacity Test",
@@ -881,7 +881,7 @@
             ]
           },
           {
-            "id": "f3fc4275-f669-4c88-839a-2c88545731f9",
+            "id": "3d4ce906-1449-440a-845c-e37a9bb0b2fe",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -897,7 +897,7 @@
             },
             "innerBlocks": [
               {
-                "id": "b9c009d8-21c8-4c2c-a6b1-1d18616db019",
+                "id": "df53867e-2daf-4cc9-a86a-8307183d19dd",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Drop Shadow Test",
@@ -908,7 +908,7 @@
             ]
           },
           {
-            "id": "6de6091a-fe7c-4160-bb5b-90e4e68d39b6",
+            "id": "06e8731d-4898-4fff-ab24-d678de3d2280",
             "type": "o4o/group",
             "attributes": {
               "layout": "flex",
@@ -917,7 +917,7 @@
             },
             "innerBlocks": [
               {
-                "id": "0110e08b-4c6b-48e0-a865-4ee4894d199a",
+                "id": "b5b22f18-94e4-47d1-81a9-23f164996f5e",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -933,7 +933,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "248a775f-a188-475c-a171-c45c6ea8471f",
+                "id": "75ff78b3-96e1-47fa-9a4e-9a81141fe26b",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -949,7 +949,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "113f62f4-7778-4ffe-8337-218fd33ca6df",
+                "id": "1eb05e15-cc68-477d-a9e7-1bed9c51f91a",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -965,7 +965,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "d159c5ca-4e55-43f8-8bfe-5c5d476a113c",
+                "id": "9483ca0b-ef1c-4f31-8cf1-400e5782e31d",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -983,7 +983,7 @@
             ]
           },
           {
-            "id": "994b4e16-ea0c-4989-8b62-ef2f573223ee",
+            "id": "ba127792-5668-4ff6-ad17-e8252cfc937a",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 5,
@@ -992,14 +992,14 @@
             },
             "innerBlocks": [
               {
-                "id": "b2d81b53-07c4-40d7-b0e1-a7516cf1f59b",
+                "id": "ebc9fa1c-4f7d-4eac-8607-1139c50e48a7",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "eea60935-5d92-493c-abc5-ecc74663b71d",
+                    "id": "211b707a-fe01-4880-8646-740bafd0175b",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1017,14 +1017,14 @@
                 ]
               },
               {
-                "id": "012e185c-04a6-48dd-bf8e-49ee1d90e42b",
+                "id": "9df7ea5f-a55e-4f59-ab04-1d8e96435ac3",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "1c4d0440-76aa-462e-b821-356da331e9d1",
+                    "id": "5f2e7151-84a0-4605-b9b0-c2ec4aee0587",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1042,14 +1042,14 @@
                 ]
               },
               {
-                "id": "5948a2b2-2402-4b2e-9e93-45f0eca772e2",
+                "id": "8016ce7c-c322-4b56-93fb-5ee9e18dfdff",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "a7c1adea-4ff0-4a0a-b78f-33ca974d62e5",
+                    "id": "7a89fd5c-be44-46ee-a121-cd50d0c68038",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1067,14 +1067,14 @@
                 ]
               },
               {
-                "id": "b760bdf8-eb86-4cab-92eb-84d1776fe745",
+                "id": "a56d61a1-5773-403a-bc8c-36b1df2895a4",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "8d02a705-5aae-4ce1-b294-1828bd407cfd",
+                    "id": "8389b02c-d2de-469a-a624-572429dacbd7",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1092,14 +1092,14 @@
                 ]
               },
               {
-                "id": "51168e9b-8cc8-40d8-ae1d-dac1f7206391",
+                "id": "0b70f8a2-1a67-4a5d-830c-de2128d40069",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "aa2254ed-d2a4-447a-8bbb-cc908e14960f",
+                    "id": "0a0d2b95-8e46-4a8b-909a-2ac48b186d6e",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1119,7 +1119,7 @@
             ]
           },
           {
-            "id": "f87abad7-c773-4d1e-aafe-061250a1f183",
+            "id": "79950e3a-a884-4e8f-8087-6a15b13f350d",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -1129,11 +1129,12 @@
                 "bottom": 48,
                 "left": 48
               },
-              "borderRadius": 8
+              "borderRadius": 8,
+              "position": "relative"
             },
             "innerBlocks": [
               {
-                "id": "03f138b8-deb2-457f-8972-a2e9d6748003",
+                "id": "1f87af8c-4ae6-42df-a5cd-932fd0761354",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Relative Container",
@@ -1142,7 +1143,7 @@
                 }
               },
               {
-                "id": "843a91ce-d82e-474e-b63f-03a56977d9b8",
+                "id": "316b7072-f89b-4117-8682-8875bcc8057b",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -1153,12 +1154,15 @@
                     "bottom": 4
                   },
                   "backgroundColor": "#ef4444",
-                  "borderRadius": 4
+                  "borderRadius": 4,
+                  "position": "absolute",
+                  "top": 8,
+                  "right": 8
                 },
                 "innerBlocks": []
               },
               {
-                "id": "c847bb96-f68d-4172-904e-abfdde3fdca2",
+                "id": "433c7fa7-57ce-41ad-af0f-1f682c800199",
                 "type": "o4o/paragraph",
                 "attributes": {
                   "content": "Some content here"
@@ -1167,7 +1171,7 @@
             ]
           },
           {
-            "id": "ce4189d9-0892-41bc-a527-8c1e9a7a8397",
+            "id": "a9b256f8-bdaa-4bfd-8b4a-88950977b2b5",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -1183,7 +1187,7 @@
             },
             "innerBlocks": [
               {
-                "id": "cc1082f0-f65f-49d8-ac04-d42790f7f6d6",
+                "id": "5cb3d789-4889-403f-ad40-766dd5034b20",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Backdrop Blur Test",
@@ -1192,7 +1196,7 @@
                 }
               },
               {
-                "id": "69fdfee3-39c5-4d73-8bf3-f244fc527f5b",
+                "id": "6ff51c9b-114a-404e-8fb8-0c6631c0033e",
                 "type": "o4o/paragraph",
                 "attributes": {
                   "content": "This has backdrop blur effect",
@@ -1209,5 +1213,409 @@
     "file": "06-invalid-jsx.tsx",
     "status": "validation_error",
     "error": "JSX parsing failed: Unterminated JSX contents. (12:10)"
+  },
+  {
+    "file": "07-image-list-quote.tsx",
+    "status": "success",
+    "stats": {
+      "totalBlocks": 38,
+      "placeholderCount": 0,
+      "successfulConversions": 38
+    },
+    "placeholders": [],
+    "blocks": [
+      {
+        "id": "fe64580a-72f8-472e-8047-ee91295b413b",
+        "type": "o4o/group",
+        "attributes": {
+          "layout": "flow",
+          "padding": {
+            "left": 16,
+            "right": 16,
+            "top": 64,
+            "bottom": 64
+          }
+        },
+        "innerBlocks": [
+          {
+            "id": "390bd120-b472-4522-9c8c-7ef4815ddfd8",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow"
+            },
+            "innerBlocks": [
+              {
+                "id": "1afc18cd-823b-415b-917f-b7aa2ec2e9be",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Image Block Tests",
+                  "level": 1,
+                  "align": "center",
+                  "fontSize": 36
+                }
+              },
+              {
+                "id": "6a95d81f-94c6-479a-84a6-01a7570a8030",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow"
+                },
+                "innerBlocks": [
+                  {
+                    "id": "fd8a3a4e-05b7-470d-960b-67f1e3033b5a",
+                    "type": "o4o/image",
+                    "attributes": {
+                      "url": "https://via.placeholder.com/800x400",
+                      "alt": "Placeholder image",
+                      "width": "100%"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "b2ad3541-155f-49d7-b738-c08682b57fe5",
+                "type": "o4o/columns",
+                "attributes": {
+                  "columnCount": 3,
+                  "gap": 16,
+                  "isStackedOnMobile": true
+                },
+                "innerBlocks": [
+                  {
+                    "id": "72682dcd-ec06-4a19-a980-751f395593b3",
+                    "type": "o4o/column",
+                    "attributes": {
+                      "width": 33.33
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "eac101e0-d140-4285-a308-cf3940b504ed",
+                        "type": "o4o/image",
+                        "attributes": {
+                          "url": "https://via.placeholder.com/300x200",
+                          "alt": "Cover image",
+                          "width": "100%",
+                          "height": 192,
+                          "objectFit": "cover",
+                          "borderRadius": 8
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "92f78276-6724-41d1-9c7e-32f61bb95ac6",
+                    "type": "o4o/column",
+                    "attributes": {
+                      "width": 33.33
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "38c82494-7b1d-446c-b8d1-7197779c3470",
+                        "type": "o4o/image",
+                        "attributes": {
+                          "url": "https://via.placeholder.com/300x200",
+                          "alt": "Contain image",
+                          "width": "100%",
+                          "height": 192,
+                          "objectFit": "contain",
+                          "borderRadius": 12
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "9eb86058-e17f-4dc7-80f3-2342437ca5a0",
+                    "type": "o4o/column",
+                    "attributes": {
+                      "width": 33.33
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "380e72f9-7979-4de0-8e0b-38085afbaf62",
+                        "type": "o4o/image",
+                        "attributes": {
+                          "url": "https://via.placeholder.com/300x200",
+                          "alt": "Shadow image",
+                          "width": "100%",
+                          "height": 192,
+                          "objectFit": "cover",
+                          "borderRadius": 9999,
+                          "shadow": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "6eda608b-97b2-4878-8f1f-eaf706d72a09",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow"
+            },
+            "innerBlocks": [
+              {
+                "id": "7da087a8-c0e4-4725-b582-37b0df7fedf0",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "List Block Tests",
+                  "level": 2,
+                  "fontSize": 30
+                }
+              },
+              {
+                "id": "bf90061b-e6ac-4218-a417-4935ebbaee2e",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow"
+                },
+                "innerBlocks": [
+                  {
+                    "id": "ce396585-19f2-48e9-aae9-4d647c664e4c",
+                    "type": "o4o/heading",
+                    "attributes": {
+                      "content": "Features",
+                      "level": 3,
+                      "fontSize": 20
+                    }
+                  },
+                  {
+                    "id": "b2e6fc48-4a11-460e-a6a6-0534c1f15088",
+                    "type": "o4o/list",
+                    "attributes": {
+                      "type": "unordered",
+                      "content": "Fast and reliable performance\nSecure authentication system\nReal-time data synchronization\nResponsive design"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "57c0dff5-66d6-44e8-a965-6fd38c1f3b8d",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow"
+                },
+                "innerBlocks": [
+                  {
+                    "id": "1daf7f74-506e-4293-9b9e-43b881df4ec8",
+                    "type": "o4o/heading",
+                    "attributes": {
+                      "content": "Installation Steps",
+                      "level": 3,
+                      "fontSize": 20
+                    }
+                  },
+                  {
+                    "id": "7dadaa0f-bd9a-467d-99cd-42f1b4bd53ac",
+                    "type": "o4o/list",
+                    "attributes": {
+                      "type": "ordered",
+                      "content": "Download the package\nInstall dependencies\nConfigure environment variables\nRun the application"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "aa049252-021d-4ec7-8947-8971a46ad034",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow"
+                },
+                "innerBlocks": [
+                  {
+                    "id": "8438a742-8163-43b2-8388-a72b9586073a",
+                    "type": "o4o/heading",
+                    "attributes": {
+                      "content": "Project Structure",
+                      "level": 3,
+                      "fontSize": 20
+                    }
+                  },
+                  {
+                    "id": "fe6efe96-975c-4bc4-9822-8380279034e0",
+                    "type": "o4o/list",
+                    "attributes": {
+                      "type": "unordered",
+                      "content": "FrontendReact componentsTailwind CSSState management\nBackendNode.js serverDatabase modelsAPI routes"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "8ebc13d9-6aed-4266-a7d3-6449e5cf5317",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow"
+            },
+            "innerBlocks": [
+              {
+                "id": "7e510b38-bc2f-472f-9624-4854a46cfe8a",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Quote Block Tests",
+                  "level": 2,
+                  "fontSize": 30
+                }
+              },
+              {
+                "id": "944234aa-6adf-447c-82aa-73d2bbf99e45",
+                "type": "o4o/quote",
+                "attributes": {
+                  "quote": "\"The best way to predict the future is to invent it.\"",
+                  "padding": {
+                    "top": 8,
+                    "bottom": 8,
+                    "left": 16
+                  },
+                  "borderLeft": {
+                    "width": 4
+                  }
+                }
+              },
+              {
+                "id": "332365e5-79c7-497b-9731-23cba3472407",
+                "type": "o4o/quote",
+                "attributes": {
+                  "quote": "\"Stay hungry, stay foolish.\"— Steve Jobs",
+                  "backgroundColor": "#f9fafb",
+                  "padding": {
+                    "top": 16,
+                    "bottom": 16,
+                    "left": 24
+                  },
+                  "borderLeft": {
+                    "width": 4
+                  },
+                  "borderRadius": 4
+                }
+              },
+              {
+                "id": "188971c1-d7ce-441d-89d2-97e72605c132",
+                "type": "o4o/quote",
+                "attributes": {
+                  "quote": "\"Innovation distinguishes between a leader and a follower.\"— Steve Jobs, Apple Inc.",
+                  "padding": {
+                    "top": 24,
+                    "bottom": 24,
+                    "left": 24
+                  },
+                  "borderLeft": {
+                    "width": 4
+                  },
+                  "borderRadius": 8,
+                  "shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+                }
+              }
+            ]
+          },
+          {
+            "id": "73d344e4-7046-4dd2-a91d-70bf3c6b6222",
+            "type": "o4o/columns",
+            "attributes": {
+              "columnCount": 2,
+              "gap": 32,
+              "isStackedOnMobile": true
+            },
+            "innerBlocks": [
+              {
+                "id": "882f7f39-0a4a-4032-b013-79835d1293fb",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 50
+                },
+                "innerBlocks": [
+                  {
+                    "id": "6ee994de-7947-49c3-8d80-7b75d0b19dff",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow"
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "ac742d66-1b80-485a-8102-46b62344bd17",
+                        "type": "o4o/image",
+                        "attributes": {
+                          "url": "https://via.placeholder.com/400x300",
+                          "alt": "Article image",
+                          "width": "100%",
+                          "height": 256,
+                          "objectFit": "cover",
+                          "borderRadius": 8,
+                          "shadow": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+                        }
+                      },
+                      {
+                        "id": "a10c0222-f1ab-4b20-9703-6f2986e171f6",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Article Title",
+                          "level": 3,
+                          "fontSize": 24
+                        }
+                      },
+                      {
+                        "id": "3968af3a-f0cf-41e1-989a-770d9196f6f6",
+                        "type": "o4o/list",
+                        "attributes": {
+                          "type": "unordered",
+                          "content": "Key point one\nKey point two\nKey point three",
+                          "textColor": "#374151"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "3d7b7576-ecbf-4f12-861c-f81405ead7ae",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 50
+                },
+                "innerBlocks": [
+                  {
+                    "id": "6cd90a6b-7c71-4d46-8f68-3c6f3f8bed74",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow"
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "eece30c9-af6a-44bd-8705-f2bda968d7d1",
+                        "type": "o4o/quote",
+                        "attributes": {
+                          "quote": "\"Quality is not an act, it is a habit.\"",
+                          "padding": {
+                            "top": 8,
+                            "bottom": 8,
+                            "left": 16
+                          },
+                          "borderLeft": {
+                            "width": 4
+                          }
+                        }
+                      },
+                      {
+                        "id": "6b49e6d0-7d94-4340-9da7-dd8a352d6a2e",
+                        "type": "o4o/list",
+                        "attributes": {
+                          "type": "ordered",
+                          "content": "Step one: Research\nStep two: Plan\nStep three: Execute\nStep four: Review",
+                          "textColor": "#374151"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

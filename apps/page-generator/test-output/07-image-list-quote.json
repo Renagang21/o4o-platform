@@ -1,0 +1,402 @@
+{
+  "blocks": [
+    {
+      "id": "fe64580a-72f8-472e-8047-ee91295b413b",
+      "type": "o4o/group",
+      "attributes": {
+        "layout": "flow",
+        "padding": {
+          "left": 16,
+          "right": 16,
+          "top": 64,
+          "bottom": 64
+        }
+      },
+      "innerBlocks": [
+        {
+          "id": "390bd120-b472-4522-9c8c-7ef4815ddfd8",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow"
+          },
+          "innerBlocks": [
+            {
+              "id": "1afc18cd-823b-415b-917f-b7aa2ec2e9be",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Image Block Tests",
+                "level": 1,
+                "align": "center",
+                "fontSize": 36
+              }
+            },
+            {
+              "id": "6a95d81f-94c6-479a-84a6-01a7570a8030",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow"
+              },
+              "innerBlocks": [
+                {
+                  "id": "fd8a3a4e-05b7-470d-960b-67f1e3033b5a",
+                  "type": "o4o/image",
+                  "attributes": {
+                    "url": "https://via.placeholder.com/800x400",
+                    "alt": "Placeholder image",
+                    "width": "100%"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "b2ad3541-155f-49d7-b738-c08682b57fe5",
+              "type": "o4o/columns",
+              "attributes": {
+                "columnCount": 3,
+                "gap": 16,
+                "isStackedOnMobile": true
+              },
+              "innerBlocks": [
+                {
+                  "id": "72682dcd-ec06-4a19-a980-751f395593b3",
+                  "type": "o4o/column",
+                  "attributes": {
+                    "width": 33.33
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "eac101e0-d140-4285-a308-cf3940b504ed",
+                      "type": "o4o/image",
+                      "attributes": {
+                        "url": "https://via.placeholder.com/300x200",
+                        "alt": "Cover image",
+                        "width": "100%",
+                        "height": 192,
+                        "objectFit": "cover",
+                        "borderRadius": 8
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "92f78276-6724-41d1-9c7e-32f61bb95ac6",
+                  "type": "o4o/column",
+                  "attributes": {
+                    "width": 33.33
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "38c82494-7b1d-446c-b8d1-7197779c3470",
+                      "type": "o4o/image",
+                      "attributes": {
+                        "url": "https://via.placeholder.com/300x200",
+                        "alt": "Contain image",
+                        "width": "100%",
+                        "height": 192,
+                        "objectFit": "contain",
+                        "borderRadius": 12
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "9eb86058-e17f-4dc7-80f3-2342437ca5a0",
+                  "type": "o4o/column",
+                  "attributes": {
+                    "width": 33.33
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "380e72f9-7979-4de0-8e0b-38085afbaf62",
+                      "type": "o4o/image",
+                      "attributes": {
+                        "url": "https://via.placeholder.com/300x200",
+                        "alt": "Shadow image",
+                        "width": "100%",
+                        "height": 192,
+                        "objectFit": "cover",
+                        "borderRadius": 9999,
+                        "shadow": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "6eda608b-97b2-4878-8f1f-eaf706d72a09",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow"
+          },
+          "innerBlocks": [
+            {
+              "id": "7da087a8-c0e4-4725-b582-37b0df7fedf0",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "List Block Tests",
+                "level": 2,
+                "fontSize": 30
+              }
+            },
+            {
+              "id": "bf90061b-e6ac-4218-a417-4935ebbaee2e",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow"
+              },
+              "innerBlocks": [
+                {
+                  "id": "ce396585-19f2-48e9-aae9-4d647c664e4c",
+                  "type": "o4o/heading",
+                  "attributes": {
+                    "content": "Features",
+                    "level": 3,
+                    "fontSize": 20
+                  }
+                },
+                {
+                  "id": "b2e6fc48-4a11-460e-a6a6-0534c1f15088",
+                  "type": "o4o/list",
+                  "attributes": {
+                    "type": "unordered",
+                    "content": "Fast and reliable performance\nSecure authentication system\nReal-time data synchronization\nResponsive design"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "57c0dff5-66d6-44e8-a965-6fd38c1f3b8d",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow"
+              },
+              "innerBlocks": [
+                {
+                  "id": "1daf7f74-506e-4293-9b9e-43b881df4ec8",
+                  "type": "o4o/heading",
+                  "attributes": {
+                    "content": "Installation Steps",
+                    "level": 3,
+                    "fontSize": 20
+                  }
+                },
+                {
+                  "id": "7dadaa0f-bd9a-467d-99cd-42f1b4bd53ac",
+                  "type": "o4o/list",
+                  "attributes": {
+                    "type": "ordered",
+                    "content": "Download the package\nInstall dependencies\nConfigure environment variables\nRun the application"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "aa049252-021d-4ec7-8947-8971a46ad034",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow"
+              },
+              "innerBlocks": [
+                {
+                  "id": "8438a742-8163-43b2-8388-a72b9586073a",
+                  "type": "o4o/heading",
+                  "attributes": {
+                    "content": "Project Structure",
+                    "level": 3,
+                    "fontSize": 20
+                  }
+                },
+                {
+                  "id": "fe6efe96-975c-4bc4-9822-8380279034e0",
+                  "type": "o4o/list",
+                  "attributes": {
+                    "type": "unordered",
+                    "content": "FrontendReact componentsTailwind CSSState management\nBackendNode.js serverDatabase modelsAPI routes"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "8ebc13d9-6aed-4266-a7d3-6449e5cf5317",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow"
+          },
+          "innerBlocks": [
+            {
+              "id": "7e510b38-bc2f-472f-9624-4854a46cfe8a",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Quote Block Tests",
+                "level": 2,
+                "fontSize": 30
+              }
+            },
+            {
+              "id": "944234aa-6adf-447c-82aa-73d2bbf99e45",
+              "type": "o4o/quote",
+              "attributes": {
+                "quote": "\"The best way to predict the future is to invent it.\"",
+                "padding": {
+                  "top": 8,
+                  "bottom": 8,
+                  "left": 16
+                },
+                "borderLeft": {
+                  "width": 4
+                }
+              }
+            },
+            {
+              "id": "332365e5-79c7-497b-9731-23cba3472407",
+              "type": "o4o/quote",
+              "attributes": {
+                "quote": "\"Stay hungry, stay foolish.\"— Steve Jobs",
+                "backgroundColor": "#f9fafb",
+                "padding": {
+                  "top": 16,
+                  "bottom": 16,
+                  "left": 24
+                },
+                "borderLeft": {
+                  "width": 4
+                },
+                "borderRadius": 4
+              }
+            },
+            {
+              "id": "188971c1-d7ce-441d-89d2-97e72605c132",
+              "type": "o4o/quote",
+              "attributes": {
+                "quote": "\"Innovation distinguishes between a leader and a follower.\"— Steve Jobs, Apple Inc.",
+                "padding": {
+                  "top": 24,
+                  "bottom": 24,
+                  "left": 24
+                },
+                "borderLeft": {
+                  "width": 4
+                },
+                "borderRadius": 8,
+                "shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "73d344e4-7046-4dd2-a91d-70bf3c6b6222",
+          "type": "o4o/columns",
+          "attributes": {
+            "columnCount": 2,
+            "gap": 32,
+            "isStackedOnMobile": true
+          },
+          "innerBlocks": [
+            {
+              "id": "882f7f39-0a4a-4032-b013-79835d1293fb",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 50
+              },
+              "innerBlocks": [
+                {
+                  "id": "6ee994de-7947-49c3-8d80-7b75d0b19dff",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow"
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "ac742d66-1b80-485a-8102-46b62344bd17",
+                      "type": "o4o/image",
+                      "attributes": {
+                        "url": "https://via.placeholder.com/400x300",
+                        "alt": "Article image",
+                        "width": "100%",
+                        "height": 256,
+                        "objectFit": "cover",
+                        "borderRadius": 8,
+                        "shadow": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+                      }
+                    },
+                    {
+                      "id": "a10c0222-f1ab-4b20-9703-6f2986e171f6",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Article Title",
+                        "level": 3,
+                        "fontSize": 24
+                      }
+                    },
+                    {
+                      "id": "3968af3a-f0cf-41e1-989a-770d9196f6f6",
+                      "type": "o4o/list",
+                      "attributes": {
+                        "type": "unordered",
+                        "content": "Key point one\nKey point two\nKey point three",
+                        "textColor": "#374151"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "3d7b7576-ecbf-4f12-861c-f81405ead7ae",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 50
+              },
+              "innerBlocks": [
+                {
+                  "id": "6cd90a6b-7c71-4d46-8f68-3c6f3f8bed74",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow"
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "eece30c9-af6a-44bd-8705-f2bda968d7d1",
+                      "type": "o4o/quote",
+                      "attributes": {
+                        "quote": "\"Quality is not an act, it is a habit.\"",
+                        "padding": {
+                          "top": 8,
+                          "bottom": 8,
+                          "left": 16
+                        },
+                        "borderLeft": {
+                          "width": 4
+                        }
+                      }
+                    },
+                    {
+                      "id": "6b49e6d0-7d94-4340-9da7-dd8a352d6a2e",
+                      "type": "o4o/list",
+                      "attributes": {
+                        "type": "ordered",
+                        "content": "Step one: Research\nStep two: Plan\nStep three: Execute\nStep four: Review",
+                        "textColor": "#374151"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": [],
+  "stats": {
+    "totalBlocks": 38,
+    "placeholderCount": 0,
+    "successfulConversions": 38
+  }
+}

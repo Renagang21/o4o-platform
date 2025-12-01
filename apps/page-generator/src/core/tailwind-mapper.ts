@@ -429,4 +429,173 @@ export class TailwindMapper {
     if (className.includes('backdrop-blur')) return 'blur(8px)'; // default
     return undefined;
   }
+
+  /**
+   * Parse object-fit from Tailwind classes
+   * Example: "object-cover" → "cover"
+   */
+  static parseObjectFit(className: string): 'contain' | 'cover' | 'fill' | 'none' | 'scale-down' | undefined {
+    if (className.includes('object-contain')) return 'contain';
+    if (className.includes('object-cover')) return 'cover';
+    if (className.includes('object-fill')) return 'fill';
+    if (className.includes('object-none')) return 'none';
+    if (className.includes('object-scale-down')) return 'scale-down';
+    return undefined;
+  }
+
+  /**
+   * Parse border-left from Tailwind classes
+   * Example: "border-l-4" → { width: 4 }
+   * Example: "border-l-4 border-blue-500" → { width: 4, color: "#2563eb" }
+   */
+  static parseBorderLeft(className: string): { width?: number; color?: string } | undefined {
+    const borderLeft: { width?: number; color?: string } = {};
+
+    // border-l-{width}
+    const widthMatch = className.match(/\bborder-l(?:-(\d+))?/);
+    if (widthMatch) {
+      borderLeft.width = widthMatch[1] ? parseInt(widthMatch[1]) : 1;
+    }
+
+    // border-{color}
+    const colorMatch = className.match(/\bborder-([\w-]+)/);
+    if (colorMatch && colorMatch[1] in COLOR_MAP && !colorMatch[1].startsWith('l')) {
+      borderLeft.color = COLOR_MAP[colorMatch[1]];
+    }
+
+    return Object.keys(borderLeft).length > 0 ? borderLeft : undefined;
+  }
+
+  /**
+   * Parse position from Tailwind classes
+   * Example: "absolute" → "absolute"
+   */
+  static parsePosition(className: string): 'relative' | 'absolute' | 'fixed' | 'sticky' | undefined {
+    if (className.includes('absolute')) return 'absolute';
+    if (className.includes('fixed')) return 'fixed';
+    if (className.includes('sticky')) return 'sticky';
+    if (className.includes('relative')) return 'relative';
+    return undefined;
+  }
+
+  /**
+   * Parse inset values from Tailwind classes
+   * Example: "inset-0" → { top: 0, right: 0, bottom: 0, left: 0 }
+   * Example: "inset-x-4" → { left: 16, right: 16 }
+   * Example: "inset-y-2" → { top: 8, bottom: 8 }
+   */
+  static parseInset(className: string): {
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+  } | undefined {
+    const inset: { top?: number; right?: number; bottom?: number; left?: number } = {};
+
+    // inset-{n} (all sides)
+    const insetMatch = className.match(/\binset-(\d+)/);
+    if (insetMatch) {
+      const value = parseInt(insetMatch[1]) * 4;
+      return { top: value, right: value, bottom: value, left: value };
+    }
+
+    // inset-x-{n} (left and right)
+    const insetXMatch = className.match(/\binset-x-(\d+)/);
+    if (insetXMatch) {
+      const value = parseInt(insetXMatch[1]) * 4;
+      inset.left = value;
+      inset.right = value;
+    }
+
+    // inset-y-{n} (top and bottom)
+    const insetYMatch = className.match(/\binset-y-(\d+)/);
+    if (insetYMatch) {
+      const value = parseInt(insetYMatch[1]) * 4;
+      inset.top = value;
+      inset.bottom = value;
+    }
+
+    return Object.keys(inset).length > 0 ? inset : undefined;
+  }
+
+  /**
+   * Parse individual position values from Tailwind classes
+   * Example: "top-4" → { top: 16 }
+   * Example: "bottom-2 left-6" → { bottom: 8, left: 24 }
+   */
+  static parsePositionValues(className: string): {
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+  } | undefined {
+    const position: { top?: number; right?: number; bottom?: number; left?: number } = {};
+
+    // top-{n}
+    const topMatch = className.match(/\btop-(\d+)/);
+    if (topMatch) {
+      position.top = parseInt(topMatch[1]) * 4;
+    }
+
+    // right-{n}
+    const rightMatch = className.match(/\bright-(\d+)/);
+    if (rightMatch) {
+      position.right = parseInt(rightMatch[1]) * 4;
+    }
+
+    // bottom-{n}
+    const bottomMatch = className.match(/\bbottom-(\d+)/);
+    if (bottomMatch) {
+      position.bottom = parseInt(bottomMatch[1]) * 4;
+    }
+
+    // left-{n}
+    const leftMatch = className.match(/\bleft-(\d+)/);
+    if (leftMatch) {
+      position.left = parseInt(leftMatch[1]) * 4;
+    }
+
+    return Object.keys(position).length > 0 ? position : undefined;
+  }
+
+  /**
+   * Parse z-index from Tailwind classes
+   * Example: "z-10" → 10
+   * Example: "z-50" → 50
+   */
+  static parseZIndex(className: string): number | undefined {
+    const match = className.match(/\bz-(\d+)/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse column span from Tailwind classes
+   * Example: "col-span-2" → 2
+   * Example: "col-span-full" → 12
+   */
+  static parseColSpan(className: string): number | undefined {
+    if (className.includes('col-span-full')) return 12;
+    const match = className.match(/\bcol-span-(\d+)/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse row span from Tailwind classes
+   * Example: "row-span-2" → 2
+   * Example: "row-span-full" → 6
+   */
+  static parseRowSpan(className: string): number | undefined {
+    if (className.includes('row-span-full')) return 6;
+    const match = className.match(/\brow-span-(\d+)/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return undefined;
+  }
 }
