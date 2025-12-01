@@ -1,7 +1,7 @@
 {
   "blocks": [
     {
-      "id": "ed65e4c2-a8eb-491d-ba83-6489394cce98",
+      "id": "5344cb4b-ec55-44d2-a62b-ba2b0795c34f",
       "type": "o4o/group",
       "attributes": {
         "layout": "flow",
@@ -14,7 +14,7 @@
       },
       "innerBlocks": [
         {
-          "id": "9e6069b3-0a64-4ad7-84bd-211c85fc13c1",
+          "id": "5219e196-555f-46e7-b220-2e02661d3d3f",
           "type": "o4o/heading",
           "attributes": {
             "content": "Welcome to O4O Platform",
@@ -24,7 +24,7 @@
           }
         },
         {
-          "id": "9ac97ee5-e7c0-4be9-86ea-5b560fb9ac05",
+          "id": "e7fc0d6f-293b-4a21-9819-a9c6ae590360",
           "type": "o4o/paragraph",
           "attributes": {
             "content": "Build amazing websites with AI-powered page generation",
@@ -33,7 +33,7 @@
           }
         },
         {
-          "id": "cb5d0166-8190-4a20-9cd4-aee7d21bc879",
+          "id": "218568ec-08ea-423c-ac25-c02443f31c49",
           "type": "o4o/group",
           "attributes": {
             "layout": "flex",
@@ -41,7 +41,7 @@
           },
           "innerBlocks": [
             {
-              "id": "eb69b200-fa8f-4a2e-88fc-445d9807d8b7",
+              "id": "af64b652-ba07-44a6-979a-5b180b508b3a",
               "type": "o4o/button",
               "attributes": {
                 "text": "Get Started",

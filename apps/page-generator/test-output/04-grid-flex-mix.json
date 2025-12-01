@@ -1,7 +1,7 @@
 {
   "blocks": [
     {
-      "id": "11c4466f-629c-4f4c-baea-1a4784a49c31",
+      "id": "b5d99661-c2f1-44d9-8b2e-e1f359c2eb69",
       "type": "o4o/group",
       "attributes": {
         "layout": "flow",
@@ -14,7 +14,7 @@
       },
       "innerBlocks": [
         {
-          "id": "54aafaa3-7086-4619-b5e7-9d66187fee40",
+          "id": "53d152cd-db6e-4885-8954-5e8557a04682",
           "type": "o4o/heading",
           "attributes": {
             "content": "Features",
@@ -24,7 +24,7 @@
           }
         },
         {
-          "id": "103ae8e7-0b34-4688-bb41-1ae53036f654",
+          "id": "48dc706f-91b1-4a8a-ac69-4a33b13ba2dc",
           "type": "o4o/columns",
           "attributes": {
             "columnCount": 2,
@@ -33,14 +33,14 @@
           },
           "innerBlocks": [
             {
-              "id": "d2b438c7-8079-4394-adb7-62467e8d237d",
+              "id": "87049394-917b-428a-b549-16a401b6b728",
               "type": "o4o/column",
               "attributes": {
                 "width": 50
               },
               "innerBlocks": [
                 {
-                  "id": "fa91cbdf-ad29-440f-bbe5-bda554e193bc",
+                  "id": "be4e6bf0-f7a9-45e7-95f4-85271f0485b5",
                   "type": "o4o/group",
                   "attributes": {
                     "layout": "flex",
@@ -57,7 +57,7 @@
                   },
                   "innerBlocks": [
                     {
-                      "id": "8ec9cd93-d5d9-4359-bd89-f7e65a864775",
+                      "id": "b73f0c65-5541-4070-aaf1-2c4cfe01e281",
                       "type": "o4o/heading",
                       "attributes": {
                         "content": "Design Tools",
@@ -66,7 +66,7 @@
                       }
                     },
                     {
-                      "id": "def8e68d-acc6-4e17-b490-731f926e77ff",
+                      "id": "c59e9279-9336-4de9-bdd2-e455d79adc40",
                       "type": "o4o/paragraph",
                       "attributes": {
                         "content": "Create stunning designs with our intuitive tools",
@@ -74,7 +74,7 @@
                       }
                     },
                     {
-                      "id": "4ffd88b6-0fa6-4543-8a0e-be15dee297ec",
+                      "id": "6208b643-c77f-4a6e-af38-dd10f8be325e",
                       "type": "o4o/group",
                       "attributes": {
                         "layout": "flex",
@@ -83,7 +83,7 @@
                       },
                       "innerBlocks": [
                         {
-                          "id": "6b9d1e6a-7204-4407-ac82-385dff945536",
+                          "id": "628e8336-fb59-4409-9015-569bf2c4dbe1",
                           "type": "o4o/button",
                           "attributes": {
                             "text": "Learn More",
@@ -100,7 +100,7 @@
                           }
                         },
                         {
-                          "id": "9938e212-bd66-457b-8477-c90110fd6115",
+                          "id": "721bd8c4-7344-4fc7-9d9e-16c7739b2791",
                           "type": "o4o/button",
                           "attributes": {
                             "text": "Watch Demo",
@@ -123,14 +123,14 @@
               ]
             },
             {
-              "id": "059c4e32-5799-4fbc-b29c-6898767b9906",
+              "id": "89e0b1d9-f2a4-4731-9738-2f7f001ea83e",
               "type": "o4o/column",
               "attributes": {
                 "width": 50
               },
               "innerBlocks": [
                 {
-                  "id": "d6edc3ea-f6b7-46a2-a0c6-5e7510c580f9",
+                  "id": "ece0db10-b414-4083-95ce-708a28033f84",
                   "type": "o4o/group",
                   "attributes": {
                     "layout": "flex",
@@ -148,7 +148,7 @@
                   },
                   "innerBlocks": [
                     {
-                      "id": "3dfc85f9-2f11-44f3-af36-ba4bdcd14bf7",
+                      "id": "53e2efba-6846-4b2c-b4a0-3a84c8cfdc34",
                       "type": "o4o/heading",
                       "attributes": {
                         "content": "Analytics",
@@ -157,7 +157,7 @@
                       }
                     },
                     {
-                      "id": "829fb209-bbf9-45dc-81ae-64954169e4f7",
+                      "id": "4259f820-c3a3-4c00-b7b8-9cd1f46edda0",
                       "type": "o4o/paragraph",
                       "attributes": {
                         "content": "Track your performance with real-time analytics",
@@ -165,7 +165,7 @@
                       }
                     },
                     {
-                      "id": "05ff5598-14e8-40aa-9f77-3df8dc03d41c",
+                      "id": "6a30adb3-638c-459f-8ee6-a5c4320000c6",
                       "type": "o4o/button",
                       "attributes": {
                         "text": "View Dashboard",
@@ -188,7 +188,7 @@
           ]
         },
         {
-          "id": "be5af1cc-a74e-4e77-8638-d47cb16593e6",
+          "id": "2e07d1cc-d31d-4dee-856b-3fdc737911b8",
           "type": "o4o/columns",
           "attributes": {
             "columnCount": 4,
@@ -197,14 +197,14 @@
           },
           "innerBlocks": [
             {
-              "id": "f4a04feb-f4e6-442c-a390-672e0ac725ce",
+              "id": "ea1c7d59-68d5-455b-959f-2a5cad3f3737",
               "type": "o4o/column",
               "attributes": {
                 "width": 25
               },
               "innerBlocks": [
                 {
-                  "id": "9d12529d-fdde-45df-8545-bfdd3adb02c5",
+                  "id": "00f257a7-c32c-463f-8404-50acbcdcd4be",
                   "type": "o4o/group",
                   "attributes": {
                     "layout": "flow",
@@ -219,7 +219,7 @@
                   },
                   "innerBlocks": [
                     {
-                      "id": "6edf6716-8045-4466-9406-124fa27a3bea",
+                      "id": "f2635ad7-a0a3-4492-a14e-b564bd985722",
                       "type": "o4o/heading",
                       "attributes": {
                         "content": "Metric 1",
@@ -231,14 +231,14 @@
               ]
             },
             {
-              "id": "af94b70d-2525-481e-9de8-23992de65df1",
+              "id": "bb38a271-d36c-4f77-aca7-c5942632af16",
               "type": "o4o/column",
               "attributes": {
                 "width": 25
               },
               "innerBlocks": [
                 {
-                  "id": "c2f6062b-ea37-4443-a25a-dbdc6667f148",
+                  "id": "d7a699b6-052a-4016-871d-55ad392a8b10",
                   "type": "o4o/group",
                   "attributes": {
                     "layout": "flow",
@@ -253,7 +253,7 @@
                   },
                   "innerBlocks": [
                     {
-                      "id": "92026e5b-c79a-4413-a0b0-c6c552452c46",
+                      "id": "dff5b079-039d-4c0c-9568-0819b06fd52b",
                       "type": "o4o/heading",
                       "attributes": {
                         "content": "Metric 2",
@@ -265,14 +265,14 @@
               ]
             },
             {
-              "id": "9a8c0688-c303-48eb-ad0f-5691eb88c068",
+              "id": "4c48a0e6-c0c9-4aa0-8471-1b703847f118",
               "type": "o4o/column",
               "attributes": {
                 "width": 25
               },
               "innerBlocks": [
                 {
-                  "id": "fa73cd76-18d7-46e1-a510-e4d6b86898fe",
+                  "id": "3f894cd1-734d-4ddd-a515-8b8e98a24252",
                   "type": "o4o/group",
                   "attributes": {
                     "layout": "flow",
@@ -287,7 +287,7 @@
                   },
                   "innerBlocks": [
                     {
-                      "id": "bea4074c-d144-49e3-aab0-c41ba471f196",
+                      "id": "5702d894-692c-4924-9b52-8a3fa62065bc",
                       "type": "o4o/heading",
                       "attributes": {
                         "content": "Metric 3",
@@ -299,14 +299,14 @@
               ]
             },
             {
-              "id": "5266d98a-18e2-47f1-9ad1-815522a91a11",
+              "id": "73270af5-08d3-4d47-8503-67bc5460bf90",
               "type": "o4o/column",
               "attributes": {
                 "width": 25
               },
               "innerBlocks": [
                 {
-                  "id": "b46f6284-804b-4a82-8b12-64889855f104",
+                  "id": "89692087-ab3b-47d3-ab99-f5f24c49b923",
                   "type": "o4o/group",
                   "attributes": {
                     "layout": "flow",
@@ -321,7 +321,7 @@
                   },
                   "innerBlocks": [
                     {
-                      "id": "978d6077-999d-4c8e-bb20-bbd09d364c94",
+                      "id": "09c5367b-b1f4-44c3-90c7-0c0f3c3fec17",
                       "type": "o4o/heading",
                       "attributes": {
                         "content": "Metric 4",

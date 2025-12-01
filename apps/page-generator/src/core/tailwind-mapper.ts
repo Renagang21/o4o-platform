@@ -598,4 +598,167 @@ export class TailwindMapper {
     }
     return undefined;
   }
+
+  /**
+   * Parse transform from Tailwind classes
+   * Example: "translate-x-4 scale-105 rotate-45" → { translateX: 16, scale: 1.05, rotate: 45 }
+   */
+  static parseTransform(className: string): {
+    translateX?: number;
+    translateY?: number;
+    scale?: number;
+    scaleX?: number;
+    scaleY?: number;
+    rotate?: number;
+    skewX?: number;
+    skewY?: number;
+  } | undefined {
+    const transform: {
+      translateX?: number;
+      translateY?: number;
+      scale?: number;
+      scaleX?: number;
+      scaleY?: number;
+      rotate?: number;
+      skewX?: number;
+      skewY?: number;
+    } = {};
+
+    // translate-x-{n}, translate-y-{n}
+    const translateXMatch = className.match(/\btranslate-x-(-?\d+)/);
+    if (translateXMatch) {
+      transform.translateX = parseInt(translateXMatch[1]) * 4;
+    }
+
+    const translateYMatch = className.match(/\btranslate-y-(-?\d+)/);
+    if (translateYMatch) {
+      transform.translateY = parseInt(translateYMatch[1]) * 4;
+    }
+
+    // scale-{n} (100 = 1.0, 105 = 1.05, 95 = 0.95)
+    const scaleMatch = className.match(/\bscale-(\d+)/);
+    if (scaleMatch) {
+      transform.scale = parseInt(scaleMatch[1]) / 100;
+    }
+
+    // scale-x-{n}, scale-y-{n}
+    const scaleXMatch = className.match(/\bscale-x-(\d+)/);
+    if (scaleXMatch) {
+      transform.scaleX = parseInt(scaleXMatch[1]) / 100;
+    }
+
+    const scaleYMatch = className.match(/\bscale-y-(\d+)/);
+    if (scaleYMatch) {
+      transform.scaleY = parseInt(scaleYMatch[1]) / 100;
+    }
+
+    // rotate-{deg}
+    const rotateMatch = className.match(/\brotate-(-?\d+)/);
+    if (rotateMatch) {
+      transform.rotate = parseInt(rotateMatch[1]);
+    }
+
+    // skew-x-{deg}, skew-y-{deg}
+    const skewXMatch = className.match(/\bskew-x-(-?\d+)/);
+    if (skewXMatch) {
+      transform.skewX = parseInt(skewXMatch[1]);
+    }
+
+    const skewYMatch = className.match(/\bskew-y-(-?\d+)/);
+    if (skewYMatch) {
+      transform.skewY = parseInt(skewYMatch[1]);
+    }
+
+    return Object.keys(transform).length > 0 ? transform : undefined;
+  }
+
+  /**
+   * Parse transform origin from Tailwind classes
+   * Example: "origin-center" → "center"
+   */
+  static parseTransformOrigin(className: string): string | undefined {
+    if (className.includes('origin-center')) return 'center';
+    if (className.includes('origin-top')) return 'top';
+    if (className.includes('origin-top-right')) return 'top right';
+    if (className.includes('origin-right')) return 'right';
+    if (className.includes('origin-bottom-right')) return 'bottom right';
+    if (className.includes('origin-bottom')) return 'bottom';
+    if (className.includes('origin-bottom-left')) return 'bottom left';
+    if (className.includes('origin-left')) return 'left';
+    if (className.includes('origin-top-left')) return 'top left';
+    return undefined;
+  }
+
+  /**
+   * Parse transition from Tailwind classes
+   * Example: "transition duration-300 ease-in-out" → { duration: 300, ease: "ease-in-out" }
+   */
+  static parseTransition(className: string): {
+    property?: string;
+    duration?: number;
+    ease?: string;
+    delay?: number;
+  } | undefined {
+    const transition: {
+      property?: string;
+      duration?: number;
+      ease?: string;
+      delay?: number;
+    } = {};
+
+    // Check if transition is present
+    if (className.includes('transition-none')) return undefined;
+
+    if (className.includes('transition-all')) {
+      transition.property = 'all';
+    } else if (className.includes('transition-colors')) {
+      transition.property = 'colors';
+    } else if (className.includes('transition-opacity')) {
+      transition.property = 'opacity';
+    } else if (className.includes('transition-shadow')) {
+      transition.property = 'shadow';
+    } else if (className.includes('transition-transform')) {
+      transition.property = 'transform';
+    } else if (className.includes('transition')) {
+      transition.property = 'all';
+    }
+
+    // duration-{ms}
+    const durationMatch = className.match(/\bduration-(\d+)/);
+    if (durationMatch) {
+      transition.duration = parseInt(durationMatch[1]);
+    }
+
+    // ease-{type}
+    if (className.includes('ease-linear')) {
+      transition.ease = 'linear';
+    } else if (className.includes('ease-in-out')) {
+      transition.ease = 'ease-in-out';
+    } else if (className.includes('ease-in')) {
+      transition.ease = 'ease-in';
+    } else if (className.includes('ease-out')) {
+      transition.ease = 'ease-out';
+    }
+
+    // delay-{ms}
+    const delayMatch = className.match(/\bdelay-(\d+)/);
+    if (delayMatch) {
+      transition.delay = parseInt(delayMatch[1]);
+    }
+
+    return transition.property ? transition : undefined;
+  }
+
+  /**
+   * Parse animation from Tailwind classes
+   * Example: "animate-spin" → "spin"
+   */
+  static parseAnimation(className: string): string | undefined {
+    if (className.includes('animate-none')) return undefined;
+    if (className.includes('animate-spin')) return 'spin';
+    if (className.includes('animate-ping')) return 'ping';
+    if (className.includes('animate-pulse')) return 'pulse';
+    if (className.includes('animate-bounce')) return 'bounce';
+    return undefined;
+  }
 }

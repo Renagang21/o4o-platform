@@ -154,6 +154,11 @@ function createHeadingBlock(
       backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
       opacity: TailwindMapper.parseOpacity(className),
       shadow: TailwindMapper.parseShadow(className),
+      // Phase 7: Transform/Transition/Animation
+      transform: TailwindMapper.parseTransform(className),
+      transformOrigin: TailwindMapper.parseTransformOrigin(className),
+      transition: TailwindMapper.parseTransition(className),
+      animation: TailwindMapper.parseAnimation(className),
     }),
   };
 }
@@ -182,6 +187,11 @@ function createParagraphBlock(
       backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
       opacity: TailwindMapper.parseOpacity(className),
       shadow: TailwindMapper.parseShadow(className),
+      // Phase 7: Transform/Transition/Animation
+      transform: TailwindMapper.parseTransform(className),
+      transformOrigin: TailwindMapper.parseTransformOrigin(className),
+      transition: TailwindMapper.parseTransition(className),
+      animation: TailwindMapper.parseAnimation(className),
     }),
   };
 }
@@ -203,6 +213,11 @@ function createImageBlock(id: string, element: ReactElement, className: string):
       borderRadius: TailwindMapper.parseBorderRadius(className),
       shadow: TailwindMapper.parseShadow(className),
       opacity: TailwindMapper.parseOpacity(className),
+      // Phase 7: Transform/Transition/Animation
+      transform: TailwindMapper.parseTransform(className),
+      transformOrigin: TailwindMapper.parseTransformOrigin(className),
+      transition: TailwindMapper.parseTransition(className),
+      animation: TailwindMapper.parseAnimation(className),
     }),
   };
 }
@@ -231,6 +246,11 @@ function createButtonBlock(
       padding: TailwindMapper.parsePadding(className),
       opacity: TailwindMapper.parseOpacity(className),
       shadow: TailwindMapper.parseShadow(className),
+      // Phase 7: Transform/Transition/Animation
+      transform: TailwindMapper.parseTransform(className),
+      transformOrigin: TailwindMapper.parseTransformOrigin(className),
+      transition: TailwindMapper.parseTransition(className),
+      animation: TailwindMapper.parseAnimation(className),
     }),
   };
 }
@@ -402,6 +422,11 @@ function createFlexGroupBlock(
       position: TailwindMapper.parsePosition(className),
       ...positioning,
       zIndex: TailwindMapper.parseZIndex(className),
+      // Phase 7: Transform/Transition/Animation
+      transform: TailwindMapper.parseTransform(className),
+      transformOrigin: TailwindMapper.parseTransformOrigin(className),
+      transition: TailwindMapper.parseTransition(className),
+      animation: TailwindMapper.parseAnimation(className),
     }),
     innerBlocks,
   };
@@ -442,6 +467,11 @@ function createFlowGroupBlock(
       position: TailwindMapper.parsePosition(className),
       ...positioning,
       zIndex: TailwindMapper.parseZIndex(className),
+      // Phase 7: Transform/Transition/Animation
+      transform: TailwindMapper.parseTransform(className),
+      transformOrigin: TailwindMapper.parseTransformOrigin(className),
+      transition: TailwindMapper.parseTransition(className),
+      animation: TailwindMapper.parseAnimation(className),
     }),
     innerBlocks,
   };
