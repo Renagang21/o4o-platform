@@ -10,7 +10,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "472d7a35-9b7b-49de-a172-222bcf158286",
+        "id": "24ef7b52-2a87-46c2-9ffe-6c2df85bf957",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -23,7 +23,7 @@
         },
         "innerBlocks": [
           {
-            "id": "4e09070c-c478-4fb0-a527-ef7da0adc8c5",
+            "id": "bd2997c8-f2dc-4e30-85e3-9d9740d226bb",
             "type": "o4o/heading",
             "attributes": {
               "content": "Welcome to O4O Platform",
@@ -33,7 +33,7 @@
             }
           },
           {
-            "id": "93b74929-3380-4fe9-aa1b-f1c6d15243cd",
+            "id": "ee439886-788b-4fb5-bad1-6c17d4379b15",
             "type": "o4o/paragraph",
             "attributes": {
               "content": "Build amazing websites with AI-powered page generation",
@@ -42,16 +42,15 @@
             }
           },
           {
-            "id": "e560e70c-da7d-4624-8dce-d662d1d3778c",
+            "id": "fbaf6c46-f867-4e6f-b8a0-3c1c79209f2f",
             "type": "o4o/group",
             "attributes": {
               "layout": "flex",
-              "justifyContent": "center",
-              "padding": {}
+              "justifyContent": "center"
             },
             "innerBlocks": [
               {
-                "id": "37fd71c8-3b86-413e-b486-bc6864301838",
+                "id": "18395a36-1cde-46a8-9676-1eab0403c6dd",
                 "type": "o4o/button",
                 "attributes": {
                   "text": "Get Started",
@@ -85,16 +84,15 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "919baa41-e80f-4a24-8dcb-a66b62c0dada",
+        "id": "2699e9a1-cdea-4ad3-b37c-c94290ed21c9",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
-          "padding": {},
           "backgroundColor": "#f9fafb"
         },
         "innerBlocks": [
           {
-            "id": "b79195f6-d812-49fd-9276-1b80465d09b1",
+            "id": "54e1376d-7600-4642-aee5-5bd8823a88cc",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -107,7 +105,7 @@
             },
             "innerBlocks": [
               {
-                "id": "f24e2e1c-4891-4006-be6c-c29fac0f352b",
+                "id": "438666ee-e0cd-4c18-b94f-2b53380e4ba0",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Revolutionary Platform",
@@ -117,7 +115,7 @@
                 }
               },
               {
-                "id": "32e6fe22-dc02-4037-977e-530dd95057c9",
+                "id": "8dfee8a8-5ba9-45f8-8821-93bda791ffbb",
                 "type": "o4o/paragraph",
                 "attributes": {
                   "content": "Transform your workflow with cutting-edge technology",
@@ -126,7 +124,7 @@
                 }
               },
               {
-                "id": "32ce4d6f-f846-463c-8a3f-a97471c4fb91",
+                "id": "733f0981-cdc3-4ece-ac5f-9573cd09bab8",
                 "type": "o4o/columns",
                 "attributes": {
                   "columnCount": 3,
@@ -135,14 +133,14 @@
                 },
                 "innerBlocks": [
                   {
-                    "id": "192b90d3-dc7c-45af-bfb5-18103f2d4381",
+                    "id": "925a5d3f-df56-4e7e-90b0-0ded8bc3a368",
                     "type": "o4o/column",
                     "attributes": {
-                      "width": 33.333333333333336
+                      "width": 33.33
                     },
                     "innerBlocks": [
                       {
-                        "id": "1f556984-4f6b-45b5-87c4-0f2bc618a5b0",
+                        "id": "3218a2a7-1f59-40b4-9451-0c5014200645",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flow",
@@ -157,7 +155,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "d5d3b3bd-4356-4160-bcb6-4693dc46e1c9",
+                            "id": "bf10f42b-2e78-435b-a265-9441ecc9fb3f",
                             "type": "o4o/heading",
                             "attributes": {
                               "content": "Fast",
@@ -166,7 +164,7 @@
                             }
                           },
                           {
-                            "id": "04c6469e-f54e-4fcc-acd2-9d0a443921ac",
+                            "id": "7c48f135-a7ce-4fcc-92db-924b6b37220b",
                             "type": "o4o/paragraph",
                             "attributes": {
                               "content": "Lightning-fast performance for your users",
@@ -178,14 +176,14 @@
                     ]
                   },
                   {
-                    "id": "44bbbdd7-e561-49e4-b5f3-1adbff6ec235",
+                    "id": "0e63d9c5-7de9-46d2-9fca-80c38cc3116c",
                     "type": "o4o/column",
                     "attributes": {
-                      "width": 33.333333333333336
+                      "width": 33.33
                     },
                     "innerBlocks": [
                       {
-                        "id": "16150308-af4d-47ab-98ab-dc64a0c4ef6f",
+                        "id": "e7ec5e51-cd15-4978-8a8b-3f20b1074cfa",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flow",
@@ -200,7 +198,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "a6cce538-df5f-43e1-8a9d-b730eefc71b3",
+                            "id": "699f902a-52e4-4b2b-844f-384369956f43",
                             "type": "o4o/heading",
                             "attributes": {
                               "content": "Secure",
@@ -209,7 +207,7 @@
                             }
                           },
                           {
-                            "id": "76145b90-b552-411e-b438-b9afef765529",
+                            "id": "551596aa-e045-474b-abec-23bac9eb32a2",
                             "type": "o4o/paragraph",
                             "attributes": {
                               "content": "Enterprise-grade security built-in",
@@ -221,14 +219,14 @@
                     ]
                   },
                   {
-                    "id": "f3e5254f-cc62-450b-b86c-700481c6d0b0",
+                    "id": "d86c6ac2-5db6-43c2-8e69-878b2ca11ce2",
                     "type": "o4o/column",
                     "attributes": {
-                      "width": 33.333333333333336
+                      "width": 33.33
                     },
                     "innerBlocks": [
                       {
-                        "id": "fec45cbd-239d-4b6a-a08c-3ab32493e2b2",
+                        "id": "05fb18b7-88c9-416a-a89b-b394fb58ceb6",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flow",
@@ -243,7 +241,7 @@
                         },
                         "innerBlocks": [
                           {
-                            "id": "7da7c77b-3da0-4fcc-9c71-677e99d73a25",
+                            "id": "7f1ea3ee-451b-4ba7-98f9-a24b551c2c13",
                             "type": "o4o/heading",
                             "attributes": {
                               "content": "Scalable",
@@ -252,7 +250,7 @@
                             }
                           },
                           {
-                            "id": "5a669942-7322-4639-af10-191a34147e12",
+                            "id": "7fecf81b-1442-48ee-8e59-d078eeca0053",
                             "type": "o4o/paragraph",
                             "attributes": {
                               "content": "Grows with your business needs",
@@ -266,16 +264,15 @@
                 ]
               },
               {
-                "id": "698c6f99-de79-4c1f-b200-c612e6421b99",
+                "id": "b847997b-c527-442d-ae54-e0e4ded67f2d",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flex",
-                  "justifyContent": "center",
-                  "padding": {}
+                  "justifyContent": "center"
                 },
                 "innerBlocks": [
                   {
-                    "id": "b48e7f5c-8a06-4888-8639-9178622c6ffe",
+                    "id": "56c66cdf-71d3-4e2c-bc99-0e74c07b7074",
                     "type": "o4o/button",
                     "attributes": {
                       "text": "Start Free Trial",
@@ -324,7 +321,7 @@
     ],
     "blocks": [
       {
-        "id": "7212385e-46b6-433c-b01b-66193715056c",
+        "id": "6e4b0a96-bf37-4592-9425-97e314077e9b",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -337,7 +334,7 @@
         },
         "innerBlocks": [
           {
-            "id": "cbb28450-08eb-4a71-8313-164186c69d4b",
+            "id": "b7ce5014-1926-4eec-a2b0-4f78558311f6",
             "type": "o4o/heading",
             "attributes": {
               "content": "Our Products",
@@ -347,7 +344,7 @@
             }
           },
           {
-            "id": "9cdb29a8-1db3-4780-b39f-9d15e1f94d88",
+            "id": "ce0041fb-f6f2-46f5-890c-6343140b946b",
             "type": "o4o/placeholder",
             "attributes": {
               "componentName": "Carousel",
@@ -361,7 +358,7 @@
             }
           },
           {
-            "id": "368964b0-2e26-4fdb-a918-c92732377d09",
+            "id": "4fe02c2d-b397-444e-8409-1e3cf8b8066e",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 3,
@@ -370,14 +367,14 @@
             },
             "innerBlocks": [
               {
-                "id": "17a4da4f-d9cf-4a99-b386-3c1863ee1c14",
+                "id": "6bbd5556-96db-42d4-ace1-58154bad5c3d",
                 "type": "o4o/column",
                 "attributes": {
-                  "width": 33.333333333333336
+                  "width": 33.33
                 },
                 "innerBlocks": [
                   {
-                    "id": "6a37353f-00da-4034-ac59-f5cd679e492e",
+                    "id": "b4d65316-45c1-4357-b04d-08ac0b496f3c",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "PricingCard",
@@ -393,14 +390,14 @@
                 ]
               },
               {
-                "id": "754eb522-15c4-4464-a82f-94c8fd9893bc",
+                "id": "4f4cf372-a4ba-491c-ac6f-f9578dc14ceb",
                 "type": "o4o/column",
                 "attributes": {
-                  "width": 33.333333333333336
+                  "width": 33.33
                 },
                 "innerBlocks": [
                   {
-                    "id": "74d0de5f-c16d-461e-9fad-28e0a00236f7",
+                    "id": "d1e8805a-5942-4dd3-b5ba-eb5fd8fb208b",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "PricingCard",
@@ -417,14 +414,14 @@
                 ]
               },
               {
-                "id": "4ac609a6-3e4d-44cb-a4f5-0948a71b9179",
+                "id": "ceb4f8b2-1a7a-45d0-8761-7cdd3236995c",
                 "type": "o4o/column",
                 "attributes": {
-                  "width": 33.333333333333336
+                  "width": 33.33
                 },
                 "innerBlocks": [
                   {
-                    "id": "df915e4d-820a-46e7-9a01-5c4a88c3ec63",
+                    "id": "264f3cb3-b5fe-4be1-a91d-eb99311d67d9",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "PricingCard",
@@ -442,24 +439,22 @@
             ]
           },
           {
-            "id": "e95262aa-7c49-41ab-9dba-2bc3bc909119",
+            "id": "bbb2cd5d-8ded-4474-a3c1-c32c370199a9",
             "type": "o4o/group",
             "attributes": {
               "layout": "flex",
-              "justifyContent": "center",
-              "padding": {}
+              "justifyContent": "center"
             },
             "innerBlocks": [
               {
-                "id": "00ea5172-b706-4399-bf56-1f90ffee7508",
+                "id": "1d8f5427-9979-47ad-a8f5-9c69ce9f3981",
                 "type": "o4o/group",
                 "attributes": {
-                  "layout": "flow",
-                  "padding": {}
+                  "layout": "flow"
                 },
                 "innerBlocks": [
                   {
-                    "id": "cf75c454-70fa-4b35-a556-35040b0f01bb",
+                    "id": "1fe5b832-dd72-4e2f-864c-34107ced1522",
                     "type": "o4o/heading",
                     "attributes": {
                       "content": "Our Users",
@@ -468,7 +463,7 @@
                     }
                   },
                   {
-                    "id": "b50ca62f-1035-4949-8694-5b2394a9218f",
+                    "id": "99737e43-5b6f-4d25-a16f-06daba1851cf",
                     "type": "o4o/placeholder",
                     "attributes": {
                       "componentName": "AnimatedCounter",
@@ -499,7 +494,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "749f6734-892f-4c28-b4da-15e8afbcd065",
+        "id": "9701a48f-0b3c-4c59-8d6d-d8d7ad4ae78b",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -512,7 +507,7 @@
         },
         "innerBlocks": [
           {
-            "id": "414d3b6e-9bcf-4c13-9aa7-1cbe18e3bce3",
+            "id": "cc7c1de2-2df4-4f6e-9b41-474550ea13f5",
             "type": "o4o/heading",
             "attributes": {
               "content": "Features",
@@ -522,7 +517,7 @@
             }
           },
           {
-            "id": "2b6f13e6-ef1f-4861-8831-d6a1f740170b",
+            "id": "6cf0855d-1b1b-4a5b-be2d-bff36d5ed613",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 2,
@@ -531,14 +526,14 @@
             },
             "innerBlocks": [
               {
-                "id": "15881908-dfa6-48b6-9947-a8145d15b4cc",
+                "id": "3049b2ae-d29a-488f-a255-b3a0bf39b3a5",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 50
                 },
                 "innerBlocks": [
                   {
-                    "id": "7f70d8b4-19d2-4648-ab6a-1bd974f26906",
+                    "id": "ffe5f79d-f705-42c9-a4a9-ae9e10277fb7",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flex",
@@ -555,7 +550,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "2bf27555-97b0-4dc6-8452-5bd652d19039",
+                        "id": "191bffb0-3266-4516-97c5-442bed7dddce",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Design Tools",
@@ -564,7 +559,7 @@
                         }
                       },
                       {
-                        "id": "0d74364b-5a88-4a55-9447-7028dd9d78af",
+                        "id": "beb2742d-f377-4faf-b992-e741de7c4ebd",
                         "type": "o4o/paragraph",
                         "attributes": {
                           "content": "Create stunning designs with our intuitive tools",
@@ -572,17 +567,16 @@
                         }
                       },
                       {
-                        "id": "d49bde22-f004-46da-a7ed-b653b9ccd534",
+                        "id": "924ca27d-b500-41f3-82b2-95a194b71f54",
                         "type": "o4o/group",
                         "attributes": {
                           "layout": "flex",
                           "flexDirection": "row",
-                          "gap": 8,
-                          "padding": {}
+                          "gap": 8
                         },
                         "innerBlocks": [
                           {
-                            "id": "fb9eb35e-9682-476d-9031-85c89a21b4f7",
+                            "id": "d542da37-c89f-45e8-974b-f0effe0b2332",
                             "type": "o4o/button",
                             "attributes": {
                               "text": "Learn More",
@@ -599,7 +593,7 @@
                             }
                           },
                           {
-                            "id": "59c60162-c9cd-4bf0-8e12-20cf4636aaae",
+                            "id": "afaf674e-1683-410f-8172-41e727858c46",
                             "type": "o4o/button",
                             "attributes": {
                               "text": "Watch Demo",
@@ -622,14 +616,14 @@
                 ]
               },
               {
-                "id": "f60d50ab-c976-4995-a3af-e976de86c5fd",
+                "id": "553b5f09-a405-4a62-99d4-c26171211630",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 50
                 },
                 "innerBlocks": [
                   {
-                    "id": "32ed9bf1-fad0-494f-b886-401ec8a6bea4",
+                    "id": "a8defb8c-d20c-40aa-a807-ac543751c8ab",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flex",
@@ -647,7 +641,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "2e0e4809-7d0f-4cb1-ad00-b3658df1ce66",
+                        "id": "74397c91-e2c3-4da2-a965-c855957132f0",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Analytics",
@@ -656,7 +650,7 @@
                         }
                       },
                       {
-                        "id": "c42d3a02-d72a-4eaa-a406-4aca295ab31f",
+                        "id": "43d6309b-5940-47d2-8cf7-5e48867f7c21",
                         "type": "o4o/paragraph",
                         "attributes": {
                           "content": "Track your performance with real-time analytics",
@@ -664,7 +658,7 @@
                         }
                       },
                       {
-                        "id": "d07e3ca8-ae4f-4646-ab19-00d83e4c99ac",
+                        "id": "a6183ca6-5cc4-49b9-8e51-d57c243d6c1e",
                         "type": "o4o/button",
                         "attributes": {
                           "text": "View Dashboard",
@@ -687,7 +681,7 @@
             ]
           },
           {
-            "id": "8e4ea72b-7b40-4cd3-aa3b-7818584090ef",
+            "id": "0106427d-6bc3-4f37-9a2c-66ffb77fd527",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 4,
@@ -696,14 +690,14 @@
             },
             "innerBlocks": [
               {
-                "id": "13a73290-44f9-49d3-9a1f-8fe42ade185d",
+                "id": "57f02c0b-49ec-4ce8-92a5-eab849b1fd2e",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "c35cf8a5-c3ff-4de0-8765-2195e701ea54",
+                    "id": "3c6b1122-bf8f-4605-b415-3904998e4c92",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -718,7 +712,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "aafaf365-d4e4-402a-9b97-5643f6446394",
+                        "id": "ffaaca14-c5e7-4e79-8283-a055ed6ee05b",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 1",
@@ -730,14 +724,14 @@
                 ]
               },
               {
-                "id": "1cc77347-6738-40a6-9c98-704397e1526d",
+                "id": "d89befc2-ff9a-4f47-aa27-53b25f7fba08",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "8081cf31-1efa-4f45-8569-b914e79b1d38",
+                    "id": "b7012474-6eb1-425a-a3d4-e216a3a431f7",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -752,7 +746,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "90f164d2-b156-41df-a741-7de5ad8423f9",
+                        "id": "7b523095-0551-45da-9a40-2810b55651d0",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 2",
@@ -764,14 +758,14 @@
                 ]
               },
               {
-                "id": "b4406177-cde3-4098-8bdf-4c2054796957",
+                "id": "34a1192f-0c5b-4e17-b350-ef52c0fed768",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "b2d64200-d409-40a3-aaa3-eba3b650c2bb",
+                    "id": "8839fa3c-704f-44f8-bff0-9bbea2da7c5d",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -786,7 +780,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "76a6bd21-5f65-40cb-a554-79ea76a8d140",
+                        "id": "f84d56aa-09d8-4b2d-a78d-51d1af40fb0d",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 3",
@@ -798,14 +792,14 @@
                 ]
               },
               {
-                "id": "4840af69-145f-4c8b-a3e7-5a9d0af69e23",
+                "id": "c932a001-c5ed-4197-91c9-f9ae5b4202c0",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 25
                 },
                 "innerBlocks": [
                   {
-                    "id": "4636fa62-5e30-4d16-b475-53752693094f",
+                    "id": "2f6cd402-cbef-4d92-af9e-6c59cd249d90",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -820,7 +814,7 @@
                     },
                     "innerBlocks": [
                       {
-                        "id": "ae49eb1d-8eff-4d3a-8dbc-ce2f52f85412",
+                        "id": "4f2e8f8f-4a5f-4754-8c4f-7f8f751e7b2b",
                         "type": "o4o/heading",
                         "attributes": {
                           "content": "Metric 4",
@@ -848,7 +842,7 @@
     "placeholders": [],
     "blocks": [
       {
-        "id": "da48853a-3878-43e6-a0bc-e91df8c97087",
+        "id": "df1f43a1-97c1-44e7-a70c-6864b8ef91dc",
         "type": "o4o/group",
         "attributes": {
           "layout": "flow",
@@ -861,7 +855,7 @@
         },
         "innerBlocks": [
           {
-            "id": "a7cc4364-b507-4ee4-8512-c0b70f14c8a8",
+            "id": "f9b0f0fe-f675-4d65-859b-24ee575aa4cc",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -871,11 +865,12 @@
                 "bottom": 24,
                 "left": 24
               },
-              "backgroundColor": "#2563eb"
+              "backgroundColor": "#2563eb",
+              "opacity": 0.75
             },
             "innerBlocks": [
               {
-                "id": "d073b77b-520a-4b28-85e0-2dbc5d54451d",
+                "id": "800fe55b-249d-43dc-899b-5cdb1296c87f",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Opacity Test",
@@ -886,7 +881,7 @@
             ]
           },
           {
-            "id": "ec969c3c-143a-419d-b650-7c8f6c653f6e",
+            "id": "f3fc4275-f669-4c88-839a-2c88545731f9",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -897,11 +892,12 @@
                 "left": 24
               },
               "backgroundColor": "#ffffff",
-              "borderRadius": 12
+              "borderRadius": 12,
+              "shadow": "0 25px 50px -12px rgb(0 0 0 / 0.25)"
             },
             "innerBlocks": [
               {
-                "id": "9b14af43-921c-472b-8c41-dae936b595c0",
+                "id": "b9c009d8-21c8-4c2c-a6b1-1d18616db019",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Drop Shadow Test",
@@ -912,16 +908,16 @@
             ]
           },
           {
-            "id": "289f979f-9211-4c59-a2d9-ff3184031286",
+            "id": "6de6091a-fe7c-4160-bb5b-90e4e68d39b6",
             "type": "o4o/group",
             "attributes": {
               "layout": "flex",
-              "gap": 16,
-              "padding": {}
+              "flexWrap": "wrap",
+              "gap": 16
             },
             "innerBlocks": [
               {
-                "id": "76d687a6-cdd6-464e-a2c9-a6fda88eb9af",
+                "id": "0110e08b-4c6b-48e0-a865-4ee4894d199a",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -937,7 +933,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "8b7a87e6-90a7-4881-b1f2-15fbf2602741",
+                "id": "248a775f-a188-475c-a171-c45c6ea8471f",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -953,7 +949,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "84d48b8d-bf04-439d-b9fb-5cfb19e60c5f",
+                "id": "113f62f4-7778-4ffe-8337-218fd33ca6df",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -969,7 +965,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "e7f69227-f7af-4091-8bea-91c572332be4",
+                "id": "d159c5ca-4e55-43f8-8bfe-5c5d476a113c",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -987,7 +983,7 @@
             ]
           },
           {
-            "id": "e3cc589d-6ed0-4a05-a3f4-1c3ad1fb6d80",
+            "id": "994b4e16-ea0c-4989-8b62-ef2f573223ee",
             "type": "o4o/columns",
             "attributes": {
               "columnCount": 5,
@@ -996,14 +992,14 @@
             },
             "innerBlocks": [
               {
-                "id": "2f724088-3f6f-4287-9b37-189f76b23938",
+                "id": "b2d81b53-07c4-40d7-b0e1-a7516cf1f59b",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "6a71cf06-16c4-4eb8-a500-f03f0ca258f0",
+                    "id": "eea60935-5d92-493c-abc5-ecc74663b71d",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1021,14 +1017,14 @@
                 ]
               },
               {
-                "id": "950cd77c-04bd-4577-92d5-cdf096a44be8",
+                "id": "012e185c-04a6-48dd-bf8e-49ee1d90e42b",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "04b8e38c-ef03-4907-98cc-f1d57539a68c",
+                    "id": "1c4d0440-76aa-462e-b821-356da331e9d1",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1046,14 +1042,14 @@
                 ]
               },
               {
-                "id": "eb329387-a3d4-467c-a2d2-c2c7b8a1ad50",
+                "id": "5948a2b2-2402-4b2e-9e93-45f0eca772e2",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "cd14f587-579d-4b1c-897e-9289bfb0f2b7",
+                    "id": "a7c1adea-4ff0-4a0a-b78f-33ca974d62e5",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1071,14 +1067,14 @@
                 ]
               },
               {
-                "id": "5c402aa0-c628-4eb3-9313-90ff0ac91788",
+                "id": "b760bdf8-eb86-4cab-92eb-84d1776fe745",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "f989e371-9d75-4cc7-8065-db8b65a9afed",
+                    "id": "8d02a705-5aae-4ce1-b294-1828bd407cfd",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1096,14 +1092,14 @@
                 ]
               },
               {
-                "id": "f2db4885-823c-4594-9ec6-c90261994717",
+                "id": "51168e9b-8cc8-40d8-ae1d-dac1f7206391",
                 "type": "o4o/column",
                 "attributes": {
                   "width": 20
                 },
                 "innerBlocks": [
                   {
-                    "id": "4d7deb0f-99b3-4057-ae0a-6dca20014b9a",
+                    "id": "aa2254ed-d2a4-447a-8bbb-cc908e14960f",
                     "type": "o4o/group",
                     "attributes": {
                       "layout": "flow",
@@ -1123,7 +1119,7 @@
             ]
           },
           {
-            "id": "d69d2b72-8a3b-4afe-ac28-a11dd65d30c7",
+            "id": "f87abad7-c773-4d1e-aafe-061250a1f183",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -1137,7 +1133,7 @@
             },
             "innerBlocks": [
               {
-                "id": "2ccbb6e0-67d2-4402-a039-16521fac275e",
+                "id": "03f138b8-deb2-457f-8972-a2e9d6748003",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Relative Container",
@@ -1146,7 +1142,7 @@
                 }
               },
               {
-                "id": "5d6452f3-c249-4195-97a4-3d3595eed57b",
+                "id": "843a91ce-d82e-474e-b63f-03a56977d9b8",
                 "type": "o4o/group",
                 "attributes": {
                   "layout": "flow",
@@ -1162,7 +1158,7 @@
                 "innerBlocks": []
               },
               {
-                "id": "3169b39d-64f3-4010-ab61-22e18cc124da",
+                "id": "c847bb96-f68d-4172-904e-abfdde3fdca2",
                 "type": "o4o/paragraph",
                 "attributes": {
                   "content": "Some content here"
@@ -1171,7 +1167,7 @@
             ]
           },
           {
-            "id": "426b1769-b247-40c7-9103-5e90de569cf3",
+            "id": "ce4189d9-0892-41bc-a527-8c1e9a7a8397",
             "type": "o4o/group",
             "attributes": {
               "layout": "flow",
@@ -1181,12 +1177,13 @@
                 "bottom": 24,
                 "left": 24
               },
-              "backgroundColor": "#ffffff",
-              "borderRadius": 8
+              "backgroundColor": "rgba(255, 255, 255, 0.5)",
+              "borderRadius": 8,
+              "backdropBlur": "blur(4px)"
             },
             "innerBlocks": [
               {
-                "id": "f6576032-d4f4-4cbc-8dbb-134ccbce4229",
+                "id": "cc1082f0-f65f-49d8-ac04-d42790f7f6d6",
                 "type": "o4o/heading",
                 "attributes": {
                   "content": "Backdrop Blur Test",
@@ -1195,7 +1192,7 @@
                 }
               },
               {
-                "id": "ff84d55f-6503-451a-adac-31e75b8eb621",
+                "id": "69fdfee3-39c5-4d73-8bf3-f244fc527f5b",
                 "type": "o4o/paragraph",
                 "attributes": {
                   "content": "This has backdrop blur effect",

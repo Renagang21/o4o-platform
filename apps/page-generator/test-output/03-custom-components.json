@@ -1,7 +1,7 @@
 {
   "blocks": [
     {
-      "id": "7212385e-46b6-433c-b01b-66193715056c",
+      "id": "6e4b0a96-bf37-4592-9425-97e314077e9b",
       "type": "o4o/group",
       "attributes": {
         "layout": "flow",
@@ -14,7 +14,7 @@
       },
       "innerBlocks": [
         {
-          "id": "cbb28450-08eb-4a71-8313-164186c69d4b",
+          "id": "b7ce5014-1926-4eec-a2b0-4f78558311f6",
           "type": "o4o/heading",
           "attributes": {
             "content": "Our Products",
@@ -24,7 +24,7 @@
           }
         },
         {
-          "id": "9cdb29a8-1db3-4780-b39f-9d15e1f94d88",
+          "id": "ce0041fb-f6f2-46f5-890c-6343140b946b",
           "type": "o4o/placeholder",
           "attributes": {
             "componentName": "Carousel",
@@ -38,7 +38,7 @@
           }
         },
         {
-          "id": "368964b0-2e26-4fdb-a918-c92732377d09",
+          "id": "4fe02c2d-b397-444e-8409-1e3cf8b8066e",
           "type": "o4o/columns",
           "attributes": {
             "columnCount": 3,
@@ -47,14 +47,14 @@
           },
           "innerBlocks": [
             {
-              "id": "17a4da4f-d9cf-4a99-b386-3c1863ee1c14",
+              "id": "6bbd5556-96db-42d4-ace1-58154bad5c3d",
               "type": "o4o/column",
               "attributes": {
-                "width": 33.333333333333336
+                "width": 33.33
               },
               "innerBlocks": [
                 {
-                  "id": "6a37353f-00da-4034-ac59-f5cd679e492e",
+                  "id": "b4d65316-45c1-4357-b04d-08ac0b496f3c",
                   "type": "o4o/placeholder",
                   "attributes": {
                     "componentName": "PricingCard",
@@ -70,14 +70,14 @@
               ]
             },
             {
-              "id": "754eb522-15c4-4464-a82f-94c8fd9893bc",
+              "id": "4f4cf372-a4ba-491c-ac6f-f9578dc14ceb",
               "type": "o4o/column",
               "attributes": {
-                "width": 33.333333333333336
+                "width": 33.33
               },
               "innerBlocks": [
                 {
-                  "id": "74d0de5f-c16d-461e-9fad-28e0a00236f7",
+                  "id": "d1e8805a-5942-4dd3-b5ba-eb5fd8fb208b",
                   "type": "o4o/placeholder",
                   "attributes": {
                     "componentName": "PricingCard",
@@ -94,14 +94,14 @@
               ]
             },
             {
-              "id": "4ac609a6-3e4d-44cb-a4f5-0948a71b9179",
+              "id": "ceb4f8b2-1a7a-45d0-8761-7cdd3236995c",
               "type": "o4o/column",
               "attributes": {
-                "width": 33.333333333333336
+                "width": 33.33
               },
               "innerBlocks": [
                 {
-                  "id": "df915e4d-820a-46e7-9a01-5c4a88c3ec63",
+                  "id": "264f3cb3-b5fe-4be1-a91d-eb99311d67d9",
                   "type": "o4o/placeholder",
                   "attributes": {
                     "componentName": "PricingCard",
@@ -119,24 +119,22 @@
           ]
         },
         {
-          "id": "e95262aa-7c49-41ab-9dba-2bc3bc909119",
+          "id": "bbb2cd5d-8ded-4474-a3c1-c32c370199a9",
           "type": "o4o/group",
           "attributes": {
             "layout": "flex",
-            "justifyContent": "center",
-            "padding": {}
+            "justifyContent": "center"
           },
           "innerBlocks": [
             {
-              "id": "00ea5172-b706-4399-bf56-1f90ffee7508",
+              "id": "1d8f5427-9979-47ad-a8f5-9c69ce9f3981",
               "type": "o4o/group",
               "attributes": {
-                "layout": "flow",
-                "padding": {}
+                "layout": "flow"
               },
               "innerBlocks": [
                 {
-                  "id": "cf75c454-70fa-4b35-a556-35040b0f01bb",
+                  "id": "1fe5b832-dd72-4e2f-864c-34107ced1522",
                   "type": "o4o/heading",
                   "attributes": {
                     "content": "Our Users",
@@ -145,7 +143,7 @@
                   }
                 },
                 {
-                  "id": "b50ca62f-1035-4949-8694-5b2394a9218f",
+                  "id": "99737e43-5b6f-4d25-a16f-06daba1851cf",
                   "type": "o4o/placeholder",
                   "attributes": {
                     "componentName": "AnimatedCounter",

@@ -1,16 +1,15 @@
 {
   "blocks": [
     {
-      "id": "919baa41-e80f-4a24-8dcb-a66b62c0dada",
+      "id": "2699e9a1-cdea-4ad3-b37c-c94290ed21c9",
       "type": "o4o/group",
       "attributes": {
         "layout": "flow",
-        "padding": {},
         "backgroundColor": "#f9fafb"
       },
       "innerBlocks": [
         {
-          "id": "b79195f6-d812-49fd-9276-1b80465d09b1",
+          "id": "54e1376d-7600-4642-aee5-5bd8823a88cc",
           "type": "o4o/group",
           "attributes": {
             "layout": "flow",
@@ -23,7 +22,7 @@
           },
           "innerBlocks": [
             {
-              "id": "f24e2e1c-4891-4006-be6c-c29fac0f352b",
+              "id": "438666ee-e0cd-4c18-b94f-2b53380e4ba0",
               "type": "o4o/heading",
               "attributes": {
                 "content": "Revolutionary Platform",
@@ -33,7 +32,7 @@
               }
             },
             {
-              "id": "32e6fe22-dc02-4037-977e-530dd95057c9",
+              "id": "8dfee8a8-5ba9-45f8-8821-93bda791ffbb",
               "type": "o4o/paragraph",
               "attributes": {
                 "content": "Transform your workflow with cutting-edge technology",
@@ -42,7 +41,7 @@
               }
             },
             {
-              "id": "32ce4d6f-f846-463c-8a3f-a97471c4fb91",
+              "id": "733f0981-cdc3-4ece-ac5f-9573cd09bab8",
               "type": "o4o/columns",
               "attributes": {
                 "columnCount": 3,
@@ -51,14 +50,14 @@
               },
               "innerBlocks": [
                 {
-                  "id": "192b90d3-dc7c-45af-bfb5-18103f2d4381",
+                  "id": "925a5d3f-df56-4e7e-90b0-0ded8bc3a368",
                   "type": "o4o/column",
                   "attributes": {
-                    "width": 33.333333333333336
+                    "width": 33.33
                   },
                   "innerBlocks": [
                     {
-                      "id": "1f556984-4f6b-45b5-87c4-0f2bc618a5b0",
+                      "id": "3218a2a7-1f59-40b4-9451-0c5014200645",
                       "type": "o4o/group",
                       "attributes": {
                         "layout": "flow",
@@ -73,7 +72,7 @@
                       },
                       "innerBlocks": [
                         {
-                          "id": "d5d3b3bd-4356-4160-bcb6-4693dc46e1c9",
+                          "id": "bf10f42b-2e78-435b-a265-9441ecc9fb3f",
                           "type": "o4o/heading",
                           "attributes": {
                             "content": "Fast",
@@ -82,7 +81,7 @@
                           }
                         },
                         {
-                          "id": "04c6469e-f54e-4fcc-acd2-9d0a443921ac",
+                          "id": "7c48f135-a7ce-4fcc-92db-924b6b37220b",
                           "type": "o4o/paragraph",
                           "attributes": {
                             "content": "Lightning-fast performance for your users",
@@ -94,14 +93,14 @@
                   ]
                 },
                 {
-                  "id": "44bbbdd7-e561-49e4-b5f3-1adbff6ec235",
+                  "id": "0e63d9c5-7de9-46d2-9fca-80c38cc3116c",
                   "type": "o4o/column",
                   "attributes": {
-                    "width": 33.333333333333336
+                    "width": 33.33
                   },
                   "innerBlocks": [
                     {
-                      "id": "16150308-af4d-47ab-98ab-dc64a0c4ef6f",
+                      "id": "e7ec5e51-cd15-4978-8a8b-3f20b1074cfa",
                       "type": "o4o/group",
                       "attributes": {
                         "layout": "flow",
@@ -116,7 +115,7 @@
                       },
                       "innerBlocks": [
                         {
-                          "id": "a6cce538-df5f-43e1-8a9d-b730eefc71b3",
+                          "id": "699f902a-52e4-4b2b-844f-384369956f43",
                           "type": "o4o/heading",
                           "attributes": {
                             "content": "Secure",
@@ -125,7 +124,7 @@
                           }
                         },
                         {
-                          "id": "76145b90-b552-411e-b438-b9afef765529",
+                          "id": "551596aa-e045-474b-abec-23bac9eb32a2",
                           "type": "o4o/paragraph",
                           "attributes": {
                             "content": "Enterprise-grade security built-in",
@@ -137,14 +136,14 @@
                   ]
                 },
                 {
-                  "id": "f3e5254f-cc62-450b-b86c-700481c6d0b0",
+                  "id": "d86c6ac2-5db6-43c2-8e69-878b2ca11ce2",
                   "type": "o4o/column",
                   "attributes": {
-                    "width": 33.333333333333336
+                    "width": 33.33
                   },
                   "innerBlocks": [
                     {
-                      "id": "fec45cbd-239d-4b6a-a08c-3ab32493e2b2",
+                      "id": "05fb18b7-88c9-416a-a89b-b394fb58ceb6",
                       "type": "o4o/group",
                       "attributes": {
                         "layout": "flow",
@@ -159,7 +158,7 @@
                       },
                       "innerBlocks": [
                         {
-                          "id": "7da7c77b-3da0-4fcc-9c71-677e99d73a25",
+                          "id": "7f1ea3ee-451b-4ba7-98f9-a24b551c2c13",
                           "type": "o4o/heading",
                           "attributes": {
                             "content": "Scalable",
@@ -168,7 +167,7 @@
                           }
                         },
                         {
-                          "id": "5a669942-7322-4639-af10-191a34147e12",
+                          "id": "7fecf81b-1442-48ee-8e59-d078eeca0053",
                           "type": "o4o/paragraph",
                           "attributes": {
                             "content": "Grows with your business needs",
@@ -182,16 +181,15 @@
               ]
             },
             {
-              "id": "698c6f99-de79-4c1f-b200-c612e6421b99",
+              "id": "b847997b-c527-442d-ae54-e0e4ded67f2d",
               "type": "o4o/group",
               "attributes": {
                 "layout": "flex",
-                "justifyContent": "center",
-                "padding": {}
+                "justifyContent": "center"
               },
               "innerBlocks": [
                 {
-                  "id": "b48e7f5c-8a06-4888-8639-9178622c6ffe",
+                  "id": "56c66cdf-71d3-4e2c-bc99-0e74c07b7074",
                   "type": "o4o/button",
                   "attributes": {
                     "text": "Start Free Trial",

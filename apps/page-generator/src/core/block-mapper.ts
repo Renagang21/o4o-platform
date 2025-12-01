@@ -11,6 +11,38 @@ import { createPlaceholderBlock, shouldCreatePlaceholder } from './placeholder';
 import { extractTextContent } from './jsx-parser';
 
 /**
+ * Clean block attributes by removing undefined and empty values
+ */
+function cleanAttributes(attributes: Record<string, any>): Record<string, any> {
+  const cleaned: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(attributes)) {
+    // Skip undefined
+    if (value === undefined) continue;
+
+    // Skip empty objects (e.g., padding: {})
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      if (Object.keys(value).length === 0) continue;
+      // Keep non-empty objects
+      cleaned[key] = value;
+      continue;
+    }
+
+    // Keep all other values
+    cleaned[key] = value;
+  }
+
+  return cleaned;
+}
+
+/**
+ * Round number to 2 decimal places
+ */
+function roundTo2(num: number): number {
+  return Math.round(num * 100) / 100;
+}
+
+/**
  * Convert ReactElement tree to O4O Block array
  */
 export function convertReactToBlocks(elements: ReactElement[]): Block[] {
@@ -95,14 +127,16 @@ function createHeadingBlock(
   return {
     id,
     type: 'o4o/heading',
-    attributes: {
+    attributes: cleanAttributes({
       content: extractTextContent(element.children),
       level,
       align: TailwindMapper.parseTextAlign(className),
       fontSize: TailwindMapper.parseFontSize(className),
-      textColor: TailwindMapper.parseTextColor(className),
-      backgroundColor: TailwindMapper.parseBackgroundColor(className),
-    },
+      textColor: TailwindMapper.parseAlphaColor(className, 'text') || TailwindMapper.parseTextColor(className),
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
+      opacity: TailwindMapper.parseOpacity(className),
+      shadow: TailwindMapper.parseShadow(className),
+    }),
   };
 }
 
@@ -122,13 +156,15 @@ function createParagraphBlock(
   return {
     id,
     type: 'o4o/paragraph',
-    attributes: {
+    attributes: cleanAttributes({
       content,
       align: TailwindMapper.parseTextAlign(className),
       fontSize: TailwindMapper.parseFontSize(className),
-      textColor: TailwindMapper.parseTextColor(className),
-      backgroundColor: TailwindMapper.parseBackgroundColor(className),
-    },
+      textColor: TailwindMapper.parseAlphaColor(className, 'text') || TailwindMapper.parseTextColor(className),
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
+      opacity: TailwindMapper.parseOpacity(className),
+      shadow: TailwindMapper.parseShadow(className),
+    }),
   };
 }
 
@@ -163,15 +199,17 @@ function createButtonBlock(
   return {
     id,
     type: 'o4o/button',
-    attributes: {
+    attributes: cleanAttributes({
       text,
       url,
-      backgroundColor: TailwindMapper.parseBackgroundColor(className),
-      textColor: TailwindMapper.parseTextColor(className),
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
+      textColor: TailwindMapper.parseAlphaColor(className, 'text') || TailwindMapper.parseTextColor(className),
       borderRadius: TailwindMapper.parseBorderRadius(className),
       fontSize: TailwindMapper.parseFontSize(className),
       padding: TailwindMapper.parsePadding(className),
-    },
+      opacity: TailwindMapper.parseOpacity(className),
+      shadow: TailwindMapper.parseShadow(className),
+    }),
   };
 }
 
@@ -262,9 +300,9 @@ function createColumnsBlock(
       return {
         id: columnId,
         type: 'o4o/column',
-        attributes: {
-          width: 100 / columnCount,
-        },
+        attributes: cleanAttributes({
+          width: roundTo2(100 / columnCount),
+        }),
         innerBlocks: childBlock ? [childBlock] : [],
       };
     });
@@ -272,11 +310,11 @@ function createColumnsBlock(
   return {
     id,
     type: 'o4o/columns',
-    attributes: {
+    attributes: cleanAttributes({
       columnCount,
       gap,
       isStackedOnMobile: true,
-    },
+    }),
     innerBlocks,
   };
 }
@@ -298,16 +336,20 @@ function createFlexGroupBlock(
   return {
     id,
     type: 'o4o/group',
-    attributes: {
+    attributes: cleanAttributes({
       layout: 'flex',
       flexDirection: TailwindMapper.parseFlexDirection(className),
+      flexWrap: TailwindMapper.parseFlexWrap(className),
       gap: TailwindMapper.parseGap(className),
       justifyContent: TailwindMapper.parseJustifyContent(className),
       alignItems: TailwindMapper.parseAlignItems(className),
       padding: TailwindMapper.parsePadding(className),
-      backgroundColor: TailwindMapper.parseBackgroundColor(className),
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
       borderRadius: TailwindMapper.parseBorderRadius(className),
-    },
+      opacity: TailwindMapper.parseOpacity(className),
+      shadow: TailwindMapper.parseShadow(className),
+      backdropBlur: TailwindMapper.parseBackdropBlur(className),
+    }),
     innerBlocks,
   };
 }
@@ -329,12 +371,15 @@ function createFlowGroupBlock(
   return {
     id,
     type: 'o4o/group',
-    attributes: {
+    attributes: cleanAttributes({
       layout: 'flow',
       padding: TailwindMapper.parsePadding(className),
-      backgroundColor: TailwindMapper.parseBackgroundColor(className),
+      backgroundColor: TailwindMapper.parseAlphaColor(className, 'bg') || TailwindMapper.parseBackgroundColor(className),
       borderRadius: TailwindMapper.parseBorderRadius(className),
-    },
+      opacity: TailwindMapper.parseOpacity(className),
+      shadow: TailwindMapper.parseShadow(className),
+      backdropBlur: TailwindMapper.parseBackdropBlur(className),
+    }),
     innerBlocks,
   };
 }

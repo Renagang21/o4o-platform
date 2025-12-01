@@ -96,6 +96,37 @@ const BORDER_RADIUS_MAP: Record<string, number> = {
   full: 9999,
 };
 
+// Opacity Mapping (opacity-{value})
+const OPACITY_MAP: Record<string, number> = {
+  '0': 0,
+  '5': 0.05,
+  '10': 0.1,
+  '20': 0.2,
+  '25': 0.25,
+  '30': 0.3,
+  '40': 0.4,
+  '50': 0.5,
+  '60': 0.6,
+  '70': 0.7,
+  '75': 0.75,
+  '80': 0.8,
+  '90': 0.9,
+  '95': 0.95,
+  '100': 1,
+};
+
+// Shadow Mapping (shadow-{size})
+const SHADOW_MAP: Record<string, string> = {
+  'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+  '': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+  'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+  'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+  'xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+  '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+  'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+  'none': 'none',
+};
+
 export class TailwindMapper {
   /**
    * Parse font size from Tailwind classes
@@ -318,6 +349,84 @@ export class TailwindMapper {
     }
     if (className.includes('h-full')) return '100%';
     if (className.includes('h-screen')) return '100vh';
+    return undefined;
+  }
+
+  /**
+   * Parse opacity from Tailwind classes
+   * Example: "opacity-50" → 0.5
+   */
+  static parseOpacity(className: string): number | undefined {
+    const match = className.match(/\bopacity-(\d+)/);
+    if (match && match[1] in OPACITY_MAP) {
+      return OPACITY_MAP[match[1]];
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse box shadow from Tailwind classes
+   * Example: "shadow-lg" → "0 10px 15px -3px rgb(0 0 0 / 0.1), ..."
+   */
+  static parseShadow(className: string): string | undefined {
+    const match = className.match(/\bshadow(?:-(\w+))?/);
+    if (match) {
+      const size = match[1] || '';
+      return SHADOW_MAP[size];
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse flex wrap from Tailwind classes
+   * Example: "flex-wrap" → "wrap"
+   */
+  static parseFlexWrap(className: string): 'wrap' | 'nowrap' | 'wrap-reverse' | undefined {
+    if (className.includes('flex-wrap-reverse')) return 'wrap-reverse';
+    if (className.includes('flex-wrap')) return 'wrap';
+    if (className.includes('flex-nowrap')) return 'nowrap';
+    return undefined;
+  }
+
+  /**
+   * Parse alpha colors (e.g., bg-white/50, text-black/20)
+   * Example: "bg-white/50" → "rgba(255, 255, 255, 0.5)"
+   */
+  static parseAlphaColor(className: string, prefix: 'bg' | 'text'): string | undefined {
+    const pattern = new RegExp(`\\b${prefix}-(\\w+)/(\\d+)\\b`);
+    const match = className.match(pattern);
+
+    if (!match) return undefined;
+
+    const colorName = match[1];
+    const alpha = parseInt(match[2]) / 100;
+
+    // Get base color
+    const baseColor = COLOR_MAP[colorName];
+    if (!baseColor || baseColor === 'transparent') return undefined;
+
+    // Convert hex to rgba
+    const hex = baseColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  /**
+   * Parse backdrop blur from Tailwind classes
+   * Example: "backdrop-blur-md" → "blur(12px)"
+   */
+  static parseBackdropBlur(className: string): string | undefined {
+    if (className.includes('backdrop-blur-none')) return 'blur(0)';
+    if (className.includes('backdrop-blur-sm')) return 'blur(4px)';
+    if (className.includes('backdrop-blur-md')) return 'blur(12px)';
+    if (className.includes('backdrop-blur-lg')) return 'blur(16px)';
+    if (className.includes('backdrop-blur-xl')) return 'blur(24px)';
+    if (className.includes('backdrop-blur-2xl')) return 'blur(40px)';
+    if (className.includes('backdrop-blur-3xl')) return 'blur(64px)';
+    if (className.includes('backdrop-blur')) return 'blur(8px)'; // default
     return undefined;
   }
 }
