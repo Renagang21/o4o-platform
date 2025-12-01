@@ -74,8 +74,8 @@ import { CartItem } from '../entities/CartItem.js';
 import { Order } from '../entities/Order.js';
 import { OrderItem } from '../entities/OrderItem.js';
 import { OrderEvent } from '../entities/OrderEvent.js';
-// Wishlist entity (R-6-5)
-import { Wishlist } from '../entities/Wishlist.js';
+// // Wishlist entity (R-6-5)
+// import { Wishlist } from '../entities/Wishlist.js';
 // Settlement entities
 import { Settlement } from '../entities/Settlement.js';
 import { SettlementItem } from '../entities/SettlementItem.js';
@@ -86,11 +86,11 @@ import { SettlementItem } from '../entities/SettlementItem.js';
 // import { Partner } from '../entities/Partner.js';
 // import { SellerProduct } from '../entities/SellerProduct.js';
 // import { PartnerCommission } from '../entities/PartnerCommission.js';
-import { BusinessInfo } from '../entities/BusinessInfo.js';
+// import { BusinessInfo } from '../entities/BusinessInfo.js';
 // import { CommissionPolicy } from '../entities/CommissionPolicy.js';
 // import { Commission } from '../entities/Commission.js';
-import { ConversionEvent } from '../entities/ConversionEvent.js';
-import { ReferralClick } from '../entities/ReferralClick.js';
+// import { ConversionEvent } from '../entities/ConversionEvent.js';
+// import { ReferralClick } from '../entities/ReferralClick.js';
 // import { SellerAuthorization } from '../entities/SellerAuthorization.js';
 // Form entities
 import { Form } from '../entities/Form.js';
@@ -110,9 +110,9 @@ import { SupplierProfile } from '../entities/SupplierProfile.js';
 import { SellerProfile } from '../entities/SellerProfile.js';
 import { PartnerProfile } from '../entities/PartnerProfile.js';
 // Forum App entities (from @o4o-apps/forum package)
-import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum';
+// import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum';
 // Dropshipping Core entities (from @o4o/dropshipping-core package)
-import { dropshippingEntities } from '@o4o/dropshipping-core';
+// import { dropshippingEntities } from '@o4o/dropshipping-core';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -230,16 +230,16 @@ export const AppDataSource = new DataSource({
     OrderItem,
     OrderEvent,
     // Wishlist entity (R-6-5)
-    Wishlist,
+    //     Wishlist,
     // Settlement entities
     Settlement,
     SettlementItem,
     // Dropshipping Core entities (from @o4o/dropshipping-core package)
-    ...dropshippingEntities,
-    // Additional dropshipping entities (not in core package)
-    BusinessInfo,
-    ConversionEvent,
-    ReferralClick,
+    //     ...dropshippingEntities,
+    //     // Additional dropshipping entities (not in core package)
+    // //     BusinessInfo,
+    // //     ConversionEvent,
+    // ReferralClick,
     // Form entities
     Form,
     FormSubmission,
@@ -258,10 +258,10 @@ export const AppDataSource = new DataSource({
     SellerProfile,
     PartnerProfile,
     // Forum App entities (from @o4o-apps/forum package)
-    ForumPost,
-    ForumCategory,
-    ForumComment,
-    ForumTag,
+    //     ForumPost,
+    //     ForumCategory,
+    //     ForumComment,
+    //     ForumTag,
   ],
   
   // 마이그레이션 설정

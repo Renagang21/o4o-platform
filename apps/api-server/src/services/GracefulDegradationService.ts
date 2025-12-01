@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection.js';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics.js';
 import { Alert, AlertSeverity } from '../entities/Alert.js';
 import { PricingResult } from '../types/auth.js';
-import { signageService } from './signageService.js';
+// import { signageService } from './signageService.js';
 import { cacheService } from './CacheService.js';
 import {
   DegradationMetadata,
@@ -217,7 +217,7 @@ export class GracefulDegradationService {
           return false; // Service is available
         
         case 'signage':
-          await signageService.getSignageAnalytics();
+          // await signageService.getSignageAnalytics();
           return false; // Service is available
         
         default:

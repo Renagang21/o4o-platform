@@ -1,6 +1,5 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
-import { digitalsignageManifest } from './digitalsignage.manifest.js';
 import { forumNetureManifest } from '@o4o-apps/forum-neture';
 import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
 
@@ -15,7 +14,6 @@ import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
  */
 const manifestRegistry: Record<string, AppManifest> = {
   forum: forumManifest as any,
-  digitalsignage: digitalsignageManifest,
   'forum-neture': forumNetureManifest as any,
   'forum-yaksa': forumYaksaManifest as any,
 };
