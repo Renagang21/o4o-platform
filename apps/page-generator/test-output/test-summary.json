@@ -1,0 +1,1216 @@
+[
+  {
+    "file": "01-simple-hero.tsx",
+    "status": "success",
+    "stats": {
+      "totalBlocks": 5,
+      "placeholderCount": 0,
+      "successfulConversions": 5
+    },
+    "placeholders": [],
+    "blocks": [
+      {
+        "id": "472d7a35-9b7b-49de-a172-222bcf158286",
+        "type": "o4o/group",
+        "attributes": {
+          "layout": "flow",
+          "padding": {
+            "left": 16,
+            "right": 16,
+            "top": 80,
+            "bottom": 80
+          }
+        },
+        "innerBlocks": [
+          {
+            "id": "4e09070c-c478-4fb0-a527-ef7da0adc8c5",
+            "type": "o4o/heading",
+            "attributes": {
+              "content": "Welcome to O4O Platform",
+              "level": 1,
+              "align": "center",
+              "fontSize": 48
+            }
+          },
+          {
+            "id": "93b74929-3380-4fe9-aa1b-f1c6d15243cd",
+            "type": "o4o/paragraph",
+            "attributes": {
+              "content": "Build amazing websites with AI-powered page generation",
+              "align": "center",
+              "fontSize": 20
+            }
+          },
+          {
+            "id": "e560e70c-da7d-4624-8dce-d662d1d3778c",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flex",
+              "justifyContent": "center",
+              "padding": {}
+            },
+            "innerBlocks": [
+              {
+                "id": "37fd71c8-3b86-413e-b486-bc6864301838",
+                "type": "o4o/button",
+                "attributes": {
+                  "text": "Get Started",
+                  "url": "",
+                  "backgroundColor": "#2563eb",
+                  "textColor": "#ffffff",
+                  "borderRadius": 8,
+                  "fontSize": 18,
+                  "padding": {
+                    "left": 32,
+                    "right": 32,
+                    "top": 16,
+                    "bottom": 16
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "02-hero-with-columns.tsx",
+    "status": "success",
+    "stats": {
+      "totalBlocks": 19,
+      "placeholderCount": 0,
+      "successfulConversions": 19
+    },
+    "placeholders": [],
+    "blocks": [
+      {
+        "id": "919baa41-e80f-4a24-8dcb-a66b62c0dada",
+        "type": "o4o/group",
+        "attributes": {
+          "layout": "flow",
+          "padding": {},
+          "backgroundColor": "#f9fafb"
+        },
+        "innerBlocks": [
+          {
+            "id": "b79195f6-d812-49fd-9276-1b80465d09b1",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow",
+              "padding": {
+                "left": 16,
+                "right": 16,
+                "top": 80,
+                "bottom": 80
+              }
+            },
+            "innerBlocks": [
+              {
+                "id": "f24e2e1c-4891-4006-be6c-c29fac0f352b",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Revolutionary Platform",
+                  "level": 1,
+                  "align": "center",
+                  "fontSize": 60
+                }
+              },
+              {
+                "id": "32e6fe22-dc02-4037-977e-530dd95057c9",
+                "type": "o4o/paragraph",
+                "attributes": {
+                  "content": "Transform your workflow with cutting-edge technology",
+                  "align": "center",
+                  "fontSize": 24
+                }
+              },
+              {
+                "id": "32ce4d6f-f846-463c-8a3f-a97471c4fb91",
+                "type": "o4o/columns",
+                "attributes": {
+                  "columnCount": 3,
+                  "gap": 32,
+                  "isStackedOnMobile": true
+                },
+                "innerBlocks": [
+                  {
+                    "id": "192b90d3-dc7c-45af-bfb5-18103f2d4381",
+                    "type": "o4o/column",
+                    "attributes": {
+                      "width": 33.333333333333336
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "1f556984-4f6b-45b5-87c4-0f2bc618a5b0",
+                        "type": "o4o/group",
+                        "attributes": {
+                          "layout": "flow",
+                          "padding": {
+                            "top": 24,
+                            "right": 24,
+                            "bottom": 24,
+                            "left": 24
+                          },
+                          "backgroundColor": "#ffffff",
+                          "borderRadius": 8
+                        },
+                        "innerBlocks": [
+                          {
+                            "id": "d5d3b3bd-4356-4160-bcb6-4693dc46e1c9",
+                            "type": "o4o/heading",
+                            "attributes": {
+                              "content": "Fast",
+                              "level": 3,
+                              "fontSize": 24
+                            }
+                          },
+                          {
+                            "id": "04c6469e-f54e-4fcc-acd2-9d0a443921ac",
+                            "type": "o4o/paragraph",
+                            "attributes": {
+                              "content": "Lightning-fast performance for your users",
+                              "textColor": "#4b5563"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "44bbbdd7-e561-49e4-b5f3-1adbff6ec235",
+                    "type": "o4o/column",
+                    "attributes": {
+                      "width": 33.333333333333336
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "16150308-af4d-47ab-98ab-dc64a0c4ef6f",
+                        "type": "o4o/group",
+                        "attributes": {
+                          "layout": "flow",
+                          "padding": {
+                            "top": 24,
+                            "right": 24,
+                            "bottom": 24,
+                            "left": 24
+                          },
+                          "backgroundColor": "#ffffff",
+                          "borderRadius": 8
+                        },
+                        "innerBlocks": [
+                          {
+                            "id": "a6cce538-df5f-43e1-8a9d-b730eefc71b3",
+                            "type": "o4o/heading",
+                            "attributes": {
+                              "content": "Secure",
+                              "level": 3,
+                              "fontSize": 24
+                            }
+                          },
+                          {
+                            "id": "76145b90-b552-411e-b438-b9afef765529",
+                            "type": "o4o/paragraph",
+                            "attributes": {
+                              "content": "Enterprise-grade security built-in",
+                              "textColor": "#4b5563"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "f3e5254f-cc62-450b-b86c-700481c6d0b0",
+                    "type": "o4o/column",
+                    "attributes": {
+                      "width": 33.333333333333336
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "fec45cbd-239d-4b6a-a08c-3ab32493e2b2",
+                        "type": "o4o/group",
+                        "attributes": {
+                          "layout": "flow",
+                          "padding": {
+                            "top": 24,
+                            "right": 24,
+                            "bottom": 24,
+                            "left": 24
+                          },
+                          "backgroundColor": "#ffffff",
+                          "borderRadius": 8
+                        },
+                        "innerBlocks": [
+                          {
+                            "id": "7da7c77b-3da0-4fcc-9c71-677e99d73a25",
+                            "type": "o4o/heading",
+                            "attributes": {
+                              "content": "Scalable",
+                              "level": 3,
+                              "fontSize": 24
+                            }
+                          },
+                          {
+                            "id": "5a669942-7322-4639-af10-191a34147e12",
+                            "type": "o4o/paragraph",
+                            "attributes": {
+                              "content": "Grows with your business needs",
+                              "textColor": "#4b5563"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "698c6f99-de79-4c1f-b200-c612e6421b99",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flex",
+                  "justifyContent": "center",
+                  "padding": {}
+                },
+                "innerBlocks": [
+                  {
+                    "id": "b48e7f5c-8a06-4888-8639-9178622c6ffe",
+                    "type": "o4o/button",
+                    "attributes": {
+                      "text": "Start Free Trial",
+                      "url": "",
+                      "backgroundColor": "#16a34a",
+                      "textColor": "#ffffff",
+                      "borderRadius": 9999,
+                      "fontSize": 20,
+                      "padding": {
+                        "left": 48,
+                        "right": 48,
+                        "top": 20,
+                        "bottom": 20
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "03-custom-components.tsx",
+    "status": "success",
+    "stats": {
+      "totalBlocks": 14,
+      "placeholderCount": 5,
+      "successfulConversions": 9
+    },
+    "placeholders": [
+      {
+        "componentName": "Carousel",
+        "count": 1
+      },
+      {
+        "componentName": "PricingCard",
+        "count": 3
+      },
+      {
+        "componentName": "AnimatedCounter",
+        "count": 1
+      }
+    ],
+    "blocks": [
+      {
+        "id": "7212385e-46b6-433c-b01b-66193715056c",
+        "type": "o4o/group",
+        "attributes": {
+          "layout": "flow",
+          "padding": {
+            "left": 16,
+            "right": 16,
+            "top": 48,
+            "bottom": 48
+          }
+        },
+        "innerBlocks": [
+          {
+            "id": "cbb28450-08eb-4a71-8313-164186c69d4b",
+            "type": "o4o/heading",
+            "attributes": {
+              "content": "Our Products",
+              "level": 1,
+              "align": "center",
+              "fontSize": 36
+            }
+          },
+          {
+            "id": "9cdb29a8-1db3-4780-b39f-9d15e1f94d88",
+            "type": "o4o/placeholder",
+            "attributes": {
+              "componentName": "Carousel",
+              "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+              "notes": "<Carousel items={[\"[expression]\",\"[expression]\"]} autoPlay interval={3000} />",
+              "props": {
+                "items": "[\"[expression]\",\"[expression]\"]",
+                "autoPlay": true,
+                "interval": 3000
+              }
+            }
+          },
+          {
+            "id": "368964b0-2e26-4fdb-a918-c92732377d09",
+            "type": "o4o/columns",
+            "attributes": {
+              "columnCount": 3,
+              "gap": 24,
+              "isStackedOnMobile": true
+            },
+            "innerBlocks": [
+              {
+                "id": "17a4da4f-d9cf-4a99-b386-3c1863ee1c14",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 33.333333333333336
+                },
+                "innerBlocks": [
+                  {
+                    "id": "6a37353f-00da-4034-ac59-f5cd679e492e",
+                    "type": "o4o/placeholder",
+                    "attributes": {
+                      "componentName": "PricingCard",
+                      "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                      "notes": "<PricingCard title=\"Basic\" price={29} features={[\"Feature 1\",\"Feature 2\"]} />",
+                      "props": {
+                        "title": "Basic",
+                        "price": 29,
+                        "features": "[\"Feature 1\",\"Feature 2\"]"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "754eb522-15c4-4464-a82f-94c8fd9893bc",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 33.333333333333336
+                },
+                "innerBlocks": [
+                  {
+                    "id": "74d0de5f-c16d-461e-9fad-28e0a00236f7",
+                    "type": "o4o/placeholder",
+                    "attributes": {
+                      "componentName": "PricingCard",
+                      "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                      "notes": "<PricingCard title=\"Pro\" price={79} features={[\"All Basic\",\"Feature 3\",\"Feature 4\"]} highlighted />",
+                      "props": {
+                        "title": "Pro",
+                        "price": 79,
+                        "features": "[\"All Basic\",\"Feature 3\",\"Feature 4\"]",
+                        "highlighted": true
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "4ac609a6-3e4d-44cb-a4f5-0948a71b9179",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 33.333333333333336
+                },
+                "innerBlocks": [
+                  {
+                    "id": "df915e4d-820a-46e7-9a01-5c4a88c3ec63",
+                    "type": "o4o/placeholder",
+                    "attributes": {
+                      "componentName": "PricingCard",
+                      "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                      "notes": "<PricingCard title=\"Enterprise\" price={199} features={[\"All Pro\",\"Feature 5\",\"Priority Support\"]} />",
+                      "props": {
+                        "title": "Enterprise",
+                        "price": 199,
+                        "features": "[\"All Pro\",\"Feature 5\",\"Priority Support\"]"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "e95262aa-7c49-41ab-9dba-2bc3bc909119",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flex",
+              "justifyContent": "center",
+              "padding": {}
+            },
+            "innerBlocks": [
+              {
+                "id": "00ea5172-b706-4399-bf56-1f90ffee7508",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow",
+                  "padding": {}
+                },
+                "innerBlocks": [
+                  {
+                    "id": "cf75c454-70fa-4b35-a556-35040b0f01bb",
+                    "type": "o4o/heading",
+                    "attributes": {
+                      "content": "Our Users",
+                      "level": 2,
+                      "fontSize": 30
+                    }
+                  },
+                  {
+                    "id": "b50ca62f-1035-4949-8694-5b2394a9218f",
+                    "type": "o4o/placeholder",
+                    "attributes": {
+                      "componentName": "AnimatedCounter",
+                      "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                      "notes": "<AnimatedCounter target={10000} duration={2000} />",
+                      "props": {
+                        "target": 10000,
+                        "duration": 2000
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "04-grid-flex-mix.tsx",
+    "status": "success",
+    "stats": {
+      "totalBlocks": 28,
+      "placeholderCount": 0,
+      "successfulConversions": 28
+    },
+    "placeholders": [],
+    "blocks": [
+      {
+        "id": "749f6734-892f-4c28-b4da-15e8afbcd065",
+        "type": "o4o/group",
+        "attributes": {
+          "layout": "flow",
+          "padding": {
+            "left": 16,
+            "right": 16,
+            "top": 64,
+            "bottom": 64
+          }
+        },
+        "innerBlocks": [
+          {
+            "id": "414d3b6e-9bcf-4c13-9aa7-1cbe18e3bce3",
+            "type": "o4o/heading",
+            "attributes": {
+              "content": "Features",
+              "level": 1,
+              "align": "center",
+              "fontSize": 48
+            }
+          },
+          {
+            "id": "2b6f13e6-ef1f-4861-8831-d6a1f740170b",
+            "type": "o4o/columns",
+            "attributes": {
+              "columnCount": 2,
+              "gap": 32,
+              "isStackedOnMobile": true
+            },
+            "innerBlocks": [
+              {
+                "id": "15881908-dfa6-48b6-9947-a8145d15b4cc",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 50
+                },
+                "innerBlocks": [
+                  {
+                    "id": "7f70d8b4-19d2-4648-ab6a-1bd974f26906",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flex",
+                      "flexDirection": "column",
+                      "gap": 16,
+                      "padding": {
+                        "top": 24,
+                        "right": 24,
+                        "bottom": 24,
+                        "left": 24
+                      },
+                      "backgroundColor": "#eff6ff",
+                      "borderRadius": 8
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "2bf27555-97b0-4dc6-8452-5bd652d19039",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Design Tools",
+                          "level": 2,
+                          "fontSize": 30
+                        }
+                      },
+                      {
+                        "id": "0d74364b-5a88-4a55-9447-7028dd9d78af",
+                        "type": "o4o/paragraph",
+                        "attributes": {
+                          "content": "Create stunning designs with our intuitive tools",
+                          "textColor": "#374151"
+                        }
+                      },
+                      {
+                        "id": "d49bde22-f004-46da-a7ed-b653b9ccd534",
+                        "type": "o4o/group",
+                        "attributes": {
+                          "layout": "flex",
+                          "flexDirection": "row",
+                          "gap": 8,
+                          "padding": {}
+                        },
+                        "innerBlocks": [
+                          {
+                            "id": "fb9eb35e-9682-476d-9031-85c89a21b4f7",
+                            "type": "o4o/button",
+                            "attributes": {
+                              "text": "Learn More",
+                              "url": "",
+                              "backgroundColor": "#2563eb",
+                              "textColor": "#ffffff",
+                              "borderRadius": 4,
+                              "padding": {
+                                "left": 16,
+                                "right": 16,
+                                "top": 8,
+                                "bottom": 8
+                              }
+                            }
+                          },
+                          {
+                            "id": "59c60162-c9cd-4bf0-8e12-20cf4636aaae",
+                            "type": "o4o/button",
+                            "attributes": {
+                              "text": "Watch Demo",
+                              "url": "",
+                              "backgroundColor": "#e5e7eb",
+                              "textColor": "#1f2937",
+                              "borderRadius": 4,
+                              "padding": {
+                                "left": 16,
+                                "right": 16,
+                                "top": 8,
+                                "bottom": 8
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "f60d50ab-c976-4995-a3af-e976de86c5fd",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 50
+                },
+                "innerBlocks": [
+                  {
+                    "id": "32ed9bf1-fad0-494f-b886-401ec8a6bea4",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flex",
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "padding": {
+                        "top": 24,
+                        "right": 24,
+                        "bottom": 24,
+                        "left": 24
+                      },
+                      "backgroundColor": "#f0fdf4",
+                      "borderRadius": 8
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "2e0e4809-7d0f-4cb1-ad00-b3658df1ce66",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Analytics",
+                          "level": 2,
+                          "fontSize": 30
+                        }
+                      },
+                      {
+                        "id": "c42d3a02-d72a-4eaa-a406-4aca295ab31f",
+                        "type": "o4o/paragraph",
+                        "attributes": {
+                          "content": "Track your performance with real-time analytics",
+                          "align": "center"
+                        }
+                      },
+                      {
+                        "id": "d07e3ca8-ae4f-4646-ab19-00d83e4c99ac",
+                        "type": "o4o/button",
+                        "attributes": {
+                          "text": "View Dashboard",
+                          "url": "",
+                          "backgroundColor": "#16a34a",
+                          "textColor": "#ffffff",
+                          "borderRadius": 8,
+                          "padding": {
+                            "left": 24,
+                            "right": 24,
+                            "top": 12,
+                            "bottom": 12
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "8e4ea72b-7b40-4cd3-aa3b-7818584090ef",
+            "type": "o4o/columns",
+            "attributes": {
+              "columnCount": 4,
+              "gap": 16,
+              "isStackedOnMobile": true
+            },
+            "innerBlocks": [
+              {
+                "id": "13a73290-44f9-49d3-9a1f-8fe42ade185d",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 25
+                },
+                "innerBlocks": [
+                  {
+                    "id": "c35cf8a5-c3ff-4de0-8765-2195e701ea54",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 16,
+                        "right": 16,
+                        "bottom": 16,
+                        "left": 16
+                      },
+                      "backgroundColor": "#f3f4f6",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "aafaf365-d4e4-402a-9b97-5643f6446394",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Metric 1",
+                          "level": 3
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "1cc77347-6738-40a6-9c98-704397e1526d",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 25
+                },
+                "innerBlocks": [
+                  {
+                    "id": "8081cf31-1efa-4f45-8569-b914e79b1d38",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 16,
+                        "right": 16,
+                        "bottom": 16,
+                        "left": 16
+                      },
+                      "backgroundColor": "#f3f4f6",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "90f164d2-b156-41df-a741-7de5ad8423f9",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Metric 2",
+                          "level": 3
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "b4406177-cde3-4098-8bdf-4c2054796957",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 25
+                },
+                "innerBlocks": [
+                  {
+                    "id": "b2d64200-d409-40a3-aaa3-eba3b650c2bb",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 16,
+                        "right": 16,
+                        "bottom": 16,
+                        "left": 16
+                      },
+                      "backgroundColor": "#f3f4f6",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "76a6bd21-5f65-40cb-a554-79ea76a8d140",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Metric 3",
+                          "level": 3
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "4840af69-145f-4c8b-a3e7-5a9d0af69e23",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 25
+                },
+                "innerBlocks": [
+                  {
+                    "id": "4636fa62-5e30-4d16-b475-53752693094f",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 16,
+                        "right": 16,
+                        "bottom": 16,
+                        "left": 16
+                      },
+                      "backgroundColor": "#f3f4f6",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": [
+                      {
+                        "id": "ae49eb1d-8eff-4d3a-8dbc-ce2f52f85412",
+                        "type": "o4o/heading",
+                        "attributes": {
+                          "content": "Metric 4",
+                          "level": 3
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "05-tailwind-edge-cases.tsx",
+    "status": "success",
+    "stats": {
+      "totalBlocks": 28,
+      "placeholderCount": 0,
+      "successfulConversions": 28
+    },
+    "placeholders": [],
+    "blocks": [
+      {
+        "id": "da48853a-3878-43e6-a0bc-e91df8c97087",
+        "type": "o4o/group",
+        "attributes": {
+          "layout": "flow",
+          "padding": {
+            "left": 16,
+            "right": 16,
+            "top": 64,
+            "bottom": 64
+          }
+        },
+        "innerBlocks": [
+          {
+            "id": "a7cc4364-b507-4ee4-8512-c0b70f14c8a8",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow",
+              "padding": {
+                "top": 24,
+                "right": 24,
+                "bottom": 24,
+                "left": 24
+              },
+              "backgroundColor": "#2563eb"
+            },
+            "innerBlocks": [
+              {
+                "id": "d073b77b-520a-4b28-85e0-2dbc5d54451d",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Opacity Test",
+                  "level": 2,
+                  "fontSize": 24
+                }
+              }
+            ]
+          },
+          {
+            "id": "ec969c3c-143a-419d-b650-7c8f6c653f6e",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow",
+              "padding": {
+                "top": 24,
+                "right": 24,
+                "bottom": 24,
+                "left": 24
+              },
+              "backgroundColor": "#ffffff",
+              "borderRadius": 12
+            },
+            "innerBlocks": [
+              {
+                "id": "9b14af43-921c-472b-8c41-dae936b595c0",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Drop Shadow Test",
+                  "level": 2,
+                  "fontSize": 24
+                }
+              }
+            ]
+          },
+          {
+            "id": "289f979f-9211-4c59-a2d9-ff3184031286",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flex",
+              "gap": 16,
+              "padding": {}
+            },
+            "innerBlocks": [
+              {
+                "id": "76d687a6-cdd6-464e-a2c9-a6fda88eb9af",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow",
+                  "padding": {
+                    "left": 16,
+                    "right": 16,
+                    "top": 8,
+                    "bottom": 8
+                  },
+                  "backgroundColor": "#ef4444",
+                  "borderRadius": 4
+                },
+                "innerBlocks": []
+              },
+              {
+                "id": "8b7a87e6-90a7-4881-b1f2-15fbf2602741",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow",
+                  "padding": {
+                    "left": 16,
+                    "right": 16,
+                    "top": 8,
+                    "bottom": 8
+                  },
+                  "backgroundColor": "#22c55e",
+                  "borderRadius": 4
+                },
+                "innerBlocks": []
+              },
+              {
+                "id": "84d48b8d-bf04-439d-b9fb-5cfb19e60c5f",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow",
+                  "padding": {
+                    "left": 16,
+                    "right": 16,
+                    "top": 8,
+                    "bottom": 8
+                  },
+                  "backgroundColor": "#3b82f6",
+                  "borderRadius": 4
+                },
+                "innerBlocks": []
+              },
+              {
+                "id": "e7f69227-f7af-4091-8bea-91c572332be4",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow",
+                  "padding": {
+                    "left": 16,
+                    "right": 16,
+                    "top": 8,
+                    "bottom": 8
+                  },
+                  "backgroundColor": "#eab308",
+                  "borderRadius": 4
+                },
+                "innerBlocks": []
+              }
+            ]
+          },
+          {
+            "id": "e3cc589d-6ed0-4a05-a3f4-1c3ad1fb6d80",
+            "type": "o4o/columns",
+            "attributes": {
+              "columnCount": 5,
+              "gap": 12,
+              "isStackedOnMobile": true
+            },
+            "innerBlocks": [
+              {
+                "id": "2f724088-3f6f-4287-9b37-189f76b23938",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 20
+                },
+                "innerBlocks": [
+                  {
+                    "id": "6a71cf06-16c4-4eb8-a500-f03f0ca258f0",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 12,
+                        "right": 12,
+                        "bottom": 12,
+                        "left": 12
+                      },
+                      "backgroundColor": "#e5e7eb",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": []
+                  }
+                ]
+              },
+              {
+                "id": "950cd77c-04bd-4577-92d5-cdf096a44be8",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 20
+                },
+                "innerBlocks": [
+                  {
+                    "id": "04b8e38c-ef03-4907-98cc-f1d57539a68c",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 12,
+                        "right": 12,
+                        "bottom": 12,
+                        "left": 12
+                      },
+                      "backgroundColor": "#d1d5db",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": []
+                  }
+                ]
+              },
+              {
+                "id": "eb329387-a3d4-467c-a2d2-c2c7b8a1ad50",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 20
+                },
+                "innerBlocks": [
+                  {
+                    "id": "cd14f587-579d-4b1c-897e-9289bfb0f2b7",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 12,
+                        "right": 12,
+                        "bottom": 12,
+                        "left": 12
+                      },
+                      "backgroundColor": "#9ca3af",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": []
+                  }
+                ]
+              },
+              {
+                "id": "5c402aa0-c628-4eb3-9313-90ff0ac91788",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 20
+                },
+                "innerBlocks": [
+                  {
+                    "id": "f989e371-9d75-4cc7-8065-db8b65a9afed",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 12,
+                        "right": 12,
+                        "bottom": 12,
+                        "left": 12
+                      },
+                      "backgroundColor": "#6b7280",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": []
+                  }
+                ]
+              },
+              {
+                "id": "f2db4885-823c-4594-9ec6-c90261994717",
+                "type": "o4o/column",
+                "attributes": {
+                  "width": 20
+                },
+                "innerBlocks": [
+                  {
+                    "id": "4d7deb0f-99b3-4057-ae0a-6dca20014b9a",
+                    "type": "o4o/group",
+                    "attributes": {
+                      "layout": "flow",
+                      "padding": {
+                        "top": 12,
+                        "right": 12,
+                        "bottom": 12,
+                        "left": 12
+                      },
+                      "backgroundColor": "#4b5563",
+                      "borderRadius": 4
+                    },
+                    "innerBlocks": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "d69d2b72-8a3b-4afe-ac28-a11dd65d30c7",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow",
+              "padding": {
+                "top": 48,
+                "right": 48,
+                "bottom": 48,
+                "left": 48
+              },
+              "borderRadius": 8
+            },
+            "innerBlocks": [
+              {
+                "id": "2ccbb6e0-67d2-4402-a039-16521fac275e",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Relative Container",
+                  "level": 3,
+                  "fontSize": 20
+                }
+              },
+              {
+                "id": "5d6452f3-c249-4195-97a4-3d3595eed57b",
+                "type": "o4o/group",
+                "attributes": {
+                  "layout": "flow",
+                  "padding": {
+                    "left": 12,
+                    "right": 12,
+                    "top": 4,
+                    "bottom": 4
+                  },
+                  "backgroundColor": "#ef4444",
+                  "borderRadius": 4
+                },
+                "innerBlocks": []
+              },
+              {
+                "id": "3169b39d-64f3-4010-ab61-22e18cc124da",
+                "type": "o4o/paragraph",
+                "attributes": {
+                  "content": "Some content here"
+                }
+              }
+            ]
+          },
+          {
+            "id": "426b1769-b247-40c7-9103-5e90de569cf3",
+            "type": "o4o/group",
+            "attributes": {
+              "layout": "flow",
+              "padding": {
+                "top": 24,
+                "right": 24,
+                "bottom": 24,
+                "left": 24
+              },
+              "backgroundColor": "#ffffff",
+              "borderRadius": 8
+            },
+            "innerBlocks": [
+              {
+                "id": "f6576032-d4f4-4cbc-8dbb-134ccbce4229",
+                "type": "o4o/heading",
+                "attributes": {
+                  "content": "Backdrop Blur Test",
+                  "level": 3,
+                  "fontSize": 20
+                }
+              },
+              {
+                "id": "ff84d55f-6503-451a-adac-31e75b8eb621",
+                "type": "o4o/paragraph",
+                "attributes": {
+                  "content": "This has backdrop blur effect",
+                  "textColor": "#374151"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "06-invalid-jsx.tsx",
+    "status": "validation_error",
+    "error": "JSX parsing failed: Unterminated JSX contents. (12:10)"
+  }
+]

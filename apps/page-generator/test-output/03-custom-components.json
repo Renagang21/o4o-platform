@@ -1,0 +1,186 @@
+{
+  "blocks": [
+    {
+      "id": "7212385e-46b6-433c-b01b-66193715056c",
+      "type": "o4o/group",
+      "attributes": {
+        "layout": "flow",
+        "padding": {
+          "left": 16,
+          "right": 16,
+          "top": 48,
+          "bottom": 48
+        }
+      },
+      "innerBlocks": [
+        {
+          "id": "cbb28450-08eb-4a71-8313-164186c69d4b",
+          "type": "o4o/heading",
+          "attributes": {
+            "content": "Our Products",
+            "level": 1,
+            "align": "center",
+            "fontSize": 36
+          }
+        },
+        {
+          "id": "9cdb29a8-1db3-4780-b39f-9d15e1f94d88",
+          "type": "o4o/placeholder",
+          "attributes": {
+            "componentName": "Carousel",
+            "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+            "notes": "<Carousel items={[\"[expression]\",\"[expression]\"]} autoPlay interval={3000} />",
+            "props": {
+              "items": "[\"[expression]\",\"[expression]\"]",
+              "autoPlay": true,
+              "interval": 3000
+            }
+          }
+        },
+        {
+          "id": "368964b0-2e26-4fdb-a918-c92732377d09",
+          "type": "o4o/columns",
+          "attributes": {
+            "columnCount": 3,
+            "gap": 24,
+            "isStackedOnMobile": true
+          },
+          "innerBlocks": [
+            {
+              "id": "17a4da4f-d9cf-4a99-b386-3c1863ee1c14",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 33.333333333333336
+              },
+              "innerBlocks": [
+                {
+                  "id": "6a37353f-00da-4034-ac59-f5cd679e492e",
+                  "type": "o4o/placeholder",
+                  "attributes": {
+                    "componentName": "PricingCard",
+                    "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                    "notes": "<PricingCard title=\"Basic\" price={29} features={[\"Feature 1\",\"Feature 2\"]} />",
+                    "props": {
+                      "title": "Basic",
+                      "price": 29,
+                      "features": "[\"Feature 1\",\"Feature 2\"]"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "754eb522-15c4-4464-a82f-94c8fd9893bc",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 33.333333333333336
+              },
+              "innerBlocks": [
+                {
+                  "id": "74d0de5f-c16d-461e-9fad-28e0a00236f7",
+                  "type": "o4o/placeholder",
+                  "attributes": {
+                    "componentName": "PricingCard",
+                    "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                    "notes": "<PricingCard title=\"Pro\" price={79} features={[\"All Basic\",\"Feature 3\",\"Feature 4\"]} highlighted />",
+                    "props": {
+                      "title": "Pro",
+                      "price": 79,
+                      "features": "[\"All Basic\",\"Feature 3\",\"Feature 4\"]",
+                      "highlighted": true
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "4ac609a6-3e4d-44cb-a4f5-0948a71b9179",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 33.333333333333336
+              },
+              "innerBlocks": [
+                {
+                  "id": "df915e4d-820a-46e7-9a01-5c4a88c3ec63",
+                  "type": "o4o/placeholder",
+                  "attributes": {
+                    "componentName": "PricingCard",
+                    "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                    "notes": "<PricingCard title=\"Enterprise\" price={199} features={[\"All Pro\",\"Feature 5\",\"Priority Support\"]} />",
+                    "props": {
+                      "title": "Enterprise",
+                      "price": 199,
+                      "features": "[\"All Pro\",\"Feature 5\",\"Priority Support\"]"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "e95262aa-7c49-41ab-9dba-2bc3bc909119",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flex",
+            "justifyContent": "center",
+            "padding": {}
+          },
+          "innerBlocks": [
+            {
+              "id": "00ea5172-b706-4399-bf56-1f90ffee7508",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow",
+                "padding": {}
+              },
+              "innerBlocks": [
+                {
+                  "id": "cf75c454-70fa-4b35-a556-35040b0f01bb",
+                  "type": "o4o/heading",
+                  "attributes": {
+                    "content": "Our Users",
+                    "level": 2,
+                    "fontSize": 30
+                  }
+                },
+                {
+                  "id": "b50ca62f-1035-4949-8694-5b2394a9218f",
+                  "type": "o4o/placeholder",
+                  "attributes": {
+                    "componentName": "AnimatedCounter",
+                    "reason": "기존 O4O 블록으로 매핑할 수 없는 커스텀 컴포넌트입니다.",
+                    "notes": "<AnimatedCounter target={10000} duration={2000} />",
+                    "props": {
+                      "target": 10000,
+                      "duration": 2000
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": [
+    {
+      "componentName": "Carousel",
+      "count": 1
+    },
+    {
+      "componentName": "PricingCard",
+      "count": 3
+    },
+    {
+      "componentName": "AnimatedCounter",
+      "count": 1
+    }
+  ],
+  "stats": {
+    "totalBlocks": 14,
+    "placeholderCount": 5,
+    "successfulConversions": 9
+  }
+}

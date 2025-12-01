@@ -1,0 +1,369 @@
+{
+  "blocks": [
+    {
+      "id": "da48853a-3878-43e6-a0bc-e91df8c97087",
+      "type": "o4o/group",
+      "attributes": {
+        "layout": "flow",
+        "padding": {
+          "left": 16,
+          "right": 16,
+          "top": 64,
+          "bottom": 64
+        }
+      },
+      "innerBlocks": [
+        {
+          "id": "a7cc4364-b507-4ee4-8512-c0b70f14c8a8",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow",
+            "padding": {
+              "top": 24,
+              "right": 24,
+              "bottom": 24,
+              "left": 24
+            },
+            "backgroundColor": "#2563eb"
+          },
+          "innerBlocks": [
+            {
+              "id": "d073b77b-520a-4b28-85e0-2dbc5d54451d",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Opacity Test",
+                "level": 2,
+                "fontSize": 24
+              }
+            }
+          ]
+        },
+        {
+          "id": "ec969c3c-143a-419d-b650-7c8f6c653f6e",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow",
+            "padding": {
+              "top": 24,
+              "right": 24,
+              "bottom": 24,
+              "left": 24
+            },
+            "backgroundColor": "#ffffff",
+            "borderRadius": 12
+          },
+          "innerBlocks": [
+            {
+              "id": "9b14af43-921c-472b-8c41-dae936b595c0",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Drop Shadow Test",
+                "level": 2,
+                "fontSize": 24
+              }
+            }
+          ]
+        },
+        {
+          "id": "289f979f-9211-4c59-a2d9-ff3184031286",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flex",
+            "gap": 16,
+            "padding": {}
+          },
+          "innerBlocks": [
+            {
+              "id": "76d687a6-cdd6-464e-a2c9-a6fda88eb9af",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow",
+                "padding": {
+                  "left": 16,
+                  "right": 16,
+                  "top": 8,
+                  "bottom": 8
+                },
+                "backgroundColor": "#ef4444",
+                "borderRadius": 4
+              },
+              "innerBlocks": []
+            },
+            {
+              "id": "8b7a87e6-90a7-4881-b1f2-15fbf2602741",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow",
+                "padding": {
+                  "left": 16,
+                  "right": 16,
+                  "top": 8,
+                  "bottom": 8
+                },
+                "backgroundColor": "#22c55e",
+                "borderRadius": 4
+              },
+              "innerBlocks": []
+            },
+            {
+              "id": "84d48b8d-bf04-439d-b9fb-5cfb19e60c5f",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow",
+                "padding": {
+                  "left": 16,
+                  "right": 16,
+                  "top": 8,
+                  "bottom": 8
+                },
+                "backgroundColor": "#3b82f6",
+                "borderRadius": 4
+              },
+              "innerBlocks": []
+            },
+            {
+              "id": "e7f69227-f7af-4091-8bea-91c572332be4",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow",
+                "padding": {
+                  "left": 16,
+                  "right": 16,
+                  "top": 8,
+                  "bottom": 8
+                },
+                "backgroundColor": "#eab308",
+                "borderRadius": 4
+              },
+              "innerBlocks": []
+            }
+          ]
+        },
+        {
+          "id": "e3cc589d-6ed0-4a05-a3f4-1c3ad1fb6d80",
+          "type": "o4o/columns",
+          "attributes": {
+            "columnCount": 5,
+            "gap": 12,
+            "isStackedOnMobile": true
+          },
+          "innerBlocks": [
+            {
+              "id": "2f724088-3f6f-4287-9b37-189f76b23938",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 20
+              },
+              "innerBlocks": [
+                {
+                  "id": "6a71cf06-16c4-4eb8-a500-f03f0ca258f0",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 12,
+                      "right": 12,
+                      "bottom": 12,
+                      "left": 12
+                    },
+                    "backgroundColor": "#e5e7eb",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": []
+                }
+              ]
+            },
+            {
+              "id": "950cd77c-04bd-4577-92d5-cdf096a44be8",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 20
+              },
+              "innerBlocks": [
+                {
+                  "id": "04b8e38c-ef03-4907-98cc-f1d57539a68c",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 12,
+                      "right": 12,
+                      "bottom": 12,
+                      "left": 12
+                    },
+                    "backgroundColor": "#d1d5db",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": []
+                }
+              ]
+            },
+            {
+              "id": "eb329387-a3d4-467c-a2d2-c2c7b8a1ad50",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 20
+              },
+              "innerBlocks": [
+                {
+                  "id": "cd14f587-579d-4b1c-897e-9289bfb0f2b7",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 12,
+                      "right": 12,
+                      "bottom": 12,
+                      "left": 12
+                    },
+                    "backgroundColor": "#9ca3af",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": []
+                }
+              ]
+            },
+            {
+              "id": "5c402aa0-c628-4eb3-9313-90ff0ac91788",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 20
+              },
+              "innerBlocks": [
+                {
+                  "id": "f989e371-9d75-4cc7-8065-db8b65a9afed",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 12,
+                      "right": 12,
+                      "bottom": 12,
+                      "left": 12
+                    },
+                    "backgroundColor": "#6b7280",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": []
+                }
+              ]
+            },
+            {
+              "id": "f2db4885-823c-4594-9ec6-c90261994717",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 20
+              },
+              "innerBlocks": [
+                {
+                  "id": "4d7deb0f-99b3-4057-ae0a-6dca20014b9a",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 12,
+                      "right": 12,
+                      "bottom": 12,
+                      "left": 12
+                    },
+                    "backgroundColor": "#4b5563",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "d69d2b72-8a3b-4afe-ac28-a11dd65d30c7",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow",
+            "padding": {
+              "top": 48,
+              "right": 48,
+              "bottom": 48,
+              "left": 48
+            },
+            "borderRadius": 8
+          },
+          "innerBlocks": [
+            {
+              "id": "2ccbb6e0-67d2-4402-a039-16521fac275e",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Relative Container",
+                "level": 3,
+                "fontSize": 20
+              }
+            },
+            {
+              "id": "5d6452f3-c249-4195-97a4-3d3595eed57b",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flow",
+                "padding": {
+                  "left": 12,
+                  "right": 12,
+                  "top": 4,
+                  "bottom": 4
+                },
+                "backgroundColor": "#ef4444",
+                "borderRadius": 4
+              },
+              "innerBlocks": []
+            },
+            {
+              "id": "3169b39d-64f3-4010-ab61-22e18cc124da",
+              "type": "o4o/paragraph",
+              "attributes": {
+                "content": "Some content here"
+              }
+            }
+          ]
+        },
+        {
+          "id": "426b1769-b247-40c7-9103-5e90de569cf3",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow",
+            "padding": {
+              "top": 24,
+              "right": 24,
+              "bottom": 24,
+              "left": 24
+            },
+            "backgroundColor": "#ffffff",
+            "borderRadius": 8
+          },
+          "innerBlocks": [
+            {
+              "id": "f6576032-d4f4-4cbc-8dbb-134ccbce4229",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Backdrop Blur Test",
+                "level": 3,
+                "fontSize": 20
+              }
+            },
+            {
+              "id": "ff84d55f-6503-451a-adac-31e75b8eb621",
+              "type": "o4o/paragraph",
+              "attributes": {
+                "content": "This has backdrop blur effect",
+                "textColor": "#374151"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": [],
+  "stats": {
+    "totalBlocks": 28,
+    "placeholderCount": 0,
+    "successfulConversions": 28
+  }
+}

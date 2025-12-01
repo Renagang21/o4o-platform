@@ -1,0 +1,73 @@
+{
+  "blocks": [
+    {
+      "id": "472d7a35-9b7b-49de-a172-222bcf158286",
+      "type": "o4o/group",
+      "attributes": {
+        "layout": "flow",
+        "padding": {
+          "left": 16,
+          "right": 16,
+          "top": 80,
+          "bottom": 80
+        }
+      },
+      "innerBlocks": [
+        {
+          "id": "4e09070c-c478-4fb0-a527-ef7da0adc8c5",
+          "type": "o4o/heading",
+          "attributes": {
+            "content": "Welcome to O4O Platform",
+            "level": 1,
+            "align": "center",
+            "fontSize": 48
+          }
+        },
+        {
+          "id": "93b74929-3380-4fe9-aa1b-f1c6d15243cd",
+          "type": "o4o/paragraph",
+          "attributes": {
+            "content": "Build amazing websites with AI-powered page generation",
+            "align": "center",
+            "fontSize": 20
+          }
+        },
+        {
+          "id": "e560e70c-da7d-4624-8dce-d662d1d3778c",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flex",
+            "justifyContent": "center",
+            "padding": {}
+          },
+          "innerBlocks": [
+            {
+              "id": "37fd71c8-3b86-413e-b486-bc6864301838",
+              "type": "o4o/button",
+              "attributes": {
+                "text": "Get Started",
+                "url": "",
+                "backgroundColor": "#2563eb",
+                "textColor": "#ffffff",
+                "borderRadius": 8,
+                "fontSize": 18,
+                "padding": {
+                  "left": 32,
+                  "right": 32,
+                  "top": 16,
+                  "bottom": 16
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": [],
+  "stats": {
+    "totalBlocks": 5,
+    "placeholderCount": 0,
+    "successfulConversions": 5
+  }
+}

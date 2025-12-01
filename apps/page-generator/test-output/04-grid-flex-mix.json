@@ -1,0 +1,347 @@
+{
+  "blocks": [
+    {
+      "id": "749f6734-892f-4c28-b4da-15e8afbcd065",
+      "type": "o4o/group",
+      "attributes": {
+        "layout": "flow",
+        "padding": {
+          "left": 16,
+          "right": 16,
+          "top": 64,
+          "bottom": 64
+        }
+      },
+      "innerBlocks": [
+        {
+          "id": "414d3b6e-9bcf-4c13-9aa7-1cbe18e3bce3",
+          "type": "o4o/heading",
+          "attributes": {
+            "content": "Features",
+            "level": 1,
+            "align": "center",
+            "fontSize": 48
+          }
+        },
+        {
+          "id": "2b6f13e6-ef1f-4861-8831-d6a1f740170b",
+          "type": "o4o/columns",
+          "attributes": {
+            "columnCount": 2,
+            "gap": 32,
+            "isStackedOnMobile": true
+          },
+          "innerBlocks": [
+            {
+              "id": "15881908-dfa6-48b6-9947-a8145d15b4cc",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 50
+              },
+              "innerBlocks": [
+                {
+                  "id": "7f70d8b4-19d2-4648-ab6a-1bd974f26906",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flex",
+                    "flexDirection": "column",
+                    "gap": 16,
+                    "padding": {
+                      "top": 24,
+                      "right": 24,
+                      "bottom": 24,
+                      "left": 24
+                    },
+                    "backgroundColor": "#eff6ff",
+                    "borderRadius": 8
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "2bf27555-97b0-4dc6-8452-5bd652d19039",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Design Tools",
+                        "level": 2,
+                        "fontSize": 30
+                      }
+                    },
+                    {
+                      "id": "0d74364b-5a88-4a55-9447-7028dd9d78af",
+                      "type": "o4o/paragraph",
+                      "attributes": {
+                        "content": "Create stunning designs with our intuitive tools",
+                        "textColor": "#374151"
+                      }
+                    },
+                    {
+                      "id": "d49bde22-f004-46da-a7ed-b653b9ccd534",
+                      "type": "o4o/group",
+                      "attributes": {
+                        "layout": "flex",
+                        "flexDirection": "row",
+                        "gap": 8,
+                        "padding": {}
+                      },
+                      "innerBlocks": [
+                        {
+                          "id": "fb9eb35e-9682-476d-9031-85c89a21b4f7",
+                          "type": "o4o/button",
+                          "attributes": {
+                            "text": "Learn More",
+                            "url": "",
+                            "backgroundColor": "#2563eb",
+                            "textColor": "#ffffff",
+                            "borderRadius": 4,
+                            "padding": {
+                              "left": 16,
+                              "right": 16,
+                              "top": 8,
+                              "bottom": 8
+                            }
+                          }
+                        },
+                        {
+                          "id": "59c60162-c9cd-4bf0-8e12-20cf4636aaae",
+                          "type": "o4o/button",
+                          "attributes": {
+                            "text": "Watch Demo",
+                            "url": "",
+                            "backgroundColor": "#e5e7eb",
+                            "textColor": "#1f2937",
+                            "borderRadius": 4,
+                            "padding": {
+                              "left": 16,
+                              "right": 16,
+                              "top": 8,
+                              "bottom": 8
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "f60d50ab-c976-4995-a3af-e976de86c5fd",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 50
+              },
+              "innerBlocks": [
+                {
+                  "id": "32ed9bf1-fad0-494f-b886-401ec8a6bea4",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flex",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "padding": {
+                      "top": 24,
+                      "right": 24,
+                      "bottom": 24,
+                      "left": 24
+                    },
+                    "backgroundColor": "#f0fdf4",
+                    "borderRadius": 8
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "2e0e4809-7d0f-4cb1-ad00-b3658df1ce66",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Analytics",
+                        "level": 2,
+                        "fontSize": 30
+                      }
+                    },
+                    {
+                      "id": "c42d3a02-d72a-4eaa-a406-4aca295ab31f",
+                      "type": "o4o/paragraph",
+                      "attributes": {
+                        "content": "Track your performance with real-time analytics",
+                        "align": "center"
+                      }
+                    },
+                    {
+                      "id": "d07e3ca8-ae4f-4646-ab19-00d83e4c99ac",
+                      "type": "o4o/button",
+                      "attributes": {
+                        "text": "View Dashboard",
+                        "url": "",
+                        "backgroundColor": "#16a34a",
+                        "textColor": "#ffffff",
+                        "borderRadius": 8,
+                        "padding": {
+                          "left": 24,
+                          "right": 24,
+                          "top": 12,
+                          "bottom": 12
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "8e4ea72b-7b40-4cd3-aa3b-7818584090ef",
+          "type": "o4o/columns",
+          "attributes": {
+            "columnCount": 4,
+            "gap": 16,
+            "isStackedOnMobile": true
+          },
+          "innerBlocks": [
+            {
+              "id": "13a73290-44f9-49d3-9a1f-8fe42ade185d",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 25
+              },
+              "innerBlocks": [
+                {
+                  "id": "c35cf8a5-c3ff-4de0-8765-2195e701ea54",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 16,
+                      "right": 16,
+                      "bottom": 16,
+                      "left": 16
+                    },
+                    "backgroundColor": "#f3f4f6",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "aafaf365-d4e4-402a-9b97-5643f6446394",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Metric 1",
+                        "level": 3
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "1cc77347-6738-40a6-9c98-704397e1526d",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 25
+              },
+              "innerBlocks": [
+                {
+                  "id": "8081cf31-1efa-4f45-8569-b914e79b1d38",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 16,
+                      "right": 16,
+                      "bottom": 16,
+                      "left": 16
+                    },
+                    "backgroundColor": "#f3f4f6",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "90f164d2-b156-41df-a741-7de5ad8423f9",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Metric 2",
+                        "level": 3
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "b4406177-cde3-4098-8bdf-4c2054796957",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 25
+              },
+              "innerBlocks": [
+                {
+                  "id": "b2d64200-d409-40a3-aaa3-eba3b650c2bb",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 16,
+                      "right": 16,
+                      "bottom": 16,
+                      "left": 16
+                    },
+                    "backgroundColor": "#f3f4f6",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "76a6bd21-5f65-40cb-a554-79ea76a8d140",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Metric 3",
+                        "level": 3
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "4840af69-145f-4c8b-a3e7-5a9d0af69e23",
+              "type": "o4o/column",
+              "attributes": {
+                "width": 25
+              },
+              "innerBlocks": [
+                {
+                  "id": "4636fa62-5e30-4d16-b475-53752693094f",
+                  "type": "o4o/group",
+                  "attributes": {
+                    "layout": "flow",
+                    "padding": {
+                      "top": 16,
+                      "right": 16,
+                      "bottom": 16,
+                      "left": 16
+                    },
+                    "backgroundColor": "#f3f4f6",
+                    "borderRadius": 4
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "ae49eb1d-8eff-4d3a-8dbc-ce2f52f85412",
+                      "type": "o4o/heading",
+                      "attributes": {
+                        "content": "Metric 4",
+                        "level": 3
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": [],
+  "stats": {
+    "totalBlocks": 28,
+    "placeholderCount": 0,
+    "successfulConversions": 28
+  }
+}

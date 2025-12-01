@@ -1,0 +1,224 @@
+{
+  "blocks": [
+    {
+      "id": "919baa41-e80f-4a24-8dcb-a66b62c0dada",
+      "type": "o4o/group",
+      "attributes": {
+        "layout": "flow",
+        "padding": {},
+        "backgroundColor": "#f9fafb"
+      },
+      "innerBlocks": [
+        {
+          "id": "b79195f6-d812-49fd-9276-1b80465d09b1",
+          "type": "o4o/group",
+          "attributes": {
+            "layout": "flow",
+            "padding": {
+              "left": 16,
+              "right": 16,
+              "top": 80,
+              "bottom": 80
+            }
+          },
+          "innerBlocks": [
+            {
+              "id": "f24e2e1c-4891-4006-be6c-c29fac0f352b",
+              "type": "o4o/heading",
+              "attributes": {
+                "content": "Revolutionary Platform",
+                "level": 1,
+                "align": "center",
+                "fontSize": 60
+              }
+            },
+            {
+              "id": "32e6fe22-dc02-4037-977e-530dd95057c9",
+              "type": "o4o/paragraph",
+              "attributes": {
+                "content": "Transform your workflow with cutting-edge technology",
+                "align": "center",
+                "fontSize": 24
+              }
+            },
+            {
+              "id": "32ce4d6f-f846-463c-8a3f-a97471c4fb91",
+              "type": "o4o/columns",
+              "attributes": {
+                "columnCount": 3,
+                "gap": 32,
+                "isStackedOnMobile": true
+              },
+              "innerBlocks": [
+                {
+                  "id": "192b90d3-dc7c-45af-bfb5-18103f2d4381",
+                  "type": "o4o/column",
+                  "attributes": {
+                    "width": 33.333333333333336
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "1f556984-4f6b-45b5-87c4-0f2bc618a5b0",
+                      "type": "o4o/group",
+                      "attributes": {
+                        "layout": "flow",
+                        "padding": {
+                          "top": 24,
+                          "right": 24,
+                          "bottom": 24,
+                          "left": 24
+                        },
+                        "backgroundColor": "#ffffff",
+                        "borderRadius": 8
+                      },
+                      "innerBlocks": [
+                        {
+                          "id": "d5d3b3bd-4356-4160-bcb6-4693dc46e1c9",
+                          "type": "o4o/heading",
+                          "attributes": {
+                            "content": "Fast",
+                            "level": 3,
+                            "fontSize": 24
+                          }
+                        },
+                        {
+                          "id": "04c6469e-f54e-4fcc-acd2-9d0a443921ac",
+                          "type": "o4o/paragraph",
+                          "attributes": {
+                            "content": "Lightning-fast performance for your users",
+                            "textColor": "#4b5563"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "44bbbdd7-e561-49e4-b5f3-1adbff6ec235",
+                  "type": "o4o/column",
+                  "attributes": {
+                    "width": 33.333333333333336
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "16150308-af4d-47ab-98ab-dc64a0c4ef6f",
+                      "type": "o4o/group",
+                      "attributes": {
+                        "layout": "flow",
+                        "padding": {
+                          "top": 24,
+                          "right": 24,
+                          "bottom": 24,
+                          "left": 24
+                        },
+                        "backgroundColor": "#ffffff",
+                        "borderRadius": 8
+                      },
+                      "innerBlocks": [
+                        {
+                          "id": "a6cce538-df5f-43e1-8a9d-b730eefc71b3",
+                          "type": "o4o/heading",
+                          "attributes": {
+                            "content": "Secure",
+                            "level": 3,
+                            "fontSize": 24
+                          }
+                        },
+                        {
+                          "id": "76145b90-b552-411e-b438-b9afef765529",
+                          "type": "o4o/paragraph",
+                          "attributes": {
+                            "content": "Enterprise-grade security built-in",
+                            "textColor": "#4b5563"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "f3e5254f-cc62-450b-b86c-700481c6d0b0",
+                  "type": "o4o/column",
+                  "attributes": {
+                    "width": 33.333333333333336
+                  },
+                  "innerBlocks": [
+                    {
+                      "id": "fec45cbd-239d-4b6a-a08c-3ab32493e2b2",
+                      "type": "o4o/group",
+                      "attributes": {
+                        "layout": "flow",
+                        "padding": {
+                          "top": 24,
+                          "right": 24,
+                          "bottom": 24,
+                          "left": 24
+                        },
+                        "backgroundColor": "#ffffff",
+                        "borderRadius": 8
+                      },
+                      "innerBlocks": [
+                        {
+                          "id": "7da7c77b-3da0-4fcc-9c71-677e99d73a25",
+                          "type": "o4o/heading",
+                          "attributes": {
+                            "content": "Scalable",
+                            "level": 3,
+                            "fontSize": 24
+                          }
+                        },
+                        {
+                          "id": "5a669942-7322-4639-af10-191a34147e12",
+                          "type": "o4o/paragraph",
+                          "attributes": {
+                            "content": "Grows with your business needs",
+                            "textColor": "#4b5563"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "698c6f99-de79-4c1f-b200-c612e6421b99",
+              "type": "o4o/group",
+              "attributes": {
+                "layout": "flex",
+                "justifyContent": "center",
+                "padding": {}
+              },
+              "innerBlocks": [
+                {
+                  "id": "b48e7f5c-8a06-4888-8639-9178622c6ffe",
+                  "type": "o4o/button",
+                  "attributes": {
+                    "text": "Start Free Trial",
+                    "url": "",
+                    "backgroundColor": "#16a34a",
+                    "textColor": "#ffffff",
+                    "borderRadius": 9999,
+                    "fontSize": 20,
+                    "padding": {
+                      "left": 48,
+                      "right": 48,
+                      "top": 20,
+                      "bottom": 20
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": [],
+  "stats": {
+    "totalBlocks": 19,
+    "placeholderCount": 0,
+    "successfulConversions": 19
+  }
+}
