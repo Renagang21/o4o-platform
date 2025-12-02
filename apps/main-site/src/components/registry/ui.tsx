@@ -43,6 +43,11 @@ import { AdminSupplierDetailView } from '@/components/ui/admin/AdminSupplierDeta
 import { AppList } from '@/components/ui/appstore/AppList';
 import { AppCard } from '@/components/ui/appstore/AppCard';
 
+// CMS UI Components
+import { ViewList } from '@/components/ui/cms/ViewList';
+import { ViewForm } from '@/components/ui/cms/ViewForm';
+import { ViewEditor } from '@/components/ui/cms/ViewEditor';
+
 function DashboardView({ title, data }: { title: string; data?: any }) {
   return (
     <div className="p-6">
@@ -115,5 +120,9 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   // AppStore
   AppList,
   AppCard,
+  // CMS
+  ViewList,
+  ViewForm,
+  ViewEditor,
   // Add more UI components here
 };

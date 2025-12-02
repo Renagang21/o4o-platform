@@ -1,0 +1,22 @@
+{
+  "viewId": "cms-view-edit",
+  "meta": {
+    "title": "Edit View - CMS",
+    "description": "Edit an existing NextGen CMS View",
+    "route": "/cms/views/:id"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "viewEditor",
+      "props": {
+        "fetch": {
+          "queryKey": ["cms-view"],
+          "url": "/api/cms/views/:id"
+        }
+      }
+    }
+  ]
+}

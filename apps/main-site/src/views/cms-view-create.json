@@ -1,0 +1,19 @@
+{
+  "viewId": "cms-view-create",
+  "meta": {
+    "title": "Create View - CMS",
+    "description": "Create a new NextGen CMS View",
+    "route": "/cms/views/create"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "viewForm",
+      "props": {
+        "mode": "create"
+      }
+    }
+  ]
+}

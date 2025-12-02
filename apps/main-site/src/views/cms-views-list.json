@@ -1,0 +1,28 @@
+{
+  "viewId": "cms-views-list",
+  "meta": {
+    "title": "Views - CMS",
+    "description": "Manage NextGen CMS Views",
+    "route": "/cms/views"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "viewList",
+      "props": {
+        "fetch": {
+          "queryKey": ["cms-views"],
+          "url": "/api/cms/views",
+          "params": {
+            "page": 1,
+            "pageSize": 20,
+            "orderBy": "updatedAt",
+            "order": "DESC"
+          }
+        }
+      }
+    }
+  ]
+}
