@@ -1,0 +1,26 @@
+{
+  "viewId": "signage-player",
+  "meta": {
+    "title": "Signage Player",
+    "description": "Digital signage display player",
+    "route": "/signage/player"
+  },
+  "layout": {
+    "type": "MinimalLayout"
+  },
+  "components": [
+    {
+      "type": "signagePlayback",
+      "props": {
+        "fetch": {
+          "queryKey": ["signage-playback"],
+          "url": "/api/signage/now",
+          "params": {
+            "deviceId": ":deviceId"
+          }
+        },
+        "refreshInterval": 60000
+      }
+    }
+  ]
+}

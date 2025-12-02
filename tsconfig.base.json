@@ -29,6 +29,9 @@
       "@/*": [
         "./src/*"
       ],
+      "@o4o-apps/*": [
+        "./packages/@o4o-apps/*"
+      ],
       "@o4o/*": [
         "./packages/*/dist",
         "./packages/*"
@@ -56,7 +59,9 @@
     "build",
     "**/node_modules",
     "**/dist",
-    "**/build"
+    "**/build",
+    "legacy",
+    "legacy/**"
   ],
   "references": [
     {

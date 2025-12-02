@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/packages/customer",
+    "rootDir": ".",
+    "composite": true
+  },
+  "include": ["src/**/*", "manifest.json"],
+  "exclude": ["node_modules", "dist"]
+}

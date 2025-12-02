@@ -1,0 +1,22 @@
+{
+  "viewId": "signage-dashboard",
+  "meta": {
+    "title": "Digital Signage Dashboard",
+    "description": "Overview of digital signage system status and statistics",
+    "route": "/signage/dashboard"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "signageDashboard",
+      "props": {
+        "fetch": {
+          "queryKey": ["signage-stats"],
+          "url": "/api/signage/stats"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "viewId": "signage-schedule",
+  "meta": {
+    "title": "Signage Schedule",
+    "description": "Manage digital signage scheduling and timing",
+    "route": "/signage/schedule"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "signageSchedule",
+      "props": {
+        "fetch": {
+          "queryKey": ["signage-schedules"],
+          "url": "/api/signage/schedules"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "viewId": "signage-playlists",
+  "meta": {
+    "title": "Signage Playlists",
+    "description": "Manage digital signage playlists and sequences",
+    "route": "/signage/playlists"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "signagePlaylists",
+      "props": {
+        "fetch": {
+          "queryKey": ["signage-playlists"],
+          "url": "/api/signage/playlists"
+        }
+      }
+    }
+  ]
+}

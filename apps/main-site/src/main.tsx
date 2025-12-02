@@ -1,56 +1,41 @@
-import { StrictMode } from 'react';
-import './utils/react-compat'; // React 19 호환성
-import './utils/iframe-context'; // iframe 컨텍스트 초기화 (가장 먼저)
-import './index.css';
-import './styles/wordpress-blocks.css';
-import './styles/markdown-reader.css';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './contexts/AuthContext';
-import { ToastProvider } from './contexts/ToastProvider';
-import { initializeIframeContext } from './utils/iframe-context';
 import App from './App';
+import './index.css';
 
-// Shortcode registration
-import { globalRegistry } from '@o4o/shortcodes';
-import { loadShortcodes, logShortcodeSummary } from './utils/shortcode-loader';
+// Initialize AppStore in background
+import { initializeAppStore } from './appstore';
 
-// React 시작 전에 iframe 컨텍스트 초기화
-initializeIframeContext();
+// Start AppStore initialization (non-blocking)
+initializeAppStore()
+  .then(() => {
+  })
+  .catch((error) => {
+    console.error('[Main] AppStore initialization failed:', error);
+  });
 
+// Performance: Optimized React Query configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
+      staleTime: 10 * 1000, // Data stays fresh for 10 seconds
+      gcTime: 5 * 60 * 1000, // Garbage collection after 5 minutes (formerly cacheTime)
+      retry: 1, // Only retry once on failure
+      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      refetchOnReconnect: false, // Don't refetch on reconnect
+      refetchOnMount: false, // Don't refetch on component mount if data exists
     },
   },
 });
 
-// Initialize app with async shortcode loading
-async function initializeApp() {
-  // Load and register all shortcodes BEFORE rendering React
-  const stats = await loadShortcodes();
-  logShortcodeSummary(stats);
-
-  // Debug: Expose globalRegistry to window (development only)
-  if (import.meta.env.DEV) {
-    (window as any).__shortcodeRegistry = globalRegistry;
-  }
-
-  // Render React app after shortcodes are loaded
-  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-        </ToastProvider>
-      </QueryClientProvider>
-    </StrictMode>
-  );
-}
-
-// Start app initialization
-initializeApp(); 
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </React.StrictMode>
+);

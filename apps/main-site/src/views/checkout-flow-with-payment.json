@@ -1,0 +1,11 @@
+{
+  "viewId": "checkout-flow-with-payment",
+  "meta": {
+    "title": "Checkout Flow With Payment",
+    "description": "Auto-generated view for checkout-flow-with-payment"
+  },
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": []
+}

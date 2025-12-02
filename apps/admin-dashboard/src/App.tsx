@@ -131,8 +131,8 @@ const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePr
 // CPT/ACF Router
 const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
-// Dropshipping Pages - Now from dropshipping-core package
-const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
+// Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
+// const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
 // Admin Order Pages (Phase 4)
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
@@ -697,14 +697,14 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
-                    {/* Dropshipping Routes */}
-                    <Route path="/dropshipping/*" element={
+                    {/* Dropshipping Routes - REMOVED (archived to legacy/packages/dropshipping-core) */}
+                    {/* <Route path="/dropshipping/*" element={
                       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <DropshippingRouter />
                         </Suspense>
                       </AdminProtectedRoute>
-                    } />
+                    } /> */}
 
                     {/* Admin Order Management (Phase 4) */}
                     <Route path="/admin/orders" element={

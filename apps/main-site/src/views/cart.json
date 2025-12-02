@@ -1,0 +1,24 @@
+{
+  "viewId": "cart",
+  "meta": {
+    "title": "Cart",
+    "description": "Auto-generated view for cart"
+  },
+  "layout": {
+    "type": "ShopLayout"
+  },
+  "components": [
+    {
+      "type": "cart",
+      "props": {
+        "fetch": {
+          "queryKey": [
+            "cart"
+          ],
+          "url": "/api/cart",
+          "method": "GET"
+        }
+      }
+    }
+  ]
+}

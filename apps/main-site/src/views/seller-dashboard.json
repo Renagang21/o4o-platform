@@ -1,0 +1,25 @@
+{
+  "viewId": "seller-dashboard",
+  "meta": {
+    "title": "Seller Dashboard",
+    "description": "Auto-generated view for seller-dashboard"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "sellerDashboard",
+      "props": {
+        "fetch": {
+          "queryKey": [
+            "seller",
+            "dashboard"
+          ],
+          "url": "/api/seller/dashboard",
+          "method": "GET"
+        }
+      }
+    }
+  ]
+}

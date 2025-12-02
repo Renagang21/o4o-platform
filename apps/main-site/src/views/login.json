@@ -1,0 +1,16 @@
+{
+  "viewId": "login",
+  "meta": {
+    "title": "Login",
+    "description": "Auto-generated view for login"
+  },
+  "layout": {
+    "type": "AuthLayout"
+  },
+  "components": [
+    {
+      "type": "login",
+      "props": {}
+    }
+  ]
+}

@@ -163,6 +163,12 @@ import yaksaPostRoutes from '../routes/yaksa/post.routes.js';
 // Neture Forum Routes
 import netureForumRoutes from '../routes/neture/forum.routes.js';
 
+// NextGen CMS Routes
+import nextgenCMSRoutes from '../routes/cms.routes.js';
+
+// Digital Signage Routes
+import signageRoutes from '../routes/signage.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -409,6 +415,14 @@ export function setupRoutes(app: Application): void {
 
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
+
+  // NextGen CMS Routes
+  app.use('/api/cms', standardLimiter, nextgenCMSRoutes);
+  app.use('/api/v1/cms', standardLimiter, nextgenCMSRoutes);
+
+  // Digital Signage Routes
+  app.use('/api/signage', standardLimiter, signageRoutes);
+  app.use('/api/v1/signage', standardLimiter, signageRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization - Now using dropshipping-core package
   //   app.use('/api/v1/ds/seller/authorizations', standardLimiter, coreSellerAuthorizationRoutes);

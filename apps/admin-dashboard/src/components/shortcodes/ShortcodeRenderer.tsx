@@ -3,29 +3,33 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 // Import all shortcode components
-import { dropshippingShortcodes } from '@o4o/dropshipping-core/admin-ui';
-import {
-  PartnerMainDashboard,
-  PartnerProducts,
-  PartnerCommissions,
-  PartnerLinkGenerator,
-  PartnerCommissionDashboard,
-  PayoutRequests,
-  UserDashboard,
-  RoleVerification
-} from '@o4o/dropshipping-core/admin-ui';
+// REMOVED: dropshipping-core imports (archived to legacy/packages/dropshipping-core)
+// import { dropshippingShortcodes } from '@o4o/dropshipping-core/admin-ui';
+// import {
+//   PartnerMainDashboard,
+//   PartnerProducts,
+//   PartnerCommissions,
+//   PartnerLinkGenerator,
+//   PartnerCommissionDashboard,
+//   PayoutRequests,
+//   UserDashboard,
+//   RoleVerification
+// } from '@o4o/dropshipping-core/admin-ui';
 import adminComponents from './admin';
+
+// Temporary empty dropshipping shortcodes array (dropshipping-core removed)
+const dropshippingShortcodes: Array<{ name: string; description?: string; component?: React.ComponentType<any> }> = [];
 
 // Shortcode component map (Legacy support for old manual registration)
 const COMPONENT_MAP = {
-  // Partner components
-  'PartnerMainDashboard': PartnerMainDashboard,
-  'PartnerProducts': PartnerProducts,
-  'PartnerCommissions': PartnerCommissions,
-  'PartnerLinkGenerator': PartnerLinkGenerator,
-  'PartnerCommissionDashboard': PartnerCommissionDashboard,
-  'CommissionDashboard': PartnerCommissionDashboard, // Alias for backward compatibility
-  'PayoutRequests': PayoutRequests,
+  // Partner components - REMOVED (dropshipping-core archived)
+  // 'PartnerMainDashboard': PartnerMainDashboard,
+  // 'PartnerProducts': PartnerProducts,
+  // 'PartnerCommissions': PartnerCommissions,
+  // 'PartnerLinkGenerator': PartnerLinkGenerator,
+  // 'PartnerCommissionDashboard': PartnerCommissionDashboard,
+  // 'CommissionDashboard': PartnerCommissionDashboard, // Alias for backward compatibility
+  // 'PayoutRequests': PayoutRequests,
 
   // Admin components
   'AdminApprovalQueue': adminComponents.AdminApprovalQueue,
@@ -33,10 +37,10 @@ const COMPONENT_MAP = {
   'AdminPlatformStats': adminComponents.AdminPlatformStats,
   'admin_platform_stats': adminComponents.AdminPlatformStats,
 
-  // Core components
-  'UserDashboard': UserDashboard,
-  'RoleVerification': RoleVerification
-};
+  // Core components - REMOVED (dropshipping-core archived)
+  // 'UserDashboard': UserDashboard,
+  // 'RoleVerification': RoleVerification
+} as Record<string, React.ComponentType<any>>;
 
 interface ShortcodeProps {
   name: string;
@@ -163,20 +167,12 @@ const ShortcodeRenderer: React.FC<ShortcodeProps> = ({ name, attributes = {}, co
         return <Component {...verificationAttributes} />;
       }
       
-      if (['dropshipping-dashboard', 'partner-products', 'partner-commissions', 'approval-queue'].includes(shortcodeKey)) {
-        return <Component type="supplier" {...attributes} />;
-      }
-      // For other components that don't need special handling
-      // Default to providing a type prop if the component is RoleVerification
-      if (shortcodeConfig.component === 'RoleVerification') {
-        const defaultProps = {
-          type: 'supplier' as const,
-          ...attributes
-        };
-        return <Component {...defaultProps} />;
-      }
+      // REMOVED: Dropshipping-specific handling (archived to legacy)
+      // if (['dropshipping-dashboard', 'partner-products', 'partner-commissions', 'approval-queue'].includes(shortcodeKey)) {
+      //   return <Component type="supplier" {...attributes} />;
+      // }
       // For all other components
-      return <Component type="supplier" {...attributes} />;
+      return <Component {...attributes} />;
     } catch (componentError) {
       setError({
         type: 'unknown',

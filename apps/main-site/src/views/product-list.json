@@ -1,0 +1,25 @@
+{
+  "viewId": "product-list",
+  "meta": {
+    "title": "Product List",
+    "description": "Auto-generated view for product-list"
+  },
+  "layout": {
+    "type": "ShopLayout"
+  },
+  "components": [
+    {
+      "type": "productList",
+      "props": {
+        "fetch": {
+          "queryKey": [
+            "products",
+            "list"
+          ],
+          "url": "/api/products",
+          "method": "GET"
+        }
+      }
+    }
+  ]
+}
