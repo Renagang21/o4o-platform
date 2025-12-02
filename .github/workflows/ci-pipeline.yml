@@ -45,9 +45,12 @@ jobs:
           --exclude-dir=node_modules --exclude-dir=dist \
           --exclude-dir=test --exclude-dir=e2e \
           --exclude-dir=scripts \
+          --exclude-dir=cli \
+          --exclude-dir=vscode-extension \
           --exclude="*test*" --exclude="*spec*" \
           --exclude="vite.config.ts" --exclude="*.config.ts" \
           --exclude="logger.ts" --exclude="*logger*.ts" \
+          --exclude="cli.ts" \
           --exclude="main.tsx" \
           | grep -v "//.*console\.log" \
           | grep -v "^\s*//" \
