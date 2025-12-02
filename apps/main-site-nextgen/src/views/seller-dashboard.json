@@ -1,0 +1,22 @@
+{
+  "viewId": "seller-dashboard",
+  "meta": {
+    "title": "Seller Dashboard",
+    "authRequired": true,
+    "roles": ["seller"]
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "SellerDashboard",
+      "props": {
+        "fetch": {
+          "queryKey": ["seller-dashboard"],
+          "url": "/api/seller/dashboard"
+        }
+      }
+    }
+  ]
+}

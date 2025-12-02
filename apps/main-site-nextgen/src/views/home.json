@@ -1,0 +1,20 @@
+{
+  "viewId": "home",
+  "layout": {
+    "type": "DefaultLayout"
+  },
+  "components": [
+    {
+      "type": "KPIGrid",
+      "props": {
+        "columns": 4,
+        "items": [
+          { "label": "Total Users", "value": "1,234" },
+          { "label": "Active Products", "value": "567" },
+          { "label": "Orders Today", "value": "89" },
+          { "label": "Revenue", "value": "$12,345" }
+        ]
+      }
+    }
+  ]
+}

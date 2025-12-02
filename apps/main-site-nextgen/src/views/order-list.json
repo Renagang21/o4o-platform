@@ -1,0 +1,22 @@
+{
+  "viewId": "order-list",
+  "meta": {
+    "title": "My Orders",
+    "description": "View your order history",
+    "authRequired": true
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "orderList",
+      "props": {
+        "fetch": {
+          "queryKey": ["order-list"],
+          "url": "/api/orders"
+        }
+      }
+    }
+  ]
+}

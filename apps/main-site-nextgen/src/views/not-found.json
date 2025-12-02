@@ -1,0 +1,14 @@
+{
+  "viewId": "not-found",
+  "layout": {
+    "type": "MinimalLayout"
+  },
+  "components": [
+    {
+      "type": "ErrorMessage",
+      "props": {
+        "message": "Page not found (404)"
+      }
+    }
+  ]
+}

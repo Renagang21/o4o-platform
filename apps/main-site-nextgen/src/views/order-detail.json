@@ -1,0 +1,22 @@
+{
+  "viewId": "order-detail",
+  "meta": {
+    "title": "Order Details",
+    "description": "View order information",
+    "authRequired": true
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "orderDetail",
+      "props": {
+        "fetch": {
+          "queryKey": ["order-detail"],
+          "url": "/api/orders/:id"
+        }
+      }
+    }
+  ]
+}
