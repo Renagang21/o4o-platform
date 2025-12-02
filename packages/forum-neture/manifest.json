@@ -1,0 +1,12 @@
+{
+  "id": "forum-neture",
+  "name": "Neture Forum",
+  "version": "2.0.0",
+  "enabled": true,
+  "category": "content",
+  "description": "Neture cosmetics forum with skin type, routine, and product integration",
+  "author": "O4O Platform Team",
+  "views": {},
+  "functions": {},
+  "ui": {}
+}

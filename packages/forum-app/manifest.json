@@ -1,0 +1,12 @@
+{
+  "id": "forum",
+  "name": "Community Forum",
+  "version": "2.0.0",
+  "enabled": true,
+  "category": "content",
+  "description": "Community forum with posts, comments, categories, and tags for user discussions",
+  "author": "O4O Platform Team",
+  "views": {},
+  "functions": {},
+  "ui": {}
+}

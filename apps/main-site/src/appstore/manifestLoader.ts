@@ -15,9 +15,6 @@ import type { AppManifest } from './types';
  */
 export async function loadManifest(manifestPath: string): Promise<AppManifest> {
   try {
-    // For now, we'll use a mock implementation
-    // In production, this would dynamically import from the package
-
     // Extract package name from path
     const packageMatch = manifestPath.match(/@o4o-apps\/([^/]+)/);
     if (!packageMatch) {
@@ -26,13 +23,24 @@ export async function loadManifest(manifestPath: string): Promise<AppManifest> {
 
     const packageName = packageMatch[1];
 
+    // Map package names to folder names (some packages have different folder names)
+    const folderNameMap: Record<string, string> = {
+      'forum': 'forum-app',
+      'commerce': 'commerce',
+      'customer': 'customer',
+      'admin': 'admin',
+      'forum-neture': 'forum-neture',
+      'forum-yaksa': 'forum-yaksa',
+    };
+
+    const folderName = folderNameMap[packageName] || packageName;
+
     // Try to dynamically import the manifest
-    // This assumes the package exports manifest.json
     try {
-      const module = await import(`../../../packages/${packageName}/manifest.json`);
+      const module = await import(`../../../packages/${folderName}/manifest.json`);
       return validateManifest(module.default || module);
     } catch (importError) {
-      console.warn(`Could not import manifest from package, using stub for ${packageName}`);
+      console.warn(`Could not import manifest from package, using stub for ${packageName}:`, importError);
       return createStubManifest(packageName);
     }
   } catch (error) {
@@ -64,7 +72,8 @@ function validateManifest(data: any): AppManifest {
     enabled: data.enabled ?? true,
     entrypoint: data.entrypoint,
     components: data.components || {},
-    views: data.views || [],
+    functions: data.functions || {}, // Support 'functions' field
+    views: data.views || (Array.isArray(data.views) ? [] : {}), // Support both array and object
     ui: data.ui || {},
     dependencies: data.dependencies || [],
     permissions: data.permissions || [],

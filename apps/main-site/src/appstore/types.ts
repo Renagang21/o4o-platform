@@ -14,11 +14,12 @@ export interface AppManifest {
   enabled: boolean;
   entrypoint?: string;
 
-  // Component mappings
+  // Component mappings (function components)
   components?: Record<string, string>;
+  functions?: Record<string, string>; // Alternative name for components
 
-  // View definitions
-  views?: string[];
+  // View definitions (can be array or object)
+  views?: string[] | Record<string, string>;
 
   // UI components
   ui?: Record<string, string>;

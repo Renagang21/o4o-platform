@@ -1,0 +1,12 @@
+{
+  "id": "forum-yaksa",
+  "name": "Yaksa Forum",
+  "version": "2.0.0",
+  "enabled": true,
+  "category": "content",
+  "description": "Yaksa-specific forum extension with custom features and integrations",
+  "author": "O4O Platform Team",
+  "views": {},
+  "functions": {},
+  "ui": {}
+}

@@ -44,34 +44,44 @@ export async function loadApp(registryEntry: AppRegistryEntry): Promise<LoadedAp
 
     // 2. Load views
     const views = new Map<string, any>();
-    if (manifest.views && manifest.views.length > 0) {
-      for (const viewPath of manifest.views) {
+    if (manifest.views) {
+      // Handle both array and object formats
+      const viewEntries = Array.isArray(manifest.views)
+        ? manifest.views.map((path) => {
+            const id = path.replace('views/', '').replace('.json', '');
+            return [id, path];
+          })
+        : Object.entries(manifest.views);
+
+      for (const [viewId, viewPath] of viewEntries) {
         try {
           // In production, this would dynamically import view JSON files
           // For now, we'll create stub view definitions
-          const viewId = viewPath.replace('views/', '').replace('.json', '');
           views.set(viewId, {
             viewId,
             source: `app:${manifest.id}`,
             path: viewPath,
           });
         } catch (error) {
-          console.warn(`[AppLoader] Failed to load view ${viewPath}:`, error);
+          console.warn(`[AppLoader] Failed to load view ${viewId}:`, error);
         }
       }
     }
 
-    // 3. Load function components
+    // 3. Load function components (support both 'components' and 'functions' fields)
     const components = new Map<string, React.ComponentType<any>>();
-    if (manifest.components) {
-      for (const [componentName, _componentPath] of Object.entries(manifest.components)) {
-        try {
-          // In production, this would dynamically import component files
-          // For now, we'll create stub components
-          components.set(componentName, createStubComponent(componentName, manifest.id));
-        } catch (error) {
-          console.warn(`[AppLoader] Failed to load component ${componentName}:`, error);
-        }
+    const functionSources = [
+      ...(manifest.components ? Object.entries(manifest.components) : []),
+      ...(manifest.functions ? Object.entries(manifest.functions) : []),
+    ];
+
+    for (const [componentName, _componentPath] of functionSources) {
+      try {
+        // In production, this would dynamically import component files
+        // For now, we'll create stub components
+        components.set(componentName, createStubComponent(componentName, manifest.id));
+      } catch (error) {
+        console.warn(`[AppLoader] Failed to load component ${componentName}:`, error);
       }
     }
 
