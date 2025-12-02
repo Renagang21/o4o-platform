@@ -1,6 +1,6 @@
 import type { FunctionComponent } from '@/components/registry/function';
 
-export const partnerDashboard: FunctionComponent = (props, context) => {
+export const partnerDashboard: FunctionComponent = (props, _context) => {
   const data = props.data || {};
 
   return {

@@ -18,7 +18,7 @@ export interface FunctionComponentResult {
 export type FunctionComponent = (
   props: FunctionComponentProps,
   context: ViewContext
-) => FunctionComponentResult | Promise<FunctionComponentResult>;
+) => FunctionComponentResult;
 
 // Dropshipping Function Components
 import { sellerDashboard } from '@/shortcodes/_functions/dropshipping/sellerDashboard';

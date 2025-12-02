@@ -1,11 +1,11 @@
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { loadView } from './loader';
+import { loadView, getRouteParams } from './loader';
 import { checkCondition } from './helpers/condition';
 import { executeLoop, resolveProps } from './helpers/loop';
 import { useFetch } from './helpers/fetch';
 import type { ViewSchema, ViewComponentSchema, ViewContext } from './types';
-import { ComponentRegistry, FunctionRegistry, UIComponentRegistry } from '@/components/registry';
+import { FunctionRegistry, UIComponentRegistry } from '@/components/registry';
 import { LayoutRegistry } from '@/layouts/registry';
 
 export function ViewRenderer() {
@@ -31,7 +31,8 @@ export function ViewRenderer() {
 }
 
 function ViewContent({ view }: { view: ViewSchema }) {
-  const context = useViewContext();
+  const location = useLocation();
+  const context = useViewContext(location.pathname);
 
   const rendered = view.components.flatMap((component, index) => {
     return renderComponent(component, context, index);
@@ -102,7 +103,7 @@ function renderSingleComponent(
   }
 
   // Otherwise, try to get UI component directly
-  const Component = ComponentRegistry[type];
+  const Component = UIComponentRegistry[type];
 
   if (!Component) {
     return (
@@ -156,7 +157,7 @@ function ComponentWithFetch({
   }
 
   // Otherwise try direct UI component
-  const Component = ComponentRegistry[type];
+  const Component = UIComponentRegistry[type];
 
   if (!Component) {
     return <div className="p-4 text-red-500">Component not found: {type}</div>;
@@ -165,13 +166,27 @@ function ComponentWithFetch({
   return <Component {...propsWithData} context={context} />;
 }
 
-function useViewContext(): ViewContext {
-  // TODO: Implement actual context with user, router, params, query
+function useViewContext(pathname: string): ViewContext {
+  const location = useLocation();
+
+  const params = useMemo(() => {
+    return getRouteParams(pathname);
+  }, [pathname]);
+
+  const query = useMemo(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryObj: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      queryObj[key] = value;
+    });
+    return queryObj;
+  }, [location.search]);
+
   return {
-    user: null,
-    router: {},
-    params: {},
-    query: {},
+    user: null, // TODO: Get from auth context
+    router: { pathname, search: location.search, hash: location.hash },
+    params,
+    query,
     data: {},
   };
 }
