@@ -1,0 +1,23 @@
+{
+  "viewId": "supplier-dashboard",
+  "meta": {
+    "title": "Supplier Dashboard",
+    "authRequired": true,
+    "roles": ["supplier"],
+    "route": "/dashboard/supplier"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "SupplierDashboard",
+      "props": {
+        "fetch": {
+          "queryKey": ["supplier-dashboard"],
+          "url": "/api/supplier/dashboard"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "viewId": "admin-stats",
+  "meta": {
+    "title": "플랫폼 통계",
+    "description": "전체 플랫폼 통계",
+    "authRequired": true,
+    "roles": ["admin"],
+    "route": "/admin/stats"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "adminStats",
+      "props": {
+        "fetch": {
+          "queryKey": ["admin-stats"],
+          "url": "/api/admin/stats"
+        }
+      }
+    }
+  ]
+}

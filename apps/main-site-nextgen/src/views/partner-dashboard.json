@@ -1,0 +1,23 @@
+{
+  "viewId": "partner-dashboard",
+  "meta": {
+    "title": "Partner Dashboard",
+    "authRequired": true,
+    "roles": ["partner"],
+    "route": "/dashboard/partner"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "PartnerDashboard",
+      "props": {
+        "fetch": {
+          "queryKey": ["partner-dashboard"],
+          "url": "/api/partner/dashboard"
+        }
+      }
+    }
+  ]
+}

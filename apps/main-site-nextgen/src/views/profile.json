@@ -1,0 +1,23 @@
+{
+  "viewId": "profile",
+  "meta": {
+    "title": "프로필 설정",
+    "description": "프로필 정보 수정",
+    "authRequired": true,
+    "route": "/profile"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "profile",
+      "props": {
+        "fetch": {
+          "queryKey": ["profile"],
+          "url": "/api/customer/profile"
+        }
+      }
+    }
+  ]
+}

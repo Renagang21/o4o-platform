@@ -8,8 +8,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/main-site/**'
-      - 'packages/**'
+      - 'apps/main-site-nextgen/**'
       - '.github/workflows/deploy-main-site.yml'
       - 'nginx-configs/neture.co.kr.conf'
   workflow_dispatch:  # Allow manual trigger from GitHub UI
@@ -28,34 +27,26 @@ jobs:
       with:
         node-version: '22.18.0'
 
-    - name: Build dependencies
+    - name: Build main site (NextGen)
       run: |
-        echo "🔨 Building package dependencies..."
-        pnpm --filter=@o4o/shortcodes run build
-        pnpm --filter=@o4o/block-renderer run build
+        echo "🔨 Building main site (NextGen)..."
+        cd apps/main-site-nextgen
 
-        echo "✅ Package builds complete"
-        ls -la packages/shortcodes/dist/ || echo "⚠️ shortcodes dist not found"
-        ls -la packages/block-renderer/dist/ || echo "⚠️ block-renderer dist not found"
-
-    - name: Build main site
-      run: |
-        echo "🔨 Building main site..."
         NODE_OPTIONS='--max-old-space-size=4096' \
         GENERATE_SOURCEMAP=false \
         VITE_API_URL=https://api.neture.co.kr/api/v1 \
-        pnpm --filter=@o4o/main-site run build
+        pnpm run build
 
         echo "📋 Build output:"
-        ls -lh apps/main-site/dist/
+        ls -lh dist/
 
-        echo "📄 Version info:"
-        cat apps/main-site/dist/version.json || echo "No version.json found"
+        echo "📄 Version info (if exists):"
+        cat dist/version.json 2>/dev/null || echo "No version.json found"
 
     - name: Prepare Nginx config for deployment
       run: |
-        mkdir -p apps/main-site/dist/nginx-config
-        cp nginx-configs/neture.co.kr.conf apps/main-site/dist/nginx-config/
+        mkdir -p apps/main-site-nextgen/dist/nginx-config
+        cp nginx-configs/neture.co.kr.conf apps/main-site-nextgen/dist/nginx-config/
 
     - name: Deploy to web server
       uses: appleboy/ssh-action@v1.0.3
@@ -79,7 +70,7 @@ jobs:
         host: ${{ secrets.WEB_HOST }}
         username: ${{ secrets.WEB_USER }}
         key: ${{ secrets.WEB_SSH_KEY }}
-        source: "apps/main-site/dist/*"
+        source: "apps/main-site-nextgen/dist/*"
         target: "/tmp/main-site-build/"
         strip_components: 3
 

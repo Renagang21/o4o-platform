@@ -19,6 +19,7 @@
   "include": [
     "src/manifest.ts",
     "src/index.ts",
+    "src/backend/**/*",
     "src/lifecycle/**/*"
   ],
   "exclude": [
@@ -30,6 +31,8 @@
     "dist",
     "node_modules",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "src/admin-ui/**/*",
+    "src/main-site/**/*"
   ]
 }

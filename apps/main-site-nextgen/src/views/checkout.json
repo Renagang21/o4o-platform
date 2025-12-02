@@ -1,0 +1,23 @@
+{
+  "viewId": "checkout",
+  "meta": {
+    "title": "Checkout",
+    "description": "Complete your purchase",
+    "authRequired": true,
+    "route": "/checkout"
+  },
+  "layout": {
+    "type": "ShopLayout"
+  },
+  "components": [
+    {
+      "type": "checkout",
+      "props": {
+        "fetch": {
+          "queryKey": ["checkout"],
+          "url": "/api/checkout"
+        }
+      }
+    }
+  ]
+}

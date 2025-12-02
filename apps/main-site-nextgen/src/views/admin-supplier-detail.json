@@ -1,0 +1,24 @@
+{
+  "viewId": "admin-supplier-detail",
+  "meta": {
+    "title": "공급자 상세",
+    "description": "공급자 상세 정보",
+    "authRequired": true,
+    "roles": ["admin"],
+    "route": "/admin/supplier/:id"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "adminSupplierDetail",
+      "props": {
+        "fetch": {
+          "queryKey": ["admin-supplier-detail"],
+          "url": "/api/admin/suppliers/:id"
+        }
+      }
+    }
+  ]
+}

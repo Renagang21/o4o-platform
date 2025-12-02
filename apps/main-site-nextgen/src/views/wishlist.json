@@ -1,0 +1,23 @@
+{
+  "viewId": "wishlist",
+  "meta": {
+    "title": "위시리스트",
+    "description": "관심 상품 목록",
+    "authRequired": true,
+    "route": "/wishlist"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "wishlist",
+      "props": {
+        "fetch": {
+          "queryKey": ["wishlist"],
+          "url": "/api/customer/wishlist"
+        }
+      }
+    }
+  ]
+}

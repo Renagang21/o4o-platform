@@ -1,0 +1,22 @@
+{
+  "viewId": "product-detail",
+  "meta": {
+    "title": "Product Details",
+    "description": "View product information",
+    "route": "/product/:id"
+  },
+  "layout": {
+    "type": "ShopLayout"
+  },
+  "components": [
+    {
+      "type": "productDetail",
+      "props": {
+        "fetch": {
+          "queryKey": ["product-detail"],
+          "url": "/api/products/:id"
+        }
+      }
+    }
+  ]
+}
