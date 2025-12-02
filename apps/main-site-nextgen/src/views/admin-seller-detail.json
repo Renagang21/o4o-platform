@@ -1,0 +1,23 @@
+{
+  "viewId": "admin-seller-detail",
+  "meta": {
+    "title": "판매자 상세",
+    "description": "판매자 상세 정보",
+    "authRequired": true,
+    "roles": ["admin"]
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "adminSellerDetail",
+      "props": {
+        "fetch": {
+          "queryKey": ["admin-seller-detail"],
+          "url": "/api/admin/sellers/:id"
+        }
+      }
+    }
+  ]
+}

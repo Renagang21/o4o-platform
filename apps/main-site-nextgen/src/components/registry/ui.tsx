@@ -31,6 +31,14 @@ import { CustomerOverview } from '@/components/ui/customer/CustomerOverview';
 import { WishlistList } from '@/components/ui/customer/WishlistList';
 import { ProfileForm } from '@/components/ui/customer/ProfileForm';
 
+// Admin UI Components
+import { AdminStatsCard } from '@/components/ui/admin/AdminStatsCard';
+import { AdminDashboardPanel } from '@/components/ui/admin/AdminDashboardPanel';
+import { AdminSellerListView } from '@/components/ui/admin/AdminSellerListView';
+import { AdminSellerDetailView } from '@/components/ui/admin/AdminSellerDetailView';
+import { AdminSupplierListView } from '@/components/ui/admin/AdminSupplierListView';
+import { AdminSupplierDetailView } from '@/components/ui/admin/AdminSupplierDetailView';
+
 function DashboardView({ title, data }: { title: string; data?: any }) {
   return (
     <div className="p-6">
@@ -93,5 +101,12 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   CustomerOverview,
   WishlistList,
   ProfileForm,
+  // Admin
+  AdminStatsCard,
+  AdminDashboardPanel,
+  AdminSellerListView,
+  AdminSellerDetailView,
+  AdminSupplierListView,
+  AdminSupplierDetailView,
   // Add more UI components here
 };

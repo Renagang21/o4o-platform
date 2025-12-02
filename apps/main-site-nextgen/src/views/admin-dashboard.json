@@ -1,0 +1,23 @@
+{
+  "viewId": "admin-dashboard",
+  "meta": {
+    "title": "관리자 대시보드",
+    "description": "관리자 메인 화면",
+    "authRequired": true,
+    "roles": ["admin"]
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "adminDashboard",
+      "props": {
+        "fetch": {
+          "queryKey": ["admin-dashboard"],
+          "url": "/api/admin/dashboard"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "viewId": "admin-supplier-list",
+  "meta": {
+    "title": "공급자 관리",
+    "description": "공급자 목록",
+    "authRequired": true,
+    "roles": ["admin"]
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "adminSupplierList",
+      "props": {
+        "fetch": {
+          "queryKey": ["admin-supplier-list"],
+          "url": "/api/admin/suppliers"
+        }
+      }
+    }
+  ]
+}

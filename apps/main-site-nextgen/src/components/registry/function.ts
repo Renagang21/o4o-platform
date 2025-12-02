@@ -41,6 +41,14 @@ import { myAccount } from '@/shortcodes/_functions/customer/myAccount';
 import { wishlist } from '@/shortcodes/_functions/customer/wishlist';
 import { profile } from '@/shortcodes/_functions/customer/profile';
 
+// Admin Function Components
+import { adminStats } from '@/shortcodes/_functions/admin/adminStats';
+import { adminDashboard } from '@/shortcodes/_functions/admin/adminDashboard';
+import { adminSellerList } from '@/shortcodes/_functions/admin/adminSellerList';
+import { adminSellerDetail } from '@/shortcodes/_functions/admin/adminSellerDetail';
+import { adminSupplierList } from '@/shortcodes/_functions/admin/adminSupplierList';
+import { adminSupplierDetail } from '@/shortcodes/_functions/admin/adminSupplierDetail';
+
 export const FunctionRegistry: Record<string, FunctionComponent> = {
   // Dropshipping
   SellerDashboard: sellerDashboard,
@@ -60,5 +68,12 @@ export const FunctionRegistry: Record<string, FunctionComponent> = {
   myAccount,
   wishlist,
   profile,
+  // Admin
+  adminStats,
+  adminDashboard,
+  adminSellerList,
+  adminSellerDetail,
+  adminSupplierList,
+  adminSupplierDetail,
   // Add more function components here
 };
