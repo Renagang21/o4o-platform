@@ -48,6 +48,14 @@ import { ViewList } from '@/components/ui/cms/ViewList';
 import { ViewForm } from '@/components/ui/cms/ViewForm';
 import { ViewEditor } from '@/components/ui/cms/ViewEditor';
 
+// Digital Signage UI Components
+import { SignageGrid } from '@o4o-apps/signage/ui/SignageGrid';
+import { SignagePlayer } from '@o4o-apps/signage/ui/SignagePlayer';
+import { DeviceCard } from '@o4o-apps/signage/ui/DeviceCard';
+import { SlideCard } from '@o4o-apps/signage/ui/SlideCard';
+import { PlaylistCard } from '@o4o-apps/signage/ui/PlaylistCard';
+import { ScheduleCard } from '@o4o-apps/signage/ui/ScheduleCard';
+
 function DashboardView({ title, data }: { title: string; data?: any }) {
   return (
     <div className="p-6">
@@ -124,5 +132,12 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   ViewList,
   ViewForm,
   ViewEditor,
+  // Digital Signage
+  SignageGrid,
+  SignagePlayer,
+  DeviceCard,
+  SlideCard,
+  PlaylistCard,
+  ScheduleCard,
   // Add more UI components here
 };

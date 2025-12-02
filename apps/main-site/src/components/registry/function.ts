@@ -57,6 +57,14 @@ import { viewList } from '@/shortcodes/_functions/cms/viewList';
 import { viewForm } from '@/shortcodes/_functions/cms/viewForm';
 import { viewEditor } from '@/shortcodes/_functions/cms/viewEditor';
 
+// Digital Signage Function Components
+import { signageDashboard } from '@o4o-apps/signage/functions/signageDashboard';
+import { signageDevices } from '@o4o-apps/signage/functions/signageDevices';
+import { signageSlides } from '@o4o-apps/signage/functions/signageSlides';
+import { signagePlaylists } from '@o4o-apps/signage/functions/signagePlaylists';
+import { signageSchedule } from '@o4o-apps/signage/functions/signageSchedule';
+import { signagePlayback } from '@o4o-apps/signage/functions/signagePlayback';
+
 export const FunctionRegistry: Record<string, FunctionComponent> = {
   // Dropshipping
   SellerDashboard: sellerDashboard,
@@ -89,5 +97,12 @@ export const FunctionRegistry: Record<string, FunctionComponent> = {
   viewList,
   viewForm,
   viewEditor,
+  // Digital Signage
+  signageDashboard,
+  signageDevices,
+  signageSlides,
+  signagePlaylists,
+  signageSchedule,
+  signagePlayback,
   // Add more function components here
 };
