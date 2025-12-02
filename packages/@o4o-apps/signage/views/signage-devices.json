@@ -1,0 +1,22 @@
+{
+  "viewId": "signage-devices",
+  "meta": {
+    "title": "Signage Devices",
+    "description": "Manage digital signage display devices",
+    "route": "/signage/devices"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "signageDevices",
+      "props": {
+        "fetch": {
+          "queryKey": ["signage-devices"],
+          "url": "/api/signage/devices"
+        }
+      }
+    }
+  ]
+}

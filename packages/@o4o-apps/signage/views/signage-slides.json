@@ -1,0 +1,22 @@
+{
+  "viewId": "signage-slides",
+  "meta": {
+    "title": "Signage Slides",
+    "description": "Manage digital signage slides and content",
+    "route": "/signage/slides"
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "signageSlides",
+      "props": {
+        "fetch": {
+          "queryKey": ["signage-slides"],
+          "url": "/api/signage/slides"
+        }
+      }
+    }
+  ]
+}
