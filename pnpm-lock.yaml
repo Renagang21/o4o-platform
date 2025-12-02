@@ -1242,6 +1242,37 @@ importers:
         specifier: ^5.1.3
         version: 5.9.2
 
+  packages/admin:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.87.1(react@19.1.1)
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.1.1
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.24
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
+
   packages/appearance-system:
     devDependencies:
       '@jest/globals':
@@ -1390,11 +1421,70 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
+  packages/commerce:
+    dependencies:
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.87.1(react@19.1.1)
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.1.1
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.24
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
+
   packages/cpt-registry:
     devDependencies:
       typescript:
         specifier: ^5.3.3
         version: 5.4.5
+
+  packages/customer:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.87.1(react@19.1.1)
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.1.1
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.8.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.24
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.24
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.2
 
   packages/forum-app:
     dependencies:
@@ -12218,12 +12308,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
+  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
-      '@emotion/react': 11.14.0(@types/react@18.2.79)(react@18.2.0)
+      '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.2.0)
       '@emotion/utils': 1.4.2
@@ -16483,7 +16573,7 @@ snapshots:
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.3.24)(react@18.2.0)
       '@emotion/serialize': 1.3.3
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.2.0))(@types/react@18.3.24)(react@18.2.0)
       '@emotion/utils': 1.4.2
       '@floating-ui/react-dom': 2.1.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/gradient-parser': 0.1.3
