@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 interface CartItemProps {
   id: string;
   productId: string;
@@ -8,7 +10,8 @@ interface CartItemProps {
   subtotal: number;
 }
 
-export function CartItem({
+// Performance: Memoize CartItem to prevent unnecessary re-renders
+export const CartItem = memo(function CartItem({
   productTitle,
   productImage,
   price,
@@ -18,7 +21,12 @@ export function CartItem({
   return (
     <div className="flex gap-4 p-4 bg-white border border-gray-200 rounded-lg">
       <div className="w-20 h-20 rounded overflow-hidden bg-gray-100 flex-shrink-0">
-        <img src={productImage} alt={productTitle} className="w-full h-full object-cover" />
+        <img
+          src={productImage}
+          alt={productTitle}
+          loading="lazy"
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="flex-1">
@@ -43,4 +51,4 @@ export function CartItem({
       </div>
     </div>
   );
-}
+});

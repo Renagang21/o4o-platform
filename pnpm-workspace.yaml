@@ -3,3 +3,4 @@ packages:
   - 'packages/*'
   - '!apps/*.backup'
   - '!packages/*.backup'
+  - '!legacy/**'

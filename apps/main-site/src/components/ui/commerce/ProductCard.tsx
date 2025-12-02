@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 interface ProductCardProps {
   id: string;
   title: string;
@@ -6,13 +8,19 @@ interface ProductCardProps {
   category?: string;
 }
 
-export function ProductCard({ title, price, thumbnail, category }: ProductCardProps) {
+// Performance: Memoize ProductCard to prevent unnecessary re-renders
+export const ProductCard = memo(function ProductCard({ title, price, thumbnail, category }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-200">
       <div className="aspect-square overflow-hidden bg-gray-100">
         <img
           src={thumbnail}
           alt={title}
+          loading="lazy" // Performance: Lazy load images
+          onError={(e) => {
+            // Performance: Fallback for broken images
+            e.currentTarget.src = '/placeholder-product.png';
+          }}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         />
       </div>
@@ -32,4 +40,4 @@ export function ProductCard({ title, price, thumbnail, category }: ProductCardPr
       </div>
     </div>
   );
-}
+});

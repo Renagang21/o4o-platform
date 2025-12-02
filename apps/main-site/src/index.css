@@ -1,27 +1,12 @@
-/* Import all theme variations */
-@import './styles/themes/index.css';
-
-/* Import appearance system utilities (Phase 3.5) */
-@import './styles/appearance-utilities.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Iframe-specific styles */
-body.in-iframe {
-  /* Optimize for iframe context */
-  overflow-x: hidden;
-  /* Prevent scroll issues in iframe */
-  -webkit-overflow-scrolling: touch;
-  /* Improve iframe performance */
-  contain: layout style;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-body.standalone {
-  /* Normal standalone styles */
-  overflow-x: auto;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

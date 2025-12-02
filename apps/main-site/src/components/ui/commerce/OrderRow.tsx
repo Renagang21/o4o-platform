@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 interface OrderRowProps {
   id: string;
   orderNumber: string;
@@ -16,7 +18,8 @@ const statusConfig = {
   cancelled: { color: 'bg-red-100 text-red-800', label: 'Cancelled' },
 };
 
-export function OrderRow({
+// Performance: Memoize OrderRow to prevent unnecessary re-renders
+export const OrderRow = memo(function OrderRow({
   orderNumber,
   date,
   status,
@@ -30,7 +33,7 @@ export function OrderRow({
     <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition">
       {thumbnail && (
         <div className="w-16 h-16 rounded overflow-hidden bg-gray-100 flex-shrink-0">
-          <img src={thumbnail} alt="Order" className="w-full h-full object-cover" />
+          <img src={thumbnail} alt="Order" loading="lazy" className="w-full h-full object-cover" />
         </div>
       )}
 
@@ -54,4 +57,4 @@ export function OrderRow({
       </button>
     </div>
   );
-}
+});
