@@ -1,6 +1,7 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../../tsconfig.json",
   "compilerOptions": {
+    "rootDir": ".",
     "outDir": "dist",
     "composite": false,
     "declaration": true,
@@ -16,6 +17,6 @@
     "isolatedModules": false,
     "lib": ["ES2022", "DOM"]
   },
-  "include": ["src/**/*", "index.ts", "manifest.ts"],
+  "include": ["index.ts", "manifest.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

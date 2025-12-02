@@ -1,4 +1,3 @@
-import manifest from './manifest.json' assert { type: 'json' };
-
-export { manifest as signageManifest };
-export default manifest;
+// Manifest export
+export { signageManifest } from './manifest.js';
+export { default } from './manifest.js';
