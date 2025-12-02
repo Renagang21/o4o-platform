@@ -39,6 +39,10 @@ import { AdminSellerDetailView } from '@/components/ui/admin/AdminSellerDetailVi
 import { AdminSupplierListView } from '@/components/ui/admin/AdminSupplierListView';
 import { AdminSupplierDetailView } from '@/components/ui/admin/AdminSupplierDetailView';
 
+// AppStore UI Components
+import { AppList } from '@/components/ui/appstore/AppList';
+import { AppCard } from '@/components/ui/appstore/AppCard';
+
 function DashboardView({ title, data }: { title: string; data?: any }) {
   return (
     <div className="p-6">
@@ -108,5 +112,8 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   AdminSellerDetailView,
   AdminSupplierListView,
   AdminSupplierDetailView,
+  // AppStore
+  AppList,
+  AppCard,
   // Add more UI components here
 };

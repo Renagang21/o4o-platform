@@ -49,6 +49,9 @@ import { adminSellerDetail } from '@/shortcodes/_functions/admin/adminSellerDeta
 import { adminSupplierList } from '@/shortcodes/_functions/admin/adminSupplierList';
 import { adminSupplierDetail } from '@/shortcodes/_functions/admin/adminSupplierDetail';
 
+// AppStore Function Components
+import { appStoreManager } from '@/shortcodes/_functions/appstore/appStoreManager';
+
 export const FunctionRegistry: Record<string, FunctionComponent> = {
   // Dropshipping
   SellerDashboard: sellerDashboard,
@@ -75,5 +78,7 @@ export const FunctionRegistry: Record<string, FunctionComponent> = {
   adminSellerDetail,
   adminSupplierList,
   adminSupplierDetail,
+  // AppStore
+  appStoreManager,
   // Add more function components here
 };

@@ -1,0 +1,20 @@
+{
+  "viewId": "appstore",
+  "layout": {
+    "type": "DashboardLayout",
+    "props": {
+      "title": "App Store"
+    }
+  },
+  "fetch": {
+    "queryKey": ["appstore", "apps"],
+    "enabled": false,
+    "initialData": []
+  },
+  "components": [
+    {
+      "type": "appStoreManager",
+      "props": {}
+    }
+  ]
+}
