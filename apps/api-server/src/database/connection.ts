@@ -113,6 +113,11 @@ import { PartnerProfile } from '../entities/PartnerProfile.js';
 // import { ForumPost, ForumCategory, ForumComment, ForumTag } from '@o4o-apps/forum';
 // Dropshipping Core entities (from @o4o/dropshipping-core package)
 // import { dropshippingEntities } from '@o4o/dropshipping-core';
+// Digital Signage entities
+import { SignageDevice } from '../entities/SignageDevice.js';
+import { SignageSlide } from '../entities/SignageSlide.js';
+import { SignagePlaylist, SignagePlaylistItem } from '../entities/SignagePlaylist.js';
+import { SignageSchedule } from '../entities/SignageSchedule.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -262,6 +267,12 @@ export const AppDataSource = new DataSource({
     //     ForumCategory,
     //     ForumComment,
     //     ForumTag,
+    // Digital Signage entities
+    SignageDevice,
+    SignageSlide,
+    SignagePlaylist,
+    SignagePlaylistItem,
+    SignageSchedule,
   ],
   
   // 마이그레이션 설정
