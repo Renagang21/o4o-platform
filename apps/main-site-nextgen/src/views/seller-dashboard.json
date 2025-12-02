@@ -2,20 +2,22 @@
   "viewId": "seller-dashboard",
   "meta": {
     "title": "Seller Dashboard",
-    "authRequired": true,
-    "roles": ["seller"],
-    "route": "/dashboard/seller"
+    "description": "Auto-generated view for seller-dashboard"
   },
   "layout": {
     "type": "DashboardLayout"
   },
   "components": [
     {
-      "type": "SellerDashboard",
+      "type": "sellerDashboard",
       "props": {
         "fetch": {
-          "queryKey": ["seller-dashboard"],
-          "url": "/api/seller/dashboard"
+          "queryKey": [
+            "seller",
+            "dashboard"
+          ],
+          "url": "/api/seller/dashboard",
+          "method": "GET"
         }
       }
     }

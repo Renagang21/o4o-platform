@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect, useMemo } from 'react';
+import { Suspense, useState, useEffect, useMemo, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { loadView, getRouteParams } from './loader';
 import { checkCondition } from './helpers/condition';
@@ -7,6 +7,14 @@ import { useFetch } from './helpers/fetch';
 import type { ViewSchema, ViewComponentSchema, ViewContext } from './types';
 import { FunctionRegistry, UIComponentRegistry } from '@/components/registry';
 import { LayoutRegistry } from '@/layouts/registry';
+
+// Performance: Function Component result cache
+const functionResultCache = new Map<string, any>();
+
+// Performance: Generate cache key for function components
+function generateCacheKey(funcName: string, props: Record<string, any>, context: ViewContext): string {
+  return `${funcName}-${JSON.stringify(props)}-${context.router.pathname}`;
+}
 
 export function ViewRenderer() {
   const location = useLocation();
@@ -30,13 +38,17 @@ export function ViewRenderer() {
   return <ViewContent view={view} />;
 }
 
-function ViewContent({ view }: { view: ViewSchema }) {
+// Performance: Memoize ViewContent to avoid unnecessary re-renders
+const ViewContent = memo(function ViewContent({ view }: { view: ViewSchema }) {
   const location = useLocation();
   const context = useViewContext(location.pathname);
 
-  const rendered = view.components.flatMap((component, index) => {
-    return renderComponent(component, context, index);
-  });
+  // Performance: Memoize component rendering
+  const rendered = useMemo(() => {
+    return view.components.flatMap((component, index) => {
+      return renderComponent(component, context, index);
+    });
+  }, [view.components, context]);
 
   const Layout = LayoutRegistry[view.layout.type] || LayoutRegistry['DefaultLayout'];
 
@@ -45,7 +57,7 @@ function ViewContent({ view }: { view: ViewSchema }) {
       <Layout view={view}>{rendered}</Layout>
     </Suspense>
   );
-}
+});
 
 function renderComponent(
   component: ViewComponentSchema,
@@ -88,7 +100,21 @@ function renderSingleComponent(
   // Check if it's a Function Component
   const func = FunctionRegistry[type];
   if (func) {
-    const result = func(componentProps, context);
+    // Performance: Use cached result if available
+    const cacheKey = generateCacheKey(type, componentProps, context);
+    let result = functionResultCache.get(cacheKey);
+
+    if (!result) {
+      result = func(componentProps, context);
+      functionResultCache.set(cacheKey, result);
+
+      // Performance: Clear cache when it gets too large (prevent memory leak)
+      if (functionResultCache.size > 100) {
+        const firstKey = functionResultCache.keys().next().value;
+        if (firstKey) functionResultCache.delete(firstKey);
+      }
+    }
+
     const UIComponent = UIComponentRegistry[result.type];
 
     if (!UIComponent) {
@@ -146,7 +172,21 @@ function ComponentWithFetch({
   // Check if it's a Function Component
   const func = FunctionRegistry[type];
   if (func) {
-    const result = func(propsWithData, context);
+    // Performance: Use cached result if available
+    const cacheKey = generateCacheKey(type, propsWithData, context);
+    let result = functionResultCache.get(cacheKey);
+
+    if (!result) {
+      result = func(propsWithData, context);
+      functionResultCache.set(cacheKey, result);
+
+      // Performance: Clear cache when it gets too large
+      if (functionResultCache.size > 100) {
+        const firstKey = functionResultCache.keys().next().value;
+        if (firstKey) functionResultCache.delete(firstKey);
+      }
+    }
+
     const UIComponent = UIComponentRegistry[result.type];
 
     if (!UIComponent) {
