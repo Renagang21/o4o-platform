@@ -4,7 +4,8 @@
     "title": "공급자 상세",
     "description": "공급자 상세 정보",
     "authRequired": true,
-    "roles": ["admin"]
+    "roles": ["admin"],
+    "route": "/admin/supplier/:id"
   },
   "layout": {
     "type": "DashboardLayout"

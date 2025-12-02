@@ -4,7 +4,8 @@
     "title": "판매자 관리",
     "description": "판매자 목록",
     "authRequired": true,
-    "roles": ["admin"]
+    "roles": ["admin"],
+    "route": "/admin/sellers"
   },
   "layout": {
     "type": "DashboardLayout"

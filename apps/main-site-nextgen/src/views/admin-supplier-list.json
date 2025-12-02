@@ -4,7 +4,8 @@
     "title": "공급자 관리",
     "description": "공급자 목록",
     "authRequired": true,
-    "roles": ["admin"]
+    "roles": ["admin"],
+    "route": "/admin/suppliers"
   },
   "layout": {
     "type": "DashboardLayout"

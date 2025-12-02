@@ -3,7 +3,8 @@
   "meta": {
     "title": "Seller Dashboard",
     "authRequired": true,
-    "roles": ["seller"]
+    "roles": ["seller"],
+    "route": "/dashboard/seller"
   },
   "layout": {
     "type": "DashboardLayout"

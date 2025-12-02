@@ -3,7 +3,8 @@
   "meta": {
     "title": "마이페이지",
     "description": "내 계정 정보",
-    "authRequired": true
+    "authRequired": true,
+    "route": "/my-account"
   },
   "layout": {
     "type": "DashboardLayout"

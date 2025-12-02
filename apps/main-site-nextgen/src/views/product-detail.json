@@ -2,7 +2,8 @@
   "viewId": "product-detail",
   "meta": {
     "title": "Product Details",
-    "description": "View product information"
+    "description": "View product information",
+    "route": "/product/:id"
   },
   "layout": {
     "type": "ShopLayout"

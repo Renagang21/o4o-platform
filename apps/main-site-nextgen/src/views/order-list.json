@@ -3,7 +3,8 @@
   "meta": {
     "title": "My Orders",
     "description": "View your order history",
-    "authRequired": true
+    "authRequired": true,
+    "route": "/orders"
   },
   "layout": {
     "type": "DashboardLayout"

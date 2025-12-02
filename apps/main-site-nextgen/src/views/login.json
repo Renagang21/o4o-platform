@@ -2,7 +2,8 @@
   "viewId": "login",
   "meta": {
     "title": "로그인",
-    "description": "로그인 페이지"
+    "description": "로그인 페이지",
+    "route": "/login"
   },
   "layout": {
     "type": "AuthLayout"

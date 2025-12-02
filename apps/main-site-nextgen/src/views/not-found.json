@@ -1,5 +1,10 @@
 {
   "viewId": "not-found",
+  "meta": {
+    "title": "Page Not Found",
+    "description": "404 Error",
+    "route": "/404"
+  },
   "layout": {
     "type": "MinimalLayout"
   },

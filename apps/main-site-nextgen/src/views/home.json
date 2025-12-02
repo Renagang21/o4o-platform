@@ -1,5 +1,10 @@
 {
   "viewId": "home",
+  "meta": {
+    "title": "Home",
+    "description": "Welcome to O4O Platform",
+    "route": "/"
+  },
   "layout": {
     "type": "DefaultLayout"
   },

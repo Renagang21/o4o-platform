@@ -3,7 +3,8 @@
   "meta": {
     "title": "Supplier Dashboard",
     "authRequired": true,
-    "roles": ["supplier"]
+    "roles": ["supplier"],
+    "route": "/dashboard/supplier"
   },
   "layout": {
     "type": "DashboardLayout"

@@ -3,7 +3,8 @@
   "meta": {
     "title": "Checkout",
     "description": "Complete your purchase",
-    "authRequired": true
+    "authRequired": true,
+    "route": "/checkout"
   },
   "layout": {
     "type": "ShopLayout"

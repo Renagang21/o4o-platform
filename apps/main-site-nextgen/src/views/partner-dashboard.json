@@ -3,7 +3,8 @@
   "meta": {
     "title": "Partner Dashboard",
     "authRequired": true,
-    "roles": ["partner"]
+    "roles": ["partner"],
+    "route": "/dashboard/partner"
   },
   "layout": {
     "type": "DashboardLayout"

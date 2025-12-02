@@ -3,7 +3,8 @@
   "meta": {
     "title": "Order Details",
     "description": "View order information",
-    "authRequired": true
+    "authRequired": true,
+    "route": "/order/:id"
   },
   "layout": {
     "type": "DashboardLayout"

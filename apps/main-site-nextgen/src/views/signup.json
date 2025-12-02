@@ -2,7 +2,8 @@
   "viewId": "signup",
   "meta": {
     "title": "회원가입",
-    "description": "회원가입 페이지"
+    "description": "회원가입 페이지",
+    "route": "/signup"
   },
   "layout": {
     "type": "AuthLayout"

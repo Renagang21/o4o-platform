@@ -4,7 +4,8 @@
     "title": "판매자 상세",
     "description": "판매자 상세 정보",
     "authRequired": true,
-    "roles": ["admin"]
+    "roles": ["admin"],
+    "route": "/admin/seller/:id"
   },
   "layout": {
     "type": "DashboardLayout"

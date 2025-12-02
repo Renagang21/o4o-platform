@@ -2,7 +2,8 @@
   "viewId": "product-list",
   "meta": {
     "title": "Products",
-    "description": "Browse our product catalog"
+    "description": "Browse our product catalog",
+    "route": "/products"
   },
   "layout": {
     "type": "ShopLayout"

@@ -20,6 +20,7 @@ export interface ViewContext {
   router: any;
   params: Record<string, string>;
   query: Record<string, string>;
+  data?: any;
 }
 
 export interface FetchConfig {

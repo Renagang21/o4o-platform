@@ -4,7 +4,8 @@
     "title": "관리자 대시보드",
     "description": "관리자 메인 화면",
     "authRequired": true,
-    "roles": ["admin"]
+    "roles": ["admin"],
+    "route": "/admin"
   },
   "layout": {
     "type": "DashboardLayout"

@@ -2,7 +2,8 @@
   "viewId": "cart",
   "meta": {
     "title": "Shopping Cart",
-    "description": "Review your cart items"
+    "description": "Review your cart items",
+    "route": "/cart"
   },
   "layout": {
     "type": "ShopLayout"
