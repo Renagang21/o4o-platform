@@ -1,0 +1,16 @@
+{
+  "viewId": "signup",
+  "meta": {
+    "title": "회원가입",
+    "description": "회원가입 페이지"
+  },
+  "layout": {
+    "type": "AuthLayout"
+  },
+  "components": [
+    {
+      "type": "signup",
+      "props": {}
+    }
+  ]
+}

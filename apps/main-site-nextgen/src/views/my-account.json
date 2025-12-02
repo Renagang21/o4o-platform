@@ -1,0 +1,22 @@
+{
+  "viewId": "my-account",
+  "meta": {
+    "title": "마이페이지",
+    "description": "내 계정 정보",
+    "authRequired": true
+  },
+  "layout": {
+    "type": "DashboardLayout"
+  },
+  "components": [
+    {
+      "type": "myAccount",
+      "props": {
+        "fetch": {
+          "queryKey": ["my-account"],
+          "url": "/api/customer/account"
+        }
+      }
+    }
+  ]
+}

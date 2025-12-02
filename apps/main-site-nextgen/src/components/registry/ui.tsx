@@ -23,6 +23,14 @@ import { OrderRow } from '@/components/ui/commerce/OrderRow';
 import { OrderListView } from '@/components/ui/commerce/OrderListView';
 import { OrderDetailView } from '@/components/ui/commerce/OrderDetailView';
 
+// Customer/Auth UI Components
+import { LoginForm } from '@/components/ui/customer/LoginForm';
+import { SignupForm } from '@/components/ui/customer/SignupForm';
+import { ResetPasswordForm } from '@/components/ui/customer/ResetPasswordForm';
+import { CustomerOverview } from '@/components/ui/customer/CustomerOverview';
+import { WishlistList } from '@/components/ui/customer/WishlistList';
+import { ProfileForm } from '@/components/ui/customer/ProfileForm';
+
 function DashboardView({ title, data }: { title: string; data?: any }) {
   return (
     <div className="p-6">
@@ -78,5 +86,12 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   OrderRow,
   OrderListView,
   OrderDetailView,
+  // Customer/Auth
+  LoginForm,
+  SignupForm,
+  ResetPasswordForm,
+  CustomerOverview,
+  WishlistList,
+  ProfileForm,
   // Add more UI components here
 };
