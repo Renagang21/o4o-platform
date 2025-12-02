@@ -49,12 +49,12 @@ import { ViewForm } from '@/components/ui/cms/ViewForm';
 import { ViewEditor } from '@/components/ui/cms/ViewEditor';
 
 // Digital Signage UI Components
-import { SignageGrid } from '@o4o-apps/signage/ui/SignageGrid';
-import { SignagePlayer } from '@o4o-apps/signage/ui/SignagePlayer';
-import { DeviceCard } from '@o4o-apps/signage/ui/DeviceCard';
-import { SlideCard } from '@o4o-apps/signage/ui/SlideCard';
-import { PlaylistCard } from '@o4o-apps/signage/ui/PlaylistCard';
-import { ScheduleCard } from '@o4o-apps/signage/ui/ScheduleCard';
+import { SignageGrid } from '../../../../packages/@o4o-apps/signage/ui/SignageGrid.tsx';
+import { SignagePlayer } from '../../../../packages/@o4o-apps/signage/ui/SignagePlayer.tsx';
+import { DeviceCard } from '../../../../packages/@o4o-apps/signage/ui/DeviceCard.tsx';
+import { SlideCard } from '../../../../packages/@o4o-apps/signage/ui/SlideCard.tsx';
+import { PlaylistCard } from '../../../../packages/@o4o-apps/signage/ui/PlaylistCard.tsx';
+import { ScheduleCard } from '../../../../packages/@o4o-apps/signage/ui/ScheduleCard.tsx';
 
 function DashboardView({ title, data }: { title: string; data?: any }) {
   return (
