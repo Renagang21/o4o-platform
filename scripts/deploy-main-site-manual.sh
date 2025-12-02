@@ -15,7 +15,7 @@ echo ""
 cd "$(dirname "$0")/.."
 
 # Check if we're in the right directory
-if [ ! -f "apps/main-site/package.json" ]; then
+if [ ! -f "apps/main-site-nextgen/package.json" ]; then
   echo "❌ Error: Not in the correct directory"
   exit 1
 fi
@@ -30,17 +30,13 @@ if [ -n "$(git status --porcelain)" ]; then
   fi
 fi
 
-# Build packages first
-echo "📦 Building packages..."
-pnpm run build:packages --silent 2>&1 | grep -E "(✅|❌|Error|error|warning)" || true
-
-# Build main site
-echo "🔨 Building main site..."
-cd apps/main-site
+# Build main site (NextGen)
+echo "🔨 Building main site (NextGen)..."
+cd apps/main-site-nextgen
 NODE_ENV=production \
 NODE_OPTIONS='--max-old-space-size=4096' \
-VITE_API_URL=https://api.neture.co.kr/api \
-VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
+GENERATE_SOURCEMAP=false \
+VITE_API_URL=https://api.neture.co.kr/api/v1 \
 pnpm run build --silent 2>&1 | grep -E "(✅|❌|vite|built|error|warning)" || true
 
 cd ../..
@@ -48,7 +44,7 @@ cd ../..
 # Create tarball
 echo "📦 Creating deployment tarball..."
 TARBALL="/tmp/main-site-deploy-$(date +%Y%m%d-%H%M%S).tar.gz"
-tar czf "$TARBALL" -C apps/main-site/dist .
+tar czf "$TARBALL" -C apps/main-site-nextgen/dist .
 
 echo "✅ Tarball created: $TARBALL"
 echo ""
