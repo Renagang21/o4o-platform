@@ -11,7 +11,6 @@ import { initializeAppStore } from './appstore';
 // Start AppStore initialization (non-blocking)
 initializeAppStore()
   .then(() => {
-    console.log('[Main] AppStore initialized successfully');
   })
   .catch((error) => {
     console.error('[Main] AppStore initialization failed:', error);

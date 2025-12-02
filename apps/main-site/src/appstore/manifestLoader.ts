@@ -40,7 +40,6 @@ export async function loadManifest(manifestPath: string): Promise<AppManifest> {
       const module = await import(`../../../packages/${folderName}/manifest.json`);
       return validateManifest(module.default || module);
     } catch (importError) {
-      console.warn(`Could not import manifest from package, using stub for ${packageName}:`, importError);
       return createStubManifest(packageName);
     }
   } catch (error) {

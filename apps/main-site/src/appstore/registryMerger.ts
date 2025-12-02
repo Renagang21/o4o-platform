@@ -15,16 +15,13 @@ import type { LoadedApp } from './types';
 export function mergeFunctionComponents(appId: string, loadedApp: LoadedApp): void {
   const { components } = loadedApp;
 
-  console.log(`[RegistryMerger] Merging ${components.size} function components from ${appId}`);
 
   components.forEach((component, componentName) => {
     const registryKey = `${appId}:${componentName}`;
 
     // Check if component already exists
     if (FunctionRegistry[registryKey]) {
-      console.warn(
-        `[RegistryMerger] Function component ${registryKey} already exists, overwriting`
-      );
+      // Component exists, overwriting
     }
 
     // Add to registry
@@ -37,7 +34,6 @@ export function mergeFunctionComponents(appId: string, loadedApp: LoadedApp): vo
       (FunctionRegistry as any)[componentName] = component;
     }
 
-    console.log(`[RegistryMerger] Registered function component: ${registryKey}`);
   });
 }
 
@@ -47,16 +43,13 @@ export function mergeFunctionComponents(appId: string, loadedApp: LoadedApp): vo
 export function mergeUIComponents(appId: string, loadedApp: LoadedApp): void {
   const { uiComponents } = loadedApp;
 
-  console.log(`[RegistryMerger] Merging ${uiComponents.size} UI components from ${appId}`);
 
   uiComponents.forEach((component, componentName) => {
     const registryKey = `${appId}:${componentName}`;
 
     // Check if component already exists
     if (UIComponentRegistry[registryKey]) {
-      console.warn(
-        `[RegistryMerger] UI component ${registryKey} already exists, overwriting`
-      );
+      // Component exists, overwriting
     }
 
     // Add to registry
@@ -67,7 +60,6 @@ export function mergeUIComponents(appId: string, loadedApp: LoadedApp): void {
       (UIComponentRegistry as any)[componentName] = component;
     }
 
-    console.log(`[RegistryMerger] Registered UI component: ${registryKey}`);
   });
 }
 
@@ -77,14 +69,11 @@ export function mergeUIComponents(appId: string, loadedApp: LoadedApp): void {
  * Views are stored in a global view registry that ViewRenderer can access.
  * For now, we'll just log what would be merged.
  */
-export function mergeViews(appId: string, loadedApp: LoadedApp): void {
+export function mergeViews(_appId: string, loadedApp: LoadedApp): void {
   const { views } = loadedApp;
 
-  console.log(`[RegistryMerger] Merging ${views.size} views from ${appId}`);
 
-  views.forEach((_viewData, viewId) => {
-    const registryKey = `${appId}:${viewId}`;
-    console.log(`[RegistryMerger] Would register view: ${registryKey}`);
+  views.forEach(() => {
     // TODO: Implement actual view registry merge
     // This should integrate with ViewRenderer's view loading system
   });
@@ -94,16 +83,11 @@ export function mergeViews(appId: string, loadedApp: LoadedApp): void {
  * Remove app components from FunctionRegistry
  */
 export function unmergeFunctionComponents(appId: string, componentNames: string[]): void {
-  console.log(
-    `[RegistryMerger] Removing ${componentNames.length} function components from ${appId}`
-  );
-
   componentNames.forEach((componentName) => {
     const registryKey = `${appId}:${componentName}`;
 
     if (FunctionRegistry[registryKey]) {
       delete (FunctionRegistry as any)[registryKey];
-      console.log(`[RegistryMerger] Removed function component: ${registryKey}`);
     }
 
     // Also remove unprefixed version if it matches
@@ -117,14 +101,12 @@ export function unmergeFunctionComponents(appId: string, componentNames: string[
  * Remove app UI components from UIComponentRegistry
  */
 export function unmergeUIComponents(appId: string, componentNames: string[]): void {
-  console.log(`[RegistryMerger] Removing ${componentNames.length} UI components from ${appId}`);
 
   componentNames.forEach((componentName) => {
     const registryKey = `${appId}:${componentName}`;
 
     if (UIComponentRegistry[registryKey]) {
       delete (UIComponentRegistry as any)[registryKey];
-      console.log(`[RegistryMerger] Removed UI component: ${registryKey}`);
     }
 
     // Also remove unprefixed version if it matches
@@ -137,12 +119,9 @@ export function unmergeUIComponents(appId: string, componentNames: string[]): vo
 /**
  * Remove app views from view registry
  */
-export function unmergeViews(appId: string, viewIds: string[]): void {
-  console.log(`[RegistryMerger] Removing ${viewIds.length} views from ${appId}`);
+export function unmergeViews(_appId: string, viewIds: string[]): void {
 
-  viewIds.forEach((viewId) => {
-    const registryKey = `${appId}:${viewId}`;
-    console.log(`[RegistryMerger] Would remove view: ${registryKey}`);
+  viewIds.forEach(() => {
     // TODO: Implement actual view registry unmerge
   });
 }
@@ -151,20 +130,17 @@ export function unmergeViews(appId: string, viewIds: string[]): void {
  * Merge all components from a loaded app
  */
 export function mergeApp(appId: string, loadedApp: LoadedApp): void {
-  console.log(`[RegistryMerger] Merging all components from app: ${appId}`);
 
   mergeFunctionComponents(appId, loadedApp);
   mergeUIComponents(appId, loadedApp);
   mergeViews(appId, loadedApp);
 
-  console.log(`[RegistryMerger] App ${appId} merged successfully`);
 }
 
 /**
  * Unmerge all components from a loaded app
  */
 export function unmergeApp(appId: string, loadedApp: LoadedApp): void {
-  console.log(`[RegistryMerger] Unmerging all components from app: ${appId}`);
 
   const componentNames = Array.from(loadedApp.components.keys());
   const uiComponentNames = Array.from(loadedApp.uiComponents.keys());
@@ -174,7 +150,6 @@ export function unmergeApp(appId: string, loadedApp: LoadedApp): void {
   unmergeUIComponents(appId, uiComponentNames);
   unmergeViews(appId, viewIds);
 
-  console.log(`[RegistryMerger] App ${appId} unmerged successfully`);
 }
 
 /**

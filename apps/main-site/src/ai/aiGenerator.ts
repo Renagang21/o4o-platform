@@ -24,23 +24,15 @@ export async function generateFromPrompt(
 ): Promise<AIGenerationResult> {
   try {
     // Step 1: Analyze intent
-    console.log('🤖 Analyzing prompt with AI...');
     const intent = await analyzeIntent(prompt, options);
 
-    console.log('📊 AI Intent Analysis:');
-    console.log(`  - View ID: ${intent.viewId}`);
-    console.log(`  - Category: ${intent.category}`);
-    console.log(`  - Confidence: ${(intent.confidence * 100).toFixed(1)}%`);
     if (intent.reasoning) {
-      console.log(`  - Reasoning: ${intent.reasoning}`);
     }
     if (intent.suggestions && intent.suggestions.length > 0) {
-      console.log('  - Suggestions:');
-      intent.suggestions.forEach((s) => console.log(`    • ${s}`));
+      // DEV: intent.suggestions.forEach((s) => console.log(`    • ${s}`));
     }
 
     // Step 2: Generate view using ViewGenerator (Step 10)
-    console.log('\n🔨 Generating view schema...');
     const filePath = await generateView(intent.viewId);
 
     // Step 3: Return result
@@ -72,25 +64,12 @@ export async function generateFromPrompts(
   const results: AIGenerationResult[] = [];
 
   for (const prompt of prompts) {
-    console.log(`\n${'='.repeat(60)}`);
-    const text = typeof prompt === 'string' ? prompt : prompt.text;
-    console.log(`🚀 Processing: "${text}"`);
-    console.log('='.repeat(60));
-
     const result = await generateFromPrompt(prompt, options);
     results.push(result);
 
     // Brief pause between generations
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-
-  // Summary
-  console.log(`\n${'='.repeat(60)}`);
-  console.log('📋 Generation Summary');
-  console.log('='.repeat(60));
-  const successful = results.filter((r) => r.success).length;
-  console.log(`✅ Successful: ${successful}/${results.length}`);
-  console.log(`❌ Failed: ${results.length - successful}/${results.length}`);
 
   return results;
 }

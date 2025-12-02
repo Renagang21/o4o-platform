@@ -10,7 +10,6 @@ let routeCache: RouteConfig[] | null = null;
 function getRoutes(): RouteConfig[] {
   if (!routeCache) {
     routeCache = generateRoutes();
-    console.log('[Router] Generated routes:', routeCache);
   }
   return routeCache;
 }
@@ -86,6 +85,5 @@ export function getRouteParams(url: string): Record<string, string> {
 if (import.meta.hot) {
   import.meta.hot.accept(() => {
     routeCache = null;
-    console.log('[Router] Routes cache cleared (HMR)');
   });
 }

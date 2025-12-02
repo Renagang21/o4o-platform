@@ -33,17 +33,14 @@ export const appStoreManager: FunctionComponent = (_props, _context) => {
       apps: allApps,
       installedAppIds,
       onInstall: (appId: string) => {
-        console.log('[AppStoreManager] Install app:', appId);
         // TODO: Implement app installation
         alert(`Installing app: ${appId}\n\nThis feature will be implemented soon.`);
       },
       onUninstall: (appId: string) => {
-        console.log('[AppStoreManager] Uninstall app:', appId);
         // TODO: Implement app uninstallation
         alert(`Uninstalling app: ${appId}\n\nThis feature will be implemented soon.`);
       },
       onToggleEnable: (appId: string, enabled: boolean) => {
-        console.log('[AppStoreManager] Toggle app:', appId, enabled);
         // TODO: Implement app enable/disable
         alert(
           `${enabled ? 'Enabling' : 'Disabling'} app: ${appId}\n\nThis feature will be implemented soon.`

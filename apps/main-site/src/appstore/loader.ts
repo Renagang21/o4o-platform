@@ -14,6 +14,11 @@ import type { AppRegistryEntry, LoadedApp, AppStoreState } from './types';
 import { loadManifest } from './manifestLoader';
 import { AppRegistry, getEnabledApps } from './registry';
 
+// Development-only logging (currently disabled for production)
+// const isDev = import.meta.env.DEV;
+// const log = isDev ? console.log.bind(console) : () => {};
+// const error = console.error.bind(console);
+
 /**
  * Global AppStore state
  */
@@ -31,14 +36,12 @@ const appStoreState: AppStoreState = {
  * @returns Loaded app with views, components, and UI
  */
 export async function loadApp(registryEntry: AppRegistryEntry): Promise<LoadedApp> {
-  console.log(`[AppLoader] Loading app: ${registryEntry.id}`);
 
   try {
     // 1. Load manifest
     const manifest = await loadManifest(registryEntry.manifestPath);
 
     if (!manifest.enabled) {
-      console.log(`[AppLoader] App ${registryEntry.id} is disabled, skipping`);
       throw new Error(`App ${registryEntry.id} is disabled`);
     }
 
@@ -63,7 +66,6 @@ export async function loadApp(registryEntry: AppRegistryEntry): Promise<LoadedAp
             path: viewPath,
           });
         } catch (error) {
-          console.warn(`[AppLoader] Failed to load view ${viewId}:`, error);
         }
       }
     }
@@ -81,7 +83,6 @@ export async function loadApp(registryEntry: AppRegistryEntry): Promise<LoadedAp
         // For now, we'll create stub components
         components.set(componentName, createStubComponent(componentName, manifest.id));
       } catch (error) {
-        console.warn(`[AppLoader] Failed to load component ${componentName}:`, error);
       }
     }
 
@@ -93,15 +94,9 @@ export async function loadApp(registryEntry: AppRegistryEntry): Promise<LoadedAp
           // In production, this would dynamically import UI component files
           uiComponents.set(uiName, createStubComponent(uiName, manifest.id));
         } catch (error) {
-          console.warn(`[AppLoader] Failed to load UI component ${uiName}:`, error);
         }
       }
     }
-
-    console.log(
-      `[AppLoader] Successfully loaded app ${registryEntry.id}: ` +
-        `${views.size} views, ${components.size} components, ${uiComponents.size} UI components`
-    );
 
     return {
       manifest,
@@ -119,13 +114,11 @@ export async function loadApp(registryEntry: AppRegistryEntry): Promise<LoadedAp
  * Load all enabled apps
  */
 export async function loadAllApps(): Promise<void> {
-  console.log('[AppLoader] Loading all enabled apps...');
   appStoreState.loading = true;
   appStoreState.error = null;
 
   try {
     const enabledApps = getEnabledApps();
-    console.log(`[AppLoader] Found ${enabledApps.length} enabled apps`);
 
     // Load apps in parallel
     const loadPromises = enabledApps.map(async (registryEntry) => {
@@ -140,12 +133,7 @@ export async function loadAllApps(): Promise<void> {
     });
 
     const results = await Promise.all(loadPromises);
-    const successCount = results.filter((r) => r.success).length;
-    const failCount = results.length - successCount;
-
-    console.log(
-      `[AppLoader] Loaded ${successCount} apps successfully, ${failCount} failed`
-    );
+    void results; // Acknowledge results without logging
 
     // Merge into registries
     mergeIntoRegistries();
@@ -162,23 +150,17 @@ export async function loadAllApps(): Promise<void> {
  * Merge loaded apps into global registries
  */
 function mergeIntoRegistries(): void {
-  console.log('[AppLoader] Merging apps into global registries...');
 
   // Import registry merger functions
   const { mergeApp } = require('./registryMerger');
 
   // Merge each loaded app
   appStoreState.apps.forEach((loadedApp, appId) => {
-    console.log(`[AppLoader] App ${appId}:`);
-    console.log(`  - Views: ${loadedApp.views.size}`);
-    console.log(`  - Components: ${loadedApp.components.size}`);
-    console.log(`  - UI Components: ${loadedApp.uiComponents.size}`);
 
     // Merge into registries
     mergeApp(appId, loadedApp);
   });
 
-  console.log('[AppLoader] All apps merged into registries');
 }
 
 /**
@@ -206,7 +188,6 @@ export function getAllLoadedApps(): Map<string, LoadedApp> {
  * Reload a specific app
  */
 export async function reloadApp(appId: string): Promise<void> {
-  console.log(`[AppLoader] Reloading app: ${appId}`);
 
   const registryEntry = AppRegistry.find((app) => app.id === appId);
   if (!registryEntry) {
@@ -223,7 +204,6 @@ export async function reloadApp(appId: string): Promise<void> {
   // Re-merge registries
   mergeIntoRegistries();
 
-  console.log(`[AppLoader] App ${appId} reloaded successfully`);
 }
 
 /**
@@ -261,7 +241,5 @@ function createStubComponent(name: string, appId: string): React.ComponentType<a
  * Initialize AppStore on app startup
  */
 export async function initializeAppStore(): Promise<void> {
-  console.log('[AppStore] Initializing...');
   await loadAllApps();
-  console.log('[AppStore] Initialization complete');
 }
