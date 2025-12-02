@@ -15,12 +15,6 @@ interface DeviceCardProps {
 }
 
 export function DeviceCard({ devices }: DeviceCardProps) {
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  };
-
   const getTimeSince = (dateString?: string) => {
     if (!dateString) return 'Never';
     const now = new Date();

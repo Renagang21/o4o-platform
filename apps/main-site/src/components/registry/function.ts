@@ -58,12 +58,12 @@ import { viewForm } from '@/shortcodes/_functions/cms/viewForm';
 import { viewEditor } from '@/shortcodes/_functions/cms/viewEditor';
 
 // Digital Signage Function Components
-import { signageDashboard } from '../../../../packages/@o4o-apps/signage/functions/signageDashboard.ts';
-import { signageDevices } from '../../../../packages/@o4o-apps/signage/functions/signageDevices.ts';
-import { signageSlides } from '../../../../packages/@o4o-apps/signage/functions/signageSlides.ts';
-import { signagePlaylists } from '../../../../packages/@o4o-apps/signage/functions/signagePlaylists.ts';
-import { signageSchedule } from '../../../../packages/@o4o-apps/signage/functions/signageSchedule.ts';
-import { signagePlayback } from '../../../../packages/@o4o-apps/signage/functions/signagePlayback.ts';
+import { signageDashboard } from '@o4o-apps/signage/functions/signageDashboard';
+import { signageDevices } from '@o4o-apps/signage/functions/signageDevices';
+import { signageSlides } from '@o4o-apps/signage/functions/signageSlides';
+import { signagePlaylists } from '@o4o-apps/signage/functions/signagePlaylists';
+import { signageSchedule } from '@o4o-apps/signage/functions/signageSchedule';
+import { signagePlayback } from '@o4o-apps/signage/functions/signagePlayback';
 
 export const FunctionRegistry: Record<string, FunctionComponent> = {
   // Dropshipping
