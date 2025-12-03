@@ -8,9 +8,9 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import type { Seller } from './Seller.js';
-import type { Product } from './Product.js';
-import type { Supplier } from './Supplier.js';
+import type { Seller } from '../../../entities/Seller.js';
+import type { Product } from '../../../entities/Product.js';
+import type { Supplier } from '../../../entities/Supplier.js';
 
 /**
  * Phase 9: Seller Authorization Entity

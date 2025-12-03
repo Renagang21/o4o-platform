@@ -9,7 +9,7 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
+import type { User } from '../../../entities/User.js';
 import { OrderEvent } from './OrderEvent.js';
 import type { OrderItem as OrderItemEntity } from './OrderItem.js';
 

@@ -8,8 +8,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
-import type { ExternalChannel } from './ExternalChannel.js';
+import type { User } from '../../../entities/User.js';
+import type { ExternalChannel } from '../../../entities/ExternalChannel.js';
 
 /**
  * SellerChannelAccount Entity

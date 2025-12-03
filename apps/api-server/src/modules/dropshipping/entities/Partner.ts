@@ -10,8 +10,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
-import type { Seller } from './Seller.js';
+import type { User } from '../../../entities/User.js';
+import type { Seller } from '../../../entities/Seller.js';
 
 export enum PartnerStatus {
   PENDING = 'pending',

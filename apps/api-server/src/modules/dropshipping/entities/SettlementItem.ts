@@ -7,7 +7,7 @@ import {
   Index,
 } from 'typeorm';
 import { Settlement } from './Settlement.js';
-import type { Order } from './Order.js';
+import type { Order } from '../../../entities/Order.js';
 
 /**
  * SettlementItem Entity

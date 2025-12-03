@@ -8,9 +8,9 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
-import type { SellerProduct } from './SellerProduct.js';
-import type { SellerChannelAccount } from './SellerChannelAccount.js';
+import type { User } from '../../../entities/User.js';
+import type { SellerProduct } from '../../../entities/SellerProduct.js';
+import type { SellerChannelAccount } from '../../../entities/SellerChannelAccount.js';
 
 /**
  * ChannelProductLink Entity

@@ -2,8 +2,8 @@ import { Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { ShippingService } from '../services/ShippingService.js';
 import { CreateShipmentDto, UpdateShipmentDto } from '../dto/index.js';
-import { logger } from '../../../utils/logger.js';
-import type { AuthRequest } from '../../../types/express.js';
+import logger from '../../../utils/logger.js';
+import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 
 /**
  * ShipmentController

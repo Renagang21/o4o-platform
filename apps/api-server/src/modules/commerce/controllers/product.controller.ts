@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { ProductService } from '../services/ProductService.js';
 import { CreateProductDto, UpdateProductDto, ProductQueryDto } from '../dto/index.js';
-import { logger } from '../../../utils/logger.js';
+import logger from '../../../utils/logger.js';
 
 /**
  * ProductController

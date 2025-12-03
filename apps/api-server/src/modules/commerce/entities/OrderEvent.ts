@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import type { Order } from './Order.js';
 import { OrderStatus } from './Order.js';
-import type { User } from './User.js';
+import type { User } from '../../../entities/User.js';
 
 // Event type enum
 export enum OrderEventType {

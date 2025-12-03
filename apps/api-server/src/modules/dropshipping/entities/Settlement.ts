@@ -9,7 +9,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import type { User } from './User.js';
+import type { User } from '../../../entities/User.js';
 import type { SettlementItem } from './SettlementItem.js';
 
 /**

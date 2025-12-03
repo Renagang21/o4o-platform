@@ -9,10 +9,10 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
+import type { User } from '../../../entities/User.js';
 import type { Category } from './Category.js';
-import type { Supplier } from './Supplier.js';
-import type { CommissionPolicy } from './CommissionPolicy.js';
+import type { Supplier } from '../../../entities/Supplier.js';
+import type { CommissionPolicy } from '../../../entities/CommissionPolicy.js';
 
 export enum ProductStatus {
   DRAFT = 'draft',

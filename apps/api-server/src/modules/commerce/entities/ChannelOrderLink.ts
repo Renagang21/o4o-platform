@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import type { Order } from './Order.js';
-import type { SellerChannelAccount } from './SellerChannelAccount.js';
+import type { SellerChannelAccount } from '../../../entities/SellerChannelAccount.js';
 
 /**
  * ChannelOrderLink Entity

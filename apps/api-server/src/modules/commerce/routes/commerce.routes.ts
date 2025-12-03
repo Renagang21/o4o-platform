@@ -58,40 +58,45 @@ const router: IRouter = Router();
  * ========================================
  */
 
+// TODO: Phase B-3 - Implement after ProductService migration
 // POST /api/v1/commerce/products - Create product (Admin/Supplier)
-router.post(
-  '/products',
-  requireAuth,
-  validateDto(CreateProductDto),
-  asyncHandler(ProductController.createProduct)
-);
+// router.post(
+//   '/products',
+//   requireAuth,
+//   validateDto(CreateProductDto),
+//   asyncHandler(ProductController.createProduct)
+// );
 
+// TODO: Phase B-3 - Implement after ProductService migration
 // GET /api/v1/commerce/products - List products (Public)
-router.get(
-  '/products',
-  asyncHandler(ProductController.listProducts)
-);
+// router.get(
+//   '/products',
+//   asyncHandler(ProductController.listProducts)
+// );
 
+// TODO: Phase B-3 - Implement after ProductService migration
 // GET /api/v1/commerce/products/:id - Get product by ID (Public)
-router.get(
-  '/products/:id',
-  asyncHandler(ProductController.getProduct)
-);
+// router.get(
+//   '/products/:id',
+//   asyncHandler(ProductController.getProduct)
+// );
 
+// TODO: Phase B-3 - Implement after ProductService migration
 // PUT /api/v1/commerce/products/:id - Update product (Admin/Supplier)
-router.put(
-  '/products/:id',
-  requireAuth,
-  validateDto(UpdateProductDto),
-  asyncHandler(ProductController.updateProduct)
-);
+// router.put(
+//   '/products/:id',
+//   requireAuth,
+//   validateDto(UpdateProductDto),
+//   asyncHandler(ProductController.updateProduct)
+// );
 
+// TODO: Phase B-3 - Implement after ProductService migration
 // DELETE /api/v1/commerce/products/:id - Delete product (Admin)
-router.delete(
-  '/products/:id',
-  requireAdmin,
-  asyncHandler(ProductController.deleteProduct)
-);
+// router.delete(
+//   '/products/:id',
+//   requireAdmin,
+//   asyncHandler(ProductController.deleteProduct)
+// );
 
 /**
  * ========================================
@@ -234,12 +239,13 @@ router.post(
   asyncHandler(PaymentController.createPayment)
 );
 
+// TODO: Phase B-3 - Implement after PaymentService migration
 // GET /api/v1/commerce/payments/:id - Get payment by ID
-router.get(
-  '/payments/:id',
-  requireAuth,
-  asyncHandler(PaymentController.getPayment)
-);
+// router.get(
+//   '/payments/:id',
+//   requireAuth,
+//   asyncHandler(PaymentController.getPayment)
+// );
 
 // POST /api/v1/commerce/payments/:id/confirm - Confirm payment (Toss callback)
 router.post(
@@ -247,19 +253,21 @@ router.post(
   asyncHandler(PaymentController.confirmPayment)
 );
 
+// TODO: Phase B-3 - Implement after PaymentService migration
 // POST /api/v1/commerce/payments/:id/cancel - Cancel payment
-router.post(
-  '/payments/:id/cancel',
-  requireAuth,
-  asyncHandler(PaymentController.cancelPayment)
-);
+// router.post(
+//   '/payments/:id/cancel',
+//   requireAuth,
+//   asyncHandler(PaymentController.cancelPayment)
+// );
 
+// TODO: Phase B-3 - Implement after PaymentService migration
 // GET /api/v1/commerce/payments/order/:orderId - Get payments for order
-router.get(
-  '/payments/order/:orderId',
-  requireAuth,
-  asyncHandler(PaymentController.getPaymentsByOrder)
-);
+// router.get(
+//   '/payments/order/:orderId',
+//   requireAuth,
+//   asyncHandler(PaymentController.getPaymentsByOrder)
+// );
 
 /**
  * ========================================
@@ -297,11 +305,12 @@ router.get(
   asyncHandler(ShipmentController.getTrackingHistory)
 );
 
+// TODO: Phase B-3 - Implement after ShipmentService migration
 // GET /api/v1/commerce/shipments/order/:orderId - Get shipments for order
-router.get(
-  '/shipments/order/:orderId',
-  requireAuth,
-  asyncHandler(ShipmentController.getShipmentsByOrder)
-);
+// router.get(
+//   '/shipments/order/:orderId',
+//   requireAuth,
+//   asyncHandler(ShipmentController.getShipmentsByOrder)
+// );
 
 export default router;

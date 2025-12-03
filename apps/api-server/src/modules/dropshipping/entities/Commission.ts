@@ -10,9 +10,9 @@ import {
   OneToOne
 } from 'typeorm';
 import type { Partner } from './Partner.js';
-import type { Product } from './Product.js';
-import { ConversionEvent } from './ConversionEvent.js';
-import type { CommissionPolicy } from './CommissionPolicy.js';
+import type { Product } from '../../../entities/Product.js';
+import { ConversionEvent } from '../../../entities/ConversionEvent.js';
+import type { CommissionPolicy } from '../../../entities/CommissionPolicy.js';
 
 /**
  * Commission Entity (Phase 2.1)

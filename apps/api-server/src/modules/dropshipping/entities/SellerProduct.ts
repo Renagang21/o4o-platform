@@ -8,8 +8,8 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
-import type { Product } from './Product.js';
+import type { User } from '../../../entities/User.js';
+import type { Product } from '../../../entities/Product.js';
 
 /**
  * SellerProduct Entity

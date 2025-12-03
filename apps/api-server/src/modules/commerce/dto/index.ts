@@ -9,9 +9,13 @@ export * from './create-product.dto.js';
 export * from './update-product.dto.js';
 export * from './product-query.dto.js';
 
+// Category DTOs
+export * from './category.dto.js';
+
 // Cart DTOs
 export * from './add-to-cart.dto.js';
 export * from './update-cart.dto.js';
+export * from './update-cart-item.dto.js';
 
 // Checkout DTOs
 export * from './checkout.dto.js';
@@ -22,6 +26,7 @@ export * from './payment.dto.js';
 // Order DTOs
 export * from './create-order.dto.js';
 export * from './update-order-status.dto.js';
+export * from './update-order.dto.js';
 export * from './order-query.dto.js';
 
 // Shipment DTOs

@@ -10,10 +10,10 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { User } from './User.js';
-import { BusinessInfo } from './BusinessInfo.js';
-import type { Product } from './Product.js';
-import type { CommissionPolicy } from './CommissionPolicy.js';
+import type { User } from '../../../entities/User.js';
+import { BusinessInfo } from '../../../entities/BusinessInfo.js';
+import type { Product } from '../../../entities/Product.js';
+import type { CommissionPolicy } from '../../../entities/CommissionPolicy.js';
 
 export enum SupplierStatus {
   PENDING = 'pending',
