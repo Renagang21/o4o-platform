@@ -48,14 +48,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
   },
   {
-    appId: 'forum-yaksa',
-    name: 'Forum Extension – Yaksa Organization',
-    version: '1.0.0',
-    description: '약사 조직 특화 포럼 (복약지도, 케이스 스터디, 약물 정보)',
-    category: 'community',
-    author: 'O4O Platform',
-  },
-  {
     appId: 'dropshipping-core',
     name: 'Dropshipping Core',
     version: '1.0.0',

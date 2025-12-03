@@ -582,7 +582,6 @@ export class AppManager {
     const packageMap: Record<string, string> = {
       'forum-core': '@o4o-apps/forum',
       'forum-neture': '@o4o-apps/forum-neture',
-      'forum-yaksa': '@o4o-apps/forum-yaksa',
       // Add more mappings as needed
     };
 

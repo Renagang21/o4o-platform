@@ -1,8 +1,6 @@
 import { AppManifest } from '@o4o/types';
 import { forumManifest } from './forum.manifest.js';
 import { forumNetureManifest } from '@o4o-apps/forum-neture';
-// Temporarily disabled due to build configuration issues
-// import { forumYaksaManifest } from '@o4o-apps/forum-yaksa';
 import { manifest as lmsCoreManifest } from '@o4o/lms-core';
 import { manifest as organizationCoreManifest } from '@o4o/organization-core';
 import { manifest as organizationForumManifest } from '@o4o-extensions/organization-forum';
@@ -18,7 +16,6 @@ import { manifest as organizationForumManifest } from '@o4o-extensions/organizat
 const manifestRegistry: Record<string, AppManifest> = {
   forum: forumManifest as any,
   'forum-neture': forumNetureManifest as any,
-  // 'forum-yaksa': forumYaksaManifest as any, // Temporarily disabled
   'lms-core': lmsCoreManifest as any,
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
