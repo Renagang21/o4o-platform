@@ -156,9 +156,9 @@ import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 // Phase PD-9 - Multichannel RPA Routes
 import channelsRoutes from '../routes/v1/channels.routes.js';
 
-// Yaksa Community Routes
-import yaksaCommunityRoutes from '../routes/yaksa/community.routes.js';
-import yaksaPostRoutes from '../routes/yaksa/post.routes.js';
+// Yaksa Community Routes - Temporarily disabled due to build configuration issues
+// import yaksaCommunityRoutes from '../routes/yaksa/community.routes.js';
+// import yaksaPostRoutes from '../routes/yaksa/post.routes.js';
 
 // Neture Forum Routes
 import netureForumRoutes from '../routes/neture/forum.routes.js';
@@ -415,9 +415,9 @@ export function setupRoutes(app: Application): void {
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);
 
-  // Yaksa Community Routes
-  app.use('/api/v1/yaksa/forum/communities', standardLimiter, yaksaCommunityRoutes);
-  app.use('/api/v1/yaksa/forum/posts', standardLimiter, yaksaPostRoutes);
+  // Yaksa Community Routes - Temporarily disabled due to build configuration issues
+  // app.use('/api/v1/yaksa/forum/communities', standardLimiter, yaksaCommunityRoutes);
+  // app.use('/api/v1/yaksa/forum/posts', standardLimiter, yaksaPostRoutes);
 
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
