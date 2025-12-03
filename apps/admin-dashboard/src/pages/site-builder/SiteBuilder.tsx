@@ -19,7 +19,7 @@ interface Site {
   updatedAt: string;
 }
 
-export function SiteBuilder() {
+function SiteBuilder() {
   const { authClient } = useAuth();
   const [sites, setSites] = useState<Site[]>([]);
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
@@ -213,3 +213,5 @@ export function SiteBuilder() {
     </div>
   );
 }
+
+export default SiteBuilder;
