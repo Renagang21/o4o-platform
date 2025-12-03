@@ -176,16 +176,21 @@ router.post('/:id/scaffold', authenticateToken as any, requireAdmin, async (req:
       });
     }
 
-    if (site.status !== SiteStatus.PENDING) {
+    // Allow scaffolding for PENDING and FAILED statuses (for retry)
+    const isRetry = site.status === SiteStatus.FAILED;
+    if (site.status !== SiteStatus.PENDING && site.status !== SiteStatus.FAILED) {
       return res.status(400).json({
         success: false,
-        error: `Site cannot be scaffolded in status: ${site.status}`,
+        error: `Site cannot be scaffolded in status: ${site.status}. Only PENDING and FAILED sites can be scaffolded.`,
       });
     }
 
     // Update status
     site.status = SiteStatus.SCAFFOLDING;
-    site.logs += `\n[${new Date().toISOString()}] Scaffolding started`;
+    const logMessage = isRetry
+      ? `\n[${new Date().toISOString()}] Scaffolding retry initiated`
+      : `\n[${new Date().toISOString()}] Scaffolding started`;
+    site.logs += logMessage;
 
     if (additionalApps && Array.isArray(additionalApps)) {
       site.apps = [...new Set([...site.apps, ...additionalApps])];
