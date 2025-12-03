@@ -11,7 +11,8 @@ import logger from '../utils/logger.js';
 import authRoutes from '../routes/auth.js';
 import authV2Routes from '../routes/auth-v2.js';
 import socialAuthRoutes from '../routes/social-auth.js';
-import authenticationRoutes from '../routes/authentication.routes.js'; // NEW: Unified authentication routes
+import authenticationRoutes from '../routes/authentication.routes.js'; // LEGACY: Unified authentication routes
+import authNextGenRoutes from '../modules/auth/routes/auth.routes.js'; // NEW: NextGen authentication routes
 import userRoutes from '../routes/user.js';
 import userManagementRoutes from '../routes/users.routes.js';
 import usersV1Routes from '../routes/v1/users.routes.js';
@@ -216,19 +217,31 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 2. AUTHENTICATION ROUTES (Before rate limiting)
   // ============================================================================
-  // NEW: Unified authentication routes (recommended)
-  app.use('/api/v1/authentication', authenticationRoutes);
+  // ✅ NEW: NextGen authentication routes (recommended)
+  app.use('/api/v1/auth', authNextGenRoutes);
 
-  // Legacy: Basic auth routes (JWT-based) - @deprecated Use /api/v1/authentication instead
-  app.use('/api/auth', authRoutes);
-  app.use('/api/v1/auth', authRoutes);
+  // ❌ DEPRECATED: Legacy JWT auth routes - Use /api/v1/auth instead (Removal: 2025-03-01)
+  app.use(
+    '/api/auth',
+    deprecatedRoute('/api/v1/auth', '2025-03-01T00:00:00Z'),
+    logDeprecatedUsage('/api/auth'),
+    authRoutes
+  );
 
-  // Legacy: Cookie-based auth routes - @deprecated Use /api/v1/authentication instead
+  // ❌ DEPRECATED: Legacy cookie-based auth routes - Use /api/v1/auth instead (Removal: 2025-03-01)
   app.use(
     '/api/v1/auth/cookie',
-    deprecatedRoute('/api/v1/authentication', '2025-12-31T00:00:00Z'),
+    deprecatedRoute('/api/v1/auth', '2025-03-01T00:00:00Z'),
     logDeprecatedUsage('/api/v1/auth/cookie'),
     authV2Routes
+  );
+
+  // ❌ DEPRECATED: Legacy unified auth routes - Use /api/v1/auth instead (Removal: 2025-03-01)
+  app.use(
+    '/api/v1/authentication',
+    deprecatedRoute('/api/v1/auth', '2025-03-01T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/authentication'),
+    authenticationRoutes
   );
 
   // Social auth
@@ -239,9 +252,6 @@ export function setupRoutes(app: Application): void {
 
   // Account linking
   app.use('/api/auth/accounts', accountLinkingRoutes);
-
-  // Legacy: Unified auth routes - @deprecated REMOVED (use /api/v1/authentication instead)
-  // Routes have been removed after deprecation period
 
   // Linked accounts
   app.use('/accounts', linkedAccountsRoutes);
