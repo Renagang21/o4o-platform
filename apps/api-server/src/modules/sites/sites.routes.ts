@@ -21,18 +21,25 @@ const requireAdmin = (req: Request, res: Response, next: Function) => {
   const user = (req as any).user;
 
   if (!user) {
+    logger.warn('[Sites API] No user found in request');
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const userRoles = user.roles || [];
-  const hasAdminRole = userRoles.some((role: any) =>
-    ['admin', 'superadmin', 'super_admin', 'manager'].includes(typeof role === 'string' ? role : role.name)
-  );
+  logger.info('[Sites API] User roles:', { userId: user.id, roles: userRoles });
+
+  const hasAdminRole = userRoles.some((role: any) => {
+    const roleName = typeof role === 'string' ? role : role.name;
+    logger.info('[Sites API] Checking role:', { roleName, type: typeof role });
+    return ['admin', 'superadmin', 'super_admin', 'manager'].includes(roleName);
+  });
 
   if (!hasAdminRole) {
+    logger.warn('[Sites API] Access denied - no admin role found', { userId: user.id, roles: userRoles });
     return res.status(403).json({ error: 'Forbidden: Admin access required' });
   }
 
+  logger.info('[Sites API] Access granted', { userId: user.id });
   next();
 };
 
