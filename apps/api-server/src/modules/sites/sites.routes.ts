@@ -7,15 +7,13 @@ import logger from '../../utils/logger.js';
 
 const router: ExpressRouter = Router();
 
-// Scaffolding function - will be loaded dynamically when needed
+// Scaffolding function - TODO: Implement scaffolding service
+// Currently disabled due to TypeScript rootDir limitations
+// Will be implemented as a separate service or moved into api-server
 async function getScaffoldingService() {
-  try {
-    const { scaffoldSite } = await import('../../../../../services/deployment-service/scaffolding/index.js');
-    return scaffoldSite;
-  } catch (error) {
-    logger.error('Failed to load scaffolding service:', error);
-    return null;
-  }
+  // Scaffolding service not yet available
+  logger.warn('Scaffolding service not yet implemented');
+  return null;
 }
 
 // Middleware: Check if user has admin role
