@@ -40,7 +40,7 @@ function SiteBuilder() {
 
   const loadSites = async () => {
     try {
-      const response = await authClient.api.get('/api/sites');
+      const response = await authClient.api.get('/sites');
       const data = response.data;
 
       setSites(data);
@@ -63,7 +63,7 @@ function SiteBuilder() {
 
   const handleCreateSite = async (siteData: any) => {
     try {
-      await authClient.api.post('/api/sites', siteData);
+      await authClient.api.post('/sites', siteData);
       setShowCreateModal(false);
       loadSites();
     } catch (error) {
@@ -78,7 +78,7 @@ function SiteBuilder() {
     }
 
     try {
-      await authClient.api.delete(`/api/sites/${siteId}`);
+      await authClient.api.delete(`/sites/${siteId}`);
       loadSites();
       if (selectedSite?.id === siteId) {
         setSelectedSite(null);
@@ -91,7 +91,7 @@ function SiteBuilder() {
 
   const handleScaffold = async (siteId: string, autoDeploy: boolean = false) => {
     try {
-      await authClient.api.post(`/api/sites/${siteId}/scaffold`, { autoDeploy });
+      await authClient.api.post(`/sites/${siteId}/scaffold`, { autoDeploy });
       loadSites();
     } catch (error) {
       console.error('Failed to trigger scaffolding:', error);
