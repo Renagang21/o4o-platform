@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
+import type { Router as ExpressRouter } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { DeploymentInstance, DeploymentStatus } from '../modules/deployment/deployment.entity.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 import logger from '../utils/logger.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
 
 // Middleware: Check if user has admin role
 const requireAdmin = (req: Request, res: Response, next: Function) => {
