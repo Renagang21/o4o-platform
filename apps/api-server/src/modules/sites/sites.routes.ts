@@ -10,7 +10,7 @@ const router: ExpressRouter = Router();
 // Scaffolding function - will be loaded dynamically when needed
 async function getScaffoldingService() {
   try {
-    const { scaffoldSite } = await import('../../../../services/deployment-service/scaffolding/index.js');
+    const { scaffoldSite } = await import('../../../../../services/deployment-service/scaffolding/index.js');
     return scaffoldSite;
   } catch (error) {
     logger.error('Failed to load scaffolding service:', error);
