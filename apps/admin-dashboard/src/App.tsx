@@ -809,7 +809,7 @@ function App() {
 
                     {/* Site Builder (Step 24) */}
                     <Route path="/admin/site-builder" element={
-                      <AdminProtectedRoute requiredRoles={['admin']}>
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <SiteBuilder />
                         </Suspense>
