@@ -12,6 +12,7 @@ import authRoutes from '../routes/auth.js';
 import authV2Routes from '../routes/auth-v2.js';
 import socialAuthRoutes from '../routes/social-auth.js';
 import authenticationRoutes from '../routes/authentication.routes.js'; // NEW: Unified authentication routes
+import userModuleRoutes from '../modules/user/routes/user.routes.js'; // NEW: Unified user routes
 import userRoutes from '../routes/user.js';
 import userManagementRoutes from '../routes/users.routes.js';
 import usersV1Routes from '../routes/v1/users.routes.js';
@@ -298,11 +299,6 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 4. SETTINGS ROUTES (Lenient rate limiting - before standard limiter)
   // ============================================================================
-  // Public roles endpoint
-  app.get('/api/v1/users/roles', (req: Request, res: Response) => {
-    return UserRoleController.getRoles(req, res);
-  });
-
   // Settings routes
   app.use('/api/v1/settings', settingsLimiter, settingsV1Routes); // Admin settings routes (OAuth, reading, etc.)
   app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes);
@@ -314,14 +310,40 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 5. V1 API ROUTES (Protected with standard rate limiting)
   // ============================================================================
-  // User management
-  app.use('/api/v1/users', userPermissionsLimiter, usersV1Routes);
-  app.use('/v1/users', userPermissionsLimiter, usersV1Routes);
-  app.use('/api/users', standardLimiter, userManagementRoutes);
-  app.use('/api/user', standardLimiter, userRoutes); // Authenticated user endpoints (profile, completeness, etc.)
+  // NEW: Unified user management routes (recommended)
+  app.use('/api/v1/users', userModuleRoutes);
 
-  // User role and permissions management
-  app.use('/api/v1/userRole', userPermissionsLimiter, userRoleRoutes);
+  // Legacy: User management routes - @deprecated Use /api/v1/users instead
+  app.use(
+    '/v1/users',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/v1/users'),
+    userPermissionsLimiter,
+    usersV1Routes
+  );
+  app.use(
+    '/api/users',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/api/users'),
+    standardLimiter,
+    userManagementRoutes
+  );
+  app.use(
+    '/api/user',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/api/user'),
+    standardLimiter,
+    userRoutes
+  );
+
+  // Legacy: User role and permissions management - @deprecated Use /api/v1/users/:userId/roles instead
+  app.use(
+    '/api/v1/userRole',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/userRole'),
+    userPermissionsLimiter,
+    userRoleRoutes
+  );
 
   // App System (NEW - Google AI, OpenAI, etc.)
   app.use('/api/v1/apps', standardLimiter, appsRoutes);
