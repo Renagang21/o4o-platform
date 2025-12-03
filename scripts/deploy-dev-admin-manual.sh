@@ -42,7 +42,7 @@ NODE_OPTIONS='--max-old-space-size=4096' \
 VITE_API_URL=https://api.neture.co.kr/api \
 VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
 VITE_GIT_BRANCH=develop \
-pnpm run build:prod --silent 2>&1 | grep -E "(✅|❌|vite|built|error|warning)" || true
+pnpm run build:prod 2>&1 | grep -E "(✅|❌|vite|built|error|warning)" | tail -20 || true
 
 cd ../..
 
