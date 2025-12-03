@@ -41,7 +41,7 @@ function SiteBuilder() {
   const loadSites = async () => {
     try {
       const response = await authClient.api.get('/sites');
-      const data = response.data;
+      const data = response.data.data || []; // API response: { success: true, data: [...] }
 
       setSites(data);
 
