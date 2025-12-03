@@ -17,7 +17,8 @@ import { User } from '../entities/User.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { emailService } from '../services/email.service.js';
-import { refreshTokenService } from '../services/refreshToken.service.js';
+import { refreshTokenService } from '../modules/auth/services/refresh-token.service.js';
+import { loginSecurityService } from '../modules/auth/services/login-security.service.js';
 import {
   hashPassword,
   comparePassword,
@@ -176,9 +177,9 @@ router.post('/login',
       const deviceId = req.body.deviceId || req.headers['x-device-id'] as string;
 
       // Check account lock status
-      const lockStatus = await refreshTokenService.checkAccountLock(email);
+      const lockStatus = await loginSecurityService.checkAccountLock(email);
       if (lockStatus.locked) {
-        await refreshTokenService.trackLoginAttempt(
+        await loginSecurityService.trackLoginAttempt(
           email,
           false,
           ipAddress,
@@ -201,7 +202,7 @@ router.post('/login',
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) {
         // Track failed login attempt
-        await refreshTokenService.trackLoginAttempt(
+        await loginSecurityService.trackLoginAttempt(
           email,
           false,
           ipAddress,
@@ -241,7 +242,7 @@ router.post('/login',
       }
 
       // Track successful login
-      await refreshTokenService.trackLoginAttempt(
+      await loginSecurityService.trackLoginAttempt(
         email,
         true,
         ipAddress,

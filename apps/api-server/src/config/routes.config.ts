@@ -12,6 +12,7 @@ import authRoutes from '../routes/auth.js';
 import authV2Routes from '../routes/auth-v2.js';
 import socialAuthRoutes from '../routes/social-auth.js';
 import authenticationRoutes from '../routes/authentication.routes.js'; // NEW: Unified authentication routes
+import userModuleRoutes from '../modules/user/routes/user.routes.js'; // NEW: Unified user routes
 import userRoutes from '../routes/user.js';
 import userManagementRoutes from '../routes/users.routes.js';
 import usersV1Routes from '../routes/v1/users.routes.js';
@@ -72,7 +73,6 @@ import adminManagementRoutes from '../routes/admin.routes.js';
 import migrationRoutes from '../routes/migration.routes.js';
 import tagRoutes from '../routes/content/tagRoutes.js';
 import previewProxyRoutes from '../routes/v1/preview.routes.js';
-import dropshippingAdminRoutes from '../routes/admin/dropshipping.routes.js';
 import userAdminRoutes from '../routes/admin/users.routes.js';
 import supplierAdminRoutes from '../routes/admin/suppliers.routes.js';
 import adminOrdersRoutes from '../routes/admin/orders.routes.js';
@@ -156,10 +156,6 @@ import adminJobsRoutes from '../routes/admin/admin-jobs.routes.js';
 // Phase PD-9 - Multichannel RPA Routes
 import channelsRoutes from '../routes/v1/channels.routes.js';
 
-// Yaksa Community Routes
-import yaksaCommunityRoutes from '../routes/yaksa/community.routes.js';
-import yaksaPostRoutes from '../routes/yaksa/post.routes.js';
-
 // Neture Forum Routes
 import netureForumRoutes from '../routes/neture/forum.routes.js';
 
@@ -168,6 +164,12 @@ import nextgenCMSRoutes from '../routes/cms.routes.js';
 
 // Digital Signage Routes
 import signageRoutes from '../routes/signage.routes.js';
+
+// Deployment Routes
+import deploymentRoutes from '../routes/deployment.routes.js';
+
+// Site Routes
+import sitesRoutes from '../modules/sites/sites.routes.js';
 
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
@@ -297,11 +299,6 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 4. SETTINGS ROUTES (Lenient rate limiting - before standard limiter)
   // ============================================================================
-  // Public roles endpoint
-  app.get('/api/v1/users/roles', (req: Request, res: Response) => {
-    return UserRoleController.getRoles(req, res);
-  });
-
   // Settings routes
   app.use('/api/v1/settings', settingsLimiter, settingsV1Routes); // Admin settings routes (OAuth, reading, etc.)
   app.use('/api/v1/customizer', settingsLimiter, customizerV1Routes);
@@ -313,14 +310,40 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 5. V1 API ROUTES (Protected with standard rate limiting)
   // ============================================================================
-  // User management
-  app.use('/api/v1/users', userPermissionsLimiter, usersV1Routes);
-  app.use('/v1/users', userPermissionsLimiter, usersV1Routes);
-  app.use('/api/users', standardLimiter, userManagementRoutes);
-  app.use('/api/user', standardLimiter, userRoutes); // Authenticated user endpoints (profile, completeness, etc.)
+  // NEW: Unified user management routes (recommended)
+  app.use('/api/v1/users', userModuleRoutes);
 
-  // User role and permissions management
-  app.use('/api/v1/userRole', userPermissionsLimiter, userRoleRoutes);
+  // Legacy: User management routes - @deprecated Use /api/v1/users instead
+  app.use(
+    '/v1/users',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/v1/users'),
+    userPermissionsLimiter,
+    usersV1Routes
+  );
+  app.use(
+    '/api/users',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/api/users'),
+    standardLimiter,
+    userManagementRoutes
+  );
+  app.use(
+    '/api/user',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/api/user'),
+    standardLimiter,
+    userRoutes
+  );
+
+  // Legacy: User role and permissions management - @deprecated Use /api/v1/users/:userId/roles instead
+  app.use(
+    '/api/v1/userRole',
+    deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/userRole'),
+    userPermissionsLimiter,
+    userRoleRoutes
+  );
 
   // App System (NEW - Google AI, OpenAI, etc.)
   app.use('/api/v1/apps', standardLimiter, appsRoutes);
@@ -409,10 +432,6 @@ export function setupRoutes(app: Application): void {
   // Phase PD-9 - Multichannel RPA
   app.use('/api/v1/channels', standardLimiter, channelsRoutes);
 
-  // Yaksa Community Routes
-  app.use('/api/v1/yaksa/forum/communities', standardLimiter, yaksaCommunityRoutes);
-  app.use('/api/v1/yaksa/forum/posts', standardLimiter, yaksaPostRoutes);
-
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
 
@@ -423,6 +442,14 @@ export function setupRoutes(app: Application): void {
   // Digital Signage Routes
   app.use('/api/signage', standardLimiter, signageRoutes);
   app.use('/api/v1/signage', standardLimiter, signageRoutes);
+
+  // Deployment Routes
+  app.use('/api/deployment', standardLimiter, deploymentRoutes);
+  app.use('/api/v1/deployment', standardLimiter, deploymentRoutes);
+
+  // Site Routes
+  app.use('/api/sites', standardLimiter, sitesRoutes);
+  app.use('/api/v1/sites', standardLimiter, sitesRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization - Now using dropshipping-core package
   //   app.use('/api/v1/ds/seller/authorizations', standardLimiter, coreSellerAuthorizationRoutes);

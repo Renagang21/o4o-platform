@@ -1,7 +1,7 @@
 import { AppDataSource } from '../database/connection.js';
-import { User } from '../entities/User.js';
+import { User } from '../modules/auth/entities/User.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
-import { LinkingSession } from '../entities/LinkingSession.js';
+import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
 import { 
   AuthProvider, 

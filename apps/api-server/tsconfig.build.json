@@ -25,6 +25,13 @@
     "scripts/seed-roles-permissions.ts",
     "src/scripts/**/*",
     "src/database/backfill-*.ts",
-    "src/database/check-*.ts"
+    "src/database/check-*.ts",
+    "src/common/templates/**/*",
+    "src/modules/shared/controllers/test-item.controller.ts",
+    "src/modules/shared/services/test-item.service.ts",
+    "src/modules/shared/routes/test-item.routes.ts",
+    "src/modules/shared/entities/TestItem.ts",
+    "src/modules/shared/dto/test-item.dto.ts",
+    "modules/**/tests/**/*"
   ]
 }

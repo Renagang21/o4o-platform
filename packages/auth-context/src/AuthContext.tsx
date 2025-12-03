@@ -26,6 +26,7 @@ interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   isAdmin: boolean;
+  authClient?: any; // AuthClient instance for API calls
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   clearError: () => void;

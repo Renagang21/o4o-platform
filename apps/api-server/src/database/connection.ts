@@ -20,11 +20,13 @@ const envPath = path.resolve(__dirname, '../../../', envFile);
 dotenv.config({
   path: envPath
 });
-import { User } from '../entities/User.js';
-import { Role } from '../entities/Role.js';
-import { Permission } from '../entities/Permission.js';
-import { RefreshToken } from '../entities/RefreshToken.js';
-import { LoginAttempt } from '../entities/LoginAttempt.js';
+// AUTH Module entities (migrated to src/modules/auth/entities/)
+import { User } from '../modules/auth/entities/User.js';
+import { Role } from '../modules/auth/entities/Role.js';
+import { Permission } from '../modules/auth/entities/Permission.js';
+import { RefreshToken } from '../modules/auth/entities/RefreshToken.js';
+import { LoginAttempt } from '../modules/auth/entities/LoginAttempt.js';
+import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
 import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
@@ -103,7 +105,7 @@ import { FormPreset } from '../entities/FormPreset.js';
 import { ViewPreset } from '../entities/ViewPreset.js';
 import { TemplatePreset } from '../entities/TemplatePreset.js';
 // P0 Zero-Data Role Management entities
-import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 import { SupplierProfile } from '../entities/SupplierProfile.js';
@@ -118,6 +120,10 @@ import { SignageDevice } from '../entities/SignageDevice.js';
 import { SignageSlide } from '../entities/SignageSlide.js';
 import { SignagePlaylist, SignagePlaylistItem } from '../entities/SignagePlaylist.js';
 import { SignageSchedule } from '../entities/SignageSchedule.js';
+// Deployment entities
+import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
+// Site entities
+import { Site } from '../modules/sites/site.entity.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -174,11 +180,15 @@ export const AppDataSource = new DataSource({
   
   // 엔티티 등록 - 모든 환경에서 명시적 엔티티 배열 사용
   entities: [
+    // AUTH Module entities
     User,
     Role,
     Permission,
     RefreshToken,
+    RoleAssignment,
     LoginAttempt,
+    LinkingSession,
+    // Legacy AUTH entities (to be migrated)
     PasswordResetToken,
     EmailVerificationToken,
     ApprovalLog,
@@ -255,8 +265,7 @@ export const AppDataSource = new DataSource({
     FormPreset,
     ViewPreset,
     TemplatePreset,
-    // P0 Zero-Data Role Management entities
-    RoleAssignment,
+    // P0 Zero-Data Role Management entities (RoleAssignment moved to AUTH module)
     RoleApplication,
     KycDocument,
     SupplierProfile,
@@ -273,6 +282,10 @@ export const AppDataSource = new DataSource({
     SignagePlaylist,
     SignagePlaylistItem,
     SignageSchedule,
+    // Deployment entities
+    DeploymentInstance,
+    // Site entities
+    Site,
   ],
   
   // 마이그레이션 설정

@@ -7,7 +7,7 @@ import { isNewerVersion } from '../utils/semver.js';
 import { AppDependencyResolver, DependencyError } from './AppDependencyResolver.js';
 import { AppDataCleaner } from './AppDataCleaner.js';
 import { AppTableOwnershipResolver, OwnershipValidationError } from './AppTableOwnershipResolver.js';
-import { PermissionService } from './PermissionService.js';
+import { permissionService } from '../modules/auth/services/permission.service.js';
 import { acfRegistry } from './ACFRegistry.js';
 import { registry as cptRegistry } from '@o4o/cpt-registry';
 import type { AppManifest, InstallContext, ActivateContext, DeactivateContext, UninstallContext } from '@o4o/types';
@@ -28,14 +28,12 @@ export class AppManager {
   private dependencyResolver: AppDependencyResolver;
   private dataCleaner: AppDataCleaner;
   private ownershipResolver: AppTableOwnershipResolver;
-  private permissionService: PermissionService;
 
   constructor() {
     this.repo = AppDataSource.getRepository(AppRegistry);
     this.dependencyResolver = new AppDependencyResolver();
     this.dataCleaner = new AppDataCleaner();
     this.ownershipResolver = new AppTableOwnershipResolver();
-    this.permissionService = new PermissionService();
   }
 
   /**
@@ -144,7 +142,7 @@ export class AppManager {
     // Register Permissions
     if (manifest.permissions && manifest.permissions.length > 0) {
       logger.info(`[AppManager] Registering ${manifest.permissions.length} permissions for ${appId}`);
-      await this.permissionService.registerPermissions(appId, manifest.permissions);
+      await permissionService.registerPermissions(appId, manifest.permissions);
     }
 
     // Register CPT definitions
@@ -417,7 +415,7 @@ export class AppManager {
 
     // Remove Permissions
     logger.info(`[AppManager] Removing permissions for ${appId}`);
-    await this.permissionService.deletePermissionsByApp(appId);
+    await permissionService.deletePermissionsByApp(appId);
 
     // Unregister ACF groups
     logger.info(`[AppManager] Unregistering ACF groups for ${appId}`);
@@ -582,7 +580,6 @@ export class AppManager {
     const packageMap: Record<string, string> = {
       'forum-core': '@o4o-apps/forum',
       'forum-neture': '@o4o-apps/forum-neture',
-      'forum-yaksa': '@o4o-apps/forum-yaksa',
       // Add more mappings as needed
     };
 

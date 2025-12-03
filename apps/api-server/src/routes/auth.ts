@@ -8,10 +8,9 @@ import { authenticate } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../middleware/error-handler.js';
 import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error.js';
 import { env } from '../utils/env-validator.js';
-import { RefreshTokenService } from '../services/refreshToken.service.js';
+import { refreshTokenService } from '../modules/auth/services/refresh-token.service.js';
 
 const router: Router = Router();
-const refreshTokenService = new RefreshTokenService();
 
 // 로그인
 router.post('/login',

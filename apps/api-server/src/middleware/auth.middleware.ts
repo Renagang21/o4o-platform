@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection.js';
-import { User } from '../entities/User.js';
-import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { User } from '../modules/auth/entities/User.js';
+import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 import { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 

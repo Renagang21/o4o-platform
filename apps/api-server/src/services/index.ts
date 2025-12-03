@@ -20,7 +20,8 @@ export * from './GracefulDegradationService.js';
 export * from './HookSystem.js';
 export * from './IncidentEscalationService.js';
 // export * from './InventoryAlertService.js';
-export * from './LoginSecurityService.js';
+// LoginSecurityService migrated to modules/auth/services/login-security.service.ts
+export { loginSecurityService } from '../modules/auth/services/login-security.service.js';
 // export * from './MembershipService.js';
 // export * from './MockDataService.js';
 // export * from './MonitoringInitializer.js';
@@ -30,7 +31,8 @@ export * from './OperationsMonitoringService.js';
 export * from './PerformanceMonitoringInitializer.js';
 export * from './PerformanceOptimizationService.js';
 // export * from './RecommendationService.js';
-export * from './RefreshTokenService.js';
+// RefreshTokenService migrated to modules/auth/services/refresh-token.service.ts
+export { refreshTokenService } from '../modules/auth/services/refresh-token.service.js';
 // export * from './RestockNotificationService.js';
 // export * from './ReturnExchangeService.js';
 // export * from './ReviewService.js';
@@ -42,7 +44,8 @@ export * from './SelfHealingService.js';
 // export * from './StatusPageService.js';
 export * from './ThemeService.js';
 // export * from './TossPaymentsService.js';
-export * from './UserService.js';
+// UserService migrated to modules/auth/services/user.service.ts
+export { userService } from '../modules/auth/services/user.service.js';
 export * from './account-linking.service.js';
 export * from './email.service.js';
 export * from './imageProcessingService.js';

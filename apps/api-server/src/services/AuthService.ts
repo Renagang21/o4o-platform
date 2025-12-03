@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
-import { User } from '../entities/User.js';
+import { User } from '../modules/auth/entities/User.js';
 import { BusinessInfo } from '../types/user.js';
 import {
   AccessTokenPayload,
@@ -371,7 +371,7 @@ let authServiceInstance: AuthService | null = null;
 export const getAuthService = async (): Promise<AuthService> => {
   if (!authServiceInstance) {
     const { AppDataSource } = await import('../database/connection.js');
-    const { User } = await import('../entities/User.js');
+    const { User } = await import('../modules/auth/entities/User.js');
     const userRepository = AppDataSource.getRepository(User);
     authServiceInstance = new AuthService(userRepository);
   }

@@ -1,7 +1,7 @@
 import { AppDataSource } from '../database/connection.js';
-import { RefreshToken } from '../entities/RefreshToken.js';
-import { LoginAttempt } from '../entities/LoginAttempt.js';
-import { User } from '../entities/User.js';
+import { RefreshToken } from '../modules/auth/entities/RefreshToken.js';
+import { LoginAttempt } from '../modules/auth/entities/LoginAttempt.js';
+import { User } from '../modules/auth/entities/User.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import logger from '../utils/logger.js';

@@ -92,6 +92,9 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 
+// Site Builder (Step 24)
+const SiteBuilder = lazy(() => import('@/pages/site-builder/SiteBuilder'));
+
 // Forum Pages (from @o4o-apps/forum package - source imports)
 const ForumBoardList = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumBoardList'));
 const ForumCategories = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumCategories'));
@@ -162,6 +165,7 @@ const DropshippingUsersTest = lazy(() => import('@/pages/test/DropshippingUsersT
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
 const ApiResponseChecker = lazy(() => import('@/pages/test/ApiResponseChecker'));
 const MenuDebug = lazy(() => import('@/pages/test/MenuDebug'));
+const SiteBuilderTest = lazy(() => import('@/pages/test/SiteBuilderTest'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -804,6 +808,15 @@ function App() {
                       </AdminProtectedRoute>
                     } />
 
+                    {/* Site Builder (Step 24) */}
+                    <Route path="/admin/site-builder" element={
+                      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SiteBuilder />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 포럼 - App-based routes with AppRouteGuard */}
                     <Route path="/forum/boards" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
@@ -1016,6 +1029,12 @@ function App() {
                     <Route path="/test/menu-debug" element={
                       <Suspense fallback={<PageLoader />}>
                         <MenuDebug />
+                      </Suspense>
+                    } />
+                    {/* Test - Site Builder */}
+                    <Route path="/admin/test/site-builder" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <SiteBuilderTest />
                       </Suspense>
                     } />
 
