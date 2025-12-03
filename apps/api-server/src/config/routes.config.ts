@@ -169,6 +169,12 @@ import nextgenCMSRoutes from '../routes/cms.routes.js';
 // Digital Signage Routes
 import signageRoutes from '../routes/signage.routes.js';
 
+// Deployment Routes
+import deploymentRoutes from '../routes/deployment.routes.js';
+
+// Site Routes
+import sitesRoutes from '../modules/sites/sites.routes.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -423,6 +429,14 @@ export function setupRoutes(app: Application): void {
   // Digital Signage Routes
   app.use('/api/signage', standardLimiter, signageRoutes);
   app.use('/api/v1/signage', standardLimiter, signageRoutes);
+
+  // Deployment Routes
+  app.use('/api/deployment', standardLimiter, deploymentRoutes);
+  app.use('/api/v1/deployment', standardLimiter, deploymentRoutes);
+
+  // Site Routes
+  app.use('/api/sites', standardLimiter, sitesRoutes);
+  app.use('/api/v1/sites', standardLimiter, sitesRoutes);
 
   // Phase 8/9 - Supplier Policy & Seller Authorization - Now using dropshipping-core package
   //   app.use('/api/v1/ds/seller/authorizations', standardLimiter, coreSellerAuthorizationRoutes);

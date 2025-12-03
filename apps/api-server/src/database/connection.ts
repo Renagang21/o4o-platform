@@ -118,6 +118,10 @@ import { SignageDevice } from '../entities/SignageDevice.js';
 import { SignageSlide } from '../entities/SignageSlide.js';
 import { SignagePlaylist, SignagePlaylistItem } from '../entities/SignagePlaylist.js';
 import { SignageSchedule } from '../entities/SignageSchedule.js';
+// Deployment entities
+import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
+// Site entities
+import { Site } from '../modules/sites/site.entity.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
@@ -273,6 +277,10 @@ export const AppDataSource = new DataSource({
     SignagePlaylist,
     SignagePlaylistItem,
     SignageSchedule,
+    // Deployment entities
+    DeploymentInstance,
+    // Site entities
+    Site,
   ],
   
   // 마이그레이션 설정

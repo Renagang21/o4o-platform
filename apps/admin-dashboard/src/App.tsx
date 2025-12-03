@@ -92,6 +92,9 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
 
+// Site Builder (Step 24)
+const SiteBuilder = lazy(() => import('@/pages/site-builder/SiteBuilder'));
+
 // Forum Pages (from @o4o-apps/forum package - source imports)
 const ForumBoardList = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumBoardList'));
 const ForumCategories = lazy(() => import('@o4o-apps/forum/src/admin-ui/pages/ForumCategories'));
@@ -800,6 +803,15 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <AppStorePage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Site Builder (Step 24) */}
+                    <Route path="/admin/site-builder" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SiteBuilder />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
