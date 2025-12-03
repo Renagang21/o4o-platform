@@ -1,12 +1,22 @@
 import { Router, Request, Response } from 'express';
+import type { Router as ExpressRouter } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { Site, SiteStatus } from './site.entity.js';
 import { authenticateToken } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
-import { View } from '../../entities/View.js';
-import { scaffoldSite } from '../../../services/deployment-service/scaffolding/index.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
+
+// Scaffolding function - will be loaded dynamically when needed
+async function getScaffoldingService() {
+  try {
+    const { scaffoldSite } = await import('../../../../services/deployment-service/scaffolding/index.js');
+    return scaffoldSite;
+  } catch (error) {
+    logger.error('Failed to load scaffolding service:', error);
+    return null;
+  }
+}
 
 // Middleware: Check if user has admin role
 const requireAdmin = (req: Request, res: Response, next: Function) => {
@@ -288,6 +298,13 @@ async function triggerScaffolding(siteId: string, autoDeploy: boolean = false) {
     site.logs += `\n[${new Date().toISOString()}] Loading template: ${site.template}`;
     await siteRepo.save(site);
 
+    // Get scaffolding service
+    const scaffoldSite = await getScaffoldingService();
+
+    if (!scaffoldSite) {
+      throw new Error('Scaffolding service is not available');
+    }
+
     // Execute scaffolding using the scaffoldSite function
     const result = await scaffoldSite({
       siteId: site.id,
@@ -305,9 +322,9 @@ async function triggerScaffolding(siteId: string, autoDeploy: boolean = false) {
       site.status = SiteStatus.READY;
       site.config = {
         ...site.config,
-        pagesCreated: result.pagesCreated,
-        appsInstalled: result.appsInstalled,
-      };
+        ...(result.pagesCreated && { pagesCreated: result.pagesCreated }),
+        ...(result.appsInstalled && { appsInstalled: result.appsInstalled }),
+      } as any;
       logger.info(`Scaffolding completed for site ${siteId}`);
     } else {
       site.status = SiteStatus.FAILED;
