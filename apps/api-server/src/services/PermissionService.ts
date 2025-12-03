@@ -7,7 +7,7 @@
 
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
-import { Permission } from '../entities/Permission.js';
+import { Permission } from '../modules/auth/entities/Permission.js';
 import logger from '../utils/logger.js';
 
 export interface RegisterPermissionInput {

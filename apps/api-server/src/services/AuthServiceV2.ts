@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Response } from 'express';
-import { User } from '../entities/User.js';
+import { User } from '../modules/auth/entities/User.js';
 import {
   AccessTokenPayload,
   AuthTokens,
@@ -8,13 +8,14 @@ import {
   LoginResponse,
   UserRole
 } from '../types/auth.js';
-import { UserService } from './UserService.js';
+import { userService } from '../modules/auth/services/user.service.js';
+import { refreshTokenService } from '../modules/auth/services/refresh-token.service.js';
 import { RefreshTokenService as RefreshTokenServiceStub } from './RefreshTokenService.js';
-import { RefreshTokenService } from './refreshToken.service.js';
 import { SessionSyncService } from './sessionSyncService.js';
 import { LoginSecurityService } from './LoginSecurityService.js';
 import * as tokenUtils from '../utils/token.utils.js';
 import * as cookieUtils from '../utils/cookie.utils.js';
+import { comparePassword } from '../modules/auth/utils/auth.utils.js';
 import {
   InvalidCredentialsError,
   AccountLockedError,
@@ -45,7 +46,6 @@ interface TokenMetadata {
 export class AuthServiceV2 {
   private static readonly JWT_SECRET = process.env.JWT_SECRET || 'jwt-secret';
   private static readonly JWT_EXPIRES_IN = '15m';
-  private static readonly refreshTokenService = new RefreshTokenService();
 
   /**
    * User login
@@ -80,7 +80,7 @@ export class AuthServiceV2 {
       }
 
       // Find user
-      const user = await UserService.getUserByEmail(email);
+      const user = await userService.findByEmail(email);
       if (!user) {
         await LoginSecurityService.recordLoginAttempt({
           email,
@@ -93,7 +93,7 @@ export class AuthServiceV2 {
       }
 
       // Check if account is locked
-      if (UserService.isAccountLocked(user)) {
+      if (userService.isAccountLocked(user)) {
         await LoginSecurityService.recordLoginAttempt({
           email,
           ipAddress: ip,
@@ -105,9 +105,9 @@ export class AuthServiceV2 {
       }
 
       // Verify password
-      const isValidPassword = await UserService.comparePassword(password, user.password);
+      const isValidPassword = await comparePassword(password, user.password);
       if (!isValidPassword) {
-        await UserService.handleFailedLogin(user);
+        await userService.handleFailedLogin(user);
         await LoginSecurityService.recordLoginAttempt({
           email,
           ipAddress: ip,
@@ -166,7 +166,7 @@ export class AuthServiceV2 {
       const tokens = await this.generateTokens(user, { userAgent, ipAddress });
       
       // Update login info
-      await UserService.handleSuccessfulLogin(user);
+      await userService.handleSuccessfulLogin(user);
 
       return {
         success: true,
@@ -215,7 +215,7 @@ export class AuthServiceV2 {
   ): Promise<AuthTokens | null> {
     try {
       // Verify refresh token
-      const verifyResult = await this.refreshTokenService.verifyRefreshToken(refreshToken);
+      const verifyResult = await refreshTokenService.verifyRefreshToken(refreshToken);
 
       if (!verifyResult.valid || !verifyResult.user) {
         return null;
@@ -247,7 +247,7 @@ export class AuthServiceV2 {
    * Logout user
    */
   static async logout(userId: string): Promise<void> {
-    await this.refreshTokenService.revokeAllUserTokens(userId);
+    await refreshTokenService.revokeAllUserTokens(userId);
   }
 
   /**
