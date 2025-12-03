@@ -12,7 +12,6 @@ import {
 import { DashboardController } from '../controllers/dashboardController.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { requireAdmin } from '../middleware/permission.middleware.js';
-import securityRoutes from './admin/security.js';
 import { PagesController } from '../controllers/pagesController.js';
 
 const router: Router = Router();
@@ -110,8 +109,5 @@ router.post('/users/:userId/reactivate',
   param('userId').isUUID().withMessage('Valid user ID is required'),
   reactivateUser
 );
-
-// Security management routes
-router.use('/security', securityRoutes);
 
 export default router;

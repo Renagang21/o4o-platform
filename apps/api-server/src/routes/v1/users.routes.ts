@@ -1,9 +1,5 @@
 import { Router, Request, Response } from 'express';
-import userActivityRoutes from './userActivity.routes.js';
 import userRoleRoutes from './userRole.routes.js';
-import userRoleSwitchRoutes from './userRoleSwitch.routes.js';
-import userStatisticsRoutes from './userStatistics.routes.js';
-import businessInfoRoutes from './businessInfo.routes.js';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../entities/User.js';
@@ -12,11 +8,7 @@ import logger from '../../utils/logger.js';
 const router: Router = Router();
 
 // Mount sub-routers FIRST (before generic /:id routes) to ensure specific routes like /statistics match correctly
-router.use('/', userActivityRoutes);
 router.use('/', userRoleRoutes);
-router.use('/', userRoleSwitchRoutes);
-router.use('/', userStatisticsRoutes);
-router.use('/', businessInfoRoutes);
 
 // Basic user list endpoint
 router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) => {
