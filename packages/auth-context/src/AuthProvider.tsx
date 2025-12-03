@@ -186,6 +186,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     isLoading,
     error,
     isAdmin,
+    authClient, // Expose authClient for API calls
     login,
     logout,
     clearError,
