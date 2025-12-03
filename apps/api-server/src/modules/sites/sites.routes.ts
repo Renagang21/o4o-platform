@@ -26,7 +26,7 @@ const requireAdmin = (req: Request, res: Response, next: Function) => {
 
   const userRoles = user.roles || [];
   const hasAdminRole = userRoles.some((role: any) =>
-    ['admin', 'superadmin', 'manager'].includes(typeof role === 'string' ? role : role.name)
+    ['admin', 'superadmin', 'super_admin', 'manager'].includes(typeof role === 'string' ? role : role.name)
   );
 
   if (!hasAdminRole) {
