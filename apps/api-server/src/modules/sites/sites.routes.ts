@@ -29,8 +29,10 @@ const requireAdmin = (req: Request, res: Response, next: Function) => {
   logger.info('[Sites API] User roles:', { userId: user.id, roles: userRoles });
 
   const hasAdminRole = userRoles.some((role: any) => {
-    const roleName = typeof role === 'string' ? role : role.name;
-    logger.info('[Sites API] Checking role:', { roleName, type: typeof role });
+    let roleName = typeof role === 'string' ? role : role.name;
+    // Remove curly braces from PostgreSQL array format
+    roleName = roleName?.replace(/[{}]/g, '');
+    logger.info('[Sites API] Checking role:', { roleName, originalRole: role, type: typeof role });
     return ['admin', 'superadmin', 'super_admin', 'manager'].includes(roleName);
   });
 
