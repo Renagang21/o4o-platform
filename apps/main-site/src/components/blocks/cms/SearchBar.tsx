@@ -5,6 +5,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BlockRendererProps } from '../BlockRenderer';
 
 export const SearchBarBlock = ({ node }: BlockRendererProps) => {
@@ -13,14 +14,17 @@ export const SearchBarBlock = ({ node }: BlockRendererProps) => {
     style = 'default',
     showButton = true,
     buttonText = 'Search',
+    redirectTo = '/search',
   } = node.props;
 
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual search
-    console.log('Search for:', searchQuery);
+    if (searchQuery.trim()) {
+      navigate(`${redirectTo}?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   if (style === 'pill') {

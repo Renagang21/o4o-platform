@@ -5,25 +5,24 @@
 'use client';
 
 import { BlockRendererProps } from '../BlockRenderer';
+import type { CMSTag } from '@/lib/cms/client';
 
 export const TagCloudBlock = ({ node }: BlockRendererProps) => {
-  const { limit = 20, minSize = 12, maxSize = 24 } = node.props;
+  const { limit = 20, minSize = 12, maxSize = 24, data } = node.props;
 
-  // TODO: Fetch actual tags with post counts from CMS API
-  // For now, return mock data
-  const mockTags = [
-    { name: 'JavaScript', count: 45 },
-    { name: 'React', count: 38 },
-    { name: 'TypeScript', count: 32 },
-    { name: 'Node.js', count: 28 },
-    { name: 'CSS', count: 25 },
-    { name: 'HTML', count: 20 },
-    { name: 'Design', count: 15 },
-    { name: 'UI/UX', count: 12 },
-  ];
+  // Get tags from injected data
+  const tags: CMSTag[] = data?.tags || [];
 
-  const maxCount = Math.max(...mockTags.map((t) => t.count));
-  const minCount = Math.min(...mockTags.map((t) => t.count));
+  if (tags.length === 0) {
+    return (
+      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        <div className="text-sm text-gray-600">No tags found</div>
+      </div>
+    );
+  }
+
+  const maxCount = Math.max(...tags.map((t) => t.count));
+  const minCount = Math.min(...tags.map((t) => t.count));
 
   const getFontSize = (count: number) => {
     if (maxCount === minCount) return (minSize + maxSize) / 2;
@@ -33,10 +32,10 @@ export const TagCloudBlock = ({ node }: BlockRendererProps) => {
 
   return (
     <div className="flex flex-wrap gap-3">
-      {mockTags.slice(0, limit).map((tag, i) => (
+      {tags.slice(0, limit).map((tag) => (
         <a
-          key={i}
-          href="#"
+          key={tag.id}
+          href={`/tag/${tag.slug}`}
           className="hover:text-blue-600 transition-colors"
           style={{ fontSize: `${getFontSize(tag.count)}px` }}
         >

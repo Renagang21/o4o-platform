@@ -9,6 +9,7 @@
 import { ReactNode } from 'react';
 import { DesignerNode } from './blocks/BlockRenderer';
 import { getBlockRenderer } from './blocks/BlockRegistry';
+import { CMSBlockWrapper, isCMSBlock } from './blocks/CMSBlockWrapper';
 
 interface ViewRendererProps {
   view: {
@@ -30,6 +31,20 @@ function renderNode(node: DesignerNode): ReactNode {
     ? node.children.map((child) => renderNode(child))
     : null;
 
+  // Check if this is a CMS block that needs data fetching
+  if (isCMSBlock(node.type)) {
+    return (
+      <CMSBlockWrapper key={node.id} node={node}>
+        {(nodeWithData) => (
+          <Renderer node={nodeWithData}>
+            {children}
+          </Renderer>
+        )}
+      </CMSBlockWrapper>
+    );
+  }
+
+  // Regular block rendering
   return (
     <Renderer key={node.id} node={node}>
       {children}

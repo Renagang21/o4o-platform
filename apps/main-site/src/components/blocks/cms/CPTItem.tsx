@@ -5,29 +5,47 @@
 'use client';
 
 import { BlockRendererProps } from '../BlockRenderer';
+import type { CMSPost } from '@/lib/cms/client';
 
 export const CPTItemBlock = ({ node }: BlockRendererProps) => {
   const {
-    postId: _postId,
     layout = 'card',
     showImage = true,
     showDate = true,
     showAuthor = true,
     showExcerpt = true,
+    data,
   } = node.props;
 
-  // TODO: Fetch actual post from CMS API using _postId
-  // For now, return a placeholder
+  // Get post from injected data
+  const post: CMSPost | null = data?.post || null;
+
+  if (!post) {
+    return (
+      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        <div className="text-sm text-gray-600">Post not found</div>
+      </div>
+    );
+  }
+
   if (layout === 'full') {
     return (
       <article className="max-w-4xl mx-auto">
-        {showImage && <div className="bg-gray-200 h-96 rounded-lg mb-6"></div>}
-        <h1 className="text-4xl font-bold mb-4">Post Title</h1>
+        {showImage && post.featuredImage && (
+          <img
+            src={post.featuredImage}
+            alt={post.title}
+            className="w-full h-96 object-cover rounded-lg mb-6"
+          />
+        )}
+        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
         <div className="flex gap-4 text-sm text-gray-600 mb-6">
-          {showDate && <span>Date</span>}
-          {showAuthor && <span>Author</span>}
+          {showDate && post.publishedAt && (
+            <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+          )}
+          {showAuthor && post.author && <span>By {post.author.name}</span>}
         </div>
-        <div className="prose prose-lg">Post content...</div>
+        <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
       </article>
     );
   }
@@ -35,8 +53,8 @@ export const CPTItemBlock = ({ node }: BlockRendererProps) => {
   if (layout === 'minimal') {
     return (
       <div className="py-4 border-b border-gray-200">
-        <h3 className="font-semibold mb-2">Post Title</h3>
-        {showExcerpt && <p className="text-sm text-gray-600">Excerpt...</p>}
+        <h3 className="font-semibold mb-2">{post.title}</h3>
+        {showExcerpt && post.excerpt && <p className="text-sm text-gray-600">{post.excerpt}</p>}
       </div>
     );
   }
@@ -44,14 +62,18 @@ export const CPTItemBlock = ({ node }: BlockRendererProps) => {
   // Default card layout
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
-      {showImage && <div className="bg-gray-200 h-48"></div>}
+      {showImage && post.featuredImage && (
+        <img src={post.featuredImage} alt={post.title} className="w-full h-48 object-cover" />
+      )}
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-2">Post Title</h2>
+        <h2 className="text-2xl font-bold mb-2">{post.title}</h2>
         <div className="flex gap-4 text-sm text-gray-600 mb-4">
-          {showDate && <span>Date</span>}
-          {showAuthor && <span>Author</span>}
+          {showDate && post.publishedAt && (
+            <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+          )}
+          {showAuthor && post.author && <span>By {post.author.name}</span>}
         </div>
-        {showExcerpt && <p className="text-gray-600">Post excerpt...</p>}
+        {showExcerpt && post.excerpt && <p className="text-gray-600">{post.excerpt}</p>}
       </div>
     </div>
   );

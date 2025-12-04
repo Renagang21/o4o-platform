@@ -7,21 +7,20 @@
 import { BlockRendererProps } from '../BlockRenderer';
 
 export const BreadcrumbBlock = ({ node }: BlockRendererProps) => {
-  const { separator = '/', showHome = true } = node.props;
+  const { separator = '/', showHome = true, data } = node.props;
 
-  // TODO: Generate breadcrumb from current page path
-  // For now, return mock breadcrumb
-  const mockBreadcrumbs = [
-    { label: 'Home', url: '/' },
-    { label: 'Category', url: '/category' },
-    { label: 'Current Page', url: '' },
-  ];
+  // Get breadcrumbs from injected data
+  const breadcrumbs: Array<{ label: string; url: string }> = data?.breadcrumbs || [];
 
-  const breadcrumbs = showHome ? mockBreadcrumbs : mockBreadcrumbs.slice(1);
+  if (breadcrumbs.length === 0) {
+    return null;
+  }
+
+  const filteredBreadcrumbs = showHome ? breadcrumbs : breadcrumbs.slice(1);
 
   return (
-    <nav className="flex items-center space-x-2 text-sm">
-      {breadcrumbs.map((item, i) => (
+    <nav className="flex items-center space-x-2 text-sm py-4">
+      {filteredBreadcrumbs.map((item, i) => (
         <div key={i} className="flex items-center">
           {i > 0 && <span className="mx-2 text-gray-400">{separator}</span>}
           {item.url ? (
