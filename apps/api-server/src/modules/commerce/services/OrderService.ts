@@ -1,19 +1,19 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Order, OrderStatus, PaymentStatus, PaymentMethod, OrderItem, Address, OrderSummary } from '../entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
 import { OrderEvent, OrderEventType, OrderEventPayload } from '../entities/OrderEvent.js';
-import { User } from '../entities/User.js';
+import { User } from '../../../entities/User.js';
 import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
-import { Partner, PartnerStatus } from '../entities/Partner.js';
-import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
+import { Partner, PartnerStatus } from '../../dropshipping/entities/Partner.js';
+import { PartnerCommission, CommissionStatus } from '../../dropshipping/entities/PartnerCommission.js';
 import { Product } from '../entities/Product.js';
-import { CommissionCalculator } from './CommissionCalculator.js';
-import { SettlementEngine } from './settlement-engine/index.js';
-import { notificationService } from './NotificationService.js';
-import logger from '../utils/logger.js';
-import { invalidateOrderRelatedCaches } from '../utils/cache-invalidation.js';
+import { CommissionCalculator } from '../../../services/CommissionCalculator.js';
+import { SettlementEngine } from '../../../services/settlement-engine/index.js';
+import { notificationService } from '../../../services/NotificationService.js';
+import logger from '../../../utils/logger.js';
+import { invalidateOrderRelatedCaches } from '../../../utils/cache-invalidation.js';
 
 export interface CreateOrderRequest {
   items?: OrderItem[];
