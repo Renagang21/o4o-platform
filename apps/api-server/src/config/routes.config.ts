@@ -26,7 +26,9 @@ import cptRoutes from '../routes/cpt.js';
 import postCreationRoutes from '../routes/post-creation/index.js';
 import servicesRoutes from '../routes/services.js';
 import contentRoutes from '../routes/content.js';
-import cmsRoutes from '../routes/content/index.js';
+// ❌ DEPRECATED: Legacy CMS routes - replaced by Phase C-2 CMS V2
+// import cmsRoutes from '../routes/content/index.js';
+import legacyCmsRoutes from '../routes/content/index.js';
 import publicRoutes from '../routes/public.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
 import emailAuthRoutes from '../routes/email-auth.routes.js';
@@ -162,8 +164,11 @@ import channelsRoutes from '../routes/v1/channels.routes.js';
 // Neture Forum Routes
 import netureForumRoutes from '../routes/neture/forum.routes.js';
 
-// NextGen CMS Routes
-import nextgenCMSRoutes from '../routes/cms.routes.js';
+// ❌ DEPRECATED: Old CMS routes - replaced by Phase C-2 CMS V2
+// import nextgenCMSRoutes from '../routes/cms.routes.js';
+
+// ✅ NEW: CMS Module V2 Routes (Phase C-2)
+import { cmsRoutes } from '../modules/cms/index.js';
 
 // Digital Signage Routes
 import signageRoutes from '../routes/signage.routes.js';
@@ -455,9 +460,13 @@ export function setupRoutes(app: Application): void {
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
 
-  // NextGen CMS Routes
-  app.use('/api/cms', standardLimiter, nextgenCMSRoutes);
-  app.use('/api/v1/cms', standardLimiter, nextgenCMSRoutes);
+  // ✅ NEW: CMS Module V2 Routes (Phase C-2)
+  // Provides: CustomPostType, CustomField, View, Page endpoints
+  // See: src/modules/cms/routes/cms.routes.ts
+  app.use('/api/v1/cms', standardLimiter, cmsRoutes);
+
+  // ❌ DEPRECATED: Old CMS routes path - Use /api/v1/cms instead (Removal: 2025-06-03)
+  // app.use('/api/cms', standardLimiter, nextgenCMSRoutes);
 
   // Digital Signage Routes
   app.use('/api/signage', standardLimiter, signageRoutes);
@@ -571,7 +580,8 @@ export function setupRoutes(app: Application): void {
   app.use('/api/post-creation', standardLimiter, postCreationRoutes);
   app.use('/api/services', standardLimiter, servicesRoutes);
   app.use('/api/content', contentRoutes);
-  app.use('/api/cms', cmsRoutes);
+  // ❌ DEPRECATED: Legacy CMS routes - Use /api/v1/cms instead (Phase C-2)
+  app.use('/api/cms', legacyCmsRoutes);
   app.use('/api/reusable-blocks', reusableBlocksRoutes);
   app.use('/api/block-patterns', blockPatternsRoutes);
   app.use('/api/template-parts', templatePartsRoutes);
