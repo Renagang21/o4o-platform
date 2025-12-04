@@ -29,7 +29,7 @@ export class CartService extends BaseService<Cart> {
 
   async getCartByUserId(userId: string): Promise<Cart | null> {
     try {
-      return await this.repo.findOne({
+      return await this.repository.findOne({
         where: { userId },
         relations: ['items'],
       });
@@ -44,13 +44,13 @@ export class CartService extends BaseService<Cart> {
 
   async createCart(userId: string): Promise<Cart> {
     try {
-      const cart = this.repo.create({
+      const cart = this.repository.create({
         userId,
         items: [],
         coupons: [],
         discountCodes: [],
       });
-      return await this.repo.save(cart);
+      return await this.repository.save(cart);
     } catch (error: any) {
       logger.error('[CartService.createCart] Error', {
         error: error.message,

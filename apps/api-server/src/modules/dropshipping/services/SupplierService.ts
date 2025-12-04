@@ -25,7 +25,7 @@ export class SupplierService extends BaseService<Supplier> {
 
   async getSupplierByUserId(userId: string): Promise<Supplier | null> {
     try {
-      return await this.repo.findOne({
+      return await this.repository.findOne({
         where: { userId },
         relations: ['businessInfo', 'products'],
       });
@@ -40,12 +40,12 @@ export class SupplierService extends BaseService<Supplier> {
 
   async createSupplier(userId: string, data: any): Promise<Supplier> {
     try {
-      const supplier = this.repo.create({
+      const supplier = this.repository.create({
         userId,
         ...data,
         status: SupplierStatus.PENDING,
       });
-      return await this.repo.save(supplier);
+      return await this.repository.save(supplier);
     } catch (error: any) {
       logger.error('[SupplierService.createSupplier] Error', {
         error: error.message,
@@ -60,7 +60,7 @@ export class SupplierService extends BaseService<Supplier> {
     data: Partial<Supplier>
   ): Promise<Supplier> {
     try {
-      const supplier = await this.repo.findOne({
+      const supplier = await this.repository.findOne({
         where: { id: supplierId },
       });
 
@@ -69,7 +69,7 @@ export class SupplierService extends BaseService<Supplier> {
       }
 
       Object.assign(supplier, data);
-      return await this.repo.save(supplier);
+      return await this.repository.save(supplier);
     } catch (error: any) {
       logger.error('[SupplierService.updateSupplier] Error', {
         error: error.message,
@@ -84,7 +84,7 @@ export class SupplierService extends BaseService<Supplier> {
     approvedBy: string
   ): Promise<Supplier> {
     try {
-      const supplier = await this.repo.findOne({
+      const supplier = await this.repository.findOne({
         where: { id: supplierId },
       });
 
@@ -93,7 +93,7 @@ export class SupplierService extends BaseService<Supplier> {
       }
 
       supplier.approve(approvedBy);
-      return await this.repo.save(supplier);
+      return await this.repository.save(supplier);
     } catch (error: any) {
       logger.error('[SupplierService.approveSupplier] Error', {
         error: error.message,
@@ -112,7 +112,7 @@ export class SupplierService extends BaseService<Supplier> {
       const { status, page = 1, limit = 20 } = filters;
       const skip = (page - 1) * limit;
 
-      const queryBuilder = this.repo.createQueryBuilder('supplier');
+      const queryBuilder = this.repository.createQueryBuilder('supplier');
 
       if (status) {
         queryBuilder.andWhere('supplier.status = :status', { status });

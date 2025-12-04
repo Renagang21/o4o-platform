@@ -37,11 +37,11 @@ export class ShippingService extends BaseService<Shipment> {
     expectedDeliveryDate?: Date;
   }): Promise<Shipment> {
     try {
-      const shipment = this.repo.create({
+      const shipment = this.repository.create({
         ...data,
         status: 'pending',
       });
-      return await this.repo.save(shipment);
+      return await this.repository.save(shipment);
     } catch (error: any) {
       logger.error('[ShippingService.createShipment] Error', {
         error: error.message,
@@ -53,7 +53,7 @@ export class ShippingService extends BaseService<Shipment> {
 
   async getShipmentByOrderId(orderId: number): Promise<Shipment | null> {
     try {
-      return await this.repo.findOne({
+      return await this.repository.findOne({
         where: { orderId },
       });
     } catch (error: any) {
@@ -72,7 +72,7 @@ export class ShippingService extends BaseService<Shipment> {
     description?: string
   ): Promise<Shipment> {
     try {
-      const shipment = await this.repo.findOne({
+      const shipment = await this.repository.findOne({
         where: { id: shipmentId },
       });
 
@@ -101,7 +101,7 @@ export class ShippingService extends BaseService<Shipment> {
         trackingTime: new Date(),
       });
 
-      return await this.repo.save(shipment);
+      return await this.repository.save(shipment);
     } catch (error: any) {
       logger.error('[ShippingService.updateShipmentStatus] Error', {
         error: error.message,

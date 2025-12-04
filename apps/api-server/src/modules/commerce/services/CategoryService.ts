@@ -25,7 +25,7 @@ export class CategoryService extends BaseService<Category> {
 
   async getAllCategories(): Promise<Category[]> {
     try {
-      return await this.repo.find({
+      return await this.repository.find({
         where: { isActive: true },
         order: { sortOrder: 'ASC', name: 'ASC' },
       });
@@ -39,7 +39,7 @@ export class CategoryService extends BaseService<Category> {
 
   async getCategoryBySlug(slug: string): Promise<Category | null> {
     try {
-      return await this.repo.findOne({
+      return await this.repository.findOne({
         where: { slug, isActive: true },
       });
     } catch (error: any) {
@@ -61,8 +61,8 @@ export class CategoryService extends BaseService<Category> {
     metaDescription?: string;
   }): Promise<Category> {
     try {
-      const category = this.repo.create(data);
-      return await this.repo.save(category);
+      const category = this.repository.create(data);
+      return await this.repository.save(category);
     } catch (error: any) {
       logger.error('[CategoryService.createCategory] Error', {
         error: error.message,
@@ -86,13 +86,13 @@ export class CategoryService extends BaseService<Category> {
     }>
   ): Promise<Category> {
     try {
-      const category = await this.repo.findOne({ where: { id } });
+      const category = await this.repository.findOne({ where: { id } });
       if (!category) {
         throw new Error('Category not found');
       }
 
       Object.assign(category, data);
-      return await this.repo.save(category);
+      return await this.repository.save(category);
     } catch (error: any) {
       logger.error('[CategoryService.updateCategory] Error', {
         error: error.message,
@@ -104,13 +104,13 @@ export class CategoryService extends BaseService<Category> {
 
   async deleteCategory(id: string): Promise<void> {
     try {
-      const category = await this.repo.findOne({ where: { id } });
+      const category = await this.repository.findOne({ where: { id } });
       if (!category) {
         throw new Error('Category not found');
       }
 
       category.isActive = false;
-      await this.repo.save(category);
+      await this.repository.save(category);
     } catch (error: any) {
       logger.error('[CategoryService.deleteCategory] Error', {
         error: error.message,
