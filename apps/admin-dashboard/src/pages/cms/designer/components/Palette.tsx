@@ -5,8 +5,10 @@
  */
 
 import { useState } from 'react';
+import { useDrag } from 'react-dnd';
 import { COMPONENT_REGISTRY, ComponentDefinition } from '../config/componentRegistry';
 import { useDesigner } from '../state/DesignerContext';
+import { DND_ITEM_TYPES, PaletteDragItem } from '../types/dnd.types';
 
 export default function Palette() {
   const { addNode, state } = useDesigner();
@@ -17,7 +19,7 @@ export default function Palette() {
   const filteredComponents = COMPONENT_REGISTRY.filter(comp => comp.category === activeCategory);
 
   const handleComponentClick = (componentType: string) => {
-    // Add to root for now - later we'll support dropping to specific locations
+    // Add to selected node or root
     const parentId = state.selectedNodeId || 'root';
     addNode(parentId, componentType);
   };
@@ -27,7 +29,7 @@ export default function Palette() {
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">Components</h2>
-        <p className="text-xs text-gray-500 mt-1">Click to add to canvas</p>
+        <p className="text-xs text-gray-500 mt-1">Drag or click to add</p>
       </div>
 
       {/* Category Tabs */}
@@ -51,24 +53,11 @@ export default function Palette() {
       <div className="flex-1 overflow-y-auto p-2">
         <div className="space-y-1">
           {filteredComponents.map(comp => (
-            <button
+            <PaletteItem
               key={comp.type}
+              component={comp}
               onClick={() => handleComponentClick(comp.type)}
-              className="w-full flex items-center gap-3 p-3 rounded border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors text-left group"
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData('componentType', comp.type);
-                e.dataTransfer.effectAllowed = 'copy';
-              }}
-            >
-              <span className="text-2xl">{comp.icon}</span>
-              <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900 group-hover:text-blue-700">
-                  {comp.label}
-                </div>
-                <div className="text-xs text-gray-500">{comp.type}</div>
-              </div>
-            </button>
+            />
           ))}
         </div>
       </div>
@@ -76,9 +65,50 @@ export default function Palette() {
       {/* Footer Tips */}
       <div className="p-3 border-t border-gray-200 bg-gray-50">
         <p className="text-xs text-gray-600">
-          💡 Tip: Click a component to add it to the selected element, or drag it to the canvas
+          💡 Tip: Drag components to canvas or click to add to selected element
         </p>
       </div>
     </div>
+  );
+}
+
+/**
+ * Draggable Palette Item
+ */
+interface PaletteItemProps {
+  component: ComponentDefinition;
+  onClick: () => void;
+}
+
+function PaletteItem({ component, onClick }: PaletteItemProps) {
+  const [{ isDragging }, drag] = useDrag<PaletteDragItem, unknown, { isDragging: boolean }>({
+    type: DND_ITEM_TYPES.PALETTE_COMPONENT,
+    item: {
+      type: DND_ITEM_TYPES.PALETTE_COMPONENT,
+      componentType: component.type,
+      label: component.label,
+      icon: component.icon,
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  return (
+    <button
+      ref={drag}
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 p-3 rounded border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left group cursor-move ${
+        isDragging ? 'opacity-50 scale-95' : 'opacity-100'
+      }`}
+    >
+      <span className="text-2xl">{component.icon}</span>
+      <div className="flex-1">
+        <div className="text-sm font-medium text-gray-900 group-hover:text-blue-700">
+          {component.label}
+        </div>
+        <div className="text-xs text-gray-500">{component.type}</div>
+      </div>
+    </button>
   );
 }

@@ -5,6 +5,8 @@
  */
 
 import { useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DesignerProvider, useDesigner } from './state/DesignerContext';
 import Palette from './components/Palette';
 import Canvas from './components/Canvas';
@@ -25,13 +27,15 @@ export default function DesignerShell({
   onPreview,
 }: DesignerShellProps) {
   return (
-    <DesignerProvider initialView={initialView}>
-      <DesignerShellContent
-        viewId={viewId}
-        onSave={onSave}
-        onPreview={onPreview}
-      />
-    </DesignerProvider>
+    <DndProvider backend={HTML5Backend}>
+      <DesignerProvider initialView={initialView}>
+        <DesignerShellContent
+          viewId={viewId}
+          onSave={onSave}
+          onPreview={onPreview}
+        />
+      </DesignerProvider>
+    </DndProvider>
   );
 }
 
