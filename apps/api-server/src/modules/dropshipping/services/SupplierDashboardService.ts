@@ -7,18 +7,18 @@
  * Mirrors SellerDashboardService structure for consistency
  */
 
-import AppDataSource from '../database/data-source.js';
-import { Order, OrderStatus, PaymentStatus, OrderItem } from '../entities/Order.js';
-import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
+import AppDataSource from '../../../database/data-source.js';
+import { Order, OrderStatus, PaymentStatus, OrderItem } from '../../commerce/entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../../commerce/entities/OrderItem.js';
 import { Between, In } from 'typeorm';
-import logger from '../utils/logger.js';
+import logger from '../../../utils/logger.js';
 import {
   SupplierDashboardSummaryDto,
   DashboardMetaDto,
   createDashboardMeta
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
-import { SettlementReadService } from './SettlementReadService.js';
+import { SettlementReadService } from '../../commerce/services/SettlementReadService.js';
 
 /**
  * @deprecated Use SupplierDashboardSummaryDto from dashboard.dto.ts

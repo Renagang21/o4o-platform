@@ -7,19 +7,19 @@
  * Provides seller-specific statistics, orders, and commission calculations
  */
 
-import AppDataSource from '../database/data-source.js';
-import { Order, OrderStatus, PaymentStatus, OrderItem } from '../entities/Order.js';
-import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
+import AppDataSource from '../../../database/data-source.js';
+import { Order, OrderStatus, PaymentStatus, OrderItem } from '../../commerce/entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../../commerce/entities/OrderItem.js';
 import { Between, In } from 'typeorm';
-import logger from '../utils/logger.js';
+import logger from '../../../utils/logger.js';
 import {
   SellerDashboardSummaryDto,
   DashboardMetaDto,
   createDashboardMeta
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
-import { SettlementReadService } from './SettlementReadService.js';
-import { cacheService, CacheKeys, getCacheConfig } from '../cache/index.js';
+import { SettlementReadService } from '../../commerce/services/SettlementReadService.js';
+import { cacheService, CacheKeys, getCacheConfig } from '../../../cache/index.js';
 
 /**
  * @deprecated Use SellerDashboardSummaryDto from dashboard.dto.ts
