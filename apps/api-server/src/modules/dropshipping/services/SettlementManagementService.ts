@@ -20,14 +20,14 @@ import { Commission } from '../entities/Commission.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import logger from '../../../utils/logger.js';
 import { invalidateSettlementCache } from '../../../utils/cache-invalidation.js';
-import { SettlementEngineV2 } from './settlement/SettlementEngineV2.js';
+import { SettlementEngineV2 } from '../../../services/settlement/SettlementEngineV2.js';
 import type {
   SettlementV2Config,
   SettlementEngineV2Result,
   SettlementPartyContext,
   DuplicateSettlementInfo,
   SettlementDiffSummary,
-} from './settlement/SettlementTypesV2.js';
+} from '../../../services/settlement/SettlementTypesV2.js';
 
 export interface SettlementFilters {
   page?: number;
@@ -530,6 +530,233 @@ export class SettlementManagementService {
     } catch (error) {
       logger.error('[SettlementManagement] compareV1AndV2 failed', {
         error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Generate settlement for a specific order
+   * Phase B-4 Step 6: Order → Settlement pipeline entry point
+   *
+   * Creates settlements for all parties involved in an order:
+   * - Seller (receives payment minus commission)
+   * - Supplier (receives base price for items)
+   * - Partner (receives referral commission if applicable)
+   *
+   * @param orderId - Order ID to generate settlements for
+   * @returns Promise<SettlementEngineV2Result> with created settlements
+   */
+  async generateSettlement(orderId: string): Promise<SettlementEngineV2Result> {
+    logger.info('[SettlementManagement] generateSettlement called', { orderId });
+
+    try {
+      // 1. Fetch order with items
+      const orderRepo = AppDataSource.getRepository(Order);
+      const order = await orderRepo.findOne({
+        where: { id: orderId },
+        relations: ['itemsRelation']
+      });
+
+      if (!order) {
+        throw new Error(`Order ${orderId} not found`);
+      }
+
+      if (!order.itemsRelation || order.itemsRelation.length === 0) {
+        throw new Error(`Order ${orderId} has no items`);
+      }
+
+      // 2. Extract unique parties from order items
+      const parties = new Set<string>();
+      const partyContexts: SettlementPartyContext[] = [];
+
+      for (const item of order.itemsRelation) {
+        // Seller
+        if (item.sellerId) {
+          const sellerKey = `seller:${item.sellerId}`;
+          if (!parties.has(sellerKey)) {
+            parties.add(sellerKey);
+            partyContexts.push({
+              partyType: 'seller',
+              partyId: item.sellerId,
+              currency: 'KRW'
+            });
+          }
+        }
+
+        // Supplier
+        if (item.supplierId) {
+          const supplierKey = `supplier:${item.supplierId}`;
+          if (!parties.has(supplierKey)) {
+            parties.add(supplierKey);
+            partyContexts.push({
+              partyType: 'supplier',
+              partyId: item.supplierId,
+              currency: 'KRW'
+            });
+          }
+        }
+
+        // Partner (if exists in item attributes)
+        if (item.attributes && typeof item.attributes === 'object') {
+          const attrs = item.attributes as Record<string, unknown>;
+          const partnerId = attrs.partnerId as string || attrs.referralPartnerId as string;
+          if (partnerId) {
+            const partnerKey = `partner:${partnerId}`;
+            if (!parties.has(partnerKey)) {
+              parties.add(partnerKey);
+              partyContexts.push({
+                partyType: 'partner',
+                partyId: partnerId,
+                currency: 'KRW'
+              });
+            }
+          }
+        }
+      }
+
+      logger.debug('[SettlementManagement] Extracted parties from order', {
+        orderId,
+        partiesCount: partyContexts.length,
+        parties: partyContexts.map(p => `${p.partyType}:${p.partyId}`)
+      });
+
+      // 3. Create default commission rule set
+      // Phase B-4 Step 6: Simple percentage-based rules for now
+      const ruleSet = {
+        id: 'default-order-settlement',
+        name: 'Default Order Settlement Rules',
+        rules: [
+          {
+            id: 'seller-commission',
+            name: 'Seller Commission (20%)',
+            appliesTo: { partyType: 'seller' as const },
+            type: 'percentage' as const,
+            percentageRate: 20
+          },
+          {
+            id: 'supplier-base-price',
+            name: 'Supplier Base Price (100%)',
+            appliesTo: { partyType: 'supplier' as const },
+            type: 'percentage' as const,
+            percentageRate: 0 // Supplier gets base price, no commission
+          },
+          {
+            id: 'partner-commission',
+            name: 'Partner Referral Commission (5%)',
+            appliesTo: { partyType: 'partner' as const },
+            type: 'percentage' as const,
+            percentageRate: 5
+          }
+        ]
+      };
+
+      // 4. Configure settlement generation
+      const config: SettlementV2Config = {
+        periodStart: order.orderDate,
+        periodEnd: order.orderDate, // Single order, same start/end date
+        parties: partyContexts,
+        ruleSet,
+        dryRun: false, // Persist to database
+        tag: `order-${orderId}`
+      };
+
+      // 5. Generate settlements via SettlementEngineV2
+      const result = await this.generateSettlementsV2(config);
+
+      logger.info('[SettlementManagement] Settlement generated for order', {
+        orderId,
+        settlementsCount: result.settlements.length,
+        itemsCount: result.settlementItems.length
+      });
+
+      return result;
+    } catch (error) {
+      logger.error('[SettlementManagement] generateSettlement failed', {
+        error: error instanceof Error ? error.message : String(error),
+        orderId
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Finalize settlement (mark as confirmed/ready for payment)
+   * Phase B-4 Step 6: Settlement confirmation entry point
+   *
+   * Transitions settlement from PENDING → CONFIRMED status
+   * - Validates settlement can be finalized
+   * - Updates status
+   * - Invalidates caches
+   * - Sends notifications
+   *
+   * @param settlementId - Settlement ID to finalize
+   * @returns Promise<Settlement> finalized settlement
+   */
+  async finalizeSettlement(settlementId: string): Promise<Settlement> {
+    logger.info('[SettlementManagement] finalizeSettlement called', { settlementId });
+
+    try {
+      // 1. Fetch settlement
+      const settlement = await this.settlementRepo.findOne({
+        where: { id: settlementId }
+      });
+
+      if (!settlement) {
+        throw new Error(`Settlement ${settlementId} not found`);
+      }
+
+      // 2. Validate settlement can be finalized
+      if (settlement.status === SettlementStatus.PAID) {
+        throw new Error(`Settlement ${settlementId} is already paid`);
+      }
+
+      if (settlement.status === SettlementStatus.CANCELLED) {
+        throw new Error(`Settlement ${settlementId} is cancelled and cannot be finalized`);
+      }
+
+      // 3. Update status to PROCESSING (intermediate state before PAID)
+      const previousStatus = settlement.status;
+      settlement.status = SettlementStatus.PROCESSING;
+
+      const saved = await this.settlementRepo.save(settlement);
+
+      logger.info('[SettlementManagement] Settlement finalized', {
+        settlementId,
+        previousStatus,
+        newStatus: saved.status,
+        payableAmount: saved.payableAmount
+      });
+
+      // 4. Invalidate caches (only for supported party types)
+      if (saved.partyType === 'seller' || saved.partyType === 'supplier' || saved.partyType === 'platform') {
+        await invalidateSettlementCache(saved.partyType, saved.partyId);
+      }
+
+      // 5. Send notification to party
+      if (saved.partyId) {
+        const periodLabel = `${saved.periodStart.toLocaleDateString('ko-KR')} ~ ${saved.periodEnd.toLocaleDateString('ko-KR')}`;
+        await notificationService.createNotification({
+          userId: saved.partyId,
+          type: 'settlement.new_pending',
+          title: '정산이 확정되었습니다',
+          message: `${periodLabel} 정산 ${saved.payableAmount.toLocaleString()}원이 확정되어 곧 지급 예정입니다.`,
+          metadata: {
+            settlementId: saved.id,
+            partyType: saved.partyType,
+            payableAmount: saved.payableAmount,
+            periodStart: saved.periodStart.toISOString(),
+            periodEnd: saved.periodEnd.toISOString(),
+          },
+          channel: 'in_app',
+        }).catch(err => logger.error(`Failed to send settlement.confirmed notification to ${saved.partyId}:`, err));
+      }
+
+      return saved;
+    } catch (error) {
+      logger.error('[SettlementManagement] finalizeSettlement failed', {
+        error: error instanceof Error ? error.message : String(error),
+        settlementId
       });
       throw error;
     }

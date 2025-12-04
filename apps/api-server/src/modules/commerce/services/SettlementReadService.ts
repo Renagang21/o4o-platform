@@ -492,4 +492,183 @@ export class SettlementReadService {
       throw error;
     }
   }
+
+  /**
+   * Get settlement overview for dashboard
+   * Phase B-4 Step 6: Aggregate settlement statistics across all parties
+   *
+   * Provides high-level overview for admin dashboard:
+   * - Total settlements count
+   * - Total amount by status (pending, processing, paid)
+   * - Settlement distribution by party type
+   */
+  async getSettlementOverview(
+    dateRange?: DateRangeFilter
+  ): Promise<{
+    totalSettlements: number;
+    totalPendingAmount: number;
+    totalProcessingAmount: number;
+    totalPaidAmount: number;
+    settlementsByPartyType: Record<string, number>;
+    settlementsByStatus: Record<string, number>;
+  }> {
+    try {
+      // Build where clause
+      const where: any = {};
+
+      if (dateRange?.from || dateRange?.to) {
+        where.periodStart = Between(
+          dateRange.from || new Date('2020-01-01'),
+          dateRange.to || new Date()
+        );
+      }
+
+      // Fetch all settlements in range
+      const settlements = await this.settlementRepository.find({ where });
+
+      // Aggregate statistics
+      let totalPendingAmount = 0;
+      let totalProcessingAmount = 0;
+      let totalPaidAmount = 0;
+      const settlementsByPartyType: Record<string, number> = {};
+      const settlementsByStatus: Record<string, number> = {};
+
+      for (const settlement of settlements) {
+        const amount = parseFloat(settlement.payableAmount || '0');
+
+        // Aggregate by status
+        switch (settlement.status) {
+          case SettlementStatus.PENDING:
+            totalPendingAmount += amount;
+            break;
+          case SettlementStatus.PROCESSING:
+            totalProcessingAmount += amount;
+            break;
+          case SettlementStatus.PAID:
+            totalPaidAmount += amount;
+            break;
+        }
+
+        // Count by party type
+        settlementsByPartyType[settlement.partyType] =
+          (settlementsByPartyType[settlement.partyType] || 0) + 1;
+
+        // Count by status
+        settlementsByStatus[settlement.status] =
+          (settlementsByStatus[settlement.status] || 0) + 1;
+      }
+
+      logger.debug('[SettlementReadService] Settlement overview retrieved', {
+        totalSettlements: settlements.length,
+        totalPendingAmount,
+        totalPaidAmount
+      });
+
+      return {
+        totalSettlements: settlements.length,
+        totalPendingAmount: Math.round(totalPendingAmount),
+        totalProcessingAmount: Math.round(totalProcessingAmount),
+        totalPaidAmount: Math.round(totalPaidAmount),
+        settlementsByPartyType,
+        settlementsByStatus
+      };
+    } catch (error) {
+      logger.error('[SettlementReadService] Failed to get settlement overview:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get daily settlement totals for trend analysis
+   * Phase B-4 Step 6: Group settlements by day for dashboard charts
+   *
+   * Useful for:
+   * - Revenue trend charts
+   * - Daily settlement volume tracking
+   * - Settlement processing patterns
+   */
+  async getDailySettlementTotals(
+    dateRange: DateRangeFilter
+  ): Promise<Array<{
+    date: string;
+    totalAmount: number;
+    totalSettlements: number;
+    pendingAmount: number;
+    processingAmount: number;
+    paidAmount: number;
+  }>> {
+    try {
+      const startDate = dateRange.from || new Date('2020-01-01');
+      const endDate = dateRange.to || new Date();
+
+      // Fetch settlements in date range
+      const settlements = await this.settlementRepository.find({
+        where: {
+          periodStart: Between(startDate, endDate)
+        },
+        order: { periodStart: 'ASC' }
+      });
+
+      // Group by date
+      const dailyTotals = new Map<string, {
+        totalAmount: number;
+        totalSettlements: number;
+        pendingAmount: number;
+        processingAmount: number;
+        paidAmount: number;
+      }>();
+
+      for (const settlement of settlements) {
+        const dateKey = settlement.periodStart.toISOString().split('T')[0];
+        const amount = parseFloat(settlement.payableAmount || '0');
+
+        if (!dailyTotals.has(dateKey)) {
+          dailyTotals.set(dateKey, {
+            totalAmount: 0,
+            totalSettlements: 0,
+            pendingAmount: 0,
+            processingAmount: 0,
+            paidAmount: 0
+          });
+        }
+
+        const day = dailyTotals.get(dateKey)!;
+        day.totalAmount += amount;
+        day.totalSettlements += 1;
+
+        switch (settlement.status) {
+          case SettlementStatus.PENDING:
+            day.pendingAmount += amount;
+            break;
+          case SettlementStatus.PROCESSING:
+            day.processingAmount += amount;
+            break;
+          case SettlementStatus.PAID:
+            day.paidAmount += amount;
+            break;
+        }
+      }
+
+      // Convert map to array
+      const result = Array.from(dailyTotals.entries()).map(([date, totals]) => ({
+        date,
+        totalAmount: Math.round(totals.totalAmount),
+        totalSettlements: totals.totalSettlements,
+        pendingAmount: Math.round(totals.pendingAmount),
+        processingAmount: Math.round(totals.processingAmount),
+        paidAmount: Math.round(totals.paidAmount)
+      }));
+
+      logger.debug('[SettlementReadService] Daily settlement totals retrieved', {
+        daysCount: result.length,
+        startDate,
+        endDate
+      });
+
+      return result;
+    } catch (error) {
+      logger.error('[SettlementReadService] Failed to get daily settlement totals:', error);
+      throw error;
+    }
+  }
 }
