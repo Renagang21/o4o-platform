@@ -47,6 +47,21 @@ import {
   SearchBarSchema,
 } from '../blocks/cms';
 
+import {
+  DividerSchema,
+  SpacerSchema,
+  IconTextSchema,
+  BadgeSchema,
+  QuoteSchema,
+  TwoColumnSchema,
+  ThreeColumnSchema,
+  BulletListSchema,
+  CardSchema,
+  AccordionSchema,
+  TabsSchema,
+  ModalSchema,
+} from '../blocks/additional';
+
 export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   // New Basic Blocks
   TextSchema,
@@ -83,6 +98,22 @@ export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   BreadcrumbSchema,
   PaginationSchema,
   SearchBarSchema,
+
+  // New Additional Blocks (12 total)
+  // Basic/Utility (5)
+  DividerSchema,
+  SpacerSchema,
+  IconTextSchema,
+  BadgeSchema,
+  QuoteSchema,
+  // Layout/Structure (7)
+  TwoColumnSchema,
+  ThreeColumnSchema,
+  BulletListSchema,
+  CardSchema,
+  AccordionSchema,
+  TabsSchema,
+  ModalSchema,
 
   // Legacy Layout Components (keeping for compatibility)
   {
