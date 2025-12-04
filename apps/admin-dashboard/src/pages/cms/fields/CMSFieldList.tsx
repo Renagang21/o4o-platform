@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, List } from 'lucide-react';
 import cmsAPI, { CustomField } from '@/lib/cms';
 import toast from 'react-hot-toast';
@@ -12,6 +13,7 @@ import toast from 'react-hot-toast';
 export default function CMSFieldList() {
   const [fields, setFields] = useState<CustomField[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadFields();
@@ -60,7 +62,7 @@ export default function CMSFieldList() {
             </p>
           </div>
           <button
-            onClick={() => toast('Create Field UI coming soon')}
+            onClick={() => navigate('/admin/cms/fields/new')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -108,7 +110,7 @@ export default function CMSFieldList() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => toast('Edit Field UI coming soon')}
+                      onClick={() => navigate(`/admin/cms/fields/${field.id}/edit`)}
                       className="p-2 text-gray-400 hover:text-gray-600"
                     >
                       <Edit className="w-5 h-5" />

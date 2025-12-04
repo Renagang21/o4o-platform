@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, Eye, FileText, Send, Archive as ArchiveIcon } from 'lucide-react';
 import cmsAPI, { Page, PageStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
@@ -15,6 +16,7 @@ export default function CMSPageList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<PageStatus | 'all'>('all');
   const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadPages();
@@ -96,7 +98,7 @@ export default function CMSPageList() {
             </p>
           </div>
           <button
-            onClick={() => toast('Create Page UI coming soon')}
+            onClick={() => navigate('/admin/cms/pages/new')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -262,7 +264,7 @@ export default function CMSPageList() {
                         </button>
                       )}
                       <button
-                        onClick={() => toast('Edit Page UI coming soon')}
+                        onClick={() => navigate(`/admin/cms/pages/${page.id}/edit`)}
                         className="p-2 text-gray-400 hover:text-gray-600"
                         title="Edit"
                       >

@@ -95,7 +95,7 @@ export default function CMSCPTList() {
             </p>
           </div>
           <button
-            onClick={() => toast('Create CPT UI coming soon')}
+            onClick={() => navigate('/admin/cms/cpts/new')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -165,7 +165,7 @@ export default function CMSCPTList() {
           </p>
           <div className="mt-6">
             <button
-              onClick={() => toast('Create CPT UI coming soon')}
+              onClick={() => navigate('/admin/cms/cpts/new')}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -216,7 +216,7 @@ export default function CMSCPTList() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => toast('Edit CPT UI coming soon')}
+                        onClick={() => navigate(`/admin/cms/cpts/${cpt.id}/edit`)}
                         className="p-2 text-gray-400 hover:text-gray-600"
                         title="Edit"
                       >

@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, Eye, Copy, Layers } from 'lucide-react';
 import cmsAPI, { View, ViewStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
@@ -15,6 +16,7 @@ export default function CMSViewList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<ViewStatus | 'all'>('all');
   const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadViews();
@@ -84,7 +86,7 @@ export default function CMSViewList() {
             </p>
           </div>
           <button
-            onClick={() => toast('Create View UI coming soon')}
+            onClick={() => navigate('/admin/cms/views/new')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -201,7 +203,7 @@ export default function CMSViewList() {
                         <Copy className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => toast('Edit View UI coming soon')}
+                        onClick={() => navigate(`/admin/cms/views/${view.id}/edit`)}
                         className="p-2 text-gray-400 hover:text-gray-600"
                         title="Edit"
                       >
