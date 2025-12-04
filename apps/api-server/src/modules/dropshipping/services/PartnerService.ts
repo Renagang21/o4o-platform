@@ -1,11 +1,11 @@
 import { Repository, Between, MoreThan, LessThan } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Partner, PartnerStatus, PartnerTier } from '../entities/Partner.js';
 import { PartnerCommission, CommissionStatus } from '../entities/PartnerCommission.js';
-import { User } from '../entities/User.js';
-import { Product } from '../entities/Product.js';
+import { User } from '../../../entities/User.js';
+import { Product } from '../../commerce/entities/Product.js';
 import { Seller } from '../entities/Seller.js';
-import logger from '../utils/logger.js';
+import logger from '../../../utils/logger.js';
 
 export interface CreatePartnerRequest {
   userId: string;

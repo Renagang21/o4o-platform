@@ -1,10 +1,10 @@
 import { In, Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { SellerAuthorization, AuthorizationStatus } from '../entities/SellerAuthorization.js';
 import { SellerAuthorizationAuditLog, AuditAction } from '../entities/SellerAuthorizationAuditLog.js';
 import { authorizationGateService } from './AuthorizationGateService.js';
 import { authorizationMetrics } from './authorization-metrics.service.js';
-import logger from '../utils/logger.js';
+import logger from '../../../utils/logger.js';
 
 /**
  * Phase 9: Seller Authorization Service
