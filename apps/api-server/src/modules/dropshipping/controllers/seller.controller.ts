@@ -18,11 +18,13 @@ export class SellerController extends BaseController {
       }
 
       const data = req.body as SellerApplicationDto;
+      const sellerService = SellerService.getInstance();
 
-      // TODO: Implement SellerService.createSeller
+      const seller = await sellerService.createSeller(req.user.id, data);
+
       return BaseController.ok(res, {
         message: 'Seller application submitted',
-        data
+        seller
       });
     } catch (error: any) {
       logger.error('[SellerController.createSeller] Error', {
@@ -64,10 +66,14 @@ export class SellerController extends BaseController {
         return BaseController.unauthorized(res, 'Not authenticated');
       }
 
-      // TODO: Implement SellerService.getByUserId
-      return BaseController.ok(res, {
-        message: 'Seller profile pending implementation'
-      });
+      const sellerService = SellerService.getInstance();
+      const seller = await sellerService.getByUserId(req.user.id);
+
+      if (!seller) {
+        return BaseController.notFound(res, 'Seller profile not found');
+      }
+
+      return BaseController.ok(res, { seller });
     } catch (error: any) {
       logger.error('[SellerController.getMySellerProfile] Error', {
         error: error.message,
@@ -85,12 +91,13 @@ export class SellerController extends BaseController {
 
       const { id } = req.params;
       const data = req.body as UpdateSellerDto;
+      const sellerService = SellerService.getInstance();
 
-      // TODO: Implement SellerService.update
+      const seller = await sellerService.updateSellerProfile(id, data);
+
       return BaseController.ok(res, {
         message: 'Seller updated',
-        sellerId: id,
-        data
+        seller
       });
     } catch (error: any) {
       logger.error('[SellerController.updateSeller] Error', {

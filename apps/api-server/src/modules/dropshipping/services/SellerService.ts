@@ -3,6 +3,8 @@ import { AppDataSource } from '../database/connection.js';
 import { SellerProduct, SyncPolicy } from '../entities/SellerProduct.js';
 import { Product, ProductStatus } from '../entities/Product.js';
 import { User, UserRole } from '../entities/User.js';
+import { Seller, SellerStatus, SellerTier } from '../entities/Seller.js';
+import { SellerApplicationDto, UpdateSellerDto } from '../dto/seller-application.dto.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -52,14 +54,169 @@ export interface SellerProductFilters {
 const DEFAULT_MARGIN_RATE = 0.20;
 
 export class SellerService {
+  private static instance: SellerService;
+  private sellerRepository: Repository<Seller>;
   private sellerProductRepository: Repository<SellerProduct>;
   private productRepository: Repository<Product>;
   private userRepository: Repository<User>;
 
   constructor() {
+    this.sellerRepository = AppDataSource.getRepository(Seller);
     this.sellerProductRepository = AppDataSource.getRepository(SellerProduct);
     this.productRepository = AppDataSource.getRepository(Product);
     this.userRepository = AppDataSource.getRepository(User);
+  }
+
+  /**
+   * Get singleton instance
+   */
+  static getInstance(): SellerService {
+    if (!SellerService.instance) {
+      SellerService.instance = new SellerService();
+    }
+    return SellerService.instance;
+  }
+
+  /**
+   * Get Seller by User ID
+   * Used to find seller profile for authenticated user
+   */
+  async getByUserId(userId: string): Promise<Seller | null> {
+    const seller = await this.sellerRepository.findOne({
+      where: { userId },
+      relations: ['user']
+    });
+
+    return seller;
+  }
+
+  /**
+   * Get Seller by ID
+   */
+  async findById(id: string): Promise<Seller | null> {
+    const seller = await this.sellerRepository.findOne({
+      where: { id },
+      relations: ['user']
+    });
+
+    return seller;
+  }
+
+  /**
+   * Create new Seller from application
+   * Status starts as PENDING, requires admin approval
+   */
+  async createSeller(userId: string, dto: SellerApplicationDto): Promise<Seller> {
+    // Check if user exists
+    const user = await this.userRepository.findOne({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if seller already exists for this user
+    const existing = await this.sellerRepository.findOne({
+      where: { userId }
+    });
+
+    if (existing) {
+      throw new Error('Seller already exists for this user');
+    }
+
+    // Validate storeSlug uniqueness
+    const slugExists = await this.sellerRepository.findOne({
+      where: { storeSlug: dto.storeSlug }
+    });
+
+    if (slugExists) {
+      throw new Error('Store slug already taken');
+    }
+
+    // Create Seller entity
+    const seller = this.sellerRepository.create({
+      userId,
+      status: SellerStatus.PENDING,
+      tier: SellerTier.BRONZE,
+      storeSlug: dto.storeSlug,
+      branding: dto.branding,
+      policies: dto.policies || {},
+      platformCommissionRate: 0.10, // Default 10%
+      metrics: {
+        totalProducts: 0,
+        totalOrders: 0,
+        totalRevenue: 0,
+        totalCommission: 0,
+        averageRating: 0,
+        totalReviews: 0,
+        returnRate: 0,
+        responseRate: 0
+      }
+    });
+
+    const saved = await this.sellerRepository.save(seller);
+
+    logger.info(`[SellerService] Seller application created`, {
+      userId,
+      sellerId: saved.id,
+      storeSlug: dto.storeSlug,
+      status: SellerStatus.PENDING
+    });
+
+    return saved;
+  }
+
+  /**
+   * Update Seller profile
+   * Seller can update branding, policies, etc.
+   */
+  async updateSellerProfile(sellerId: string, dto: UpdateSellerDto): Promise<Seller> {
+    const seller = await this.sellerRepository.findOne({
+      where: { id: sellerId }
+    });
+
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+
+    // Update branding if provided
+    if (dto.branding) {
+      seller.branding = {
+        ...seller.branding,
+        ...dto.branding
+      };
+    }
+
+    // Update policies if provided
+    if (dto.policies) {
+      seller.policies = {
+        ...seller.policies,
+        ...dto.policies
+      };
+    }
+
+    // Update storeSlug if provided and unique
+    if (dto.storeSlug && dto.storeSlug !== seller.storeSlug) {
+      const slugExists = await this.sellerRepository.findOne({
+        where: { storeSlug: dto.storeSlug }
+      });
+
+      if (slugExists) {
+        throw new Error('Store slug already taken');
+      }
+
+      seller.storeSlug = dto.storeSlug;
+    }
+
+    const updated = await this.sellerRepository.save(seller);
+
+    logger.info(`[SellerService] Seller profile updated`, {
+      sellerId,
+      updates: Object.keys(dto)
+    });
+
+    return updated;
   }
 
   /**

@@ -13,13 +13,13 @@ export * from './Category.js';
 export * from './Cart.js';
 export * from './CartItem.js';
 
-// Order
+// Order (exports Order, OrderItem interface, OrderStatus, PaymentStatus, PaymentMethod)
 export * from './Order.js';
-export * from './OrderItem.js';
+export { OrderItem } from './OrderItem.js';  // Export OrderItem entity class (interface already exported from Order.js)
 export * from './OrderEvent.js';
 
-// Payment
-export * from './Payment.js';
+// Payment (Note: PaymentMethod and PaymentStatus already exported from Order.js)
+export { Payment } from './Payment.js';
 export * from './PaymentSettlement.js';
 
 // Shipment
