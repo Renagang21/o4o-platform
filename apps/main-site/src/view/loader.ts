@@ -35,7 +35,7 @@ export async function loadView(url: string, preview = false): Promise<ViewSchema
   try {
     const cmsView = await loadCMSView(slug, preview);
     if (cmsView) {
-      console.log(`✅ Loaded CMS page: ${slug}${preview ? ' (preview mode)' : ''}`);
+      // Successfully loaded CMS page
       return cmsView;
     }
   } catch (error) {
