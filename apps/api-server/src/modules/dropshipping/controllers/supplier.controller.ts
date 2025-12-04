@@ -86,7 +86,8 @@ export class SupplierController extends BaseController {
       const data = req.body as UpdateSupplierDto;
       const supplierService = SupplierService.getInstance();
 
-      const supplier = await supplierService.updateSupplier(id, data);
+      // Phase B-4 Step 2: Updated to use updateSupplierProfile
+      const supplier = await supplierService.updateSupplierProfile(id, data);
 
       return BaseController.ok(res, { supplier });
     } catch (error: any) {
