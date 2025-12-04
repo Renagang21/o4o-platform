@@ -14,6 +14,7 @@ interface DesignerContextValue {
   addNode: (parentId: string, componentType: string, position?: number) => void;
   updateNode: (nodeId: string, props: Record<string, any>) => void;
   deleteNode: (nodeId: string) => void;
+  cloneNode: (nodeId: string) => void;
   moveNode: (nodeId: string, targetParentId: string, position: number) => void;
   undo: () => void;
   redo: () => void;
@@ -21,6 +22,7 @@ interface DesignerContextValue {
   canRedo: boolean;
   setRootNode: (node: DesignerNode) => void;
   getNode: (nodeId: string) => DesignerNode | null;
+  getNodePath: (nodeId: string) => DesignerNode[];
 }
 
 const DesignerContext = createContext<DesignerContextValue | null>(null);
@@ -151,6 +153,38 @@ export function DesignerProvider({ children, initialView }: { children: ReactNod
     });
   }, [pushToUndoStack]);
 
+  // Clone node
+  const cloneNodeAction = useCallback((nodeId: string) => {
+    if (nodeId === 'root') return; // Can't clone root
+
+    pushToUndoStack();
+
+    setState(prev => {
+      const newRoot = cloneNode(prev.rootNode);
+      const nodeToClone = findNodeInTree(newRoot, nodeId);
+      if (!nodeToClone || !nodeToClone.parentId) return prev;
+
+      // Deep clone the node with new IDs
+      const clonedNode = deepCloneWithNewIds(nodeToClone);
+
+      // Find parent and add cloned node after original
+      const parentNode = findNodeInTree(newRoot, nodeToClone.parentId);
+      if (parentNode) {
+        const index = parentNode.children.findIndex(child => child.id === nodeId);
+        if (index !== -1) {
+          parentNode.children.splice(index + 1, 0, clonedNode);
+        }
+      }
+
+      return {
+        ...prev,
+        rootNode: newRoot,
+        selectedNodeId: clonedNode.id,
+        isDirty: true,
+      };
+    });
+  }, [pushToUndoStack]);
+
   // Move node
   const moveNode = useCallback((nodeId: string, targetParentId: string, position: number) => {
     pushToUndoStack();
@@ -229,12 +263,33 @@ export function DesignerProvider({ children, initialView }: { children: ReactNod
     return findNode(nodeId);
   }, [findNode]);
 
+  // Get node path (for breadcrumb)
+  const getNodePath = useCallback((nodeId: string): DesignerNode[] => {
+    const path: DesignerNode[] = [];
+    const buildPath = (node: DesignerNode): boolean => {
+      if (node.id === nodeId) {
+        path.push(node);
+        return true;
+      }
+      for (const child of node.children) {
+        if (buildPath(child)) {
+          path.unshift(node);
+          return true;
+        }
+      }
+      return false;
+    };
+    buildPath(state.rootNode);
+    return path.filter(n => n.id !== 'root'); // Exclude root from path
+  }, [state.rootNode]);
+
   const value: DesignerContextValue = {
     state,
     selectNode,
     addNode,
     updateNode,
     deleteNode,
+    cloneNode: cloneNodeAction,
     moveNode,
     undo,
     redo,
@@ -242,6 +297,7 @@ export function DesignerProvider({ children, initialView }: { children: ReactNod
     canRedo: state.redoStack.length > 0,
     setRootNode,
     getNode,
+    getNodePath,
   };
 
   return (
@@ -280,4 +336,13 @@ function removeNodeFromTree(tree: DesignerNode, nodeId: string): boolean {
     }
   }
   return false;
+}
+
+function deepCloneWithNewIds(node: DesignerNode): DesignerNode {
+  const newId = `node_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  return {
+    ...node,
+    id: newId,
+    children: node.children.map(child => deepCloneWithNewIds(child)),
+  };
 }

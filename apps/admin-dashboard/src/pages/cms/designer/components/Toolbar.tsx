@@ -4,7 +4,7 @@
  * Top toolbar with save, preview, undo, redo actions
  */
 
-import { Save, Eye, Undo, Redo, X } from 'lucide-react';
+import { Save, Eye, Undo, Redo, X, Plus, Grid, ZoomIn, ZoomOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDesigner } from '../state/DesignerContext';
 
@@ -13,11 +13,24 @@ interface ToolbarProps {
   onSave: () => Promise<void>;
   onPreview: () => void;
   saving?: boolean;
+  zoom?: number;
+  onZoomChange?: (zoom: number) => void;
+  showGrid?: boolean;
+  onGridToggle?: () => void;
 }
 
-export default function Toolbar({ viewId, onSave, onPreview, saving }: ToolbarProps) {
+export default function Toolbar({
+  viewId,
+  onSave,
+  onPreview,
+  saving,
+  zoom = 1.0,
+  onZoomChange,
+  showGrid = false,
+  onGridToggle
+}: ToolbarProps) {
   const navigate = useNavigate();
-  const { undo, redo, canUndo, canRedo, state } = useDesigner();
+  const { undo, redo, canUndo, canRedo, state, addNode } = useDesigner();
 
   const handleBack = () => {
     if (state.isDirty) {
@@ -26,6 +39,33 @@ export default function Toolbar({ viewId, onSave, onPreview, saving }: ToolbarPr
       }
     } else {
       navigate(-1);
+    }
+  };
+
+  const handleAddRow = () => {
+    const parentId = state.selectedNodeId || 'root';
+    addNode(parentId, 'Row');
+  };
+
+  const handleAddColumn = () => {
+    // Check if selected node is a Row
+    const selectedNode = state.selectedNodeId ? state.rootNode : null;
+    if (selectedNode && state.selectedNodeId) {
+      addNode(state.selectedNodeId, 'Column');
+    } else {
+      alert('Please select a Row component first');
+    }
+  };
+
+  const handleZoomIn = () => {
+    if (onZoomChange && zoom < 1.5) {
+      onZoomChange(Math.min(zoom + 0.25, 1.5));
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (onZoomChange && zoom > 0.5) {
+      onZoomChange(Math.max(zoom - 0.25, 0.5));
     }
   };
 
@@ -54,12 +94,74 @@ export default function Toolbar({ viewId, onSave, onPreview, saving }: ToolbarPr
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* Add Row */}
+        <button
+          onClick={handleAddRow}
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+          title="Add Row"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="ml-1 text-xs">Row</span>
+        </button>
+
+        {/* Add Column */}
+        <button
+          onClick={handleAddColumn}
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+          title="Add Column (select a Row first)"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="ml-1 text-xs">Col</span>
+        </button>
+
+        <div className="w-px h-6 bg-gray-300 mx-2"></div>
+
+        {/* Zoom Out */}
+        <button
+          onClick={handleZoomOut}
+          disabled={zoom <= 0.5}
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          title="Zoom Out"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
+
+        {/* Zoom Level */}
+        <span className="px-2 text-xs text-gray-600 font-mono min-w-[3rem] text-center">
+          {Math.round(zoom * 100)}%
+        </span>
+
+        {/* Zoom In */}
+        <button
+          onClick={handleZoomIn}
+          disabled={zoom >= 1.5}
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          title="Zoom In"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+
+        {/* Grid Toggle */}
+        <button
+          onClick={onGridToggle}
+          className={`p-2 rounded transition-colors ${
+            showGrid
+              ? 'text-blue-600 bg-blue-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+          title="Toggle Grid"
+        >
+          <Grid className="w-4 h-4" />
+        </button>
+
+        <div className="w-px h-6 bg-gray-300 mx-2"></div>
+
         {/* Undo */}
         <button
           onClick={undo}
           disabled={!canUndo}
           className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          title="Undo"
+          title="Undo (Ctrl+Z)"
         >
           <Undo className="w-5 h-5" />
         </button>
@@ -69,7 +171,7 @@ export default function Toolbar({ viewId, onSave, onPreview, saving }: ToolbarPr
           onClick={redo}
           disabled={!canRedo}
           className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          title="Redo"
+          title="Redo (Ctrl+Shift+Z)"
         >
           <Redo className="w-5 h-5" />
         </button>
@@ -90,6 +192,7 @@ export default function Toolbar({ viewId, onSave, onPreview, saving }: ToolbarPr
           onClick={onSave}
           disabled={saving || !state.isDirty}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Save (Ctrl+S)"
         >
           {saving ? (
             <>

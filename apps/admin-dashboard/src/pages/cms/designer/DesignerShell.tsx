@@ -50,6 +50,8 @@ function DesignerShellContent({
 }) {
   const { state } = useDesigner();
   const [saving, setSaving] = useState(false);
+  const [zoom, setZoom] = useState(1.0);
+  const [showGrid, setShowGrid] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -71,6 +73,10 @@ function DesignerShellContent({
         onSave={handleSave}
         onPreview={onPreview}
         saving={saving}
+        zoom={zoom}
+        onZoomChange={setZoom}
+        showGrid={showGrid}
+        onGridToggle={() => setShowGrid(!showGrid)}
       />
 
       {/* Main Content */}
@@ -79,7 +85,7 @@ function DesignerShellContent({
         <Palette />
 
         {/* Center: Canvas */}
-        <Canvas />
+        <Canvas zoom={zoom} showGrid={showGrid} />
 
         {/* Right: Inspector */}
         <Inspector />
