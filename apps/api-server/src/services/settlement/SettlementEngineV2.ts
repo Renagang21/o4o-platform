@@ -24,11 +24,11 @@
  */
 
 import { Repository, Between, DataSource } from 'typeorm';
-import { Order } from '../../entities/Order.js';
-import { OrderItem as OrderItemEntity } from '../../entities/OrderItem.js';
-import { Settlement, SettlementStatus } from '../../entities/Settlement.js';
-import { SettlementItem } from '../../entities/SettlementItem.js';
-import { Commission } from '../../entities/Commission.js';
+import { Order } from '../../modules/commerce/entities/Order.js';
+import { OrderItem as OrderItemEntity } from '../../modules/commerce/entities/OrderItem.js';
+import { Settlement, SettlementStatus } from '../../modules/dropshipping/entities/Settlement.js';
+import { SettlementItem } from '../../modules/dropshipping/entities/SettlementItem.js';
+import { Commission } from '../../modules/dropshipping/entities/Commission.js';
 import {
   SettlementV2Config,
   SettlementEngineV2Result,

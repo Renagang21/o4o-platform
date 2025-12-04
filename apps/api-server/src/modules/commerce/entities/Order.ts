@@ -10,7 +10,7 @@ import {
   Index
 } from 'typeorm';
 import type { User } from '../../../entities/User.js';
-import { OrderEvent } from './OrderEvent.js';
+import { OrderEvent } from '../../../entities/OrderEvent.js';
 import type { OrderItem as OrderItemEntity } from './OrderItem.js';
 
 // Enums

@@ -29,7 +29,7 @@ export interface CreateProductRequest {
     gold?: number;
     platinum?: number;
   };
-  inventory: number;
+  inventory?: number;
   lowStockThreshold?: number;
   trackInventory?: boolean;
   allowBackorder?: boolean;
@@ -707,6 +707,27 @@ export class ProductService {
     }
 
     return savedProduct;
+  }
+
+  // Controller-compatible alias methods
+  async create(data: CreateProductRequest): Promise<Product> {
+    return this.createProduct(data);
+  }
+
+  async findById(id: string): Promise<Product | null> {
+    return this.getProduct(id);
+  }
+
+  async findAll(filters: ProductFilters = {}) {
+    return this.getProducts(filters);
+  }
+
+  async update(id: string, data: UpdateProductRequest): Promise<Product> {
+    return this.updateProduct(id, data);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    return this.deleteProduct(id);
   }
 }
 

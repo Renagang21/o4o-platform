@@ -44,7 +44,8 @@ export interface PartnerFilters {
   limit?: number;
 }
 
-export interface CommissionFilters {
+// Note: Renamed to avoid conflict with CommissionEngine exports
+export interface PartnerCommissionFilters {
   partnerId?: string;
   status?: CommissionStatus;
   productId?: string;
@@ -380,7 +381,7 @@ export class PartnerService {
   }
 
   // 커미션 내역 조회
-  async getCommissions(filters: CommissionFilters = {}) {
+  async getCommissions(filters: PartnerCommissionFilters = {}) {
     try {
       const {
         partnerId,
@@ -685,6 +686,11 @@ export class PartnerService {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
+  }
+
+  // Controller-compatible alias method
+  async findById(id: string): Promise<Partner | null> {
+    return this.getPartner(id);
   }
 }
 

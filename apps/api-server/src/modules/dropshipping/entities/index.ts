@@ -18,7 +18,8 @@ export * from './SupplierProfile.js';
 
 // Partner
 export * from './Partner.js';
-export * from './PartnerProfile.js';
+// Note: PartnerProfile entity not exported here to avoid conflict with PartnerProfile interface in Partner.js
+// Import directly from './PartnerProfile.js' if needed
 
 // Commission
 export * from './Commission.js';

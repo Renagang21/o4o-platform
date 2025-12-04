@@ -17,7 +17,9 @@ import logger from '../../../utils/logger.js';
 import {
   SellerDashboardSummaryDto,
   DashboardMetaDto,
-  createDashboardMeta
+  createDashboardMeta,
+  DateRangeFilter,
+  PaginationParams
 } from '../dto/dashboard.dto.js';
 import { dashboardRangeService, type ParsedDateRange } from './DashboardRangeService.js';
 import { SettlementReadService } from '../../commerce/services/SettlementReadService.js';
@@ -48,15 +50,7 @@ export interface SellerOrderSummary {
   itemCount: number;
 }
 
-export interface DateRangeFilter {
-  from?: Date;
-  to?: Date;
-}
-
-export interface PaginationParams {
-  page: number;
-  limit: number;
-}
+// DateRangeFilter and PaginationParams imported from dashboard.dto.ts
 
 export class SellerDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);

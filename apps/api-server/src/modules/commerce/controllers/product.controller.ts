@@ -58,8 +58,8 @@ export class ProductController extends BaseController {
       // This is a simplified implementation
       // Real implementation would use the service's advanced query methods
       const products = await productService.findAll({
-        skip: (page - 1) * limit,
-        take: limit,
+        page,
+        limit,
       });
 
       return BaseController.okPaginated(res, products, {

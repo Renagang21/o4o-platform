@@ -1,14 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsEnum, IsNotEmpty, IsDate, Min, IsUUID, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
-
-export type SettlementPartyType = 'seller' | 'supplier' | 'platform' | 'partner';
-
-export enum SettlementStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  PAID = 'paid',
-  CANCELLED = 'cancelled'
-}
+import { SettlementPartyType, SettlementStatus } from '../entities/Settlement.js';
 
 export class CreateSettlementDto {
   @IsString()

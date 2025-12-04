@@ -217,4 +217,57 @@ export class SellerProductController extends BaseController {
       return BaseController.error(res, error);
     }
   }
+
+  /**
+   * Create Seller Product (alias for addProductToSeller)
+   * Phase B-4 Step 10: Route compatibility method
+   */
+  static async createSellerProduct(req: AuthRequest, res: Response): Promise<any> {
+    return SellerProductController.addProductToSeller(req, res);
+  }
+
+  /**
+   * Update Seller Product
+   * Phase B-4 Step 10: Missing CRUD method
+   */
+  static async updateSellerProduct(req: AuthRequest, res: Response): Promise<any> {
+    try {
+      if (!req.user) {
+        return BaseController.unauthorized(res, 'Not authenticated');
+      }
+
+      const { id } = req.params;
+      const updateData = req.body;
+
+      const sellerService = SellerService.getInstance();
+      const seller = await sellerService.getByUserId(req.user.id);
+
+      if (!seller) {
+        return BaseController.notFound(res, 'Seller profile not found');
+      }
+
+      const sellerProductService = SellerProductService.getInstance();
+      const sellerProduct = await sellerProductService.updateSellerProduct(id, updateData);
+
+      return BaseController.ok(res, {
+        message: 'Seller product updated successfully',
+        sellerProduct
+      });
+    } catch (error: any) {
+      logger.error('[SellerProductController.updateSellerProduct] Error', {
+        error: error.message,
+        userId: req.user?.id,
+        sellerProductId: req.params.id,
+      });
+      return BaseController.error(res, error);
+    }
+  }
+
+  /**
+   * Delete Seller Product (alias for removeProductFromSeller)
+   * Phase B-4 Step 10: Route compatibility method
+   */
+  static async deleteSellerProduct(req: AuthRequest, res: Response): Promise<any> {
+    return SellerProductController.removeProductFromSeller(req, res);
+  }
 }

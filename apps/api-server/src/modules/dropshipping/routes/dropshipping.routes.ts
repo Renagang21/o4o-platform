@@ -190,7 +190,7 @@ router.get(
 router.put(
   '/partners/:id',
   requireAuth,
-  validateDto(UpdatePartnerDto),
+  // TODO: Add validation when UpdatePartnerDto is converted to class with decorators
   asyncHandler(PartnerController.updatePartner)
 );
 
@@ -204,7 +204,7 @@ router.put(
 router.post(
   '/seller-products',
   requireAuth,
-  validateDto(CreateSellerProductDto),
+  // TODO: Add validation when CreateSellerProductDto is converted to class with decorators
   asyncHandler(SellerProductController.createSellerProduct)
 );
 
@@ -226,7 +226,7 @@ router.get(
 router.put(
   '/seller-products/:id',
   requireAuth,
-  validateDto(UpdateSellerProductDto),
+  // TODO: Add validation when UpdateSellerProductDto is converted to class with decorators
   asyncHandler(SellerProductController.updateSellerProduct)
 );
 

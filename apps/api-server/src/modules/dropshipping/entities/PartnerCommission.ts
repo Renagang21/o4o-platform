@@ -45,6 +45,12 @@ export class PartnerCommission {
   @JoinColumn({ name: 'orderId' })
   order: Order;
 
+  @Column({ type: 'uuid', nullable: true })
+  productId: string | null;
+
+  @Column({ type: 'uuid', nullable: true })
+  sellerId: string | null;
+
   @Column({ type: 'varchar', nullable: true })
   referralCode: string | null;
 
@@ -56,6 +62,12 @@ export class PartnerCommission {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   orderAmount: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  productPrice: number | null;
+
+  @Column({ type: 'integer', nullable: true })
+  quantity: number | null;
 
   @Column({
     type: 'enum',
@@ -70,6 +82,9 @@ export class PartnerCommission {
   @Column({ type: 'timestamp', nullable: true })
   paidAt: Date | null;
 
+  @Column({ type: 'timestamp', nullable: true })
+  convertedAt: Date | null;
+
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
@@ -78,4 +93,52 @@ export class PartnerCommission {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  /**
+   * Calculate commission amount from order details
+   * Static helper method for commission calculation
+   */
+  static calculateCommission(
+    unitPrice: number,
+    quantity: number,
+    commissionRate: number
+  ): { commission: number; orderAmount: number } {
+    const orderAmount = unitPrice * quantity;
+    const commission = Math.round((orderAmount * commissionRate) / 100);
+
+    return { commission, orderAmount };
+  }
+
+  /**
+   * Confirm commission (after return period expires)
+   */
+  confirm(): void {
+    if (this.status !== CommissionStatus.PENDING) {
+      throw new Error(`Cannot confirm commission in status: ${this.status}`);
+    }
+
+    this.status = CommissionStatus.CONFIRMED;
+    this.confirmedAt = new Date();
+  }
+
+  /**
+   * Check if commission can be cancelled
+   */
+  canCancel(): boolean {
+    return this.status === CommissionStatus.PENDING || this.status === CommissionStatus.CONFIRMED;
+  }
+
+  /**
+   * Cancel commission (order cancelled or refunded)
+   */
+  cancel(reason?: string): void {
+    if (!this.canCancel()) {
+      throw new Error(`Cannot cancel commission in status: ${this.status}`);
+    }
+
+    this.status = CommissionStatus.CANCELLED;
+    if (reason) {
+      this.notes = reason;
+    }
+  }
 }

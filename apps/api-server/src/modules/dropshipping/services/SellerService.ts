@@ -33,14 +33,16 @@ export interface ImportProductRequest {
   syncPolicy?: SyncPolicy;
 }
 
-export interface UpdateSellerProductRequest {
+// Note: Renamed to avoid conflict with SellerProductService exports
+export interface SellerServiceUpdateProductRequest {
   salePrice?: number;
   marginRate?: number;
   syncPolicy?: SyncPolicy;
   isActive?: boolean;
 }
 
-export interface SellerProductFilters {
+// Note: Renamed to avoid conflict with SellerProductService exports
+export interface SellerServiceProductFilters {
   search?: string;
   syncPolicy?: SyncPolicy;
   isActive?: boolean;
@@ -147,11 +149,11 @@ export class SellerService {
         totalProducts: 0,
         totalOrders: 0,
         totalRevenue: 0,
-        totalCommission: 0,
-        averageRating: 0,
-        totalReviews: 0,
+        averageOrderValue: 0,
+        conversionRate: 0,
+        customerSatisfaction: 0,
         returnRate: 0,
-        responseRate: 0
+        responseTime: 0
       }
     });
 
@@ -431,7 +433,7 @@ export class SellerService {
   /**
    * Get seller's imported products
    */
-  async getSellerProducts(sellerId: string, filters: SellerProductFilters = {}) {
+  async getSellerProducts(sellerId: string, filters: SellerServiceProductFilters = {}) {
     const {
       search,
       syncPolicy,
@@ -509,7 +511,7 @@ export class SellerService {
   async updateSellerProduct(
     sellerId: string,
     sellerProductId: string,
-    updates: UpdateSellerProductRequest
+    updates: SellerServiceUpdateProductRequest
   ) {
     // Find seller product
     const sellerProduct = await this.sellerProductRepository.findOne({
