@@ -220,6 +220,43 @@ export class SellerService {
   }
 
   /**
+   * Approve Seller application
+   * Admin/Platform action to approve seller application
+   * Phase B-4 Step 3: Added for ApprovalController integration
+   */
+  async approveSeller(
+    sellerId: string,
+    approvedBy: string
+  ): Promise<Seller> {
+    try {
+      const seller = await this.sellerRepository.findOne({
+        where: { id: sellerId },
+      });
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
+      seller.approve(approvedBy);
+      const approved = await this.sellerRepository.save(seller);
+
+      logger.info(`[SellerService] Seller approved`, {
+        sellerId,
+        approvedBy,
+        status: approved.status
+      });
+
+      return approved;
+    } catch (error: any) {
+      logger.error('[SellerService.approveSeller] Error', {
+        error: error.message,
+        sellerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Get supplier product catalog for sellers
    * Returns products that can be imported
    */
