@@ -9,7 +9,7 @@ import {
   Index,
   Unique,
 } from 'typeorm';
-import { User } from './User.js';
+import { User } from '../modules/auth/entities/User.js';
 
 /**
  * 역할 할당 (Assignment)

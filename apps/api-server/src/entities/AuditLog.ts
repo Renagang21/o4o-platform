@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   Index
 } from 'typeorm';
-import { User } from './User.js';
+import { User } from '../modules/auth/entities/User.js';
 
 /**
  * Interface for tracking changes in audit logs

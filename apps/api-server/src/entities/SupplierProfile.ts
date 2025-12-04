@@ -8,7 +8,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { User } from './User.js';
+import { User } from '../modules/auth/entities/User.js';
 
 /**
  * 공급자 프로필 (Supplier Profile)
