@@ -23,6 +23,7 @@ interface DesignerContextValue {
   setRootNode: (node: DesignerNode) => void;
   getNode: (nodeId: string) => DesignerNode | null;
   getNodePath: (nodeId: string) => DesignerNode[];
+  clearDirty: () => void;
 }
 
 const DesignerContext = createContext<DesignerContextValue | null>(null);
@@ -283,6 +284,11 @@ export function DesignerProvider({ children, initialView }: { children: ReactNod
     return path.filter(n => n.id !== 'root'); // Exclude root from path
   }, [state.rootNode]);
 
+  // Clear dirty flag (called after save)
+  const clearDirty = useCallback(() => {
+    setState(prev => ({ ...prev, isDirty: false }));
+  }, []);
+
   const value: DesignerContextValue = {
     state,
     selectNode,
@@ -298,6 +304,7 @@ export function DesignerProvider({ children, initialView }: { children: ReactNod
     setRootNode,
     getNode,
     getNodePath,
+    clearDirty,
   };
 
   return (

@@ -12,6 +12,7 @@ interface ToolbarProps {
   viewId?: string;
   onSave: () => Promise<void>;
   onPreview: () => void;
+  onBackClick?: () => void;
   saving?: boolean;
   zoom?: number;
   onZoomChange?: (zoom: number) => void;
@@ -23,6 +24,7 @@ export default function Toolbar({
   viewId,
   onSave,
   onPreview,
+  onBackClick,
   saving,
   zoom = 1.0,
   onZoomChange,
@@ -33,12 +35,17 @@ export default function Toolbar({
   const { undo, redo, canUndo, canRedo, state, addNode } = useDesigner();
 
   const handleBack = () => {
-    if (state.isDirty) {
-      if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      // Fallback to default behavior
+      if (state.isDirty) {
+        if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+          navigate(-1);
+        }
+      } else {
         navigate(-1);
       }
-    } else {
-      navigate(-1);
     }
   };
 
