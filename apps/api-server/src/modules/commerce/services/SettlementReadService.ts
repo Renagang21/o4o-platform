@@ -14,12 +14,12 @@
  */
 
 import { Repository, Between, In } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Order, OrderStatus, PaymentStatus } from '../entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../entities/OrderItem.js';
-import { Settlement, SettlementStatus } from '../entities/Settlement.js';
-import logger from '../utils/logger.js';
-import { cacheService, CacheKeys, getCacheConfig, generateRangeKey } from '../cache/index.js';
+import { Settlement, SettlementStatus } from '../../dropshipping/entities/Settlement.js';
+import logger from '../../../utils/logger.js';
+import { cacheService, CacheKeys, getCacheConfig, generateRangeKey } from '../../../cache/index.js';
 
 export interface DateRangeFilter {
   from?: Date;
