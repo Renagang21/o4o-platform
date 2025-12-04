@@ -71,6 +71,7 @@ export interface ReferralLinkParams {
 }
 
 export class PartnerService {
+  private static instance: PartnerService;
   private partnerRepository: Repository<Partner>;
   private commissionRepository: Repository<PartnerCommission>;
   private userRepository: Repository<User>;
@@ -83,6 +84,13 @@ export class PartnerService {
     this.userRepository = AppDataSource.getRepository(User);
     this.productRepository = AppDataSource.getRepository(Product);
     this.sellerRepository = AppDataSource.getRepository(Seller);
+  }
+
+  static getInstance(): PartnerService {
+    if (!PartnerService.instance) {
+      PartnerService.instance = new PartnerService();
+    }
+    return PartnerService.instance;
   }
 
   // 파트너 등록 신청

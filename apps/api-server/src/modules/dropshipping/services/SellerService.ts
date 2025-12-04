@@ -1,11 +1,11 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { SellerProduct, SyncPolicy } from '../entities/SellerProduct.js';
-import { Product, ProductStatus } from '../entities/Product.js';
-import { User, UserRole } from '../entities/User.js';
+import { Product, ProductStatus } from '../../commerce/entities/Product.js';
+import { User, UserRole } from '../../../entities/User.js';
 import { Seller, SellerStatus, SellerTier } from '../entities/Seller.js';
 import { SellerApplicationDto, UpdateSellerDto } from '../dto/seller-application.dto.js';
-import logger from '../utils/logger.js';
+import logger from '../../../utils/logger.js';
 
 /**
  * SellerService
