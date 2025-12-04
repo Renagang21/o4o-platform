@@ -58,6 +58,7 @@ export interface InspectorFieldConfig {
   rows?: number; // For textarea
   min?: number; // For number
   max?: number; // For number
+  defaultValue?: any; // Default value for the field
 }
 
 /**

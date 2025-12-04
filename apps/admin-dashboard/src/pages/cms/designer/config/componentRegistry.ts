@@ -20,6 +20,21 @@ import {
   HeroSchema,
 } from '../blocks/layout';
 
+import {
+  FeatureGridSchema,
+  TestimonialSchema,
+  TestimonialGridSchema,
+  PricingCardSchema,
+  PricingGridSchema,
+  FAQSchema,
+  CTASchema,
+  StatsCounterSchema,
+  ImageCaptionSchema,
+  TeamMemberSchema,
+  TimelineSchema,
+  StepGuideSchema,
+} from '../blocks/marketing';
+
 export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   // New Basic Blocks
   TextSchema,
@@ -31,6 +46,20 @@ export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   SectionSchema,
   ContainerSchema,
   HeroSchema,
+
+  // New Marketing Blocks (12 total)
+  FeatureGridSchema,
+  TestimonialSchema,
+  TestimonialGridSchema,
+  PricingCardSchema,
+  PricingGridSchema,
+  FAQSchema,
+  CTASchema,
+  StatsCounterSchema,
+  ImageCaptionSchema,
+  TeamMemberSchema,
+  TimelineSchema,
+  StepGuideSchema,
 
   // Legacy Layout Components (keeping for compatibility)
   {
@@ -384,37 +413,7 @@ export const COMPONENT_REGISTRY: ComponentDefinition[] = [
     ],
   },
 
-  // Marketing Components
-  {
-    type: 'FeatureGrid',
-    label: 'Feature Grid',
-    category: 'Marketing',
-    icon: '⭐',
-    defaultProps: {
-      title: 'Our Features',
-      features: [],
-      columns: 3,
-    },
-    propSchema: [
-      {
-        key: 'title',
-        label: 'Section Title',
-        type: 'string',
-        defaultValue: 'Our Features',
-      },
-      {
-        key: 'columns',
-        label: 'Columns',
-        type: 'select',
-        options: [
-          { value: '2', label: '2 Columns' },
-          { value: '3', label: '3 Columns' },
-          { value: '4', label: '4 Columns' },
-        ],
-        defaultValue: 3,
-      },
-    ],
-  },
+  // Legacy Marketing Components removed - now using new Marketing Blocks above
 ];
 
 /**
