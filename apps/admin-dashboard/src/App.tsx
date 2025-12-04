@@ -134,6 +134,12 @@ const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePr
 // CPT/ACF Router
 const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
+// CMS V2 Pages (Phase C-2.5)
+const CMSCPTList = lazy(() => import('@/pages/cms/cpts/CMSCPTList'));
+const CMSFieldList = lazy(() => import('@/pages/cms/fields/CMSFieldList'));
+const CMSViewList = lazy(() => import('@/pages/cms/views/CMSViewList'));
+const CMSPageList = lazy(() => import('@/pages/cms/pages/CMSPageList'));
+
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
 
@@ -570,7 +576,37 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
+
+                    {/* CMS V2 관리 (Phase C-2.5) */}
+                    <Route path="/admin/cms/cpts" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CMSCPTList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/cms/fields" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CMSFieldList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/cms/views" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CMSViewList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/cms/pages" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CMSPageList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
                     {/* 재사용 블록 관리 */}
                     <Route path="/reusable-blocks" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>

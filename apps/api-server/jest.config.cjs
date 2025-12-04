@@ -19,7 +19,7 @@ module.exports = {
         allowSyntheticDefaultImports: true,
         types: ['jest', 'node'],
       },
-      isolatedModules: true,
+      useESM: false, // Disable ESM for ts-jest
       diagnostics: false,
     }],
   },
@@ -35,4 +35,10 @@ module.exports = {
     '!src/types/**/*',
     '!src/migrations/**/*',
   ],
+  // Mock problematic ESM modules
+  transformIgnorePatterns: [
+    'node_modules/(?!(typeorm)/)', // Allow typeorm transformation
+  ],
+  // Global setup for tests
+  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup/jest.setup.ts'],
 };
