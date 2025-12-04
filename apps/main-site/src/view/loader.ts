@@ -18,8 +18,11 @@ function getRoutes(): RouteConfig[] {
 /**
  * Loads a view based on the current URL path
  * Priority: CMS pages > Static routes > Dynamic parameter routes > Not found
+ *
+ * @param url - The URL path to load
+ * @param preview - If true, loads draft/scheduled pages from CMS (no caching)
  */
-export async function loadView(url: string): Promise<ViewSchema> {
+export async function loadView(url: string, preview = false): Promise<ViewSchema> {
   // Remove leading slash for consistent slug matching
   const slug = url.startsWith('/') ? url.slice(1) : url;
 
@@ -30,9 +33,9 @@ export async function loadView(url: string): Promise<ViewSchema> {
 
   // PRIORITY 1: Try loading from CMS first
   try {
-    const cmsView = await loadCMSView(slug);
+    const cmsView = await loadCMSView(slug, preview);
     if (cmsView) {
-      console.log(`✅ Loaded CMS page: ${slug}`);
+      console.log(`✅ Loaded CMS page: ${slug}${preview ? ' (preview mode)' : ''}`);
       return cmsView;
     }
   } catch (error) {

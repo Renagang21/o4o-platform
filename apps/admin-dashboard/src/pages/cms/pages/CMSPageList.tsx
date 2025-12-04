@@ -8,11 +8,13 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, FileText, Send, Archive as ArchiveIcon } from 'lucide-react';
 import cmsAPI, { Page, PageStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
+import PreviewFrame from '@/components/cms/PreviewFrame';
 
 export default function CMSPageList() {
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<PageStatus | 'all'>('all');
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
 
   useEffect(() => {
     loadPages();
@@ -223,6 +225,15 @@ export default function CMSPageList() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
+                      {/* Preview Button - Available for all statuses */}
+                      <button
+                        onClick={() => setPreviewSlug(page.slug)}
+                        className="p-2 text-gray-400 hover:text-purple-600"
+                        title="Preview"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+
                       {page.status === PageStatus.PUBLISHED && (
                         <button
                           onClick={() => window.open(`https://neture.co.kr/${page.slug}`, '_blank')}
@@ -271,6 +282,14 @@ export default function CMSPageList() {
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Preview Frame */}
+      {previewSlug && (
+        <PreviewFrame
+          slug={previewSlug}
+          onClose={() => setPreviewSlug(null)}
+        />
       )}
     </div>
   );

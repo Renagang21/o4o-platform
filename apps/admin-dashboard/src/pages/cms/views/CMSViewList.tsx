@@ -8,11 +8,13 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Copy, Layers } from 'lucide-react';
 import cmsAPI, { View, ViewStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
+import PreviewFrame from '@/components/cms/PreviewFrame';
 
 export default function CMSViewList() {
   const [views, setViews] = useState<View[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<ViewStatus | 'all'>('all');
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
 
   useEffect(() => {
     loadViews();
@@ -185,8 +187,8 @@ export default function CMSViewList() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => toast('Preview UI coming soon')}
-                        className="p-2 text-gray-400 hover:text-blue-600"
+                        onClick={() => setPreviewSlug(view.slug)}
+                        className="p-2 text-gray-400 hover:text-purple-600"
                         title="Preview"
                       >
                         <Eye className="w-5 h-5" />
@@ -219,6 +221,14 @@ export default function CMSViewList() {
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Preview Frame */}
+      {previewSlug && (
+        <PreviewFrame
+          slug={previewSlug}
+          onClose={() => setPreviewSlug(null)}
+        />
       )}
     </div>
   );

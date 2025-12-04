@@ -21,12 +21,17 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 /**
  * Load a view from CMS by page slug
  * Returns null if page not found or not published
+ *
+ * @param slug - Page slug to load
+ * @param preview - If true, loads draft/scheduled pages (no caching)
  */
-export async function loadCMSView(slug: string): Promise<ViewSchema | null> {
-  // Check cache first
-  const cached = getCachedView(slug);
-  if (cached !== undefined) {
-    return cached;
+export async function loadCMSView(slug: string, preview = false): Promise<ViewSchema | null> {
+  // Skip cache in preview mode
+  if (!preview) {
+    const cached = getCachedView(slug);
+    if (cached !== undefined) {
+      return cached;
+    }
   }
 
   try {
@@ -56,13 +61,17 @@ export async function loadCMSView(slug: string): Promise<ViewSchema | null> {
     // Adapt CMS view to ViewRenderer format
     const viewSchema = adaptCMSViewToViewSchema(page.view, page);
 
-    // Cache the result
-    setCachedView(slug, viewSchema);
+    // Cache the result (skip cache in preview mode)
+    if (!preview) {
+      setCachedView(slug, viewSchema);
+    }
 
     return viewSchema;
   } catch (error) {
     console.error(`Error loading CMS view for slug: ${slug}`, error);
-    setCachedView(slug, null);
+    if (!preview) {
+      setCachedView(slug, null);
+    }
     return null;
   }
 }
