@@ -10,6 +10,8 @@
 import AppDataSource from '../../../database/data-source.js';
 import { Order, OrderStatus, PaymentStatus, OrderItem } from '../../commerce/entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../../commerce/entities/OrderItem.js';
+import { SellerProduct } from '../entities/SellerProduct.js';
+import { SellerAuthorization, AuthorizationStatus } from '../entities/SellerAuthorization.js';
 import { Between, In } from 'typeorm';
 import logger from '../../../utils/logger.js';
 import {
@@ -59,6 +61,8 @@ export interface PaginationParams {
 export class SellerDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);
   private orderItemRepository = AppDataSource.getRepository(OrderItemEntity);
+  private sellerProductRepository = AppDataSource.getRepository(SellerProduct);
+  private sellerAuthorizationRepository = AppDataSource.getRepository(SellerAuthorization);
   private settlementReadService = new SettlementReadService();
 
   /**
@@ -124,6 +128,43 @@ export class SellerDashboardService {
       const totalCommissionAmount = parseFloat(result?.totalCommissionAmount || '0');
       const avgOrderAmount = totalOrders > 0 ? totalSalesAmount / totalOrders : 0;
 
+      // Phase B-4 Step 5: Calculate product catalog statistics from SellerProduct table
+      const productStats = await this.sellerProductRepository
+        .createQueryBuilder('sellerProduct')
+        .select('COUNT(*)', 'totalProducts')
+        .addSelect('SUM(CASE WHEN sellerProduct.isActive = true THEN 1 ELSE 0 END)', 'activeProducts')
+        .addSelect('SUM(CASE WHEN sellerProduct.isActive = false THEN 1 ELSE 0 END)', 'inactiveProducts')
+        .addSelect('SUM(sellerProduct.salesCount)', 'totalProductSales')
+        .addSelect('SUM(sellerProduct.totalSold)', 'totalUnitsSold')
+        .where('sellerProduct.sellerId = :sellerId', { sellerId })
+        .getRawOne();
+
+      const totalProducts = parseInt(productStats?.totalProducts || '0', 10);
+      const activeProducts = parseInt(productStats?.activeProducts || '0', 10);
+      const inactiveProducts = parseInt(productStats?.inactiveProducts || '0', 10);
+      const totalProductSales = parseInt(productStats?.totalProductSales || '0', 10);
+      const totalUnitsSold = parseInt(productStats?.totalUnitsSold || '0', 10);
+
+      // Phase B-4 Step 5: Calculate authorization statistics from SellerAuthorization table
+      const authStats = await this.sellerAuthorizationRepository
+        .createQueryBuilder('auth')
+        .select('COUNT(*)', 'totalAuthorizations')
+        .addSelect('SUM(CASE WHEN auth.status = :requestedStatus THEN 1 ELSE 0 END)', 'pendingAuthorizations')
+        .addSelect('SUM(CASE WHEN auth.status = :approvedStatus THEN 1 ELSE 0 END)', 'approvedAuthorizations')
+        .addSelect('SUM(CASE WHEN auth.status = :rejectedStatus THEN 1 ELSE 0 END)', 'rejectedAuthorizations')
+        .where('auth.sellerId = :sellerId', { sellerId })
+        .setParameters({
+          requestedStatus: AuthorizationStatus.REQUESTED,
+          approvedStatus: AuthorizationStatus.APPROVED,
+          rejectedStatus: AuthorizationStatus.REJECTED
+        })
+        .getRawOne();
+
+      const totalAuthorizations = parseInt(authStats?.totalAuthorizations || '0', 10);
+      const pendingAuthorizations = parseInt(authStats?.pendingAuthorizations || '0', 10);
+      const approvedAuthorizations = parseInt(authStats?.approvedAuthorizations || '0', 10);
+      const rejectedAuthorizations = parseInt(authStats?.rejectedAuthorizations || '0', 10);
+
       // R-6-2: Return standard DTO with legacy fields for backward compatibility
       const summary: SellerDashboardSummaryDto = {
         totalOrders,
@@ -131,6 +172,17 @@ export class SellerDashboardService {
         averageOrderValue: Math.round(avgOrderAmount), // Standard field
         totalItems,
         totalCommission: Math.round(totalCommissionAmount),
+        // Phase B-4 Step 5: Product catalog statistics
+        totalProducts,
+        activeProducts,
+        inactiveProducts,
+        totalProductSales,
+        totalUnitsSold,
+        // Phase B-4 Step 5: Authorization statistics
+        totalAuthorizations,
+        pendingAuthorizations,
+        approvedAuthorizations,
+        rejectedAuthorizations,
         // Legacy fields (backward compatibility)
         totalSalesAmount: Math.round(totalSalesAmount),
         avgOrderAmount: Math.round(avgOrderAmount),

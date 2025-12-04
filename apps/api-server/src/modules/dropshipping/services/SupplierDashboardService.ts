@@ -10,6 +10,7 @@
 import AppDataSource from '../../../database/data-source.js';
 import { Order, OrderStatus, PaymentStatus, OrderItem } from '../../commerce/entities/Order.js';
 import { OrderItem as OrderItemEntity } from '../../commerce/entities/OrderItem.js';
+import { Product, ProductStatus } from '../../commerce/entities/Product.js';
 import { Between, In } from 'typeorm';
 import logger from '../../../utils/logger.js';
 import {
@@ -56,6 +57,7 @@ export interface PaginationParams {
 export class SupplierDashboardService {
   private orderRepository = AppDataSource.getRepository(Order);
   private orderItemRepository = AppDataSource.getRepository(OrderItemEntity);
+  private productRepository = AppDataSource.getRepository(Product);
   private settlementReadService = new SettlementReadService();
 
   /**
@@ -110,20 +112,44 @@ export class SupplierDashboardService {
       const totalItems = parseInt(result?.totalItems || '0', 10);
       const avgOrderAmount = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
+      // Phase B-4 Step 5: Calculate product statistics from Product table
+      const productStats = await this.productRepository
+        .createQueryBuilder('product')
+        .select('COUNT(*)', 'totalProducts')
+        .addSelect('SUM(CASE WHEN product.status = :activeStatus THEN 1 ELSE 0 END)', 'approvedProducts')
+        .addSelect('SUM(CASE WHEN product.status = :draftStatus THEN 1 ELSE 0 END)', 'pendingProducts')
+        .addSelect('SUM(CASE WHEN product.status IN (:...inactiveStatuses) THEN 1 ELSE 0 END)', 'rejectedProducts')
+        .addSelect('SUM(CASE WHEN product.trackInventory = true AND product.inventory <= COALESCE(product.lowStockThreshold, 10) AND product.inventory > 0 THEN 1 ELSE 0 END)', 'lowStockProducts')
+        .addSelect('SUM(CASE WHEN product.trackInventory = true AND product.inventory = 0 THEN 1 ELSE 0 END)', 'outOfStockProducts')
+        .where('product.supplierId = :supplierId', { supplierId })
+        .setParameters({
+          activeStatus: ProductStatus.ACTIVE,
+          draftStatus: ProductStatus.DRAFT,
+          inactiveStatuses: [ProductStatus.INACTIVE, ProductStatus.DISCONTINUED]
+        })
+        .getRawOne();
+
+      const totalProducts = parseInt(productStats?.totalProducts || '0', 10);
+      const approvedProducts = parseInt(productStats?.approvedProducts || '0', 10);
+      const pendingProducts = parseInt(productStats?.pendingProducts || '0', 10);
+      const rejectedProducts = parseInt(productStats?.rejectedProducts || '0', 10);
+      const lowStockProducts = parseInt(productStats?.lowStockProducts || '0', 10);
+      const outOfStockProducts = parseInt(productStats?.outOfStockProducts || '0', 10);
+
       // R-8: Return standard DTO with legacy fields for backward compatibility
       return {
         totalOrders,
         totalRevenue: Math.round(totalRevenue), // Standard field
         averageOrderValue: Math.round(avgOrderAmount), // Standard field
         totalItems,
-        // Additional supplier-specific fields
-        totalProducts: 0, // TODO: Calculate from Product table
-        approvedProducts: 0,
-        pendingProducts: 0,
-        rejectedProducts: 0,
-        lowStockProducts: 0,
-        outOfStockProducts: 0,
-        totalProfit: 0, // TODO: Calculate if margin data available
+        // Additional supplier-specific fields (Phase B-4 Step 5: Real data from Product table)
+        totalProducts,
+        approvedProducts,
+        pendingProducts,
+        rejectedProducts,
+        lowStockProducts,
+        outOfStockProducts,
+        totalProfit: 0, // Will be calculated from SellerProduct margin data in future phase
         // Legacy fields (backward compatibility)
         monthlyOrders: totalOrders,
         avgOrderValue: Math.round(avgOrderAmount)
