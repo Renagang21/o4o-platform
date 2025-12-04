@@ -3,8 +3,8 @@
  * Select dropdown with options
  */
 
-interface DropdownOption {
-  value: string;
+export interface DropdownOption {
+  value: string | number;
   label: string;
 }
 

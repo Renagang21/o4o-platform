@@ -12,11 +12,21 @@ import { DND_ITEM_TYPES, PaletteDragItem } from '../types/dnd.types';
 
 export default function Palette() {
   const { addNode, state } = useDesigner();
-  const [activeCategory, setActiveCategory] = useState<ComponentDefinition['category']>('Layout');
+  const [activeCategory, setActiveCategory] = useState<string>('Basic');
 
-  const categories: ComponentDefinition['category'][] = ['Layout', 'Basic', 'Media', 'CMS', 'Marketing'];
+  // Support both uppercase and lowercase categories
+  const categories = [
+    { id: 'Basic', label: 'Basic', includes: ['Basic', 'basic'] },
+    { id: 'Layout', label: 'Layout', includes: ['Layout', 'layout'] },
+    { id: 'Marketing', label: 'Marketing', includes: ['Marketing', 'marketing'] },
+    { id: 'CMS', label: 'CMS', includes: ['CMS', 'cms'] },
+    { id: 'Media', label: 'Media', includes: ['Media'] },
+  ];
 
-  const filteredComponents = COMPONENT_REGISTRY.filter(comp => comp.category === activeCategory);
+  const activeCategories = categories.find(c => c.id === activeCategory)?.includes || [];
+  const filteredComponents = COMPONENT_REGISTRY.filter(comp =>
+    activeCategories.includes(comp.category as string)
+  );
 
   const handleComponentClick = (componentType: string) => {
     // Add to selected node or root
@@ -36,15 +46,15 @@ export default function Palette() {
       <div className="flex flex-wrap gap-1 p-2 border-b border-gray-200">
         {categories.map(category => (
           <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
             className={`px-3 py-1 text-xs rounded transition-colors ${
-              activeCategory === category
+              activeCategory === category.id
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {category}
+            {category.label}
           </button>
         ))}
       </div>
@@ -107,7 +117,11 @@ function PaletteItem({ component, onClick }: PaletteItemProps) {
         <div className="text-sm font-medium text-gray-900 group-hover:text-blue-700">
           {component.label}
         </div>
-        <div className="text-xs text-gray-500">{component.type}</div>
+        {component.description ? (
+          <div className="text-xs text-gray-500">{component.description}</div>
+        ) : (
+          <div className="text-xs text-gray-400 italic">{component.type}</div>
+        )}
       </div>
     </button>
   );

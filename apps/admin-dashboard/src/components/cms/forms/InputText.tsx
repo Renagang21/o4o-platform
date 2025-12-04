@@ -9,7 +9,7 @@ interface InputTextProps {
   placeholder?: string;
   disabled?: boolean;
   maxLength?: number;
-  type?: 'text' | 'email' | 'url' | 'password';
+  type?: 'text' | 'email' | 'url' | 'password' | 'number';
 }
 
 export default function InputText({

@@ -164,7 +164,8 @@ function CanvasNode({ node }: { node: DesignerNode }) {
         addNode(node.id, item.componentType);
       } else if (item.type === DND_ITEM_TYPES.CANVAS_NODE) {
         // Move existing node as child of this node
-        moveNode(item.nodeId, node.id);
+        // Add to end of children array
+        moveNode(item.nodeId, node.id, node.children?.length || 0);
       }
     },
     collect: (monitor) => ({

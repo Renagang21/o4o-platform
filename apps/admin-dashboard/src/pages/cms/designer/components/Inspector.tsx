@@ -43,6 +43,9 @@ export default function Inspector() {
     updateNode(node.id, { [key]: value });
   };
 
+  // Support both old (propSchema) and new (inspectorConfig) formats
+  const fields = componentDef?.inspectorConfig || componentDef?.propSchema || [];
+
   return (
     <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full">
       {/* Header */}
@@ -58,48 +61,83 @@ export default function Inspector() {
 
       {/* Properties */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {componentDef?.propSchema.map(prop => (
-          <div key={prop.key}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {prop.label}
-            </label>
+        {fields.map((field: any) => {
+          // Support both formats: propSchema (key) and inspectorConfig (name)
+          const fieldKey = field.name || field.key;
+          const fieldLabel = field.label;
+          const fieldType = field.type;
+          const fieldPlaceholder = field.placeholder;
+          const fieldHelpText = field.helpText;
+          const fieldOptions = field.options;
+          const fieldDefaultValue = field.defaultValue;
+          const fieldRows = field.rows || 4;
 
-            {prop.type === 'string' && (
-              <InputText
-                value={node.props[prop.key] || prop.defaultValue || ''}
-                onChange={(value) => handlePropChange(prop.key, value)}
-                placeholder={prop.placeholder}
-              />
-            )}
+          return (
+            <div key={fieldKey}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {fieldLabel}
+                {field.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
 
-            {prop.type === 'number' && (
-              <InputText
-                type="number"
-                value={node.props[prop.key]?.toString() || prop.defaultValue?.toString() || '0'}
-                onChange={(value) => handlePropChange(prop.key, parseInt(value) || 0)}
-              />
-            )}
+              {(fieldType === 'string' || fieldType === 'text') && (
+                <InputText
+                  value={node.props[fieldKey] || fieldDefaultValue || ''}
+                  onChange={(value) => handlePropChange(fieldKey, value)}
+                  placeholder={fieldPlaceholder}
+                />
+              )}
 
-            {prop.type === 'boolean' && (
-              <Switch
-                value={node.props[prop.key] ?? prop.defaultValue ?? false}
-                onChange={(value) => handlePropChange(prop.key, value)}
-              />
-            )}
+              {fieldType === 'textarea' && (
+                <Textarea
+                  value={node.props[fieldKey] || fieldDefaultValue || ''}
+                  onChange={(value) => handlePropChange(fieldKey, value)}
+                  placeholder={fieldPlaceholder}
+                  rows={fieldRows}
+                />
+              )}
 
-            {prop.type === 'select' && prop.options && (
-              <Dropdown
-                value={node.props[prop.key]?.toString() || prop.defaultValue?.toString() || ''}
-                onChange={(value) => handlePropChange(prop.key, value)}
-                options={prop.options}
-              />
-            )}
+              {fieldType === 'number' && (
+                <InputText
+                  type="number"
+                  value={node.props[fieldKey]?.toString() || fieldDefaultValue?.toString() || '0'}
+                  onChange={(value) => handlePropChange(fieldKey, parseInt(value) || 0)}
+                />
+              )}
 
-            {prop.helpText && (
-              <p className="text-xs text-gray-500 mt-1">{prop.helpText}</p>
-            )}
-          </div>
-        ))}
+              {fieldType === 'boolean' && (
+                <Switch
+                  value={node.props[fieldKey] ?? fieldDefaultValue ?? false}
+                  onChange={(value) => handlePropChange(fieldKey, value)}
+                />
+              )}
+
+              {fieldType === 'select' && fieldOptions && (
+                <Dropdown
+                  value={node.props[fieldKey]?.toString() || fieldDefaultValue?.toString() || ''}
+                  onChange={(value) => handlePropChange(fieldKey, value)}
+                  options={fieldOptions}
+                />
+              )}
+
+              {fieldType === 'color' && (
+                <input
+                  type="color"
+                  value={node.props[fieldKey] || fieldDefaultValue || '#000000'}
+                  onChange={(e) => handlePropChange(fieldKey, e.target.value)}
+                  className="w-full h-10 rounded border border-gray-300 cursor-pointer"
+                />
+              )}
+
+              {fieldHelpText && (
+                <p className="text-xs text-gray-500 mt-1">{fieldHelpText}</p>
+              )}
+            </div>
+          );
+        })}
+
+        {fields.length === 0 && (
+          <p className="text-sm text-gray-500">No editable properties</p>
+        )}
 
         {/* Raw Props Editor (Advanced) */}
         <details className="mt-6">
