@@ -21,23 +21,43 @@ export interface DesignerNode {
 export interface ComponentDefinition {
   type: string;
   label: string;
-  category: 'Layout' | 'Basic' | 'Media' | 'CMS' | 'Marketing';
+  category: 'Layout' | 'Basic' | 'Media' | 'CMS' | 'Marketing' | 'basic' | 'layout' | 'marketing' | 'cms';
   icon: string;
+  description?: string;
   defaultProps: Record<string, any>;
-  propSchema: PropSchemaItem[];
+  propSchema?: PropSchemaItem[]; // Old format (deprecated)
+  inspectorConfig?: InspectorFieldConfig[]; // New format
+  allowsChildren?: boolean;
+  maxChildren?: number;
 }
 
 /**
- * Property Schema Item - Defines how to edit a property
+ * Property Schema Item - Defines how to edit a property (Old format)
  */
 export interface PropSchemaItem {
   key: string;
   label: string;
   type: 'string' | 'number' | 'boolean' | 'select' | 'color' | 'image' | 'json';
   defaultValue?: any;
-  options?: Array<{ value: string; label: string }>;
+  options?: Array<{ value: string | number; label: string }>;
   placeholder?: string;
   helpText?: string;
+}
+
+/**
+ * Inspector Field Config - New format for property editing
+ */
+export interface InspectorFieldConfig {
+  name: string;
+  label: string;
+  type: 'text' | 'textarea' | 'number' | 'boolean' | 'select' | 'color' | 'image';
+  required?: boolean;
+  options?: Array<{ value: string | number; label: string }>;
+  placeholder?: string;
+  helpText?: string;
+  rows?: number; // For textarea
+  min?: number; // For number
+  max?: number; // For number
 }
 
 /**
