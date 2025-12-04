@@ -35,6 +35,18 @@ import {
   StepGuideSchema,
 } from '../blocks/marketing';
 
+import {
+  CPTListSchema,
+  CPTItemSchema,
+  CategoryListSchema,
+  TagCloudSchema,
+  RecentPostsSchema,
+  RelatedPostsSchema,
+  BreadcrumbSchema,
+  PaginationSchema,
+  SearchBarSchema,
+} from '../blocks/cms';
+
 export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   // New Basic Blocks
   TextSchema,
@@ -60,6 +72,17 @@ export const COMPONENT_REGISTRY: ComponentDefinition[] = [
   TeamMemberSchema,
   TimelineSchema,
   StepGuideSchema,
+
+  // New CMS Blocks (9 total)
+  CPTListSchema,
+  CPTItemSchema,
+  CategoryListSchema,
+  TagCloudSchema,
+  RecentPostsSchema,
+  RelatedPostsSchema,
+  BreadcrumbSchema,
+  PaginationSchema,
+  SearchBarSchema,
 
   // Legacy Layout Components (keeping for compatibility)
   {
@@ -385,35 +408,7 @@ export const COMPONENT_REGISTRY: ComponentDefinition[] = [
 
   // Media Components (removed duplicate Hero - using HeroSchema instead)
 
-  // CMS Components
-  {
-    type: 'CPTList',
-    label: 'CPT List',
-    category: 'CMS',
-    icon: '📋',
-    defaultProps: {
-      postType: '',
-      limit: 10,
-      className: 'grid grid-cols-3 gap-4',
-    },
-    propSchema: [
-      {
-        key: 'postType',
-        label: 'Post Type Slug',
-        type: 'string',
-        defaultValue: '',
-        placeholder: 'product',
-      },
-      {
-        key: 'limit',
-        label: 'Items to Show',
-        type: 'number',
-        defaultValue: 10,
-      },
-    ],
-  },
-
-  // Legacy Marketing Components removed - now using new Marketing Blocks above
+  // Legacy CMS Components removed - now using new CMS Blocks above
 ];
 
 /**
