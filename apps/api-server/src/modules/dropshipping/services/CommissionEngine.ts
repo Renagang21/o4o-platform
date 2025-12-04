@@ -1,11 +1,11 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { CommissionPolicy, PolicyType, PolicyStatus, CommissionType } from '../entities/CommissionPolicy.js';
 import { Commission, CommissionStatus } from '../entities/Commission.js';
-import { ConversionEvent, ConversionStatus } from '../entities/ConversionEvent.js';
+import { ConversionEvent, ConversionStatus } from '../../../entities/ConversionEvent.js';
 import { Partner } from '../entities/Partner.js';
-import { Product } from '../entities/Product.js';
-import logger from '../utils/logger.js';
+import { Product } from '../../commerce/entities/Product.js';
+import logger from '../../../utils/logger.js';
 
 export interface CreateCommissionRequest {
   conversionId: string;

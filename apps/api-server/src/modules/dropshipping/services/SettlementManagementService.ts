@@ -8,18 +8,18 @@
  */
 
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import {
   Settlement,
   SettlementPartyType,
   SettlementStatus,
 } from '../entities/Settlement.js';
-import { Order } from '../entities/Order.js';
+import { Order } from '../../commerce/entities/Order.js';
 import { SettlementItem } from '../entities/SettlementItem.js';
 import { Commission } from '../entities/Commission.js';
-import { notificationService } from './NotificationService.js';
-import logger from '../utils/logger.js';
-import { invalidateSettlementCache } from '../utils/cache-invalidation.js';
+import { notificationService } from '../../../services/NotificationService.js';
+import logger from '../../../utils/logger.js';
+import { invalidateSettlementCache } from '../../../utils/cache-invalidation.js';
 import { SettlementEngineV2 } from './settlement/SettlementEngineV2.js';
 import type {
   SettlementV2Config,

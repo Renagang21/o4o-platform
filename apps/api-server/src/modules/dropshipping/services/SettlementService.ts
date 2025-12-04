@@ -1,13 +1,13 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Commission } from '../entities/Commission.js';
-import { Order } from '../entities/Order.js';
+import { Order } from '../../commerce/entities/Order.js';
 import { CommissionType } from '../entities/CommissionPolicy.js';
 import { PolicyResolutionService, PolicyResolutionContext } from './PolicyResolutionService.js';
-import shadowModeService, { ShadowModeService } from './shadow-mode.service.js';
-import FeatureFlags from '../config/featureFlags.js';
-import logger from '../utils/logger.js';
-import metricsService from './metrics.service.js';
+import shadowModeService, { ShadowModeService } from '../../../services/shadow-mode.service.js';
+import FeatureFlags from '../../../config/featureFlags.js';
+import logger from '../../../utils/logger.js';
+import metricsService from '../../../services/metrics.service.js';
 
 /**
  * SettlementService
