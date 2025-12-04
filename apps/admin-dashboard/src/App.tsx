@@ -134,7 +134,7 @@ const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePr
 // CPT/ACF Router
 const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
-// CMS V2 Pages (Phase C-2.5)
+// CMS V2 Pages (Phase C-2.5 & C-3)
 const CMSCPTList = lazy(() => import('@/pages/cms/cpts/CMSCPTList'));
 const CMSCPTForm = lazy(() => import('@/pages/cms/cpts/CPTForm'));
 const CMSFieldList = lazy(() => import('@/pages/cms/fields/CMSFieldList'));
@@ -143,6 +143,9 @@ const CMSViewList = lazy(() => import('@/pages/cms/views/CMSViewList'));
 const CMSViewForm = lazy(() => import('@/pages/cms/views/ViewForm'));
 const CMSPageList = lazy(() => import('@/pages/cms/pages/CMSPageList'));
 const CMSPageForm = lazy(() => import('@/pages/cms/pages/PageForm'));
+
+// CMS V2 Visual Designer (Phase C-3)
+const ViewDesigner = lazy(() => import('@/pages/cms/designer/ViewDesigner'));
 
 // Dropshipping Pages - REMOVED (archived to legacy/packages/dropshipping-core)
 // const DropshippingRouter = lazy(() => import('@o4o/dropshipping-core/admin-ui').then(module => ({ default: module.DropshippingRouter })));
@@ -647,6 +650,15 @@ function App() {
                       <AdminProtectedRoute requiredRoles={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <CMSViewForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Visual Designer Route (Phase C-3) */}
+                    <Route path="/admin/cms/views/:id/designer" element={
+                      <AdminProtectedRoute requiredRoles={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ViewDesigner />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

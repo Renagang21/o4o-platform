@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, Eye, Copy, Layers } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Copy, Layers, Palette } from 'lucide-react';
 import cmsAPI, { View, ViewStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
 import PreviewFrame from '@/components/cms/PreviewFrame';
@@ -196,6 +196,13 @@ export default function CMSViewList() {
                         <Eye className="w-5 h-5" />
                       </button>
                       <button
+                        onClick={() => navigate(`/admin/cms/views/${view.id}/designer`)}
+                        className="p-2 text-gray-400 hover:text-blue-600"
+                        title="Visual Designer"
+                      >
+                        <Palette className="w-5 h-5" />
+                      </button>
+                      <button
                         onClick={() => handleClone(view.id)}
                         className="p-2 text-gray-400 hover:text-purple-600"
                         title="Clone"
@@ -205,7 +212,7 @@ export default function CMSViewList() {
                       <button
                         onClick={() => navigate(`/admin/cms/views/${view.id}/edit`)}
                         className="p-2 text-gray-400 hover:text-gray-600"
-                        title="Edit"
+                        title="Edit JSON"
                       >
                         <Edit className="w-5 h-5" />
                       </button>
