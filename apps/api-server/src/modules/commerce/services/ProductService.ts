@@ -1,13 +1,13 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../database/connection.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Product, ProductStatus } from '../entities/Product.js';
-import { Supplier } from '../entities/Supplier.js';
+import { Supplier } from '../../dropshipping/entities/Supplier.js';
 import { Category } from '../entities/Category.js';
-import { SellerProduct } from '../entities/SellerProduct.js';
-import { notificationService } from './NotificationService.js';
-import logger from '../utils/logger.js';
-import { cacheService } from './cache.service.js';
-import { prometheusMetrics } from './prometheus-metrics.service.js';
+import { SellerProduct } from '../../dropshipping/entities/SellerProduct.js';
+import { notificationService } from '../../../services/NotificationService.js';
+import logger from '../../../utils/logger.js';
+import { cacheService } from '../../../services/cache.service.js';
+import { prometheusMetrics } from '../../../services/prometheus-metrics.service.js';
 
 export interface CreateProductRequest {
   name: string;
@@ -77,6 +77,7 @@ export interface ProductFilters {
 }
 
 export class ProductService {
+  private static instance: ProductService;
   private productRepository: Repository<Product>;
   private supplierRepository: Repository<Supplier>;
   private categoryRepository: Repository<Category>;
@@ -87,6 +88,16 @@ export class ProductService {
     this.supplierRepository = AppDataSource.getRepository(Supplier);
     this.categoryRepository = AppDataSource.getRepository(Category);
     this.sellerProductRepository = AppDataSource.getRepository(SellerProduct);
+  }
+
+  /**
+   * Get singleton instance
+   */
+  static getInstance(): ProductService {
+    if (!ProductService.instance) {
+      ProductService.instance = new ProductService();
+    }
+    return ProductService.instance;
   }
 
   // 제품 생성 (공급자용)

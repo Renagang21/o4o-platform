@@ -1,6 +1,7 @@
 import { Category } from '../entities/Category.js';
 import { BaseService } from '../../../common/base.service.js';
-import { logger } from '../../../utils/logger.js';
+import logger from '../../../utils/logger.js';
+import { AppDataSource } from '../../../database/connection.js';
 
 /**
  * CategoryService
@@ -11,7 +12,8 @@ export class CategoryService extends BaseService<Category> {
   private static instance: CategoryService;
 
   constructor() {
-    super(Category);
+    const repo = AppDataSource.getRepository(Category);
+    super(repo);
   }
 
   static getInstance(): CategoryService {

@@ -1,6 +1,7 @@
 import { Supplier, SupplierStatus } from '../entities/Supplier.js';
 import { BaseService } from '../../../common/base.service.js';
-import { logger } from '../../../utils/logger.js';
+import logger from '../../../utils/logger.js';
+import { AppDataSource } from '../../../database/connection.js';
 
 /**
  * SupplierService
@@ -11,7 +12,8 @@ export class SupplierService extends BaseService<Supplier> {
   private static instance: SupplierService;
 
   constructor() {
-    super(Supplier);
+    const repo = AppDataSource.getRepository(Supplier);
+    super(repo);
   }
 
   static getInstance(): SupplierService {

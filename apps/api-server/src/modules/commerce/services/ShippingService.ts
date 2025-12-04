@@ -1,8 +1,9 @@
 import { Shipment } from '../entities/Shipment.js';
 import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory.js';
 import { BaseService } from '../../../common/base.service.js';
-import { AppDataSource } from '../../../config/database.js';
-import { logger } from '../../../utils/logger.js';
+import { AppDataSource } from '../../../database/connection.js';
+import logger from '../../../utils/logger.js';
+import { Repository } from 'typeorm';
 
 /**
  * ShippingService
@@ -11,10 +12,12 @@ import { logger } from '../../../utils/logger.js';
  */
 export class ShippingService extends BaseService<Shipment> {
   private static instance: ShippingService;
-  private trackingRepo = AppDataSource.getRepository(ShipmentTrackingHistory);
+  private trackingRepo: Repository<ShipmentTrackingHistory>;
 
   constructor() {
-    super(Shipment);
+    const repo = AppDataSource.getRepository(Shipment);
+    super(repo);
+    this.trackingRepo = AppDataSource.getRepository(ShipmentTrackingHistory);
   }
 
   static getInstance(): ShippingService {

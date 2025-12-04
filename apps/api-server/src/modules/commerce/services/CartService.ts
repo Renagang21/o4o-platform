@@ -1,8 +1,9 @@
-import { AppDataSource } from '../../../config/database.js';
+import { AppDataSource } from '../../../database/connection.js';
 import { Cart } from '../entities/Cart.js';
 import { CartItem } from '../entities/CartItem.js';
 import { BaseService } from '../../../common/base.service.js';
-import { logger } from '../../../utils/logger.js';
+import logger from '../../../utils/logger.js';
+import { Repository } from 'typeorm';
 
 /**
  * CartService
@@ -11,10 +12,12 @@ import { logger } from '../../../utils/logger.js';
  */
 export class CartService extends BaseService<Cart> {
   private static instance: CartService;
-  private cartItemRepo = AppDataSource.getRepository(CartItem);
+  private cartItemRepo: Repository<CartItem>;
 
   constructor() {
-    super(Cart);
+    const repo = AppDataSource.getRepository(Cart);
+    super(repo);
+    this.cartItemRepo = AppDataSource.getRepository(CartItem);
   }
 
   static getInstance(): CartService {
