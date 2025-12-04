@@ -13,11 +13,13 @@ export * from './Category.js';
 export * from './Cart.js';
 export * from './CartItem.js';
 
-// Order (Note: Order.js exports OrderItem, Payment internally - no duplicates)
+// Order
 export * from './Order.js';
+export * from './OrderItem.js';
 export * from './OrderEvent.js';
 
-// Payment Settlement
+// Payment
+export * from './Payment.js';
 export * from './PaymentSettlement.js';
 
 // Shipment
