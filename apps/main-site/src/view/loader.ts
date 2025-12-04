@@ -1,5 +1,6 @@
 import { ViewSchema } from './types';
 import { generateRoutes, matchRoute, type RouteConfig } from './route-generator';
+import { loadCMSView } from '@/lib/cms/loader';
 
 // Cache for auto-generated routes
 let routeCache: RouteConfig[] | null = null;
@@ -16,9 +17,29 @@ function getRoutes(): RouteConfig[] {
 
 /**
  * Loads a view based on the current URL path
- * Supports both static routes and dynamic parameter routes
+ * Priority: CMS pages > Static routes > Dynamic parameter routes > Not found
  */
 export async function loadView(url: string): Promise<ViewSchema> {
+  // Remove leading slash for consistent slug matching
+  const slug = url.startsWith('/') ? url.slice(1) : url;
+
+  // Handle root path
+  if (!slug || slug === '') {
+    return loadStaticView('home');
+  }
+
+  // PRIORITY 1: Try loading from CMS first
+  try {
+    const cmsView = await loadCMSView(slug);
+    if (cmsView) {
+      console.log(`✅ Loaded CMS page: ${slug}`);
+      return cmsView;
+    }
+  } catch (error) {
+    console.error(`Error loading CMS view for ${slug}:`, error);
+  }
+
+  // PRIORITY 2: Fall back to static routes
   const routes = getRoutes();
 
   // First try exact match for static routes
@@ -40,12 +61,19 @@ export async function loadView(url: string): Promise<ViewSchema> {
 
   const viewId = matchedRoute?.viewId || 'not-found';
 
+  return loadStaticView(viewId);
+}
+
+/**
+ * Load a static view from JSON files
+ */
+async function loadStaticView(viewId: string): Promise<ViewSchema> {
   try {
     // Dynamic import of JSON view files
     const json = await import(`../views/${viewId}.json`);
     return json.default as ViewSchema;
   } catch (error) {
-    console.error(`Failed to load view: ${viewId}`, error);
+    console.error(`Failed to load static view: ${viewId}`, error);
 
     // Return fallback error view
     return {
