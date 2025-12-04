@@ -4,6 +4,8 @@ import { SellerProduct, SellerProductStatus } from '../entities/SellerProduct.js
 import { Seller, SellerTier } from '../entities/Seller.js';
 import { Product, ProductStatus } from '../../commerce/entities/Product.js';
 import { User } from '../../../entities/User.js';
+import { sellerAuthorizationService } from './SellerAuthorizationService.js';
+import { AuthorizationStatus } from '../entities/SellerAuthorization.js';
 import logger from '../../../utils/logger.js';
 
 export interface AddProductToSellerRequest {
@@ -66,6 +68,7 @@ export interface ProfitAnalysis {
 }
 
 export class SellerProductService {
+  private static instance: SellerProductService;
   private sellerProductRepository: Repository<SellerProduct>;
   private sellerRepository: Repository<Seller>;
   private productRepository: Repository<Product>;
@@ -78,22 +81,54 @@ export class SellerProductService {
     this.userRepository = AppDataSource.getRepository(User);
   }
 
-  // 판매자가 제품을 자신의 상점에 추가
-  async addProductToSeller(data: AddProductToSellerRequest): Promise<SellerProduct> {
+  /**
+   * Get singleton instance
+   * Phase B-4 Step 4: Added for consistency with SellerService/SupplierService
+   */
+  static getInstance(): SellerProductService {
+    if (!SellerProductService.instance) {
+      SellerProductService.instance = new SellerProductService();
+    }
+    return SellerProductService.instance;
+  }
+
+  /**
+   * Validate Seller Product Eligibility
+   * Phase B-4 Step 4: Core authorization check integrating with SellerAuthorizationService
+   *
+   * Checks:
+   * 1. Seller exists and is active
+   * 2. Product exists and is available
+   * 3. Seller has APPROVED authorization for this product (via SellerAuthorizationService)
+   * 4. Product not already added to seller's catalog
+   */
+  async validateSellerProductEligibility(
+    sellerId: string,
+    productId: string
+  ): Promise<{
+    eligible: boolean;
+    reason?: string;
+    seller?: Seller;
+    product?: Product;
+    authorization?: any;
+  }> {
     try {
-      // 판매자 검증
+      // 1. Check seller
       const seller = await this.sellerRepository.findOne({
-        where: { id: data.sellerId, isActive: true }
+        where: { id: sellerId, isActive: true }
       });
 
       if (!seller) {
-        throw new Error('Seller not found or inactive');
+        return {
+          eligible: false,
+          reason: 'Seller not found or inactive'
+        };
       }
 
-      // 제품 검증 (활성 상태이고 재고가 있는 제품만)
+      // 2. Check product
       const product = await this.productRepository.findOne({
-        where: { 
-          id: data.productId, 
+        where: {
+          id: productId,
           status: ProductStatus.ACTIVE,
           isActive: true
         },
@@ -101,20 +136,177 @@ export class SellerProductService {
       });
 
       if (!product) {
-        throw new Error('Product not found or not available for sale');
+        return {
+          eligible: false,
+          reason: 'Product not found or not available for sale',
+          seller
+        };
       }
 
       if (product.trackInventory && product.inventory <= 0) {
-        throw new Error('Product is out of stock');
+        return {
+          eligible: false,
+          reason: 'Product is out of stock',
+          seller,
+          product
+        };
       }
 
-      // 이미 추가된 제품인지 확인
-      const existingSellerProduct = await this.sellerProductRepository.findOne({
-        where: { sellerId: data.sellerId, productId: data.productId }
+      // 3. Check SellerAuthorization (Phase B-4 Step 4: KEY INTEGRATION)
+      const authorizationResult = await sellerAuthorizationService.listAuthorizations({
+        sellerId,
+        productId,
+        status: AuthorizationStatus.APPROVED,
+        limit: 1
       });
 
-      if (existingSellerProduct) {
-        throw new Error('Product already added to seller store');
+      if (authorizationResult.authorizations.length === 0) {
+        return {
+          eligible: false,
+          reason: 'Seller does not have authorization to sell this product. Please request authorization first.',
+          seller,
+          product
+        };
+      }
+
+      const authorization = authorizationResult.authorizations[0];
+
+      // Check if authorization has expired
+      if (authorization.expiresAt && new Date(authorization.expiresAt) < new Date()) {
+        return {
+          eligible: false,
+          reason: 'Product authorization has expired',
+          seller,
+          product,
+          authorization
+        };
+      }
+
+      // 4. Check if already added
+      const existing = await this.sellerProductRepository.findOne({
+        where: { sellerId, productId }
+      });
+
+      if (existing) {
+        return {
+          eligible: false,
+          reason: 'Product already added to seller store',
+          seller,
+          product,
+          authorization
+        };
+      }
+
+      // All checks passed
+      return {
+        eligible: true,
+        seller,
+        product,
+        authorization
+      };
+
+    } catch (error: any) {
+      logger.error('[SellerProductService.validateSellerProductEligibility] Error', {
+        error: error.message,
+        sellerId,
+        productId
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get Product Status for Seller
+   * Phase B-4 Step 4: Returns comprehensive status information
+   *
+   * Returns:
+   * - Authorization status (REQUESTED, APPROVED, REJECTED, etc.)
+   * - Active status (if already added to catalog)
+   * - Eligibility (can be added now)
+   */
+  async getProductStatus(sellerId: string, productId: string): Promise<{
+    authorized: boolean;
+    authorizationStatus?: AuthorizationStatus;
+    authorizationDetails?: any;
+    alreadyAdded: boolean;
+    sellerProduct?: SellerProduct;
+    eligible: boolean;
+    eligibilityReason?: string;
+  }> {
+    try {
+      // Check authorization status
+      const authResult = await sellerAuthorizationService.listAuthorizations({
+        sellerId,
+        productId,
+        limit: 1
+      });
+
+      let authorized = false;
+      let authorizationStatus: AuthorizationStatus | undefined;
+      let authorizationDetails: any;
+
+      if (authResult.authorizations.length > 0) {
+        authorizationDetails = authResult.authorizations[0];
+        authorizationStatus = authorizationDetails.status;
+        authorized = authorizationStatus === AuthorizationStatus.APPROVED;
+      }
+
+      // Check if already added
+      const sellerProduct = await this.sellerProductRepository.findOne({
+        where: { sellerId, productId }
+      });
+
+      const alreadyAdded = !!sellerProduct;
+
+      // Check eligibility
+      const eligibility = await this.validateSellerProductEligibility(sellerId, productId);
+
+      return {
+        authorized,
+        authorizationStatus,
+        authorizationDetails,
+        alreadyAdded,
+        sellerProduct: sellerProduct || undefined,
+        eligible: eligibility.eligible,
+        eligibilityReason: eligibility.reason
+      };
+
+    } catch (error: any) {
+      logger.error('[SellerProductService.getProductStatus] Error', {
+        error: error.message,
+        sellerId,
+        productId
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Add Product to Seller Catalog (linkProductToSeller)
+   * Phase B-4 Step 4: Enhanced with SellerAuthorizationService integration
+   *
+   * IMPORTANT: Only authorized products can be added
+   * Authorization flow:
+   * 1. Seller requests authorization via SellerAuthorizationService.requestAuthorization()
+   * 2. Supplier/Admin approves via SellerAuthorizationService.approveAuthorization()
+   * 3. Seller adds product via this method (requires APPROVED authorization)
+   */
+  async addProductToSeller(data: AddProductToSellerRequest): Promise<SellerProduct> {
+    try {
+      // Phase B-4 Step 4: Use validateSellerProductEligibility for authorization check
+      const eligibility = await this.validateSellerProductEligibility(
+        data.sellerId,
+        data.productId
+      );
+
+      if (!eligibility.eligible) {
+        throw new Error(eligibility.reason || 'Product cannot be added to seller');
+      }
+
+      const { seller, product } = eligibility;
+
+      if (!seller || !product) {
+        throw new Error('Seller or product data missing from eligibility check');
       }
 
       // 판매자 등급에 따른 공급가 계산
@@ -127,7 +319,12 @@ export class SellerProductService {
 
       // 권장 판매가 대비 너무 낮은 가격 경고
       if (data.salePrice < product.recommendedPrice * 0.8) {
-        logger.warn(`Seller price significantly below recommended: ${data.salePrice} vs ${product.recommendedPrice}`);
+        logger.warn(`Seller price significantly below recommended: ${data.salePrice} vs ${product.recommendedPrice}`, {
+          sellerId: data.sellerId,
+          productId: data.productId,
+          salePrice: data.salePrice,
+          recommendedPrice: product.recommendedPrice
+        });
       }
 
       const sellerProduct = this.sellerProductRepository.create({
@@ -142,12 +339,23 @@ export class SellerProductService {
 
       const savedSellerProduct = await this.sellerProductRepository.save(sellerProduct);
 
-      logger.info(`Product added to seller: ${data.productId} -> ${data.sellerId}`);
-      
+      logger.info('[SellerProductService] Product added to seller catalog', {
+        sellerProductId: savedSellerProduct.id,
+        sellerId: data.sellerId,
+        productId: data.productId,
+        salePrice: data.salePrice,
+        costPrice: supplierPrice,
+        profit: savedSellerProduct.profit
+      });
+
       return savedSellerProduct;
 
-    } catch (error) {
-      logger.error('Error adding product to seller:', error);
+    } catch (error: any) {
+      logger.error('[SellerProductService.addProductToSeller] Error', {
+        error: error.message,
+        sellerId: data.sellerId,
+        productId: data.productId
+      });
       throw error;
     }
   }
@@ -409,7 +617,13 @@ export class SellerProductService {
     }
   }
 
-  // 대량 제품 추가
+  /**
+   * Bulk Add Products to Seller Catalog
+   * Phase B-4 Step 4: Enhanced with SellerAuthorizationService integration
+   *
+   * Validates authorization for ALL products before adding any
+   * Fails atomically if any product lacks authorization
+   */
   async bulkAddProducts(data: BulkAddProductsRequest): Promise<SellerProduct[]> {
     try {
       const seller = await this.sellerRepository.findOne({
@@ -420,42 +634,36 @@ export class SellerProductService {
         throw new Error('Seller not found or inactive');
       }
 
-      const productIds = data.products.map(p => p.productId);
-      
-      // 모든 제품 검증
-      const products = await this.productRepository.find({
-        where: { 
-          id: In(productIds),
-          status: ProductStatus.ACTIVE,
-          isActive: true
-        }
-      });
+      // Phase B-4 Step 4: Validate authorization for ALL products first
+      const eligibilityChecks = await Promise.all(
+        data.products.map(p => this.validateSellerProductEligibility(data.sellerId, p.productId))
+      );
 
-      if (products.length !== productIds.length) {
-        throw new Error('Some products are not available for sale');
-      }
+      // Check if all products are eligible
+      const ineligible = eligibilityChecks.filter(check => !check.eligible);
 
-      // 이미 추가된 제품 확인
-      const existingSellerProducts = await this.sellerProductRepository.find({
-        where: { sellerId: data.sellerId, productId: In(productIds) }
-      });
-
-      if (existingSellerProducts.length > 0) {
-        throw new Error('Some products are already added to seller store');
+      if (ineligible.length > 0) {
+        const reasons = ineligible.map(check => check.reason).join('; ');
+        throw new Error(`Some products cannot be added: ${reasons}`);
       }
 
       const sellerProducts: SellerProduct[] = [];
 
-      for (const productData of data.products) {
-        const product = products.find(p => p.id === productData.productId);
-        if (!product) continue;
+      for (let i = 0; i < data.products.length; i++) {
+        const productData = data.products[i];
+        const eligibility = eligibilityChecks[i];
+        const product = eligibility.product;
+
+        if (!product) {
+          throw new Error(`Product ${productData.productId} data missing`);
+        }
 
         const supplierPrice = product.getCurrentPrice(seller.tier);
 
         if (productData.salePrice <= supplierPrice) {
           throw new Error(`Invalid seller price for product ${product.name}: must be higher than ${supplierPrice}`);
         }
-        
+
         const sellerProduct = this.sellerProductRepository.create({
           sellerId: data.sellerId,
           productId: productData.productId,
@@ -473,12 +681,20 @@ export class SellerProductService {
 
       const savedSellerProducts = await this.sellerProductRepository.save(sellerProducts);
 
-      logger.info(`Bulk products added to seller: ${savedSellerProducts.length} products -> ${data.sellerId}`);
-      
+      logger.info('[SellerProductService] Bulk products added to seller', {
+        sellerId: data.sellerId,
+        count: savedSellerProducts.length,
+        productIds: savedSellerProducts.map(sp => sp.productId)
+      });
+
       return savedSellerProducts;
 
-    } catch (error) {
-      logger.error('Error bulk adding products:', error);
+    } catch (error: any) {
+      logger.error('[SellerProductService.bulkAddProducts] Error', {
+        error: error.message,
+        sellerId: data.sellerId,
+        productCount: data.products.length
+      });
       throw error;
     }
   }
