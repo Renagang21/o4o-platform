@@ -32,7 +32,7 @@ fi
 
 # Build packages first
 echo "📦 Building packages..."
-pnpm run build:packages --silent 2>&1 | grep -E "(✅|❌|Error|error|warning)" || true
+pnpm run build:packages 2>&1 | grep -E "(✅|❌|Error|error|warning)" || true
 
 # Build admin dashboard
 echo "🔨 Building admin dashboard..."
@@ -41,7 +41,7 @@ NODE_ENV=production \
 NODE_OPTIONS='--max-old-space-size=4096' \
 VITE_API_URL=https://api.neture.co.kr/api \
 VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
-pnpm run build:prod --silent 2>&1 | grep -E "(✅|❌|vite|built|error|warning)" || true
+pnpm run build:prod 2>&1 | tail -20
 
 cd ../..
 
