@@ -140,7 +140,22 @@ export default function ViewForm() {
       navigate('/admin/cms/views');
     } catch (error: any) {
       console.error('Failed to save view:', error);
-      toast.error(error.response?.data?.message || 'Failed to save view');
+
+      // Extract error message from API response
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Failed to save view';
+
+      // Handle specific error cases
+      if (error.response?.status === 409) {
+        // Duplicate slug error
+        toast.error(`Slug already exists. Please use a different slug.`);
+        setErrors({ slug: 'This slug is already in use' });
+      } else if (error.response?.status === 400) {
+        // Validation error
+        toast.error(errorMessage);
+      } else {
+        // Other errors
+        toast.error(errorMessage);
+      }
     } finally {
       setSaving(false);
     }
