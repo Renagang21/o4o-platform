@@ -3,6 +3,8 @@
  * Slug input with auto-formatting (lowercase, hyphenated)
  */
 
+import { useEffect, useState } from 'react';
+
 interface InputSlugProps {
   value: string;
   onChange: (value: string) => void;
@@ -20,6 +22,8 @@ export default function InputSlug({
   autoGenerate = false,
   sourceValue = '',
 }: InputSlugProps) {
+  const [manuallyEdited, setManuallyEdited] = useState(false);
+
   const formatSlug = (input: string): string => {
     return input
       .toLowerCase()
@@ -30,14 +34,25 @@ export default function InputSlug({
 
   const handleChange = (input: string) => {
     const formatted = formatSlug(input);
+    setManuallyEdited(true); // User manually edited the slug
     onChange(formatted);
   };
 
   const handleAutoGenerate = () => {
     if (sourceValue) {
-      handleChange(sourceValue);
+      const formatted = formatSlug(sourceValue);
+      onChange(formatted);
+      setManuallyEdited(false);
     }
   };
+
+  // Auto-generate slug from sourceValue when it changes (only if not manually edited)
+  useEffect(() => {
+    if (autoGenerate && sourceValue && !manuallyEdited && !value) {
+      const formatted = formatSlug(sourceValue);
+      onChange(formatted);
+    }
+  }, [sourceValue, autoGenerate, manuallyEdited, value]);
 
   return (
     <div className="flex gap-2">

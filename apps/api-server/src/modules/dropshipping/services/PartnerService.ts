@@ -688,6 +688,136 @@ export class PartnerService {
     return result;
   }
 
+  /**
+   * Reject Partner application
+   * Admin/Platform action to reject partner application
+   */
+  async rejectPartner(partnerId: string, reason?: string): Promise<Partner> {
+    try {
+      const partner = await this.partnerRepository.findOne({
+        where: { id: partnerId },
+      });
+
+      if (!partner) {
+        throw new Error('Partner not found');
+      }
+
+      partner.reject(reason || 'Application rejected');
+      const rejected = await this.partnerRepository.save(partner);
+
+      logger.info(`[PartnerService] Partner rejected`, {
+        partnerId,
+        status: rejected.status
+      });
+
+      return rejected;
+    } catch (error: any) {
+      logger.error('[PartnerService.rejectPartner] Error', {
+        error: error.message,
+        partnerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Suspend Partner
+   * Admin/Platform action to suspend partner account
+   */
+  async suspendPartner(partnerId: string): Promise<Partner> {
+    try {
+      const partner = await this.partnerRepository.findOne({
+        where: { id: partnerId },
+      });
+
+      if (!partner) {
+        throw new Error('Partner not found');
+      }
+
+      partner.suspend();
+      const suspended = await this.partnerRepository.save(partner);
+
+      logger.info(`[PartnerService] Partner suspended`, {
+        partnerId,
+        status: suspended.status
+      });
+
+      return suspended;
+    } catch (error: any) {
+      logger.error('[PartnerService.suspendPartner] Error', {
+        error: error.message,
+        partnerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Reactivate Partner
+   * Admin/Platform action to reactivate suspended partner
+   */
+  async reactivatePartner(partnerId: string): Promise<Partner> {
+    try {
+      const partner = await this.partnerRepository.findOne({
+        where: { id: partnerId },
+      });
+
+      if (!partner) {
+        throw new Error('Partner not found');
+      }
+
+      partner.reactivate();
+      const reactivated = await this.partnerRepository.save(partner);
+
+      logger.info(`[PartnerService] Partner reactivated`, {
+        partnerId,
+        status: reactivated.status,
+        isActive: reactivated.isActive
+      });
+
+      return reactivated;
+    } catch (error: any) {
+      logger.error('[PartnerService.reactivatePartner] Error', {
+        error: error.message,
+        partnerId,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Approve Partner - Wrapper for entity approve method
+   * Admin/Platform action to approve partner application
+   */
+  async approvePartnerEntity(partnerId: string, approvedBy: string): Promise<Partner> {
+    try {
+      const partner = await this.partnerRepository.findOne({
+        where: { id: partnerId },
+      });
+
+      if (!partner) {
+        throw new Error('Partner not found');
+      }
+
+      partner.approve(approvedBy);
+      const approved = await this.partnerRepository.save(partner);
+
+      logger.info(`[PartnerService] Partner approved`, {
+        partnerId,
+        approvedBy,
+        status: approved.status
+      });
+
+      return approved;
+    } catch (error: any) {
+      logger.error('[PartnerService.approvePartnerEntity] Error', {
+        error: error.message,
+        partnerId,
+      });
+      throw error;
+    }
+  }
+
   // Controller-compatible alias method
   async findById(id: string): Promise<Partner | null> {
     return this.getPartner(id);

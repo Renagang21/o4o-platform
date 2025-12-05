@@ -5,22 +5,24 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Edit, Trash2, Eye, FileText, Send, Archive as ArchiveIcon } from 'lucide-react';
 import cmsAPI, { Page, PageStatus } from '@/lib/cms';
-import toast from 'react-hot-toast';
+import { useToast } from '@/contexts/ToastContext';
 import PreviewFrame from '@/components/cms/PreviewFrame';
 
 export default function CMSPageList() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const toast = useToast();
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<PageStatus | 'all'>('all');
   const [previewSlug, setPreviewSlug] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadPages();
-  }, [filter]);
+  }, [filter, location.key]); // location.key changes on navigation
 
   const loadPages = async () => {
     try {

@@ -18,11 +18,23 @@ export class PartnerController extends BaseController {
       }
 
       const data = req.body as PartnerApplicationDto;
+      const partnerService = PartnerService.getInstance();
 
-      // TODO: Implement PartnerService.create
+      const partner = await partnerService.applyAsPartner({
+        userId: req.user.id,
+        businessName: data.businessName,
+        website: data.website,
+        socialMedia: data.socialMedia,
+        marketingChannels: data.marketingChannels,
+        expectedMonthlyTraffic: data.expectedMonthlyTraffic,
+        targetAudience: data.targetAudience,
+        bio: data.bio,
+        profileImage: data.profileImage
+      });
+
       return BaseController.ok(res, {
-        message: 'Partner application submitted',
-        data
+        message: 'Partner application submitted successfully',
+        partner
       });
     } catch (error: any) {
       logger.error('[PartnerController.createPartner] Error', {

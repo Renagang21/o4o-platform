@@ -133,13 +133,13 @@ export default function ViewForm() {
       if (isEditMode && id) {
         await cmsAPI.updateView(id, formData);
         toast.success('View updated successfully', 2000);
-        // Navigate after toast is visible
-        setTimeout(() => navigate('/admin/cms/views'), 2000);
+        // Navigate after toast is visible - force refresh by using push navigation
+        setTimeout(() => navigate('/admin/cms/views', { replace: false }), 2000);
       } else {
         await cmsAPI.createView(formData);
         toast.success('View created successfully', 2000);
-        // Navigate after toast is visible
-        setTimeout(() => navigate('/admin/cms/views'), 2000);
+        // Navigate after toast is visible - force refresh by using push navigation
+        setTimeout(() => navigate('/admin/cms/views', { replace: false }), 2000);
       }
     } catch (error: any) {
       console.error('Failed to save view:', error);
