@@ -818,6 +818,27 @@ export class PartnerService {
     }
   }
 
+  /**
+   * Get Partner by User ID
+   * Used to find partner profile for authenticated user
+   */
+  async getByUserId(userId: string): Promise<Partner | null> {
+    try {
+      const partner = await this.partnerRepository.findOne({
+        where: { userId },
+        relations: ['user']
+      });
+
+      return partner;
+    } catch (error: any) {
+      logger.error('[PartnerService.getByUserId] Error', {
+        error: error.message,
+        userId,
+      });
+      throw error;
+    }
+  }
+
   // Controller-compatible alias method
   async findById(id: string): Promise<Partner | null> {
     return this.getPartner(id);

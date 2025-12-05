@@ -356,6 +356,55 @@ export class SellerService {
   }
 
   /**
+   * List sellers with pagination
+   * Admin/Platform action to list all sellers
+   */
+  async listSellers(filters: {
+    status?: SellerStatus;
+    page?: number;
+    limit?: number;
+    search?: string;
+  } = {}): Promise<{ sellers: Seller[]; total: number; page: number; limit: number; totalPages: number }> {
+    try {
+      const { status, page = 1, limit = 20, search } = filters;
+      const query = this.sellerRepository.createQueryBuilder('seller')
+        .leftJoinAndSelect('seller.user', 'user')
+        .leftJoinAndSelect('seller.businessInfo', 'businessInfo');
+
+      if (status) {
+        query.andWhere('seller.status = :status', { status });
+      }
+
+      if (search) {
+        query.andWhere(
+          '(user.name ILIKE :search OR user.email ILIKE :search OR seller.storeSlug ILIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+
+      query.orderBy('seller.createdAt', 'DESC');
+
+      const offset = (page - 1) * limit;
+      query.skip(offset).take(limit);
+
+      const [sellers, total] = await query.getManyAndCount();
+
+      return {
+        sellers,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error: any) {
+      logger.error('[SellerService.listSellers] Error', {
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Get supplier product catalog for sellers
    * Returns products that can be imported
    */
