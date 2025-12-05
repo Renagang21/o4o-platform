@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { User, UserRole, UserStatus } from '../../entities/User.js';
+import { User, UserRole, UserStatus } from '../../modules/auth/entities/User.js';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 
