@@ -36,7 +36,7 @@ export interface FieldConditional {
   value: any;
 }
 
-@Entity('custom_fields')
+@Entity('cms_fields')
 @Index(['postTypeId'])
 @Index(['key'], { unique: true })
 export class CustomField {

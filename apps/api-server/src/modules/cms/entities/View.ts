@@ -50,7 +50,7 @@ export interface ViewSchema {
   };
 }
 
-@Entity('views')
+@Entity('cms_views')
 @Index(['slug'], { unique: true })
 @Index(['type'])
 @Index(['status'])

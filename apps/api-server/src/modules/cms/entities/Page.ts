@@ -15,7 +15,7 @@ export interface PageVersion {
   updatedAt: Date;
 }
 
-@Entity('pages')
+@Entity('cms_pages')
 @Index(['slug'], { unique: true })
 @Index(['status'])
 @Index(['publishedAt'])

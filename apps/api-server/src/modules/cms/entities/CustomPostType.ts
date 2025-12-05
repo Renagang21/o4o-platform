@@ -19,7 +19,7 @@ export interface CPTSchema {
   }>;
 }
 
-@Entity('custom_post_types')
+@Entity('cms_post_types')
 @Index(['slug'], { unique: true })
 @Index(['status'])
 export class CustomPostType {
