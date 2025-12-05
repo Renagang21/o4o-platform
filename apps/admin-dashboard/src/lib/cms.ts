@@ -389,7 +389,19 @@ export const cmsAPI = {
     limit?: number;
   }): Promise<APIListResponse<View>> {
     const response = await api.get('/cms/views', { params });
-    return response.data;
+    // Server may return { success, data: { views, total } } or paginated response
+    const serverData = response.data?.data || response.data;
+    const views = serverData.views || serverData.data || [];
+    return {
+      success: true,
+      data: Array.isArray(views) ? views : [],
+      pagination: serverData.pagination || {
+        total: serverData.total || views.length || 0,
+        page: params?.page || 1,
+        limit: params?.limit || 100,
+        totalPages: Math.ceil((serverData.total || views.length || 0) / (params?.limit || 100)),
+      },
+    };
   },
 
   async getView(id: string): Promise<View> {
