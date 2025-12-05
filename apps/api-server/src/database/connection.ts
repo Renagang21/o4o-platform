@@ -125,6 +125,12 @@ import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
 // Site entities
 import { Site } from '../modules/sites/site.entity.js';
 
+// ✅ NEW: CMS Module V2 entities (Phase C-2)
+import { CustomPostType as CMSCustomPostType } from '../modules/cms/entities/CustomPostType.js';
+import { CustomField as CMSCustomField } from '../modules/cms/entities/CustomField.js';
+import { View as CMSView } from '../modules/cms/entities/View.js';
+import { Page as CMSPage } from '../modules/cms/entities/Page.js';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -286,6 +292,11 @@ export const AppDataSource = new DataSource({
     DeploymentInstance,
     // Site entities
     Site,
+    // ✅ NEW: CMS Module V2 entities (Phase C-2)
+    CMSCustomPostType,
+    CMSCustomField,
+    CMSView,
+    CMSPage,
   ],
   
   // 마이그레이션 설정

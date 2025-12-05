@@ -36,7 +36,9 @@ import {
   Code,
   ChevronLeft,
   Sparkles,
-  ShoppingBag
+  ShoppingBag,
+  Database,
+  Layers
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -94,7 +96,19 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'pages-new', label: '새 페이지 추가', icon: <FileTextIcon className="w-4 h-4" />, path: '/editor/pages/new' }
     ]
   },
-  // 4. 외모
+  // 4. CMS V2
+  {
+    id: 'cms',
+    label: 'CMS',
+    icon: <Database className="w-5 h-5" />,
+    children: [
+      { id: 'cms-cpts', label: 'Custom Post Types', icon: <FileCode className="w-4 h-4" />, path: '/admin/cms/cpts' },
+      { id: 'cms-fields', label: 'Custom Fields', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/cms/fields' },
+      { id: 'cms-views', label: 'View Templates', icon: <Layers className="w-4 h-4" />, path: '/admin/cms/views' },
+      { id: 'cms-pages', label: 'CMS Pages', icon: <FileTextIcon className="w-4 h-4" />, path: '/admin/cms/pages' }
+    ]
+  },
+  // 5. 외모
   {
     id: 'appearance',
     label: '외모',
@@ -107,7 +121,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' }
     ]
   },
-  // 5. 사용자
+  // 6. 사용자
   {
     id: 'users',
     label: '사용자',
@@ -128,7 +142,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 7. 드롭쉬핑
+  // 8. 드롭쉬핑
   {
     id: 'dropshipping',
     label: '드롭쉬핑',
@@ -143,7 +157,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'ds-setup', label: '시스템 설정', icon: <Settings className="w-4 h-4" />, path: '/dropshipping/setup' }
     ]
   },
-  // 8. 포럼
+  // 9. 포럼
   {
     id: 'forum',
     label: '포럼',
@@ -160,7 +174,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
     ]
   },
-  // 9. 공동구매
+  // 10. 공동구매
   {
     id: 'groupbuy',
     label: '공동구매',
@@ -177,7 +191,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <></>,
     separator: true
   },
-  // 10. CPT 엔진
+  // 11. CPT 엔진
   {
     id: 'cpt-engine',
     label: 'CPT 엔진',
@@ -193,7 +207,7 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-template-presets', label: '템플릿 프리셋', icon: <FileText className="w-4 h-4" />, path: '/cpt-engine/presets/templates' }
     ]
   },
-  // 11. 도구
+  // 12. 도구
   {
     id: 'tools',
     label: '도구',
@@ -206,14 +220,14 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
     ]
   },
-  // 12. 설정
+  // 13. 설정
   {
     id: 'settings',
     label: '설정',
     icon: <Settings className="w-5 h-5" />,
     path: '/settings'
   },
-  // 13. 시스템 모니터링
+  // 14. 시스템 모니터링
   {
     id: 'monitoring',
     label: '시스템 모니터링',

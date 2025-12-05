@@ -16,7 +16,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { User } from './User.js';
+import { User } from '../modules/auth/entities/User.js';
 
 export enum RoleApplicationStatus {
   PENDING = 'pending',

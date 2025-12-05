@@ -14,6 +14,8 @@ import socialAuthRoutes from '../routes/social-auth.js';
 import authenticationRoutes from '../routes/authentication.routes.js'; // LEGACY: Unified authentication routes
 import authNextGenRoutes from '../modules/auth/routes/auth.routes.js'; // NEW: NextGen authentication routes
 import userModuleRoutes from '../modules/user/routes/user.routes.js'; // NEW: Unified user routes
+import { commerceRoutes } from '../modules/commerce/routes/index.js'; // NEW: NextGen commerce routes
+import { dropshippingRoutes } from '../modules/dropshipping/routes/index.js'; // NEW: NextGen dropshipping routes
 import userRoutes from '../routes/user.js';
 import userManagementRoutes from '../routes/users.routes.js';
 import usersV1Routes from '../routes/v1/users.routes.js';
@@ -24,7 +26,9 @@ import cptRoutes from '../routes/cpt.js';
 import postCreationRoutes from '../routes/post-creation/index.js';
 import servicesRoutes from '../routes/services.js';
 import contentRoutes from '../routes/content.js';
-import cmsRoutes from '../routes/content/index.js';
+// ❌ DEPRECATED: Legacy CMS routes - replaced by Phase C-2 CMS V2
+// import cmsRoutes from '../routes/content/index.js';
+import legacyCmsRoutes from '../routes/content/index.js';
 import publicRoutes from '../routes/public.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
 import emailAuthRoutes from '../routes/email-auth.routes.js';
@@ -160,8 +164,11 @@ import channelsRoutes from '../routes/v1/channels.routes.js';
 // Neture Forum Routes
 import netureForumRoutes from '../routes/neture/forum.routes.js';
 
-// NextGen CMS Routes
-import nextgenCMSRoutes from '../routes/cms.routes.js';
+// ❌ DEPRECATED: Old CMS routes - replaced by Phase C-2 CMS V2
+// import nextgenCMSRoutes from '../routes/cms.routes.js';
+
+// ✅ NEW: CMS Module V2 Routes (Phase C-2)
+import { cmsRoutes } from '../modules/cms/index.js';
 
 // Digital Signage Routes
 import signageRoutes from '../routes/signage.routes.js';
@@ -320,10 +327,18 @@ export function setupRoutes(app: Application): void {
   // ============================================================================
   // 5. V1 API ROUTES (Protected with standard rate limiting)
   // ============================================================================
-  // NEW: Unified user management routes (recommended)
+  // ✅ NEW: Unified user management routes (recommended)
   app.use('/api/v1/users', userModuleRoutes);
 
-  // Legacy: User management routes - @deprecated Use /api/v1/users instead
+  // ✅ NEW: NextGen Commerce routes (Phase B-3)
+  // Products, Categories, Cart, Orders, Payments, Shipments
+  app.use('/api/v1/commerce', standardLimiter, commerceRoutes);
+
+  // ✅ NEW: NextGen Dropshipping routes (Phase B-3)
+  // Seller, Supplier, Partner, Authorization, Commission, Settlement, Dashboard
+  app.use('/api/v1/dropshipping', standardLimiter, dropshippingRoutes);
+
+  // ❌ DEPRECATED: Legacy user management routes - Use /api/v1/users instead (Removal: 2026-03-03)
   app.use(
     '/v1/users',
     deprecatedRoute('/api/v1/users', '2026-03-03T00:00:00Z'),
@@ -445,9 +460,13 @@ export function setupRoutes(app: Application): void {
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
 
-  // NextGen CMS Routes
-  app.use('/api/cms', standardLimiter, nextgenCMSRoutes);
-  app.use('/api/v1/cms', standardLimiter, nextgenCMSRoutes);
+  // ✅ NEW: CMS Module V2 Routes (Phase C-2)
+  // Provides: CustomPostType, CustomField, View, Page endpoints
+  // See: src/modules/cms/routes/cms.routes.ts
+  app.use('/api/v1/cms', standardLimiter, cmsRoutes);
+
+  // ❌ DEPRECATED: Old CMS routes path - Use /api/v1/cms instead (Removal: 2025-06-03)
+  // app.use('/api/cms', standardLimiter, nextgenCMSRoutes);
 
   // Digital Signage Routes
   app.use('/api/signage', standardLimiter, signageRoutes);
@@ -490,15 +509,56 @@ export function setupRoutes(app: Application): void {
   app.use('/api/forms', formsRoutes);
   app.use('/api/inventory', inventoryRoutes);
 
-  // Dropshipping & Ecommerce
-  app.use('/api/v1/dropshipping', dropshippingCPTRoutes);
-  app.use('/api/v1/dropshipping/partner', partnerRoutes);
-  app.use('/api/v1/products', productsRoutes);
-  app.use('/api/products', productsRoutes); // Legacy compatibility
-  app.use('/api/partners', partnersRoutes);
-  app.use('/api/seller-products', sellerProductsRoutes);
-  app.use('/api/orders', orderRoutes);
-  app.use('/api/v1/payments', paymentRoutes);
+  // ❌ DEPRECATED: Legacy Dropshipping & Ecommerce routes - Use /api/v1/commerce and /api/v1/dropshipping instead (Removal: 2025-06-03)
+  // These routes are superseded by NextGen Commerce/Dropshipping modules (Phase B-3)
+  app.use(
+    '/api/v1/dropshipping/cpt',
+    deprecatedRoute('/api/v1/dropshipping', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/dropshipping/cpt'),
+    dropshippingCPTRoutes
+  );
+  app.use(
+    '/api/v1/dropshipping/partner',
+    deprecatedRoute('/api/v1/dropshipping/partners', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/dropshipping/partner'),
+    partnerRoutes
+  );
+  app.use(
+    '/api/v1/products',
+    deprecatedRoute('/api/v1/commerce/products', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/products'),
+    productsRoutes
+  );
+  app.use(
+    '/api/products',
+    deprecatedRoute('/api/v1/commerce/products', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/products'),
+    productsRoutes
+  ); // Legacy compatibility
+  app.use(
+    '/api/partners',
+    deprecatedRoute('/api/v1/dropshipping/partners', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/partners'),
+    partnersRoutes
+  );
+  app.use(
+    '/api/seller-products',
+    deprecatedRoute('/api/v1/dropshipping/seller-products', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/seller-products'),
+    sellerProductsRoutes
+  );
+  app.use(
+    '/api/orders',
+    deprecatedRoute('/api/v1/commerce/orders', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/orders'),
+    orderRoutes
+  );
+  app.use(
+    '/api/v1/payments',
+    deprecatedRoute('/api/v1/commerce/payments', '2025-06-03T00:00:00Z'),
+    logDeprecatedUsage('/api/v1/payments'),
+    paymentRoutes
+  );
 
   // Phase 3: Storefront Order API
   app.use('/api/v1/storefront/orders', storefrontRoutes);
@@ -520,7 +580,8 @@ export function setupRoutes(app: Application): void {
   app.use('/api/post-creation', standardLimiter, postCreationRoutes);
   app.use('/api/services', standardLimiter, servicesRoutes);
   app.use('/api/content', contentRoutes);
-  app.use('/api/cms', cmsRoutes);
+  // ❌ DEPRECATED: Legacy CMS routes - Use /api/v1/cms instead (Phase C-2)
+  app.use('/api/cms', legacyCmsRoutes);
   app.use('/api/reusable-blocks', reusableBlocksRoutes);
   app.use('/api/block-patterns', blockPatternsRoutes);
   app.use('/api/template-parts', templatePartsRoutes);

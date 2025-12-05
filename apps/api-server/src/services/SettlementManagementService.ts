@@ -16,7 +16,7 @@ import {
 } from '../entities/Settlement.js';
 import { Order } from '../entities/Order.js';
 import { SettlementItem } from '../entities/SettlementItem.js';
-import { Commission } from '../entities/Commission.js';
+import { Commission } from '../modules/dropshipping/entities/Commission.js';
 import { notificationService } from './NotificationService.js';
 import logger from '../utils/logger.js';
 import { invalidateSettlementCache } from '../utils/cache-invalidation.js';

@@ -16,16 +16,20 @@ function generateCacheKey(funcName: string, props: Record<string, any>, context:
   return `${funcName}-${JSON.stringify(props)}-${context.router.pathname}`;
 }
 
-export function ViewRenderer() {
+export function ViewRenderer({ preview = false }: { preview?: boolean } = {}) {
   const location = useLocation();
   const [view, setView] = useState<ViewSchema | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadView(location.pathname)
+    // Check for preview mode from query params or prop
+    const searchParams = new URLSearchParams(location.search);
+    const isPreview = preview || searchParams.get('preview') === '1';
+
+    loadView(location.pathname, isPreview)
       .then(setView)
       .finally(() => setLoading(false));
-  }, [location.pathname]);
+  }, [location.pathname, location.search, preview]);
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
