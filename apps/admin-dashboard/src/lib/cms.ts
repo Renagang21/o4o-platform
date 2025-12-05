@@ -190,7 +190,7 @@ export const cmsAPI = {
     isHierarchical?: boolean;
     supportedFeatures?: string[];
   }): Promise<CPT> {
-    const response = await api.post('/api/v1/cms/cpts', data);
+    const response = await api.post('/cms/cpts', data);
     return response.data.data;
   },
 
@@ -201,36 +201,36 @@ export const cmsAPI = {
     page?: number;
     limit?: number;
   }): Promise<APIListResponse<CPT>> {
-    const response = await api.get('/api/v1/cms/cpts', { params });
+    const response = await api.get('/cms/cpts', { params });
     return response.data;
   },
 
   async getCPT(id: string): Promise<CPT> {
-    const response = await api.get(`/api/v1/cms/cpts/${id}`);
+    const response = await api.get(`/cms/cpts/${id}`);
     return response.data.data;
   },
 
   async getCPTBySlug(slug: string): Promise<CPT> {
-    const response = await api.get(`/api/v1/cms/cpts/slug/${slug}`);
+    const response = await api.get(`/cms/cpts/slug/${slug}`);
     return response.data.data;
   },
 
   async updateCPT(id: string, data: Partial<CPT>): Promise<CPT> {
-    const response = await api.put(`/api/v1/cms/cpts/${id}`, data);
+    const response = await api.put(`/cms/cpts/${id}`, data);
     return response.data.data;
   },
 
   async deleteCPT(id: string): Promise<void> {
-    await api.delete(`/api/v1/cms/cpts/${id}`);
+    await api.delete(`/cms/cpts/${id}`);
   },
 
   async activateCPT(id: string): Promise<CPT> {
-    const response = await api.post(`/api/v1/cms/cpts/${id}/activate`);
+    const response = await api.post(`/cms/cpts/${id}/activate`);
     return response.data.data;
   },
 
   async archiveCPT(id: string): Promise<CPT> {
-    const response = await api.post(`/api/v1/cms/cpts/${id}/archive`);
+    const response = await api.post(`/cms/cpts/${id}/archive`);
     return response.data.data;
   },
 
@@ -249,7 +249,7 @@ export const cmsAPI = {
     config?: Record<string, any>;
     conditionalLogic?: any[];
   }): Promise<CustomField> {
-    const response = await api.post('/api/v1/cms/fields', data);
+    const response = await api.post('/cms/fields', data);
     return response.data.data;
   },
 
@@ -258,40 +258,40 @@ export const cmsAPI = {
     page?: number;
     limit?: number;
   }): Promise<APIListResponse<CustomField>> {
-    const response = await api.get('/api/v1/cms/fields', { params });
+    const response = await api.get('/cms/fields', { params });
     return response.data;
   },
 
   async getField(id: string): Promise<CustomField> {
-    const response = await api.get(`/api/v1/cms/fields/${id}`);
+    const response = await api.get(`/cms/fields/${id}`);
     return response.data.data;
   },
 
   async getFieldsForCPT(postTypeId: string): Promise<CustomField[]> {
-    const response = await api.get(`/api/v1/cms/fields/cpt/${postTypeId}`);
+    const response = await api.get(`/cms/fields/cpt/${postTypeId}`);
     return response.data.data;
   },
 
   async getFieldsByGroup(postTypeId: string): Promise<Record<string, CustomField[]>> {
-    const response = await api.get(`/api/v1/cms/fields/cpt/${postTypeId}/grouped`);
+    const response = await api.get(`/cms/fields/cpt/${postTypeId}/grouped`);
     return response.data.data;
   },
 
   async updateField(id: string, data: Partial<CustomField>): Promise<CustomField> {
-    const response = await api.put(`/api/v1/cms/fields/${id}`, data);
+    const response = await api.put(`/cms/fields/${id}`, data);
     return response.data.data;
   },
 
   async deleteField(id: string): Promise<void> {
-    await api.delete(`/api/v1/cms/fields/${id}`);
+    await api.delete(`/cms/fields/${id}`);
   },
 
   async reorderFields(postTypeId: string, fieldIds: string[]): Promise<void> {
-    await api.post(`/api/v1/cms/fields/cpt/${postTypeId}/reorder`, { fieldIds });
+    await api.post(`/cms/fields/cpt/${postTypeId}/reorder`, { fieldIds });
   },
 
   async validateFieldValue(id: string, value: any): Promise<{ valid: boolean; errors?: string[] }> {
-    const response = await api.post(`/api/v1/cms/fields/${id}/validate`, { value });
+    const response = await api.post(`/cms/fields/${id}/validate`, { value });
     return response.data.data;
   },
 
@@ -310,7 +310,7 @@ export const cmsAPI = {
     tags?: string[];
     metadata?: Record<string, any>;
   }): Promise<View> {
-    const response = await api.post('/api/v1/cms/views', data);
+    const response = await api.post('/cms/views', data);
     return response.data.data;
   },
 
@@ -322,51 +322,51 @@ export const cmsAPI = {
     page?: number;
     limit?: number;
   }): Promise<APIListResponse<View>> {
-    const response = await api.get('/api/v1/cms/views', { params });
+    const response = await api.get('/cms/views', { params });
     return response.data;
   },
 
   async getView(id: string): Promise<View> {
-    const response = await api.get(`/api/v1/cms/views/${id}`);
+    const response = await api.get(`/cms/views/${id}`);
     return response.data.data;
   },
 
   async getViewBySlug(slug: string): Promise<View> {
-    const response = await api.get(`/api/v1/cms/views/slug/${slug}`);
+    const response = await api.get(`/cms/views/slug/${slug}`);
     return response.data.data;
   },
 
   async getViewsForCPT(postTypeSlug: string): Promise<View[]> {
-    const response = await api.get(`/api/v1/cms/views/cpt/${postTypeSlug}`);
+    const response = await api.get(`/cms/views/cpt/${postTypeSlug}`);
     return response.data.data;
   },
 
   async getComponentsInView(id: string): Promise<ViewComponent[]> {
-    const response = await api.get(`/api/v1/cms/views/${id}/components`);
+    const response = await api.get(`/cms/views/${id}/components`);
     return response.data.data;
   },
 
   async updateView(id: string, data: Partial<View>): Promise<View> {
-    const response = await api.put(`/api/v1/cms/views/${id}`, data);
+    const response = await api.put(`/cms/views/${id}`, data);
     return response.data.data;
   },
 
   async deleteView(id: string): Promise<void> {
-    await api.delete(`/api/v1/cms/views/${id}`);
+    await api.delete(`/cms/views/${id}`);
   },
 
   async activateView(id: string): Promise<View> {
-    const response = await api.post(`/api/v1/cms/views/${id}/activate`);
+    const response = await api.post(`/cms/views/${id}/activate`);
     return response.data.data;
   },
 
   async archiveView(id: string): Promise<View> {
-    const response = await api.post(`/api/v1/cms/views/${id}/archive`);
+    const response = await api.post(`/cms/views/${id}/archive`);
     return response.data.data;
   },
 
   async cloneView(id: string, newSlug?: string): Promise<View> {
-    const response = await api.post(`/api/v1/cms/views/${id}/clone`, { newSlug });
+    const response = await api.post(`/cms/views/${id}/clone`, { newSlug });
     return response.data.data;
   },
 
@@ -384,7 +384,7 @@ export const cmsAPI = {
     tags?: string[];
     metadata?: Record<string, any>;
   }): Promise<Page> {
-    const response = await api.post('/api/v1/cms/pages', data);
+    const response = await api.post('/cms/pages', data);
     return response.data.data;
   },
 
@@ -396,56 +396,56 @@ export const cmsAPI = {
     page?: number;
     limit?: number;
   }): Promise<APIListResponse<Page>> {
-    const response = await api.get('/api/v1/cms/pages', { params });
+    const response = await api.get('/cms/pages', { params });
     return response.data;
   },
 
   async getPage(id: string): Promise<Page> {
-    const response = await api.get(`/api/v1/cms/pages/${id}`);
+    const response = await api.get(`/cms/pages/${id}`);
     return response.data.data;
   },
 
   async getPageBySlug(slug: string): Promise<Page> {
-    const response = await api.get(`/api/v1/cms/pages/slug/${slug}`);
+    const response = await api.get(`/cms/pages/slug/${slug}`);
     return response.data.data;
   },
 
   async updatePage(id: string, data: Partial<Page>): Promise<Page> {
-    const response = await api.put(`/api/v1/cms/pages/${id}`, data);
+    const response = await api.put(`/cms/pages/${id}`, data);
     return response.data.data;
   },
 
   async deletePage(id: string): Promise<void> {
-    await api.delete(`/api/v1/cms/pages/${id}`);
+    await api.delete(`/cms/pages/${id}`);
   },
 
   async publishPage(id: string): Promise<Page> {
-    const response = await api.post(`/api/v1/cms/pages/${id}/publish`);
+    const response = await api.post(`/cms/pages/${id}/publish`);
     return response.data.data;
   },
 
   async schedulePage(id: string, scheduledAt: string): Promise<Page> {
-    const response = await api.post(`/api/v1/cms/pages/${id}/schedule`, { scheduledAt });
+    const response = await api.post(`/cms/pages/${id}/schedule`, { scheduledAt });
     return response.data.data;
   },
 
   async draftPage(id: string): Promise<Page> {
-    const response = await api.post(`/api/v1/cms/pages/${id}/draft`);
+    const response = await api.post(`/cms/pages/${id}/draft`);
     return response.data.data;
   },
 
   async archivePage(id: string): Promise<Page> {
-    const response = await api.post(`/api/v1/cms/pages/${id}/archive`);
+    const response = await api.post(`/cms/pages/${id}/archive`);
     return response.data.data;
   },
 
   async getVersionHistory(id: string): Promise<PageVersion[]> {
-    const response = await api.get(`/api/v1/cms/pages/${id}/versions`);
+    const response = await api.get(`/cms/pages/${id}/versions`);
     return response.data.data;
   },
 
   async revertToVersion(id: string, version: number): Promise<Page> {
-    const response = await api.post(`/api/v1/cms/pages/${id}/revert`, { version });
+    const response = await api.post(`/cms/pages/${id}/revert`, { version });
     return response.data.data;
   },
 
@@ -454,7 +454,7 @@ export const cmsAPI = {
   // ========================================
 
   async getPublishedPage(slug: string): Promise<{ page: Page; view: View | null }> {
-    const response = await api.get(`/api/v1/cms/public/page/${slug}`);
+    const response = await api.get(`/cms/public/page/${slug}`);
     return response.data.data;
   },
 
@@ -462,7 +462,7 @@ export const cmsAPI = {
     page?: number;
     limit?: number;
   }): Promise<APIListResponse<Page>> {
-    const response = await api.get('/api/v1/cms/public/pages', { params });
+    const response = await api.get('/cms/public/pages', { params });
     return response.data;
   },
 };
