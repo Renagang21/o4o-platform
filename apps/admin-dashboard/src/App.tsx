@@ -180,6 +180,7 @@ const ApiResponseChecker = lazy(() => import('@/pages/test/ApiResponseChecker'))
 const MenuDebug = lazy(() => import('@/pages/test/MenuDebug'));
 const SiteBuilderTest = lazy(() => import('@/pages/test/SiteBuilderTest'));
 const CMSFieldsDebug = lazy(() => import('@/pages/test/CMSFieldsDebug'));
+const CMSViewCreateTest = lazy(() => import('@/pages/test/CMSViewCreateTest'));
 
 // Removed Apps Manager - using WordPress style menu
 
@@ -1157,6 +1158,12 @@ function App() {
                     <Route path="/admin/test/cms-fields" element={
                       <Suspense fallback={<PageLoader />}>
                         <CMSFieldsDebug />
+                      </Suspense>
+                    } />
+                    {/* Test - CMS View Create */}
+                    <Route path="/admin/test/cms-view-test" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <CMSViewCreateTest />
                       </Suspense>
                     } />
 
