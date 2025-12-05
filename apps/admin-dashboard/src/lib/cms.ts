@@ -271,17 +271,58 @@ export const cmsAPI = {
     limit?: number;
   }): Promise<APIListResponse<CustomField>> {
     const response = await api.get('/cms/fields', { params });
-    return response.data;
+    // Server returns { fields, total }, map to { data, pagination }
+    const serverData = response.data;
+    const fields = (serverData.fields || []).map((field: any) => ({
+      ...field,
+      name: field.key,  // Server uses 'key', client uses 'name'
+      groupName: field.group,
+      required: field.validation?.required || false,
+      config: field.options || {},
+      conditionalLogic: field.conditional || [],
+    }));
+    return {
+      success: true,
+      data: fields,
+      pagination: {
+        total: serverData.total || 0,
+        page: params?.page || 1,
+        limit: params?.limit || 100,
+        totalPages: Math.ceil((serverData.total || 0) / (params?.limit || 100)),
+      },
+    };
   },
 
   async getField(id: string): Promise<CustomField> {
     const response = await api.get(`/cms/fields/${id}`);
-    return response.data.data;
+    // Server returns { field }, map to CustomField
+    const serverData = response.data;
+    const field = serverData.field || serverData.data;
+    // Map server field names to client field names
+    return {
+      ...field,
+      name: field.key,  // Server uses 'key', client uses 'name'
+      groupName: field.group,
+      required: field.validation?.required || false,
+      config: field.options || {},
+      conditionalLogic: field.conditional || [],
+    };
   },
 
   async getFieldsForCPT(postTypeId: string): Promise<CustomField[]> {
     const response = await api.get(`/cms/fields/cpt/${postTypeId}`);
-    return response.data.data;
+    // Server returns { fields, total }
+    const serverData = response.data;
+    const fields = serverData.fields || serverData.data || [];
+    // Map server field names to client field names
+    return fields.map((field: any) => ({
+      ...field,
+      name: field.key,
+      groupName: field.group,
+      required: field.validation?.required || false,
+      config: field.options || {},
+      conditionalLogic: field.conditional || [],
+    }));
   },
 
   async getFieldsByGroup(postTypeId: string): Promise<Record<string, CustomField[]>> {
