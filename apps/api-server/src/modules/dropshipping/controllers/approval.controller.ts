@@ -3,6 +3,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import { AuthorizeSellerDto, AuthorizeSupplierDto, AuthorizePartnerDto, AuthorizeProductDto, AuthorizationAction } from '../dto/index.js';
 import { SellerService } from '../services/SellerService.js';
 import { SupplierService } from '../services/SupplierService.js';
+import { PartnerService } from '../services/PartnerService.js';
 import { sellerAuthorizationService } from '../services/SellerAuthorizationService.js';
 import { AuthorizationStatus } from '../entities/SellerAuthorization.js';
 import logger from '../../../utils/logger.js';
@@ -119,12 +120,36 @@ export class ApprovalController extends BaseController {
       }
 
       const data = req.body as AuthorizePartnerDto;
+      const partnerService = PartnerService.getInstance();
 
-      // TODO: Implement PartnerService.approve
+      // Integrated with PartnerService
+      let partner;
+      let message;
+
+      switch (data.action) {
+        case AuthorizationAction.APPROVE:
+          partner = await partnerService.approvePartnerEntity(data.partnerId, req.user.id);
+          message = 'Partner approved successfully';
+          break;
+        case AuthorizationAction.REJECT:
+          partner = await partnerService.rejectPartner(data.partnerId);
+          message = 'Partner rejected';
+          break;
+        case AuthorizationAction.SUSPEND:
+          partner = await partnerService.suspendPartner(data.partnerId);
+          message = 'Partner suspended';
+          break;
+        case AuthorizationAction.REACTIVATE:
+          partner = await partnerService.reactivatePartner(data.partnerId);
+          message = 'Partner reactivated';
+          break;
+        default:
+          return BaseController.error(res, `Unknown action: ${data.action}`, 400);
+      }
+
       return BaseController.ok(res, {
-        message: 'Partner authorization processed',
-        partnerId: data.partnerId,
-        action: data.action
+        message,
+        partner
       });
     } catch (error: any) {
       logger.error('[ApprovalController.approvePartner] Error', {

@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Edit, Trash2, Eye, Copy, Layers, Palette } from 'lucide-react';
 import cmsAPI, { View, ViewStatus } from '@/lib/cms';
 import { useToast } from '@/contexts/ToastContext';
@@ -13,6 +13,7 @@ import PreviewFrame from '@/components/cms/PreviewFrame';
 
 export default function CMSViewList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const [views, setViews] = useState<View[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,21 +22,13 @@ export default function CMSViewList() {
 
   useEffect(() => {
     loadViews();
-  }, [filter]);
+  }, [filter, location.key]); // location.key changes on navigation
 
   const loadViews = async () => {
     try {
       setLoading(true);
       const params = filter !== 'all' ? { status: filter } : {};
       const response = await cmsAPI.listViews(params);
-
-      // Debug: Log the response
-      console.log('[CMSViewList] API Response:', {
-        totalViews: response.data?.length || 0,
-        filter,
-        views: response.data
-      });
-
       setViews(response.data || []);
     } catch (error) {
       console.error('Failed to load views:', error);

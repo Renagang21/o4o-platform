@@ -137,13 +137,13 @@ export default function PageForm() {
       if (isEditMode && id) {
         await cmsAPI.updatePage(id, formData);
         toast.success('Page updated successfully', 2000);
-        // Navigate after toast is visible
-        setTimeout(() => navigate('/admin/cms/pages'), 2000);
+        // Navigate after toast is visible - force refresh by using push navigation
+        setTimeout(() => navigate('/admin/cms/pages', { replace: false }), 2000);
       } else {
         await cmsAPI.createPage(formData);
         toast.success('Page created successfully', 2000);
-        // Navigate after toast is visible
-        setTimeout(() => navigate('/admin/cms/pages'), 2000);
+        // Navigate after toast is visible - force refresh by using push navigation
+        setTimeout(() => navigate('/admin/cms/pages', { replace: false }), 2000);
       }
     } catch (error: any) {
       console.error('Failed to save page:', error);
