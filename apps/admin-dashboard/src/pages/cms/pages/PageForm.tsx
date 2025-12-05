@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Send, Eye, Calendar } from 'lucide-react';
 import cmsAPI, { Page, PageStatus, View, PageSEO } from '@/lib/cms';
-import toast from 'react-hot-toast';
+import { useToast } from '@/contexts/ToastContext';
 import FormSection from '@/components/cms/forms/FormSection';
 import FormRow from '@/components/cms/forms/FormRow';
 import InputText from '@/components/cms/forms/InputText';
@@ -51,6 +51,7 @@ const initialFormData: FormData = {
 export default function PageForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [views, setViews] = useState<View[]>([]);
   const [loading, setLoading] = useState(false);
@@ -135,17 +136,15 @@ export default function PageForm() {
 
       if (isEditMode && id) {
         await cmsAPI.updatePage(id, formData);
-        toast.success('Page updated successfully');
+        toast.success('Page updated successfully', 2000);
+        // Navigate after toast is visible
+        setTimeout(() => navigate('/admin/cms/pages'), 2000);
       } else {
-        const result = await cmsAPI.createPage(formData);
-        console.log('✅ Page created successfully:', result);
-        toast.success('Page created successfully');
+        await cmsAPI.createPage(formData);
+        toast.success('Page created successfully', 2000);
+        // Navigate after toast is visible
+        setTimeout(() => navigate('/admin/cms/pages'), 2000);
       }
-
-      // Wait for toast to be visible before navigating
-      setTimeout(() => {
-        navigate('/admin/cms/pages');
-      }, 1000);
     } catch (error: any) {
       console.error('Failed to save page:', error);
 

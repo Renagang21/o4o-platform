@@ -7,9 +7,10 @@
 
 import { useState } from 'react';
 import cmsAPI from '@/lib/cms';
-import toast from 'react-hot-toast';
+import { useToast } from '@/contexts/ToastContext';
 
 export default function CMSViewCreateTest() {
+  const toast = useToast();
   const [formData, setFormData] = useState({
     name: 'Test View ' + Date.now(),
     slug: 'test-view-' + Date.now(),

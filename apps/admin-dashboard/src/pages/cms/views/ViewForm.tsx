@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 import cmsAPI, { View, ViewStatus, ViewSchema } from '@/lib/cms';
-import toast from 'react-hot-toast';
+import { useToast } from '@/contexts/ToastContext';
 import FormSection from '@/components/cms/forms/FormSection';
 import FormRow from '@/components/cms/forms/FormRow';
 import InputText from '@/components/cms/forms/InputText';
@@ -60,6 +60,7 @@ const initialFormData: FormData = {
 export default function ViewForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -104,21 +105,14 @@ export default function ViewForm() {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
-      console.error('❌ Validation failed: Name is required');
     }
 
     if (!formData.slug.trim()) {
       newErrors.slug = 'Slug is required';
-      console.error('❌ Validation failed: Slug is required');
     }
 
     if (!formData.schema || !formData.schema.components) {
       newErrors.schema = 'Schema must have components array';
-      console.error('❌ Validation failed: Schema must have components array');
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      console.error('❌ Validation errors:', newErrors);
     }
 
     setErrors(newErrors);
@@ -138,17 +132,15 @@ export default function ViewForm() {
 
       if (isEditMode && id) {
         await cmsAPI.updateView(id, formData);
-        toast.success('View updated successfully');
+        toast.success('View updated successfully', 2000);
+        // Navigate after toast is visible
+        setTimeout(() => navigate('/admin/cms/views'), 2000);
       } else {
-        const result = await cmsAPI.createView(formData);
-        console.log('✅ View created successfully:', result);
-        toast.success('View created successfully');
+        await cmsAPI.createView(formData);
+        toast.success('View created successfully', 2000);
+        // Navigate after toast is visible
+        setTimeout(() => navigate('/admin/cms/views'), 2000);
       }
-
-      // Wait for toast to be visible before navigating
-      setTimeout(() => {
-        navigate('/admin/cms/views');
-      }, 1000);
     } catch (error: any) {
       console.error('Failed to save view:', error);
 
