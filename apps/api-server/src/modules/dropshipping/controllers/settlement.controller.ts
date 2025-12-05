@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CreateSettlementDto, UpdateSettlementDto, SettlementQueryDto } from '../dto/index.js';
+import { SettlementService } from '../services/SettlementService.js';
 import logger from '../../../utils/logger.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 
@@ -17,11 +18,26 @@ export class SettlementController extends BaseController {
       }
 
       const data = req.body as CreateSettlementDto;
+      const settlementService = new SettlementService();
 
-      // TODO: Implement SettlementService.create
+      // Convert DTO numbers to appropriate format for service
+      const settlement = await settlementService.create({
+        partyType: data.partyType,
+        partyId: data.partyId,
+        periodStart: data.periodStart,
+        periodEnd: data.periodEnd,
+        totalSaleAmount: data.totalSaleAmount as any,
+        totalBaseAmount: data.totalBaseAmount as any,
+        totalCommissionAmount: data.totalCommissionAmount as any,
+        totalMarginAmount: data.totalMarginAmount as any,
+        payableAmount: data.payableAmount as any,
+        notes: data.notes,
+        memo: data.memo
+      });
+
       return BaseController.ok(res, {
         message: 'Settlement created',
-        data
+        settlement
       });
     } catch (error: any) {
       logger.error('[SettlementController.createSettlement] Error', {
@@ -35,12 +51,15 @@ export class SettlementController extends BaseController {
   static async getSettlement(req: AuthRequest, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const settlementService = new SettlementService();
 
-      // TODO: Implement SettlementService.findById
-      return BaseController.ok(res, {
-        settlementId: id,
-        message: 'Settlement pending implementation'
-      });
+      const settlement = await settlementService.findById(id);
+
+      if (!settlement) {
+        return BaseController.notFound(res, 'Settlement not found');
+      }
+
+      return BaseController.ok(res, { settlement });
     } catch (error: any) {
       logger.error('[SettlementController.getSettlement] Error', {
         error: error.message,
@@ -53,15 +72,25 @@ export class SettlementController extends BaseController {
   static async listSettlements(req: AuthRequest, res: Response): Promise<any> {
     try {
       const query = req.query as unknown as SettlementQueryDto;
-      const page = query.page || 1;
-      const limit = query.limit || 20;
+      const settlementService = new SettlementService();
 
-      // TODO: Implement SettlementService.list with filters
-      return BaseController.okPaginated(res, [], {
-        page,
-        limit,
-        total: 0,
-        totalPages: 0,
+      const result = await settlementService.list({
+        partyType: query.partyType,
+        partyId: query.partyId,
+        status: query.status,
+        startDate: query.startDate,
+        endDate: query.endDate,
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: query.sortOrder?.toLowerCase() as 'asc' | 'desc' || 'desc',
+        page: query.page || 1,
+        limit: query.limit || 20
+      });
+
+      return BaseController.okPaginated(res, result.settlements, {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
       });
     } catch (error: any) {
       logger.error('[SettlementController.listSettlements] Error', {
@@ -79,12 +108,19 @@ export class SettlementController extends BaseController {
 
       const { id } = req.params;
       const data = req.body as UpdateSettlementDto;
+      const settlementService = new SettlementService();
 
-      // TODO: Implement SettlementService.update
+      const settlement = await settlementService.update(id, {
+        status: data.status,
+        payableAmount: data.payableAmount as any,
+        notes: data.notes,
+        memo: data.memo,
+        paidAt: data.paidAt
+      });
+
       return BaseController.ok(res, {
         message: 'Settlement updated',
-        settlementId: id,
-        data
+        settlement
       });
     } catch (error: any) {
       logger.error('[SettlementController.updateSettlement] Error', {
@@ -102,11 +138,18 @@ export class SettlementController extends BaseController {
       }
 
       const { id } = req.params;
+      const { action } = req.body;
+      const settlementService = new SettlementService();
 
-      // TODO: Implement SettlementService.process
+      if (!action || !['pay', 'cancel', 'start_processing'].includes(action)) {
+        return BaseController.error(res, 'Invalid action. Must be one of: pay, cancel, start_processing', 400);
+      }
+
+      const settlement = await settlementService.process(id, action);
+
       return BaseController.ok(res, {
-        message: 'Settlement processed',
-        settlementId: id
+        message: `Settlement ${action === 'pay' ? 'marked as paid' : action === 'cancel' ? 'cancelled' : 'processing started'}`,
+        settlement
       });
     } catch (error: any) {
       logger.error('[SettlementController.processSettlement] Error', {

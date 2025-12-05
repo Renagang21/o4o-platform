@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { Commission } from '../entities/Commission.js';
 import { Order } from '../../commerce/entities/Order.js';
+import { Settlement, SettlementStatus, SettlementPartyType } from '../entities/Settlement.js';
 import { CommissionType } from '../entities/CommissionPolicy.js';
 import { PolicyResolutionService, PolicyResolutionContext } from './PolicyResolutionService.js';
 import shadowModeService, { ShadowModeService } from '../../../services/shadow-mode.service.js';
@@ -43,15 +44,29 @@ export interface CommissionCalculationResult {
   calculationTimeMs: number;
 }
 
+export interface SettlementFilters {
+  partyType?: SettlementPartyType;
+  partyId?: string;
+  status?: SettlementStatus;
+  startDate?: Date;
+  endDate?: Date;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
 export class SettlementService {
   private policyResolutionService: PolicyResolutionService;
   private commissionRepo: Repository<Commission>;
   private orderRepo: Repository<Order>;
+  private settlementRepo: Repository<Settlement>;
 
   constructor() {
     this.policyResolutionService = new PolicyResolutionService();
     this.commissionRepo = AppDataSource.getRepository(Commission);
     this.orderRepo = AppDataSource.getRepository(Order);
+    this.settlementRepo = AppDataSource.getRepository(Settlement);
   }
 
   /**
@@ -312,5 +327,240 @@ export class SettlementService {
         message: 'Stub: Full implementation in Phase 8'
       }
     };
+  }
+
+  /**
+   * Create a new settlement record
+   */
+  async create(data: Partial<Settlement>): Promise<Settlement> {
+    try {
+      // Convert numeric strings to proper format for database
+      const settlementData: any = {
+        ...data,
+        totalSaleAmount: data.totalSaleAmount?.toString() || '0',
+        totalBaseAmount: data.totalBaseAmount?.toString() || '0',
+        totalCommissionAmount: data.totalCommissionAmount?.toString() || '0',
+        totalMarginAmount: data.totalMarginAmount?.toString() || '0',
+        payableAmount: data.payableAmount?.toString() || '0',
+        status: data.status || SettlementStatus.PENDING
+      };
+
+      const settlement = this.settlementRepo.create(settlementData);
+      const saved = await this.settlementRepo.save(settlement);
+
+      logger.info('[Settlement] Settlement created', {
+        settlementId: saved.id,
+        partyType: saved.partyType,
+        partyId: saved.partyId,
+        period: `${saved.periodStart} - ${saved.periodEnd}`,
+        payableAmount: saved.payableAmount
+      });
+
+      return saved;
+    } catch (error: any) {
+      logger.error('[Settlement] Error creating settlement', {
+        error: error.message,
+        data
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Find settlement by ID
+   */
+  async findById(settlementId: string): Promise<Settlement | null> {
+    try {
+      const settlement = await this.settlementRepo.findOne({
+        where: { id: settlementId },
+        relations: ['items', 'party']
+      });
+
+      if (!settlement) {
+        logger.warn('[Settlement] Settlement not found', { settlementId });
+        return null;
+      }
+
+      return settlement;
+    } catch (error: any) {
+      logger.error('[Settlement] Error finding settlement by ID', {
+        error: error.message,
+        settlementId
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * List settlements with filters and pagination
+   */
+  async list(filters: SettlementFilters = {}) {
+    try {
+      const {
+        partyType,
+        partyId,
+        status,
+        startDate,
+        endDate,
+        sortBy = 'createdAt',
+        sortOrder = 'desc',
+        page = 1,
+        limit = 20
+      } = filters;
+
+      const queryBuilder = this.settlementRepo.createQueryBuilder('settlement')
+        .leftJoinAndSelect('settlement.party', 'party')
+        .leftJoinAndSelect('settlement.items', 'items');
+
+      if (partyType) {
+        queryBuilder.andWhere('settlement.partyType = :partyType', { partyType });
+      }
+
+      if (partyId) {
+        queryBuilder.andWhere('settlement.partyId = :partyId', { partyId });
+      }
+
+      if (status) {
+        queryBuilder.andWhere('settlement.status = :status', { status });
+      }
+
+      if (startDate) {
+        queryBuilder.andWhere('settlement.periodStart >= :startDate', { startDate });
+      }
+
+      if (endDate) {
+        queryBuilder.andWhere('settlement.periodEnd <= :endDate', { endDate });
+      }
+
+      const sortField = `settlement.${sortBy}`;
+      queryBuilder.orderBy(sortField, sortOrder.toUpperCase() as 'ASC' | 'DESC');
+
+      const offset = (page - 1) * limit;
+      queryBuilder.skip(offset).take(limit);
+
+      const [settlements, total] = await queryBuilder.getManyAndCount();
+
+      return {
+        settlements,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error: any) {
+      logger.error('[Settlement] Error listing settlements', {
+        error: error.message,
+        filters
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Update settlement
+   */
+  async update(settlementId: string, data: Partial<Settlement>): Promise<Settlement> {
+    try {
+      const existing = await this.settlementRepo.findOne({
+        where: { id: settlementId }
+      });
+
+      if (!existing) {
+        throw new Error('Settlement not found');
+      }
+
+      // Check if settlement can be modified
+      if (!existing.canModify() && data.status !== SettlementStatus.PAID) {
+        throw new Error('Cannot modify settlement in current status');
+      }
+
+      // Convert numeric values if present
+      const updateData: any = { ...data };
+      if (updateData.payableAmount !== undefined) {
+        updateData.payableAmount = updateData.payableAmount.toString();
+      }
+
+      const updated = await this.settlementRepo.save({
+        ...existing,
+        ...updateData,
+        updatedAt: new Date()
+      });
+
+      logger.info('[Settlement] Settlement updated', {
+        settlementId,
+        changes: Object.keys(data)
+      });
+
+      return updated;
+    } catch (error: any) {
+      logger.error('[Settlement] Error updating settlement', {
+        error: error.message,
+        settlementId,
+        data
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Process settlement (mark as paid/processing/cancelled)
+   */
+  async process(settlementId: string, action: 'pay' | 'cancel' | 'start_processing'): Promise<Settlement> {
+    try {
+      const settlement = await this.settlementRepo.findOne({
+        where: { id: settlementId }
+      });
+
+      if (!settlement) {
+        throw new Error('Settlement not found');
+      }
+
+      switch (action) {
+        case 'pay':
+          settlement.markAsPaid();
+          logger.info('[Settlement] Settlement marked as paid', {
+            settlementId,
+            partyType: settlement.partyType,
+            partyId: settlement.partyId,
+            payableAmount: settlement.payableAmount
+          });
+          break;
+
+        case 'cancel':
+          settlement.cancel();
+          logger.info('[Settlement] Settlement cancelled', {
+            settlementId,
+            partyType: settlement.partyType,
+            partyId: settlement.partyId
+          });
+          break;
+
+        case 'start_processing':
+          if (settlement.status !== SettlementStatus.PENDING) {
+            throw new Error('Can only start processing settlements in PENDING status');
+          }
+          settlement.status = SettlementStatus.PROCESSING;
+          logger.info('[Settlement] Settlement processing started', {
+            settlementId,
+            partyType: settlement.partyType,
+            partyId: settlement.partyId
+          });
+          break;
+
+        default:
+          throw new Error(`Unknown action: ${action}`);
+      }
+
+      const updated = await this.settlementRepo.save(settlement);
+
+      return updated;
+    } catch (error: any) {
+      logger.error('[Settlement] Error processing settlement', {
+        error: error.message,
+        settlementId,
+        action
+      });
+      throw error;
+    }
   }
 }
