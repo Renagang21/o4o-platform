@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { User, UserRole } from '../../entities/User.js';
-import { Role } from '../../entities/Role.js';
-import { Permission } from '../../entities/Permission.js';
+import { User, UserRole } from '../../modules/auth/entities/User.js';
+import { Role } from '../../modules/auth/entities/Role.js';
+import { Permission } from '../../modules/auth/entities/Permission.js';
 import { UserActivityLog, ActivityType } from '../../entities/UserActivityLog.js';
 import { validate } from 'class-validator';
 

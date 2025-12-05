@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection.js';
-import { User, UserRole, UserStatus } from '../entities/User.js';
+import { User, UserRole, UserStatus } from '../modules/auth/entities/User.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../middleware/error-handler.js';
 import { UnauthorizedError, BadRequestError, ValidationError, ServiceUnavailableError } from '../utils/api-error.js';
