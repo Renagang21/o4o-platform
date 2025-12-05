@@ -49,7 +49,7 @@ export class ApprovalController extends BaseController {
           message = 'Seller reactivated';
           break;
         default:
-          return BaseController.badRequest(res, `Unknown action: ${data.action}`);
+          return BaseController.error(res, `Unknown action: ${data.action}`, 400);
       }
 
       return BaseController.ok(res, {
@@ -96,7 +96,7 @@ export class ApprovalController extends BaseController {
           message = 'Supplier reactivated';
           break;
         default:
-          return BaseController.badRequest(res, `Unknown action: ${data.action}`);
+          return BaseController.error(res, `Unknown action: ${data.action}`, 400);
       }
 
       return BaseController.ok(res, {
