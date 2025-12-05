@@ -8,15 +8,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, Eye, Copy, Layers, Palette } from 'lucide-react';
 import cmsAPI, { View, ViewStatus } from '@/lib/cms';
-import toast from 'react-hot-toast';
+import { useToast } from '@/contexts/ToastContext';
 import PreviewFrame from '@/components/cms/PreviewFrame';
 
 export default function CMSViewList() {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [views, setViews] = useState<View[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<ViewStatus | 'all'>('all');
   const [previewSlug, setPreviewSlug] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadViews();
@@ -27,7 +28,15 @@ export default function CMSViewList() {
       setLoading(true);
       const params = filter !== 'all' ? { status: filter } : {};
       const response = await cmsAPI.listViews(params);
-      setViews(response.data);
+
+      // Debug: Log the response
+      console.log('[CMSViewList] API Response:', {
+        totalViews: response.data?.length || 0,
+        filter,
+        views: response.data
+      });
+
+      setViews(response.data || []);
     } catch (error) {
       console.error('Failed to load views:', error);
       toast.error('Failed to load View Templates');

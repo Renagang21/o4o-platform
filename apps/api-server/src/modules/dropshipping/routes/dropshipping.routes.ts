@@ -15,6 +15,7 @@ import {
 import {
   requireAuth,
   requireAdmin,
+  requireRole,
 } from '../../../common/middleware/auth.middleware.js';
 import {
   SellerApplicationDto,
@@ -90,6 +91,7 @@ router.get(
 router.get(
   '/sellers/me',
   requireAuth,
+  requireRole('seller'),
   asyncHandler(SellerController.getMySellerProfile)
 );
 
@@ -133,6 +135,7 @@ router.get(
 router.get(
   '/suppliers/me',
   requireAuth,
+  requireRole('vendor'),
   asyncHandler(SupplierController.getMySupplierProfile)
 );
 
@@ -176,6 +179,7 @@ router.get(
 router.get(
   '/partners/me',
   requireAuth,
+  requireRole('partner'),
   asyncHandler(PartnerController.getMyPartnerProfile)
 );
 
@@ -204,6 +208,7 @@ router.put(
 router.post(
   '/seller-products',
   requireAuth,
+  requireRole('seller'),
   validateDto(CreateSellerProductDto),
   asyncHandler(SellerProductController.createSellerProduct)
 );
@@ -212,6 +217,7 @@ router.post(
 router.get(
   '/seller-products',
   requireAuth,
+  requireRole(['seller', 'admin']),
   asyncHandler(SellerProductController.listSellerProducts)
 );
 
@@ -219,6 +225,7 @@ router.get(
 router.get(
   '/seller-products/:id',
   requireAuth,
+  requireRole(['seller', 'admin']),
   asyncHandler(SellerProductController.getSellerProduct)
 );
 
@@ -226,6 +233,7 @@ router.get(
 router.put(
   '/seller-products/:id',
   requireAuth,
+  requireRole('seller'),
   validateDto(UpdateSellerProductDto),
   asyncHandler(SellerProductController.updateSellerProduct)
 );
@@ -234,6 +242,7 @@ router.put(
 router.delete(
   '/seller-products/:id',
   requireAuth,
+  requireRole('seller'),
   asyncHandler(SellerProductController.deleteSellerProduct)
 );
 
@@ -371,6 +380,7 @@ router.post(
 router.get(
   '/dashboard/seller',
   requireAuth,
+  requireRole('seller'),
   asyncHandler(DashboardController.getSellerDashboard)
 );
 
@@ -378,6 +388,7 @@ router.get(
 router.get(
   '/dashboard/supplier',
   requireAuth,
+  requireRole('vendor'),
   asyncHandler(DashboardController.getSupplierDashboard)
 );
 
@@ -385,6 +396,7 @@ router.get(
 router.get(
   '/dashboard/partner',
   requireAuth,
+  requireRole('partner'),
   asyncHandler(DashboardController.getPartnerDashboard)
 );
 

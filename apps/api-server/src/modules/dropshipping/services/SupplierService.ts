@@ -321,6 +321,91 @@ export class SupplierService extends BaseService<Supplier> {
     }
   }
 
+  async rejectSupplier(supplierId: string): Promise<Supplier> {
+    try {
+      const supplier = await this.repository.findOne({
+        where: { id: supplierId },
+      });
+
+      if (!supplier) {
+        throw new Error('Supplier not found');
+      }
+
+      supplier.reject();
+      const rejected = await this.repository.save(supplier);
+
+      logger.info(`[SupplierService] Supplier rejected`, {
+        supplierId,
+        status: rejected.status
+      });
+
+      return rejected;
+    } catch (error: any) {
+      logger.error('[SupplierService.rejectSupplier] Error', {
+        error: error.message,
+        supplierId,
+      });
+      throw error;
+    }
+  }
+
+  async suspendSupplier(supplierId: string): Promise<Supplier> {
+    try {
+      const supplier = await this.repository.findOne({
+        where: { id: supplierId },
+      });
+
+      if (!supplier) {
+        throw new Error('Supplier not found');
+      }
+
+      supplier.suspend();
+      const suspended = await this.repository.save(supplier);
+
+      logger.info(`[SupplierService] Supplier suspended`, {
+        supplierId,
+        status: suspended.status
+      });
+
+      return suspended;
+    } catch (error: any) {
+      logger.error('[SupplierService.suspendSupplier] Error', {
+        error: error.message,
+        supplierId,
+      });
+      throw error;
+    }
+  }
+
+  async reactivateSupplier(supplierId: string): Promise<Supplier> {
+    try {
+      const supplier = await this.repository.findOne({
+        where: { id: supplierId },
+      });
+
+      if (!supplier) {
+        throw new Error('Supplier not found');
+      }
+
+      supplier.reactivate();
+      const reactivated = await this.repository.save(supplier);
+
+      logger.info(`[SupplierService] Supplier reactivated`, {
+        supplierId,
+        status: reactivated.status,
+        isActive: reactivated.isActive
+      });
+
+      return reactivated;
+    } catch (error: any) {
+      logger.error('[SupplierService.reactivateSupplier] Error', {
+        error: error.message,
+        supplierId,
+      });
+      throw error;
+    }
+  }
+
   async listSuppliers(filters: {
     status?: SupplierStatus;
     page?: number;
