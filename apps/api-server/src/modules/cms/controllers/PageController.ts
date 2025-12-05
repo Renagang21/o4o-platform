@@ -19,6 +19,17 @@ export class PageController extends BaseController {
       return BaseController.created(res, { page });
     } catch (error: any) {
       logger.error('[PageController.createPage] Error', { error: error.message });
+
+      // Handle duplicate slug error
+      if (error.message && error.message.includes('already exists')) {
+        return BaseController.error(res, error.message, 409);
+      }
+
+      // Handle validation errors
+      if (error.message && (error.message.includes('not found') || error.message.includes('Invalid'))) {
+        return BaseController.error(res, error.message, 400);
+      }
+
       return BaseController.error(res, error);
     }
   }
@@ -89,6 +100,22 @@ export class PageController extends BaseController {
       return BaseController.ok(res, { page });
     } catch (error: any) {
       logger.error('[PageController.updatePage] Error', { error: error.message });
+
+      // Handle not found error
+      if (error.message && error.message.includes('not found')) {
+        return BaseController.notFound(res, error.message);
+      }
+
+      // Handle duplicate slug error
+      if (error.message && error.message.includes('already exists')) {
+        return BaseController.error(res, error.message, 409);
+      }
+
+      // Handle validation errors
+      if (error.message && error.message.includes('Invalid')) {
+        return BaseController.error(res, error.message, 400);
+      }
+
       return BaseController.error(res, error);
     }
   }

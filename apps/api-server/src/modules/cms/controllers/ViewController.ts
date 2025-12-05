@@ -19,6 +19,17 @@ export class ViewController extends BaseController {
       return BaseController.created(res, { view });
     } catch (error: any) {
       logger.error('[ViewController.createView] Error', { error: error.message });
+
+      // Handle duplicate slug error
+      if (error.message && error.message.includes('already exists')) {
+        return BaseController.error(res, error.message, 409);
+      }
+
+      // Handle validation errors
+      if (error.message && error.message.includes('Invalid View schema')) {
+        return BaseController.error(res, error.message, 400);
+      }
+
       return BaseController.error(res, error);
     }
   }
@@ -89,6 +100,22 @@ export class ViewController extends BaseController {
       return BaseController.ok(res, { view });
     } catch (error: any) {
       logger.error('[ViewController.updateView] Error', { error: error.message });
+
+      // Handle not found error
+      if (error.message && error.message.includes('not found')) {
+        return BaseController.notFound(res, error.message);
+      }
+
+      // Handle duplicate slug error
+      if (error.message && error.message.includes('already exists')) {
+        return BaseController.error(res, error.message, 409);
+      }
+
+      // Handle validation errors
+      if (error.message && error.message.includes('Invalid View schema')) {
+        return BaseController.error(res, error.message, 400);
+      }
+
       return BaseController.error(res, error);
     }
   }
@@ -145,7 +172,7 @@ export class ViewController extends BaseController {
       const { slug, name } = req.body;
 
       if (!slug) {
-        return BaseController.error(res, 'slug is required');
+        return BaseController.error(res, 'slug is required', 400);
       }
 
       const service = ViewService.getInstance();
@@ -154,6 +181,17 @@ export class ViewController extends BaseController {
       return BaseController.created(res, { view: clonedView });
     } catch (error: any) {
       logger.error('[ViewController.cloneView] Error', { error: error.message });
+
+      // Handle not found error
+      if (error.message && error.message.includes('not found')) {
+        return BaseController.notFound(res, error.message);
+      }
+
+      // Handle duplicate slug error
+      if (error.message && error.message.includes('already exists')) {
+        return BaseController.error(res, error.message, 409);
+      }
+
       return BaseController.error(res, error);
     }
   }
