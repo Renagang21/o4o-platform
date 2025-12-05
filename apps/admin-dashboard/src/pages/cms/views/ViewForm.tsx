@@ -104,14 +104,21 @@ export default function ViewForm() {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
+      console.error('❌ Validation failed: Name is required');
     }
 
     if (!formData.slug.trim()) {
       newErrors.slug = 'Slug is required';
+      console.error('❌ Validation failed: Slug is required');
     }
 
     if (!formData.schema || !formData.schema.components) {
       newErrors.schema = 'Schema must have components array';
+      console.error('❌ Validation failed: Schema must have components array');
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      console.error('❌ Validation errors:', newErrors);
     }
 
     setErrors(newErrors);
@@ -133,11 +140,15 @@ export default function ViewForm() {
         await cmsAPI.updateView(id, formData);
         toast.success('View updated successfully');
       } else {
-        await cmsAPI.createView(formData);
+        const result = await cmsAPI.createView(formData);
+        console.log('✅ View created successfully:', result);
         toast.success('View created successfully');
       }
 
-      navigate('/admin/cms/views');
+      // Wait for toast to be visible before navigating
+      setTimeout(() => {
+        navigate('/admin/cms/views');
+      }, 1000);
     } catch (error: any) {
       console.error('Failed to save view:', error);
 

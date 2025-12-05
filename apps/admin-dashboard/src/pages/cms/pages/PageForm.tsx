@@ -137,11 +137,15 @@ export default function PageForm() {
         await cmsAPI.updatePage(id, formData);
         toast.success('Page updated successfully');
       } else {
-        await cmsAPI.createPage(formData);
+        const result = await cmsAPI.createPage(formData);
+        console.log('✅ Page created successfully:', result);
         toast.success('Page created successfully');
       }
 
-      navigate('/admin/cms/pages');
+      // Wait for toast to be visible before navigating
+      setTimeout(() => {
+        navigate('/admin/cms/pages');
+      }, 1000);
     } catch (error: any) {
       console.error('Failed to save page:', error);
 
