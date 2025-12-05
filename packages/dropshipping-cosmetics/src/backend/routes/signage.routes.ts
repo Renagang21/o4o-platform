@@ -5,11 +5,16 @@
  */
 
 import { Router } from 'express';
+import type { DataSource } from 'typeorm';
 import { SignageController } from '../controllers/signage.controller.js';
+import { CosmeticsFilterService } from '../services/cosmetics-filter.service.js';
+import { InfluencerRoutineService } from '../services/influencer-routine.service.js';
 
-export function createSignageRoutes(): Router {
+export function createSignageRoutes(dataSource: DataSource): Router {
   const router = Router();
-  const controller = new SignageController();
+  const filterService = new CosmeticsFilterService(dataSource);
+  const routineService = new InfluencerRoutineService(dataSource);
+  const controller = new SignageController(filterService, routineService);
 
   // GET /api/v1/cosmetics/products/signage - Get products for signage
   // Query params: skinType, concerns, category, limit, featured

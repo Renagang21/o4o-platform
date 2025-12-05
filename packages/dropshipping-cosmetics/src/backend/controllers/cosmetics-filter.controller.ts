@@ -11,8 +11,8 @@ import type { CosmeticsFilters } from '../../types.js';
 export class CosmeticsFilterController {
   private filterService: CosmeticsFilterService;
 
-  constructor() {
-    this.filterService = new CosmeticsFilterService();
+  constructor(filterService: CosmeticsFilterService) {
+    this.filterService = filterService;
   }
 
   /**

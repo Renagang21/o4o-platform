@@ -1,54 +1,62 @@
 /**
- * Influencer Routine Service
+ * Influencer Routine Service (DB-based)
  *
- * Manages influencer beauty routines
+ * Manages influencer beauty routines using TypeORM
  */
 
+import type { Repository, DataSource } from 'typeorm';
+import { CosmeticsRoutine } from '../entities/cosmetics-routine.entity.js';
 import type {
-  InfluencerRoutine,
   CreateRoutineDto,
   UpdateRoutineDto,
   RoutineStep,
 } from '../../types.js';
 
 export class InfluencerRoutineService {
-  private routines: Map<string, InfluencerRoutine> = new Map();
+  private repository: Repository<CosmeticsRoutine>;
+
+  constructor(dataSource: DataSource) {
+    this.repository = dataSource.getRepository(CosmeticsRoutine);
+  }
 
   /**
    * Create a new influencer routine
    */
-  async createRoutine(data: CreateRoutineDto): Promise<InfluencerRoutine> {
-    const id = this.generateId();
-    const now = new Date();
-
-    const routine: InfluencerRoutine = {
-      id,
-      ...data,
+  async createRoutine(data: CreateRoutineDto): Promise<CosmeticsRoutine> {
+    const routine = this.repository.create({
+      partnerId: data.partnerId,
+      title: data.title,
+      description: data.description || null,
+      steps: data.routine,
+      metadata: {
+        skinType: data.skinType,
+        concerns: data.concerns,
+        timeOfUse: data.timeOfUse,
+        tags: data.tags || [],
+      },
       isPublished: false,
       viewCount: 0,
       recommendCount: 0,
-      createdAt: now,
-      updatedAt: now,
-    };
+    });
 
-    this.routines.set(id, routine);
-    return routine;
+    return await this.repository.save(routine);
   }
 
   /**
    * Get routine by ID
    */
-  async getRoutineById(id: string): Promise<InfluencerRoutine | null> {
-    return this.routines.get(id) || null;
+  async getRoutineById(id: string): Promise<CosmeticsRoutine | null> {
+    return await this.repository.findOne({ where: { id } });
   }
 
   /**
    * Get routines by partner ID
    */
-  async getRoutinesByPartnerId(partnerId: string): Promise<InfluencerRoutine[]> {
-    return Array.from(this.routines.values()).filter(
-      (routine) => routine.partnerId === partnerId
-    );
+  async getRoutinesByPartnerId(partnerId: string): Promise<CosmeticsRoutine[]> {
+    return await this.repository.find({
+      where: { partnerId },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   /**
@@ -59,51 +67,52 @@ export class InfluencerRoutineService {
     concerns?: string[];
     timeOfUse?: 'morning' | 'evening' | 'both';
     tags?: string[];
-  }): Promise<InfluencerRoutine[]> {
-    let routines = Array.from(this.routines.values()).filter(
-      (routine) => routine.isPublished
-    );
+  }): Promise<CosmeticsRoutine[]> {
+    const queryBuilder = this.repository
+      .createQueryBuilder('routine')
+      .where('routine.isPublished = :isPublished', { isPublished: true });
 
     if (filters) {
       // Filter by skin type
       if (filters.skinType && filters.skinType.length > 0) {
-        routines = routines.filter((routine) =>
-          filters.skinType!.some((type) => routine.skinType.includes(type))
+        queryBuilder.andWhere(
+          'routine.metadata->>\'skinType\' ?| array[:...skinTypes]',
+          { skinTypes: filters.skinType }
         );
       }
 
       // Filter by concerns
       if (filters.concerns && filters.concerns.length > 0) {
-        routines = routines.filter((routine) =>
-          filters.concerns!.some((concern) => routine.concerns.includes(concern))
+        queryBuilder.andWhere(
+          'routine.metadata->>\'concerns\' ?| array[:...concerns]',
+          { concerns: filters.concerns }
         );
       }
 
       // Filter by time of use
       if (filters.timeOfUse) {
-        routines = routines.filter(
-          (routine) =>
-            routine.timeOfUse === filters.timeOfUse ||
-            routine.timeOfUse === 'both'
+        queryBuilder.andWhere(
+          '(routine.metadata->>\'timeOfUse\' = :timeOfUse OR routine.metadata->>\'timeOfUse\' = \'both\')',
+          { timeOfUse: filters.timeOfUse }
         );
       }
 
       // Filter by tags
       if (filters.tags && filters.tags.length > 0) {
-        routines = routines.filter((routine) =>
-          filters.tags!.some((tag) => routine.tags?.includes(tag))
+        queryBuilder.andWhere(
+          'routine.metadata->>\'tags\' ?| array[:...tags]',
+          { tags: filters.tags }
         );
       }
     }
 
-    // Sort by view count and recommend count
-    routines.sort((a, b) => {
-      const scoreA = a.viewCount + a.recommendCount * 2;
-      const scoreB = b.viewCount + b.recommendCount * 2;
-      return scoreB - scoreA;
-    });
+    // Sort by popularity (view count + recommend count * 2)
+    queryBuilder.orderBy(
+      'routine.viewCount + routine.recommendCount * 2',
+      'DESC'
+    );
 
-    return routines;
+    return await queryBuilder.getMany();
   }
 
   /**
@@ -114,8 +123,8 @@ export class InfluencerRoutineService {
     updates: UpdateRoutineDto,
     userId: string,
     userRole: string
-  ): Promise<InfluencerRoutine | null> {
-    const routine = this.routines.get(id);
+  ): Promise<CosmeticsRoutine | null> {
+    const routine = await this.repository.findOne({ where: { id } });
     if (!routine) {
       return null;
     }
@@ -127,14 +136,24 @@ export class InfluencerRoutineService {
       throw new Error('Unauthorized: You can only update your own routines');
     }
 
-    const updated: InfluencerRoutine = {
-      ...routine,
-      ...updates,
-      updatedAt: new Date(),
-    };
+    // Update metadata if provided
+    if (updates.skinType || updates.concerns || updates.timeOfUse || updates.tags) {
+      routine.metadata = {
+        ...routine.metadata,
+        ...(updates.skinType && { skinType: updates.skinType }),
+        ...(updates.concerns && { concerns: updates.concerns }),
+        ...(updates.timeOfUse && { timeOfUse: updates.timeOfUse }),
+        ...(updates.tags && { tags: updates.tags }),
+      };
+    }
 
-    this.routines.set(id, updated);
-    return updated;
+    // Update other fields
+    if (updates.title) routine.title = updates.title;
+    if (updates.description !== undefined) routine.description = updates.description || null;
+    if (updates.routine) routine.steps = updates.routine;
+    if (updates.isPublished !== undefined) routine.isPublished = updates.isPublished;
+
+    return await this.repository.save(routine);
   }
 
   /**
@@ -145,7 +164,7 @@ export class InfluencerRoutineService {
     userId: string,
     userRole: string
   ): Promise<boolean> {
-    const routine = this.routines.get(id);
+    const routine = await this.repository.findOne({ where: { id } });
     if (!routine) {
       return false;
     }
@@ -157,32 +176,38 @@ export class InfluencerRoutineService {
 
     // Soft delete: just unpublish
     routine.isPublished = false;
-    routine.updatedAt = new Date();
-    this.routines.set(id, routine);
+    await this.repository.save(routine);
 
     return true;
+  }
+
+  /**
+   * Hard delete routine (only for admin)
+   */
+  async hardDeleteRoutine(
+    id: string,
+    userRole: string
+  ): Promise<boolean> {
+    if (userRole !== 'admin') {
+      throw new Error('Unauthorized: Only admins can hard delete routines');
+    }
+
+    const result = await this.repository.delete({ id });
+    return (result.affected || 0) > 0;
   }
 
   /**
    * Increment view count
    */
   async incrementViewCount(id: string): Promise<void> {
-    const routine = this.routines.get(id);
-    if (routine) {
-      routine.viewCount += 1;
-      this.routines.set(id, routine);
-    }
+    await this.repository.increment({ id }, 'viewCount', 1);
   }
 
   /**
    * Increment recommend count
    */
   async incrementRecommendCount(id: string): Promise<void> {
-    const routine = this.routines.get(id);
-    if (routine) {
-      routine.recommendCount += 1;
-      this.routines.set(id, routine);
-    }
+    await this.repository.increment({ id }, 'recommendCount', 1);
   }
 
   /**
@@ -223,10 +248,30 @@ export class InfluencerRoutineService {
   }
 
   /**
-   * Generate unique ID
+   * Get routine statistics
    */
-  private generateId(): string {
-    return `routine_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  async getRoutineStatistics(partnerId?: string): Promise<{
+    total: number;
+    published: number;
+    unpublished: number;
+    totalViews: number;
+    totalRecommends: number;
+  }> {
+    const queryBuilder = this.repository.createQueryBuilder('routine');
+
+    if (partnerId) {
+      queryBuilder.where('routine.partnerId = :partnerId', { partnerId });
+    }
+
+    const routines = await queryBuilder.getMany();
+
+    return {
+      total: routines.length,
+      published: routines.filter((r) => r.isPublished).length,
+      unpublished: routines.filter((r) => !r.isPublished).length,
+      totalViews: routines.reduce((sum, r) => sum + r.viewCount, 0),
+      totalRecommends: routines.reduce((sum, r) => sum + r.recommendCount, 0),
+    };
   }
 }
 

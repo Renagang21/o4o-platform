@@ -1,9 +1,11 @@
 /**
- * Cosmetics Filter Service
+ * Cosmetics Filter Service (DB-based)
  *
- * Manages cosmetics-specific product filtering logic
+ * Manages cosmetics-specific product filtering logic using TypeORM
  */
 
+import type { Repository, DataSource } from 'typeorm';
+import { CosmeticsFilter } from '../entities/cosmetics-filter.entity.js';
 import type { CosmeticsFilters, CosmeticsMetadata } from '../../types.js';
 
 export interface FilterConfiguration {
@@ -17,107 +19,128 @@ export interface FilterConfiguration {
 }
 
 export class CosmeticsFilterService {
-  private filterConfigurations: Map<string, FilterConfiguration> = new Map();
+  private repository: Repository<CosmeticsFilter>;
 
-  constructor() {
-    // Initialize with default configurations
-    this.initializeDefaultFilters();
+  constructor(dataSource: DataSource) {
+    this.repository = dataSource.getRepository(CosmeticsFilter);
   }
 
   /**
-   * Initialize default filter configurations
+   * Initialize default filters (call during installation)
    */
-  private initializeDefaultFilters(): void {
-    const defaults: FilterConfiguration[] = [
+  async initializeDefaultFilters(): Promise<void> {
+    const existingCount = await this.repository.count();
+
+    if (existingCount > 0) {
+      // Filters already initialized
+      return;
+    }
+
+    const defaults: Omit<CosmeticsFilter, 'id' | 'createdAt' | 'updatedAt'>[] = [
       {
-        id: 'skinType',
         name: 'Skin Type Filter',
         type: 'skinType',
-        values: ['dry', 'oily', 'combination', 'sensitive', 'normal'],
+        filters: {
+          values: ['dry', 'oily', 'combination', 'sensitive', 'normal'],
+        },
         enabled: true,
+        updatedBy: null,
       },
       {
-        id: 'concerns',
         name: 'Skin Concerns Filter',
         type: 'concerns',
-        values: [
-          'acne',
-          'whitening',
-          'wrinkle',
-          'pore',
-          'soothing',
-          'moisturizing',
-          'elasticity',
-          'trouble',
-        ],
+        filters: {
+          values: [
+            'acne',
+            'whitening',
+            'wrinkle',
+            'pore',
+            'soothing',
+            'moisturizing',
+            'elasticity',
+            'trouble',
+          ],
+        },
         enabled: true,
+        updatedBy: null,
       },
       {
-        id: 'certifications',
         name: 'Certifications Filter',
         type: 'certifications',
-        values: [
-          'vegan',
-          'hypoallergenic',
-          'organic',
-          'ewgGreen',
-          'crueltyfree',
-          'dermatologicallyTested',
-        ],
+        filters: {
+          values: [
+            'vegan',
+            'hypoallergenic',
+            'organic',
+            'ewgGreen',
+            'crueltyfree',
+            'dermatologicallyTested',
+          ],
+        },
         enabled: true,
+        updatedBy: null,
       },
       {
-        id: 'category',
         name: 'Product Category Filter',
         type: 'category',
-        values: [
-          'skincare',
-          'cleansing',
-          'makeup',
-          'suncare',
-          'mask',
-          'bodycare',
-          'haircare',
-        ],
+        filters: {
+          values: [
+            'skincare',
+            'cleansing',
+            'makeup',
+            'suncare',
+            'mask',
+            'bodycare',
+            'haircare',
+          ],
+        },
         enabled: true,
+        updatedBy: null,
       },
       {
-        id: 'texture',
         name: 'Texture Filter',
         type: 'texture',
-        values: [
-          'gel',
-          'cream',
-          'lotion',
-          'serum',
-          'oil',
-          'foam',
-          'water',
-          'balm',
-        ],
+        filters: {
+          values: [
+            'gel',
+            'cream',
+            'lotion',
+            'serum',
+            'oil',
+            'foam',
+            'water',
+            'balm',
+          ],
+        },
         enabled: true,
+        updatedBy: null,
       },
     ];
 
-    defaults.forEach((config) => {
-      if (config.id) {
-        this.filterConfigurations.set(config.id, config);
-      }
-    });
+    await this.repository.save(defaults as any);
   }
 
   /**
    * Get all filter configurations
    */
-  async getAllFilters(): Promise<FilterConfiguration[]> {
-    return Array.from(this.filterConfigurations.values());
+  async getAllFilters(): Promise<CosmeticsFilter[]> {
+    return await this.repository.find({
+      order: { name: 'ASC' },
+    });
   }
 
   /**
    * Get filter configuration by ID
    */
-  async getFilterById(id: string): Promise<FilterConfiguration | null> {
-    return this.filterConfigurations.get(id) || null;
+  async getFilterById(id: string): Promise<CosmeticsFilter | null> {
+    return await this.repository.findOne({ where: { id } });
+  }
+
+  /**
+   * Get filter configuration by name
+   */
+  async getFilterByName(name: string): Promise<CosmeticsFilter | null> {
+    return await this.repository.findOne({ where: { name } });
   }
 
   /**
@@ -125,22 +148,20 @@ export class CosmeticsFilterService {
    */
   async updateFilter(
     id: string,
-    updates: Partial<FilterConfiguration>
-  ): Promise<FilterConfiguration | null> {
-    const existing = this.filterConfigurations.get(id);
+    updates: Partial<CosmeticsFilter>,
+    userId?: string
+  ): Promise<CosmeticsFilter | null> {
+    const existing = await this.repository.findOne({ where: { id } });
     if (!existing) {
       return null;
     }
 
-    const updated: FilterConfiguration = {
-      ...existing,
+    const updated = this.repository.merge(existing, {
       ...updates,
-      id,
-      updatedAt: new Date(),
-    };
+      updatedBy: userId || null,
+    });
 
-    this.filterConfigurations.set(id, updated);
-    return updated;
+    return await this.repository.save(updated);
   }
 
   /**

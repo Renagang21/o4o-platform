@@ -5,15 +5,18 @@
  */
 
 import { Router } from 'express';
+import type { DataSource } from 'typeorm';
 import { InfluencerRoutineController } from '../controllers/influencer-routine.controller.js';
+import { InfluencerRoutineService } from '../services/influencer-routine.service.js';
 import {
   requirePermission,
   CosmeticsPermissions,
 } from '../middleware/permissions.middleware.js';
 
-export function createInfluencerRoutineRoutes(): Router {
+export function createInfluencerRoutineRoutes(dataSource: DataSource): Router {
   const router = Router();
-  const controller = new InfluencerRoutineController();
+  const routineService = new InfluencerRoutineService(dataSource);
+  const controller = new InfluencerRoutineController(routineService);
 
   // POST /api/v1/partner/routines - Create new routine
   // Required permission: cosmetics:recommend_routine

@@ -41,9 +41,12 @@ export class SignageController {
   private filterService: CosmeticsFilterService;
   private routineService: InfluencerRoutineService;
 
-  constructor() {
-    this.filterService = new CosmeticsFilterService();
-    this.routineService = new InfluencerRoutineService();
+  constructor(
+    filterService: CosmeticsFilterService,
+    routineService: InfluencerRoutineService
+  ) {
+    this.filterService = filterService;
+    this.routineService = routineService;
   }
 
   /**
@@ -123,10 +126,10 @@ export class SignageController {
           title: routine.title,
           partnerId: routine.partnerId,
           partnerName: undefined, // TODO: Get from partner service
-          skinType: routine.skinType,
-          concerns: routine.concerns,
-          timeOfUse: routine.timeOfUse,
-          steps: routine.routine.map((step) => ({
+          skinType: routine.metadata.skinType || [],
+          concerns: routine.metadata.concerns || [],
+          timeOfUse: routine.metadata.timeOfUse || 'both',
+          steps: routine.steps.map((step: any) => ({
             order: step.orderInRoutine,
             category: step.category,
             productName: step.product?.name || 'Unknown Product',

@@ -11,8 +11,8 @@ import type { CreateRoutineDto, UpdateRoutineDto } from '../../types.js';
 export class InfluencerRoutineController {
   private routineService: InfluencerRoutineService;
 
-  constructor() {
-    this.routineService = new InfluencerRoutineService();
+  constructor(routineService: InfluencerRoutineService) {
+    this.routineService = routineService;
   }
 
   /**

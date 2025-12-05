@@ -5,15 +5,18 @@
  */
 
 import { Router } from 'express';
+import type { DataSource } from 'typeorm';
 import { CosmeticsFilterController } from '../controllers/cosmetics-filter.controller.js';
+import { CosmeticsFilterService } from '../services/cosmetics-filter.service.js';
 import {
   requirePermission,
   CosmeticsPermissions,
 } from '../middleware/permissions.middleware.js';
 
-export function createCosmeticsFilterRoutes(): Router {
+export function createCosmeticsFilterRoutes(dataSource: DataSource): Router {
   const router = Router();
-  const controller = new CosmeticsFilterController();
+  const filterService = new CosmeticsFilterService(dataSource);
+  const controller = new CosmeticsFilterController(filterService);
 
   // GET /api/v1/cosmetics/filters - Get all filter configurations
   router.get('/filters', (req, res) => controller.getAllFilters(req, res));
