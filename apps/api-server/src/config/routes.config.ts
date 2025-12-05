@@ -179,6 +179,9 @@ import deploymentRoutes from '../routes/deployment.routes.js';
 // Site Routes
 import sitesRoutes from '../modules/sites/sites.routes.js';
 
+// ✅ NEW: Membership-Yaksa Routes
+import { createMembershipRoutes } from '../../../packages/membership-yaksa/dist/backend/routes/index.js';
+
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
 
@@ -464,6 +467,11 @@ export function setupRoutes(app: Application): void {
   // Provides: CustomPostType, CustomField, View, Page endpoints
   // See: src/modules/cms/routes/cms.routes.ts
   app.use('/api/v1/cms', standardLimiter, cmsRoutes);
+
+  // ✅ NEW: Membership-Yaksa Routes
+  // Provides: Member, MemberCategory, Affiliation, Verification endpoints
+  // See: packages/membership-yaksa/src/backend/routes/index.ts
+  app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource));
 
   // ❌ DEPRECATED: Old CMS routes path - Use /api/v1/cms instead (Removal: 2025-06-03)
   // app.use('/api/cms', standardLimiter, nextgenCMSRoutes);

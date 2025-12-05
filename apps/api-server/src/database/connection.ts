@@ -131,6 +131,14 @@ import { CustomField as CMSCustomField } from '../modules/cms/entities/CustomFie
 import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
+// ✅ NEW: Membership-Yaksa entities
+import { Member } from '../../../packages/membership-yaksa/dist/backend/entities/Member.js';
+import { MemberCategory } from '../../../packages/membership-yaksa/dist/backend/entities/MemberCategory.js';
+import { Affiliation } from '../../../packages/membership-yaksa/dist/backend/entities/Affiliation.js';
+import { MembershipRoleAssignment } from '../../../packages/membership-yaksa/dist/backend/entities/MembershipRoleAssignment.js';
+import { MembershipYear } from '../../../packages/membership-yaksa/dist/backend/entities/MembershipYear.js';
+import { Verification } from '../../../packages/membership-yaksa/dist/backend/entities/Verification.js';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -297,6 +305,13 @@ export const AppDataSource = new DataSource({
     CMSCustomField,
     CMSView,
     CMSPage,
+    // ✅ NEW: Membership-Yaksa entities
+    Member,
+    MemberCategory,
+    Affiliation,
+    MembershipRoleAssignment,
+    MembershipYear,
+    Verification,
   ],
   
   // 마이그레이션 설정

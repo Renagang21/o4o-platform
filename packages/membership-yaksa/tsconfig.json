@@ -21,7 +21,8 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/backend/**/*"
   ],
   "exclude": [
     "dist",
