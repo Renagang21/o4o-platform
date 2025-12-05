@@ -1,0 +1,37 @@
+{
+  "name": "@o4o/dropshipping-cosmetics",
+  "version": "1.0.0",
+  "description": "Cosmetics extension for Dropshipping Core",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "npx tsc --build",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "pnpm": ">=9.0.0"
+  }
+}
