@@ -249,7 +249,19 @@ export const cmsAPI = {
     config?: Record<string, any>;
     conditionalLogic?: any[];
   }): Promise<CustomField> {
-    const response = await api.post('/cms/fields', data);
+    // Map frontend 'name' field to server 'key' field
+    const serverData = {
+      postTypeId: data.postTypeId,
+      key: data.name,  // Server expects 'key', frontend sends 'name'
+      label: data.label,
+      type: data.type,
+      group: data.groupName,
+      order: data.order,
+      validation: data.required ? { required: true } : undefined,
+      options: data.config,
+      conditional: data.conditionalLogic,
+    };
+    const response = await api.post('/cms/fields', serverData);
     return response.data.data;
   },
 
@@ -277,8 +289,20 @@ export const cmsAPI = {
     return response.data.data;
   },
 
-  async updateField(id: string, data: Partial<CustomField>): Promise<CustomField> {
-    const response = await api.put(`/cms/fields/${id}`, data);
+  async updateField(id: string, data: Partial<CustomField> & { groupName?: string; required?: boolean; config?: Record<string, any>; conditionalLogic?: any[] }): Promise<CustomField> {
+    // Map frontend fields to server fields
+    const serverData: Record<string, any> = {};
+    if (data.postTypeId) serverData.postTypeId = data.postTypeId;
+    if (data.name) serverData.key = data.name;  // Server expects 'key'
+    if (data.label) serverData.label = data.label;
+    if (data.type) serverData.type = data.type;
+    if (data.groupName !== undefined) serverData.group = data.groupName;
+    if (data.order !== undefined) serverData.order = data.order;
+    if (data.required !== undefined) serverData.validation = data.required ? { required: true } : {};
+    if (data.config) serverData.options = data.config;
+    if (data.conditionalLogic) serverData.conditional = data.conditionalLogic;
+
+    const response = await api.put(`/cms/fields/${id}`, serverData);
     return response.data.data;
   },
 

@@ -86,7 +86,7 @@ export const wordpressMenuItems: MenuItem[] = [
         id: 'view-designer',
         label: 'View Designer',
         icon: <Palette className="w-4 h-4" />,
-        path: '/admin/cms/views/designer',
+        path: '/admin/cms/views',  // Navigate to views list, then select a view to edit with designer
       },
     ],
   },
