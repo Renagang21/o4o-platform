@@ -171,7 +171,7 @@ export const AppDataSource = new DataSource({
   // namingStrategy: new SnakeNamingStrategy(),
   
   // 프로덕션 환경 설정
-  synchronize: false, // 프로덕션에서는 항상 false
+  synchronize: true, // TEMPORARY: Auto-create CMS V2 tables
   logging: ['error'], // 프로덕션에서는 에러만 로깅
   
   // 연결 풀 설정 (PostgreSQL에서만 사용)
