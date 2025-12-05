@@ -271,9 +271,10 @@ export const cmsAPI = {
     limit?: number;
   }): Promise<APIListResponse<CustomField>> {
     const response = await api.get('/cms/fields', { params });
-    // Server returns { fields, total }, map to { data, pagination }
-    const serverData = response.data;
-    const fields = (serverData.fields || []).map((field: any) => ({
+    // Server returns { success, data: { fields, total } }
+    const serverData = response.data?.data || response.data;
+    const rawFields = serverData.fields || [];
+    const fields = rawFields.map((field: any) => ({
       ...field,
       name: field.key,  // Server uses 'key', client uses 'name'
       groupName: field.group,
