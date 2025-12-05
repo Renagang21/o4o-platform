@@ -29,11 +29,11 @@ export class Page {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'viewid' })
   viewId?: string; // Associated View template
 
   @ManyToOne('View', { nullable: true })
-  @JoinColumn({ name: 'viewId' })
+  @JoinColumn({ name: 'viewid' })
   view?: View;
 
   @Column({ type: 'jsonb' })
@@ -42,10 +42,10 @@ export class Page {
   @Column({ type: 'enum', enum: PageStatus, default: PageStatus.DRAFT })
   status: PageStatus;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'publishedat' })
   publishedAt?: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'scheduledat' })
   scheduledAt?: Date; // For scheduled publishing
 
   @Column({ type: 'jsonb', nullable: true })
@@ -60,10 +60,10 @@ export class Page {
   @Column({ type: 'jsonb', nullable: true })
   versions?: PageVersion[]; // Version history
 
-  @Column({ type: 'integer', default: 1 })
+  @Column({ type: 'integer', default: 1, name: 'currentversion' })
   currentVersion: number;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'siteid' })
   siteId?: string; // Multi-site support
 
   @Column({ type: 'simple-array', nullable: true })
@@ -72,10 +72,10 @@ export class Page {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 
   // Helper Methods

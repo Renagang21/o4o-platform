@@ -43,11 +43,11 @@ export class CustomField {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'posttypeid' })
   postTypeId: string;
 
   @ManyToOne('CustomPostType', { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'postTypeId' })
+  @JoinColumn({ name: 'posttypeid' })
   postType: CustomPostType;
 
   @Column({ type: 'varchar', length: 100, unique: true })
@@ -65,7 +65,7 @@ export class CustomField {
   @Column({ type: 'text', nullable: true })
   placeholder?: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'defaultvalue' })
   defaultValue?: string;
 
   @Column({ type: 'jsonb', nullable: true })
@@ -77,19 +77,19 @@ export class CustomField {
   @Column({ type: 'jsonb', nullable: true })
   conditional?: FieldConditional[]; // Show field only if conditions met
 
-  @Column({ type: 'integer', default: 0 })
+  @Column({ type: 'integer', default: 0, name: 'order' })
   order: number; // Display order in form
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'group' })
   group?: string; // Group fields together (e.g., 'Contact Info')
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: true, name: 'isactive' })
   isActive: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 
   // Helper Methods

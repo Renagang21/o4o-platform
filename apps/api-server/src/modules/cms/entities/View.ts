@@ -76,7 +76,7 @@ export class View {
   @Column({ type: 'jsonb' })
   schema: ViewSchema; // ViewRenderer-compatible JSON
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'posttypeslug' })
   postTypeSlug?: string; // Associated CPT (e.g., 'blog')
 
   @Column({ type: 'simple-array', nullable: true })
@@ -85,10 +85,10 @@ export class View {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 
   // Helper Methods

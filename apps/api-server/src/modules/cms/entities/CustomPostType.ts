@@ -38,28 +38,28 @@ export class CustomPostType {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'jsonb' })
+  @Column({ type: 'jsonb', name: 'schema' })
   schema: CPTSchema; // Field definitions
 
-  @Column({ type: 'enum', enum: CPTStatus, default: CPTStatus.DRAFT })
+  @Column({ type: 'enum', enum: CPTStatus, default: CPTStatus.DRAFT, name: 'status' })
   status: CPTStatus;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: true, name: 'ispublic' })
   isPublic: boolean; // Can be used in public pages
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'ishierarchical' })
   isHierarchical: boolean; // Supports parent/child posts
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'simple-array', nullable: true, name: 'supportedfeatures' })
   supportedFeatures?: string[]; // ['comments', 'revisions', 'featured_image']
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'jsonb', nullable: true, name: 'metadata' })
   metadata?: Record<string, any>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdat' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedat' })
   updatedAt: Date;
 
   // Helper Methods
