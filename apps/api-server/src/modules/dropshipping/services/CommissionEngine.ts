@@ -624,6 +624,175 @@ export class CommissionEngine {
   }
 
   /**
+   * Create commission policy
+   */
+  async createPolicy(data: Partial<CommissionPolicy>): Promise<CommissionPolicy> {
+    try {
+      // Check for duplicate policy code
+      if (data.policyCode) {
+        const existing = await this.policyRepository.findOne({
+          where: { policyCode: data.policyCode }
+        });
+        if (existing) {
+          throw new Error(`Policy with code '${data.policyCode}' already exists`);
+        }
+      }
+
+      // Convert date strings to Date objects if needed
+      if (typeof data.validFrom === 'string') {
+        data.validFrom = new Date(data.validFrom) as any;
+      }
+      if (typeof data.validUntil === 'string') {
+        data.validUntil = new Date(data.validUntil) as any;
+      }
+
+      const policy = this.policyRepository.create(data);
+      const saved = await this.policyRepository.save(policy);
+
+      logger.info(`Commission policy created: ${saved.policyCode} (${saved.id})`);
+      return saved;
+
+    } catch (error) {
+      logger.error('Error creating commission policy:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get commission policy by ID
+   */
+  async getPolicy(policyId: string): Promise<CommissionPolicy | null> {
+    try {
+      const policy = await this.policyRepository.findOne({
+        where: { id: policyId }
+      });
+
+      if (!policy) {
+        logger.warn(`Commission policy not found: ${policyId}`);
+        return null;
+      }
+
+      return policy;
+
+    } catch (error) {
+      logger.error('Error fetching commission policy:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update commission policy
+   */
+  async updatePolicy(policyId: string, data: Partial<CommissionPolicy>): Promise<CommissionPolicy> {
+    try {
+      const existing = await this.policyRepository.findOne({
+        where: { id: policyId }
+      });
+
+      if (!existing) {
+        throw new Error('Commission policy not found');
+      }
+
+      // Prevent changing policy code if it would create a duplicate
+      if (data.policyCode && data.policyCode !== existing.policyCode) {
+        const duplicate = await this.policyRepository.findOne({
+          where: { policyCode: data.policyCode }
+        });
+        if (duplicate) {
+          throw new Error(`Policy with code '${data.policyCode}' already exists`);
+        }
+      }
+
+      // Convert date strings to Date objects if needed
+      const updateData: any = { ...data };
+      if (typeof updateData.validFrom === 'string') {
+        updateData.validFrom = new Date(updateData.validFrom);
+      }
+      if (typeof updateData.validUntil === 'string') {
+        updateData.validUntil = new Date(updateData.validUntil);
+      }
+
+      const updated = await this.policyRepository.save({
+        ...existing,
+        ...updateData,
+        updatedAt: new Date()
+      });
+
+      logger.info(`Commission policy updated: ${updated.policyCode} (${updated.id})`);
+      return updated;
+
+    } catch (error) {
+      logger.error('Error updating commission policy:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * List commission policies with filters and pagination
+   */
+  async listPolicies(filters: PolicyFilters = {}) {
+    try {
+      const {
+        policyType,
+        status,
+        partnerId,
+        productId,
+        category,
+        isActive,
+        sortBy = 'priority',
+        sortOrder = 'desc',
+        page = 1,
+        limit = 50
+      } = filters;
+
+      const queryBuilder = this.policyRepository.createQueryBuilder('policy');
+
+      if (policyType) {
+        queryBuilder.andWhere('policy.policyType = :policyType', { policyType });
+      }
+
+      if (status) {
+        queryBuilder.andWhere('policy.status = :status', { status });
+      }
+
+      if (partnerId) {
+        queryBuilder.andWhere('policy.partnerId = :partnerId', { partnerId });
+      }
+
+      if (productId) {
+        queryBuilder.andWhere('policy.productId = :productId', { productId });
+      }
+
+      if (category) {
+        queryBuilder.andWhere('policy.category = :category', { category });
+      }
+
+      // Note: isActive filter requires checking time-based validity
+      // This is a simplification - full implementation would use a method
+
+      const sortField = `policy.${sortBy}`;
+      queryBuilder.orderBy(sortField, sortOrder.toUpperCase() as 'ASC' | 'DESC');
+
+      const offset = (page - 1) * limit;
+      queryBuilder.skip(offset).take(limit);
+
+      const [policies, total] = await queryBuilder.getManyAndCount();
+
+      return {
+        policies,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      };
+
+    } catch (error) {
+      logger.error('Error listing commission policies:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get commission stats
    */
   async getCommissionStats(partnerId: string, dateFrom?: Date, dateTo?: Date) {

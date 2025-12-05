@@ -1,7 +1,52 @@
-import { IsString, IsNumber, IsOptional, IsEnum, IsNotEmpty, Min, Max, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsNotEmpty,
+  Min,
+  Max,
+  IsUUID,
+  IsBoolean,
+  IsArray,
+  IsInt,
+  ValidateNested,
+  IsDateString
+} from 'class-validator';
 import { Type } from 'class-transformer';
+import { PolicyType, PolicyStatus, CommissionType } from '../entities/CommissionPolicy.js';
+
+export class TieredRateDto {
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  minAmount!: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  maxAmount?: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  @Type(() => Number)
+  @IsOptional()
+  rate?: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  amount?: number;
+}
 
 export class CreateCommissionPolicyDto {
+  @IsString()
+  @IsNotEmpty()
+  policyCode!: string;
+
   @IsString()
   @IsNotEmpty()
   name!: string;
@@ -10,51 +55,132 @@ export class CreateCommissionPolicyDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(['rate', 'fixed'])
+  @IsEnum(PolicyType)
   @IsNotEmpty()
-  type!: 'rate' | 'fixed';
+  policyType!: PolicyType;
 
-  @IsNumber()
+  @IsEnum(PolicyStatus)
+  @IsOptional()
+  status?: PolicyStatus;
+
+  @IsInt()
   @Min(0)
   @Type(() => Number)
-  value!: number;
-
-  @IsUUID()
   @IsOptional()
-  sellerId?: string;
-
-  @IsUUID()
-  @IsOptional()
-  supplierId?: string;
+  priority?: number;
 
   @IsUUID()
   @IsOptional()
   partnerId?: string;
 
+  @IsString()
+  @IsOptional()
+  partnerTier?: string;
+
   @IsUUID()
   @IsOptional()
   productId?: string;
 
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  @Type(() => Number)
+  @IsUUID()
   @IsOptional()
-  platformShare?: number;
+  supplierId?: string;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsEnum(CommissionType)
+  @IsNotEmpty()
+  commissionType!: CommissionType;
 
   @IsNumber()
   @Min(0)
   @Max(100)
   @Type(() => Number)
   @IsOptional()
-  sellerShare?: number;
+  commissionRate?: number;
 
   @IsNumber()
   @Min(0)
-  @Max(100)
   @Type(() => Number)
   @IsOptional()
-  partnerShare?: number;
+  commissionAmount?: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TieredRateDto)
+  @IsOptional()
+  tieredRates?: TieredRateDto[];
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  minCommission?: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  maxCommission?: number;
+
+  @IsDateString()
+  @IsOptional()
+  validFrom?: string;
+
+  @IsDateString()
+  @IsOptional()
+  validUntil?: string;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  minOrderAmount?: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  maxOrderAmount?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  requiresNewCustomer?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  excludeDiscountedItems?: boolean;
+
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  maxUsagePerPartner?: number;
+
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  maxUsageTotal?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  canStackWithOtherPolicies?: boolean;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  exclusiveWith?: string[];
+
+  @IsBoolean()
+  @IsOptional()
+  requiresApproval?: boolean;
 }
 
 export class UpdateCommissionPolicyDto {
@@ -66,34 +192,122 @@ export class UpdateCommissionPolicyDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(['rate', 'fixed'])
+  @IsEnum(PolicyStatus)
   @IsOptional()
-  type?: 'rate' | 'fixed';
+  status?: PolicyStatus;
 
-  @IsNumber()
+  @IsInt()
   @Min(0)
   @Type(() => Number)
   @IsOptional()
-  value?: number;
+  priority?: number;
+
+  @IsUUID()
+  @IsOptional()
+  partnerId?: string;
+
+  @IsString()
+  @IsOptional()
+  partnerTier?: string;
+
+  @IsUUID()
+  @IsOptional()
+  productId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  supplierId?: string;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsEnum(CommissionType)
+  @IsOptional()
+  commissionType?: CommissionType;
 
   @IsNumber()
   @Min(0)
   @Max(100)
   @Type(() => Number)
   @IsOptional()
-  platformShare?: number;
+  commissionRate?: number;
 
   @IsNumber()
   @Min(0)
-  @Max(100)
   @Type(() => Number)
   @IsOptional()
-  sellerShare?: number;
+  commissionAmount?: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TieredRateDto)
+  @IsOptional()
+  tieredRates?: TieredRateDto[];
 
   @IsNumber()
   @Min(0)
-  @Max(100)
   @Type(() => Number)
   @IsOptional()
-  partnerShare?: number;
+  minCommission?: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  maxCommission?: number;
+
+  @IsDateString()
+  @IsOptional()
+  validFrom?: string;
+
+  @IsDateString()
+  @IsOptional()
+  validUntil?: string;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  minOrderAmount?: number;
+
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  @IsOptional()
+  maxOrderAmount?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  requiresNewCustomer?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  excludeDiscountedItems?: boolean;
+
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  maxUsagePerPartner?: number;
+
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  maxUsageTotal?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  canStackWithOtherPolicies?: boolean;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  exclusiveWith?: string[];
 }

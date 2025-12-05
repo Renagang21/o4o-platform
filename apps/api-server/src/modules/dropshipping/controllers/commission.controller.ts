@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CreateCommissionPolicyDto, UpdateCommissionPolicyDto } from '../dto/index.js';
+import { CommissionEngine } from '../services/CommissionEngine.js';
+import { PolicyStatus } from '../entities/CommissionPolicy.js';
 import logger from '../../../utils/logger.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 
@@ -17,11 +19,22 @@ export class CommissionController extends BaseController {
       }
 
       const data = req.body as CreateCommissionPolicyDto;
+      const commissionEngine = new CommissionEngine();
 
-      // TODO: Implement CommissionEngine.createPolicy
+      // Set default status if not provided and convert date strings to Date objects
+      const policyData: any = {
+        ...data,
+        status: data.status || PolicyStatus.ACTIVE,
+        createdBy: req.user.id,
+        validFrom: data.validFrom ? new Date(data.validFrom) : undefined,
+        validUntil: data.validUntil ? new Date(data.validUntil) : undefined
+      };
+
+      const policy = await commissionEngine.createPolicy(policyData);
+
       return BaseController.ok(res, {
         message: 'Commission policy created',
-        data
+        policy
       });
     } catch (error: any) {
       logger.error('[CommissionController.createCommissionPolicy] Error', {
@@ -35,12 +48,15 @@ export class CommissionController extends BaseController {
   static async getCommissionPolicy(req: AuthRequest, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      const commissionEngine = new CommissionEngine();
 
-      // TODO: Implement CommissionEngine.getPolicy
-      return BaseController.ok(res, {
-        policyId: id,
-        message: 'Commission policy pending implementation'
-      });
+      const policy = await commissionEngine.getPolicy(id);
+
+      if (!policy) {
+        return BaseController.notFound(res, 'Commission policy not found');
+      }
+
+      return BaseController.ok(res, { policy });
     } catch (error: any) {
       logger.error('[CommissionController.getCommissionPolicy] Error', {
         error: error.message,
@@ -58,12 +74,20 @@ export class CommissionController extends BaseController {
 
       const { id } = req.params;
       const data = req.body as UpdateCommissionPolicyDto;
+      const commissionEngine = new CommissionEngine();
 
-      // TODO: Implement CommissionEngine.updatePolicy
+      // Convert date strings to Date objects
+      const updateData: any = {
+        ...data,
+        validFrom: data.validFrom ? new Date(data.validFrom) : undefined,
+        validUntil: data.validUntil ? new Date(data.validUntil) : undefined
+      };
+
+      const policy = await commissionEngine.updatePolicy(id, updateData);
+
       return BaseController.ok(res, {
         message: 'Commission policy updated',
-        policyId: id,
-        data
+        policy
       });
     } catch (error: any) {
       logger.error('[CommissionController.updateCommissionPolicy] Error', {
@@ -78,13 +102,25 @@ export class CommissionController extends BaseController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
+      const status = req.query.status as string | undefined;
+      const partnerId = req.query.partnerId as string | undefined;
+      const productId = req.query.productId as string | undefined;
 
-      // TODO: Implement CommissionEngine.listPolicies
-      return BaseController.okPaginated(res, [], {
+      const commissionEngine = new CommissionEngine();
+
+      const result = await commissionEngine.listPolicies({
+        status: status as any,
+        partnerId,
+        productId,
         page,
-        limit,
-        total: 0,
-        totalPages: 0,
+        limit
+      });
+
+      return BaseController.okPaginated(res, result.policies, {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
       });
     } catch (error: any) {
       logger.error('[CommissionController.listCommissionPolicies] Error', {
