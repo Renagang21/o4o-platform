@@ -17,6 +17,9 @@ let Permission = Permission_1 = class Permission {
     description;
     // Permission category (e.g., 'users', 'content', 'admin')
     category;
+    // App that owns this permission (nullable for system permissions)
+    // TEMPORARY FIX: select: false to avoid querying non-existent column in DB
+    appId;
     // Active status
     isActive;
     createdAt;
@@ -52,6 +55,10 @@ __decorate([
     __metadata("design:type", String)
 ], Permission.prototype, "category", void 0);
 __decorate([
+    Column({ type: 'varchar', length: 100, nullable: true, select: false }),
+    __metadata("design:type", String)
+], Permission.prototype, "appId", void 0);
+__decorate([
     Column({ type: 'boolean', default: true }),
     __metadata("design:type", Boolean)
 ], Permission.prototype, "isActive", void 0);
@@ -72,6 +79,6 @@ Permission = Permission_1 = __decorate([
     Index(['key'], { unique: true }),
     Index(['category']),
     Index(['isActive'])
+    // @Index(['appId']) // TEMPORARY: Disabled until appId column is added to DB
 ], Permission);
 export { Permission };
-//# sourceMappingURL=Permission.js.map

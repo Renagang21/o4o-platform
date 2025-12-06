@@ -92,6 +92,19 @@ export class CosmeticsProductListService {
   }
 
   /**
+   * Get products by brand name
+   * Convenience method for brand-specific product lists
+   */
+  async getProductsByBrandName(brandName: string, params?: Omit<ProductListParams, 'filters'>): Promise<ProductListResult> {
+    return this.listProducts({
+      ...params,
+      filters: {
+        brand: brandName,
+      },
+    });
+  }
+
+  /**
    * Fetch products from database
    */
   private async fetchProducts(): Promise<Product[]> {
