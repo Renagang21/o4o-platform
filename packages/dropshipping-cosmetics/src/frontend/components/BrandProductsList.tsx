@@ -5,7 +5,21 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { CosmeticsProductCard, ProductData } from './CosmeticsProductCard.js';
+import { CosmeticsProductCard } from './CosmeticsProductCard.js';
+
+export interface ProductData {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  metadata: {
+    skinTypes: string[];
+    concerns: string[];
+    category?: string;
+    certifications: string[];
+  };
+}
 
 interface BrandProductsListProps {
   brandName: string;
@@ -147,7 +161,15 @@ export const BrandProductsList: React.FC<BrandProductsListProps> = ({
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
         {products.map((product) => (
-          <CosmeticsProductCard key={product.id} product={product} />
+          <CosmeticsProductCard
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            brand={product.brand}
+            price={product.price}
+            image={product.image}
+            metadata={product.metadata}
+          />
         ))}
       </div>
 
