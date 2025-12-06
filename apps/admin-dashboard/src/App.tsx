@@ -52,6 +52,10 @@ const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
 // P4-Admin: Role Applications Management
 const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdminPage'));
+// Membership-Yaksa: Membership Management
+const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
+const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
+const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
 // const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content')); // Removed - replaced by CPT Engine
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
@@ -528,6 +532,29 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['users:update']}>
                         <Suspense fallback={<PageLoader />}>
                           <RoleApplicationsAdminPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+
+                    {/* Membership-Yaksa: 회원 관리 */}
+                    <Route path="/admin/membership/members" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:view', 'membership:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MemberManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/membership/verifications" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:verify']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <VerificationManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/admin/membership/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CategoryManagement />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

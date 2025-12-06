@@ -9,6 +9,7 @@ import {
   Users,
   Bell,
   FileText,
+  UserCheck,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -131,6 +132,34 @@ export const wordpressMenuItems: MenuItem[] = [
         label: 'Installed Apps',
         icon: <Package className="w-4 h-4" />,
         path: '/admin/appstore/installed',
+      },
+    ],
+  },
+
+  // Membership
+  {
+    id: 'membership',
+    label: 'Membership',
+    icon: <UserCheck className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'membership-members',
+        label: 'Members',
+        icon: <Users className="w-4 h-4" />,
+        path: '/admin/membership/members',
+      },
+      {
+        id: 'membership-verifications',
+        label: 'Verifications',
+        icon: <UserCheck className="w-4 h-4" />,
+        path: '/admin/membership/verifications',
+      },
+      {
+        id: 'membership-categories',
+        label: 'Categories',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/admin/membership/categories',
       },
     ],
   },
