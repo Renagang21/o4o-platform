@@ -180,7 +180,8 @@ import deploymentRoutes from '../routes/deployment.routes.js';
 import sitesRoutes from '../modules/sites/sites.routes.js';
 
 // ✅ NEW: Membership-Yaksa Routes
-import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
+// TEMPORARILY DISABLED: Circular dependency issue
+// import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
 
 // ✅ NEW: Dropshipping-Cosmetics Routes
 import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-filter.routes.js';
@@ -476,7 +477,8 @@ export function setupRoutes(app: Application): void {
   // ✅ NEW: Membership-Yaksa Routes
   // Provides: Member, MemberCategory, Affiliation, Verification endpoints
   // See: packages/membership-yaksa/src/backend/routes/index.ts
-  app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
+  // TEMPORARILY DISABLED: Circular dependency issue in Member<->Affiliation entities
+  // app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
 
   // ✅ NEW: Dropshipping-Cosmetics Routes
   // Provides: Cosmetics Filter, Influencer Routine, Signage endpoints

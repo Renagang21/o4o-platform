@@ -132,12 +132,13 @@ import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
 // ✅ NEW: Membership-Yaksa entities
-import { Member } from '@o4o/membership-yaksa/backend/entities/Member.js';
-import { MemberCategory } from '@o4o/membership-yaksa/backend/entities/MemberCategory.js';
-import { Affiliation } from '@o4o/membership-yaksa/backend/entities/Affiliation.js';
-import { MembershipRoleAssignment } from '@o4o/membership-yaksa/backend/entities/MembershipRoleAssignment.js';
-import { MembershipYear } from '@o4o/membership-yaksa/backend/entities/MembershipYear.js';
-import { Verification } from '@o4o/membership-yaksa/backend/entities/Verification.js';
+// TEMPORARILY DISABLED: Circular dependency issue in Member<->Affiliation
+// import { Member } from '@o4o/membership-yaksa/backend/entities/Member.js';
+// import { MemberCategory } from '@o4o/membership-yaksa/backend/entities/MemberCategory.js';
+// import { Affiliation } from '@o4o/membership-yaksa/backend/entities/Affiliation.js';
+// import { MembershipRoleAssignment } from '@o4o/membership-yaksa/backend/entities/MembershipRoleAssignment.js';
+// import { MembershipYear } from '@o4o/membership-yaksa/backend/entities/MembershipYear.js';
+// import { Verification } from '@o4o/membership-yaksa/backend/entities/Verification.js';
 
 // ✅ NEW: Dropshipping-Cosmetics entities
 import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';
@@ -310,12 +311,13 @@ export const AppDataSource = new DataSource({
     CMSView,
     CMSPage,
     // ✅ NEW: Membership-Yaksa entities
-    Member,
-    MemberCategory,
-    Affiliation,
-    MembershipRoleAssignment,
-    MembershipYear,
-    Verification,
+    // TEMPORARILY DISABLED: Circular dependency issue
+    // Member,
+    // MemberCategory,
+    // Affiliation,
+    // MembershipRoleAssignment,
+    // MembershipYear,
+    // Verification,
     // ✅ NEW: Dropshipping-Cosmetics entities
     CosmeticsFilter,
     CosmeticsRoutine,
