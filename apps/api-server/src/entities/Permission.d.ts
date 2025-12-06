@@ -4,6 +4,7 @@ export declare class Permission {
     key: string;
     description: string;
     category: string;
+    appId?: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;

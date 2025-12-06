@@ -54,7 +54,7 @@ export class Affiliation {
   /**
    * 회원 관계
    */
-  @ManyToOne(() => Member, (member) => member.affiliations, {
+  @ManyToOne('Member', (member: Member) => member.affiliations, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'memberId' })

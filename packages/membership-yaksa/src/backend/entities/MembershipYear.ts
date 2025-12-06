@@ -49,7 +49,7 @@ export class MembershipYear {
   /**
    * 회원 관계
    */
-  @ManyToOne(() => Member, (member) => member.membershipYears, {
+  @ManyToOne('Member', (member: Member) => member.membershipYears, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'memberId' })

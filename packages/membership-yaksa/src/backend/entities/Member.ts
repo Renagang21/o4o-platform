@@ -167,19 +167,19 @@ export class Member {
   /**
    * 소속 정보 (여러 지부/분회에 소속 가능)
    */
-  @OneToMany(() => Affiliation, (affiliation) => affiliation.member)
+  @OneToMany('Affiliation', (affiliation: Affiliation) => affiliation.member)
   affiliations?: Affiliation[];
 
   /**
    * 연회비 납부 이력
    */
-  @OneToMany(() => MembershipYear, (year) => year.member)
+  @OneToMany('MembershipYear', (year: MembershipYear) => year.member)
   membershipYears?: MembershipYear[];
 
   /**
    * 자격 검증 이력
    */
-  @OneToMany(() => Verification, (verification) => verification.member)
+  @OneToMany('Verification', (verification: Verification) => verification.member)
   verifications?: Verification[];
 
   // Helper Methods

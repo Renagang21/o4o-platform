@@ -51,7 +51,7 @@ export class Verification {
   /**
    * 회원 관계
    */
-  @ManyToOne(() => Member, (member) => member.verifications, {
+  @ManyToOne('Member', (member: Member) => member.verifications, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'memberId' })

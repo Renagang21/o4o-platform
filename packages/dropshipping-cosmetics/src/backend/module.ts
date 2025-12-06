@@ -5,11 +5,12 @@
  */
 
 import type { DataSource } from 'typeorm';
-import { CosmeticsFilter, CosmeticsRoutine } from './entities/index.js';
+import { CosmeticsFilter, CosmeticsRoutine, CosmeticsBrand } from './entities/index.js';
 import { createCosmeticsFilterRoutes } from './routes/cosmetics-filter.routes.js';
 import { createInfluencerRoutineRoutes } from './routes/influencer-routine.routes.js';
 import { createSignageRoutes } from './routes/signage.routes.js';
 import { createRecommendationRoutes } from './routes/recommendation.routes.js';
+import { createBrandRoutes } from './routes/brand.routes.js';
 
 export function createCosmeticsModule(dataSource: DataSource) {
   return {
@@ -17,7 +18,7 @@ export function createCosmeticsModule(dataSource: DataSource) {
     version: '1.0.0',
 
     // TypeORM entities
-    entities: [CosmeticsFilter, CosmeticsRoutine],
+    entities: [CosmeticsFilter, CosmeticsRoutine, CosmeticsBrand],
 
     // Express routes (initialized with DataSource)
     routes: [
@@ -37,11 +38,15 @@ export function createCosmeticsModule(dataSource: DataSource) {
         path: '/api/v1/cosmetics',
         router: createRecommendationRoutes(dataSource),
       },
+      {
+        path: '/api/v1/cosmetics',
+        router: createBrandRoutes(dataSource),
+      },
     ],
   };
 }
 
 // Export for convenience
-export const CosmeticsEntities = [CosmeticsFilter, CosmeticsRoutine];
+export const CosmeticsEntities = [CosmeticsFilter, CosmeticsRoutine, CosmeticsBrand];
 
 export default createCosmeticsModule;
