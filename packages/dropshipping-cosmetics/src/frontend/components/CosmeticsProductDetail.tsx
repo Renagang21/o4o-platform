@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { CosmeticsRecommendationPanel } from './CosmeticsRecommendationPanel.js';
 
 export interface CosmeticsProductData {
   id: string;
@@ -210,6 +211,20 @@ export const CosmeticsProductDetail: React.FC<CosmeticsProductDetailProps> = ({
           </div>
         </div>
       )}
+
+      {/* Recommended Products */}
+      <div className="mt-12">
+        <CosmeticsRecommendationPanel
+          skinTypes={data.metadata.skinTypes}
+          concerns={data.metadata.concerns}
+          brand={data.brand}
+          category={data.metadata.category}
+          excludeProductId={data.id}
+          limit={5}
+          apiBaseUrl={apiBaseUrl}
+          title="비슷한 제품 추천"
+        />
+      </div>
     </div>
   );
 };

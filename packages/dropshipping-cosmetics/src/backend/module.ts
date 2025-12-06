@@ -9,6 +9,7 @@ import { CosmeticsFilter, CosmeticsRoutine } from './entities/index.js';
 import { createCosmeticsFilterRoutes } from './routes/cosmetics-filter.routes.js';
 import { createInfluencerRoutineRoutes } from './routes/influencer-routine.routes.js';
 import { createSignageRoutes } from './routes/signage.routes.js';
+import { createRecommendationRoutes } from './routes/recommendation.routes.js';
 
 export function createCosmeticsModule(dataSource: DataSource) {
   return {
@@ -31,6 +32,10 @@ export function createCosmeticsModule(dataSource: DataSource) {
       {
         path: '/api/v1/cosmetics',
         router: createSignageRoutes(dataSource),
+      },
+      {
+        path: '/api/v1/cosmetics',
+        router: createRecommendationRoutes(dataSource),
       },
     ],
   };

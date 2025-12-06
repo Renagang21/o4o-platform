@@ -9,3 +9,4 @@ export { CosmeticsProductDetail } from './CosmeticsProductDetail.js';
 export { CosmeticsFilterSidebar } from './CosmeticsFilterSidebar.js';
 export { CosmeticsProductsList } from './CosmeticsProductsList.js';
 export { FilterControlPanel } from './FilterControlPanel.js';
+export { CosmeticsRecommendationPanel } from './CosmeticsRecommendationPanel.js';

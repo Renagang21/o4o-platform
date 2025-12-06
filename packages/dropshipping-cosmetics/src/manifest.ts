@@ -390,6 +390,49 @@ export const cosmeticsExtensionManifest: AppManifest = {
         },
       },
     },
+    {
+      name: 'cosmetics-recommendations',
+      component: './frontend/shortcodes/cosmetics-recommendations.js',
+      description: 'Display product recommendations based on criteria',
+      usage: '[cosmetics-recommendations skinType="dry,sensitive" concerns="hydration,redness" limit="5"]',
+      attributes: {
+        skinType: {
+          type: 'string',
+          required: false,
+          description: 'Skin types (comma-separated)',
+        },
+        concerns: {
+          type: 'string',
+          required: false,
+          description: 'Skin concerns (comma-separated)',
+        },
+        brand: {
+          type: 'string',
+          required: false,
+          description: 'Brand filter',
+        },
+        category: {
+          type: 'string',
+          required: false,
+          description: 'Product category',
+        },
+        limit: {
+          type: 'number',
+          required: false,
+          description: 'Number of recommendations (default: 5)',
+        },
+        apiBaseUrl: {
+          type: 'string',
+          required: false,
+          description: 'API base URL (defaults to /api/v1)',
+        },
+        title: {
+          type: 'string',
+          required: false,
+          description: 'Panel title',
+        },
+      },
+    },
   ],
 
   // Admin menu extension (adds submenu under Dropshipping)
