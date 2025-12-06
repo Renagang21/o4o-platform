@@ -93,6 +93,8 @@
     "@o4o/cpt-registry": "workspace:*",
     "@o4o/lms-core": "workspace:*",
     "@o4o/organization-core": "workspace:*",
+    "@o4o/membership-yaksa": "workspace:*",
+    "@o4o/dropshipping-cosmetics": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
