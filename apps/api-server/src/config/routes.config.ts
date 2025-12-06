@@ -189,6 +189,7 @@ import { createInfluencerRoutineRoutes } from '@o4o/dropshipping-cosmetics/backe
 import { createSignageRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/signage.routes.js';
 import { createCosmeticsProductRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-product.routes.js';
 import { createCosmeticsProductListRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-product-list.routes.js';
+import { createRecommendationRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/recommendation.routes.js';
 
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
@@ -483,11 +484,12 @@ export function setupRoutes(app: Application): void {
   // app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
 
   // ✅ NEW: Dropshipping-Cosmetics Routes
-  // Provides: Cosmetics Filter, Influencer Routine, Signage, Product Detail, Product List endpoints
+  // Provides: Cosmetics Filter, Influencer Routine, Signage, Product Detail, Product List, Recommendations endpoints
   // See: packages/dropshipping-cosmetics/src/backend/routes/
   app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsFilterRoutes(AppDataSource) as any);
   app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsProductRoutes(AppDataSource) as any);
   app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsProductListRoutes(AppDataSource) as any);
+  app.use('/api/v1/cosmetics', standardLimiter, createRecommendationRoutes(AppDataSource) as any);
   app.use('/api/v1/partner/routines', standardLimiter, createInfluencerRoutineRoutes(AppDataSource) as any);
   app.use('/api/v1/cosmetics/signage', standardLimiter, createSignageRoutes(AppDataSource) as any);
 
