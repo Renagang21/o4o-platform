@@ -6,17 +6,7 @@
  */
 
 import { DataSource, Repository } from 'typeorm';
-
-// Mock Product type (will be replaced with actual Product entity)
-interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  price: number;
-  image: string;
-  createdAt: Date;
-  metadata?: any;
-}
+import type { Product } from '../../../../../apps/api-server/src/entities/Product.js';
 
 export interface ProductListFilters {
   skinType?: string[];
@@ -57,10 +47,10 @@ export interface ProductListResult {
 }
 
 export class CosmeticsProductListService {
-  private dataSource: DataSource;
+  private productRepo: Repository<Product>;
 
-  constructor(dataSource: DataSource) {
-    this.dataSource = dataSource;
+  constructor(private dataSource: DataSource) {
+    this.productRepo = dataSource.getRepository('Product') as Repository<Product>;
   }
 
   /**
@@ -103,87 +93,20 @@ export class CosmeticsProductListService {
 
   /**
    * Fetch products from database
-   * TODO: Replace with actual Product entity query
    */
   private async fetchProducts(): Promise<Product[]> {
-    // Mock data for now
-    return [
-      {
-        id: 'product-1',
-        name: 'Hydrating Essence',
-        brand: 'AquaBeau',
-        price: 32000,
-        image: 'https://via.placeholder.com/300',
-        createdAt: new Date('2025-01-15'),
-        metadata: {
-          skinTypes: ['dry', 'sensitive'],
-          concerns: ['hydration', 'redness'],
-          category: 'skincare',
-          certifications: ['vegan', 'cruelty-free'],
-          ingredients: ['Hyaluronic Acid', 'Centella Asiatica'],
-        },
-      },
-      {
-        id: 'product-2',
-        name: 'Brightening Serum',
-        brand: 'LuminGlow',
-        price: 45000,
-        image: 'https://via.placeholder.com/300',
-        createdAt: new Date('2025-01-10'),
-        metadata: {
-          skinTypes: ['normal', 'combination'],
-          concerns: ['whitening', 'dark spots'],
-          category: 'skincare',
-          certifications: ['dermatologically-tested'],
-          ingredients: ['Vitamin C', 'Niacinamide'],
-        },
-      },
-      {
-        id: 'product-3',
-        name: 'Acne Treatment Cream',
-        brand: 'ClearSkin',
-        price: 28000,
-        image: 'https://via.placeholder.com/300',
-        createdAt: new Date('2025-01-20'),
-        metadata: {
-          skinTypes: ['oily', 'combination'],
-          concerns: ['acne', 'pore'],
-          category: 'skincare',
-          certifications: ['hypoallergenic'],
-          ingredients: ['Salicylic Acid', 'Tea Tree Oil'],
-        },
-      },
-      {
-        id: 'product-4',
-        name: 'Anti-Aging Retinol Serum',
-        brand: 'YouthRevive',
-        price: 55000,
-        image: 'https://via.placeholder.com/300',
-        createdAt: new Date('2025-01-05'),
-        metadata: {
-          skinTypes: ['normal', 'dry'],
-          concerns: ['wrinkle', 'elasticity'],
-          category: 'skincare',
-          certifications: ['dermatologically-tested'],
-          ingredients: ['Retinol', 'Peptides'],
-        },
-      },
-      {
-        id: 'product-5',
-        name: 'Soothing Gel Cream',
-        brand: 'CalmDerm',
-        price: 35000,
-        image: 'https://via.placeholder.com/300',
-        createdAt: new Date('2025-01-12'),
-        metadata: {
-          skinTypes: ['sensitive', 'dry'],
-          concerns: ['soothing', 'redness'],
-          category: 'skincare',
-          certifications: ['vegan', 'hypoallergenic'],
-          ingredients: ['Aloe Vera', 'Centella Asiatica'],
-        },
-      },
-    ];
+    try {
+      // Fetch all products with category relation
+      const products = await this.productRepo.find({
+        relations: ['category']
+      });
+
+      // Filter to only cosmetics products (those with cosmetics_metadata)
+      return products.filter(product => product.metadata?.cosmetics_metadata);
+    } catch (error) {
+      console.error('[CosmeticsProductList] Error fetching products:', error);
+      return [];
+    }
   }
 
   /**
@@ -195,7 +118,8 @@ export class CosmeticsProductListService {
     // Filter by skin type
     if (filters.skinType && filters.skinType.length > 0) {
       filtered = filtered.filter((product) => {
-        const productSkinTypes = product.metadata?.skinTypes || [];
+        const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
+        const productSkinTypes = cosmeticsMetadata.skinTypes || [];
         return this.hasIntersection(productSkinTypes, filters.skinType!);
       });
     }
@@ -203,7 +127,8 @@ export class CosmeticsProductListService {
     // Filter by concerns
     if (filters.concerns && filters.concerns.length > 0) {
       filtered = filtered.filter((product) => {
-        const productConcerns = product.metadata?.concerns || [];
+        const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
+        const productConcerns = cosmeticsMetadata.concerns || [];
         return this.hasIntersection(productConcerns, filters.concerns!);
       });
     }
@@ -215,13 +140,17 @@ export class CosmeticsProductListService {
 
     // Filter by category
     if (filters.category) {
-      filtered = filtered.filter((product) => product.metadata?.category === filters.category);
+      filtered = filtered.filter((product) => {
+        const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
+        return cosmeticsMetadata.category === filters.category || product.category?.name === filters.category;
+      });
     }
 
     // Filter by certifications
     if (filters.certifications && filters.certifications.length > 0) {
       filtered = filtered.filter((product) => {
-        const productCerts = product.metadata?.certifications || [];
+        const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
+        const productCerts = cosmeticsMetadata.certifications || [];
         return this.hasIntersection(productCerts, filters.certifications!);
       });
     }
@@ -229,7 +158,8 @@ export class CosmeticsProductListService {
     // Filter by ingredients
     if (filters.ingredients && filters.ingredients.length > 0) {
       filtered = filtered.filter((product) => {
-        const productIngredients = product.metadata?.ingredients || [];
+        const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
+        const productIngredients = cosmeticsMetadata.ingredients || [];
         return this.hasIntersection(productIngredients, filters.ingredients!);
       });
     }
@@ -248,14 +178,15 @@ export class CosmeticsProductListService {
         sorted.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         break;
       case 'price_asc':
-        sorted.sort((a, b) => a.price - b.price);
+        sorted.sort((a, b) => Number(a.recommendedPrice) - Number(b.recommendedPrice));
         break;
       case 'price_desc':
-        sorted.sort((a, b) => b.price - a.price);
+        sorted.sort((a, b) => Number(b.recommendedPrice) - Number(a.recommendedPrice));
         break;
       case 'popular':
-        // Mock: sort by name for now (TODO: integrate sales count)
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        // TODO: integrate sales count when available
+        // For now, sort by createdAt as fallback
+        sorted.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         break;
       default:
         // Default to newest
@@ -269,17 +200,19 @@ export class CosmeticsProductListService {
    * Transform Product to ProductListItem
    */
   private transformProduct(product: Product): ProductListItem {
+    const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
+
     return {
       id: product.id,
       name: product.name,
-      brand: product.brand,
-      price: product.price,
-      image: product.image,
+      brand: product.brand || 'Unknown Brand',
+      price: Number(product.recommendedPrice),
+      image: product.images?.main || '',
       metadata: {
-        skinTypes: product.metadata?.skinTypes || [],
-        concerns: product.metadata?.concerns || [],
-        category: product.metadata?.category,
-        certifications: product.metadata?.certifications || [],
+        skinTypes: cosmeticsMetadata.skinTypes || [],
+        concerns: cosmeticsMetadata.concerns || [],
+        category: cosmeticsMetadata.category || product.category?.name,
+        certifications: cosmeticsMetadata.certifications || [],
       },
     };
   }

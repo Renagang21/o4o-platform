@@ -6,6 +6,7 @@
  */
 
 import { DataSource, Repository } from 'typeorm';
+import type { Product } from '../../../../../apps/api-server/src/entities/Product.js';
 import { CosmeticsRoutine } from '../entities/cosmetics-routine.entity.js';
 
 export interface CosmeticsProductDetail {
@@ -31,9 +32,11 @@ export interface CosmeticsProductDetail {
 }
 
 export class CosmeticsProductService {
+  private productRepo: Repository<Product>;
   private routineRepo: Repository<CosmeticsRoutine>;
 
   constructor(private dataSource: DataSource) {
+    this.productRepo = dataSource.getRepository('Product') as Repository<Product>;
     this.routineRepo = dataSource.getRepository(CosmeticsRoutine);
   }
 
@@ -42,12 +45,16 @@ export class CosmeticsProductService {
    */
   async getProductDetail(productId: string): Promise<CosmeticsProductDetail | null> {
     try {
-      // TODO: Fetch from Dropshipping Core Product entity
-      // For now, use mock data structure
       const product = await this.fetchCoreProduct(productId);
 
       if (!product) {
         return null;
+      }
+
+      // Check if this is a cosmetics product
+      if (!product.metadata?.cosmetics_metadata) {
+        console.warn(`[CosmeticsProduct] Product ${productId} has no cosmetics metadata`);
+        // Still return the product, but with empty metadata
       }
 
       // Fetch routines that include this product
@@ -55,11 +62,11 @@ export class CosmeticsProductService {
 
       return {
         id: product.id,
-        title: product.title,
+        title: product.name,
         brand: product.brand || 'Unknown Brand',
-        price: product.price,
-        image: product.image || '',
-        description: product.description,
+        price: Number(product.recommendedPrice),
+        image: product.images?.main || '',
+        description: product.description || product.shortDescription || undefined,
         metadata: this.extractCosmeticsMetadata(product),
         routineMatches: routineMatches.map(r => ({
           id: r.id,
@@ -75,42 +82,35 @@ export class CosmeticsProductService {
 
   /**
    * Fetch core product from Dropshipping Core
-   * TODO: Replace with actual Product entity query
    */
-  private async fetchCoreProduct(productId: string): Promise<any> {
-    // Mock implementation - will be replaced with actual Product repository query
-    // const productRepo = this.dataSource.getRepository(Product);
-    // return productRepo.findOne({ where: { id: productId } });
+  private async fetchCoreProduct(productId: string): Promise<Product | null> {
+    try {
+      const product = await this.productRepo.findOne({
+        where: { id: productId },
+        relations: ['category']
+      });
 
-    return {
-      id: productId,
-      title: 'Sample Product',
-      brand: 'Sample Brand',
-      price: 35000,
-      image: 'https://via.placeholder.com/400',
-      description: 'Sample description',
-      customFields: {
-        skinTypes: ['dry', 'sensitive'],
-        concerns: ['hydration', 'redness'],
-        ingredients: ['Hyaluronic Acid', 'Panthenol', 'Centella Asiatica'],
-        certifications: ['vegan', 'cruelty-free']
-      }
-    };
+      return product;
+    } catch (error) {
+      console.error('[CosmeticsProduct] Error fetching product:', error);
+      return null;
+    }
   }
 
   /**
-   * Extract cosmetics metadata from product custom fields
+   * Extract cosmetics metadata from product metadata field
+   * Expects: product.metadata.cosmetics_metadata
    */
-  private extractCosmeticsMetadata(product: any): CosmeticsProductDetail['metadata'] {
-    const customFields = product.customFields || {};
+  private extractCosmeticsMetadata(product: Product): CosmeticsProductDetail['metadata'] {
+    const cosmeticsMetadata = product.metadata?.cosmetics_metadata || {};
 
     return {
-      skinTypes: Array.isArray(customFields.skinTypes) ? customFields.skinTypes : [],
-      concerns: Array.isArray(customFields.concerns) ? customFields.concerns : [],
-      ingredients: Array.isArray(customFields.ingredients) ? customFields.ingredients : [],
-      certifications: Array.isArray(customFields.certifications) ? customFields.certifications : [],
-      category: customFields.category || undefined,
-      usage: customFields.usage || undefined
+      skinTypes: Array.isArray(cosmeticsMetadata.skinTypes) ? cosmeticsMetadata.skinTypes : [],
+      concerns: Array.isArray(cosmeticsMetadata.concerns) ? cosmeticsMetadata.concerns : [],
+      ingredients: Array.isArray(cosmeticsMetadata.ingredients) ? cosmeticsMetadata.ingredients : [],
+      certifications: Array.isArray(cosmeticsMetadata.certifications) ? cosmeticsMetadata.certifications : [],
+      category: cosmeticsMetadata.category || product.category?.name || undefined,
+      usage: cosmeticsMetadata.usage || undefined
     };
   }
 

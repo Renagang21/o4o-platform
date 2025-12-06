@@ -22,7 +22,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "npx tsc --build",
+    "build": "echo 'Skipping independent build - compiled by api-server'",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
