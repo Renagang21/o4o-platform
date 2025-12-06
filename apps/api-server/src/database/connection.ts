@@ -139,6 +139,10 @@ import { MembershipRoleAssignment } from '../../../packages/membership-yaksa/dis
 import { MembershipYear } from '../../../packages/membership-yaksa/dist/backend/entities/MembershipYear.js';
 import { Verification } from '../../../packages/membership-yaksa/dist/backend/entities/Verification.js';
 
+// ✅ NEW: Dropshipping-Cosmetics entities
+import { CosmeticsFilter } from '../../../packages/dropshipping-cosmetics/dist/backend/entities/cosmetics-filter.entity.js';
+import { CosmeticsRoutine } from '../../../packages/dropshipping-cosmetics/dist/backend/entities/cosmetics-routine.entity.js';
+
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -312,6 +316,9 @@ export const AppDataSource = new DataSource({
     MembershipRoleAssignment,
     MembershipYear,
     Verification,
+    // ✅ NEW: Dropshipping-Cosmetics entities
+    CosmeticsFilter,
+    CosmeticsRoutine,
   ],
   
   // 마이그레이션 설정
