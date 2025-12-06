@@ -21,6 +21,20 @@ export class DashboardQueryDto {
   @IsString()
   @IsIn(['revenue', 'orders', 'products', 'customers'])
   metric?: 'revenue' | 'orders' | 'products' | 'customers';
+
+  // Date range query parameters
+  @IsOptional()
+  @IsString()
+  @IsIn(['today', 'yesterday', 'last7days', 'last30days', 'thisMonth', 'lastMonth', 'custom'])
+  range?: 'today' | 'yesterday' | 'last7days' | 'last30days' | 'thisMonth' | 'lastMonth' | 'custom';
+
+  @IsOptional()
+  @IsString()
+  from?: string;
+
+  @IsOptional()
+  @IsString()
+  to?: string;
 }
 
 export class SellerDashboardQueryDto extends DashboardQueryDto {

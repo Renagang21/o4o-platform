@@ -202,6 +202,27 @@ export class PartnerService {
     }
   }
 
+  // Get Partner by User ID
+  async getByUserId(userId: string): Promise<Partner | null> {
+    try {
+      const partner = await this.partnerRepository.findOne({
+        where: { userId },
+        relations: ['user']
+      });
+
+      return partner;
+
+    } catch (error) {
+      logger.error('Error getting partner by user ID:', error);
+      throw error;
+    }
+  }
+
+  // Alias for backward compatibility
+  async findById(id: string): Promise<Partner | null> {
+    return this.getPartner(id);
+  }
+
   // 파트너 목록 조회
   async getPartners(filters: PartnerFilters = {}) {
     try {

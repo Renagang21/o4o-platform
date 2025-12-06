@@ -134,6 +134,7 @@ export interface SupplierDashboardSummaryDto {
   // Legacy fields (backward compatibility)
   monthlyOrders?: number;
   avgOrderValue?: number;
+  avgOrderAmount?: number; // Alias for averageOrderValue
 
   // Time period
   periodStart?: Date;

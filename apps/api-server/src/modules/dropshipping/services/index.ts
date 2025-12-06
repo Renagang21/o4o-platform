@@ -12,6 +12,13 @@ export * from './SellerAuthorizationService.js';
 export * from './SupplierService.js';
 export * from './SupplierDashboardService.js';
 export * from './PartnerService.js';
-export * from './SettlementService.js';
-export * from './SettlementManagementService.js';
+
+// Export SettlementService with selective exports to avoid naming conflicts
+export { SettlementService } from './SettlementService.js';
+export type { CreateSettlementInput } from './SettlementService.js';
+
+// Export SettlementManagementService with renamed SettlementFilters
+export { SettlementManagementService } from './SettlementManagementService.js';
+export type { SettlementFilters as ManagementSettlementFilters } from './SettlementManagementService.js';
+
 export * from './CommissionEngine.js';

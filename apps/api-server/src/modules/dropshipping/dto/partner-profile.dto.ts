@@ -76,6 +76,47 @@ export class PartnerApplicationDto {
   @IsString({ each: true })
   @IsOptional()
   webhookEvents?: string[];
+
+  // Additional fields for partner application
+  @IsString()
+  @IsOptional()
+  businessName?: string;
+
+  @IsString()
+  @IsOptional()
+  website?: string;
+
+  @IsObject()
+  @IsOptional()
+  socialMedia?: {
+    youtube?: string;
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    tiktok?: string;
+    blog?: string;
+  };
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  marketingChannels?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  expectedMonthlyTraffic?: number;
+
+  @IsString()
+  @IsOptional()
+  targetAudience?: string;
+
+  @IsString()
+  @IsOptional()
+  bio?: string;
+
+  @IsString()
+  @IsOptional()
+  profileImage?: string;
 }
 
 export class UpdatePartnerProfileDto {

@@ -50,6 +50,14 @@ export class SupplierService extends BaseService<Supplier> {
   }
 
   /**
+   * Alias for getSupplierByUserId
+   * Matches SellerService naming convention
+   */
+  async getByUserId(userId: string): Promise<Supplier | null> {
+    return this.getSupplierByUserId(userId);
+  }
+
+  /**
    * Get Supplier by ID
    * Mirrors SellerService.findById for structural consistency
    */

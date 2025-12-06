@@ -346,7 +346,7 @@ export class SettlementService {
       };
 
       const settlement = this.settlementRepo.create(settlementData);
-      const saved = await this.settlementRepo.save(settlement);
+      const saved = await this.settlementRepo.save(settlement) as Settlement;
 
       logger.info('[Settlement] Settlement created', {
         settlementId: saved.id,
