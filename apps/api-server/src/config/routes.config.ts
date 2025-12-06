@@ -184,12 +184,12 @@ import sitesRoutes from '../modules/sites/sites.routes.js';
 // import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
 
 // ✅ NEW: Dropshipping-Cosmetics Routes
-import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-filter.routes.js';
-import { createInfluencerRoutineRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/influencer-routine.routes.js';
-import { createSignageRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/signage.routes.js';
-import { createCosmeticsProductRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-product.routes.js';
-import { createCosmeticsProductListRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-product-list.routes.js';
-import { createRecommendationRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/recommendation.routes.js';
+import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/src/backend/routes/cosmetics-filter.routes.js';
+import { createInfluencerRoutineRoutes } from '@o4o/dropshipping-cosmetics/src/backend/routes/influencer-routine.routes.js';
+import { createSignageRoutes } from '@o4o/dropshipping-cosmetics/src/backend/routes/signage.routes.js';
+import { createCosmeticsProductRoutes } from '@o4o/dropshipping-cosmetics/src/backend/routes/cosmetics-product.routes.js';
+import { createCosmeticsProductListRoutes } from '@o4o/dropshipping-cosmetics/src/backend/routes/cosmetics-product-list.routes.js';
+import { createRecommendationRoutes } from '@o4o/dropshipping-cosmetics/src/backend/routes/recommendation.routes.js';
 
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
