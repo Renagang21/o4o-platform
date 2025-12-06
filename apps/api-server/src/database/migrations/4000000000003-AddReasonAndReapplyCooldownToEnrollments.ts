@@ -16,6 +16,21 @@ export class AddReasonAndReapplyCooldownToEnrollments1731129600000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Check if role_enrollments table exists
+    const tableExists = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'role_enrollments'
+      )
+    `);
+
+    // Skip migration if table doesn't exist (already dropped in later migration)
+    if (!tableExists[0].exists) {
+      console.log('⏭️  Skipping migration: role_enrollments table does not exist (already dropped)');
+      return;
+    }
+
     // Add reason column if it doesn't exist
     await queryRunner.query(`
       ALTER TABLE "role_enrollments"
