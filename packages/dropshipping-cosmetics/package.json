@@ -18,7 +18,8 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js"
     },
-    "./backend/*": "./dist/backend/*"
+    "./backend/*": "./dist/backend/*",
+    "./src/*": "./src/*"
   },
   "sideEffects": false,
   "scripts": {
