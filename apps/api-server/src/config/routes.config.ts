@@ -187,6 +187,7 @@ import sitesRoutes from '../modules/sites/sites.routes.js';
 import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-filter.routes.js';
 import { createInfluencerRoutineRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/influencer-routine.routes.js';
 import { createSignageRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/signage.routes.js';
+import { createCosmeticsProductRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-product.routes.js';
 
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
@@ -481,9 +482,10 @@ export function setupRoutes(app: Application): void {
   // app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
 
   // ✅ NEW: Dropshipping-Cosmetics Routes
-  // Provides: Cosmetics Filter, Influencer Routine, Signage endpoints
+  // Provides: Cosmetics Filter, Influencer Routine, Signage, Product Detail endpoints
   // See: packages/dropshipping-cosmetics/src/backend/routes/
   app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsFilterRoutes(AppDataSource) as any);
+  app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsProductRoutes(AppDataSource) as any);
   app.use('/api/v1/partner/routines', standardLimiter, createInfluencerRoutineRoutes(AppDataSource) as any);
   app.use('/api/v1/cosmetics/signage', standardLimiter, createSignageRoutes(AppDataSource) as any);
 

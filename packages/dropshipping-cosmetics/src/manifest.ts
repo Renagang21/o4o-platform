@@ -342,6 +342,28 @@ export const cosmeticsExtensionManifest: AppManifest = {
     'cosmetics:recommend_routine',
   ],
 
+  // Shortcodes
+  shortcodes: [
+    {
+      name: 'cosmetics-product',
+      component: './frontend/shortcodes/cosmetics-product.js',
+      description: 'Display product detail with cosmetics metadata',
+      usage: '[cosmetics-product id="PRODUCT_ID"]',
+      attributes: {
+        id: {
+          type: 'string',
+          required: true,
+          description: 'Product ID to display',
+        },
+        apiBaseUrl: {
+          type: 'string',
+          required: false,
+          description: 'API base URL (defaults to /api/v1)',
+        },
+      },
+    },
+  ],
+
   // Admin menu extension (adds submenu under Dropshipping)
   menu: {
     parent: 'dropshipping',
