@@ -335,7 +335,7 @@ export class SettlementService {
   async create(data: Partial<Settlement>): Promise<Settlement> {
     try {
       // Convert numeric strings to proper format for database
-      const settlementData: any = {
+      const settlementData = {
         ...data,
         totalSaleAmount: data.totalSaleAmount?.toString() || '0',
         totalBaseAmount: data.totalBaseAmount?.toString() || '0',
@@ -346,7 +346,9 @@ export class SettlementService {
       };
 
       const settlement = this.settlementRepo.create(settlementData);
-      const saved = await this.settlementRepo.save(settlement) as Settlement;
+      const savedResult = await this.settlementRepo.save(settlement);
+      // Ensure we return a single Settlement, not an array
+      const saved: Settlement = Array.isArray(savedResult) ? savedResult[0] : savedResult;
 
       logger.info('[Settlement] Settlement created', {
         settlementId: saved.id,

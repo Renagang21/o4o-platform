@@ -15,7 +15,6 @@ export * from './PartnerService.js';
 
 // Export SettlementService with selective exports to avoid naming conflicts
 export { SettlementService } from './SettlementService.js';
-export type { CreateSettlementInput } from './SettlementService.js';
 
 // Export SettlementManagementService with renamed SettlementFilters
 export { SettlementManagementService } from './SettlementManagementService.js';

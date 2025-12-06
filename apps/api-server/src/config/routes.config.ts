@@ -180,12 +180,12 @@ import deploymentRoutes from '../routes/deployment.routes.js';
 import sitesRoutes from '../modules/sites/sites.routes.js';
 
 // ✅ NEW: Membership-Yaksa Routes
-import { createMembershipRoutes } from '../../../packages/membership-yaksa/dist/backend/routes/index.js';
+import { createMembershipRoutes } from '@o4o/membership-yaksa/backend/routes/index.js';
 
 // ✅ NEW: Dropshipping-Cosmetics Routes
-import { createCosmeticsFilterRoutes } from '../../../packages/dropshipping-cosmetics/dist/backend/routes/cosmetics-filter.routes.js';
-import { createInfluencerRoutineRoutes } from '../../../packages/dropshipping-cosmetics/dist/backend/routes/influencer-routine.routes.js';
-import { createSignageRoutes } from '../../../packages/dropshipping-cosmetics/dist/backend/routes/signage.routes.js';
+import { createCosmeticsFilterRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/cosmetics-filter.routes.js';
+import { createInfluencerRoutineRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/influencer-routine.routes.js';
+import { createSignageRoutes } from '@o4o/dropshipping-cosmetics/backend/routes/signage.routes.js';
 
 // Dashboard controller
 import { DashboardController } from '../controllers/dashboardController.js';
@@ -476,14 +476,14 @@ export function setupRoutes(app: Application): void {
   // ✅ NEW: Membership-Yaksa Routes
   // Provides: Member, MemberCategory, Affiliation, Verification endpoints
   // See: packages/membership-yaksa/src/backend/routes/index.ts
-  app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource));
+  app.use('/api/membership', standardLimiter, createMembershipRoutes(AppDataSource) as any);
 
   // ✅ NEW: Dropshipping-Cosmetics Routes
   // Provides: Cosmetics Filter, Influencer Routine, Signage endpoints
   // See: packages/dropshipping-cosmetics/src/backend/routes/
-  app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsFilterRoutes(AppDataSource));
-  app.use('/api/v1/partner/routines', standardLimiter, createInfluencerRoutineRoutes(AppDataSource));
-  app.use('/api/v1/cosmetics/signage', standardLimiter, createSignageRoutes(AppDataSource));
+  app.use('/api/v1/cosmetics', standardLimiter, createCosmeticsFilterRoutes(AppDataSource) as any);
+  app.use('/api/v1/partner/routines', standardLimiter, createInfluencerRoutineRoutes(AppDataSource) as any);
+  app.use('/api/v1/cosmetics/signage', standardLimiter, createSignageRoutes(AppDataSource) as any);
 
   // ❌ DEPRECATED: Old CMS routes path - Use /api/v1/cms instead (Removal: 2025-06-03)
   // app.use('/api/cms', standardLimiter, nextgenCMSRoutes);

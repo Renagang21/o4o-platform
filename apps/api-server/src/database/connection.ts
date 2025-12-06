@@ -132,16 +132,16 @@ import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
 // ✅ NEW: Membership-Yaksa entities
-import { Member } from '../../../packages/membership-yaksa/dist/backend/entities/Member.js';
-import { MemberCategory } from '../../../packages/membership-yaksa/dist/backend/entities/MemberCategory.js';
-import { Affiliation } from '../../../packages/membership-yaksa/dist/backend/entities/Affiliation.js';
-import { MembershipRoleAssignment } from '../../../packages/membership-yaksa/dist/backend/entities/MembershipRoleAssignment.js';
-import { MembershipYear } from '../../../packages/membership-yaksa/dist/backend/entities/MembershipYear.js';
-import { Verification } from '../../../packages/membership-yaksa/dist/backend/entities/Verification.js';
+import { Member } from '@o4o/membership-yaksa/backend/entities/Member.js';
+import { MemberCategory } from '@o4o/membership-yaksa/backend/entities/MemberCategory.js';
+import { Affiliation } from '@o4o/membership-yaksa/backend/entities/Affiliation.js';
+import { MembershipRoleAssignment } from '@o4o/membership-yaksa/backend/entities/MembershipRoleAssignment.js';
+import { MembershipYear } from '@o4o/membership-yaksa/backend/entities/MembershipYear.js';
+import { Verification } from '@o4o/membership-yaksa/backend/entities/Verification.js';
 
 // ✅ NEW: Dropshipping-Cosmetics entities
-import { CosmeticsFilter } from '../../../packages/dropshipping-cosmetics/dist/backend/entities/cosmetics-filter.entity.js';
-import { CosmeticsRoutine } from '../../../packages/dropshipping-cosmetics/dist/backend/entities/cosmetics-routine.entity.js';
+import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';
+import { CosmeticsRoutine } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-routine.entity.js';
 
 // 환경변수 직접 사용 (dotenv는 main.ts에서 먼저 로딩됨)
 const DB_TYPE = process.env.DB_TYPE || 'postgres';

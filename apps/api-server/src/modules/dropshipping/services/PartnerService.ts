@@ -218,11 +218,6 @@ export class PartnerService {
     }
   }
 
-  // Alias for backward compatibility
-  async findById(id: string): Promise<Partner | null> {
-    return this.getPartner(id);
-  }
-
   // 파트너 목록 조회
   async getPartners(filters: PartnerFilters = {}) {
     try {
