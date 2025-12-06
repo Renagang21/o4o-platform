@@ -1,81 +1,85 @@
 /**
- * Cosmetics Product Card Component
+ * CosmeticsProductCard Component (Skeleton)
  *
- * Displays a cosmetics product with metadata
+ * Minimal product card for list display
+ * Actual design/styling will be handled by Antigravity
  */
 
 import React from 'react';
-import type { CosmeticsMetadata } from '../../types.js';
 
 export interface CosmeticsProductCardProps {
-  product: {
-    id: string;
-    name?: string;
-    title?: string;
-    price?: number;
-    image?: string;
-    metadata?: CosmeticsMetadata;
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  metadata: {
+    skinTypes: string[];
+    concerns: string[];
+    category?: string;
+    certifications: string[];
   };
-  onClick?: (productId: string) => void;
+  onCardClick?: (id: string) => void;
 }
 
 export const CosmeticsProductCard: React.FC<CosmeticsProductCardProps> = ({
-  product,
-  onClick,
+  id,
+  name,
+  brand,
+  price,
+  image,
+  metadata,
+  onCardClick,
 }) => {
   const handleClick = () => {
-    if (onClick) {
-      onClick(product.id);
+    if (onCardClick) {
+      onCardClick(id);
+    } else {
+      // Default: navigate to detail page
+      window.location.href = `/cosmetics/product/${id}`;
     }
+  };
+
+  const formatPrice = (amount: number): string => {
+    return new Intl.NumberFormat('ko-KR', {
+      style: 'currency',
+      currency: 'KRW',
+    }).format(amount);
   };
 
   return (
     <div
-      className="cosmetics-product-card"
+      className="cosmetics-product-card bg-white p-4 cursor-pointer"
       onClick={handleClick}
-      style={{
-        border: '1px solid #e0e0e0',
-        borderRadius: '8px',
-        padding: '16px',
-        cursor: onClick ? 'pointer' : 'default',
-      }}
+      data-product-id={id}
     >
-      {product.image && (
-        <img
-          src={product.image}
-          alt={product.name || product.title}
-          style={{ width: '100%', borderRadius: '4px' }}
-        />
-      )}
+      {/* Image */}
+      <div className="product-image bg-gray-100 mb-3">
+        <img src={image} alt={name} className="w-full h-auto" />
+      </div>
 
-      <h3>{product.name || product.title}</h3>
+      {/* Brand */}
+      <div className="product-brand text-sm text-gray-600 mb-1">{brand}</div>
 
-      {product.price && <p className="price">₩{product.price.toLocaleString()}</p>}
+      {/* Name */}
+      <div className="product-name font-medium mb-2">{name}</div>
 
-      {product.metadata && (
-        <div className="metadata">
-          {product.metadata.skinType && product.metadata.skinType.length > 0 && (
-            <div className="skin-types">
-              <strong>Skin Type:</strong>{' '}
-              {product.metadata.skinType.join(', ')}
-            </div>
-          )}
+      {/* Price */}
+      <div className="product-price font-bold mb-3">{formatPrice(price)}</div>
 
-          {product.metadata.concerns && product.metadata.concerns.length > 0 && (
-            <div className="concerns">
-              <strong>Concerns:</strong> {product.metadata.concerns.join(', ')}
-            </div>
-          )}
-
-          {product.metadata.certifications &&
-            product.metadata.certifications.length > 0 && (
-              <div className="certifications">
-                <strong>Certifications:</strong>{' '}
-                {product.metadata.certifications.join(', ')}
-              </div>
-            )}
-        </div>
-      )}
+      {/* Tags (Skin Type / Concerns) */}
+      <div className="product-tags flex flex-wrap gap-1">
+        {metadata.skinTypes.slice(0, 2).map((type, idx) => (
+          <span key={idx} className="tag-skin-type text-xs bg-gray-100 px-2 py-1">
+            {type}
+          </span>
+        ))}
+        {metadata.concerns.slice(0, 2).map((concern, idx) => (
+          <span key={idx} className="tag-concern text-xs bg-gray-100 px-2 py-1">
+            {concern}
+          </span>
+        ))}
+      </div>
     </div>
   );
 };

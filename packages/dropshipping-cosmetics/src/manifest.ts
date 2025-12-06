@@ -362,6 +362,34 @@ export const cosmeticsExtensionManifest: AppManifest = {
         },
       },
     },
+    {
+      name: 'cosmetics-products-list',
+      component: './frontend/shortcodes/cosmetics-products-list.js',
+      description: 'Display filterable product list with cosmetics metadata',
+      usage: '[cosmetics-products-list filters="skinType:dry,concerns:hydration" sort="newest" limit="20"]',
+      attributes: {
+        filters: {
+          type: 'string',
+          required: false,
+          description: 'Filter string (format: "skinType:dry,concerns:hydration")',
+        },
+        sort: {
+          type: 'string',
+          required: false,
+          description: 'Sort order: newest | price_asc | price_desc | popular',
+        },
+        limit: {
+          type: 'number',
+          required: false,
+          description: 'Items per page (default: 20)',
+        },
+        apiBaseUrl: {
+          type: 'string',
+          required: false,
+          description: 'API base URL (defaults to /api/v1)',
+        },
+      },
+    },
   ],
 
   // Admin menu extension (adds submenu under Dropshipping)

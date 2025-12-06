@@ -1,100 +1,69 @@
 /**
  * Cosmetics Products List Shortcode
  *
- * Shortcode: [cosmetics-products-list]
+ * Usage: [cosmetics-products-list filters="skinType:dry,concerns:hydration" sort="newest" limit="20"]
  *
- * Displays a filterable list of cosmetics products
+ * Displays a filterable list of cosmetics products with sidebar filters
  */
 
-import React, { useState, useEffect } from 'react';
-import { CosmeticsProductCard } from '../components/CosmeticsProductCard.js';
-import { FilterControlPanel } from '../components/FilterControlPanel.js';
-import type { CosmeticsFilters } from '../../types.js';
+import React from 'react';
+import { CosmeticsProductsList } from '../components/CosmeticsProductsList.js';
+import type { FilterState } from '../components/CosmeticsFilterSidebar.js';
 
-export interface CosmeticsProductsListProps {
-  filters?: CosmeticsFilters;
-  showFilters?: boolean;
-  columns?: number;
+export interface CosmeticsProductsListShortcodeProps {
+  filters?: string; // Format: "skinType:dry,concerns:hydration,category:skincare"
+  sort?: 'newest' | 'price_asc' | 'price_desc' | 'popular';
+  limit?: number;
+  apiBaseUrl?: string;
 }
 
-export const CosmeticsProductsList: React.FC<CosmeticsProductsListProps> = ({
-  filters: initialFilters = {},
-  showFilters = true,
-  columns = 3,
+export const CosmeticsProductsListShortcode: React.FC<CosmeticsProductsListShortcodeProps> = ({
+  filters: filtersString,
+  sort = 'newest',
+  limit = 20,
+  apiBaseUrl,
 }) => {
-  const [filters, setFilters] = useState<CosmeticsFilters>(initialFilters);
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  // Parse filters string to FilterState object
+  const parseFilters = (filterStr?: string): Partial<FilterState> => {
+    if (!filterStr) return {};
 
-  useEffect(() => {
-    fetchProducts();
-  }, [filters]);
+    const parsed: Partial<FilterState> = {
+      skinType: [],
+      concerns: [],
+      certifications: [],
+    };
 
-  const fetchProducts = async () => {
-    setLoading(true);
+    const pairs = filterStr.split(',').map((p) => p.trim());
 
-    try {
-      // TODO: Replace with actual API call
-      const response = await fetch('/api/v1/cosmetics/products/filter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ filters }),
-      });
+    pairs.forEach((pair) => {
+      const [key, value] = pair.split(':').map((s) => s.trim());
 
-      const data = await response.json() as { data?: any[] };
-      setProducts(data.data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
+      if (key === 'skinType' && value) {
+        parsed.skinType = value.split('|');
+      } else if (key === 'concerns' && value) {
+        parsed.concerns = value.split('|');
+      } else if (key === 'category' && value) {
+        parsed.category = value;
+      } else if (key === 'brand' && value) {
+        parsed.brand = value;
+      } else if (key === 'certifications' && value) {
+        parsed.certifications = value.split('|');
+      }
+    });
+
+    return parsed;
   };
 
-  const handleFilterChange = (newFilters: CosmeticsFilters) => {
-    setFilters(newFilters);
-  };
-
-  const handleProductClick = (productId: string) => {
-    console.log('Product clicked:', productId);
-    // TODO: Navigate to product detail page
-  };
+  const initialFilters = parseFilters(filtersString);
 
   return (
-    <div className="cosmetics-products-list">
-      {showFilters && (
-        <FilterControlPanel
-          onFilterChange={handleFilterChange}
-          initialFilters={initialFilters}
-        />
-      )}
-
-      {loading && <div>Loading products...</div>}
-
-      <div
-        className="products-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          gap: '16px',
-          marginTop: '16px',
-        }}
-      >
-        {products.map((product) => (
-          <CosmeticsProductCard
-            key={product.id}
-            product={product}
-            onClick={handleProductClick}
-          />
-        ))}
-      </div>
-
-      {!loading && products.length === 0 && (
-        <div>No products found matching your filters.</div>
-      )}
-    </div>
+    <CosmeticsProductsList
+      apiBaseUrl={apiBaseUrl}
+      initialFilters={initialFilters}
+      initialSort={sort}
+      initialLimit={limit}
+    />
   );
 };
 
-export default CosmeticsProductsList;
+export default CosmeticsProductsListShortcode;
