@@ -132,13 +132,15 @@ import { View as CMSView } from '../modules/cms/entities/View.js';
 import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
 // ✅ NEW: Membership-Yaksa entities
-// Import order: Category first (no dependencies), then Member, then related entities
-import { MemberCategory } from '@o4o/membership-yaksa/backend/entities/MemberCategory.js';
-import { Member } from '@o4o/membership-yaksa/backend/entities/Member.js';
-import { Affiliation } from '@o4o/membership-yaksa/backend/entities/Affiliation.js';
-import { MembershipRoleAssignment } from '@o4o/membership-yaksa/backend/entities/MembershipRoleAssignment.js';
-import { MembershipYear } from '@o4o/membership-yaksa/backend/entities/MembershipYear.js';
-import { Verification } from '@o4o/membership-yaksa/backend/entities/Verification.js';
+// Import from index to ensure correct loading order and prevent circular dependency
+import {
+  MemberCategory,
+  Member,
+  Affiliation,
+  MembershipRoleAssignment,
+  MembershipYear,
+  Verification,
+} from '@o4o/membership-yaksa/backend/entities/index.js';
 
 // ✅ NEW: Dropshipping-Cosmetics entities
 import { CosmeticsFilter } from '@o4o/dropshipping-cosmetics/backend/entities/cosmetics-filter.entity.js';

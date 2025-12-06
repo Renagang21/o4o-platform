@@ -1,11 +1,22 @@
 /**
- * Membership-Yaksa Entities
+ * Entity exports with controlled loading order
  *
- * 약사회 회원 관리 시스템 엔티티
+ * This file ensures entities are loaded in dependency order to prevent
+ * circular dependency initialization errors in ES modules.
+ *
+ * Loading order:
+ * 1. MemberCategory (no dependencies)
+ * 2. Member (depends on MemberCategory)
+ * 3. Affiliation, MembershipRoleAssignment, MembershipYear, Verification (depend on Member)
  */
 
-export { Member } from './Member.js';
+// Load independent entities first
 export { MemberCategory } from './MemberCategory.js';
+
+// Then load Member which depends on MemberCategory
+export { Member } from './Member.js';
+
+// Finally load entities that depend on Member
 export { Affiliation } from './Affiliation.js';
 export { MembershipRoleAssignment } from './MembershipRoleAssignment.js';
 export { MembershipYear } from './MembershipYear.js';
