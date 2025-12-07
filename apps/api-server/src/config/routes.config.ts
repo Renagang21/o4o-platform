@@ -164,6 +164,9 @@ import channelsRoutes from '../routes/v1/channels.routes.js';
 // Neture Forum Routes
 import netureForumRoutes from '../routes/neture/forum.routes.js';
 
+// Generic Forum Routes (forum-core)
+import forumRoutes from '../routes/forum/forum.routes.js';
+
 // ❌ DEPRECATED: Old CMS routes - replaced by Phase C-2 CMS V2
 // import nextgenCMSRoutes from '../routes/cms.routes.js';
 
@@ -472,6 +475,14 @@ export function setupRoutes(app: Application): void {
 
   // Neture Forum Routes
   app.use('/api/v1/neture/forum', standardLimiter, netureForumRoutes);
+
+  // ✅ NEW: Generic Forum Routes (forum-core)
+  // Provides: Posts CRUD, Categories CRUD, Comments, Stats, Moderation
+  // Used by admin-dashboard for forum management
+  app.use('/api/v1/forum', standardLimiter, forumRoutes);
+  // Legacy alias for admin-dashboard compatibility
+  app.use('/api/services/forum', standardLimiter, forumRoutes);
+  app.use('/api/forum', standardLimiter, forumRoutes);
 
   // ✅ NEW: CMS Module V2 Routes (Phase C-2)
   // Provides: CustomPostType, CustomField, View, Page endpoints
