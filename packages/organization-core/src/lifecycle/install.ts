@@ -1,5 +1,5 @@
-import { InstallContext } from '../types/context';
-import { Organization } from '../entities/Organization';
+import { InstallContext } from '../types/context.js';
+import { Organization } from '../entities/Organization.js';
 
 /**
  * Install Hook

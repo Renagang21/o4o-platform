@@ -8,6 +8,8 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,

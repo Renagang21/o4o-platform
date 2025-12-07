@@ -1,4 +1,4 @@
-import { ActivateContext } from '../types/context';
+import { ActivateContext } from '../types/context.js';
 
 /**
  * Activate Hook

@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Organization } from './Organization';
+import { Organization } from './Organization.js';
 
 /**
  * OrganizationMember Entity

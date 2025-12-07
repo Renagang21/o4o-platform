@@ -1,4 +1,4 @@
-import { DeactivateContext } from '../types/context';
+import { DeactivateContext } from '../types/context.js';
 
 /**
  * Deactivate Hook

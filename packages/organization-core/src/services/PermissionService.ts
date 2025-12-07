@@ -1,6 +1,6 @@
 import { DataSource, Repository, IsNull } from 'typeorm';
-import { RoleAssignment } from '../entities/RoleAssignment';
-import { Organization } from '../entities/Organization';
+import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { Organization } from '../entities/Organization.js';
 
 /**
  * Permission Context

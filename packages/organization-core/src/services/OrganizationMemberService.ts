@@ -1,11 +1,11 @@
 import { DataSource, Repository, IsNull } from 'typeorm';
-import { OrganizationMember } from '../entities/OrganizationMember';
-import { Organization } from '../entities/Organization';
+import { OrganizationMember } from '../entities/OrganizationMember.js';
+import { Organization } from '../entities/Organization.js';
 import {
   CreateOrganizationMemberDto,
   UpdateOrganizationMemberDto,
   ListOrganizationMemberDto,
-} from '../types/dtos';
+} from '../types/dtos.js';
 
 /**
  * OrganizationMemberService

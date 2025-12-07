@@ -1,2 +1,2 @@
-export { PermissionGuard, checkPermission, requirePermission } from './PermissionGuard';
-export type { PermissionGuardConfig, PermissionGuardResult } from './PermissionGuard';
+export { PermissionGuard, checkPermission, requirePermission } from './PermissionGuard.js';
+export type { PermissionGuardConfig, PermissionGuardResult } from './PermissionGuard.js';

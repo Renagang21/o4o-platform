@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { PermissionService, PermissionContext } from '../services/PermissionService';
+import { PermissionService, PermissionContext } from '../services/PermissionService.js';
 
 /**
  * Permission Guard Configuration

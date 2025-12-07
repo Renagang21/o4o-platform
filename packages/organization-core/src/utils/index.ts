@@ -1,1 +1,1 @@
-export * from './organizationPermissions';
+export * from './organizationPermissions.js';

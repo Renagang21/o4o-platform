@@ -7,8 +7,8 @@
  * 실제 API 서버에서는 @nestjs/common 데코레이터를 사용하여 등록됩니다.
  */
 
-import { OrganizationService } from '../services/OrganizationService';
-import { OrganizationMemberService } from '../services/OrganizationMemberService';
+import { OrganizationService } from '../services/OrganizationService.js';
+import { OrganizationMemberService } from '../services/OrganizationMemberService.js';
 import {
   CreateOrganizationDto,
   UpdateOrganizationDto,
@@ -16,7 +16,7 @@ import {
   CreateOrganizationMemberDto,
   UpdateOrganizationMemberDto,
   ListOrganizationMemberDto,
-} from '../types/dtos';
+} from '../types/dtos.js';
 
 /**
  * Organization Controller

@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { PermissionService } from '../services/PermissionService';
+import { PermissionService } from '../services/PermissionService.js';
 
 /**
  * Organization Permission Utilities

@@ -1,4 +1,4 @@
-import { UninstallContext } from '../types/context';
+import { UninstallContext } from '../types/context.js';
 
 /**
  * Uninstall Hook

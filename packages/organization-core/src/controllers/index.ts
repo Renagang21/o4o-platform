@@ -1,1 +1,1 @@
-export { OrganizationController } from './OrganizationController';
+export { OrganizationController } from './OrganizationController.js';

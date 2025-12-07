@@ -1,3 +1,3 @@
-export { Organization } from './Organization';
-export { OrganizationMember } from './OrganizationMember';
-export { RoleAssignment } from './RoleAssignment';
+export { Organization } from './Organization.js';
+export { OrganizationMember } from './OrganizationMember.js';
+export { RoleAssignment } from './RoleAssignment.js';
