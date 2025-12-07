@@ -96,7 +96,6 @@ export interface CMSCustomPostType {
  */
 export async function fetchPageBySlug(slug: string): Promise<CMSPage | null> {
   const url = `${API_BASE_URL}/api/v1/cms/public/page/${slug}`;
-  console.log(`[fetchPageBySlug] Fetching: ${url}`);
 
   try {
     const response = await fetch(url, {
@@ -105,21 +104,16 @@ export async function fetchPageBySlug(slug: string): Promise<CMSPage | null> {
       },
     });
 
-    console.log(`[fetchPageBySlug] Response status: ${response.status}`);
-
     if (!response.ok) {
       if (response.status === 404) {
-        console.log(`[fetchPageBySlug] Page not found (404): ${slug}`);
         return null;
       }
       throw new Error(`Failed to fetch page: ${response.statusText}`);
     }
 
     const result = await response.json();
-    console.log(`[fetchPageBySlug] Response data:`, result);
 
     if (!result.success) {
-      console.log(`[fetchPageBySlug] Response not successful for ${slug}`);
       return null;
     }
 
@@ -135,7 +129,6 @@ export async function fetchPageBySlug(slug: string): Promise<CMSPage | null> {
  */
 export async function fetchViewBySlug(slug: string): Promise<{ view: CMSView; renderData?: any } | null> {
   const url = `${API_BASE_URL}/api/v1/cms/public/view/${slug}`;
-  console.log(`[fetchViewBySlug] Fetching: ${url}`);
 
   try {
     const response = await fetch(url, {
@@ -144,21 +137,16 @@ export async function fetchViewBySlug(slug: string): Promise<{ view: CMSView; re
       },
     });
 
-    console.log(`[fetchViewBySlug] Response status: ${response.status}`);
-
     if (!response.ok) {
       if (response.status === 404) {
-        console.log(`[fetchViewBySlug] View not found (404): ${slug}`);
         return null;
       }
       throw new Error(`Failed to fetch view: ${response.statusText}`);
     }
 
     const result = await response.json();
-    console.log(`[fetchViewBySlug] Response data:`, result);
 
     if (!result.success) {
-      console.log(`[fetchViewBySlug] Response not successful for ${slug}`);
       return null;
     }
 
