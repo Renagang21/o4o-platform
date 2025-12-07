@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Palette } from 'lucide-react';
 import cmsAPI, { View, ViewStatus, ViewSchema } from '@/lib/cms';
 import { useToast } from '@/contexts/ToastContext';
 import FormSection from '@/components/cms/forms/FormSection';
@@ -200,18 +200,30 @@ export default function ViewForm() {
         </button>
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">
-            {isEditMode ? 'Edit View Template' : 'Create View Template'}
+            {isEditMode ? 'Edit View Template (JSON Mode)' : 'Create View Template'}
           </h1>
-          {formData.slug && (
-            <button
-              type="button"
-              onClick={handlePreview}
-              className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {isEditMode && id && (
+              <button
+                type="button"
+                onClick={() => navigate(`/admin/cms/views/${id}/designer`)}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <Palette className="w-4 h-4 mr-2" />
+                Visual Designer
+              </button>
+            )}
+            {formData.slug && (
+              <button
+                type="button"
+                onClick={handlePreview}
+                className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
