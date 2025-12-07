@@ -7,6 +7,7 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { DesignerState, DesignerNode } from '../types/designer.types';
 import { getComponentDefinition } from '../config/componentRegistry';
+import { cmsViewToDesigner } from '../core/jsonAdapter';
 
 interface DesignerContextValue {
   state: DesignerState;
@@ -44,8 +45,12 @@ const INITIAL_STATE: DesignerState = {
 export function DesignerProvider({ children, initialView }: { children: ReactNode; initialView?: any }) {
   const [state, setState] = useState<DesignerState>(() => {
     if (initialView) {
-      // TODO: Convert CMS View JSON to DesignerNode tree
-      return INITIAL_STATE;
+      // Convert CMS View JSON to DesignerNode tree
+      const rootNode = cmsViewToDesigner(initialView);
+      return {
+        ...INITIAL_STATE,
+        rootNode,
+      };
     }
     return INITIAL_STATE;
   });

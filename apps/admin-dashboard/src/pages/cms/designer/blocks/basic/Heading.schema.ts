@@ -24,6 +24,7 @@ export const HeadingSchema: ComponentDefinition = {
       label: 'Text',
       type: 'text',
       required: true,
+      placeholder: 'Enter heading text...',
     },
     {
       name: 'level',

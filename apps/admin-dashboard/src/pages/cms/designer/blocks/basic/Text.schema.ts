@@ -24,6 +24,7 @@ export const TextSchema: ComponentDefinition = {
       label: 'Text',
       type: 'textarea',
       required: true,
+      placeholder: 'Enter your text here...',
     },
     {
       name: 'size',
