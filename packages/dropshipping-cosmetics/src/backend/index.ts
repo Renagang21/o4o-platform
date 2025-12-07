@@ -4,6 +4,10 @@
  * Main export for backend functionality
  */
 
+import { Router } from 'express';
+import type { DataSource } from 'typeorm';
+import { createCosmeticsModule, CosmeticsEntities } from './module.js';
+
 export * from './entities/index.js';
 export * from './services/cosmetics-filter.service.js';
 export * from './services/influencer-routine.service.js';
@@ -18,3 +22,31 @@ export * from './middleware/permissions.middleware.js';
 export * from './hooks/product-filter.hook.js';
 export { createCosmeticsModule, CosmeticsEntities } from './module.js';
 export { default as CosmeticsModule } from './module.js';
+
+/**
+ * Routes factory compatible with Module Loader
+ *
+ * Creates a combined router for all cosmetics routes
+ *
+ * @param dataSource - TypeORM DataSource from API server
+ */
+export function routes(dataSource?: DataSource | any): Router {
+  if (!dataSource) {
+    throw new Error('DataSource is required for dropshipping-cosmetics routes');
+  }
+
+  const module = createCosmeticsModule(dataSource);
+  const router = Router();
+
+  // Register all cosmetics routes
+  for (const route of module.routes) {
+    router.use(route.path.replace('/api/v1/cosmetics', ''), route.router);
+  }
+
+  return router;
+}
+
+/**
+ * Entity list for TypeORM
+ */
+export const entities = CosmeticsEntities;

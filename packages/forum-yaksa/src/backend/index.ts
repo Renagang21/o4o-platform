@@ -1,7 +1,7 @@
 /**
- * Forum-App Backend Exports
+ * Forum-Yaksa Backend Exports
  *
- * Core forum package - provides entities and services
+ * Extension package - provides entities and services only, no routes
  */
 
 // Export entities
