@@ -53,6 +53,7 @@ const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentMa
 // P4-Admin: Role Applications Management
 const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdminPage'));
 // Membership-Yaksa: Membership Management
+const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/MembershipDashboard'));
 const MemberManagement = lazy(() => import('@/pages/membership/members/MemberManagement'));
 const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
@@ -543,6 +544,13 @@ function App() {
                     } />
 
                     {/* Membership-Yaksa: 회원 관리 */}
+                    <Route path="/admin/membership/dashboard" element={
+                      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <MembershipDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
                     <Route path="/admin/membership/members" element={
                       <AdminProtectedRoute requiredPermissions={['membership:view', 'membership:manage']}>
                         <Suspense fallback={<PageLoader />}>

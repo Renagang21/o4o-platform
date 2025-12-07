@@ -10,6 +10,7 @@ import {
   Bell,
   FileText,
   UserCheck,
+  BarChart2,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -143,6 +144,12 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <UserCheck className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
     children: [
+      {
+        id: 'membership-dashboard',
+        label: 'Dashboard',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/admin/membership/dashboard',
+      },
       {
         id: 'membership-members',
         label: 'Members',
