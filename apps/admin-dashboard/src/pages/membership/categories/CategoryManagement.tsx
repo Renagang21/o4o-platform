@@ -17,6 +17,7 @@ import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import ExportButton from '@/components/membership/ExportButton';
 
 interface MemberCategory {
   id: string;
@@ -186,13 +187,16 @@ const CategoryManagement = () => {
                 </p>
               </div>
               {!isCreating && (
-                <button
-                  onClick={handleStartCreate}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  분류 추가
-                </button>
+                <div className="flex gap-3">
+                  <ExportButton type="categories" />
+                  <button
+                    onClick={handleStartCreate}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    분류 추가
+                  </button>
+                </div>
               )}
             </div>
           </div>

@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import { Pagination } from '@/components/common/Pagination';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import ExportButton from '@/components/membership/ExportButton';
 
 interface Verification {
   id: string;
@@ -165,10 +166,22 @@ const VerificationManagement = () => {
         <div className="bg-white rounded-lg shadow">
           {/* Header */}
           <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-semibold text-gray-900">검증 관리</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              회원의 면허 검증 요청을 검토하고 승인/거부할 수 있습니다.
-            </p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900">검증 관리</h1>
+                <p className="mt-1 text-sm text-gray-600">
+                  회원의 면허 검증 요청을 검토하고 승인/거부할 수 있습니다.
+                </p>
+              </div>
+              <ExportButton
+                type="verifications"
+                filters={{
+                  search: debouncedSearchQuery,
+                  status: filterStatus !== 'all' ? filterStatus : undefined,
+                  method: filterMethod !== 'all' ? filterMethod : undefined,
+                }}
+              />
+            </div>
           </div>
 
           {/* Filters */}
