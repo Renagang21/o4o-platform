@@ -6,7 +6,7 @@
  */
 
 import type { ViewSchema } from '@/view/types';
-import { fetchPageBySlug } from './client';
+import { fetchPageBySlug, fetchViewBySlug } from './client';
 import { adaptCMSViewToViewSchema, isViewRendererCompatible } from './adapter';
 
 // Cache for CMS pages to avoid redundant API calls
@@ -35,33 +35,66 @@ export async function loadCMSView(slug: string, preview = false): Promise<ViewSc
   }
 
   try {
-    // Fetch page from CMS API
+    // Try to fetch page from CMS API first
     const page = await fetchPageBySlug(slug);
 
-    if (!page) {
-      // Page not found or not published
-      setCachedView(slug, null);
-      return null;
+    if (page) {
+      // Check if page has an associated view
+      if (!page.view) {
+        console.error(`CMS Page ${slug} has no associated view`);
+        setCachedView(slug, null);
+        return null;
+      }
+
+      // Check ViewRenderer compatibility
+      if (!isViewRendererCompatible(page.view)) {
+        console.error(`CMS View for page ${slug} is not ViewRenderer compatible`);
+        setCachedView(slug, null);
+        return null;
+      }
+
+      // Adapt CMS view to ViewRenderer format
+      const viewSchema = adaptCMSViewToViewSchema(page.view, page);
+
+      // Cache the result (skip cache in preview mode)
+      if (!preview) {
+        setCachedView(slug, viewSchema);
+      }
+
+      return viewSchema;
     }
 
-    // Check if page has an associated view
-    if (!page.view) {
-      console.error(`CMS Page ${slug} has no associated view`);
+    // Fallback: Try to fetch view directly (for view preview without a page)
+    const viewData = await fetchViewBySlug(slug);
+
+    if (!viewData) {
+      // Neither page nor view found
       setCachedView(slug, null);
       return null;
     }
 
     // Check ViewRenderer compatibility
-    if (!isViewRendererCompatible(page.view)) {
-      console.error(`CMS View for page ${slug} is not ViewRenderer compatible`);
+    if (!isViewRendererCompatible(viewData.view)) {
+      console.error(`CMS View ${slug} is not ViewRenderer compatible`);
       setCachedView(slug, null);
       return null;
     }
 
-    // Adapt CMS view to ViewRenderer format
-    const viewSchema = adaptCMSViewToViewSchema(page.view, page);
+    // Adapt CMS view to ViewRenderer format (using renderData if available)
+    const mockPage = {
+      id: 'preview',
+      slug: viewData.view.slug,
+      title: viewData.view.name,
+      content: viewData.renderData?.content || {},
+      status: 'published' as const,
+      currentVersion: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    // Cache the result (skip cache in preview mode)
+    const viewSchema = adaptCMSViewToViewSchema(viewData.view, mockPage);
+
+    // Don't cache preview views
     if (!preview) {
       setCachedView(slug, viewSchema);
     }

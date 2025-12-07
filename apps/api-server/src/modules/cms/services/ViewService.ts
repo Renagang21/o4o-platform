@@ -251,4 +251,33 @@ export class ViewService extends BaseService<View> {
       order: { createdAt: 'DESC' }
     });
   }
+
+  // Preview View (for frontend preview without requiring a Page)
+  async previewView(slug: string): Promise<{ view: View; renderData: any } | null> {
+    const view = await this.viewRepository.findOne({ where: { slug } });
+
+    if (!view) {
+      return null;
+    }
+
+    // Generate mock/sample data for preview
+    const renderData = {
+      meta: {
+        title: `Preview: ${view.name}`,
+        description: view.description || 'View template preview',
+        slug: view.slug,
+      },
+      content: {
+        // Sample content for preview
+        title: 'Sample Title',
+        subtitle: 'This is a preview with sample data',
+        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      },
+      schema: view.schema,
+    };
+
+    logger.info(`[CMS] Previewing view: ${view.slug}`, { viewId: view.id });
+
+    return { view, renderData };
+  }
 }

@@ -153,6 +153,9 @@ router.post('/pages/:id/revert', requireAdmin, asyncHandler(PageController.rever
 // GET /api/v1/cms/public/page/:slug - Get Published Page by slug (for frontend)
 router.get('/public/page/:slug', asyncHandler(PageController.getPublishedPage));
 
+// GET /api/v1/cms/public/view/:slug - Preview View template (for frontend preview)
+router.get('/public/view/:slug', asyncHandler(PageController.getPublishedView));
+
 // GET /api/v1/cms/public/pages - Get All Published Pages (for sitemap)
 router.get('/public/pages', asyncHandler(PageController.getPublishedPages));
 

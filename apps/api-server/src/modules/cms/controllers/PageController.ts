@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { PageService } from '../services/PageService.js';
+import { ViewService } from '../services/ViewService.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -254,6 +255,28 @@ export class PageController extends BaseController {
       });
     } catch (error: any) {
       logger.error('[PageController.getPublishedPage] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // Preview View (No Auth Required) - for previewing View templates without a Page
+  static async getPublishedView(req: Request, res: Response): Promise<any> {
+    try {
+      const { slug } = req.params;
+      const service = ViewService.getInstance();
+
+      const result = await service.previewView(slug);
+
+      if (!result) {
+        return BaseController.notFound(res, 'View not found');
+      }
+
+      return BaseController.ok(res, {
+        view: result.view,
+        renderData: result.renderData
+      });
+    } catch (error: any) {
+      logger.error('[PageController.getPublishedView] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

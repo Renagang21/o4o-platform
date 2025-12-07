@@ -123,7 +123,39 @@ export async function fetchPageBySlug(slug: string): Promise<CMSPage | null> {
 }
 
 /**
+ * Fetch view by slug (public endpoint for view preview)
+ */
+export async function fetchViewBySlug(slug: string): Promise<{ view: CMSView; renderData?: any } | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/cms/public/view/${slug}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error(`Failed to fetch view: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return null;
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching view:', error);
+    return null;
+  }
+}
+
+/**
  * Fetch view by ID (public endpoint for published views)
+ * @deprecated Use fetchViewBySlug instead
  */
 export async function fetchViewById(viewId: string): Promise<CMSView | null> {
   try {
@@ -143,7 +175,7 @@ export async function fetchViewById(viewId: string): Promise<CMSView | null> {
       return null;
     }
 
-    return result.data;
+    return result.data.view;
   } catch (error) {
     console.error('Error fetching view:', error);
     return null;
