@@ -21,17 +21,9 @@
     }
   },
   "include": [
-    "src/manifest.ts",
-    "src/index.ts",
-    "src/types/**/*"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "src/entities/**/*",
-    "src/services/**/*",
-    "src/controllers/**/*",
-    "src/guards/**/*",
-    "src/utils/**/*",
-    "src/lifecycle/**/*",
     "dist",
     "node_modules",
     "**/*.test.ts",
