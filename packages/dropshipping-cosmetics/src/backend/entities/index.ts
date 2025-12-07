@@ -11,3 +11,6 @@ export { CosmeticsSkinType } from './skin-type.entity.js';
 export { CosmeticsConcern } from './concern.entity.js';
 export { CosmeticsIngredient } from './ingredient.entity.js';
 export { CosmeticsCategory } from './category.entity.js';
+
+// Signage Entities
+export { CosmeticsSignagePlaylist } from './signage-playlist.entity.js';
