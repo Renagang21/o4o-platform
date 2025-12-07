@@ -14,3 +14,6 @@ export { CosmeticsCategory } from './category.entity.js';
 
 // Signage Entities
 export { CosmeticsSignagePlaylist } from './signage-playlist.entity.js';
+
+// Seller Workflow Entities
+export { CosmeticsSellerWorkflowSession } from './seller-workflow-session.entity.js';

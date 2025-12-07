@@ -14,6 +14,7 @@ import {
   CosmeticsIngredient,
   CosmeticsCategory,
   CosmeticsSignagePlaylist,
+  CosmeticsSellerWorkflowSession,
 } from './entities/index.js';
 import { createCosmeticsFilterRoutes } from './routes/cosmetics-filter.routes.js';
 import { createInfluencerRoutineRoutes } from './routes/influencer-routine.routes.js';
@@ -22,6 +23,7 @@ import { createRecommendationRoutes } from './routes/recommendation.routes.js';
 import { createBrandRoutes } from './routes/brand.routes.js';
 import { createDictionaryRoutes } from './routes/dictionary.routes.js';
 import { createSignagePlaylistRoutes } from './routes/signage-playlist.routes.js';
+import { createSellerWorkflowRoutes } from './routes/seller-workflow.routes.js';
 
 export function createCosmeticsModule(dataSource: DataSource) {
   return {
@@ -38,6 +40,7 @@ export function createCosmeticsModule(dataSource: DataSource) {
       CosmeticsIngredient,
       CosmeticsCategory,
       CosmeticsSignagePlaylist,
+      CosmeticsSellerWorkflowSession,
     ],
 
     // Express routes (initialized with DataSource)
@@ -70,6 +73,10 @@ export function createCosmeticsModule(dataSource: DataSource) {
         path: '/api/v1/cosmetics',
         router: createSignagePlaylistRoutes(dataSource),
       },
+      {
+        path: '/api/v1/cosmetics',
+        router: createSellerWorkflowRoutes(dataSource),
+      },
     ],
   };
 }
@@ -84,6 +91,7 @@ export const CosmeticsEntities = [
   CosmeticsIngredient,
   CosmeticsCategory,
   CosmeticsSignagePlaylist,
+  CosmeticsSellerWorkflowSession,
 ];
 
 export default createCosmeticsModule;
