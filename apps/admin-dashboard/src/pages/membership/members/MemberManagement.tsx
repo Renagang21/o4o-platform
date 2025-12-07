@@ -19,6 +19,8 @@ import toast from 'react-hot-toast';
 import { Pagination } from '@/components/common/Pagination';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import ExportButton from '@/components/membership/ExportButton';
+import BulkActionToolbar from '@/components/membership/BulkActionToolbar';
 
 interface Member {
   id: string;
@@ -64,6 +66,7 @@ const MemberManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
   const [totalMembers, setTotalMembers] = useState(0);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   useKeyboardShortcuts();
@@ -149,7 +152,34 @@ const MemberManagement = () => {
     }
   };
 
+  // Bulk selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(members.map((m) => m.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      setSelectedIds(selectedIds.filter((sid) => sid !== id));
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+  };
+
+  const handleBulkSuccess = () => {
+    fetchMembers();
+    setSelectedIds([]);
+  };
+
   const totalPages = Math.ceil(totalMembers / itemsPerPage);
+  const isAllSelected = members.length > 0 && selectedIds.length === members.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -171,13 +201,24 @@ const MemberManagement = () => {
                   약사 회원 정보를 관리하고 회원 상태를 확인할 수 있습니다.
                 </p>
               </div>
-              <button
-                onClick={() => toast.info('회원 추가 기능 - 구현 예정')}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <UserPlus className="w-5 h-5 mr-2" />
-                회원 추가
-              </button>
+              <div className="flex gap-3">
+                <ExportButton
+                  type="members"
+                  filters={{
+                    search: debouncedSearchQuery,
+                    categoryId: filterCategory !== 'all' ? filterCategory : undefined,
+                    isVerified: filterVerified !== 'all' ? filterVerified === 'verified' : undefined,
+                    isActive: filterActive !== 'all' ? filterActive === 'active' : undefined,
+                  }}
+                />
+                <button
+                  onClick={() => toast.info('회원 추가 기능 - 구현 예정')}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  회원 추가
+                </button>
+              </div>
             </div>
           </div>
 
@@ -240,6 +281,16 @@ const MemberManagement = () => {
             </div>
           </div>
 
+          {/* Bulk Action Toolbar */}
+          {selectedIds.length > 0 && (
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              categories={categories}
+              onSuccess={handleBulkSuccess}
+              onClearSelection={handleClearSelection}
+            />
+          )}
+
           {/* Table */}
           <div className="overflow-x-auto">
             {loading ? (
@@ -255,6 +306,14 @@ const MemberManagement = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th className="px-6 py-3 text-left">
+                      <input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       이름
                     </th>
@@ -281,6 +340,14 @@ const MemberManagement = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {members.map((member) => (
                     <tr key={member.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(member.id)}
+                          onChange={(e) => handleSelectOne(member.id, e.target.checked)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{member.name}</div>
                         <div className="text-sm text-gray-500">{member.email || '-'}</div>
