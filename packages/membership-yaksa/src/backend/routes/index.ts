@@ -6,6 +6,7 @@
 
 export { createMemberRoutes } from './memberRoutes.js';
 export { createVerificationRoutes } from './verificationRoutes.js';
+export { createStatsRoutes } from './statsRoutes.js';
 
 /**
  * Create all membership routes
@@ -16,6 +17,7 @@ import { Router } from 'express';
 import { DataSource } from 'typeorm';
 import { createMemberRoutes } from './memberRoutes.js';
 import { createVerificationRoutes } from './verificationRoutes.js';
+import { createStatsRoutes } from './statsRoutes.js';
 
 export function createMembershipRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -25,6 +27,9 @@ export function createMembershipRoutes(dataSource: DataSource): Router {
 
   // /api/membership/verifications
   router.use('/verifications', createVerificationRoutes(dataSource));
+
+  // /api/membership/stats
+  router.use('/stats', createStatsRoutes(dataSource));
 
   return router;
 }

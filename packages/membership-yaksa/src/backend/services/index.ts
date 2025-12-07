@@ -7,11 +7,13 @@ export { MemberCategoryService } from './MemberCategoryService.js';
 export { AffiliationService } from './AffiliationService.js';
 export { VerificationService } from './VerificationService.js';
 export { MembershipYearService } from './MembershipYearService.js';
+export { StatsService } from './StatsService.js';
 
 export type {
   CreateMemberDto,
   UpdateMemberDto,
   MemberFilterDto,
+  ComputedMemberStatus,
 } from './MemberService.js';
 
 export type {
@@ -33,3 +35,7 @@ export type {
   CreateMembershipYearDto,
   PaymentDto,
 } from './MembershipYearService.js';
+
+export type {
+  DashboardStats,
+} from './StatsService.js';

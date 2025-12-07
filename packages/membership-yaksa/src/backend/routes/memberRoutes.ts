@@ -29,5 +29,8 @@ export function createMemberRoutes(dataSource: DataSource): Router {
   // PATCH /api/membership/members/:id/verify
   router.patch('/:id/verify', (req, res) => controller.verify(req, res));
 
+  // POST /api/membership/members/bulk-update
+  router.post('/bulk-update', (req, res) => controller.bulkUpdate(req, res));
+
   return router;
 }
