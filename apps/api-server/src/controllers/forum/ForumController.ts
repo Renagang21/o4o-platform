@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import { ForumService, ForumSearchOptions } from '@o4o-apps/forum';
 import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, PostStatus } from '@o4o-apps/forum';
 import { ForumCategory } from '@o4o-apps/forum';
 import { ForumComment, CommentStatus } from '@o4o-apps/forum';
+import { User } from '../../entities/User.js';
+import { MoreThanOrEqual } from 'typeorm';
 import logger from '../../utils/logger.js';
 
 /**
@@ -13,10 +14,20 @@ import logger from '../../utils/logger.js';
  * Used by admin-dashboard for forum management
  */
 export class ForumController {
-  private forumService: ForumService;
+  private get postRepository() {
+    return AppDataSource.getRepository(ForumPost);
+  }
 
-  constructor() {
-    this.forumService = new ForumService();
+  private get categoryRepository() {
+    return AppDataSource.getRepository(ForumCategory);
+  }
+
+  private get commentRepository() {
+    return AppDataSource.getRepository(ForumComment);
+  }
+
+  private get userRepository() {
+    return AppDataSource.getRepository(User);
   }
 
   // ============================================================================
@@ -45,26 +56,70 @@ export class ForumController {
    */
   async listPosts(req: Request, res: Response): Promise<void> {
     try {
-      const options: ForumSearchOptions = {
-        query: req.query.search as string || req.query.query as string,
-        categoryId: req.query.categoryId as string || req.query.category as string,
-        authorId: req.query.authorId as string,
-        organizationId: req.query.organizationId as string,
-        tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
-        status: req.query.status as PostStatus,
-        page: parseInt(req.query.page as string) || 1,
-        limit: parseInt(req.query.limit as string) || 20,
-        sortBy: (req.query.sortBy as 'latest' | 'popular' | 'trending' | 'oldest') || 'latest',
-      };
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+      const skip = (page - 1) * limit;
 
-      const userRole = (req as any).user?.role || 'customer';
-      const result = await this.forumService.searchPosts(options, userRole);
+      const categoryId = req.query.categoryId as string || req.query.category as string;
+      const query = req.query.search as string || req.query.query as string;
+      const status = req.query.status as PostStatus;
+      const sortBy = (req.query.sortBy as string) || 'latest';
+
+      let queryBuilder = this.postRepository
+        .createQueryBuilder('post')
+        .leftJoinAndSelect('post.category', 'category')
+        .leftJoinAndSelect('post.author', 'author');
+
+      // Status filter
+      if (status) {
+        queryBuilder.where('post.status = :status', { status });
+      } else {
+        queryBuilder.where('post.status = :status', { status: PostStatus.PUBLISHED });
+      }
+
+      // Category filter
+      if (categoryId) {
+        queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
+      }
+
+      // Search filter
+      if (query) {
+        queryBuilder.andWhere(
+          '(post.title ILIKE :query OR post.content ILIKE :query)',
+          { query: `%${query}%` }
+        );
+      }
+
+      // Sorting
+      switch (sortBy) {
+        case 'popular':
+          queryBuilder.orderBy('post.viewCount', 'DESC');
+          break;
+        case 'oldest':
+          queryBuilder.orderBy('post.createdAt', 'ASC');
+          break;
+        case 'latest':
+        default:
+          queryBuilder
+            .orderBy('post.isPinned', 'DESC')
+            .addOrderBy('post.createdAt', 'DESC');
+          break;
+      }
+
+      // Pagination
+      queryBuilder.skip(skip).take(limit);
+
+      const [posts, totalCount] = await queryBuilder.getManyAndCount();
 
       res.json({
         success: true,
-        data: result.posts,
-        pagination: result.pagination,
-        totalCount: result.totalCount,
+        data: posts,
+        pagination: {
+          page,
+          limit,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+        totalCount,
       });
     } catch (error: any) {
       logger.error('Error listing forum posts:', error);
@@ -82,9 +137,11 @@ export class ForumController {
   async getPost(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id;
 
-      const post = await this.forumService.getPost(id, userId);
+      const post = await this.postRepository.findOne({
+        where: { id },
+        relations: ['category', 'author'],
+      });
 
       if (!post) {
         res.status(404).json({
@@ -123,24 +180,42 @@ export class ForumController {
         return;
       }
 
-      const postData = {
-        title: req.body.title,
-        content: req.body.content,
-        excerpt: req.body.excerpt,
-        categoryId: req.body.categoryId,
-        type: req.body.type,
-        tags: req.body.tags,
-        organizationId: req.body.organizationId,
-        isPinned: req.body.isPinned,
-        allowComments: req.body.allowComments !== false,
-        metadata: req.body.metadata,
-      };
+      const { title, content, excerpt, categoryId, type, tags, isPinned, allowComments, metadata } = req.body;
 
-      const post = await this.forumService.createPost(postData, userId);
+      // Generate slug from title
+      const slug = this.generateSlug(title);
+
+      // Check if category exists
+      const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
+      if (!category) {
+        res.status(400).json({
+          success: false,
+          error: 'Category not found',
+        });
+        return;
+      }
+
+      const post = this.postRepository.create({
+        title,
+        content,
+        excerpt,
+        categoryId,
+        type,
+        tags,
+        isPinned,
+        allowComments: allowComments !== false,
+        metadata,
+        authorId: userId,
+        slug,
+        status: category.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
+        publishedAt: category.requireApproval ? undefined : new Date(),
+      });
+
+      const savedPost = await this.postRepository.save(post);
 
       res.status(201).json({
         success: true,
-        data: post,
+        data: savedPost,
       });
     } catch (error: any) {
       logger.error('Error creating forum post:', error);
@@ -169,29 +244,7 @@ export class ForumController {
         return;
       }
 
-      const updateData = {
-        title: req.body.title,
-        content: req.body.content,
-        excerpt: req.body.excerpt,
-        categoryId: req.body.categoryId,
-        type: req.body.type,
-        status: req.body.status,
-        tags: req.body.tags,
-        isPinned: req.body.isPinned,
-        isLocked: req.body.isLocked,
-        allowComments: req.body.allowComments,
-        metadata: req.body.metadata,
-      };
-
-      // Remove undefined fields
-      Object.keys(updateData).forEach(key => {
-        if ((updateData as any)[key] === undefined) {
-          delete (updateData as any)[key];
-        }
-      });
-
-      const post = await this.forumService.updatePost(id, updateData, userId, userRole);
-
+      const post = await this.postRepository.findOne({ where: { id } });
       if (!post) {
         res.status(404).json({
           success: false,
@@ -200,21 +253,43 @@ export class ForumController {
         return;
       }
 
-      res.json({
-        success: true,
-        data: post,
-      });
-    } catch (error: any) {
-      logger.error('Error updating forum post:', error);
-
-      if (error.message?.includes('permission') || error.message?.includes('Permission')) {
+      // Check permission
+      if (!['admin', 'manager'].includes(userRole) && post.authorId !== userId) {
         res.status(403).json({
           success: false,
-          error: error.message,
+          error: 'Permission denied',
         });
         return;
       }
 
+      const { title, content, excerpt, categoryId, type, status, tags, isPinned, isLocked, allowComments, metadata } = req.body;
+
+      // Update slug if title changed
+      if (title && title !== post.title) {
+        post.slug = this.generateSlug(title);
+      }
+
+      // Update fields
+      if (title !== undefined) post.title = title;
+      if (content !== undefined) post.content = content;
+      if (excerpt !== undefined) post.excerpt = excerpt;
+      if (categoryId !== undefined) post.categoryId = categoryId;
+      if (type !== undefined) post.type = type;
+      if (status !== undefined) post.status = status;
+      if (tags !== undefined) post.tags = tags;
+      if (isPinned !== undefined) post.isPinned = isPinned;
+      if (isLocked !== undefined) post.isLocked = isLocked;
+      if (allowComments !== undefined) post.allowComments = allowComments;
+      if (metadata !== undefined) post.metadata = metadata;
+
+      const updatedPost = await this.postRepository.save(post);
+
+      res.json({
+        success: true,
+        data: updatedPost,
+      });
+    } catch (error: any) {
+      logger.error('Error updating forum post:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to update post',
@@ -240,14 +315,7 @@ export class ForumController {
         return;
       }
 
-      // Archive the post instead of hard delete
-      const post = await this.forumService.updatePost(
-        id,
-        { status: PostStatus.ARCHIVED },
-        userId,
-        userRole
-      );
-
+      const post = await this.postRepository.findOne({ where: { id } });
       if (!post) {
         res.status(404).json({
           success: false,
@@ -256,21 +324,25 @@ export class ForumController {
         return;
       }
 
+      // Check permission
+      if (!['admin', 'manager'].includes(userRole) && post.authorId !== userId) {
+        res.status(403).json({
+          success: false,
+          error: 'Permission denied',
+        });
+        return;
+      }
+
+      // Archive instead of hard delete
+      post.status = PostStatus.ARCHIVED;
+      await this.postRepository.save(post);
+
       res.json({
         success: true,
         message: 'Post deleted successfully',
       });
     } catch (error: any) {
       logger.error('Error deleting forum post:', error);
-
-      if (error.message?.includes('permission') || error.message?.includes('Permission')) {
-        res.status(403).json({
-          success: false,
-          error: error.message,
-        });
-        return;
-      }
-
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to delete post',
@@ -289,9 +361,13 @@ export class ForumController {
   async listCategories(req: Request, res: Response): Promise<void> {
     try {
       const includeInactive = req.query.includeInactive === 'true';
-      const organizationId = req.query.organizationId as string;
 
-      const categories = await this.forumService.getCategories(includeInactive, organizationId);
+      const where = includeInactive ? {} : { isActive: true };
+      const categories = await this.categoryRepository.find({
+        where,
+        order: { sortOrder: 'ASC', name: 'ASC' },
+        relations: ['creator'],
+      });
 
       res.json({
         success: true,
@@ -315,14 +391,16 @@ export class ForumController {
     try {
       const { id } = req.params;
 
-      // Try to find by slug first, then by ID
-      let category = await this.forumService.getCategoryBySlug(id);
+      // Try to find by ID
+      let category = await this.categoryRepository.findOne({
+        where: { id },
+        relations: ['creator'],
+      });
 
+      // If not found, try by slug
       if (!category) {
-        // Try by ID using repository directly
-        const categoryRepository = AppDataSource.getRepository(ForumCategory);
-        category = await categoryRepository.findOne({
-          where: { id },
+        category = await this.categoryRepository.findOne({
+          where: { slug: id },
           relations: ['creator'],
         });
       }
@@ -364,35 +442,30 @@ export class ForumController {
         return;
       }
 
-      const categoryData = {
-        name: req.body.name,
-        description: req.body.description,
-        color: req.body.color,
-        sortOrder: req.body.sortOrder || 0,
-        isActive: req.body.isActive !== false,
-        requireApproval: req.body.requireApproval || false,
-        accessLevel: req.body.accessLevel || 'all',
-        organizationId: req.body.organizationId,
-        isOrganizationExclusive: req.body.isOrganizationExclusive || false,
-      };
+      const { name, description, color, sortOrder, isActive, requireApproval, accessLevel } = req.body;
 
-      const category = await this.forumService.createCategory(categoryData, userId);
+      const slug = this.generateSlug(name);
+
+      const category = this.categoryRepository.create({
+        name,
+        description,
+        slug,
+        color,
+        sortOrder: sortOrder || 0,
+        isActive: isActive !== false,
+        requireApproval: requireApproval || false,
+        accessLevel: accessLevel || 'all',
+        createdBy: userId,
+      });
+
+      const savedCategory = await this.categoryRepository.save(category);
 
       res.status(201).json({
         success: true,
-        data: category,
+        data: savedCategory,
       });
     } catch (error: any) {
       logger.error('Error creating forum category:', error);
-
-      if (error.message?.includes('permission') || error.message?.includes('Permission')) {
-        res.status(403).json({
-          success: false,
-          error: error.message,
-        });
-        return;
-      }
-
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to create category',
@@ -417,25 +490,7 @@ export class ForumController {
         return;
       }
 
-      const updateData = {
-        name: req.body.name,
-        description: req.body.description,
-        color: req.body.color,
-        sortOrder: req.body.sortOrder,
-        isActive: req.body.isActive,
-        requireApproval: req.body.requireApproval,
-        accessLevel: req.body.accessLevel,
-      };
-
-      // Remove undefined fields
-      Object.keys(updateData).forEach(key => {
-        if ((updateData as any)[key] === undefined) {
-          delete (updateData as any)[key];
-        }
-      });
-
-      const category = await this.forumService.updateCategory(id, updateData);
-
+      const category = await this.categoryRepository.findOne({ where: { id } });
       if (!category) {
         res.status(404).json({
           success: false,
@@ -444,9 +499,27 @@ export class ForumController {
         return;
       }
 
+      const { name, description, color, sortOrder, isActive, requireApproval, accessLevel } = req.body;
+
+      // Update slug if name changed
+      if (name && name !== category.name) {
+        category.slug = this.generateSlug(name);
+      }
+
+      // Update fields
+      if (name !== undefined) category.name = name;
+      if (description !== undefined) category.description = description;
+      if (color !== undefined) category.color = color;
+      if (sortOrder !== undefined) category.sortOrder = sortOrder;
+      if (isActive !== undefined) category.isActive = isActive;
+      if (requireApproval !== undefined) category.requireApproval = requireApproval;
+      if (accessLevel !== undefined) category.accessLevel = accessLevel;
+
+      const updatedCategory = await this.categoryRepository.save(category);
+
       res.json({
         success: true,
-        data: category,
+        data: updatedCategory,
       });
     } catch (error: any) {
       logger.error('Error updating forum category:', error);
@@ -474,9 +547,7 @@ export class ForumController {
         return;
       }
 
-      // Deactivate instead of hard delete
-      const category = await this.forumService.updateCategory(id, { isActive: false });
-
+      const category = await this.categoryRepository.findOne({ where: { id } });
       if (!category) {
         res.status(404).json({
           success: false,
@@ -484,6 +555,10 @@ export class ForumController {
         });
         return;
       }
+
+      // Deactivate instead of hard delete
+      category.isActive = false;
+      await this.categoryRepository.save(category);
 
       res.json({
         success: true,
@@ -511,14 +586,28 @@ export class ForumController {
       const { postId } = req.params;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
+      const skip = (page - 1) * limit;
 
-      const result = await this.forumService.getComments(postId, page, limit);
+      const [comments, totalCount] = await this.commentRepository.findAndCount({
+        where: {
+          postId,
+          status: CommentStatus.PUBLISHED,
+        },
+        relations: ['author'],
+        order: { createdAt: 'ASC' },
+        skip,
+        take: limit,
+      });
 
       res.json({
         success: true,
-        data: result.comments,
-        pagination: result.pagination,
-        totalCount: result.totalCount,
+        data: comments,
+        pagination: {
+          page,
+          limit,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+        totalCount,
       });
     } catch (error: any) {
       logger.error('Error listing forum comments:', error);
@@ -545,29 +634,40 @@ export class ForumController {
         return;
       }
 
-      const commentData = {
-        postId: req.body.postId,
-        content: req.body.content,
-        parentId: req.body.parentId,
-      };
+      const { postId, content, parentId } = req.body;
 
-      const comment = await this.forumService.createComment(commentData, userId);
-
-      res.status(201).json({
-        success: true,
-        data: comment,
-      });
-    } catch (error: any) {
-      logger.error('Error creating forum comment:', error);
-
-      if (error.message?.includes('permission') || error.message?.includes('Permission')) {
-        res.status(403).json({
+      // Check if post exists
+      const post = await this.postRepository.findOne({ where: { id: postId } });
+      if (!post) {
+        res.status(400).json({
           success: false,
-          error: error.message,
+          error: 'Post not found',
         });
         return;
       }
 
+      const comment = this.commentRepository.create({
+        postId,
+        content,
+        parentId,
+        authorId: userId,
+        status: CommentStatus.PUBLISHED,
+      });
+
+      const savedComment = await this.commentRepository.save(comment);
+
+      // Update post comment count
+      post.commentCount = (post.commentCount || 0) + 1;
+      post.lastCommentAt = new Date();
+      post.lastCommentBy = userId;
+      await this.postRepository.save(post);
+
+      res.status(201).json({
+        success: true,
+        data: savedComment,
+      });
+    } catch (error: any) {
+      logger.error('Error creating forum comment:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to create comment',
@@ -585,11 +685,52 @@ export class ForumController {
    */
   async getStats(req: Request, res: Response): Promise<void> {
     try {
-      const stats = await this.forumService.getForumStatistics();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const [
+        totalPosts,
+        totalComments,
+        totalUsers,
+        todayPosts,
+        todayComments,
+        activeCategories,
+      ] = await Promise.all([
+        this.postRepository.count({ where: { status: PostStatus.PUBLISHED } }),
+        this.commentRepository.count({ where: { status: CommentStatus.PUBLISHED } }),
+        this.userRepository.count(),
+        this.postRepository.count({
+          where: {
+            status: PostStatus.PUBLISHED,
+            createdAt: MoreThanOrEqual(today),
+          },
+        }),
+        this.commentRepository.count({
+          where: {
+            status: CommentStatus.PUBLISHED,
+            createdAt: MoreThanOrEqual(today),
+          },
+        }),
+        this.categoryRepository.find({
+          where: { isActive: true },
+          order: { postCount: 'DESC' },
+          take: 10,
+        }),
+      ]);
 
       res.json({
         success: true,
-        data: stats,
+        data: {
+          totalPosts,
+          totalComments,
+          totalUsers,
+          todayPosts,
+          todayComments,
+          activeCategories: activeCategories.map(cat => ({
+            name: cat.name,
+            postCount: cat.postCount,
+          })),
+        },
       });
     } catch (error: any) {
       logger.error('Error getting forum stats:', error);
@@ -614,11 +755,8 @@ export class ForumController {
       const limit = parseInt(req.query.limit as string) || 20;
       const skip = (page - 1) * limit;
 
-      const postRepository = AppDataSource.getRepository(ForumPost);
-      const commentRepository = AppDataSource.getRepository(ForumComment);
-
       // Get pending posts
-      const [pendingPosts, pendingPostsCount] = await postRepository.findAndCount({
+      const [pendingPosts, pendingPostsCount] = await this.postRepository.findAndCount({
         where: { status: PostStatus.PENDING },
         relations: ['author', 'category'],
         order: { createdAt: 'ASC' },
@@ -627,7 +765,7 @@ export class ForumController {
       });
 
       // Get pending comments
-      const [pendingComments, pendingCommentsCount] = await commentRepository.findAndCount({
+      const [pendingComments, pendingCommentsCount] = await this.commentRepository.findAndCount({
         where: { status: CommentStatus.PENDING },
         relations: ['author'],
         order: { createdAt: 'ASC' },
@@ -668,7 +806,7 @@ export class ForumController {
   async moderateContent(req: Request, res: Response): Promise<void> {
     try {
       const { type, id } = req.params;
-      const { action, reason } = req.body; // action: 'approve' | 'reject'
+      const { action } = req.body; // action: 'approve' | 'reject'
       const userId = (req as any).user?.id;
       const userRole = (req as any).user?.role;
 
@@ -698,17 +836,7 @@ export class ForumController {
       }
 
       if (type === 'post') {
-        const newStatus = action === 'approve' ? PostStatus.PUBLISHED : PostStatus.REJECTED;
-        const post = await this.forumService.updatePost(
-          id,
-          {
-            status: newStatus,
-            ...(action === 'approve' ? { publishedAt: new Date() } : {}),
-          },
-          userId,
-          userRole
-        );
-
+        const post = await this.postRepository.findOne({ where: { id } });
         if (!post) {
           res.status(404).json({
             success: false,
@@ -717,15 +845,20 @@ export class ForumController {
           return;
         }
 
+        post.status = action === 'approve' ? PostStatus.PUBLISHED : PostStatus.REJECTED;
+        if (action === 'approve') {
+          post.publishedAt = new Date();
+        }
+
+        await this.postRepository.save(post);
+
         res.json({
           success: true,
           data: post,
           message: `Post ${action}d successfully`,
         });
       } else if (type === 'comment') {
-        const commentRepository = AppDataSource.getRepository(ForumComment);
-        const comment = await commentRepository.findOne({ where: { id } });
-
+        const comment = await this.commentRepository.findOne({ where: { id } });
         if (!comment) {
           res.status(404).json({
             success: false,
@@ -734,17 +867,12 @@ export class ForumController {
           return;
         }
 
-        const newStatus = action === 'approve' ? CommentStatus.PUBLISHED : CommentStatus.REJECTED;
-        await commentRepository.update(id, { status: newStatus });
-
-        const updatedComment = await commentRepository.findOne({
-          where: { id },
-          relations: ['author'],
-        });
+        comment.status = action === 'approve' ? CommentStatus.PUBLISHED : CommentStatus.DELETED;
+        await this.commentRepository.save(comment);
 
         res.json({
           success: true,
-          data: updatedComment,
+          data: comment,
           message: `Comment ${action}d successfully`,
         });
       } else {
@@ -760,6 +888,23 @@ export class ForumController {
         error: error.message || 'Failed to moderate content',
       });
     }
+  }
+
+  // ============================================================================
+  // Helper Methods
+  // ============================================================================
+
+  private generateSlug(text: string): string {
+    const timestamp = Date.now().toString(36);
+    const baseSlug = text
+      .toLowerCase()
+      .replace(/[^a-z0-9가-힣\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 180);
+
+    return `${baseSlug}-${timestamp}`;
   }
 }
 
