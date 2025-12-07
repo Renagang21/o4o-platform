@@ -268,9 +268,10 @@ export class ModuleLoader {
    * Get module router
    *
    * @param moduleId - Module ID
+   * @param dataSource - Optional TypeORM DataSource for route factories
    * @returns Express Router or null
    */
-  getModuleRouter(moduleId: string): Router | null {
+  getModuleRouter(moduleId: string, dataSource?: any): Router | null {
     const entry = this.registry.get(moduleId);
 
     if (!entry || entry.status !== 'active') {
@@ -281,7 +282,14 @@ export class ModuleLoader {
 
     if (module.backend?.routes) {
       try {
-        return module.backend.routes();
+        // Support both patterns:
+        // 1. routes() => Router (simple function)
+        // 2. routes(dataSource) => Router (factory pattern)
+        if (dataSource) {
+          return module.backend.routes(dataSource);
+        } else {
+          return module.backend.routes();
+        }
       } catch (error) {
         logger.error(`[ModuleLoader] Failed to get router for ${moduleId}:`, error);
         return null;

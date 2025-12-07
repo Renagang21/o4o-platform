@@ -31,8 +31,8 @@ export interface AppModule {
 
   /** Backend exports (routes, services, entities, middleware) */
   backend?: {
-    /** Express router factory */
-    routes?: () => Router;
+    /** Express router factory (optionally accepts DataSource) */
+    routes?: (dataSource?: any) => Router;
 
     /** Service exports (injectable services) */
     services?: Record<string, any>;

@@ -45,6 +45,7 @@ import { setupSwagger } from './config/swagger-enhanced.js';
 
 // Module Loader (Phase 5 — AppStore + Module Loader)
 import { moduleLoader } from './modules/module-loader.js';
+import { AppDataSource } from './database/connection.js';
 
 const app: Application = express();
 
@@ -389,7 +390,7 @@ const startServer = async () => {
     // 3. Register dynamic routes from activated modules
     const routesRegistered: string[] = [];
     for (const moduleId of loadedModules) {
-      const router = moduleLoader.getModuleRouter(moduleId);
+      const router = moduleLoader.getModuleRouter(moduleId, AppDataSource);
       if (router) {
         const basePath = `/api/v1/${moduleId}`;
         app.use(basePath, router);
