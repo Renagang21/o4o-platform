@@ -2,10 +2,23 @@ import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class CreateCMSTablesV2_1733302800000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Check if tables already exist
+    const customPostTypesExists = await queryRunner.hasTable('custom_post_types');
+    const customFieldsExists = await queryRunner.hasTable('custom_fields');
+    const viewsExists = await queryRunner.hasTable('views');
+    const pagesExists = await queryRunner.hasTable('pages');
+
+    // If all tables exist, skip migration
+    if (customPostTypesExists && customFieldsExists && viewsExists && pagesExists) {
+      console.log('⏭️  Skipping migration: CMS tables already exist');
+      return;
+    }
+
     // ========================================
     // 1. CREATE custom_post_types TABLE
     // ========================================
-    await queryRunner.createTable(
+    if (!customPostTypesExists) {
+      await queryRunner.createTable(
       new Table({
         name: 'custom_post_types',
         columns: [
@@ -74,27 +87,29 @@ export class CreateCMSTablesV2_1733302800000 implements MigrationInterface {
       true
     );
 
-    await queryRunner.createIndex(
-      'custom_post_types',
-      new TableIndex({
-        name: 'IDX_custom_post_types_slug',
-        columnNames: ['slug'],
-        isUnique: true
-      })
-    );
+      await queryRunner.createIndex(
+        'custom_post_types',
+        new TableIndex({
+          name: 'IDX_custom_post_types_slug',
+          columnNames: ['slug'],
+          isUnique: true
+        })
+      );
 
-    await queryRunner.createIndex(
-      'custom_post_types',
-      new TableIndex({
-        name: 'IDX_custom_post_types_status',
-        columnNames: ['status']
-      })
-    );
+      await queryRunner.createIndex(
+        'custom_post_types',
+        new TableIndex({
+          name: 'IDX_custom_post_types_status',
+          columnNames: ['status']
+        })
+      );
+    }
 
     // ========================================
     // 2. CREATE custom_fields TABLE
     // ========================================
-    await queryRunner.createTable(
+    if (!customFieldsExists) {
+      await queryRunner.createTable(
       new Table({
         name: 'custom_fields',
         columns: [
@@ -181,34 +196,36 @@ export class CreateCMSTablesV2_1733302800000 implements MigrationInterface {
       true
     );
 
-    await queryRunner.createIndex(
-      'custom_fields',
-      new TableIndex({
-        name: 'IDX_custom_fields_post_type',
-        columnNames: ['postTypeId']
-      })
-    );
+      await queryRunner.createIndex(
+        'custom_fields',
+        new TableIndex({
+          name: 'IDX_custom_fields_post_type',
+          columnNames: ['postTypeId']
+        })
+      );
 
-    await queryRunner.createIndex(
-      'custom_fields',
-      new TableIndex({
-        name: 'IDX_custom_fields_type',
-        columnNames: ['type']
-      })
-    );
+      await queryRunner.createIndex(
+        'custom_fields',
+        new TableIndex({
+          name: 'IDX_custom_fields_type',
+          columnNames: ['type']
+        })
+      );
 
-    await queryRunner.createIndex(
-      'custom_fields',
-      new TableIndex({
-        name: 'IDX_custom_fields_group',
-        columnNames: ['groupName']
-      })
-    );
+      await queryRunner.createIndex(
+        'custom_fields',
+        new TableIndex({
+          name: 'IDX_custom_fields_group',
+          columnNames: ['groupName']
+        })
+      );
+    }
 
     // ========================================
     // 3. CREATE views TABLE
     // ========================================
-    await queryRunner.createTable(
+    if (!viewsExists) {
+      await queryRunner.createTable(
       new Table({
         name: 'views',
         columns: [
@@ -277,27 +294,29 @@ export class CreateCMSTablesV2_1733302800000 implements MigrationInterface {
       true
     );
 
-    await queryRunner.createIndex(
-      'views',
-      new TableIndex({
-        name: 'IDX_views_slug',
-        columnNames: ['slug'],
-        isUnique: true
-      })
-    );
+      await queryRunner.createIndex(
+        'views',
+        new TableIndex({
+          name: 'IDX_views_slug',
+          columnNames: ['slug'],
+          isUnique: true
+        })
+      );
 
-    await queryRunner.createIndex(
-      'views',
-      new TableIndex({
-        name: 'IDX_views_status',
-        columnNames: ['status']
-      })
-    );
+      await queryRunner.createIndex(
+        'views',
+        new TableIndex({
+          name: 'IDX_views_status',
+          columnNames: ['status']
+        })
+      );
+    }
 
     // ========================================
     // 4. CREATE pages TABLE
     // ========================================
-    await queryRunner.createTable(
+    if (!pagesExists) {
+      await queryRunner.createTable(
       new Table({
         name: 'pages',
         columns: [
@@ -406,46 +425,47 @@ export class CreateCMSTablesV2_1733302800000 implements MigrationInterface {
       true
     );
 
-    await queryRunner.createIndex(
-      'pages',
-      new TableIndex({
-        name: 'IDX_pages_slug',
-        columnNames: ['slug'],
-        isUnique: true
-      })
-    );
+      await queryRunner.createIndex(
+        'pages',
+        new TableIndex({
+          name: 'IDX_pages_slug',
+          columnNames: ['slug'],
+          isUnique: true
+        })
+      );
 
-    await queryRunner.createIndex(
-      'pages',
-      new TableIndex({
-        name: 'IDX_pages_status',
-        columnNames: ['status']
-      })
-    );
+      await queryRunner.createIndex(
+        'pages',
+        new TableIndex({
+          name: 'IDX_pages_status',
+          columnNames: ['status']
+        })
+      );
 
-    await queryRunner.createIndex(
-      'pages',
-      new TableIndex({
-        name: 'IDX_pages_view',
-        columnNames: ['viewId']
-      })
-    );
+      await queryRunner.createIndex(
+        'pages',
+        new TableIndex({
+          name: 'IDX_pages_view',
+          columnNames: ['viewId']
+        })
+      );
 
-    await queryRunner.createIndex(
-      'pages',
-      new TableIndex({
-        name: 'IDX_pages_published',
-        columnNames: ['publishedAt']
-      })
-    );
+      await queryRunner.createIndex(
+        'pages',
+        new TableIndex({
+          name: 'IDX_pages_published',
+          columnNames: ['publishedAt']
+        })
+      );
 
-    await queryRunner.createIndex(
-      'pages',
-      new TableIndex({
-        name: 'IDX_pages_scheduled',
-        columnNames: ['scheduledAt']
-      })
-    );
+      await queryRunner.createIndex(
+        'pages',
+        new TableIndex({
+          name: 'IDX_pages_scheduled',
+          columnNames: ['scheduledAt']
+        })
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

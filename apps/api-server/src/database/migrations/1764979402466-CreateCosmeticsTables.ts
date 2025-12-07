@@ -3,8 +3,32 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 export class CreateCosmeticsTables1764979402466 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create cosmetics_filters table
-        await queryRunner.query(`
+        // Check if tables already exist
+        const filtersTableExists = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = 'cosmetics_filters'
+            )
+        `);
+
+        const routinesTableExists = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = 'cosmetics_routines'
+            )
+        `);
+
+        // Skip migration if tables already exist
+        if (filtersTableExists[0].exists && routinesTableExists[0].exists) {
+            console.log('⏭️  Skipping migration: Cosmetics tables already exist');
+            return;
+        }
+
+        // Create cosmetics_filters table if it doesn't exist
+        if (!filtersTableExists[0].exists) {
+            await queryRunner.query(`
             CREATE TABLE "cosmetics_filters" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "name" character varying NOT NULL,
@@ -16,10 +40,12 @@ export class CreateCosmeticsTables1764979402466 implements MigrationInterface {
                 CONSTRAINT "PK_cosmetics_filters" PRIMARY KEY ("id"),
                 CONSTRAINT "UQ_cosmetics_filters_name" UNIQUE ("name")
             )
-        `);
+            `);
+        }
 
-        // Create cosmetics_routines table
-        await queryRunner.query(`
+        // Create cosmetics_routines table if it doesn't exist
+        if (!routinesTableExists[0].exists) {
+            await queryRunner.query(`
             CREATE TABLE "cosmetics_routines" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "partnerId" character varying NOT NULL,
@@ -34,16 +60,17 @@ export class CreateCosmeticsTables1764979402466 implements MigrationInterface {
                 "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "PK_cosmetics_routines" PRIMARY KEY ("id")
             )
-        `);
+            `);
 
-        // Create indexes for cosmetics_routines
-        await queryRunner.query(`
-            CREATE INDEX "IDX_cosmetics_routines_partnerId" ON "cosmetics_routines" ("partnerId")
-        `);
+            // Create indexes for cosmetics_routines
+            await queryRunner.query(`
+                CREATE INDEX "IDX_cosmetics_routines_partnerId" ON "cosmetics_routines" ("partnerId")
+            `);
 
-        await queryRunner.query(`
-            CREATE INDEX "IDX_cosmetics_routines_isPublished" ON "cosmetics_routines" ("isPublished")
-        `);
+            await queryRunner.query(`
+                CREATE INDEX "IDX_cosmetics_routines_isPublished" ON "cosmetics_routines" ("isPublished")
+            `);
+        }
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
