@@ -48,6 +48,9 @@ import { ViewList } from '@/components/ui/cms/ViewList';
 import { ViewForm } from '@/components/ui/cms/ViewForm';
 import { ViewEditor } from '@/components/ui/cms/ViewEditor';
 
+// CMS Block Components
+import { TextBlock } from '@/components/ui/cms/blocks/Text';
+
 // Digital Signage UI Components
 import { SignageGrid } from '@o4o-apps/signage/ui/SignageGrid';
 import { SignagePlayer } from '@o4o-apps/signage/ui/SignagePlayer';
@@ -132,6 +135,8 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   ViewList,
   ViewForm,
   ViewEditor,
+  // CMS Blocks
+  Text: TextBlock,
   // Digital Signage
   SignageGrid,
   SignagePlayer,
