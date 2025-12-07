@@ -41,8 +41,9 @@ export default function ViewPreview() {
         setError(null);
 
         // Fetch view from Main Site API
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-        const response = await fetch(`${apiUrl}/api/v1/cms/public/view/${slug}`, {
+        // Use VITE_API_BASE_URL (without /api/v1 suffix) to avoid duplication
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        const response = await fetch(`${apiBaseUrl}/api/v1/cms/public/view/${slug}`, {
           headers: { 'Accept': 'application/json' },
         });
 
