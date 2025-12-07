@@ -88,6 +88,7 @@
     "@o4o-apps/forum": "workspace:*",
     "@o4o-apps/forum-neture": "workspace:*",
     "@o4o-apps/forum-yaksa": "workspace:*",
+    "@o4o-extensions/organization-forum": "workspace:*",
     "@o4o/auth-client": "workspace:*",
     "@o4o/block-renderer": "workspace:*",
     "@o4o/cpt-registry": "workspace:*",

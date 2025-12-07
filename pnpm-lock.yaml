@@ -638,6 +638,9 @@ importers:
       '@o4o-apps/forum-yaksa':
         specifier: workspace:*
         version: link:../../packages/forum-yaksa
+      '@o4o-extensions/organization-forum':
+        specifier: workspace:*
+        version: link:../../packages/organization-forum
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client

@@ -4,6 +4,7 @@ import { forumNetureManifest } from '@o4o-apps/forum-neture';
 import { manifest as lmsCoreManifest } from '@o4o/lms-core';
 import { manifest as organizationCoreManifest } from '@o4o/organization-core';
 import { manifest as organizationForumManifest } from '@o4o-extensions/organization-forum';
+import { dropshippingCoreManifest } from './dropshipping-core.manifest.js';
 
 /**
  * App Manifest Registry
@@ -19,6 +20,7 @@ const manifestRegistry: Record<string, AppManifest> = {
   'lms-core': lmsCoreManifest as any,
   'organization-core': organizationCoreManifest as any,
   'organization-forum': organizationForumManifest as any,
+  'dropshipping-core': dropshippingCoreManifest as any,
 };
 
 /**
